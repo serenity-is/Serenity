@@ -49,7 +49,8 @@ namespace Serenity.Web
                         script = (LookupScript)Activator.CreateInstance(type);
                     }
 
-                    script.LookupKey = attr.Key;
+                    script.LookupKey = attr.Key ??
+                        LookupScriptAttribute.AutoLookupKeyFor(type);
 
                     Type otherType;
                     if (registeredType.TryGetValue(script.LookupKey, out otherType))

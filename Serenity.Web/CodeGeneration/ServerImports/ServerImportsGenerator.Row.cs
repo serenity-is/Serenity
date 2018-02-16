@@ -68,14 +68,15 @@ namespace Serenity.CodeGeneration
             if (lookupAttr != null)
             {
                 cw.Indented("[InlineConstant] public const string LookupKey = \"");
-                sb.Append(lookupAttr.Key);
+                sb.Append(lookupAttr.Key ??
+                    LookupScriptAttribute.AutoLookupKeyFor(rowType));
                 sb.AppendLine("\";");
 
                 sb.AppendLine();
                 cw.Indented("public static Lookup<");
                 MakeFriendlyName(rowType, codeNamespace, null);
                 sb.Append("> Lookup { [InlineCode(\"Q.getLookup('");
-                sb.Append(lookupAttr.Key);
+                sb.Append(lookupAttr.Key ?? LookupScriptAttribute.AutoLookupKeyFor(rowType));
                 sb.AppendLine("')\")] get { return null; } }");
 
                 anyMetadata = true;

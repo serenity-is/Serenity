@@ -80,19 +80,40 @@ namespace Serenity.CodeGeneration
             return null;
         }
 
+        private string DetermineModuleIdentifier(TypeDefinition rowType)
+        {
+            var moduleAttr = CecilUtils.GetAttr(rowType, "Serenity.ComponentModel", "ModuleAttribute");
+            if (moduleAttr != null)
+                return moduleAttr.ConstructorArguments[0].Value as string;
+
+            var ns = rowType.Namespace ?? "";
+
+            if (ns.EndsWith(".Entities"))
+                ns = ns.Substring(0, ns.Length - 9);
+
+            var idx = ns.IndexOf(".");
+            if (idx >= 0)
+                ns = ns.Substring(idx + 1);
+
+            return ns;
+        }
+
+        private string DetermineRowIdentifier(TypeDefinition rowType)
+        {
+            var name = rowType.Name;
+            if (name.EndsWith("Row"))
+                name = name.Substring(0, name.Length - 3);
+
+            var moduleIdentifier = DetermineModuleIdentifier(rowType);
+            return string.IsNullOrEmpty(moduleIdentifier) ? name : 
+                moduleIdentifier + "." + name;
+        }
+
         private string DetermineLocalTextPrefix(TypeDefinition rowType)
         {
             string localTextPrefix = null;
-            var attr = CecilUtils.GetAttr(rowType, "Serenity.ComponentModel", "LocalTextPrefix");
-            if (attr != null)
-            {
-                localTextPrefix = attr.ConstructorArguments[0].Value as string;
-                if (!string.IsNullOrEmpty(localTextPrefix))
-                    return localTextPrefix;
-            }
-
             var fieldsType = rowType.NestedTypes.FirstOrDefault(x =>
-                CecilUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
+                            CecilUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
 
             if (fieldsType != null)
             {
@@ -110,22 +131,108 @@ namespace Serenity.CodeGeneration
                 if (localTextPrefix != null)
                     return localTextPrefix;
             }
+            
+            var ltp = CecilUtils.GetAttr(rowType, "Serenity.ComponentModel", "LocalTextPrefixAttribute");
+            if (ltp != null)
+            {
+                localTextPrefix = ltp.ConstructorArguments[0].Value as string;
+                if (!string.IsNullOrEmpty(localTextPrefix))
+                    return localTextPrefix;
+            }
 
-            var parts = (rowType.Namespace ?? "").Split('.') as IEnumerable<string>;
-            if (!parts.Any())
-                return null;
+            return DetermineRowIdentifier(rowType);
+        }
 
-            if (parts.Last() == "Entities")
-                parts = parts.Take(parts.Count() - 1);
+        private string AutoLookupKeyFor(TypeDefinition type)
+        {
+            string module;
+            var moduleAttr = CecilUtils.GetAttr(type,
+                "Serenity.ComponentModel", "ModuleAttribute");
+            if (moduleAttr != null)
+            {
+                if (moduleAttr.ConstructorArguments.Count == 1 &&
+                    moduleAttr.ConstructorArguments[0].Type.FullName == "System.String")
+                    module = moduleAttr.ConstructorArguments[0].Value as string;
+                else
+                    module = null;
+            }
+            else
+            {
+                module = type.Namespace ?? "";
 
-            if (parts.Count() > 1)
-                parts = parts.Skip(1);
+                if (module.EndsWith(".Entities"))
+                    module = module.Substring(0, module.Length - 9);
+                else if (module.EndsWith(".Scripts"))
+                    module = module.Substring(0, module.Length - 8);
+                else if (module.EndsWith(".Lookups"))
+                    module = module.Substring(0, module.Length - 8);
 
-            var name = rowType.Name;
+                var idx = module.IndexOf(".");
+                if (idx >= 0)
+                    module = module.Substring(idx + 1);
+            }
+
+            var name = type.Name;
             if (name.EndsWith("Row"))
                 name = name.Substring(0, name.Length - 3);
+            else if (name.EndsWith("Lookup"))
+                name = name.Substring(0, name.Length - 6);
 
-            return string.Join(".", parts) + "." + name;
+            return string.IsNullOrEmpty(module) ? name :
+                module + "." + name;
+        }
+
+        public string DetermineLookupKey(TypeDefinition rowType)
+        {
+            var lookupAttr = CecilUtils.GetAttr(rowType, 
+                "Serenity.ComponentModel", "LookupScriptAttribute");
+
+            TypeDefinition autoFrom = rowType;
+            if (lookupAttr == null)
+            {
+                var script = lookupScripts.FirstOrDefault(x =>
+                    x.BaseType != null &&
+                    x.BaseType is GenericInstanceType &&
+                    (x.BaseType as GenericInstanceType).GenericArguments.Any(z =>
+                        z.Name == rowType.Name && z.Namespace == rowType.Namespace));
+
+                if (script != null)
+                    lookupAttr = CecilUtils.GetAttr(script, "Serenity.ComponentModel", 
+                        "LookupScriptAttribute");
+            }
+            else if (lookupAttr.ConstructorArguments.Count > 0 &&
+                lookupAttr.ConstructorArguments[0].Type.FullName == "System.Type")
+            {
+                autoFrom = ((TypeReference)lookupAttr.ConstructorArguments[0].Value).Resolve();
+                lookupAttr = CecilUtils.GetAttr(autoFrom, 
+                    "Serenity.ComponentModel", "LookupScriptAttribute");
+            }
+
+            if (lookupAttr == null)
+                return null;
+
+            if (lookupAttr.ConstructorArguments.Count == 1 &&
+                lookupAttr.ConstructorArguments[0].Type.FullName == "System.String")
+                return lookupAttr.ConstructorArguments[0].Value as string;
+
+            if (lookupAttr.ConstructorArguments.Count == 1 &&
+                lookupAttr.ConstructorArguments[0].Type.FullName == "System.Type")
+            {
+                return AutoLookupKeyFor(
+                    (lookupAttr.ConstructorArguments[0].Value as TypeReference).Resolve());
+            }
+
+            if (lookupAttr.ConstructorArguments.Count == 1 &&
+                lookupAttr.ConstructorArguments[0].Type.FullName == "System.Type")
+            {
+                return AutoLookupKeyFor(
+                    (lookupAttr.ConstructorArguments[0].Value as TypeReference).Resolve());
+            }
+
+            if (lookupAttr.ConstructorArguments.Count == 0)
+                return AutoLookupKeyFor(autoFrom);
+
+            return null;
         }
 
         private void GenerateRowMetadata(TypeDefinition rowType)
@@ -143,24 +250,7 @@ namespace Serenity.CodeGeneration
                 "Serenity.Data.Int16Field", "IsActiveField", 
                 "Serenity.Data.Int16Field Serenity.Data.IIsActiveRow::get_IsActiveField()");
 
-            var lookupAttr = CecilUtils.GetAttr(rowType, "Serenity.ComponentModel", "LookupScriptAttribute");
-            if (lookupAttr == null)
-            {
-                var script = lookupScripts.FirstOrDefault(x =>
-                    x.BaseType != null &&
-                    x.BaseType is GenericInstanceType &&
-                    (x.BaseType as GenericInstanceType).GenericArguments.Any(z =>
-                        z.Name == rowType.Name && z.Namespace == rowType.Namespace));
-
-                if (script != null)
-                    lookupAttr = CecilUtils.GetAttr(script, "Serenity.ComponentModel", "LookupScriptAttribute");
-            }
-            else if (lookupAttr.ConstructorArguments.Count > 0 &&
-                lookupAttr.ConstructorArguments[0].Type.FullName == "System.Type")
-            {
-                lookupAttr = CecilUtils.GetAttr(((TypeReference)lookupAttr.ConstructorArguments[0].Value).Resolve(), 
-                    "Serenity.ComponentModel", "LookupScriptAttribute");
-            }
+            var lookupKey = DetermineLookupKey(rowType);
 
             sb.AppendLine();
             cw.Indented("export namespace ");
@@ -203,10 +293,8 @@ namespace Serenity.CodeGeneration
                     anyMetadata = true;
                 }
 
-                if (lookupAttr != null && lookupAttr.ConstructorArguments.Count > 0 && 
-                    lookupAttr.ConstructorArguments[0].Type.FullName == "System.String")
+                if (!string.IsNullOrEmpty(lookupKey))
                 {
-                    var lookupKey = lookupAttr.ConstructorArguments[0].Value as string;
                     cw.Indented("export const lookupKey = '");
                     sb.Append(lookupKey);
                     sb.AppendLine("';");

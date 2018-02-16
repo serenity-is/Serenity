@@ -456,7 +456,8 @@ namespace Serenity.ComponentModel
                     lookupType.FullName), "lookupType");
             }
 
-            SetOption("lookupKey", attr.Key);
+            SetOption("lookupKey", attr.Key ??
+                LookupScriptAttribute.AutoLookupKeyFor(lookupType));
         }
     }
 
@@ -488,7 +489,8 @@ namespace Serenity.ComponentModel
                     lookupType.FullName), "lookupType");
             }
 
-            SetOption("lookupKey", attr.Key);
+            SetOption("lookupKey", attr.Key ??
+                LookupScriptAttribute.AutoLookupKeyFor(lookupType));
         }
 
         /// <summary>
@@ -601,7 +603,8 @@ namespace Serenity.ComponentModel
                     lookupType.FullName), "lookupType");
             }
 
-            SetOption("lookupKey", attr.Key);
+            SetOption("lookupKey", attr.Key ??
+                LookupScriptAttribute.AutoLookupKeyFor(lookupType));
         }
 
         public string LookupKey
@@ -753,7 +756,7 @@ namespace Serenity.ComponentModel
                     enumOrLookupType.FullName), "lookupType");
             }
 
-            LookupKey = lk.Key;
+            LookupKey = lk.Key ?? LookupScriptAttribute.AutoLookupKeyFor(enumOrLookupType);
         }
 
         public RadioButtonEditorAttribute()

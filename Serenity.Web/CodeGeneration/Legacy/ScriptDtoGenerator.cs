@@ -508,15 +508,16 @@ namespace Serenity.CodeGeneration
 
             if (attr != null)
             {
+                var lookupKey = attr.Key ?? LookupScriptAttribute.AutoLookupKeyFor(rowType);
                 cw.Indented("[InlineConstant] public const string LookupKey = \"");
-                sb.Append(attr.Key);
+                sb.Append(lookupKey);
                 sb.AppendLine("\";");
 
                 sb.AppendLine();
                 cw.Indented("public static Lookup<");
                 sb.Append(MakeFriendlyName(rowType, null, null));
                 sb.Append("> Lookup { [InlineCode(\"Q.getLookup('");
-                sb.Append(attr.Key);
+                sb.Append(lookupKey);
                 sb.AppendLine("')\")] get { return null; } }");
 
                 anyMetadata = true;

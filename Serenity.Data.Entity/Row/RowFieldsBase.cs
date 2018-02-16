@@ -153,7 +153,7 @@ namespace Serenity.Data
                 this.moduleIdentifier = moduleAttr.Value;
             else
             {
-                var ns = rowType.Namespace;
+                var ns = rowType.Namespace ?? "";
 
                 if (ns.EndsWith(".Entities"))
                     ns = ns.Substring(0, ns.Length - 9);

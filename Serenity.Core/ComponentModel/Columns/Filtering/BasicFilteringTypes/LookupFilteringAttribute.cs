@@ -18,7 +18,8 @@ namespace Serenity.ComponentModel
             if (attr == null)
                 throw new ArgumentOutOfRangeException("lookupType");
 
-            SetOption("lookupKey", attr.Key);
+            SetOption("lookupKey", attr.Key ?? 
+                LookupScriptAttribute.AutoLookupKeyFor(lookupType));
         }
 
         public String IdField

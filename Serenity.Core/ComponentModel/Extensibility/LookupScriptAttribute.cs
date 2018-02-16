@@ -6,17 +6,76 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Placed on rows / or custom lookup classes to denote
     /// it has a lookup script.
+    /// When placed on a row class, lookup scripts only transfer ID 
+    /// and Name fields by default to client side for 
+    /// security / performance reasons. Make sure you add 
+    /// [LookupInclude] attribute to properties you'll need to
+    /// access from script.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class LookupScriptAttribute : Attribute
     {
+        /// <summary>
+        /// Creates a LookupScriptAttribute with auto determined lookup key
+        /// </summary>
+        public LookupScriptAttribute()
+        {
+        }
+
         /// <summary>
         /// Creates a LookupScriptAttribute.
         /// </summary>
         /// <param name="key">Lookup key, usually in "Module.EntityName" format.</param>
         public LookupScriptAttribute(string key)
         {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException("lookupKey");
+
             this.Key = key;
+        }
+
+        /// <summary>
+        /// When lookup key is null, e.g. default constructor is used, this method
+        /// tries to determine the lookup key by looking at the type this attribute 
+        /// is placed on. This is a combination of module identifier and type name.
+        /// If type has a [Module] attribute it is used, otherwise module identifier
+        /// is determined from namespace, by removing ".Entities", ".Scripts", ".Lookups"
+        /// common suffixes and the root namespace (e.g. the first part of namespace 
+        /// before the first dot). Type name is determined from class type name, with
+        /// common suffixes like "Row" or "Lookup" removed.
+        /// </summary>
+        /// <param name="type">Type to generate a lookup key for</param>
+        /// <returns>Auto generated lookup key</returns>
+        public static string AutoLookupKeyFor(Type type)
+        {
+            string module;
+            var moduleAttr = type.GetCustomAttribute<ModuleAttribute>(true);
+            if (moduleAttr != null)
+                module = moduleAttr.Value;
+            else
+            {
+                module = type.Namespace ?? "";
+
+                if (module.EndsWith(".Entities"))
+                    module = module.Substring(0, module.Length - 9);
+                else if (module.EndsWith(".Scripts"))
+                    module = module.Substring(0, module.Length - 8);
+                else if (module.EndsWith(".Lookups"))
+                    module = module.Substring(0, module.Length - 8);
+
+                var idx = module.IndexOf(".");
+                if (idx >= 0)
+                    module = module.Substring(idx + 1);
+            }
+
+            var name = type.Name;
+            if (name.EndsWith("Row"))
+                name = name.Substring(0, name.Length - 3);
+            else if (name.EndsWith("Lookup"))
+                name = name.Substring(0, name.Length - 6);
+
+            return string.IsNullOrEmpty(module) ? name :
+                module + "." + name;
         }
 
         /// <summary>
@@ -36,7 +95,7 @@ namespace Serenity.ComponentModel
                     "Type {0} is specified as lookup type in a LookupScript attribute, " + 
                     "but it has not LookupScript attribute itself.", lookupType.FullName));
 
-            this.Key = attr.Key;
+            this.Key = attr.Key ?? AutoLookupKeyFor(lookupType);
             this.LookupType = lookupType;
         }
 
