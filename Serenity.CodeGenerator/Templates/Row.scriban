@@ -10,7 +10,7 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
     using System.IO;
 
     [ConnectionKey("{{ConnectionKey}}"), TableName("{{SchemaAndTable}}")]
-    [DisplayName("{{Title}}"), InstanceName("{{Title}}"), TwoLevelCached]
+    [DisplayName("{{Title}}"), InstanceName("{{Title}}")]]
     [ReadPermission("{{Permission}}")]
     [ModifyPermission("{{Permission}}")]
     public sealed class {{RowClassName}} : {{RowBaseClassAndInterfaces}}
