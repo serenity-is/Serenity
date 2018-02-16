@@ -194,11 +194,15 @@ namespace Serenity.CodeGeneration
                     x.BaseType != null &&
                     x.BaseType is GenericInstanceType &&
                     (x.BaseType as GenericInstanceType).GenericArguments.Any(z =>
-                        z.Name == rowType.Name && z.Namespace == rowType.Namespace));
+                        z.Name == rowType.Name && z.Namespace == rowType.Namespace) &&
+                    DetermineLookupKey(x) == AutoLookupKeyFor(rowType));
 
                 if (script != null)
-                    lookupAttr = CecilUtils.GetAttr(script, "Serenity.ComponentModel", 
+                {
+                    lookupAttr = CecilUtils.GetAttr(script, "Serenity.ComponentModel",
                         "LookupScriptAttribute");
+                    autoFrom = script;
+                }
             }
             else if (lookupAttr.ConstructorArguments.Count > 0 &&
                 lookupAttr.ConstructorArguments[0].Type.FullName == "System.Type")
