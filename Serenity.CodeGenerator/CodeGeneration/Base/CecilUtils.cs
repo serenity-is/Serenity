@@ -127,7 +127,7 @@ namespace Serenity.Reflection
 
 #if COREFX
             var resolver = ICSharpCode.Decompiler.UniversalAssemblyResolver
-                .LoadMainModule(assemblyLocations.First()).AssemblyResolver
+                .LoadMainModule(assemblyLocations.First(), inMemory: true).AssemblyResolver
                     as ICSharpCode.Decompiler.UniversalAssemblyResolver;
 #else
             var resolver = new Mono.Cecil.DefaultAssemblyResolver();
@@ -139,7 +139,11 @@ namespace Serenity.Reflection
             var assemblyDefinitions = new List<AssemblyDefinition>();
             foreach (var assembly in assemblyLocations)
                 assemblyDefinitions.Add(Mono.Cecil.AssemblyDefinition.ReadAssembly(
-                    assembly, new Mono.Cecil.ReaderParameters { AssemblyResolver = resolver }));
+                    assembly, new Mono.Cecil.ReaderParameters
+                    {
+                        AssemblyResolver = resolver,
+                        InMemory = true
+                    }));
 
             return assemblyDefinitions.ToArray();
         }
