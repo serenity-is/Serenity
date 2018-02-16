@@ -27,6 +27,7 @@ namespace Serenity.Data
 #endif
         internal Func<Row> rowFactory;
         internal Type rowType;
+        internal string moduleIdentifier;
         internal string connectionKey;
         internal string generationKey;
         internal object initializeLock;
@@ -52,6 +53,7 @@ namespace Serenity.Data
             DetermineTableName();
             DetermineDatabaseAndSchema();
             DetermineConnectionKey();
+            DetermineModuleIdentifier();
             DetermineLocalTextPrefix();
         }
 
@@ -135,6 +137,7 @@ namespace Serenity.Data
             this.tableOnly = ParseDatabaseAndSchema(this.tableName, out this.database, out this.schema);
         }
 
+
         private void DetermineConnectionKey()
         {
             var connectionKeyAttr = rowType.GetCustomAttribute<ConnectionKeyAttribute>();
@@ -144,19 +147,39 @@ namespace Serenity.Data
                 this.connectionKey = "Default";
         }
 
+        private void DetermineModuleIdentifier()
+        {
+            var moduleAttr = rowType.GetCustomAttribute<ModuleAttribute>();
+            if (moduleAttr != null)
+                this.moduleIdentifier = moduleAttr.Value;
+            else
+            {
+                var ns = rowType.Namespace;
+
+                if (ns.EndsWith(".Entities"))
+                    ns = ns.Substring(0, ns.Length - 9);
+
+                var idx = ns.IndexOf(".");
+                if (idx >= 0)
+                    ns = ns.Substring(idx + 1);
+
+                this.moduleIdentifier = ns;
+            }
+        }
+
         private void DetermineLocalTextPrefix()
         {
             if (localTextPrefix != null)
                 return;
 
-            if (connectionKey != null)
+            var localTextPrefixAttr = rowType.GetCustomAttribute<LocalTextPrefixAttribute>();
+            if (localTextPrefixAttr != null)
             {
-                localTextPrefix = connectionKey + "." + tableName;
+                this.localTextPrefix = localTextPrefixAttr.Value;
                 return;
             }
 
-            localTextPrefix = tableName;
-            return;
+            this.localTextPrefix = this.RowIdentifier;
         }
 
         private void GetRowFieldsAndProperties(
@@ -580,8 +603,25 @@ namespace Serenity.Data
 
         public string LocalTextPrefix
         {
-            get { return localTextPrefix ?? TableName; }
+            get { return localTextPrefix ?? RowIdentifier; }
             set { localTextPrefix = value; }
+        }
+
+        public string ModuleIdentifier
+        {
+            get { return moduleIdentifier; }
+        }
+
+        public string RowIdentifier
+        {
+            get
+            {
+                var name = rowType.Name;
+                if (name.EndsWith("Row"))
+                    name = name.Substring(0, name.Length - 3);
+
+                return string.IsNullOrEmpty(moduleIdentifier) ? name : moduleIdentifier + "." + name;
+            }
         }
 
         public string ConnectionKey
