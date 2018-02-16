@@ -12,11 +12,13 @@ namespace Serenity.Data.Mapping
 
             this.ForeignKey = foreignKey;
             this.CheckChangesOnUpdate = true;
+            this.DeleteNonPresentLines = true;
             this.ColumnSelection = ColumnSelection.List;
         }
 
         public string ForeignKey { get; private set; }
         public bool CheckChangesOnUpdate { get; set; }
+        public bool DeleteNonPresentLines { get; set; }
         public ColumnSelection ColumnSelection { get; set; }
         public string IncludeColumns { get; set; }
         public string FilterField { get; set; }
