@@ -474,13 +474,11 @@ namespace Serenity.Services
 
         protected virtual void InvalidateCacheOnCommit()
         {
+            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Row.GetFields().GenerationKey);
             var attr = typeof(TRow).GetCustomAttribute<TwoLevelCachedAttribute>(false);
             if (attr != null)
-            {
-                BatchGenerationUpdater.OnCommit(this.UnitOfWork, Row.GetFields().GenerationKey);
                 foreach (var key in attr.GenerationKeys)
                     BatchGenerationUpdater.OnCommit(this.UnitOfWork, key);
-            }
         }
 
         SaveResponse ISaveRequestProcessor.Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type)

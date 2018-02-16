@@ -141,13 +141,9 @@ namespace Serenity.Services
 
         protected virtual void InvalidateCacheOnCommit()
         {
-            var attr = typeof(TRow).GetCustomAttribute<TwoLevelCachedAttribute>(false);
-            if (attr != null)
-            {
-                BatchGenerationUpdater.OnCommit(this.UnitOfWork, Row.GetFields().GenerationKey);
-                foreach (var key in attr.GenerationKeys)
-                    BatchGenerationUpdater.OnCommit(this.UnitOfWork, key);
-            }
+            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Row.GetFields().GenerationKey);
+            foreach (var key in attr.GenerationKeys)
+                BatchGenerationUpdater.OnCommit(this.UnitOfWork, key);
         }
 
         public TUndeleteResponse Process(IUnitOfWork unitOfWork, UndeleteRequest request)
