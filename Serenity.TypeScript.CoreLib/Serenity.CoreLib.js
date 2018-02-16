@@ -8759,9 +8759,9 @@ var Serenity;
                         $this: _this
                     }, function (e) {
                         e.preventDefault();
-                        this.$this.$fieldChanged = !ss.referenceEquals(self.field, this.field.$);
+                        this.$this.fieldChanged = !ss.referenceEquals(self.field, this.field.$);
                         self.field = this.field.$;
-                        this.$this.$updateInputPlaceHolder();
+                        this.$this.updateInputPlaceHolder();
                         this.$this.checkIfValueChanged();
                     }));
                 }

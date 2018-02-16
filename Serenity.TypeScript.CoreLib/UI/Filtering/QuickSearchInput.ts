@@ -47,9 +47,9 @@
                             $this: this
                         }, function (e: any) {
                             e.preventDefault();
-                            this.$this.$fieldChanged = !(ss as any).referenceEquals(self.field, this.field.$);
+                            this.$this.fieldChanged = !(ss as any).referenceEquals(self.field, this.field.$);
                             self.field = this.field.$;
-                            this.$this.$updateInputPlaceHolder();
+                            this.$this.updateInputPlaceHolder();
                             this.$this.checkIfValueChanged();
                         }));
                 }
