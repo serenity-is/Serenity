@@ -52,7 +52,8 @@ namespace Serenity.Services
                 var attr = attrList[i];
                 var fields = attrFields[i];
 
-                UniqueFieldSaveBehavior.ValidateUniqueConstraint(handler, fields, attr.ErrorMessage, Criteria.Empty);
+                UniqueFieldSaveBehavior.ValidateUniqueConstraint(handler, fields, attr.ErrorMessage, 
+                    attrList[i].IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
             }
         }
     }

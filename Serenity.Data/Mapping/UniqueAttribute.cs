@@ -13,6 +13,7 @@ namespace Serenity.Data.Mapping
 
         public string Name { get; set; }
         public bool CheckBeforeSave { get; set; }
+        public bool IgnoreDeleted { get; set; }
         public string ErrorMessage { get; set; }
     }
 }

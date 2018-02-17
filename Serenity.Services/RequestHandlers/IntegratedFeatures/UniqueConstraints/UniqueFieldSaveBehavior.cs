@@ -32,7 +32,7 @@ namespace Serenity.Services
         {
             ValidateUniqueConstraint(handler, new Field[] { Target },
                 attr == null ? (string)null : attr.ErrorMessage,
-                Criteria.Empty);
+                attr != null && attr.IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
         }
 
         internal static void ValidateUniqueConstraint(ISaveRequestHandler handler, IEnumerable<Field> fields,
