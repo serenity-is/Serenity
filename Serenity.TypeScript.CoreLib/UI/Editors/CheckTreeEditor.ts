@@ -428,7 +428,7 @@
     }
 
     @Decorators.registerEditor("Serenity.CheckLookupEditor")
-    export class CheckLookupEditor<TItem> extends CheckTreeEditor<Serenity.CheckTreeItem<TItem>, CheckLookupEditorOptions> {
+    export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<Serenity.CheckTreeItem<TItem>, CheckLookupEditorOptions> {
 
         private searchText: string;
         private enableUpdateItems: boolean;

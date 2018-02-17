@@ -11288,7 +11288,8 @@ var Serenity;
             return el.tryGetWidget(type);
         };
         DataGrid.prototype.createIncludeDeletedButton = function () {
-            if (!Q.isEmptyOrNull(this.getIsActiveProperty())) {
+            if (!Q.isEmptyOrNull(this.getIsActiveProperty()) ||
+                !Q.isEmptyOrNull(this.getIsDeletedProperty())) {
                 Serenity.GridUtils.addIncludeDeletedToggle(this.toolbar.element, this.view, null, false);
             }
         };
@@ -11323,25 +11324,31 @@ var Serenity;
         };
         DataGrid.prototype.getItemCssClass = function (item, index) {
             var activeFieldName = this.getIsActiveProperty();
-            if (Q.isEmptyOrNull(activeFieldName)) {
+            var deletedFieldName = this.getIsDeletedProperty();
+            if (Q.isEmptyOrNull(activeFieldName) && Q.isEmptyOrNull(deletedFieldName)) {
                 return null;
             }
-            var value = item[activeFieldName];
-            if (value == null) {
-                return null;
+            if (activeFieldName) {
+                var value = item[activeFieldName];
+                if (value == null) {
+                    return null;
+                }
+                if (typeof (value) === 'number') {
+                    if (value < 0) {
+                        return 'deleted';
+                    }
+                    else if (value === 0) {
+                        return 'inactive';
+                    }
+                }
+                else if (typeof (value) === 'boolean') {
+                    if (value === false) {
+                        return 'deleted';
+                    }
+                }
             }
-            if (typeof (value) === 'number') {
-                if (value < 0) {
-                    return 'deleted';
-                }
-                else if (value === 0) {
-                    return 'inactive';
-                }
-            }
-            else if (typeof (value) === 'boolean') {
-                if (value === false) {
-                    return 'deleted';
-                }
+            else {
+                return item[deletedFieldName] ? 'deleted' : null;
             }
             return null;
         };
@@ -11866,6 +11873,9 @@ var Serenity;
                 }
             }
             return this.idProperty;
+        };
+        DataGrid.prototype.getIsDeletedProperty = function () {
+            return null;
         };
         DataGrid.prototype.getIsActiveProperty = function () {
             if (this.isActiveProperty == null) {
@@ -13615,6 +13625,10 @@ var Serenity;
             if (this.get_entityId() == null) {
                 return false;
             }
+            var isDeletedProperty = this.getIsDeletedProperty();
+            if (isDeletedProperty) {
+                return !!this.get_entity()[isDeletedProperty];
+            }
             var value = this.get_entity()[this.getIsActiveProperty()];
             if (value == null) {
                 return false;
@@ -13748,6 +13762,9 @@ var Serenity;
             else
                 this.isActiveProperty = 'IsActive';
             return this.isActiveProperty;
+        };
+        EntityDialog.prototype.getIsDeletedProperty = function () {
+            return null;
         };
         EntityDialog.prototype.getService = function () {
             if (this.service != null)
@@ -14298,6 +14315,10 @@ var Serenity;
             var isActiveField = this.getIsActiveProperty();
             if (!Q.isEmptyOrNull(isActiveField)) {
                 delete clone[isActiveField];
+            }
+            var isDeletedField = this.getIsDeletedProperty();
+            if (!Q.isEmptyOrNull(isDeletedField)) {
+                delete clone[isDeletedField];
             }
             return clone;
         };

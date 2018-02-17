@@ -97,12 +97,13 @@ namespace Serenity.Services
 
         protected virtual void ExecuteDelete()
         {
-            var isDeletedRow = Row as IIsActiveDeletedRow;
+            var isActiveDeletedRow = Row as IIsActiveDeletedRow;
+            var isDeletedRow = Row as IIsDeletedRow;
             var deleteLogRow = Row as IDeleteLogRow;
             var idField = (Field)Row.IdField;
             var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
-            if (isDeletedRow == null && deleteLogRow == null)
+            if (isActiveDeletedRow == null && isDeletedRow == null && deleteLogRow == null)
             {
                 if (new SqlDelete(Row.Table)
                         .WhereEqual(idField, id)
@@ -111,14 +112,22 @@ namespace Serenity.Services
             }
             else
             {
-                if (isDeletedRow != null)
+                if (isDeletedRow != null || isActiveDeletedRow != null)
                 {
+                    
                     var updateLogRow = Row as IUpdateLogRow;
-
                     var update = new SqlUpdate(Row.Table)
-                        .Set(isDeletedRow.IsActiveField, -1)
                         .WhereEqual(idField, id)
-                        .Where(new Criteria(isDeletedRow.IsActiveField) >= 0);
+                        .Where(ServiceQueryHelper.GetNotDeletedCriteria(Row));
+
+                    if (isActiveDeletedRow != null)
+                    {
+                        update.Set(isActiveDeletedRow.IsActiveField, -1);
+                    }
+                    else if (isDeletedRow != null)
+                    {
+                        update.Set(isDeletedRow.IsDeletedField, true);
+                    }
 
                     if (deleteLogRow != null)
                     {
@@ -208,13 +217,13 @@ namespace Serenity.Services
 
             ValidateRequest();
 
-            var isDeletedRow = Row as IIsActiveDeletedRow;
+            var isActiveDeletedRow = Row as IIsActiveDeletedRow;
+            var isDeletedRow = Row as IIsDeletedRow;
             var deleteLogRow = Row as IDeleteLogRow;
 
-            if ((isDeletedRow != null &&
-                 isDeletedRow.IsActiveField[Row] < 0) ||
-                (deleteLogRow != null &&
-                 !((Field)deleteLogRow.DeleteUserIdField).IsNull(Row)))
+            if ((isDeletedRow != null && isDeletedRow.IsDeletedField[Row] == true) ||
+                (isActiveDeletedRow != null && isActiveDeletedRow.IsActiveField[Row] < 0) ||
+                (deleteLogRow != null && !((Field)deleteLogRow.DeleteUserIdField).IsNull(Row)))
                 Response.WasAlreadyDeleted = true;
             else
             {

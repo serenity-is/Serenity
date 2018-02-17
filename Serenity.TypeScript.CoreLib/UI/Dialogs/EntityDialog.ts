@@ -112,6 +112,11 @@
                 return false;
             }
 
+            var isDeletedProperty = this.getIsDeletedProperty();
+            if (isDeletedProperty) {
+                return !!this.get_entity()[isDeletedProperty];
+            }
+
             var value = this.get_entity()[this.getIsActiveProperty()];
             if (value == null) {
                 return false;
@@ -302,6 +307,10 @@
                 this.isActiveProperty = 'IsActive';
 
             return this.isActiveProperty;
+        }
+
+        protected getIsDeletedProperty(): string {
+            return null;
         }
 
         protected service: string;
@@ -976,6 +985,11 @@
             var isActiveField = this.getIsActiveProperty();
             if (!Q.isEmptyOrNull(isActiveField)) {
                 delete clone[isActiveField];
+            }
+
+            var isDeletedField = this.getIsDeletedProperty();
+            if (!Q.isEmptyOrNull(isDeletedField)) {
+                delete clone[isDeletedField];
             }
 
             return clone;

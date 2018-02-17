@@ -2481,6 +2481,7 @@ declare namespace Serenity {
         protected getLocalTextDbPrefix(): string;
         protected getLocalTextPrefix(): string;
         protected getIdProperty(): string;
+        protected getIsDeletedProperty(): string;
         protected getIsActiveProperty(): string;
         protected updateDisabledState(): void;
         protected resizeCanvas(): void;
@@ -2593,7 +2594,7 @@ declare namespace Serenity {
         filterField?: string;
         filterValue?: any;
     }
-    class CheckLookupEditor<TItem> extends CheckTreeEditor<Serenity.CheckTreeItem<TItem>, CheckLookupEditorOptions> {
+    class CheckLookupEditor<TItem = any> extends CheckTreeEditor<Serenity.CheckTreeItem<TItem>, CheckLookupEditorOptions> {
         private searchText;
         private enableUpdateItems;
         constructor(div: JQuery, options: CheckLookupEditorOptions);
@@ -2728,6 +2729,7 @@ declare namespace Serenity {
         protected getIdProperty(): string;
         protected isActiveProperty: string;
         protected getIsActiveProperty(): string;
+        protected getIsDeletedProperty(): string;
         protected service: string;
         protected getService(): string;
         load(entityOrId: any, done: () => void, fail: (ex: ss.Exception) => void): void;

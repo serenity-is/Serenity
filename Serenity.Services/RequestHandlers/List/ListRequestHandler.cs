@@ -331,17 +331,7 @@
         protected virtual void ApplyIncludeDeletedFilter(SqlQuery query)
         {
             if (!Request.IncludeDeleted)
-            {
-                var isDeletedRow = Row as IIsActiveDeletedRow;
-                if (isDeletedRow != null)
-                    query.Where(new Criteria(isDeletedRow.IsActiveField) >= 0);
-                else
-                {
-                    var deleteLogRow = Row as IDeleteLogRow;
-                    if (deleteLogRow != null)
-                        query.Where(new Criteria((Field)deleteLogRow.DeleteUserIdField).IsNull());
-                }
-            }
+                query.Where(ServiceQueryHelper.GetNotDeletedCriteria(Row));
         }
 
         protected virtual BaseCriteria ReplaceFieldExpressions(BaseCriteria criteria)

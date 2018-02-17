@@ -475,6 +475,16 @@ namespace Serenity.CodeGeneration
                 anyMetadata = true;
             }
 
+            var isDeletedRow = row as IIsDeletedRow;
+            if (isDeletedRow != null)
+            {
+                cw.Indented("[InlineConstant] public const string IsDeletedProperty = \"");
+                var field = (isDeletedRow.IsDeletedField);
+                sb.Append(field.PropertyName ?? field.Name);
+                sb.AppendLine("\";");
+                anyMetadata = true;
+            }
+
             var nameRow = row as INameRow;
             if (nameRow != null)
             {

@@ -16,6 +16,7 @@ namespace Serenity.CodeGeneration
 
             var idRow = row as IIdRow;
             var isActiveRow = row as IIsActiveRow;
+            var isDeletedRow = row as IIsDeletedRow;
             var nameRow = row as INameRow;
             var lookupAttr = rowType.GetCustomAttribute<LookupScriptAttribute>();
             if (lookupAttr == null)
@@ -42,6 +43,15 @@ namespace Serenity.CodeGeneration
             {
                 cw.Indented("[InlineConstant] public const string IsActiveProperty = \"");
                 var field = (isActiveRow.IsActiveField);
+                sb.Append(field.PropertyName ?? field.Name);
+                sb.AppendLine("\";");
+                anyMetadata = true;
+            }
+
+            if (isDeletedRow != null)
+            {
+                cw.Indented("[InlineConstant] public const string IsDeletedProperty = \"");
+                var field = (isDeletedRow.IsDeletedField);
                 sb.Append(field.PropertyName ?? field.Name);
                 sb.AppendLine("\";");
                 anyMetadata = true;

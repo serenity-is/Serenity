@@ -441,6 +441,11 @@ namespace Serenity.Services
             if (isActiveRow != null &&
                 isActiveRow.IsActiveField[Old] < 0)
                 throw DataValidation.RecordNotActive(Old);
+
+            var isDeletedRow = Old as IIsDeletedRow;
+            if (isDeletedRow != null &&
+                isDeletedRow.IsDeletedField[Old] == true)
+                throw DataValidation.RecordNotActive(Old);
         }
 
         protected virtual void ValidateAndClearIdField()

@@ -254,6 +254,11 @@ namespace Serenity.CodeGeneration
                 "Serenity.Data.Int16Field", "IsActiveField", 
                 "Serenity.Data.Int16Field Serenity.Data.IIsActiveRow::get_IsActiveField()");
 
+            var isDeletedProperty = ExtractInterfacePropertyFromRow(rowType,
+                new[] { "Serenity.Data.IIsDeletedRow", "Serenity.Data.IIsDeletedRow" },
+                "Serenity.Data.BooleanField", "IsDeletedField",
+                "Serenity.Data.BooleanField Serenity.Data.IIsDeletedRow::get_IsDeletedField()");
+
             var lookupKey = DetermineLookupKey(rowType);
 
             sb.AppendLine();
@@ -276,6 +281,14 @@ namespace Serenity.CodeGeneration
                 {
                     cw.Indented("export const isActiveProperty = '");
                     sb.Append(isActiveProperty);
+                    sb.AppendLine("';");
+                    anyMetadata = true;
+                }
+
+                if (isDeletedProperty != null)
+                {
+                    cw.Indented("export const isDeletedProperty = '");
+                    sb.Append(isDeletedProperty);
                     sb.AppendLine("';");
                     anyMetadata = true;
                 }

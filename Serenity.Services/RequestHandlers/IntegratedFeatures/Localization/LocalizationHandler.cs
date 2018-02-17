@@ -95,6 +95,10 @@ namespace Serenity.Data
                 ReferenceEquals(match, ((IIsActiveRow)info.localRowInstance).IsActiveField))
                 return null;
 
+            if (info.localRowInstance is IIsDeletedRow &&
+                ReferenceEquals(match, ((IIsDeletedRow)info.localRowInstance).IsDeletedField))
+                return null;
+
             var logging = info.localRowInstance as ILoggingRow;
             if (logging != null && (
                 ReferenceEquals(match, logging.InsertUserIdField) ||

@@ -81,7 +81,8 @@ namespace Serenity.Services
         protected virtual void DoCaptureLog()
         {
             var newRow = Row.Clone();
-            ((IIsActiveRow)newRow).IsActiveField[newRow] = 1;
+            if (newRow is IIsActiveRow)
+                ((IIsActiveRow)newRow).IsActiveField[newRow] = 1;
             captureLogHandler.Log(this.UnitOfWork, this.Row, newRow, Authorization.UserId);
         }
 
@@ -165,10 +166,11 @@ namespace Serenity.Services
 
             Row = new TRow();
 
-            var isDeletedRow = Row as IIsActiveDeletedRow;
+            var isActiveDeletedRow = Row as IIsActiveDeletedRow;
+            var isDeletedRow = Row as IIsDeletedRow;
             var deleteLogRow = Row as IDeleteLogRow;
 
-            if (isDeletedRow == null && deleteLogRow == null)
+            if (isActiveDeletedRow == null && isDeletedRow == null && deleteLogRow == null)
                 throw new NotImplementedException();
 
             var idField = (Field)Row.IdField;
@@ -178,7 +180,8 @@ namespace Serenity.Services
 
             ValidateRequest();
 
-            if ((isDeletedRow != null && isDeletedRow.IsActiveField[Row] > 0) ||
+            if ((isDeletedRow != null && isDeletedRow.IsDeletedField[Row] != true) ||
+                (isActiveDeletedRow != null && isActiveDeletedRow.IsActiveField[Row] >= 0) ||
                 (deleteLogRow != null && ((Field)deleteLogRow.DeleteUserIdField).IsNull(Row)))
                 Response.WasNotDeleted = true;
             else
@@ -188,10 +191,15 @@ namespace Serenity.Services
                 var update = new SqlUpdate(Row.Table)
                     .WhereEqual(idField, id);
 
-                if (isDeletedRow != null)
+                if (isActiveDeletedRow != null)
                 {
-                    update.Set(isDeletedRow.IsActiveField, 1)
-                        .WhereEqual(isDeletedRow.IsActiveField, -1);
+                    update.Set(isActiveDeletedRow.IsActiveField, 1)
+                        .WhereEqual(isActiveDeletedRow.IsActiveField, -1);
+                }
+                else if (isDeletedRow != null)
+                {
+                    update.Set(isDeletedRow.IsDeletedField, false)
+                        .WhereEqual(isDeletedRow.IsDeletedField, 1);
                 }
 
                 if (deleteLogRow != null)
@@ -199,7 +207,7 @@ namespace Serenity.Services
                     update.Set((Field)deleteLogRow.DeleteUserIdField, null)
                         .Set(deleteLogRow.DeleteDateField, null);
 
-                    if (isDeletedRow == null)
+                    if (isActiveDeletedRow == null && isDeletedRow == null)
                         update.Where(((Field)deleteLogRow.DeleteUserIdField).IsNotNull());
                 }
 

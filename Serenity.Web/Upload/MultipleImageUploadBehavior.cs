@@ -149,8 +149,7 @@ namespace Serenity.Services
 
         public override void OnAfterDelete(IDeleteRequestHandler handler)
         {
-            if (handler.Row is IIsActiveDeletedRow ||
-                handler.Row is IDeleteLogRow)
+            if (ServiceQueryHelper.UseSoftDelete(handler.Row))
                 return;
 
             var field = (StringField)Target;

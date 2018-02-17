@@ -30,7 +30,7 @@ namespace Serenity.Services
         private Field filterField;
         private object filterValue;
         private BaseCriteria filterCriteria;
-        private BaseCriteria filterCriteriaT0;
+        private BaseCriteria queryCriteria;
         private HashSet<string> includeColumns;
 
         public bool ActivateFor(Row row)
@@ -102,14 +102,16 @@ namespace Serenity.Services
                 if (this.filterValue == null)
                 {
                     this.filterCriteria = this.filterCriteria.IsNull();
-                    this.filterCriteriaT0 = this.filterField.IsNull();
+                    this.queryCriteria = this.filterField.IsNull();
                 }
                 else
                 {
                     this.filterCriteria = this.filterCriteria == new ValueCriteria(this.filterValue);
-                    this.filterCriteriaT0 = this.filterField == new ValueCriteria(this.filterValue);
+                    this.queryCriteria = this.filterField == new ValueCriteria(this.filterValue);
                 }
             }
+
+            queryCriteria = queryCriteria & ServiceQueryHelper.GetNotDeletedCriteria(detailRow);
 
             this.includeColumns = new HashSet<string>();
 
@@ -359,7 +361,7 @@ namespace Serenity.Services
                         .Select((Field)rowIdField)
                         .Where(
                             foreignKeyField == new ValueCriteria(idField.AsObject(handler.Row)) &
-                            filterCriteriaT0)
+                            queryCriteria)
                         .ForEach(handler.Connection, () =>
                         {
                             oldList.Add(row.Clone());
@@ -388,7 +390,7 @@ namespace Serenity.Services
                 (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
                 return;
 
-            if (handler.Row is IIsActiveDeletedRow)
+            if (ServiceQueryHelper.UseSoftDelete(handler.Row))
                 return;
 
             var idField = (Field)((handler.Row as IIdRow).IdField);
@@ -403,7 +405,7 @@ namespace Serenity.Services
                     .Select((Field)rowIdField)
                     .Where(
                             foreignKeyField == new ValueCriteria(idField.AsObject(handler.Row)) &
-                            filterCriteriaT0)
+                            queryCriteria)
                     .ForEach(handler.Connection, () =>
                     {
                         deleteList.Add(rowIdField.AsObject(row));

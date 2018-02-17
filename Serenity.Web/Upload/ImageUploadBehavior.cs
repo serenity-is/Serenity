@@ -266,6 +266,7 @@ namespace Serenity.Services
         public override void OnAfterDelete(IDeleteRequestHandler handler)
         {
             if (handler.Row is IIsActiveDeletedRow ||
+                handler.Row is IIsDeletedRow ||
                 handler.Row is IDeleteLogRow)
                 return;
 

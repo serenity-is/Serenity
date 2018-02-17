@@ -35,6 +35,11 @@ namespace Serenity.Services
                 newRow = handler.Row.Clone();
                 ((IIsActiveDeletedRow)newRow).IsActiveField[newRow] = -1;
             }
+            else if (handler.Row is IIsDeletedRow)
+            {
+                newRow = handler.Row.Clone();
+                ((IIsDeletedRow)newRow).IsDeletedField[newRow] = true;
+            }
 
             captureLogHandler.Log(handler.UnitOfWork, handler.Row, newRow, Authorization.UserId);
         }

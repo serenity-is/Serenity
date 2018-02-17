@@ -131,6 +131,10 @@ namespace Serenity.Services
                 ReferenceEquals(match, ((IIsActiveRow)localRowInstance).IsActiveField))
                 return null;
 
+            if (localRowInstance is IIsDeletedRow &&
+                ReferenceEquals(match, ((IIsDeletedRow)localRowInstance).IsDeletedField))
+                return null;
+
             var insertLog = localRowInstance as IInsertLogRow;
             if (insertLog != null && (
                 ReferenceEquals(match, insertLog.InsertUserIdField) ||
@@ -308,7 +312,7 @@ namespace Serenity.Services
 
         public override void OnBeforeDelete(IDeleteRequestHandler handler)
         {
-            if (handler.Row is IIsActiveDeletedRow)
+            if (ServiceQueryHelper.UseSoftDelete(handler.Row))
                 return;
 
             var idField = (Field)((handler.Row as IIdRow).IdField);

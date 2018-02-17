@@ -219,7 +219,8 @@
         }
 
         protected createIncludeDeletedButton(): void {
-            if (!Q.isEmptyOrNull(this.getIsActiveProperty())) {
+            if (!Q.isEmptyOrNull(this.getIsActiveProperty()) ||
+                !Q.isEmptyOrNull(this.getIsDeletedProperty())) {
                 Serenity.GridUtils.addIncludeDeletedToggle(this.toolbar.element, this.view, null, false);
             }
         }
@@ -261,26 +262,33 @@
 
         protected getItemCssClass(item: TItem, index: number): string {
             var activeFieldName = this.getIsActiveProperty();
-            if (Q.isEmptyOrNull(activeFieldName)) {
-                return null;
-            }
-            var value = item[activeFieldName];
-            if (value == null) {
+            var deletedFieldName = this.getIsDeletedProperty();
+            if (Q.isEmptyOrNull(activeFieldName) && Q.isEmptyOrNull(deletedFieldName)) {
                 return null;
             }
 
-            if (typeof (value) === 'number') {
-                if (value < 0) {
-                    return 'deleted';
+            if (activeFieldName) {
+                var value = item[activeFieldName];
+                if (value == null) {
+                    return null;
                 }
-                else if (value === 0) {
-                    return 'inactive';
+
+                if (typeof (value) === 'number') {
+                    if (value < 0) {
+                        return 'deleted';
+                    }
+                    else if (value === 0) {
+                        return 'inactive';
+                    }
+                }
+                else if (typeof (value) === 'boolean') {
+                    if (value === false) {
+                        return 'deleted';
+                    }
                 }
             }
-            else if (typeof (value) === 'boolean') {
-                if (value === false) {
-                    return 'deleted';
-                }
+            else {
+                return item[deletedFieldName] ? 'deleted' : null;
             }
 
             return null;
@@ -908,6 +916,10 @@
             }
 
             return this.idProperty;
+        }
+
+        protected getIsDeletedProperty(): string {
+            return null;
         }
 
         protected getIsActiveProperty(): string {
