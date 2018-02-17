@@ -464,7 +464,7 @@ namespace Serenity.ComponentModel
     public partial class CheckLookupEditorAttribute : CustomEditorAttribute
     {
         public CheckLookupEditorAttribute(string lookupKey)
-            : base("Lookup")
+            : base("CheckLookup")
         {
             SetOption("lookupKey", lookupKey);
         }
@@ -475,7 +475,7 @@ namespace Serenity.ComponentModel
         /// on it.
         /// </summary>
         public CheckLookupEditorAttribute(Type lookupType)
-            : base("Lookup")
+            : base("CheckLookup")
         {
             if (lookupType == null)
                 throw new ArgumentNullException("lookupType");
