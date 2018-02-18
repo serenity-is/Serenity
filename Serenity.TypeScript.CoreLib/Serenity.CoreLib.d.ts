@@ -2587,6 +2587,7 @@ declare namespace Serenity {
         lookupKey?: string;
         checkedOnTop?: boolean;
         showSelectAll?: boolean;
+        hideSearch?: boolean;
         delimited?: boolean;
         cascadeFrom?: string;
         cascadeField?: string;
@@ -2600,6 +2601,7 @@ declare namespace Serenity {
         constructor(div: JQuery, options: CheckLookupEditorOptions);
         protected updateItems(): void;
         protected getLookupKey(): string;
+        protected getButtons(): Serenity.ToolButton[];
         protected createToolbarExtensions(): void;
         protected getSelectAllText(): string;
         protected cascadeItems(items: TItem[]): TItem[];

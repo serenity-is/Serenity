@@ -419,6 +419,7 @@
         lookupKey?: string;
         checkedOnTop?: boolean;
         showSelectAll?: boolean;
+        hideSearch?: boolean;
         delimited?: boolean;
         cascadeFrom?: string;
         cascadeField?: string;
@@ -450,6 +451,10 @@
 
         protected getLookupKey() {
             return this.options.lookupKey;
+        }
+
+        protected getButtons(): Serenity.ToolButton[] {
+            return Q.coalesce(super.getButtons(), this.options.hideSearch ? null : []);
         }
 
         protected createToolbarExtensions() {

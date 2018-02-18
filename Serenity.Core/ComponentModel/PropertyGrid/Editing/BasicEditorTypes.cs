@@ -578,6 +578,15 @@ namespace Serenity.ComponentModel
             get { return GetOption<bool>("showSelectAll"); }
             set { SetOption("showSelectAll", value); }
         }
+
+        /// <summary>
+        /// Hide quick search input
+        /// </summary>
+        public bool HideSearch
+        {
+            get { return GetOption<bool>("hideSearch"); }
+            set { SetOption("hideSearch", value); }
+        }
     }
 
     public partial class AsyncLookupEditorAttribute : CustomEditorAttribute

@@ -13157,6 +13157,9 @@ var Serenity;
         CheckLookupEditor.prototype.getLookupKey = function () {
             return this.options.lookupKey;
         };
+        CheckLookupEditor.prototype.getButtons = function () {
+            return Q.coalesce(_super.prototype.getButtons.call(this), this.options.hideSearch ? null : []);
+        };
         CheckLookupEditor.prototype.createToolbarExtensions = function () {
             var _this = this;
             _super.prototype.createToolbarExtensions.call(this);
