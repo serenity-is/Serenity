@@ -1,3 +1,8 @@
+## 3.5.2 (2018-02-18)
+
+Bugfixes:
+  - fix Row.scriban sergen template
+
 ## 3.5.1 (2018-02-18)
 
 Bugfixes:
