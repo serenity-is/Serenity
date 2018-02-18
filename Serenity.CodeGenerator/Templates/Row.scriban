@@ -10,7 +10,7 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
     using System.IO;
 
     [ConnectionKey("{{ConnectionKey}}"){{if Module}}, Module("{{Module}}"){{end}}, TableName("{{SchemaAndTable}}")]
-    [DisplayName("{{Title}}"), InstanceName("{{Title}}")]]
+    [DisplayName("{{Title}}"), InstanceName("{{Title}}")]
     [ReadPermission("{{Permission}}")]
     [ModifyPermission("{{Permission}}")]
     public sealed class {{RowClassName}} : {{RowBaseClassAndInterfaces}}
@@ -62,5 +62,6 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
             public {{k.FieldType}}Field {{k.Ident}};
 {{~end}}
 {{~end}}
+		}
     }
 }
