@@ -7,7 +7,9 @@
     display: inline-block;
     width: 15px;
     height: 15px;
-    margin: 2px 3px 0 0;
+    margin-right: 4px;
+    position: relative;
+    top: 2px;
     cursor: pointer;
 }
 
@@ -46,4 +48,12 @@
 
 .check-box.readonly {
     cursor: default;
+}
+
+.s-CheckLookupEditor .grid-container {
+    margin: 2px;    
+}
+
+.s-CheckTreeEditor.s-CheckLookupEditor.s-DataGrid .s-TreeToggle {
+    display: none;
 }
