@@ -31,6 +31,7 @@
   </metadata>
   <files>
     <file src="bin/${configuration}/netcoreapp2.0/dotnet-sergen.dll" target="lib/netcoreapp2.0/dotnet-sergen.dll" />	
+	<file src="bin/${configuration}/netcoreapp2.0/Mono.Cecil.dll" target="lib/netcoreapp2.0/Mono.Cecil.dll" />
     <file src="bin/${configuration}/netcoreapp2.0/dotnet-sergen.deps.json" target="lib/netcoreapp2.0/dotnet-sergen.deps.json" />	
     <file src="bin/${configuration}/netcoreapp2.0/dotnet-sergen.runtimeconfig.json" target="lib/netcoreapp2.0/dotnet-sergen.runtimeconfig.json" />	
     <file src="../Serenity.CodeGenerator.Net45/Readme.CodeGenerator.txt" target="content/Readme.CodeGenerator.txt" />

@@ -1,3 +1,8 @@
+## 3.5.1 (2018-02-18)
+
+Bugfixes:
+  - add missing Mono.Cecil.dll
+
 ## 3.5.0 (2018-02-18)
 
 Features:
