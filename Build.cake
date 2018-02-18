@@ -8,6 +8,9 @@ if (target == "")
 	target = "Pack";
 	
 var configuration = Argument("configuration", "Release");
+var msBuildPath = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\msbuild.exe";
+if (!System.IO.File.Exists(msBuildPath))
+	msBuildPath = null;
 
 string serenityVersion = null;
 
@@ -22,18 +25,6 @@ var nuspecParams = new Dictionary<string, string> {
     { "tags", "Serenity" },
     { "framework", "net45" },
     { "configuration", configuration }
-};
-
-var dotnetBuildOrder = new string[] {
-    "Serenity.Core",
-    "Serenity.Configuration",
-    "Serenity.Caching.Couchbase",
-    "Serenity.Caching.Redis",
-    "Serenity.Data",
-    "Serenity.Data.Entity",
-    "Serenity.Services",
-    "Serenity.Web",
-	"Serenity.CodeGenerator"
 };
 
 Func<string, XElement> loadCsProj = (csproj) => {
@@ -57,7 +48,6 @@ Func<string, System.Xml.XmlDocument> loadXml = path =>
 nuspecParams["scriptFramework"] = loadXml(@".\Serenity.Script.Imports\packages.config").SelectSingleNode("//package[@id='Saltarelle.Runtime']/@targetFramework").Value; 
 nuspecParams["serenityWebAssetsVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Assets.nuspec");
 nuspecParams["serenityWebToolingVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Tooling.nuspec");
-
 
 var nugetPackages = new List<string>();
 
@@ -279,9 +269,6 @@ Task("Compile")
     .IsDependentOn("Restore")
     .Does(context => 
 {
-	var msBuildPath = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\msbuild.exe";
-	if (!System.IO.File.Exists(msBuildPath))
-		msBuildPath = null;
 
     MSBuild("./Serenity.Net45.sln", s => {
         s.SetConfiguration(configuration);
@@ -332,7 +319,6 @@ Task("Pack")
     myPack("Serenity.Data.Entity", null, null);
     myPack("Serenity.Services", null, null);
     myPack("Serenity.Testing", null, null);
-    myPack("Serenity.Script.UI", "Serenity.Script", null);
     myPack("Serenity.Web", null, null);
     myPack("Serenity.Web", "Serenity.Web.AspNetCore", "Serenity.Web");
     myPack("Serenity.CodeGenerator", null, null);
@@ -372,6 +358,27 @@ Task("Tooling-Pack")
 
 Task("Tooling-Push")
     .IsDependentOn("Tooling-Pack")
+    .Does(() =>
+    {
+        myPush();
+    });
+	
+Task("Script-Pack")
+    .IsDependentOn("Clean")
+    .Does(() =>
+    {
+		NuGetRestore("./Serenity.Script.UI/Serenity.Script.UI.sln");
+		MSBuild("./Serenity.Script.UI/Serenity.Script.UI.sln", s => {
+			s.SetConfiguration(configuration);
+			s.ToolPath = msBuildPath;
+		});
+
+        myPack("Serenity.Script.UI", "Serenity.Script", null);
+        fixNugetCache();
+    });
+
+Task("Script-Push")
+    .IsDependentOn("Script-Pack")
     .Does(() =>
     {
         myPush();
