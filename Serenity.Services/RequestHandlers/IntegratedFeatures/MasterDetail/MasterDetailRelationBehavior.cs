@@ -390,7 +390,7 @@ namespace Serenity.Services
                 (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
                 return;
 
-            if (ServiceQueryHelper.UseSoftDelete(handler.Row))
+            if (!attr.ForceCascadeDelete && ServiceQueryHelper.UseSoftDelete(handler.Row))
                 return;
 
             var idField = (Field)((handler.Row as IIdRow).IdField);

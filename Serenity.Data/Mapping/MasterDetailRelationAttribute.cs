@@ -21,5 +21,11 @@ namespace Serenity.Data.Mapping
         public string IncludeColumns { get; set; }
         public string FilterField { get; set; }
         public object FilterValue { get; set; }
+
+        /// <summary>
+        /// Forces deletion of linking row records even if master record uses soft delete.
+        /// If false (default) this doesn't delete linking records, as master record might be undeleted.
+        /// </summary>
+        public bool ForceCascadeDelete { get; set; }
     }
 }
