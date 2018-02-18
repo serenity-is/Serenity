@@ -1,3 +1,42 @@
+## 3.5.0 (2018-02-18)
+
+Features:
+  - rewrote servertypings generator using mono.cecil to reduce assembly loading errors on .net core sergen transform
+  - added CheckLookupEditor which is similar to lookup editor with multiple option but uses checkboxes instead
+  - updated AspNetCore, jQuery, Redis, Couchbase, Nuglify, Dapper and some other packages
+  - added module attribute that will be used to auto determine local text prefix and lookup script keys
+  - [LookupScript] attribute can now be used without specifying a lookup key. In that case lookup key will be auto generated from row module / name and / or class namespace.
+  - no need to set localTextPrefix as it will now be determined by RowIdentifier, e.g. module identifier dot row type name without row suffix
+  - added IIsDeletedRow which works similar to IIsActiveDeletedRow but as a Boolean fields
+  - added IgnoreDeleted option to UniqueConstraintAttribute and UniqueAttribute to skip soft deleted records on check
+  - added CheckNames option to BasedOnRowAttribute so that property name matching with row can be validated optionally to ensure valid / exact case matching property names. can turn check off on a property by adding [NotMapped]
+  - ability to skip minification for specific files using NoMinimize option in ScriptBundling settings
+  - added ResolvePath function to ContentHashCache resolve virtual paths to absolute or cdn urls when enabled
+  - seek to page 1 after a change in filters / sort orders / quick filter in slick grid
+  - more descriptive error message when lookup script is not found
+  - try to give more info when lookup script fails to load due to permissions or another exception
+  - error handler to show runtime errors in browser console as toast on localhost / 127.0.0.1
+  - make sure there is only one type with a lookup key, raise an error otherwise to warn user
+  - overflow hidden to prevent double scrollbars in iframedialog
+  - removing responsive() attribute from dialog template as its should be default now in all except legacy apps
+  - validate cache on commit even if row doesn't have TwoLevelCachedAttribute, so that attribute is not required anymore
+  - added ForceCascadeDelete option to LinkingSetRelationAttribute and MasterDetailRelationAttribute that forces deletion of sub records even if master row uses soft delete
+  - removing old ResponsiveDialog and MultiColumnResponsiveDialog samples as we now have a different way to handle them. removed  responsiveDialog decorators as it is no longer needed. [Serene]
+  - added CheckNames = true to all BasedOnRow attributes so that property / field name matching can be validated [Serene]
+  - increase upload request limits to 50mb [Serene]
+  - make sure colorbox scale properly for very large images [Serene]
+  - finalize agenda and decision tabs in meeting module [StartSharp]
+  - include ckeditor in pages where required to improve first time startup time [StartSharp]
+  - use tablename and module attributes for all rows, move external lookups to Lookups namespace instead of Scripts, remove explicit lookup keys from all lookups as it can be auto generated now. [StartSharp]
+
+  
+Bugfixes:
+  - possible race condition in css / script bundling at first startup
+  - fix quick search input property/method reference, closes #3248
+  - check-box vertical alignment issue
+  - fix northwind employee symbols [Serene]
+  - fix missing navigation icons [Serene]
+
 ## 3.4.4 (2018-01-30)
 
 Bugfixes:
