@@ -274,7 +274,7 @@ namespace Serenity.Services
 
             var rowIdField = (Field)((row as IIdRow).IdField);
 
-            if (newList.Count == 0)
+            if (newList.Count == 0 && attr.DeleteNonPresentLines)
             {
                 foreach (Row entity in oldList)
                     DeleteDetail(uow, rowIdField.AsObject(entity));
@@ -295,12 +295,15 @@ namespace Serenity.Services
                     newById[idStr] = item;
             }
 
-            foreach (Row item in oldList)
+            if (attr.DeleteNonPresentLines)
             {
-                var id = rowIdField.AsObject(item);
-                var idStr = AsString(id);
-                if (!newById.ContainsKey(idStr))
-                    DeleteDetail(uow, id);
+                foreach (Row item in oldList)
+                {
+                    var id = rowIdField.AsObject(item);
+                    var idStr = AsString(id);
+                    if (!newById.ContainsKey(idStr))
+                        DeleteDetail(uow, id);
+                }
             }
 
             foreach (Row item in newList)
