@@ -48,6 +48,7 @@
         <dependency id="Serenity.Data.Entity" version="${version}" />
         <dependency id="Serenity.Services" version="${version}" />
         <dependency id="Serenity.Web.Assets" version="${serenityWebAssetsVersion}" />
+        <dependency id="Serenity.Web.Tooling" version="${serenityWebToolingVersion}" />
         <dependency id="System.Data.Common" version="${netstandard2.0:System.Data.Common}" />
         <dependency id="System.Data.SqlClient" version="${netstandard2.0:System.Data.SqlClient}" />
         <dependency id="System.Diagnostics.Process" version="${netstandard2.0:System.Diagnostics.Process}" />

@@ -1,3 +1,10 @@
+## 3.5.4 (2018-02-19)
+
+Features:
+  - add reference to Serenity.Web.Tooling package so that it auto updates as well
+  - [Breaking Change] need to replace "externalType.Interfaces.Add(intf.FullName)" with "externalType.Interfaces.Add(intf.InterfaceType.FullName)" in CodeGenerationHelpers.ttinclude
+  - MasterKeyField option to use another field as master key in master row, thanks @hannesb
+  
 ## 3.5.3 (2018-02-19)
 
 Bugfixes:
