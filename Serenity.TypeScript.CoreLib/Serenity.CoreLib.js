@@ -1724,7 +1724,7 @@ var Q;
                 }
             };
         }
-        function loadScriptAsync(url) {
+        function loadScriptAsync(name) {
             return Promise.resolve().then(function () {
                 Q.blockUI(null);
                 return Promise.resolve($.ajax(loadOptions(name, false))

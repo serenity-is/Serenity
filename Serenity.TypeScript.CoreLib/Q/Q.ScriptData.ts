@@ -73,7 +73,7 @@ namespace Q {
             }
         }
 
-        function loadScriptAsync(url: string) {
+        function loadScriptAsync(name: string) {
             return Promise.resolve().then(function () {
                 Q.blockUI(null);
                 return Promise.resolve(
