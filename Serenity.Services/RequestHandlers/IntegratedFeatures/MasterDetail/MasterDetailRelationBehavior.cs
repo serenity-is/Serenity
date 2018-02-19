@@ -28,6 +28,7 @@ namespace Serenity.Services
         private Field foreignKeyField;
         private BaseCriteria foreignKeyCriteria;
         private Field filterField;
+        private Field masterKeyField;
         private object filterValue;
         private BaseCriteria filterCriteria;
         private BaseCriteria queryCriteria;
@@ -75,6 +76,23 @@ namespace Serenity.Services
 
             deleteHandlerFactory = FastReflection.DelegateForConstructor<IDeleteRequestProcessor>(
                 typeof(DeleteRequestHandler<>).MakeGenericType(rowType));
+
+            if (attr.MasterKeyField != null)
+            {
+                // Use field from AltIdField
+                masterKeyField = row.FindFieldByPropertyName(attr.MasterKeyField) ??
+                    row.FindField(attr.MasterKeyField);
+                if (ReferenceEquals(masterKeyField, null))
+                    throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                        "This field is specified for a master detail relation in field '{2}'.",
+                        attr.MasterKeyField, row.GetType().FullName,
+                        Target.PropertyName ?? Target.Name));
+            }
+            else
+            {
+                // Default behaviour: use id field
+                masterKeyField = (Field)((row as IIdRow).IdField);
+            }
 
             var detailRow = rowFactory();
             foreignKeyField = detailRow.FindFieldByPropertyName(attr.ForeignKey) ??
@@ -143,15 +161,13 @@ namespace Serenity.Services
                 !handler.ShouldSelectField(Target))
                 return;
 
-            var idField = (Field)((handler.Row as IIdRow).IdField);
-
             var listHandler = listHandlerFactory();
 
             var listRequest = new ListRequest
             {
                 ColumnSelection = this.attr.ColumnSelection,
                 IncludeColumns = this.includeColumns,
-                Criteria = foreignKeyCriteria == new ValueCriteria(idField.AsObject(handler.Row)) & filterCriteria
+                Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria
             };
 
             IListResponse response = listHandler.Process(handler.Connection, listRequest);
@@ -171,8 +187,6 @@ namespace Serenity.Services
                 handler.Response.Entities.IsEmptyOrNull())
                 return;
 
-            var idField = (Field)((handler.Row as IIdRow).IdField);
-
             var listHandler = listHandlerFactory();
 
             var listRequest = new ListRequest
@@ -191,7 +205,7 @@ namespace Serenity.Services
                 enumerator = enumerator.Skip(1000);
 
                 listRequest.Criteria = foreignKeyCriteria.In(
-                    part.Select(x => idField.AsObject(x))) & filterCriteria;
+                    part.Select(x => masterKeyField.AsObject(x))) & filterCriteria;
 
                 IListResponse response = listHandler.Process(
                     handler.Connection, listRequest);
@@ -202,7 +216,7 @@ namespace Serenity.Services
                 foreach (var row in part)
                 {
                     var list = rowListFactory();
-                    var matching = lookup[idField.AsObject(row).ToString()];
+                    var matching = lookup[masterKeyField.AsObject(row).ToString()];
                     foreach (var x in matching)
                         list.Add(x);
 
@@ -334,8 +348,7 @@ namespace Serenity.Services
             if (newList == null)
                 return;
 
-            var idField = (Field)((handler.Row as IIdRow).IdField);
-            var masterId = idField.AsObject(handler.Row);
+            var masterId = masterKeyField.AsObject(handler.Row);
 
             if (handler.IsCreate)
             {
@@ -360,7 +373,7 @@ namespace Serenity.Services
                         .From(row)
                         .Select((Field)rowIdField)
                         .Where(
-                            foreignKeyField == new ValueCriteria(idField.AsObject(handler.Row)) &
+                            foreignKeyField == new ValueCriteria(masterKeyField.AsObject(handler.Row)) &
                             queryCriteria)
                         .ForEach(handler.Connection, () =>
                         {
@@ -372,7 +385,7 @@ namespace Serenity.Services
                 var listRequest = new ListRequest
                 {
                     ColumnSelection = ColumnSelection.List,
-                    Criteria = foreignKeyCriteria == new ValueCriteria(idField.AsObject(handler.Row)) & filterCriteria
+                    Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria
                 };
 
                 var listHandler = listHandlerFactory();
@@ -393,7 +406,6 @@ namespace Serenity.Services
             if (!attr.ForceCascadeDelete && ServiceQueryHelper.UseSoftDelete(handler.Row))
                 return;
 
-            var idField = (Field)((handler.Row as IIdRow).IdField);
             var row = rowFactory();
             var rowIdField = (Field)((row as IIdRow).IdField);
 
@@ -404,7 +416,7 @@ namespace Serenity.Services
                     .From(row)
                     .Select((Field)rowIdField)
                     .Where(
-                            foreignKeyField == new ValueCriteria(idField.AsObject(handler.Row)) &
+                            foreignKeyField == new ValueCriteria(masterKeyField.AsObject(handler.Row)) &
                             queryCriteria)
                     .ForEach(handler.Connection, () =>
                     {

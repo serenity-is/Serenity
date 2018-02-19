@@ -23,6 +23,11 @@ namespace Serenity.Data.Mapping
         public object FilterValue { get; set; }
 
         /// <summary>
+        /// Optional: override the default behaviour and use a different id field (i.e. from a unique constraint)
+        /// </summary>
+        public string MasterKeyField { get; set; }
+
+        /// <summary>
         /// Forces deletion of linking row records even if master record uses soft delete.
         /// If false (default) this doesn't delete linking records, as master record might be undeleted.
         /// </summary>
