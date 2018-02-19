@@ -25,7 +25,7 @@ namespace Serenity.Data.Mapping
         /// <summary>
         /// Optional: override the default behaviour and use a different id field (i.e. from a unique constraint)
         /// </summary>
-        public string AltIdField { get; set; }
+        public string MasterKeyField { get; set; }
 
         /// <summary>
         /// Forces deletion of linking row records even if master record uses soft delete.
