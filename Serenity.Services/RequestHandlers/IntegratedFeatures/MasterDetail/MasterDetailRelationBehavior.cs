@@ -28,6 +28,7 @@ namespace Serenity.Services
         private Field foreignKeyField;
         private BaseCriteria foreignKeyCriteria;
         private Field filterField;
+        private Field idField;
         private object filterValue;
         private BaseCriteria filterCriteria;
         private BaseCriteria queryCriteria;
@@ -75,6 +76,23 @@ namespace Serenity.Services
 
             deleteHandlerFactory = FastReflection.DelegateForConstructor<IDeleteRequestProcessor>(
                 typeof(DeleteRequestHandler<>).MakeGenericType(rowType));
+
+            if (attr.AltIdField != null)
+            {
+                // Use field from AltIdField
+                idField = row.FindFieldByPropertyName(attr.AltIdField) ??
+                    row.FindField(attr.AltIdField);
+                if (ReferenceEquals(idField, null))
+                    throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                        "This field is specified for a master detail relation in field '{2}'.",
+                        attr.AltIdField, row.GetType().FullName,
+                        Target.PropertyName ?? Target.Name));
+            }
+            else
+            {
+                // Default behaviour: use id field
+                idField = (Field)((row as IIdRow).IdField);
+            }
 
             var detailRow = rowFactory();
             foreignKeyField = detailRow.FindFieldByPropertyName(attr.ForeignKey) ??
@@ -143,8 +161,6 @@ namespace Serenity.Services
                 !handler.ShouldSelectField(Target))
                 return;
 
-            var idField = (Field)((handler.Row as IIdRow).IdField);
-
             var listHandler = listHandlerFactory();
 
             var listRequest = new ListRequest
@@ -170,8 +186,6 @@ namespace Serenity.Services
                 !handler.ShouldSelectField(Target) ||
                 handler.Response.Entities.IsEmptyOrNull())
                 return;
-
-            var idField = (Field)((handler.Row as IIdRow).IdField);
 
             var listHandler = listHandlerFactory();
 
@@ -334,7 +348,6 @@ namespace Serenity.Services
             if (newList == null)
                 return;
 
-            var idField = (Field)((handler.Row as IIdRow).IdField);
             var masterId = idField.AsObject(handler.Row);
 
             if (handler.IsCreate)
@@ -393,7 +406,6 @@ namespace Serenity.Services
             if (!attr.ForceCascadeDelete && ServiceQueryHelper.UseSoftDelete(handler.Row))
                 return;
 
-            var idField = (Field)((handler.Row as IIdRow).IdField);
             var row = rowFactory();
             var rowIdField = (Field)((row as IIdRow).IdField);
 
