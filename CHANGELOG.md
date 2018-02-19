@@ -1,3 +1,9 @@
+## 3.5.3 (2018-02-19)
+
+Bugfixes:
+  - resolve possible problem with loadScriptAsync
+  - [InstrinicProperty] in legacy script form import generator is causing issues
+
 ## 3.5.2 (2018-02-18)
 
 Bugfixes:
