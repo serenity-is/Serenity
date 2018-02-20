@@ -290,6 +290,29 @@ namespace Serenity.CodeGeneration
 
                 return name + "`" + (type as GenericInstanceType).GenericArguments.Count;
             }
+            else if (type.HasGenericParameters)
+            {
+                var name = type.Name;
+                var idx = name.IndexOf('`');
+                if (idx >= 0)
+                    name = name.Substring(0, idx);
+
+                sb.Append(name);
+                sb.Append("<");
+
+                int i = 0;
+                foreach (var argument in type.GenericParameters)
+                {
+                    if (i++ > 0)
+                        sb.Append(", ");
+
+                    sb.Append(argument.Name);
+                }
+
+                sb.Append(">");
+
+                return name + "`" + type.GenericParameters.Count;
+            }
             else
             {
                 sb.Append(type.Name);

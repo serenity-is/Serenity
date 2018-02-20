@@ -126,6 +126,12 @@ namespace Serenity.CodeGeneration
                 }
             }
 
+            if (memberType.IsGenericParameter)
+            {
+                sb.Append(memberType.Name);
+                return;
+            }
+
             EnqueueType(memberType.Resolve());
             MakeFriendlyReference(memberType, codeNamespace);
         }
