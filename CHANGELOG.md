@@ -1,3 +1,8 @@
+## 3.5.5 (2018-02-20)
+
+Bugfixes:
+  - null reference exception during servertypings generation of types with generic parameters
+
 ## 3.5.4 (2018-02-19)
 
 Features:
