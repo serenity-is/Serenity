@@ -175,7 +175,8 @@ namespace Serenity.CodeGeneration
                      constructor.Arguments[0].Type == "JQuery"))
                 {
                     var optionsType = GetScriptType(constructor.Arguments[isWidget ? 1 : 0].Type);
-                    AddOptionMembers(result, optionsType, isOptions: true);
+                    if (optionsType != null)
+                        AddOptionMembers(result, optionsType, isOptions: true);
                 }
             }
 
