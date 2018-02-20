@@ -71,6 +71,7 @@ namespace Serenity.CodeGeneration
                 var ns = DoGetNamespace(type);
 
                 sb.Clear();
+                cw.IndentedLine("[Imported]");
                 cw.Indented("public partial class ");
                 sb.Append(DoGetTypeName(type));
                 sb.AppendLine(" : PrefixedContext");
@@ -80,7 +81,8 @@ namespace Serenity.CodeGeneration
                     sb.Append(formScriptAttribute.Key);
                     sb.AppendLine("\";");
                     sb.AppendLine();
-                    
+
+                    cw.IndentedLine("[InlineCode(\"new Serenity.PrefixedContext({idPrefix})\")]");
                     cw.Indented("public ");
                     sb.Append(DoGetTypeName(type));
                     sb.AppendLine("(string idPrefix) : base(idPrefix) {}");
