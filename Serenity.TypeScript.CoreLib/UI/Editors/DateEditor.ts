@@ -119,11 +119,11 @@
 
             if (value !== this.get_readOnly()) {
                 if (value) {
-                    this.element.addClass('readonly').attr('readonly', 'readonly');
+                    this.element.addClass('readonly').attr('readonly', 'readonly').attr('tabindex', '-1');
                     this.element.nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
                 }
                 else {
-                    this.element.removeClass('readonly').removeAttr('readonly');
+                    this.element.removeClass('readonly').removeAttr('readonly').removeAttr('tabindex');
                     this.element.nextAll('.ui-datepicker-trigger').css('opacity', '1');
                 }
             }

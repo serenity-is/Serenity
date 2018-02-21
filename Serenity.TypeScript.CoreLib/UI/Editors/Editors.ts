@@ -242,17 +242,17 @@
                 var type = elx.attr('type');
                 if (elx.is('select') || type === 'radio' || type === 'checkbox') {
                     if (isReadOnly) {
-                        elx.addClass('readonly').attr('disabled', 'disabled');
+                        elx.addClass('readonly').attr('disabled', 'disabled').attr('tabindex', '-1');
                     }
                     else {
-                        elx.removeClass('readonly').removeAttr('disabled');
+                        elx.removeClass('readonly').removeAttr('disabled').removeAttr('tabindex');
                     }
                 }
                 else if (isReadOnly) {
-                    elx.addClass('readonly').attr('readonly', 'readonly');
+                    elx.addClass('readonly').attr('readonly', 'readonly').attr('tabindex', '-1');
                 }
                 else {
-                    elx.removeClass('readonly').removeAttr('readonly');
+                    elx.removeClass('readonly').removeAttr('readonly').removeAttr('tabindex');
                 }
                 return true;
             });
