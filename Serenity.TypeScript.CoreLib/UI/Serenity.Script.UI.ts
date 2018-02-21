@@ -116,7 +116,7 @@ namespace Serenity.DialogExtensions {
         return dialog;
     }
 
-    function dialogCloseOnEnter(dialog: JQuery): JQuery {
+    export function dialogCloseOnEnter(dialog: JQuery): JQuery {
         dialog.bind('keydown', function (e) {
             if (e.which !== 13) {
                 return;

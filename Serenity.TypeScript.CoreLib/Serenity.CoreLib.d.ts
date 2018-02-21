@@ -3286,6 +3286,7 @@ declare namespace Serenity.DialogExtensions {
     function dialogFlexify(dialog: JQuery): JQuery;
     function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery;
     function dialogMaximizable(dialog: JQuery): JQuery;
+    function dialogCloseOnEnter(dialog: JQuery): JQuery;
 }
 declare namespace Serenity.DialogTypeRegistry {
     function tryGet(key: string): Function;

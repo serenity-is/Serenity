@@ -16786,6 +16786,7 @@ var Serenity;
             });
             return dialog;
         }
+        DialogExtensions.dialogCloseOnEnter = dialogCloseOnEnter;
     })(DialogExtensions = Serenity.DialogExtensions || (Serenity.DialogExtensions = {}));
 })(Serenity || (Serenity = {}));
 (function (Serenity) {
