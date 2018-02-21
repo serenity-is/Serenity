@@ -1349,6 +1349,7 @@ declare namespace Serenity {
         readonly text: string;
         get_readOnly(): boolean;
         readOnly: boolean;
+        private updateInplaceReadOnly();
         set_readOnly(value: boolean): void;
     }
     interface Select2Item {

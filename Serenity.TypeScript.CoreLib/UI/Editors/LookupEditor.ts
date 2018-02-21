@@ -164,12 +164,22 @@
         }
 
         protected inplaceCreateClick(e: JQueryEventObject) {
-            if (this.get_readOnly()) {
+
+            if (this.get_readOnly() &&
+                ((this.multiple && !e['editItem']) || !this.value))
                 return;
-            }
 
             var self = this;
             this.createEditDialog(dialog => {
+
+                // an ugly workaround
+                if (this.get_readOnly() &&
+                    (dialog as any).element)
+                    (dialog as any).element
+                        .find('.tool-button.delete-button')
+                        .addClass('disabled')
+                        .unbind('click');
+
                 Serenity.SubDialogHelper.bindToDataChange(dialog, this, (x, dci) => {
                     Q.reloadLookup(this.getLookupKey());
                     self.updateItems();

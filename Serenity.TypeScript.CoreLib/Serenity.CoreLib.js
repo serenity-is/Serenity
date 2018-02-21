@@ -5278,6 +5278,7 @@ var Serenity;
                 }
                 this.element.select2('val', val)
                     .triggerHandler('change', [true]);
+                this.updateInplaceReadOnly();
             }
         };
         Select2Editor.prototype.get_values = function () {
@@ -5334,13 +5335,18 @@ var Serenity;
             enumerable: true,
             configurable: true
         });
+        Select2Editor.prototype.updateInplaceReadOnly = function () {
+            var readOnly = this.get_readOnly() &&
+                (this.multiple || !this.value);
+            this.element.nextAll('.inplace-create')
+                .attr('disabled', (readOnly ? 'disabled' : ''))
+                .css('opacity', (readOnly ? '0.1' : ''))
+                .css('cursor', (readOnly ? 'default' : ''));
+        };
         Select2Editor.prototype.set_readOnly = function (value) {
             if (value !== this.get_readOnly()) {
                 Serenity.EditorUtils.setReadonly(this.element, value);
-                this.element.nextAll('.inplace-create')
-                    .attr('disabled', (value ? 'disabled' : ''))
-                    .css('opacity', (value ? '0.1' : ''))
-                    .css('cursor', (value ? 'default' : ''));
+                this.updateInplaceReadOnly();
             }
         };
         Select2Editor = __decorate([
@@ -5570,11 +5576,18 @@ var Serenity;
         };
         LookupEditorBase.prototype.inplaceCreateClick = function (e) {
             var _this = this;
-            if (this.get_readOnly()) {
+            if (this.get_readOnly() &&
+                ((this.multiple && !e['editItem']) || !this.value))
                 return;
-            }
             var self = this;
             this.createEditDialog(function (dialog) {
+                // an ugly workaround
+                if (_this.get_readOnly() &&
+                    dialog.element)
+                    dialog.element
+                        .find('.tool-button.delete-button')
+                        .addClass('disabled')
+                        .unbind('click');
                 Serenity.SubDialogHelper.bindToDataChange(dialog, _this, function (x, dci) {
                     Q.reloadLookup(_this.getLookupKey());
                     self.updateItems();

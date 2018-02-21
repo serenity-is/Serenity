@@ -295,6 +295,8 @@ namespace Serenity {
 
                 this.element.select2('val', val)
                     .triggerHandler('change', [true]);
+
+                this.updateInplaceReadOnly();
             }
         }
 
@@ -355,13 +357,20 @@ namespace Serenity {
             return this.get_readOnly();
         }
 
+        private updateInplaceReadOnly(): void {
+            var readOnly = this.get_readOnly() &&
+                (this.multiple || !this.value);
+
+            this.element.nextAll('.inplace-create')
+                .attr('disabled', (readOnly ? 'disabled' : ''))
+                .css('opacity', (readOnly ? '0.1' : ''))
+                .css('cursor', (readOnly ? 'default' : ''));
+        }
+
         set_readOnly(value: boolean) {
             if (value !== this.get_readOnly()) {
                 Serenity.EditorUtils.setReadonly(this.element, value);
-                this.element.nextAll('.inplace-create')
-                    .attr('disabled', (value ? 'disabled' : ''))
-                    .css('opacity', (value ? '0.1' : ''))
-                    .css('cursor', (value ? 'default' : ''));
+                this.updateInplaceReadOnly();
             }
         }
 
