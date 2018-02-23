@@ -1482,6 +1482,7 @@
     }
 
     @Decorators.registerEditor('Serenity.Recaptcha', [IStringValue])
+    @Element('<div/>')
     export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
         constructor(div: JQuery, opt: RecaptchaOptions) {
             super(div, opt);

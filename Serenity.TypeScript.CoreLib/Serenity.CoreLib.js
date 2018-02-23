@@ -7168,7 +7168,8 @@ var Serenity;
             // ignore
         };
         Recaptcha = __decorate([
-            Serenity.Decorators.registerEditor('Serenity.Recaptcha', [Serenity.IStringValue])
+            Serenity.Decorators.registerEditor('Serenity.Recaptcha', [Serenity.IStringValue]),
+            Element('<div/>')
         ], Recaptcha);
         return Recaptcha;
     }(Serenity.Widget));
