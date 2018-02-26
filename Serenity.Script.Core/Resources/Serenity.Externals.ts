@@ -279,7 +279,7 @@
             return null;
 
         var timestamp = Date.parse(s);
-        if (!isNaN(timestamp) && typeof timestamp == "Date")
+        if (!isNaN(timestamp) && (typeof timestamp as any) == "Date")
             return <Date><any>timestamp;
 
         s = s + "";
@@ -610,7 +610,7 @@
                 e.dialog('destroy').html('');
             }
         }, options);
-        e.dialog(settings);
+        e.dialog(settings as any);
     };
 
     export function toId(id: any): any {
