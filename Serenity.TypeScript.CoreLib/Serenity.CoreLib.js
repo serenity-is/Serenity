@@ -31,6 +31,9 @@ if (typeof Promise === "undefined") {
 }
 // fake assembly for typescript apps
 ss.initAssembly({}, 'App', {});
+if (typeof preact === undefined && window['React'])
+    window['preact'] = window['React'];
+var H = preact.h;
 var Q;
 (function (Q) {
     function coalesce(a, b) {
@@ -16839,5 +16842,89 @@ var Serenity;
         }
         DialogTypeRegistry.get = get;
     })(DialogTypeRegistry = Serenity.DialogTypeRegistry || (Serenity.DialogTypeRegistry = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var ToolBarButton = /** @class */ (function (_super) {
+        __extends(ToolBarButton, _super);
+        function ToolBarButton(props) {
+            return _super.call(this, props) || this;
+        }
+        ToolBarButton.prototype.render = function () {
+            var p = this.props;
+            var klass = p.icon;
+            var htext = p.title;
+            if (Q.startsWith(klass, 'fa-')) {
+                klass = 'fa ' + klass;
+            }
+            else if (Q.startsWith(klass, 'glyphicon-')) {
+                klass = 'glyphicon ' + klass;
+            }
+            if (p.htmlEncode !== false)
+                htext = Q.htmlEncode(htext);
+            var htext = '<i class="' + Q.attrEncode(klass) + '"></i> ' + htext;
+            return (H("div", { class: (_a = {
+                        "tool-button": true,
+                        "icon-tool-button": !p.icon,
+                        "no-text": !p.title,
+                        disabled: p.disabled
+                    },
+                    _a[p.cssClass] = !!p.cssClass,
+                    _a), title: p.hint, onClick: function (e) {
+                    if (p.disabled || !p.onClick)
+                        return;
+                    p.onClick(e);
+                } },
+                H("div", { class: "button-outer" },
+                    H("span", { dangerouslySetInnerHTML: { __html: htext } }))));
+            var _a;
+        };
+        ToolBarButton.prototype.componentDidMount = function () {
+            var _this = this;
+            if (!!(!Q.isEmptyOrNull(this.props.hotkey) && window['Mousetrap'] != null)) {
+                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.props.hotkeyContext || window.document.documentElement);
+                this.mouseTrap.bind(this.props.hotkey, function (e1, action) {
+                    if ($(_this.base).is(':visible')) {
+                        var event = new Event('click', { bubbles: true });
+                        _this.base.dispatchEvent(event);
+                    }
+                    return _this.props.hotkeyAllowDefault;
+                });
+            }
+        };
+        ToolBarButton.prototype.componentWillUnmount = function () {
+            if (this.mouseTrap) {
+                if (!!this.mouseTrap.destroy) {
+                    this.mouseTrap.destroy();
+                }
+                else {
+                    this.mouseTrap.reset();
+                }
+                this.mouseTrap = null;
+            }
+        };
+        return ToolBarButton;
+    }(preact.Component));
+    Serenity.ToolBarButton = ToolBarButton;
+    var ToolBar = /** @class */ (function (_super) {
+        __extends(ToolBar, _super);
+        function ToolBar(props) {
+            return _super.call(this, props) || this;
+        }
+        ToolBar.prototype.render = function () {
+            var _this = this;
+            return (H("div", { class: "s-Toolbar clearfix" },
+                H("div", { class: "tool-buttons" },
+                    H("div", { class: "buttons-outer" },
+                        H("div", { class: "buttons-inner" }, (this.props.buttons || []).map(function (button) {
+                            {
+                                button.separator && H("div", { class: "separator" });
+                            }
+                            H(Serenity.ToolBarButton, __assign({ hotkeyContext: _this.props.hotkeyContext }, button));
+                        }))))));
+        };
+        return ToolBar;
+    }(preact.Component));
+    Serenity.ToolBar = ToolBar;
 })(Serenity || (Serenity = {}));
 //# sourceMappingURL=Serenity.CoreLib.js.map

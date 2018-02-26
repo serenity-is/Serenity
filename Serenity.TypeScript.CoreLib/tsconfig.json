@@ -10,8 +10,13 @@
     "outFile": "Serenity.CoreLib.js",
     "suppressImplicitAnyIndexErrors": true,
     "target": "ES5",
-    "noEmitHelpers": true
+    "noEmitHelpers": true,
+    "jsx": "react",
+    "jsxFactory": "H"
   },
+  "typeRoots": [
+    "./node_modules/@types/"
+  ],
   "files": [
     "Imports/Helpers.ts",
     "Imports/RSVP.ts",
@@ -20,6 +25,8 @@
     "Imports/SS.ts",
     "Imports/jQueryStatic.ts",
     "Imports/JQBlockUI.ts",
+    "./node_modules/preact/dist/preact.d.ts",
+    "Imports/InitPreact.ts",
     "Services/ServiceError.ts",
     "Services/ServiceResponse.ts",
     "Q/Q.BasicUtils.ts",
@@ -98,7 +105,8 @@
     "UI/jQuery/jQueryUI.ButtonNoConflict.ts",
     "Externals/Serenity.Externals.Slick.ts",
     "Externals/Serenity.Externals.ts",
-    "UI/Serenity.Script.UI.ts"
+    "UI/Serenity.Script.UI.ts",
+    "UI/Widgets/Toolbar.tsx"
   ],
   "exclude": [
     "node_modules/",

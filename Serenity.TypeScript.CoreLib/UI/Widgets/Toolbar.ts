@@ -8,7 +8,9 @@
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
+        hotkeyContext?: any;
         separator?: boolean;
+        disabled?: boolean;
     }
 
     export interface PopupMenuButtonOptions {

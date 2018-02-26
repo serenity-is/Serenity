@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Imports\Helpers.ts" />
+    <TypeScriptCompile Include="Imports\InitPreact.ts" />
     <TypeScriptCompile Include="Imports\RSVP.ts" />
     <TypeScriptCompile Include="Imports\Promise.ts" />
     <TypeScriptCompile Include="Imports\Select2.ts" />
@@ -80,6 +81,7 @@
     <TypeScriptCompile Include="UI\Helpers\SubDialogHelper.ts" />
     <TypeScriptCompile Include="UI\Helpers\TabsExtensions.ts" />
     <TypeScriptCompile Include="UI\Helpers\UploadHelper.ts" />
+    <TypeScriptCompile Include="UI\Widgets\Toolbar.tsx" />
     <TypeScriptCompile Include="UI\Widgets\Widget.ts" />
     <TypeScriptCompile Include="UI\Helpers\ValidationHelper.ts" />
     <TypeScriptCompile Include="UI\Widgets\TemplatedWidget.ts" />
@@ -153,7 +155,7 @@
     <Exec Command="cmd /c &quot;$(NpmPath)npm&quot; install" />
   </Target>
   <Target Name="CreateInputsOutputs" BeforeTargets="BeforeBuild">
-    <CreateItem Include="Decorators\**\*.ts;Externals\**\*.ts;Imports\**\*.ts;Q\**\*.ts;Services\**\*.ts;UI\**\*.ts">
+    <CreateItem Include="Decorators\**\*.ts;Externals\**\*.ts;Imports\**\*.ts;Q\**\*.ts;Services\**\*.ts;UI\**\*.ts;**\*.tsx">
       <Output TaskParameter="Include" ItemName="CompileTSCInputs" />
     </CreateItem>
   </Target>

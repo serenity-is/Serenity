@@ -3292,3 +3292,5 @@ declare namespace Serenity.DialogTypeRegistry {
     function tryGet(key: string): Function;
     function get(key: string): Function;
 }
+declare var React: any;
+declare function test(): any;
