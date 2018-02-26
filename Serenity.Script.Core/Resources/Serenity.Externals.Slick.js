@@ -146,7 +146,7 @@ var Slick;
     var Data;
     (function (Data) {
         var GroupItemMetadataProvider;
-        var RemoteView = (function () {
+        var RemoteView = /** @class */ (function () {
             function RemoteView(options) {
                 var self = this;
                 var defaults = {
@@ -732,6 +732,7 @@ var Slick;
                         "$filter$; ",
                         "} ",
                         "return _retval; "
+                        //"}"
                     ].join("");
                     tpl = tpl.replace(/\$filter\$/gi, filterBody);
                     tpl = tpl.replace(/\$item\$/gi, filterInfo.params[0]);
@@ -762,6 +763,7 @@ var Slick;
                         "$filter$; ",
                         "} ",
                         "return _retval; "
+                        //"}"
                     ].join("");
                     tpl = tpl.replace(/\$filter\$/gi, filterBody);
                     tpl = tpl.replace(/\$item\$/gi, filterInfo.params[0]);
