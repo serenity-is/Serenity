@@ -9,8 +9,20 @@ namespace Q {
         return t;
     }
 
+    export function dbText(prefix: string): ((key: string) => string) {
+        return function (key: string) {
+            return text("Db." + prefix + "." + key);
+        }
+    }
+
     export function tryGetText(key: string): string {
         return LT.$table[key];
+    }
+
+    export function dbTryText(prefix: string): ((key: string) => string) {
+        return function (key: string) {
+            return text("Db." + prefix + "." + key);
+        }
     }
 
     export class LT {

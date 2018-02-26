@@ -10,8 +10,13 @@
     "outFile": "Serenity.CoreLib.js",
     "suppressImplicitAnyIndexErrors": true,
     "target": "ES5",
-    "noEmitHelpers": true
+    "noEmitHelpers": true,
+    "jsx": "react",
+    "jsxFactory": "H"
   },
+  "typeRoots": [
+    "./node_modules/@types/"
+  ],
   "files": [
     "Imports/Helpers.ts",
     "Imports/RSVP.ts",
@@ -38,6 +43,8 @@
     "Q/Q.TypeSystem.ts",
     "Q/Q.Authorization.ts",
     "Q/Q.Router.ts",
+    "Q/Q.JSX.ts",
+    "Q/Q.VDom.ts",
     "Decorators/Decorators.ts",
     "Services/Criteria.ts",
     "UI/Helpers/SlickHelpers.ts",
@@ -76,7 +83,8 @@
     "UI/Widgets/Widgets.ts",
     "UI/Widgets/WX.ts",
     "UI/PropertyGrid/PropertyGrid.ts",
-    "UI/Widgets/Toolbar.ts",
+    "UI/Widgets/Toolbar.tsx",
+    "UI/Widgets/PopupToolButton.ts",
     "UI/Widgets/CreateWidgetParams.ts",
     "UI/Widgets/CustomValidation.ts",
     "UI/Widgets/IValidateRequired.ts",

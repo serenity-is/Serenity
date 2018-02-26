@@ -53,6 +53,8 @@
     <TypeScriptCompile Include="Imports\SS.ts" />
     <TypeScriptCompile Include="Imports\jQueryStatic.ts" />
     <TypeScriptCompile Include="Imports\JQBlockUI.ts" />
+    <TypeScriptCompile Include="Q\Q.JSX.ts" />
+    <TypeScriptCompile Include="Q\Q.VDom.ts" />
     <TypeScriptCompile Include="Services\ServiceError.ts" />
     <TypeScriptCompile Include="Services\ServiceResponse.ts" />
     <TypeScriptCompile Include="Q\Q.BasicUtils.ts" />
@@ -80,6 +82,7 @@
     <TypeScriptCompile Include="UI\Helpers\SubDialogHelper.ts" />
     <TypeScriptCompile Include="UI\Helpers\TabsExtensions.ts" />
     <TypeScriptCompile Include="UI\Helpers\UploadHelper.ts" />
+    <TypeScriptCompile Include="UI\Widgets\Toolbar.tsx" />
     <TypeScriptCompile Include="UI\Widgets\Widget.ts" />
     <TypeScriptCompile Include="UI\Helpers\ValidationHelper.ts" />
     <TypeScriptCompile Include="UI\Widgets\TemplatedWidget.ts" />
@@ -111,7 +114,7 @@
     <TypeScriptCompile Include="UI\Widgets\Widgets.ts" />
     <TypeScriptCompile Include="UI\Widgets\WX.ts" />
     <TypeScriptCompile Include="UI\PropertyGrid\PropertyGrid.ts" />
-    <TypeScriptCompile Include="UI\Widgets\Toolbar.ts" />
+    <TypeScriptCompile Include="UI\Widgets\PopupToolButton.ts" />
     <TypeScriptCompile Include="UI\Widgets\CreateWidgetParams.ts" />
     <TypeScriptCompile Include="UI\Widgets\CustomValidation.ts" />
     <TypeScriptCompile Include="UI\Widgets\IValidateRequired.ts" />
@@ -153,7 +156,7 @@
     <Exec Command="cmd /c &quot;$(NpmPath)npm&quot; install" />
   </Target>
   <Target Name="CreateInputsOutputs" BeforeTargets="BeforeBuild">
-    <CreateItem Include="Decorators\**\*.ts;Externals\**\*.ts;Imports\**\*.ts;Q\**\*.ts;Services\**\*.ts;UI\**\*.ts">
+    <CreateItem Include="Decorators\**\*.ts;Externals\**\*.ts;Imports\**\*.ts;Q\**\*.ts;Services\**\*.ts;UI\**\*.ts;**\*.tsx">
       <Output TaskParameter="Include" ItemName="CompileTSCInputs" />
     </CreateItem>
   </Target>

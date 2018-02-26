@@ -15,6 +15,26 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var __assign = Object.assign || function (t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+    }
+    return t;
+};
+var __rest = function (s, e) {
+    var t = {};
+    for (var p in s)
+        if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+            t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++)
+            if (e.indexOf(p[i]) < 0)
+                t[p[i]] = s[p[i]];
+    return t;
+};
 /**
  * Represents the completion of an asynchronous operation
  */
@@ -778,10 +798,22 @@ var Q;
         return t;
     }
     Q.text = text;
+    function dbText(prefix) {
+        return function (key) {
+            return text("Db." + prefix + "." + key);
+        };
+    }
+    Q.dbText = dbText;
     function tryGetText(key) {
         return LT.$table[key];
     }
     Q.tryGetText = tryGetText;
+    function dbTryText(prefix) {
+        return function (key) {
+            return text("Db." + prefix + "." + key);
+        };
+    }
+    Q.dbTryText = dbTryText;
     var LT = /** @class */ (function () {
         function LT(key) {
             this.key = key;
@@ -2298,6 +2330,433 @@ var Q;
         });
     })(Router = Q.Router || (Q.Router = {}));
 })(Q || (Q = {}));
+var Q;
+(function (Q) {
+    var Component = /** @class */ (function () {
+        function Component(props, children) {
+            this.props = props;
+            this.children = children;
+        }
+        return Component;
+    }());
+    Q.Component = Component;
+})(Q || (Q = {}));
+var Q;
+(function (Q) {
+    // modified version of https://github.com/yelouafi/petit-dom for one time mount only, update / removal with jQuery
+    var isArray = Array.isArray;
+    var EMPTYO = {};
+    var EMPTYAR = [];
+    var isVNode = function (c) { return c && (c._vnode != null || c._text != null); };
+    function h(type, props, contArg) {
+        var children, args, i, isSVG = false;
+        var len = arguments.length - 2;
+        if (typeof type !== "string") {
+            if (len === 1) {
+                children = contArg;
+            }
+            else if (len > 1) {
+                args = Array(len);
+                for (i = 0; i < len; i++) {
+                    args[i] = arguments[i + 2];
+                }
+                children = args;
+            }
+        }
+        else {
+            isSVG = type === "svg";
+            if (len === 1) {
+                if (isArray(contArg)) {
+                    children = maybeFlatten(contArg, isSVG);
+                }
+                else if (isVNode(contArg)) {
+                    contArg.isSVG = isSVG;
+                    children = [contArg];
+                }
+                else {
+                    children = [{ _text: contArg == null ? "" : contArg }];
+                }
+            }
+            else if (len > 1) {
+                args = Array(len);
+                for (i = 0; i < len; i++) {
+                    args[i] = arguments[i + 2];
+                }
+                children = maybeFlatten(args, isSVG);
+            }
+            else {
+                children = EMPTYAR;
+            }
+        }
+        return {
+            _vnode: true,
+            isSVG: isSVG,
+            type: type,
+            props: props || EMPTYO,
+            children: children
+        };
+    }
+    Q.h = h;
+    function maybeFlatten(arr, isSVG) {
+        for (var i = 0; i < arr.length; i++) {
+            var ch = arr[i];
+            if (isArray(ch)) {
+                return flattenChildren(arr, i, arr.slice(0, i), isSVG);
+            }
+            else if (!isVNode(ch)) {
+                arr[i] = { _text: ch == null ? "" : ch };
+            }
+            else if (isSVG && !ch.isSVG) {
+                ch.isSVG = true;
+            }
+        }
+        return arr;
+    }
+    Q.maybeFlatten = maybeFlatten;
+    function flattenChildren(children, start, arr, isSVG) {
+        for (var i = start; i < children.length; i++) {
+            var ch = children[i];
+            if (isArray(ch)) {
+                flattenChildren(ch, 0, arr, isSVG);
+            }
+            else if (isVNode(ch)) {
+                if (isSVG && !ch.isSVG) {
+                    ch.isSVG = true;
+                }
+                arr.push(ch);
+            }
+            else {
+                arr.push({ _text: ch == null ? "" : ch });
+            }
+        }
+        return arr;
+    }
+    var SVG_NS = "http://www.w3.org/2000/svg";
+    var SELECT = "select";
+    var SELECT_DELAYED_PROPS = { selectedIndex: true };
+    var INPUT = "input";
+    var INPUT_DELAYED_PROPS = { type: true, value: true };
+    var XLINK_NS = "http://www.w3.org/1999/xlink";
+    var NS_ATTRS = {
+        show: XLINK_NS,
+        actuate: XLINK_NS,
+        href: XLINK_NS
+    };
+    var IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
+    var IGNORE_KEYS = {
+        "ref": true,
+        "children": true
+    };
+    function setProps(el, props, ignoreKeys) {
+        for (var key in props) {
+            if (IGNORE_KEYS[key] === true)
+                continue;
+            if (ignoreKeys != null && ignoreKeys[key] === true)
+                continue;
+            var val = props[key];
+            if (val == null || val == false)
+                continue;
+            if (key === 'class')
+                key = 'className';
+            else if (key === "for")
+                key = 'htmlFor';
+            if (key == 'style') {
+                if (!val || typeof val === 'string') {
+                    el.style.cssText = val || '';
+                }
+                if (val && typeof val === 'object') {
+                    for (var i in val) {
+                        el.style[i] = typeof val[i] === 'number' &&
+                            IS_NON_DIMENSIONAL.test(i) === false ? (val[i] + 'px') : val[i];
+                    }
+                }
+                continue;
+            }
+            else if (key == "className") {
+                if (val && typeof val === 'object') {
+                    var classes = [];
+                    for (var _i = 0, _a = Object.getOwnPropertyNames(val); _i < _a.length; _i++) {
+                        var key = _a[_i];
+                        if (val[key]) {
+                            classes.push(key);
+                        }
+                    }
+                    val = classes.join(' ');
+                }
+                el.className = val;
+                continue;
+            }
+            else if (key == "setInnerHTML") {
+                el.innerHTML = val;
+                continue;
+            }
+            else if (key.charAt(0) == 'o' && key.charAt(1) == 'n') {
+                key = key.toLowerCase();
+            }
+            try {
+                el[key] = val;
+            }
+            catch (e) { }
+        }
+    }
+    function appendChildren(parent, children, start, end, beforeNode) {
+        if (start === void 0) { start = 0; }
+        if (end === void 0) { end = children.length - 1; }
+        while (start <= end) {
+            var ch = children[start++];
+            parent.insertBefore(mount(ch), beforeNode);
+        }
+    }
+    function updateSelect(node, props, children, oldProps, oldChildren) {
+        var isMount = oldProps == null;
+        var hasSelIndex = props.selectedIndex != null;
+        var hasValue = !hasSelIndex && "value" in props;
+        var ignoreKeys = hasSelIndex || hasValue ? SELECT_DELAYED_PROPS : null;
+        setProps(node, props, ignoreKeys);
+        appendChildren(node, children);
+        if (!props.multiple) {
+            if (hasSelIndex) {
+                if (isMount || props.selectedIndex !== oldProps.selectedIndex) {
+                    node.selectedIndex = props.selectedIndex;
+                }
+            }
+            else if (hasValue) {
+                if (isMount || props.value !== oldProps.value) {
+                    node.value = props.value;
+                }
+            }
+        }
+        return node;
+    }
+    function updateInput(node, props) {
+        var hasValue = props.value != null;
+        var ignoreKeys = hasValue ? INPUT_DELAYED_PROPS : null;
+        if (props.type != null) {
+            node.type = props.type;
+        }
+        setProps(node, props, ignoreKeys);
+        if (hasValue)
+            node.value = props.value;
+        return node;
+    }
+    function setAttributes(el, attrs) {
+        for (var key in attrs) {
+            if (IGNORE_KEYS[key] === true)
+                continue;
+            var newv = attrs[key];
+            if (newv == null || newv === false)
+                continue;
+            setDOMAttr(el, key, newv);
+        }
+    }
+    function setDOMAttr(el, attr, value) {
+        if (value === true) {
+            el.setAttribute(attr, "");
+        }
+        else {
+            var ns = NS_ATTRS[attr];
+            if (ns !== undefined) {
+                el.setAttributeNS(ns, attr, value);
+            }
+            else {
+                el.setAttribute(attr, value);
+            }
+        }
+    }
+    function Fragment(props, children) {
+        return null;
+    }
+    Q.Fragment = Fragment;
+    function extend(obj, props) {
+        for (var i in props)
+            obj[i] = props[i];
+        return obj;
+    }
+    Q.extend = extend;
+    function getNodeProps(vnode) {
+        var defaultProps = vnode.type.defaultProps;
+        if (defaultProps === undefined)
+            return vnode.props;
+        var props = extend({}, vnode.props);
+        for (var i in defaultProps) {
+            if (props[i] === undefined) {
+                props[i] = defaultProps[i];
+            }
+        }
+        return props;
+    }
+    var uniqueId = 0;
+    var mountQueue = [];
+    var mountDepth = 0;
+    function withUniqueID(action) {
+        var prefix = "uid_" + uniqueId + "_";
+        return action(function (s) {
+            return prefix + s;
+        });
+    }
+    Q.withUniqueID = withUniqueID;
+    function processQueue() {
+        var m = mountQueue;
+        mountQueue = [];
+        for (var _i = 0, m_1 = m; _i < m_1.length; _i++) {
+            var x = m_1[_i];
+            x();
+        }
+    }
+    function render(vnode, parent) {
+        mountDepth++;
+        try {
+            parent.appendChild(mount(vnode));
+        }
+        finally {
+            mountDepth--;
+        }
+        if (mountDepth == 0)
+            processQueue();
+    }
+    Q.render = render;
+    function mount(vnode, node) {
+        mountDepth++;
+        try {
+            var ref = vnode.props && vnode.props.ref;
+            var component, vnode;
+            if (vnode._text != null) {
+                node = node || document.createTextNode(vnode._text);
+            }
+            else if (vnode._vnode === true) {
+                var type_1 = vnode.type;
+                var children = vnode.children;
+                var isSVG = vnode.isSVG;
+                var props = vnode.props;
+                if (typeof type_1 === "string") {
+                    var isSelect = !isSVG && type_1.length === 6 && type_1.toLowerCase() === SELECT;
+                    var isInput = !isSelect &&
+                        !isSVG &&
+                        type_1.length === 5 &&
+                        type_1.toLowerCase() === INPUT;
+                    if (isSelect) {
+                        node = node || document.createElement(type_1);
+                        updateSelect(node, props, children);
+                    }
+                    else if (isInput) {
+                        node = node || document.createElement(type_1);
+                        updateInput(node, props);
+                    }
+                    else {
+                        if (!isSVG) {
+                            node = node || document.createElement(type_1);
+                            setProps(node, props);
+                        }
+                        else {
+                            node = node || document.createElementNS(SVG_NS, type_1);
+                            setAttributes(node, props);
+                        }
+                        if (isArray(children)) {
+                            appendChildren(node, children);
+                        }
+                        else {
+                            node.appendChild(mount(children));
+                        }
+                    }
+                }
+                else if (type_1.render) {
+                    component = type_1;
+                    props = getNodeProps(vnode);
+                    var vnode = type_1.render(props, children);
+                    node = mount(vnode);
+                }
+                else if (typeof type_1 === "function") {
+                    if (type_1.prototype.__isWidget) {
+                        node = Serenity.Widget.elementFor(type_1)[0];
+                        var mref = ref;
+                        ref = null;
+                        mountQueue.push(function () {
+                            var $node = $(node);
+                            var e = node;
+                            if (props.id != null)
+                                e.setAttribute("id", props.id);
+                            if (props.name != null)
+                                e.setAttribute("name", props.name);
+                            if ($node.is(':input'))
+                                $node.addClass("editor");
+                            if (props.class != null)
+                                $node.addClass(props.class);
+                            var widget = new type_1($node, props);
+                            if (props.maxLength != null)
+                                e.setAttribute("maxLength", props.maxlength);
+                            if (props.required)
+                                Serenity.EditorUtils.setRequired(widget, true);
+                            if (props.readOnly)
+                                Serenity.EditorUtils.setReadOnly(widget, true);
+                            if (mref) {
+                                mref(widget);
+                                $node.on('remove', function () {
+                                    mref(null);
+                                });
+                            }
+                        });
+                    }
+                    else if (type_1.prototype.render) {
+                        props = getNodeProps(vnode);
+                        var instance = new type_1(props, children);
+                        component = instance;
+                        vnode = instance.render(props, children);
+                        node = mount(vnode);
+                    }
+                    else if (type_1 === Fragment) {
+                        node = document.createDocumentFragment();
+                        if (isArray(children)) {
+                            var start = 0;
+                            var end = children.length - 1;
+                            while (start <= end) {
+                                var ch = children[start++];
+                                node.appendChild(mount(ch));
+                            }
+                        }
+                        else
+                            node.appendChild(mount(children));
+                    }
+                    else {
+                        props = getNodeProps(vnode);
+                        vnode = type_1(props, children);
+                        node = mount(vnode);
+                    }
+                }
+            }
+            if (node == null) {
+                throw new Error("Unknown node type!");
+            }
+            if (ref != null) {
+                mountQueue.push(function () {
+                    ref(component || node);
+                });
+                $(node).on('remove', function () {
+                    ref(null);
+                });
+            }
+            if (component != null && component.mounted != null) {
+                mountQueue.push(function () {
+                    component.mounted(node);
+                });
+            }
+            if (component != null && component.unmounted != null) {
+                mountQueue.push(function () {
+                    $(node).one('remove', function () {
+                        component.unmounted();
+                    });
+                });
+            }
+        }
+        finally {
+            mountDepth--;
+        }
+        if (!mountDepth)
+            processQueue();
+        return node;
+    }
+    Q.mount = mount;
+})(Q || (Q = {}));
+var H = Q.h;
 var Serenity;
 (function (Serenity) {
     var Decorators;
@@ -4178,6 +4637,16 @@ var Serenity;
             }
             return this.asyncPromise;
         };
+        Widget.prototype.render = function (props, children) {
+            throw "This method is only here for TypeScript VDOM to work!";
+        };
+        Object.defineProperty(Widget.prototype, "props", {
+            get: function () {
+                return this.options;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Widget.nextWidgetNumber = 0;
         Widget = Widget_1 = __decorate([
             Serenity.Decorators.registerClass()
@@ -4186,6 +4655,7 @@ var Serenity;
         var Widget_1;
     }());
     Serenity.Widget = Widget;
+    Widget.prototype.__isWidget = true;
     Widget.prototype.addValidationRule = function (eventClass, rule) {
         return Serenity.VX.addValidationRule(this.element, eventClass, rule);
     };
@@ -10382,6 +10852,129 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var Toolbar = /** @class */ (function (_super) {
+        __extends(Toolbar, _super);
+        function Toolbar(div, options) {
+            var _this = _super.call(this, div, options) || this;
+            Q.mount(_this.render(options), div[0]);
+            _this.setupMouseTrap();
+            return _this;
+        }
+        Toolbar_1 = Toolbar;
+        Toolbar.prototype.destroy = function () {
+            this.element.find(Toolbar_1.buttonSelector).unbind('click');
+            if (this.mouseTrap) {
+                if (!!this.mouseTrap.destroy) {
+                    this.mouseTrap.destroy();
+                }
+                else {
+                    this.mouseTrap.reset();
+                }
+                this.mouseTrap = null;
+            }
+            _super.prototype.destroy.call(this);
+        };
+        Toolbar.prototype.setupMouseTrap = function () {
+            var _this = this;
+            if (!window['Mousetrap'])
+                return;
+            var buttons;
+            for (var _i = 0, _a = this.options.buttons || []; _i < _a.length; _i++) {
+                var b = _a[_i];
+                if (Q.isEmptyOrNull(b.hotkey))
+                    continue;
+                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.options.hotkeyContext || window.document.documentElement);
+                (function (x) {
+                    var btn = (buttons = buttons || _this.element.find(Toolbar_1.buttonSelector))
+                        .filter("." + x.cssClass);
+                    _this.mouseTrap.bind(x.hotkey, function (e, action) {
+                        if (btn.is(':visible')) {
+                            btn.triggerHandler('click');
+                        }
+                        return x.hotkeyAllowDefault;
+                    });
+                })(b);
+            }
+        };
+        Toolbar.prototype.adjustIconClass = function (icon) {
+            if (!icon)
+                return icon;
+            if (Q.startsWith(icon, 'fa-'))
+                return 'fa ' + icon;
+            if (Q.startsWith(icon, 'glyphicon-'))
+                return 'glyphicon ' + icon;
+            return icon;
+        };
+        Toolbar.prototype.buttonClass = function (btn) {
+            return _a = {
+                    "tool-button": true,
+                    "icon-tool-button": !!btn.icon,
+                    "no-text": !btn.title,
+                    disabled: btn.disabled
+                },
+                _a[btn.cssClass] = !!btn.cssClass,
+                _a;
+            var _a;
+        };
+        Toolbar.prototype.buttonClick = function (e, btn) {
+            if (!btn.onClick || $(e.currentTarget).hasClass('disabled'))
+                return;
+            btn.onClick(e);
+        };
+        Toolbar.prototype.findButton = function (className) {
+            if (className != null && Q.startsWith(className, '.')) {
+                className = className.substr(1);
+            }
+            return $(Toolbar_1.buttonSelector + '.' + className, this.element);
+        };
+        Toolbar.prototype.render = function (options, children) {
+            return (H("div", { class: "s-Toolbar clearfix" },
+                H("div", { class: "tool-buttons" },
+                    H("div", { class: "buttons-outer" },
+                        H("div", { class: "buttons-inner" },
+                            this.renderButtons(options.buttons),
+                            children)))));
+        };
+        Toolbar.prototype.renderButtons = function (buttons) {
+            var result = [];
+            for (var _i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
+                var btn = buttons_1[_i];
+                if (btn.separator)
+                    result.push(H("div", { class: "separator" }));
+                result.push(this.renderButton(btn));
+            }
+            return H(Q.Fragment, null, result);
+        };
+        Toolbar.prototype.renderButton = function (btn) {
+            var _this = this;
+            return (H("div", { class: this.buttonClass(btn), title: btn.hint, onClick: function (e) { return _this.buttonClick(e, btn); } },
+                H("div", { class: "button-outer" }, this.renderButtonText(btn))));
+        };
+        Toolbar.prototype.renderButtonText = function (btn) {
+            var klass = this.adjustIconClass(btn.icon);
+            if (!klass && !btn.title)
+                return H("span", { class: "button-inner" });
+            if (!btn.htmlEncode) {
+                return (H("span", { class: "button-inner", setInnerHTML: (klass ? '<i class="' +
+                        Q.attrEncode(klass) + '"></i> ' : '') + btn.title }));
+            }
+            if (!klass)
+                return H("span", { class: "button-inner" }, btn.title);
+            return H("span", { class: "button-inner" },
+                H("i", { class: klass }),
+                btn.title);
+        };
+        Toolbar.buttonSelector = "div.tool-button";
+        Toolbar = Toolbar_1 = __decorate([
+            Serenity.Decorators.registerClass('Serenity.Toolbar')
+        ], Toolbar);
+        return Toolbar;
+        var Toolbar_1;
+    }(Serenity.Widget));
+    Serenity.Toolbar = Toolbar;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var PopupMenuButton = /** @class */ (function (_super) {
         __extends(PopupMenuButton, _super);
         function PopupMenuButton(div, opt) {
@@ -10435,96 +11028,6 @@ var Serenity;
         return PopupToolButton;
     }(PopupMenuButton));
     Serenity.PopupToolButton = PopupToolButton;
-    var Toolbar = /** @class */ (function (_super) {
-        __extends(Toolbar, _super);
-        function Toolbar(div, options) {
-            var _this = _super.call(this, div, options) || this;
-            _this.element.addClass('s-Toolbar clearfix')
-                .html('<div class="tool-buttons"><div class="buttons-outer">' +
-                '<div class="buttons-inner"></div></div></div>');
-            var container = $('div.buttons-inner', _this.element);
-            var buttons = _this.options.buttons;
-            for (var i = 0; i < buttons.length; i++) {
-                _this.createButton(container, buttons[i]);
-            }
-            return _this;
-        }
-        Toolbar.prototype.destroy = function () {
-            this.element.find('div.tool-button').unbind('click');
-            if (this.mouseTrap) {
-                if (!!this.mouseTrap.destroy) {
-                    this.mouseTrap.destroy();
-                }
-                else {
-                    this.mouseTrap.reset();
-                }
-                this.mouseTrap = null;
-            }
-            _super.prototype.destroy.call(this);
-        };
-        Toolbar.prototype.createButton = function (container, b) {
-            var cssClass = Q.coalesce(b.cssClass, '');
-            if (b.separator === true) {
-                $('<div class="separator"></div>').appendTo(container);
-            }
-            var btn = $('<div class="tool-button"><div class="button-outer">' +
-                '<span class="button-inner"></span></div></div>')
-                .appendTo(container);
-            if (cssClass.length > 0) {
-                btn.addClass(cssClass);
-            }
-            if (!Q.isEmptyOrNull(b.hint)) {
-                btn.attr('title', b.hint);
-            }
-            btn.click(function (e) {
-                if (btn.hasClass('disabled')) {
-                    return;
-                }
-                b.onClick(e);
-            });
-            var text = b.title;
-            if (b.htmlEncode !== false) {
-                text = Q.htmlEncode(b.title);
-            }
-            if (!Q.isEmptyOrNull(b.icon)) {
-                btn.addClass('icon-tool-button');
-                var klass = b.icon;
-                if (Q.startsWith(klass, 'fa-')) {
-                    klass = 'fa ' + klass;
-                }
-                else if (Q.startsWith(klass, 'glyphicon-')) {
-                    klass = 'glyphicon ' + klass;
-                }
-                text = "<i class='" + klass + "'></i> " + text;
-            }
-            if (text == null || text.length === 0) {
-                btn.addClass('no-text');
-            }
-            else {
-                btn.find('span').html(text);
-            }
-            if (!!(!Q.isEmptyOrNull(b.hotkey) && window['Mousetrap'] != null)) {
-                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.options.hotkeyContext || window.document.documentElement);
-                this.mouseTrap.bind(b.hotkey, function (e1, action) {
-                    if (btn.is(':visible')) {
-                        btn.triggerHandler('click');
-                    }
-                    return b.hotkeyAllowDefault;
-                });
-            }
-        };
-        Toolbar.prototype.findButton = function (className) {
-            if (className != null && Q.startsWith(className, '.')) {
-                className = className.substr(1);
-            }
-            return $('div.tool-button.' + className, this.element);
-        };
-        Toolbar = __decorate([
-            Serenity.Decorators.registerClass('Serenity.Toolbar')
-        ], Toolbar);
-        return Toolbar;
-    }(Serenity.Widget));
-    Serenity.Toolbar = Toolbar;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
