@@ -47,13 +47,14 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Imports\Helpers.ts" />
-    <TypeScriptCompile Include="Imports\InitPreact.ts" />
     <TypeScriptCompile Include="Imports\RSVP.ts" />
     <TypeScriptCompile Include="Imports\Promise.ts" />
     <TypeScriptCompile Include="Imports\Select2.ts" />
     <TypeScriptCompile Include="Imports\SS.ts" />
     <TypeScriptCompile Include="Imports\jQueryStatic.ts" />
     <TypeScriptCompile Include="Imports\JQBlockUI.ts" />
+    <TypeScriptCompile Include="Q\Q.JSX.ts" />
+    <TypeScriptCompile Include="Q\Q.VDom.ts" />
     <TypeScriptCompile Include="Services\ServiceError.ts" />
     <TypeScriptCompile Include="Services\ServiceResponse.ts" />
     <TypeScriptCompile Include="Q\Q.BasicUtils.ts" />

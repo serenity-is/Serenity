@@ -348,6 +348,7 @@ interface JQueryStatic {
 interface JQBlockUIOptions {
     useTimeout?: boolean;
 }
+declare var H: typeof preact.h;
 declare namespace Serenity {
     interface ServiceError {
         Code?: string;
@@ -2229,7 +2230,9 @@ declare namespace Serenity {
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
+        hotkeyContext?: any;
         separator?: boolean;
+        disabled?: boolean;
     }
     interface PopupMenuButtonOptions {
         menu?: JQuery;
@@ -2248,6 +2251,7 @@ declare namespace Serenity {
     }
     interface ToolbarOptions {
         buttons?: ToolButton[];
+        children: JSX.Element[];
         hotkeyContext?: any;
     }
     class Toolbar extends Widget<ToolbarOptions> {
@@ -3292,5 +3296,15 @@ declare namespace Serenity.DialogTypeRegistry {
     function tryGet(key: string): Function;
     function get(key: string): Function;
 }
-declare var React: any;
-declare function test(): any;
+declare namespace Serenity {
+    class ToolBarButton extends preact.Component<ToolButton, void> {
+        render(props: ToolButton): JSX.Element;
+        protected mouseTrap: any;
+        componentDidMount(): void;
+        componentWillUnmount(): void;
+    }
+    class ToolBar extends preact.Component<ToolbarOptions, void> {
+        render(props: ToolbarOptions): JSX.Element;
+        renderButtons(props: ToolbarOptions): any;
+    }
+}

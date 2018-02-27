@@ -1,66 +1,19 @@
 ﻿namespace Serenity {
-    export class ToolBarButton extends preact.Component<ToolButton, void> {
-        constructor(props: ToolButton) {
-            super(props);
-        }
+    @Decorators.registerClass('Serenity.Toolbar')
+    export class Toolbar extends Widget<ToolbarOptions> {
 
-        render(): JSX.Element {
-            var p = this.props;
-            var klass = p.icon;
-            var htext = p.title;
+        constructor(div: JQuery, options: ToolbarOptions) {
+            super(div, options);
 
-            if (Q.startsWith(klass, 'fa-')) {
-                klass = 'fa ' + klass;
-            }
-            else if (Q.startsWith(klass, 'glyphicon-')) {
-                klass = 'glyphicon ' + klass;
-            }
-
-            if (p.htmlEncode !== false)
-                htext = Q.htmlEncode(htext);
-
-            var htext = '<i class="' + Q.attrEncode(klass) + '"></i> ' + htext;
-
-            return (
-                <div class={{
-                    "tool-button": true,
-                    "icon-tool-button": !p.icon,
-                    "no-text": !p.title,
-                    disabled: p.disabled,
-                    [p.cssClass]: !!p.cssClass,
-                }} title={p.hint} onClick={(e) => {
-                    if (p.disabled || !p.onClick)
-                        return;
-
-                    p.onClick(e);
-                }}>
-                    <div class="button-outer">
-                        <span dangerouslySetInnerHTML={{ __html: htext }}></span>
-                    </div>
-                </div>
-            )
+            Q.mount(this.render(options), div[0]);
+            this.setupMouseTrap();
         }
 
         protected mouseTrap: any;
 
-        componentDidMount() {
+        destroy() {
+            this.element.find(Toolbar.buttonSelector).unbind('click');
 
-            if (!!(!Q.isEmptyOrNull(this.props.hotkey) && window['Mousetrap'] != null)) {
-                this.mouseTrap = this.mouseTrap || window['Mousetrap'](
-                    this.props.hotkeyContext || window.document.documentElement);
-
-                this.mouseTrap.bind(this.props.hotkey,
-                    (e1: any, action: any) => {
-                        if ($(this.base).is(':visible')) {
-                            var event = new Event('click', { bubbles: true });
-                            this.base.dispatchEvent(event);
-                        }
-                        return this.props.hotkeyAllowDefault;
-                    });
-            }
-        }
-
-        componentWillUnmount() {
             if (this.mouseTrap) {
                 if (!!this.mouseTrap.destroy) {
                     this.mouseTrap.destroy();
@@ -68,31 +21,129 @@
                 else {
                     this.mouseTrap.reset();
                 }
+
                 this.mouseTrap = null;
             }
-        }
-    }
 
-    export class ToolBar extends preact.Component<ToolbarOptions, void> {
-        constructor(props?: ToolbarOptions) {
-            super(props);
+            super.destroy();
         }
 
-        render() {
+        protected setupMouseTrap() {
+            if (!window['Mousetrap'])
+                return;
+
+            var buttons;
+            for (var b of this.options.buttons || []) {
+                if (Q.isEmptyOrNull(b.hotkey))
+                    continue;
+
+                this.mouseTrap = this.mouseTrap || window['Mousetrap'](
+                    this.options.hotkeyContext || window.document.documentElement);
+                
+                var btn = (buttons = buttons || this.element.find(Toolbar.buttonSelector))
+                    .filter("." + b.cssClass);
+
+                this.mouseTrap.bind(b.hotkey, function (e: BaseJQueryEventObject, action: any) {
+                    if (btn.is(':visible')) {
+                        btn.triggerHandler('click');
+                    }
+                    return b.hotkeyAllowDefault;
+                });
+            }
+        }
+
+        render(options: ToolbarOptions & Q.ComponentProps<this>): Q.VNode {
             return (
                 <div class="s-Toolbar clearfix">
                     <div class="tool-buttons">
                         <div class="buttons-outer">
                             <div class="buttons-inner">
-                                {(this.props.buttons || []).map(button => {
-                                    { button.separator && <div class="separator" /> }
-                                    <Serenity.ToolBarButton hotkeyContext={this.props.hotkeyContext} {...button} />
-                                })}
+                                {this.renderButtons(options.buttons)}
+                                {options.children}
                             </div>
                         </div>
                     </div>
                 </div>
             );
+        }
+
+        static buttonSelector = "div.tool-button";
+
+        adjustIconClass(icon: string): string {
+            if (!icon)
+                return icon;
+
+            if (Q.startsWith(icon, 'fa-'))
+                return 'fa ' + icon;
+
+            if (Q.startsWith(icon, 'glyphicon-'))
+                return 'glyphicon ' + icon;
+
+            return icon;
+        }
+
+        renderButtons(buttons: ToolButton[]) {
+            var result: Q.VNode[] = [];
+            for (var btn of buttons) {
+                if (btn.separator)
+                    result.push(<div class="separator" />);
+
+                result.push(this.renderButton(btn));
+            }
+
+            return <Q.Fragment>{result}</Q.Fragment>;
+        }
+
+        buttonClass(btn: ToolButton) {
+            return {
+                "tool-button": true,
+                "icon-tool-button": !!btn.icon,
+                "no-text": !btn.title,
+                disabled: btn.disabled,
+                [btn.cssClass]: !!btn.cssClass,
+            }
+        }
+
+        renderButtonText(btn: ToolButton) {
+            var klass = this.adjustIconClass(btn.icon);
+            if (!klass && !btn.title)
+                return <span class="button-inner"></span>;
+            
+            if (!btn.htmlEncode) {
+                return (<span class="button-inner" setInnerHTML={(klass ? '<i class="' +
+                    Q.attrEncode(klass) + '"></i> ' : '') + btn.title}></span>)
+            }
+
+            if (!klass)
+                return <span class="button-inner">{btn.title}</span>
+
+            return <span class="button-inner"><i class={klass} ></i>{btn.title}</span>
+        }
+
+        buttonClick(e: MouseEvent, btn: ToolButton) {
+            if (!btn.onClick || $(e.currentTarget).hasClass('disabled'))
+                return;
+
+            btn.onClick(e);
+        }
+
+        renderButton(btn: ToolButton) {
+            return (
+                <div class={this.buttonClass(btn)} title={btn.hint}
+                    onClick={(e) => this.buttonClick(e, btn)}>
+                    <div class="button-outer">
+                        {this.renderButtonText(btn)}
+                    </div>
+                </div>
+            );
+        }
+
+        findButton(className: string): JQuery {
+            if (className != null && Q.startsWith(className, '.')) {
+                className = className.substr(1);
+            }
+
+            return $(Toolbar.buttonSelector + '.' + className, this.element);
         }
     }
 }

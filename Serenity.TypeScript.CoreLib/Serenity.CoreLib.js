@@ -31,9 +31,6 @@ if (typeof Promise === "undefined") {
 }
 // fake assembly for typescript apps
 ss.initAssembly({}, 'App', {});
-if (typeof preact === undefined && window['React'])
-    window['preact'] = window['React'];
-var H = preact.h;
 var Q;
 (function (Q) {
     function coalesce(a, b) {
@@ -2301,6 +2298,343 @@ var Q;
         });
     })(Router = Q.Router || (Q.Router = {}));
 })(Q || (Q = {}));
+var Q;
+(function (Q) {
+    // modified version of https://github.com/yelouafi/petit-dom
+    var isArray = Array.isArray;
+    var EMPTYO = {};
+    var EMPTYAR = [];
+    var isVNode = function (c) { return c && (c._vnode != null || c._text != null); };
+    var isComponent = function (c) { return c && c.mount && c.patch && c.unmount; };
+    function h(type, props, contArg) {
+        var content, args, i, isSVG = false;
+        var len = arguments.length - 2;
+        if (typeof type !== "string") {
+            if (len === 1) {
+                content = contArg;
+            }
+            else if (len > 1) {
+                args = Array(len);
+                for (i = 0; i < len; i++) {
+                    args[i] = arguments[i + 2];
+                }
+                content = args;
+            }
+        }
+        else {
+            isSVG = type === "svg";
+            if (len === 1) {
+                if (Array.isArray(contArg)) {
+                    content = maybeFlatten(contArg, isSVG);
+                }
+                else if (isVNode(contArg)) {
+                    contArg.isSVG = isSVG;
+                    content = [contArg];
+                }
+                else {
+                    content = [{ _text: contArg == null ? "" : contArg }];
+                }
+            }
+            else if (len > 1) {
+                args = Array(len);
+                for (i = 0; i < len; i++) {
+                    args[i] = arguments[i + 2];
+                }
+                content = maybeFlatten(args, isSVG);
+            }
+            else {
+                content = EMPTYAR;
+            }
+        }
+        return {
+            _vnode: true,
+            isSVG: isSVG,
+            type: type,
+            key: (props && props.key) || null,
+            props: props || EMPTYO,
+            content: content
+        };
+    }
+    Q.h = h;
+    function maybeFlatten(arr, isSVG) {
+        for (var i = 0; i < arr.length; i++) {
+            var ch = arr[i];
+            if (isArray(ch)) {
+                return flattenChildren(arr, i, arr.slice(0, i), isSVG);
+            }
+            else if (!isVNode(ch)) {
+                arr[i] = { _text: ch == null ? "" : ch };
+            }
+            else if (isSVG && !ch.isSVG) {
+                ch.isSVG = true;
+            }
+        }
+        return arr;
+    }
+    Q.maybeFlatten = maybeFlatten;
+    function flattenChildren(children, start, arr, isSVG) {
+        for (var i = start; i < children.length; i++) {
+            var ch = children[i];
+            if (isArray(ch)) {
+                flattenChildren(ch, 0, arr, isSVG);
+            }
+            else if (isVNode(ch)) {
+                if (isSVG && !ch.isSVG) {
+                    ch.isSVG = true;
+                }
+                arr.push(ch);
+            }
+            else {
+                arr.push({ _text: ch == null ? "" : ch });
+            }
+        }
+        return arr;
+    }
+    var SVG_NS = "http://www.w3.org/2000/svg";
+    var SELECT = "select";
+    var SELECT_DELAYED_PROPS = { selectedIndex: true };
+    var INPUT = "input";
+    var INPUT_DELAYED_PROPS = { type: true, value: true };
+    var XLINK_NS = "http://www.w3.org/1999/xlink";
+    var NS_ATTRS = {
+        show: XLINK_NS,
+        actuate: XLINK_NS,
+        href: XLINK_NS
+    };
+    function defShouldUpdate(p1, p2, c1, c2) {
+        if (c1 !== c2)
+            return true;
+        for (var key in p1) {
+            if (p1[key] !== p2[key])
+                return true;
+        }
+        return false;
+    }
+    var IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
+    function setProps(el, props, oldProps, ignoreKeys) {
+        for (var key in props) {
+            if (ignoreKeys != null && ignoreKeys[key] === true)
+                continue;
+            var oldv = oldProps && oldProps[key];
+            var newv = props[key];
+            if (oldv !== newv) {
+                if (key === 'class')
+                    key = 'className';
+                if (key == 'style') {
+                    if (!newv || typeof newv === 'string' || typeof oldv === 'string') {
+                        el.style.cssText = newv || '';
+                    }
+                    if (newv && typeof newv === 'object') {
+                        if (typeof oldv !== 'string') {
+                            for (var i in oldv)
+                                if (!(i in newv))
+                                    el.style[i] = '';
+                        }
+                        for (var i in newv) {
+                            el.style[i] = typeof newv[i] === 'number' &&
+                                IS_NON_DIMENSIONAL.test(i) === false ? (newv[i] + 'px') : newv[i];
+                        }
+                    }
+                    continue;
+                }
+                else if (key == "className") {
+                    if (newv && typeof newv === 'object') {
+                        var classes = [];
+                        for (var _i = 0, _a = Object.getOwnPropertyNames(newv); _i < _a.length; _i++) {
+                            var key = _a[_i];
+                            if (newv[key]) {
+                                classes.push(key);
+                            }
+                        }
+                        newv = classes.join(' ');
+                    }
+                    el.className = newv;
+                    continue;
+                }
+                else if (key == "setInnerHTML") {
+                    el.innerHTML = newv;
+                    continue;
+                }
+                else if (key.charAt(0) == 'o' && key.charAt(1) == 'n') {
+                    key = key.toLowerCase();
+                }
+                el[key] = newv;
+            }
+        }
+    }
+    function appendChildren(parent, children, start, end, beforeNode) {
+        if (start === void 0) { start = 0; }
+        if (end === void 0) { end = children.length - 1; }
+        while (start <= end) {
+            var ch = children[start++];
+            parent.insertBefore(mount(ch), beforeNode);
+        }
+    }
+    function updateSelect(node, props, children, oldProps, oldChildren) {
+        var isMount = oldProps == null;
+        var hasSelIndex = props.selectedIndex != null;
+        var hasValue = !hasSelIndex && "value" in props;
+        var ignoreKeys = hasSelIndex || hasValue ? SELECT_DELAYED_PROPS : null;
+        setProps(node, props, null, ignoreKeys);
+        //if (isMount) {
+        appendChildren(node, children);
+        //} else {
+        //    patchContent(node, children, oldChildren);
+        //}
+        if (!props.multiple) {
+            if (hasSelIndex) {
+                if (isMount || props.selectedIndex !== oldProps.selectedIndex) {
+                    node.selectedIndex = props.selectedIndex;
+                }
+            }
+            else if (hasValue) {
+                if (isMount || props.value !== oldProps.value) {
+                    node.value = props.value;
+                }
+            }
+        }
+        return node;
+    }
+    function updateInput(node, props, oldProps) {
+        var isMount = oldProps == null;
+        var hasValue = props.value != null;
+        var ignoreKeys = hasValue ? INPUT_DELAYED_PROPS : null;
+        if (props.type != null && (isMount || props.type !== oldProps.type)) {
+            node.type = props.type;
+        }
+        setProps(node, props, null, ignoreKeys);
+        if (hasValue && (isMount || props.value !== oldProps.value)) {
+            node.value = props.value;
+        }
+        return node;
+    }
+    function setAttributes(el, attrs, oldAttrs) {
+        for (var key in attrs) {
+            var oldv = oldAttrs != null ? oldAttrs[key] : undefined;
+            var newv = attrs[key];
+            if (oldv !== newv) {
+                setDOMAttr(el, key, newv);
+            }
+        }
+        for (key in oldAttrs) {
+            if (!(key in attrs)) {
+                el.removeAttribute(key);
+            }
+        }
+    }
+    function setDOMAttr(el, attr, value) {
+        if (value === true) {
+            el.setAttribute(attr, "");
+        }
+        else if (value === false) {
+            el.removeAttribute(attr);
+        }
+        else {
+            var ns = NS_ATTRS[attr];
+            if (ns !== undefined) {
+                el.setAttributeNS(ns, attr, value);
+            }
+            else {
+                el.setAttribute(attr, value);
+            }
+        }
+    }
+    function mountTo(parent, c) {
+        if (Array.isArray(c))
+            appendChildren(parent, c);
+        else
+            parent.appendChild(mount(c));
+    }
+    Q.mountTo = mountTo;
+    var Fragment = /** @class */ (function () {
+        function Fragment(props, context) {
+        }
+        Fragment.prototype.mount = function (props, content) {
+            var node = document.createDocumentFragment();
+            if (content) {
+                for (var _i = 0, content_1 = content; _i < content_1.length; _i++) {
+                    var x = content_1[_i];
+                    node.appendChild(Q.mount(x));
+                }
+            }
+            return node;
+        };
+        Fragment.prototype.patch = function (el, newProps, oldProps, newContent, oldContent) {
+            for (var i = el.childNodes.length - 1; i >= 0; i--)
+                el.removeChild(el.childNodes[i]);
+            return el;
+        };
+        Fragment.prototype.unmount = function (el) {
+        };
+        return Fragment;
+    }());
+    Q.Fragment = Fragment;
+    function mount(c, node) {
+        if (c._text != null) {
+            node = node || document.createTextNode(c._text);
+        }
+        else if (c._vnode === true) {
+            var type = c.type, props = c.props, content = c.content, isSVG = c.isSVG;
+            if (typeof type === "string") {
+                var isSelect = !isSVG && type.length === 6 && type.toLowerCase() === SELECT;
+                var isInput = !isSelect &&
+                    !isSVG &&
+                    type.length === 5 &&
+                    type.toLowerCase() === INPUT;
+                if (isSelect) {
+                    node = node || document.createElement(type);
+                    updateSelect(node, props, content);
+                }
+                else if (isInput) {
+                    node = node || document.createElement(type);
+                    updateInput(node, props);
+                }
+                else {
+                    // TODO : {is} for custom elements
+                    if (!isSVG) {
+                        node = node || document.createElement(type);
+                        setProps(node, props);
+                    }
+                    else {
+                        node = node || document.createElementNS(SVG_NS, type);
+                        setAttributes(node, props);
+                    }
+                    if (!isArray(content)) {
+                        node.appendChild(mount(content));
+                    }
+                    else {
+                        appendChildren(node, content);
+                    }
+                }
+            }
+            else if (isComponent(type)) {
+                node = type.mount(props, content);
+            }
+            else if (typeof type === "function") {
+                if (isComponent(type.prototype)) {
+                    var instance = new type(props, content);
+                    node = instance.mount(props, content);
+                    c._data = instance;
+                }
+                else {
+                    var vnode = type(props, content);
+                    node = mount(vnode);
+                    c._data = vnode;
+                }
+            }
+        }
+        if (node == null) {
+            throw new Error("Unknown node type!");
+        }
+        c._node = node;
+        if (c.props && c.props.ref)
+            c.props.ref(node);
+        return node;
+    }
+    Q.mount = mount;
+})(Q || (Q = {}));
+var H = Q.h;
+/// <reference path="q.vdom.ts" />
 var Serenity;
 (function (Serenity) {
     var Decorators;
@@ -10425,96 +10759,6 @@ var Serenity;
         return PopupToolButton;
     }(PopupMenuButton));
     Serenity.PopupToolButton = PopupToolButton;
-    var Toolbar = /** @class */ (function (_super) {
-        __extends(Toolbar, _super);
-        function Toolbar(div, options) {
-            var _this = _super.call(this, div, options) || this;
-            _this.element.addClass('s-Toolbar clearfix')
-                .html('<div class="tool-buttons"><div class="buttons-outer">' +
-                '<div class="buttons-inner"></div></div></div>');
-            var container = $('div.buttons-inner', _this.element);
-            var buttons = _this.options.buttons;
-            for (var i = 0; i < buttons.length; i++) {
-                _this.createButton(container, buttons[i]);
-            }
-            return _this;
-        }
-        Toolbar.prototype.destroy = function () {
-            this.element.find('div.tool-button').unbind('click');
-            if (this.mouseTrap) {
-                if (!!this.mouseTrap.destroy) {
-                    this.mouseTrap.destroy();
-                }
-                else {
-                    this.mouseTrap.reset();
-                }
-                this.mouseTrap = null;
-            }
-            _super.prototype.destroy.call(this);
-        };
-        Toolbar.prototype.createButton = function (container, b) {
-            var cssClass = Q.coalesce(b.cssClass, '');
-            if (b.separator === true) {
-                $('<div class="separator"></div>').appendTo(container);
-            }
-            var btn = $('<div class="tool-button"><div class="button-outer">' +
-                '<span class="button-inner"></span></div></div>')
-                .appendTo(container);
-            if (cssClass.length > 0) {
-                btn.addClass(cssClass);
-            }
-            if (!Q.isEmptyOrNull(b.hint)) {
-                btn.attr('title', b.hint);
-            }
-            btn.click(function (e) {
-                if (btn.hasClass('disabled')) {
-                    return;
-                }
-                b.onClick(e);
-            });
-            var text = b.title;
-            if (b.htmlEncode !== false) {
-                text = Q.htmlEncode(b.title);
-            }
-            if (!Q.isEmptyOrNull(b.icon)) {
-                btn.addClass('icon-tool-button');
-                var klass = b.icon;
-                if (Q.startsWith(klass, 'fa-')) {
-                    klass = 'fa ' + klass;
-                }
-                else if (Q.startsWith(klass, 'glyphicon-')) {
-                    klass = 'glyphicon ' + klass;
-                }
-                text = "<i class='" + klass + "'></i> " + text;
-            }
-            if (text == null || text.length === 0) {
-                btn.addClass('no-text');
-            }
-            else {
-                btn.find('span').html(text);
-            }
-            if (!!(!Q.isEmptyOrNull(b.hotkey) && window['Mousetrap'] != null)) {
-                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.options.hotkeyContext || window.document.documentElement);
-                this.mouseTrap.bind(b.hotkey, function (e1, action) {
-                    if (btn.is(':visible')) {
-                        btn.triggerHandler('click');
-                    }
-                    return b.hotkeyAllowDefault;
-                });
-            }
-        };
-        Toolbar.prototype.findButton = function (className) {
-            if (className != null && Q.startsWith(className, '.')) {
-                className = className.substr(1);
-            }
-            return $('div.tool-button.' + className, this.element);
-        };
-        Toolbar = __decorate([
-            Serenity.Decorators.registerClass('Serenity.Toolbar')
-        ], Toolbar);
-        return Toolbar;
-    }(Serenity.Widget));
-    Serenity.Toolbar = Toolbar;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -16845,54 +17089,17 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var ToolBarButton = /** @class */ (function (_super) {
-        __extends(ToolBarButton, _super);
-        function ToolBarButton(props) {
-            return _super.call(this, props) || this;
+    var Toolbar = /** @class */ (function (_super) {
+        __extends(Toolbar, _super);
+        function Toolbar(div, options) {
+            var _this = _super.call(this, div, options) || this;
+            Q.mount(_this.render(options), div[0]);
+            _this.setupMouseTrap();
+            return _this;
         }
-        ToolBarButton.prototype.render = function () {
-            var p = this.props;
-            var klass = p.icon;
-            var htext = p.title;
-            if (Q.startsWith(klass, 'fa-')) {
-                klass = 'fa ' + klass;
-            }
-            else if (Q.startsWith(klass, 'glyphicon-')) {
-                klass = 'glyphicon ' + klass;
-            }
-            if (p.htmlEncode !== false)
-                htext = Q.htmlEncode(htext);
-            var htext = '<i class="' + Q.attrEncode(klass) + '"></i> ' + htext;
-            return (H("div", { class: (_a = {
-                        "tool-button": true,
-                        "icon-tool-button": !p.icon,
-                        "no-text": !p.title,
-                        disabled: p.disabled
-                    },
-                    _a[p.cssClass] = !!p.cssClass,
-                    _a), title: p.hint, onClick: function (e) {
-                    if (p.disabled || !p.onClick)
-                        return;
-                    p.onClick(e);
-                } },
-                H("div", { class: "button-outer" },
-                    H("span", { dangerouslySetInnerHTML: { __html: htext } }))));
-            var _a;
-        };
-        ToolBarButton.prototype.componentDidMount = function () {
-            var _this = this;
-            if (!!(!Q.isEmptyOrNull(this.props.hotkey) && window['Mousetrap'] != null)) {
-                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.props.hotkeyContext || window.document.documentElement);
-                this.mouseTrap.bind(this.props.hotkey, function (e1, action) {
-                    if ($(_this.base).is(':visible')) {
-                        var event = new Event('click', { bubbles: true });
-                        _this.base.dispatchEvent(event);
-                    }
-                    return _this.props.hotkeyAllowDefault;
-                });
-            }
-        };
-        ToolBarButton.prototype.componentWillUnmount = function () {
+        Toolbar_1 = Toolbar;
+        Toolbar.prototype.destroy = function () {
+            this.element.find(Toolbar_1.buttonSelector).unbind('click');
             if (this.mouseTrap) {
                 if (!!this.mouseTrap.destroy) {
                     this.mouseTrap.destroy();
@@ -16902,29 +17109,102 @@ var Serenity;
                 }
                 this.mouseTrap = null;
             }
+            _super.prototype.destroy.call(this);
         };
-        return ToolBarButton;
-    }(preact.Component));
-    Serenity.ToolBarButton = ToolBarButton;
-    var ToolBar = /** @class */ (function (_super) {
-        __extends(ToolBar, _super);
-        function ToolBar(props) {
-            return _super.call(this, props) || this;
-        }
-        ToolBar.prototype.render = function () {
-            var _this = this;
+        Toolbar.prototype.setupMouseTrap = function () {
+            if (!window['Mousetrap'])
+                return;
+            var buttons;
+            for (var _i = 0, _a = this.options.buttons || []; _i < _a.length; _i++) {
+                var b = _a[_i];
+                if (Q.isEmptyOrNull(b.hotkey))
+                    continue;
+                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.options.hotkeyContext || window.document.documentElement);
+                var btn = (buttons = buttons || this.element.find(Toolbar_1.buttonSelector))
+                    .filter("." + b.cssClass);
+                this.mouseTrap.bind(b.hotkey, function (e, action) {
+                    if (btn.is(':visible')) {
+                        btn.triggerHandler('click');
+                    }
+                    return b.hotkeyAllowDefault;
+                });
+            }
+        };
+        Toolbar.prototype.render = function (options) {
             return (H("div", { class: "s-Toolbar clearfix" },
                 H("div", { class: "tool-buttons" },
                     H("div", { class: "buttons-outer" },
-                        H("div", { class: "buttons-inner" }, (this.props.buttons || []).map(function (button) {
-                            {
-                                button.separator && H("div", { class: "separator" });
-                            }
-                            H(Serenity.ToolBarButton, __assign({ hotkeyContext: _this.props.hotkeyContext }, button));
-                        }))))));
+                        H("div", { class: "buttons-inner" },
+                            this.renderButtons(options.buttons),
+                            options.children)))));
         };
-        return ToolBar;
-    }(preact.Component));
-    Serenity.ToolBar = ToolBar;
+        Toolbar.prototype.adjustIconClass = function (icon) {
+            if (!icon)
+                return icon;
+            if (Q.startsWith(icon, 'fa-'))
+                return 'fa ' + icon;
+            if (Q.startsWith(icon, 'glyphicon-'))
+                return 'glyphicon ' + icon;
+            return icon;
+        };
+        Toolbar.prototype.renderButtons = function (buttons) {
+            var result = [];
+            for (var _i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
+                var btn = buttons_1[_i];
+                if (btn.separator)
+                    result.push(H("div", { class: "separator" }));
+                result.push(this.renderButton(btn));
+            }
+            return H(Q.Fragment, null, result);
+        };
+        Toolbar.prototype.buttonClass = function (btn) {
+            return _a = {
+                    "tool-button": true,
+                    "icon-tool-button": !!btn.icon,
+                    "no-text": !btn.title,
+                    disabled: btn.disabled
+                },
+                _a[btn.cssClass] = !!btn.cssClass,
+                _a;
+            var _a;
+        };
+        Toolbar.prototype.renderButtonText = function (btn) {
+            var klass = this.adjustIconClass(btn.icon);
+            if (!klass && !btn.title)
+                return H("span", { class: "button-inner" });
+            if (!btn.htmlEncode) {
+                return (H("span", { class: "button-inner", setInnerHTML: (klass ? '<i class="' +
+                        Q.attrEncode(klass) + '"></i> ' : '') + btn.title }));
+            }
+            if (!klass)
+                return H("span", { class: "button-inner" }, btn.title);
+            return H("span", { class: "button-inner" },
+                H("i", { class: klass }),
+                btn.title);
+        };
+        Toolbar.prototype.buttonClick = function (e, btn) {
+            if (!btn.onClick || $(e.currentTarget).hasClass('disabled'))
+                return;
+            btn.onClick(e);
+        };
+        Toolbar.prototype.renderButton = function (btn) {
+            var _this = this;
+            return (H("div", { class: this.buttonClass(btn), title: btn.hint, onClick: function (e) { return _this.buttonClick(e, btn); } },
+                H("div", { class: "button-outer" }, this.renderButtonText(btn))));
+        };
+        Toolbar.prototype.findButton = function (className) {
+            if (className != null && Q.startsWith(className, '.')) {
+                className = className.substr(1);
+            }
+            return $(Toolbar_1.buttonSelector + '.' + className, this.element);
+        };
+        Toolbar.buttonSelector = "div.tool-button";
+        Toolbar = Toolbar_1 = __decorate([
+            Serenity.Decorators.registerClass('Serenity.Toolbar')
+        ], Toolbar);
+        return Toolbar;
+        var Toolbar_1;
+    }(Serenity.Widget));
+    Serenity.Toolbar = Toolbar;
 })(Serenity || (Serenity = {}));
 //# sourceMappingURL=Serenity.CoreLib.js.map
