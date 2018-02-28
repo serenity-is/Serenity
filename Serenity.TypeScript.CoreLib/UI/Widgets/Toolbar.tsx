@@ -1,4 +1,23 @@
 ﻿namespace Serenity {
+    export interface ToolButton {
+        title?: string;
+        hint?: string;
+        cssClass?: string;
+        icon?: string;
+        onClick?: any;
+        htmlEncode?: any;
+        hotkey?: string;
+        hotkeyAllowDefault?: boolean;
+        hotkeyContext?: any;
+        separator?: boolean;
+        disabled?: boolean;
+    }
+
+    export interface ToolbarOptions {
+        buttons?: ToolButton[];
+        hotkeyContext?: any;
+    }
+
     @Decorators.registerClass('Serenity.Toolbar')
     export class Toolbar extends Widget<ToolbarOptions> {
 
@@ -39,17 +58,60 @@
 
                 this.mouseTrap = this.mouseTrap || window['Mousetrap'](
                     this.options.hotkeyContext || window.document.documentElement);
-                
-                var btn = (buttons = buttons || this.element.find(Toolbar.buttonSelector))
-                    .filter("." + b.cssClass);
 
-                this.mouseTrap.bind(b.hotkey, function (e: BaseJQueryEventObject, action: any) {
-                    if (btn.is(':visible')) {
-                        btn.triggerHandler('click');
-                    }
-                    return b.hotkeyAllowDefault;
-                });
+                ((x) => {
+                    var btn = (buttons = buttons || this.element.find(Toolbar.buttonSelector))
+                        .filter("." + x.cssClass);
+
+                    this.mouseTrap.bind(x.hotkey, function (e: BaseJQueryEventObject, action: any) {
+                        if (btn.is(':visible')) {
+                            btn.triggerHandler('click');
+                        }
+                        return x.hotkeyAllowDefault;
+                    });
+                })(b);
             }
+        }
+
+
+        static buttonSelector = "div.tool-button";
+
+        adjustIconClass(icon: string): string {
+            if (!icon)
+                return icon;
+
+            if (Q.startsWith(icon, 'fa-'))
+                return 'fa ' + icon;
+
+            if (Q.startsWith(icon, 'glyphicon-'))
+                return 'glyphicon ' + icon;
+
+            return icon;
+        }
+
+        buttonClass(btn: ToolButton) {
+            return {
+                "tool-button": true,
+                "icon-tool-button": !!btn.icon,
+                "no-text": !btn.title,
+                disabled: btn.disabled,
+                [btn.cssClass]: !!btn.cssClass,
+            }
+        }
+
+        buttonClick(e: MouseEvent, btn: ToolButton) {
+            if (!btn.onClick || $(e.currentTarget).hasClass('disabled'))
+                return;
+
+            btn.onClick(e);
+        }
+
+        findButton(className: string): JQuery {
+            if (className != null && Q.startsWith(className, '.')) {
+                className = className.substr(1);
+            }
+
+            return $(Toolbar.buttonSelector + '.' + className, this.element);
         }
 
         render(options: ToolbarOptions & Q.ComponentProps<this>): Q.VNode {
@@ -67,21 +129,6 @@
             );
         }
 
-        static buttonSelector = "div.tool-button";
-
-        adjustIconClass(icon: string): string {
-            if (!icon)
-                return icon;
-
-            if (Q.startsWith(icon, 'fa-'))
-                return 'fa ' + icon;
-
-            if (Q.startsWith(icon, 'glyphicon-'))
-                return 'glyphicon ' + icon;
-
-            return icon;
-        }
-
         renderButtons(buttons: ToolButton[]) {
             var result: Q.VNode[] = [];
             for (var btn of buttons) {
@@ -94,14 +141,15 @@
             return <Q.Fragment>{result}</Q.Fragment>;
         }
 
-        buttonClass(btn: ToolButton) {
-            return {
-                "tool-button": true,
-                "icon-tool-button": !!btn.icon,
-                "no-text": !btn.title,
-                disabled: btn.disabled,
-                [btn.cssClass]: !!btn.cssClass,
-            }
+        renderButton(btn: ToolButton) {
+            return (
+                <div class={this.buttonClass(btn)} title={btn.hint}
+                    onClick={(e) => this.buttonClick(e, btn)}>
+                    <div class="button-outer">
+                        {this.renderButtonText(btn)}
+                    </div>
+                </div>
+            );
         }
 
         renderButtonText(btn: ToolButton) {
@@ -118,32 +166,6 @@
                 return <span class="button-inner">{btn.title}</span>
 
             return <span class="button-inner"><i class={klass} ></i>{btn.title}</span>
-        }
-
-        buttonClick(e: MouseEvent, btn: ToolButton) {
-            if (!btn.onClick || $(e.currentTarget).hasClass('disabled'))
-                return;
-
-            btn.onClick(e);
-        }
-
-        renderButton(btn: ToolButton) {
-            return (
-                <div class={this.buttonClass(btn)} title={btn.hint}
-                    onClick={(e) => this.buttonClick(e, btn)}>
-                    <div class="button-outer">
-                        {this.renderButtonText(btn)}
-                    </div>
-                </div>
-            );
-        }
-
-        findButton(className: string): JQuery {
-            if (className != null && Q.startsWith(className, '.')) {
-                className = className.substr(1);
-            }
-
-            return $(Toolbar.buttonSelector + '.' + className, this.element);
         }
     }
 }

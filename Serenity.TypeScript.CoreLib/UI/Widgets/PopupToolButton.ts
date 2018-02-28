@@ -1,17 +1,4 @@
 ﻿namespace Serenity {
-    export interface ToolButton {
-        title?: string;
-        hint?: string;
-        cssClass?: string;
-        icon?: string;
-        onClick?: any;
-        htmlEncode?: any;
-        hotkey?: string;
-        hotkeyAllowDefault?: boolean;
-        hotkeyContext?: any;
-        separator?: boolean;
-        disabled?: boolean;
-    }
 
     export interface PopupMenuButtonOptions {
         menu?: JQuery;
@@ -71,10 +58,5 @@
             div.addClass('s-PopupToolButton');
             $('<b/>').appendTo(div.children('.button-outer').children('span'));
         }
-    }
-
-    export interface ToolbarOptions {
-        buttons?: ToolButton[];
-        hotkeyContext?: any;
     }
 }

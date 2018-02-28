@@ -2300,12 +2300,12 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
-    // modified version of https://github.com/yelouafi/petit-dom
+    // modified version of https://github.com/yelouafi/petit-dom for one time mount only, update / removal with jQuery
     var isArray = Array.isArray;
     var EMPTYO = {};
     var EMPTYAR = [];
     var isVNode = function (c) { return c && (c._vnode != null || c._text != null); };
-    var isComponent = function (c) { return c && c.mount && c.patch && c.unmount; };
+    var isComponent = function (c) { return c && c.mount; };
     function h(type, props, contArg) {
         var content, args, i, isSVG = false;
         var len = arguments.length - 2;
@@ -2401,65 +2401,48 @@ var Q;
         actuate: XLINK_NS,
         href: XLINK_NS
     };
-    function defShouldUpdate(p1, p2, c1, c2) {
-        if (c1 !== c2)
-            return true;
-        for (var key in p1) {
-            if (p1[key] !== p2[key])
-                return true;
-        }
-        return false;
-    }
     var IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
-    function setProps(el, props, oldProps, ignoreKeys) {
+    function setProps(el, props, ignoreKeys) {
         for (var key in props) {
             if (ignoreKeys != null && ignoreKeys[key] === true)
                 continue;
-            var oldv = oldProps && oldProps[key];
-            var newv = props[key];
-            if (oldv !== newv) {
-                if (key === 'class')
-                    key = 'className';
-                if (key == 'style') {
-                    if (!newv || typeof newv === 'string' || typeof oldv === 'string') {
-                        el.style.cssText = newv || '';
+            var val = props[key];
+            if (key === 'class')
+                key = 'className';
+            if (key == 'style') {
+                if (!val || typeof val === 'string') {
+                    el.style.cssText = val || '';
+                }
+                if (val && typeof val === 'object') {
+                    for (var i in val) {
+                        el.style[i] = typeof val[i] === 'number' &&
+                            IS_NON_DIMENSIONAL.test(i) === false ? (val[i] + 'px') : val[i];
                     }
-                    if (newv && typeof newv === 'object') {
-                        if (typeof oldv !== 'string') {
-                            for (var i in oldv)
-                                if (!(i in newv))
-                                    el.style[i] = '';
-                        }
-                        for (var i in newv) {
-                            el.style[i] = typeof newv[i] === 'number' &&
-                                IS_NON_DIMENSIONAL.test(i) === false ? (newv[i] + 'px') : newv[i];
-                        }
-                    }
-                    continue;
                 }
-                else if (key == "className") {
-                    if (newv && typeof newv === 'object') {
-                        var classes = [];
-                        for (var _i = 0, _a = Object.getOwnPropertyNames(newv); _i < _a.length; _i++) {
-                            var key = _a[_i];
-                            if (newv[key]) {
-                                classes.push(key);
-                            }
-                        }
-                        newv = classes.join(' ');
-                    }
-                    el.className = newv;
-                    continue;
-                }
-                else if (key == "setInnerHTML") {
-                    el.innerHTML = newv;
-                    continue;
-                }
-                else if (key.charAt(0) == 'o' && key.charAt(1) == 'n') {
-                    key = key.toLowerCase();
-                }
-                el[key] = newv;
+                continue;
             }
+            else if (key == "className") {
+                if (val && typeof val === 'object') {
+                    var classes = [];
+                    for (var _i = 0, _a = Object.getOwnPropertyNames(val); _i < _a.length; _i++) {
+                        var key = _a[_i];
+                        if (val[key]) {
+                            classes.push(key);
+                        }
+                    }
+                    val = classes.join(' ');
+                }
+                el.className = val;
+                continue;
+            }
+            else if (key == "setInnerHTML") {
+                el.innerHTML = val;
+                continue;
+            }
+            else if (key.charAt(0) == 'o' && key.charAt(1) == 'n') {
+                key = key.toLowerCase();
+            }
+            el[key] = val;
         }
     }
     function appendChildren(parent, children, start, end, beforeNode) {
@@ -2475,12 +2458,8 @@ var Q;
         var hasSelIndex = props.selectedIndex != null;
         var hasValue = !hasSelIndex && "value" in props;
         var ignoreKeys = hasSelIndex || hasValue ? SELECT_DELAYED_PROPS : null;
-        setProps(node, props, null, ignoreKeys);
-        //if (isMount) {
+        setProps(node, props, ignoreKeys);
         appendChildren(node, children);
-        //} else {
-        //    patchContent(node, children, oldChildren);
-        //}
         if (!props.multiple) {
             if (hasSelIndex) {
                 if (isMount || props.selectedIndex !== oldProps.selectedIndex) {
@@ -2495,31 +2474,23 @@ var Q;
         }
         return node;
     }
-    function updateInput(node, props, oldProps) {
-        var isMount = oldProps == null;
+    function updateInput(node, props) {
         var hasValue = props.value != null;
         var ignoreKeys = hasValue ? INPUT_DELAYED_PROPS : null;
-        if (props.type != null && (isMount || props.type !== oldProps.type)) {
+        if (props.type != null) {
             node.type = props.type;
         }
-        setProps(node, props, null, ignoreKeys);
-        if (hasValue && (isMount || props.value !== oldProps.value)) {
+        setProps(node, props, ignoreKeys);
+        if (hasValue)
             node.value = props.value;
-        }
         return node;
     }
-    function setAttributes(el, attrs, oldAttrs) {
+    function setAttributes(el, attrs) {
         for (var key in attrs) {
-            var oldv = oldAttrs != null ? oldAttrs[key] : undefined;
+            if (key === "ref")
+                continue;
             var newv = attrs[key];
-            if (oldv !== newv) {
-                setDOMAttr(el, key, newv);
-            }
-        }
-        for (key in oldAttrs) {
-            if (!(key in attrs)) {
-                el.removeAttribute(key);
-            }
+            setDOMAttr(el, key, newv);
         }
     }
     function setDOMAttr(el, attr, value) {
@@ -2539,15 +2510,8 @@ var Q;
             }
         }
     }
-    function mountTo(parent, c) {
-        if (Array.isArray(c))
-            appendChildren(parent, c);
-        else
-            parent.appendChild(mount(c));
-    }
-    Q.mountTo = mountTo;
     var Fragment = /** @class */ (function () {
-        function Fragment(props, context) {
+        function Fragment() {
         }
         Fragment.prototype.mount = function (props, content) {
             var node = document.createDocumentFragment();
@@ -2559,76 +2523,94 @@ var Q;
             }
             return node;
         };
-        Fragment.prototype.patch = function (el, newProps, oldProps, newContent, oldContent) {
-            for (var i = el.childNodes.length - 1; i >= 0; i--)
-                el.removeChild(el.childNodes[i]);
-            return el;
-        };
-        Fragment.prototype.unmount = function (el) {
-        };
         return Fragment;
     }());
     Q.Fragment = Fragment;
+    var mountQueue = [];
+    var mountDepth = 0;
     function mount(c, node) {
-        if (c._text != null) {
-            node = node || document.createTextNode(c._text);
-        }
-        else if (c._vnode === true) {
-            var type = c.type, props = c.props, content = c.content, isSVG = c.isSVG;
-            if (typeof type === "string") {
-                var isSelect = !isSVG && type.length === 6 && type.toLowerCase() === SELECT;
-                var isInput = !isSelect &&
-                    !isSVG &&
-                    type.length === 5 &&
-                    type.toLowerCase() === INPUT;
-                if (isSelect) {
-                    node = node || document.createElement(type);
-                    updateSelect(node, props, content);
-                }
-                else if (isInput) {
-                    node = node || document.createElement(type);
-                    updateInput(node, props);
-                }
-                else {
-                    // TODO : {is} for custom elements
-                    if (!isSVG) {
-                        node = node || document.createElement(type);
-                        setProps(node, props);
+        mountDepth++;
+        try {
+            if (c._text != null) {
+                node = node || document.createTextNode(c._text);
+            }
+            else if (c._vnode === true) {
+                var type_1 = c.type, props_1 = c.props, content = c.content, isSVG = c.isSVG;
+                if (typeof type_1 === "string") {
+                    var isSelect = !isSVG && type_1.length === 6 && type_1.toLowerCase() === SELECT;
+                    var isInput = !isSelect &&
+                        !isSVG &&
+                        type_1.length === 5 &&
+                        type_1.toLowerCase() === INPUT;
+                    if (isSelect) {
+                        node = node || document.createElement(type_1);
+                        updateSelect(node, props_1, content);
+                    }
+                    else if (isInput) {
+                        node = node || document.createElement(type_1);
+                        updateInput(node, props_1);
                     }
                     else {
-                        node = node || document.createElementNS(SVG_NS, type);
-                        setAttributes(node, props);
+                        if (!isSVG) {
+                            node = node || document.createElement(type_1);
+                            setProps(node, props_1);
+                        }
+                        else {
+                            node = node || document.createElementNS(SVG_NS, type_1);
+                            setAttributes(node, props_1);
+                        }
+                        if (!isArray(content)) {
+                            node.appendChild(mount(content));
+                        }
+                        else {
+                            appendChildren(node, content);
+                        }
                     }
-                    if (!isArray(content)) {
-                        node.appendChild(mount(content));
+                }
+                else if (isComponent(type_1)) {
+                    node = type_1.mount(props_1, content);
+                }
+                else if (typeof type_1 === "function") {
+                    if (ss.isAssignableFrom(Serenity.Widget, type_1)) {
+                        node = Serenity.Widget.elementFor(type_1)[0];
+                        mountQueue.push(function () {
+                            new type_1($(node), props_1);
+                        });
+                    }
+                    else if (isComponent(type_1.prototype)) {
+                        var instance = new type_1(props_1, content);
+                        node = instance.mount(props_1, content);
                     }
                     else {
-                        appendChildren(node, content);
+                        var vnode = type_1(props_1, content);
+                        node = mount(vnode);
                     }
                 }
             }
-            else if (isComponent(type)) {
-                node = type.mount(props, content);
+            if (node == null) {
+                throw new Error("Unknown node type!");
             }
-            else if (typeof type === "function") {
-                if (isComponent(type.prototype)) {
-                    var instance = new type(props, content);
-                    node = instance.mount(props, content);
-                    c._data = instance;
-                }
-                else {
-                    var vnode = type(props, content);
-                    node = mount(vnode);
-                    c._data = vnode;
-                }
+            if (c.props && c.props.ref) {
+                var ref = c.props.ref;
+                mountQueue.push(function () {
+                    ref(node);
+                    $(node).on('remove', function () {
+                        ref(null);
+                    });
+                });
             }
         }
-        if (node == null) {
-            throw new Error("Unknown node type!");
+        finally {
+            mountDepth--;
         }
-        c._node = node;
-        if (c.props && c.props.ref)
-            c.props.ref(node);
+        if (!mountDepth) {
+            var m = mountQueue;
+            mountQueue = [];
+            for (var _i = 0, m_1 = m; _i < m_1.length; _i++) {
+                var x = m_1[_i];
+                x();
+            }
+        }
         return node;
     }
     Q.mount = mount;
@@ -4515,6 +4497,16 @@ var Serenity;
             }
             return this.asyncPromise;
         };
+        Widget.prototype.mount = function (props, content) {
+            throw "This method is only here for TypeScript VDOM to work!";
+        };
+        Object.defineProperty(Widget.prototype, "props", {
+            get: function () {
+                return this.options;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Widget.nextWidgetNumber = 0;
         Widget = Widget_1 = __decorate([
             Serenity.Decorators.registerClass()
@@ -10703,6 +10695,129 @@ var Serenity;
         }
         PropertyItemHelper.getPropertyItemsFor = getPropertyItemsFor;
     })(PropertyItemHelper = Serenity.PropertyItemHelper || (Serenity.PropertyItemHelper = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Toolbar = /** @class */ (function (_super) {
+        __extends(Toolbar, _super);
+        function Toolbar(div, options) {
+            var _this = _super.call(this, div, options) || this;
+            Q.mount(_this.render(options), div[0]);
+            _this.setupMouseTrap();
+            return _this;
+        }
+        Toolbar_1 = Toolbar;
+        Toolbar.prototype.destroy = function () {
+            this.element.find(Toolbar_1.buttonSelector).unbind('click');
+            if (this.mouseTrap) {
+                if (!!this.mouseTrap.destroy) {
+                    this.mouseTrap.destroy();
+                }
+                else {
+                    this.mouseTrap.reset();
+                }
+                this.mouseTrap = null;
+            }
+            _super.prototype.destroy.call(this);
+        };
+        Toolbar.prototype.setupMouseTrap = function () {
+            var _this = this;
+            if (!window['Mousetrap'])
+                return;
+            var buttons;
+            for (var _i = 0, _a = this.options.buttons || []; _i < _a.length; _i++) {
+                var b = _a[_i];
+                if (Q.isEmptyOrNull(b.hotkey))
+                    continue;
+                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.options.hotkeyContext || window.document.documentElement);
+                (function (x) {
+                    var btn = (buttons = buttons || _this.element.find(Toolbar_1.buttonSelector))
+                        .filter("." + x.cssClass);
+                    _this.mouseTrap.bind(x.hotkey, function (e, action) {
+                        if (btn.is(':visible')) {
+                            btn.triggerHandler('click');
+                        }
+                        return x.hotkeyAllowDefault;
+                    });
+                })(b);
+            }
+        };
+        Toolbar.prototype.adjustIconClass = function (icon) {
+            if (!icon)
+                return icon;
+            if (Q.startsWith(icon, 'fa-'))
+                return 'fa ' + icon;
+            if (Q.startsWith(icon, 'glyphicon-'))
+                return 'glyphicon ' + icon;
+            return icon;
+        };
+        Toolbar.prototype.buttonClass = function (btn) {
+            return _a = {
+                    "tool-button": true,
+                    "icon-tool-button": !!btn.icon,
+                    "no-text": !btn.title,
+                    disabled: btn.disabled
+                },
+                _a[btn.cssClass] = !!btn.cssClass,
+                _a;
+            var _a;
+        };
+        Toolbar.prototype.buttonClick = function (e, btn) {
+            if (!btn.onClick || $(e.currentTarget).hasClass('disabled'))
+                return;
+            btn.onClick(e);
+        };
+        Toolbar.prototype.findButton = function (className) {
+            if (className != null && Q.startsWith(className, '.')) {
+                className = className.substr(1);
+            }
+            return $(Toolbar_1.buttonSelector + '.' + className, this.element);
+        };
+        Toolbar.prototype.render = function (options) {
+            return (H("div", { class: "s-Toolbar clearfix" },
+                H("div", { class: "tool-buttons" },
+                    H("div", { class: "buttons-outer" },
+                        H("div", { class: "buttons-inner" },
+                            this.renderButtons(options.buttons),
+                            options.children)))));
+        };
+        Toolbar.prototype.renderButtons = function (buttons) {
+            var result = [];
+            for (var _i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
+                var btn = buttons_1[_i];
+                if (btn.separator)
+                    result.push(H("div", { class: "separator" }));
+                result.push(this.renderButton(btn));
+            }
+            return H(Q.Fragment, null, result);
+        };
+        Toolbar.prototype.renderButton = function (btn) {
+            var _this = this;
+            return (H("div", { class: this.buttonClass(btn), title: btn.hint, onClick: function (e) { return _this.buttonClick(e, btn); } },
+                H("div", { class: "button-outer" }, this.renderButtonText(btn))));
+        };
+        Toolbar.prototype.renderButtonText = function (btn) {
+            var klass = this.adjustIconClass(btn.icon);
+            if (!klass && !btn.title)
+                return H("span", { class: "button-inner" });
+            if (!btn.htmlEncode) {
+                return (H("span", { class: "button-inner", setInnerHTML: (klass ? '<i class="' +
+                        Q.attrEncode(klass) + '"></i> ' : '') + btn.title }));
+            }
+            if (!klass)
+                return H("span", { class: "button-inner" }, btn.title);
+            return H("span", { class: "button-inner" },
+                H("i", { class: klass }),
+                btn.title);
+        };
+        Toolbar.buttonSelector = "div.tool-button";
+        Toolbar = Toolbar_1 = __decorate([
+            Serenity.Decorators.registerClass('Serenity.Toolbar')
+        ], Toolbar);
+        return Toolbar;
+        var Toolbar_1;
+    }(Serenity.Widget));
+    Serenity.Toolbar = Toolbar;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -17086,125 +17201,5 @@ var Serenity;
         }
         DialogTypeRegistry.get = get;
     })(DialogTypeRegistry = Serenity.DialogTypeRegistry || (Serenity.DialogTypeRegistry = {}));
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var Toolbar = /** @class */ (function (_super) {
-        __extends(Toolbar, _super);
-        function Toolbar(div, options) {
-            var _this = _super.call(this, div, options) || this;
-            Q.mount(_this.render(options), div[0]);
-            _this.setupMouseTrap();
-            return _this;
-        }
-        Toolbar_1 = Toolbar;
-        Toolbar.prototype.destroy = function () {
-            this.element.find(Toolbar_1.buttonSelector).unbind('click');
-            if (this.mouseTrap) {
-                if (!!this.mouseTrap.destroy) {
-                    this.mouseTrap.destroy();
-                }
-                else {
-                    this.mouseTrap.reset();
-                }
-                this.mouseTrap = null;
-            }
-            _super.prototype.destroy.call(this);
-        };
-        Toolbar.prototype.setupMouseTrap = function () {
-            if (!window['Mousetrap'])
-                return;
-            var buttons;
-            for (var _i = 0, _a = this.options.buttons || []; _i < _a.length; _i++) {
-                var b = _a[_i];
-                if (Q.isEmptyOrNull(b.hotkey))
-                    continue;
-                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.options.hotkeyContext || window.document.documentElement);
-                var btn = (buttons = buttons || this.element.find(Toolbar_1.buttonSelector))
-                    .filter("." + b.cssClass);
-                this.mouseTrap.bind(b.hotkey, function (e, action) {
-                    if (btn.is(':visible')) {
-                        btn.triggerHandler('click');
-                    }
-                    return b.hotkeyAllowDefault;
-                });
-            }
-        };
-        Toolbar.prototype.render = function (options) {
-            return (H("div", { class: "s-Toolbar clearfix" },
-                H("div", { class: "tool-buttons" },
-                    H("div", { class: "buttons-outer" },
-                        H("div", { class: "buttons-inner" },
-                            this.renderButtons(options.buttons),
-                            options.children)))));
-        };
-        Toolbar.prototype.adjustIconClass = function (icon) {
-            if (!icon)
-                return icon;
-            if (Q.startsWith(icon, 'fa-'))
-                return 'fa ' + icon;
-            if (Q.startsWith(icon, 'glyphicon-'))
-                return 'glyphicon ' + icon;
-            return icon;
-        };
-        Toolbar.prototype.renderButtons = function (buttons) {
-            var result = [];
-            for (var _i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
-                var btn = buttons_1[_i];
-                if (btn.separator)
-                    result.push(H("div", { class: "separator" }));
-                result.push(this.renderButton(btn));
-            }
-            return H(Q.Fragment, null, result);
-        };
-        Toolbar.prototype.buttonClass = function (btn) {
-            return _a = {
-                    "tool-button": true,
-                    "icon-tool-button": !!btn.icon,
-                    "no-text": !btn.title,
-                    disabled: btn.disabled
-                },
-                _a[btn.cssClass] = !!btn.cssClass,
-                _a;
-            var _a;
-        };
-        Toolbar.prototype.renderButtonText = function (btn) {
-            var klass = this.adjustIconClass(btn.icon);
-            if (!klass && !btn.title)
-                return H("span", { class: "button-inner" });
-            if (!btn.htmlEncode) {
-                return (H("span", { class: "button-inner", setInnerHTML: (klass ? '<i class="' +
-                        Q.attrEncode(klass) + '"></i> ' : '') + btn.title }));
-            }
-            if (!klass)
-                return H("span", { class: "button-inner" }, btn.title);
-            return H("span", { class: "button-inner" },
-                H("i", { class: klass }),
-                btn.title);
-        };
-        Toolbar.prototype.buttonClick = function (e, btn) {
-            if (!btn.onClick || $(e.currentTarget).hasClass('disabled'))
-                return;
-            btn.onClick(e);
-        };
-        Toolbar.prototype.renderButton = function (btn) {
-            var _this = this;
-            return (H("div", { class: this.buttonClass(btn), title: btn.hint, onClick: function (e) { return _this.buttonClick(e, btn); } },
-                H("div", { class: "button-outer" }, this.renderButtonText(btn))));
-        };
-        Toolbar.prototype.findButton = function (className) {
-            if (className != null && Q.startsWith(className, '.')) {
-                className = className.substr(1);
-            }
-            return $(Toolbar_1.buttonSelector + '.' + className, this.element);
-        };
-        Toolbar.buttonSelector = "div.tool-button";
-        Toolbar = Toolbar_1 = __decorate([
-            Serenity.Decorators.registerClass('Serenity.Toolbar')
-        ], Toolbar);
-        return Toolbar;
-        var Toolbar_1;
-    }(Serenity.Widget));
-    Serenity.Toolbar = Toolbar;
 })(Serenity || (Serenity = {}));
 //# sourceMappingURL=Serenity.CoreLib.js.map

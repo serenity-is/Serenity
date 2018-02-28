@@ -83,7 +83,8 @@
     "UI/Widgets/Widgets.ts",
     "UI/Widgets/WX.ts",
     "UI/PropertyGrid/PropertyGrid.ts",
-    "UI/Widgets/Toolbar.ts",
+    "UI/Widgets/Toolbar.tsx",
+    "UI/Widgets/PopupToolButton.ts",
     "UI/Widgets/CreateWidgetParams.ts",
     "UI/Widgets/CustomValidation.ts",
     "UI/Widgets/IValidateRequired.ts",
@@ -105,8 +106,7 @@
     "UI/jQuery/jQueryUI.ButtonNoConflict.ts",
     "Externals/Serenity.Externals.Slick.ts",
     "Externals/Serenity.Externals.ts",
-    "UI/Serenity.Script.UI.ts",
-    "UI/Widgets/Toolbar.tsx"
+    "UI/Serenity.Script.UI.ts"
   ],
   "exclude": [
     "node_modules/",

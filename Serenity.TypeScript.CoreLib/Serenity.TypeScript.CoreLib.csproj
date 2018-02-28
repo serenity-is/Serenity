@@ -114,7 +114,7 @@
     <TypeScriptCompile Include="UI\Widgets\Widgets.ts" />
     <TypeScriptCompile Include="UI\Widgets\WX.ts" />
     <TypeScriptCompile Include="UI\PropertyGrid\PropertyGrid.ts" />
-    <TypeScriptCompile Include="UI\Widgets\Toolbar.ts" />
+    <TypeScriptCompile Include="UI\Widgets\PopupToolButton.ts" />
     <TypeScriptCompile Include="UI\Widgets\CreateWidgetParams.ts" />
     <TypeScriptCompile Include="UI\Widgets\CustomValidation.ts" />
     <TypeScriptCompile Include="UI\Widgets\IValidateRequired.ts" />

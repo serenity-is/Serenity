@@ -2,8 +2,6 @@
 namespace Q {
     export interface IComponent<PropsType = any> {
         mount(props: PropsType, content: any[]): Node;
-        patch(el: Node, newProps: any, oldProps: any, newContent: VNode[], oldContent: VNode[]): Node;
-        unmount(el: Node): void;
     }
 
     export interface ComponentProps<C extends FunctionalComponent<any> | Serenity.Widget<any>> {
@@ -26,8 +24,8 @@ namespace Q {
         key?: string;
         props?: { [name: string]: any };
         content?: any[];
-        _node?: Node;
-        _data?: any;
+        //_node?: Node;
+        //_data?: any;
     }
 
     export interface FunctionalComponent<PropsType> {
@@ -44,7 +42,8 @@ declare namespace JSX {
     export interface Element extends Q.VNode {
     }
 
-    export interface ElementClass extends Q.IComponent {
+    export interface ElementClass {
+        mount(props: any, content: any[]): Node;
     }
 
     export interface ElementAttributesProperty {

@@ -769,13 +769,9 @@ declare namespace Q {
         [propName: string]: any;
     }, children?: (JSX.Element | JSX.Element[] | string)[]): JSX.Element;
     function maybeFlatten(arr: any[], isSVG?: boolean): any[];
-    function mountTo(parent: Element, c: VNode | VNode[]): void;
     type Empty = null | void | boolean;
     class Fragment implements IComponent {
-        constructor(props?: any, context?: any);
         mount(props: any, content: VNode[]): Node;
-        patch(el: Node, newProps: any, oldProps: any, newContent: VNode[], oldContent: VNode[]): Node;
-        unmount(el: Node): void;
     }
     function mount(c: VNode, node?: Node): Node;
 }
@@ -783,8 +779,6 @@ declare const H: typeof Q.h;
 declare namespace Q {
     interface IComponent<PropsType = any> {
         mount(props: PropsType, content: any[]): Node;
-        patch(el: Node, newProps: any, oldProps: any, newContent: VNode[], oldContent: VNode[]): Node;
-        unmount(el: Node): void;
     }
     interface ComponentProps<C extends FunctionalComponent<any> | Serenity.Widget<any>> {
         children?: JSX.Element[];
@@ -806,8 +800,6 @@ declare namespace Q {
             [name: string]: any;
         };
         content?: any[];
-        _node?: Node;
-        _data?: any;
     }
     interface FunctionalComponent<PropsType> {
         (props?: PropsType & ComponentProps<this>, context?: any): JSX.Element;
@@ -819,7 +811,8 @@ declare namespace Q {
 declare namespace JSX {
     interface Element extends Q.VNode {
     }
-    interface ElementClass extends Q.IComponent {
+    interface ElementClass {
+        mount(props: any, content: any[]): Node;
     }
     interface ElementAttributesProperty {
         props: any;
@@ -1795,6 +1788,8 @@ declare namespace Serenity {
         static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
         init(action?: (widget: any) => void): this;
         initialize(): PromiseLike<void>;
+        mount(props: any, content: Q.VNode[]): Node;
+        readonly props: TOptions;
     }
     interface Widget<TOptions> {
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
@@ -2920,6 +2915,33 @@ declare namespace Serenity {
         separator?: boolean;
         disabled?: boolean;
     }
+    interface ToolbarOptions {
+        buttons?: ToolButton[];
+        hotkeyContext?: any;
+    }
+    class Toolbar extends Widget<ToolbarOptions> {
+        constructor(div: JQuery, options: ToolbarOptions);
+        protected mouseTrap: any;
+        destroy(): void;
+        protected setupMouseTrap(): void;
+        static buttonSelector: string;
+        adjustIconClass(icon: string): string;
+        buttonClass(btn: ToolButton): {
+            [x: string]: boolean;
+            "tool-button": boolean;
+            "icon-tool-button": boolean;
+            "no-text": boolean;
+            disabled: boolean;
+        };
+        buttonClick(e: MouseEvent, btn: ToolButton): void;
+        findButton(className: string): JQuery;
+        render(options: ToolbarOptions & Q.ComponentProps<this>): Q.VNode;
+        renderButtons(buttons: ToolButton[]): JSX.Element;
+        renderButton(btn: ToolButton): JSX.Element;
+        renderButtonText(btn: ToolButton): JSX.Element;
+    }
+}
+declare namespace Serenity {
     interface PopupMenuButtonOptions {
         menu?: JQuery;
         onPopup?: () => void;
@@ -2934,10 +2956,6 @@ declare namespace Serenity {
     }
     class PopupToolButton extends PopupMenuButton {
         constructor(div: JQuery, opt: PopupToolButtonOptions);
-    }
-    interface ToolbarOptions {
-        buttons?: ToolButton[];
-        hotkeyContext?: any;
     }
 }
 declare namespace Serenity {
@@ -3973,27 +3991,4 @@ declare namespace Serenity.DialogExtensions {
 declare namespace Serenity.DialogTypeRegistry {
     function tryGet(key: string): Function;
     function get(key: string): Function;
-}
-declare namespace Serenity {
-    class Toolbar extends Widget<ToolbarOptions> {
-        constructor(div: JQuery, options: ToolbarOptions);
-        protected mouseTrap: any;
-        destroy(): void;
-        protected setupMouseTrap(): void;
-        render(options: ToolbarOptions & Q.ComponentProps<this>): Q.VNode;
-        static buttonSelector: string;
-        adjustIconClass(icon: string): string;
-        renderButtons(buttons: ToolButton[]): JSX.Element;
-        buttonClass(btn: ToolButton): {
-            [x: string]: boolean;
-            "tool-button": boolean;
-            "icon-tool-button": boolean;
-            "no-text": boolean;
-            disabled: boolean;
-        };
-        renderButtonText(btn: ToolButton): JSX.Element;
-        buttonClick(e: MouseEvent, btn: ToolButton): void;
-        renderButton(btn: ToolButton): JSX.Element;
-        findButton(className: string): JQuery;
-    }
 }

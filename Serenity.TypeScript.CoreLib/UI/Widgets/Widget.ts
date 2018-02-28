@@ -131,6 +131,14 @@
 
             return this.asyncPromise;
         }
+
+        mount(props: any, content: Q.VNode[]): Node {
+            throw "This method is only here for TypeScript VDOM to work!";
+        }
+
+        get props(): TOptions {
+            return this.options;
+        }
     }
 
     export declare interface Widget<TOptions> {
