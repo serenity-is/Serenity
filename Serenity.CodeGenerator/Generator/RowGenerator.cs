@@ -123,6 +123,7 @@ namespace Serenity.CodeGenerator
             model.Fields = new List<EntityField>();
             model.Joins = new List<EntityJoin>();
             model.Instance = true;
+            model.ServerType = connection.GetDialect().ServerType;
 
             var schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
             var fields = schemaProvider.GetFieldInfos(connection, tableSchema, table).ToList();
@@ -302,6 +303,10 @@ namespace Serenity.CodeGenerator
                         var atk = new List<string>();
                         atk.Add("DisplayName(\"" + k.Title + "\")");
                         k.Expression = "j" + j.Name + ".[" + k.Name + "]";
+                        if (model.ServerType.StartsWith("Oracle", StringComparison.OrdinalIgnoreCase))
+                          k.Expression = "j" + j.Name + "." + k.Name;
+                        else
+                          k.Expression = "j" + j.Name + ".[" + k.Name + "]";
                         atk.Add("Expression(\"" + k.Expression + "\")");
                         k.Attributes = String.Join(", ", atk);
 
@@ -335,7 +340,7 @@ namespace Serenity.CodeGenerator
                 if (x.Ident != x.Name)
                     attrs.Add("Column(\"" + x.Name + "\")");
 
-                if ((x.Size ?? 0) > 0)
+                if (((x.Size ?? 0) > 0) && x.DataType == "String")
                     attrs.Add("Size(" + x.Size + ")");
 
                 if (x.Scale > 0)
@@ -346,7 +351,11 @@ namespace Serenity.CodeGenerator
 
                 if (!String.IsNullOrEmpty(x.PKTable))
                 {
+                  if (model.ServerType.StartsWith("Oracle", StringComparison.OrdinalIgnoreCase))
+                    attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : (x.PKSchema + "." + x.PKTable)) + "\", \"" + x.PKColumn + "\")");
+                  else
                     attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
+
                     attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
                 }
 

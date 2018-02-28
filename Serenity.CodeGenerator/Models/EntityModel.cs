@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Serenity.CodeGenerator
 {
@@ -24,6 +25,7 @@ namespace Serenity.CodeGenerator
         public string NameField { get; set; }
         public string FieldPrefix { get; set; }
         public bool AspNetCore { get; set; }
+        public string ServerType { get; set; }
 
         public string IdField { get { return Identity; } }
         public Dictionary<string, object> CustomSettings { get; set; }
@@ -60,8 +62,14 @@ namespace Serenity.CodeGenerator
 
         public string SchemaAndTable
         {
-            get { return string.IsNullOrEmpty(Schema)? Tablename : "[" + Schema + "].[" + Tablename + "]"; }
-        }
+            get
+            {
+              if (ServerType.StartsWith("Oracle", StringComparison.OrdinalIgnoreCase))
+                return (string.IsNullOrEmpty(Schema) ? Tablename : Schema + "." + Tablename);
+              else
+                return string.IsNullOrEmpty(Schema) ? Tablename : "[" + Schema + "].[" + Tablename + "]";
+            }
+    }
 
         public string RowBaseClassAndInterfaces
         {
