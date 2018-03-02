@@ -114,14 +114,14 @@
             return $(Toolbar.buttonSelector + '.' + className, this.element);
         }
 
-        render(options: ToolbarOptions & Q.ComponentProps<this>): Q.VNode {
+        render(options: ToolbarOptions, children?: JSX.Element[]): JSX.Element {
             return (
                 <div class="s-Toolbar clearfix">
                     <div class="tool-buttons">
                         <div class="buttons-outer">
                             <div class="buttons-inner">
                                 {this.renderButtons(options.buttons)}
-                                {options.children}
+                                {children}
                             </div>
                         </div>
                     </div>

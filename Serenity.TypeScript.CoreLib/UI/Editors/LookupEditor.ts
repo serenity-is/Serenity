@@ -14,6 +14,7 @@
         filterValue?: any;
         multiple?: boolean;
         delimited?: boolean;
+        required?: boolean;
     }
 
     @Serenity.Decorators.registerEditor("Serenity.LookupEditorBase")

@@ -5,6 +5,8 @@
 declare var Reflect: any;
 declare var __decorate: any;
 declare var __extends: any;
+declare var __assign: any;
+declare var __rest: (s: any, e: any) => {};
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }
@@ -513,7 +515,9 @@ declare namespace Q {
 }
 declare namespace Q {
     function text(key: string): string;
+    function dbText(prefix: string): ((key: string) => string);
     function tryGetText(key: string): string;
+    function dbTryText(prefix: string): ((key: string) => string);
     class LT {
         private key;
         static $table: {
@@ -764,55 +768,54 @@ declare namespace Q.Router {
     function resolve(hash?: string): void;
 }
 declare namespace Q {
-    function h<PropsType = any>(type: Q.FunctionalComponent<PropsType>, props: PropsType, children?: (JSX.Element | JSX.Element[] | string)[]): JSX.Element;
-    function h(type: string, props: JSX.HTMLAttributes & JSX.SVGAttributes & {
-        [propName: string]: any;
-    }, children?: (JSX.Element | JSX.Element[] | string)[]): JSX.Element;
-    function maybeFlatten(arr: any[], isSVG?: boolean): any[];
-    type Empty = null | void | boolean;
-    class Fragment implements IComponent {
-        mount(props: any, content: VNode[]): Node;
+    interface VNode {
+        _vnode?: boolean;
+        _text?: string;
+        type?: IComponent<any> | FunctionalComponent<any> | string;
+        isSVG?: boolean;
+        props?: any;
+        children?: JSX.Children;
     }
-    function mount(c: VNode, node?: Node): Node;
-}
-declare const H: typeof Q.h;
-declare namespace Q {
-    interface IComponent<PropsType = any> {
-        mount(props: PropsType, content: any[]): Node;
+    interface IComponent<P = any> {
+        render(props?: P, children?: JSX.Children): JSX.Element | null;
+        mounted?(node: Node): void;
+        unmounted?(): void;
     }
-    interface ComponentProps<C extends FunctionalComponent<any> | Serenity.Widget<any>> {
-        children?: JSX.Element[];
-        key?: string | number | any;
+    abstract class Component<P = any> implements IComponent<P> {
+        constructor(props: P, children?: JSX.Children);
+        abstract render(props?: P, children?: JSX.Children): JSX.Element | null;
+        static defaultProps?: any;
+        props: P & ComponentProps<this>;
+        readonly children?: JSX.Children;
+    }
+    interface FunctionalComponent<P = any> {
+        (props: P, children?: JSX.Children): JSX.Element;
+        defaultProps?: any;
+    }
+    type AnyComponent<P> = FunctionalComponent<P> | Component<P>;
+    interface ComponentProps<C extends FunctionalComponent<any> | Component<any>> {
         ref?: (el: C) => void;
+    }
+    interface WidgetProps<W extends Serenity.Widget<any>> {
+        id?: string;
+        name?: string;
+        class?: string;
+        maxLength?: number;
+        required?: boolean;
+        readOnly?: boolean;
+        ref?: (el: W) => void;
     }
     interface VDomHtmlAttrs {
         setInnerHTML?: string;
-        key?: string;
         ref?: (el?: Element) => void;
     }
-    interface VNode {
-        _vnode?: true;
-        _text?: string;
-        isSVG?: boolean;
-        type?: IComponent<any> | FunctionalComponent<any> | string;
-        key?: string;
-        props?: {
-            [name: string]: any;
-        };
-        content?: any[];
-    }
-    interface FunctionalComponent<PropsType> {
-        (props?: PropsType & ComponentProps<this>, context?: any): JSX.Element;
-        displayName?: string;
-        defaultProps?: any;
-    }
-    type AnyComponent<PropsType, StateType> = FunctionalComponent<PropsType>;
 }
 declare namespace JSX {
+    type Children = JSX.Element | JSX.Element[];
     interface Element extends Q.VNode {
     }
     interface ElementClass {
-        mount(props: any, content: any[]): Node;
+        render(props?: any, children?: JSX.Children): JSX.Element;
     }
     interface ElementAttributesProperty {
         props: any;
@@ -1443,6 +1446,17 @@ declare namespace JSX {
         use: SVGAttributes;
     }
 }
+declare namespace Q {
+    function h(type: any, props: any, contArg?: any): JSX.Element;
+    function maybeFlatten(arr: any[], isSVG?: boolean): JSX.Element[];
+    type Empty = null | void | boolean;
+    function Fragment(props?: any, children?: JSX.Element[]): JSX.Element | null;
+    function extend(obj: any, props: any): any;
+    function withUniqueID<T>(action: (uid: (id: string) => string) => T): T;
+    function render(vnode: VNode, parent: Node): void;
+    function mount(vnode: VNode, node?: Node): Node;
+}
+declare const H: typeof Q.h;
 declare namespace Serenity {
     namespace Decorators {
         function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
@@ -1788,8 +1802,8 @@ declare namespace Serenity {
         static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
         init(action?: (widget: any) => void): this;
         initialize(): PromiseLike<void>;
-        mount(props: any, content: Q.VNode[]): Node;
-        readonly props: TOptions;
+        render(props?: TOptions, children?: JSX.Children): JSX.Element | null;
+        readonly props: TOptions & Q.WidgetProps<this>;
     }
     interface Widget<TOptions> {
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
@@ -2076,6 +2090,7 @@ declare namespace Serenity {
         filterValue?: any;
         multiple?: boolean;
         delimited?: boolean;
+        required?: boolean;
     }
     class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
         constructor(input: JQuery, opt?: TOptions);
@@ -2935,7 +2950,7 @@ declare namespace Serenity {
         };
         buttonClick(e: MouseEvent, btn: ToolButton): void;
         findButton(className: string): JQuery;
-        render(options: ToolbarOptions & Q.ComponentProps<this>): Q.VNode;
+        render(options: ToolbarOptions, children?: JSX.Element[]): JSX.Element;
         renderButtons(buttons: ToolButton[]): JSX.Element;
         renderButton(btn: ToolButton): JSX.Element;
         renderButtonText(btn: ToolButton): JSX.Element;

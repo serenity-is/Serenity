@@ -15,6 +15,26 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var __assign = Object.assign || function (t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+    }
+    return t;
+};
+var __rest = function (s, e) {
+    var t = {};
+    for (var p in s)
+        if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+            t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++)
+            if (e.indexOf(p[i]) < 0)
+                t[p[i]] = s[p[i]];
+    return t;
+};
 /**
  * Represents the completion of an asynchronous operation
  */
@@ -778,10 +798,22 @@ var Q;
         return t;
     }
     Q.text = text;
+    function dbText(prefix) {
+        return function (key) {
+            return text("Db." + prefix + "." + key);
+        };
+    }
+    Q.dbText = dbText;
     function tryGetText(key) {
         return LT.$table[key];
     }
     Q.tryGetText = tryGetText;
+    function dbTryText(prefix) {
+        return function (key) {
+            return text("Db." + prefix + "." + key);
+        };
+    }
+    Q.dbTryText = dbTryText;
     var LT = /** @class */ (function () {
         function LT(key) {
             this.key = key;
@@ -2300,39 +2332,49 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
+    var Component = /** @class */ (function () {
+        function Component(props, children) {
+            this.props = props;
+            this.children = children;
+        }
+        return Component;
+    }());
+    Q.Component = Component;
+})(Q || (Q = {}));
+var Q;
+(function (Q) {
     // modified version of https://github.com/yelouafi/petit-dom for one time mount only, update / removal with jQuery
     var isArray = Array.isArray;
     var EMPTYO = {};
     var EMPTYAR = [];
     var isVNode = function (c) { return c && (c._vnode != null || c._text != null); };
-    var isComponent = function (c) { return c && c.mount; };
     function h(type, props, contArg) {
-        var content, args, i, isSVG = false;
+        var children, args, i, isSVG = false;
         var len = arguments.length - 2;
         if (typeof type !== "string") {
             if (len === 1) {
-                content = contArg;
+                children = contArg;
             }
             else if (len > 1) {
                 args = Array(len);
                 for (i = 0; i < len; i++) {
                     args[i] = arguments[i + 2];
                 }
-                content = args;
+                children = args;
             }
         }
         else {
             isSVG = type === "svg";
             if (len === 1) {
-                if (Array.isArray(contArg)) {
-                    content = maybeFlatten(contArg, isSVG);
+                if (isArray(contArg)) {
+                    children = maybeFlatten(contArg, isSVG);
                 }
                 else if (isVNode(contArg)) {
                     contArg.isSVG = isSVG;
-                    content = [contArg];
+                    children = [contArg];
                 }
                 else {
-                    content = [{ _text: contArg == null ? "" : contArg }];
+                    children = [{ _text: contArg == null ? "" : contArg }];
                 }
             }
             else if (len > 1) {
@@ -2340,19 +2382,18 @@ var Q;
                 for (i = 0; i < len; i++) {
                     args[i] = arguments[i + 2];
                 }
-                content = maybeFlatten(args, isSVG);
+                children = maybeFlatten(args, isSVG);
             }
             else {
-                content = EMPTYAR;
+                children = EMPTYAR;
             }
         }
         return {
             _vnode: true,
             isSVG: isSVG,
             type: type,
-            key: (props && props.key) || null,
             props: props || EMPTYO,
-            content: content
+            children: children
         };
     }
     Q.h = h;
@@ -2402,13 +2443,23 @@ var Q;
         href: XLINK_NS
     };
     var IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
+    var IGNORE_KEYS = {
+        "ref": true,
+        "children": true
+    };
     function setProps(el, props, ignoreKeys) {
         for (var key in props) {
+            if (IGNORE_KEYS[key] === true)
+                continue;
             if (ignoreKeys != null && ignoreKeys[key] === true)
                 continue;
             var val = props[key];
+            if (val == null || val == false)
+                continue;
             if (key === 'class')
                 key = 'className';
+            else if (key === "for")
+                key = 'htmlFor';
             if (key == 'style') {
                 if (!val || typeof val === 'string') {
                     el.style.cssText = val || '';
@@ -2442,7 +2493,10 @@ var Q;
             else if (key.charAt(0) == 'o' && key.charAt(1) == 'n') {
                 key = key.toLowerCase();
             }
-            el[key] = val;
+            try {
+                el[key] = val;
+            }
+            catch (e) { }
         }
     }
     function appendChildren(parent, children, start, end, beforeNode) {
@@ -2487,18 +2541,17 @@ var Q;
     }
     function setAttributes(el, attrs) {
         for (var key in attrs) {
-            if (key === "ref")
+            if (IGNORE_KEYS[key] === true)
                 continue;
             var newv = attrs[key];
+            if (newv == null || newv === false)
+                continue;
             setDOMAttr(el, key, newv);
         }
     }
     function setDOMAttr(el, attr, value) {
         if (value === true) {
             el.setAttribute(attr, "");
-        }
-        else if (value === false) {
-            el.removeAttribute(attr);
         }
         else {
             var ns = NS_ATTRS[attr];
@@ -2510,32 +2563,71 @@ var Q;
             }
         }
     }
-    var Fragment = /** @class */ (function () {
-        function Fragment() {
-        }
-        Fragment.prototype.mount = function (props, content) {
-            var node = document.createDocumentFragment();
-            if (content) {
-                for (var _i = 0, content_1 = content; _i < content_1.length; _i++) {
-                    var x = content_1[_i];
-                    node.appendChild(Q.mount(x));
-                }
-            }
-            return node;
-        };
-        return Fragment;
-    }());
+    function Fragment(props, children) {
+        return null;
+    }
     Q.Fragment = Fragment;
+    function extend(obj, props) {
+        for (var i in props)
+            obj[i] = props[i];
+        return obj;
+    }
+    Q.extend = extend;
+    function getNodeProps(vnode) {
+        var defaultProps = vnode.type.defaultProps;
+        if (defaultProps === undefined)
+            return vnode.props;
+        var props = extend({}, vnode.props);
+        for (var i in defaultProps) {
+            if (props[i] === undefined) {
+                props[i] = defaultProps[i];
+            }
+        }
+        return props;
+    }
+    var uniqueId = 0;
     var mountQueue = [];
     var mountDepth = 0;
-    function mount(c, node) {
+    function withUniqueID(action) {
+        var prefix = "uid_" + uniqueId + "_";
+        return action(function (s) {
+            return prefix + s;
+        });
+    }
+    Q.withUniqueID = withUniqueID;
+    function processQueue() {
+        var m = mountQueue;
+        mountQueue = [];
+        for (var _i = 0, m_1 = m; _i < m_1.length; _i++) {
+            var x = m_1[_i];
+            x();
+        }
+    }
+    function render(vnode, parent) {
         mountDepth++;
         try {
-            if (c._text != null) {
-                node = node || document.createTextNode(c._text);
+            parent.appendChild(mount(vnode));
+        }
+        finally {
+            mountDepth--;
+        }
+        if (mountDepth == 0)
+            processQueue();
+    }
+    Q.render = render;
+    function mount(vnode, node) {
+        mountDepth++;
+        try {
+            var ref = vnode.props && vnode.props.ref;
+            var component, vnode;
+            if (vnode._text != null) {
+                node = node || document.createTextNode(vnode._text);
             }
-            else if (c._vnode === true) {
-                var type_1 = c.type, props_1 = c.props, content = c.content, isSVG = c.isSVG;
+            else if (vnode._vnode === true) {
+                var type_1 = vnode.type;
+                var children = vnode.children;
+                var isSVG = vnode.isSVG;
+                var props = vnode.props;
                 if (typeof type_1 === "string") {
                     var isSelect = !isSVG && type_1.length === 6 && type_1.toLowerCase() === SELECT;
                     var isInput = !isSelect &&
@@ -2544,45 +2636,89 @@ var Q;
                         type_1.toLowerCase() === INPUT;
                     if (isSelect) {
                         node = node || document.createElement(type_1);
-                        updateSelect(node, props_1, content);
+                        updateSelect(node, props, children);
                     }
                     else if (isInput) {
                         node = node || document.createElement(type_1);
-                        updateInput(node, props_1);
+                        updateInput(node, props);
                     }
                     else {
                         if (!isSVG) {
                             node = node || document.createElement(type_1);
-                            setProps(node, props_1);
+                            setProps(node, props);
                         }
                         else {
                             node = node || document.createElementNS(SVG_NS, type_1);
-                            setAttributes(node, props_1);
+                            setAttributes(node, props);
                         }
-                        if (!isArray(content)) {
-                            node.appendChild(mount(content));
+                        if (isArray(children)) {
+                            appendChildren(node, children);
                         }
                         else {
-                            appendChildren(node, content);
+                            node.appendChild(mount(children));
                         }
                     }
                 }
-                else if (isComponent(type_1)) {
-                    node = type_1.mount(props_1, content);
+                else if (type_1.render) {
+                    component = type_1;
+                    props = getNodeProps(vnode);
+                    var vnode = type_1.render(props, children);
+                    node = mount(vnode);
                 }
                 else if (typeof type_1 === "function") {
-                    if (ss.isAssignableFrom(Serenity.Widget, type_1)) {
+                    if (type_1.prototype.__isWidget) {
                         node = Serenity.Widget.elementFor(type_1)[0];
+                        var mref = ref;
+                        ref = null;
                         mountQueue.push(function () {
-                            new type_1($(node), props_1);
+                            var $node = $(node);
+                            var e = node;
+                            if (props.id != null)
+                                e.setAttribute("id", props.id);
+                            if (props.name != null)
+                                e.setAttribute("name", props.name);
+                            if ($node.is(':input'))
+                                $node.addClass("editor");
+                            if (props.class != null)
+                                $node.addClass(props.class);
+                            var widget = new type_1($node, props);
+                            if (props.maxLength != null)
+                                e.setAttribute("maxLength", props.maxlength);
+                            if (props.required)
+                                Serenity.EditorUtils.setRequired(widget, true);
+                            if (props.readOnly)
+                                Serenity.EditorUtils.setReadOnly(widget, true);
+                            if (mref) {
+                                mref(widget);
+                                $node.on('remove', function () {
+                                    mref(null);
+                                });
+                            }
                         });
                     }
-                    else if (isComponent(type_1.prototype)) {
-                        var instance = new type_1(props_1, content);
-                        node = instance.mount(props_1, content);
+                    else if (type_1.prototype.render) {
+                        props = getNodeProps(vnode);
+                        var instance = new type_1(props, children);
+                        component = instance;
+                        vnode = instance.render(props, children);
+                        node = mount(vnode);
+                    }
+                    else if (type_1 === Fragment) {
+                        node = document.createDocumentFragment();
+                        if (isArray(children)) {
+                            var start = 0;
+                            var end = children.length - 1;
+                            while (start <= end) {
+                                var ch = children[start++];
+                                node.appendChild(mount(ch));
+                            }
+                        }
+                        else
+                            node.appendChild(mount(children));
                     }
                     else {
-                        var vnode = type_1(props_1, content);
+                        props = getNodeProps(vnode);
+                        vnode = type_1(props, children);
                         node = mount(vnode);
                     }
                 }
@@ -2590,12 +2726,23 @@ var Q;
             if (node == null) {
                 throw new Error("Unknown node type!");
             }
-            if (c.props && c.props.ref) {
-                var ref = c.props.ref;
+            if (ref != null) {
                 mountQueue.push(function () {
-                    ref(node);
-                    $(node).on('remove', function () {
-                        ref(null);
+                    ref(component || node);
+                });
+                $(node).on('remove', function () {
+                    ref(null);
+                });
+            }
+            if (component != null && component.mounted != null) {
+                mountQueue.push(function () {
+                    component.mounted(node);
+                });
+            }
+            if (component != null && component.unmounted != null) {
+                mountQueue.push(function () {
+                    $(node).one('remove', function () {
+                        component.unmounted();
                     });
                 });
             }
@@ -2603,20 +2750,13 @@ var Q;
         finally {
             mountDepth--;
         }
-        if (!mountDepth) {
-            var m = mountQueue;
-            mountQueue = [];
-            for (var _i = 0, m_1 = m; _i < m_1.length; _i++) {
-                var x = m_1[_i];
-                x();
-            }
-        }
+        if (!mountDepth)
+            processQueue();
         return node;
     }
     Q.mount = mount;
 })(Q || (Q = {}));
 var H = Q.h;
-/// <reference path="q.vdom.ts" />
 var Serenity;
 (function (Serenity) {
     var Decorators;
@@ -4497,7 +4637,7 @@ var Serenity;
             }
             return this.asyncPromise;
         };
-        Widget.prototype.mount = function (props, content) {
+        Widget.prototype.render = function (props, children) {
             throw "This method is only here for TypeScript VDOM to work!";
         };
         Object.defineProperty(Widget.prototype, "props", {
@@ -4515,6 +4655,7 @@ var Serenity;
         var Widget_1;
     }());
     Serenity.Widget = Widget;
+    Widget.prototype.__isWidget = true;
     Widget.prototype.addValidationRule = function (eventClass, rule) {
         return Serenity.VX.addValidationRule(this.element, eventClass, rule);
     };
@@ -10773,13 +10914,13 @@ var Serenity;
             }
             return $(Toolbar_1.buttonSelector + '.' + className, this.element);
         };
-        Toolbar.prototype.render = function (options) {
+        Toolbar.prototype.render = function (options, children) {
             return (H("div", { class: "s-Toolbar clearfix" },
                 H("div", { class: "tool-buttons" },
                     H("div", { class: "buttons-outer" },
                         H("div", { class: "buttons-inner" },
                             this.renderButtons(options.buttons),
-                            options.children)))));
+                            children)))));
         };
         Toolbar.prototype.renderButtons = function (buttons) {
             var result = [];

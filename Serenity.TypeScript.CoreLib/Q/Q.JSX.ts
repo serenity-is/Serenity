@@ -1,49 +1,69 @@
-﻿/// <reference path="q.vdom.ts" />
-namespace Q {
-    export interface IComponent<PropsType = any> {
-        mount(props: PropsType, content: any[]): Node;
+﻿namespace Q {
+    export interface VNode {
+        _vnode?: boolean;
+        _text?: string;
+        type?: IComponent<any> | FunctionalComponent<any> | string;
+        isSVG?: boolean;
+        props?: any;
+        children?: JSX.Children;
     }
 
-    export interface ComponentProps<C extends FunctionalComponent<any> | Serenity.Widget<any>> {
-        children?: JSX.Element[];
-        key?: string | number | any;
+    export interface IComponent<P = any> {
+        render(props?: P, children?: JSX.Children): JSX.Element | null;
+        mounted?(node: Node): void;
+        unmounted?(): void;
+    }
+
+    export abstract class Component<P = any> implements IComponent<P> {
+        constructor(props: P, children?: JSX.Children) {
+            this.props = props;
+            this.children = children;
+        }
+
+        abstract render(props?: P, children?: JSX.Children): JSX.Element | null;
+
+        static defaultProps?: any;
+        props: P & ComponentProps<this>
+        readonly children?: JSX.Children;
+    }
+
+    export interface FunctionalComponent<P = any> {
+        (props: P, children?: JSX.Children): JSX.Element;
+        defaultProps?: any;
+    }
+
+    export type AnyComponent<P> = FunctionalComponent<P> | Component<P>;
+
+    export interface ComponentProps<C extends FunctionalComponent<any> | Component<any>> {
         ref?: (el: C) => void;
+    }
+
+    export interface WidgetProps<W extends Serenity.Widget<any>> {
+        id?: string;
+        name?: string;
+        class?: string;
+        maxLength?: number;
+        required?: boolean;
+        readOnly?: boolean;
+        ref?: (el: W) => void;
     }
 
     export interface VDomHtmlAttrs {
         setInnerHTML?: string;
-        key?: string;
         ref?: (el?: Element) => void;
     }
-
-    export interface VNode {
-        _vnode?: true;
-        _text?: string;
-        isSVG?: boolean;
-        type?: IComponent<any> | FunctionalComponent<any> | string;
-        key?: string;
-        props?: { [name: string]: any };
-        content?: any[];
-        //_node?: Node;
-        //_data?: any;
-    }
-
-    export interface FunctionalComponent<PropsType> {
-        (props?: PropsType & ComponentProps<this>, context?: any): JSX.Element;
-        displayName?: string;
-        defaultProps?: any;
-    }
-
-    export type AnyComponent<PropsType, StateType> = FunctionalComponent<PropsType>;
+    
 }
 
 declare namespace JSX {
+
+    export type Children = JSX.Element | JSX.Element[];
 
     export interface Element extends Q.VNode {
     }
 
     export interface ElementClass {
-        mount(props: any, content: any[]): Node;
+        render(props?: any, children?: JSX.Children): JSX.Element;
     }
 
     export interface ElementAttributesProperty {

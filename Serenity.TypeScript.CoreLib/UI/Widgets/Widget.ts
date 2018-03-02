@@ -132,11 +132,11 @@
             return this.asyncPromise;
         }
 
-        mount(props: any, content: Q.VNode[]): Node {
+        render(props?: TOptions, children?: JSX.Children): JSX.Element | null {
             throw "This method is only here for TypeScript VDOM to work!";
         }
 
-        get props(): TOptions {
+        get props(): TOptions & Q.WidgetProps<this> {
             return this.options;
         }
     }
@@ -148,6 +148,7 @@
         changeSelect2(handler: (e: JQueryEventObject) => void): void;
     }
 
+    (Widget.prototype as any).__isWidget = true;
     Widget.prototype.addValidationRule = function (eventClass: string, rule: (p1: JQuery) => string): JQuery {
         return VX.addValidationRule(this.element, eventClass, rule);
     }

@@ -4,12 +4,9 @@
     const EMPTYO = {};
     const EMPTYAR: any[] = [];
     const isVNode = (c: any) => c && (c._vnode != null || c._text != null);
-    const isComponent = (c: any) => c && c.mount;
 
-    export function h<PropsType = any>(type: Q.FunctionalComponent<PropsType>, props: PropsType, children?: (JSX.Element | JSX.Element[] | string)[]): JSX.Element;
-    export function h(type: string, props: JSX.HTMLAttributes & JSX.SVGAttributes & { [propName: string]: any }, children?: (JSX.Element | JSX.Element[] | string)[]): JSX.Element;
-    export function h(type: any, props: any, contArg?: (JSX.Element | JSX.Element[] | string)[]): any {
-        var content,
+    export function h(type: any, props: any, contArg?: any): JSX.Element {
+        var children: JSX.Children,
             args,
             i,
             isSVG = false;
@@ -17,33 +14,33 @@
 
         if (typeof type !== "string") {
             if (len === 1) {
-                content = contArg;
+                children = contArg;
             } else if (len > 1) {
                 args = Array(len);
                 for (i = 0; i < len; i++) {
                     args[i] = arguments[i + 2];
                 }
-                content = args;
+                children = args;
             }
         } else {
             isSVG = type === "svg";
             if (len === 1) {
-                if (Array.isArray(contArg)) {
-                    content = maybeFlatten(contArg, isSVG);
+                if (isArray(contArg)) {
+                    children = maybeFlatten(contArg, isSVG);
                 } else if (isVNode(contArg)) {
                     (contArg as VNode).isSVG = isSVG;
-                    content = [contArg];
+                    children = [contArg];
                 } else {
-                    content = [{ _text: contArg == null ? "" : contArg }];
+                    children = [{ _text: contArg == null ? "" : contArg }];
                 }
             } else if (len > 1) {
                 args = Array(len);
                 for (i = 0; i < len; i++) {
                     args[i] = arguments[i + 2];
                 }
-                content = maybeFlatten(args, isSVG);
+                children = maybeFlatten(args, isSVG);
             } else {
-                content = EMPTYAR;
+                children = EMPTYAR;
             }
         }
 
@@ -51,13 +48,12 @@
             _vnode: true,
             isSVG,
             type,
-            key: (props && props.key) || null,
             props: props || EMPTYO,
-            content
+            children
         };
     }
 
-    export function maybeFlatten(arr: any[], isSVG?: boolean) {
+    export function maybeFlatten(arr: any[], isSVG?: boolean): JSX.Element[] {
         for (var i = 0; i < arr.length; i++) {
             var ch = arr[i];
             if (isArray(ch)) {
@@ -103,13 +99,28 @@
 
     const IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
 
+    const IGNORE_KEYS = {
+        "ref": true,
+        "children": true
+    }
+
     function setProps(el: Element, props: any, ignoreKeys?: any) {
         for (var key in props) {
-            if (ignoreKeys != null && ignoreKeys[key] === true) continue;
+
+            if (IGNORE_KEYS[key] === true)
+                continue;
+
+            if (ignoreKeys != null && ignoreKeys[key] === true)
+                continue;
+
             var val = props[key];
+            if (val == null || val == false)
+                continue;
 
             if (key === 'class')
                 key = 'className';
+            else if (key === "for")
+                key = 'htmlFor';
 
             if (key == 'style') {
                 if (!val || typeof val === 'string') {
@@ -144,7 +155,9 @@
                 key = key.toLowerCase();
             }
 
-            el[key] = val;
+            try {
+                el[key] = val;
+            } catch (e) { }
         }
     }
 
@@ -201,10 +214,13 @@
     function setAttributes(el: Element, attrs: any) {
         for (var key in attrs) {
 
-            if (key === "ref")
+            if (IGNORE_KEYS[key] === true)
                 continue;
 
             var newv = attrs[key];
+            if (newv == null || newv === false)
+                continue;
+
             setDOMAttr(el, key, newv);
         }
     }
@@ -212,8 +228,6 @@
     function setDOMAttr(el: Element, attr: string, value: any) {
         if (value === true) {
             el.setAttribute(attr, "");
-        } else if (value === false) {
-            el.removeAttribute(attr);
         } else {
             var ns = NS_ATTRS[attr];
             if (ns !== undefined) {
@@ -226,28 +240,75 @@
 
     export type Empty = null | void | boolean;
 
-    export class Fragment implements IComponent {
-        mount(props: any, content: VNode[]): Node {
-            var node = document.createDocumentFragment();
-            if (content) {
-                for (var x of content) {
-                    node.appendChild(Q.mount(x));
-                }
-            }
-            return node;
-        }
+    export function Fragment(props?: any, children?: JSX.Element[]): JSX.Element | null {
+        return null;
     }
 
+    export function extend(obj: any, props: any) {
+        for (let i in props)
+            obj[i] = props[i];
+
+        return obj;
+    }
+
+    function getNodeProps(vnode: VNode) {
+        let defaultProps = (vnode.type as any).defaultProps;
+        if (defaultProps === undefined)
+            return vnode.props;
+
+        let props = extend({}, vnode.props);
+        for (let i in defaultProps) {
+            if (props[i] === undefined) {
+                props[i] = defaultProps[i];
+            }
+        }
+
+        return props;
+    }
+
+    var uniqueId = 0;
     var mountQueue: any[] = [];
     var mountDepth = 0;
 
-    export function mount(c: VNode, node?: Node): Node {
+    export function withUniqueID<T>(action: (uid: (id: string) => string) => T): T{
+        var prefix = "uid_" + uniqueId + "_";
+        return action(function (s) {
+            return prefix + s;
+        });
+    }
+
+    function processQueue() {
+        var m = mountQueue;
+        mountQueue = [];
+        for (var x of m)
+            x();
+    }
+
+    export function render(vnode: VNode, parent: Node): void {
         mountDepth++;
         try {
-            if (c._text != null) {
-                node = node || document.createTextNode(c._text);
-            } else if (c._vnode === true) {
-                const { type, props, content, isSVG } = c;
+            parent.appendChild(mount(vnode));
+        }
+        finally {
+            mountDepth--;
+        }
+
+        if (mountDepth == 0)
+            processQueue();
+    }
+
+    export function mount(vnode: VNode, node?: Node): Node {
+        mountDepth++;
+        try {
+            var ref = vnode.props && vnode.props.ref;
+            var component: any, vnode: VNode;
+            if (vnode._text != null) {
+                node = node || document.createTextNode(vnode._text);
+            } else if (vnode._vnode === true) {
+                const type = vnode.type;
+                const children = vnode.children;
+                const isSVG = vnode.isSVG;
+                var props = vnode.props;
                 if (typeof type === "string") {
                     const isSelect =
                         !isSVG && type.length === 6 && type.toLowerCase() === SELECT;
@@ -258,7 +319,7 @@
                         type.toLowerCase() === INPUT;
                     if (isSelect) {
                         node = node || document.createElement(type);
-                        updateSelect(node as HTMLSelectElement, props, content);
+                        updateSelect(node as HTMLSelectElement, props, children as JSX.Element[]);
                     } else if (isInput) {
                         node = node || document.createElement(type);
                         updateInput(node as HTMLInputElement, props);
@@ -270,28 +331,81 @@
                             node = node || document.createElementNS(SVG_NS, type);
                             setAttributes(node as Element, props);
                         }
-                        if (!isArray(content)) {
-                            node.appendChild(mount(content));
+                        if (isArray(children)) {
+                            appendChildren(node as Element, children as VNode[]);
                         } else {
-                            appendChildren(node as Element, content);
+                            node.appendChild(mount(children));                            
                         }
                     }
                 }
-                else if (isComponent(type)) {
-                    node = (type as IComponent).mount(props, content);
+                else if ((type as IComponent).render) {
+                    component = type;
+                    props = getNodeProps(vnode);
+                    var vnode = (type as IComponent).render(props, children);
+                    node = mount(vnode);
                 } else if (typeof type === "function") {
-                    if ((ss as any).isAssignableFrom(Serenity.Widget, type)) {
+                    if (type.prototype.__isWidget) {
                         node = Serenity.Widget.elementFor(type as any)[0];
+                        var mref = ref;
+                        ref = null;
                         mountQueue.push(function () {
-                            new (type as any)($(node), props);
+                            var $node = $(node);
+                            var e = node as Element;
+                            if (props.id != null)
+                                e.setAttribute("id", props.id);
+
+                            if (props.name != null)
+                                e.setAttribute("name", props.name);
+
+                            if ($node.is(':input'))
+                                $node.addClass("editor");
+
+                            if (props.class != null)
+                                $node.addClass(props.class);
+
+                            var widget = new (type as any)($node, props);
+
+                            if (props.maxLength != null)
+                                e.setAttribute("maxLength", props.maxlength);
+
+                            if (props.required)
+                                Serenity.EditorUtils.setRequired(widget, true);
+
+                            if (props.readOnly)
+                                Serenity.EditorUtils.setReadOnly(widget, true);
+
+                            if (mref) {
+                                mref(widget);
+
+                                $node.on('remove', function () {
+                                    mref(null);
+                                });
+                            }
                         });
                     }
-                    else if (isComponent(type.prototype)) {
-                        var instance = new (type as any)(props, content);
-                        node = instance.mount(props, content);
+                    else if (type.prototype.render) {
+                        props = getNodeProps(vnode);
+                        var instance = new (type as any)(props, children);
+                        component = instance;
+                        vnode = (instance as IComponent).render(props, children);
+                        node = mount(vnode);
+                    }
+                    else if (type === Fragment) {
+                        node = document.createDocumentFragment();
+                        if (isArray(children)) {
+                            var start = 0;
+                            var end = (children as any).length - 1;
+                            while (start <= end) {
+                                var ch = children[start++];
+                                node.appendChild(mount(ch as JSX.Element));
+                            }
+                        }
+                        else 
+                            node.appendChild(mount(children));
                     }
                     else {
-                        var vnode = type(props, content);
+                        props = getNodeProps(vnode);
+                        vnode = (type as Q.FunctionalComponent)(props, children);
                         node = mount(vnode);
                     }
                 }
@@ -300,12 +414,26 @@
                 throw new Error("Unknown node type!");
             }
 
-            if (c.props && c.props.ref) {
-                var ref = c.props.ref;
+            if (ref != null) {
                 mountQueue.push(function () {
-                    ref(node);
-                    $(node).on('remove', function () {
-                        ref(null);
+                    ref(component || node);
+                });
+
+                $(node).on('remove', function () {
+                    ref(null);
+                });
+            }
+
+            if (component != null && (component as IComponent).mounted != null) {
+                mountQueue.push(function () {
+                    (component as IComponent).mounted(node);
+                });
+            }
+
+            if (component != null && (component as IComponent).unmounted != null) {
+                mountQueue.push(function () {
+                    $(node).one('remove', function () {
+                        (component as IComponent).unmounted();
                     });
                 });
             }
@@ -314,12 +442,8 @@
             mountDepth--;
         }
 
-        if (!mountDepth) {
-            var m = mountQueue;
-            mountQueue = [];
-            for (var x of m)
-                x();
-        }
+        if (!mountDepth)
+            processQueue();
 
         return node;
     }
