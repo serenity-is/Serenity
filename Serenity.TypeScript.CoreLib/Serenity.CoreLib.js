@@ -4122,30 +4122,48 @@ var Serenity;
         return IAsyncInit;
     }());
     Serenity.IAsyncInit = IAsyncInit;
-    var Widget = /** @class */ (function () {
+    if (typeof React === "undefined") {
+        if (window['preact'] != null) {
+            window['React'] = window['ReactDOM'] = window['preact'];
+            React.Fragment = "x-fragment";
+        }
+        else {
+            window['React'] = {
+                Component: function () { },
+                Fragment: "x-fragment",
+                createElement: function () { return { _reactNotLoaded: true }; }
+            };
+            window['ReactDOM'] = {
+                render: function () { throw Error("To use React, it should be included before Serenity.CoreLib.js"); }
+            };
+        }
+    }
+    var Widget = /** @class */ (function (_super) {
+        __extends(Widget, _super);
         function Widget(element, options) {
-            var _this = this;
-            this.element = element;
-            this.options = options || {};
-            this.widgetName = Widget_1.getWidgetName(ss.getInstanceType(this));
-            this.uniqueName = this.widgetName + (Widget_1.nextWidgetNumber++).toString();
-            if (element.data(this.widgetName)) {
-                throw new ss.Exception(Q.format("The element already has widget '{0}'!", this.widgetName));
+            var _this = _super.call(this, options) || this;
+            _this.element = element;
+            _this.options = options || {};
+            _this.widgetName = Widget_1.getWidgetName(ss.getInstanceType(_this));
+            _this.uniqueName = _this.widgetName + (Widget_1.nextWidgetNumber++).toString();
+            if (element.data(_this.widgetName)) {
+                throw new ss.Exception(Q.format("The element already has widget '{0}'!", _this.widgetName));
             }
-            element.bind('remove.' + this.widgetName, function (e) {
+            element.bind('remove.' + _this.widgetName, function (e) {
                 if (e.bubbles || e.cancelable) {
                     return;
                 }
                 _this.destroy();
-            }).data(this.widgetName, this);
-            this.addCssClass();
-            if (this.isAsyncWidget()) {
+            }).data(_this.widgetName, _this);
+            _this.addCssClass();
+            if (_this.isAsyncWidget()) {
                 window.setTimeout(function () {
                     if (element && !_this.asyncPromise) {
                         _this.asyncPromise = _this.initializeAsync();
                     }
                 }, 0);
             }
+            return _this;
         }
         Widget_1 = Widget;
         Widget.prototype.destroy = function () {
@@ -4225,12 +4243,13 @@ var Serenity;
             return this.asyncPromise;
         };
         Widget.nextWidgetNumber = 0;
+        Widget.__isWidgetType = true;
         Widget = Widget_1 = __decorate([
             Serenity.Decorators.registerClass()
         ], Widget);
         return Widget;
         var Widget_1;
-    }());
+    }(React.Component));
     Serenity.Widget = Widget;
     Widget.prototype.addValidationRule = function (eventClass, rule) {
         return Serenity.VX.addValidationRule(this.element, eventClass, rule);
@@ -10638,7 +10657,7 @@ var Serenity;
         };
         TemplatedDialog.prototype.onDialogOpen = function () {
             if (!$(document.body).hasClass('mobile-device'))
-                $(':input:eq(0)', this.element).focus();
+                $(':input', this.element).not('button').eq(0).focus();
             this.arrange();
             this.tabs && this.tabs.tabs('option', 'active', 0);
         };

@@ -11,7 +11,8 @@
     "outFile": "Serenity.CoreLib.js",
     "suppressImplicitAnyIndexErrors": true,
     "target": "ES5",
-    "noEmitHelpers": true
+    "noEmitHelpers": true,
+    "jsx": "react"
   },
   "typeRoots": [
     "./node_modules/@types/"

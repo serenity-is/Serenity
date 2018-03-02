@@ -1,6 +1,7 @@
 ﻿/// <reference types="toastr" />
 /// <reference types="jquery" />
 /// <reference types="jquery.validation" />
+/// <reference types="react" />
 /// <reference types="jqueryui" />
 declare var Reflect: any;
 declare var __decorate: any;
@@ -762,6 +763,11 @@ declare namespace Q.Router {
     function replaceLast(hash: string, tryBack?: boolean): void;
     function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
     function resolve(hash?: string): void;
+}
+declare namespace Q {
+    function extend(obj: any, props: any): any;
+    function withUniqueID<T>(action: (uid: (id: string) => string) => T): T;
+    function cssClass(...args: any[]): string;
 }
 declare namespace Serenity {
     namespace Decorators {
@@ -2230,8 +2236,33 @@ declare namespace Serenity {
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
+        hotkeyContext?: any;
         separator?: boolean;
+        disabled?: boolean;
     }
+    interface ToolbarOptions {
+        buttons?: ToolButton[];
+        hotkeyContext?: any;
+    }
+    class Toolbar extends Widget<ToolbarOptions> {
+        constructor(div: JQuery, options: ToolbarOptions);
+        protected mouseTrap: any;
+        destroy(): void;
+        protected setupMouseTrap(): void;
+        static buttonSelector: string;
+        adjustIconClass(icon: string): string;
+        buttonClass(btn: ToolButton): string;
+        buttonClick(e: React.MouseEvent<any>, btn: ToolButton): void;
+        findButton(className: string): JQuery;
+        render(props: Serenity.ToolbarOptions & {
+            children?: React.ReactNode;
+        }): JSX.Element;
+        renderButtons(buttons: ToolButton[]): JSX.Element;
+        renderButton(btn: ToolButton): JSX.Element;
+        renderButtonText(btn: ToolButton): JSX.Element;
+    }
+}
+declare namespace Serenity {
     interface PopupMenuButtonOptions {
         menu?: JQuery;
         onPopup?: () => void;
@@ -2246,17 +2277,6 @@ declare namespace Serenity {
     }
     class PopupToolButton extends PopupMenuButton {
         constructor(div: JQuery, opt: PopupToolButtonOptions);
-    }
-    interface ToolbarOptions {
-        buttons?: ToolButton[];
-        hotkeyContext?: any;
-    }
-    class Toolbar extends Widget<ToolbarOptions> {
-        constructor(div: JQuery, options: ToolbarOptions);
-        destroy(): void;
-        protected mouseTrap: any;
-        protected createButton(container: JQuery, b: ToolButton): void;
-        findButton(className: string): JQuery;
     }
 }
 declare namespace Serenity {

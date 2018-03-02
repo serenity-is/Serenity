@@ -22,8 +22,14 @@
             (React as any).Fragment = "x-fragment";
         }
         else {
-            (React as any).Component = function () { };
-            (React as any).Fragment = "x-fragment";
+            window['React'] = {
+                Component: function () { },
+                Fragment: "x-fragment",
+                createElement: function () { return { _reactNotLoaded: true }; }
+            }
+            window['ReactDOM'] = {
+                render: function () { throw Error("To use React, it should be included before Serenity.CoreLib.js"); }
+            }
         }
     }
 

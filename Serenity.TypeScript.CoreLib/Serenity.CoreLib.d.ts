@@ -1,5 +1,6 @@
 ﻿/// <reference types="toastr" />
 /// <reference types="jquery" />
+/// <reference types="react" />
 /// <reference types="jquery.validation" />
 /// <reference types="jqueryui" />
 declare var Reflect: any;
@@ -1110,7 +1111,7 @@ declare namespace Serenity {
         element: JQuery;
     }
     type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
-    class Widget<TOptions> {
+    class Widget<TOptions> extends React.Component<TOptions, any> {
         private static nextWidgetNumber;
         element: JQuery;
         protected options: TOptions;
@@ -1130,6 +1131,22 @@ declare namespace Serenity {
         static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
         init(action?: (widget: any) => void): this;
         initialize(): PromiseLike<void>;
+        private static __isWidgetType;
+        props: Readonly<{
+            children?: React.ReactNode;
+        }> & Readonly<TOptions> & WidgetComponentProps<this>;
+    }
+    interface WidgetComponentProps<W extends Serenity.Widget<any>> {
+        id?: string;
+        name?: string;
+        className?: string;
+        maxLength?: number;
+        placeholder?: string;
+        setOptions?: any;
+        required?: boolean;
+        readOnly?: boolean;
+        oneWay?: boolean;
+        ref?: (el: W) => void;
     }
     interface Widget<TOptions> {
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
@@ -1211,12 +1228,13 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    type Constructor<T> = new (...args: any[]) => T;
     interface PropertyItem {
         name?: string;
         title?: string;
         hint?: string;
         placeholder?: string;
-        editorType?: string;
+        editorType?: string | React.ComponentType<any>;
         editorParams?: any;
         category?: string;
         collapsible?: boolean;
