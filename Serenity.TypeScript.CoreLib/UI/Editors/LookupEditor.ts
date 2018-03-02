@@ -142,7 +142,7 @@
             var dialogTypeKey = this.getDialogTypeKey();
             var dialogType = Serenity.DialogTypeRegistry.get(dialogTypeKey);
             Serenity.Widget.create({
-                type: dialogType as any,
+                type: dialogType,
                 init: x => callback(x as any)
             });
         }

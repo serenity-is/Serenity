@@ -164,9 +164,9 @@ namespace Serenity.DialogTypeRegistry {
         return null;
     }
 
-    var knownTypes: Q.Dictionary<any> = {};
+    var knownTypes: Q.Dictionary<WidgetDialogClass> = {};
 
-    export function tryGet(key: string): Function {
+    export function tryGet(key: string): WidgetDialogClass {
         if (knownTypes[key] == null) {
             var typeName = key;
             var dialogType = search(typeName);
@@ -187,7 +187,7 @@ namespace Serenity.DialogTypeRegistry {
         return knownTypes[key];
     }
 
-    export function get(key: string): Function {
+    export function get(key: string): WidgetDialogClass {
 
         var type = tryGet(key);
 

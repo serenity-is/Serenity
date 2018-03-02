@@ -3,20 +3,27 @@
     import Option = Serenity.Decorators.option
 
     export namespace EditorTypeRegistry {
-        let knownTypes: Q.Dictionary<Function>;
+        let knownTypes: Q.Dictionary<WidgetClass>;
 
-        export function get(key: string): Function {
+        export function get(key: string): WidgetClass {
 
             if (Q.isEmptyOrNull(key)) {
                 throw new (ss as any).ArgumentNullException('key');
             }
 
             initialize();
+
             var editorType = knownTypes[key.toLowerCase()];
             if (editorType == null) {
+
+                var type = Q.typeByFullName(key);
+                if (type != null) {
+                    knownTypes[key.toLowerCase()] = type;
+                    return type;
+                }
+
                 throw new ss.Exception(Q.format("Can't find {0} editor type!", key));
             }
-
             return editorType;
 
         }
@@ -73,20 +80,25 @@
             var suffix = 'editor';
             var keys = Object.keys(knownTypes);
             for (var k of keys) {
-
-                if (!Q.endsWith(k, suffix))
-                    continue;
-
-                var p = k.substr(0, k.length - suffix.length);
-
-                if (Q.isEmptyOrNull(p))
-                    continue;
-
-                if (knownTypes[p] != null)
-                    continue;
-
-                knownTypes[p] = knownTypes[k];
+                setWithoutSuffix(k, knownTypes[k]);
             }
+        }
+
+        function setWithoutSuffix(key: string, t: Serenity.WidgetClass) {
+            var suffix = 'editor';
+
+            if (!Q.endsWith(key, suffix))
+                return;
+
+            var p = key.substr(0, key.length - suffix.length);
+
+            if (Q.isEmptyOrNull(p))
+                return;
+
+            if (knownTypes[p] != null)
+                return;
+
+            knownTypes[p] = knownTypes[key];
         }
     }
 

@@ -97,7 +97,6 @@ namespace Serenity.Web
 
             path = Path.GetDirectoryName(path);
 
-
             var beforeName = Path.GetFileName(before.Replace('/', System.IO.Path.DirectorySeparatorChar));
 
             var latest = GetLatestVersion(path, beforeName + "*" + extension.Replace('/', System.IO.Path.DirectorySeparatorChar));
@@ -110,6 +109,76 @@ namespace Serenity.Web
             result = before + latest + after;
             expandVersion[scriptUrl] = result;
             return result;
+        }
+
+        public static string DoReplacements(string scriptUrl, Dictionary<string, object> replacements)
+        {
+            int idx = 0;
+            do
+            {
+                idx = scriptUrl.IndexOf('{', idx);
+                if (idx < 0)
+                    break;
+
+                var end = scriptUrl.IndexOf('}', idx + 1);
+                if (end < 0)
+                    break;
+
+                var key = scriptUrl.Substring(idx + 1, end - idx - 1);
+                if (string.IsNullOrEmpty(key))
+                    return null;
+
+                if (key == "version")
+                {
+                    idx = end + 1;
+                    continue;
+                }
+
+                bool falsey = key.StartsWith("!");
+                if (falsey)
+                    key = key.Substring(1);
+
+                if (string.IsNullOrEmpty(key))
+                    return null;
+
+                object value;
+                if (replacements == null ||
+                    !replacements.TryGetValue(key, out value))
+                {
+                    value = null;
+                }
+
+                string replace;
+                if (falsey)
+                {
+                    if (value is Boolean && (Boolean)value == true)
+                        return null;
+
+                    if (value != null && (!(value is Boolean) || ((Boolean)value == true)))
+                        return null;
+
+                    replace = "";
+                }
+                else
+                {
+                    if (value == null)
+                        return null;
+
+                    if (value is Boolean && (Boolean)value == false)
+                        return null;
+
+                    if (value is Boolean && (Boolean)value == true)
+                        replace = "";
+                    else
+                        replace = value.ToString();
+                }
+
+                scriptUrl = scriptUrl.Substring(0, idx) + replace + scriptUrl.Substring(end + 1);
+                idx = end + 1 + (replace.Length - key.Length - (falsey ? 1 : 0));
+            }
+            while (idx < scriptUrl.Length - 1);
+
+            return scriptUrl;
         }
 
         public static Dictionary<string, List<string>> ExpandBundleIncludes(Dictionary<string, string[]> bundles,

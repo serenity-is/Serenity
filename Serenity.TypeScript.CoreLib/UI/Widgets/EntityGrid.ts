@@ -302,7 +302,7 @@
             return Serenity.DialogTypeRegistry.get(itemType) as any;
         }
 
-        private dialogType: { new(...args: any[]): Widget<any> };
+        private dialogType: WidgetDialogClass;
 
         protected getDialogType(): { new(...args: any[]): Widget<any> } {
 
@@ -311,9 +311,9 @@
 
             var attr = this.attrs(DialogTypeAttribute);
             if (attr.length >= 1)
-                this.dialogType = attr[0].value as any;
+                this.dialogType = attr[0].value;
             else
-                this.dialogType = Serenity.DialogTypeRegistry.get(this.getEntityType()) as any;
+                this.dialogType = Serenity.DialogTypeRegistry.get(this.getEntityType());
 
             return this.dialogType;
         }

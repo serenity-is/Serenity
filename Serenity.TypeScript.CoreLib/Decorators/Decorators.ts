@@ -83,14 +83,6 @@ namespace Serenity {
         }
     }
 
-    @Attr('Collapsible')
-    export class CollapsibleAttribute {
-        constructor(public value: boolean) {
-        }
-
-        public collapsed: boolean;
-    }
-
     @Attr('ColumnsKey')
     export class ColumnsKeyAttribute {
         constructor(public value: string) {
@@ -112,7 +104,7 @@ namespace Serenity {
 
     @Attr('DialogType')
     export class DialogTypeAttribute {
-        constructor(public value: Function) {
+        constructor(public value: WidgetDialogClass) {
         }
     }
 
@@ -323,13 +315,7 @@ namespace Serenity.Decorators {
         type.__metadata.attr.push(attr);
     }
 
-    export function columnsKey(value: string) {
-        return function (target: Function) {
-            addAttribute(target, new ColumnsKeyAttribute(value));
-        }
-    }
-
-    export function dialogType(value: Function) {
+    export function dialogType(value: WidgetDialogClass) {
         return function (target: Function) {
             addAttribute(target, new DialogTypeAttribute(value));
         }
@@ -350,12 +336,6 @@ namespace Serenity.Decorators {
         }
     }
 
-    export function entityType(value: string) {
-        return function (target: Function) {
-            addAttribute(target, new EntityTypeAttribute(value));
-        }
-    }
-
     export function enumKey(value: string) {
         return function (target: Function) {
             addAttribute(target, new EnumKeyAttribute(value));
@@ -365,24 +345,6 @@ namespace Serenity.Decorators {
     export function flexify(value = true) {
         return function (target: Function) {
             addAttribute(target, new FlexifyAttribute(value));
-        }
-    }
-
-    export function formKey(value: string) {
-        return function (target: Function) {
-            addAttribute(target, new FormKeyAttribute(value));
-        }
-    }
-
-    export function generatedCode(origin?: string) {
-        return function (target: Function) {
-            addAttribute(target, new GeneratedCodeAttribute(origin));
-        }
-    }
-
-    export function idProperty(value: string) {
-        return function (target: Function) {
-            addAttribute(target, new IdPropertyAttribute(value));
         }
     }
 
@@ -428,27 +390,9 @@ namespace Serenity.Decorators {
         }
     }
 
-    export function isActiveProperty(value: string) {
-        return function (target: Function) {
-            addAttribute(target, new IsActivePropertyAttribute(value));
-        }
-    }
-
-    export function localTextPrefix(value: string) {
-        return function (target: Function) {
-            addAttribute(target, new LocalTextPrefixAttribute(value));
-        }
-    }
-
     export function maximizable(value = true) {
         return function (target: Function) {
             addAttribute(target, new MaximizableAttribute(value));
-        }
-    }
-
-    export function nameProperty(value: string) {
-        return function (target: Function) {
-            addAttribute(target, new NamePropertyAttribute(value));
         }
     }
 

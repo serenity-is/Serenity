@@ -8,12 +8,37 @@
                 r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __skipExtends = {
+    "__metadata": true,
+    "__typeName": true,
+    "__componentFactory": true
+};
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b)
-        if (b.hasOwnProperty(p) && p !== '__metadata' && p !== '__typeName')
+        if (b.hasOwnProperty(p) && __skipExtends[p] !== true)
             d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var __assign = Object.assign || function (t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+    }
+    return t;
+};
+var __rest = function (s, e) {
+    var t = {};
+    for (var p in s)
+        if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+            t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++)
+            if (e.indexOf(p[i]) < 0)
+                t[p[i]] = s[p[i]];
+    return t;
 };
 /**
  * Represents the completion of an asynchronous operation
@@ -142,6 +167,36 @@ var Q;
         return lookup;
     }
     Q.toGrouping = toGrouping;
+    /**
+     * Groups an array with keys determined by specified getKey() callback.
+     * Resulting object contains group objects in order and a dictionary to access by key.
+     */
+    function groupBy(items, getKey) {
+        var result = {
+            byKey: Object.create(null),
+            inOrder: []
+        };
+        for (var index = 0; index < items.length; index++) {
+            var item = items[index];
+            var key = Q.coalesce(getKey(item), "");
+            var group = result.byKey[key];
+            if (group === undefined) {
+                group = {
+                    order: result.inOrder.length,
+                    key: key,
+                    items: [item],
+                    start: index
+                };
+                result.byKey[key] = group;
+                result.inOrder.push(group);
+            }
+            else {
+                group.items.push(item);
+            }
+        }
+        return result;
+    }
+    Q.groupBy = groupBy;
     /**
      * Gets first element in an array that matches given predicate.
      * Returns null if no match is found.
@@ -778,10 +833,44 @@ var Q;
         return t;
     }
     Q.text = text;
+    function dbText(prefix) {
+        return function (key) {
+            return text("Db." + prefix + "." + key);
+        };
+    }
+    Q.dbText = dbText;
+    function prefixedText(prefix) {
+        return function (text, key) {
+            if (text != null && !Q.startsWith(text, '`')) {
+                var local = Q.tryGetText(text);
+                if (local != null) {
+                    return local;
+                }
+            }
+            if (text != null && Q.startsWith(text, '`')) {
+                text = text.substr(1);
+            }
+            if (!Q.isEmptyOrNull(prefix)) {
+                var textKey = typeof (key) == "function" ? key(prefix) : (prefix + key);
+                var localText = Q.tryGetText(textKey);
+                if (localText != null) {
+                    return localText;
+                }
+            }
+            return text;
+        };
+    }
+    Q.prefixedText = prefixedText;
     function tryGetText(key) {
         return LT.$table[key];
     }
     Q.tryGetText = tryGetText;
+    function dbTryText(prefix) {
+        return function (key) {
+            return text("Db." + prefix + "." + key);
+        };
+    }
+    Q.dbTryText = dbTryText;
     var LT = /** @class */ (function () {
         function LT(key) {
             this.key = key;
@@ -1906,6 +1995,21 @@ var Q;
         });
     }
     Q.prop = prop;
+    function typeByFullName(fullName, global) {
+        if (!fullName)
+            return null;
+        var parts = fullName.split('.');
+        var root = global || window;
+        for (var i = 0; i < parts.length; i++) {
+            root = root[parts[i]];
+            if (root == null)
+                return null;
+        }
+        if (typeof root != "function")
+            return null;
+        return root;
+    }
+    Q.typeByFullName = typeByFullName;
     function enumerateTypes(global, namespaces, callback) {
         function scan(root, fullName, depth) {
             if (!root)
@@ -2298,6 +2402,162 @@ var Q;
         });
     })(Router = Q.Router || (Q.Router = {}));
 })(Q || (Q = {}));
+var Q;
+(function (Q) {
+    function extend(obj, props) {
+        for (var i in props)
+            obj[i] = props[i];
+        return obj;
+    }
+    Q.extend = extend;
+    var uniqueId = 0;
+    function uidGenerator() {
+        var prefix = "uid_" + (++uniqueId) + "_";
+        return function () {
+            var counter = 0;
+            return function () {
+                return prefix + (++counter);
+            };
+        };
+    }
+    Q.uidGenerator = uidGenerator;
+    var hasOwn = {}.hasOwnProperty;
+    function cssClass() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var classes = [];
+        for (var i = 0; i < arguments.length; i++) {
+            var arg = arguments[i];
+            if (!arg)
+                continue;
+            var argType = typeof arg;
+            if (argType === 'string' || argType === 'number') {
+                classes.push(arg);
+            }
+            else if (Array.isArray(arg) && arg.length) {
+                var inner = cssClass.apply(null, arg);
+                if (inner) {
+                    classes.push(inner);
+                }
+            }
+            else if (argType === 'object') {
+                for (var key in arg) {
+                    if (hasOwn.call(arg, key) && arg[key]) {
+                        classes.push(key);
+                    }
+                }
+            }
+        }
+        return classes.join(' ');
+    }
+    Q.cssClass = cssClass;
+    if (typeof React === "undefined" &&
+        window['preact'] != null) {
+        window['React'] = window['ReactDOM'] = window['preact'];
+        React.Fragment = "x-fragment";
+    }
+    function widgetComponentFactory(widgetType) {
+        return (function (_super) {
+            __extends(Wrapper, _super);
+            function Wrapper() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Wrapper.prototype.render = function () {
+                var _this = this;
+                return React.createElement("div", {
+                    ref: (function (el) { return _this.el = el; }),
+                    className: 'widget-wrapper'
+                });
+            };
+            Wrapper.prototype.componentWillReceiveProps = function (nextProps) {
+                var props = this.props;
+                var widget = this.widget;
+                if (widget == null || widget.element == null)
+                    return;
+                var $node = widget.element;
+                var node = $node[0];
+                if (nextProps.id !== props.id) {
+                    node.id = nextProps.id;
+                }
+                if (nextProps.name !== props.name && $node.is(':input')) {
+                    node.name = nextProps.name;
+                }
+                if (nextProps.placeholder !== props.placeholder && $node.is(':input')) {
+                    node.placeholder = nextProps.placeholder;
+                }
+                if (nextProps.className !== props.className) {
+                    $node.removeClass(props.className || '').addClass(nextProps.className);
+                }
+                if (nextProps.oneWay !== props.oneWay) {
+                    node.dataset.oneWay = nextProps.oneWay ? "1" : undefined;
+                }
+                if (nextProps.maxLength != props.maxLength)
+                    node.setAttribute("maxLength", nextProps.maxLength || 0);
+                if (nextProps.required !== props.required)
+                    Serenity.EditorUtils.setRequired(this.widget, nextProps.required);
+                if (props.readOnly !== props.readOnly)
+                    Serenity.EditorUtils.setReadOnly(this.widget, nextProps.readOnly);
+                if (nextProps.setOptions != props.setOptions) {
+                    Serenity.ReflectionOptionsSetter.set(this.widget, nextProps.setOptions);
+                }
+            };
+            Wrapper.prototype.componentDidMount = function () {
+                if (this.widget != null)
+                    return;
+                var $node = Serenity.Widget.elementFor(widgetType);
+                var node = $node[0];
+                this.el.appendChild(node);
+                var props = this.props;
+                if (props.id != null)
+                    node.id = props.id;
+                if ($node.is(':input')) {
+                    $node.addClass("editor");
+                    if (props.name != null)
+                        node.name = props.name;
+                    if (props.placeholder != null)
+                        node.placeholder = props.placeholder;
+                }
+                if (props.className != null)
+                    $node.addClass(props.className);
+                if (props.oneWay)
+                    node.dataset.oneWay = "1";
+                this.widget = new widgetType($node, props);
+                if (props.maxLength != null)
+                    node.setAttribute("maxLength", props.maxLength.toString());
+                if (props.required)
+                    Serenity.EditorUtils.setRequired(this.widget, true);
+                if (props.readOnly)
+                    Serenity.EditorUtils.setReadOnly(this.widget, true);
+                if (props.setOptions != null) {
+                    Serenity.ReflectionOptionsSetter.set(this.widget, props.setOptions);
+                }
+            };
+            Wrapper.prototype.componentWillUnmount = function () {
+                this.widget && this.widget.destroy();
+                this.widget = null;
+            };
+            Wrapper.prototype.shouldComponentUpdate = function () {
+                return false;
+            };
+            Wrapper.prototype.isWidgetWrapper = true;
+            Wrapper.displayName = "Wrapped<" + ss.getTypeFullName(widgetType) + ">";
+            return Wrapper;
+        }(React.Component));
+    }
+    var reactCreateElement = React.createElement;
+    React.createElement = function () {
+        var arg = arguments[0];
+        if (typeof arg === "function" && arg.__isWidgetType === true) {
+            if (arg.__componentFactory === undefined)
+                arguments[0] = arg.__componentFactory = widgetComponentFactory(arg);
+            else
+                arguments[0] = arg.__componentFactory;
+        }
+        return reactCreateElement.apply(this, arguments);
+    };
+})(Q || (Q = {}));
 var Serenity;
 (function (Serenity) {
     var Decorators;
@@ -2389,16 +2649,6 @@ var System;
         return CategoryAttribute;
     }());
     Serenity.CategoryAttribute = CategoryAttribute;
-    var CollapsibleAttribute = /** @class */ (function () {
-        function CollapsibleAttribute(value) {
-            this.value = value;
-        }
-        CollapsibleAttribute = __decorate([
-            Attr('Collapsible')
-        ], CollapsibleAttribute);
-        return CollapsibleAttribute;
-    }());
-    Serenity.CollapsibleAttribute = CollapsibleAttribute;
     var ColumnsKeyAttribute = /** @class */ (function () {
         function ColumnsKeyAttribute(value) {
             this.value = value;
@@ -2785,12 +3035,6 @@ var System;
             type.__metadata.attr.push(attr);
         }
         Decorators.addAttribute = addAttribute;
-        function columnsKey(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.ColumnsKeyAttribute(value));
-            };
-        }
-        Decorators.columnsKey = columnsKey;
         function dialogType(value) {
             return function (target) {
                 addAttribute(target, new Serenity.DialogTypeAttribute(value));
@@ -2812,12 +3056,6 @@ var System;
             };
         }
         Decorators.element = element;
-        function entityType(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.EntityTypeAttribute(value));
-            };
-        }
-        Decorators.entityType = entityType;
         function enumKey(value) {
             return function (target) {
                 addAttribute(target, new Serenity.EnumKeyAttribute(value));
@@ -2831,24 +3069,6 @@ var System;
             };
         }
         Decorators.flexify = flexify;
-        function formKey(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.FormKeyAttribute(value));
-            };
-        }
-        Decorators.formKey = formKey;
-        function generatedCode(origin) {
-            return function (target) {
-                addAttribute(target, new Serenity.GeneratedCodeAttribute(origin));
-            };
-        }
-        Decorators.generatedCode = generatedCode;
-        function idProperty(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.IdPropertyAttribute(value));
-            };
-        }
-        Decorators.idProperty = idProperty;
         function registerEnum(target, enumKey, name) {
             if (!target.__enum) {
                 Object.defineProperty(target, '__enum', {
@@ -2891,18 +3111,6 @@ var System;
             };
         }
         Decorators.itemName = itemName;
-        function isActiveProperty(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.IsActivePropertyAttribute(value));
-            };
-        }
-        Decorators.isActiveProperty = isActiveProperty;
-        function localTextPrefix(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.LocalTextPrefixAttribute(value));
-            };
-        }
-        Decorators.localTextPrefix = localTextPrefix;
         function maximizable(value) {
             if (value === void 0) { value = true; }
             return function (target) {
@@ -2910,12 +3118,6 @@ var System;
             };
         }
         Decorators.maximizable = maximizable;
-        function nameProperty(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.NamePropertyAttribute(value));
-            };
-        }
-        Decorators.nameProperty = nameProperty;
         function option() {
             return function (target, propertyKey) {
                 var isGetSet = Q.startsWith(propertyKey, 'get_') || Q.startsWith(propertyKey, 'set_');
@@ -3064,6 +3266,1274 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var UI;
+    (function (UI) {
+        var EditorRefs = /** @class */ (function () {
+            function EditorRefs(inner) {
+                this.inner = inner;
+                this.refFunctions = Object.create(null);
+                this.refs = Object.create(null);
+                this.setRef = this.setRef.bind(this);
+                this.ref = this.ref.bind(this);
+            }
+            EditorRefs.prototype.getRef = function (name) {
+                return this.refs[name];
+            };
+            EditorRefs.prototype.setRef = function (name, ref) {
+                this.refs[name] = ref;
+                if (this.inner != null)
+                    this.inner(name, ref);
+            };
+            EditorRefs.prototype.ref = function (name) {
+                var func = this.refFunctions[name];
+                if (func != null)
+                    return func;
+                var setRef = this.setRef;
+                func = (function (ref) {
+                    setRef(name, ref);
+                });
+                this.refFunctions[name] = func;
+                return func;
+            };
+            EditorRefs.prototype.loadFrom = function (source, names) {
+                names = Q.coalesce(names, Object.keys(this.refs));
+                for (var _i = 0, names_1 = names; _i < names_1.length; _i++) {
+                    var name = names_1[_i];
+                    var editor = this.refs[name];
+                    if (editor == null)
+                        continue;
+                    if (editor.isWidgetWrapper) {
+                        editor = editor.widget;
+                        if (editor)
+                            Serenity.EditorUtils.loadValue(editor, { name: name }, source);
+                    }
+                    else if (editor.nodeType) {
+                        source[name] = editor.value;
+                    }
+                    else if (editor.element) {
+                        Serenity.EditorUtils.loadValue(editor, { name: name }, source);
+                    }
+                }
+            };
+            EditorRefs.prototype.saveTo = function (target, names, ignoreOneWay) {
+                names = Q.coalesce(names, Object.keys(this.refs));
+                for (var _i = 0, names_2 = names; _i < names_2.length; _i++) {
+                    var name = names_2[_i];
+                    var editor = this.refs[name];
+                    if (editor.isWidgetWrapper) {
+                        if (ignoreOneWay || !editor.props.oneWay) {
+                            editor = editor.widget;
+                            if (editor)
+                                Serenity.EditorUtils.saveValue(editor, { name: name }, target);
+                        }
+                    }
+                    else if (editor.nodeType) {
+                        if (ignoreOneWay ||
+                            !editor.dataset ||
+                            !editor.dataset.oneWay)
+                            target[name] = editor.value;
+                    }
+                    else if (editor.element) {
+                        if (ignoreOneWay ||
+                            !editor.options ||
+                            !editor.options.oneWay) {
+                            Serenity.EditorUtils.saveValue(editor, { name: name }, target);
+                        }
+                    }
+                }
+            };
+            return EditorRefs;
+        }());
+        UI.EditorRefs = EditorRefs;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var Label = /** @class */ (function (_super) {
+            __extends(Label, _super);
+            function Label() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Label.prototype.render = function () {
+                var props = this.props;
+                var width = typeof props.width == "string" || props.width == null ? null :
+                    (typeof (props.width) == "number" ? props.width + "px" :
+                        props.width);
+                var style = width == null ? null : (width == "0" ? { display: "none" } : { width: width });
+                return (React.createElement("label", { className: "caption", htmlFor: props.htmlFor, title: props.hint, style: style },
+                    props.required && React.createElement("sup", { title: Q.text('Controls.PropertyGrid.RequiredHint') }, "*"),
+                    props.children));
+            };
+            return Label;
+        }(React.Component));
+        UI.Label = Label;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var ValidationMark = /** @class */ (function (_super) {
+            __extends(ValidationMark, _super);
+            function ValidationMark() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            ValidationMark.prototype.render = function () {
+                return (React.createElement("div", { className: "vx" }));
+            };
+            ValidationMark.prototype.shouldComponentUpdate = function () {
+                return false;
+            };
+            return ValidationMark;
+        }(React.Component));
+        UI.ValidationMark = ValidationMark;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var Field = /** @class */ (function (_super) {
+            __extends(Field, _super);
+            function Field() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Field.prototype.componentWillReceiveProps = function (nextProps, nextContext) {
+                if (nextProps != null && nextProps.setRef !== this.props.setRef) {
+                    this.editorRef = null;
+                }
+            };
+            Field.prototype.render = function () {
+                var props = this.props;
+                var lblElement;
+                if (props.label != null)
+                    lblElement = props.label(this.props);
+                else if (props.caption !== false) {
+                    lblElement = (React.createElement(UI.Label, { htmlFor: props.htmlFor === undefined ? props.id : props.htmlFor, hint: props.hint, width: props.labelWidth, required: props.required }, props.caption));
+                }
+                var className = "field";
+                if (props.name) {
+                    className += " " + props.name;
+                }
+                if (props.className) {
+                    className += " " + props.className;
+                }
+                var name = props.name;
+                if (this.props.setRef != null &&
+                    this.editorRef == null) {
+                    var setRef = this.props.setRef;
+                    this.editorRef = function (x) {
+                        setRef(name, x);
+                    };
+                }
+                var editorProps = {
+                    className: "editor",
+                    name: name,
+                    id: this.props.id,
+                    required: this.props.required,
+                    ref: this.editorRef
+                };
+                return (React.createElement("div", { className: className },
+                    lblElement,
+                    props.editor != null && props.editor(editorProps),
+                    props.children,
+                    props.vx !== false && React.createElement(UI.ValidationMark, null),
+                    React.createElement("div", { className: "clear" })));
+            };
+            return Field;
+        }(React.Component));
+        UI.Field = Field;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var PropertyField = /** @class */ (function (_super) {
+            __extends(PropertyField, _super);
+            function PropertyField() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.text = Q.prefixedText(_this.props.localTextPrefix);
+                return _this;
+            }
+            PropertyField.prototype.getCaption = function () {
+                return this.text(this.props.title, this.props.name);
+            };
+            PropertyField.prototype.getHint = function () {
+                var hint = this.text(this.props.hint, this.props.name + '_Hint');
+                if (hint == null)
+                    return this.getCaption();
+                return hint || null;
+            };
+            PropertyField.prototype.getPlaceHolder = function () {
+                return this.text(this.props.placeholder, this.props.name + '_Placeholder');
+            };
+            PropertyField.prototype.getClassName = function () {
+                var className = this.props.cssClass || "";
+                if (!Q.isEmptyOrNull(this.props.formCssClass)) {
+                    className += (className ? " " : "") + this.props.formCssClass;
+                }
+                return className;
+            };
+            PropertyField.prototype.getHtmlFor = function (editorType) {
+                var htmlFor;
+                if ((editorType === Serenity.RadioButtonEditor || editorType === Serenity.BooleanEditor) &&
+                    (this.props.editorParams == null || !!!this.props.editorParams['labelFor'])) {
+                    htmlFor = null;
+                }
+                return htmlFor;
+            };
+            PropertyField.prototype.getEditorType = function () {
+                if (this.props.editorType == null)
+                    return Serenity.StringEditor;
+                if (typeof this.props.editorType == "string")
+                    return Serenity.EditorTypeRegistry.get(this.props.editorType);
+                return this.props.editorType;
+            };
+            PropertyField.prototype.getEditorId = function () {
+                return (this.props.idPrefix || "") + (this.props.name || "");
+            };
+            PropertyField.prototype.getMaxLength = function () {
+                return this.props.maxLength > 0 ? this.props.maxLength : null;
+            };
+            PropertyField.prototype.render = function () {
+                var _this = this;
+                var EditorType = this.getEditorType();
+                return (React.createElement(UI.Field, { className: this.getClassName(), caption: this.getCaption(), id: this.getEditorId(), name: this.props.name, labelWidth: this.props.labelWidth, htmlFor: this.getHtmlFor(EditorType), hint: this.getHint(), required: this.props.required, setRef: this.props.setRef, editor: function (ed) {
+                        return React.createElement(EditorType, __assign({}, ed, { maxlength: _this.getMaxLength() }, _this.props.editorParams, { setOptions: _this.props.editorParams }));
+                    } }, this.props.children));
+            };
+            return PropertyField;
+        }(React.Component));
+        UI.PropertyField = PropertyField;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var CategoryTitle = /** @class */ (function (_super) {
+            __extends(CategoryTitle, _super);
+            function CategoryTitle() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            CategoryTitle.prototype.render = function () {
+                return (React.createElement("div", { className: "category-title", onClick: this.props.onClick },
+                    React.createElement("a", { className: "category-anchor", id: this.props.categoryId }, this.props.children),
+                    this.props.collapsed != null && (this.props.collapsed ? CategoryTitle.collapsedIcon : CategoryTitle.expandedIcon)));
+            };
+            CategoryTitle.collapsedIcon = React.createElement("i", { className: "fa fa-plus" });
+            CategoryTitle.expandedIcon = React.createElement("i", { className: "fa fa-minus" });
+            return CategoryTitle;
+        }(React.Component));
+        UI.CategoryTitle = CategoryTitle;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var CategoryLineBreak = /** @class */ (function (_super) {
+            __extends(CategoryLineBreak, _super);
+            function CategoryLineBreak() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            CategoryLineBreak.prototype.getBreakClass = function () {
+                var breakClass = "line-break";
+                var splitted = this.props.breakClass.split(' ');
+                if (splitted.indexOf('line-break-xs') >= 0) {
+                }
+                else if (splitted.indexOf('line-break-sm') >= 0) {
+                    breakClass += " hidden-xs";
+                }
+                else if (splitted.indexOf('line-break-md') >= 0) {
+                    breakClass += " hidden-sm";
+                }
+                else if (splitted.indexOf('line-break-lg') >= 0) {
+                    breakClass += " hidden-md";
+                }
+                return breakClass;
+            };
+            CategoryLineBreak.prototype.render = function () {
+                return (React.createElement("div", { className: this.getBreakClass(), style: { width: "100%" } }));
+            };
+            return CategoryLineBreak;
+        }(React.Component));
+        UI.CategoryLineBreak = CategoryLineBreak;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var CategoryLink = /** @class */ (function (_super) {
+            __extends(CategoryLink, _super);
+            function CategoryLink() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            CategoryLink.prototype.handleClick = function (e) {
+                e.preventDefault();
+                this.props.onClick && this.props.onClick(e);
+                var title = $('a[id=' + this.props.categoryId + ']');
+                var category = title.closest('.category');
+                if (category.hasClass('collapsed'))
+                    category.children('.category-title').click();
+                if (!title && !title.fadeTo)
+                    return;
+                var animate = function () {
+                    title.fadeTo(100, 0.5, function () {
+                        title.fadeTo(100, 1, function () {
+                        });
+                    });
+                };
+                if (category.closest(':scrollable(both)').length === 0)
+                    animate();
+                else {
+                    var siv = category.scrollintoview;
+                    siv && siv.scrollintoview({
+                        duration: 'fast',
+                        direction: 'y',
+                        complete: animate
+                    });
+                }
+            };
+            CategoryLink.prototype.getLink = function () {
+                if (Q.isEmptyOrNull(this.props.categoryId))
+                    return null;
+                return "#" + this.props.categoryId;
+            };
+            CategoryLink.prototype.render = function () {
+                var _this = this;
+                return (React.createElement("a", { className: "category-link", tabIndex: -1, onClick: function (e) { return _this.handleClick(e); }, href: this.getLink() }, this.props.children));
+            };
+            return CategoryLink;
+        }(React.Component));
+        UI.CategoryLink = CategoryLink;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var CategoryLinks = /** @class */ (function (_super) {
+            __extends(CategoryLinks, _super);
+            function CategoryLinks() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.text = Q.prefixedText(_this.props.localTextPrefix);
+                return _this;
+            }
+            CategoryLinks.prototype.renderSeparator = function (key) {
+                return React.createElement("span", { className: "separator", key: key }, "|");
+            };
+            CategoryLinks.prototype.render = function () {
+                var _this = this;
+                var groups = UI.Categories.groupByCategory(this.props.items);
+                return (React.createElement("div", { className: "category-links" }, groups.inOrder.map(function (g, idx) { return [
+                    (idx > 0 && _this.renderSeparator("sep-" + idx)),
+                    React.createElement(UI.CategoryLink, { categoryId: "Category" + g.order, key: idx }, _this.text(g.key, "Categories." + g.key))
+                ]; })));
+            };
+            return CategoryLinks;
+        }(React.Component));
+        UI.CategoryLinks = CategoryLinks;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var Category = /** @class */ (function (_super) {
+            __extends(Category, _super);
+            function Category(props, context) {
+                var _this = _super.call(this, props, context) || this;
+                _this.text = Q.prefixedText(_this.props.localTextPrefix);
+                _this.state = {
+                    collapsed: _this.props.collapsed
+                };
+                return _this;
+            }
+            Category.prototype.componentWillReceiveProps = function (nextProps) {
+                if (nextProps.collapsed !== this.props.collapsed) {
+                    this.setState({
+                        collapsed: nextProps.collapsed
+                    });
+                }
+            };
+            Category.prototype.getClassName = function () {
+                if (this.state.collapsed == null)
+                    return "category ";
+                if (this.state.collapsed == true)
+                    return "category collapsible collapsed";
+                return "category collapsible";
+            };
+            Category.prototype.getCategoryId = function () {
+                if (!this.props.categoryId)
+                    return null;
+                return Q.coalesce(this.props.idPrefix, '') + this.props.categoryId;
+            };
+            Category.prototype.handleTitleClick = function () {
+                if (this.state.collapsed == null)
+                    return;
+                this.setState({
+                    collapsed: !this.state.collapsed
+                });
+            };
+            Category.prototype.renderTitle = function () {
+                var _this = this;
+                if (this.props.category == null)
+                    return null;
+                return (React.createElement(UI.CategoryTitle, { categoryId: this.getCategoryId(), collapsed: this.state.collapsed, onClick: function () { return _this.handleTitleClick(); } }, this.text(this.props.category, "Categories." + this.props.category)));
+            };
+            Category.prototype.renderField = function (item) {
+                var props = Q.extend({
+                    idPrefix: this.props.idPrefix,
+                    localTextPrefix: this.props.localTextPrefix,
+                    key: item.name,
+                    setRef: this.props.setRef
+                }, item);
+                if (this.props.renderField != null) {
+                    var content = this.props.renderField(props);
+                    if (content !== undefined)
+                        return content;
+                }
+                return React.createElement(UI.PropertyField, props);
+            };
+            Category.prototype.renderWithBreak = function (item) {
+                return [React.createElement(UI.CategoryLineBreak, { breakClass: item.formCssClass, key: "break-" + item.name }), this.renderField(item)];
+            };
+            Category.prototype.render = function () {
+                var _this = this;
+                var props = this.props;
+                return (React.createElement("div", { className: this.getClassName() },
+                    this.renderTitle(),
+                    props.items && props.items.map(function (item) {
+                        if (item.formCssClass && item.formCssClass.indexOf('line-break-') >= 0)
+                            return _this.renderWithBreak(item);
+                        return _this.renderField(item);
+                    }),
+                    props.children));
+            };
+            return Category;
+        }(React.Component));
+        UI.Category = Category;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var CategoriesProps = /** @class */ (function () {
+            function CategoriesProps() {
+            }
+            return CategoriesProps;
+        }());
+        UI.CategoriesProps = CategoriesProps;
+        var Categories = /** @class */ (function (_super) {
+            __extends(Categories, _super);
+            function Categories() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Categories.applyOrder = function (groups, categoryOrder) {
+                if (!categoryOrder)
+                    return;
+                var split = categoryOrder.split(';');
+                var order = 0;
+                var catOrder = {};
+                for (var _i = 0, split_1 = split; _i < split_1.length; _i++) {
+                    var s = split_1[_i];
+                    var x = Q.trimToNull(s);
+                    if (x == null || catOrder[x] != null)
+                        continue;
+                    catOrder[x] = order++;
+                }
+                groups.inOrder.sort(function (g1, g2) {
+                    var order1 = catOrder[g1.key];
+                    if (order1 == null)
+                        catOrder[g1.key] = catOrder = order++;
+                    var order2 = catOrder[g2.key];
+                    if (order2 == null)
+                        catOrder[g2.key] = catOrder = order++;
+                    return order1 - order2;
+                });
+                for (order = 0; order < groups.inOrder.length; order++)
+                    groups.inOrder[order].order = order;
+            };
+            Categories.groupByCategory = function (items, defaultCategory, categoryOrder) {
+                var defCat = Q.coalesce(defaultCategory, '');
+                var groups = Q.groupBy(items || [], function (x) { return Q.coalesce(x.category, defCat); });
+                Categories.applyOrder(groups, categoryOrder);
+                return groups;
+            };
+            Categories.prototype.renderCategory = function (group) {
+                var catProps = {
+                    categoryId: "Category" + group.order,
+                    category: group.key,
+                    idPrefix: this.props.idPrefix,
+                    localTextPrefix: this.props.localTextPrefix,
+                    items: group.items,
+                    key: group.order,
+                    renderField: this.props.renderField,
+                    setRef: this.props.setRef
+                };
+                if (this.props.renderCategory != null) {
+                    var content = this.props.renderCategory(catProps);
+                    if (content !== undefined)
+                        return content;
+                }
+                return React.createElement(UI.Category, __assign({}, catProps));
+            };
+            Categories.prototype.render = function () {
+                var _this = this;
+                return (React.createElement("div", { className: "categories" }, Categories.groupByCategory(this.props.items || [], this.props.defaultCategory, this.props.categoryOrder).inOrder.map(function (g) {
+                    return _this.renderCategory(g);
+                })));
+            };
+            return Categories;
+        }(React.Component));
+        UI.Categories = Categories;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var ValidateForm = /** @class */ (function (_super) {
+            __extends(ValidateForm, _super);
+            function ValidateForm() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            ValidateForm.prototype.render = function () {
+                var _this = this;
+                var _a = this.props, options = _a.options, other = __rest(_a, ["options"]);
+                return (React.createElement("form", __assign({}, other, { ref: function (el) { _this.form = el; }, onSubmit: this.props.onSubmit || (function (e) { return _this.handleSubmit(e); }) }), this.props.children));
+            };
+            ValidateForm.prototype.handleSubmit = function (e) {
+            };
+            ValidateForm.prototype.componentDidMount = function () {
+                this.validator = $(this.form).validate(Q.validateOptions(this.props.options));
+            };
+            ValidateForm.prototype.validateForm = function () {
+                return this.validator == null || !!this.validator.form();
+            };
+            ValidateForm.prototype.serialize = function () {
+                var result = {};
+                $(this.form).find(':input, .editor').each(function (i, e) {
+                    var name = $(e).attr('name');
+                    if (!name)
+                        return;
+                    var widget = $(e).tryGetWidget(Serenity.Widget);
+                    if (widget)
+                        result[name] = Serenity.EditorUtils.getValue(widget);
+                    else
+                        result[name] = $(e).val();
+                });
+                return result;
+            };
+            return ValidateForm;
+        }(React.Component));
+        UI.ValidateForm = ValidateForm;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var Form = /** @class */ (function (_super) {
+            __extends(Form, _super);
+            function Form() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Form.prototype.render = function () {
+                return (React.createElement("div", { className: "flex-layout" },
+                    React.createElement("div", { className: "s-Form" }, _super.prototype.render.call(this))));
+            };
+            return Form;
+        }(UI.ValidateForm));
+        UI.Form = Form;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var PropertyTabs = /** @class */ (function (_super) {
+            __extends(PropertyTabs, _super);
+            function PropertyTabs() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.text = Q.prefixedText(_this.props.localTextPrefix);
+                return _this;
+            }
+            PropertyTabs.groupByTab = function (items) {
+                return Q.groupBy(items || [], function (x) { return Q.coalesce(x.tab, ''); });
+            };
+            PropertyTabs.prototype.renderTab = function (group) {
+                return (React.createElement("li", { className: group.order == 0 ? "active" : null, key: group.order },
+                    React.createElement("a", { "data-toggle": 'tab', role: 'tab', href: "#" + this.props.idPrefix + "_Tab" + group.order }, this.text(group.key, "Tabs." + group.key))));
+            };
+            PropertyTabs.prototype.renderPane = function (group) {
+                return (React.createElement("div", { id: this.props.idPrefix + "_Tab" + group.order, key: group.order, className: "tab-pane fade" + (group.order == 0 ? " in active" : ""), role: "tabpanel" }, this.renderCategories(group)));
+            };
+            PropertyTabs.prototype.renderCategories = function (group) {
+                var props = {
+                    items: group.items,
+                    idPrefix: this.props.idPrefix,
+                    localTextPrefix: this.props.localTextPrefix,
+                    categoryOrder: this.props.categoryOrder,
+                    defaultCategory: this.props.defaultCategory,
+                    renderCategory: this.props.renderCategory,
+                    renderField: this.props.renderField,
+                    setRef: this.props.setRef
+                };
+                if (this.props.renderCategories) {
+                    var content = this.props.renderCategories(group.key, props);
+                    if (content !== undefined)
+                        return content;
+                }
+                return React.createElement(UI.Categories, __assign({}, props));
+            };
+            PropertyTabs.prototype.render = function () {
+                var _this = this;
+                var tabs = PropertyTabs.groupByTab(this.props.items || []);
+                return (React.createElement(React.Fragment, null,
+                    React.createElement("ul", { className: "nav nav-tabs property-tabs", role: "tablist" }, tabs.inOrder.map(function (g) { return _this.renderTab(g); })),
+                    React.createElement("div", { className: "tab-content property-panes" }, tabs.inOrder.map(function (g) { return _this.renderPane(g); }))));
+            };
+            return PropertyTabs;
+        }(React.Component));
+        UI.PropertyTabs = PropertyTabs;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var IntraPropertyGrid = /** @class */ (function (_super) {
+            __extends(IntraPropertyGrid, _super);
+            function IntraPropertyGrid() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            IntraPropertyGrid.prototype.loadFrom = function (source, editors) {
+                var items = this.props.items || [];
+                for (var _i = 0, items_2 = items; _i < items_2.length; _i++) {
+                    var item = items_2[_i];
+                    if (this.props.mode != 2 /* update */ &&
+                        item.defaultValue != null &&
+                        typeof (source[item.name]) === 'undefined') {
+                        source[item.name] = item.defaultValue;
+                    }
+                }
+                editors.loadFrom(source, items.map(function (x) { return x.name; }));
+            };
+            IntraPropertyGrid.prototype.canModifyItem = function (item) {
+                if (this.props.mode != 2 /* update */) {
+                    if (item.insertable === false) {
+                        return false;
+                    }
+                    if (item.insertPermission == null) {
+                        return true;
+                    }
+                    return Q.Authorization.hasPermission(item.insertPermission);
+                }
+                if (item.updatable === false) {
+                    return false;
+                }
+                if (item.updatePermission == null) {
+                    return true;
+                }
+                return Q.Authorization.hasPermission(item.updatePermission);
+            };
+            IntraPropertyGrid.prototype.saveTo = function (target, editors) {
+                editors.saveTo(target);
+            };
+            IntraPropertyGrid.prototype.getItems = function () {
+                var _this = this;
+                return (this.props.items || []).map(function (item) {
+                    var canModify = _this.canModifyItem(item);
+                    var oneWay = !!item.oneWay || !canModify;
+                    var readOnly = item.readOnly === true || !canModify;
+                    var required = !readOnly && !!item.required && item.editorType !== 'Boolean';
+                    var visible = !((item.readPermission != null &&
+                        !Q.Authorization.hasPermission(item.readPermission)) ||
+                        item.visible === false ||
+                        (_this.props.mode != 2 /* update */ && item.hideOnInsert === true) ||
+                        (_this.props.mode == 2 /* update */ && item.hideOnUpdate === true));
+                    return Q.extend(Q.extend({}, item), {
+                        readOnly: readOnly,
+                        oneWay: oneWay,
+                        required: required,
+                        visible: visible
+                    });
+                });
+            };
+            IntraPropertyGrid.prototype.render = function () {
+                var props = Q.extend({}, this.props);
+                props.items = this.getItems();
+                var useTabs = Q.any(props.items, function (x) {
+                    return !Q.isEmptyOrNull(x.tab);
+                });
+                if (useTabs)
+                    return React.createElement(UI.PropertyTabs, props);
+                var useCategories = props.useCategories !== false && Q.any(props.items, function (x) {
+                    return !Q.isEmptyOrNull(x.category);
+                });
+                if (useCategories) {
+                    React.createElement(React.Fragment, null,
+                        React.createElement(UI.CategoryLinks, props),
+                        React.createElement(UI.Categories, props));
+                }
+                return (React.createElement("div", { className: "categories" }, React.createElement(UI.Category, props)));
+            };
+            return IntraPropertyGrid;
+        }(React.Component));
+        UI.IntraPropertyGrid = IntraPropertyGrid;
+        var PropertyGrid = /** @class */ (function (_super) {
+            __extends(PropertyGrid, _super);
+            function PropertyGrid() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            PropertyGrid.prototype.render = function () {
+                return (React.createElement("div", { className: "s-PropertyGrid" }, _super.prototype.render.call(this)));
+            };
+            return PropertyGrid;
+        }(IntraPropertyGrid));
+        UI.PropertyGrid = PropertyGrid;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var ButtonPanel = /** @class */ (function (_super) {
+            __extends(ButtonPanel, _super);
+            function ButtonPanel() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            ButtonPanel.prototype.render = function () {
+                return (React.createElement("div", { className: "align-right", style: { marginTop: "10px", paddingRight: "24px" } }, this.props.children));
+            };
+            return ButtonPanel;
+        }(React.Component));
+        UI.ButtonPanel = ButtonPanel;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var ToolButton = /** @class */ (function (_super) {
+            __extends(ToolButton, _super);
+            function ToolButton() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            ToolButton_1 = ToolButton;
+            ToolButton.adjustIconClass = function (icon) {
+                if (!icon)
+                    return icon;
+                if (Q.startsWith(icon, 'fa-'))
+                    return 'fa ' + icon;
+                if (Q.startsWith(icon, 'glyphicon-'))
+                    return 'glyphicon ' + icon;
+                return icon;
+            };
+            ToolButton.className = function (btn) {
+                return Q.cssClass((_a = {
+                        "tool-button": true,
+                        "icon-tool-button": !!btn.icon,
+                        "no-text": !btn.title,
+                        disabled: btn.disabled
+                    },
+                    _a[btn.cssClass] = !!btn.cssClass,
+                    _a));
+                var _a;
+            };
+            ToolButton.prototype.handleClick = function (e) {
+                if (!this.props.onClick || $(e.currentTarget).hasClass('disabled'))
+                    return;
+                this.props.onClick(e);
+            };
+            ToolButton.prototype.render = function () {
+                var _this = this;
+                return (React.createElement("div", { className: ToolButton_1.className(this.props), title: this.props.hint, onClick: function (e) { return _this.handleClick(e); } },
+                    React.createElement("div", { className: "button-outer" }, this.renderButtonText())));
+            };
+            ToolButton.prototype.renderButtonText = function () {
+                var btn = this.props;
+                var klass = ToolButton_1.adjustIconClass(btn.icon);
+                if (!klass && !btn.title)
+                    return React.createElement("span", { className: "button-inner" });
+                var title = Q.coalesce(btn.title, '');
+                if (btn.htmlEncode === false) {
+                    var h = (klass ? '<i class="' + Q.attrEncode(klass) + '"></i> ' : '') + title;
+                    return (React.createElement("span", { className: "button-inner", dangerouslySetInnerHTML: { __html: h } }));
+                }
+                if (!klass)
+                    return React.createElement("span", { className: "button-inner" }, title);
+                return React.createElement("span", { className: "button-inner" },
+                    React.createElement("i", { className: klass }),
+                    " ",
+                    title);
+            };
+            ToolButton.buttonSelector = "div.tool-button";
+            ToolButton = ToolButton_1 = __decorate([
+                Serenity.Decorators.registerClass("Serenity.UI.ToolButton")
+            ], ToolButton);
+            return ToolButton;
+            var ToolButton_1;
+        }(React.Component));
+        UI.ToolButton = ToolButton;
+        var IntraToolbar = /** @class */ (function (_super) {
+            __extends(IntraToolbar, _super);
+            function IntraToolbar() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            IntraToolbar.prototype.setupMouseTrap = function () {
+                var _this = this;
+                if (!window['Mousetrap'])
+                    return;
+                var buttons;
+                for (var _i = 0, _a = (this.props.buttons || []); _i < _a.length; _i++) {
+                    var b = _a[_i];
+                    if (Q.isEmptyOrNull(b.hotkey))
+                        continue;
+                    this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.props.hotkeyContext || window.document.documentElement);
+                    (function (x) {
+                        var btn = (buttons = buttons || $(_this.el).find(UI.ToolButton.buttonSelector))
+                            .filter("." + x.cssClass);
+                        _this.mouseTrap.bind(x.hotkey, function (e, action) {
+                            if (btn.is(':visible')) {
+                                btn.click();
+                            }
+                            return x.hotkeyAllowDefault;
+                        });
+                    })(b);
+                }
+            };
+            IntraToolbar.prototype.componentDidMount = function () {
+                this.setupMouseTrap();
+            };
+            IntraToolbar.prototype.componentWillUnmount = function () {
+                $(this.el).find(UI.ToolButton.buttonSelector).unbind('click');
+                if (this.mouseTrap) {
+                    if (!!this.mouseTrap.destroy) {
+                        this.mouseTrap.destroy();
+                    }
+                    else {
+                        this.mouseTrap.reset();
+                    }
+                    this.mouseTrap = null;
+                }
+            };
+            IntraToolbar.prototype.render = function () {
+                var _this = this;
+                return (React.createElement("div", { className: "tool-buttons", ref: function (el) { return _this.el = el; } },
+                    React.createElement("div", { className: "buttons-outer" }, this.renderButtons(this.props.buttons || []))));
+            };
+            IntraToolbar.prototype.renderButtons = function (buttons) {
+                var result = [];
+                for (var _i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
+                    var btn = buttons_1[_i];
+                    if (btn.separator)
+                        result.push(React.createElement("div", { className: "separator", key: result.length }));
+                    result.push(React.createElement(UI.ToolButton, __assign({}, btn, { key: result.length })));
+                }
+                var key = 0;
+                return (React.createElement("div", { className: "buttons-inner" },
+                    result.map(function (x) { x.key = ++key; return x; }),
+                    this.props.children));
+            };
+            return IntraToolbar;
+        }(React.Component));
+        UI.IntraToolbar = IntraToolbar;
+        var Toolbar = /** @class */ (function (_super) {
+            __extends(Toolbar, _super);
+            function Toolbar() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Toolbar.prototype.render = function () {
+                return (React.createElement("div", { className: "s-Toolbar clearfix" }, _super.prototype.render.call(this)));
+            };
+            Toolbar = __decorate([
+                Serenity.Decorators.registerClass("Serenity.UI.Toolbar")
+            ], Toolbar);
+            return Toolbar;
+        }(IntraToolbar));
+        UI.Toolbar = Toolbar;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var SaveButton = /** @class */ (function (_super) {
+            __extends(SaveButton, _super);
+            function SaveButton() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            SaveButton.prototype.render = function () {
+                var title = Q.text("Controls.EntityDialog." + (this.props.isUpdate ? "UpdateButton" : "SaveButton"));
+                return (React.createElement(UI.ToolButton, __assign({ icon: "fa-save text-light-blue", title: title }, this.props)));
+            };
+            return SaveButton;
+        }(React.Component));
+        UI.SaveButton = SaveButton;
+        var ApplyChangesButton = /** @class */ (function (_super) {
+            __extends(ApplyChangesButton, _super);
+            function ApplyChangesButton() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            ApplyChangesButton.prototype.render = function () {
+                var hint = Q.text("Controls.EntityDialog.ApplyChangesButton");
+                return (React.createElement(UI.ToolButton, __assign({ icon: "fa-save", cssClass: "text-black", hint: hint }, this.props)));
+            };
+            return ApplyChangesButton;
+        }(React.Component));
+        UI.ApplyChangesButton = ApplyChangesButton;
+        var DeleteButton = /** @class */ (function (_super) {
+            __extends(DeleteButton, _super);
+            function DeleteButton() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            DeleteButton.prototype.render = function () {
+                var title = Q.text("Controls.EntityDialog.DeleteButton");
+                return (React.createElement(UI.ToolButton, __assign({ icon: "fa-times text-red", title: title }, this.props)));
+            };
+            return DeleteButton;
+        }(React.Component));
+        UI.DeleteButton = DeleteButton;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var FormMode;
+        (function (FormMode) {
+            FormMode[FormMode["Initial"] = 0] = "Initial";
+            FormMode[FormMode["New"] = 1] = "New";
+            FormMode[FormMode["Edit"] = 2] = "Edit";
+            FormMode[FormMode["View"] = 3] = "View";
+            FormMode[FormMode["Deleted"] = 4] = "Deleted";
+        })(FormMode = UI.FormMode || (UI.FormMode = {}));
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var FormDataSource = /** @class */ (function (_super) {
+            __extends(FormDataSource, _super);
+            function FormDataSource(props, context) {
+                var _this = _super.call(this, props, context) || this;
+                _this.emptyEntity = Object.create(null);
+                var entity = _this.props.entity;
+                var mode = _this.modeFor(entity);
+                _this.state = {
+                    formMode: mode,
+                    formTitle: _this.titleFor(entity, mode),
+                    entity: entity
+                };
+                if (_this.props.entityId != null)
+                    _this.loadById(_this.props.entityId);
+                _this.delete = _this.delete.bind(_this);
+                _this.save = _this.save.bind(_this);
+                return _this;
+            }
+            FormDataSource.prototype.componentWillReceiveProps = function (nextProps) {
+                var nextEntityId = Q.coalesce(nextProps.entityId, null);
+                var entityId = Q.coalesce(this.props.entityId, null);
+                if (nextEntityId !== entityId) {
+                    if (nextEntityId === null) {
+                        this.loadEntity(nextProps.entity || Object.create(null));
+                    }
+                    else {
+                        this.loadById(nextProps.entityId);
+                    }
+                }
+                else if (nextProps.entity !== this.props.entity) {
+                    this.loadEntity(Q.coalesce(nextProps.entity, Object.create(null)));
+                }
+            };
+            FormDataSource.prototype.componentDidMount = function () {
+                this.canSetState = true;
+                if (this.pendingEntity !== undefined) {
+                    this.loadEntity(this.pendingEntity || Object.create(null));
+                }
+            };
+            FormDataSource.prototype.componentWillUnmount = function () {
+                this.canSetState = false;
+            };
+            FormDataSource.prototype.loadEntity = function (entity) {
+                if (this.canSetState) {
+                    var mode = this.modeFor(entity);
+                    this.setState({
+                        formMode: mode,
+                        formTitle: this.titleFor(entity, mode),
+                        entity: entity
+                    });
+                    this.pendingEntity = undefined;
+                }
+                else {
+                    this.pendingEntity = entity || null;
+                }
+            };
+            FormDataSource.prototype.loadResponse = function (response) {
+                this.loadEntity(response.Entity);
+            };
+            FormDataSource.prototype.getLoadByIdRequest = function (entityId) {
+                return {
+                    EntityId: entityId
+                };
+            };
+            FormDataSource.prototype.getServiceFor = function (method) {
+                var service = this.props[method.charAt(0).toLowerCase() + method.substr(1) + "Service"];
+                if (service != null)
+                    return service;
+                return (this.props.service || "ServiceNotSet!") + "/" + method;
+            };
+            FormDataSource.prototype.getLoadByIdOptions = function (entityId) {
+                return {
+                    service: this.getServiceFor("Retrieve"),
+                    request: this.getLoadByIdRequest(entityId)
+                };
+            };
+            FormDataSource.prototype.loadById = function (entityId) {
+                var _this = this;
+                var options = this.getLoadByIdOptions(entityId);
+                return Q.serviceCall(options).then(function (response) {
+                    _this.loadResponse(response);
+                    return response;
+                });
+            };
+            FormDataSource.prototype.isDeleted = function (entity) {
+                if (this.props.isDeletedProperty && entity[this.props.isDeletedProperty])
+                    return true;
+                if (this.props.isActiveProperty && entity[this.props.isActiveProperty] === -1)
+                    return true;
+            };
+            FormDataSource.prototype.modeFor = function (entity) {
+                if (entity == null)
+                    return UI.FormMode.Initial;
+                if (this.props.readOnly)
+                    return UI.FormMode.View;
+                if (this.props.idProperty && entity[this.props.idProperty] != null)
+                    return UI.FormMode.Edit;
+                if (this.isDeleted(entity))
+                    return UI.FormMode.Deleted;
+                return UI.FormMode.New;
+            };
+            FormDataSource.prototype.getEntityName = function () {
+                if (this.props.localTextPrefix) {
+                    var es = Q.tryGetText("Db." + this.props.localTextPrefix + '.EntitySingular');
+                    if (es)
+                        return es;
+                }
+                return "Item";
+            };
+            FormDataSource.prototype.getNameValue = function (entity) {
+                if (!entity || !this.props.nameProperty)
+                    return "";
+                return Q.coalesce(entity[this.props.nameProperty], '').toString();
+            };
+            FormDataSource.prototype.titleFor = function (entity, mode) {
+                if (mode == UI.FormMode.New)
+                    return Q.format(Q.text('Controls.EntityDialog.NewRecordTitle'), this.getEntityName());
+                var title = Q.coalesce(this.getNameValue(entity), '');
+                return Q.format(Q.text('Controls.EntityDialog.EditRecordTitle'), this.getEntityName(), (Q.isEmptyOrNull(title) ? '' : (' (' + title + ')')));
+            };
+            FormDataSource.prototype.isEditMode = function () {
+                return this.state.formMode == UI.FormMode.Edit;
+            };
+            FormDataSource.prototype.getSaveEntity = function (values) {
+                return values;
+            };
+            FormDataSource.prototype.getSaveOptions = function (values) {
+                var opt = {};
+                opt.service = this.getServiceFor(this.isEditMode() ? "Update" : "Create");
+                opt.request = this.getSaveRequest(values);
+                return opt;
+            };
+            FormDataSource.prototype.getIdProperty = function () {
+                return this.props.idProperty || "NoIdProperty!";
+            };
+            FormDataSource.prototype.getLanguages = function () {
+                if (Serenity.EntityDialog.defaultLanguageList != null)
+                    return Serenity.EntityDialog.defaultLanguageList() || [];
+                return [];
+            };
+            FormDataSource.prototype.getPendingLocalizations = function () {
+                if (this.state.localizations == null) {
+                    return null;
+                }
+                var result = {};
+                var idField = this.getIdProperty();
+                var langs = this.getLanguages();
+                for (var _i = 0, langs_1 = langs; _i < langs_1.length; _i++) {
+                    var pair = langs_1[_i];
+                    var language = pair[0];
+                    var entity = {};
+                    if (idField != null) {
+                        entity[idField] = this.entity[this.getIdProperty()];
+                    }
+                    var prefix = language + '$';
+                    for (var _a = 0, _b = Object.keys(this.state.localizations); _a < _b.length; _a++) {
+                        var k = _b[_a];
+                        if (Q.startsWith(k, prefix))
+                            entity[k.substr(prefix.length)] = this.state.localizations[k];
+                    }
+                    result[language] = entity;
+                }
+                return result;
+            };
+            FormDataSource.prototype.getSaveRequest = function (values) {
+                var entity = this.getSaveEntity(values);
+                var req = {};
+                req.Entity = entity;
+                if (this.isEditMode()) {
+                    var idField = this.getIdProperty();
+                    if (idField != null) {
+                        req.EntityId = this.entity[this.props.idProperty];
+                    }
+                }
+                if (this.state.localizations != null) {
+                    req.Localizations = this.getPendingLocalizations();
+                }
+                return req;
+            };
+            FormDataSource.prototype.save = function (values) {
+                var options = this.getSaveOptions(values);
+                return Q.serviceCall(options);
+            };
+            FormDataSource.prototype.delete = function () {
+                return null;
+            };
+            FormDataSource.prototype.undelete = function () {
+                return null;
+            };
+            FormDataSource.prototype.getDataModel = function () {
+                return {
+                    entity: this.state.entity || this.emptyEntity,
+                    formMode: this.state.formMode,
+                    formTitle: this.state.formTitle,
+                    onSave: (this.state.formMode == UI.FormMode.Edit || this.state.formMode == UI.FormMode.New) ? this.save : null,
+                    onDelete: this.state.formMode == UI.FormMode.Edit ? this.delete : null,
+                    onUndelete: this.state.formMode == UI.FormMode.Deleted ? this.undelete : null,
+                };
+            };
+            Object.defineProperty(FormDataSource.prototype, "dataModel", {
+                get: function () {
+                    return this.getDataModel();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(FormDataSource.prototype, "entity", {
+                get: function () {
+                    return this.pendingEntity !== undefined ? this.pendingEntity : this.state.entity;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            FormDataSource.prototype.render = function () {
+                return this.props.view(this.getDataModel());
+            };
+            return FormDataSource;
+        }(React.Component));
+        UI.FormDataSource = FormDataSource;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var FormView = /** @class */ (function (_super) {
+            __extends(FormView, _super);
+            function FormView() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.editors = new UI.EditorRefs();
+                return _this;
+            }
+            FormView.prototype.canSave = function () {
+                return this.props.onSave != null;
+            };
+            FormView.prototype.showSave = function () {
+                return this.props.formMode == UI.FormMode.Edit || this.props.formMode == UI.FormMode.New;
+            };
+            FormView.prototype.canClose = function () {
+                return this.props.onClose != null;
+            };
+            FormView.prototype.showApplyChanges = function () {
+                return this.showSave() && this.canClose();
+            };
+            FormView.prototype.isUpdate = function () {
+                return this.props.formMode == UI.FormMode.Edit;
+            };
+            FormView.prototype.canDelete = function () {
+                return this.props.onDelete != null;
+            };
+            FormView.prototype.showDelete = function () {
+                return this.props.formMode == UI.FormMode.Edit;
+            };
+            FormView.prototype.canUndelete = function () {
+                return this.props.onUndelete != null;
+            };
+            FormView.prototype.showUndelete = function () {
+                return this.props.formMode == UI.FormMode.Deleted;
+            };
+            FormView.prototype.loadEntity = function (entity) {
+                this.editors.loadFrom(entity);
+            };
+            FormView.prototype.componentDidMount = function () {
+                this.loadEntity(this.props.entity || Object.create(null));
+            };
+            FormView.prototype.componentWillReceiveProps = function (nextProps) {
+                if (nextProps.entity !== null &&
+                    this.props.entity !== nextProps.entity) {
+                    this.loadEntity(nextProps.entity || Object.create(null));
+                }
+            };
+            FormView.prototype.renderSaveButton = function () {
+                var _this = this;
+                return React.createElement(UI.SaveButton, { isUpdate: this.isUpdate(), disabled: !this.canSave(), onClick: function () { return _this.save(true); } });
+            };
+            FormView.prototype.renderApplyChangesButton = function () {
+                var _this = this;
+                return React.createElement(UI.ApplyChangesButton, { disabled: !this.canSave(), onClick: function () { return _this.save(false); } });
+            };
+            FormView.prototype.renderDeleteButton = function () {
+                return React.createElement(UI.DeleteButton, { disabled: !this.canDelete() });
+            };
+            FormView.prototype.renderToolbar = function (children) {
+                return (React.createElement(UI.Toolbar, null,
+                    this.showSave() && this.renderSaveButton(),
+                    this.showApplyChanges() && this.renderApplyChangesButton(),
+                    this.showDelete() && this.renderDeleteButton(),
+                    children));
+            };
+            FormView.prototype.save = function (close) {
+                var _this = this;
+                if (this.props.onSave == null)
+                    return Promise.reject("No onSave handler!");
+                var values = Object.create(null);
+                this.editors.saveTo(values);
+                var promise = this.props.onSave(values);
+                if (close) {
+                    if (this.props.onClose != null)
+                        promise = promise.then(function (e) { return _this.props.onClose != null && _this.props.onClose(); });
+                }
+                else if (this.props.onReload != null) {
+                    promise = promise.then(function (e) { return _this.props.onReload != null && _this.props.onReload(); });
+                }
+                return promise;
+            };
+            return FormView;
+        }(React.Component));
+        UI.FormView = FormView;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var GridRowSelectionMixin = /** @class */ (function () {
         function GridRowSelectionMixin(grid) {
             var _this = this;
@@ -3099,8 +4569,8 @@ var Serenity;
                     }
                     else {
                         var items = grid.getView().getItems();
-                        for (var _i = 0, items_2 = items; _i < items_2.length; _i++) {
-                            var x = items_2[_i];
+                        for (var _i = 0, items_3 = items; _i < items_3.length; _i++) {
+                            var x = items_3[_i];
                             var id1 = x[_this.idField];
                             _this.include[id1] = true;
                         }
@@ -3605,8 +5075,8 @@ var Serenity;
         SlickTreeHelper.filterById = filterById;
         function setCollapsed(items, collapsed) {
             if (items != null) {
-                for (var _i = 0, items_3 = items; _i < items_3.length; _i++) {
-                    var item = items_3[_i];
+                for (var _i = 0, items_4 = items; _i < items_4.length; _i++) {
+                    var item = items_4[_i];
                     item._collapsed = collapsed;
                 }
             }
@@ -4076,30 +5546,32 @@ var Serenity;
         return IAsyncInit;
     }());
     Serenity.IAsyncInit = IAsyncInit;
-    var Widget = /** @class */ (function () {
+    var Widget = /** @class */ (function (_super) {
+        __extends(Widget, _super);
         function Widget(element, options) {
-            var _this = this;
-            this.element = element;
-            this.options = options || {};
-            this.widgetName = Widget_1.getWidgetName(ss.getInstanceType(this));
-            this.uniqueName = this.widgetName + (Widget_1.nextWidgetNumber++).toString();
-            if (element.data(this.widgetName)) {
-                throw new ss.Exception(Q.format("The element already has widget '{0}'!", this.widgetName));
+            var _this = _super.call(this, options) || this;
+            _this.element = element;
+            _this.options = options || {};
+            _this.widgetName = Widget_1.getWidgetName(ss.getInstanceType(_this));
+            _this.uniqueName = _this.widgetName + (Widget_1.nextWidgetNumber++).toString();
+            if (element.data(_this.widgetName)) {
+                throw new ss.Exception(Q.format("The element already has widget '{0}'!", _this.widgetName));
             }
-            element.bind('remove.' + this.widgetName, function (e) {
+            element.bind('remove.' + _this.widgetName, function (e) {
                 if (e.bubbles || e.cancelable) {
                     return;
                 }
                 _this.destroy();
-            }).data(this.widgetName, this);
-            this.addCssClass();
-            if (this.isAsyncWidget()) {
+            }).data(_this.widgetName, _this);
+            _this.addCssClass();
+            if (_this.isAsyncWidget()) {
                 window.setTimeout(function () {
                     if (element && !_this.asyncPromise) {
                         _this.asyncPromise = _this.initializeAsync();
                     }
                 }, 0);
             }
+            return _this;
         }
         Widget_1 = Widget;
         Widget.prototype.destroy = function () {
@@ -4179,12 +5651,13 @@ var Serenity;
             return this.asyncPromise;
         };
         Widget.nextWidgetNumber = 0;
+        Widget.__isWidgetType = true;
         Widget = Widget_1 = __decorate([
             Serenity.Decorators.registerClass()
         ], Widget);
         return Widget;
         var Widget_1;
-    }());
+    }(React.Component));
     Serenity.Widget = Widget;
     Widget.prototype.addValidationRule = function (eventClass, rule) {
         return Serenity.VX.addValidationRule(this.element, eventClass, rule);
@@ -5377,8 +6850,8 @@ var Serenity;
             this.clearItems();
             if (items.length > 0) {
                 var isStrings = typeof (items[0]) === 'string';
-                for (var _i = 0, items_4 = items; _i < items_4.length; _i++) {
-                    var item = items_4[_i];
+                for (var _i = 0, items_5 = items; _i < items_5.length; _i++) {
+                    var item = items_5[_i];
                     var key = isStrings ? item : item[0];
                     var text = isStrings ? item : Q.coalesce(item[1], item[0]);
                     this.addOption(key, text, item, false);
@@ -5828,6 +7301,11 @@ var Serenity;
             initialize();
             var editorType = knownTypes[key.toLowerCase()];
             if (editorType == null) {
+                var type = Q.typeByFullName(key);
+                if (type != null) {
+                    knownTypes[key.toLowerCase()] = type;
+                    return type;
+                }
                 throw new ss.Exception(Q.format("Can't find {0} editor type!", key));
             }
             return editorType;
@@ -5879,15 +7357,19 @@ var Serenity;
             var keys = Object.keys(knownTypes);
             for (var _i = 0, keys_3 = keys; _i < keys_3.length; _i++) {
                 var k = keys_3[_i];
-                if (!Q.endsWith(k, suffix))
-                    continue;
-                var p = k.substr(0, k.length - suffix.length);
-                if (Q.isEmptyOrNull(p))
-                    continue;
-                if (knownTypes[p] != null)
-                    continue;
-                knownTypes[p] = knownTypes[k];
+                setWithoutSuffix(k, knownTypes[k]);
             }
+        }
+        function setWithoutSuffix(key, t) {
+            var suffix = 'editor';
+            if (!Q.endsWith(key, suffix))
+                return;
+            var p = key.substr(0, key.length - suffix.length);
+            if (Q.isEmptyOrNull(p))
+                return;
+            if (knownTypes[p] != null)
+                return;
+            knownTypes[p] = knownTypes[key];
         }
     })(EditorTypeRegistry = Serenity.EditorTypeRegistry || (Serenity.EditorTypeRegistry = {}));
     var EditorUtils;
@@ -8398,8 +9880,8 @@ var Serenity;
         FilterPanel.prototype.updateRowsFromStore = function () {
             this.rowsDiv.empty();
             var items = this.get_store().get_items();
-            for (var _i = 0, items_5 = items; _i < items_5.length; _i++) {
-                var item = items_5[_i];
+            for (var _i = 0, items_6 = items; _i < items_6.length; _i++) {
+                var item = items_6[_i];
                 this.addEmptyRow(false);
                 var row = this.rowsDiv.children().last();
                 var divl = row.children('div.l');
@@ -9707,384 +11189,28 @@ var Serenity;
         __extends(PropertyGrid, _super);
         function PropertyGrid(div, opt) {
             var _this = _super.call(this, div, opt) || this;
-            _this.categoryLinkClick = function (e) {
-                e.preventDefault();
-                var title = $('a[name=' + e.target.getAttribute('href')
-                    .toString().substr(1) + ']');
-                if (title.closest('.category').hasClass('collapsed'))
-                    title.closest('.category').children('.category-title').click();
-                var animate = function () {
-                    title.fadeTo(100, 0.5, function () {
-                        title.fadeTo(100, 1, function () {
-                        });
-                    });
-                };
-                var intoView = title.closest('.category');
-                if (intoView.closest(':scrollable(both)').length === 0)
-                    animate();
-                else {
-                    intoView.scrollintoview({
-                        duration: 'fast',
-                        direction: 'y',
-                        complete: animate
-                    });
-                }
-            };
             if (opt.mode == null)
                 opt.mode = 1;
             div.addClass('s-PropertyGrid');
-            _this.editors = [];
             _this.items = _this.options.items || [];
-            var useTabs = Q.any(_this.items, function (x) {
-                return !Q.isEmptyOrNull(x.tab);
-            });
-            if (useTabs) {
-                var ul = $("<ul class='nav nav-tabs property-tabs' role='tablist'></ul>")
-                    .appendTo(_this.element);
-                var tc = $("<div class='tab-content property-panes'></div>")
-                    .appendTo(_this.element);
-                var tabIndex = 0;
-                var i = 0;
-                while (i < _this.items.length) {
-                    var tab = { $: Q.trimToEmpty(_this.items[i].tab) };
-                    var tabItems = [];
-                    var j = i;
-                    do {
-                        tabItems.push(_this.items[j]);
-                    } while (++j < _this.items.length &&
-                        Q.trimToEmpty(_this.items[j].tab) === tab.$);
-                    i = j;
-                    var li = $("<li><a data-toggle='tab' role='tab'></a></li>")
-                        .appendTo(ul);
-                    if (tabIndex === 0) {
-                        li.addClass('active');
-                    }
-                    var tabID = _this.uniqueName + '_Tab' + tabIndex;
-                    li.children('a').attr('href', '#' + tabID)
-                        .text(_this.determineText(tab.$, ss.mkdel({
-                        tab: tab
-                    }, function (prefix) {
-                        return prefix + 'Tabs.' + this.tab.$;
-                    })));
-                    var pane = $("<div class='tab-pane fade' role='tabpanel'>")
-                        .appendTo(tc);
-                    if (tabIndex === 0) {
-                        pane.addClass('in active');
-                    }
-                    pane.attr('id', tabID);
-                    _this.createItems(pane, tabItems);
-                    tabIndex++;
-                }
-            }
-            else {
-                _this.createItems(_this.element, _this.items);
-            }
-            _this.updateInterface();
+            _this.renderIntraGrid();
             return _this;
         }
-        PropertyGrid_1 = PropertyGrid;
+        PropertyGrid.prototype.renderIntraGrid = function () {
+            if (!this.element || !this.element.length)
+                return;
+            var props = Q.extend({}, this.options);
+            if (this.editors == null)
+                this.editors = new Serenity.UI.EditorRefs(this.props.setRef);
+            props.setRef = this.editors.setRef;
+            this.propertyGrid = ReactDOM.render(React.createElement(Serenity.UI.IntraPropertyGrid, props), this.element[0]);
+        };
         PropertyGrid.prototype.destroy = function () {
-            if (this.editors != null) {
-                for (var i = 0; i < this.editors.length; i++) {
-                    this.editors[i].destroy();
-                }
+            if (this.editors != null && this.element != null && this.element.length) {
                 this.editors = null;
+                ReactDOM.unmountComponentAtNode(this.element[0]);
             }
-            this.element.find('a.category-link').unbind('click', this.categoryLinkClick).remove();
             Serenity.Widget.prototype.destroy.call(this);
-        };
-        PropertyGrid.prototype.createItems = function (container, items) {
-            var categoryIndexes = {};
-            var categoriesDiv = container;
-            var useCategories = this.options.useCategories !== false && Q.any(items, function (x) {
-                return !Q.isEmptyOrNull(x.category);
-            });
-            if (useCategories) {
-                var linkContainer = $('<div/>').addClass('category-links');
-                categoryIndexes = this.createCategoryLinks(linkContainer, items);
-                if (Object.keys(categoryIndexes).length > 1) {
-                    linkContainer.appendTo(container);
-                }
-                else {
-                    linkContainer.find('a.category-link').unbind('click', this.categoryLinkClick).remove();
-                }
-            }
-            categoriesDiv = $('<div/>').addClass('categories').appendTo(container);
-            var fieldContainer;
-            if (useCategories) {
-                fieldContainer = categoriesDiv;
-            }
-            else {
-                fieldContainer = $('<div/>').addClass('category').appendTo(categoriesDiv);
-            }
-            var priorCategory = null;
-            for (var i = 0; i < items.length; i++) {
-                var item = items[i];
-                var category = item.category;
-                if (category == null) {
-                    category = Q.coalesce(this.options.defaultCategory, '');
-                }
-                if (useCategories && priorCategory !== category) {
-                    var categoryDiv = this.createCategoryDiv(categoriesDiv, categoryIndexes, category, ((item.collapsible !== true) ? null :
-                        Q.coalesce(item.collapsed, false)));
-                    if (priorCategory == null) {
-                        categoryDiv.addClass('first-category');
-                    }
-                    priorCategory = category;
-                    fieldContainer = categoryDiv;
-                }
-                var editor = this.createField(fieldContainer, item);
-                this.editors.push(editor);
-            }
-        };
-        PropertyGrid.prototype.createCategoryDiv = function (categoriesDiv, categoryIndexes, category, collapsed) {
-            var categoryDiv = $('<div/>').addClass('category')
-                .appendTo(categoriesDiv);
-            var title = $('<div/>').addClass('category-title')
-                .append($('<a/>').addClass('category-anchor')
-                .text(this.determineText(category, function (prefix) {
-                return prefix + 'Categories.' + category;
-            }))
-                .attr('name', this.options.idPrefix +
-                'Category' + categoryIndexes[category].toString()))
-                .appendTo(categoryDiv);
-            if (collapsed != null) {
-                categoryDiv.addClass(((collapsed === true) ?
-                    'collapsible collapsed' : 'collapsible'));
-                var img = $('<i/>').addClass(((collapsed === true) ?
-                    'fa fa-plus' : 'fa fa-minus')).appendTo(title);
-                title.click(function (e) {
-                    categoryDiv.toggleClass('collapsed');
-                    img.toggleClass('fa-plus').toggleClass('fa-minus');
-                });
-            }
-            return categoryDiv;
-        };
-        PropertyGrid.prototype.determineText = function (text, getKey) {
-            if (text != null && !Q.startsWith(text, '`')) {
-                var local = Q.tryGetText(text);
-                if (local != null) {
-                    return local;
-                }
-            }
-            if (text != null && Q.startsWith(text, '`')) {
-                text = text.substr(1);
-            }
-            if (!Q.isEmptyOrNull(this.options.localTextPrefix)) {
-                var local1 = Q.tryGetText(getKey(this.options.localTextPrefix));
-                if (local1 != null) {
-                    return local1;
-                }
-            }
-            return text;
-        };
-        PropertyGrid.prototype.createField = function (container, item) {
-            var fieldDiv = $('<div/>').addClass('field')
-                .addClass(item.name).data('PropertyItem', item).appendTo(container);
-            if (!Q.isEmptyOrNull(item.cssClass)) {
-                fieldDiv.addClass(item.cssClass);
-            }
-            if (!Q.isEmptyOrNull(item.formCssClass)) {
-                fieldDiv.addClass(item.formCssClass);
-                if (item.formCssClass.indexOf('line-break-') >= 0) {
-                    var splitted = item.formCssClass.split(String.fromCharCode(32));
-                    if (splitted.indexOf('line-break-xs') >= 0) {
-                        $("<div class='line-break' style='width: 100%' />")
-                            .insertBefore(fieldDiv);
-                    }
-                    else if (splitted.indexOf('line-break-sm') >= 0) {
-                        $("<div class='line-break hidden-xs' style='width: 100%' />")
-                            .insertBefore(fieldDiv);
-                    }
-                    else if (splitted.indexOf('line-break-md') >= 0) {
-                        $("<div class='line-break hidden-sm' style='width: 100%' />")
-                            .insertBefore(fieldDiv);
-                    }
-                    else if (splitted.indexOf('line-break-lg') >= 0) {
-                        $("<div class='line-break hidden-md' style='width: 100%' />")
-                            .insertBefore(fieldDiv);
-                    }
-                }
-            }
-            var editorId = this.options.idPrefix + item.name;
-            var title = this.determineText(item.title, function (prefix) {
-                return prefix + item.name;
-            });
-            var hint = this.determineText(item.hint, function (prefix1) {
-                return prefix1 + item.name + '_Hint';
-            });
-            var placeHolder = this.determineText(item.placeholder, function (prefix2) {
-                return prefix2 + item.name + '_Placeholder';
-            });
-            if (hint == null) {
-                hint = Q.coalesce(title, '');
-            }
-            var label = $('<label/>')
-                .addClass('caption').attr('for', editorId)
-                .attr('title', hint).html(Q.coalesce(title, ''))
-                .appendTo(fieldDiv);
-            if (!Q.isEmptyOrNull(item.labelWidth)) {
-                if (item.labelWidth === '0') {
-                    label.hide();
-                }
-                else {
-                    label.css('width', item.labelWidth);
-                }
-            }
-            if (item.required === true) {
-                $('<sup>*</sup>').attr('title', Q.text('Controls.PropertyGrid.RequiredHint'))
-                    .prependTo(label);
-            }
-            var editorType = Serenity.EditorTypeRegistry
-                .get(Q.coalesce(item.editorType, 'String'));
-            var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
-            var elementHtml = ((elementAttr.length > 0) ?
-                elementAttr[0].value : '<input/>');
-            var element = Serenity.Widget.elementFor(editorType)
-                .addClass('editor').addClass('flexify')
-                .attr('id', editorId).appendTo(fieldDiv);
-            if (element.is(':input')) {
-                element.attr('name', Q.coalesce(item.name, ''));
-            }
-            if (!Q.isEmptyOrNull(placeHolder)) {
-                element.attr('placeholder', placeHolder);
-            }
-            var editorParams = item.editorParams;
-            var optionsType = null;
-            var optionsAttr = ss.getAttributes(editorType, Serenity.OptionsTypeAttribute, true);
-            if (optionsAttr != null && optionsAttr.length > 0) {
-                optionsType = optionsAttr[0].optionsType;
-            }
-            var editor;
-            if (optionsType != null) {
-                editorParams = $.extend(ss.createInstance(optionsType), item.editorParams);
-                editor = new editorType(element, editorParams);
-            }
-            else {
-                editorParams = $.extend(new Object(), item.editorParams);
-                editor = new editorType(element, editorParams);
-            }
-            editor.initialize();
-            if (ss.isInstanceOfType(editor, Serenity.BooleanEditor) &&
-                (item.editorParams == null || !!!item.editorParams['labelFor'])) {
-                label.removeAttr('for');
-            }
-            if (ss.isInstanceOfType(editor, Serenity.RadioButtonEditor) &&
-                (item.editorParams == null || !!!item.editorParams['labelFor'])) {
-                label.removeAttr('for');
-            }
-            if (item.maxLength != null) {
-                PropertyGrid_1.setMaxLength(editor, item.maxLength);
-            }
-            if (item.editorParams != null) {
-                Serenity.ReflectionOptionsSetter.set(editor, item.editorParams);
-            }
-            $('<div/>').addClass('vx').appendTo(fieldDiv);
-            $('<div/>').addClass('clear').appendTo(fieldDiv);
-            return editor;
-        };
-        PropertyGrid.prototype.getCategoryOrder = function (items) {
-            var order = 0;
-            var result = {};
-            var categoryOrder = Q.trimToNull(this.options.categoryOrder);
-            if (categoryOrder != null) {
-                var split = categoryOrder.split(';');
-                for (var _i = 0, split_1 = split; _i < split_1.length; _i++) {
-                    var s = split_1[_i];
-                    var x = Q.trimToNull(s);
-                    if (x == null) {
-                        continue;
-                    }
-                    if (result[x] != null) {
-                        continue;
-                    }
-                    result[x] = order++;
-                }
-            }
-            for (var _a = 0, items_6 = items; _a < items_6.length; _a++) {
-                var x1 = items_6[_a];
-                var category = x1.category;
-                if (category == null) {
-                    category = Q.coalesce(this.options.defaultCategory, '');
-                }
-                if (result[category] == null) {
-                    result[category] = order++;
-                }
-            }
-            return result;
-        };
-        PropertyGrid.prototype.createCategoryLinks = function (container, items) {
-            var idx = 0;
-            var itemIndex = {};
-            var itemCategory = {};
-            for (var _i = 0, items_7 = items; _i < items_7.length; _i++) {
-                var x = items_7[_i];
-                var name1 = x.name;
-                var cat1 = x.category;
-                if (cat1 == null) {
-                    cat1 = Q.coalesce(this.options.defaultCategory, '');
-                }
-                itemCategory[name1] = cat1;
-                itemIndex[x.name] = idx++;
-            }
-            var self = this;
-            var categoryOrder = this.getCategoryOrder(items);
-            items.sort(function (x1, y) {
-                var c = 0;
-                var xcategory = itemCategory[x1.name];
-                var ycategory = itemCategory[y.name];
-                if (!ss.referenceEquals(xcategory, ycategory)) {
-                    var c1 = categoryOrder[xcategory];
-                    var c2 = categoryOrder[ycategory];
-                    if (c1 != null && c2 != null) {
-                        c = c1 - c2;
-                    }
-                    else if (c1 != null) {
-                        c = -1;
-                    }
-                    else if (c2 != null) {
-                        c = 1;
-                    }
-                }
-                if (c === 0) {
-                    c = ss.compareStrings(xcategory, ycategory);
-                }
-                if (c === 0) {
-                    c = ss.compare(itemIndex[x1.name], itemIndex[y.name]);
-                }
-                return c;
-            });
-            var categoryIndexes = {};
-            for (var i = 0; i < items.length; i++) {
-                var item = items[i];
-                var category = { $: itemCategory[item.name] };
-                if (categoryIndexes[category.$] == null) {
-                    var index = Object.keys(categoryIndexes).length + 1;
-                    categoryIndexes[category.$] = index;
-                    if (index > 1) {
-                        $('<span/>').addClass('separator').text('|').prependTo(container);
-                    }
-                    $('<a/>').addClass('category-link').text(this.determineText(category.$, ss.mkdel({ category: category }, function (prefix) {
-                        return prefix + 'Categories.' + this.category.$;
-                    })))
-                        .attr('tabindex', '-1')
-                        .attr('href', '#' + this.options.idPrefix +
-                        'Category' + index.toString())
-                        .click(this.categoryLinkClick)
-                        .prependTo(container);
-                }
-            }
-            $('<div/>').addClass('clear').appendTo(container);
-            return categoryIndexes;
-        };
-        PropertyGrid.prototype.get_editors = function () {
-            return this.editors;
-        };
-        PropertyGrid.prototype.get_items = function () {
-            return this.items;
-        };
-        PropertyGrid.prototype.get_idPrefix = function () {
-            return this.options.idPrefix;
         };
         PropertyGrid.prototype.get_mode = function () {
             return this.options.mode;
@@ -10092,7 +11218,7 @@ var Serenity;
         PropertyGrid.prototype.set_mode = function (value) {
             if (this.options.mode !== value) {
                 this.options.mode = value;
-                this.updateInterface();
+                this.renderIntraGrid();
             }
         };
         // Obsolete
@@ -10114,271 +11240,59 @@ var Serenity;
         PropertyGrid.setRequired = function (widget, isRequired) {
             Serenity.EditorUtils.setRequired(widget, isRequired);
         };
-        PropertyGrid.setMaxLength = function (widget, maxLength) {
-            if (widget.element.is(':input')) {
-                if (maxLength > 0) {
-                    widget.element.attr('maxlength', maxLength);
-                }
-                else {
-                    widget.element.removeAttr('maxlength');
-                }
-            }
-        };
         PropertyGrid.prototype.load = function (source) {
-            for (var i = 0; i < this.editors.length; i++) {
-                var item = this.items[i];
-                var editor = this.editors[i];
-                if (!!(this.get_mode() === 1 && item.defaultValue != null) &&
-                    typeof (source[item.name]) === 'undefined') {
-                    source[item.name] = item.defaultValue;
-                }
-                Serenity.EditorUtils.loadValue(editor, item, source);
-            }
+            this.propertyGrid.loadFrom(source, this.editors);
         };
         PropertyGrid.prototype.save = function (target) {
-            for (var i = 0; i < this.editors.length; i++) {
-                var item = this.items[i];
-                if (item.oneWay !== true && this.canModifyItem(item)) {
-                    var editor = this.editors[i];
-                    Serenity.EditorUtils.saveValue(editor, item, target);
-                }
-            }
-        };
-        PropertyGrid.prototype.canModifyItem = function (item) {
-            if (this.get_mode() === 1 /* insert */) {
-                if (item.insertable === false) {
-                    return false;
-                }
-                if (item.insertPermission == null) {
-                    return true;
-                }
-                return Q.Authorization.hasPermission(item.insertPermission);
-            }
-            else if (this.get_mode() === 2 /* update */) {
-                if (item.updatable === false) {
-                    return false;
-                }
-                if (item.updatePermission == null) {
-                    return true;
-                }
-                return Q.Authorization.hasPermission(item.updatePermission);
-            }
-            return true;
-        };
-        PropertyGrid.prototype.updateInterface = function () {
-            for (var i = 0; i < this.editors.length; i++) {
-                var item = this.items[i];
-                var editor = this.editors[i];
-                var readOnly = item.readOnly === true || !this.canModifyItem(item);
-                Serenity.EditorUtils.setReadOnly(editor, readOnly);
-                Serenity.EditorUtils.setRequired(editor, !readOnly &&
-                    !!item.required && item.editorType !== 'Boolean');
-                if (item.visible === false || item.readPermission != null ||
-                    item.insertPermission != null || item.updatePermission != null ||
-                    item.hideOnInsert === true || item.hideOnUpdate === true) {
-                    var hidden = (item.readPermission != null &&
-                        !Q.Authorization.hasPermission(item.readPermission)) ||
-                        item.visible === false ||
-                        (this.get_mode() === 1 /* insert */ && item.hideOnInsert === true) ||
-                        (this.get_mode() === 2 && item.hideOnUpdate === true);
-                    editor.getGridField().toggle(!hidden);
-                }
-            }
+            this.propertyGrid.saveTo(target, this.editors);
         };
         PropertyGrid.prototype.enumerateItems = function (callback) {
-            for (var i = 0; i < this.editors.length; i++) {
-                var item = this.items[i];
-                var editor = this.editors[i];
-                callback(item, editor);
-            }
+            //for (var i = 0; i < this.editors.length; i++) {
+            //    var item = this.items[i];
+            //    var editor = this.editors[i];
+            //    callback(item, editor);
+            //}
         };
-        PropertyGrid = PropertyGrid_1 = __decorate([
+        PropertyGrid = __decorate([
             Serenity.Decorators.registerClass('PropertyGrid')
         ], PropertyGrid);
         return PropertyGrid;
-        var PropertyGrid_1;
     }(Serenity.Widget));
     Serenity.PropertyGrid = PropertyGrid;
-    var PropertyItemHelper;
-    (function (PropertyItemHelper) {
-        function getPropertyItemsFor(type) {
-            if (type == null) {
-                throw new ss.Exception('type');
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Toolbar = /** @class */ (function (_super) {
+        __extends(Toolbar, _super);
+        function Toolbar(div, options) {
+            var _this = _super.call(this, div, options) || this;
+            if (div.length) {
+                _this.toolbar = ReactDOM.render(React.createElement(Serenity.UI.IntraToolbar, options), div[0]);
             }
-            var list = [];
-            var $t1 = ss.getMembers(type, 31, 20);
-            for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-                var member = $t1[$t2];
-                var pi = {};
-                if (member.type !== 16 && member.type !== 4) {
-                    continue;
-                }
-                var hiddenAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.HiddenAttribute);
-                });
-                if (hiddenAttribute.length > 0) {
-                    continue;
-                }
-                var displayNameAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
-                });
-                var hintAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.HintAttribute);
-                });
-                var placeholderAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.PlaceholderAttribute);
-                });
-                var memberType = ((member.type === 16) ? ss.cast(member, member != null && member.type === 16)
-                    .returnType : ss.cast(member, member != null && member.type === 4).returnType);
-                if (member.type === 16) {
-                    var p = ss.cast(member, member && member.type === 16);
-                    if (p.fname == null) {
-                        continue;
-                    }
-                    pi.name = p.fname;
-                }
-                else if (member.type === 4) {
-                    var f = ss.cast(member, member != null && member.type === 4);
-                    pi.name = f.sname;
-                }
-                else {
-                    continue;
-                }
-                var categoryAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.CategoryAttribute);
-                });
-                if (categoryAttribute.length > 0) {
-                    pi.category = ss.cast(categoryAttribute[0], Serenity.CategoryAttribute).category;
-                }
-                else if (list.length > 0) {
-                    pi.category = list[list.length - 1].category;
-                }
-                var collapsibleAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.CollapsibleAttribute);
-                });
-                if (collapsibleAttribute.length > 0 && ss.cast(collapsibleAttribute[0], Serenity.CollapsibleAttribute).value) {
-                    pi.collapsible = true;
-                    pi.collapsed = ss.cast(collapsibleAttribute[0], Serenity.CollapsibleAttribute).collapsed;
-                }
-                var cssClassAttr = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.CssClassAttribute);
-                });
-                if (cssClassAttr.length > 0) {
-                    pi.cssClass = ss.cast(cssClassAttr[0], Serenity.CssClassAttribute).cssClass;
-                }
-                if ((member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.OneWayAttribute);
-                }).length > 0) {
-                    pi.oneWay = true;
-                }
-                if ((member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.ReadOnlyAttribute);
-                }).length > 0) {
-                    pi.readOnly = true;
-                }
-                if (displayNameAttribute.length > 0) {
-                    pi.title = ss.cast(displayNameAttribute[0], System.ComponentModel.DisplayNameAttribute).displayName;
-                }
-                if (hintAttribute.length > 0) {
-                    pi.hint = ss.cast(hintAttribute[0], Serenity.HintAttribute).hint;
-                }
-                if (placeholderAttribute.length > 0) {
-                    pi.placeholder = ss.cast(placeholderAttribute[0], Serenity.PlaceholderAttribute).value;
-                }
-                if (pi.title == null) {
-                    pi.title = pi.name;
-                }
-                var defaultValueAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.DefaultValueAttribute);
-                });
-                if (defaultValueAttribute.length === 1) {
-                    pi.defaultValue = ss.cast(defaultValueAttribute[0], Serenity.DefaultValueAttribute).value;
-                }
-                var insertableAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.InsertableAttribute);
-                });
-                if (insertableAttribute.length > 0) {
-                    pi.insertable = insertableAttribute[0].value;
-                }
-                else {
-                    pi.insertable = true;
-                }
-                var updatableAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.UpdatableAttribute);
-                });
-                if (updatableAttribute.length > 0) {
-                    pi.updatable = updatableAttribute[0].value;
-                }
-                else {
-                    pi.updatable = true;
-                }
-                var typeAttrArray = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.EditorTypeAttribute);
-                });
-                var nullableType = memberType;
-                //Nullable.GetUnderlyingType(memberType);
-                var enumType = null;
-                if (ss.isEnum(memberType)) {
-                    enumType = memberType;
-                }
-                else if (nullableType && ss.isEnum(nullableType)) {
-                    enumType = nullableType;
-                }
-                if (typeAttrArray.length === 0) {
-                    if (enumType) {
-                        pi.editorType = 'Select';
-                    }
-                    else if (memberType === ss.JsDate) {
-                        pi.editorType = 'Date';
-                    }
-                    else if (memberType === Boolean) {
-                        pi.editorType = 'Boolean';
-                    }
-                    else if (memberType === Number) {
-                        pi.editorType = 'Decimal';
-                    }
-                    else if (memberType === ss.Int32) {
-                        pi.editorType = 'Integer';
-                    }
-                    else {
-                        pi.editorType = 'String';
-                    }
-                }
-                else {
-                    var et = ss.cast(typeAttrArray[0], Serenity.EditorTypeAttribute);
-                    pi.editorType = et.editorType;
-                    et.setParams(pi.editorParams);
-                }
-                var reqAttr = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.RequiredAttribute);
-                });
-                if (reqAttr.length > 0) {
-                    pi.required = reqAttr[0].isRequired;
-                }
-                var maxLengthAttr = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.MaxLengthAttribute);
-                });
-                if (maxLengthAttr.length > 0) {
-                    pi.maxLength = maxLengthAttr.maxLength;
-                    pi.editorParams['maxLength'] = pi.maxLength;
-                }
-                var $t3 = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.EditorOptionAttribute);
-                });
-                for (var $t4 = 0; $t4 < $t3.length; $t4++) {
-                    var param = $t3[$t4];
-                    var key = param.key;
-                    if (key != null && key.length >= 1) {
-                        key = key.substr(0, 1).toLowerCase() + key.substring(1);
-                    }
-                    pi.editorParams[key] = param.value;
-                }
-                list.push(pi);
-            }
-            return list;
+            return _this;
         }
-        PropertyItemHelper.getPropertyItemsFor = getPropertyItemsFor;
-    })(PropertyItemHelper = Serenity.PropertyItemHelper || (Serenity.PropertyItemHelper = {}));
+        Toolbar.prototype.destroy = function () {
+            if (this.toolbar != null && this.toolbar.el != null) {
+                // we used to insert elements to toolbar element, and React expects it to be at start
+                if ($(this.toolbar.el).index() != 0)
+                    $(this.toolbar.el).prependTo(this.element);
+                ReactDOM.unmountComponentAtNode(this.element[0]);
+                this.toolbar = null;
+            }
+            _super.prototype.destroy.call(this);
+        };
+        Toolbar.prototype.findButton = function (className) {
+            if (className != null && Q.startsWith(className, '.')) {
+                className = className.substr(1);
+            }
+            return $(Serenity.UI.ToolButton.buttonSelector + '.' + className, this.element);
+        };
+        Toolbar = __decorate([
+            Serenity.Decorators.registerClass('Serenity.Toolbar')
+        ], Toolbar);
+        return Toolbar;
+    }(Serenity.Widget));
+    Serenity.Toolbar = Toolbar;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -10435,96 +11349,6 @@ var Serenity;
         return PopupToolButton;
     }(PopupMenuButton));
     Serenity.PopupToolButton = PopupToolButton;
-    var Toolbar = /** @class */ (function (_super) {
-        __extends(Toolbar, _super);
-        function Toolbar(div, options) {
-            var _this = _super.call(this, div, options) || this;
-            _this.element.addClass('s-Toolbar clearfix')
-                .html('<div class="tool-buttons"><div class="buttons-outer">' +
-                '<div class="buttons-inner"></div></div></div>');
-            var container = $('div.buttons-inner', _this.element);
-            var buttons = _this.options.buttons;
-            for (var i = 0; i < buttons.length; i++) {
-                _this.createButton(container, buttons[i]);
-            }
-            return _this;
-        }
-        Toolbar.prototype.destroy = function () {
-            this.element.find('div.tool-button').unbind('click');
-            if (this.mouseTrap) {
-                if (!!this.mouseTrap.destroy) {
-                    this.mouseTrap.destroy();
-                }
-                else {
-                    this.mouseTrap.reset();
-                }
-                this.mouseTrap = null;
-            }
-            _super.prototype.destroy.call(this);
-        };
-        Toolbar.prototype.createButton = function (container, b) {
-            var cssClass = Q.coalesce(b.cssClass, '');
-            if (b.separator === true) {
-                $('<div class="separator"></div>').appendTo(container);
-            }
-            var btn = $('<div class="tool-button"><div class="button-outer">' +
-                '<span class="button-inner"></span></div></div>')
-                .appendTo(container);
-            if (cssClass.length > 0) {
-                btn.addClass(cssClass);
-            }
-            if (!Q.isEmptyOrNull(b.hint)) {
-                btn.attr('title', b.hint);
-            }
-            btn.click(function (e) {
-                if (btn.hasClass('disabled')) {
-                    return;
-                }
-                b.onClick(e);
-            });
-            var text = b.title;
-            if (b.htmlEncode !== false) {
-                text = Q.htmlEncode(b.title);
-            }
-            if (!Q.isEmptyOrNull(b.icon)) {
-                btn.addClass('icon-tool-button');
-                var klass = b.icon;
-                if (Q.startsWith(klass, 'fa-')) {
-                    klass = 'fa ' + klass;
-                }
-                else if (Q.startsWith(klass, 'glyphicon-')) {
-                    klass = 'glyphicon ' + klass;
-                }
-                text = "<i class='" + klass + "'></i> " + text;
-            }
-            if (text == null || text.length === 0) {
-                btn.addClass('no-text');
-            }
-            else {
-                btn.find('span').html(text);
-            }
-            if (!!(!Q.isEmptyOrNull(b.hotkey) && window['Mousetrap'] != null)) {
-                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.options.hotkeyContext || window.document.documentElement);
-                this.mouseTrap.bind(b.hotkey, function (e1, action) {
-                    if (btn.is(':visible')) {
-                        btn.triggerHandler('click');
-                    }
-                    return b.hotkeyAllowDefault;
-                });
-            }
-        };
-        Toolbar.prototype.findButton = function (className) {
-            if (className != null && Q.startsWith(className, '.')) {
-                className = className.substr(1);
-            }
-            return $('div.tool-button.' + className, this.element);
-        };
-        Toolbar = __decorate([
-            Serenity.Decorators.registerClass('Serenity.Toolbar')
-        ], Toolbar);
-        return Toolbar;
-    }(Serenity.Widget));
-    Serenity.Toolbar = Toolbar;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -10763,7 +11587,7 @@ var Serenity;
         };
         TemplatedDialog.prototype.onDialogOpen = function () {
             if (!$(document.body).hasClass('mobile-device'))
-                $(':input:eq(0)', this.element).focus();
+                $(':input', this.element).not('button').eq(0).focus();
             this.arrange();
             this.tabs && this.tabs.tabs('option', 'active', 0);
         };
@@ -10920,6 +11744,48 @@ var Serenity;
         var TemplatedDialog_1;
     }(Serenity.TemplatedWidget));
     Serenity.TemplatedDialog = TemplatedDialog;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var UI;
+    (function (UI) {
+        var Dialog = /** @class */ (function (_super) {
+            __extends(Dialog, _super);
+            function Dialog(options) {
+                var _this = _super.call(this, options) || this;
+                _this.mountView();
+                return _this;
+            }
+            Dialog.prototype.loadByIdAndOpenDialog = function (entityId, asPanel) {
+                this.entityId = entityId;
+                this.dialogOpen(asPanel);
+                this.mountView();
+            };
+            Dialog.prototype.loadEntityAndOpenDialog = function (entity, asPanel) {
+                this.entityId = null;
+                this.entity = entity;
+                this.dialogOpen(asPanel);
+                this.mountView();
+            };
+            Dialog.prototype.loadNewAndOpenDialog = function (asPanel) {
+                this.entityId = null;
+                this.entity = {};
+                this.dialogOpen(asPanel);
+                this.mountView();
+            };
+            Dialog.prototype.mountView = function () {
+                if (!this.element || !this.element.length)
+                    return;
+                var props = Q.extend({}, this.options);
+                this.view = ReactDOM.render(this.render(), this.element[0]);
+            };
+            Dialog.prototype.getTemplate = function () {
+                return '<div class="s-DialogContent"></div>';
+            };
+            return Dialog;
+        }(Serenity.TemplatedDialog));
+        UI.Dialog = Dialog;
+    })(UI = Serenity.UI || (Serenity.UI = {}));
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -13947,8 +14813,8 @@ var Serenity;
                     items.push(copy);
                     if (langs == null)
                         langs = this.getLangs();
-                    for (var _b = 0, langs_1 = langs; _b < langs_1.length; _b++) {
-                        var lang = langs_1[_b];
+                    for (var _b = 0, langs_2 = langs; _b < langs_2.length; _b++) {
+                        var lang = langs_2[_b];
                         copy = $.extend({}, item1);
                         copy.name = lang[0] + '$' + copy.name;
                         copy.title = lang[1];
@@ -14087,8 +14953,8 @@ var Serenity;
             var result = {};
             var idField = this.getIdProperty();
             var langs = this.getLangs();
-            for (var _i = 0, langs_2 = langs; _i < langs_2.length; _i++) {
-                var pair = langs_2[_i];
+            for (var _i = 0, langs_3 = langs; _i < langs_3.length; _i++) {
+                var pair = langs_3[_i];
                 var language = pair[0];
                 var entity = {};
                 if (idField != null) {
@@ -14860,8 +15726,8 @@ var Serenity;
                     takeChildren(getId(child));
                 }
             }
-            for (var _i = 0, items_8 = items; _i < items_8.length; _i++) {
-                var item = items_8[_i];
+            for (var _i = 0, items_7 = items; _i < items_7.length; _i++) {
+                var item = items_7[_i];
                 var parentId = getParentId(item);
                 if (parentId == null ||
                     !((byId[parentId] || []).length)) {

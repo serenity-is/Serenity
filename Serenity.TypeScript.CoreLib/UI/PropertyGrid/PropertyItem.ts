@@ -1,10 +1,12 @@
 ﻿namespace Serenity {
+    export type Constructor<T> = new (...args: any[]) => T;
+
     export interface PropertyItem {
         name?: string;
         title?: string;
         hint?: string;
         placeholder?: string;
-        editorType?: string;
+        editorType?: string | React.ComponentType<any>;
         editorParams?: any;
         category?: string;
         collapsible?: boolean;

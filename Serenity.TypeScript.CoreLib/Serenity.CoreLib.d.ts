@@ -1,10 +1,18 @@
 ﻿/// <reference types="toastr" />
 /// <reference types="jquery" />
+/// <reference types="react" />
 /// <reference types="jquery.validation" />
 /// <reference types="jqueryui" />
 declare var Reflect: any;
 declare var __decorate: any;
+declare const __skipExtends: {
+    "__metadata": boolean;
+    "__typeName": boolean;
+    "__componentFactory": boolean;
+};
 declare var __extends: any;
+declare var __assign: any;
+declare var __rest: (s: any, e: any) => {};
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }
@@ -468,6 +476,21 @@ declare namespace Q {
      * and values that are arrays containing elements for a particular key.
      */
     function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Grouping<TItem>;
+    type Group<TItem> = {
+        order: number;
+        key: string;
+        items: TItem[];
+        start: number;
+    };
+    type Groups<TItem> = {
+        byKey: Q.Dictionary<Group<TItem>>;
+        inOrder: Group<TItem>[];
+    };
+    /**
+     * Groups an array with keys determined by specified getKey() callback.
+     * Resulting object contains group objects in order and a dictionary to access by key.
+     */
+    function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Groups<TItem>;
     /**
      * Gets first element in an array that matches given predicate.
      * Returns null if no match is found.
@@ -513,7 +536,10 @@ declare namespace Q {
 }
 declare namespace Q {
     function text(key: string): string;
+    function dbText(prefix: string): ((key: string) => string);
+    function prefixedText(prefix: string): (text: string, key: string | ((p?: string) => string)) => string;
     function tryGetText(key: string): string;
+    function dbTryText(prefix: string): ((key: string) => string);
     class LT {
         private key;
         static $table: {
@@ -722,17 +748,18 @@ declare namespace Q {
     function getLookupAsync<TItem>(key: string): PromiseLike<Lookup<TItem>>;
     function reloadLookup(key: string): void;
     function reloadLookupAsync(key: string): PromiseLike<any>;
-    function getColumns(key: string): any;
-    function getColumnsAsync(key: string): PromiseLike<any>;
-    function getForm(key: string): any;
-    function getFormAsync(key: string): PromiseLike<any>;
-    function getTemplate(key: string): any;
-    function getTemplateAsync(key: string): PromiseLike<any>;
+    function getColumns(key: string): Serenity.PropertyItem[];
+    function getColumnsAsync(key: string): PromiseLike<Serenity.PropertyItem[]>;
+    function getForm(key: string): Serenity.PropertyItem[];
+    function getFormAsync(key: string): PromiseLike<Serenity.PropertyItem[]>;
+    function getTemplate(key: string): string;
+    function getTemplateAsync(key: string): PromiseLike<string>;
     function canLoadScriptData(name: string): boolean;
 }
 declare namespace Q {
     function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function prop(type: any, name: string, getter?: string, setter?: string): void;
+    function typeByFullName(fullName: string, global?: any): any;
 }
 declare namespace Q {
     namespace Authorization {
@@ -763,6 +790,11 @@ declare namespace Q.Router {
     function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
     function resolve(hash?: string): void;
 }
+declare namespace Q {
+    function extend(obj: any, props: any): any;
+    function uidGenerator(): () => (() => string);
+    function cssClass(...args: any[]): string;
+}
 declare namespace Serenity {
     namespace Decorators {
         function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
@@ -783,11 +815,6 @@ declare namespace Serenity {
         category: string;
         constructor(category: string);
     }
-    class CollapsibleAttribute {
-        value: boolean;
-        constructor(value: boolean);
-        collapsed: boolean;
-    }
     class ColumnsKeyAttribute {
         value: string;
         constructor(value: string);
@@ -801,8 +828,8 @@ declare namespace Serenity {
         constructor(value: any);
     }
     class DialogTypeAttribute {
-        value: Function;
-        constructor(value: Function);
+        value: WidgetDialogClass;
+        constructor(value: WidgetDialogClass);
     }
     class EditorAttribute {
         constructor();
@@ -933,24 +960,16 @@ declare namespace Serenity {
 declare namespace Serenity.Decorators {
     function registerFormatter(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
     function addAttribute(type: any, attr: any): void;
-    function columnsKey(value: string): (target: Function) => void;
-    function dialogType(value: Function): (target: Function) => void;
+    function dialogType(value: WidgetDialogClass): (target: Function) => void;
     function editor(key?: string): (target: Function) => void;
     function element(value: string): (target: Function) => void;
-    function entityType(value: string): (target: Function) => void;
     function enumKey(value: string): (target: Function) => void;
     function flexify(value?: boolean): (target: Function) => void;
-    function formKey(value: string): (target: Function) => void;
-    function generatedCode(origin?: string): (target: Function) => void;
-    function idProperty(value: string): (target: Function) => void;
     function registerEnum(target: any, enumKey?: string, name?: string): void;
     function registerEnumType(target: any, name?: string, enumKey?: string): void;
     function filterable(value?: boolean): (target: Function) => void;
     function itemName(value: string): (target: Function) => void;
-    function isActiveProperty(value: string): (target: Function) => void;
-    function localTextPrefix(value: string): (target: Function) => void;
     function maximizable(value?: boolean): (target: Function) => void;
-    function nameProperty(value: string): (target: Function) => void;
     function option(): (target: Object, propertyKey: string) => void;
     function optionsType(value: Function): (target: Function) => void;
     function panel(value?: boolean): (target: Function) => void;
@@ -966,6 +985,410 @@ declare namespace Serenity {
         function paren(c: any[]): any[];
         function and(c1: any[], c2: any[], ...rest: any[][]): any[];
         function or(c1: any[], c2: any[], ...rest: any[][]): any[];
+    }
+}
+declare namespace Serenity.UI {
+    class EditorRefs {
+        private inner;
+        private refFunctions;
+        private refs;
+        constructor(inner?: (name: string, ref: any) => void);
+        getRef(name: string): any;
+        setRef(name: string, ref: any): void;
+        ref(name: string): ((ref: any) => void);
+        loadFrom(source: any, names?: string[]): void;
+        saveTo(target: any, names?: string[], ignoreOneWay?: boolean): void;
+    }
+}
+declare namespace Serenity.UI {
+    interface LabelProps {
+        hint?: string;
+        htmlFor?: string;
+        width?: string | number;
+        required?: boolean;
+    }
+    class Label extends React.Component<LabelProps> {
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    class ValidationMark extends React.Component {
+        render(): JSX.Element;
+        shouldComponentUpdate(): boolean;
+    }
+}
+declare namespace Serenity.UI {
+    type EditorRenderProps = {
+        name?: string;
+        id?: string;
+        required?: boolean;
+    };
+    interface FieldProps {
+        name?: string;
+        id?: string;
+        className?: string;
+        caption?: string | false;
+        labelWidth?: number | string;
+        label?: ((p: LabelProps) => JSX.Element);
+        htmlFor?: string;
+        editor?: ((p: EditorRenderProps) => JSX.Element);
+        setRef?: (name: string, editor: any) => void;
+        hint?: string;
+        required?: boolean;
+        vx?: boolean;
+    }
+    interface EditorProps {
+        className?: string;
+        name?: string;
+        id?: string;
+        editor?: ((p: EditorRenderProps) => JSX.Element);
+        required?: boolean;
+        ref?: (name: string, editor: any) => void;
+    }
+    class Field extends React.Component<FieldProps> {
+        private editorRef;
+        componentWillReceiveProps(nextProps: FieldProps, nextContext?: any): void;
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    interface PropertyFieldProps extends Serenity.PropertyItem {
+        idPrefix?: string;
+        localTextPrefix?: string;
+        setRef?: (name: string, editor: any) => void;
+    }
+    class PropertyField extends React.Component<PropertyFieldProps> {
+        protected text: (text: string, key: string | ((p?: string) => string)) => string;
+        getCaption(): string;
+        getHint(): string;
+        getPlaceHolder(): string;
+        getClassName(): string;
+        getHtmlFor(editorType: any): null;
+        getEditorType(): React.ComponentClass<any> | React.StatelessComponent<any> | typeof StringEditor | WidgetClass<object>;
+        getEditorId(): string;
+        getMaxLength(): number;
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    interface CategoryTitleProps {
+        categoryId?: string;
+        collapsed?: boolean;
+        onClick?: React.EventHandler<any>;
+    }
+    class CategoryTitle extends React.Component<CategoryTitleProps> {
+        static collapsedIcon: JSX.Element;
+        static expandedIcon: JSX.Element;
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    interface CategoryLineBreakProps {
+        breakClass: string;
+    }
+    class CategoryLineBreak extends React.Component<CategoryLineBreakProps> {
+        getBreakClass(): string;
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    interface CategoryLinkProps {
+        categoryId?: string;
+        onClick?: React.EventHandler<any>;
+    }
+    class CategoryLink extends React.Component<CategoryLinkProps> {
+        handleClick(e: React.MouseEvent<any>): void;
+        getLink(): string;
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    interface CategoryLinksProps {
+        idPrefix?: string;
+        items?: Serenity.PropertyItem[];
+        defaultCategory?: string;
+        categoryOrder?: string;
+        localTextPrefix?: string;
+    }
+    class CategoryLinks extends React.Component<CategoryLinksProps> {
+        protected text: (text: string, key: string | ((p?: string) => string)) => string;
+        renderSeparator(key: any): JSX.Element;
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    interface CategoryProps {
+        categoryId?: string;
+        category?: string;
+        collapsed?: boolean;
+        idPrefix?: string;
+        localTextPrefix?: string;
+        items?: PropertyItem[];
+        renderField?: (props: PropertyItem) => React.ReactNode;
+        setRef?: (name: string, editor: any) => void;
+    }
+    class Category extends React.Component<CategoryProps, Partial<CategoryProps>> {
+        protected text: (text: string, key: string | ((p?: string) => string)) => string;
+        constructor(props: CategoryProps, context?: any);
+        componentWillReceiveProps(nextProps: CategoryProps): void;
+        getClassName(): "category " | "category collapsible collapsed" | "category collapsible";
+        getCategoryId(): string;
+        handleTitleClick(): void;
+        renderTitle(): JSX.Element;
+        renderField(item: PropertyItem): {};
+        renderWithBreak(item: PropertyItem): {}[];
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    class CategoriesProps {
+        idPrefix?: string;
+        items?: Serenity.PropertyItem[];
+        defaultCategory?: string;
+        categoryOrder?: string;
+        localTextPrefix?: string;
+        renderCategory?: (props: CategoryProps) => React.ReactNode;
+        renderField?: (props: PropertyItem) => React.ReactNode;
+        setRef?: (name: string, editor: any) => void;
+    }
+    class Categories extends React.Component<CategoriesProps> {
+        static applyOrder(groups: Q.Groups<Serenity.PropertyItem>, categoryOrder: string): void;
+        static groupByCategory(items: PropertyItem[], defaultCategory?: string, categoryOrder?: string): Q.Groups<PropertyItem>;
+        renderCategory(group: Q.Group<PropertyItem>): {};
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    type ValidateFormProps = {
+        options?: JQueryValidation.ValidationOptions;
+    } & React.HTMLAttributes<HTMLFormElement>;
+    class ValidateForm extends React.Component<ValidateFormProps> {
+        private validator;
+        private form;
+        render(): JSX.Element;
+        handleSubmit(e: React.FormEvent<HTMLFormElement>): void;
+        componentDidMount(): void;
+        validateForm(): boolean;
+        serialize(): any;
+    }
+}
+declare namespace Serenity.UI {
+    class Form extends ValidateForm {
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    interface PropertyTabProps {
+        idPrefix?: string;
+        items?: Serenity.PropertyItem[];
+        localTextPrefix?: string;
+        categoryOrder?: string;
+        defaultCategory?: string;
+        renderCategories?: (tab: string, props: CategoriesProps) => React.ReactNode;
+        renderCategory?: (props: CategoryProps) => React.ReactNode;
+        renderField?: (props: PropertyItem) => React.ReactNode;
+        setRef?: (name: string, editor: any) => void;
+    }
+    class PropertyTabs extends React.Component<PropertyTabProps> {
+        protected text: (text: string, key: string | ((p?: string) => string)) => string;
+        static groupByTab(items: PropertyItem[]): Q.Groups<PropertyItem>;
+        renderTab(group: Q.Group<PropertyItem>): JSX.Element;
+        renderPane(group: Q.Group<PropertyItem>): JSX.Element;
+        renderCategories(group: Q.Group<PropertyItem>): {};
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity {
+    interface PropertyGridOptions {
+        idPrefix?: string;
+        items?: PropertyItem[];
+        useCategories?: boolean;
+        categoryOrder?: string;
+        defaultCategory?: string;
+        localTextPrefix?: string;
+        mode?: PropertyGridMode;
+        renderCategories?: (tab: string, props: UI.CategoriesProps) => React.ReactNode;
+        renderCategory?: (props: UI.CategoryProps) => React.ReactNode;
+        renderField?: (props: PropertyItem) => React.ReactNode;
+        setRef?: (name: string, editor: any) => void;
+    }
+}
+declare namespace Serenity.UI {
+    class IntraPropertyGrid extends React.Component<PropertyGridOptions> {
+        loadFrom(source: any, editors: UI.EditorRefs): void;
+        canModifyItem(item: PropertyItem): boolean;
+        saveTo(target: any, editors: EditorRefs): void;
+        getItems(): any[];
+        render(): React.ReactNode;
+    }
+    class PropertyGrid extends IntraPropertyGrid {
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    class ButtonPanel extends React.Component {
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity {
+    interface ToolButton {
+        title?: string;
+        hint?: string;
+        cssClass?: string;
+        icon?: string;
+        onClick?: any;
+        htmlEncode?: any;
+        hotkey?: string;
+        hotkeyAllowDefault?: boolean;
+        hotkeyContext?: any;
+        separator?: boolean;
+    }
+    interface ToolbarOptions {
+        buttons?: ToolButton[];
+        hotkeyContext?: any;
+    }
+    namespace UI {
+        interface ToolButtonProps extends Serenity.ToolButton {
+            disabled?: boolean;
+            hidden?: boolean;
+        }
+        class ToolButton extends React.Component<ToolButtonProps> {
+            static buttonSelector: string;
+            static adjustIconClass(icon: string): string;
+            static className(btn: ToolButtonProps): string;
+            handleClick(e: React.MouseEvent<any>): void;
+            render(): JSX.Element;
+            renderButtonText(): JSX.Element;
+        }
+        class IntraToolbar extends React.Component<Serenity.ToolbarOptions> {
+            el: Element;
+            protected mouseTrap: any;
+            setupMouseTrap(): void;
+            componentDidMount(): void;
+            componentWillUnmount(): void;
+            render(): JSX.Element;
+            renderButtons(buttons: Serenity.ToolButton[]): JSX.Element;
+        }
+        class Toolbar extends IntraToolbar {
+            render(): JSX.Element;
+        }
+    }
+}
+declare namespace Serenity.UI {
+    interface SaveButtonProps extends ToolButtonProps {
+        isUpdate?: boolean;
+    }
+    class SaveButton extends React.Component<SaveButtonProps> {
+        render(): JSX.Element;
+    }
+    class ApplyChangesButton extends React.Component<ToolButtonProps> {
+        render(): JSX.Element;
+    }
+    class DeleteButton extends React.Component<ToolButtonProps> {
+        render(): JSX.Element;
+    }
+}
+declare namespace Serenity.UI {
+    enum FormMode {
+        Initial = 0,
+        New = 1,
+        Edit = 2,
+        View = 3,
+        Deleted = 4,
+    }
+}
+declare namespace Serenity.UI {
+    interface FormDataModel<TEntity> {
+        entity: TEntity;
+        entityId?: any;
+        formMode: FormMode;
+        formTitle?: string;
+        onSave?: (values: TEntity) => PromiseLike<void>;
+        onDelete?: () => PromiseLike<void>;
+        onUndelete?: () => PromiseLike<void>;
+        onReload?: () => PromiseLike<void>;
+    }
+}
+declare namespace Serenity.UI {
+    interface FormDataSourceProps<TEntity> {
+        service?: string;
+        retrieveService?: string;
+        createService?: string;
+        updateService?: string;
+        entityId?: any;
+        entity?: TEntity;
+        idProperty?: string;
+        nameProperty?: string;
+        isActiveProperty?: string;
+        isDeletedProperty?: string;
+        localTextPrefix?: string;
+        readOnly?: boolean;
+        view?: (model: FormDataModel<TEntity>) => React.ReactNode;
+    }
+    interface FormDataSourceState<TEntity> {
+        entity: TEntity;
+        formMode: FormMode;
+        formTitle: string;
+        localizations?: any;
+    }
+    class FormDataSource<TEntity> extends React.Component<FormDataSourceProps<TEntity>, FormDataSourceState<TEntity>> {
+        private emptyEntity;
+        private pendingEntity;
+        private canSetState;
+        constructor(props: FormDataSourceProps<TEntity>, context?: any);
+        componentWillReceiveProps(nextProps: FormDataSourceProps<TEntity>): void;
+        componentDidMount(): void;
+        componentWillUnmount(): void;
+        loadEntity(entity: TEntity): void;
+        loadResponse(response: RetrieveResponse<TEntity>): void;
+        getLoadByIdRequest(entityId: any): RetrieveRequest;
+        getServiceFor(method: string): string;
+        getLoadByIdOptions(entityId: any): ServiceOptions<RetrieveResponse<TEntity>>;
+        loadById(entityId: any): PromiseLike<RetrieveResponse<TEntity>>;
+        isDeleted(entity: TEntity): boolean;
+        modeFor(entity: TEntity): FormMode;
+        protected getEntityName(): string;
+        protected getNameValue(entity: TEntity): any;
+        titleFor(entity: TEntity, mode: FormMode): string;
+        isEditMode(): boolean;
+        getSaveEntity(values: TEntity): TEntity;
+        getSaveOptions(values: TEntity): ServiceOptions<SaveResponse>;
+        getIdProperty(): string;
+        protected getLanguages(): any[];
+        protected getPendingLocalizations(): any;
+        getSaveRequest(values: TEntity): SaveRequest<TEntity>;
+        save(values: TEntity): PromiseLike<void>;
+        delete(): PromiseLike<void>;
+        undelete(): PromiseLike<void>;
+        getDataModel(): FormDataModel<TEntity>;
+        readonly dataModel: FormDataModel<TEntity>;
+        readonly entity: TEntity;
+        render(): React.ReactNode;
+    }
+}
+declare namespace Serenity.UI {
+    interface FormViewProps<TEntity> extends FormDataModel<TEntity> {
+        onClose?: () => void;
+    }
+    class FormView<TEntity, TProps extends FormViewProps<TEntity> = FormViewProps<TEntity>, TState = any> extends React.Component<TProps, TState> {
+        protected editors: EditorRefs;
+        canSave(): boolean;
+        showSave(): boolean;
+        canClose(): boolean;
+        showApplyChanges(): boolean;
+        isUpdate(): boolean;
+        canDelete(): boolean;
+        showDelete(): boolean;
+        canUndelete(): boolean;
+        showUndelete(): boolean;
+        loadEntity(entity: TEntity): void;
+        componentDidMount(): void;
+        componentWillReceiveProps(nextProps: TProps): void;
+        renderSaveButton(): JSX.Element;
+        renderApplyChangesButton(): JSX.Element;
+        renderDeleteButton(): JSX.Element;
+        renderToolbar(children?: React.ReactNode): JSX.Element;
+        save(close?: boolean): PromiseLike<void>;
     }
 }
 declare namespace Serenity {
@@ -1088,7 +1511,16 @@ declare namespace Serenity {
 declare namespace Serenity {
     class IAsyncInit {
     }
-    class Widget<TOptions> {
+    interface WidgetClass<TOptions = object> {
+        new (element: JQuery, options?: TOptions): Widget<TOptions>;
+        element: JQuery;
+    }
+    interface WidgetDialogClass<TOptions = object> {
+        new (options?: TOptions): Widget<TOptions> & IDialog;
+        element: JQuery;
+    }
+    type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
+    class Widget<TOptions> extends React.Component<TOptions, any> {
         private static nextWidgetNumber;
         element: JQuery;
         protected options: TOptions;
@@ -1108,6 +1540,22 @@ declare namespace Serenity {
         static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
         init(action?: (widget: any) => void): this;
         initialize(): PromiseLike<void>;
+        private static __isWidgetType;
+        props: Readonly<{
+            children?: React.ReactNode;
+        }> & Readonly<TOptions> & WidgetComponentProps<this>;
+    }
+    interface WidgetComponentProps<W extends Serenity.Widget<any>> {
+        id?: string;
+        name?: string;
+        className?: string;
+        maxLength?: number;
+        placeholder?: string;
+        setOptions?: any;
+        required?: boolean;
+        readOnly?: boolean;
+        oneWay?: boolean;
+        ref?: (el: W) => void;
     }
     interface Widget<TOptions> {
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
@@ -1189,12 +1637,13 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    type Constructor<T> = new (...args: any[]) => T;
     interface PropertyItem {
         name?: string;
         title?: string;
         hint?: string;
         placeholder?: string;
-        editorType?: string;
+        editorType?: string | React.ComponentType<any>;
         editorParams?: any;
         category?: string;
         collapsible?: boolean;
@@ -1443,7 +1892,7 @@ declare namespace Serenity {
 }
 declare namespace Serenity {
     namespace EditorTypeRegistry {
-        function get(key: string): Function;
+        function get(key: string): WidgetClass;
         function reset(): void;
     }
     namespace EditorUtils {
@@ -2175,20 +2624,12 @@ declare namespace Serenity {
 }
 declare namespace Serenity {
     class PropertyGrid extends Widget<PropertyGridOptions> {
-        private editors;
         private items;
+        private editors;
+        private propertyGrid;
         constructor(div: JQuery, opt: PropertyGridOptions);
+        private renderIntraGrid();
         destroy(): void;
-        private createItems(container, items);
-        private createCategoryDiv(categoriesDiv, categoryIndexes, category, collapsed);
-        private categoryLinkClick;
-        private determineText(text, getKey);
-        private createField(container, item);
-        private getCategoryOrder(items);
-        private createCategoryLinks(container, items);
-        get_editors(): Widget<any>[];
-        get_items(): PropertyItem[];
-        get_idPrefix(): string;
         get_mode(): PropertyGridMode;
         set_mode(value: PropertyGridMode): void;
         static loadEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
@@ -2196,42 +2637,24 @@ declare namespace Serenity {
         private static setReadOnly(widget, isReadOnly);
         private static setReadonly(elements, isReadOnly);
         private static setRequired(widget, isRequired);
-        private static setMaxLength(widget, maxLength);
         load(source: any): void;
         save(target: any): void;
-        private canModifyItem(item);
-        updateInterface(): void;
         enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
     }
     const enum PropertyGridMode {
         insert = 1,
         update = 2,
     }
-    interface PropertyGridOptions {
-        idPrefix?: string;
-        items?: PropertyItem[];
-        useCategories?: boolean;
-        categoryOrder?: string;
-        defaultCategory?: string;
-        localTextPrefix?: string;
-        mode?: PropertyGridMode;
-    }
-    namespace PropertyItemHelper {
-        function getPropertyItemsFor(type: Function): PropertyItem[];
+}
+declare namespace Serenity {
+    class Toolbar extends Widget<ToolbarOptions> {
+        protected toolbar: UI.IntraToolbar;
+        constructor(div: JQuery, options: ToolbarOptions);
+        destroy(): void;
+        findButton(className: string): JQuery;
     }
 }
 declare namespace Serenity {
-    interface ToolButton {
-        title?: string;
-        hint?: string;
-        cssClass?: string;
-        icon?: string;
-        onClick?: any;
-        htmlEncode?: any;
-        hotkey?: string;
-        hotkeyAllowDefault?: boolean;
-        separator?: boolean;
-    }
     interface PopupMenuButtonOptions {
         menu?: JQuery;
         onPopup?: () => void;
@@ -2246,17 +2669,6 @@ declare namespace Serenity {
     }
     class PopupToolButton extends PopupMenuButton {
         constructor(div: JQuery, opt: PopupToolButtonOptions);
-    }
-    interface ToolbarOptions {
-        buttons?: ToolButton[];
-        hotkeyContext?: any;
-    }
-    class Toolbar extends Widget<ToolbarOptions> {
-        constructor(div: JQuery, options: ToolbarOptions);
-        destroy(): void;
-        protected mouseTrap: any;
-        protected createButton(container: JQuery, b: ToolButton): void;
-        findButton(className: string): JQuery;
     }
 }
 declare namespace Serenity {
@@ -2327,6 +2739,19 @@ declare namespace Serenity {
         set_dialogTitle(value: string): void;
         protected initTabs(): void;
         protected handleResponsive(): void;
+    }
+}
+declare namespace Serenity.UI {
+    class Dialog<TOptions = object> extends Serenity.TemplatedDialog<TOptions> {
+        protected view: any;
+        protected entityId: any;
+        protected entity: any;
+        constructor(options?: TOptions);
+        loadByIdAndOpenDialog(entityId: any, asPanel?: boolean): void;
+        loadEntityAndOpenDialog(entity: any, asPanel?: boolean): void;
+        loadNewAndOpenDialog(asPanel?: boolean): void;
+        private mountView();
+        getTemplate(): string;
     }
 }
 declare namespace Serenity {
@@ -2763,7 +3188,7 @@ declare namespace Serenity {
         protected getPendingLocalizations(): any;
         protected initPropertyGrid(): void;
         protected initPropertyGridAsync(): PromiseLike<void>;
-        protected getPropertyItems(): any;
+        protected getPropertyItems(): PropertyItem[];
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
         protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
@@ -3290,6 +3715,6 @@ declare namespace Serenity.DialogExtensions {
     function dialogCloseOnEnter(dialog: JQuery): JQuery;
 }
 declare namespace Serenity.DialogTypeRegistry {
-    function tryGet(key: string): Function;
-    function get(key: string): Function;
+    function tryGet(key: string): WidgetDialogClass;
+    function get(key: string): WidgetDialogClass;
 }

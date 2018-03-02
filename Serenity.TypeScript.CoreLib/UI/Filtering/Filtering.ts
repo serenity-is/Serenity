@@ -545,7 +545,7 @@
                 var editorType = Serenity.EditorTypeRegistry.get(this.editorType);
 
                 this.editor = Serenity.Widget.create({
-                    type: editorType as any,
+                    type: editorType ,
                     element: e => e.appendTo(this.get_container()),
                     options: this.getEditorOptions()
                 });
@@ -563,7 +563,7 @@
         initQuickFilter(filter: QuickFilter<Widget<any>, any>) {
             super.initQuickFilter(filter);
 
-            filter.type = Serenity.EditorTypeRegistry.get(this.editorType) as any;
+            filter.type = Serenity.EditorTypeRegistry.get(this.editorType);
         }
     }
 

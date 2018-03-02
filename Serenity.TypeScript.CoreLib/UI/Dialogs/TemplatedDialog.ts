@@ -262,7 +262,7 @@
 
         protected onDialogOpen(): void {
             if (!$(document.body).hasClass('mobile-device'))
-                $(':input:eq(0)', this.element).focus();
+                $(':input', this.element).not('button').eq(0).focus();
             this.arrange();
             this.tabs && this.tabs.tabs('option', 'active', 0);
         }

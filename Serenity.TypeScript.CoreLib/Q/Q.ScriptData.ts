@@ -205,31 +205,31 @@ namespace Q {
         return ScriptData.reloadAsync('Lookup.' + key);
     }
 
-    export function getColumns(key: string) {
+    export function getColumns(key: string): Serenity.PropertyItem[] {
         return ScriptData.ensure('Columns.' + key);
     }
 
-    export function getColumnsAsync(key: string) {
+    export function getColumnsAsync(key: string): PromiseLike<Serenity.PropertyItem[]> {
         return ScriptData.ensureAsync('Columns.' + key);
     }
 
-    export function getForm(key: string) {
+    export function getForm(key: string): Serenity.PropertyItem[] {
         return ScriptData.ensure('Form.' + key);
     }
 
-    export function getFormAsync(key: string) {
+    export function getFormAsync(key: string): PromiseLike<Serenity.PropertyItem[]> {
         return ScriptData.ensureAsync('Form.' + key);
     }
 
-    export function getTemplate(key: string) {
+    export function getTemplate(key: string): string {
         return ScriptData.ensure('Template.' + key);
     }
 
-    export function getTemplateAsync(key: string) {
+    export function getTemplateAsync(key: string): PromiseLike<string> {
         return ScriptData.ensureAsync('Template.' + key);
     }
 
-    export function canLoadScriptData(name: string) {
+    export function canLoadScriptData(name: string): boolean {
         return ScriptData.canLoad(name);
     }
 }

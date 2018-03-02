@@ -760,22 +760,22 @@ if (typeof Slick === "undefined") {
                         $canvasBottomR.width(canvasWidthR);
                     }
                 } else {
-                    $paneHeaderL.width('100%');
+                    $paneHeaderL.css('width', '100%');
 
-                    $paneTopL.width('100%');
+                    $paneTopL.css('width', '100%');
 
-                    $headerRowScrollerL.width('100%');
+                    $headerRowScrollerL.css('width', '100%');
 
                     $headerRowL.width(canvasWidth);
 
-                    $footerRowScrollerL.width('100%');
+                    $footerRowScrollerL.css('width', '100%');
 
                     $footerRowL.width(canvasWidth);
 
-                    $viewportTopL.width('100%');
+                    $viewportTopL.css('width', '100%');
 
                     if (hasFrozenRows) {
-                        $viewportBottomL.width('100%');
+                        $viewportBottomL.css('width', '100%');
                         $canvasBottomL.width(canvasWidthL);
                     }
                 }
