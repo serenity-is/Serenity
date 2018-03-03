@@ -54,7 +54,7 @@
     <TypeScriptCompile Include="Imports\jQueryStatic.ts" />
     <TypeScriptCompile Include="Imports\JQBlockUI.ts" />
     <TypeScriptCompile Include="Q\Q.JSX.ts" />
-    <TypeScriptCompile Include="Q\Q.VDom.ts" />
+    <TypeScriptCompile Include="Q\Q.DOM.ts" />
     <TypeScriptCompile Include="Services\ServiceError.ts" />
     <TypeScriptCompile Include="Services\ServiceResponse.ts" />
     <TypeScriptCompile Include="Q\Q.BasicUtils.ts" />

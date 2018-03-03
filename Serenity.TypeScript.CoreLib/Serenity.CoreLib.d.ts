@@ -767,55 +767,12 @@ declare namespace Q.Router {
     function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
     function resolve(hash?: string): void;
 }
-declare namespace Q {
-    interface VNode {
-        _vnode?: boolean;
-        _text?: string;
-        type?: IComponent<any> | FunctionalComponent<any> | string;
-        isSVG?: boolean;
-        props?: any;
-        children?: JSX.Children;
-    }
-    interface IComponent<P = any> {
-        render(props?: P, children?: JSX.Children): JSX.Element | null;
-        mounted?(node: Node): void;
-        unmounted?(): void;
-    }
-    abstract class Component<P = any> implements IComponent<P> {
-        constructor(props: P, children?: JSX.Children);
-        abstract render(props?: P, children?: JSX.Children): JSX.Element | null;
-        static defaultProps?: any;
-        props: P & ComponentProps<this>;
-        readonly children?: JSX.Children;
-    }
-    interface FunctionalComponent<P = any> {
-        (props: P, children?: JSX.Children): JSX.Element;
-        defaultProps?: any;
-    }
-    type AnyComponent<P> = FunctionalComponent<P> | Component<P>;
-    interface ComponentProps<C extends FunctionalComponent<any> | Component<any>> {
-        ref?: (el: C) => void;
-    }
-    interface WidgetProps<W extends Serenity.Widget<any>> {
-        id?: string;
-        name?: string;
-        class?: string;
-        maxLength?: number;
-        required?: boolean;
-        readOnly?: boolean;
-        ref?: (el: W) => void;
-    }
-    interface VDomHtmlAttrs {
-        setInnerHTML?: string;
-        ref?: (el?: Element) => void;
-    }
-}
 declare namespace JSX {
-    type Children = JSX.Element | JSX.Element[];
+    type Children = JSX.Element[];
     interface Element extends Q.VNode {
     }
     interface ElementClass {
-        render(props?: any, children?: JSX.Children): JSX.Element;
+        render(props?: any, children?: JSX.Children): Element;
     }
     interface ElementAttributesProperty {
         props: any;
@@ -1447,7 +1404,47 @@ declare namespace JSX {
     }
 }
 declare namespace Q {
-    function h(type: any, props: any, contArg?: any): JSX.Element;
+    interface VNode {
+        _vnode?: boolean;
+        _text?: string;
+        type?: ITemplate<any> | TemplateFunction<any> | string;
+        isSVG?: boolean;
+        props?: any;
+        children?: JSX.Children;
+    }
+    interface ITemplate<P = any> {
+        render(props?: P, children?: JSX.Children): JSX.Element | null;
+        mounted?(node: Node): void;
+        unmounted?(): void;
+    }
+    abstract class Template<P = any> implements ITemplate<P> {
+        constructor(props: P, children?: JSX.Children);
+        abstract render(): JSX.Element | null;
+        static defaultProps?: any;
+        props: P & TemplateProps<this>;
+        children?: JSX.Children;
+    }
+    interface TemplateFunction<P = any> {
+        (props?: P, children?: JSX.Children): JSX.Element | null;
+        defaultProps?: any;
+    }
+    interface TemplateProps<C extends TemplateFunction<any> | Template<any>> {
+        ref?: (el: C) => void;
+    }
+    interface WidgetProps<W extends Serenity.Widget<any>> {
+        id?: string;
+        name?: string;
+        class?: string;
+        maxLength?: number;
+        required?: boolean;
+        readOnly?: boolean;
+        ref?: (el: W) => void;
+    }
+    interface VDomHtmlAttrs {
+        setInnerHTML?: string;
+        ref?: (el?: JSX.Element) => void;
+    }
+    function createElement(type: any, props: any, contArg?: any): JSX.Element;
     function maybeFlatten(arr: any[], isSVG?: boolean): JSX.Element[];
     type Empty = null | void | boolean;
     function Fragment(props?: any, children?: JSX.Element[]): JSX.Element | null;
@@ -1456,7 +1453,7 @@ declare namespace Q {
     function render(vnode: VNode, parent: Node): void;
     function mount(vnode: VNode, node?: Node): Node;
 }
-declare const H: typeof Q.h;
+declare const H: typeof Q.createElement;
 declare namespace Serenity {
     namespace Decorators {
         function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;

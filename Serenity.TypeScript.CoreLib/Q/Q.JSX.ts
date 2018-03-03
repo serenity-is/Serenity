@@ -1,69 +1,12 @@
-﻿namespace Q {
-    export interface VNode {
-        _vnode?: boolean;
-        _text?: string;
-        type?: IComponent<any> | FunctionalComponent<any> | string;
-        isSVG?: boolean;
-        props?: any;
-        children?: JSX.Children;
-    }
+﻿namespace JSX {
 
-    export interface IComponent<P = any> {
-        render(props?: P, children?: JSX.Children): JSX.Element | null;
-        mounted?(node: Node): void;
-        unmounted?(): void;
-    }
-
-    export abstract class Component<P = any> implements IComponent<P> {
-        constructor(props: P, children?: JSX.Children) {
-            this.props = props;
-            this.children = children;
-        }
-
-        abstract render(props?: P, children?: JSX.Children): JSX.Element | null;
-
-        static defaultProps?: any;
-        props: P & ComponentProps<this>
-        readonly children?: JSX.Children;
-    }
-
-    export interface FunctionalComponent<P = any> {
-        (props: P, children?: JSX.Children): JSX.Element;
-        defaultProps?: any;
-    }
-
-    export type AnyComponent<P> = FunctionalComponent<P> | Component<P>;
-
-    export interface ComponentProps<C extends FunctionalComponent<any> | Component<any>> {
-        ref?: (el: C) => void;
-    }
-
-    export interface WidgetProps<W extends Serenity.Widget<any>> {
-        id?: string;
-        name?: string;
-        class?: string;
-        maxLength?: number;
-        required?: boolean;
-        readOnly?: boolean;
-        ref?: (el: W) => void;
-    }
-
-    export interface VDomHtmlAttrs {
-        setInnerHTML?: string;
-        ref?: (el?: Element) => void;
-    }
-    
-}
-
-declare namespace JSX {
-
-    export type Children = JSX.Element | JSX.Element[];
+    export type Children = JSX.Element[];
 
     export interface Element extends Q.VNode {
     }
 
     export interface ElementClass {
-        render(props?: any, children?: JSX.Children): JSX.Element;
+        render(props?: any, children?: JSX.Children): Element;
     }
 
     export interface ElementAttributesProperty {

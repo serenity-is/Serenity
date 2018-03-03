@@ -2332,28 +2332,28 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
-    var Component = /** @class */ (function () {
-        function Component(props, children) {
+    var Template = /** @class */ (function () {
+        function Template(props, children) {
             this.props = props;
             this.children = children;
         }
-        return Component;
+        return Template;
     }());
-    Q.Component = Component;
-})(Q || (Q = {}));
-var Q;
-(function (Q) {
-    // modified version of https://github.com/yelouafi/petit-dom for one time mount only, update / removal with jQuery
+    Q.Template = Template;
+    // a mixture of preact / petit-dom for one time mount only, update / removal with jQuery
     var isArray = Array.isArray;
     var EMPTYO = {};
     var EMPTYAR = [];
     var isVNode = function (c) { return c && (c._vnode != null || c._text != null); };
-    function h(type, props, contArg) {
+    function createElement(type, props, contArg) {
         var children, args, i, isSVG = false;
         var len = arguments.length - 2;
         if (typeof type !== "string") {
             if (len === 1) {
-                children = contArg;
+                if (isArray(contArg))
+                    children = contArg;
+                else
+                    children = [contArg];
             }
             else if (len > 1) {
                 args = Array(len);
@@ -2396,7 +2396,7 @@ var Q;
             children: children
         };
     }
-    Q.h = h;
+    Q.createElement = createElement;
     function maybeFlatten(arr, isSVG) {
         for (var i = 0; i < arr.length; i++) {
             var ch = arr[i];
@@ -2589,7 +2589,7 @@ var Q;
     var mountQueue = [];
     var mountDepth = 0;
     function withUniqueID(action) {
-        var prefix = "uid_" + uniqueId + "_";
+        var prefix = "uid_" + (++uniqueId) + "_";
         return action(function (s) {
             return prefix + s;
         });
@@ -2673,17 +2673,23 @@ var Q;
                         mountQueue.push(function () {
                             var $node = $(node);
                             var e = node;
-                            if (props.id != null)
-                                e.setAttribute("id", props.id);
                             if (props.name != null)
                                 e.setAttribute("name", props.name);
+                            if (props.id != null) {
+                                if (typeof props.id === "function") {
+                                    if (props.name != null)
+                                        e.setAttribute("id", props.id(props.name));
+                                }
+                                else
+                                    e.setAttribute("id", props.id);
+                            }
                             if ($node.is(':input'))
                                 $node.addClass("editor");
                             if (props.class != null)
                                 $node.addClass(props.class);
                             var widget = new type_1($node, props);
                             if (props.maxLength != null)
-                                e.setAttribute("maxLength", props.maxlength);
+                                e.setAttribute("maxLength", props.maxLength);
                             if (props.required)
                                 Serenity.EditorUtils.setRequired(widget, true);
                             if (props.readOnly)
@@ -2756,7 +2762,7 @@ var Q;
     }
     Q.mount = mount;
 })(Q || (Q = {}));
-var H = Q.h;
+var H = Q.createElement;
 var Serenity;
 (function (Serenity) {
     var Decorators;

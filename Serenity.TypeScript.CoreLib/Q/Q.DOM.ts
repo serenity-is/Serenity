@@ -1,11 +1,64 @@
 ﻿namespace Q {
-    // modified version of https://github.com/yelouafi/petit-dom for one time mount only, update / removal with jQuery
+
+    export interface VNode {
+        _vnode?: boolean;
+        _text?: string;
+        type?: ITemplate<any> | TemplateFunction<any> | string;
+        isSVG?: boolean;
+        props?: any;
+        children?: JSX.Children;
+    }
+
+    export interface ITemplate<P = any> {
+        render(props?: P, children?: JSX.Children): JSX.Element | null;
+        mounted?(node: Node): void;
+        unmounted?(): void;
+    }
+
+    export abstract class Template<P = any> implements ITemplate<P> {
+        constructor(props: P, children?: JSX.Children) {
+            this.props = props;
+            this.children = children;
+        }
+
+        abstract render(): JSX.Element | null;
+
+        static defaultProps?: any;
+        props: P & TemplateProps<this>
+        children?: JSX.Children;
+    }
+
+    export interface TemplateFunction<P = any> {
+        (props?: P, children?: JSX.Children): JSX.Element | null;
+        defaultProps?: any;
+    }
+
+    export interface TemplateProps<C extends TemplateFunction<any> | Template<any>> {
+        ref?: (el: C) => void;
+    }
+
+    export interface WidgetProps<W extends Serenity.Widget<any>> {
+        id?: string;
+        name?: string;
+        class?: string;
+        maxLength?: number;
+        required?: boolean;
+        readOnly?: boolean;
+        ref?: (el: W) => void;
+    }
+
+    export interface VDomHtmlAttrs {
+        setInnerHTML?: string;
+        ref?: (el?: JSX.Element) => void;
+    }
+
+    // a mixture of preact / petit-dom for one time mount only, update / removal with jQuery
     const isArray = Array.isArray;
     const EMPTYO = {};
     const EMPTYAR: any[] = [];
     const isVNode = (c: any) => c && (c._vnode != null || c._text != null);
 
-    export function h(type: any, props: any, contArg?: any): JSX.Element {
+    export function createElement(type: any, props: any, contArg?: any): JSX.Element {
         var children: JSX.Children,
             args,
             i,
@@ -14,7 +67,10 @@
 
         if (typeof type !== "string") {
             if (len === 1) {
-                children = contArg;
+                if (isArray(contArg))
+                    children = contArg;
+                else
+                    children = [contArg]
             } else if (len > 1) {
                 args = Array(len);
                 for (i = 0; i < len; i++) {
@@ -271,7 +327,7 @@
     var mountDepth = 0;
 
     export function withUniqueID<T>(action: (uid: (id: string) => string) => T): T{
-        var prefix = "uid_" + uniqueId + "_";
+        var prefix = "uid_" + (++uniqueId) + "_";
         return action(function (s) {
             return prefix + s;
         });
@@ -338,10 +394,10 @@
                         }
                     }
                 }
-                else if ((type as IComponent).render) {
+                else if ((type as ITemplate).render) {
                     component = type;
                     props = getNodeProps(vnode);
-                    var vnode = (type as IComponent).render(props, children);
+                    var vnode = (type as ITemplate).render(props, children);
                     node = mount(vnode);
                 } else if (typeof type === "function") {
                     if (type.prototype.__isWidget) {
@@ -351,11 +407,18 @@
                         mountQueue.push(function () {
                             var $node = $(node);
                             var e = node as Element;
-                            if (props.id != null)
-                                e.setAttribute("id", props.id);
 
                             if (props.name != null)
                                 e.setAttribute("name", props.name);
+
+                            if (props.id != null) {
+                                if (typeof props.id === "function") {
+                                    if (props.name != null)
+                                        e.setAttribute("id", props.id(props.name));
+                                }
+                                else
+                                    e.setAttribute("id", props.id);
+                            }
 
                             if ($node.is(':input'))
                                 $node.addClass("editor");
@@ -366,7 +429,7 @@
                             var widget = new (type as any)($node, props);
 
                             if (props.maxLength != null)
-                                e.setAttribute("maxLength", props.maxlength);
+                                e.setAttribute("maxLength", props.maxLength);
 
                             if (props.required)
                                 Serenity.EditorUtils.setRequired(widget, true);
@@ -387,7 +450,7 @@
                         props = getNodeProps(vnode);
                         var instance = new (type as any)(props, children);
                         component = instance;
-                        vnode = (instance as IComponent).render(props, children);
+                        vnode = (instance as ITemplate).render(props, children);
                         node = mount(vnode);
                     }
                     else if (type === Fragment) {
@@ -405,7 +468,7 @@
                     }
                     else {
                         props = getNodeProps(vnode);
-                        vnode = (type as Q.FunctionalComponent)(props, children);
+                        vnode = (type as TemplateFunction)(props, children);
                         node = mount(vnode);
                     }
                 }
@@ -424,16 +487,16 @@
                 });
             }
 
-            if (component != null && (component as IComponent).mounted != null) {
+            if (component != null && (component as ITemplate).mounted != null) {
                 mountQueue.push(function () {
-                    (component as IComponent).mounted(node);
+                    (component as ITemplate).mounted(node);
                 });
             }
 
-            if (component != null && (component as IComponent).unmounted != null) {
+            if (component != null && (component as ITemplate).unmounted != null) {
                 mountQueue.push(function () {
                     $(node).one('remove', function () {
-                        (component as IComponent).unmounted();
+                        (component as ITemplate).unmounted();
                     });
                 });
             }
@@ -449,4 +512,4 @@
     }
 }
 
-const H = Q.h;
+const H = Q.createElement;
