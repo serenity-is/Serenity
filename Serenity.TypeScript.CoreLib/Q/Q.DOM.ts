@@ -70,7 +70,7 @@
                 if (isArray(contArg))
                     children = contArg;
                 else
-                    children = [contArg]
+                    children = contArg == null ? [] : [contArg]
             } else if (len > 1) {
                 args = Array(len);
                 for (i = 0; i < len; i++) {
