@@ -136,7 +136,7 @@ namespace Serenity.Services
 
                 if (!string.IsNullOrEmpty(attr.PresenceField))
                 {
-                    info.PresenceField = ext.FindFieldByPropertyName(attr.PresenceField) ?? ext.FindField(attr.PresenceField);
+                    info.PresenceField = row.FindFieldByPropertyName(attr.PresenceField) ?? row.FindField(attr.PresenceField);
                     if (ReferenceEquals(info.PresenceField, null))
                         throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                             "This field is specified as PresenceField as an ExtensionRelation attribute.",
