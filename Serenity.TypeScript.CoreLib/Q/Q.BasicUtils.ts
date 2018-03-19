@@ -111,6 +111,51 @@ namespace Q {
         return lookup;
     }
 
+
+    export type Group<TItem> = {
+        order: number;
+        key: string;
+        items: TItem[];
+        start: number;
+    }
+
+    export type Groups<TItem> = {
+        byKey: Q.Dictionary<Group<TItem>>;
+        inOrder: Group<TItem>[];
+    };
+
+    /**
+     * Groups an array with keys determined by specified getKey() callback.
+     * Resulting object contains group objects in order and a dictionary to access by key.
+     */
+    export function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Groups<TItem> {
+        let result: Groups<TItem> = {
+            byKey: Object.create(null),
+            inOrder: []
+        };
+
+        for (var index = 0; index < items.length; index++) {
+            var item = items[index];
+            let key = Q.coalesce(getKey(item), "");
+            var group = result.byKey[key];
+            if (group === undefined) {
+                group = {
+                    order: result.inOrder.length,
+                    key: key,
+                    items: [item],
+                    start: index
+                }
+                result.byKey[key] = group;
+                result.inOrder.push(group);
+            }
+            else {
+                group.items.push(item);
+            }
+        }
+
+        return result;
+    }
+
     /**
      * Gets first element in an array that matches given predicate.
      * Returns null if no match is found.
