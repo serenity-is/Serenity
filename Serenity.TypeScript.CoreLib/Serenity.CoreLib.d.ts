@@ -4,7 +4,14 @@
 /// <reference types="jqueryui" />
 declare var Reflect: any;
 declare var __decorate: any;
+declare const __skipExtends: {
+    "__metadata": boolean;
+    "__typeName": boolean;
+    "__componentFactory": boolean;
+};
 declare var __extends: any;
+declare var __assign: any;
+declare var __rest: (s: any, e: any) => {};
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }
@@ -468,6 +475,21 @@ declare namespace Q {
      * and values that are arrays containing elements for a particular key.
      */
     function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Grouping<TItem>;
+    type Group<TItem> = {
+        order: number;
+        key: string;
+        items: TItem[];
+        start: number;
+    };
+    type Groups<TItem> = {
+        byKey: Q.Dictionary<Group<TItem>>;
+        inOrder: Group<TItem>[];
+    };
+    /**
+     * Groups an array with keys determined by specified getKey() callback.
+     * Resulting object contains group objects in order and a dictionary to access by key.
+     */
+    function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Groups<TItem>;
     /**
      * Gets first element in an array that matches given predicate.
      * Returns null if no match is found.
@@ -513,7 +535,10 @@ declare namespace Q {
 }
 declare namespace Q {
     function text(key: string): string;
+    function dbText(prefix: string): ((key: string) => string);
+    function prefixedText(prefix: string): (text: string, key: string | ((p?: string) => string)) => string;
     function tryGetText(key: string): string;
+    function dbTryText(prefix: string): ((key: string) => string);
     class LT {
         private key;
         static $table: {
@@ -722,17 +747,18 @@ declare namespace Q {
     function getLookupAsync<TItem>(key: string): PromiseLike<Lookup<TItem>>;
     function reloadLookup(key: string): void;
     function reloadLookupAsync(key: string): PromiseLike<any>;
-    function getColumns(key: string): any;
-    function getColumnsAsync(key: string): PromiseLike<any>;
-    function getForm(key: string): any;
-    function getFormAsync(key: string): PromiseLike<any>;
-    function getTemplate(key: string): any;
-    function getTemplateAsync(key: string): PromiseLike<any>;
+    function getColumns(key: string): Serenity.PropertyItem[];
+    function getColumnsAsync(key: string): PromiseLike<Serenity.PropertyItem[]>;
+    function getForm(key: string): Serenity.PropertyItem[];
+    function getFormAsync(key: string): PromiseLike<Serenity.PropertyItem[]>;
+    function getTemplate(key: string): string;
+    function getTemplateAsync(key: string): PromiseLike<string>;
     function canLoadScriptData(name: string): boolean;
 }
 declare namespace Q {
     function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function prop(type: any, name: string, getter?: string, setter?: string): void;
+    function typeByFullName(fullName: string, global?: any): any;
 }
 declare namespace Q {
     namespace Authorization {
@@ -783,11 +809,6 @@ declare namespace Serenity {
         category: string;
         constructor(category: string);
     }
-    class CollapsibleAttribute {
-        value: boolean;
-        constructor(value: boolean);
-        collapsed: boolean;
-    }
     class ColumnsKeyAttribute {
         value: string;
         constructor(value: string);
@@ -801,8 +822,8 @@ declare namespace Serenity {
         constructor(value: any);
     }
     class DialogTypeAttribute {
-        value: Function;
-        constructor(value: Function);
+        value: WidgetDialogClass;
+        constructor(value: WidgetDialogClass);
     }
     class EditorAttribute {
         constructor();
@@ -933,24 +954,16 @@ declare namespace Serenity {
 declare namespace Serenity.Decorators {
     function registerFormatter(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
     function addAttribute(type: any, attr: any): void;
-    function columnsKey(value: string): (target: Function) => void;
-    function dialogType(value: Function): (target: Function) => void;
+    function dialogType(value: WidgetDialogClass): (target: Function) => void;
     function editor(key?: string): (target: Function) => void;
     function element(value: string): (target: Function) => void;
-    function entityType(value: string): (target: Function) => void;
     function enumKey(value: string): (target: Function) => void;
     function flexify(value?: boolean): (target: Function) => void;
-    function formKey(value: string): (target: Function) => void;
-    function generatedCode(origin?: string): (target: Function) => void;
-    function idProperty(value: string): (target: Function) => void;
     function registerEnum(target: any, enumKey?: string, name?: string): void;
     function registerEnumType(target: any, name?: string, enumKey?: string): void;
     function filterable(value?: boolean): (target: Function) => void;
     function itemName(value: string): (target: Function) => void;
-    function isActiveProperty(value: string): (target: Function) => void;
-    function localTextPrefix(value: string): (target: Function) => void;
     function maximizable(value?: boolean): (target: Function) => void;
-    function nameProperty(value: string): (target: Function) => void;
     function option(): (target: Object, propertyKey: string) => void;
     function optionsType(value: Function): (target: Function) => void;
     function panel(value?: boolean): (target: Function) => void;
@@ -1088,6 +1101,15 @@ declare namespace Serenity {
 declare namespace Serenity {
     class IAsyncInit {
     }
+    interface WidgetClass<TOptions = object> {
+        new (element: JQuery, options?: TOptions): Widget<TOptions>;
+        element: JQuery;
+    }
+    interface WidgetDialogClass<TOptions = object> {
+        new (options?: TOptions): Widget<TOptions> & IDialog;
+        element: JQuery;
+    }
+    type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
     class Widget<TOptions> {
         private static nextWidgetNumber;
         element: JQuery;
@@ -1443,7 +1465,7 @@ declare namespace Serenity {
 }
 declare namespace Serenity {
     namespace EditorTypeRegistry {
-        function get(key: string): Function;
+        function get(key: string): WidgetClass;
         function reset(): void;
     }
     namespace EditorUtils {
@@ -2216,9 +2238,6 @@ declare namespace Serenity {
         localTextPrefix?: string;
         mode?: PropertyGridMode;
     }
-    namespace PropertyItemHelper {
-        function getPropertyItemsFor(type: Function): PropertyItem[];
-    }
 }
 declare namespace Serenity {
     interface ToolButton {
@@ -2763,7 +2782,7 @@ declare namespace Serenity {
         protected getPendingLocalizations(): any;
         protected initPropertyGrid(): void;
         protected initPropertyGridAsync(): PromiseLike<void>;
-        protected getPropertyItems(): any;
+        protected getPropertyItems(): PropertyItem[];
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
         protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
@@ -3290,6 +3309,6 @@ declare namespace Serenity.DialogExtensions {
     function dialogCloseOnEnter(dialog: JQuery): JQuery;
 }
 declare namespace Serenity.DialogTypeRegistry {
-    function tryGet(key: string): Function;
-    function get(key: string): Function;
+    function tryGet(key: string): WidgetDialogClass;
+    function get(key: string): WidgetDialogClass;
 }

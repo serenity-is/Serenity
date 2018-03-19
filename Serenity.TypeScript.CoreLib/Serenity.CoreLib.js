@@ -8,12 +8,37 @@
                 r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __skipExtends = {
+    "__metadata": true,
+    "__typeName": true,
+    "__componentFactory": true
+};
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b)
-        if (b.hasOwnProperty(p) && p !== '__metadata' && p !== '__typeName')
+        if (b.hasOwnProperty(p) && __skipExtends[p] !== true)
             d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var __assign = Object.assign || function (t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+    }
+    return t;
+};
+var __rest = function (s, e) {
+    var t = {};
+    for (var p in s)
+        if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+            t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++)
+            if (e.indexOf(p[i]) < 0)
+                t[p[i]] = s[p[i]];
+    return t;
 };
 /**
  * Represents the completion of an asynchronous operation
@@ -142,6 +167,36 @@ var Q;
         return lookup;
     }
     Q.toGrouping = toGrouping;
+    /**
+     * Groups an array with keys determined by specified getKey() callback.
+     * Resulting object contains group objects in order and a dictionary to access by key.
+     */
+    function groupBy(items, getKey) {
+        var result = {
+            byKey: Object.create(null),
+            inOrder: []
+        };
+        for (var index = 0; index < items.length; index++) {
+            var item = items[index];
+            var key = Q.coalesce(getKey(item), "");
+            var group = result.byKey[key];
+            if (group === undefined) {
+                group = {
+                    order: result.inOrder.length,
+                    key: key,
+                    items: [item],
+                    start: index
+                };
+                result.byKey[key] = group;
+                result.inOrder.push(group);
+            }
+            else {
+                group.items.push(item);
+            }
+        }
+        return result;
+    }
+    Q.groupBy = groupBy;
     /**
      * Gets first element in an array that matches given predicate.
      * Returns null if no match is found.
@@ -778,10 +833,44 @@ var Q;
         return t;
     }
     Q.text = text;
+    function dbText(prefix) {
+        return function (key) {
+            return text("Db." + prefix + "." + key);
+        };
+    }
+    Q.dbText = dbText;
+    function prefixedText(prefix) {
+        return function (text, key) {
+            if (text != null && !Q.startsWith(text, '`')) {
+                var local = Q.tryGetText(text);
+                if (local != null) {
+                    return local;
+                }
+            }
+            if (text != null && Q.startsWith(text, '`')) {
+                text = text.substr(1);
+            }
+            if (!Q.isEmptyOrNull(prefix)) {
+                var textKey = typeof (key) == "function" ? key(prefix) : (prefix + key);
+                var localText = Q.tryGetText(textKey);
+                if (localText != null) {
+                    return localText;
+                }
+            }
+            return text;
+        };
+    }
+    Q.prefixedText = prefixedText;
     function tryGetText(key) {
         return LT.$table[key];
     }
     Q.tryGetText = tryGetText;
+    function dbTryText(prefix) {
+        return function (key) {
+            return text("Db." + prefix + "." + key);
+        };
+    }
+    Q.dbTryText = dbTryText;
     var LT = /** @class */ (function () {
         function LT(key) {
             this.key = key;
@@ -1906,6 +1995,21 @@ var Q;
         });
     }
     Q.prop = prop;
+    function typeByFullName(fullName, global) {
+        if (!fullName)
+            return null;
+        var parts = fullName.split('.');
+        var root = global || window;
+        for (var i = 0; i < parts.length; i++) {
+            root = root[parts[i]];
+            if (root == null)
+                return null;
+        }
+        if (typeof root != "function")
+            return null;
+        return root;
+    }
+    Q.typeByFullName = typeByFullName;
     function enumerateTypes(global, namespaces, callback) {
         function scan(root, fullName, depth) {
             if (!root)
@@ -2389,16 +2493,6 @@ var System;
         return CategoryAttribute;
     }());
     Serenity.CategoryAttribute = CategoryAttribute;
-    var CollapsibleAttribute = /** @class */ (function () {
-        function CollapsibleAttribute(value) {
-            this.value = value;
-        }
-        CollapsibleAttribute = __decorate([
-            Attr('Collapsible')
-        ], CollapsibleAttribute);
-        return CollapsibleAttribute;
-    }());
-    Serenity.CollapsibleAttribute = CollapsibleAttribute;
     var ColumnsKeyAttribute = /** @class */ (function () {
         function ColumnsKeyAttribute(value) {
             this.value = value;
@@ -2785,12 +2879,6 @@ var System;
             type.__metadata.attr.push(attr);
         }
         Decorators.addAttribute = addAttribute;
-        function columnsKey(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.ColumnsKeyAttribute(value));
-            };
-        }
-        Decorators.columnsKey = columnsKey;
         function dialogType(value) {
             return function (target) {
                 addAttribute(target, new Serenity.DialogTypeAttribute(value));
@@ -2812,12 +2900,6 @@ var System;
             };
         }
         Decorators.element = element;
-        function entityType(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.EntityTypeAttribute(value));
-            };
-        }
-        Decorators.entityType = entityType;
         function enumKey(value) {
             return function (target) {
                 addAttribute(target, new Serenity.EnumKeyAttribute(value));
@@ -2831,24 +2913,6 @@ var System;
             };
         }
         Decorators.flexify = flexify;
-        function formKey(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.FormKeyAttribute(value));
-            };
-        }
-        Decorators.formKey = formKey;
-        function generatedCode(origin) {
-            return function (target) {
-                addAttribute(target, new Serenity.GeneratedCodeAttribute(origin));
-            };
-        }
-        Decorators.generatedCode = generatedCode;
-        function idProperty(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.IdPropertyAttribute(value));
-            };
-        }
-        Decorators.idProperty = idProperty;
         function registerEnum(target, enumKey, name) {
             if (!target.__enum) {
                 Object.defineProperty(target, '__enum', {
@@ -2891,18 +2955,6 @@ var System;
             };
         }
         Decorators.itemName = itemName;
-        function isActiveProperty(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.IsActivePropertyAttribute(value));
-            };
-        }
-        Decorators.isActiveProperty = isActiveProperty;
-        function localTextPrefix(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.LocalTextPrefixAttribute(value));
-            };
-        }
-        Decorators.localTextPrefix = localTextPrefix;
         function maximizable(value) {
             if (value === void 0) { value = true; }
             return function (target) {
@@ -2910,12 +2962,6 @@ var System;
             };
         }
         Decorators.maximizable = maximizable;
-        function nameProperty(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.NamePropertyAttribute(value));
-            };
-        }
-        Decorators.nameProperty = nameProperty;
         function option() {
             return function (target, propertyKey) {
                 var isGetSet = Q.startsWith(propertyKey, 'get_') || Q.startsWith(propertyKey, 'set_');
@@ -5828,6 +5874,11 @@ var Serenity;
             initialize();
             var editorType = knownTypes[key.toLowerCase()];
             if (editorType == null) {
+                var type = Q.typeByFullName(key);
+                if (type != null) {
+                    knownTypes[key.toLowerCase()] = type;
+                    return type;
+                }
                 throw new ss.Exception(Q.format("Can't find {0} editor type!", key));
             }
             return editorType;
@@ -5879,15 +5930,19 @@ var Serenity;
             var keys = Object.keys(knownTypes);
             for (var _i = 0, keys_3 = keys; _i < keys_3.length; _i++) {
                 var k = keys_3[_i];
-                if (!Q.endsWith(k, suffix))
-                    continue;
-                var p = k.substr(0, k.length - suffix.length);
-                if (Q.isEmptyOrNull(p))
-                    continue;
-                if (knownTypes[p] != null)
-                    continue;
-                knownTypes[p] = knownTypes[k];
+                setWithoutSuffix(k, knownTypes[k]);
             }
+        }
+        function setWithoutSuffix(key, t) {
+            var suffix = 'editor';
+            if (!Q.endsWith(key, suffix))
+                return;
+            var p = key.substr(0, key.length - suffix.length);
+            if (Q.isEmptyOrNull(p))
+                return;
+            if (knownTypes[p] != null)
+                return;
+            knownTypes[p] = knownTypes[key];
         }
     })(EditorTypeRegistry = Serenity.EditorTypeRegistry || (Serenity.EditorTypeRegistry = {}));
     var EditorUtils;
@@ -10199,186 +10254,6 @@ var Serenity;
         var PropertyGrid_1;
     }(Serenity.Widget));
     Serenity.PropertyGrid = PropertyGrid;
-    var PropertyItemHelper;
-    (function (PropertyItemHelper) {
-        function getPropertyItemsFor(type) {
-            if (type == null) {
-                throw new ss.Exception('type');
-            }
-            var list = [];
-            var $t1 = ss.getMembers(type, 31, 20);
-            for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-                var member = $t1[$t2];
-                var pi = {};
-                if (member.type !== 16 && member.type !== 4) {
-                    continue;
-                }
-                var hiddenAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.HiddenAttribute);
-                });
-                if (hiddenAttribute.length > 0) {
-                    continue;
-                }
-                var displayNameAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
-                });
-                var hintAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.HintAttribute);
-                });
-                var placeholderAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.PlaceholderAttribute);
-                });
-                var memberType = ((member.type === 16) ? ss.cast(member, member != null && member.type === 16)
-                    .returnType : ss.cast(member, member != null && member.type === 4).returnType);
-                if (member.type === 16) {
-                    var p = ss.cast(member, member && member.type === 16);
-                    if (p.fname == null) {
-                        continue;
-                    }
-                    pi.name = p.fname;
-                }
-                else if (member.type === 4) {
-                    var f = ss.cast(member, member != null && member.type === 4);
-                    pi.name = f.sname;
-                }
-                else {
-                    continue;
-                }
-                var categoryAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.CategoryAttribute);
-                });
-                if (categoryAttribute.length > 0) {
-                    pi.category = ss.cast(categoryAttribute[0], Serenity.CategoryAttribute).category;
-                }
-                else if (list.length > 0) {
-                    pi.category = list[list.length - 1].category;
-                }
-                var collapsibleAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.CollapsibleAttribute);
-                });
-                if (collapsibleAttribute.length > 0 && ss.cast(collapsibleAttribute[0], Serenity.CollapsibleAttribute).value) {
-                    pi.collapsible = true;
-                    pi.collapsed = ss.cast(collapsibleAttribute[0], Serenity.CollapsibleAttribute).collapsed;
-                }
-                var cssClassAttr = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.CssClassAttribute);
-                });
-                if (cssClassAttr.length > 0) {
-                    pi.cssClass = ss.cast(cssClassAttr[0], Serenity.CssClassAttribute).cssClass;
-                }
-                if ((member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.OneWayAttribute);
-                }).length > 0) {
-                    pi.oneWay = true;
-                }
-                if ((member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.ReadOnlyAttribute);
-                }).length > 0) {
-                    pi.readOnly = true;
-                }
-                if (displayNameAttribute.length > 0) {
-                    pi.title = ss.cast(displayNameAttribute[0], System.ComponentModel.DisplayNameAttribute).displayName;
-                }
-                if (hintAttribute.length > 0) {
-                    pi.hint = ss.cast(hintAttribute[0], Serenity.HintAttribute).hint;
-                }
-                if (placeholderAttribute.length > 0) {
-                    pi.placeholder = ss.cast(placeholderAttribute[0], Serenity.PlaceholderAttribute).value;
-                }
-                if (pi.title == null) {
-                    pi.title = pi.name;
-                }
-                var defaultValueAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.DefaultValueAttribute);
-                });
-                if (defaultValueAttribute.length === 1) {
-                    pi.defaultValue = ss.cast(defaultValueAttribute[0], Serenity.DefaultValueAttribute).value;
-                }
-                var insertableAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.InsertableAttribute);
-                });
-                if (insertableAttribute.length > 0) {
-                    pi.insertable = insertableAttribute[0].value;
-                }
-                else {
-                    pi.insertable = true;
-                }
-                var updatableAttribute = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.UpdatableAttribute);
-                });
-                if (updatableAttribute.length > 0) {
-                    pi.updatable = updatableAttribute[0].value;
-                }
-                else {
-                    pi.updatable = true;
-                }
-                var typeAttrArray = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.EditorTypeAttribute);
-                });
-                var nullableType = memberType;
-                //Nullable.GetUnderlyingType(memberType);
-                var enumType = null;
-                if (ss.isEnum(memberType)) {
-                    enumType = memberType;
-                }
-                else if (nullableType && ss.isEnum(nullableType)) {
-                    enumType = nullableType;
-                }
-                if (typeAttrArray.length === 0) {
-                    if (enumType) {
-                        pi.editorType = 'Select';
-                    }
-                    else if (memberType === ss.JsDate) {
-                        pi.editorType = 'Date';
-                    }
-                    else if (memberType === Boolean) {
-                        pi.editorType = 'Boolean';
-                    }
-                    else if (memberType === Number) {
-                        pi.editorType = 'Decimal';
-                    }
-                    else if (memberType === ss.Int32) {
-                        pi.editorType = 'Integer';
-                    }
-                    else {
-                        pi.editorType = 'String';
-                    }
-                }
-                else {
-                    var et = ss.cast(typeAttrArray[0], Serenity.EditorTypeAttribute);
-                    pi.editorType = et.editorType;
-                    et.setParams(pi.editorParams);
-                }
-                var reqAttr = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.RequiredAttribute);
-                });
-                if (reqAttr.length > 0) {
-                    pi.required = reqAttr[0].isRequired;
-                }
-                var maxLengthAttr = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.MaxLengthAttribute);
-                });
-                if (maxLengthAttr.length > 0) {
-                    pi.maxLength = maxLengthAttr.maxLength;
-                    pi.editorParams['maxLength'] = pi.maxLength;
-                }
-                var $t3 = (member.attr || []).filter(function (a) {
-                    return ss.isInstanceOfType(a, Serenity.EditorOptionAttribute);
-                });
-                for (var $t4 = 0; $t4 < $t3.length; $t4++) {
-                    var param = $t3[$t4];
-                    var key = param.key;
-                    if (key != null && key.length >= 1) {
-                        key = key.substr(0, 1).toLowerCase() + key.substring(1);
-                    }
-                    pi.editorParams[key] = param.value;
-                }
-                list.push(pi);
-            }
-            return list;
-        }
-        PropertyItemHelper.getPropertyItemsFor = getPropertyItemsFor;
-    })(PropertyItemHelper = Serenity.PropertyItemHelper || (Serenity.PropertyItemHelper = {}));
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {

@@ -4,6 +4,18 @@
     export class IAsyncInit {
     }
 
+    export interface WidgetClass<TOptions = object> {
+        new(element: JQuery, options?: TOptions): Widget<TOptions>;
+        element: JQuery;
+    }
+
+    export interface WidgetDialogClass<TOptions = object> {
+        new(options?: TOptions): Widget<TOptions> & IDialog;
+        element: JQuery;
+    }
+
+    export type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
+
     @Serenity.Decorators.registerClass()
     export class Widget<TOptions> {
         private static nextWidgetNumber = 0;

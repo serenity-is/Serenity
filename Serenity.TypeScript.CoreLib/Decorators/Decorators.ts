@@ -104,7 +104,7 @@ namespace Serenity {
 
     @Attr('DialogType')
     export class DialogTypeAttribute {
-        constructor(public value: Function) {
+        constructor(public value: WidgetDialogClass) {
         }
     }
 
@@ -315,7 +315,7 @@ namespace Serenity.Decorators {
         type.__metadata.attr.push(attr);
     }
 
-    export function dialogType(value: Function) {
+    export function dialogType(value: WidgetDialogClass) {
         return function (target: Function) {
             addAttribute(target, new DialogTypeAttribute(value));
         }

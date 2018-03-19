@@ -31,6 +31,24 @@ namespace Q {
         });
     }
 
+    export function typeByFullName(fullName: string, global?: any): any {
+        if (!fullName)
+            return null;
+
+        var parts = fullName.split('.');
+        var root = global || window;
+        for (var i = 0; i < parts.length; i++) {
+            root = root[parts[i]];
+            if (root == null)
+                return null;
+        }
+
+        if (typeof root != "function")
+            return null;
+
+        return root;
+    }
+
     function enumerateTypes(global: any, namespaces: string[], callback: (type: any, fullName: string) => void): void {
         function scan(root: any, fullName: string, depth: number) {
             if (!root)

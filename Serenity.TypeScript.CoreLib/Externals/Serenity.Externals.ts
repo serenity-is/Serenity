@@ -404,7 +404,7 @@ namespace Q {
                 }
             },
             render: function (createElement: any) {
-                var editorType: any = Serenity.EditorTypeRegistry.get(this.type);
+                var editorType = Serenity.EditorTypeRegistry.get(this.type);
                 var elementAttr = (ss as any).getAttributes(editorType, Serenity.ElementAttribute, true);
                 var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>') as string;
                 var domProps: any = {};
