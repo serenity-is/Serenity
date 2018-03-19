@@ -16,8 +16,19 @@
 
     export type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
 
+    if (typeof React === "undefined") {
+        if (window['preact'] != null) {
+            window['React'] = window['ReactDOM'] = window['preact'];
+            (React as any).Fragment = "x-fragment";
+        }
+        else {
+            (React as any).Component = function () { };
+            (React as any).Fragment = "x-fragment";
+        }
+    }
+
     @Serenity.Decorators.registerClass()
-    export class Widget<TOptions> {
+    export class Widget<TOptions> extends React.Component<TOptions, any> {
         private static nextWidgetNumber = 0;
         public element: JQuery;
         protected options: TOptions;
@@ -26,6 +37,8 @@
         protected asyncPromise: PromiseLike<void>;
 
         constructor(element: JQuery, options?: TOptions) {
+            super(options);
+
             this.element = element;
             this.options = options || ({} as TOptions);
 
@@ -143,6 +156,22 @@
 
             return this.asyncPromise;
         }
+
+        private static __isWidgetType = true;
+        props: Readonly<{ children?: React.ReactNode }> & Readonly<TOptions> & WidgetComponentProps<this>;
+    }
+
+    export interface WidgetComponentProps<W extends Serenity.Widget<any>> {
+        id?: string;
+        name?: string;
+        className?: string;
+        maxLength?: number;
+        placeholder?: string;
+        setOptions?: any;
+        required?: boolean;
+        readOnly?: boolean;
+        oneWay?: boolean;
+        ref?: (el: W) => void;
     }
 
     export declare interface Widget<TOptions> {

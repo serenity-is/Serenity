@@ -71,6 +71,10 @@ div.s-Toolbar .tool-button.no-text span.button-inner {
     padding: 5px 3px 19px 13px;
 }
 
+div.s-Toolbar .tool-button.icon-tool-button.no-text span.button-inner {
+    padding: 3px 2px;
+}
+
 div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
     margin-top: 2px;
 }
@@ -154,7 +158,7 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
 }
 
 .flex-layout {
-    .s-Form .editor {
+    .s-Form .editor, .s-Form .widget-wrapper {
         float: initial;
     }
 
@@ -178,10 +182,14 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
         .flex(0, 0, auto);
     }
 
-    .editor {
+    .editor, .widget-wrapper {
         float: initial;
         .flex(1, 1, 80%);
         min-width: 0;
+    }
+
+    .widget-wrapper {
+        .display(flex);
     }
 
     input.editor[type=checkbox] {
