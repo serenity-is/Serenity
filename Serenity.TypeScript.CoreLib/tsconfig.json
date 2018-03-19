@@ -7,11 +7,15 @@
     "emitBOM": true,
     "noImplicitAny": true,
     "sourceMap": true,
+    "inlineSources": true,
     "outFile": "Serenity.CoreLib.js",
     "suppressImplicitAnyIndexErrors": true,
     "target": "ES5",
     "noEmitHelpers": true
   },
+  "typeRoots": [
+    "./node_modules/@types/"
+  ],
   "files": [
     "Imports/Helpers.ts",
     "Imports/RSVP.ts",
