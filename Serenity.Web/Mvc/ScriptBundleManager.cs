@@ -3,6 +3,7 @@ using Serenity.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Hosting;
 
@@ -17,6 +18,7 @@ namespace Serenity.Web
             public bool? Minimize { get; set; }
             public bool? UseMinJS { get; set; }
             public string[] NoMinimize { get; set; }
+            public Dictionary<string, object> Replacements { get; set; }
         }
 
         private static object initializationLock = new object();
@@ -62,6 +64,12 @@ namespace Serenity.Web
             var bundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
                 HostingEnvironment.MapPath("~/Scripts/site/ScriptBundles.json"));
 
+            bundles = bundles.Keys.ToDictionary(k => k,
+                k => (bundles[k] ?? new string[0])
+                    .Select(u => BundleUtils.DoReplacements(u, settings.Replacements))
+                    .Where(u => !string.IsNullOrEmpty(u))
+                    .ToArray());
+                   
             bundleIncludes = BundleUtils.ExpandBundleIncludes(bundles, "dynamic://Bundle.", "script");
 
             if (bundles.Count == 0 ||
