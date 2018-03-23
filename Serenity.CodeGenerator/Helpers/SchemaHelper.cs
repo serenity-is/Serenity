@@ -55,7 +55,9 @@ namespace Serenity.CodeGenerator
                 { "tinyint", "Int16" },
                 { "uniqueidentifier", "Guid" },
                 { "varbinary", "Stream" },
-                { "varchar", "String" }
+                { "varchar", "String" },
+                { "varchar2", "String" }, // Oracle
+                { "nvarchar2", "String" } // Oracle
             };
 
         public static string SqlTypeNameToFieldType(string sqlTypeName, int size, out string dataType)
@@ -76,6 +78,17 @@ namespace Serenity.CodeGenerator
             {
                 dataType = "byte[]";
                 return "ByteArray";
+            }
+            // Oracle generic NUMBER type
+            // Generic type to map C# to Oracle NUMBER is (Decimal) Type
+            // => To avoid this slow/heavy-cost type we map C# system types according NUMBER() length
+            else if (sqlTypeName == "number")
+            {
+              if (size < 5) // NUMBER(5) = maxvalue up to 32 767
+                return "Int16";
+              if (size >= 11) // NUMBER(11) maxvalue from 2 147 483 649 and upper
+                return "Int64";
+              return "Int32"; // NUMBER(10) = maxvalue up to 2 147 483 648
             }
             else if (SqlTypeToFieldTypeMap.TryGetValue(sqlTypeName, out fieldType))
                 return fieldType;

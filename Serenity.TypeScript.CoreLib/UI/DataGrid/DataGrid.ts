@@ -654,7 +654,7 @@
             this.filterBar = new Serenity.FilterDisplayBar(filterBarDiv);
             if (!this.isAsyncWidget()) {
                 this.filterBar.set_store(new Serenity.FilterStore(this.allColumns.filter(function (x) {
-                    return (x.sourceItem != null) && x.sourceItem.notFilterable !== true;
+                       return (x.sourceItem != null) && (x.sourceItem.notFilterable !== true) && (Authorization.hasPermission(x.sourceItem.readPermission) || x.sourceItem.readPermission == null);
                 }).map(function (x1) {
                     return x1.sourceItem;
                     })));
