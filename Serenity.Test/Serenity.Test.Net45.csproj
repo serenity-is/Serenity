@@ -408,7 +408,7 @@
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Target Name="BeforeBuild">
     <Exec Command="npm install" ContinueOnError="false" />
-    <Copy SourceFiles="$(ProjectDir)..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
+    <Copy SourceFiles="$(ProjectDir)..\Serenity.Scripts\dist\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
   </Target>
   <Target Name="AfterBuild">
     <Exec Command="&quot;$(ProjectDir)..\tools\TypeScript\tsc.exe&quot; -p ./tsconfig.json" ContinueOnError="true" />

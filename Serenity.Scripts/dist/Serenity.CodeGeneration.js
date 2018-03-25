@@ -462,12 +462,12 @@
                         }
                         return;
                     case ts.SyntaxKind.ModuleDeclaration:
-                        var module = node;
-                        if (sourceFile.isDeclarationFile || hasExportModifier(module) ||
-                            (!isUnderAmbientNamespace(module) &&
-                                !hasDeclareModifier(module))) {
-                            var name_6 = prependNamespace(module.name.getText(), module);
-                            var exportedType = moduleToExternalType(module);
+                        var module_1 = node;
+                        if (sourceFile.isDeclarationFile || hasExportModifier(module_1) ||
+                            (!isUnderAmbientNamespace(module_1) &&
+                                !hasDeclareModifier(module_1))) {
+                            var name_6 = prependNamespace(module_1.name.getText(), module_1);
+                            var exportedType = moduleToExternalType(module_1);
                             result[name_6] = exportedType;
                             result.push(exportedType);
                         }

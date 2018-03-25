@@ -11,7 +11,7 @@
     <DefineConstants>$(DefineConstants);ASPNETCORE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Serenity.TypeScript.CodeGeneration\Serenity.CodeGeneration.js">
+    <EmbeddedResource Include="..\Serenity.Scripts\dist\Serenity.CodeGeneration.js">
       <Link>Serenity.CodeGeneration.js</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">

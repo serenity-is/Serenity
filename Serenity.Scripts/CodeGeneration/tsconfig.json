@@ -6,7 +6,7 @@
     "declaration": true,
     "emitBOM": true,
     "sourceMap": true,
-    "outFile": "Serenity.CodeGeneration.js",
+    "outFile": "../dist/Serenity.CodeGeneration.js",
     "target": "ES3"
   },
   "files": [
@@ -14,7 +14,7 @@
     "Serenity.CodeGeneration.ts"
   ],
   "exclude": [
-    "node_modules/",
+    "node_modules",
     "Serenity.CodeGeneration.d.ts"
   ]
 }

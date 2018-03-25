@@ -8,14 +8,14 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "inlineSources": true,
-    "outFile": "Serenity.CoreLib.js",
+    "outFile": "../dist/Serenity.CoreLib.js",
     "suppressImplicitAnyIndexErrors": true,
     "target": "ES5",
     "noEmitHelpers": true,
     "jsx": "react"
   },
   "typeRoots": [
-    "./node_modules/@types/"
+    "../node_modules/@types/"
   ],
   "files": [
     "Imports/Helpers.ts",
@@ -106,7 +106,7 @@
     "UI/Serenity.Script.UI.ts"
   ],
   "exclude": [
-    "node_modules/",
+    "node_modules",
     "Serenity.CoreLib.d.ts"
   ]
 }

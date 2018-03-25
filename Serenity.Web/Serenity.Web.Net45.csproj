@@ -1025,7 +1025,7 @@
     <Content Include="Assets\Scripts\SlickGrid\slick.remotemodel-yahoo.js" />
     <Content Include="Assets\Scripts\SlickGrid\slick.remotemodel.js" />
     <None Include="Tooling\JsEngine\typescriptServices.js" />
-    <EmbeddedResource Include="..\Serenity.TypeScript.CodeGeneration\Serenity.CodeGeneration.js">
+    <EmbeddedResource Include="..\Serenity.Scripts\dist\Serenity.CodeGeneration.js">
       <Link>Scripts\tsservices\Serenity.CodeGeneration.js</Link>
     </EmbeddedResource>
     <None Include="Tooling\JsEngine\json2.min.js" />
