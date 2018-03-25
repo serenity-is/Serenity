@@ -45,7 +45,6 @@ Func<string, System.Xml.XmlDocument> loadXml = path =>
     return xml;
 };
 
-nuspecParams["scriptFramework"] = loadXml(@".\Serenity.Script.Imports\packages.config").SelectSingleNode("//package[@id='Saltarelle.Runtime']/@targetFramework").Value; 
 nuspecParams["serenityWebAssetsVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Assets.nuspec");
 nuspecParams["serenityWebToolingVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Tooling.nuspec");
 
