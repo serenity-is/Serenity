@@ -303,13 +303,21 @@ namespace Serenity
         public JsDate MinDate
         {
             get { return Q.ParseISODateTime(MinValue); }
-            set { MinValue = Q.FormatDate(value, "yyyy-MM-dd"); }
+            set
+            {
+                MinValue = Q.FormatDate(value, "yyyy-MM-dd");
+                Element.DatePicker().MinDate = value;
+            }
         }
 
         public JsDate MaxDate
         {
             get { return Q.ParseISODateTime(MaxValue); }
-            set { MaxValue = Q.FormatDate(value, "yyyy-MM-dd"); }
+            set
+            {
+                MaxValue = Q.FormatDate(value, "yyyy-MM-dd");
+                Element.DatePicker().MaxDate = value;
+            }
         }
 
         [Option]
