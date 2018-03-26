@@ -610,13 +610,13 @@ namespace Serenity.CodeGeneration {
                     return;
 
                 case ts.SyntaxKind.ModuleDeclaration:
-                    let module = node as ts.ModuleDeclaration;
+                    let modul = node as ts.ModuleDeclaration;
 
-                    if (sourceFile.isDeclarationFile || hasExportModifier(module) ||
-                        (!isUnderAmbientNamespace(module) &&
-                         !hasDeclareModifier(module))) {
-                        let name = prependNamespace(module.name.getText(), module);
-                        let exportedType = moduleToExternalType(module);
+                    if (sourceFile.isDeclarationFile || hasExportModifier(modul) ||
+                        (!isUnderAmbientNamespace(modul) &&
+                         !hasDeclareModifier(modul))) {
+                        let name = prependNamespace(modul.name.getText(), modul);
+                        let exportedType = moduleToExternalType(modul);
                         result[name] = exportedType;
                         result.push(exportedType);
                     }
