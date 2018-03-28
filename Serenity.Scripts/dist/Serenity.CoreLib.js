@@ -4125,7 +4125,11 @@ var Serenity;
     if (typeof React === "undefined") {
         if (window['preact'] != null) {
             window['React'] = window['ReactDOM'] = window['preact'];
-            React.Fragment = "x-fragment";
+            React.Fragment = Q.coalesce(React.Fragment, "x-fragment");
+        }
+        else if (window['Nerv'] != null) {
+            window['React'] = window['ReactDOM'] = window['Nerv'];
+            React.Fragment = Q.coalesce(React.Fragment, "x-fragment");
         }
         else {
             window['React'] = {

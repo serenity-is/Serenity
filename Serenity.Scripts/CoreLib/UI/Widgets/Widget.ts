@@ -19,7 +19,11 @@
     if (typeof React === "undefined") {
         if (window['preact'] != null) {
             window['React'] = window['ReactDOM'] = window['preact'];
-            (React as any).Fragment = "x-fragment";
+            (React as any).Fragment = Q.coalesce((React as any).Fragment, "x-fragment");
+        }
+        else if (window['Nerv'] != null) {
+            window['React'] = window['ReactDOM'] = window['Nerv'];
+            (React as any).Fragment = Q.coalesce((React as any).Fragment, "x-fragment");
         }
         else {
             window['React'] = {
