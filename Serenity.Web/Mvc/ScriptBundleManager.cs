@@ -185,7 +185,9 @@ namespace Serenity.Web
                         if (!File.Exists(sourcePath))
                             return String.Format(errorLines, String.Format("File {0} is not found!", sourcePath));
 
-                        if (minimize && !noMinimize.Contains(sourceFile))
+                        if (minimize && 
+                            !noMinimize.Contains(sourceFile) &&
+                            !sourceFile.EndsWith(".min.js", StringComparison.OrdinalIgnoreCase))
                         {
                             if (settings.UseMinJS == true)
                             {
