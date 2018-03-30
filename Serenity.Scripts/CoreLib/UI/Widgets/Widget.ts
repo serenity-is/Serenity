@@ -181,7 +181,10 @@
         required?: boolean;
         readOnly?: boolean;
         oneWay?: boolean;
-        ref?: (el: W) => void;
+        onChange?: (e: JQueryEventObject) => void;
+        onChangeSelect2?: (e: JQueryEventObject) => void;
+        value?: any;
+        defaultValue?: any;
     }
 
     export declare interface Widget<TOptions> {

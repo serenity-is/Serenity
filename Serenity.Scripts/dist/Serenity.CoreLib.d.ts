@@ -1146,7 +1146,10 @@ declare namespace Serenity {
         required?: boolean;
         readOnly?: boolean;
         oneWay?: boolean;
-        ref?: (el: W) => void;
+        onChange?: (e: JQueryEventObject) => void;
+        onChangeSelect2?: (e: JQueryEventObject) => void;
+        value?: any;
+        defaultValue?: any;
     }
     interface Widget<TOptions> {
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
