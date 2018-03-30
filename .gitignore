@@ -55,3 +55,4 @@ Serenity.TypeScript.CoreLib/Serenity.CoreLib.min.js
 /Serenity.Scripts/dist/Serenity.CodeGeneration.min.js
 /Serenity.Scripts/dist/Serenity.CoreLib.js.map
 /Serenity.Scripts/dist/Serenity.CoreLib.min.js
+/Serenity.Test/Scripts/typings/serenity/Serenity.CoreLib.d.ts
