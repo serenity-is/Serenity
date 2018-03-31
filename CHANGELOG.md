@@ -1,3 +1,20 @@
+## 3.6.0 (2018-03-31)
+
+Features:
+  - changes to widget for React integration (currently StartSharp only), you'll need to add @types/react to your package.json even if you'll not use React at all
+  - include react scripts in Serenity.Web.Assets
+  - allow viewing / editing with inplace button even if the lookup editor itself is readonly
+  - use inline source maps for better script debugging experience with corelib
+  - add helpers required for spread operator
+  - grouping helper in corelib
+  - ability to do replacements in ScriptBundles.json, e.g. replace development version of some script with prod using web.config setting Replacements
+  - improve typing of widget class, make editor discovery more tolerant even if type doesn't have a registerEditor attribute
+  - don't try to minimize files ending in min.js when script bundling is on
+  - deprecating Saltaralle, no longer Serenity.Script package
+
+Bugfixes:
+  - fix some slickgrid compability issues in chrome related to jquery changes
+  - fix return type declarations of some script data functions
 ## 3.5.5 (2018-02-20)
 
 Bugfixes:

@@ -1,7 +1,7 @@
 ﻿<Project>
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <VersionPrefix>3.5.5</VersionPrefix>
+    <VersionPrefix>3.6.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PlatformTarget>AnyCPU</PlatformTarget>
