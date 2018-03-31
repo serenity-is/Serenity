@@ -3,6 +3,9 @@
 Features:
   - changes to widget for React integration (currently StartSharp only), you'll need to add @types/react to your package.json even if you'll not use React at all
   - include react scripts in Serenity.Web.Assets
+  - full featured e-mail client (IMAP) sample written with React and MailKit (StartSharp)
+  - rewrote CardViewMixin with React (StartSharp)
+  - introduced Serenity.Pro.Scripts nuget package which makes it possible to update StartSharp scripts. It contains UI, App and EmailClient scripts now.
   - allow viewing / editing with inplace button even if the lookup editor itself is readonly
   - use inline source maps for better script debugging experience with corelib
   - add helpers required for spread operator
