@@ -51,7 +51,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FakeItEasy, Version=4.0.0.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\FakeItEasy.4.4.0\lib\net45\FakeItEasy.dll</HintPath>
+      <HintPath>..\..\packages\FakeItEasy.4.5.1\lib\net45\FakeItEasy.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -95,8 +95,8 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="WebDriver, Version=3.9.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Selenium.WebDriver.3.9.1\lib\net45\WebDriver.dll</HintPath>
+    <Reference Include="WebDriver, Version=3.11.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Selenium.WebDriver.3.11.0\lib\net45\WebDriver.dll</HintPath>
     </Reference>
     <Reference Include="xunit.abstractions">
       <HintPath>..\..\packages\xunit.abstractions.2.0.1\lib\net35\xunit.abstractions.dll</HintPath>
@@ -238,10 +238,6 @@
     <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
       <Link>CodeGeneration\TypeScriptParserTests\typescriptServices.js</Link>
     </EmbeddedResource>
-    <Content Include="..\..\packages\PhantomJS.2.1.1\tools\phantomjs\phantomjs.exe">
-      <Link>phantomjs.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -288,9 +284,6 @@
     <Content Include="Content\themes\base\theme.css" />
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="phantomjs-license.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-3.3.1.intellisense.js" />
@@ -420,6 +413,8 @@
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.3.1\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.3.1\build\net20\xunit.runner.visualstudio.props'))" />
     <Error Condition="!Exists('..\..\packages\xunit.core.2.3.1\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.core.2.3.1\build\xunit.core.props'))" />
     <Error Condition="!Exists('..\..\packages\xunit.core.2.3.1\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.core.2.3.1\build\xunit.core.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.2.37.0\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Selenium.WebDriver.ChromeDriver.2.37.0\build\Selenium.WebDriver.ChromeDriver.targets'))" />
   </Target>
   <Import Project="..\..\packages\xunit.core.2.3.1\build\xunit.core.targets" Condition="Exists('..\..\packages\xunit.core.2.3.1\build\xunit.core.targets')" />
+  <Import Project="..\..\packages\Selenium.WebDriver.ChromeDriver.2.37.0\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.2.37.0\build\Selenium.WebDriver.ChromeDriver.targets')" />
 </Project>

@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.PhantomJS;
 using System;
 using System.ComponentModel;
@@ -71,7 +72,11 @@ namespace Serenity.Testing
 
             private SeleniumDriverManager()
             {
-                driver = new PhantomJSDriver();
+                var options = new ChromeOptions();
+                options.AddArguments("--proxy-server='direct://'");
+                options.AddArgument("--proxy-bypass-list=*");
+                options.AddArgument("--headless");
+                driver = new ChromeDriver(options);
                 driver.Manage().Window.Size = new System.Drawing.Size(1366, 768);
             }
 
