@@ -15309,6 +15309,7 @@ var Slick;
                         item.title = gi.formatter ? gi.formatter(item) : item.value;
                     }
                 }
+                // if this is a totals row, make sure it's calculated
                 else if (item && item.__groupTotals && !item.initialized) {
                     calculateTotals(item);
                 }

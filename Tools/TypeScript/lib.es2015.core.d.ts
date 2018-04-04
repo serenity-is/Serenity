@@ -89,7 +89,7 @@ interface ArrayConstructor {
 }
 
 interface DateConstructor {
-    new (value: Date): Date;
+    new (value: number | string | Date): Date;
 }
 
 interface Function {
