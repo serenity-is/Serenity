@@ -46,8 +46,6 @@ namespace Serenity.CodeGenerator
             return t;
         }
 
-        private static DelegateMemberRenamer noRenamer = new DelegateMemberRenamer(x => x);
-
         public static string Render(string templateKey, object model)
         {
             var template = GetTemplate(templateKey);
@@ -56,10 +54,10 @@ namespace Serenity.CodeGenerator
                 var context = new TemplateContext();
                 context.LoopLimit = 100000;
                 context.RecursiveLimit = 1000;
-                context.MemberRenamer = noRenamer;
+                context.MemberRenamer = x => x.Name;
                 context.CurrentGlobal.Import(model,
                     ScriptMemberImportFlags.Field | ScriptMemberImportFlags.Property,
-                    null, noRenamer);
+                    null, x => x.Name);
                 template.Render(context);
                 return context.Output.ToString();
             }
