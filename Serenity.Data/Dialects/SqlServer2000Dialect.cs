@@ -34,7 +34,7 @@ namespace Serenity.Data
         {
             get
             {
-                return '[';
+                return ']';
             }
         }
 
