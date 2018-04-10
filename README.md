@@ -91,11 +91,11 @@ https://www.youtube.com/watch?v=_AqRl_U_gcw
 
 https://www.youtube.com/playlist?list=PLMr_-cvwVIMWBsgWWUYdbHxBHPrOSzWVf
 
-**Setting up Continuous Deployment on Microsoft Azure for Serenity Applications: (@bysamdubey)**
+**Setting up Continuous Deployment on Microsoft Azure for Serenity Applications: (by @samdubey)**
 
 https://www.youtube.com/watch?v=tcywhS9k9Wc
 
-**Serenity Application Deployment to Microsoft Azure (@bysamdubey)**:
+**Serenity Application Deployment to Microsoft Azure (by @samdubey)**:
 
 https://www.youtube.com/watch?v=hkU6iVFlWl8
 
