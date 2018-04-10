@@ -20,16 +20,26 @@ namespace Serenity.CodeGenerator
 
                 Func<string, XElement> findItemGroupOf = fileName =>
                 {
+                    var lowerFileName = fileName.ToLowerInvariant();
+
                     foreach (var group in doc.Elements(ns + "ItemGroup"))
                     {
                         foreach (var c in group.Elements(ns + "Compile")
                                     .Concat(group.Elements(ns + "TypeScriptCompile"))
                                     .Concat(group.Elements(ns + "Content"))
                                     .Concat(group.Elements(ns + "None")))
-                            if (c.Attribute("Include").Value.ToLowerInvariant() == fileName.ToLowerInvariant())
-                            {
+                        {
+                            var value = c.Attribute("Include").Value.ToLowerInvariant();
+                            if (value == lowerFileName)
                                 return group;
+
+                            if (value.IndexOf("*.") >= 0)
+                            {
+                                var extension = Path.GetExtension(lowerFileName);
+                                if (value == Path.GetDirectoryName(lowerFileName) + @"\*" + extension)
+                                    return group;
                             }
+                        }
                     }
 
                     return null;
