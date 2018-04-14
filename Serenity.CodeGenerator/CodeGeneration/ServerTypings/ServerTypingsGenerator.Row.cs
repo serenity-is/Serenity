@@ -239,6 +239,85 @@ namespace Serenity.CodeGeneration
             return null;
         }
 
+        public Dictionary<string, string> DetermineCustomLookupKeys(TypeDefinition rowType)
+        {
+            var result = new Dictionary<string, string>();
+            var lookupAttrs = CecilUtils.GetAttrs(rowType, "Serenity.ComponentModel", "HasCustomLookupAttribute");
+
+            if (lookupAttrs == null || !lookupAttrs.Any())
+                return null;
+
+            foreach (var lkItem in lookupAttrs)
+            {
+                string lookupKey = null;
+                var lookupAttr = lkItem;
+                TypeDefinition autoFrom = rowType;
+
+                if (lookupAttr == null)
+                {
+                    var script = lookupScripts.FirstOrDefault(x =>
+                        x.BaseType != null &&
+                        x.BaseType is GenericInstanceType &&
+                        (x.BaseType as GenericInstanceType).GenericArguments.Any(z =>
+                            z.Name == rowType.Name && z.Namespace == rowType.Namespace) &&
+                        DetermineLookupKey(x) == AutoLookupKeyFor(rowType));
+
+                    if (script != null)
+                    {
+                        lookupAttr = CecilUtils.GetAttr(script, "Serenity.ComponentModel", "LookupScriptAttribute");
+                        autoFrom = script;
+                    }
+                }
+                else if (lookupAttr.ConstructorArguments.Count > 0 &&
+                    lookupAttr.ConstructorArguments[0].Type.FullName == "System.Type")
+                {
+                    autoFrom = ((TypeReference)lookupAttr.ConstructorArguments[0].Value).Resolve();
+                    lookupAttr = CecilUtils.GetAttr(autoFrom, "Serenity.ComponentModel", "LookupScriptAttribute");
+                }
+
+                if (lookupAttr == null)
+                {
+                    continue;
+                }
+
+                if (lookupAttr.ConstructorArguments.Count == 1 &&
+                    lookupAttr.ConstructorArguments[0].Type.FullName == "System.String")
+                {
+                    lookupKey = lookupAttr.ConstructorArguments[0].Value as string;
+                }
+
+                if (lookupAttr.ConstructorArguments.Count == 1 &&
+                    lookupAttr.ConstructorArguments[0].Type.FullName == "System.Type")
+                {
+                    var typeRef = (lookupAttr.ConstructorArguments[0].Value as TypeReference).Resolve();
+                    var typeRefLookupAttr = CecilUtils.GetAttr(typeRef, "Serenity.ComponentModel", "LookupScriptAttribute");
+                    if (typeRefLookupAttr != null)
+                    {
+                        lookupKey = AutoLookupKeyFor(typeRef);
+                    }
+                    else
+                    {
+                        lookupKey = null;
+                    }
+                }
+
+                if (lookupAttr.ConstructorArguments.Count == 0)
+                {
+                    lookupKey = AutoLookupKeyFor(autoFrom);
+                }
+
+                if (!string.IsNullOrWhiteSpace(lookupKey))
+                {
+                    if (!string.IsNullOrWhiteSpace(autoFrom.Name) && !result.ContainsKey(autoFrom.Name))
+                    {
+                        result.Add(autoFrom.Name, lookupKey);
+                    }                  
+                }
+            }
+
+            return result;
+        }
+
         private void GenerateRowMetadata(TypeDefinition rowType)
         {
             var idProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.IIdRow" }, 
@@ -260,6 +339,7 @@ namespace Serenity.CodeGeneration
                 "Serenity.Data.BooleanField Serenity.Data.IIsDeletedRow::get_IsDeletedField()");
 
             var lookupKey = DetermineLookupKey(rowType);
+            var customLookupKeys = DetermineCustomLookupKeys(rowType); // [className, lookupKey]
 
             sb.AppendLine();
             cw.Indented("export namespace ");
@@ -331,6 +411,61 @@ namespace Serenity.CodeGeneration
 
                     anyMetadata = true;
 
+                }
+
+                if (customLookupKeys != null && customLookupKeys.Any())
+                {
+                    var enumKey = "CustomLookups";
+                    var methodPrefix = "getLookup_";
+                    var asyncSuffix = "Async";
+
+                    sb.AppendLine();
+                    foreach (var customLookupItem in customLookupKeys)
+                    {
+                        cw.IndentedLine($"export declare function {methodPrefix}{customLookupItem.Key}(): Q.Lookup<{"{}"}>;");
+                    }
+
+                    sb.AppendLine();
+                    foreach (var customLookupItem in customLookupKeys)
+                    {
+                        cw.IndentedLine($"export declare function {methodPrefix}{customLookupItem.Key}{asyncSuffix}(): PromiseLike<Q.Lookup<{"{}"}>>;");
+                    }
+
+                    sb.AppendLine();
+                    cw.Indented($"export enum {enumKey}");
+                    cw.InBrace(delegate
+                    {
+                        var counter = customLookupKeys.Count;
+                        foreach (var customLookupItem in customLookupKeys)
+                        {
+                            counter--;
+                            cw.IndentedLine($"{methodPrefix}{customLookupItem.Key} = \"{customLookupItem.Value}\"{(counter > 0 ? "," : "")}");
+                        }
+                    });
+
+                    sb.AppendLine();
+                    cw.IndentedLine($"Object.keys({enumKey}).forEach(x =>{" {"}");
+                    cw.Block(delegate
+                    {
+                        cw.IndentedLine($"(<any>{rowType.Name})[x] = function (){" {"}");
+                        cw.Block(delegate
+                        {
+                            cw.IndentedLine($"return Q.getLookup({enumKey}[x]);");
+                        });
+                        cw.IndentedLine("};");
+
+                        sb.AppendLine();
+                        cw.IndentedLine($"(<any>{rowType.Name})[x + \"{asyncSuffix}\"] = function (){" {"}");
+                        cw.Block(delegate
+                        {
+                            cw.IndentedLine($"return Q.getLookupAsync({enumKey}[x]);");
+                        });
+                        cw.IndentedLine("};");
+                    });
+                    cw.IndentedLine("});");
+
+                    sb.AppendLine();
+                    anyMetadata = true;
                 }
 
                 if (anyMetadata)

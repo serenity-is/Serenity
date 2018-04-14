@@ -166,6 +166,26 @@ namespace Serenity.Reflection
             return null;
         }
 
+        public static IEnumerable<CustomAttribute> GetAttrs(TypeDefinition klass, string ns, string name, TypeDefinition[] baseClasses = null)
+        {
+            IEnumerable<CustomAttribute> attrs;
+
+            attrs = FindAttrs(klass.CustomAttributes, ns, name);
+            if (attrs != null && attrs.Any())
+            {
+                return attrs;
+            }                
+
+            foreach (var b in baseClasses ?? EnumerateBaseClasses(klass))
+            {
+                attrs = FindAttrs(b.CustomAttributes, ns, name);
+                if (attrs != null && attrs.Any())
+                    return attrs;
+            }
+
+            return null;
+        }
+
         public static CustomAttribute FindAttr(IEnumerable<CustomAttribute> attrList, string ns, string name)
         {
             if (attrList == null)
@@ -176,6 +196,26 @@ namespace Serenity.Reflection
                     return x;
 
             return null;
+        }
+
+        public static IEnumerable<CustomAttribute> FindAttrs(IEnumerable<CustomAttribute> attrList, string ns, string name)
+        {
+            var result = new List<CustomAttribute>();
+            if (attrList == null)
+                return null;
+
+            foreach (var x in attrList)
+                if (x.AttributeType != null && IsOrSubClassOf(x.AttributeType.Resolve(), ns, name))
+                    result.Add(x);
+
+            if (result.Any())
+            {
+                return result;
+            }                
+            else
+            {
+                return null;
+            }
         }
 
         public static bool IsAssignableFrom(TypeReference baseType, TypeReference type)
