@@ -242,7 +242,7 @@ namespace Serenity.CodeGeneration
         public Dictionary<string, string> DetermineCustomLookupKeys(TypeDefinition rowType)
         {
             var result = new Dictionary<string, string>();
-            var lookupAttrs = CecilUtils.GetAttrs(rowType, "Serenity.ComponentModel", "HasCustomLookupAttribute");
+            var lookupAttrs = CecilUtils.GetAttrs(rowType, "Serenity.ComponentModel", "HasCustomLookupAttribute", null);
 
             if (lookupAttrs == null || !lookupAttrs.Any())
                 return null;
