@@ -60,7 +60,7 @@ namespace ServerTypingsTest.SomeModule.Entities
         {
         }
 
-        public static RowFields Fields = new RowFields().Init();
+        public readonly static RowFields Fields = new RowFields().Init();
 
         public RowForCustomLookupRow()
             : base(Fields)
@@ -74,7 +74,7 @@ namespace ServerTypingsTest.SomeModule.Entities
         {
         }
 
-        public static RowFields Fields = new RowFields().Init();
+        public readonly static RowFields Fields = new RowFields().Init();
 
         public RowForCustomLookupWithoutFlagAttributeRow()
             : base(Fields)
