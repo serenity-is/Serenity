@@ -112,7 +112,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowCustomLookupKey.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.TypeWithGenericParameters.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowLocalTextPrefix.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowLookupKey.cs" />
