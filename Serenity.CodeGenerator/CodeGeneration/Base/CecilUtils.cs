@@ -166,7 +166,7 @@ namespace Serenity.Reflection
             return null;
         }
 
-        public static IEnumerable<CustomAttribute> GetAttrs(TypeDefinition klass, string ns, string name, TypeDefinition[] baseClasses = null)
+        public static IEnumerable<CustomAttribute> GetAttrs(TypeDefinition klass, string ns, string name, TypeDefinition[] baseClasses)
         {
             IEnumerable<CustomAttribute> attrs;
 
