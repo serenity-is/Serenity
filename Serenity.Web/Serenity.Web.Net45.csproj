@@ -170,8 +170,6 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CodeGeneration\Legacy\ManualTsParser.cs" />
-    <Compile Include="CodeGeneration\Legacy\Lexer.cs" />
     <Compile Include="CodeGeneration\Legacy\DtoActionResult.cs" />
     <Compile Include="CodeGeneration\Legacy\DtoGenerator.cs" />
     <Compile Include="CodeGeneration\Legacy\FormatterTypeGenerator.cs" />

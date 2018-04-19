@@ -926,6 +926,8 @@
             }
         }
 
+        static CKEditorVer = "4.7.1";
+
         static includeCKEditor(): void {
             if (window['CKEDITOR']) {
                 return;
@@ -938,7 +940,8 @@
 
             $('<script/>').attr('type', 'text/javascript')
                 .attr('id', 'CKEditorScript')
-                .attr('src', Q.resolveUrl('~/Scripts/CKEditor/ckeditor.js'))
+                .attr('src', Q.resolveUrl('~/Scripts/CKEditor/ckeditor.js?v=' +
+                    HtmlContentEditor.CKEditorVer))
                 .appendTo(window.document.head);
         };
     }

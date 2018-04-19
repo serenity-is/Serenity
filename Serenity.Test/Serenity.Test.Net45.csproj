@@ -127,7 +127,6 @@
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.Int32MasterRow.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidMasterRow.cs" />
     <Compile Include="Services\PropertyGrid\UseUtcTests.cs" />
-    <Compile Include="Web\ManualTsParserTests.cs" />
     <Compile Include="Core\Config\AppSettingsJsonConfigRepositoryTests.cs" />
     <Compile Include="Core\Caching\DistributedCacheEmulatorTests.cs" />
     <Compile Include="Core\Caching\DistributedCacheTests.cs" />
@@ -180,7 +179,6 @@
     <Compile Include="Testing\TestSqlHelperTests.cs" />
     <Compile Include="Testing\TestRow.cs" />
     <Compile Include="Testing\DbScriptTests.cs" />
-    <Compile Include="CodeGeneration\TypeScriptParserTests\TypeScriptParserTests.cs" />
     <Compile Include="Web\NavigationHelperTests.cs" />
     <Compile Include="Web\NavigationItemTests.cs" />
   </ItemGroup>
@@ -231,12 +229,6 @@
     <EmbeddedResource Include="SqlScript\DbSerenity.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\json2.min.js">
-      <Link>CodeGeneration\TypeScriptParserTests\json2.min.js</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
-      <Link>CodeGeneration\TypeScriptParserTests\typescriptServices.js</Link>
-    </EmbeddedResource>
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />

@@ -6693,10 +6693,12 @@ var Serenity;
             }
             $('<script/>').attr('type', 'text/javascript')
                 .attr('id', 'CKEditorScript')
-                .attr('src', Q.resolveUrl('~/Scripts/CKEditor/ckeditor.js'))
+                .attr('src', Q.resolveUrl('~/Scripts/CKEditor/ckeditor.js?v=' +
+                HtmlContentEditor_1.CKEditorVer))
                 .appendTo(window.document.head);
         };
         ;
+        HtmlContentEditor.CKEditorVer = "4.7.1";
         HtmlContentEditor = HtmlContentEditor_1 = __decorate([
             Editor('HtmlContent', [Serenity.IStringValue, Serenity.IReadOnly]),
             Element('<textarea/>')
