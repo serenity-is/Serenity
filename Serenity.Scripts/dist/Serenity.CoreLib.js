@@ -6698,7 +6698,7 @@ var Serenity;
                 .appendTo(window.document.head);
         };
         ;
-        HtmlContentEditor.CKEditorVer = 457;
+        HtmlContentEditor.CKEditorVer = "4.7.1";
         HtmlContentEditor = HtmlContentEditor_1 = __decorate([
             Editor('HtmlContent', [Serenity.IStringValue, Serenity.IReadOnly]),
             Element('<textarea/>')

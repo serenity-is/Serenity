@@ -926,7 +926,7 @@
             }
         }
 
-        static CKEditorVer = "4.5.7";
+        static CKEditorVer = "4.7.1";
 
         static includeCKEditor(): void {
             if (window['CKEDITOR']) {
