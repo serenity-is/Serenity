@@ -1584,6 +1584,7 @@ declare namespace Serenity {
         set_value(value: string): void;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
+        static CKEditorVer: number;
         static includeCKEditor(): void;
     }
     class HtmlNoteContentEditor extends HtmlContentEditor {
