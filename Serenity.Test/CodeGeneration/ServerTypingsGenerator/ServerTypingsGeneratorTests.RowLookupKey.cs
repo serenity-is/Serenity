@@ -87,17 +87,17 @@ namespace Serenity.CodeGeneration.Test
             Assert.Contains("export declare function getLookup_CustomWithRowLookupScriptLookup(): Q.Lookup<{}>;", code);
 
             Assert.Contains("export enum CustomLookups {", code);
-            Assert.Contains("getLookup_CustomWithAutoKeyLookup = \"SomeModule.CustomWithAutoKey\"", code);
-            Assert.Contains("getLookup_CustomWithExplicitKeyLookup = \"This is custom lookup key\"", code);
-            Assert.Contains("getLookup_CustomWithRowLookupScriptLookup = \"SomeModule.CustomWithRowLookupScript\"", code);
+            Assert.Contains("CustomWithAutoKeyLookup = \"SomeModule.CustomWithAutoKey\"", code);
+            Assert.Contains("CustomWithExplicitKeyLookup = \"This is custom lookup key\"", code);
+            Assert.Contains("CustomWithRowLookupScriptLookup = \"SomeModule.CustomWithRowLookupScript\"", code);
 
             Assert.Contains("Object.keys(CustomLookups).forEach(x => {", code);
 
-            Assert.Contains("(<any>RowForCustomLookupRow)[x] = function () {", code);
+            Assert.Contains("(<any>RowForCustomLookupRow)[\"getLookup_\" + x] = function () {", code);
             Assert.Contains("return Q.getLookup(CustomLookups[x]);", code);
 
-            Assert.Contains("(<any>RowForCustomLookupRow)[x + \"Async\"] = function () {", code);
-            Assert.Contains("return Q.getLookupAsync(CustomLookups[x]);", code);
+            //Assert.Contains("(<any>RowForCustomLookupRow)[\"getLookup_\" + x + \"Async\"] = function () {", code);
+            //Assert.Contains("return Q.getLookupAsync(CustomLookups[x]);", code);
         }
 
         [Fact]

@@ -417,7 +417,7 @@ namespace Serenity.CodeGeneration
                 {
                     var enumKey = "CustomLookups";
                     var methodPrefix = "getLookup_";
-                    var asyncSuffix = "Async";
+                    //var asyncSuffix = "Async";
 
                     sb.AppendLine();
                     foreach (var customLookupItem in customLookupKeys)
@@ -425,11 +425,11 @@ namespace Serenity.CodeGeneration
                         cw.IndentedLine($"export declare function {methodPrefix}{customLookupItem.Key}(): Q.Lookup<{"{}"}>;");
                     }
 
-                    sb.AppendLine();
-                    foreach (var customLookupItem in customLookupKeys)
-                    {
-                        cw.IndentedLine($"export declare function {methodPrefix}{customLookupItem.Key}{asyncSuffix}(): PromiseLike<Q.Lookup<{"{}"}>>;");
-                    }
+                    //sb.AppendLine();
+                    //foreach (var customLookupItem in customLookupKeys)
+                    //{
+                    //    cw.IndentedLine($"export declare function {methodPrefix}{customLookupItem.Key}{asyncSuffix}(): PromiseLike<Q.Lookup<{"{}"}>>;");
+                    //}
 
                     sb.AppendLine();
                     cw.Indented($"export enum {enumKey}");
@@ -439,7 +439,7 @@ namespace Serenity.CodeGeneration
                         foreach (var customLookupItem in customLookupKeys)
                         {
                             counter--;
-                            cw.IndentedLine($"{methodPrefix}{customLookupItem.Key} = \"{customLookupItem.Value}\"{(counter > 0 ? "," : "")}");
+                            cw.IndentedLine($"{customLookupItem.Key} = \"{customLookupItem.Value}\"{(counter > 0 ? "," : "")}");
                         }
                     });
 
@@ -447,20 +447,20 @@ namespace Serenity.CodeGeneration
                     cw.IndentedLine($"Object.keys({enumKey}).forEach(x =>{" {"}");
                     cw.Block(delegate
                     {
-                        cw.IndentedLine($"(<any>{rowType.Name})[x] = function (){" {"}");
+                        cw.IndentedLine($"(<any>{rowType.Name})[\"{methodPrefix}\" + x] = function (){" {"}");
                         cw.Block(delegate
                         {
                             cw.IndentedLine($"return Q.getLookup({enumKey}[x]);");
                         });
                         cw.IndentedLine("};");
 
-                        sb.AppendLine();
-                        cw.IndentedLine($"(<any>{rowType.Name})[x + \"{asyncSuffix}\"] = function (){" {"}");
-                        cw.Block(delegate
-                        {
-                            cw.IndentedLine($"return Q.getLookupAsync({enumKey}[x]);");
-                        });
-                        cw.IndentedLine("};");
+                        //sb.AppendLine();
+                        //cw.IndentedLine($"(<any>{rowType.Name})[\"{methodPrefix}\" + x + \"{asyncSuffix}\"] = function (){" {"}");
+                        //cw.Block(delegate
+                        //{
+                        //    cw.IndentedLine($"return Q.getLookupAsync({enumKey}[x]);");
+                        //});
+                        //cw.IndentedLine("};");
                     });
                     cw.IndentedLine("});");
 
