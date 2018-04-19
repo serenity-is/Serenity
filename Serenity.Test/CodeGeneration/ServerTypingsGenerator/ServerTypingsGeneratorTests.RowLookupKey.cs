@@ -95,9 +95,6 @@ namespace Serenity.CodeGeneration.Test
 
             Assert.Contains("(<any>RowForCustomLookupRow)[\"getLookup_\" + x] = function () {", code);
             Assert.Contains("return Q.getLookup(CustomLookups[x]);", code);
-
-            //Assert.Contains("(<any>RowForCustomLookupRow)[\"getLookup_\" + x + \"Async\"] = function () {", code);
-            //Assert.Contains("return Q.getLookupAsync(CustomLookups[x]);", code);
         }
 
         [Fact]

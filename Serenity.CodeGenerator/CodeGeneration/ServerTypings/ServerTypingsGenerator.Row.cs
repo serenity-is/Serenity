@@ -417,19 +417,12 @@ namespace Serenity.CodeGeneration
                 {
                     var enumKey = "CustomLookups";
                     var methodPrefix = "getLookup_";
-                    //var asyncSuffix = "Async";
 
                     sb.AppendLine();
                     foreach (var customLookupItem in customLookupKeys)
                     {
                         cw.IndentedLine($"export declare function {methodPrefix}{customLookupItem.Key}(): Q.Lookup<{"{}"}>;");
                     }
-
-                    //sb.AppendLine();
-                    //foreach (var customLookupItem in customLookupKeys)
-                    //{
-                    //    cw.IndentedLine($"export declare function {methodPrefix}{customLookupItem.Key}{asyncSuffix}(): PromiseLike<Q.Lookup<{"{}"}>>;");
-                    //}
 
                     sb.AppendLine();
                     cw.Indented($"export enum {enumKey}");
@@ -453,14 +446,6 @@ namespace Serenity.CodeGeneration
                             cw.IndentedLine($"return Q.getLookup({enumKey}[x]);");
                         });
                         cw.IndentedLine("};");
-
-                        //sb.AppendLine();
-                        //cw.IndentedLine($"(<any>{rowType.Name})[\"{methodPrefix}\" + x + \"{asyncSuffix}\"] = function (){" {"}");
-                        //cw.Block(delegate
-                        //{
-                        //    cw.IndentedLine($"return Q.getLookupAsync({enumKey}[x]);");
-                        //});
-                        //cw.IndentedLine("};");
                     });
                     cw.IndentedLine("});");
 
