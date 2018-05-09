@@ -167,6 +167,11 @@ namespace Serenity.Services
             }
         }
 
+        public string UnionKeyword(SqlUnionType unionType)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool UseDateTime2
         {
             get

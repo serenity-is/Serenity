@@ -21,6 +21,8 @@
         private StringBuilder where;
         private int intoIndex = -1;
         private List<object> into = new List<object>();
+        private SqlQuery unionQuery;
+        private SqlUnionType unionType;
 
         /// <summary>
         /// Creates a new SqlQuery instance.
@@ -488,6 +490,30 @@
         public string Text
         {
             get { return ToString(); }
+        }
+
+        public SqlQuery Union(SqlUnionType unionType = SqlUnionType.Union)
+        {
+            this.unionQuery = this.Clone();
+            this.unionQuery.countRecords = false;
+            this.unionQuery.parent = this;
+            this.unionQuery.parameters = null;
+            this.unionType = unionType;
+            this.columns = new List<Column>();
+            this.from = new StringBuilder();
+            this.aliasExpressions = null;
+            this.aliasWithJoins = null;
+            this.distinct = false;
+            this.having = null;
+            this.groupBy = null;
+            this.orderBy = null;
+            this.forXml = null;
+            this.skip = 0;
+            this.take = 0;
+            this.where = null;
+            this.intoIndex = -1;
+            this.into = new List<object>();
+            return this;
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿namespace Serenity.Data
 {
+    using System;
     using System.Collections.Generic;
     using System.Text;
 
@@ -22,9 +23,12 @@
             clone.skip = skip;
             clone.take = take;
             clone.countRecords = countRecords;
-
+            clone.distinct = distinct;
             clone.into = new List<object>(into);
             clone.intoIndex = intoIndex;
+            clone.forXml = forXml;
+            clone.unionQuery = unionQuery;
+            clone.unionType = unionType;
 
             Column s;
             for (int i = 0; i < columns.Count; i++)
@@ -55,6 +59,14 @@
             else if (this.Params != null)
                 foreach (var pair in this.Params)
                     clone.AddParam(pair.Key, pair.Value);
+
+            if (aliasExpressions != null)
+                clone.aliasExpressions = new Dictionary<string, string>(
+                    aliasExpressions, StringComparer.OrdinalIgnoreCase);
+
+            if (aliasWithJoins != null)
+                aliasWithJoins = new Dictionary<string, IHaveJoins>(
+                    aliasWithJoins, StringComparer.OrdinalIgnoreCase);
 
             return clone;
         }

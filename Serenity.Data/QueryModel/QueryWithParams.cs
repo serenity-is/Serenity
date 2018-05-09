@@ -10,7 +10,7 @@
         protected ISqlDialect dialect;
         protected bool dialectOverridden;
         protected QueryWithParams parent;
-        private Dictionary parameters;
+        protected Dictionary parameters;
         private int nextAutoParam;
 
         public QueryWithParams()
