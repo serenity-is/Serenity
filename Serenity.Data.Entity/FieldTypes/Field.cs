@@ -128,7 +128,21 @@ namespace Serenity.Data
             set { propertyName = value; }
         }
 
-        public object[] CustomAttributes { get; set; }
+        internal object[] customAttributes;
+
+        public object[] CustomAttributes
+        {
+            get { return customAttributes; }
+            set
+            {
+                if (customAttributes != value)
+                {
+                    customAttributes = value;
+                    if (this.fields != null)
+                        this.fields.byAttribute = null;
+                }
+            }
+        }
 
         protected Exception JsonUnexpectedToken(JsonReader reader)
         {

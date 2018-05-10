@@ -14,6 +14,7 @@ namespace Serenity.Data
     {
         internal Dictionary<string, Field> byName;
         internal Dictionary<string, Field> byPropertyName;
+        internal Dictionary<Type, Field[]> byAttribute;
         internal Field[] primaryKeys;
         internal Tuple<Field, bool>[] sortOrders;
         internal bool isInitialized;
@@ -205,7 +206,6 @@ namespace Serenity.Data
 
         protected virtual void AfterInitialize()
         {
-
         }
 
         public void Initialize()
@@ -472,7 +472,7 @@ namespace Serenity.Data
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;
 
-                            field.CustomAttributes = property.GetCustomAttributes(false).ToArray();
+                            field.customAttributes = property.GetCustomAttributes(false).ToArray();
                         }
                     }
                 }
@@ -502,6 +502,57 @@ namespace Serenity.Data
             }
 
             isInitialized = true;
+        }
+
+        private Field[] EmptyFields = new Field[0];
+
+        public Field[] GetFieldsByAttribute<TAttr>()
+            where TAttr : Attribute
+        {
+            return GetFieldsByAttribute(typeof(TAttr));
+        }
+
+        public Field[] GetFieldsByAttribute(Type attrType)
+        {
+            var byAttribute = this.byAttribute;
+
+            Field[] fieldList;
+            if (byAttribute != null &&
+                byAttribute.TryGetValue(attrType, out fieldList))
+                return fieldList;
+
+            List<Field> newList = new List<Field>();
+
+            foreach (var field in this)
+            {
+                if (field.CustomAttributes == null)
+                    continue;
+
+                foreach (var attr in field.CustomAttributes)
+                {
+                    if (attrType.IsAssignableFrom(attr.GetType()))
+                    {
+                        newList.Add(field);
+                        continue;
+                    }
+                }
+            }
+
+            fieldList = newList.ToArray();
+
+            if (byAttribute == null)
+            {
+                byAttribute = new Dictionary<Type, Field[]>();
+                byAttribute.Add(attrType, fieldList);
+            }
+            else
+            {
+                byAttribute = new Dictionary<Type, Field[]>(byAttribute);
+                byAttribute[attrType] = fieldList; 
+            }
+
+            this.byAttribute = byAttribute;
+            return fieldList;
         }
 
         private static TAttr GetFieldAttr<TAttr>(Field x)

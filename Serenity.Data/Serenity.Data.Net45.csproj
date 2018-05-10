@@ -52,6 +52,7 @@
     </Compile>
     <Compile Include="FluentSql\SqlUnionType.cs" />
     <Compile Include="Join\ISqlJoin.cs" />
+    <Compile Include="Mapping\NamePropertyAttribute.cs" />
     <Compile Include="Mapping\OriginAttribute.cs" />
     <Compile Include="Schema\FieldInfo.cs" />
     <Compile Include="Schema\ForeignKeyInfo.cs" />

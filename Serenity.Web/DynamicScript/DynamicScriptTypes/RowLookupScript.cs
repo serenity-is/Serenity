@@ -16,8 +16,9 @@ namespace Serenity.Web
         {
             var row = (Row)((query as ISqlQueryExtensible).FirstIntoRow);
 
-            if (row is INameRow)
-                query.OrderBy(((INameRow)row).NameField);
+            var nameField = row.GetNameField();
+            if (!ReferenceEquals(null, nameField))
+                query.OrderBy(nameField);
             else if (row is IIdRow)
                 query.OrderBy((Field)((IIdRow)row).IdField);
         }
@@ -29,8 +30,9 @@ namespace Serenity.Web
             if (row is IIdRow)
                 query.Select((Field)((IIdRow)row).IdField);
 
-            if (row is INameRow)
-                query.Select(((INameRow)row).NameField);
+            var nameField = row.GetNameField();
+            if (!ReferenceEquals(null, nameField))
+                query.Select(nameField);
 
             var list = new List<object>();
 
@@ -56,11 +58,10 @@ namespace Serenity.Web
                 this.IdField = field.PropertyName ?? field.Name;
             }
 
-            var nameRow = row as INameRow;
-            if (nameRow != null)
+            var nameField = row.GetNameField();
+            if (!ReferenceEquals(null, nameField))
             {
-                field = ((Field)nameRow.NameField);
-                this.TextField = field.PropertyName ?? field.Name;
+                this.TextField = nameField.PropertyName ?? nameField.Name;
             }
 
             var treeRow = row as IParentIdRow;

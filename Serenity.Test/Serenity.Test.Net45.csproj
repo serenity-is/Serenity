@@ -112,6 +112,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowNameProperty.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.TypeWithGenericParameters.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowLocalTextPrefix.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowLookupKey.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Core\Logging\FileLoggerTests.cs" />
     <Compile Include="Core\LogicOperatorPermissionServiceTests.cs" />
     <Compile Include="Data\DateTimeFieldKindTests.cs" />
+    <Compile Include="Data\RowMappingTests.NamePropertyRow.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidLoadsDetailsOnRetrieve.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidDetailRow.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.Int32DetailRow.cs" />

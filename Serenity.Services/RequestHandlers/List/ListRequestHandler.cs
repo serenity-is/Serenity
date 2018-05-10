@@ -47,9 +47,9 @@
             if (!sortOrders.IsEmptyOrNull())
                 return sortOrders.Select(x => new SortBy(x.Item1.PropertyName ?? x.Item1.Name, x.Item2)).ToArray();
 
-            var nameRow = Row as INameRow;
-            if (nameRow != null)
-                return new SortBy[] { new SortBy(nameRow.NameField.Name, false) };
+            var nameField = Row.GetNameField();
+            if (!ReferenceEquals(null, nameField))
+                return new SortBy[] { new SortBy(nameField.Name, false) };
 
             return null;
         }
@@ -177,8 +177,12 @@
                     return true;
                 });
 
-                if (!fields.Any() && Row is INameRow)
-                    return new Field[] { ((INameRow)Row).NameField };
+                if (!fields.Any())
+                {
+                    var nameField = Row.GetNameField();
+                    if (!ReferenceEquals(null, nameField))
+                        return new Field[] { nameField };
+                }
 
                 return fields;
             }

@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using Serenity.Data.Mapping;
+using System;
+using System.Globalization;
 
 namespace Serenity.Data
 {
@@ -37,6 +39,31 @@ namespace Serenity.Data
         {
             rowFields.Initialize();
             return rowFields;
+        }
+
+        public static Field GetNameField(this Row row, bool force = false)
+        {
+            var nameRow = row as INameRow;
+            if (nameRow != null)
+                return nameRow.NameField;
+
+            var nameProperty = row.GetFields().GetFieldsByAttribute<NamePropertyAttribute>();
+            if (nameProperty.Length > 0)
+            {
+                if (nameProperty.Length > 1)
+                    throw new Exception(string.Format(
+                        "Row type {0} has multiple fields with [NameProperty] attribute!", 
+                        row.GetType().FullName));
+
+                return nameProperty[0];
+            }
+
+            if (force)
+                throw new Exception(string.Format(
+                    "Row type {0} doesn't have a field with [NameProperty] attribute and doesn't implement INameRow!",
+                    row.GetType().FullName));
+
+            return null;
         }
     }
 }

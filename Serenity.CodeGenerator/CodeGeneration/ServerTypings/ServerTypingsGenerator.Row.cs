@@ -249,6 +249,13 @@ namespace Serenity.CodeGeneration
                     "Serenity.Data.StringField", "NameField",
                     "Serenity.Data.StringField Serenity.Data.INameRow::get_NameField()");
 
+            if (nameProperty == null)
+            {
+                nameProperty = rowType.Properties.FirstOrDefault(x =>
+                    x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
+                        "Serenity.Data", "NamePropertyAttribute") != null)?.Name;
+            }
+
             var isActiveProperty = ExtractInterfacePropertyFromRow(rowType,
                 new[] { "Serenity.Data.IIsActiveRow", "Serenity.Data.IIsActiveDeletedRow" },
                 "Serenity.Data.Int16Field", "IsActiveField", 

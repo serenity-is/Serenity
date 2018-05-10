@@ -213,5 +213,30 @@ namespace Serenity.Test.Data
         {
             Assert.True(ComplexRow.Fields.FullName.Flags.HasFlag(FieldFlags.Calculated));
         }
+
+        [Fact]
+        public void GetPropertyByAttributeWorksProperlyForNameProperty()
+        {
+            Assert.Equal("AName", new NamePropertyRow().GetNameField().Name);
+        }
+
+        [Fact]
+        public void GetPropertyByAttributeWorksProperlyForNamePropertyAddedLater()
+        {
+            Assert.Null(new BasicRow().GetNameField());
+            var old = BasicRow.Fields.AString.CustomAttributes;
+            try
+            {
+                BasicRow.Fields.AString.CustomAttributes = new object[] { new NamePropertyAttribute() };
+                var nameField = new BasicRow().GetNameField();
+                Assert.NotNull(nameField);
+                Assert.Equal("AString", nameField.Name);
+            }
+            finally
+            {
+                BasicRow.Fields.AString.CustomAttributes = old;
+            }
+        }
+
     }
 }

@@ -485,12 +485,11 @@ namespace Serenity.CodeGeneration
                 anyMetadata = true;
             }
 
-            var nameRow = row as INameRow;
-            if (nameRow != null)
+            var nameField = row.GetNameField();
+            if (!ReferenceEquals(null, nameField))
             {
                 cw.Indented("[InlineConstant] public const string NameProperty = \"");
-                var field = (nameRow.NameField);
-                sb.Append(field.PropertyName ?? field.Name);
+                sb.Append(nameField.PropertyName ?? nameField.Name);
                 sb.AppendLine("\";");
                 anyMetadata = true;
             }

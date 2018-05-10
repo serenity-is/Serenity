@@ -17,7 +17,7 @@ namespace Serenity.CodeGeneration
             var idRow = row as IIdRow;
             var isActiveRow = row as IIsActiveRow;
             var isDeletedRow = row as IIsDeletedRow;
-            var nameRow = row as INameRow;
+            var nameField = row.GetNameField();
             var lookupAttr = rowType.GetCustomAttribute<LookupScriptAttribute>();
             if (lookupAttr == null)
             {
@@ -57,11 +57,10 @@ namespace Serenity.CodeGeneration
                 anyMetadata = true;
             }
 
-            if (nameRow != null)
+            if (!ReferenceEquals(null, nameField))
             {
                 cw.Indented("[InlineConstant] public const string NameProperty = \"");
-                var field = (nameRow.NameField);
-                sb.Append(field.PropertyName ?? field.Name);
+                sb.Append(nameField.PropertyName ?? nameField.Name);
                 sb.AppendLine("\";");
                 anyMetadata = true;
             }
