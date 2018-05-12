@@ -62,18 +62,6 @@ namespace Serenity.Services
             rowListFactory = FastReflection.DelegateForConstructor<IList>(rowListType);
             rowFactory = FastReflection.DelegateForConstructor<Row>(rowType);
 
-            //listHandlerFactory = FastReflection.DelegateForConstructor<IListRequestProcessor>(
-            //    typeof(ListRequestHandler<>).MakeGenericType(rowType));
-
-            //saveHandlerFactory = FastReflection.DelegateForConstructor<ISaveRequestProcessor>(
-            //    typeof(SaveRequestHandler<>).MakeGenericType(rowType));
-
-            //saveRequestFactory = FastReflection.DelegateForConstructor<ISaveRequest>(
-            //    typeof(SaveRequest<>).MakeGenericType(rowType));
-
-            //deleteHandlerFactory = FastReflection.DelegateForConstructor<IDeleteRequestProcessor>(
-            //    typeof(DeleteRequestHandler<>).MakeGenericType(rowType));
-
             if (attr.MasterKeyField != null)
             {
                 // Use field from AltIdField
