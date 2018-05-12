@@ -8,7 +8,7 @@
     using System.Linq;
     using System.Reflection;
 
-    public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestHandler
+    public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestHandler, IRetrieveRequestProcessor
         where TRow: Row, new()
         where TRetrieveRequest: RetrieveRequest
         where TRetrieveResponse: RetrieveResponse<TRow>, new()
@@ -227,11 +227,22 @@
         IRetrieveResponse IRetrieveRequestHandler.Response { get { return this.Response; } }
         bool IRetrieveRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
         bool IRetrieveRequestHandler.AllowSelectField(Field field) { return AllowSelectField(field); }
+
+        IRetrieveResponse IRetrieveRequestProcessor.Process(IDbConnection connection, RetrieveRequest request)
+        {
+            return Process(connection, (TRetrieveRequest)request);
+        }
+
         public IDictionary<string, object> StateBag { get; private set; }
     }
 
     public class RetrieveRequestHandler<TRow> : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>
         where TRow : Row, new()
     {
+    }
+
+    public interface IRetrieveRequestProcessor
+    {
+        IRetrieveResponse Process(IDbConnection connection, RetrieveRequest request);
     }
 }

@@ -21,17 +21,14 @@ namespace Serenity.Services
         private LinkingSetRelationAttribute attr;
         private Func<IList> listFactory;
         private Func<Row> rowFactory;
-        private Func<IListRequestProcessor> listHandlerFactory;
-        private Func<ISaveRequestProcessor> saveHandlerFactory;
-        private Func<IDeleteRequestProcessor> deleteHandlerFactory;
-        private Func<ISaveRequest> saveRequestFactory;
+        private Type rowType;
         private Field thisKeyField;
         private Criteria thisKeyCriteria;
         private Field itemKeyField;
         private Field filterField;
         private object filterValue;
-        public BaseCriteria filterCriteria;
-        public BaseCriteria queryCriteria;
+        private BaseCriteria filterCriteria;
+        private BaseCriteria queryCriteria;
 
         public bool ActivateFor(Row row)
         {
@@ -59,7 +56,7 @@ namespace Serenity.Services
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
             }
 
-            var rowType = attr.RowType;
+            rowType = attr.RowType;
             if (rowType.IsAbstract ||
                 !typeof(Row).IsAssignableFrom(rowType))
             {
@@ -79,18 +76,6 @@ namespace Serenity.Services
 
             listFactory = FastReflection.DelegateForConstructor<IList>(listType);
             rowFactory = FastReflection.DelegateForConstructor<Row>(rowType);
-
-            listHandlerFactory = FastReflection.DelegateForConstructor<IListRequestProcessor>(
-                typeof(ListRequestHandler<>).MakeGenericType(rowType));
-
-            saveHandlerFactory = FastReflection.DelegateForConstructor<ISaveRequestProcessor>(
-                typeof(SaveRequestHandler<>).MakeGenericType(rowType));
-
-            saveRequestFactory = FastReflection.DelegateForConstructor<ISaveRequest>(
-                typeof(SaveRequest<>).MakeGenericType(rowType));
-
-            deleteHandlerFactory = FastReflection.DelegateForConstructor<IDeleteRequestProcessor>(
-                typeof(DeleteRequestHandler<>).MakeGenericType(rowType));
 
             var detailRow = rowFactory();
 
@@ -205,17 +190,14 @@ namespace Serenity.Services
 
             var idField = (Field)((handler.Row as IIdRow).IdField);
 
-            var listHandler = listHandlerFactory();
-
-            var listRequest = new ListRequest
+            var listHandler = DefaultHandlerFactory.ListHandlerFor(rowType);
+            var listRequest = DefaultHandlerFactory.ListRequestFor(rowType);
+            listRequest.ColumnSelection = ColumnSelection.KeyOnly;
+            listRequest.IncludeColumns = new HashSet<string>
             {
-                ColumnSelection = ColumnSelection.KeyOnly,
-                IncludeColumns = new HashSet<string>
-                {
                     itemKeyField.PropertyName ?? itemKeyField.Name
-                },
-                Criteria = thisKeyCriteria == new ValueCriteria(idField.AsObject(handler.Row)) & filterCriteria
             };
+            listRequest.Criteria = thisKeyCriteria == new ValueCriteria(idField.AsObject(handler.Row)) & filterCriteria;
 
             IListResponse response = listHandler.Process(handler.Connection, listRequest);
 
@@ -236,16 +218,13 @@ namespace Serenity.Services
 
             var idField = (Field)((handler.Row as IIdRow).IdField);
 
-            var listHandler = listHandlerFactory();
-
-            var listRequest = new ListRequest
+            var listHandler = DefaultHandlerFactory.ListHandlerFor(rowType);
+            var listRequest = DefaultHandlerFactory.ListRequestFor(rowType);
+            listRequest.ColumnSelection = ColumnSelection.KeyOnly;
+            listRequest.IncludeColumns = new HashSet<string>
             {
-                ColumnSelection = ColumnSelection.KeyOnly,
-                IncludeColumns = new HashSet<string>
-                {
-                    itemKeyField.PropertyName ?? itemKeyField.Name,
-                    thisKeyField.PropertyName ?? thisKeyField.Name
-                }
+                itemKeyField.PropertyName ?? itemKeyField.Name,
+                thisKeyField.PropertyName ?? thisKeyField.Name
             };
 
             var enumerator = handler.Response.Entities.Cast<Row>();
@@ -286,16 +265,17 @@ namespace Serenity.Services
             if (!ReferenceEquals(null, filterField))
                 filterField.AsObject(detail, filterValue);
 
-            var saveHandler = saveHandlerFactory();
-            var saveRequest = saveRequestFactory();
+            var saveHandler = DefaultHandlerFactory.SaveHandlerFor(rowType);
+            var saveRequest = DefaultHandlerFactory.SaveRequestFor(rowType);
             saveRequest.Entity = detail;
             saveHandler.Process(uow, saveRequest, SaveRequestType.Create);
         }
 
         private void DeleteDetail(IUnitOfWork uow, object detailId)
         {
-            var deleteHandler = deleteHandlerFactory();
-            var deleteRequest = new DeleteRequest { EntityId = detailId };
+            var deleteHandler = DefaultHandlerFactory.DeleteHandlerFor(rowType);
+            var deleteRequest = DefaultHandlerFactory.DeleteRequestFor(rowType);
+            deleteRequest.EntityId = detailId;
             deleteHandler.Process(uow, deleteRequest);
         }
 
@@ -427,7 +407,6 @@ namespace Serenity.Services
             var row = rowFactory();
             var rowIdField = (Field)((row as IIdRow).IdField);
 
-            var deleteHandler = deleteHandlerFactory();
             var deleteList = new List<object>();
             new SqlQuery()
                     .Dialect(handler.Connection.GetDialect())

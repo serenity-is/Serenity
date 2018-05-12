@@ -21,10 +21,7 @@ namespace Serenity.Services
         private MasterDetailRelationAttribute attr;
         private Func<IList> rowListFactory;
         private Func<Row> rowFactory;
-        private Func<IListRequestProcessor> listHandlerFactory;
-        private Func<ISaveRequestProcessor> saveHandlerFactory;
-        private Func<IDeleteRequestProcessor> deleteHandlerFactory;
-        private Func<ISaveRequest> saveRequestFactory;
+        private Type rowType;
         private Field foreignKeyField;
         private BaseCriteria foreignKeyCriteria;
         private Field filterField;
@@ -52,7 +49,7 @@ namespace Serenity.Services
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
             }
 
-            var rowType = rowListType.GetGenericArguments()[0];
+            rowType = rowListType.GetGenericArguments()[0];
             if (rowType.IsAbstract ||
                 !typeof(Row).IsAssignableFrom(rowType))
             {
@@ -65,17 +62,17 @@ namespace Serenity.Services
             rowListFactory = FastReflection.DelegateForConstructor<IList>(rowListType);
             rowFactory = FastReflection.DelegateForConstructor<Row>(rowType);
 
-            listHandlerFactory = FastReflection.DelegateForConstructor<IListRequestProcessor>(
-                typeof(ListRequestHandler<>).MakeGenericType(rowType));
+            //listHandlerFactory = FastReflection.DelegateForConstructor<IListRequestProcessor>(
+            //    typeof(ListRequestHandler<>).MakeGenericType(rowType));
 
-            saveHandlerFactory = FastReflection.DelegateForConstructor<ISaveRequestProcessor>(
-                typeof(SaveRequestHandler<>).MakeGenericType(rowType));
+            //saveHandlerFactory = FastReflection.DelegateForConstructor<ISaveRequestProcessor>(
+            //    typeof(SaveRequestHandler<>).MakeGenericType(rowType));
 
-            saveRequestFactory = FastReflection.DelegateForConstructor<ISaveRequest>(
-                typeof(SaveRequest<>).MakeGenericType(rowType));
+            //saveRequestFactory = FastReflection.DelegateForConstructor<ISaveRequest>(
+            //    typeof(SaveRequest<>).MakeGenericType(rowType));
 
-            deleteHandlerFactory = FastReflection.DelegateForConstructor<IDeleteRequestProcessor>(
-                typeof(DeleteRequestHandler<>).MakeGenericType(rowType));
+            //deleteHandlerFactory = FastReflection.DelegateForConstructor<IDeleteRequestProcessor>(
+            //    typeof(DeleteRequestHandler<>).MakeGenericType(rowType));
 
             if (attr.MasterKeyField != null)
             {
@@ -161,14 +158,11 @@ namespace Serenity.Services
                 !handler.ShouldSelectField(Target))
                 return;
 
-            var listHandler = listHandlerFactory();
-
-            var listRequest = new ListRequest
-            {
-                ColumnSelection = this.attr.ColumnSelection,
-                IncludeColumns = this.includeColumns,
-                Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria
-            };
+            var listHandler = DefaultHandlerFactory.ListHandlerFor(rowType);
+            var listRequest = DefaultHandlerFactory.ListRequestFor(rowType);
+            listRequest.ColumnSelection = this.attr.ColumnSelection;
+            listRequest.IncludeColumns = this.includeColumns;
+            listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria;
 
             IListResponse response = listHandler.Process(handler.Connection, listRequest);
 
@@ -187,13 +181,10 @@ namespace Serenity.Services
                 handler.Response.Entities.IsEmptyOrNull())
                 return;
 
-            var listHandler = listHandlerFactory();
-
-            var listRequest = new ListRequest
-            {
-                ColumnSelection = this.attr.ColumnSelection,
-                IncludeColumns = this.includeColumns
-            };          
+            var listHandler = DefaultHandlerFactory.ListHandlerFor(rowType);
+            var listRequest = DefaultHandlerFactory.ListRequestFor(rowType);
+            listRequest.ColumnSelection = this.attr.ColumnSelection;
+            listRequest.IncludeColumns = this.includeColumns;
 
             var enumerator = handler.Response.Entities.Cast<Row>();
             while (true)
@@ -235,16 +226,17 @@ namespace Serenity.Services
 
             ((Field)((IIdRow)detail).IdField).AsObject(detail, detailId);
 
-            var saveHandler = saveHandlerFactory();
-            var saveRequest = saveRequestFactory();
+            var saveHandler = DefaultHandlerFactory.SaveHandlerFor(rowType);
+            var saveRequest = DefaultHandlerFactory.SaveRequestFor(rowType);
             saveRequest.Entity = detail;
             saveHandler.Process(uow, saveRequest, detailId == null ? SaveRequestType.Create : SaveRequestType.Update);
         }
 
         private void DeleteDetail(IUnitOfWork uow, object detailId)
         {
-            var deleteHandler = deleteHandlerFactory();
-            var deleteRequest = new DeleteRequest { EntityId = detailId };
+            var deleteHandler = DefaultHandlerFactory.DeleteHandlerFor(rowType);
+            var deleteRequest = DefaultHandlerFactory.DeleteRequestFor(rowType);
+            deleteRequest.EntityId = detailId;
             deleteHandler.Process(uow, deleteRequest);
         }
 
@@ -382,13 +374,11 @@ namespace Serenity.Services
             }
             else
             {
-                var listRequest = new ListRequest
-                {
-                    ColumnSelection = ColumnSelection.List,
-                    Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria
-                };
+                var listHandler = DefaultHandlerFactory.ListHandlerFor(rowType);
+                var listRequest = DefaultHandlerFactory.ListRequestFor(rowType);
+                listRequest.ColumnSelection = ColumnSelection.List;
+                listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria;
 
-                var listHandler = listHandlerFactory();
                 var entities = listHandler.Process(handler.Connection, listRequest).Entities;
                 foreach (Row entity in entities)
                     oldList.Add(entity);
@@ -409,7 +399,6 @@ namespace Serenity.Services
             var row = rowFactory();
             var rowIdField = (Field)((row as IIdRow).IdField);
 
-            var deleteHandler = deleteHandlerFactory();
             var deleteList = new List<object>();
             new SqlQuery()
                     .Dialect(handler.Connection.GetDialect())

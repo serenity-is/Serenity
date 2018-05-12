@@ -45,6 +45,10 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="RequestHandlers\DefaultHandler\DefaultHandlerAttribute.cs" />
+    <Compile Include="RequestHandlers\DefaultHandler\DefaultHandlerRegistry.cs" />
+    <Compile Include="RequestHandlers\DefaultHandler\IDefaultHandlerRegistry.cs" />
+    <Compile Include="RequestHandlers\DefaultHandler\DefaultHandlerFactory.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\Localization\LocalizationBehavior.cs" />
     <Compile Include="ServiceRequestExtensions.cs" />
     <Compile Include="Json\JsonServiceClient.cs" />
