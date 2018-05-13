@@ -213,6 +213,8 @@ namespace Serenity.Services
                 .Set(field, copyResult)
                 .Where(idField == new ValueCriteria(idField.AsObject(handler.Row)))
                 .Execute(handler.UnitOfWork.Connection);
+
+            field[handler.Row] = copyResult;
         }
     }
 }

@@ -314,6 +314,8 @@ namespace Serenity.Services
                 .Set(filename, copyResult.DbFileName)
                 .Where(idField == new ValueCriteria(idField.AsObject(handler.Row)))
                 .Execute(handler.UnitOfWork.Connection);
+
+            filename[handler.Row] = copyResult.DbFileName;
         }
 
         public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attr, ref string temporaryFile)

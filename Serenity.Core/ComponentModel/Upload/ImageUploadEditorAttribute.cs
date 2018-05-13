@@ -119,7 +119,7 @@ namespace Serenity.ComponentModel
 
         /// <summary>
         /// Only useful for MultipleImageUploadeEditor. Specifies
-        /// wheter to JSON encode value. If your field is a string
+        /// whether to JSON encode value. If your field is a string
         /// field set it to true.
         /// </summary>
         public bool JsonEncodeValue
