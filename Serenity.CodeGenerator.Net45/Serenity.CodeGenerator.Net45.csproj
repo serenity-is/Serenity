@@ -235,21 +235,21 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.Net45.csproj">
-      <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
-      <Name>Serenity.Data.Entity.Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data\Serenity.Data.Net45.csproj">
-      <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
-      <Name>Serenity.Data.Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Core\Serenity.Core.Net45.csproj">
-      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
-      <Name>Serenity.Core.Net45</Name>
-    </ProjectReference>
+    <Resource Include="SerenityLogo.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="SerenityLogo.ico" />
+    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
+      <Project>{6f13b7f5-3f1e-4a7f-962d-59ebd3118e83}</Project>
+      <Name>Serenity.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
+      <Project>{a2b991e8-3e2c-477f-b70a-22355c52a8b8}</Project>
+      <Name>Serenity.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
+      <Project>{716c65d4-b1b0-49d1-80bd-780659577150}</Project>
+      <Name>Serenity.Data.Entity</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

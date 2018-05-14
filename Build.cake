@@ -95,11 +95,19 @@ Action<string> minimizeJs = filename => {
     });
 };
 
-Action runGitLink = () => {
-    StartProcess("./Tools/GitLink/GitLink.exe", new ProcessSettings
-    { 
-        Arguments = System.IO.Path.GetFullPath(@".\") + " -u https://github.com/volkanceylan/serenity"
+Action runSourceLink = () => {
+
+    MSBuild(@".\Serenity.Web\Serenity.Web.Net45.csproj", s => {
+        s.SetConfiguration(configuration);
+		s.ToolPath = msBuildPath;
+        s.WithProperty("SourceLinkCreate", "true");
     });
+
+    MSBuild(@".\Serenity.Testing\Serenity.Testing.Net45.csproj", s => {
+        s.SetConfiguration(configuration);
+		s.ToolPath = msBuildPath;
+        s.WithProperty("SourceLinkCreate", "true");
+    });    
 };
 
 Func<string, List<Tuple<string, string, string>>> parsePackageVersions = (path) => {
@@ -135,49 +143,62 @@ Action<string, string, string> myPack = (s, id, project) => {
     setPackageVersions(prm, csproj, packagesConfig);
     
     var filename = "./" + s + "/" + id + ".nuspec";
-    var nuspec = System.IO.File.ReadAllText(filename);
     string version;
-  
-    if (nuspec.IndexOf("<version>${version}</version>") < 0) {
-        version = getVersionFromNuspec(filename);
-    }
-    else {
+    if (!System.IO.File.Exists(filename) &&
+        csproj != null) {
+        writeHeader("dotnet pack " + csproj);
+        var exitCode = StartProcess("dotnet", "pack " + csproj + " -c:" + configuration + " -o:../.nupkg/");
+        if (exitCode > 0)
+            throw new Exception("Error while packing " + csproj);
         version = serenityVersion;
-        nuspec = nuspec.Replace("${version}", version);
     }
-    nuspec = nuspec.Replace("${id}", id);
-    
-    foreach (var p in prm)
-        nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
+    else {        
+        var nuspec = System.IO.File.ReadAllText(filename);
       
-    var assembly = "./" + s + ".Net45/bin/" + configuration + "/" + project + ".dll";
-    if (!System.IO.File.Exists(assembly))
-        assembly = "./" + s + ".Net45/bin/" + configuration + "/" + project + ".exe";
-	if (!System.IO.File.Exists(assembly))
-		assembly = "./" + s + "/bin/" + configuration + "/" + project + ".dll";
-    if (!System.IO.File.Exists(assembly))
-        assembly = "./" + s + "/bin/" + configuration + "/" + project + ".exe";
-      
-    if (System.IO.File.Exists(assembly)) 
-    {
-        var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly);
-        nuspec = nuspec.Replace("${title}", vi.FileDescription);
-        nuspec = nuspec.Replace("${description}", vi.Comments);
-    }
+        if (nuspec.IndexOf("<version>${version}</version>") < 0) {
+            version = getVersionFromNuspec(filename);
+        }
+        else {
+            version = serenityVersion;
+            nuspec = nuspec.Replace("${version}", version);
+        }
+        nuspec = nuspec.Replace("${id}", id);
+        
+        foreach (var p in prm)
+            nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
+          
+        var assembly = "./" + s + ".Net45/bin/" + configuration + "/" + project + ".dll";
+        if (!System.IO.File.Exists(assembly))
+            assembly = "./" + s + ".Net45/bin/" + configuration + "/" + project + ".exe";
+        if (!System.IO.File.Exists(assembly))
+            assembly = "./" + s + "/bin/" + configuration + "/" + project + ".dll";
+        if (!System.IO.File.Exists(assembly))
+            assembly = "./" + s + "/bin/" + configuration + "/" + project + ".exe";
+          
+        if (System.IO.File.Exists(assembly)) 
+        {
+            var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly);
+            nuspec = nuspec.Replace("${title}", vi.FileDescription);
+            nuspec = nuspec.Replace("${description}", vi.Comments);
+        }
 
-    var temp = "./.nupkg/" + id + ".temp.nuspec";
-    System.IO.File.WriteAllText(temp, nuspec);
-     
-    var basePath = @"./" + s;
-     
-    NuGetPack(temp, new NuGetPackSettings {
-        BasePath = basePath,
-        OutputDirectory = "./.nupkg",
-        NoPackageAnalysis = true
-    });
-    
-    System.IO.File.Delete(temp);
-    nugetPackages.Add("./.nupkg/" + id + "." + version + ".nupkg");
+        var temp = "./.nupkg/" + id + ".temp.nuspec";
+        System.IO.File.WriteAllText(temp, nuspec);
+         
+        var basePath = @"./" + s;
+         
+        NuGetPack(temp, new NuGetPackSettings {
+            BasePath = basePath,
+            OutputDirectory = "./.nupkg",
+            NoPackageAnalysis = true
+        });
+        
+        System.IO.File.Delete(temp);
+    }
+    var pkg = "./.nupkg/" + id + "." + version + ".nupkg";
+    if (!System.IO.File.Exists(pkg))
+        throw new Exception("Package " + pkg + " is not found!");
+    nugetPackages.Add(pkg);
 };
 
 Action fixNugetCache = delegate() {
@@ -260,8 +281,11 @@ Task("Restore")
     .IsDependentOn("Clean")
     .Does(context =>
 {
-    NuGetRestore("./Serenity.Net45.sln");
-	NuGetRestore("./Serenity.DotNet.sln");
+	var dotnetSln = @"./Serenity.sln";
+	writeHeader("dotnet restore " + dotnetSln);
+	var exitCode = StartProcess("dotnet", "restore " + dotnetSln);
+	if (exitCode > 0)
+		throw new Exception("Error while restoring " + dotnetSln);
 });
 
 Task("Compile")
@@ -269,25 +293,17 @@ Task("Compile")
     .Does(context => 
 {
 
-    MSBuild("./Serenity.Net45.sln", s => {
+    var sasmi = System.IO.File.ReadAllText(@".\SharedAssemblyInfo.cs");
+    var sasmi1 = sasmi.IndexOf("AssemblyVersion(\"");
+    serenityVersion = sasmi.Substring(sasmi1 + "AssemblyVersion(\"".Length).Split('"')[0];
+               
+	patchProjectVer(@"./SharedProperties.xml", serenityVersion);
+
+	writeHeader("Building Serenity.sln");
+    MSBuild("./Serenity.sln", s => {
         s.SetConfiguration(configuration);
 		s.ToolPath = msBuildPath;
     });
-    
-    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/Serenity.Core.dll");
-    serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
-           
-	patchProjectVer(@"./SharedProperties.xml", serenityVersion);
-
-	var dotnetSln = @"./Serenity.DotNet.sln";
-	writeHeader("dotnet restore " + dotnetSln);
-	var exitCode = StartProcess("dotnet", "restore " + dotnetSln);
-	if (exitCode > 0)
-		throw new Exception("Error while restoring " + dotnetSln);
-	writeHeader("dotnet build " + dotnetSln);
-	exitCode = StartProcess("dotnet", "build " + dotnetSln + " -c " + configuration);
-	if (exitCode > 0)
-		throw new Exception("Error while building " + dotnetSln);
 });
 
 Task("Test")
@@ -303,7 +319,7 @@ Task("PdbPatch")
 {
     if ((target ?? "").ToLowerInvariant() == "push" ||
         (target ?? "").ToLowerInvariant() == "pdbpatch")
-        runGitLink();
+        runSourceLink();
 });
 
 Task("Pack")

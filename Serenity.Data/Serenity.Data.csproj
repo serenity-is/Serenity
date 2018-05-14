@@ -2,6 +2,9 @@
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
     <AssemblyName>Serenity.Data</AssemblyName>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <Title>Serenity Platform - Data Library</Title>
+    <Description>Contains helper classes for SQL data connections, fluent SQL builders, criteria, join definitions, data mapping, validation...</Description>    
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
