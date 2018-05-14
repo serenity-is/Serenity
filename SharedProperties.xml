@@ -1,11 +1,11 @@
 ﻿<Project>
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <VersionPrefix>3.6.1</VersionPrefix>
+    <VersionPrefix>3.7.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <Authors>Volkan Ceylan</Authors>    
+    <Authors>Volkan Ceylan</Authors>
     <Copyright>Copyright (c) Volkan Ceylan</Copyright>
     <PackageIconUrl>https://raw.github.com/volkanceylan/Serenity/master/Tools/Images/serenity-logo-128.png</PackageIconUrl>
     <PackageLicenseUrl>https://raw.github.com/volkanceylan/Serenity/master/LICENSE.md</PackageLicenseUrl>

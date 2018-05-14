@@ -1,3 +1,30 @@
+## 3.7.0 (2018-05-14)
+
+Features:
+  - support for UNION including INTERSECT, EXCEPT and/or ALL (where DB support is available) to SqlQuery using .Union method
+  - added ability to determine Name field by using new [NameProperty] attribute instead of INameRow interface if name field is of non-string type
+  - introduced [DefaultHandler] attribute, which when placed on a service handler, e.g. ListRequestHandler, SaveHandler etc, allows behaviors like MasterDetailRelationBehavior, LinkingSetRelationBehavior, UpdatableExtensionBehavior etc to use your custom handlers (MySaveHandler etc.) instead of generic ones for that row type. This allows logic in your custom handlers to be reused for related records, e.g. detail rows for MasterDetailRelation without having to write a behavior.  
+  - added [DataAuditLog] attribute which allows simple audit logging for change operations to any entity (StartSharp)
+  - set filename field after upload so that audit logging can take the final value
+  - data audit log viewer sample (StartSharp)
+  - split master details grid sample (StartSharp)
+  - add MigrationAttribute to enforce migration versioning
+  - switched to SourceLink from GitLink
+  - removed .Net45.csproj versions for some Serenity libraries like Core, Data, Entity, Services...
+  - updated all packages including AspNetCore, AspNet.Mvc, Newtonsoft.Json, Nuglify, Selenium, CKEditor etc.
+  - use double right arrow character for organization dropdown (StartSharp)
+  - added documentation about upgrading from Serene to StartSharp, inplace or by migration (StartSharp)
+  - handle *.ts *.cs includes for ServerTypings / ClientTypes to get less merge conflicts on .csproj files
+  - added debounce function
+  - got rid of .Net45.csproj files for Serenity.Core, Serenity.Data, Serenity.Data.Entity, Serenity.Services and Serenity.Caching packages, switched to SourceLink
+  
+Bugfixes:
+  - resolve intellisense issue on project creation (StartSharp)
+  - presencefield bug on updatable extension (thanks @marcobisio)
+  - fix missing element in Recaptcha Widget Editor (thanks @edson)
+  - fix typo in closequote for sql2000dialect (thanks @hannesb)
+  - FastReflection should try to skip visibility checks
+  
 ## 3.6.0 (2018-03-31)
 
 Features:
