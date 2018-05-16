@@ -4,7 +4,7 @@
     <AssemblyName>Serenity.Core</AssemblyName>
     <Title>Serenity Platform - Core Library</Title>
     <Description>Contains abstractions and implementations for some basic Serenity features like authorization, caching, localization, dependency resolution, reflection...</Description>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
