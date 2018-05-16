@@ -58,8 +58,7 @@ namespace Serenity.CodeGenerator
                 context.CurrentGlobal.Import(model,
                     ScriptMemberImportFlags.Field | ScriptMemberImportFlags.Property,
                     null, x => x.Name);
-                template.Render(context);
-                return context.Output.ToString();
+                return template.Render(context);
             }
             catch (InvalidOperationException ex)
             {
