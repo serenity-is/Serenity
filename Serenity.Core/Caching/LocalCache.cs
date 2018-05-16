@@ -14,6 +14,9 @@ namespace Serenity
         /// </summary>
         public static ILocalCache StaticProvider;
 
+        /// <summary>
+        /// Gets current local cache provider, static one or the one configured in dependency resolver
+        /// </summary>
         public static ILocalCache Provider
         {
             get

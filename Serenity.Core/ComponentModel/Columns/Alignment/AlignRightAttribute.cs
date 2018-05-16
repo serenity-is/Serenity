@@ -10,6 +10,9 @@ namespace Serenity.ComponentModel
     /// </remarks>
     public class AlignRightAttribute : AlignmentAttribute
     {
+        /// <summary>
+        /// Creates a new AlignRight attribute
+        /// </summary>
         public AlignRightAttribute()
             : base("right")
         {

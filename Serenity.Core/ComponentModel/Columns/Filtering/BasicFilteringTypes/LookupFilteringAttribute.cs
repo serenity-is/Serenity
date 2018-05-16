@@ -3,14 +3,28 @@ using System.Reflection;
 
 namespace Serenity.ComponentModel
 {
+    /// <summary>
+    /// Indicates that property should use lookup editor type of filtering
+    /// </summary>
+    /// <seealso cref="Serenity.ComponentModel.CustomFilteringAttribute" />
     public partial class LookupFilteringAttribute : CustomFilteringAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LookupFilteringAttribute"/> class.
+        /// </summary>
+        /// <param name="lookupKey">The lookup key.</param>
         public LookupFilteringAttribute(string lookupKey)
             : base("Lookup")
         {
             SetOption("lookupKey", lookupKey);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LookupFilteringAttribute"/> class.
+        /// </summary>
+        /// <param name="lookupType">Type of the lookup to get lookup key from. Can be 
+        /// a row with [LookupScript] attribute or a custom lookup script.</param>
+        /// <exception cref="ArgumentOutOfRangeException">lookupType is null</exception>
         public LookupFilteringAttribute(Type lookupType)
             : base("Lookup")
         {
@@ -22,6 +36,12 @@ namespace Serenity.ComponentModel
                 LookupScriptAttribute.AutoLookupKeyFor(lookupType));
         }
 
+        /// <summary>
+        /// Gets or sets the ID field editor should filter on.
+        /// </summary>
+        /// <value>
+        /// The identifier field.
+        /// </value>
         public String IdField
         {
             get { return GetOption<String>("idField"); }

@@ -10,6 +10,9 @@ namespace Serenity.ComponentModel
     /// </remarks>
     public class AlignCenterAttribute : AlignmentAttribute
     {
+        /// <summary>
+        /// Creates a new AlignCenterAttribute
+        /// </summary>
         public AlignCenterAttribute()
             : base("center")
         {

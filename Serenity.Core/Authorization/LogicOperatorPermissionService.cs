@@ -22,6 +22,10 @@ namespace Serenity.Web
         private IPermissionService permissionService;
         private ConcurrentDictionary<string, string[][]> cache = new ConcurrentDictionary<string, string[][]>();
 
+        /// <summary>
+        /// Creates a new LogicOperatorPermissionService wrapping passed IPermissionService
+        /// </summary>
+        /// <param name="permissionService">Permission service to wrap with AND/OR functionality</param>
         public LogicOperatorPermissionService(IPermissionService permissionService)
         {
             Check.NotNull(permissionService, "permissionService");
@@ -29,6 +33,11 @@ namespace Serenity.Web
             this.permissionService = permissionService;
         }
 
+        /// <summary>
+        /// Returns true if user has specified permission
+        /// </summary>
+        /// <param name="permission">Permission to check</param>
+        /// <returns>True if user has specified permission</returns>
         public bool HasPermission(string permission)
         {
             if (string.IsNullOrEmpty(permission) ||

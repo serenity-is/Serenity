@@ -7,8 +7,18 @@
     /// Provides shortcuts to currently configured IDistributedCache provider.</summary>
     public static class DistributedCache
     {
+        /// <summary>
+        /// As cache access is performance-criticial, in some cases resolving 
+        /// the cache through dependency resolver might add some overhead even 
+        /// though neglible. This lets you to set a static provider to use in
+        /// cases where desirable (millions of requests per second).
+        /// </summary>
         public static IDistributedCache StaticProvider;
 
+        /// <summary>
+        /// Gets current distributed cache provider, e.g. static one or
+        /// the one configured through dependency resolver
+        /// </summary>
         public static IDistributedCache Provider
         {
             get

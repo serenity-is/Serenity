@@ -19,6 +19,10 @@ namespace Serenity.Web
         private IPermissionService permissionService;
         private ThreadLocal<Stack<HashSet<string>>> grantingStack = new ThreadLocal<Stack<HashSet<string>>>();
 
+        /// <summary>
+        /// Creates a new TransientGrantingPermissionService wrapping passed service
+        /// </summary>
+        /// <param name="permissionService">Permission service to wrap with transient granting ability</param>
         public TransientGrantingPermissionService(IPermissionService permissionService)
         {
             Check.NotNull(permissionService, "permissionService");
@@ -47,6 +51,11 @@ namespace Serenity.Web
             return stack;
         }
 
+        /// <summary>
+        /// Checks if user has specified permission
+        /// </summary>
+        /// <param name="permission">Permission to check</param>
+        /// <returns>True if user has the permission</returns>
         public bool HasPermission(string permission)
         { 
             var grantingStack = GetGrantingStack(false);
