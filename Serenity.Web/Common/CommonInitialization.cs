@@ -179,7 +179,7 @@ namespace Serenity.Caching
         {
             if (expiration == TimeSpan.Zero)
                 cache.Set(key, value);
-            else
+            else if (expiration > TimeSpan.Zero)
                 cache.Set(key, value, expiration);
         }
 
