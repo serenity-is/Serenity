@@ -1,3 +1,8 @@
+## 3.7.1 (2018-05-16)
+
+Bugfixes:
+  - fix sergen generating empty files due to a change in template engine (scriban) we use
+
 ## 3.7.0 (2018-05-14)
 
 Features:
