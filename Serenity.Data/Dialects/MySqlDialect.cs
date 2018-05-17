@@ -58,7 +58,7 @@ namespace Serenity.Data
         {
             get
             {
-                return "\'yyyy-MM-dd HH:mm:ss.fff\'";
+                return "\\'yyyy-MM-dd HH:mm:ss.fff\\'";
             }
         }
 
