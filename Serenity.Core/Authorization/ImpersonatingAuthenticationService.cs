@@ -13,6 +13,11 @@ namespace Serenity.Web
         private IAuthorizationService authorizationService;
         private ThreadLocal<Stack<string>> impersonationStack = new ThreadLocal<Stack<string>>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImpersonatingAuthorizationService"/> class
+        /// that wraps passed authorization service and adds impersonation support.
+        /// </summary>
+        /// <param name="authorizationService">The authorization service to wrap with impersonation support.</param>
         public ImpersonatingAuthorizationService(IAuthorizationService authorizationService)
         {
             Check.NotNull(authorizationService, "authorizationService");
@@ -42,6 +47,9 @@ namespace Serenity.Web
             return stack;
         }
 
+        /// <summary>
+        /// True if there is a currenty logged user
+        /// </summary>
         public bool IsLoggedIn 
         {
             get
@@ -50,6 +58,9 @@ namespace Serenity.Web
             }
         }
 
+        /// <summary>
+        /// Return currently logged user name
+        /// </summary>
         public string Username
         { 
             get
@@ -63,6 +74,10 @@ namespace Serenity.Web
             }
         }
 
+        /// <summary>
+        /// Temporarily impersonates as a user
+        /// </summary>
+        /// <param name="username">Username to impersonate as</param>
         public void Impersonate(string username)
         {
             Check.NotNullOrEmpty(username, "username");
@@ -70,6 +85,10 @@ namespace Serenity.Web
             impersonationStack.Push(username);
         }
 
+        /// <summary>
+        /// Undoes impersonation
+        /// </summary>
+        /// <exception cref="InvalidOperationException">UndoImpersonate() is called while impersonation stack is empty!</exception>
         public void UndoImpersonate()
         {
             var impersonationStack = GetImpersonationStack(false);

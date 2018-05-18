@@ -18,6 +18,12 @@ namespace Serenity.ComponentModel
             this.Value = insertable;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="InsertableAttribute"/> is enabled.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if enabled; otherwise, <c>false</c>.
+        /// </value>
         public bool Value
         {
             get;
