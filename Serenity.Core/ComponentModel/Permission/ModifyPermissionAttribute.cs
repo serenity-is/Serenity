@@ -3,6 +3,8 @@ namespace Serenity.Data
 {
     /// <summary>
     /// Sets modify permission for the row.
+    /// Modify permission is used for Insert/Update/Delete if they are
+    /// not explicitly specified.
     /// </summary>
     /// <seealso cref="Serenity.Data.PermissionAttributeBase" />
     public class ModifyPermissionAttribute : PermissionAttributeBase
@@ -18,7 +20,7 @@ namespace Serenity.Data
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModifyPermissionAttribute"/> class.
-        /// A colon is inserted between module and permission to generate permission key
+        /// A colon is inserted between module and permission to generate permission key.
         /// </summary>
         /// <param name="module">The module.</param>
         /// <param name="permission">The permission.</param>
