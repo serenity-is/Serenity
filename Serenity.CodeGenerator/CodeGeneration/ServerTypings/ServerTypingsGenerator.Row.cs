@@ -18,14 +18,19 @@ namespace Serenity.CodeGeneration
                     (!x.PropertyType.Name.EndsWith("Field") ||
                       x.PropertyType.Namespace != "Serenity.Data")).ToLookup(x => x.Name);
 
-                foreach (var fieldName in rowType.NestedTypes.FirstOrDefault(x =>
-                    CecilUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase")).Fields
+                var fieldsType = rowType.NestedTypes.FirstOrDefault(x =>
+                    CecilUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
+                
+                if (fieldsType != null)
+                {
+                    foreach (var fieldName in fieldsType.Fields
                         .Where(x => x.IsPublic)
                         .Select(x => x.Name))
-                {
-                    var property = propertyByName[fieldName].FirstOrDefault();
-                    if (property != null)
-                        yield return property;
+                    {
+                        var property = propertyByName[fieldName].FirstOrDefault();
+                        if (property != null)
+                            yield return property;
+                    }
                 }
             }
             while ((rowType = (rowType.BaseType?.Resolve())) != null && rowType.FullName != "Serenity.Data.Row");
