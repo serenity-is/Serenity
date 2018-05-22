@@ -8,7 +8,6 @@ namespace Serenity.Extensibility
     /// </summary>
     /// <seealso cref="Serenity.Extensibility.BaseRegistrarAttribute" />
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple=true)]
-    [Obsolete]
     public sealed class ScriptRegistrarAttribute : BaseRegistrarAttribute
     {
         /// <summary>
