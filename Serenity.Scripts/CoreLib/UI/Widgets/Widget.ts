@@ -143,7 +143,13 @@
                 widget = new params.type(e, params.options);
             }
 
-            widget.init(params.init);
+            if (widget.isAsyncWidget())
+                widget.init(params.init);
+            else {
+                widget.init(null);
+                params.init && params.init(widget);
+            }
+
             return widget;
         }
 
