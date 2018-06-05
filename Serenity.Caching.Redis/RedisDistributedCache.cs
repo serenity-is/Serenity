@@ -14,7 +14,7 @@ namespace Serenity.Caching
         public RedisDistributedCache(int database = 0)
         {
             var config = Config.Get<Configuration>();
-            keyPrefix = keyPrefix ?? "";
+            keyPrefix = config.KeyPrefix ?? "";
             redis = ConnectionMultiplexer.Connect(config.Connection);
             cache = redis.GetDatabase(config.Database);
         }
