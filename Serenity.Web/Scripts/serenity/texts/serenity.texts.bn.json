@@ -176,6 +176,6 @@
   "Validation.UniqueViolation": "একত্ব নষ্ট হচ্ছে",
   "Validation.Url": "দয়া করে একটি যথাযথ URL লিখুন (উদাঃ http://www.site.com)।",
   "Validation.Username": "ব্যবহারকারীর নাম যথাযথ নয়।",
-  "Validation.UsernameExists": "এই ব্যবহারকারী নাম ইতিমধ্যে ব্যবহৃত হয়েছে। অন্য চয়ন করুন।",
+  "Validation.UsernameExists": "এই ব্যবহারকারীর নাম ইতিমধ্যে ব্যবহৃত হয়েছে। অন্য চয়ন করুন।",
   "Validation.Xss": "অবৈধ মান! ('& lt;' এবং '& amp;' ব্যবহার করবেন না"
 }
