@@ -42,7 +42,7 @@ declare namespace Serenity {
     interface ListRequest extends ServiceRequest {
         Skip?: number;
         Take?: number;
-        Sort?: any;
+        Sort?: string[];
         ContainsText?: string;
         ContainsField?: string;
         Criteria?: any[];
