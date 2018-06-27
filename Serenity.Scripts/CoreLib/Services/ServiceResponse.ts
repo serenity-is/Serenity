@@ -52,10 +52,12 @@ declare namespace Serenity {
         ColumnSelection?: ColumnSelection;
         IncludeColumns?: string[];
         ExcludeColumns?: string[];
+        DistinctFields?: string[];
     }
 
     interface ListResponse<TEntity> extends ServiceResponse {
         Entities?: TEntity[];
+        Values?: any[];
         TotalCount?: number;
         Skip?: number;
         Take?: number;

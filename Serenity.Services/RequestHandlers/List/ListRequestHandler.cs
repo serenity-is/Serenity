@@ -68,6 +68,9 @@
 
         protected virtual bool ShouldSelectField(Field field)
         {
+            if (DistinctFields != null)
+                return DistinctFields.Contains(field);
+
             var mode = field.MinSelectLevel;
             
             if (mode == SelectLevel.Always)
@@ -487,6 +490,29 @@
                 }
         }
 
+        public Field[] GetDistinctFields()
+        {
+            if (!Request.DistinctFields.IsEmptyOrNull())
+            {
+                Query.Distinct(true);
+                Query.ApplySort(Request.DistinctFields);
+
+                return Request.DistinctFields.Select(x =>
+                {
+                    var field = Row.FindFieldByPropertyName(x.Field) ??
+                        Row.FindField(x.Field);
+
+                    if (ReferenceEquals(null, field) || !AllowSelectField(field))
+                        throw new ArgumentOutOfRangeException("distinctFields", String.Format(
+                            "{0} field specified in DistinctFields does not exist!", x));
+
+                    return field;
+                }).ToArray();
+            }
+
+            return null;
+        }
+
         public TListResponse Process(IDbConnection connection, TListRequest request)
         {
             StateBag.Clear();
@@ -506,15 +532,22 @@
             var query = CreateQuery();
             this.Query = query;
 
+            DistinctFields = GetDistinctFields();
+            if (DistinctFields != null)
+                Response.Values = new List<object>();
+
             PrepareQuery(query);
 
-            ApplyKeyOrder(query);
+            if (DistinctFields == null)
+                ApplyKeyOrder(query);
 
-            query.ApplySkipTakeAndCount(request.Skip, request.Take, request.ExcludeTotalCount);
+            query.ApplySkipTakeAndCount(request.Skip, request.Take, 
+                request.ExcludeTotalCount || DistinctFields != null);
 
             ApplyContainsText(query, request.ContainsText);
 
-            ApplySort(query);
+            if (DistinctFields == null)
+                ApplySort(query);
 
             ApplyFilters(query);
 
@@ -525,7 +558,15 @@
                 var clone = ProcessEntity(Row.Clone());
 
                 if (clone != null)
-                    Response.Entities.Add(clone);
+                {
+                    if (DistinctFields != null)
+                    {
+                        foreach (var field in DistinctFields)
+                            Response.Values.Add(field.AsObject(clone));
+                    }
+                    else
+                        Response.Entities.Add(clone);
+                }
             });
 
             Response.SetSkipTakeTotal(query);
@@ -550,6 +591,7 @@
             ignoredEqualityFilters.Add(field);
         }
 
+        public Field[] DistinctFields { get; private set; }
         public IDbConnection Connection { get; private set; }
         Row IListRequestHandler.Row { get { return this.Row; } }
         public SqlQuery Query { get; private set; }
