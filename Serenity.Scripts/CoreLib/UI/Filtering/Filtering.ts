@@ -173,6 +173,7 @@
                     text = this.getEditorText();
                     result.displayText = this.displayText(this.get_operator(), [text]);
                     result.criteria = [[this.getCriteriaField()], 'like', '%' + text + '%'];
+                    return result;
                 }
 
                 case 'startswith': {
