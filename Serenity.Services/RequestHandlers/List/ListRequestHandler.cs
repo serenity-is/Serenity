@@ -504,7 +504,7 @@
 
                     if (ReferenceEquals(null, field) || !AllowSelectField(field))
                         throw new ArgumentOutOfRangeException("distinctFields", String.Format(
-                            "{0} field specified in DistinctFields does not exist!", x));
+                            "{0} field specified in DistinctFields does not exist!", x.Field));
 
                     return field;
                 }).ToArray();

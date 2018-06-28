@@ -2491,7 +2491,7 @@ declare namespace Serenity {
         protected editItem(entityOrId: any): void;
         protected editItemOfType(itemType: string, entityOrId: any): void;
         protected onClick(e: JQueryEventObject, row: number, cell: number): void;
-        protected viewDataChanged(e: JQuery, rows: TItem[]): void;
+        protected viewDataChanged(e: any, rows: TItem[]): void;
         protected bindToViewEvents(): void;
         protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
         protected onViewFilter(item: TItem): boolean;
@@ -2972,11 +2972,14 @@ declare namespace Slick {
         format(ctx: FormatterContext): string;
     }
     type Format = (ctx: Slick.FormatterContext) => string;
-    class Event {
-        subscribe(handler: (p1: any, p2?: any) => void): void;
-        subscribe(handler: (p1: any, p2?: any) => any): void;
-        unsubscribe(handler: (p1: any, p2?: any) => void): void;
-        notify(p1?: any, p2?: any, p3?: any): void;
+    interface IEventData {
+        isPropagationStopped(): boolean;
+        isImmediatePropagationStopped(): boolean;
+    }
+    class Event<TArgs = any> {
+        subscribe(handler: Handler<TArgs>): void;
+        unsubscribe(handler: Handler<TArgs>): void;
+        notify(args?: TArgs, e?: IEventData, scope?: any): void;
         clear(): void;
     }
     interface PositionInfo {
@@ -2996,6 +2999,8 @@ declare namespace Slick {
     }
     class EventData {
         constructor();
+        isPropagationStopped(): boolean;
+        isImmediatePropagationStopped(): boolean;
     }
     type AsyncPostRender = (cellNode: any, row: number, item: any, column: Slick.Column, clean?: boolean) => void;
     type CancellableViewCallback<TEntity> = (view: Slick.RemoteView<TEntity>) => boolean;
@@ -3003,6 +3008,12 @@ declare namespace Slick {
     type RemoteViewAjaxCallback<TEntity> = (view: Slick.RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean;
     type RemoteViewFilter<TEntity> = (item: TEntity, view: Slick.RemoteView<TEntity>) => boolean;
     type RemoteViewProcessCallback<TEntity> = (data: Serenity.ListResponse<TEntity>, view: Slick.RemoteView<TEntity>) => Serenity.ListResponse<TEntity>;
+    type Handler<TArgs> = (e: JQueryEventObject, args: TArgs) => void;
+    class EventHandler<TArgs = any> {
+        subscribe<TArgs>(event: Event<TArgs>, handler: Handler<TArgs>): EventHandler<TArgs>;
+        unsubscribe<TArgs>(event: Event<TArgs>, handler: Handler<TArgs>): EventHandler<TArgs>;
+        unsubscribeAll(): EventHandler<TArgs>;
+    }
     interface Column {
         asyncPostRender?: Slick.AsyncPostRender;
         behavior?: any;

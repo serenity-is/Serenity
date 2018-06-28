@@ -469,11 +469,11 @@
 
             this.slickGrid.onClick.subscribe(this.slickGridOnClick);
 
-            this.slickGrid.onColumnsReordered.subscribe((e2: JQuery, p2: any) => {
+            this.slickGrid.onColumnsReordered.subscribe((e2: JQueryEventObject, p2: any) => {
                 return this.persistSettings(null);
             });
 
-            this.slickGrid.onColumnsResized.subscribe((e3: JQuery, p3: any) => {
+            this.slickGrid.onColumnsResized.subscribe((e3: JQueryEventObject, p3: any) => {
                 return this.persistSettings(null);
             });
         }
@@ -515,7 +515,7 @@
             }
         }
 
-        protected viewDataChanged(e: JQuery, rows: TItem[]): void {
+        protected viewDataChanged(e: any, rows: TItem[]): void {
             this.markupReady();
         }
 
