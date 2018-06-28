@@ -1,3 +1,17 @@
+## 3.7.2 (2018-06-28)
+
+Features:
+  - added ability to select distinct fields to ListRequest and its handler by using DistinctFields which works similar to Sort property
+  - excel style column filtering grid mixin and related sample [StartSharp]
+  - call init async on widget if the widget is async as well
+
+Bugfixes:
+  - removed BW operator from StringFiltering (thanks @marcobisio)
+  - added missing return statement that causes switch on advanced filter contains to fall back to startsWith operator (thanks @edwardch)
+  - replaced default keyPrefix with config.KeyPrefix in RedisDistributedCache (thanks @MungoWang)
+  - handle null reference exception gracefully when row type doesn't have a nested fields type
+  - .net core memory cache raises an exception if timespan is less than zero (#3514)
+
 ## 3.7.1 (2018-05-16)
 
 Bugfixes:
