@@ -222,12 +222,12 @@ var Q;
     }
     Q.isTrimmedEmpty = isTrimmedEmpty;
     function format(msg) {
-        var _a;
         var prm = [];
         for (var _i = 1; _i < arguments.length; _i++) {
             prm[_i - 1] = arguments[_i];
         }
         return (_a = ss).formatString.apply(_a, [msg].concat(prm));
+        var _a;
     }
     Q.format = format;
     function padLeft(s, len, ch) {
@@ -4309,13 +4309,13 @@ var Serenity;
             }
             return this.asyncPromise;
         };
-        var Widget_1;
         Widget.nextWidgetNumber = 0;
         Widget.__isWidgetType = true;
         Widget = Widget_1 = __decorate([
             Serenity.Decorators.registerClass()
         ], Widget);
         return Widget;
+        var Widget_1;
     }(React.Component));
     Serenity.Widget = Widget;
     Widget.prototype.addValidationRule = function (eventClass, rule) {
@@ -4499,12 +4499,12 @@ var Serenity;
             }
             return template;
         };
-        var TemplatedWidget_1;
         TemplatedWidget.templateNames = {};
         TemplatedWidget = TemplatedWidget_1 = __decorate([
             Serenity.Decorators.registerClass()
         ], TemplatedWidget);
         return TemplatedWidget;
+        var TemplatedWidget_1;
     }(Serenity.Widget));
     Serenity.TemplatedWidget = TemplatedWidget;
 })(Serenity || (Serenity = {}));
@@ -5108,7 +5108,6 @@ var Serenity;
             date.setMilliseconds(0);
             return date;
         };
-        var DateTimeEditor_1;
         DateTimeEditor.getTimeOptions = function (fromHour, fromMin, toHour, toMin, stepMins) {
             var list = [];
             if (toHour >= 23) {
@@ -5150,6 +5149,7 @@ var Serenity;
             Serenity.Decorators.element('<input/>')
         ], DateTimeEditor);
         return DateTimeEditor;
+        var DateTimeEditor_1;
     }(Serenity.Widget));
     Serenity.DateTimeEditor = DateTimeEditor;
 })(Serenity || (Serenity = {}));
@@ -6506,12 +6506,12 @@ var Serenity;
                 }
             }
         };
-        var EmailEditor_1;
         EmailEditor = EmailEditor_1 = __decorate([
             Editor('Email', [Serenity.IStringValue, Serenity.IReadOnly]),
             Element('<input type="text"/>')
         ], EmailEditor);
         return EmailEditor;
+        var EmailEditor_1;
     }(Serenity.Widget));
     Serenity.EmailEditor = EmailEditor;
     var EnumEditor = /** @class */ (function (_super) {
@@ -6761,13 +6761,13 @@ var Serenity;
                 .appendTo(window.document.head);
         };
         ;
-        var HtmlContentEditor_1;
         HtmlContentEditor.CKEditorVer = "4.7.1";
         HtmlContentEditor = HtmlContentEditor_1 = __decorate([
             Editor('HtmlContent', [Serenity.IStringValue, Serenity.IReadOnly]),
             Element('<textarea/>')
         ], HtmlContentEditor);
         return HtmlContentEditor;
+        var HtmlContentEditor_1;
     }(Serenity.Widget));
     Serenity.HtmlContentEditor = HtmlContentEditor;
     var HtmlNoteContentEditor = /** @class */ (function (_super) {
@@ -7735,11 +7735,11 @@ var Serenity;
                 this.displayText = FilterStore_1.getDisplayTextFor(this.items);
             return this.displayText;
         };
-        var FilterStore_1;
         FilterStore = FilterStore_1 = __decorate([
             Serenity.Decorators.registerClass('FilterStore')
         ], FilterStore);
         return FilterStore;
+        var FilterStore_1;
     }());
     Serenity.FilterStore = FilterStore;
 })(Serenity || (Serenity = {}));
@@ -8301,8 +8301,12 @@ var Serenity;
             return _super !== null && _super.apply(this, arguments) || this;
         }
         StringFiltering.prototype.getOperators = function () {
-            var ops = [{ key: Operators.contains }, { key: Operators.startsWith }, { key: Operators.EQ },
-                { key: Operators.NE }, { key: Operators.BW }];
+            var ops = [
+                { key: Operators.contains },
+                { key: Operators.startsWith },
+                { key: Operators.EQ },
+                { key: Operators.NE }
+            ];
             return this.appendNullableOperators(ops);
         };
         StringFiltering.prototype.validateEditorValue = function (value) {
@@ -9126,7 +9130,6 @@ var Serenity;
         DateFormatter.prototype.format = function (ctx) {
             return DateFormatter_1.format(ctx.value, this.displayFormat);
         };
-        var DateFormatter_1;
         __decorate([
             Option()
         ], DateFormatter.prototype, "displayFormat", void 0);
@@ -9134,6 +9137,7 @@ var Serenity;
             Formatter('Date')
         ], DateFormatter);
         return DateFormatter;
+        var DateFormatter_1;
     }());
     Serenity.DateFormatter = DateFormatter;
     var DateTimeFormatter = /** @class */ (function (_super) {
@@ -9189,7 +9193,6 @@ var Serenity;
             }
             return ss.Enum.toString(enumType, value);
         };
-        var EnumFormatter_1;
         __decorate([
             Option()
         ], EnumFormatter.prototype, "enumKey", void 0);
@@ -9197,6 +9200,7 @@ var Serenity;
             Formatter('Enum')
         ], EnumFormatter);
         return EnumFormatter;
+        var EnumFormatter_1;
     }());
     Serenity.EnumFormatter = EnumFormatter;
     var FileDownloadFormatter = /** @class */ (function () {
@@ -9227,7 +9231,6 @@ var Serenity;
                 return;
             }
         };
-        var FileDownloadFormatter_1;
         __decorate([
             Option()
         ], FileDownloadFormatter.prototype, "displayFormat", void 0);
@@ -9238,6 +9241,7 @@ var Serenity;
             Formatter('FileDownload', [Serenity.ISlickFormatter, IInitializeColumn])
         ], FileDownloadFormatter);
         return FileDownloadFormatter;
+        var FileDownloadFormatter_1;
     }());
     Serenity.FileDownloadFormatter = FileDownloadFormatter;
     var MinuteFormatter = /** @class */ (function () {
@@ -9263,11 +9267,11 @@ var Serenity;
                 minuteStr = minute.toString();
             return Q.format('{0}:{1}', hourStr, minuteStr);
         };
-        var MinuteFormatter_1;
         MinuteFormatter = MinuteFormatter_1 = __decorate([
             Formatter('Minute')
         ], MinuteFormatter);
         return MinuteFormatter;
+        var MinuteFormatter_1;
     }());
     Serenity.MinuteFormatter = MinuteFormatter;
     var NumberFormatter = /** @class */ (function () {
@@ -9291,7 +9295,6 @@ var Serenity;
                 return '';
             return Q.htmlEncode(value.toString());
         };
-        var NumberFormatter_1;
         __decorate([
             Option()
         ], NumberFormatter.prototype, "displayFormat", void 0);
@@ -9299,6 +9302,7 @@ var Serenity;
             Formatter('Number')
         ], NumberFormatter);
         return NumberFormatter;
+        var NumberFormatter_1;
     }());
     Serenity.NumberFormatter = NumberFormatter;
     var UrlFormatter = /** @class */ (function () {
@@ -10337,11 +10341,11 @@ var Serenity;
                 callback(item, editor);
             }
         };
-        var PropertyGrid_1;
         PropertyGrid = PropertyGrid_1 = __decorate([
             Serenity.Decorators.registerClass('PropertyGrid')
         ], PropertyGrid);
         return PropertyGrid;
+        var PropertyGrid_1;
     }(Serenity.Widget));
     Serenity.PropertyGrid = PropertyGrid;
 })(Serenity || (Serenity = {}));
@@ -10878,11 +10882,11 @@ var Serenity;
                 }
             }
         };
-        var TemplatedDialog_1;
         TemplatedDialog = TemplatedDialog_1 = __decorate([
             Serenity.Decorators.registerClass([Serenity.IDialog])
         ], TemplatedDialog);
         return TemplatedDialog;
+        var TemplatedDialog_1;
     }(Serenity.TemplatedWidget));
     Serenity.TemplatedDialog = TemplatedDialog;
 })(Serenity || (Serenity = {}));

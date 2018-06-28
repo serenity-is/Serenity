@@ -1,8 +1,8 @@
-﻿/// <reference types="jqueryui" />
-/// <reference types="toastr" />
+﻿/// <reference types="toastr" />
 /// <reference types="jquery" />
 /// <reference types="react" />
 /// <reference types="jquery.validation" />
+/// <reference types="jqueryui" />
 declare var Reflect: any;
 declare var __decorate: any;
 declare const __skipExtends: {
@@ -353,7 +353,7 @@ interface JQueryStatic {
     extend<T>(target: T, object1?: T, ...objectN: T[]): T;
     toJSON(obj: any): string;
 }
-declare interface JQBlockUIOptions {
+interface JQBlockUIOptions {
     useTimeout?: boolean;
 }
 declare namespace Serenity {
@@ -880,7 +880,7 @@ declare namespace Serenity {
         constructor(value: string);
     }
     class GeneratedCodeAttribute {
-        origin?: string;
+        origin: string;
         constructor(origin?: string);
     }
     class HiddenAttribute {
@@ -1188,9 +1188,9 @@ declare namespace Serenity {
         private static templateNames;
         constructor(container: JQuery, options?: TOptions);
         protected byId(id: string): JQuery;
-        private byID;
-        private static noGeneric;
-        private getDefaultTemplateName;
+        private byID<TWidget>(id, type);
+        private static noGeneric(s);
+        private getDefaultTemplateName();
         protected getTemplateName(): string;
         protected getFallbackTemplate(): string;
         protected getTemplate(): string;
@@ -1309,9 +1309,9 @@ declare namespace Serenity {
         get_value(): string;
         value: string;
         set_value(value: string): void;
-        private get_valueAsDate;
+        private get_valueAsDate();
         valueAsDate: Date;
-        private set_valueAsDate;
+        private set_valueAsDate(value);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         yearRange: string;
@@ -1341,9 +1341,9 @@ declare namespace Serenity {
         get_value(): string;
         value: string;
         set_value(value: string): void;
-        private get_valueAsDate;
+        private get_valueAsDate();
         valueAsDate: Date;
-        private set_valueAsDate;
+        private set_valueAsDate(value);
         get_minValue(): string;
         set_minValue(value: string): void;
         get_maxValue(): string;
@@ -1404,7 +1404,7 @@ declare namespace Serenity {
         readonly text: string;
         get_readOnly(): boolean;
         readOnly: boolean;
-        private updateInplaceReadOnly;
+        private updateInplaceReadOnly();
         set_readOnly(value: boolean): void;
     }
     interface Select2Item {
@@ -2092,10 +2092,10 @@ declare namespace Serenity {
         private yDifference;
         constructor(container: JQuery, options: FlexifyOptions);
         storeInitialSize(): void;
-        private getXFactor;
-        private getYFactor;
-        private resizeElements;
-        private resizeElement;
+        private getXFactor(element);
+        private getYFactor(element);
+        private resizeElements();
+        private resizeElement(element);
     }
     interface FlexifyOptions {
         getXFactor?: (p1: JQuery) => any;
@@ -2136,7 +2136,7 @@ declare namespace Serenity {
     const enum RetrieveColumnSelection {
         details = 0,
         keyOnly = 1,
-        list = 2
+        list = 2,
     }
     class CheckListEditor extends Widget<CheckListEditorOptions> {
         constructor(div: JQuery, opt: CheckListEditorOptions);
@@ -2165,7 +2165,7 @@ declare namespace Serenity {
     const enum ColumnSelection {
         List = 0,
         KeyOnly = 1,
-        Details = 2
+        Details = 2,
     }
     interface HtmlContentEditorOptions {
     }
@@ -2204,7 +2204,7 @@ declare namespace Serenity {
         Before = 0,
         Delete = 1,
         Insert = 2,
-        Update = 3
+        Update = 3,
     }
     namespace CustomValidation {
         function registerValidationMethods(): void;
@@ -2235,13 +2235,13 @@ declare namespace Serenity {
         private items;
         constructor(div: JQuery, opt: PropertyGridOptions);
         destroy(): void;
-        private createItems;
-        private createCategoryDiv;
+        private createItems(container, items);
+        private createCategoryDiv(categoriesDiv, categoryIndexes, category, collapsed);
         private categoryLinkClick;
-        private determineText;
-        private createField;
-        private getCategoryOrder;
-        private createCategoryLinks;
+        private determineText(text, getKey);
+        private createField(container, item);
+        private getCategoryOrder(items);
+        private createCategoryLinks(container, items);
         get_editors(): Widget<any>[];
         get_items(): PropertyItem[];
         get_idPrefix(): string;
@@ -2249,19 +2249,19 @@ declare namespace Serenity {
         set_mode(value: PropertyGridMode): void;
         static loadEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
         static saveEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
-        private static setReadOnly;
-        private static setReadonly;
-        private static setRequired;
-        private static setMaxLength;
+        private static setReadOnly(widget, isReadOnly);
+        private static setReadonly(elements, isReadOnly);
+        private static setRequired(widget, isRequired);
+        private static setMaxLength(widget, maxLength);
         load(source: any): void;
         save(target: any): void;
-        private canModifyItem;
+        private canModifyItem(item);
         updateInterface(): void;
         enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
     }
     const enum PropertyGridMode {
         insert = 1,
-        update = 2
+        update = 2,
     }
     interface PropertyGridOptions {
         idPrefix?: string;
@@ -2355,8 +2355,8 @@ declare namespace Serenity {
         constructor(options?: TOptions);
         private readonly isMarkedAsPanel;
         private readonly isResponsive;
-        private static getCssSize;
-        private static applyCssSizes;
+        private static getCssSize(element, name);
+        private static applyCssSizes(opt, dialogClass);
         destroy(): void;
         protected initDialog(): void;
         protected initToolbar(): void;
@@ -2376,7 +2376,7 @@ declare namespace Serenity {
         protected getDialogTitle(): string;
         dialogClose(): void;
         dialogTitle: string;
-        private setupPanelTitle;
+        private setupPanelTitle();
         set_dialogTitle(value: string): void;
         protected initTabs(): void;
         protected handleResponsive(): void;
@@ -2633,9 +2633,9 @@ declare namespace Serenity {
         protected getSlickOptions(): Slick.GridOptions;
         protected sortItems(): void;
         protected moveSelectedUp(): boolean;
-        private get_value;
+        private get_value();
         value: string[];
-        private set_value;
+        private set_value(value);
     }
     interface CheckLookupEditorOptions {
         lookupKey?: string;
@@ -2809,7 +2809,7 @@ declare namespace Serenity {
         protected isLocalizationModeAndChanged(): boolean;
         protected localizationButtonClick(): void;
         protected getLanguages(): any[];
-        private getLangs;
+        private getLangs();
         protected loadLocalization(): void;
         protected setLocalizationGridCurrentValues(): void;
         protected getLocalizationGridValue(): any;
@@ -2893,9 +2893,9 @@ declare namespace Serenity {
         constructor();
         static createToolButton(grid: DataGrid<any, any>): ToolButton;
         protected getDialogOptions(): JQueryUI.DialogOptions;
-        private getTitle;
-        private createLI;
-        private updateListStates;
+        private getTitle(col);
+        private createLI(col);
+        private updateListStates();
         protected setupColumns(): void;
         protected onDialogOpen(): void;
         protected getTemplate(): string;

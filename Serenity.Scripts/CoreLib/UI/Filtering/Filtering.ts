@@ -625,8 +625,12 @@
     export class StringFiltering extends BaseFiltering {
 
         getOperators(): Serenity.FilterOperator[] {
-            var ops = [{ key: Operators.contains }, { key: Operators.startsWith }, { key: Operators.EQ },
-            { key: Operators.NE }, { key: Operators.BW }];
+            var ops = [
+                { key: Operators.contains }, 
+                { key: Operators.startsWith }, 
+                { key: Operators.EQ },
+                { key: Operators.NE }
+            ];
             return this.appendNullableOperators(ops);
         }
 
