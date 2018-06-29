@@ -1,6 +1,12 @@
 ## 3.7.2 (2018-06-28)
 
 Features:
+  - updated Serenity.Web.Assets package
+
+
+## 3.7.2 (2018-06-28)
+
+Features:
   - added ability to select distinct fields to ListRequest and its handler by using DistinctFields which works similar to Sort property
   - excel style column filtering grid mixin and related sample [StartSharp]
   - call init async on widget if the widget is async as well
