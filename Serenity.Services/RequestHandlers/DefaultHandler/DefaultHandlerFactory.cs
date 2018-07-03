@@ -129,27 +129,10 @@ namespace Serenity.Services
                 if (typeof(ISaveRequestProcessor).IsAssignableFrom(handlerType))
                 {
                     genericArguments = IsSubclassOfRawGeneric(typeof(SaveRequestHandler<,,>), handlerType);
-                    if (genericArguments != null || genericArguments[0] != rowType)
+                    if (genericArguments == null || genericArguments[0] != rowType)
                         continue;
 
                     if (factories.saveRequestFactory != null)
-                        throw new InvalidProgramException("There are multiple DeleteRequestHandler types " +
-                            "with [DefaultHandler] attribute for row type " + rowType.FullName);
-
-                    factories.deleteHandlerFactory = FastReflection
-                        .DelegateForConstructor<IDeleteRequestProcessor>(handlerType);
-                    factories.deleteRequestFactory = FastReflection
-                        .DelegateForConstructor<DeleteRequest>(genericArguments[1]);
-                    continue;
-                }
-
-                if (typeof(IDeleteRequestProcessor).IsAssignableFrom(handlerType))
-                {
-                    genericArguments = IsSubclassOfRawGeneric(typeof(DeleteRequestHandler<,,>), handlerType);
-                    if (genericArguments != null || genericArguments[0] != rowType)
-                        continue;
-
-                    if (factories.deleteRequestFactory != null)
                         throw new InvalidProgramException("There are multiple SaveRequestHandler types " +
                             "with [DefaultHandler] attribute for row type " + rowType.FullName);
 
@@ -157,6 +140,23 @@ namespace Serenity.Services
                         .DelegateForConstructor<ISaveRequestProcessor>(handlerType);
                     factories.saveRequestFactory = FastReflection
                         .DelegateForConstructor<ISaveRequest>(genericArguments[1]);
+                    continue;
+                }
+
+                if (typeof(IDeleteRequestProcessor).IsAssignableFrom(handlerType))
+                {
+                    genericArguments = IsSubclassOfRawGeneric(typeof(DeleteRequestHandler<,,>), handlerType);
+                    if (genericArguments == null || genericArguments[0] != rowType)
+                        continue;
+
+                    if (factories.deleteRequestFactory != null)
+                        throw new InvalidProgramException("There are multiple DeleteRequestHandler types " +
+                            "with [DefaultHandler] attribute for row type " + rowType.FullName);
+
+                    factories.deleteHandlerFactory = FastReflection
+                        .DelegateForConstructor<IDeleteRequestProcessor>(handlerType);
+                    factories.deleteRequestFactory = FastReflection
+                        .DelegateForConstructor<DeleteRequest>(genericArguments[1]);
                     continue;
                 }
 
