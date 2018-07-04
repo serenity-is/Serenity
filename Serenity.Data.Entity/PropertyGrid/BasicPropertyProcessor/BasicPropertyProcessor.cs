@@ -7,6 +7,7 @@ namespace Serenity.PropertyGrid
         public override void Process(IPropertySource source, PropertyItem item)
         {
             SetAlignment(source, item);
+            SetAllowHide(source, item);
             SetCategory(source, item);
             SetCollapsible(source, item);
             SetTab(source, item);

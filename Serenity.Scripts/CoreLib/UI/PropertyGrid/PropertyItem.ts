@@ -29,6 +29,7 @@
         defaultValue?: any;
         localizable?: boolean;
         visible?: boolean;
+        allowHide?: boolean;
         formatterType?: string;
         formatterParams?: any;
         displayFormat?: string;

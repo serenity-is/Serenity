@@ -150,12 +150,17 @@ namespace Serenity {
             return col.name || col.toolTip || col.id;
         }
 
+        private allowHide(col: Slick.Column): boolean {
+            return col.sourceItem == null || col.sourceItem.allowHide == null || col.sourceItem.allowHide;
+        }
+
         private createLI(col: Slick.Column): JQuery {
+            var allowHide = this.allowHide(col);
             return $(`
-<li data-key="${col.id}">
+<li data-key="${col.id}" class="${allowHide ? "" : "cant-hide"}">
   <span class="drag-handle">☰</span>
   ${ Q.htmlEncode(this.getTitle(col)) }
-  <i class="js-hide" title="${ Q.text("Controls.ColumnPickerDialog.HideHint") }">✖</i>
+  ${ allowHide ? `<i class="js-hide" title="${ Q.text("Controls.ColumnPickerDialog.HideHint") }">✖</i>` : '' }
   <i class="js-show fa fa-eye" title="${ Q.text("Controls.ColumnPickerDialog.ShowHint") }"></i>
 </li>`);
         }
@@ -217,6 +222,13 @@ namespace Serenity {
                     onFilter: evt => {
                         $(evt.item).appendTo(this.ulHidden);
                         this.updateListStates();
+                    },
+                    onMove: x => {
+                        if ($(x.dragged).hasClass('cant-hide') &&
+                            x.from == this.ulVisible[0] &&
+                            x.to !== x.from)
+                            return false;
+                        return true;
                     },
                     onEnd: evt => this.updateListStates()
                 });

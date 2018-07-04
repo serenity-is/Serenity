@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace Serenity.ComponentModel
@@ -59,6 +60,8 @@ namespace Serenity.ComponentModel
         public bool? Localizable { get; set; }
         [JsonProperty("visible")]
         public bool? Visible { get; set; }
+        [JsonProperty("allowHide")]
+        public bool? AllowHide { get; set; }
 
         [JsonProperty("formatterType")]
         public string FormatterType { get; set; }
@@ -113,6 +116,9 @@ namespace Serenity.ComponentModel
         [JsonProperty("quickFilterCssClass")]
         public string QuickFilterCssClass { get; set; }
 
+        [JsonExtensionData]
+        public IDictionary<string, JToken> ExtensionData { get; set; }
+
         public bool ShouldSerializeEditorType()
         {
             return EditorType != null && EditorType != "String";
@@ -149,6 +155,7 @@ namespace Serenity.ComponentModel
             FormatterParams = new Dictionary<string, object>();
             FilteringParams = new Dictionary<string, object>();
             QuickFilterParams = new Dictionary<string, object>();
+            ExtensionData = new Dictionary<string, JToken>();
         }
     }
 }
