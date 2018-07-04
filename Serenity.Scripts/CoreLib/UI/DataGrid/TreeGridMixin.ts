@@ -59,6 +59,16 @@
             this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
         }
 
+        collapseAll(): void {
+            SlickTreeHelper.setCollapsed(this.dataGrid.view.getItems(), true);
+            this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
+        }
+        
+        expandAll(): void {
+            SlickTreeHelper.setCollapsed(this.dataGrid.view.getItems(), false);
+            this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
+        }
+        
         /**
          * Reorders a set of items so that parents comes before their children.
          * This method is required for proper tree ordering, as it is not so easy to perform with SQL.
