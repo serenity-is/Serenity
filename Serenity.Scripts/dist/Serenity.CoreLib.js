@@ -11205,7 +11205,10 @@ var Serenity;
         DataGrid.prototype.getQuickFilters = function () {
             var list = [];
             var columns = this.allColumns.filter(function (x) {
-                return x.sourceItem && x.sourceItem.quickFilter === true;
+                return x.sourceItem &&
+                    x.sourceItem.quickFilter === true &&
+                    (x.sourceItem.readPermission == null ||
+                        Q.Authorization.hasPermission(x.sourceItem.readPermission));
             });
             for (var _i = 0, columns_2 = columns; _i < columns_2.length; _i++) {
                 var column = columns_2[_i];

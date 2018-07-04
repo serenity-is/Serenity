@@ -145,7 +145,10 @@
             var list = [];
 
             var columns = this.allColumns.filter(function (x) {
-                return x.sourceItem && x.sourceItem.quickFilter === true;
+                return x.sourceItem && 
+                    x.sourceItem.quickFilter === true &&
+                    (x.sourceItem.readPermission == null ||
+                     Q.Authorization.hasPermission(x.sourceItem.readPermission));
             });
 
             for (var column of columns) {
