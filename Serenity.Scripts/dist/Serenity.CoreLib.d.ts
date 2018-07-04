@@ -2478,6 +2478,8 @@ declare namespace Serenity {
         protected getItemMetadata(item: TItem, index: number): any;
         protected postProcessColumns(columns: Slick.Column[]): Slick.Column[];
         protected initialPopulate(): void;
+        protected canFilterColumn(column: Slick.Column): boolean;
+        protected initializeFilterBar(): void;
         protected initializeAsync(): PromiseLike<void>;
         protected createSlickGrid(): Slick.Grid;
         protected setInitialSortOrder(): void;
@@ -2914,6 +2916,8 @@ declare namespace Serenity {
          * Expands / collapses all rows in a grid automatically
          */
         toggleAll(): void;
+        collapseAll(): void;
+        expandAll(): void;
         /**
          * Reorders a set of items so that parents comes before their children.
          * This method is required for proper tree ordering, as it is not so easy to perform with SQL.

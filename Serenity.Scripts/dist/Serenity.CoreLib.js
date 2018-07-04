@@ -11359,6 +11359,25 @@ var Serenity;
                 this.view.populate();
             }
         };
+        DataGrid.prototype.canFilterColumn = function (column) {
+            return (column.sourceItem != null &&
+                column.sourceItem.notFilterable !== true &&
+                (column.sourceItem.readPermission == null ||
+                    Q.Authorization.hasPermission(column.sourceItem.readPermission)));
+        };
+        DataGrid.prototype.initializeFilterBar = function () {
+            var _this = this;
+            this.filterBar.set_store(new Serenity.FilterStore(this.allColumns
+                .filter(function (c) { return _this.canFilterColumn(c); })
+                .map(function (x) { return x.sourceItem; })));
+            this.filterBar.get_store().add_changed(function (s, e) {
+                if (_this.restoringSettings <= 0) {
+                    _this.persistSettings(null);
+                    _this.view && (_this.view.seekToPage = 1);
+                    _this.refresh();
+                }
+            });
+        };
         DataGrid.prototype.initializeAsync = function () {
             var _this = this;
             return _super.prototype.initializeAsync.call(this)
@@ -11366,21 +11385,7 @@ var Serenity;
                 .then(function (columns) {
                 _this.allColumns = columns;
                 _this.postProcessColumns(_this.allColumns);
-                var self = _this;
-                if (_this.filterBar) {
-                    _this.filterBar.set_store(new Serenity.FilterStore(_this.allColumns.filter(function (x) {
-                        return x.sourceItem && x.sourceItem.notFilterable !== true;
-                    }).map(function (x1) {
-                        return x1.sourceItem;
-                    })));
-                    _this.filterBar.get_store().add_changed(function (s, e) {
-                        if (_this.restoringSettings <= 0) {
-                            self.persistSettings(null);
-                            self.view && (self.view.seekToPage = 1);
-                            self.refresh();
-                        }
-                    });
-                }
+                _this.filterBar && _this.initializeFilterBar();
                 var visibleColumns = _this.allColumns.filter(function (x2) {
                     return x2.visible !== false;
                 });
@@ -11631,24 +11636,11 @@ var Serenity;
             return false;
         };
         DataGrid.prototype.createFilterBar = function () {
-            var _this = this;
             var filterBarDiv = $('<div/>').appendTo(this.element);
             var self = this;
             this.filterBar = new Serenity.FilterDisplayBar(filterBarDiv);
-            if (!this.isAsyncWidget()) {
-                this.filterBar.set_store(new Serenity.FilterStore(this.allColumns.filter(function (x) {
-                    return (x.sourceItem != null) && x.sourceItem.notFilterable !== true;
-                }).map(function (x1) {
-                    return x1.sourceItem;
-                })));
-                this.filterBar.get_store().add_changed(function (s, e) {
-                    if (_this.restoringSettings <= 0) {
-                        self.persistSettings(null);
-                        self.view && (self.view.seekToPage = 1);
-                        self.refresh();
-                    }
-                });
-            }
+            if (!this.isAsyncWidget())
+                this.initializeFilterBar();
         };
         DataGrid.prototype.getPagerOptions = function () {
             return {
@@ -14805,6 +14797,14 @@ var Serenity;
          */
         TreeGridMixin.prototype.toggleAll = function () {
             Serenity.SlickTreeHelper.setCollapsed(this.dataGrid.view.getItems(), !this.dataGrid.view.getItems().every(function (x) { return x._collapsed == true; }));
+            this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
+        };
+        TreeGridMixin.prototype.collapseAll = function () {
+            Serenity.SlickTreeHelper.setCollapsed(this.dataGrid.view.getItems(), true);
+            this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
+        };
+        TreeGridMixin.prototype.expandAll = function () {
+            Serenity.SlickTreeHelper.setCollapsed(this.dataGrid.view.getItems(), false);
             this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
         };
         /**
