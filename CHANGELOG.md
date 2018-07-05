@@ -1,3 +1,21 @@
+## 3.7.4 (2018-07-05)
+
+Features:
+  - introduced AllowHideAttribute which when set on a property to false, doesn't let that column to be hidden in column picker dialog
+  - added collapseAll() and expandAll() to TreeGridMixin.ts, thanks @dfaruque
+  - Bengali translation, thanks @dfaruque
+  - remove quick filter if user doesn't have permission to column
+  - advanced filter should only show columns that user has read permission to (thanks @kilroyFR)
+  - renamed ColumnFiltersMixin to HeaderFiltersMixin [StartSharp]
+  - better positioning for header filter popup [StartSharp]
+  - added ability to check for roles like permissions with Role:RoleKey if role has a key set (a new field added to Roles table) [StartSharp]
+  - fix SqlErrorStore error logging in non sql server type database servers
+  
+Bugfixes:
+  - fix typos in [DefaultHandler] implementation for Save and Delete handlers
+  - avoid duplicate key exception while adding implict permissions in UserPermissionService
+  - fix some ClientTypes conditional files left behind even if related features are not selected
+
 ## 3.7.3 (2018-06-28)
 
 Features:
