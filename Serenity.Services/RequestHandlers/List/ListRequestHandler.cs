@@ -497,17 +497,24 @@
                 Query.Distinct(true);
                 Query.ApplySort(Request.DistinctFields);
 
-                return Request.DistinctFields.Select(x =>
+                var result = Request.DistinctFields.Select(x =>
                 {
                     var field = Row.FindFieldByPropertyName(x.Field) ??
                         Row.FindField(x.Field);
 
-                    if (ReferenceEquals(null, field) || !AllowSelectField(field))
-                        throw new ArgumentOutOfRangeException("distinctFields", String.Format(
-                            "{0} field specified in DistinctFields does not exist!", x.Field));
+                    if (ReferenceEquals(null, field) ||
+                        (field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped ||
+                        !AllowSelectField(field))
+                        return null;
 
                     return field;
                 }).ToArray();
+
+                // if any of fields are invalid, return an empty array to avoid errors
+                if (result.Any(x => ReferenceEquals(null, x)))
+                    return new Field[0];
+
+                return result;
             }
 
             return null;
@@ -553,21 +560,29 @@
 
             OnBeforeExecuteQuery();
 
-            Response.TotalCount = query.ForEach(Connection, delegate()
+            if (DistinctFields == null || DistinctFields.Length > 0)
             {
-                var clone = ProcessEntity(Row.Clone());
-
-                if (clone != null)
+                Response.TotalCount = query.ForEach(Connection, delegate ()
                 {
-                    if (DistinctFields != null)
+                    var clone = ProcessEntity(Row.Clone());
+
+                    if (clone != null)
                     {
-                        foreach (var field in DistinctFields)
-                            Response.Values.Add(field.AsObject(clone));
+                        if (DistinctFields != null)
+                        {
+                            foreach (var field in DistinctFields)
+                                Response.Values.Add(field.AsObject(clone));
+                        }
+                        else
+                            Response.Entities.Add(clone);
                     }
-                    else
-                        Response.Entities.Add(clone);
-                }
-            });
+                });
+            }
+            else
+            {
+                // mark response to specify that one or more fields are invalid
+                Response.Values = null;
+            }
 
             Response.SetSkipTakeTotal(query);
 
