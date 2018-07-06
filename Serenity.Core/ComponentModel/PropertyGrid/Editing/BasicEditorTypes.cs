@@ -206,9 +206,9 @@ namespace Serenity.ComponentModel
         }
     }
 
-    public partial class HtmlNoteContentEditor : CustomEditorAttribute
+    public partial class HtmlNoteContentEditorAttribute : CustomEditorAttribute
     {
-        public HtmlNoteContentEditor()
+        public HtmlNoteContentEditorAttribute()
             : base("HtmlNoteContent")
         {
         }

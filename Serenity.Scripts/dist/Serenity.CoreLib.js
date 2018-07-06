@@ -6687,6 +6687,7 @@ var Serenity;
                 removeButtons: 'SpecialChar,Anchor,Subscript,Styles',
                 format_tags: 'p;h1;h2;h3;pre',
                 removeDialogTabs: 'image:advanced;link:advanced',
+                removePlugins: 'uploadimage,image2',
                 contentsCss: Q.resolveUrl('~/Content/site/site.htmlcontent.css'),
                 entities: false,
                 entities_latin: false,
@@ -6783,7 +6784,7 @@ var Serenity;
                 'HorizontalRule,Source,Maximize,Format,Font,FontSize,Anchor,Blockquote,' +
                 'CreatePlaceholder,BGColor,JustifyLeft,JustifyCenter,' +
                 'JustifyRight,JustifyBlock,Superscript,RemoveFormat';
-            config.removePlugins += ',elementspath';
+            config.removePlugins = 'elementspath,uploadimage,image2';
             return config;
         };
         HtmlNoteContentEditor = __decorate([
@@ -6805,7 +6806,7 @@ var Serenity;
                 'Image,Table,HorizontalRule,Source,Maximize,Format,Font,FontSize,' +
                 'Anchor,Blockquote,CreatePlaceholder,BGColor,JustifyLeft,JustifyCenter,' +
                 'JustifyRight,JustifyBlock,Superscript,RemoveFormat';
-            config.removePlugins += ',elementspath';
+            config.removePlugins = 'elementspath,uploadimage,image2';
             return config;
         };
         HtmlReportContentEditor = __decorate([

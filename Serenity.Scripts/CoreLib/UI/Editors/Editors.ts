@@ -860,6 +860,7 @@
                 removeButtons: 'SpecialChar,Anchor,Subscript,Styles',
                 format_tags: 'p;h1;h2;h3;pre',
                 removeDialogTabs: 'image:advanced;link:advanced',
+                removePlugins: 'uploadimage,image2',
                 contentsCss: Q.resolveUrl('~/Content/site/site.htmlcontent.css'),
                 entities: false,
                 entities_latin: false,
@@ -961,7 +962,7 @@
                 'CreatePlaceholder,BGColor,JustifyLeft,JustifyCenter,' +
                 'JustifyRight,JustifyBlock,Superscript,RemoveFormat';
 
-            (config as any).removePlugins += ',elementspath';
+            (config as any).removePlugins = 'elementspath,uploadimage,image2';
             return config;
         }
     }
@@ -981,7 +982,7 @@
                 'Anchor,Blockquote,CreatePlaceholder,BGColor,JustifyLeft,JustifyCenter,' +
                 'JustifyRight,JustifyBlock,Superscript,RemoveFormat';
 
-            (config as any).removePlugins += ',elementspath';
+            (config as any).removePlugins = 'elementspath,uploadimage,image2';
             return config;
         }
     }
