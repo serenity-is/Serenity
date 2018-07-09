@@ -41,6 +41,7 @@
         resizable?: boolean;
         sortable?: boolean;
         sortOrder?: number;
+        groupOrder?: number;
         editLink?: boolean;
         editLinkItemType?: string;
         editLinkIdField?: string;

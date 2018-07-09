@@ -344,6 +344,9 @@ declare namespace Slick {
         cellFlashingCssClass?: string;
         cellHighlightCssClass?: string;
         dataItemColumnValueExtractor?: () => void;
+        groupingPanel?: boolean,
+        groupingPanelHeight?: number;
+        setGroupingPanelVisibility?: (value: boolean) => void;
         defaultColumnWidth?: number;
         defaultFormatter?: () => void;
         editable?: boolean;
@@ -468,6 +471,7 @@ declare namespace Slick {
         autoSizeColumns(): void;
         getColumnIndex(id: string): number;
         getColumns(): Column[];
+        getUID(): string;
         setColumns(columns: Column[]): void;
         setSortColumn(columnId: string, ascending: boolean): void;
         setSortColumns(cols: Slick.ColumnSort[]): void;
@@ -515,7 +519,10 @@ declare namespace Slick {
         updateCell(row: number, cell: number): void;
         updateRow(row: number): void;
         updateRowCount(): void;
+        updateColumnHeader(columnId: string, title?: string, toolTip?: string): void;
+        getGroupingPanel(): HTMLDivElement;
         getHeaderRow(): any;
+        getEditorLock(): any;
         getHeaderRowColumn(columnId: string): any;
         getSortColumns(): any;
         getTopPanel(): any;
