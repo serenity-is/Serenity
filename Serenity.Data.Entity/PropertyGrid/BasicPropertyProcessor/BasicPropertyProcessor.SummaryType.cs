@@ -1,0 +1,46 @@
+﻿using Serenity.ComponentModel;
+using Serenity.Data;
+using Serenity.Data.Mapping;
+using System;
+using System.IO;
+
+namespace Serenity.PropertyGrid
+{
+    public partial class BasicPropertyProcessor : PropertyProcessor
+    {
+        private void SetSummaryType(IPropertySource source, PropertyItem item)
+        {
+            var summaryTypeAttr = source.GetAttribute<SummaryTypeAttribute>();
+
+            if (summaryTypeAttr == null)
+            {
+                if (source.GetAttribute<PrimaryKeyAttribute>() != null ||
+                    source.GetAttribute<IdentityAttribute>() != null)
+                {
+                    item.SummaryType = SummaryType.Disabled;
+                    return;
+                }
+
+                var valueType = source.ValueType;
+                if (valueType == typeof(Decimal) ||
+                    valueType == typeof(Double) ||
+                    valueType == typeof(Single) ||
+                    valueType == typeof(Int64) ||
+                    valueType == typeof(Int32) ||
+                    valueType == typeof(Int16))
+                {
+                    item.SummaryType = SummaryType.Sum;
+                }
+                else if (valueType == typeof(String) || 
+                    valueType == typeof(bool) ||
+                    valueType == typeof(Stream) ||
+                    valueType == typeof(Guid) ||
+                    valueType == typeof(DateTime) ||
+                    valueType == typeof(TimeSpan))
+                    item.SummaryType = SummaryType.Disabled;
+            }
+            else if (summaryTypeAttr.Value != SummaryType.None)
+                item.SummaryType = summaryTypeAttr.Value;
+        }
+    }
+}

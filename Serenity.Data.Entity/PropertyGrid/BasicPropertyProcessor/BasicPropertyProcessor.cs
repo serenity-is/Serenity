@@ -31,6 +31,7 @@ namespace Serenity.PropertyGrid
             SetRequired(source, item);
             SetResizable(source, item);
             SetSorting(source, item);
+            SetSummaryType(source, item);
             SetTitle(source, item);
             SetUpdatable(source, item);
             SetUpdatePermission(source, item);

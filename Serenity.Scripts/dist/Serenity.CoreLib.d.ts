@@ -1285,6 +1285,7 @@ declare namespace Serenity {
         sortable?: boolean;
         sortOrder?: number;
         groupOrder?: number;
+        summaryType?: SummaryType;
         editLink?: boolean;
         editLinkItemType?: string;
         editLinkIdField?: string;
@@ -1298,6 +1299,14 @@ declare namespace Serenity {
         quickFilterParams?: any;
         quickFilterSeparator?: boolean;
         quickFilterCssClass?: string;
+    }
+    enum SummaryType {
+        Disabled = -1,
+        None = 0,
+        Sum = 1,
+        Avg = 2,
+        Min = 3,
+        Max = 4,
     }
 }
 declare namespace Serenity {

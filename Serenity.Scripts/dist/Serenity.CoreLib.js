@@ -4582,6 +4582,19 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var SummaryType;
+    (function (SummaryType) {
+        SummaryType[SummaryType["Disabled"] = -1] = "Disabled";
+        SummaryType[SummaryType["None"] = 0] = "None";
+        SummaryType[SummaryType["Sum"] = 1] = "Sum";
+        SummaryType[SummaryType["Avg"] = 2] = "Avg";
+        SummaryType[SummaryType["Min"] = 3] = "Min";
+        SummaryType[SummaryType["Max"] = 4] = "Max";
+    })(SummaryType = Serenity.SummaryType || (Serenity.SummaryType = {}));
+    Serenity.Decorators.registerEnum(SummaryType, "Serenity.SummaryType");
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var Option = Serenity.Decorators.option;
     var DateEditor = /** @class */ (function (_super) {
         __extends(DateEditor, _super);

@@ -1013,18 +1013,34 @@ if (typeof Slick === "undefined") {
             }
         }
 
+        function formatGroupTotal(total, columnDef) {
+            if (columnDef.formatter != null) {
+                var item = {};
+                item[columnDef.field] = total;
+                try {
+                    return columnDef.formatter(-1, -1, total, columnDef, item);
+                }
+                catch(e) {
+                }
+            }
+
+            if (typeof total == "number" && Q && Q.formatNumber) {
+                if (columnDef.sourceItem && columnDef.sourceItem.displayFormat) {
+                    return Q.formatNumber(total, columnDef.sourceItem.displayFormat);
+                }
+                else
+                    return Q.formatNumber(total, "#,##0.##");
+            }
+            else
+                return Q.htmlEncode(total);
+        }
+
         function groupTotalText(totals, columnDef, key) {
             var ltKey = (key.substr(0, 1).toUpperCase() + key.substr(1));
             text = (window.Q && Q.tryGetText && Q.tryGetText(ltKey)) || ltKey;
 
             var total = totals[key][columnDef.field];
-            if (typeof total == "number" && Q && Q.formatNumber) {
-                if (columnDef.sourceItem && columnDef.sourceItem.displayFormat) {
-                    total = Q.formatNumber(total, columnDef.sourceItem.displayFormat);
-                }
-                else
-                    total = Q.formatNumber(total, "#,##0.##");
-            }
+            total = formatGroupTotal(total, columnDef);
 
             return "<span class='aggregate agg-" + key + "'  title='" + text + "'>" +
                 total +
@@ -2198,6 +2214,7 @@ if (typeof Slick === "undefined") {
                 createColumnHeaders();
                 createColumnGroupHeaders();
                 createColumnFooter();
+                updateFooterTotals();
                 removeCssRules();
                 createCssRules();
                 resizeCanvas();

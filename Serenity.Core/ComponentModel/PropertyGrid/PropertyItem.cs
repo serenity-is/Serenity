@@ -88,6 +88,8 @@ namespace Serenity.ComponentModel
         public int? SortOrder { get; set; }
         [JsonProperty("groupOrder")]
         public int? GroupOrder { get; set; }
+        [JsonProperty("summaryType")]
+        public SummaryType? SummaryType { get; set; }
 
         [JsonProperty("editLink")]
         public bool? EditLink { get; set; }
