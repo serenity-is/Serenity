@@ -1,3 +1,14 @@
+## 3.7.5 (2018-07-10)
+
+Features:
+  - added drag & drop grouping mixin and related sample [StartSharp]
+  - added customizable summaries mixin and related sample [StartSharp]
+  - group headers and summary footers uses column formatter if available
+  - ignore when one or more of requested distinct fields are not allowed and instead of raising exception return null to gracefully handle issue
+  
+Bugfixes:
+  - handle ckeditor warning about upload plugin
+
 ## 3.7.4 (2018-07-05)
 
 Features:
