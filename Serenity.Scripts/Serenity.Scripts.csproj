@@ -41,6 +41,4 @@
     </Message>
     <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)dist\Serenity.CodeGeneration.js&quot; -o &quot;$(ProjectDir)dist\Serenity.CodeGeneration.min.js&quot; --comments --mangle" />
   </Target>
-  <Target Name="MinimizeSerenityScripts" AfterTargets="AfterBuild" Inputs="..\Serenity.Web\Assets\Scripts\Saltaralle\mscorlib.js;..\Serenity.Web\Assets\Scripts\Saltaralle\linq.js;..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.js;..\Serenity.Web\Assets\Scripts\SlickGrid\slick.grid.js" Outputs="..\Serenity.Web\Assets\Scripts\Saltaralle\mscorlib.min.js;..\Serenity.Web\Assets\Scripts\Saltaralle\linq.min.js;..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.min.js;..\Serenity.Web\Assets\Scripts\SlickGrid\slick.grid.min.js">
-  </Target>
 </Project>
