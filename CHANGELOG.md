@@ -1,3 +1,8 @@
+## 3.7.6 (2018-07-10)
+
+Features:
+  - updated Serenity.Web.Assets package
+
 ## 3.7.5 (2018-07-10)
 
 Features:
