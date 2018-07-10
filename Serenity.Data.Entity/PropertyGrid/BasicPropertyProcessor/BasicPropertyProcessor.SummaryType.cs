@@ -15,9 +15,10 @@ namespace Serenity.PropertyGrid
             if (summaryTypeAttr == null)
             {
                 if (source.GetAttribute<PrimaryKeyAttribute>() != null ||
-                    source.GetAttribute<IdentityAttribute>() != null)
+                    source.GetAttribute<IdentityAttribute>() != null ||
+                    source.GetAttribute<ForeignKeyAttribute>() != null ||
+                    source.GetAttribute<LeftJoinAttribute>() != null)
                 {
-                    item.SummaryType = SummaryType.Disabled;
                     return;
                 }
 
@@ -30,16 +31,21 @@ namespace Serenity.PropertyGrid
                     valueType == typeof(Int16))
                 {
                     item.SummaryType = SummaryType.Sum;
+                    return;
                 }
-                else if (valueType == typeof(String) || 
-                    valueType == typeof(bool) ||
-                    valueType == typeof(Stream) ||
-                    valueType == typeof(Guid) ||
-                    valueType == typeof(DateTime) ||
-                    valueType == typeof(TimeSpan))
-                    item.SummaryType = SummaryType.Disabled;
+
+                if (valueType != typeof(String) &&
+                    valueType != typeof(bool) &&
+                    valueType != typeof(Stream) &&
+                    valueType != typeof(Guid) &&
+                    valueType != typeof(DateTime) &&
+                    valueType != typeof(TimeSpan))
+                {
+                    item.SummaryType = SummaryType.None;
+                    return;
+                }
             }
-            else if (summaryTypeAttr.Value != SummaryType.None)
+            else if (summaryTypeAttr.Value != SummaryType.Disabled)
                 item.SummaryType = summaryTypeAttr.Value;
         }
     }
