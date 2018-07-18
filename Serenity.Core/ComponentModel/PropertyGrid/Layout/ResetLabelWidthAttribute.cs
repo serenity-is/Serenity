@@ -7,7 +7,7 @@ namespace Serenity.ComponentModel
     /// </summary>
     public class ResetLabelWidthAttribute : LabelWidthAttribute
     {
-        public ResetLabelWidthAttribute(string value)
+        public ResetLabelWidthAttribute()
             : base(null)
         {
         }
