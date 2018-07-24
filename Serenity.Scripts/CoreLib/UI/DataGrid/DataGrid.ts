@@ -1059,7 +1059,8 @@
             };
 
             Serenity.WX.changeSelect2(widget, (e1: JQueryEventObject) => {
-                this.quickFilterChange(e1);
+                // use timeout give cascaded dropdowns a chance to update / clear themselves
+                window.setTimeout(() => this.quickFilterChange(e1), 0);
             });
 
             this.add_submitHandlers(submitHandler);

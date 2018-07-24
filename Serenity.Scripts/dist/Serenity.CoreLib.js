@@ -11988,7 +11988,8 @@ var Serenity;
                 }
             };
             Serenity.WX.changeSelect2(widget, function (e1) {
-                _this.quickFilterChange(e1);
+                // use timeout give cascaded dropdowns a chance to update / clear themselves
+                window.setTimeout(function () { return _this.quickFilterChange(e1); }, 0);
             });
             this.add_submitHandlers(submitHandler);
             widget.element.bind('remove.' + this.uniqueName, function (x) {
