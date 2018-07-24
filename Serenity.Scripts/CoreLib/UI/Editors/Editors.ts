@@ -1414,9 +1414,11 @@
         lookupKey?: string;
     }
 
-    @Editor('RadioButton', [IStringValue])
+    @Editor('RadioButton', [IStringValue, IReadOnly])
     @Element('<div/>')
-    export class RadioButtonEditor extends Widget<RadioButtonEditorOptions> {
+    export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
+        implements IReadOnly {
+
         constructor(input: JQuery, opt: RadioButtonEditorOptions) {
             super(input, opt);
 
@@ -1490,6 +1492,24 @@
         set value(v: string) {
             this.set_value(v);
         }
+
+        get_readOnly(): boolean {
+            return this.element.attr('disabled') != null;
+        }
+
+        set_readOnly(value: boolean): void {
+            if (this.get_readOnly() !== value) {
+                if (value) {
+                    this.element.attr('disabled', 'disabled')
+                        .find('input').attr('disabled', 'disabled');
+                }
+                else {
+                    this.element.removeAttr('disabled')
+                        .find('input').removeAttr('disabled');
+                }
+            }
+        }
+
     }
 
     export interface RecaptchaOptions {
@@ -1701,7 +1721,7 @@
                 }
             });
         }
-            
+
         protected emptyItemText(): string {
             var txt = this.element.attr('placeholder');
             if (txt == null) {

@@ -7282,8 +7282,23 @@ var Serenity;
                 }
             }
         };
+        RadioButtonEditor.prototype.get_readOnly = function () {
+            return this.element.attr('disabled') != null;
+        };
+        RadioButtonEditor.prototype.set_readOnly = function (value) {
+            if (this.get_readOnly() !== value) {
+                if (value) {
+                    this.element.attr('disabled', 'disabled')
+                        .find('input').attr('disabled', 'disabled');
+                }
+                else {
+                    this.element.removeAttr('disabled')
+                        .find('input').removeAttr('disabled');
+                }
+            }
+        };
         RadioButtonEditor = __decorate([
-            Editor('RadioButton', [Serenity.IStringValue]),
+            Editor('RadioButton', [Serenity.IStringValue, Serenity.IReadOnly]),
             Element('<div/>')
         ], RadioButtonEditor);
         return RadioButtonEditor;
