@@ -226,10 +226,13 @@
                 if (value) {
                     this.element.addClass('readonly').attr('readonly', 'readonly');
                     this.element.nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
+                    this.element.nextAll('.inplace-now').css('opacity', '0.1');
+
                 }
                 else {
                     this.element.removeClass('readonly').removeAttr('readonly');
                     this.element.nextAll('.ui-datepicker-trigger').css('opacity', '1');
+                    this.element.nextAll('.inplace-now').css('opacity', '1');
                 }
                 Serenity.EditorUtils.setReadonly(this.time, value);
             }
