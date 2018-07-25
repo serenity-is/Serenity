@@ -111,17 +111,17 @@ namespace Serenity {
             return !!!!this.options['delimited'];
         }
 
-        protected clearItems() {
+        public clearItems() {
             (ss as any).clear(this.items);
             this.itemById = {};
         }
 
-        protected addItem(item: Select2Item) {
+        public addItem(item: Select2Item) {
             this.items.push(item);
             this.itemById[item.id] = item;
         }
 
-        protected addOption(key: string, text: string, source?: any, disabled?: boolean) {
+        public addOption(key: string, text: string, source?: any, disabled?: boolean) {
             this.addItem({
                 id: key,
                 text: text,
