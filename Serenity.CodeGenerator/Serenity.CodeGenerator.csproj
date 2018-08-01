@@ -24,7 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="Scriban" Version="1.2.0" />
+    <PackageReference Include="Scriban" Version="1.2.3" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
