@@ -15,7 +15,7 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
     [ModifyPermission("{{Permission}}")]
     public sealed class {{RowClassName}} : {{RowBaseClassAndInterfaces}}
     {
-{{~for x in Fields}}
+{{-for x in Fields}}
         [{{x.Attributes}}]
         public {{x.PropertyType}} {{x.Ident}}
         {
@@ -23,8 +23,8 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
             set { Fields.{{x.Ident}}[this] = value; }
         }
 {{end}}
-{{~for j in Joins}}
-{{~for k in j.Fields}}
+{{-for j in Joins}}
+{{-for k in j.Fields}}
         [{{k.Attributes}}]
         public {{k.PropertyType}} {{k.Ident}}
         {
@@ -32,14 +32,14 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
             set { Fields.{{k.Ident}}[this] = value; }
         }
 {{end}}
-{{~end}}
-{{~if Identity}}
+{{-end}}
+{{-if Identity}}
         IIdField IIdRow.IdField
         {
             get { return Fields.{{Identity}}; }
         }
-{{end~}}
-{{~if NameField}}
+{{end-}}
+{{-if NameField}}
         StringField INameRow.NameField
         {
             get { return Fields.{{NameField}}; }
@@ -54,14 +54,14 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
 
         public class RowFields : {{FieldsBaseClass}}
         {
-{{~for x in Fields}}
+{{-for x in Fields}}
             public {{x.FieldType}}Field {{x.Ident}};
-{{~end}}
-{{~for j in Joins}}
+{{-end}}
+{{-for j in Joins}}
 {{for k in j.Fields}}
             public {{k.FieldType}}Field {{k.Ident}};
-{{~end}}
-{{~end}}
-		}
+{{-end}}
+{{-end}}
+        }
     }
 }
