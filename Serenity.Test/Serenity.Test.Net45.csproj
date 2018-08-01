@@ -112,6 +112,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGeneration\ScribanTemplate\ScribanTemplateTests.Row.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowNameProperty.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.TypeWithGenericParameters.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowLocalTextPrefix.cs" />
@@ -185,6 +186,10 @@
     <Compile Include="Web\NavigationItemTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Serenity.CodeGenerator.Net45\Serenity.CodeGenerator.Net45.csproj">
+      <Project>{49704c9a-30a2-43de-ae3d-d13073ba50a4}</Project>
+      <Name>Serenity.CodeGenerator.Net45</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{6f13b7f5-3f1e-4a7f-962d-59ebd3118e83}</Project>
       <Name>Serenity.Core</Name>
@@ -371,6 +376,7 @@
     <TypeScriptCompile Include="ScriptTests\Widget\Widget.GetWidgetTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Widget\Widget.TryGetWidgetTests.ts" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
