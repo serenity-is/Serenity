@@ -78,7 +78,10 @@ namespace Serenity.Services
             {
                 try
                 {
-                    unitOfWork.Commit();
+                    if (context != null && context.Exception != null)
+                        unitOfWork.Dispose();
+                    else
+                        unitOfWork.Commit();
                 }
                 catch (InvalidOperationException)
                 {
