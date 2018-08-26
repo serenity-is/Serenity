@@ -23,7 +23,9 @@ namespace Serenity.PropertyGrid
             if (labelWidthAttr != null)
             {
                 item.LabelWidth = labelWidthAttr.Value;
-                labelWidthPrior = labelWidthAttr.UntilNext ? labelWidthAttr : null;
+
+                if (!labelWidthAttr.JustThis)
+                    labelWidthPrior = labelWidthAttr.UntilNext ? labelWidthAttr : null;
             }
         }
 
