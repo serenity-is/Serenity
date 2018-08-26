@@ -3,13 +3,13 @@
 namespace Serenity.ComponentModel
 {
     /// <summary>
-    /// Marks form field with "col-sm-8" css class, which makes it allocate two third of form row
-    /// on device widths >= 768px (e.g. iPad)
+    /// Marks form field with "col-md-8" css class, which makes it allocate two third of form row
+    /// on device widths >= 992px (e.g. medium desktop)
     /// </summary>
     public class TwoThirdWidthAttribute : FormWidthAttribute
     {
         public TwoThirdWidthAttribute()
-            : base("col-sm-8")
+            : base("col-md-8")
         {
         }
     }
