@@ -35,7 +35,8 @@ namespace Serenity.PropertyGrid
                         item.FormCssClass = width.Value;
                 }
 
-                formWidthPrior = width.UntilNext ? width : null;
+                if (!width.JustThis)
+                    formWidthPrior = width.UntilNext ? width : null;
             }
         }
     }
