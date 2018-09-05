@@ -1539,6 +1539,7 @@ declare namespace Serenity {
     interface IntegerEditorOptions {
         minValue?: number;
         maxValue?: number;
+        allowNegatives?: boolean;
     }
     class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
         constructor(input: JQuery, opt?: IntegerEditorOptions);
@@ -1552,6 +1553,7 @@ declare namespace Serenity {
         maxValue?: string;
         decimals?: any;
         padDecimals?: any;
+        allowNegatives?: boolean;
     }
     interface EmailEditorOptions {
         domain?: string;

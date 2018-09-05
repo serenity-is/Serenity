@@ -6264,7 +6264,7 @@ var Serenity;
             var _this = _super.call(this, input, opt) || this;
             input.addClass('decimalQ');
             var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
-                vMin: Q.coalesce(_this.options.minValue, '0.00'),
+                vMin: Q.coalesce(_this.options.minValue, _this.options.allowNegatives ? (_this.options.maxValue != null ? ("-" + _this.options.maxValue) : '999999999999.99') : '0.00'),
                 vMax: Q.coalesce(_this.options.maxValue, '999999999999.99')
             });
             if (_this.options.decimals != null) {
@@ -6324,7 +6324,7 @@ var Serenity;
             var _this = _super.call(this, input, opt) || this;
             input.addClass('integerQ');
             var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
-                vMin: Q.coalesce(_this.options.minValue, 0),
+                vMin: Q.coalesce(_this.options.minValue, _this.options.allowNegatives ? (_this.options.maxValue != null ? ("-" + _this.options.maxValue) : '-2147483647') : '0'),
                 vMax: Q.coalesce(_this.options.maxValue, 2147483647),
                 aSep: null
             });

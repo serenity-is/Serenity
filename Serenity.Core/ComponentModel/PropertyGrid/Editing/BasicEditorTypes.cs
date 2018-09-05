@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Reflection;
 
 namespace Serenity.ComponentModel
@@ -159,6 +160,8 @@ namespace Serenity.ComponentModel
         public DecimalEditorAttribute()
             : base("Decimal")
         {
+			if (AllowNegativesByDefault)
+				AllowNegatives = true;
         }
 
         public Int32 Decimals
@@ -167,16 +170,16 @@ namespace Serenity.ComponentModel
             set { SetOption("decimals", value); }
         }
 
-        public String MaxValue
+        public Object MaxValue
         {
             get { return GetOption<String>("maxValue"); }
-            set { SetOption("maxValue", value); }
+            set { SetOption("maxValue", value == null ? null : Convert.ToString(value, CultureInfo.InvariantCulture)); }
         }
 
-        public String MinValue
+        public Object MinValue
         {
             get { return GetOption<String>("minValue"); }
-            set { SetOption("minValue", value); }
+            set { SetOption("minValue", value == null ? null : Convert.ToString(value, CultureInfo.InvariantCulture)); }
         }
 
         public Boolean PadDecimals
@@ -184,6 +187,14 @@ namespace Serenity.ComponentModel
             get { return GetOption<Boolean>("padDecimals"); }
             set { SetOption("padDecimals", value); }
         }
+
+		public Boolean AllowNegatives
+		{
+			get { return GetOption<Boolean>("allowNegatives"); }
+			set { SetOption("allowNegatives", value); }
+		}
+
+		public static bool AllowNegativesByDefault { get; set; }
     }
 
     public partial class HtmlContentEditorAttribute : CustomEditorAttribute
@@ -251,7 +262,9 @@ namespace Serenity.ComponentModel
         public IntegerEditorAttribute()
             : base("Integer")
         {
-        }
+			if (AllowNegativesByDefault)
+				AllowNegatives = true;
+		}
 
         public Int64 MaxValue
         {
@@ -264,7 +277,15 @@ namespace Serenity.ComponentModel
             get { return GetOption<Int64>("minValue"); }
             set { SetOption("minValue", value); }
         }
-    }
+
+		public Boolean AllowNegatives
+		{
+			get { return GetOption<Boolean>("allowNegatives"); }
+			set { SetOption("allowNegatives", value); }
+		}
+
+		public static bool AllowNegativesByDefault { get; set; }
+	}
 
     public partial class EnumEditorAttribute : CustomEditorAttribute
     {
