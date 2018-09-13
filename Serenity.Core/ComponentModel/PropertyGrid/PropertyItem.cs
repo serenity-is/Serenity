@@ -74,7 +74,9 @@ namespace Serenity.ComponentModel
         public string Alignment { get; set; }
         [JsonProperty("width")]
         public int? Width { get; set; }
-        [JsonProperty("minWidth")]
+		[JsonProperty("widthSet")]
+		public bool? WidthSet { get; set; }
+		[JsonProperty("minWidth")]
         public int? MinWidth { get; set; }
         [JsonProperty("maxWidth")]
         public int? MaxWidth { get; set; }
