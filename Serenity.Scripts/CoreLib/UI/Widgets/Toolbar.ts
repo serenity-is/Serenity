@@ -9,6 +9,7 @@
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
         separator?: boolean;
+        separatorSide?: ('left' | 'right' | 'both');
     }
 
     export interface PopupMenuButtonOptions {
@@ -110,13 +111,20 @@
         protected mouseTrap: any;
 
         protected createButton(container: JQuery, b: ToolButton) {
-			var cssClass = Q.coalesce(b.cssClass, '');
-			if (b.separator === true) {
-				$('<div class="separator"></div>').appendTo(container);
-			}
+            var cssClass = Q.coalesce(b.cssClass, '');
+            var separatorSide: ('left' | 'right' | 'both') = Q.coalesce(b.separatorSide, 'left');
+
+            if (b.separator === true && (separatorSide === 'left' || separatorSide === 'both')) {
+                $('<div class="separator"></div>').appendTo(container);
+            }
+
             var btn = $('<div class="tool-button"><div class="button-outer">' +
                 '<span class="button-inner"></span></div></div>')
                 .appendTo(container);
+
+            if (b.separator === true && (separatorSide === 'right' || separatorSide === 'both')) {
+                $('<div class="separator"></div>').appendTo(container);
+            }
 
             if (cssClass.length > 0) {
 				btn.addClass(cssClass);
