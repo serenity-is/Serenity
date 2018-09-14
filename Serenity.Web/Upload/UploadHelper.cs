@@ -294,6 +294,7 @@ namespace Serenity.Web
                 }
 
                 TemporaryFileHelper.Delete(fileName + ".meta", deleteType);
+                TemporaryFileHelper.Delete(fileName + ".orig", deleteType);
             }
         }
 
