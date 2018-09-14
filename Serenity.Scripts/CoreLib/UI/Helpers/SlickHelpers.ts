@@ -144,6 +144,94 @@
         }
     }
 
+    @Serenity.Decorators.registerClass('Serenity.GridRadioSelectionMixin')
+    export class GridRadioSelectionMixin {
+
+        private idField: string;
+        private include: Q.Dictionary<boolean>;
+        private grid: Serenity.IDataGrid;
+
+        constructor(grid: Serenity.IDataGrid) {
+
+            this.include = {};
+            this.grid = grid;
+            this.idField = (grid.getView() as any).idField;
+
+            grid.getGrid().onClick.subscribe((e, p) => {
+                if ($(e.target).hasClass('rad-select-item')) {
+                    e.preventDefault();
+                    var item = grid.getView().getItem(p.row);
+                    var id = item[this.idField].toString();
+
+                    if (this.include[id] == true) {
+                        (ss as any).clearKeys(this.include);
+                    }
+                    else {
+                        (ss as any).clearKeys(this.include);
+                        this.include[id] = true;
+                    }
+
+                    for (var i = 0; i < (grid.getView() as any).getLength(); i++) {
+                        grid.getGrid().updateRow(i);
+                    }
+                }
+            });
+        }
+
+        clear(): void {
+            (ss as any).clearKeys(this.include);
+        }
+
+        resetCheckedAndRefresh(): void {
+            this.include = {};
+            this.grid.getView().populate();
+        }
+
+        getSelectedKeys(): string[] {
+            return Object.keys(this.include);
+        }
+
+        getSelectedAsInt32(): number[] {
+            return Object.keys(this.include).map(function (x) {
+                return parseInt(x, 10);
+            });
+        }
+
+        getSelectedAsInt64(): number[] {
+            return Object.keys(this.include).map(function (x) {
+                return parseInt(x, 10);
+            });
+        }
+
+        setSelectedKeys(keys: string[]): void {
+            this.clear();
+            for (var k of keys) {
+                this.include[k] = true;
+            }
+        }
+
+        static createSelectColumn(getMixin: () => Serenity.GridRadioSelectionMixin): Slick.Column {
+            return {
+                name: '',
+                toolTip: ' ',
+                field: '__select__',
+                width: 26,
+                minWidth: 26,
+                headerCssClass: '',
+                sortable: false,
+                formatter: function (row, cell, value, column, item) {
+                    var mixin = getMixin();
+                    if (!mixin) {
+                        return '';
+                    }
+
+                    var isChecked = mixin.include[item[mixin.idField]];
+                    return '<input type="radio" name="radio-selection-group" class="rad-select-item no-float" style="cursor: pointer;width: 13px; height:13px;" ' + (isChecked ? ' checked' : '') + ' /> ';
+                }
+            };
+        }
+    }
+
     export namespace GridSelectAllButtonHelper {
         export function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void {
             var toolbar = (grid as any).element.children('.s-Toolbar') as JQuery;
