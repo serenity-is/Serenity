@@ -1014,6 +1014,19 @@ declare namespace Serenity {
         setSelectedKeys(keys: string[]): void;
         static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column;
     }
+    class GridRadioSelectionMixin {
+        private idField;
+        private include;
+        private grid;
+        constructor(grid: Serenity.IDataGrid);
+        clear(): void;
+        resetCheckedAndRefresh(): void;
+        getSelectedKeys(): string[];
+        getSelectedAsInt32(): number[];
+        getSelectedAsInt64(): number[];
+        setSelectedKeys(keys: string[]): void;
+        static createSelectColumn(getMixin: () => Serenity.GridRadioSelectionMixin): Slick.Column;
+    }
     namespace GridSelectAllButtonHelper {
         function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void;
         function define(getGrid: () => IDataGrid, getId: (p1: any) => any, getSelected: (p1: any) => boolean, setSelected: (p1: any, p2: boolean) => void, text?: string, onClick?: () => void): ToolButton;

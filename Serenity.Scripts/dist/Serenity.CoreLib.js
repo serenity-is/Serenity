@@ -3289,6 +3289,82 @@ var Serenity;
         return GridRowSelectionMixin;
     }());
     Serenity.GridRowSelectionMixin = GridRowSelectionMixin;
+    var GridRadioSelectionMixin = /** @class */ (function () {
+        function GridRadioSelectionMixin(grid) {
+            var _this = this;
+            this.include = {};
+            this.grid = grid;
+            this.idField = grid.getView().idField;
+            grid.getGrid().onClick.subscribe(function (e, p) {
+                if ($(e.target).hasClass('rad-select-item')) {
+                    e.preventDefault();
+                    var item = grid.getView().getItem(p.row);
+                    var id = item[_this.idField].toString();
+                    if (_this.include[id] == true) {
+                        ss.clearKeys(_this.include);
+                    }
+                    else {
+                        ss.clearKeys(_this.include);
+                        _this.include[id] = true;
+                    }
+                    for (var i = 0; i < grid.getView().getLength(); i++) {
+                        grid.getGrid().updateRow(i);
+                    }
+                }
+            });
+        }
+        GridRadioSelectionMixin.prototype.clear = function () {
+            ss.clearKeys(this.include);
+        };
+        GridRadioSelectionMixin.prototype.resetCheckedAndRefresh = function () {
+            this.include = {};
+            this.grid.getView().populate();
+        };
+        GridRadioSelectionMixin.prototype.getSelectedKeys = function () {
+            return Object.keys(this.include);
+        };
+        GridRadioSelectionMixin.prototype.getSelectedAsInt32 = function () {
+            return Object.keys(this.include).map(function (x) {
+                return parseInt(x, 10);
+            });
+        };
+        GridRadioSelectionMixin.prototype.getSelectedAsInt64 = function () {
+            return Object.keys(this.include).map(function (x) {
+                return parseInt(x, 10);
+            });
+        };
+        GridRadioSelectionMixin.prototype.setSelectedKeys = function (keys) {
+            this.clear();
+            for (var _i = 0, keys_3 = keys; _i < keys_3.length; _i++) {
+                var k = keys_3[_i];
+                this.include[k] = true;
+            }
+        };
+        GridRadioSelectionMixin.createSelectColumn = function (getMixin) {
+            return {
+                name: '',
+                toolTip: ' ',
+                field: '__select__',
+                width: 26,
+                minWidth: 26,
+                headerCssClass: '',
+                sortable: false,
+                formatter: function (row, cell, value, column, item) {
+                    var mixin = getMixin();
+                    if (!mixin) {
+                        return '';
+                    }
+                    var isChecked = mixin.include[item[mixin.idField]];
+                    return '<input type="radio" name="radio-selection-group" class="rad-select-item no-float" style="cursor: pointer;width: 13px; height:13px;" ' + (isChecked ? ' checked' : '') + ' /> ';
+                }
+            };
+        };
+        GridRadioSelectionMixin = __decorate([
+            Serenity.Decorators.registerClass('Serenity.GridRadioSelectionMixin')
+        ], GridRadioSelectionMixin);
+        return GridRadioSelectionMixin;
+    }());
+    Serenity.GridRadioSelectionMixin = GridRadioSelectionMixin;
     var GridSelectAllButtonHelper;
     (function (GridSelectAllButtonHelper) {
         function update(grid, getSelected) {
@@ -6029,8 +6105,8 @@ var Serenity;
         function setTypeKeysWithoutEditorSuffix() {
             var suffix = 'editor';
             var keys = Object.keys(knownTypes);
-            for (var _i = 0, keys_3 = keys; _i < keys_3.length; _i++) {
-                var k = keys_3[_i];
+            for (var _i = 0, keys_4 = keys; _i < keys_4.length; _i++) {
+                var k = keys_4[_i];
                 setWithoutSuffix(k, knownTypes[k]);
             }
         }
@@ -9679,8 +9755,8 @@ var Serenity;
                 type.__fieldByName = fieldByName;
             }
             var keys = Object.keys(options);
-            for (var _a = 0, keys_4 = keys; _a < keys_4.length; _a++) {
-                var k2 = keys_4[_a];
+            for (var _a = 0, keys_5 = keys; _a < keys_5.length; _a++) {
+                var k2 = keys_5[_a];
                 var v = options[k2];
                 var cc = ReflectionUtils.makeCamelCase(k2);
                 var p = propByName[cc] || propByName[k2];
