@@ -187,27 +187,42 @@
             this.grid.getView().populate();
         }
 
-        getSelectedKeys(): string[] {
-            return Object.keys(this.include);
-        }
-
-        getSelectedAsInt32(): number[] {
-            return Object.keys(this.include).map(function (x) {
-                return parseInt(x, 10);
-            });
-        }
-
-        getSelectedAsInt64(): number[] {
-            return Object.keys(this.include).map(function (x) {
-                return parseInt(x, 10);
-            });
-        }
-
-        setSelectedKeys(keys: string[]): void {
-            this.clear();
-            for (var k of keys) {
-                this.include[k] = true;
+        getSelectedKey(): string {
+            var items = Object.keys(this.include);
+            if (items != null && items.length > 0) {
+                return items[0];
             }
+
+            return null;
+        }
+
+        getSelectedAsInt32(): number {
+            var items = Object.keys(this.include).map(function (x) {
+                return parseInt(x, 10);
+            });
+
+            if (items != null && items.length > 0) {
+                return items[0];
+            }
+
+            return null;
+        }
+
+        getSelectedAsInt64(): number {
+            var items = Object.keys(this.include).map(function (x) {
+                return parseInt(x, 10);
+            });
+
+            if (items != null && items.length > 0) {
+                return items[0];
+            }
+
+            return null;
+        }
+
+        setSelectedKey(key: string): void {
+            this.clear();
+            this.include[key] = true;
         }
 
         static createSelectColumn(getMixin: () => Serenity.GridRadioSelectionMixin): Slick.Column {

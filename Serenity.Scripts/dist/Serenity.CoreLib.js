@@ -3320,25 +3320,34 @@ var Serenity;
             this.include = {};
             this.grid.getView().populate();
         };
-        GridRadioSelectionMixin.prototype.getSelectedKeys = function () {
-            return Object.keys(this.include);
+        GridRadioSelectionMixin.prototype.getSelectedKey = function () {
+            var items = Object.keys(this.include);
+            if (items != null && items.length > 0) {
+                return items[0];
+            }
+            return null;
         };
         GridRadioSelectionMixin.prototype.getSelectedAsInt32 = function () {
-            return Object.keys(this.include).map(function (x) {
+            var items = Object.keys(this.include).map(function (x) {
                 return parseInt(x, 10);
             });
+            if (items != null && items.length > 0) {
+                return items[0];
+            }
+            return null;
         };
         GridRadioSelectionMixin.prototype.getSelectedAsInt64 = function () {
-            return Object.keys(this.include).map(function (x) {
+            var items = Object.keys(this.include).map(function (x) {
                 return parseInt(x, 10);
             });
-        };
-        GridRadioSelectionMixin.prototype.setSelectedKeys = function (keys) {
-            this.clear();
-            for (var _i = 0, keys_3 = keys; _i < keys_3.length; _i++) {
-                var k = keys_3[_i];
-                this.include[k] = true;
+            if (items != null && items.length > 0) {
+                return items[0];
             }
+            return null;
+        };
+        GridRadioSelectionMixin.prototype.setSelectedKey = function (key) {
+            this.clear();
+            this.include[key] = true;
         };
         GridRadioSelectionMixin.createSelectColumn = function (getMixin) {
             return {
@@ -6105,8 +6114,8 @@ var Serenity;
         function setTypeKeysWithoutEditorSuffix() {
             var suffix = 'editor';
             var keys = Object.keys(knownTypes);
-            for (var _i = 0, keys_4 = keys; _i < keys_4.length; _i++) {
-                var k = keys_4[_i];
+            for (var _i = 0, keys_3 = keys; _i < keys_3.length; _i++) {
+                var k = keys_3[_i];
                 setWithoutSuffix(k, knownTypes[k]);
             }
         }
@@ -9755,8 +9764,8 @@ var Serenity;
                 type.__fieldByName = fieldByName;
             }
             var keys = Object.keys(options);
-            for (var _a = 0, keys_5 = keys; _a < keys_5.length; _a++) {
-                var k2 = keys_5[_a];
+            for (var _a = 0, keys_4 = keys; _a < keys_4.length; _a++) {
+                var k2 = keys_4[_a];
                 var v = options[k2];
                 var cc = ReflectionUtils.makeCamelCase(k2);
                 var p = propByName[cc] || propByName[k2];

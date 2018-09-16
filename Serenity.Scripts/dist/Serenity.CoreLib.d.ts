@@ -1021,10 +1021,10 @@ declare namespace Serenity {
         constructor(grid: Serenity.IDataGrid);
         clear(): void;
         resetCheckedAndRefresh(): void;
-        getSelectedKeys(): string[];
-        getSelectedAsInt32(): number[];
-        getSelectedAsInt64(): number[];
-        setSelectedKeys(keys: string[]): void;
+        getSelectedKey(): string;
+        getSelectedAsInt32(): number;
+        getSelectedAsInt64(): number;
+        setSelectedKey(key: string): void;
         static createSelectColumn(getMixin: () => Serenity.GridRadioSelectionMixin): Slick.Column;
     }
     namespace GridSelectAllButtonHelper {
