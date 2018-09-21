@@ -1327,23 +1327,26 @@
             return Q.Authorization.hasPermission(item.readPermission);
         }
 
-        protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void {
-            if (settings == null) {
-                var storage = this.getPersistanceStorage();
-                if (storage == null) {
-                    return;
-                }
-                var json = Q.trimToNull(storage.getItem(this.getPersistanceKey()));
-                if (json != null && Q.startsWith(json, '{') && Q.endsWith(json, '}')) {
-                    settings = JSON.parse(json);
-                }
-                else {
-                    return;
-                }
-            }
+        protected getPersistedSettings(): PersistedGridSettings {
+            var storage = this.getPersistanceStorage();
+            if (storage == null)
+                return null;
 
-            if (!this.slickGrid) {
+            var json = Q.trimToNull(storage.getItem(this.getPersistanceKey()));
+            if (json != null && Q.startsWith(json, '{') && Q.endsWith(json, '}'))
+                return JSON.parse(json);
+
+            return null;
+        }
+
+        protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void {
+            if (!this.slickGrid)
                 return;
+
+            if (settings == null) {
+                settings = this.getPersistedSettings();
+                if (settings == null)
+                    return;
             }
 
             var columns = this.slickGrid.getColumns();

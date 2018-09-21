@@ -4723,8 +4723,8 @@ if (typeof Slick === "undefined") {
                 "next": 1
             };
 
-            tabbingDirection[xLeft] = -1;
-            tabbingDirection[xRight] = 1;
+            tabbingDirections[xLeft] = -1;
+            tabbingDirections[xRight] = 1;
 
             tabbingDirection = tabbingDirections[dir];
 

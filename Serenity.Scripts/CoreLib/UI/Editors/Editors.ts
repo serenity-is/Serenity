@@ -344,8 +344,8 @@
             super(input, opt);
 
             input.addClass('decimalQ');
-            var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
-                vMin: Q.coalesce(this.options.minValue, '0.00'),
+			var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
+				vMin: Q.coalesce(this.options.minValue, this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '999999999999.99') : '0.00'),
                 vMax: Q.coalesce(this.options.maxValue, '999999999999.99')
             });
 
@@ -402,7 +402,8 @@
 
     export interface IntegerEditorOptions {
         minValue?: number;
-        maxValue?: number;
+		maxValue?: number;
+		allowNegatives?: boolean;
     }
 
     @Editor('Integer', [IDoubleValue])
@@ -415,7 +416,7 @@
             input.addClass('integerQ');
             var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(),
                 {
-                    vMin: Q.coalesce(this.options.minValue, 0),
+					vMin: Q.coalesce(this.options.minValue, this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-2147483647') : '0'),
                     vMax: Q.coalesce(this.options.maxValue, 2147483647),
                     aSep: null
                 });
@@ -460,7 +461,8 @@
         minValue?: string;
         maxValue?: string;
         decimals?: any;
-        padDecimals?: any;
+		padDecimals?: any;
+		allowNegatives?: boolean;
     }
 
     export interface EmailEditorOptions {

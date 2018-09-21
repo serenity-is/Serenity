@@ -73,6 +73,14 @@ namespace Serenity.ComponentModel
         /// </summary>
         public bool UntilNext { get; set; }
 
+        /// <summary>
+        /// Applies this form width (e.g. bootstrap grid size) to just 
+        /// current field and doesn't cancel prior form width attribute
+        /// with a UntilNext attribute. Don't set UntilNext = true if
+        /// you set JustThis = true, as they are exclusive
+        /// </summary>
+        public bool JustThis { get; set; }
+
         private void Set(string prefix, int cols)
         {
             var parts = (this.Value ?? "").Split(' ');

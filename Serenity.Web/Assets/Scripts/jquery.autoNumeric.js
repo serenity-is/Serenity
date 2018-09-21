@@ -283,9 +283,6 @@
         s = truncateDecimal(s, settings.aDec, settings.mDec);
         s = fixNumber(s, settings.aDec, settings.aNeg);
         var value = +s;
-        if (settings.oEvent === 'set' && (value < settings.vMin || value > settings.vMax)) {
-            $.error("The value (" + value + ") from the 'set' method falls outside of the vMin / vMax range");
-        }
         return value >= settings.vMin && value <= settings.vMax;
     }
     /**
@@ -555,6 +552,7 @@
                 parts = this.normalizeParts(left, right),
                 new_value = parts.join(''),
                 position = parts[0].length;
+            this.dirty = true;
             if (autoCheck(new_value, settingsClone)) {
                 new_value = truncateDecimal(new_value, settingsClone.aDec, settingsClone.mDec);
                 if (position > new_value.length) {
@@ -1030,7 +1028,7 @@
                         holder.formatted = false;
                     });
                     $this.on('keyup.autoNumeric', function (e) {
-                        var holder = getHolder($this);
+                    	var holder = getHolder($this);
                         holder.init(e);
                         holder.settings.oEvent = 'keyup';
                         var skip = holder.skipAllways(e);
@@ -1054,6 +1052,10 @@
                         }
                     });
                     $this.on('focusin.autoNumeric', function () {
+
+                    	if ($this.is('[readonly]') || $this.is('[disabled]'))
+                    		return;
+
                         var holder = getHolder($this);
                         holder.settingsClone.oEvent = 'focusin';
                         if (holder.settingsClone.nBracket !== null) {
@@ -1061,6 +1063,7 @@
                             $this.val(negativeBracket(checkVal, holder.settingsClone.nBracket, holder.settingsClone.oEvent));
                         }
                         holder.inVal = $this.val();
+                        holder.dirty = false;
                         var onempty = checkEmpty(holder.inVal, holder.settingsClone, true);
                         if (onempty !== null) {
                             $this.val(onempty);
@@ -1072,6 +1075,10 @@
                         }
                     });
                     $this.on('focusout.autoNumeric', function () {
+
+                    	if ($this.is('[readonly]') || $this.is('[disabled]'))
+                    		return;
+
                         var holder = getHolder($this),
                             settingsClone = holder.settingsClone,
                             value = $this.val(),
@@ -1084,7 +1091,8 @@
                         }
                         if (value !== '') {
                             value = autoStrip(value, settingsClone, strip_zero);
-                            if (checkEmpty(value, settingsClone) === null && autoCheck(value, settingsClone, $this[0])) {
+                            if (checkEmpty(value, settingsClone) === null && (
+								(!holder.dirty && holder.inVal == origValue) || autoCheck(value, settingsClone, $this[0]))) {
                                 value = fixNumber(value, settingsClone.aDec, settingsClone.aNeg);
                                 value = autoRound(value, settingsClone);
                                 value = presentNumber(value, settingsClone.aDec, settingsClone.aNeg);
@@ -1173,9 +1181,6 @@
                     value = autoRound(value, settings);
                 }
                 value = presentNumber(value, settings.aDec, settings.aNeg);
-                if (!autoCheck(value, settings)) {
-                    value = autoRound('', settings);
-                }
                 value = autoGroup(value, settings);
                 if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) { /**added hidden type */
                     return $this.val(value);

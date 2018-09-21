@@ -1278,6 +1278,7 @@ declare namespace Serenity {
         displayFormat?: string;
         alignment?: string;
         width?: number;
+        widthSet?: boolean;
         minWidth?: number;
         maxWidth?: number;
         labelWidth?: string;
@@ -1539,6 +1540,7 @@ declare namespace Serenity {
     interface IntegerEditorOptions {
         minValue?: number;
         maxValue?: number;
+        allowNegatives?: boolean;
     }
     class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
         constructor(input: JQuery, opt?: IntegerEditorOptions);
@@ -1552,6 +1554,7 @@ declare namespace Serenity {
         maxValue?: string;
         decimals?: any;
         padDecimals?: any;
+        allowNegatives?: boolean;
     }
     interface EmailEditorOptions {
         domain?: string;
@@ -2570,6 +2573,7 @@ declare namespace Serenity {
         protected getPersistanceKey(): string;
         protected gridPersistanceFlags(): GridPersistanceFlags;
         protected canShowColumn(column: Slick.Column): boolean;
+        protected getPersistedSettings(): PersistedGridSettings;
         protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void;
         protected persistSettings(flags?: GridPersistanceFlags): void;
         protected getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
