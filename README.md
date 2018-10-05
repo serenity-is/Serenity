@@ -16,7 +16,7 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 
 ## Documentation and Tutorials
 
-See [Serenity Developer Guide](https://volkanceylan.gitbooks.io/serenity-guide/) at https://volkanceylan.gitbooks.io/serenity-guide/ for documentation, and step by step tutorials.
+See [Serenity Developer Guide](https://serenity.is/docs/) at https://serenity.is/docs/ for documentation, and step by step tutorials.
 
 **Translations of Serenity Developer Guide:**
 - [Chinese Simplified (thanks @WuShenghui)](https://volkanceylan.gitbooks.io/serenity-zh-cn)
