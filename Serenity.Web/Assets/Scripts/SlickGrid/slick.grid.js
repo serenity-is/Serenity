@@ -160,6 +160,8 @@ if (typeof Slick === "undefined") {
         var viewportTopH = 0;
         var viewportBottomH = 0;
         var topPanelH = 0;
+        var groupPanelH = 0;
+        var headerH = 0;
         var headerRowH = 0;
         var footerRowH = 0;
 
@@ -1684,6 +1686,9 @@ if (typeof Slick === "undefined") {
         }
 
         function getVBoxDelta($el) {
+            if ($el.css('box-sizing') == 'border-box')
+                return 0;
+
             var p = ["borderTopWidth", "borderBottomWidth", "paddingTop", "paddingBottom"];
             var delta = 0;
             $.each(p, function (n, val) {
@@ -2778,6 +2783,9 @@ if (typeof Slick === "undefined") {
                   ? options.topPanelHeight + getVBoxDelta($topPanelScroller)
                   : 0;
 
+                groupPanelH = (options.groupingPanel && options.showGroupingPanel)
+                  ? options.groupingPanelHeight + getVBoxDelta($groupingPanelScroller) : 0;
+
                 headerRowH = (options.showHeaderRow)
                   ? options.headerRowHeight + getVBoxDelta($headerRowScroller)
                   : 0;
@@ -2786,14 +2794,14 @@ if (typeof Slick === "undefined") {
                   ? options.footerRowHeight + getVBoxDelta($footerRowScroller)
                   : 0;
 
+                headerH = parseFloat($.css($headerScroller[0], "height")) + getVBoxDelta($headerScroller);
+
                 viewportH = parseFloat($.css($container[0], "height", true))
                   - parseFloat($.css($container[0], "paddingTop", true))
                   - parseFloat($.css($container[0], "paddingBottom", true))
-                  - parseFloat($.css($headerScroller[0], "height"))
-                  - (options.groupingPanel && options.showGroupingPanel ? 
-                        options.groupingPanelHeight + getVBoxDelta($groupingPanelScroller) : 0)
-                  - getVBoxDelta($headerScroller)
+                  - headerH
                   - topPanelH
+                  - groupPanelH
                   - headerRowH
                   - footerRowH;
             }
@@ -2850,12 +2858,19 @@ if (typeof Slick === "undefined") {
                     );
                 }
 
-                $paneTopL.css('position', 'relative');
+                $paneTopL.css({
+                    'position': 'relative',
+                    'top': headerH, 
+                    'height': paneTopH
+                });
             }
-
-            $paneTopL.css({
-                'top': Math.round($paneHeaderL.height()), 'height': paneTopH
-            });
+            else {
+                $paneTopL.css({
+                    'position': '',
+                    'top': headerH + groupPanelH, 
+                    'height': paneTopH
+                });
+            }
 
             var paneBottomTop = $paneTopL.position().top
               + paneTopH;
