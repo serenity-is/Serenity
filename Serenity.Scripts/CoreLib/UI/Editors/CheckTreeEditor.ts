@@ -1,9 +1,9 @@
 ﻿namespace Serenity {
 
-    @Serenity.Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue])
+    @Serenity.Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
     @Serenity.Decorators.element("<div/>")
     export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends DataGrid<TItem, TOptions>
-        implements IGetEditValue, ISetEditValue {
+        implements IGetEditValue, ISetEditValue, IReadOnly {
 
         private byId: Q.Dictionary<TItem>;
 
@@ -156,6 +156,11 @@
 
             var target = $(e.target);
             if (target.hasClass('check-box')) {
+                e.preventDefault();
+
+                if (this._readOnly)
+                    return;
+
                 var checkedOrPartial = target.hasClass('checked') || target.hasClass('partial');
                 var item = this.itemAt(row);
                 var anyChanged = item.isSelected !== !checkedOrPartial;
@@ -312,6 +317,8 @@
                             cls += ' checked';
                         }
                     }
+                    if (this._readOnly)
+                        cls += ' readonly';
                     return '<span class="' + cls + '"></span>' + this.getItemText(ctx);
                 })
             });
@@ -358,6 +365,19 @@
 
         protected moveSelectedUp(): boolean {
             return false;
+        }
+
+        private _readOnly: boolean;
+
+        public get_readOnly() {
+            return this._readOnly;
+        }
+
+        public set_readOnly(value: boolean) {
+            if (!!this._readOnly != !!value) {
+                this._readOnly = !!value;
+                this.view.refresh();
+            }
         }
 
         private get_value(): string[] {
