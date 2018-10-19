@@ -13,10 +13,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="CouchbaseNetClient" Version="2.5.10" />
+    <PackageReference Include="CouchbaseNetClient" Version="2.7.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="CouchbaseNetClient" Version="2.5.10" />
+    <PackageReference Include="CouchbaseNetClient" Version="2.5.12" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
