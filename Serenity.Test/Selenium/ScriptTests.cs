@@ -1,10 +1,6 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.PhantomJS;
-using Serenity.Testing;
+﻿using Serenity.Testing;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
 using Xunit;
