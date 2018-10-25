@@ -6264,7 +6264,7 @@ var Serenity;
             var _this = _super.call(this, input, opt) || this;
             input.addClass('decimalQ');
             var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
-                vMin: Q.coalesce(_this.options.minValue, _this.options.allowNegatives ? (_this.options.maxValue != null ? ("-" + _this.options.maxValue) : '999999999999.99') : '0.00'),
+                vMin: Q.coalesce(_this.options.minValue, _this.options.allowNegatives ? (_this.options.maxValue != null ? ("-" + _this.options.maxValue) : '-999999999999.99') : '0.00'),
                 vMax: Q.coalesce(_this.options.maxValue, '999999999999.99')
             });
             if (_this.options.decimals != null) {
@@ -12903,6 +12903,9 @@ var Serenity;
             }
             var target = $(e.target);
             if (target.hasClass('check-box')) {
+                e.preventDefault();
+                if (this._readOnly)
+                    return;
                 var checkedOrPartial = target.hasClass('checked') || target.hasClass('partial');
                 var item = this.itemAt(row);
                 var anyChanged = item.isSelected !== !checkedOrPartial;
@@ -13049,6 +13052,8 @@ var Serenity;
                             cls += ' checked';
                         }
                     }
+                    if (_this._readOnly)
+                        cls += ' readonly';
                     return '<span class="' + cls + '"></span>' + _this.getItemText(ctx);
                 })
             });
@@ -13090,6 +13095,15 @@ var Serenity;
         };
         CheckTreeEditor.prototype.moveSelectedUp = function () {
             return false;
+        };
+        CheckTreeEditor.prototype.get_readOnly = function () {
+            return this._readOnly;
+        };
+        CheckTreeEditor.prototype.set_readOnly = function (value) {
+            if (!!this._readOnly != !!value) {
+                this._readOnly = !!value;
+                this.view.refresh();
+            }
         };
         CheckTreeEditor.prototype.get_value = function () {
             var list = [];
@@ -13143,7 +13157,7 @@ var Serenity;
             }
         };
         CheckTreeEditor = __decorate([
-            Serenity.Decorators.registerEditor('Serenity.CheckTreeEditor', [Serenity.IGetEditValue, Serenity.ISetEditValue]),
+            Serenity.Decorators.registerEditor('Serenity.CheckTreeEditor', [Serenity.IGetEditValue, Serenity.ISetEditValue, Serenity.IReadOnly]),
             Serenity.Decorators.element("<div/>")
         ], CheckTreeEditor);
         return CheckTreeEditor;

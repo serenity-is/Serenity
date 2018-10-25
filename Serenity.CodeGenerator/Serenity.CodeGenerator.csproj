@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>dotnet-sergen</AssemblyName>
-    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <PackageId>Serenity.CodeGenerator</PackageId>
     <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
@@ -26,11 +26,12 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Scriban" Version="1.2.3" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="6.3.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
     <PackageReference Include="MySqlConnector" Version="0.40.3" />
-    <PackageReference Include="Npgsql" Version="3.2.7" />
+    <PackageReference Include="Npgsql" Version="4.0.3" />
     <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
     <Reference Include="Mono.Cecil">
       <HintPath>..\Tools\Cecil\netstandard1.3\Mono.Cecil.dll</HintPath>
@@ -41,7 +42,7 @@
       <HintPath>..\Tools\Cecil\net40\Mono.Cecil.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
     <DefineConstants>$(DefineConstants);COREFX</DefineConstants>
   </PropertyGroup>
 </Project>

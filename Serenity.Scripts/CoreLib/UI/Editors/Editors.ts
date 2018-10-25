@@ -345,7 +345,7 @@
 
             input.addClass('decimalQ');
 			var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
-				vMin: Q.coalesce(this.options.minValue, this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '999999999999.99') : '0.00'),
+				vMin: Q.coalesce(this.options.minValue, this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-999999999999.99') : '0.00'),
                 vMax: Q.coalesce(this.options.maxValue, '999999999999.99')
             });
 
