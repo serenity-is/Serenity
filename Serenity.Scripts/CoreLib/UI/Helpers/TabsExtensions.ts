@@ -13,7 +13,7 @@
                 return;
             }
 
-            if (index === tabs.tabs('option', 'active')) {
+            if (isDisabled && index === tabs.tabs('option', 'active')) {
                 tabs.tabs('option', 'active', 0);
             }
 

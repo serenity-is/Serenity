@@ -3941,7 +3941,7 @@ var Serenity;
             if (index == null) {
                 return;
             }
-            if (index === tabs.tabs('option', 'active')) {
+            if (isDisabled && index === tabs.tabs('option', 'active')) {
                 tabs.tabs('option', 'active', 0);
             }
             tabs.tabs(isDisabled ? 'disable' : 'enable', index);
