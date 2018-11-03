@@ -1,3 +1,8 @@
+## 3.8.1 (2018-11-03)
+
+Bugfixes:
+  - resolve package downgrade issue with System.Data.SqlClient
+
 ## 3.8.0 (2018-11-03)
 
 Features:
