@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <system.webServer>
-    <handlers>
-      <add name="DynamicScriptHandler" verb="POST,GET,HEAD" path="DynJS.axd" 
-           type="Serenity.Web.HttpHandlers.DynamicScriptHandler, Serenity.Web" />
-    </handlers>
-  </system.webServer>
-</configuration>
