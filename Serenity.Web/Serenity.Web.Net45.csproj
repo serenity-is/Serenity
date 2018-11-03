@@ -170,6 +170,9 @@
     <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.SS.cs">
       <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.SS.cs</Link>
     </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.Texts.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.Texts.cs</Link>
+    </Compile>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
@@ -1079,7 +1082,8 @@
     <Exec Command="&quot;$(ProjectDir)..\tools\Node\lessc.cmd&quot; &quot;$(ProjectDir)style\serenity.less&quot; &gt; &quot;$(OutDir)serenity.css&quot;" />
   </Target>
   <Target Name="MinimizeAssetScripts" AfterTargets="AfterBuild" Inputs="$(ProjectDir)Assets\Scripts\jquery-ui.js;$(ProjectDir)Assets\Scripts\jquery.dialogextendQ.js;$(ProjectDir)Assets\Scripts\SlickGrid\slick.grid.js" Outputs="$(ProjectDir)Assets\Scripts\jquery-ui.min.js;$(ProjectDir)Assets\Scripts\jquery.dialogextendQ.js;$(ProjectDir)Assets\Scripts\SlickGrid\slick.grid.min.js">
-    <Message Text="Minimizing Asset Scripts..." Importance="high"></Message>
+    <Message Text="Minimizing Asset Scripts..." Importance="high">
+    </Message>
     <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Assets\Scripts\jquery-ui.js&quot; -o &quot;$(ProjectDir)Assets\Scripts\jquery-ui.min.js&quot; --comments --mangle" />
     <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Assets\Scripts\jquery.dialogextendQ.js&quot; -o &quot;$(ProjectDir)Assets\Scripts\jquery.dialogextendQ.min.js&quot; --comments --mangle" />
     <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Assets\Scripts\SlickGrid\slick.grid.js&quot; -o &quot;$(ProjectDir)Assets\Scripts\SlickGrid\slick.grid.min.js&quot; --comments --mangle" />

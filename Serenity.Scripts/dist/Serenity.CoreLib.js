@@ -929,6 +929,40 @@ var Q;
         };
     }
     Q.dbTryText = dbTryText;
+    function proxyTexts(o, p, t) {
+        if (typeof window != 'undefined' && window['Proxy']) {
+            return new window['Proxy'](o, {
+                get: function (x, y) {
+                    var tv = t[y];
+                    if (tv == null)
+                        return;
+                    if (typeof tv == 'number')
+                        return Q.text(p + y);
+                    else {
+                        var z = o[y];
+                        if (z != null)
+                            return z;
+                        o[y] = z = proxyTexts({}, p + y + '.', tv);
+                        return z;
+                    }
+                },
+                ownKeys: function (x) { return Object.keys(t); }
+            });
+        }
+        else {
+            for (var _i = 0, _a = Object.keys(t); _i < _a.length; _i++) {
+                var k = _a[_i];
+                if (typeof t[k] == 'number')
+                    Object.defineProperty(o, k, {
+                        get: function () { return Q.text(p + k); }
+                    });
+                else
+                    o[k] = proxyTexts({}, p + k + '.', t[k]);
+            }
+            return o;
+        }
+    }
+    Q.proxyTexts = proxyTexts;
     var LT = /** @class */ (function () {
         function LT(key) {
             this.key = key;

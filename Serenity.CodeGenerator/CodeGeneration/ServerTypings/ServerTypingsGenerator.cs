@@ -10,6 +10,9 @@ namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGenerator : CecilImportGenerator
     {
+        public bool LocalTexts { get; set; }
+        public readonly HashSet<string> LocalTextFilters = new HashSet<string>();
+
         public ServerTypingsGenerator(params Assembly[] assemblies)
             : base(assemblies)
         {
@@ -28,6 +31,8 @@ namespace Serenity.CodeGeneration
         protected override void GenerateAll()
         {
             base.GenerateAll();
+            if (LocalTexts)
+                GenerateTexts();
             GenerateSSDeclarations();
         }
 

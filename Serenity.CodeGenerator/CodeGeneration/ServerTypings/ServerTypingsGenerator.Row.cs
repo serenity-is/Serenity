@@ -322,6 +322,8 @@ namespace Serenity.CodeGeneration
                     anyMetadata = true;
                 }
 
+                AddRowTexts(rowType, "Db." + (localTextPrefix.IsEmptyOrNull() ? "" : (localTextPrefix + ".")));
+
                 if (!string.IsNullOrEmpty(lookupKey))
                 {
                     cw.Indented("export const lookupKey = '");
