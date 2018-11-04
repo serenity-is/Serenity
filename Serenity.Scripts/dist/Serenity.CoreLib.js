@@ -5026,6 +5026,7 @@ var Serenity;
                     return;
                 }
                 _this.set_valueAsDate(new Date());
+                input.triggerHandler('change');
             });
             _this.time.on('change', function (e3) {
                 input.triggerHandler('change');

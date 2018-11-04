@@ -92,6 +92,7 @@
                         return;
                     }
                     this.set_valueAsDate(new Date());
+                    input.triggerHandler('change');
                 });
 
             this.time.on('change', function (e3) {
