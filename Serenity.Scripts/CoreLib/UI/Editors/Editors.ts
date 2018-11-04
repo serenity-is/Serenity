@@ -1258,6 +1258,7 @@
         protected updateInterface(): void {
             var addButton = this.toolbar.findButton('add-file-button');
             addButton.toggleClass('disabled', this.get_readOnly());
+            this.fileSymbols.find('a.delete').toggle(!this.get_readOnly());
         }
 
         get_readOnly(): boolean {
