@@ -27,7 +27,10 @@ namespace Serenity.CodeGeneration
 
             cw.InBrace(delegate
             {
-                var fields = enumType.Fields.Where(x => x.IsStatic && !x.IsSpecialName && x.Constant != null);
+                var fields = enumType.Fields.Where(x => x.IsStatic && !x.IsSpecialName && x.Constant != null &&
+                    (!x.HasCustomAttributes ||
+                        CecilUtils.FindAttr(x.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") == null));
+
                 fields = fields.OrderBy(x => Convert.ToInt64(x.Constant));
 
                 var inserted = 0;
