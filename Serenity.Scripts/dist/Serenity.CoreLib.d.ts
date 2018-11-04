@@ -1740,6 +1740,8 @@ declare namespace Serenity {
         value: number;
         protected get_value(): number;
         protected set_value(value: number): void;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
     }
     class URLEditor extends StringEditor {
         constructor(input: JQuery);

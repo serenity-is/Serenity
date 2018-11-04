@@ -1609,7 +1609,7 @@
         intervalMinutes?: any;
     }
 
-    @Editor('Time', [IDoubleValue])
+    @Editor('Time', [IDoubleValue, IReadOnly])
     @Element("<select />")
     export class TimeEditor extends Widget<TimeEditorOptions> {
 
@@ -1668,6 +1668,23 @@
 
         protected set_value(value: number): void {
             this.value = value;
+        }
+
+        get_readOnly(): boolean {
+            return this.element.hasClass('readonly');
+        }
+
+        set_readOnly(value: boolean): void {
+
+            if (value !== this.get_readOnly()) {
+                if (value) {
+                    this.element.addClass('readonly').attr('readonly', 'readonly');
+                }
+                else {
+                    this.element.removeClass('readonly').removeAttr('readonly');
+                }
+                Serenity.EditorUtils.setReadonly(this.minutes, value);
+            }
         }
     }
 

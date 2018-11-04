@@ -7470,8 +7470,22 @@ var Serenity;
         TimeEditor.prototype.set_value = function (value) {
             this.value = value;
         };
+        TimeEditor.prototype.get_readOnly = function () {
+            return this.element.hasClass('readonly');
+        };
+        TimeEditor.prototype.set_readOnly = function (value) {
+            if (value !== this.get_readOnly()) {
+                if (value) {
+                    this.element.addClass('readonly').attr('readonly', 'readonly');
+                }
+                else {
+                    this.element.removeClass('readonly').removeAttr('readonly');
+                }
+                Serenity.EditorUtils.setReadonly(this.minutes, value);
+            }
+        };
         TimeEditor = __decorate([
-            Editor('Time', [Serenity.IDoubleValue]),
+            Editor('Time', [Serenity.IDoubleValue, Serenity.IReadOnly]),
             Element("<select />")
         ], TimeEditor);
         return TimeEditor;
