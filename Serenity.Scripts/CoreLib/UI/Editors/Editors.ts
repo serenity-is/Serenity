@@ -1629,6 +1629,7 @@
             }
 
             this.minutes = $('<select/>').addClass('editor s-TimeEditor minute').insertAfter(input);
+            this.minutes.change(() => this.element.trigger("change"));
 
             for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
                 Q.addOption(this.minutes, m.toString(), ((m < 10) ? ('0' + m) : m.toString()));
