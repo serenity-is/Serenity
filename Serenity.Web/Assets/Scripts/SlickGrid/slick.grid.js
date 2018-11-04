@@ -2291,7 +2291,7 @@ if (typeof Slick === "undefined") {
             if (data) {
                 data.onRowCountChanged && data.onRowCountChanged.unsubscribe(viewOnRowCountChanged);
                 data.onRowsChanged && data.onRowsChanged.unsubscribe(viewOnRowsChanged);
-                data.onDataChanged && data.onDataChanged.unsubscribe(viewonDataChanged);
+                data.onDataChanged && data.onDataChanged.unsubscribe(viewOnDataChanged);
             }
         }
 
