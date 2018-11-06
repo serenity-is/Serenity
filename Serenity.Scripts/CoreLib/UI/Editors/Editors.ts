@@ -1258,6 +1258,7 @@
         protected updateInterface(): void {
             var addButton = this.toolbar.findButton('add-file-button');
             addButton.toggleClass('disabled', this.get_readOnly());
+            this.fileSymbols.find('a.delete').toggle(!this.get_readOnly());
         }
 
         get_readOnly(): boolean {
@@ -1609,7 +1610,7 @@
         intervalMinutes?: any;
     }
 
-    @Editor('Time', [IDoubleValue])
+    @Editor('Time', [IDoubleValue, IReadOnly])
     @Element("<select />")
     export class TimeEditor extends Widget<TimeEditorOptions> {
 
@@ -1629,6 +1630,7 @@
             }
 
             this.minutes = $('<select/>').addClass('editor s-TimeEditor minute').insertAfter(input);
+            this.minutes.change(() => this.element.trigger("change"));
 
             for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
                 Q.addOption(this.minutes, m.toString(), ((m < 10) ? ('0' + m) : m.toString()));
@@ -1667,6 +1669,23 @@
 
         protected set_value(value: number): void {
             this.value = value;
+        }
+
+        get_readOnly(): boolean {
+            return this.element.hasClass('readonly');
+        }
+
+        set_readOnly(value: boolean): void {
+
+            if (value !== this.get_readOnly()) {
+                if (value) {
+                    this.element.addClass('readonly').attr('readonly', 'readonly');
+                }
+                else {
+                    this.element.removeClass('readonly').removeAttr('readonly');
+                }
+                Serenity.EditorUtils.setReadonly(this.minutes, value);
+            }
         }
     }
 

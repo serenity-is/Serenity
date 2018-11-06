@@ -89,7 +89,7 @@ namespace Serenity.CodeGenerator
             public string Module { get; set; }
             public string PermissionKey { get; set; }
         }
-
+        
         public class BaseRowClass
         {
             public string ClassName { get; set; }
@@ -99,7 +99,8 @@ namespace Serenity.CodeGenerator
         public class ServerTypingsConfig
         {
             public string[] Assemblies { get; set; }
-            public string OutDir { get; set; }           
+            public string OutDir { get; set; }
+            public bool LocalTexts { get; set; }
         }
 
         public class ClientTypesConfig

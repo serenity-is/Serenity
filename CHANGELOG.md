@@ -1,3 +1,24 @@
+## 3.8.1 (2018-11-03)
+
+Bugfixes:
+  - resolve package downgrade issue with System.Data.SqlClient
+
+## 3.8.0 (2018-11-03)
+
+Features:
+  - updated to .net core 2.1, updated many packages
+  - when a field can't be loaded from database using getFromReader, show the name of the field and row type so that developer can understand which field has an invalid type
+  - added local text generation ability (optional) to server typings so that local texts can be accessed with completion and compile time checking. currently only processes row field texts and nested local texts.
+  - serenity guide is now hosted at https://serenity.is/docs
+  - added readonly option to CheckTreeEditor and subclasses like CheckLookupEditor
+  - improve UniversalAssemblyResolver so that more packages can be located / loaded by sergen
+  - divide InBrace function of CodeWriter to StartBrace and EndBrace functions so blocks can be manually opened and closed
+  
+Bugfixes:
+  - if allowNegatives is true and minValue / maxValue is not specified, minValue is set to 999999999999.99 instead of -999999999999.99 in decimal editor
+  - only switch to main tab if current tab is being made disabled
+  - add / to handler paths to make them only available at root, see https://github.com/volkanceylan/Serenity/issues/4017
+  
 ## 3.7.7 (2018-09-15)
 
 Features:

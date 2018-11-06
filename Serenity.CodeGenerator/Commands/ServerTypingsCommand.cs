@@ -1,4 +1,5 @@
-﻿using Serenity.CodeGeneration;
+﻿using Newtonsoft.Json.Linq;
+using Serenity.CodeGeneration;
 using Serenity.Data;
 using Serenity.Localization;
 using Serenity.Services;
@@ -120,6 +121,30 @@ namespace Serenity.CodeGenerator
                 Environment.Exit(1);
             }
 
+            var generator = new ServerTypingsGenerator(assemblyFiles.ToArray());
+            generator.LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts;
+
+            var appSettings = Path.Combine(projectDir, "appsettings.json");
+            if (generator.LocalTexts && File.Exists(appSettings))
+            {
+                try
+                {
+                    var obj = JObject.Parse(File.ReadAllText(appSettings));
+                    var packages = ((obj["AppSettings"] as JObject)?["LocalTextPackages"] as JObject);
+                    if (packages != null)
+                    {
+                        foreach (var p in packages.PropertyValues())
+                            foreach (var x in p.Values<string>())
+                                generator.LocalTextFilters.Add(x);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Console.WriteLine("Error occured while parsing appsettings.json!" + Environment.NewLine + 
+                        ex.ToString());
+                }
+            }
+
             var outDir = Path.Combine(projectDir, (config.ServerTypings.OutDir.TrimToNull() ?? "Imports/ServerTypings")
                 .Replace('/', Path.DirectorySeparatorChar));
 
@@ -128,7 +153,6 @@ namespace Serenity.CodeGenerator
             Console.ResetColor();
             Console.WriteLine(outDir);
 
-            var generator = new ServerTypingsGenerator(assemblyFiles.ToArray());
             generator.RootNamespaces.Add(config.RootNamespace);
 
             foreach (var type in tsTypes)

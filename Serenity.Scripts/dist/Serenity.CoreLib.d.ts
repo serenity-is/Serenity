@@ -552,6 +552,7 @@ declare namespace Q {
     function prefixedText(prefix: string): (text: string, key: string | ((p?: string) => string)) => string;
     function tryGetText(key: string): string;
     function dbTryText(prefix: string): ((key: string) => string);
+    function proxyTexts(o: Object, p: string, t: Object): Object;
     class LT {
         private key;
         static $table: {
@@ -1739,6 +1740,8 @@ declare namespace Serenity {
         value: number;
         protected get_value(): number;
         protected set_value(value: number): void;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
     }
     class URLEditor extends StringEditor {
         constructor(input: JQuery);

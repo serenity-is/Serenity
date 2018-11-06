@@ -14,6 +14,7 @@ namespace Serenity.CodeGeneration
         private HashSet<string> visited;
         private Queue<TypeDefinition> generateQueue;
         protected List<TypeDefinition> lookupScripts;
+        protected HashSet<string> localTextKeys;
         protected HashSet<string> generatedTypes;
         protected string fileIdentifier;
 
@@ -118,6 +119,7 @@ namespace Serenity.CodeGeneration
             this.generateQueue = new Queue<TypeDefinition>();
             this.visited = new HashSet<string>();
             this.lookupScripts = new List<TypeDefinition>();
+            this.localTextKeys = new HashSet<string>();
         }
 
         protected abstract bool IsTS();
@@ -131,7 +133,7 @@ namespace Serenity.CodeGeneration
                     TypeDefinition[] types;
                     try
                     {
-                        types = module.GetTypes().ToArray();
+                        types = module.Types.ToArray();
                     }
                     catch
                     {
@@ -139,8 +141,21 @@ namespace Serenity.CodeGeneration
                         continue;
                     }
 
+                    TypeDefinition[] emptyTypes = new TypeDefinition[0];
+
                     foreach (var fromType in types)
                     {
+                        var nestedLocalTexts = CecilUtils.GetAttr(fromType, "Serenity.Extensibility",
+                            "NestedLocalTextsAttribute", emptyTypes);
+                        if (nestedLocalTexts != null)
+                        {
+                            string prefix = null;
+                            if (nestedLocalTexts.HasProperties)
+                                prefix = nestedLocalTexts.Properties.FirstOrDefault(x => x.Name == "Prefix").Argument.Value as string;
+
+                            AddNestedLocalTexts(fromType, prefix ?? "");
+                        }
+
                         if (fromType.IsAbstract)
                             continue;
 
@@ -163,10 +178,7 @@ namespace Serenity.CodeGeneration
                         }
 
                         if (CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "LookupScriptAttribute", baseClasses) != null)
-                        {
                             lookupScripts.Add(fromType);
-                            continue;
-                        }
                     }
                 }
             }
@@ -515,6 +527,10 @@ namespace Serenity.CodeGeneration
             }
 
             return methodName;
+        }
+
+        protected virtual void AddNestedLocalTexts(TypeDefinition type, string prefix)
+        {
         }
     }
 }

@@ -36,13 +36,23 @@ namespace Serenity.Reflection
 
         public void InBrace(Action insideBlock)
         {
+            StartBrace();
+            insideBlock();
+            EndBrace();
+        }
+
+        public void StartBrace()
+        {
             if (!BraceOnSameLine)
                 sb.Append(indent);
             else
                 sb.Append(" ");
             sb.AppendLine("{");
             IncreaseIndent();
-            insideBlock();
+        }
+
+        public void EndBrace()
+        {
             DecreaseIndent();
             sb.Append(indent);
             sb.AppendLine("}");

@@ -52,6 +52,39 @@ namespace Q {
         }
     }
 
+    export function proxyTexts(o: Object, p: string, t: Object): Object {
+        if (typeof window != 'undefined' && window['Proxy']) {
+            return new window['Proxy'](o, {
+                get: (x: Object, y: string) => {
+                    var tv = t[y];
+                    if (tv == null)
+                        return;
+                    if (typeof tv == 'number')
+                        return Q.text(p + y);
+                    else {
+                        var z = o[y];
+                        if (z != null)
+                            return z;
+                        o[y] = z = proxyTexts({}, p + y + '.', tv);
+                        return z;
+                    }
+                },
+                ownKeys: (x: Object) => Object.keys(t)
+            });
+        }
+        else {
+            for (var k of Object.keys(t)) {
+                if (typeof t[k] == 'number')
+                    Object.defineProperty(o, k, {
+                        get: () => Q.text(p + k)
+                    });
+                else
+                    o[k] = proxyTexts({}, p + k + '.', t[k]);
+            }
+            return o;
+        }
+    }
+
     export class LT {
         static $table: { [key: string]: string } = {};
         static empty: LT = new LT('');

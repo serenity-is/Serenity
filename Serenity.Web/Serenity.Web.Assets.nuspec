@@ -2,7 +2,7 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>Serenity.Web.Assets</id>
-    <version>3.7.8</version>
+    <version>3.8.1</version>
     <authors>${authors}</authors>
     <owners>${owners}</owners>
     <title>Serenity Platform - Web Assets</title>
