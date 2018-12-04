@@ -62,7 +62,7 @@ declare namespace Serenity.CodeGeneration {
     const enum ExternalTypeOrigin {
         Server = 1,
         SS = 2,
-        TS = 3,
+        TS = 3
     }
     function stringifyNode(node: any): string;
     function parseSourceToJson(sourceText: string): string;
