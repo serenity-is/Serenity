@@ -1,14 +1,14 @@
 ﻿<Project>
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <VersionPrefix>3.8.1</VersionPrefix>
+    <VersionPrefix>3.8.2</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Authors>Volkan Ceylan</Authors>
     <Copyright>Copyright (c) Volkan Ceylan</Copyright>
     <PackageIconUrl>https://raw.github.com/volkanceylan/Serenity/master/Tools/Images/serenity-logo-128.png</PackageIconUrl>
-    <PackageLicenseUrl>https://raw.github.com/volkanceylan/Serenity/master/LICENSE.md</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://github.com/volkanceylan/Serenity</PackageProjectUrl>
     <PackageTags>Serenity</PackageTags>
   </PropertyGroup>

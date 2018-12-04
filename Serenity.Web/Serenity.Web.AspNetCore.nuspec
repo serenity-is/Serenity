@@ -9,7 +9,7 @@
     <description>${description}</description>
     <language>${language}</language>
     <iconUrl>${iconUrl}</iconUrl>
-    <licenseUrl>${licenceUrl}</licenseUrl>
+    <license type="expression">MIT</license>
     <projectUrl>${projectUrl}</projectUrl>
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
@@ -70,7 +70,6 @@
     <file src="bin\${configuration}\net461\Serenity.Web.dll" target="lib/net461" />
     <file src="bin\${configuration}\net461\Serenity.Web.pdb" target="lib/net461" />
     <file src="bin\${configuration}\serenity.css" target="content/Content/serenity" />
-    <file src="Includes\web.config.transform" target="content\web.config.transform" />
     <file src="Style\images\*.png" target="content/Content/serenity/images" />
     <file src="Style\images\*.gif" target="content/Content/serenity/images" />
     <file src="Style\images\*.jpg" target="content/Content/serenity/images" />

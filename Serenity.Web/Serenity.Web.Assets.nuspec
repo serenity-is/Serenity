@@ -9,7 +9,7 @@
     <description>Contains static assets for Serenity web applications</description>
     <language>${language}</language>
     <iconUrl>${iconUrl}</iconUrl>
-    <licenseUrl>${licenceUrl}</licenseUrl>
+    <license type="expression">MIT</license>
     <projectUrl>${projectUrl}</projectUrl>
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>

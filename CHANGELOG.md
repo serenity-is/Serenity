@@ -1,3 +1,15 @@
+## 3.8.2 (2018-12-04)
+
+Features:
+  - skip enum members that has Ignore attribute in ServerTypingsGenerator
+  - trigger change handler when now button is clicked in date/time editor
+  - trigger change event of TimeEditor hour input when minute changes
+
+Bugfixes:
+  - set minutes section readonly when time editor is readonly
+  - hide delete buttons on images when MultipleImageUploadEditor is readonly
+  - fix typo on unsubscribe viewOnDataChanged of SlickGrid
+
 ## 3.8.1 (2018-11-03)
 
 Bugfixes:
