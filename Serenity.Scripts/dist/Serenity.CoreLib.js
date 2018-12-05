@@ -5217,7 +5217,6 @@ var Serenity;
                 hidden.attr('placeholder', emptyItemText);
             }
             var select2Options = _this.getSelect2Options();
-            _this.multiple = !!select2Options.multiple;
             hidden.select2(select2Options);
             hidden.attr('type', 'text');
             // jquery validate to work
@@ -5228,9 +5227,11 @@ var Serenity;
                     }
                 }
             });
+            _this.setCascadeFrom(_this.options.cascadeFrom);
+            if (_this.useInplaceAdd())
+                _this.addInplaceCreate(Q.text('Controls.SelectEditor.InplaceAdd'), null);
             return _this;
         }
-        ;
         Select2Editor.prototype.destroy = function () {
             if (this.element != null) {
                 this.element.select2('destroy');
@@ -5240,13 +5241,21 @@ var Serenity;
         Select2Editor.prototype.emptyItemText = function () {
             return Q.coalesce(this.element.attr('placeholder'), Q.text('Controls.SelectEditor.EmptyItemText'));
         };
+        Select2Editor.prototype.allowClear = function () {
+            return this.options.allowClear != null ?
+                !!this.options.allowClear : this.emptyItemText() != null;
+        };
+        Select2Editor.prototype.isMultiple = function () {
+            return !!this.options.multiple;
+        };
         Select2Editor.prototype.getSelect2Options = function () {
             var _this = this;
             var emptyItemText = this.emptyItemText();
-            return {
+            var opt = {
                 data: this.items,
+                multiple: this.isMultiple(),
                 placeHolder: (!Q.isEmptyOrNull(emptyItemText) ? emptyItemText : null),
-                allowClear: emptyItemText != null,
+                allowClear: this.allowClear(),
                 createSearchChoicePosition: 'bottom',
                 query: function (query) {
                     var term = (Q.isEmptyOrNull(query.term) ? '' : Select2.util.stripDiacritics(Q.coalesce(query.term, '')).toUpperCase());
@@ -5266,7 +5275,7 @@ var Serenity;
                 initSelection: function (element, callback) {
                     var val = element.val();
                     var isAutoComplete = _this.isAutoComplete();
-                    if (_this.multiple) {
+                    if (_this.isMultiple()) {
                         var list = [];
                         var $t1 = val.split(',');
                         for (var $t2 = 0; $t2 < $t1.length; $t2++) {
@@ -5291,9 +5300,14 @@ var Serenity;
                     callback(it);
                 }
             };
+            if (this.options.minimumResultsForSearch != null)
+                opt.minimumResultsForSearch = this.options.minimumResultsForSearch;
+            if (this.isAutoComplete() || this.useInplaceAdd())
+                opt.createSearchChoice = this.getCreateSearchChoice(null);
+            return opt;
         };
         Select2Editor.prototype.get_delimited = function () {
-            return !!!!this.options['delimited'];
+            return !!this.options.delimited;
         };
         Select2Editor.prototype.clearItems = function () {
             ss.clear(this.items);
@@ -5324,11 +5338,11 @@ var Serenity;
             });
             this.get_select2Container().add(this.element).addClass('has-inplace-button');
             Serenity.WX.change(this, function (e1) {
-                var isNew = _this.multiple || Q.isEmptyOrNull(_this.get_value());
+                var isNew = _this.isMultiple() || Q.isEmptyOrNull(_this.get_value());
                 inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
             });
             Serenity.WX.changeSelect2(this, function (e2) {
-                if (_this.multiple) {
+                if (_this.isMultiple()) {
                     var values = _this.get_values();
                     if (values.length > 0 && values[values.length - 1] == (-2147483648).toString()) {
                         _this.set_values(values.slice(0, values.length - 1));
@@ -5340,7 +5354,7 @@ var Serenity;
                     _this.inplaceCreateClick(e2);
                 }
             });
-            if (this.multiple) {
+            if (this.isMultiple()) {
                 this.get_select2Container().on('dblclick.' + this.uniqueName, '.select2-search-choice', function (e3) {
                     var q = $(e3.target);
                     if (!q.hasClass('select2-search-choice')) {
@@ -5356,10 +5370,14 @@ var Serenity;
                 });
             }
         };
-        Select2Editor.prototype.inplaceCreateClick = function (e) {
+        Select2Editor.prototype.useInplaceAdd = function () {
+            return !this.isAutoComplete() &&
+                this.options.inplaceAdd &&
+                (this.options.inplaceAddPermission == null ||
+                    Q.Authorization.hasPermission(this.options.inplaceAddPermission));
         };
         Select2Editor.prototype.isAutoComplete = function () {
-            return false;
+            return !!this.options.autoComplete;
         };
         Select2Editor.prototype.getCreateSearchChoice = function (getName) {
             var _this = this;
@@ -5410,7 +5428,7 @@ var Serenity;
             }
         };
         Select2Editor.prototype.getEditValue = function (property, target) {
-            if (!this.multiple || this.get_delimited()) {
+            if (!this.isMultiple() || this.get_delimited()) {
                 target[property.name] = this.get_value();
             }
             else {
@@ -5451,7 +5469,7 @@ var Serenity;
         Select2Editor.prototype.set_value = function (value) {
             if (value != this.get_value()) {
                 var val = value;
-                if (!Q.isEmptyOrNull(value) && this.multiple) {
+                if (!Q.isEmptyOrNull(value) && this.isMultiple()) {
                     val = value.split(String.fromCharCode(44)).map(function (x) {
                         return Q.trimToNull(x);
                     }).filter(function (x1) {
@@ -5519,7 +5537,7 @@ var Serenity;
         });
         Select2Editor.prototype.updateInplaceReadOnly = function () {
             var readOnly = this.get_readOnly() &&
-                (this.multiple || !this.value);
+                (this.isMultiple() || !this.value);
             this.element.nextAll('.inplace-create')
                 .attr('disabled', (readOnly ? 'disabled' : ''))
                 .css('opacity', (readOnly ? '0.1' : ''))
@@ -5530,6 +5548,243 @@ var Serenity;
                 Serenity.EditorUtils.setReadonly(this.element, value);
                 this.updateInplaceReadOnly();
             }
+        };
+        Select2Editor.prototype.getCascadeFromValue = function (parent) {
+            return Serenity.EditorUtils.getValue(parent);
+        };
+        Select2Editor.prototype.setCascadeFrom = function (value) {
+            var _this = this;
+            if (Q.isEmptyOrNull(value)) {
+                if (this.cascadeLink != null) {
+                    this.cascadeLink.set_parentID(null);
+                    this.cascadeLink = null;
+                }
+                this.options.cascadeFrom = null;
+                return;
+            }
+            this.cascadeLink = new Serenity.CascadedWidgetLink(Serenity.Widget, this, function (p) {
+                _this.set_cascadeValue(_this.getCascadeFromValue(p));
+            });
+            this.cascadeLink.set_parentID(value);
+            this.options.cascadeFrom = value;
+        };
+        Select2Editor.prototype.get_cascadeFrom = function () {
+            return this.options.cascadeFrom;
+        };
+        Object.defineProperty(Select2Editor.prototype, "cascadeFrom", {
+            get: function () {
+                return this.get_cascadeFrom();
+            },
+            set: function (value) {
+                this.set_cascadeFrom(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Select2Editor.prototype.set_cascadeFrom = function (value) {
+            if (value !== this.options.cascadeFrom) {
+                this.setCascadeFrom(value);
+                this.updateItems();
+            }
+        };
+        Select2Editor.prototype.get_cascadeField = function () {
+            return Q.coalesce(this.options.cascadeField, this.options.cascadeFrom);
+        };
+        Object.defineProperty(Select2Editor.prototype, "cascadeField", {
+            get: function () {
+                return this.get_cascadeField();
+            },
+            set: function (value) {
+                this.set_cascadeField(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Select2Editor.prototype.set_cascadeField = function (value) {
+            this.options.cascadeField = value;
+        };
+        Select2Editor.prototype.get_cascadeValue = function () {
+            return this.options.cascadeValue;
+        };
+        Object.defineProperty(Select2Editor.prototype, "cascadeValue", {
+            get: function () {
+                return this.get_cascadeValue();
+            },
+            set: function (value) {
+                this.set_cascadeValue(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Select2Editor.prototype.set_cascadeValue = function (value) {
+            if (this.options.cascadeValue !== value) {
+                this.options.cascadeValue = value;
+                this.set_value(null);
+                this.updateItems();
+            }
+        };
+        Select2Editor.prototype.get_filterField = function () {
+            return this.options.filterField;
+        };
+        Object.defineProperty(Select2Editor.prototype, "filterField", {
+            get: function () {
+                return this.get_filterField();
+            },
+            set: function (value) {
+                this.set_filterField(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Select2Editor.prototype.set_filterField = function (value) {
+            this.options.filterField = value;
+        };
+        Select2Editor.prototype.get_filterValue = function () {
+            return this.options.filterValue;
+        };
+        Object.defineProperty(Select2Editor.prototype, "filterValue", {
+            get: function () {
+                return this.get_filterValue();
+            },
+            set: function (value) {
+                this.set_filterValue(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Select2Editor.prototype.set_filterValue = function (value) {
+            if (this.options.filterValue !== value) {
+                this.options.filterValue = value;
+                this.set_value(null);
+                this.updateItems();
+            }
+        };
+        Select2Editor.prototype.cascadeItems = function (items) {
+            var val = this.get_cascadeValue();
+            if (val == null || val === '') {
+                if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+                    return [];
+                }
+                return items;
+            }
+            var key = val.toString();
+            var fld = this.get_cascadeField();
+            return items.filter(function (x) {
+                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                return !!(itemKey != null && itemKey.toString() === key);
+            });
+        };
+        Select2Editor.prototype.filterItems = function (items) {
+            var val = this.get_filterValue();
+            if (val == null || val === '') {
+                return items;
+            }
+            var key = val.toString();
+            var fld = this.get_filterField();
+            return items.filter(function (x) {
+                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                return !!(itemKey != null && itemKey.toString() === key);
+            });
+        };
+        Select2Editor.prototype.updateItems = function () {
+        };
+        Select2Editor.prototype.getDialogTypeKey = function () {
+            if (this.options.dialogType != null) {
+                return this.options.dialogType;
+            }
+            return null;
+        };
+        Select2Editor.prototype.createEditDialog = function (callback) {
+            var dialogTypeKey = this.getDialogTypeKey();
+            var dialogType = Serenity.DialogTypeRegistry.get(dialogTypeKey);
+            Serenity.Widget.create({
+                type: dialogType,
+                init: function (x) { return callback(x); }
+            });
+        };
+        Select2Editor.prototype.initNewEntity = function (entity) {
+            if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+                entity[this.get_cascadeField()] = this.get_cascadeValue();
+            }
+            if (!Q.isEmptyOrNull(this.get_filterField())) {
+                entity[this.get_filterField()] = this.get_filterValue();
+            }
+            if (this.onInitNewEntity != null) {
+                this.onInitNewEntity(entity);
+            }
+        };
+        Select2Editor.prototype.setEditDialogReadOnly = function (dialog) {
+            // an ugly workaround
+            dialog.element && dialog.element
+                .find('.tool-button.delete-button')
+                .addClass('disabled')
+                .unbind('click');
+        };
+        Select2Editor.prototype.editDialogDataChange = function () {
+        };
+        Select2Editor.prototype.setTermOnNewEntity = function (entity, term) {
+        };
+        Select2Editor.prototype.inplaceCreateClick = function (e) {
+            var _this = this;
+            if (this.get_readOnly() &&
+                ((this.isMultiple() && !e['editItem']) || !this.value))
+                return;
+            this.createEditDialog(function (dialog) {
+                if (_this.get_readOnly())
+                    _this.setEditDialogReadOnly(dialog);
+                Serenity.SubDialogHelper.bindToDataChange(dialog, _this, function (x, dci) {
+                    _this.editDialogDataChange();
+                    _this.updateItems();
+                    _this.lastCreateTerm = null;
+                    if ((dci.type === 'create' || dci.type === 'update') &&
+                        dci.entityId != null) {
+                        var id = dci.entityId.toString();
+                        if (_this.isMultiple()) {
+                            var values = _this.get_values().slice();
+                            if (values.indexOf(id) < 0) {
+                                values.push(id);
+                            }
+                            _this.set_values(null);
+                            _this.set_values(values.slice());
+                        }
+                        else {
+                            _this.set_value(null);
+                            _this.set_value(id);
+                        }
+                    }
+                    else if (_this.isMultiple() && dci.type === 'delete' &&
+                        dci.entityId != null) {
+                        var id1 = dci.entityId.toString();
+                        var values1 = _this.get_values().slice();
+                        var idx1 = values1.indexOf(id1);
+                        if (idx1 >= 0)
+                            values1.splice(idx1, 1);
+                        _this.set_values(values1.slice());
+                    }
+                    else if (!_this.isMultiple()) {
+                        _this.set_value(null);
+                    }
+                }, true);
+                var editItem = e['editItem'];
+                if (editItem != null) {
+                    dialog.load(editItem, function () {
+                        dialog.dialogOpen(_this.openDialogAsPanel);
+                    }, null);
+                }
+                else if (_this.isMultiple() || Q.isEmptyOrNull(_this.get_value())) {
+                    var entity = {};
+                    _this.setTermOnNewEntity(entity, Q.trimToEmpty(_this.lastCreateTerm));
+                    _this.initNewEntity(entity);
+                    dialog.load(entity, function () {
+                        dialog.dialogOpen(_this.openDialogAsPanel);
+                    }, null);
+                }
+                else {
+                    dialog.load(_this.get_value(), function () {
+                        dialog.dialogOpen(_this.openDialogAsPanel);
+                    }, null);
+                }
+            });
         };
         Select2Editor = __decorate([
             Serenity.Decorators.registerClass('Serenity.Select2Editor', [Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly]),
@@ -5636,19 +5891,12 @@ var Serenity;
         __extends(LookupEditorBase, _super);
         function LookupEditorBase(input, opt) {
             var _this = _super.call(this, input, opt) || this;
-            _this.setCascadeFrom(_this.options.cascadeFrom);
             var self = _this;
             if (!_this.isAsyncWidget()) {
                 _this.updateItems();
                 Q.ScriptData.bindToChange('Lookup.' + _this.getLookupKey(), _this.uniqueName, function () {
                     self.updateItems();
                 });
-            }
-            if (!_this.options.autoComplete &&
-                _this.options.inplaceAdd &&
-                (_this.options.inplaceAddPermission == null ||
-                    Q.Authorization.hasPermission(_this.options.inplaceAddPermission))) {
-                _this.addInplaceCreate(Q.text('Controls.SelectEditor.InplaceAdd'), null);
             }
             return _this;
         }
@@ -5662,7 +5910,7 @@ var Serenity;
         };
         LookupEditorBase.prototype.destroy = function () {
             Q.ScriptData.unbindFromChange(this.uniqueName);
-            Serenity.Select2Editor.prototype.destroy.call(this);
+            _super.prototype.destroy.call(this);
         };
         LookupEditorBase.prototype.getLookupKey = function () {
             if (this.options.lookupKey != null) {
@@ -5732,252 +5980,16 @@ var Serenity;
             }, null);
         };
         LookupEditorBase.prototype.getDialogTypeKey = function () {
-            if (this.options.dialogType != null) {
-                return this.options.dialogType;
-            }
-            return this.getLookupKey();
+            var dialogTypeKey = _super.prototype.getDialogTypeKey.call(this);
+            if (dialogTypeKey)
+                return this.getLookupKey();
+            return dialogTypeKey;
         };
-        LookupEditorBase.prototype.createEditDialog = function (callback) {
-            var dialogTypeKey = this.getDialogTypeKey();
-            var dialogType = Serenity.DialogTypeRegistry.get(dialogTypeKey);
-            Serenity.Widget.create({
-                type: dialogType,
-                init: function (x) { return callback(x); }
-            });
+        LookupEditorBase.prototype.setCreateTermOnNewEntity = function (entity, term) {
+            entity[this.getLookup().textField] = term;
         };
-        LookupEditorBase.prototype.initNewEntity = function (entity) {
-            if (!Q.isEmptyOrNull(this.get_cascadeField())) {
-                entity[this.get_cascadeField()] = this.get_cascadeValue();
-            }
-            if (!Q.isEmptyOrNull(this.get_filterField())) {
-                entity[this.get_filterField()] = this.get_filterValue();
-            }
-            if (this.onInitNewEntity != null) {
-                this.onInitNewEntity(entity);
-            }
-        };
-        LookupEditorBase.prototype.inplaceCreateClick = function (e) {
-            var _this = this;
-            if (this.get_readOnly() &&
-                ((this.multiple && !e['editItem']) || !this.value))
-                return;
-            var self = this;
-            this.createEditDialog(function (dialog) {
-                // an ugly workaround
-                if (_this.get_readOnly() &&
-                    dialog.element)
-                    dialog.element
-                        .find('.tool-button.delete-button')
-                        .addClass('disabled')
-                        .unbind('click');
-                Serenity.SubDialogHelper.bindToDataChange(dialog, _this, function (x, dci) {
-                    Q.reloadLookup(_this.getLookupKey());
-                    self.updateItems();
-                    _this.lastCreateTerm = null;
-                    if ((dci.type === 'create' || dci.type === 'update') &&
-                        dci.entityId != null) {
-                        var id = dci.entityId.toString();
-                        if (_this.multiple) {
-                            var values = self.get_values().slice();
-                            if (values.indexOf(id) < 0) {
-                                values.push(id);
-                            }
-                            self.set_values(null);
-                            self.set_values(values.slice());
-                        }
-                        else {
-                            self.set_value(null);
-                            self.set_value(id);
-                        }
-                    }
-                    else if (_this.multiple && dci.type === 'delete' &&
-                        dci.entityId != null) {
-                        var id1 = dci.entityId.toString();
-                        var values1 = self.get_values().slice();
-                        var idx1 = values1.indexOf(id1);
-                        if (idx1 >= 0)
-                            values1.splice(idx1, 1);
-                        self.set_values(values1.slice());
-                    }
-                    else if (!_this.multiple) {
-                        self.set_value(null);
-                    }
-                }, true);
-                var editItem = e['editItem'];
-                if (editItem != null) {
-                    dialog.load(editItem, function () {
-                        dialog.dialogOpen(_this.openDialogAsPanel);
-                    }, null);
-                }
-                else if (_this.multiple || Q.isEmptyOrNull(_this.get_value())) {
-                    var entity = {};
-                    entity[_this.getLookup().textField] = Q.trimToEmpty(_this.lastCreateTerm);
-                    _this.initNewEntity(entity);
-                    dialog.load(entity, function () {
-                        dialog.dialogOpen(_this.openDialogAsPanel);
-                    }, null);
-                }
-                else {
-                    dialog.load(_this.get_value(), function () {
-                        dialog.dialogOpen(_this.openDialogAsPanel);
-                    }, null);
-                }
-            });
-        };
-        LookupEditorBase.prototype.cascadeItems = function (items) {
-            var val = this.get_cascadeValue();
-            if (val == null || val === '') {
-                if (!Q.isEmptyOrNull(this.get_cascadeField())) {
-                    return [];
-                }
-                return items;
-            }
-            var key = val.toString();
-            var fld = this.get_cascadeField();
-            return items.filter(function (x) {
-                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
-                return !!(itemKey != null && itemKey.toString() === key);
-            });
-        };
-        LookupEditorBase.prototype.filterItems = function (items) {
-            var val = this.get_filterValue();
-            if (val == null || val === '') {
-                return items;
-            }
-            var key = val.toString();
-            var fld = this.get_filterField();
-            return items.filter(function (x) {
-                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
-                return !!(itemKey != null && itemKey.toString() === key);
-            });
-        };
-        LookupEditorBase.prototype.getCascadeFromValue = function (parent) {
-            return Serenity.EditorUtils.getValue(parent);
-        };
-        LookupEditorBase.prototype.setCascadeFrom = function (value) {
-            var _this = this;
-            if (Q.isEmptyOrNull(value)) {
-                if (this.cascadeLink != null) {
-                    this.cascadeLink.set_parentID(null);
-                    this.cascadeLink = null;
-                }
-                this.options.cascadeFrom = null;
-                return;
-            }
-            this.cascadeLink = new Serenity.CascadedWidgetLink(Serenity.Widget, this, function (p) {
-                _this.set_cascadeValue(_this.getCascadeFromValue(p));
-            });
-            this.cascadeLink.set_parentID(value);
-            this.options.cascadeFrom = value;
-        };
-        LookupEditorBase.prototype.isAutoComplete = function () {
-            return this.options != null && this.options.autoComplete;
-        };
-        LookupEditorBase.prototype.getSelect2Options = function () {
-            var opt = _super.prototype.getSelect2Options.call(this);
-            if (this.options.minimumResultsForSearch != null)
-                opt.minimumResultsForSearch = this.options.minimumResultsForSearch;
-            if (this.options.autoComplete)
-                opt.createSearchChoice = this.getCreateSearchChoice(null);
-            else if (this.options.inplaceAdd && (this.options.inplaceAddPermission == null ||
-                Q.Authorization.hasPermission(this.options.inplaceAddPermission))) {
-                opt.createSearchChoice = this.getCreateSearchChoice(null);
-            }
-            if (this.options.multiple)
-                opt.multiple = true;
-            opt.allowClear = Q.coalesce(this.options.allowClear, true);
-            return opt;
-        };
-        LookupEditorBase.prototype.get_cascadeFrom = function () {
-            return this.options.cascadeFrom;
-        };
-        Object.defineProperty(LookupEditorBase.prototype, "cascadeFrom", {
-            get: function () {
-                return this.get_cascadeFrom();
-            },
-            set: function (value) {
-                this.set_cascadeFrom(value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        LookupEditorBase.prototype.set_cascadeFrom = function (value) {
-            if (value !== this.options.cascadeFrom) {
-                this.setCascadeFrom(value);
-                this.updateItems();
-            }
-        };
-        LookupEditorBase.prototype.get_cascadeField = function () {
-            return Q.coalesce(this.options.cascadeField, this.options.cascadeFrom);
-        };
-        Object.defineProperty(LookupEditorBase.prototype, "cascadeField", {
-            get: function () {
-                return this.get_cascadeField();
-            },
-            set: function (value) {
-                this.set_cascadeField(value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        LookupEditorBase.prototype.set_cascadeField = function (value) {
-            this.options.cascadeField = value;
-        };
-        LookupEditorBase.prototype.get_cascadeValue = function () {
-            return this.options.cascadeValue;
-        };
-        Object.defineProperty(LookupEditorBase.prototype, "cascadeValue", {
-            get: function () {
-                return this.get_cascadeValue();
-            },
-            set: function (value) {
-                this.set_cascadeValue(value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        LookupEditorBase.prototype.set_cascadeValue = function (value) {
-            if (this.options.cascadeValue !== value) {
-                this.options.cascadeValue = value;
-                this.set_value(null);
-                this.updateItems();
-            }
-        };
-        LookupEditorBase.prototype.get_filterField = function () {
-            return this.options.filterField;
-        };
-        Object.defineProperty(LookupEditorBase.prototype, "filterField", {
-            get: function () {
-                return this.get_filterField();
-            },
-            set: function (value) {
-                this.set_filterField(value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        LookupEditorBase.prototype.set_filterField = function (value) {
-            this.options.filterField = value;
-        };
-        LookupEditorBase.prototype.get_filterValue = function () {
-            return this.options.filterValue;
-        };
-        Object.defineProperty(LookupEditorBase.prototype, "filterValue", {
-            get: function () {
-                return this.get_filterValue();
-            },
-            set: function (value) {
-                this.set_filterValue(value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        LookupEditorBase.prototype.set_filterValue = function (value) {
-            if (this.options.filterValue !== value) {
-                this.options.filterValue = value;
-                this.set_value(null);
-                this.updateItems();
-            }
+        LookupEditorBase.prototype.editDialogDataChange = function () {
+            Q.reloadLookup(this.getLookupKey());
         };
         LookupEditorBase = __decorate([
             Serenity.Decorators.registerEditor("Serenity.LookupEditorBase")
@@ -6588,10 +6600,8 @@ var Serenity;
                 this.addOption(ss.cast(x, ss.Int32).toString(), Q.coalesce(Q.tryGetText('Enums.' + enumKey + '.' + name), name), null, false);
             }
         };
-        EnumEditor.prototype.getSelect2Options = function () {
-            var opt = _super.prototype.getSelect2Options.call(this);
-            opt.allowClear = Q.coalesce(this.options.allowClear, true);
-            return opt;
+        EnumEditor.prototype.allowClear = function () {
+            return Q.coalesce(this.options.allowClear, true);
         };
         EnumEditor = __decorate([
             Editor('Enum')

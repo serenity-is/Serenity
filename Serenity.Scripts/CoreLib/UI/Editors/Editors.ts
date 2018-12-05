@@ -645,10 +645,9 @@
         }
     }
 
-    export interface EnumEditorOptions {
+    export interface EnumEditorOptions extends Select2CommonOptions {
         enumKey?: string;
         enumType?: any;
-        allowClear?: boolean;
     }
 
     @Editor('Enum')
@@ -679,10 +678,8 @@
             }
         }
 
-        protected getSelect2Options(): Select2Options {
-            var opt = super.getSelect2Options();
-            opt.allowClear = Q.coalesce(this.options.allowClear, true);
-            return opt;
+        protected allowClear() {
+            return Q.coalesce(this.options.allowClear, true);
         }
     }
 

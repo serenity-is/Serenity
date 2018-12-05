@@ -1,6 +1,31 @@
 ﻿
 namespace Serenity {
 
+    export interface Select2CommonOptions {
+        allowClear?: boolean;
+        delimited?: boolean;
+        minimumResultsForSearch?: any;
+        multiple?: boolean;
+    }
+
+    export interface Select2FilterOptions {
+        cascadeFrom?: string;
+        cascadeField?: string;
+        cascadeValue?: any;
+        filterField?: string;
+        filterValue?: any;
+    }
+
+    export interface Select2InplaceAddOptions {
+        inplaceAdd?: boolean;
+        inplaceAddPermission?: string;
+        dialogType?: string;
+        autoComplete?: boolean;
+    }
+
+    export interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
+    }
+
     @Serenity.Decorators.registerClass('Serenity.Select2Editor',
         [Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly])
     @Serenity.Decorators.element("<input type=\"hidden\"/>")
@@ -8,7 +33,6 @@ namespace Serenity {
         Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly {
 
         public items: Select2Item[];
-        protected multiple: boolean;
         protected itemById: Q.Dictionary<Select2Item>
         protected pageSize: number = 100;
         protected lastCreateTerm: string;
@@ -23,7 +47,6 @@ namespace Serenity {
                 hidden.attr('placeholder', emptyItemText);
             }
             var select2Options = this.getSelect2Options();
-            this.multiple = !!select2Options.multiple;
             hidden.select2(select2Options);
             hidden.attr('type', 'text');
 
@@ -35,7 +58,12 @@ namespace Serenity {
                     }
                 }
             });
-        };
+
+            this.setCascadeFrom((this.options as Select2EditorOptions).cascadeFrom);
+
+            if (this.useInplaceAdd())
+                this.addInplaceCreate(Q.text('Controls.SelectEditor.InplaceAdd'), null);
+        }
 
         destroy() {
             if (this.element != null) {
@@ -50,12 +78,22 @@ namespace Serenity {
                 Q.text('Controls.SelectEditor.EmptyItemText'));
         }
 
+        protected allowClear() {
+            return (this.options as Select2EditorOptions).allowClear != null ?
+                !!(this.options as Select2EditorOptions).allowClear : this.emptyItemText() != null;
+        }
+
+        protected isMultiple() {
+            return !!(this.options as Select2EditorOptions).multiple;
+        }
+
         protected getSelect2Options(): Select2Options {
             var emptyItemText = this.emptyItemText();
-            return {
+            var opt: Select2Options = {
                 data: this.items,
+                multiple: this.isMultiple(),
                 placeHolder: (!Q.isEmptyOrNull(emptyItemText) ? emptyItemText : null),
-                allowClear: emptyItemText != null,
+                allowClear: this.allowClear(),
                 createSearchChoicePosition: 'bottom',
                 query: (query) => {
                     var term = (Q.isEmptyOrNull(query.term) ? '' : Select2.util.stripDiacritics(
@@ -80,7 +118,7 @@ namespace Serenity {
                 initSelection: (element, callback) => {
                     var val = element.val();
                     var isAutoComplete = this.isAutoComplete();
-                    if (this.multiple) {
+                    if (this.isMultiple()) {
                         var list = [];
                         var $t1 = val.split(',');
                         for (var $t2 = 0; $t2 < $t1.length; $t2++) {
@@ -105,10 +143,18 @@ namespace Serenity {
                     callback(it);
                 }
             }
+
+            if ((this.options as Select2EditorOptions).minimumResultsForSearch != null)
+                opt.minimumResultsForSearch = (this.options as Select2EditorOptions).minimumResultsForSearch;
+
+            if (this.isAutoComplete() || this.useInplaceAdd())
+                opt.createSearchChoice = this.getCreateSearchChoice(null);
+
+            return opt;
         }
 
         get_delimited() {
-            return !!!!this.options['delimited'];
+            return !!(this.options as Select2EditorOptions).delimited;
         }
 
         protected clearItems() {
@@ -144,12 +190,12 @@ namespace Serenity {
             this.get_select2Container().add(this.element).addClass('has-inplace-button');
 
             Serenity.WX.change(this, (e1: JQueryEventObject) => {
-                var isNew = this.multiple || Q.isEmptyOrNull(this.get_value());
+                var isNew = this.isMultiple() || Q.isEmptyOrNull(this.get_value());
                 inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
             });
 
             Serenity.WX.changeSelect2(this, (e2: JQueryEventObject) => {
-                if (this.multiple) {
+                if (this.isMultiple()) {
                     var values = this.get_values();
                     if (values.length > 0 && values[values.length - 1] == (-2147483648).toString()) {
                         this.set_values(values.slice(0, values.length - 1));
@@ -162,7 +208,7 @@ namespace Serenity {
                 }
             });
 
-            if (this.multiple) {
+            if (this.isMultiple()) {
                 this.get_select2Container().on('dblclick.' + this.uniqueName, '.select2-search-choice', (e3: JQueryEventObject) => {
                     var q = $(e3.target);
                     if (!q.hasClass('select2-search-choice')) {
@@ -179,11 +225,15 @@ namespace Serenity {
             }
         }
 
-        protected inplaceCreateClick(e: JQueryEventObject) {
+        protected useInplaceAdd(): boolean {
+            return !this.isAutoComplete() &&
+                (this.options as Select2EditorOptions).inplaceAdd &&
+                ((this.options as Select2EditorOptions).inplaceAddPermission == null ||
+                    Q.Authorization.hasPermission((this.options as Select2EditorOptions).inplaceAddPermission));
         }
 
-        protected isAutoComplete() {
-            return false;
+        protected isAutoComplete(): boolean {
+            return !!(this.options as Select2EditorOptions).autoComplete;
         }
 
         public getCreateSearchChoice(getName: (z: any) => string) {
@@ -243,7 +293,7 @@ namespace Serenity {
         }
 
         getEditValue(property: PropertyItem, target: any) {
-            if(!this.multiple || this.get_delimited()) {
+            if (!this.isMultiple() || this.get_delimited()) {
                 target[property.name] = this.get_value();
             }
 			else {
@@ -285,7 +335,7 @@ namespace Serenity {
 
             if (value != this.get_value()) {
                 var val: any = value;
-                if (!Q.isEmptyOrNull(value) && this.multiple) {
+                if (!Q.isEmptyOrNull(value) && this.isMultiple()) {
                     val = value.split(String.fromCharCode(44)).map(function (x) {
                         return Q.trimToNull(x);
                     }).filter(function (x1) {
@@ -359,7 +409,7 @@ namespace Serenity {
 
         private updateInplaceReadOnly(): void {
             var readOnly = this.get_readOnly() &&
-                (this.multiple || !this.value);
+                (this.isMultiple() || !this.value);
 
             this.element.nextAll('.inplace-create')
                 .attr('disabled', (readOnly ? 'disabled' : ''))
@@ -377,6 +427,283 @@ namespace Serenity {
         set readOnly(value: boolean) {
             this.set_readOnly(value);
         }
+
+        protected getCascadeFromValue(parent: Serenity.Widget<any>) {
+            return Serenity.EditorUtils.getValue(parent);
+        }
+
+        protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
+
+        protected setCascadeFrom(value: string) {
+
+            if (Q.isEmptyOrNull(value)) {
+                if (this.cascadeLink != null) {
+                    this.cascadeLink.set_parentID(null);
+                    this.cascadeLink = null;
+                }
+                (this.options as Select2EditorOptions).cascadeFrom = null;
+                return;
+            }
+
+            this.cascadeLink = new Serenity.CascadedWidgetLink<Widget<any>>(Widget, this, p => {
+                this.set_cascadeValue(this.getCascadeFromValue(p));
+            });
+
+            this.cascadeLink.set_parentID(value);
+            (this.options as Select2EditorOptions).cascadeFrom = value;
+        }
+
+        protected get_cascadeFrom(): string {
+            return (this.options as Select2EditorOptions).cascadeFrom;
+        }
+
+        get cascadeFrom(): string {
+            return this.get_cascadeFrom();
+        }
+
+        protected set_cascadeFrom(value: string) {
+            if (value !== (this.options as Select2EditorOptions).cascadeFrom) {
+                this.setCascadeFrom(value);
+                this.updateItems();
+            }
+        }
+
+        set cascadeFrom(value: string) {
+            this.set_cascadeFrom(value);
+        }
+
+        protected get_cascadeField() {
+            return Q.coalesce((this.options as Select2EditorOptions).cascadeField, (this.options as Select2EditorOptions).cascadeFrom);
+        }
+
+        get cascadeField(): string {
+            return this.get_cascadeField();
+        }
+
+        protected set_cascadeField(value: string) {
+            (this.options as Select2EditorOptions).cascadeField = value;
+        }
+
+        set cascadeField(value: string) {
+            this.set_cascadeField(value);
+        }
+
+        protected get_cascadeValue(): any {
+            return (this.options as Select2EditorOptions).cascadeValue;
+        }
+
+        get cascadeValue(): any {
+            return this.get_cascadeValue();
+        }
+
+        protected set_cascadeValue(value: any) {
+            if ((this.options as Select2EditorOptions).cascadeValue !== value) {
+                (this.options as Select2EditorOptions).cascadeValue = value;
+                this.set_value(null);
+                this.updateItems();
+            }
+        }
+
+        set cascadeValue(value: any) {
+            this.set_cascadeValue(value);
+        }
+
+        protected get_filterField() {
+            return (this.options as Select2EditorOptions).filterField;
+        }
+
+        get filterField(): string {
+            return this.get_filterField();
+        }
+
+        protected set_filterField(value: string) {
+            (this.options as Select2EditorOptions).filterField = value;
+        }
+
+        set filterField(value: string) {
+            this.set_filterField(value);
+        }
+
+        protected get_filterValue(): any {
+            return (this.options as Select2EditorOptions).filterValue;
+        }
+
+        get filterValue(): any {
+            return this.get_filterValue();
+        }
+
+        protected set_filterValue(value: any) {
+            if ((this.options as Select2EditorOptions).filterValue !== value) {
+                (this.options as Select2EditorOptions).filterValue = value;
+                this.set_value(null);
+                this.updateItems();
+            }
+        }
+
+        set filterValue(value: any) {
+            this.set_filterValue(value);
+        }
+
+        protected cascadeItems(items: TItem[]) {
+
+            var val = this.get_cascadeValue();
+
+            if (val == null || val === '') {
+
+                if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+                    return [];
+                }
+
+                return items;
+            }
+
+            var key = val.toString();
+            var fld = this.get_cascadeField();
+
+            return items.filter(x => {
+                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                return !!(itemKey != null && itemKey.toString() === key);
+            });
+        }
+
+        protected filterItems(items: TItem[]) {
+            var val = this.get_filterValue();
+
+            if (val == null || val === '') {
+                return items;
+            }
+
+            var key = val.toString();
+            var fld = this.get_filterField();
+
+            return items.filter(x => {
+                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                return !!(itemKey != null && itemKey.toString() === key);
+            });
+        }
+
+        protected updateItems() {
+        }
+
+        protected getDialogTypeKey() {
+            if ((this.options as Select2EditorOptions).dialogType != null) {
+                return (this.options as Select2EditorOptions).dialogType;
+            }
+
+            return null;
+        }
+
+        protected createEditDialog(callback: (dlg: IEditDialog) => void) {
+            var dialogTypeKey = this.getDialogTypeKey();
+            var dialogType = Serenity.DialogTypeRegistry.get(dialogTypeKey);
+            Serenity.Widget.create({
+                type: dialogType,
+                init: x => callback(x as any)
+            });
+        }
+
+        public onInitNewEntity: (entity: TItem) => void;
+
+        protected initNewEntity(entity: TItem) {
+            if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+                entity[this.get_cascadeField()] = this.get_cascadeValue();
+            }
+
+            if (!Q.isEmptyOrNull(this.get_filterField())) {
+                entity[this.get_filterField()] = this.get_filterValue();
+            }
+
+            if (this.onInitNewEntity != null) {
+                this.onInitNewEntity(entity);
+            }
+        }
+
+        protected setEditDialogReadOnly(dialog: any): void {
+            // an ugly workaround
+            dialog.element && dialog.element
+                .find('.tool-button.delete-button')
+                .addClass('disabled')
+                .unbind('click');
+        }
+
+        protected editDialogDataChange() {
+        }
+
+        protected setTermOnNewEntity(entity: TItem, term: string) {
+        }
+
+        protected inplaceCreateClick(e: JQueryEventObject) {
+
+            if (this.get_readOnly() &&
+                ((this.isMultiple() && !e['editItem']) || !this.value))
+                return;
+
+            this.createEditDialog(dialog => {
+
+                if (this.get_readOnly())
+                    this.setEditDialogReadOnly(dialog);
+
+                Serenity.SubDialogHelper.bindToDataChange(dialog, this, (x, dci) => {
+                    this.editDialogDataChange();
+                    this.updateItems();
+                    this.lastCreateTerm = null;
+
+                    if ((dci.type === 'create' || dci.type === 'update') &&
+                        dci.entityId != null) {
+                        var id = dci.entityId.toString();
+
+                        if (this.isMultiple()) {
+                            var values = this.get_values().slice();
+                            if (values.indexOf(id) < 0) {
+                                values.push(id);
+                            }
+                            this.set_values(null);
+                            this.set_values(values.slice());
+                        }
+                        else {
+                            this.set_value(null);
+                            this.set_value(id);
+                        }
+                    }
+                    else if (this.isMultiple() && dci.type === 'delete' &&
+                        dci.entityId != null) {
+                        var id1 = dci.entityId.toString();
+                        var values1 = this.get_values().slice();
+
+                        var idx1 = values1.indexOf(id1);
+                        if (idx1 >= 0)
+                            values1.splice(idx1, 1);
+
+                        this.set_values(values1.slice());
+                    }
+                    else if (!this.isMultiple()) {
+                        this.set_value(null);
+                    }
+                }, true);
+
+                var editItem = e['editItem'];
+                if (editItem != null) {
+                    dialog.load(editItem, () => {
+                        (dialog as any).dialogOpen(this.openDialogAsPanel);
+                    }, null);
+                }
+                else if (this.isMultiple() || Q.isEmptyOrNull(this.get_value())) {
+                    var entity: TItem = {} as any;
+                    this.setTermOnNewEntity(entity, Q.trimToEmpty(this.lastCreateTerm));
+                    this.initNewEntity(entity);
+                    dialog.load(entity, () => {
+                        (dialog as any).dialogOpen(this.openDialogAsPanel);
+                    }, null);
+                }
+                else {
+                    dialog.load(this.get_value(), () => {
+                        (dialog as any).dialogOpen(this.openDialogAsPanel);
+                    }, null);
+                }
+            });
+        }
+
+        public openDialogAsPanel: boolean;
     }
 
     declare namespace Select2Extensions {
@@ -427,7 +754,7 @@ namespace Serenity {
         }
     }
 
-    export interface SelectEditorOptions {
+    export interface SelectEditorOptions extends Select2CommonOptions {
         items?: any[];
         emptyOptionText?: string;
     }

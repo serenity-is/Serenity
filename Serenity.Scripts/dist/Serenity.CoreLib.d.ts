@@ -1381,22 +1381,44 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    interface Select2CommonOptions {
+        allowClear?: boolean;
+        delimited?: boolean;
+        minimumResultsForSearch?: any;
+        multiple?: boolean;
+    }
+    interface Select2FilterOptions {
+        cascadeFrom?: string;
+        cascadeField?: string;
+        cascadeValue?: any;
+        filterField?: string;
+        filterValue?: any;
+    }
+    interface Select2InplaceAddOptions {
+        inplaceAdd?: boolean;
+        inplaceAddPermission?: string;
+        dialogType?: string;
+        autoComplete?: boolean;
+    }
+    interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
+    }
     class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly {
         items: Select2Item[];
-        protected multiple: boolean;
         protected itemById: Q.Dictionary<Select2Item>;
         protected pageSize: number;
         protected lastCreateTerm: string;
         constructor(hidden: JQuery, opt?: any);
         destroy(): void;
         protected emptyItemText(): any;
+        protected allowClear(): boolean;
+        protected isMultiple(): boolean;
         protected getSelect2Options(): Select2Options;
         get_delimited(): boolean;
         protected clearItems(): void;
         protected addItem(item: Select2Item): void;
         protected addOption(key: string, text: string, source?: any, disabled?: boolean): void;
         protected addInplaceCreate(addTitle: string, editTitle: string): void;
-        protected inplaceCreateClick(e: JQueryEventObject): void;
+        protected useInplaceAdd(): boolean;
         protected isAutoComplete(): boolean;
         getCreateSearchChoice(getName: (z: any) => string): (s: string) => {
             id: string;
@@ -1419,6 +1441,36 @@ declare namespace Serenity {
         readOnly: boolean;
         private updateInplaceReadOnly;
         set_readOnly(value: boolean): void;
+        protected getCascadeFromValue(parent: Serenity.Widget<any>): any;
+        protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
+        protected setCascadeFrom(value: string): void;
+        protected get_cascadeFrom(): string;
+        cascadeFrom: string;
+        protected set_cascadeFrom(value: string): void;
+        protected get_cascadeField(): any;
+        cascadeField: string;
+        protected set_cascadeField(value: string): void;
+        protected get_cascadeValue(): any;
+        cascadeValue: any;
+        protected set_cascadeValue(value: any): void;
+        protected get_filterField(): string;
+        filterField: string;
+        protected set_filterField(value: string): void;
+        protected get_filterValue(): any;
+        filterValue: any;
+        protected set_filterValue(value: any): void;
+        protected cascadeItems(items: TItem[]): TItem[];
+        protected filterItems(items: TItem[]): TItem[];
+        protected updateItems(): void;
+        protected getDialogTypeKey(): string;
+        protected createEditDialog(callback: (dlg: IEditDialog) => void): void;
+        onInitNewEntity: (entity: TItem) => void;
+        protected initNewEntity(entity: TItem): void;
+        protected setEditDialogReadOnly(dialog: any): void;
+        protected editDialogDataChange(): void;
+        protected setTermOnNewEntity(entity: TItem, term: string): void;
+        protected inplaceCreateClick(e: JQueryEventObject): void;
+        openDialogAsPanel: boolean;
     }
     interface Select2Item {
         id: string;
@@ -1432,7 +1484,7 @@ declare namespace Serenity {
         protected emptyItemText(): any;
         updateItems(): void;
     }
-    interface SelectEditorOptions {
+    interface SelectEditorOptions extends Select2CommonOptions {
         items?: any[];
         emptyOptionText?: string;
     }
@@ -1449,20 +1501,8 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    interface LookupEditorOptions {
+    interface LookupEditorOptions extends Select2EditorOptions {
         lookupKey?: string;
-        minimumResultsForSearch?: any;
-        autoComplete?: boolean;
-        inplaceAdd?: boolean;
-        inplaceAddPermission?: string;
-        dialogType?: string;
-        cascadeFrom?: string;
-        cascadeField?: string;
-        cascadeValue?: any;
-        filterField?: string;
-        filterValue?: any;
-        multiple?: boolean;
-        delimited?: boolean;
     }
     class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
         constructor(input: JQuery, opt?: TOptions);
@@ -1477,33 +1517,8 @@ declare namespace Serenity {
         updateItems(): void;
         updateItemsAsync(): PromiseLike<void>;
         protected getDialogTypeKey(): string;
-        protected createEditDialog(callback: (dlg: IEditDialog) => void): void;
-        onInitNewEntity: (entity: TItem) => void;
-        protected initNewEntity(entity: TItem): void;
-        protected inplaceCreateClick(e: JQueryEventObject): void;
-        protected cascadeItems(items: TItem[]): TItem[];
-        protected filterItems(items: TItem[]): TItem[];
-        protected getCascadeFromValue(parent: Serenity.Widget<any>): any;
-        protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
-        protected setCascadeFrom(value: string): void;
-        protected isAutoComplete(): boolean;
-        protected getSelect2Options(): Select2Options;
-        protected get_cascadeFrom(): string;
-        cascadeFrom: string;
-        protected set_cascadeFrom(value: string): void;
-        protected get_cascadeField(): any;
-        cascadeField: string;
-        protected set_cascadeField(value: string): void;
-        protected get_cascadeValue(): any;
-        cascadeValue: any;
-        protected set_cascadeValue(value: any): void;
-        protected get_filterField(): string;
-        filterField: string;
-        protected set_filterField(value: string): void;
-        protected get_filterValue(): any;
-        filterValue: any;
-        protected set_filterValue(value: any): void;
-        openDialogAsPanel: boolean;
+        protected setCreateTermOnNewEntity(entity: TItem, term: string): void;
+        protected editDialogDataChange(): void;
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(hidden: JQuery, opt?: LookupEditorOptions);
@@ -1570,15 +1585,14 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
     }
-    interface EnumEditorOptions {
+    interface EnumEditorOptions extends Select2CommonOptions {
         enumKey?: string;
         enumType?: any;
-        allowClear?: boolean;
     }
     class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
         constructor(hidden: JQuery, opt: EnumEditorOptions);
         protected updateItems(): void;
-        protected getSelect2Options(): Select2Options;
+        protected allowClear(): any;
     }
     interface GoogleMapOptions {
         latitude?: any;
