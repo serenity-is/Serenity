@@ -8,8 +8,7 @@
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
-        separator?: boolean;
-        separatorSide?: ('left' | 'right' | 'both');
+        separator?: (false | true | 'left' | 'right' | 'both');
     }
 
     export interface PopupMenuButtonOptions {
@@ -112,9 +111,8 @@
 
         protected createButton(container: JQuery, b: ToolButton) {
             var cssClass = Q.coalesce(b.cssClass, '');
-            var separatorSide: ('left' | 'right' | 'both') = Q.coalesce(b.separatorSide, 'left');
 
-            if (b.separator === true && (separatorSide === 'left' || separatorSide === 'both')) {
+            if (b.separator === true || b.separator === 'left' || b.separator === 'both') {
                 $('<div class="separator"></div>').appendTo(container);
             }
 
@@ -122,7 +120,7 @@
                 '<span class="button-inner"></span></div></div>')
                 .appendTo(container);
 
-            if (b.separator === true && (separatorSide === 'right' || separatorSide === 'both')) {
+            if (b.separator === 'right' || b.separator === 'both') {
                 $('<div class="separator"></div>').appendTo(container);
             }
 
