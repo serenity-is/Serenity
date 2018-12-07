@@ -1427,9 +1427,9 @@ declare namespace Serenity {
         protected isMultiple(): boolean;
         protected getSelect2Options(): Select2Options;
         get_delimited(): boolean;
-        protected clearItems(): void;
-        protected addItem(item: Select2Item): void;
-        protected addOption(key: string, text: string, source?: any, disabled?: boolean): void;
+        clearItems(): void;
+        addItem(item: Select2Item): void;
+        addOption(key: string, text: string, source?: any, disabled?: boolean): void;
         protected addInplaceCreate(addTitle: string, editTitle: string): void;
         protected useInplaceAdd(): boolean;
         protected isAutoComplete(): boolean;
