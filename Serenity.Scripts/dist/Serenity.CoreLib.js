@@ -3323,6 +3323,91 @@ var Serenity;
         return GridRowSelectionMixin;
     }());
     Serenity.GridRowSelectionMixin = GridRowSelectionMixin;
+    var GridRadioSelectionMixin = /** @class */ (function () {
+        function GridRadioSelectionMixin(grid) {
+            var _this = this;
+            this.include = {};
+            this.grid = grid;
+            this.idField = grid.getView().idField;
+            grid.getGrid().onClick.subscribe(function (e, p) {
+                if ($(e.target).hasClass('rad-select-item')) {
+                    e.preventDefault();
+                    var item = grid.getView().getItem(p.row);
+                    var id = item[_this.idField].toString();
+                    if (_this.include[id] == true) {
+                        ss.clearKeys(_this.include);
+                    }
+                    else {
+                        ss.clearKeys(_this.include);
+                        _this.include[id] = true;
+                    }
+                    for (var i = 0; i < grid.getView().getLength(); i++) {
+                        grid.getGrid().updateRow(i);
+                    }
+                }
+            });
+        }
+        GridRadioSelectionMixin.prototype.clear = function () {
+            ss.clearKeys(this.include);
+        };
+        GridRadioSelectionMixin.prototype.resetCheckedAndRefresh = function () {
+            this.include = {};
+            this.grid.getView().populate();
+        };
+        GridRadioSelectionMixin.prototype.getSelectedKey = function () {
+            var items = Object.keys(this.include);
+            if (items != null && items.length > 0) {
+                return items[0];
+            }
+            return null;
+        };
+        GridRadioSelectionMixin.prototype.getSelectedAsInt32 = function () {
+            var items = Object.keys(this.include).map(function (x) {
+                return parseInt(x, 10);
+            });
+            if (items != null && items.length > 0) {
+                return items[0];
+            }
+            return null;
+        };
+        GridRadioSelectionMixin.prototype.getSelectedAsInt64 = function () {
+            var items = Object.keys(this.include).map(function (x) {
+                return parseInt(x, 10);
+            });
+            if (items != null && items.length > 0) {
+                return items[0];
+            }
+            return null;
+        };
+        GridRadioSelectionMixin.prototype.setSelectedKey = function (key) {
+            this.clear();
+            this.include[key] = true;
+        };
+        GridRadioSelectionMixin.createSelectColumn = function (getMixin) {
+            return {
+                name: '',
+                toolTip: ' ',
+                field: '__select__',
+                width: 26,
+                minWidth: 26,
+                headerCssClass: '',
+                sortable: false,
+                formatter: function (row, cell, value, column, item) {
+                    var mixin = getMixin();
+                    if (!mixin) {
+                        return '';
+                    }
+                    var isChecked = mixin.include[item[mixin.idField]];
+                    return '<input type="radio" name="radio-selection-group" class="rad-select-item no-float" style="cursor: pointer;width: 13px; height:13px;" ' + (isChecked ? ' checked' : '') + ' /> ';
+                }
+            };
+        };
+        GridRadioSelectionMixin = __decorate([
+            Serenity.Decorators.registerClass('Serenity.GridRadioSelectionMixin')
+        ], GridRadioSelectionMixin);
+        return GridRadioSelectionMixin;
+    }());
+    Serenity.GridRadioSelectionMixin = GridRadioSelectionMixin;
     var GridSelectAllButtonHelper;
     (function (GridSelectAllButtonHelper) {
         function update(grid, getSelected) {
