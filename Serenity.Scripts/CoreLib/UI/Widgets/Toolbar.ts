@@ -158,7 +158,7 @@
 
             if (!!(!Q.isEmptyOrNull(b.hotkey) && window['Mousetrap'] != null)) {
                 this.mouseTrap = this.mouseTrap || window['Mousetrap'](
-                    this.options.hotkeyContext || window.document.documentElement);
+                    b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
 
                 this.mouseTrap.bind(b.hotkey, function (e1: BaseJQueryEventObject, action: any) {
 					if (btn.is(':visible')) {
