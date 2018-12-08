@@ -2329,7 +2329,7 @@ declare namespace Serenity {
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
-        separator?: boolean;
+        separator?: (false | true | 'left' | 'right' | 'both');
     }
     interface PopupMenuButtonOptions {
         menu?: JQuery;
