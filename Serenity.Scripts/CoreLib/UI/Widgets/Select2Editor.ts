@@ -354,6 +354,10 @@ namespace Serenity {
             this.set_value(v);
         }
 
+        get selectedItem(): TItem {
+            return this.itemById[this.get_value()].source;
+        }
+
         protected get_values(): string[] {
 
             var val = this.element.select2('val');
