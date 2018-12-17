@@ -1,8 +1,8 @@
-﻿/// <reference types="toastr" />
+﻿/// <reference types="jqueryui" />
+/// <reference types="toastr" />
 /// <reference types="jquery" />
 /// <reference types="react" />
 /// <reference types="jquery.validation" />
-/// <reference types="jqueryui" />
 declare var Reflect: any;
 declare var __decorate: any;
 declare const __skipExtends: {
@@ -353,7 +353,7 @@ interface JQueryStatic {
     extend<T>(target: T, object1?: T, ...objectN: T[]): T;
     toJSON(obj: any): string;
 }
-interface JQBlockUIOptions {
+declare interface JQBlockUIOptions {
     useTimeout?: boolean;
 }
 declare namespace Serenity {
@@ -881,7 +881,7 @@ declare namespace Serenity {
         constructor(value: string);
     }
     class GeneratedCodeAttribute {
-        origin: string;
+        origin?: string;
         constructor(origin?: string);
     }
     class HiddenAttribute {
@@ -1014,6 +1014,19 @@ declare namespace Serenity {
         getSelectedAsInt64(): number[];
         setSelectedKeys(keys: string[]): void;
         static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column;
+    }
+    class GridRadioSelectionMixin {
+        private idField;
+        private include;
+        private grid;
+        constructor(grid: Serenity.IDataGrid);
+        clear(): void;
+        resetCheckedAndRefresh(): void;
+        getSelectedKey(): string;
+        getSelectedAsInt32(): number;
+        getSelectedAsInt64(): number;
+        setSelectedKey(key: string): void;
+        static createSelectColumn(getMixin: () => Serenity.GridRadioSelectionMixin): Slick.Column;
     }
     namespace GridSelectAllButtonHelper {
         function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void;
@@ -1189,9 +1202,9 @@ declare namespace Serenity {
         private static templateNames;
         constructor(container: JQuery, options?: TOptions);
         protected byId(id: string): JQuery;
-        private byID<TWidget>(id, type);
-        private static noGeneric(s);
-        private getDefaultTemplateName();
+        private byID;
+        private static noGeneric;
+        private getDefaultTemplateName;
         protected getTemplateName(): string;
         protected getFallbackTemplate(): string;
         protected getTemplate(): string;
@@ -1308,7 +1321,7 @@ declare namespace Serenity {
         Sum = 1,
         Avg = 2,
         Min = 3,
-        Max = 4,
+        Max = 4
     }
 }
 declare namespace Serenity {
@@ -1322,9 +1335,9 @@ declare namespace Serenity {
         get_value(): string;
         value: string;
         set_value(value: string): void;
-        private get_valueAsDate();
+        private get_valueAsDate;
         valueAsDate: Date;
-        private set_valueAsDate(value);
+        private set_valueAsDate;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         yearRange: string;
@@ -1354,9 +1367,9 @@ declare namespace Serenity {
         get_value(): string;
         value: string;
         set_value(value: string): void;
-        private get_valueAsDate();
+        private get_valueAsDate;
         valueAsDate: Date;
-        private set_valueAsDate(value);
+        private set_valueAsDate;
         get_minValue(): string;
         set_minValue(value: string): void;
         get_maxValue(): string;
@@ -1381,22 +1394,44 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    interface Select2CommonOptions {
+        allowClear?: boolean;
+        delimited?: boolean;
+        minimumResultsForSearch?: any;
+        multiple?: boolean;
+    }
+    interface Select2FilterOptions {
+        cascadeFrom?: string;
+        cascadeField?: string;
+        cascadeValue?: any;
+        filterField?: string;
+        filterValue?: any;
+    }
+    interface Select2InplaceAddOptions {
+        inplaceAdd?: boolean;
+        inplaceAddPermission?: string;
+        dialogType?: string;
+        autoComplete?: boolean;
+    }
+    interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
+    }
     class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly {
         items: Select2Item[];
-        protected multiple: boolean;
         protected itemById: Q.Dictionary<Select2Item>;
         protected pageSize: number;
         protected lastCreateTerm: string;
         constructor(hidden: JQuery, opt?: any);
         destroy(): void;
         protected emptyItemText(): any;
+        protected allowClear(): boolean;
+        protected isMultiple(): boolean;
         protected getSelect2Options(): Select2Options;
         get_delimited(): boolean;
-        protected clearItems(): void;
-        protected addItem(item: Select2Item): void;
-        protected addOption(key: string, text: string, source?: any, disabled?: boolean): void;
+        clearItems(): void;
+        addItem(item: Select2Item): void;
+        addOption(key: string, text: string, source?: any, disabled?: boolean): void;
         protected addInplaceCreate(addTitle: string, editTitle: string): void;
-        protected inplaceCreateClick(e: JQueryEventObject): void;
+        protected useInplaceAdd(): boolean;
         protected isAutoComplete(): boolean;
         getCreateSearchChoice(getName: (z: any) => string): (s: string) => {
             id: string;
@@ -1417,8 +1452,38 @@ declare namespace Serenity {
         readonly text: string;
         get_readOnly(): boolean;
         readOnly: boolean;
-        private updateInplaceReadOnly();
+        private updateInplaceReadOnly;
         set_readOnly(value: boolean): void;
+        protected getCascadeFromValue(parent: Serenity.Widget<any>): any;
+        protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
+        protected setCascadeFrom(value: string): void;
+        protected get_cascadeFrom(): string;
+        cascadeFrom: string;
+        protected set_cascadeFrom(value: string): void;
+        protected get_cascadeField(): any;
+        cascadeField: string;
+        protected set_cascadeField(value: string): void;
+        protected get_cascadeValue(): any;
+        cascadeValue: any;
+        protected set_cascadeValue(value: any): void;
+        protected get_filterField(): string;
+        filterField: string;
+        protected set_filterField(value: string): void;
+        protected get_filterValue(): any;
+        filterValue: any;
+        protected set_filterValue(value: any): void;
+        protected cascadeItems(items: TItem[]): TItem[];
+        protected filterItems(items: TItem[]): TItem[];
+        protected updateItems(): void;
+        protected getDialogTypeKey(): string;
+        protected createEditDialog(callback: (dlg: IEditDialog) => void): void;
+        onInitNewEntity: (entity: TItem) => void;
+        protected initNewEntity(entity: TItem): void;
+        protected setEditDialogReadOnly(dialog: any): void;
+        protected editDialogDataChange(): void;
+        protected setTermOnNewEntity(entity: TItem, term: string): void;
+        protected inplaceCreateClick(e: JQueryEventObject): void;
+        openDialogAsPanel: boolean;
     }
     interface Select2Item {
         id: string;
@@ -1432,7 +1497,7 @@ declare namespace Serenity {
         protected emptyItemText(): any;
         updateItems(): void;
     }
-    interface SelectEditorOptions {
+    interface SelectEditorOptions extends Select2CommonOptions {
         items?: any[];
         emptyOptionText?: string;
     }
@@ -1449,20 +1514,8 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    interface LookupEditorOptions {
+    interface LookupEditorOptions extends Select2EditorOptions {
         lookupKey?: string;
-        minimumResultsForSearch?: any;
-        autoComplete?: boolean;
-        inplaceAdd?: boolean;
-        inplaceAddPermission?: string;
-        dialogType?: string;
-        cascadeFrom?: string;
-        cascadeField?: string;
-        cascadeValue?: any;
-        filterField?: string;
-        filterValue?: any;
-        multiple?: boolean;
-        delimited?: boolean;
     }
     class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
         constructor(input: JQuery, opt?: TOptions);
@@ -1477,33 +1530,8 @@ declare namespace Serenity {
         updateItems(): void;
         updateItemsAsync(): PromiseLike<void>;
         protected getDialogTypeKey(): string;
-        protected createEditDialog(callback: (dlg: IEditDialog) => void): void;
-        onInitNewEntity: (entity: TItem) => void;
-        protected initNewEntity(entity: TItem): void;
-        protected inplaceCreateClick(e: JQueryEventObject): void;
-        protected cascadeItems(items: TItem[]): TItem[];
-        protected filterItems(items: TItem[]): TItem[];
-        protected getCascadeFromValue(parent: Serenity.Widget<any>): any;
-        protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
-        protected setCascadeFrom(value: string): void;
-        protected isAutoComplete(): boolean;
-        protected getSelect2Options(): Select2Options;
-        protected get_cascadeFrom(): string;
-        cascadeFrom: string;
-        protected set_cascadeFrom(value: string): void;
-        protected get_cascadeField(): any;
-        cascadeField: string;
-        protected set_cascadeField(value: string): void;
-        protected get_cascadeValue(): any;
-        cascadeValue: any;
-        protected set_cascadeValue(value: any): void;
-        protected get_filterField(): string;
-        filterField: string;
-        protected set_filterField(value: string): void;
-        protected get_filterValue(): any;
-        filterValue: any;
-        protected set_filterValue(value: any): void;
-        openDialogAsPanel: boolean;
+        protected setCreateTermOnNewEntity(entity: TItem, term: string): void;
+        protected editDialogDataChange(): void;
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(hidden: JQuery, opt?: LookupEditorOptions);
@@ -1570,15 +1598,14 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
     }
-    interface EnumEditorOptions {
+    interface EnumEditorOptions extends Select2CommonOptions {
         enumKey?: string;
         enumType?: any;
-        allowClear?: boolean;
     }
     class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
         constructor(hidden: JQuery, opt: EnumEditorOptions);
         protected updateItems(): void;
-        protected getSelect2Options(): Select2Options;
+        protected allowClear(): any;
     }
     interface GoogleMapOptions {
         latitude?: any;
@@ -2111,10 +2138,10 @@ declare namespace Serenity {
         private yDifference;
         constructor(container: JQuery, options: FlexifyOptions);
         storeInitialSize(): void;
-        private getXFactor(element);
-        private getYFactor(element);
-        private resizeElements();
-        private resizeElement(element);
+        private getXFactor;
+        private getYFactor;
+        private resizeElements;
+        private resizeElement;
     }
     interface FlexifyOptions {
         getXFactor?: (p1: JQuery) => any;
@@ -2155,7 +2182,7 @@ declare namespace Serenity {
     const enum RetrieveColumnSelection {
         details = 0,
         keyOnly = 1,
-        list = 2,
+        list = 2
     }
     class CheckListEditor extends Widget<CheckListEditorOptions> {
         constructor(div: JQuery, opt: CheckListEditorOptions);
@@ -2184,7 +2211,7 @@ declare namespace Serenity {
     const enum ColumnSelection {
         List = 0,
         KeyOnly = 1,
-        Details = 2,
+        Details = 2
     }
     interface HtmlContentEditorOptions {
     }
@@ -2223,7 +2250,7 @@ declare namespace Serenity {
         Before = 0,
         Delete = 1,
         Insert = 2,
-        Update = 3,
+        Update = 3
     }
     namespace CustomValidation {
         function registerValidationMethods(): void;
@@ -2254,13 +2281,13 @@ declare namespace Serenity {
         private items;
         constructor(div: JQuery, opt: PropertyGridOptions);
         destroy(): void;
-        private createItems(container, items);
-        private createCategoryDiv(categoriesDiv, categoryIndexes, category, collapsed);
+        private createItems;
+        private createCategoryDiv;
         private categoryLinkClick;
-        private determineText(text, getKey);
-        private createField(container, item);
-        private getCategoryOrder(items);
-        private createCategoryLinks(container, items);
+        private determineText;
+        private createField;
+        private getCategoryOrder;
+        private createCategoryLinks;
         get_editors(): Widget<any>[];
         get_items(): PropertyItem[];
         get_idPrefix(): string;
@@ -2268,19 +2295,19 @@ declare namespace Serenity {
         set_mode(value: PropertyGridMode): void;
         static loadEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
         static saveEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
-        private static setReadOnly(widget, isReadOnly);
-        private static setReadonly(elements, isReadOnly);
-        private static setRequired(widget, isRequired);
-        private static setMaxLength(widget, maxLength);
+        private static setReadOnly;
+        private static setReadonly;
+        private static setRequired;
+        private static setMaxLength;
         load(source: any): void;
         save(target: any): void;
-        private canModifyItem(item);
+        private canModifyItem;
         updateInterface(): void;
         enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
     }
     const enum PropertyGridMode {
         insert = 1,
-        update = 2,
+        update = 2
     }
     interface PropertyGridOptions {
         idPrefix?: string;
@@ -2302,7 +2329,7 @@ declare namespace Serenity {
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
-        separator?: boolean;
+        separator?: (false | true | 'left' | 'right' | 'both');
     }
     interface PopupMenuButtonOptions {
         menu?: JQuery;
@@ -2374,8 +2401,8 @@ declare namespace Serenity {
         constructor(options?: TOptions);
         private readonly isMarkedAsPanel;
         private readonly isResponsive;
-        private static getCssSize(element, name);
-        private static applyCssSizes(opt, dialogClass);
+        private static getCssSize;
+        private static applyCssSizes;
         destroy(): void;
         protected initDialog(): void;
         protected initToolbar(): void;
@@ -2395,7 +2422,7 @@ declare namespace Serenity {
         protected getDialogTitle(): string;
         dialogClose(): void;
         dialogTitle: string;
-        private setupPanelTitle();
+        private setupPanelTitle;
         set_dialogTitle(value: string): void;
         protected initTabs(): void;
         protected handleResponsive(): void;
@@ -2658,9 +2685,9 @@ declare namespace Serenity {
         private _readOnly;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
-        private get_value();
+        private get_value;
         value: string[];
-        private set_value(value);
+        private set_value;
     }
     interface CheckLookupEditorOptions {
         lookupKey?: string;
@@ -2834,7 +2861,7 @@ declare namespace Serenity {
         protected isLocalizationModeAndChanged(): boolean;
         protected localizationButtonClick(): void;
         protected getLanguages(): any[];
-        private getLangs();
+        private getLangs;
         protected loadLocalization(): void;
         protected setLocalizationGridCurrentValues(): void;
         protected getLocalizationGridValue(): any;
@@ -2918,10 +2945,10 @@ declare namespace Serenity {
         constructor();
         static createToolButton(grid: DataGrid<any, any>): ToolButton;
         protected getDialogOptions(): JQueryUI.DialogOptions;
-        private getTitle(col);
-        private allowHide(col);
-        private createLI(col);
-        private updateListStates();
+        private getTitle;
+        private allowHide;
+        private createLI;
+        private updateListStates;
         protected setupColumns(): void;
         protected onDialogOpen(): void;
         protected getTemplate(): string;

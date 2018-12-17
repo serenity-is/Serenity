@@ -8,7 +8,7 @@
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
-        separator?: boolean;
+        separator?: (false | true | 'left' | 'right' | 'both');
     }
 
     export interface PopupMenuButtonOptions {
@@ -110,13 +110,19 @@
         protected mouseTrap: any;
 
         protected createButton(container: JQuery, b: ToolButton) {
-			var cssClass = Q.coalesce(b.cssClass, '');
-			if (b.separator === true) {
-				$('<div class="separator"></div>').appendTo(container);
-			}
+            var cssClass = Q.coalesce(b.cssClass, '');
+
+            if (b.separator === true || b.separator === 'left' || b.separator === 'both') {
+                $('<div class="separator"></div>').appendTo(container);
+            }
+
             var btn = $('<div class="tool-button"><div class="button-outer">' +
                 '<span class="button-inner"></span></div></div>')
                 .appendTo(container);
+
+            if (b.separator === 'right' || b.separator === 'both') {
+                $('<div class="separator"></div>').appendTo(container);
+            }
 
             if (cssClass.length > 0) {
 				btn.addClass(cssClass);
@@ -158,7 +164,7 @@
 
             if (!!(!Q.isEmptyOrNull(b.hotkey) && window['Mousetrap'] != null)) {
                 this.mouseTrap = this.mouseTrap || window['Mousetrap'](
-                    this.options.hotkeyContext || window.document.documentElement);
+                    b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
 
                 this.mouseTrap.bind(b.hotkey, function (e1: BaseJQueryEventObject, action: any) {
 					if (btn.is(':visible')) {

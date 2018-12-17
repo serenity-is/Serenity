@@ -51,7 +51,7 @@ namespace Serenity.Web
                             throw new ArgumentOutOfRangeException("parameters", String.Format(
                                 "DynamicScript actions shouldn't have any parameters other " + 
                                 "than an a base ServiceRequest and optional IDbConnection. Method {0} of type {1} has {2} arguments",
-                                type.Name, method.Name));
+                                type.Name, method.Name, parameters.Length));
                         }
 
                         string connectionKey = null;
@@ -61,7 +61,7 @@ namespace Serenity.Web
                             var connectionKeyAttr = type.GetCustomAttribute<ConnectionKeyAttribute>();
                             if (connectionKeyAttr == null || connectionKeyAttr.Value.IsEmptyOrNull())
                                 throw new ArgumentOutOfRangeException("connectionKey", String.Format(
-                                    "Cannot determine connection key for DynamicScript defined on type {1}, method {2}",
+                                    "Cannot determine connection key for DynamicScript defined on type {0}, method {1}",
                                     type.Name, method.Name));
 
                             connectionKey = connectionKeyAttr.Value;
@@ -71,14 +71,14 @@ namespace Serenity.Web
 
                         if (returnType == typeof(void))
                             throw new ArgumentOutOfRangeException("returnType", String.Format(
-                                "DynamicScript defined on method {2} of type {1} has void return type",
+                                "DynamicScript defined on method {1} of type {0} has void return type",
                                 type.Name, method.Name));
 
                         var isResult = returnType.IsGenericType && 
                             returnType.GetGenericTypeDefinition() == typeof(Result<>);
                         if (!isResult && typeof(ActionResult).IsAssignableFrom(returnType))
                             throw new ArgumentOutOfRangeException("returnType", String.Format(
-                                "DynamicScript defined on method {2} of type {1} has ActionResult descendant return type. " +
+                                "DynamicScript defined on method {1} of type {0} has ActionResult descendant return type. " +
                                 "It must be Result<T> or a regular class!",
                                 type.Name, method.Name));
 
