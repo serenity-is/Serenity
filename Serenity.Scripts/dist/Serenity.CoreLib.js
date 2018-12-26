@@ -10653,7 +10653,7 @@ var Serenity;
                 btn.find('span').html(text);
             }
             if (!!(!Q.isEmptyOrNull(b.hotkey) && window['Mousetrap'] != null)) {
-                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.options.hotkeyContext || window.document.documentElement);
+                this.mouseTrap = this.mouseTrap || window['Mousetrap'](b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
                 this.mouseTrap.bind(b.hotkey, function (e1, action) {
                     if (btn.is(':visible')) {
                         btn.triggerHandler('click');
