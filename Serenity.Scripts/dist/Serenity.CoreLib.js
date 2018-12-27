@@ -5566,6 +5566,19 @@ var Serenity;
                 this.updateInplaceReadOnly();
             }
         };
+        Object.defineProperty(Select2Editor.prototype, "selectedItem", {
+            get: function () {
+                var selectedValue = this.get_value();
+                if (selectedValue && this.itemById) {
+                    var item = this.itemById[selectedValue];
+                    if (item)
+                        return item.source;
+                }
+                return null;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Select2Editor.prototype.get_values = function () {
             var val = this.element.select2('val');
             if (val == null) {

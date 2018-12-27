@@ -1445,6 +1445,7 @@ declare namespace Serenity {
         get_value(): any;
         value: string;
         set_value(value: string): void;
+        readonly selectedItem: TItem;
         protected get_values(): string[];
         values: string[];
         protected set_values(value: string[]): void;
