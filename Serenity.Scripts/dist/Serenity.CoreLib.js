@@ -5568,7 +5568,13 @@ var Serenity;
         };
         Object.defineProperty(Select2Editor.prototype, "selectedItem", {
             get: function () {
-                return this.itemById[this.get_value()].source;
+                var selectedValue = this.get_value();
+                if (selectedValue && this.itemById) {
+                    var item = this.itemById[selectedValue];
+                    if (item)
+                        return item.source;
+                }
+                return null;
             },
             enumerable: true,
             configurable: true
