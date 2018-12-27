@@ -70,7 +70,7 @@ namespace Serenity {
                 this.element.select2('destroy');
             }
 
-            super.destroy();
+			super.destroy();
         }
 
         protected emptyItemText() {
@@ -247,8 +247,8 @@ namespace Serenity {
                 }
 
                 if (Q.any(this.get_items(), (x: Select2Item) => {
-                    var text = getName ? getName(x.source) : x.text;
-                    return Select2.util.stripDiacritics(Q.coalesce(text, '')).toLowerCase() == s;
+                        var text = getName ? getName(x.source) : x.text;
+                        return Select2.util.stripDiacritics(Q.coalesce(text, '')).toLowerCase() == s;
                 }))
                     return null;
 
@@ -287,7 +287,7 @@ namespace Serenity {
             if(Q.isArray(val)) {
                 this.set_values(val);
             }
-            else {
+			else {
                 this.set_value((val == null ? null : val.toString()));
             }
         }
@@ -296,7 +296,7 @@ namespace Serenity {
             if (!this.isMultiple() || this.get_delimited()) {
                 target[property.name] = this.get_value();
             }
-            else {
+			else {
                 target[property.name] = this.get_values();
             }
         }
@@ -324,7 +324,7 @@ namespace Serenity {
             else
                 val = this.element.val();
 
-            return val;
+			return val;
         }
 
         get value(): string {
@@ -371,7 +371,7 @@ namespace Serenity {
                 return [];
             }
 
-            if (Q.isArray(val)) {
+			if (Q.isArray(val)) {
                 return val;
             }
 
@@ -380,7 +380,7 @@ namespace Serenity {
                 return [];
             }
 
-            return [str];
+			return [str];
         }
 
         get values(): string[] {
@@ -394,7 +394,7 @@ namespace Serenity {
                 return;
             }
 
-            this.set_value(value.join(','));
+			this.set_value(value.join(','));
         }
 
         set values(value: string[]) {
