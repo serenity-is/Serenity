@@ -5282,7 +5282,7 @@ var Serenity;
         ], DateTimeEditor.prototype, "get_sqlMinMax", null);
         DateTimeEditor = DateTimeEditor_1 = __decorate([
             Serenity.Decorators.registerEditor('Serenity.DateTimeEditor', [Serenity.IStringValue, Serenity.IReadOnly]),
-            Serenity.Decorators.element('<input/>')
+            Serenity.Decorators.element('<input type="text"/>')
         ], DateTimeEditor);
         return DateTimeEditor;
     }(Serenity.Widget));

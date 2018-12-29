@@ -2330,6 +2330,7 @@ declare namespace Serenity {
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
+        hotkeyContext?: any;
         separator?: (false | true | 'left' | 'right' | 'both');
     }
     interface PopupMenuButtonOptions {

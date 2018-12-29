@@ -1,3 +1,23 @@
+## 3.8.3 (2918-12-29)
+
+Features:
+  - added idle (session) timeout feature and related sample [StartSharp]
+  - implemented impersonate as (login as) functionality in users page [StartSharp]
+  - backported two factor authentication sample to .NET core [StartSharp]
+  - added from address setting for mailing in .NET core version [StartSharp]
+  - added selectedItem getter in SelectEditor (thanks @dfaruque)
+  - changed protection level of clearItems, addItem and addOption in lookup editor to public (thanks @dfaruque)
+  - ability to specify location of button separator (thanks @Jin)
+  - added GridRadioSelectionMixin (thanks @Jin)
+  - moved most of lookup editor code like cascading, filtering etc. into select2editor base class so that they can be reused in custom editors
+  - enum editor supports multiple option
+  
+Bugfixes:
+  - fix ui look of datetimeeditor (thanks @adam feng)
+  - fix fonts folder casing issue in linux
+  - fixed OracleSchemaProvider based on pull request by @kilroyFR
+  - hotkeyContext of tool button definition is ignored (thanks @hannesb)
+
 ## 3.8.2 (2018-12-04)
 
 Features:
