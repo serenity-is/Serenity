@@ -6080,8 +6080,8 @@ var Serenity;
         LookupEditorBase.prototype.getDialogTypeKey = function () {
             var dialogTypeKey = _super.prototype.getDialogTypeKey.call(this);
             if (dialogTypeKey)
-                return this.getLookupKey();
-            return dialogTypeKey;
+                return dialogTypeKey;
+            return this.getLookupKey();
         };
         LookupEditorBase.prototype.setCreateTermOnNewEntity = function (entity, term) {
             entity[this.getLookup().textField] = term;

@@ -112,9 +112,9 @@
         protected getDialogTypeKey() {
             var dialogTypeKey = super.getDialogTypeKey();
             if (dialogTypeKey)
-                return this.getLookupKey();
+                return dialogTypeKey;
 
-            return dialogTypeKey;
+            return this.getLookupKey();
         }
 
         protected setCreateTermOnNewEntity(entity: TItem, term: string) {
