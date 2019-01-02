@@ -1,4 +1,4 @@
-## 3.8.3 (2918-12-29)
+## 3.8.3 (2018-12-29)
 
 Features:
   - added idle (session) timeout feature and related sample [StartSharp]
