@@ -1,3 +1,8 @@
+## 3.8.5 (2019-01-03)
+
+Bugfixes:
+  - ensure not-mapped fields that are populated by MasterDetailRelation or LinkingSetRelation are only loaded if explicitly included (e.g. column is visible) for ListRequestHandler and loaded in default Details mode for RetrieveRequestHandler
+
 ## 3.8.4 (2019-01-02)
 
 Bugfixes:
