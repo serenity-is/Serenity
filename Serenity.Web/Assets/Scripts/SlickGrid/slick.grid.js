@@ -305,7 +305,11 @@ if (typeof Slick === "undefined") {
 
             columnsById = {};
             for (var i = 0; i < columns.length; i++) {
-                var m = columns[i] = $.extend({}, columnDefaults, columns[i]);
+                var m = columns[i];
+                for (var k in columnDefaults) {
+                    if (m[k] === undefined)
+                        m[k] = columnDefaults[k];
+                }
                 columnsById[m.id] = i;
                 if (m.minWidth && m.width < m.minWidth) {
                     m.width = m.minWidth;
@@ -2199,7 +2203,11 @@ if (typeof Slick === "undefined") {
 
             columnsById = {};
             for (var i = 0; i < columns.length; i++) {
-                var m = columns[i] = $.extend({}, columnDefaults, columns[i]);
+                var m = columns[i];
+                for (var k in columnDefaults) {
+                    if (m[k] === undefined)
+                        m[k] = columnDefaults[k];
+                }
                 columnsById[m.id] = i;
                 if (m.minWidth && m.width < m.minWidth) {
                     m.width = m.minWidth;

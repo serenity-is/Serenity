@@ -15009,9 +15009,11 @@ var Serenity;
                 return response;
             };
             if (options.toggleField) {
-                var col = Q.first(dg.getGrid().getColumns(), function (x) { return x.field == options.toggleField; });
-                col.format = Serenity.SlickFormatting.treeToggle(function () { return dg.view; }, getId, col.format || (function (ctx) { return Q.htmlEncode(ctx.value); }));
-                col.formatter = Serenity.SlickHelper.convertToFormatter(col.format);
+                var col = Q.tryFirst(dg['allColumns'] || dg.slickGrid.getColumns() || [], function (x) { return x.field == options.toggleField; });
+                if (col) {
+                    col.format = Serenity.SlickFormatting.treeToggle(function () { return dg.view; }, getId, col.format || (function (ctx) { return Q.htmlEncode(ctx.value); }));
+                    col.formatter = Serenity.SlickHelper.convertToFormatter(col.format);
+                }
             }
         }
         /**
