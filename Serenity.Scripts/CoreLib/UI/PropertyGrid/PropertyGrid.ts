@@ -529,7 +529,9 @@
             }
         }
 
-        save(target: any): void {
+        save(target?: any): any {
+            if (target == null)
+                target = Object.create(null);
             for (var i = 0; i < this.editors.length; i++) {
                 var item = this.items[i];
                 if (item.oneWay !== true && this.canModifyItem(item)) {
@@ -537,6 +539,17 @@
                     Serenity.EditorUtils.saveValue(editor, item, target);
                 }
             }
+            return target;
+        }
+
+        public get value(): any {
+            return this.save();
+        }
+
+        public set value(val: any) {
+            if (val == null)
+                val = Object.create(null);
+            this.load(val);
         }
 
         private canModifyItem(item: PropertyItem) {

@@ -2301,7 +2301,8 @@ declare namespace Serenity {
         private static setRequired;
         private static setMaxLength;
         load(source: any): void;
-        save(target: any): void;
+        save(target?: any): any;
+        value: any;
         private canModifyItem;
         updateInterface(): void;
         enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;

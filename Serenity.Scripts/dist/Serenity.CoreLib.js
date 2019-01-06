@@ -10475,6 +10475,8 @@ var Serenity;
             }
         };
         PropertyGrid.prototype.save = function (target) {
+            if (target == null)
+                target = Object.create(null);
             for (var i = 0; i < this.editors.length; i++) {
                 var item = this.items[i];
                 if (item.oneWay !== true && this.canModifyItem(item)) {
@@ -10482,7 +10484,20 @@ var Serenity;
                     Serenity.EditorUtils.saveValue(editor, item, target);
                 }
             }
+            return target;
         };
+        Object.defineProperty(PropertyGrid.prototype, "value", {
+            get: function () {
+                return this.save();
+            },
+            set: function (val) {
+                if (val == null)
+                    val = Object.create(null);
+                this.load(val);
+            },
+            enumerable: true,
+            configurable: true
+        });
         PropertyGrid.prototype.canModifyItem = function (item) {
             if (this.get_mode() === 1 /* insert */) {
                 if (item.insertable === false) {
