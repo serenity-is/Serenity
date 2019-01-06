@@ -21,6 +21,15 @@
             });
 
             if (useTabs) {
+                var itemsWithoutTab = this.items.filter(f => Q.isEmptyOrNull(f.tab));
+                if (itemsWithoutTab.length > 0) {
+                    this.createItems(this.element, itemsWithoutTab);
+
+                    $("<div class='pad'></div>").appendTo(this.element);
+                }
+
+                var itemsWithTab = this.items.filter(f => !Q.isEmptyOrNull(f.tab));
+
                 var ul = $("<ul class='nav nav-tabs property-tabs' role='tablist'></ul>")
                     .appendTo(this.element);
 
@@ -29,15 +38,15 @@
 
                 var tabIndex = 0;
                 var i = 0;
-                while (i < this.items.length) {
-                    var tab = { $: Q.trimToEmpty(this.items[i].tab) };
+                while (i < itemsWithTab.length) {
+                    var tab = { $: Q.trimToEmpty(itemsWithTab[i].tab) };
                     var tabItems = [];
 
                     var j = i;
                     do {
-                        tabItems.push(this.items[j]);
-                    } while (++j < this.items.length &&
-                        Q.trimToEmpty(this.items[j].tab) === tab.$);
+                        tabItems.push(itemsWithTab[j]);
+                    } while (++j < itemsWithTab.length &&
+                        Q.trimToEmpty(itemsWithTab[j].tab) === tab.$);
                     i = j;
 
                     var li = $("<li><a data-toggle='tab' role='tab'></a></li>")
