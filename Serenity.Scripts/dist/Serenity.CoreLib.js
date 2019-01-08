@@ -7600,6 +7600,71 @@ var Serenity;
         return TimeEditor;
     }(Serenity.Widget));
     Serenity.TimeEditor = TimeEditor;
+    var TimeSpanEditor = /** @class */ (function (_super) {
+        __extends(TimeSpanEditor, _super);
+        function TimeSpanEditor(input, opt) {
+            var _this = _super.call(this, input, opt) || this;
+            input.addClass('hours');
+            var spanStyle = 'style="margin-left: 6px; min-width: 10px; max-width: 10px;"';
+            var stdClass = 'editor s-EditTimeEditor ';
+            var colon1 = $('<span ' + spanStyle + ' />').text(':').addClass(stdClass + 'colon1').insertAfter(input);
+            var minutes = $('<input type="number" min="0" max="59"/>').addClass(stdClass + 'minutes').addClass('flexify').insertAfter(colon1);
+            if (opt.showSeconds) {
+                var colon2 = $('<span ' + spanStyle + ' />').text(':').addClass(stdClass + 'colon2').insertAfter(minutes);
+                $('<input type="number" min="0" max="59"/>').addClass(stdClass + 'seconds').addClass('flexify').insertAfter(colon2);
+            }
+            return _this;
+        }
+        Object.defineProperty(TimeSpanEditor.prototype, "value", {
+            get: function () {
+                var hours = this.element.val();
+                hours = ("0" + hours).slice(-2);
+                var mins = this.element.siblings('.minutes').val();
+                mins = ("0" + mins).slice(-2);
+                var retVal = hours + ':' + mins;
+                if (this.options.showSeconds) {
+                    var secs = this.element.siblings('.seconds').val();
+                    secs = ("0" + secs).slice(-2);
+                    retVal += ':' + secs;
+                }
+                return retVal;
+            },
+            set: function (value) {
+                var vals = value.split(':');
+                this.element.val(vals[0]);
+                this.element.siblings('.minutes').val(vals[1]);
+                if (this.options.showSeconds)
+                    this.element.siblings('.seconds').val(vals[2]);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TimeSpanEditor.prototype.getEditValue = function (property, target) {
+            target[property.name] = this.value;
+        };
+        TimeSpanEditor.prototype.setEditValue = function (source, property) {
+            this.value = source[property.name];
+        };
+        TimeSpanEditor.prototype.get_readOnly = function () {
+            return !(this.element.attr('readonly') == null);
+        };
+        TimeSpanEditor.prototype.set_readOnly = function (value) {
+            if (value) {
+                this.element.attr('readonly', 'readonly').addClass('readonly');
+                this.element.nextAll('.s-EditTimeEditor:not(span)').attr('readonly', 'readonly').addClass('readonly');
+            }
+            else {
+                this.element.removeAttr('readonly').removeClass('readonly');
+                this.element.nextAll('.s-EditTimeEditor:not(span)').removeAttr('readonly').removeClass('readonly');
+            }
+        };
+        TimeSpanEditor = __decorate([
+            Editor('TimeSpan', [Serenity.IGetEditValue, Serenity.ISetEditValue, Serenity.IReadOnly]),
+            Element("<input type='number' min='0' max='23'/>")
+        ], TimeSpanEditor);
+        return TimeSpanEditor;
+    }(Serenity.Widget));
+    Serenity.TimeSpanEditor = TimeSpanEditor;
     var URLEditor = /** @class */ (function (_super) {
         __extends(URLEditor, _super);
         function URLEditor(input) {
