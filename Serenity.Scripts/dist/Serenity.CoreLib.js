@@ -7665,6 +7665,44 @@ var Serenity;
         return TimeSpanEditor;
     }(Serenity.Widget));
     Serenity.TimeSpanEditor = TimeSpanEditor;
+    var ButtonEditor = /** @class */ (function (_super) {
+        __extends(ButtonEditor, _super);
+        function ButtonEditor(container, options) {
+            var _this = _super.call(this, container, options) || this;
+            if (_this.options.emptyLabel)
+                _this.element.closest('.field').find('.caption').text('');
+            ;
+            _this.updateElementContent();
+            _this.element.click(function (e) { _this.onClick(e); });
+            return _this;
+        }
+        ButtonEditor.prototype.updateElementContent = function () {
+            var classBtn = "btn ";
+            if (Q.isEmptyOrNull(this.options.cssClass)) {
+                if (this.options.primaryBtn)
+                    classBtn += "btn-primary";
+                else if (this.options.successBtn)
+                    classBtn += "btn-success";
+                else if (this.options.warningBtn)
+                    classBtn += "btn-info";
+                else if (this.options.dangerBtn)
+                    classBtn += "btn-danger";
+                else
+                    classBtn += "btn-default";
+            }
+            else {
+                classBtn = this.options.cssClass;
+            }
+            this.element.addClass(classBtn);
+            this.element.html(this.options.title);
+        };
+        ButtonEditor = __decorate([
+            Editor('Button'),
+            Element("<button type='button'/>")
+        ], ButtonEditor);
+        return ButtonEditor;
+    }(Serenity.Widget));
+    Serenity.ButtonEditor = ButtonEditor;
     var URLEditor = /** @class */ (function (_super) {
         __extends(URLEditor, _super);
         function URLEditor(input) {

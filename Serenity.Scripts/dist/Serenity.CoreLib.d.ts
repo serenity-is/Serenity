@@ -1782,6 +1782,20 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
     }
+    interface ButtonEditorOptions {
+        title?: string;
+        emptyLabel?: boolean;
+        cssClass?: string;
+        primaryBtn?: boolean;
+        successBtn?: boolean;
+        warningBtn?: boolean;
+        dangerBtn?: boolean;
+    }
+    class ButtonEditor extends Serenity.Widget<ButtonEditorOptions> {
+        onClick: (eventObject: JQueryEventObject) => void;
+        constructor(container: JQuery, options: ButtonEditorOptions);
+        private updateElementContent;
+    }
     class URLEditor extends StringEditor {
         constructor(input: JQuery);
     }

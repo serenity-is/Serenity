@@ -143,6 +143,56 @@ namespace Serenity.ComponentModel
         }
     }
 
+    public partial class ButtonEditorAttribute : CustomEditorAttribute
+    {
+        public ButtonEditorAttribute()
+            : base("Button")
+        {
+        }
+
+        public String Title
+        {
+            get { return GetOption<String>("title"); }
+            set { SetOption("title", value); }
+        }
+
+        public Boolean EmptyLabel
+        {
+            get { return GetOption<Boolean>("emptyLabel"); }
+            set { SetOption("emptyLabel", value); }
+        }
+
+        public String CssClass
+        {
+            get { return GetOption<String>("cssClass"); }
+            set { SetOption("cssClass", value); }
+        }
+
+        public Boolean PrimaryBtn
+        {
+            get { return GetOption<Boolean>("primaryBtn"); }
+            set { SetOption("primaryBtn", value); }
+        }
+
+        public Boolean SuccessBtn
+        {
+            get { return GetOption<Boolean>("successBtn"); }
+            set { SetOption("successBtn", value); }
+        }
+
+        public Boolean WarningBtn
+        {
+            get { return GetOption<Boolean>("warningBtn"); }
+            set { SetOption("warningBtn", value); }
+        }
+
+        public Boolean DangerBtn
+        {
+            get { return GetOption<Boolean>("dangerBtn?"); }
+            set { SetOption("dangerBtn?", value); }
+        }
+    }
+
     public partial class DateYearEditorAttribute : CustomEditorAttribute
     {
         public DateYearEditorAttribute()

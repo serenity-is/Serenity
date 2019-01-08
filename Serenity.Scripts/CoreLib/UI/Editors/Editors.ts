@@ -1758,6 +1758,55 @@
         }
     }
 
+    export interface ButtonEditorOptions {
+        title?: string;
+        emptyLabel?: boolean;
+        cssClass?: string;
+        primaryBtn?: boolean;
+        successBtn?: boolean;
+        warningBtn?: boolean;
+        dangerBtn?: boolean;
+    }
+
+    @Editor('Button')
+    @Element("<button type='button'/>")
+    export class ButtonEditor extends Widget<ButtonEditorOptions> {
+        public onClick: (eventObject: JQueryEventObject) => void;
+
+        constructor(container: JQuery, options: ButtonEditorOptions) {
+            super(container, options);
+
+            if (this.options.emptyLabel)
+                this.element.closest('.field').find('.caption').text('');;
+
+            this.updateElementContent();
+            this.element.click((e) => { this.onClick(e); })
+        }
+
+        private updateElementContent() {
+            var classBtn = "btn ";
+
+            if (Q.isEmptyOrNull(this.options.cssClass)) {
+                if (this.options.primaryBtn)
+                    classBtn += "btn-primary";
+                else if (this.options.successBtn)
+                    classBtn += "btn-success";
+                else if (this.options.warningBtn)
+                    classBtn += "btn-info";
+                else if (this.options.dangerBtn)
+                    classBtn += "btn-danger";
+                else
+                    classBtn += "btn-default";
+            }
+            else {
+                classBtn = this.options.cssClass;
+            }
+
+            this.element.addClass(classBtn);
+            this.element.html(this.options.title);
+        }
+    }
+
     @Editor('URL', [IStringValue])
     export class URLEditor extends StringEditor {
 
