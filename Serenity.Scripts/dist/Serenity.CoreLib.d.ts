@@ -1771,6 +1771,17 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
     }
+    interface TimeSpanEditorOptions {
+        showSeconds?: any;
+    }
+    class TimeSpanEditor extends Widget<TimeSpanEditorOptions> {
+        constructor(input: JQuery, opt?: TimeSpanEditorOptions);
+        value: string;
+        getEditValue(property: PropertyItem, target: any): void;
+        setEditValue(source: any, property: PropertyItem): void;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+    }
     class URLEditor extends StringEditor {
         constructor(input: JQuery);
     }

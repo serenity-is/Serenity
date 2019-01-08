@@ -129,6 +129,20 @@ namespace Serenity.ComponentModel
 
     }
 
+    public partial class TimeSpanEditorAttribute : CustomEditorAttribute
+    {
+        public TimeSpanEditorAttribute()
+            : base("TimeSpan")
+        {
+        }
+
+        public Boolean ShowSeconds
+        {
+            get { return GetOption<Boolean>("showSeconds"); }
+            set { SetOption("showSeconds", value); }
+        }
+    }
+
     public partial class DateYearEditorAttribute : CustomEditorAttribute
     {
         public DateYearEditorAttribute()
