@@ -67,12 +67,6 @@ Visit [this blog post](http://serenity.is/blog/2017/08/08/what-is-in-premium) fo
 
 Paid support options are available from the author and a team of Serenity professionals. [Contact us](mailto:volkanceylan@gmail.com) for details.
 
-## Donating
-
-If Serenity was helpful to you, please consider donating to keep Serenity alive and moving forward.
-
-http://serenity.is/#Donate
-
 ## Video Tutorials (thanks a lot to @samdubey and @sayuga for these contributions)
 
 **Starting Point Videos (by @sayuga):**
