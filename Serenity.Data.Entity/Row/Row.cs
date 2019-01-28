@@ -231,7 +231,11 @@ namespace Serenity.Data
 
                 return field.AsObject(this); 
             }
-            set { FindFieldEnsure(fieldName).AsObject(this, value); }
+            set
+            {
+                (FindFieldByPropertyName(fieldName) ?? 
+                    FindFieldEnsure(fieldName)).AsObject(this, value);
+            }
         }
 
         public void SetDictionaryData(object key, object value)
