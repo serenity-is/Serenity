@@ -90,11 +90,17 @@ namespace Serenity
 
         public static string GetName(this Enum value)
         {
+            if (value == null)
+                return String.Empty;
+
             return System.Enum.GetName(value.GetType(), value);
         }
 
         public static string GetText(this Enum value)
         {
+            if (value == null)
+                return String.Empty;
+
             return FormatEnum(value.GetType(), value);
         }
 
