@@ -11,6 +11,7 @@
     }
 
     @Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid])
+    @Serenity.Decorators.element("<div/>")
     export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid {
 
         protected titleDiv: JQuery;

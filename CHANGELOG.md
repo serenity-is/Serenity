@@ -1,3 +1,11 @@
+## 3.8.6 (2019-02-09)
+
+Features:
+  - when there are items without a tab, instead of showing an empty tab caption, create those property items before the tab (thanks @dfaruque)
+  - ability to register data scripts using classes like lookup scripts
+  - row field value name indexed get access should also look field by property name and also in dictionary data if available
+  - made target optional for PropertyGrid.save and it returns the new/passed target object. added value property to PropertyGrid.
+  
 ## 3.8.5 (2019-01-03)
 
 Bugfixes:

@@ -12692,7 +12692,8 @@ var Serenity;
             return (this.filterBar == null) ? null : this.filterBar.get_store();
         };
         DataGrid = __decorate([
-            Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid])
+            Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid]),
+            Serenity.Decorators.element("<div/>")
         ], DataGrid);
         return DataGrid;
     }(Serenity.Widget));
