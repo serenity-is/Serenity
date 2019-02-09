@@ -1,6 +1,7 @@
 ## 3.8.6 (2019-02-09)
 
 Features:
+  - modern flat design for grids, dialogs and toolbars [StartSharp]
   - when there are items without a tab, instead of showing an empty tab caption, create those property items before the tab (thanks @dfaruque)
   - ability to register data scripts using classes like lookup scripts
   - row field value name indexed get access should also look field by property name and also in dictionary data if available
