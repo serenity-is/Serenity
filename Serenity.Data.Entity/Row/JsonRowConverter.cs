@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Serenity.Data
@@ -7,6 +8,8 @@ namespace Serenity.Data
     ///   Serialize/deserialize a row</summary>
     public class JsonRowConverter : JsonConverter
     {
+        public static Func<Row, string, bool> ShouldSerializeExtension;
+
         /// <summary>
         ///   Writes the JSON representation of the object.</summary>
         /// <param name="writer">
@@ -45,12 +48,25 @@ namespace Serenity.Data
             else
             {
                 var fields = row.fields;
-                foreach (var f in fields)
+                foreach (var f in fields)  
                     if (!f.IsNull(row))
                     {
                         writer.WritePropertyName(f.PropertyName ?? f.Name);
                         f.ValueToJson(writer, row, serializer);
                     }
+            }
+
+            if (ShouldSerializeExtension != null &&
+                row.dictionaryData != null)
+            {
+                foreach (string key in row.dictionaryData.Keys)
+                {
+                    if (ShouldSerializeExtension(row, key))
+                    {
+                        writer.WritePropertyName(key);
+                        writer.WriteValue(row.dictionaryData[key]);
+                    }
+                }
             }
 
             writer.WriteEndObject();
