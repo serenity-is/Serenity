@@ -1,3 +1,8 @@
+## 3.8.7 (2019-02-27)
+
+Features:
+  - update bootstrap dependency to 3.4.1
+
 ## 3.8.6 (2019-02-09)
 
 Features:
