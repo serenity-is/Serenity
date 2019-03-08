@@ -88,12 +88,26 @@ namespace Serenity.CodeGenerator
                 }
 
                 var x = Math.Min(last.Length, parts.Length) - 2;
-                while (x >= 0 && last[x] != parts[x])
+                if (x >= 0)
                 {
-                    var close = (new String(' ', ((x + 2) * 4)) + "}");
-                    x--;
-                    sb.AppendLine(close);
-                    sb.AppendLine();
+                    var j = 0;
+                    var newx = x;
+                    while (j <= x)
+                    {
+                        if (last[j] != parts[j])
+                        {
+                            newx = j - 1;
+                            for (var h = x; h >=j; h--)
+                            {
+                                var close = (new String(' ', (( h + 2) * 4)) + "}");
+                                sb.AppendLine(close);
+                                sb.AppendLine();
+                            }
+                            j = x;
+                        }
+                        j++;
+                    }
+                    x = newx;
                 }
 
                 for (var i = Math.Max(x + 1, 0); i < parts.Length - 1; i++)
