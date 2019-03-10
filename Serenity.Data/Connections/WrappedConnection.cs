@@ -8,6 +8,7 @@ namespace Serenity.Data
         private bool openedOnce;
         private WrappedTransaction currentTransaction;
         private ISqlDialect dialect;
+        private int? customCommandTimeout;
 
         public WrappedConnection(IDbConnection actualConnection, ISqlDialect dialect)
         {
@@ -129,6 +130,18 @@ namespace Serenity.Data
         public void Dispose()
         {
             actualConnection.Dispose();
+        }
+
+        public int? CustomCommandTimeout
+        {
+            get
+            {
+                return customCommandTimeout;
+            }
+            set
+            {
+                this.customCommandTimeout = value;
+            }
         }
     }
 }

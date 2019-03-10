@@ -233,7 +233,18 @@
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
+            int? customCommandTimeout = null;
+
+            if (connection is WrappedConnection)
+            {
+                customCommandTimeout = (connection as WrappedConnection).CustomCommandTimeout;
+            }
+
             IDbCommand command = connection.CreateCommand();
+            if (customCommandTimeout != null)
+            {
+                command.CommandTimeout = (int)customCommandTimeout;
+            }
 
             // TODO: find a workaround in new Dapper
 #if !COREFX
