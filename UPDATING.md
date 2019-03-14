@@ -142,3 +142,66 @@ To resolve such errors, you'll need to include typing for React in your package.
 After that save the file and make sure there is a **react** folder at *YourProject.Web\node_modules\@types*. If not, you might have some configuration error with NodeJS integration in Visual Studio.^
 
 If you are still seeing warnings in Visual Studio errors tab about React, you might need to restart Visual Studio.
+
+## Serenity 3.8.0
+
+### Important Security Notice!
+
+During testing we found out that handlers defined in your web.config files also applies to sub folders. This might lead to some problems / security issues, especially for error log. Please put a slash in PATH attribute of these handlers. E.g. if you have these in your web.config:
+
+> This only applies to Asp.Net MVC version, not .NET Core version.
+
+```xml
+<handlers>
+<add name="ErrorLog" path="errorlog.axd" verb="POST,GET,HEAD" 
+  type="StackExchange.Exceptional.HandlerFactory, StackExchange.Exceptional" preCondition="integratedMode" />
+<add name="DynamicScriptHandler" verb="POST,GET,HEAD" path="DynJS.axd" 
+  type="Serenity.Web.HttpHandlers.DynamicScriptHandler, Serenity.Web" />
+<add name="SkipStaticFileForUploadFolder" verb="GET" path="upload/*"   
+  type="System.Web.Handlers.TransferRequestHandler"/>    
+</handlers>
+```
+
+Replace them with
+
+```xml
+<handlers>
+  <add name="ErrorLog" path="/errorlog.axd" verb="POST,GET,HEAD"   
+    type="StackExchange.Exceptional.HandlerFactory, StackExchange.Exceptional" preCondition="integratedMode" />
+  <add name="DynamicScriptHandler" verb="POST,GET,HEAD" path="/DynJS.axd" 
+    type="Serenity.Web.HttpHandlers.DynamicScriptHandler, Serenity.Web" />
+  <add name="SkipStaticFileForUploadFolder" verb="GET" path="/upload/*"    
+    type="System.Web.Handlers.TransferRequestHandler"/>    
+</handlers>
+```
+
+So that these handlers only apply to web root folder.
+
+## Serenity 3.8.2
+
+After you upgrade from < 3.8.2 version to 3.8.2+, you might lose DynamicScriptHandler entry in your web.config file and start to get script errors.
+
+> We had to this change as NuGet creates duplicate handler entries in web.config after doing modifications to handlers sections as shown in 3.8.0 upgrade information.
+
+> This only applies to Asp.Net MVC version, not .NET Core version.
+
+Make sure you have following DynamicScriptHandler entry in your web.config:
+
+```xml
+<handlers>
+    //...
+    <add name="DynamicScriptHandler" verb="POST,GET,HEAD" path="DynJS.axd" 
+       type="Serenity.Web.HttpHandlers.DynamicScriptHandler, Serenity.Web" />
+    //...
+</handlers>
+```
+
+## Serenity 3.8.5
+
+This is not actually an issue about Serenity itself, but you might have this problem if you choose to update Microsoft.TypeScript.MsBuild in your Serene/StartSharp project.
+
+TypeScript no longer has a tsc.exe file and it uses NodeJS instead of Chakra (Edge) so you need to update your .CSPROJ file, find CompileTSC section in your project file and replace it like below:
+
+```xml
+<Exec Command="&quot;$(NodePath)\node&quot; &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" ContinueOnError="true" />
+```
