@@ -1,6 +1,7 @@
 ## 3.9.0 (2019-03-15)
 
 Features:
+  - added basic attributes to support plugin architecture (work in progress...)
   - [Breaking Change] Serenity.Web NuGet package no longer contains / has reference to Serenity script, css and image files, so you need to manually install Serenity.Scripts NuGet package in your project after updating. 
   Also update Serenity.Web.Assets package. If using AspNetCore add reference to Serenity.Web.Assets and Serenity.Web.Scripts packages in CSPROJ file next to Serenity.Web reference.
 

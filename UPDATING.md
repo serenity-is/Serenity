@@ -52,6 +52,8 @@ Using package manager console, update following packages:
 
 ```
 Update-Package Serenity.Web
+Update-Package Serenity.Scripts
+Update-Package Serenity.Web.Assets
 Update-Package Serenity.CodeGenerator
 Update-Package Serenity.Web.Tooling
 ```
@@ -64,6 +66,8 @@ Using package manager console, update following package:
 
 ```
 Update-Package Serenity.Web
+Update-Package Serenity.Scripts
+Update-Package Serenity.Web.Assets
 ```
 
 Edit *YourProject.Web.csproj* by right clicking on project name in VS, and choosing edit.
@@ -205,3 +209,25 @@ TypeScript no longer has a tsc.exe file and it uses NodeJS instead of Chakra (Ed
 ```xml
 <Exec Command="&quot;$(NodePath)\node&quot; &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" ContinueOnError="true" />
 ```
+
+## Serenity 3.9.0
+
+Serenity.Web NuGet package no longer contains / has reference to Serenity script, css and image files, so you need to install Serenity.Scripts package after updating to 3.9.0. Serenity.Web.Assets package now contains some static files so also need to update/install this package.
+
+If using ASP.NET MVC, run following in the package manager console:
+
+```ps
+Install-Package Serenity.Scripts
+Update-Package Serenity.Web.Assets
+```
+
+If using ASP.NET Core, add following two lines in your CSPROJ next to line containing reference to **Serenity.Web**:
+
+```xml
+<PackageReference Include="Serenity.Web" Version="3.8.6"
+    Condition="!Exists('..\..\Serenity\Serenity.Core\Serenity.Core.csproj')" />
+<PackageReference Include="Serenity.Web.Assets" Version="3.9.0" />
+<PackageReference Include="Serenity.Scripts" Version="3.9.0" />
+```
+
+Make sure you write latest versions of Serenity.Web.Assets and Serenity.Scripts in Version attribute.
