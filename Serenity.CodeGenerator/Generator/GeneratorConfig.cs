@@ -15,20 +15,28 @@ namespace Serenity.CodeGenerator
         public string TSCPath { get; set; }
         public List<BaseRowClass> BaseRowClasses { get; set; }
         public List<string> RemoveForeignFields { get; set; }
+        public string CustomTemplates { get; set; }
+        public Dictionary<string, string> CustomGenerate { get; set; }
+        public Dictionary<string, object> CustomSettings { get; set; }
         [JsonIgnore]
         public bool GenerateRow { get; set; }
         [JsonIgnore]
         public bool GenerateService { get; set; }
         [JsonIgnore]
         public bool GenerateUI { get; set; }
+        [JsonIgnore]
+        public bool GenerateCustom { get; set; }
 
         public GeneratorConfig()
         {
             Connections = new List<Connection>();
             BaseRowClasses = new List<BaseRowClass>();
+            CustomSettings = new Dictionary<string, object>();
+            CustomGenerate = new Dictionary<string, string>();
             GenerateRow = true;
             GenerateService = true;
             GenerateUI = true;
+            GenerateCustom = true;
         }
 
         public string SaveToJson()
@@ -81,7 +89,7 @@ namespace Serenity.CodeGenerator
             public string Module { get; set; }
             public string PermissionKey { get; set; }
         }
-
+        
         public class BaseRowClass
         {
             public string ClassName { get; set; }
@@ -91,7 +99,8 @@ namespace Serenity.CodeGenerator
         public class ServerTypingsConfig
         {
             public string[] Assemblies { get; set; }
-            public string OutDir { get; set; }           
+            public string OutDir { get; set; }
+            public bool LocalTexts { get; set; }
         }
 
         public class ClientTypesConfig

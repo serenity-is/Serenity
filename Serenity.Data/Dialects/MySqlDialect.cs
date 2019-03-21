@@ -58,7 +58,7 @@ namespace Serenity.Data
         {
             get
             {
-                return "\'yyyy-MM-dd HH:mm:ss.fff\'";
+                return "\\'yyyy-MM-dd HH:mm:ss.fff\\'";
             }
         }
 
@@ -179,6 +179,19 @@ namespace Serenity.Data
             get
             {
                 return "\\'HH':'mm':'ss\\'";
+            }
+        }
+
+        public string UnionKeyword(SqlUnionType unionType)
+        {
+            switch (unionType)
+            {
+                case SqlUnionType.Union:
+                    return "UNION";
+                case SqlUnionType.UnionAll:
+                    return "UNION ALL";
+                default:
+                    throw new NotImplementedException();
             }
         }
 

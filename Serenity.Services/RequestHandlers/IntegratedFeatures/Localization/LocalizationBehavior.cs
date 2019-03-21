@@ -15,16 +15,13 @@ namespace Serenity.Services
         private LocalizationRowAttribute attr;
         private int rowPrefixLength;
         private Func<Row> rowFactory;
+        private Type localRowType;
         private Func<Row> localRowFactory;
         private int localRowPrefixLength;
         private Field foreignKeyField;
         private Field localRowIdField;
         private Field cultureIdField;
         private Row localRowInstance;
-        private Func<IListRequestProcessor> listHandlerFactory;
-        private Func<ISaveRequestProcessor> saveHandlerFactory;
-        private Func<IDeleteRequestProcessor> deleteHandlerFactory;
-        private Func<ISaveRequest> saveRequestFactory;
         private BaseCriteria foreignKeyCriteria;
         private Func<IDictionary> dictionaryFactory;
 
@@ -34,7 +31,7 @@ namespace Serenity.Services
             if (attr == null)
                 return false;
 
-            var localRowType = attr.LocalizationRow;
+            localRowType = attr.LocalizationRow;
             if (!typeof(ILocalizationRow).IsAssignableFrom(localRowType))
             {
                 throw new ArgumentException(String.Format(
@@ -61,18 +58,6 @@ namespace Serenity.Services
 
             rowFactory = FastReflection.DelegateForConstructor<Row>(row.GetType());
             localRowFactory = FastReflection.DelegateForConstructor<Row>(localRowType);
-
-            listHandlerFactory = FastReflection.DelegateForConstructor<IListRequestProcessor>(
-                typeof(ListRequestHandler<>).MakeGenericType(localRowType));
-
-            saveHandlerFactory = FastReflection.DelegateForConstructor<ISaveRequestProcessor>(
-                typeof(SaveRequestHandler<>).MakeGenericType(localRowType));
-
-            saveRequestFactory = FastReflection.DelegateForConstructor<ISaveRequest>(
-                typeof(SaveRequest<>).MakeGenericType(localRowType));
-
-            deleteHandlerFactory = FastReflection.DelegateForConstructor<IDeleteRequestProcessor>(
-                typeof(DeleteRequestHandler<>).MakeGenericType(localRowType));
 
             var localRow = localRowFactory();
             localRowInstance = localRow;
@@ -131,6 +116,10 @@ namespace Serenity.Services
                 ReferenceEquals(match, ((IIsActiveRow)localRowInstance).IsActiveField))
                 return null;
 
+            if (localRowInstance is IIsDeletedRow &&
+                ReferenceEquals(match, ((IIsDeletedRow)localRowInstance).IsDeletedField))
+                return null;
+
             var insertLog = localRowInstance as IInsertLogRow;
             if (insertLog != null && (
                 ReferenceEquals(match, insertLog.InsertUserIdField) ||
@@ -179,13 +168,11 @@ namespace Serenity.Services
 
             var localIdField = (Field)((handler.Row as IIdRow).IdField);
 
-            var listHandler = listHandlerFactory();
+            var listHandler = DefaultHandlerFactory.ListHandlerFor(localRowType);
 
-            var listRequest = new ListRequest
-            {
-                ColumnSelection = ColumnSelection.List,
-                Criteria = foreignKeyCriteria == new ValueCriteria(localIdField.AsObject(handler.Row))
-            };
+            var listRequest = DefaultHandlerFactory.ListRequestFor(localRowType);
+            listRequest.ColumnSelection = ColumnSelection.List;
+            listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(localIdField.AsObject(handler.Row));
 
             IListResponse response = listHandler.Process(handler.Connection, listRequest);
 
@@ -234,16 +221,17 @@ namespace Serenity.Services
             foreignKeyField.AsObject(localRow, masterId);
             ((Field)((IIdRow)localRow).IdField).AsObject(localRow, localRowId);
 
-            var saveHandler = saveHandlerFactory();
-            var saveRequest = saveRequestFactory();
+            var saveHandler = DefaultHandlerFactory.SaveHandlerFor(localRowType);
+            var saveRequest = DefaultHandlerFactory.SaveRequestFor(localRowType);
             saveRequest.Entity = localRow;
             saveHandler.Process(uow, saveRequest, localRowId == null ? SaveRequestType.Create : SaveRequestType.Update);
         }
 
         private void DeleteLocalRow(IUnitOfWork uow, object detailId)
         {
-            var deleteHandler = deleteHandlerFactory();
-            var deleteRequest = new DeleteRequest { EntityId = detailId };
+            var deleteHandler = DefaultHandlerFactory.DeleteHandlerFor(localRowType);
+            var deleteRequest = DefaultHandlerFactory.DeleteRequestFor(localRowType);
+            deleteRequest.EntityId = detailId;
             deleteHandler.Process(uow, deleteRequest);
         }
 
@@ -308,13 +296,12 @@ namespace Serenity.Services
 
         public override void OnBeforeDelete(IDeleteRequestHandler handler)
         {
-            if (handler.Row is IIsActiveDeletedRow)
+            if (ServiceQueryHelper.UseSoftDelete(handler.Row))
                 return;
 
             var idField = (Field)((handler.Row as IIdRow).IdField);
             var localRow = localRowFactory();
 
-            var deleteHandler = deleteHandlerFactory();
             var deleteList = new List<object>();
             new SqlQuery()
                     .Dialect(handler.Connection.GetDialect())

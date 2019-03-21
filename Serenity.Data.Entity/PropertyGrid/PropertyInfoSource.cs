@@ -16,8 +16,18 @@ namespace Serenity.PropertyGrid
             BasedOnRow = basedOnRow;
 
             if (basedOnRow != null)
-                BasedOnField = basedOnRow.FindField(property.Name) ??
-                    basedOnRow.FindFieldByPropertyName(property.Name);
+            {
+                BasedOnField = basedOnRow.FindFieldByPropertyName(property.Name);
+                    
+                if (ReferenceEquals(null, BasedOnField))
+                {
+                    // only use field found by field name if it has no property
+                    var byFieldName = basedOnRow.FindField(property.Name);
+                    if (!ReferenceEquals(byFieldName, null) &&
+                        string.IsNullOrEmpty(byFieldName.PropertyName))
+                        BasedOnField = byFieldName;
+                }
+            }
 
             var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
             ValueType = nullableType ?? property.PropertyType;

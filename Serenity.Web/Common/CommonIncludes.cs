@@ -5,9 +5,8 @@ namespace Serenity.Web
     {
         public static readonly string[] Scripts = new string[] 
         {
-            "~/Scripts/rsvp.js",
             "~/Scripts/jquery-{version}.js",
-            "~/Scripts/jquery-ui-{version}.js",
+            "~/Scripts/jquery-ui.js",
             "~/Scripts/jquery-ui-i18n.js",
             "~/Scripts/jquery.validate.js",
             "~/Scripts/jquery.blockUI.js",
@@ -28,8 +27,7 @@ namespace Serenity.Web
             "~/Scripts/SlickGrid/Plugins/slick.headerbuttons.js",
             "~/Scripts/bootstrap.js",
             "~/Scripts/saltarelle/mscorlib.js",
-            "~/Scripts/serenity/Serenity.CoreLib.js",
-            "~/Scripts/serenity/Serenity.Script.UI.js"
+            "~/Scripts/serenity/Serenity.CoreLib.js"
         };
 
         public static readonly string[] Styles = new string[] 

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.IO;
 using System.Web.Hosting;
+using Serenity.Services;
 
 namespace Serenity.Web.HttpHandlers
 {
@@ -18,16 +19,42 @@ namespace Serenity.Web.HttpHandlers
             var response = context.Response;
             var request = context.Request;
 
-            var script = DynamicScriptManager.GetScript(scriptKey);
+            DynamicScriptManager.Script script;
+            try
+            {
+                script = DynamicScriptManager.GetScript(scriptKey);
+            }
+            catch (ValidationError ve)
+            {
+                if (ve.ErrorCode == "AccessDenied")
+                {
+                    response.StatusCode = 403;
+                    return;
+                }
+
+                throw;
+            }
+
             if (script == null)
-                throw new HttpException(404, "File not found!");
+            {
+                response.StatusCode = 404;
+                response.StatusDescription = "A dynamic script with key " + scriptKey + " is not found!";
+                return;
+            }
 
             int expiresOffset = 365; // Cache for 365 days in browser cache
             response.ContentType = contentType;
             response.Charset = "utf-8";
 
             response.Cache.SetExpires(DateTime.Now.AddDays(expiresOffset));
-            response.Cache.SetCacheability(HttpCacheability.Private);
+
+            // allow CDNs to cache anonymous resources
+            if (!string.IsNullOrEmpty(request.QueryString["v"]) &&
+                !Authorization.IsLoggedIn)
+                response.Cache.SetCacheability(HttpCacheability.Public);
+            else
+                response.Cache.SetCacheability(HttpCacheability.Private);
+
             response.Cache.SetValidUntilExpires(false);
 
             response.Cache.VaryByHeaders["Accept-Encoding"] = true;
@@ -52,10 +79,16 @@ namespace Serenity.Web.HttpHandlers
             if (pos >= 0)
                 path = path.Substring(pos + dyn.Length);
 
+            var contentType = "text/javascript";
             if (path.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
                 path = path.Substring(0, path.Length - 3);
+            else if (path.EndsWith(".css", StringComparison.OrdinalIgnoreCase))
+            {
+                contentType = "text/css";
+                path = path.Substring(0, path.Length - 4);
+            }
 
-            ProcessScriptRequest(context, path, "text/javascript");
+            ProcessScriptRequest(context, path, contentType);
         }
 
         public static void WriteWithIfModifiedSinceControl(HttpContext context, byte[] bytes, DateTime lastWriteTime)
@@ -90,32 +123,6 @@ namespace Serenity.Web.HttpHandlers
 
         /// <summary>
         ///   Returns true to set this handler as reusable</summary>
-        public bool IsReusable
-        {
-            get { return true; }
-        }
-    }
-
-    public class BundleCssHandler : IHttpHandler
-    {
-        public void ProcessRequest(HttpContext context)
-        {
-            var request = context.Request;
-            DynamicScriptManager.IfNotRegistered("BundleCss", () =>
-            {
-                DynamicScriptManager.Register("BundleCss",
-                    new ConcatenatedScript(new Func<string>[] {
-                        () => {
-                            using (var sr = new StreamReader(
-                                HostingEnvironment.MapPath("~/Content/bundle.css")))
-                                return sr.ReadToEnd();
-                        }
-                    }));
-            });
-
-            DynamicScriptHandler.ProcessScriptRequest(context, "BundleCss", "text/css");
-        }
-
         public bool IsReusable
         {
             get { return true; }

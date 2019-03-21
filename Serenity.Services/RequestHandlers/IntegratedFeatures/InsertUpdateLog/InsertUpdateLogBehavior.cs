@@ -21,8 +21,8 @@ namespace Serenity.Services
 
             if (updateLogRow != null && (handler.IsUpdate || insertLogRow == null))
             {
-                updateLogRow.UpdateDateField[row] = updateLogRow.UpdateDateField.DateTimeKind == DateTimeKind.Utc ?
-                    DateTime.UtcNow : DateTime.Now;
+                updateLogRow.UpdateDateField[row] = DateTimeField.ToDateTimeKind(DateTime.Now,
+                    updateLogRow.UpdateDateField.DateTimeKind);
 
                 if (updateLogRow.UpdateUserIdField.IsIntegerType)
                     updateLogRow.UpdateUserIdField[row] = Authorization.UserId.TryParseID();
@@ -34,8 +34,8 @@ namespace Serenity.Services
             }
             else if (insertLogRow != null && handler.IsCreate)
             {
-                insertLogRow.InsertDateField[row] = insertLogRow.InsertDateField.DateTimeKind == DateTimeKind.Utc ?
-                    DateTime.UtcNow : DateTime.Now;
+                insertLogRow.InsertDateField[row] = DateTimeField.ToDateTimeKind(DateTime.Now,
+                    insertLogRow.InsertDateField.DateTimeKind);
 
                 if (insertLogRow.InsertUserIdField.IsIntegerType)
                     insertLogRow.InsertUserIdField[row] = Authorization.UserId.TryParseID();

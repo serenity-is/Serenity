@@ -4,12 +4,6 @@ using Serenity.Data;
 
 namespace Serenity.Services
 {
-    public interface IIncludeExcludeColumns
-    {
-        HashSet<string> IncludeColumns { get; set; }
-        HashSet<string> ExcludeColumns { get; set; }
-    }
-
     public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     {
         public int Skip { get; set; }
@@ -27,18 +21,6 @@ namespace Serenity.Services
         public HashSet<string> IncludeColumns { get; set; }
         [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> ExcludeColumns { get; set; }
+        public SortBy[] DistinctFields { get; set; }
     }
-
-    //[Flags] //TODO: add this validation
-    //public enum ListRequestSupport
-    //{
-    //    Paging = 1,
-    //    Sorting = 2,
-    //    ContainsText = 4,
-    //    IncludeDeleted = 8
-    //    FilterLines = 16,
-    //    Filter = 32,
-    //    SetPageSortContains = Paging | Sorting | ContainsText,
-    //    SetFull = SetPageSortContains | Filter | FilterLines | IncludeDeleted
-    //}
 }

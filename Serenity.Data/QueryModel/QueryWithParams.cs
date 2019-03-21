@@ -10,7 +10,7 @@
         protected ISqlDialect dialect;
         protected bool dialectOverridden;
         protected QueryWithParams parent;
-        private Dictionary parameters;
+        protected Dictionary parameters;
         private int nextAutoParam;
 
         public QueryWithParams()
@@ -108,6 +108,22 @@
         ISqlDialect IQueryWithParams.Dialect
         {
             get { return dialect; }
+        }
+
+        /// <summary>
+        /// Gets the dialect (SQL server type / version) for query.
+        /// </summary>
+        public ISqlDialect Dialect()
+        {
+            return this.dialect;
+        }
+
+        public bool IsDialectOverridden
+        {
+            get
+            {
+                return this.dialectOverridden;
+            }
         }
 
         public string DebugText

@@ -16,7 +16,8 @@ namespace Serenity.CodeGeneration
 
             var idRow = row as IIdRow;
             var isActiveRow = row as IIsActiveRow;
-            var nameRow = row as INameRow;
+            var isDeletedRow = row as IIsDeletedRow;
+            var nameField = row.GetNameField();
             var lookupAttr = rowType.GetCustomAttribute<LookupScriptAttribute>();
             if (lookupAttr == null)
             {
@@ -47,11 +48,19 @@ namespace Serenity.CodeGeneration
                 anyMetadata = true;
             }
 
-            if (nameRow != null)
+            if (isDeletedRow != null)
+            {
+                cw.Indented("[InlineConstant] public const string IsDeletedProperty = \"");
+                var field = (isDeletedRow.IsDeletedField);
+                sb.Append(field.PropertyName ?? field.Name);
+                sb.AppendLine("\";");
+                anyMetadata = true;
+            }
+
+            if (!ReferenceEquals(null, nameField))
             {
                 cw.Indented("[InlineConstant] public const string NameProperty = \"");
-                var field = (nameRow.NameField);
-                sb.Append(field.PropertyName ?? field.Name);
+                sb.Append(nameField.PropertyName ?? nameField.Name);
                 sb.AppendLine("\";");
                 anyMetadata = true;
             }
@@ -68,14 +77,15 @@ namespace Serenity.CodeGeneration
             if (lookupAttr != null)
             {
                 cw.Indented("[InlineConstant] public const string LookupKey = \"");
-                sb.Append(lookupAttr.Key);
+                sb.Append(lookupAttr.Key ??
+                    LookupScriptAttribute.AutoLookupKeyFor(rowType));
                 sb.AppendLine("\";");
 
                 sb.AppendLine();
                 cw.Indented("public static Lookup<");
                 MakeFriendlyName(rowType, codeNamespace, null);
                 sb.Append("> Lookup { [InlineCode(\"Q.getLookup('");
-                sb.Append(lookupAttr.Key);
+                sb.Append(lookupAttr.Key ?? LookupScriptAttribute.AutoLookupKeyFor(rowType));
                 sb.AppendLine("')\")] get { return null; } }");
 
                 anyMetadata = true;

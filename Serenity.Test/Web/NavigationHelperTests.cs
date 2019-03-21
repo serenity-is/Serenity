@@ -15,16 +15,16 @@ namespace Serenity.Navigation.Test
             var actual = NavigationHelper.ConvertToNavigationItems(source, null);
 
             Assert.NotNull(actual);
-            Assert.Equal(1, actual.Count);
+            Assert.StrictEqual(1, actual.Count);
             var a = actual[0];
             Assert.Equal("A", a.Title);
             Assert.Equal("A", a.FullPath);
             Assert.NotNull(a.Children);
-            Assert.Equal(1, a.Children.Count);
+            Assert.StrictEqual(1, a.Children.Count);
             var b = a.Children[0];
             Assert.Equal("B", b.Title);
             Assert.Equal("A/B", b.FullPath);
-            Assert.Equal(0, b.Children.Count);
+            Assert.StrictEqual(0, b.Children.Count);
         }
 
         [Fact]
@@ -38,19 +38,19 @@ namespace Serenity.Navigation.Test
             var actual = NavigationHelper.ConvertToNavigationItems(source, null);
 
             Assert.NotNull(actual);
-            Assert.Equal(1, actual.Count);
+            Assert.StrictEqual(1, actual.Count);
             var a = actual[0];
             Assert.Equal("A", a.Title);
             Assert.Equal("A", a.FullPath);
-            Assert.Equal(1, a.Children.Count);
+            Assert.StrictEqual(1, a.Children.Count);
             var b = a.Children[0];
             Assert.Equal("B", b.Title);
             Assert.Equal("A/B", b.FullPath);
-            Assert.Equal(1, b.Children.Count);
+            Assert.StrictEqual(1, b.Children.Count);
             var c = b.Children[0];
             Assert.Equal("C", c.Title);
             Assert.Equal("A/B/C", c.FullPath);
-            Assert.Equal(0, c.Children.Count);
+            Assert.StrictEqual(0, c.Children.Count);
         }
 
         [Fact]
@@ -66,32 +66,32 @@ namespace Serenity.Navigation.Test
             var actual = NavigationHelper.ConvertToNavigationItems(source, null);
 
             Assert.NotNull(actual);
-            Assert.Equal(1, actual.Count);
+            Assert.StrictEqual(1, actual.Count);
 
             var a = actual[0];
             Assert.Equal("A", a.Title);
             Assert.Equal("A", a.FullPath);
-            Assert.Equal(1, a.Children.Count);
+            Assert.StrictEqual(1, a.Children.Count);
 
             var b = a.Children[0];
             Assert.Equal("B", b.Title);
             Assert.Equal("A/B", b.FullPath);
-            Assert.Equal(3, b.Children.Count);
+            Assert.StrictEqual(3, b.Children.Count);
 
             var c = b.Children[0];
             Assert.Equal("C", c.Title);
             Assert.Equal("A/B/C", c.FullPath);
-            Assert.Equal(0, c.Children.Count);
+            Assert.StrictEqual(0, c.Children.Count);
 
             var d = b.Children[1];
             Assert.Equal("D", d.Title);
             Assert.Equal("A/B/D", d.FullPath);
-            Assert.Equal(0, d.Children.Count);
+            Assert.StrictEqual(0, d.Children.Count);
 
             var e = b.Children[2];
             Assert.Equal("E", e.Title);
             Assert.Equal("A/B/E", e.FullPath);
-            Assert.Equal(0, e.Children.Count);
+            Assert.StrictEqual(0, e.Children.Count);
         }
 
         [Fact]
@@ -105,22 +105,22 @@ namespace Serenity.Navigation.Test
             var actual = NavigationHelper.ConvertToNavigationItems(source, null);
 
             Assert.NotNull(actual);
-            Assert.Equal(1, actual.Count);
+            Assert.StrictEqual(1, actual.Count);
 
             var a1 = actual[0];
             Assert.Equal("A ", a1.Title);
             Assert.Equal("A ", a1.FullPath);
-            Assert.Equal(1, a1.Children.Count);
+            Assert.StrictEqual(1, a1.Children.Count);
 
             var a1b = a1.Children[0];
             Assert.Equal(" B ", a1b.Title);
             Assert.Equal("A / B ", a1b.FullPath);
-            Assert.Equal(1, a1b.Children.Count);
+            Assert.StrictEqual(1, a1b.Children.Count);
 
             var a1bc = a1b.Children[0];
             Assert.Equal(" C", a1bc.Title);
             Assert.Equal("A / B / C", a1bc.FullPath);
-            Assert.Equal(0, a1bc.Children.Count);
+            Assert.StrictEqual(0, a1bc.Children.Count);
         }
 
         [Fact]
@@ -134,12 +134,12 @@ namespace Serenity.Navigation.Test
             var actual = NavigationHelper.ConvertToNavigationItems(source, null);
 
             Assert.NotNull(actual);
-            Assert.Equal(1, actual.Count);
+            Assert.StrictEqual(1, actual.Count);
 
             var xy = actual[0];
             Assert.Equal("X/Y", xy.Title);
             Assert.Equal("X//Y", xy.FullPath);
-            Assert.Equal(0, xy.Children.Count);
+            Assert.StrictEqual(0, xy.Children.Count);
         }
 
         [Fact]
@@ -153,12 +153,12 @@ namespace Serenity.Navigation.Test
             var actual = NavigationHelper.ConvertToNavigationItems(source, null);
 
             Assert.NotNull(actual);
-            Assert.Equal(1, actual.Count);
+            Assert.StrictEqual(1, actual.Count);
 
             var xy = actual[0];
             Assert.Equal("X//Y", xy.Title);
             Assert.Equal("X////Y", xy.FullPath);
-            Assert.Equal(0, xy.Children.Count);
+            Assert.StrictEqual(0, xy.Children.Count);
         }
 
         [Fact]
@@ -172,17 +172,17 @@ namespace Serenity.Navigation.Test
             var actual = NavigationHelper.ConvertToNavigationItems(source, null);
 
             Assert.NotNull(actual);
-            Assert.Equal(1, actual.Count);
+            Assert.StrictEqual(1, actual.Count);
 
             var xy = actual[0];
             Assert.Equal("X/Y", xy.Title);
             Assert.Equal("X//Y", xy.FullPath);
-            Assert.Equal(1, xy.Children.Count);
+            Assert.StrictEqual(1, xy.Children.Count);
 
             var uw = xy.Children[0];
             Assert.Equal("U/W", uw.Title);
             Assert.Equal("X//Y/U//W", uw.FullPath);
-            Assert.Equal(0, uw.Children.Count);
+            Assert.StrictEqual(0, uw.Children.Count);
         }
 
         [Fact]
@@ -196,17 +196,17 @@ namespace Serenity.Navigation.Test
             var actual = NavigationHelper.ConvertToNavigationItems(source, null);
 
             Assert.NotNull(actual);
-            Assert.Equal(1, actual.Count);
+            Assert.StrictEqual(1, actual.Count);
 
             var xy = actual[0];
             Assert.Equal("X//Y", xy.Title);
             Assert.Equal("X////Y", xy.FullPath);
-            Assert.Equal(1, xy.Children.Count);
+            Assert.StrictEqual(1, xy.Children.Count);
 
             var uw = xy.Children[0];
             Assert.Equal("U/W", uw.Title);
             Assert.Equal("X////Y/U//W", uw.FullPath);
-            Assert.Equal(0, uw.Children.Count);
+            Assert.StrictEqual(0, uw.Children.Count);
         }
     }
 }

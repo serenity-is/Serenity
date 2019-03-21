@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Reflection;
 
 namespace Serenity.ComponentModel
@@ -79,6 +80,20 @@ namespace Serenity.ComponentModel
             get { return GetOption<Int32>("intervalMinutes"); }
             set { SetOption("intervalMinutes", value); }
         }
+
+        public Boolean UseUtc
+        {
+            get { return GetOption<Boolean>("useUtc"); }
+            set { SetOption("useUtc", value); }
+        }
+    }
+
+    public partial class EmailAddressEditorAttribute : CustomEditorAttribute
+    {
+        public EmailAddressEditorAttribute()
+            : base("EmailAddress")
+        {
+        }
     }
 
     public partial class TimeEditorAttribute : CustomEditorAttribute
@@ -132,6 +147,12 @@ namespace Serenity.ComponentModel
             get { return GetOption<String>("minYear"); }
             set { SetOption("minYear", value); }
         }
+
+        public Boolean Descending
+        {
+            get { return GetOption<Boolean>("descending"); }
+            set { SetOption("descending", value); }
+        }
     }
 
     public partial class DecimalEditorAttribute : CustomEditorAttribute
@@ -139,6 +160,8 @@ namespace Serenity.ComponentModel
         public DecimalEditorAttribute()
             : base("Decimal")
         {
+			if (AllowNegativesByDefault)
+				AllowNegatives = true;
         }
 
         public Int32 Decimals
@@ -147,16 +170,16 @@ namespace Serenity.ComponentModel
             set { SetOption("decimals", value); }
         }
 
-        public String MaxValue
+        public Object MaxValue
         {
             get { return GetOption<String>("maxValue"); }
-            set { SetOption("maxValue", value); }
+            set { SetOption("maxValue", value == null ? null : Convert.ToString(value, CultureInfo.InvariantCulture)); }
         }
 
-        public String MinValue
+        public Object MinValue
         {
             get { return GetOption<String>("minValue"); }
-            set { SetOption("minValue", value); }
+            set { SetOption("minValue", value == null ? null : Convert.ToString(value, CultureInfo.InvariantCulture)); }
         }
 
         public Boolean PadDecimals
@@ -164,14 +187,14 @@ namespace Serenity.ComponentModel
             get { return GetOption<Boolean>("padDecimals"); }
             set { SetOption("padDecimals", value); }
         }
-    }
 
-    public partial class EditorTypeEditorAttribute : CustomEditorAttribute
-    {
-        public EditorTypeEditorAttribute()
-            : base("EditorType")
-        {
-        }
+		public Boolean AllowNegatives
+		{
+			get { return GetOption<Boolean>("allowNegatives"); }
+			set { SetOption("allowNegatives", value); }
+		}
+
+		public static bool AllowNegativesByDefault { get; set; }
     }
 
     public partial class HtmlContentEditorAttribute : CustomEditorAttribute
@@ -194,9 +217,9 @@ namespace Serenity.ComponentModel
         }
     }
 
-    public partial class HtmlNoteContentEditor : CustomEditorAttribute
+    public partial class HtmlNoteContentEditorAttribute : CustomEditorAttribute
     {
-        public HtmlNoteContentEditor()
+        public HtmlNoteContentEditorAttribute()
             : base("HtmlNoteContent")
         {
         }
@@ -239,7 +262,9 @@ namespace Serenity.ComponentModel
         public IntegerEditorAttribute()
             : base("Integer")
         {
-        }
+			if (AllowNegativesByDefault)
+				AllowNegatives = true;
+		}
 
         public Int64 MaxValue
         {
@@ -252,7 +277,15 @@ namespace Serenity.ComponentModel
             get { return GetOption<Int64>("minValue"); }
             set { SetOption("minValue", value); }
         }
-    }
+
+		public Boolean AllowNegatives
+		{
+			get { return GetOption<Boolean>("allowNegatives"); }
+			set { SetOption("allowNegatives", value); }
+		}
+
+		public static bool AllowNegativesByDefault { get; set; }
+	}
 
     public partial class EnumEditorAttribute : CustomEditorAttribute
     {
@@ -265,6 +298,36 @@ namespace Serenity.ComponentModel
         {
             get { return GetOption<Boolean>("allowClear"); }
             set { SetOption("allowClear", value); }
+        }
+
+        /// <summary>
+        /// Use comma separated string instead of an array to serialize values.
+        /// </summary>
+        public bool Delimited
+        {
+            get { return GetOption<bool>("delimited"); }
+            set { SetOption("delimited", value); }
+        }
+
+        /// <summary>
+        /// The minimum number of results that must be initially (after opening the dropdown for the first time) populated in order to keep the search field. 
+        /// This is useful for cases where local data is used with just a few results, in which case the search box is not very useful and wastes screen space.
+        /// The option can be set to a negative value to permanently hide the search field.
+        /// </summary>
+        public int MinimumResultsForSearch
+        {
+            get { return GetOption<int>("minimumResultsForSearch"); }
+            set { SetOption("minimumResultsForSearch", value); }
+        }
+
+        /// <summary>
+        /// Allow multiple selection. Make sure your field is a List. 
+        /// You may also set CommaSeparated to use a string field.
+        /// </summary>
+        public bool Multiple
+        {
+            get { return GetOption<bool>("multiple"); }
+            set { SetOption("multiple", value); }
         }
     }
 
@@ -282,6 +345,18 @@ namespace Serenity.ComponentModel
         {
             get { return GetOption<string>("lookupKey"); }
             set { SetOption("lookupKey", value); }
+        }
+
+        /// <summary>
+        /// Allows dynamically creating new options from text input by the user in the search box.
+        /// This option should only be used for free text inputs, not ID / Text pairs.
+        /// When this option is enabled InplaceAdd cannot be used. 
+        /// Newly created option will have same ID / Text which is user entered text.
+        /// </summary>
+        public bool AutoComplete
+        {
+            get { return GetOption<bool>("autoComplete"); }
+            set { SetOption("autoComplete", value); }
         }
 
         /// <summary>
@@ -393,6 +468,15 @@ namespace Serenity.ComponentModel
             get { return GetOption<bool>("delimited"); }
             set { SetOption("delimited", value); }
         }
+
+        /// <summary>
+        /// Open dialogs as panel (default value is null, which uses panel attribute on dialog class)
+        /// </summary>
+        public bool OpenDialogAsPanel
+        {
+            get { return GetOption<bool>("openDialogAsPanel"); }
+            set { SetOption("openDialogAsPanel", value); }
+        }
     }
 
     public partial class LookupEditorAttribute : LookupEditorBaseAttribute
@@ -423,7 +507,136 @@ namespace Serenity.ComponentModel
                     lookupType.FullName), "lookupType");
             }
 
-            SetOption("lookupKey", attr.Key);
+            SetOption("lookupKey", attr.Key ??
+                LookupScriptAttribute.AutoLookupKeyFor(lookupType));
+        }
+    }
+
+    public partial class CheckLookupEditorAttribute : CustomEditorAttribute
+    {
+        public CheckLookupEditorAttribute(string lookupKey)
+            : base("CheckLookup")
+        {
+            SetOption("lookupKey", lookupKey);
+        }
+
+        /// <summary>
+        /// If you use this constructor, lookupKey will be determined by [LookupScript] attribute
+        /// on specified lookup type. If this is a row type, make sure it has [LookupScript] attribute
+        /// on it.
+        /// </summary>
+        public CheckLookupEditorAttribute(Type lookupType)
+            : base("CheckLookup")
+        {
+            if (lookupType == null)
+                throw new ArgumentNullException("lookupType");
+
+            var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false);
+            if (attr == null)
+            {
+                throw new ArgumentException(String.Format(
+                    "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
+                    "be used with a CheckLookupEditor!",
+                    lookupType.FullName), "lookupType");
+            }
+
+            SetOption("lookupKey", attr.Key ??
+                LookupScriptAttribute.AutoLookupKeyFor(lookupType));
+        }
+
+        /// <summary>
+        /// Lookup key, e.g. Northwind.CustomerCity
+        /// </summary>
+        public string LookupKey
+        {
+            get { return GetOption<string>("lookupKey"); }
+            set { SetOption("lookupKey", value); }
+        }
+
+        /// <summary>
+        /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country
+        /// </summary>
+        public string CascadeFrom
+        {
+            get { return GetOption<string>("cascadeFrom"); }
+            set { SetOption("cascadeFrom", value); }
+        }
+
+        /// <summary>
+        /// Cascade filtering field (items will be filtered on this key, e.g. CountryID)
+        /// Make sure you have [LookupInclude] attribute on this field of lookup row,
+        /// otherwise you'll have empty results as this field won't be available client side.
+        /// </summary>
+        public object CascadeField
+        {
+            get { return GetOption<string>("cascadeField"); }
+            set { SetOption("cascadeField", value); }
+        }
+
+        /// <summary>
+        /// Cascade filtering value, usually set by CascadeFrom editor, e.g. the integer value of CountryID
+        /// If null or empty, and CascadeField is set, all items are filtered
+        /// </summary>
+        public object CascadeValue
+        {
+            get { return GetOption<string>("cascadeValue"); }
+            set { SetOption("cascadeValue", value); }
+        }
+
+        /// <summary>
+        /// Optional filtering field (items will be filtered on this key, e.g. GroupID)
+        /// Make sure you have [LookupInclude] attribute on this field of lookup row,
+        /// otherwise you'll have empty results as this field won't be available client side.
+        /// </summary>
+        public object FilterField
+        {
+            get { return GetOption<string>("filterField"); }
+            set { SetOption("filterField", value); }
+        }
+
+        /// <summary>
+        /// Optional filtering value, e.g. the integer value of GroupID. If null or empty string no filtering occurs.
+        /// </summary>
+        public object FilterValue
+        {
+            get { return GetOption<string>("filterValue"); }
+            set { SetOption("filterValue", value); }
+        }
+
+        /// <summary>
+        /// Use comma separated string instead of an array to serialize values.
+        /// </summary>
+        public bool Delimited
+        {
+            get { return GetOption<bool>("delimited"); }
+            set { SetOption("delimited", value); }
+        }
+
+        /// <summary>
+        /// Move selected items to top on load
+        /// </summary>
+        public bool CheckedOnTop
+        {
+            get { return GetOption<bool>("checkedOnTop"); }
+            set { SetOption("checkedOnTop", value); }
+        }
+
+        /// <summary>
+        /// Show select all button
+        /// </summary>
+        public bool ShowSelectAll
+        {
+            get { return GetOption<bool>("showSelectAll"); }
+            set { SetOption("showSelectAll", value); }
+        }
+
+        /// <summary>
+        /// Hide quick search input
+        /// </summary>
+        public bool HideSearch
+        {
+            get { return GetOption<bool>("hideSearch"); }
+            set { SetOption("hideSearch", value); }
         }
     }
 
@@ -450,13 +663,58 @@ namespace Serenity.ComponentModel
                     lookupType.FullName), "lookupType");
             }
 
-            SetOption("lookupKey", attr.Key);
+            SetOption("lookupKey", attr.Key ??
+                LookupScriptAttribute.AutoLookupKeyFor(lookupType));
         }
 
         public string LookupKey
         {
             get { return GetOption<string>("lookupKey"); }
         }
+    }
+
+    public partial class DistinctValuesEditorAttribute : LookupEditorBaseAttribute
+    {
+        public DistinctValuesEditorAttribute()
+            : base("Lookup")
+        {
+        }
+
+        public DistinctValuesEditorAttribute(Type rowType, string propertyName)
+            : base("Lookup")
+        {
+            if (rowType == null)
+                throw new ArgumentNullException("rowType");
+
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
+
+            this.RowType = rowType;
+            this.PropertyName = propertyName;
+        }
+
+        /// <summary>
+        /// RowType that this editor will get values from
+        /// </summary>
+        public Type RowType { get; set; }
+
+        /// <summary>
+        /// Property name that this editor will get values from
+        /// </summary>
+        public string PropertyName { get; set; }
+
+        /// <summary>
+        /// Permission key required to access this lookup script.
+        /// Use special value "?" for all logged-in users.
+        /// Use special value "*" for anyone including not logged-in users.
+        /// </summary>
+        public string Permission { get; set; }
+
+        /// <summary>
+        /// Cache duration in seconds
+        /// </summary>
+        public int Expiration { get; set; }
+
     }
 
     public partial class MaskedEditorAttribute : CustomEditorAttribute
@@ -483,14 +741,6 @@ namespace Serenity.ComponentModel
     {
         public PasswordEditorAttribute()
             : base("Password")
-        {
-        }
-    }
-
-    public partial class PersonNameEditorAttribute : CustomEditorAttribute
-    {
-        public PersonNameEditorAttribute()
-            : base("PersonName")
         {
         }
     }
@@ -566,7 +816,7 @@ namespace Serenity.ComponentModel
                     enumOrLookupType.FullName), "lookupType");
             }
 
-            LookupKey = lk.Key;
+            LookupKey = lk.Key ?? LookupScriptAttribute.AutoLookupKeyFor(enumOrLookupType);
         }
 
         public RadioButtonEditorAttribute()

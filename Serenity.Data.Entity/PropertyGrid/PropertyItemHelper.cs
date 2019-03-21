@@ -1,5 +1,6 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data;
+using Serenity.Data.Mapping;
 using Serenity.Extensibility;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,8 @@ namespace Serenity.PropertyGrid
 
             var list = new List<PropertyItem>();
 
-            var basedOnRow = GetBasedOnRow(type);
+            bool checkNames;
+            var basedOnRow = GetBasedOnRow(type, out checkNames);
             var processors = ProcessorTypes.Select(x => (IPropertyProcessor)Activator.CreateInstance(x))
                 .OrderBy(x => x.Priority).ToList();
 
@@ -36,6 +38,35 @@ namespace Serenity.PropertyGrid
                     continue;
 
                 var source = new PropertyInfoSource(property, basedOnRow);
+                if (checkNames)
+                {
+                    if (ReferenceEquals(null, source.BasedOnField))
+                    {
+                        if (property.GetCustomAttribute<NotMappedAttribute>() == null)
+                            throw new Exception(String.Format(
+                                "{0} has a [BasedOnRow(typeof({2}), CheckNames = true)] attribute but its '{1}' property " +
+                                "doesn't have a matching field with same property / field name in the row.\n\n" +
+                                "Please check if property is named correctly.\n\n" +
+                                "To remove this validation you may set CheckNames to false on [BasedOnRow] attribute.\n\n" +
+                                "To disable check for this specific property add a [NotMapped] attribute to the property itself.",
+                                type.FullName, property.Name, basedOnRow.GetType().FullName));
+                    }
+                    else if (
+                        (!source.BasedOnField.PropertyName.IsEmptyOrNull() &&
+                         source.BasedOnField.PropertyName != property.Name) ||
+                        (source.BasedOnField.PropertyName.IsEmptyOrNull() &&
+                         source.BasedOnField.Name != property.Name))
+                    {
+                        throw new Exception(String.Format(
+                                "{0} has a [BasedOnRow(typeof({3}), CheckNames = true)] attribute but its '{1}' property " +
+                                "doesn't match the property/field name '{2}' in the row.\n\n" +
+                                "Property names must match case sensitively. Please change property name to '{2}'.\n\n" +
+                                "To remove this validation you may set CheckNames to false on [BasedOnRow] attribute.\n\n" +
+                                "To disable check for this specific property add a [NotMapped] attribute to the property itself.",
+                                type.FullName, property.Name, source.BasedOnField.PropertyName.TrimToNull() ?? 
+                                    source.BasedOnField.Name, basedOnRow.GetType().FullName));
+                    }
+                }
 
                 PropertyItem pi = new PropertyItem();
                 pi.Name = property.Name;
@@ -52,8 +83,9 @@ namespace Serenity.PropertyGrid
             return list;
         }
 
-        private static Row GetBasedOnRow(Type type)
+        private static Row GetBasedOnRow(Type type, out bool checkPropertyNames)
         {
+            checkPropertyNames = false;
             var basedOnRowAttr = type.GetCustomAttribute<BasedOnRowAttribute>();
             if (basedOnRowAttr == null)
                 return null;
@@ -61,9 +93,10 @@ namespace Serenity.PropertyGrid
             var basedOnRowType = basedOnRowAttr.RowType;
             if (!basedOnRowType.IsSubclassOf(typeof(Row)))
                 throw new InvalidOperationException(String.Format(
-                    "BasedOnRowAttribute value ({0}) must be set to a subclass of {0}!", 
+                    "BasedOnRowAttribute value ({0}) must be set to a subclass of {1}!", 
                         type.FullName, typeof(Row).FullName));
 
+            checkPropertyNames = basedOnRowAttr.CheckNames;
             return (Row)Activator.CreateInstance(basedOnRowType);
         }
 

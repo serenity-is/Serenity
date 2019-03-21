@@ -2,13 +2,21 @@
 @import (reference) "bootstrap/variables.less";
 @import (reference) "serenity.variables.less";
 
-.grid-title {
+.grid-title, .panel-titlebar {
     font-size: 16px;
     font-weight: 600;
     padding: 6px 0;
     margin-bottom: 8px;
     border-bottom: 1px solid #e7e7e7;
     color: @grid-title-color;
+}
+
+.s-Panel {
+    padding: 10px;
+    border-radius: 3px;
+    background: #fff;
+    border-top: 3px solid #3c8dbc;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 .s-DataGrid input[type=checkbox] {

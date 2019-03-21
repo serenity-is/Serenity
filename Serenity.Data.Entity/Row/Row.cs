@@ -218,12 +218,24 @@ namespace Serenity.Data
         {
             get 
             {
-                var field = FindField(fieldName);
+                var field = FindFieldByPropertyName(fieldName) ??
+                    FindField(fieldName);
+
                 if (ReferenceEquals(null, field))
+                {
+                    if (dictionaryData != null)
+                        return dictionaryData[fieldName];
+
                     return null;
+                }
+
                 return field.AsObject(this); 
             }
-            set { FindFieldEnsure(fieldName).AsObject(this, value); }
+            set
+            {
+                (FindFieldByPropertyName(fieldName) ?? 
+                    FindFieldEnsure(fieldName)).AsObject(this, value);
+            }
         }
 
         public void SetDictionaryData(object key, object value)

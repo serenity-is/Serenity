@@ -23,7 +23,7 @@ namespace Serenity.Logging
             queue = new Queue<string>();
             lastFlush = DateTimeProvider.Now;
             
-            var settings = Config.TryGet<LogSettings>() ?? new LogSettings();
+            var settings = log ?? Config.TryGet<LogSettings>() ?? new LogSettings();
             File = string.IsNullOrEmpty(settings.File) ? null : settings.File;
             FlushTimeout = TimeSpan.FromSeconds(settings.FlushTimeout);
         }
@@ -195,10 +195,12 @@ namespace Serenity.Logging
 #endif
 
                             stream = null;
-                            stream = new StreamWriter(System.IO.File.OpenWrite(newFile), Encoding.UTF8);
+                            stream = new StreamWriter(System.IO.File.Open(newFile, FileMode.OpenOrCreate, 
+                                FileAccess.Write, FileShare.Read), Encoding.UTF8);
                         }
                         else
-                            stream = new StreamWriter(System.IO.File.OpenWrite(newFile), Encoding.UTF8);
+                            stream = new StreamWriter(System.IO.File.Open(newFile, FileMode.OpenOrCreate, 
+                                FileAccess.Write, FileShare.Read), Encoding.UTF8);
                     }
 
                     queue.Enqueue(sb.ToString());

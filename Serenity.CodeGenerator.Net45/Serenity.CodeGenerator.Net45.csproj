@@ -79,16 +79,16 @@
     <ApplicationIcon>SerenityLogo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RazorGenerator.Templating, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\RazorGenerator.Templating.2.4.7\lib\portable-Profile328\RazorGenerator.Templating.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Scriban, Version=1.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Scriban.1.2.7\lib\net40\Scriban.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -105,173 +105,81 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\Serenity.CodeGenerator\Generator\EntityCodeGenerator.cs">
+      <Link>Generator\EntityCodeGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\Generator\RowGenerator.cs">
+      <Link>Generator\RowGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\Generator\Templates.cs">
+      <Link>Generator\Templates.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\Helpers\ProjectFileHelper.cs">
+      <Link>Helpers\ProjectFileHelper.cs</Link>
+    </Compile>
     <Compile Include="..\Serenity.CodeGenerator\Helpers\SchemaHelper.cs">
       <Link>Helpers\SchemaHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\Helpers\StringInflector.cs">
+      <Link>Helpers\StringInflector.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\Models\EntityField.cs">
+      <Link>Models\EntityField.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\Models\EntityJoin.cs">
+      <Link>Models\EntityJoin.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\Models\EntityModel.cs">
+      <Link>Models\EntityModel.cs</Link>
     </Compile>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Models\EntityField.cs" />
-    <Compile Include="Models\EntityModel.cs" />
     <Compile Include="Helpers\CodeFileHelper.cs" />
     <Compile Include="Models\TableItem.cs" />
-    <Compile Include="Helpers\ProjectFileHelper.cs" />
-    <Compile Include="Models\GeneratorConfig.cs" />
-    <Compile Include="Helpers\StringInflector.cs" />
-    <Compile Include="Generator\EntityCodeGenerator.cs" />
-    <Compile Include="Generator\RowGenerator.cs" />
-    <Compile Include="Models\EntityJoin.cs" />
-    <Compile Include="Templates.cs" />
-    <Compile Include="Views\EntityColumns.generated.cs">
-      <DependentUpon>EntityColumns.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Views\EntityForm.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityForm.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityRowWithRegion.generated.cs">
-      <DependentUpon>EntityRowWithRegion.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Views\EntityScriptGridEditorDialogTS.generated.cs">
-      <DependentUpon>EntityScriptGridEditorDialogTS.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Views\EntityScriptDialogTS.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityScriptDialogTS.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityScriptFormTS.generated.cs">
-      <DependentUpon>EntityScriptFormTS.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Views\EntityScriptFormSS.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityScriptFormSS.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityScriptGridSS.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityScriptGridSS.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityScriptGridEditorTS.generated.cs">
-      <DependentUpon>EntityScriptGridEditorTS.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Views\EntityScriptGridTS.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityScriptGridTS.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityScriptRowSS.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityScriptRowSS.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityScriptRowTS.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityScriptRowTS.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityScriptServiceTS.generated.cs">
-      <DependentUpon>EntityScriptServiceTS.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Views\EntityScriptServiceSS.generated.cs">
-      <DependentUpon>EntityScriptServiceSS.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Views\EntityEndpoint.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityEndpoint.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityCss.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityCss.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityPageController.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityPageController.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityPageIndex.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityPageIndex.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityRepository.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityRepository.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityRow.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityRow.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityScriptDialogSS.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityScriptDialogSS.cshtml</DependentUpon>
-    </Compile>
-    <None Include="Views\EntityRowWithRegion.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityRowWithRegion.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptGridEditorDialogTS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptGridEditorDialogTS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptFormTS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptFormTS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptFormSS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptFormSS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptDialogTS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptDialogTS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptGridEditorTS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptGridEditorTS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptGridTS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptGridTS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptRowTS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptRowTS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptServiceTS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptServiceTS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptServiceSS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptServiceSS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptRowSS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptRowSS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\razorgenerator.directives" />
+    <Compile Include="Generator\GeneratorConfig.cs" />
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\Columns.scriban">
+      <Link>Templates\Columns.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\Dialog.scriban">
+      <Link>Templates\Dialog.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\Endpoint.scriban">
+      <Link>Templates\Endpoint.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\Form.scriban">
+      <Link>Templates\Form.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\FormTyping.scriban">
+      <Link>Templates\FormTyping.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\Grid.scriban">
+      <Link>Templates\Grid.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\IndexView.scriban">
+      <Link>Templates\IndexView.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\NavigationLink.scriban">
+      <Link>Templates\NavigationLink.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\Page.scriban">
+      <Link>Templates\Page.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\Repository.scriban">
+      <Link>Templates\Repository.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\Row.scriban">
+      <Link>Templates\Row.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\RowTyping.scriban">
+      <Link>Templates\RowTyping.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\ServiceTyping.scriban">
+      <Link>Templates\ServiceTyping.scriban</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.CodeGenerator\Templates\Style.scriban">
+      <Link>Templates\Style.scriban</Link>
+    </EmbeddedResource>
     <Page Include="AddConnectionStringWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -308,46 +216,6 @@
     </EmbeddedResource>
     <None Include="packages.Serenity.CodeGenerator.Net45.config" />
     <AppDesigner Include="Properties\" />
-    <None Include="Views\EntityColumns.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityColumns.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityCss.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityCss.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptGridSS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptGridSS.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityPageIndex.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityPageIndex.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityPageController.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityPageController.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityEndpoint.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityEndpoint.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityForm.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityForm.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityRow.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityRow.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityRepository.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityRepository.generated.cs</LastGenOutput>
-    </None>
-    <None Include="Views\EntityScriptDialogSS.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptDialogSS.generated.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -367,21 +235,21 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.Net45.csproj">
-      <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
-      <Name>Serenity.Data.Entity</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data\Serenity.Data.Net45.csproj">
-      <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
-      <Name>Serenity.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Core\Serenity.Core.Net45.csproj">
-      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
-      <Name>Serenity.Core</Name>
-    </ProjectReference>
+    <Resource Include="SerenityLogo.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="SerenityLogo.ico" />
+    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
+      <Project>{6f13b7f5-3f1e-4a7f-962d-59ebd3118e83}</Project>
+      <Name>Serenity.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
+      <Project>{a2b991e8-3e2c-477f-b70a-22355c52a8b8}</Project>
+      <Name>Serenity.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
+      <Project>{716c65d4-b1b0-49d1-80bd-780659577150}</Project>
+      <Name>Serenity.Data.Entity</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

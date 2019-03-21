@@ -412,10 +412,10 @@ namespace Serenity.CodeGeneration
             {
                 var idx = codeNamespace.IndexOf('.');
                 if (idx >= 0 && type.FullName.StartsWith(codeNamespace.Substring(0, idx + 1)))
-                    return type.FullName.Substring(idx + 1);
+                    return (type.FullName.Substring(idx + 1)).Replace(".Entities.", ".");
             }
 
-            return type.FullName;
+            return type.FullName.Replace(".Entities.", ".");
         }
 
         private void GenerateEnum(Type enumType)
@@ -475,12 +475,21 @@ namespace Serenity.CodeGeneration
                 anyMetadata = true;
             }
 
-            var nameRow = row as INameRow;
-            if (nameRow != null)
+            var isDeletedRow = row as IIsDeletedRow;
+            if (isDeletedRow != null)
+            {
+                cw.Indented("[InlineConstant] public const string IsDeletedProperty = \"");
+                var field = (isDeletedRow.IsDeletedField);
+                sb.Append(field.PropertyName ?? field.Name);
+                sb.AppendLine("\";");
+                anyMetadata = true;
+            }
+
+            var nameField = row.GetNameField();
+            if (!ReferenceEquals(null, nameField))
             {
                 cw.Indented("[InlineConstant] public const string NameProperty = \"");
-                var field = (nameRow.NameField);
-                sb.Append(field.PropertyName ?? field.Name);
+                sb.Append(nameField.PropertyName ?? nameField.Name);
                 sb.AppendLine("\";");
                 anyMetadata = true;
             }
@@ -508,15 +517,16 @@ namespace Serenity.CodeGeneration
 
             if (attr != null)
             {
+                var lookupKey = attr.Key ?? LookupScriptAttribute.AutoLookupKeyFor(rowType);
                 cw.Indented("[InlineConstant] public const string LookupKey = \"");
-                sb.Append(attr.Key);
+                sb.Append(lookupKey);
                 sb.AppendLine("\";");
 
                 sb.AppendLine();
                 cw.Indented("public static Lookup<");
                 sb.Append(MakeFriendlyName(rowType, null, null));
                 sb.Append("> Lookup { [InlineCode(\"Q.getLookup('");
-                sb.Append(attr.Key);
+                sb.Append(lookupKey);
                 sb.AppendLine("')\")] get { return null; } }");
 
                 anyMetadata = true;

@@ -18,6 +18,12 @@ namespace Serenity.ComponentModel
             this.Value = updatable;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="UpdatableAttribute"/> is enabled.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if enabled; otherwise, <c>false</c>.
+        /// </value>
         public bool Value
         {
             get;

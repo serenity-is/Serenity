@@ -1,19 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <AssemblyName>Serenity.Caching.Couchbase</AssemblyName>
+    <Title>Serenity Platform - Couchbase Distributed Cache Implementation</Title>
+    <Description>Contains CouchbaseDistributedCache that implements IDistributedCache interface</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="CouchbaseNetClient" Version="2.4.8" />
+    <PackageReference Include="CouchbaseNetClient" Version="2.7.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="CouchbaseNetClient" Version="2.4.7" />
+    <PackageReference Include="CouchbaseNetClient" Version="2.5.12" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

@@ -109,5 +109,41 @@ namespace Serenity.Services
             }
             return null;
         }
+
+        public static BaseCriteria GetNotDeletedCriteria(Row row)
+        {
+            var isActiveDeletedRow = row as IIsActiveDeletedRow;
+            if (isActiveDeletedRow != null)
+            {
+                var criteria = isActiveDeletedRow.IsActiveField >= 0;
+                if ((isActiveDeletedRow.IsActiveField.Flags & FieldFlags.NotNull) != FieldFlags.NotNull)
+                    return isActiveDeletedRow.IsActiveField.IsNull() | criteria;
+
+                return criteria;
+            }
+
+            var isDeletedRow = row as IIsDeletedRow;
+            if (isDeletedRow != null)
+            {
+                var criteria = isDeletedRow.IsDeletedField == 0;
+                if ((isDeletedRow.IsDeletedField.Flags & FieldFlags.NotNull) != FieldFlags.NotNull)
+                    return isDeletedRow.IsDeletedField.IsNull() | criteria;
+
+                return criteria;
+            }
+            
+            var deleteLogRow = row as IDeleteLogRow;
+            if (deleteLogRow != null)
+                return ((Field)deleteLogRow.DeleteUserIdField).IsNull();
+
+            return null;
+        }
+
+        public static bool UseSoftDelete(Row row)
+        {
+            return row is IIsActiveDeletedRow ||
+                row is IIsDeletedRow ||
+                row is IDeleteLogRow;
+        }
     }
 }

@@ -11,26 +11,34 @@ namespace Serenity.CodeGenerator
         private EntityModel model;
         private string rootDir;
         private Encoding utf8 = new UTF8Encoding(true);
-        private string modules = "Modules/".Replace('/', Path.DirectorySeparatorChar);
-        private string serverTypings;
+        private string csproj;
+        private string moduleClass;
+        private string typingClass;
+        private string serverTypingsTT;
 
         public EntityCodeGenerator(EntityModel model, GeneratorConfig config, string csproj)
         {
-            var kdiff3Paths = new[]
-            {
-                config.KDiff3Path
-            };
-
             this.model = model;
-            CodeFileHelper.Kdiff3Path = kdiff3Paths.FirstOrDefault(File.Exists);
-            CodeFileHelper.TSCPath = config.TSCPath ?? "tsc";
+            this.csproj = csproj;
 
             this.rootDir = Path.GetDirectoryName(csproj);
             this.config = config;
+            this.model.CustomSettings = config.CustomSettings;
 
-            this.serverTypings = Path.Combine(rootDir, "Modules/Common/Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
+            var serverTypings = Path.Combine(rootDir, "Modules/Common/Imports/ServerTypings/"
+                .Replace('/', Path.DirectorySeparatorChar));
             if (!Directory.Exists(serverTypings))
-                this.serverTypings = Path.Combine(rootDir, "Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
+                serverTypings = Path.Combine(rootDir, "Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
+
+            serverTypingsTT = (serverTypings.Substring(rootDir.Length + 1) + "ServerTypings.tt").Replace('/', '\\');
+
+            typingClass = Path.Combine(serverTypings, model.ModuleDot + model.ClassName);
+
+            var modulePath = Path.Combine(rootDir, "Modules"); 
+            if (!string.IsNullOrEmpty(model.Module))
+                modulePath = Path.Combine(modulePath, model.Module);
+
+            moduleClass = Path.Combine(modulePath, Path.Combine(model.ClassName, model.ClassName));
         }
 
         public void Run()
@@ -39,43 +47,61 @@ namespace Serenity.CodeGenerator
 
             if (config.GenerateRow)
             {
-                GenerateRow();
-                GenerateScriptRowTS();
+                CreateFile(Templates.Render("Row", model), moduleClass + "Row.cs");
+                CreateFile(Templates.Render("RowTyping", model), typingClass + "Row.ts", serverTypingsTT);
             }
-
 
             if (config.GenerateService)
             {
-                GenerateRepository();
-                GenerateEndpoint();
-                GenerateScriptServiceTS();
+                CreateFile(Templates.Render("Repository", model), moduleClass + "Repository.cs");
+                CreateFile(Templates.Render("Endpoint", model), moduleClass + "Endpoint.cs");
+                CreateFile(Templates.Render("ServiceTyping", model), typingClass + "Service.ts", serverTypingsTT);
             }
 
             if (config.GenerateUI)
             {
-                GeneratePageController();
-                GeneratePageIndex();
-                GenerateCss();
-                GenerateColumns();
-                GenerateForm();
-                GenerateScriptDialogTS();
-                GenerateScriptGridTS();
-                GenerateScriptFormTS();
+                CreateFile(Templates.Render("Page", model), moduleClass + "Page.cs");
+                CreateFile(Templates.Render("IndexView", model), moduleClass + "Index.cshtml");
+                CreateFile(Templates.Render("Columns", model), moduleClass + "Columns.cs");
+                CreateFile(Templates.Render("Form", model), moduleClass + "Form.cs");
+                CreateFile(Templates.Render("Dialog", model), moduleClass + "Dialog.ts");
+                CreateFile(Templates.Render("Grid", model), moduleClass + "Grid.ts");
+                CreateFile(Templates.Render("FormTyping", model), typingClass + "Form.ts", serverTypingsTT);
+                GenerateNavigationLink();
+                GenerateStyle();
+            }
+
+            if (config.CustomGenerate != null &&
+                config.GenerateCustom)
+            {
+                foreach (var pair in config.CustomGenerate)
+                {
+                    if (string.IsNullOrEmpty(pair.Value))
+                        continue;
+
+                    var templateKey = pair.Key;
+                    if (templateKey.IndexOf("..") >= 0 ||
+                        templateKey.StartsWith("\\") ||
+                        templateKey.StartsWith("//"))
+                        throw new ArgumentOutOfRangeException("templateFile");
+
+                    var outputFile = pair.Value;
+                    if (outputFile.IndexOf("..") >= 0 || 
+                        outputFile.StartsWith("\\") ||
+                        outputFile.StartsWith("//"))
+                        throw new ArgumentOutOfRangeException("outputFile");
+
+                    outputFile = String.Format(outputFile, model.ClassName, model.Module, 
+                        Path.GetDirectoryName(moduleClass), Path.GetDirectoryName(typingClass), rootDir);
+
+                    var content = Templates.Render(templateKey, model);
+                    if (!string.IsNullOrWhiteSpace(content))
+                        CreateFile(content, outputFile);
+                }
             }
         }
 
         private string CreateDirectoryOrBackupFile(string file)
-        {
-            if (File.Exists(file))
-                return BackupFile(file);
-            else
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(file));
-                return null;
-            }
-        }
-
-        private string BackupFile(string file)
         {
             if (File.Exists(file))
             {
@@ -83,47 +109,79 @@ namespace Serenity.CodeGenerator
                 CodeFileHelper.CheckoutAndWrite(backupFile, File.ReadAllBytes(file), false);
                 return backupFile;
             }
-
-            return null;
+            else
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                return null;
+            }
         }
 
-        private void CreateNewSiteWebFile(string code, string relativeFile, string dependentUpon = null)
+        private void CreateFile(string code, string file, string dependentUpon = null)
         {
-            string file = Path.Combine(rootDir, relativeFile);
             var backup = CreateDirectoryOrBackupFile(file);
             CodeFileHelper.CheckoutAndWrite(file, code, true);
             CodeFileHelper.MergeChanges(backup, file);
+#if !ASPNETCORE
+            ProjectFileHelper.AddFileToProject(this.csproj, 
+                file.Substring(Path.GetDirectoryName(csproj).Length + 1).Replace('/', '\\'), dependentUpon);
+#endif
         }
 
-        private void GenerateRow()
+        private void GenerateStyle()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityRow(), model),
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
-                    Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
-        }
+#if ASPNETCORE
+            string contentSite = "wwwroot/Content/site".Replace('/', Path.DirectorySeparatorChar);
+#else
+            string contentSite = "Content/site".Replace('/', Path.DirectorySeparatorChar);
+#endif
+            string file = Path.Combine(rootDir, Path.Combine(contentSite,
+                    "site" + model.DotModule.ToLowerInvariant() + ".less"));
 
-        private void GenerateCss()
-        {
-            string relativeFile = Path.Combine(@"Content/site/".Replace('/', Path.DirectorySeparatorChar), "site" +  
-                (!string.IsNullOrEmpty(model.Module) ? ("." + model.Module.ToLowerInvariant()) : "") + ".less");
-
-            string file = Path.Combine(rootDir, relativeFile);
-            Directory.CreateDirectory(Path.GetDirectoryName(file));
-            if (!File.Exists(file))
+            if (!string.IsNullOrEmpty(model.Module))
             {
-                if (!string.IsNullOrEmpty(model.Module))
-                {
-                    relativeFile = Path.Combine("wwwroot/Content/site/".Replace('/', Path.DirectorySeparatorChar), "site.less");
-                    file = Path.Combine(rootDir, relativeFile);
-                }
+                var siteLess = Path.Combine(rootDir, Path.Combine(contentSite, "site.less"));
 
-                if (!File.Exists(file))
-                    CodeFileHelper.CheckoutAndWrite(file, Environment.NewLine, false);
+                if (File.Exists(siteLess))
+                {
+                    var importLine = "@import \"site." + model.Module.ToLowerInvariant() + ".less\";";
+                    var lines = File.ReadAllLines(siteLess).ToList();
+                    if (!lines.Any(x => (x ?? "").ToLowerInvariant().IsTrimmedSame(importLine)))
+                    {
+                        var index = lines.FindLastIndex(x =>
+                        {
+                            return x.StartsWith("@import") ||
+                                (x.StartsWith("//") && x.Contains("if:"));
+                        });
+
+                        if (index < 0)
+                            index = lines.Count;
+                        else
+                            index++;
+
+                        lines.Insert(index, importLine);
+                        CodeFileHelper.CheckoutAndWrite(siteLess, string.Join(Environment.NewLine, lines), false);
+                    }
+                }
             }
 
-            string code = Templates.Render(new Views.EntityCss(), model);
+            if (!File.Exists(file))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                CreateFile("@import \"site.mixins.less\";" + Environment.NewLine, file);
+            }
+
+            string code = Templates.Render("Style", model);
             using (var ms = new MemoryStream())
             {
+                var firstLine = code.Replace("\r", "").Split('\n').FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+                if (!string.IsNullOrWhiteSpace(firstLine))
+                {
+                    var lines = File.ReadAllLines(file);
+                    // don't generate less for dialog multiple times
+                    if (lines.Any(x => x.IsTrimmedSame(firstLine)))
+                        return;
+                }
+
                 var old = File.ReadAllBytes(file);
                 if (old.Length > 0)
                     ms.Write(old, 0, old.Length);
@@ -137,139 +195,48 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        private void GenerateColumns()
+        private void GenerateNavigationLink()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityColumns(), new
+            string file = Path.Combine(rootDir, string.IsNullOrEmpty(model.Module) ?
+                "Modules/Common/Navigation/NavigationItems.cs" :
+                "Modules/" + model.ModuleSlash + model.Module + "Navigation.cs");
+            file = file.Replace('/', Path.DirectorySeparatorChar);
+
+            string code = Templates.Render("NavigationLink", model);
+
+            if (!File.Exists(file))
             {
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                RootNamespace = model.RootNamespace,
-                Fields = model.Fields,
-                IdField = model.Identity,
-                NameField = model.NameField
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Columns.cs"))));
-        }
-
-        private void GenerateForm()
-        {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityForm(), new
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                CreateFile(code, file);
+            }
+            else
             {
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                RootNamespace = model.RootNamespace,
-                Fields = model.Fields,
-                IdField = model.Identity,
-                NameField = model.NameField
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Form.cs"))));
-        }
+                var lines = File.ReadAllLines(file).ToList();
+                var toInsert = code.Replace("\r", "").Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var usingIndex = lines.FindLastIndex(x => x.TrimToEmpty().StartsWith("using "));
+                if (usingIndex < 0)
+                    usingIndex = 0;
 
-        private void GenerateRepository()
-        {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityRepository(), new
-            {
-                RootNamespace = model.RootNamespace,
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                Permission = model.Permission
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Repository.cs"))));
-        }
+                foreach (var usng in toInsert.Where(x => x.TrimToEmpty().StartsWith("using ")))
+                {
+                    if (lines.Find(x => x.TrimToEmpty().Replace(" ", "")
+                        .IsTrimmedSame(usng.TrimToEmpty().Replace(" ", ""))) == null)
+                    {
+                        lines.Insert(usingIndex, usng);
+                        usingIndex++;
+                    }
+                }
 
-        private void GenerateEndpoint()
-        {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityEndpoint(), new
-            {
-                ConnectionKey = model.ConnectionKey,
-                RootNamespace = model.RootNamespace,
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                Permission = model.Permission
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Endpoint.cs"))));
-        }
+                if (!lines.Any(x => x.Contains("MyPages." + model.ClassName + "Controller")))
+                {
+                    var insertIndex = lines.FindLastIndex(x => !string.IsNullOrWhiteSpace(x)) + 1;
+                    foreach (var z in toInsert.Where(x => !string.IsNullOrWhiteSpace(x) &&
+                        !x.TrimToEmpty().StartsWith("using ")))
+                        lines.Insert(insertIndex, z);
+                }
 
-        private void GeneratePageController()
-        {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityPageController(), new
-            {
-                ConnectionKey = model.ConnectionKey,
-                RootNamespace = model.RootNamespace,
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                Permission = model.Permission,
-                NavigationCategory = model.Module
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Page.cs"))));
-        }
-
-        private void GeneratePageIndex()
-        {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityPageIndex(), new
-            {
-                ConnectionKey = model.ConnectionKey,
-                RootNamespace = model.RootNamespace,
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                Permission = model.Permission,
-                NavigationCategory = model.Module
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Index.cshtml"))));
-        }
-
-        private void GenerateScriptRowTS()
-        {
-            var targetFile = model.RowClassName + ".ts";
-
-            if (model.Module != null)
-                targetFile = model.Module + "." + targetFile;
-
-            targetFile = Path.Combine(Path.GetDirectoryName(serverTypings), targetFile);
-
-            var content = Templates.Render(new Views.EntityScriptRowTS(), model);
-
-            CreateNewSiteWebFile(content, targetFile, serverTypings);
-        }
-
-        private void GenerateScriptServiceTS()
-        {
-            var targetFile = model.ClassName + "Service.ts";
-
-            if (model.Module != null)
-                targetFile = model.Module + "." + targetFile;
-
-            targetFile = Path.Combine(Path.GetDirectoryName(serverTypings), targetFile);
-
-            var content = Templates.Render(new Views.EntityScriptServiceTS(), model);
-
-            CreateNewSiteWebFile(content, targetFile, serverTypings);
-        }
-
-        private void GenerateScriptFormTS()
-        {
-            var targetFile = model.ClassName + "Form.ts";
-
-            if (model.Module != null)
-                targetFile = model.Module + "." + targetFile;
-
-            targetFile = Path.Combine(Path.GetDirectoryName(serverTypings), targetFile);
-
-            var content = Templates.Render(new Views.EntityScriptFormTS(), model);
-
-            CreateNewSiteWebFile(content, targetFile, serverTypings);
-        }
-
-        private void GenerateScriptGridTS()
-        {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptGridTS(), model),
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Grid.ts"))));
-        }
-
-        private void GenerateScriptDialogTS()
-        {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptDialogTS(), model, config),
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Dialog.ts"))));
+                CodeFileHelper.CheckoutAndWrite(file, string.Join(Environment.NewLine, lines), false);
+            }
         }
     }
 }

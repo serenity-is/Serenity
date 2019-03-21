@@ -1,41 +1,48 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>dotnet-sergen</AssemblyName>
+    <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <PackageId>Serenity.CodeGenerator</PackageId>
     <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8;dnxcore50</AssetTargetFallback>
+    <DefineConstants>$(DefineConstants);ASPNETCORE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\lib.d.ts_">
-      <Link>lib.d.ts_</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Serenity.TypeScript.CodeGeneration\Serenity.CodeGeneration.js">
+    <EmbeddedResource Include="..\Serenity.Scripts\dist\Serenity.CodeGeneration.js">
       <Link>Serenity.CodeGeneration.js</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
       <Link>typeScriptServices.js</Link>
     </EmbeddedResource>
+    <EmbeddedResource Include="Templates\*.scriban" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Web\Serenity.Web.csproj" />
+    <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Scriban" Version="1.2.3" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.9.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.0" />
-    <PackageReference Include="MySqlConnector" Version="0.26.0" />
-    <PackageReference Include="Npgsql" Version="3.2.5" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="6.3.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
+    <PackageReference Include="MySqlConnector" Version="0.40.3" />
+    <PackageReference Include="Npgsql" Version="4.0.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\Tools\Cecil\netstandard1.3\Mono.Cecil.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\Tools\Cecil\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
     <DefineConstants>$(DefineConstants);COREFX</DefineConstants>
   </PropertyGroup>
 </Project>

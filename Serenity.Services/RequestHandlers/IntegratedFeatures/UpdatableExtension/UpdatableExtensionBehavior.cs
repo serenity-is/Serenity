@@ -16,10 +16,6 @@ namespace Serenity.Services
         {
             public UpdatableExtensionAttribute Attr;
             public Func<Row> RowFactory;
-            public Func<IListRequestProcessor> ListHandlerFactory;
-            public Func<ISaveRequestProcessor> SaveHandlerFactory;
-            public Func<IDeleteRequestProcessor> DeleteHandlerFactory;
-            public Func<ISaveRequest> SaveRequestFactory;
             public Field ThisKeyField;
             public Field OtherKeyField;
             public Field FilterField;
@@ -58,18 +54,6 @@ namespace Serenity.Services
                 }
 
                 info.RowFactory = FastReflection.DelegateForConstructor<Row>(rowType);
-
-                info.ListHandlerFactory = FastReflection.DelegateForConstructor<IListRequestProcessor>(
-                    typeof(ListRequestHandler<>).MakeGenericType(rowType));
-
-                info.SaveHandlerFactory = FastReflection.DelegateForConstructor<ISaveRequestProcessor>(
-                    typeof(SaveRequestHandler<>).MakeGenericType(rowType));
-
-                info.SaveRequestFactory = FastReflection.DelegateForConstructor<ISaveRequest>(
-                    typeof(SaveRequest<>).MakeGenericType(rowType));
-
-                info.DeleteHandlerFactory = FastReflection.DelegateForConstructor<IDeleteRequestProcessor>(
-                    typeof(DeleteRequestHandler<>).MakeGenericType(rowType));
 
                 var thisKey = attr.ThisKey;
                 if (string.IsNullOrEmpty(thisKey))
@@ -136,7 +120,7 @@ namespace Serenity.Services
 
                 if (!string.IsNullOrEmpty(attr.PresenceField))
                 {
-                    info.PresenceField = ext.FindFieldByPropertyName(attr.PresenceField) ?? ext.FindField(attr.PresenceField);
+                    info.PresenceField = row.FindFieldByPropertyName(attr.PresenceField) ?? row.FindField(attr.PresenceField);
                     if (ReferenceEquals(info.PresenceField, null))
                         throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                             "This field is specified as PresenceField as an ExtensionRelation attribute.",
@@ -255,11 +239,12 @@ namespace Serenity.Services
                     criteria &= flt == new ValueCriteria(info.FilterValue);
             }
 
-            var existing = info.ListHandlerFactory().Process(connection, new ListRequest
-            {
-                ColumnSelection = ColumnSelection.KeyOnly,
-                Criteria = criteria
-            }).Entities;
+            var listHandler = DefaultHandlerFactory.ListHandlerFor(info.Attr.RowType);
+            var listRequest = DefaultHandlerFactory.ListRequestFor(info.Attr.RowType);
+            listRequest.ColumnSelection = ColumnSelection.KeyOnly;
+            listRequest.Criteria = criteria;
+
+            var existing = listHandler.Process(connection, listRequest).Entities;
 
             if (existing.Count > 1)
                 throw new Exception(String.Format("Found multiple extension rows for UpdatableExtension '{0}'", 
@@ -323,14 +308,15 @@ namespace Serenity.Services
                 if (!ReferenceEquals(null, info.FilterField))
                     info.FilterField.AsObject(extension, info.FilterValue);
 
-                var request = info.SaveRequestFactory();
+                var request = DefaultHandlerFactory.SaveRequestFor(info.Attr.RowType);
                 request.Entity = extension;
                 request.EntityId = oldID;
 
                 foreach (var mapping in mappings)
                     mapping.Item2.AsObject(extension, mapping.Item1.AsObject(handler.Row));
 
-                info.SaveHandlerFactory().Process(handler.UnitOfWork, request, oldID == null ? SaveRequestType.Create : SaveRequestType.Update);
+                DefaultHandlerFactory.SaveHandlerFor(info.Attr.RowType)
+                    .Process(handler.UnitOfWork, request, oldID == null ? SaveRequestType.Create : SaveRequestType.Update);
             }
         }
 
@@ -349,10 +335,10 @@ namespace Serenity.Services
                 if (oldID == null)
                     continue;
 
-                info.DeleteHandlerFactory().Process(handler.UnitOfWork, new Services.DeleteRequest
-                {
-                    EntityId = oldID
-                });
+                var deleteHandler = DefaultHandlerFactory.DeleteHandlerFor(info.Attr.RowType);
+                var deleteRequest = DefaultHandlerFactory.DeleteRequestFor(info.Attr.RowType);
+                deleteRequest.EntityId = oldID;
+                deleteHandler.Process(handler.UnitOfWork, deleteRequest);
             }
         }
     }

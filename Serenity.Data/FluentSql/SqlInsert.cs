@@ -131,6 +131,20 @@
         }
 
         /// <summary>
+        /// Sets the dialect (SQL server type / version) for query.
+        /// </summary>
+        public SqlInsert Dialect(ISqlDialect dialect)
+        {
+            if (dialect == null)
+                throw new ArgumentNullException("dialect");
+
+            this.dialect = dialect;
+            this.dialectOverridden = true;
+
+            return this;
+        }
+
+        /// <summary>
         ///   Gets string representation of the query.</summary>
         /// <returns>
         ///   String representation.</returns>

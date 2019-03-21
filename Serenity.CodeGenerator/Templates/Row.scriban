@@ -1,0 +1,67 @@
+﻿
+namespace {{RootNamespace}}{{DotModule}}.Entities
+{
+    using Serenity;
+    using Serenity.ComponentModel;
+    using Serenity.Data;
+    using Serenity.Data.Mapping;
+    using System;
+    using System.ComponentModel;
+    using System.IO;
+
+    [ConnectionKey("{{ConnectionKey}}"){{if Module}}, Module("{{Module}}"){{end}}, TableName("{{SchemaAndTable}}")]
+    [DisplayName("{{Title}}"), InstanceName("{{Title}}")]
+    [ReadPermission("{{Permission}}")]
+    [ModifyPermission("{{Permission}}")]
+    public sealed class {{RowClassName}} : {{RowBaseClassAndInterfaces}}
+    {
+{{-for x in Fields}}
+        [{{x.Attributes}}]
+        public {{x.PropertyType}} {{x.Ident}}
+        {
+            get { return Fields.{{x.Ident}}[this]; }
+            set { Fields.{{x.Ident}}[this] = value; }
+        }
+{{end}}
+{{-for j in Joins}}
+{{-for k in j.Fields}}
+        [{{k.Attributes}}]
+        public {{k.PropertyType}} {{k.Ident}}
+        {
+            get { return Fields.{{k.Ident}}[this]; }
+            set { Fields.{{k.Ident}}[this] = value; }
+        }
+{{end}}
+{{-end}}
+{{-if Identity}}
+        IIdField IIdRow.IdField
+        {
+            get { return Fields.{{Identity}}; }
+        }
+{{end-}}
+{{-if NameField}}
+        StringField INameRow.NameField
+        {
+            get { return Fields.{{NameField}}; }
+        }
+{{end}}
+        public static readonly RowFields Fields = new RowFields().Init();
+
+        public {{RowClassName}}()
+            : base(Fields)
+        {
+        }
+
+        public class RowFields : {{FieldsBaseClass}}
+        {
+{{-for x in Fields}}
+            public {{x.FieldType}}Field {{x.Ident}};
+{{-end}}
+{{-for j in Joins}}
+{{for k in j.Fields}}
+            public {{k.FieldType}}Field {{k.Ident}};
+{{-end}}
+{{-end}}
+        }
+    }
+}

@@ -61,6 +61,10 @@ namespace Serenity.CodeGenerator
                 CodeFileHelper.Overwrite = true;
 
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
+
+            if (!string.IsNullOrEmpty(config.CustomTemplates))
+                Templates.TemplatePath = Path.Combine(projectDir, config.CustomTemplates);
+
             var connectionKeys = config.Connections
                 .Where(x => !x.ConnectionString.IsEmptyOrNull())
                 .Select(x => x.Key).ToList();
@@ -324,11 +328,11 @@ namespace Serenity.CodeGenerator
             { 
                 Console.WriteLine();
 
-                userInput = "RSU";
+                userInput = "RSUC";
                 while (what.IsEmptyOrNull())
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Choose What to Generate (R:Row, S:Repo+Svc, U=Cols+Form+Page+Grid+Dlg+Css)");
+                    Console.WriteLine("Choose What to Generate (R:Row, S:Repo+Svc, U=UI, C=Custom)");
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     what = Hinter.ReadHintedLine(new string[0], userInput: userInput);
                     userInput = what;
@@ -344,6 +348,7 @@ namespace Serenity.CodeGenerator
             config.GenerateRow = what.IndexOf("R", StringComparison.OrdinalIgnoreCase) >= 0;
             config.GenerateService = what.IndexOf("S", StringComparison.OrdinalIgnoreCase) >= 0;
             config.GenerateUI = what.IndexOf("U", StringComparison.OrdinalIgnoreCase) >= 0;
+            config.GenerateCustom = what.IndexOf("C", StringComparison.OrdinalIgnoreCase) >= 0;
 
             Console.ResetColor();
             Console.WriteLine();
@@ -384,6 +389,16 @@ namespace Serenity.CodeGenerator
 
                 var rowModel = RowGenerator.GenerateModel(connection, tableName.Schema, tableName.Table,
                     module, connectionKey, identifier, permissionKey, config);
+
+                rowModel.AspNetCore = true;
+
+                var kdiff3Paths = new[]
+                {
+                    config.KDiff3Path
+                };
+
+                CodeFileHelper.Kdiff3Path = kdiff3Paths.FirstOrDefault(File.Exists);
+                CodeFileHelper.TSCPath = config.TSCPath ?? "tsc";
 
                 new EntityCodeGenerator(rowModel, config, csproj).Run();
             }

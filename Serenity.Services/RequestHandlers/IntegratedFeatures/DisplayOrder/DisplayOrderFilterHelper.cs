@@ -15,6 +15,12 @@ namespace Serenity.Services
             var activeRow = row as IIsActiveRow;
             if (activeRow != null)
                 flt = flt & new Criteria((Field)activeRow.IsActiveField) >= 0;
+            else
+            {
+                var deletedRow = row as IIsDeletedRow;
+                if (deletedRow != null)
+                    flt = flt & deletedRow.IsDeletedField == 0;
+            }
 
             return flt;
         }

@@ -65,6 +65,7 @@ namespace Serenity.Web
             private void ScriptChanged(object sender, EventArgs e)
             {
                 Reset();
+                RaiseScriptChanged(Name);
             }
 
             private static string GetMD5HashString(byte[] bytes)
@@ -115,6 +116,7 @@ namespace Serenity.Web
                     {
                         Hash = GetMD5HashString(ub),
                         Time = DateTime.UtcNow,
+                        ScriptText = scriptText,
                         CompressedBytes = cb,
                         UncompressedBytes = ub,
                         Expiration = Generator.Expiration == TimeSpan.Zero ? DateTime.MaxValue :

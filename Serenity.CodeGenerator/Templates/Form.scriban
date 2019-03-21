@@ -1,0 +1,18 @@
+﻿
+namespace {{RootNamespace}}{{DotModule}}.Forms
+{
+    using Serenity;
+    using Serenity.ComponentModel;
+    using Serenity.Data;
+    using System;
+    using System.ComponentModel;
+    using System.Collections.Generic;
+    using System.IO;
+
+    [FormScript("{{ModuleDot}}{{ClassName}}")]
+    [BasedOnRow(typeof(Entities.{{RowClassName}}), CheckNames = true)]
+    public class {{ClassName}}Form
+    {%{{}%}{{for x in Fields}}{{if x.Ident != IdField}}
+        public {{x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}
+    }
+}

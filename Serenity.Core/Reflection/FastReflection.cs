@@ -30,7 +30,7 @@ namespace Serenity.Reflection
                 throw new MissingMethodException(String.Format(
                     "There is no parameterless constructor for type {0}", type));
 
-            var dm = new DynamicMethod("ctor0", type, Type.EmptyTypes);
+            var dm = new DynamicMethod("ctor0", type, Type.EmptyTypes, true);
             ILGenerator il = dm.GetILGenerator();
             il.DeclareLocal(type);
             il.Emit(OpCodes.Newobj, ctor);

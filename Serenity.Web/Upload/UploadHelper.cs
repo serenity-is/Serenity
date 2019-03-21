@@ -11,22 +11,6 @@ using System.Web;
 
 namespace Serenity.Web
 {
-    public class CopyTemporaryFileResult
-    {
-        public string TemporaryFilePath { get; set; }
-        public string DbFileName { get; set; }
-        public string OriginalName { get; set; }
-        public string FilePath { get; set; }
-        public bool HasThumbnail { get; set; }
-        public long FileSize { get; set; }
-    }
-
-    [SettingScope("Application"), SettingKey("UploadSettings")]
-    public class UploadSettings
-    {
-        public string Url { get; set; }
-        public string Path { get; set; }
-    }
 
     public class UploadHelper
     {
@@ -164,10 +148,10 @@ namespace Serenity.Web
         ///   Converted filename.</returns>
         public static string ToPath(string fileName)
         {
-            var seperator = Path.DirectorySeparatorChar;
-            var opposite = seperator == '/' ? '\\' : '/';
+            var separator = Path.DirectorySeparatorChar;
+            var opposite = separator == '/' ? '\\' : '/';
             if (fileName != null && fileName.IndexOf(opposite) >= 0)
-                return fileName.Replace(opposite, seperator);
+                return fileName.Replace(opposite, separator);
             else
                 return fileName;
         }
@@ -294,6 +278,7 @@ namespace Serenity.Web
                 }
 
                 TemporaryFileHelper.Delete(fileName + ".meta", deleteType);
+                TemporaryFileHelper.Delete(fileName + ".orig", deleteType);
             }
         }
 

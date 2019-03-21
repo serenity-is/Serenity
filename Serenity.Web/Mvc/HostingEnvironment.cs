@@ -36,20 +36,32 @@ namespace System.Web.Hosting
             if (path.IsEmptyOrNull())
                 return path;
 
+            path = path.Replace('\\', '/');
+
             if (path.IndexOf("..") >= 0 ||
                 path.IndexOf("//") >= 0 ||
-                path.IndexOf("\\\\") >= 0 ||
-                path.IndexOfAny(new char[] { '*', '?', '>', '<', ',', ':', ';', '\'', '"', ']' }) >= 0 ||
-                path.IndexOf('?') >= 0 ||
-                path.IndexOf('>') >= 0)
+                path.IndexOf(":/") >= 0 ||
+                path.IndexOfAny(new char[] { '*', '?', '>', '<', ',', ':', ';', '\'', '"', ']', '?' }) >= 0)
                 throw new ArgumentOutOfRangeException("path");
+
+            var webRootPath = Dependency.Resolve<IHostingEnvironment>().WebRootPath;
 
             if (path.StartsWith("~/"))
                 path = path.Substring(2);
             else if (path.StartsWith("/"))
-                path = path.Substring(1);
+            {
+                var applicationRoot = VirtualPathUtility.ToAbsolute("~/");
+                if (path.StartsWith(applicationRoot, StringComparison.OrdinalIgnoreCase))
+                    path = path.Substring(applicationRoot.Length);
+                else
+                    throw new ArgumentOutOfRangeException("path");
+            }
 
-            return Path.Combine(Dependency.Resolve<IHostingEnvironment>().WebRootPath, path);
+            path = Path.Combine(webRootPath, path.Replace('/', Path.DirectorySeparatorChar));
+            if (!path.StartsWith(webRootPath, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentOutOfRangeException("path");
+
+            return path;
         }
 
         public static string ApplicationVirtualPath

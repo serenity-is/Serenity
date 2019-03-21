@@ -21,6 +21,8 @@
         private StringBuilder where;
         private int intoIndex = -1;
         private List<object> into = new List<object>();
+        private SqlQuery unionQuery;
+        private SqlUnionType unionType;
 
         /// <summary>
         /// Creates a new SqlQuery instance.
@@ -490,6 +492,30 @@
             get { return ToString(); }
         }
 
+        public SqlQuery Union(SqlUnionType unionType = SqlUnionType.Union)
+        {
+            this.unionQuery = this.Clone();
+            this.unionQuery.countRecords = false;
+            this.unionQuery.parent = this;
+            this.unionQuery.parameters = null;
+            this.unionType = unionType;
+            this.columns = new List<Column>();
+            this.from = new StringBuilder();
+            this.aliasExpressions = null;
+            this.aliasWithJoins = null;
+            this.distinct = false;
+            this.having = null;
+            this.groupBy = null;
+            this.orderBy = null;
+            this.forXml = null;
+            this.skip = 0;
+            this.take = 0;
+            this.where = null;
+            this.intoIndex = -1;
+            this.into = new List<object>();
+            return this;
+        }
+
         /// <summary>
         /// Adds an expression to WHERE clause. If query already has a WHERE
         /// clause, inserts AND between existing one and new one.
@@ -537,25 +563,8 @@
         }
 
         /// <summary>
-        /// Gets the dialect (SQL server type / version) for query.
-        /// </summary>
-        public ISqlDialect Dialect()
-        {
-            return this.dialect;
-        }
-
-        public bool IsDialectOverridden
-        {
-            get
-            {
-                return this.dialectOverridden;
-            }
-        }
-
-        /// <summary>
         /// Sets the dialect (SQL server type / version) for query.
         /// </summary>
-        /// <remarks>TODO: SqlDialect system should be improved.</remarks>
         public SqlQuery Dialect(ISqlDialect dialect)
         {
             if (dialect == null)

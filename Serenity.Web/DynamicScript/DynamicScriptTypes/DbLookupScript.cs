@@ -47,11 +47,10 @@ namespace Serenity.Web
                     IdField = field.PropertyName ?? field.Name;
                 }
 
-                var nameRow = row as INameRow;
-                if (nameRow != null)
+                var nameField = row.GetNameField();
+                if (!ReferenceEquals(null, nameField))
                 {
-                    field = ((Field)nameRow.NameField);
-                    TextField = field.PropertyName ?? field.Name;
+                    TextField = nameField.PropertyName ?? nameField.Name;
                 }
 
                 var treeRow = row as IParentIdRow;

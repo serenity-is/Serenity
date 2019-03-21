@@ -1,7 +1,6 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data.Mapping;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -15,6 +14,7 @@ namespace Serenity.Data
     {
         internal Dictionary<string, Field> byName;
         internal Dictionary<string, Field> byPropertyName;
+        internal Dictionary<Type, Field[]> byAttribute;
         internal Field[] primaryKeys;
         internal Tuple<Field, bool>[] sortOrders;
         internal bool isInitialized;
@@ -27,6 +27,7 @@ namespace Serenity.Data
 #endif
         internal Func<Row> rowFactory;
         internal Type rowType;
+        internal string moduleIdentifier;
         internal string connectionKey;
         internal string generationKey;
         internal object initializeLock;
@@ -52,6 +53,7 @@ namespace Serenity.Data
             DetermineTableName();
             DetermineDatabaseAndSchema();
             DetermineConnectionKey();
+            DetermineModuleIdentifier();
             DetermineLocalTextPrefix();
         }
 
@@ -135,6 +137,7 @@ namespace Serenity.Data
             this.tableOnly = ParseDatabaseAndSchema(this.tableName, out this.database, out this.schema);
         }
 
+
         private void DetermineConnectionKey()
         {
             var connectionKeyAttr = rowType.GetCustomAttribute<ConnectionKeyAttribute>();
@@ -144,19 +147,39 @@ namespace Serenity.Data
                 this.connectionKey = "Default";
         }
 
+        private void DetermineModuleIdentifier()
+        {
+            var moduleAttr = rowType.GetCustomAttribute<ModuleAttribute>();
+            if (moduleAttr != null)
+                this.moduleIdentifier = moduleAttr.Value;
+            else
+            {
+                var ns = rowType.Namespace ?? "";
+
+                if (ns.EndsWith(".Entities"))
+                    ns = ns.Substring(0, ns.Length - 9);
+
+                var idx = ns.IndexOf(".");
+                if (idx >= 0)
+                    ns = ns.Substring(idx + 1);
+
+                this.moduleIdentifier = ns;
+            }
+        }
+
         private void DetermineLocalTextPrefix()
         {
             if (localTextPrefix != null)
                 return;
 
-            if (connectionKey != null)
+            var localTextPrefixAttr = rowType.GetCustomAttribute<LocalTextPrefixAttribute>();
+            if (localTextPrefixAttr != null)
             {
-                localTextPrefix = connectionKey + "." + tableName;
+                this.localTextPrefix = localTextPrefixAttr.Value;
                 return;
             }
 
-            localTextPrefix = tableName;
-            return;
+            this.localTextPrefix = this.RowIdentifier;
         }
 
         private void GetRowFieldsAndProperties(
@@ -183,7 +206,6 @@ namespace Serenity.Data
 
         protected virtual void AfterInitialize()
         {
-
         }
 
         public void Initialize()
@@ -450,7 +472,7 @@ namespace Serenity.Data
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;
 
-                            field.CustomAttributes = property.GetCustomAttributes(false).ToArray();
+                            field.customAttributes = property.GetCustomAttributes(false).ToArray();
                         }
                     }
                 }
@@ -480,6 +502,57 @@ namespace Serenity.Data
             }
 
             isInitialized = true;
+        }
+
+        private Field[] EmptyFields = new Field[0];
+
+        public Field[] GetFieldsByAttribute<TAttr>()
+            where TAttr : Attribute
+        {
+            return GetFieldsByAttribute(typeof(TAttr));
+        }
+
+        public Field[] GetFieldsByAttribute(Type attrType)
+        {
+            var byAttribute = this.byAttribute;
+
+            Field[] fieldList;
+            if (byAttribute != null &&
+                byAttribute.TryGetValue(attrType, out fieldList))
+                return fieldList;
+
+            List<Field> newList = new List<Field>();
+
+            foreach (var field in this)
+            {
+                if (field.CustomAttributes == null)
+                    continue;
+
+                foreach (var attr in field.CustomAttributes)
+                {
+                    if (attrType.IsAssignableFrom(attr.GetType()))
+                    {
+                        newList.Add(field);
+                        continue;
+                    }
+                }
+            }
+
+            fieldList = newList.ToArray();
+
+            if (byAttribute == null)
+            {
+                byAttribute = new Dictionary<Type, Field[]>();
+                byAttribute.Add(attrType, fieldList);
+            }
+            else
+            {
+                byAttribute = new Dictionary<Type, Field[]>(byAttribute);
+                byAttribute[attrType] = fieldList; 
+            }
+
+            this.byAttribute = byAttribute;
+            return fieldList;
         }
 
         private static TAttr GetFieldAttr<TAttr>(Field x)
@@ -580,8 +653,25 @@ namespace Serenity.Data
 
         public string LocalTextPrefix
         {
-            get { return localTextPrefix ?? TableName; }
+            get { return localTextPrefix ?? RowIdentifier; }
             set { localTextPrefix = value; }
+        }
+
+        public string ModuleIdentifier
+        {
+            get { return moduleIdentifier; }
+        }
+
+        public string RowIdentifier
+        {
+            get
+            {
+                var name = rowType.Name;
+                if (name.EndsWith("Row"))
+                    name = name.Substring(0, name.Length - 3);
+
+                return string.IsNullOrEmpty(moduleIdentifier) ? name : moduleIdentifier + "." + name;
+            }
         }
 
         public string ConnectionKey

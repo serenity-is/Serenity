@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Serenity.CodeGenerator
 {
@@ -50,6 +51,58 @@ namespace Serenity.CodeGenerator
 
             if (!config.WebProjectFile.IsEmptyOrNull())
                 config.UpdateConnectionsFrom(GetWebConfigLocation(), x => _connections.Add(x));
+
+            if (!string.IsNullOrEmpty(config.CustomTemplates))
+                Templates.TemplatePath = config.CustomTemplates;
+
+            if (config.CustomSettings != null)
+            {
+                foreach (var pair in config.CustomSettings.OrderBy(x => x.Key))
+                {
+                    if (pair.Value is Boolean)
+                    {
+                        var binding = new Binding("CustomSettings[" + pair.Key + "]");
+                        binding.Source = this;
+                        var checkbox = new CheckBox();
+                        checkbox.SetBinding(CheckBox.IsCheckedProperty, binding);
+                        checkbox.Content = Inflector.Inflector.Titleize(pair.Key);
+                        checkbox.HorizontalAlignment = HorizontalAlignment.Left;
+                        checkbox.Margin = new Thickness(10, 0, 10, 0);
+                        checkbox.Click += (s, e) =>
+                        {
+                            CustomSettings[pair.Key] = checkbox.IsChecked;
+                            config.Save();
+                        };
+                        GenerationOptions.Children.Add(checkbox);
+                    }
+                    else
+                    {
+                        var dockPanel = new DockPanel();
+                        dockPanel.LastChildFill = true;
+                        dockPanel.Margin = new Thickness(5);
+                        var textBlock = new TextBlock();
+                        textBlock.Margin = new Thickness(0, 0, 4, 0);
+                        textBlock.Width = 200;
+                        textBlock.Text = Inflector.Inflector.Titleize(pair.Key);
+                        dockPanel.Children.Add(textBlock);
+
+                        var binding = new Binding("CustomSettings[" + pair.Key + "]");
+                        binding.Source = this;
+                        var textbox = new TextBox();
+                        textbox.SetBinding(TextBox.TextProperty, binding);
+                        textbox.TextChanged += (s, e) =>
+                        {
+                            CustomSettings[pair.Key] = textbox.Text;
+                            config.Save();
+                        };
+                        dockPanel.Children.Add(textbox);
+                        GenerationOptions.Children.Add(dockPanel);
+                        DockPanel.SetDock(dockPanel, Dock.Top);
+                        DockPanel.SetDock(textBlock, Dock.Left);
+                        dockPanel.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    }
+                }
+            }
         }
 
         public BindingList<TableItem> Tables { get { return _tables; } }
@@ -66,6 +119,12 @@ namespace Serenity.CodeGenerator
                     Changed("RootNamespace");
                 }
             }
+        }
+
+        public Dictionary<string, object> CustomSettings
+        {
+            get { return config.CustomSettings; }
+            set { config.CustomSettings = value; }
         }
 
         public string GetWebConfigLocation()
@@ -95,19 +154,6 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        public string ScriptProjectFile
-        {
-            get { return config.ScriptProjectFile; }
-            set
-            {
-                if (value != config.ScriptProjectFile)
-                {
-                    config.ScriptProjectFile = value;
-                    Changed("ScriptProjectFile");
-                }
-            }
-        }
-
         private string _entitySingular;
 
         public string EntitySingular
@@ -127,30 +173,6 @@ namespace Serenity.CodeGenerator
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(property));
-        }
-
-        private void ScriptProjectFileBrowse(object sender, RoutedEventArgs e)
-        {
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            if (string.IsNullOrWhiteSpace(ScriptProjectFile))
-            {
-                dlg.FileName = "*.csproj";
-                dlg.InitialDirectory = Path.GetDirectoryName(GeneratorConfig.GetConfigurationFilePath());
-            }
-            else
-            {
-                var scriptProjectFile = Path.GetFullPath(ScriptProjectFile);
-                dlg.FileName = Path.GetFileName(scriptProjectFile);
-                dlg.InitialDirectory = Path.GetDirectoryName(scriptProjectFile);
-            }
-
-            Nullable<bool> result = dlg.ShowDialog();
-
-            if (result == true)
-            {
-                ScriptProjectFile = GeneratorConfig.GetRelativePath(dlg.FileName, AppDomain.CurrentDomain.BaseDirectory);
-                config.Save();
-            }
         }
 
         private void WebProjectFileBrowse(object sender, RoutedEventArgs e)
@@ -177,44 +199,58 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        public bool GenerateTSCode
+        public bool GenerateRow
         {
-            get { return config.GenerateTSCode; }
+            get { return config.GenerateRow; }
             set
             {
-                if (value != config.GenerateTSCode)
+                if (value != config.GenerateRow)
                 {
-                    config.GenerateTSCode = value;
+                    config.GenerateRow = value;
                     config.Save();
-                    Changed("GenerateTSCode");
+                    Changed("GenerateRow");
                 }
             }
         }
 
-        public bool GenerateTSTypings
+        public bool GenerateService
         {
-            get { return config.GenerateTSTypings; }
+            get { return config.GenerateService; }
             set
             {
-                if (value != config.GenerateTSTypings)
+                if (value != config.GenerateService)
                 {
-                    config.GenerateTSTypings = value;
+                    config.GenerateService = value;
                     config.Save();
-                    Changed("GenerateTSTypings");
+                    Changed("GenerateService");
                 }
             }
         }
 
-        public bool GenerateSSImports
+        public bool GenerateUI
         {
-            get { return config.GenerateSSImports; }
+            get { return config.GenerateUI; }
             set
             {
-                if (value != config.GenerateSSImports)
+                if (value != config.GenerateUI)
                 {
-                    config.GenerateSSImports = value;
+                    config.GenerateUI = value;
                     config.Save();
-                    Changed("GenerateSSImports");
+                    Changed("GenerateUI");
+                }
+            }
+        }
+
+        public bool GenerateCustom
+        {
+            get { return config.GenerateCustom; }
+            set
+            {
+                if (value != config.GenerateCustom)
+                {
+                    config.GenerateCustom = value;
+                    config.Save();
+                    Changed("GenerateCustom");
                 }
             }
         }
@@ -246,48 +282,6 @@ namespace Serenity.CodeGenerator
                 }
             }
         }
-
-        public bool RowFieldsSurroundWithRegion
-        {
-            get { return config.RowFieldsSurroundWithRegion; }
-            set
-            {
-                if (value != config.RowFieldsSurroundWithRegion)
-                {
-                    config.RowFieldsSurroundWithRegion = value;
-                    config.Save();
-                    Changed("RowFieldsSurroundWithRegion");
-                }
-            }
-        }
-
-        public bool GenerateLookupEditor
-        {
-            get { return config.GenerateLookupEditor; }
-            set
-            {
-                if (value != config.GenerateLookupEditor)
-                {
-                    config.GenerateLookupEditor = value;
-                    config.Save();
-                    Changed("GenerateLookupEditor");
-                }
-            }
-        }
-
-        public bool MaximizableDialog
-        {
-            get { return config.MaximizableDialog; }
-            set
-            {
-                if (value != config.MaximizableDialog)
-                {
-                    config.MaximizableDialog = value;
-                    config.Save();
-                    Changed("MaximizableDialog");
-                }
-            }
-        }
                 
         public string KDiff3Path
         {
@@ -299,6 +293,20 @@ namespace Serenity.CodeGenerator
                     config.KDiff3Path = value;
                     config.Save();
                     Changed("KDiff3Path");
+                }
+            }
+        }
+
+        public string CustomTemplates
+        {
+            get { return config.CustomTemplates; }
+            set
+            {
+                if (value != config.CustomTemplates)
+                {
+                    config.CustomTemplates = value;
+                    config.Save();
+                    Changed("CustomTemplates");
                 }
             }
         }
@@ -317,137 +325,6 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        public bool GenerateRow
-        {
-            get { return config.GenerateRow; }
-            set
-            {
-                if (value != config.GenerateRow)
-                {
-                    config.GenerateRow = value;
-                    config.Save();
-                    Changed("GenerateRow");
-                }
-            }
-        }
-        public bool GenerateColumn
-        {
-            get { return config.GenerateColumn; }
-            set
-            {
-                if (value != config.GenerateColumn)
-                {
-                    config.GenerateColumn = value;
-                    config.Save();
-                    Changed("GenerateColumn");
-                }
-            }
-        }
-        public bool GenerateForm
-        {
-            get { return config.GenerateForm; }
-            set
-            {
-                if (value != config.GenerateForm)
-                {
-                    config.GenerateForm = value;
-                    config.Save();
-                    Changed("GenerateForm");
-                }
-            }
-        }
-        public bool GenerateEndpoint
-        {
-            get { return config.GenerateEndpoint; }
-            set
-            {
-                if (value != config.GenerateEndpoint)
-                {
-                    config.GenerateEndpoint = value;
-                    config.Save();
-                    Changed("GenerateEndpoint");
-                }
-            }
-        }
-        public bool GenerateRepository
-        {
-            get { return config.GenerateRepository; }
-            set
-            {
-                if (value != config.GenerateRepository)
-                {
-                    config.GenerateRepository = value;
-                    config.Save();
-                    Changed("GenerateRepository");
-                }
-            }
-        }
-        public bool GeneratePage
-        {
-            get { return config.GeneratePage; }
-            set
-            {
-                if (value != config.GeneratePage)
-                {
-                    config.GeneratePage = value;
-                    config.Save();
-                    Changed("GeneratePage");
-                }
-            }
-        }
-
-        public bool GenerateGrid
-        {
-            get { return config.GenerateGrid; }
-            set
-            {
-                if (value != config.GenerateGrid)
-                {
-                    config.GenerateGrid = value;
-                    config.Save();
-                    Changed("GenerateGrid");
-                }
-            }
-        }
-        public bool GenerateDialog
-        {
-            get { return config.GenerateDialog; }
-            set
-            {
-                if (value != config.GenerateDialog)
-                {
-                    config.GenerateDialog = value;
-                    config.Save();
-                    Changed("GenerateDialog");
-                }
-            }
-        }
-        public bool GenerateGridEditor
-        {
-            get { return config.GenerateGridEditor; }
-            set
-            {
-                if (value != config.GenerateGridEditor)
-                {
-                    config.GenerateGridEditor = value;
-                    config.Save();
-                    Changed("GenerateGridEditor");
-                }
-            }
-        }
-        public bool GenerateGridEditorDialog
-        {
-            get { return config.GenerateGridEditorDialog; }
-            set
-            {
-                if (value != config.GenerateGridEditorDialog)
-                {
-                    config.GenerateGridEditorDialog = value;
-                    config.Save();
-                    Changed("GenerateGridEditorDialog");
-                }
-            }
-        }
         private void AddConnection_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new AddConnectionStringWindow();
@@ -520,7 +397,7 @@ namespace Serenity.CodeGenerator
                                 table.ConnectionKey : conn.Key;
 
                             var module = (table != null && table.Module != null) ? table.Module :
-                                Inflector.Inflector.Capitalize(connectionKey);
+                                (Inflector.Inflector.Pascalize(connectionKey) ?? "").Replace(" ", "");
 
                             var tableItem = new TableItem
                             {
@@ -605,7 +482,22 @@ namespace Serenity.CodeGenerator
                         rowModel = RowGenerator.GenerateModel(connection, schema, tableName,
                             table.Module, table.ConnectionKey, table.Identifier, table.PermissionKey, config);
 
-                        new EntityCodeGenerator(rowModel, config).Run();
+                        var kdiff3Paths = new[]
+                        {
+                            config.KDiff3Path,
+                            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "KDiff3\\kdiff3.exe"),
+                            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "KDiff3\\kdiff3.exe"),
+                        };
+
+                        CodeFileHelper.Kdiff3Path = kdiff3Paths.FirstOrDefault(File.Exists);
+
+                        if (config.TFSIntegration)
+                            CodeFileHelper.SetupTFSIntegration(config.TFPath);
+
+                        CodeFileHelper.SetupTSCPath(config.TSCPath);
+                        var siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
+
+                        new EntityCodeGenerator(rowModel, config, siteWebProj).Run();
                     }
 
                 }
@@ -615,8 +507,9 @@ namespace Serenity.CodeGenerator
                 }
             }
 
-            if (config.GenerateTSCode ||
-                config.GenerateTSTypings)
+            if (config.GenerateService ||
+                config.GenerateUI ||
+                config.GenerateCustom)
             {
                 var siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
                 var siteWebPath = Path.GetDirectoryName(siteWebProj);
@@ -669,6 +562,29 @@ namespace Serenity.CodeGenerator
             if (result == true)
             {
                 TSCPath = dlg.FileName;
+                config.Save();
+            }
+        }
+
+        private void btnCustomTemplates_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            if (string.IsNullOrWhiteSpace(config.CustomTemplates))
+            {
+                dlg.FileName = "*.scriban";
+                dlg.InitialDirectory = Path.GetDirectoryName(GeneratorConfig.GetConfigurationFilePath());
+            }
+            else
+            {
+                dlg.FileName = "*.scriban";
+                dlg.InitialDirectory = config.CustomTemplates;
+            }
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                CustomTemplates = Path.GetDirectoryName(dlg.FileName);
                 config.Save();
             }
         }

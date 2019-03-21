@@ -76,7 +76,19 @@ namespace Serenity.Services
         {
             if (unitOfWork != null)
             {
-                unitOfWork.Commit();
+                try
+                {
+                    if (context != null && context.Exception != null)
+                        unitOfWork.Dispose();
+                    else
+                        unitOfWork.Commit();
+                }
+                catch (InvalidOperationException)
+                {
+                    // if a DDL error occurs transaction might turn into a zombie
+                    // and we'll get an error here
+                }
+
                 unitOfWork = null;
             }
 

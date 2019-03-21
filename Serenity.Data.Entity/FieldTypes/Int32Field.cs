@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Serenity.Data
 {
-    public sealed class Int32Field : GenericValueField<Int32>, IIdField
+    public class Int32Field : GenericValueField<Int32>, IIdField
     {
         public Int32Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
             Func<Row, Int32?> getValue = null, Action<Row, Int32?> setValue = null)

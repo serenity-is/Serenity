@@ -55,12 +55,6 @@ namespace Serenity.Services
             return true;
         }
 
-        private class UploadedFile
-        {
-            public string Filename { get; set; }
-            public string OriginalName { get; set; }
-        }
-
         private UploadedFile[] ParseAndValidate(string json, string key)
         {
             json = json.TrimToNull();
@@ -155,8 +149,7 @@ namespace Serenity.Services
 
         public override void OnAfterDelete(IDeleteRequestHandler handler)
         {
-            if (handler.Row is IIsActiveDeletedRow ||
-                handler.Row is IDeleteLogRow)
+            if (ServiceQueryHelper.UseSoftDelete(handler.Row))
                 return;
 
             var field = (StringField)Target;
@@ -220,6 +213,8 @@ namespace Serenity.Services
                 .Set(field, copyResult)
                 .Where(idField == new ValueCriteria(idField.AsObject(handler.Row)))
                 .Execute(handler.UnitOfWork.Connection);
+
+            field[handler.Row] = copyResult;
         }
     }
 }

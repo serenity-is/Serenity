@@ -441,6 +441,11 @@ namespace Serenity.Services
             if (isActiveRow != null &&
                 isActiveRow.IsActiveField[Old] < 0)
                 throw DataValidation.RecordNotActive(Old);
+
+            var isDeletedRow = Old as IIsDeletedRow;
+            if (isDeletedRow != null &&
+                isDeletedRow.IsDeletedField[Old] == true)
+                throw DataValidation.RecordNotActive(Old);
         }
 
         protected virtual void ValidateAndClearIdField()
@@ -474,13 +479,11 @@ namespace Serenity.Services
 
         protected virtual void InvalidateCacheOnCommit()
         {
+            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Row.GetFields().GenerationKey);
             var attr = typeof(TRow).GetCustomAttribute<TwoLevelCachedAttribute>(false);
             if (attr != null)
-            {
-                BatchGenerationUpdater.OnCommit(this.UnitOfWork, Row.GetFields().GenerationKey);
                 foreach (var key in attr.GenerationKeys)
                     BatchGenerationUpdater.OnCommit(this.UnitOfWork, key);
-            }
         }
 
         SaveResponse ISaveRequestProcessor.Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type)

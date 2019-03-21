@@ -7,8 +7,16 @@ namespace Serenity
     /// </summary>
     public static class TwoLevelCache
     {
+        /// <summary>
+        /// Expiration timeout for cache generation keys
+        /// </summary>
         public static readonly TimeSpan GenerationCacheExpiration = TimeSpan.FromSeconds(5);
+        
+        /// <summary>
+        /// Suffix for cache generation keys
+        /// </summary>
         public const string GenerationSuffix = "$Generation$";
+
         private static readonly Random GenerationRandomizer;
 
         static TwoLevelCache()

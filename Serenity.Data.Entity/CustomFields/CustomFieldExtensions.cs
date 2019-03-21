@@ -33,10 +33,10 @@ namespace Serenity.Data
                         field = new BooleanField(collection, name, caption, 0, flags);
                         break;
                     case CustomFieldType.Date:
-                        field = new DateTimeField(collection, name, caption, 0, flags) { DateTimeKind = DateTimeKind.Unspecified };
+                        field = new DateTimeField(collection, name, caption, 0, flags) { DateOnly = true };
                         break;
                     case CustomFieldType.DateTime:
-                        field = new DateTimeField(collection, name, caption, 0, flags) { DateTimeKind = DateTimeKind.Local };
+                        field = new DateTimeField(collection, name, caption, 0, flags) { DateTimeKind = DateTimeKind.Unspecified };
                         break;
                     case CustomFieldType.Decimal:
                         field = new DecimalField(collection, name, caption, item.Size, flags);

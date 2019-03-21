@@ -3,6 +3,7 @@ Serenity Application Platform
 
 <img src="https://github.com/volkanceylan/Serenity/blob/master/Tools/Images/serenity-logo-128.png" />
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3b9118bb630f4ee593757b8d59d0322f)](https://www.codacy.com/app/Serenity/Serenity?utm_source=github.com&utm_medium=referral&utm_content=volkanceylan/Serenity&utm_campaign=badger)
 [![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Core/)   [![Serenity Slack Status](https://serenityslackinvitation.herokuapp.com/badge.svg?2)](https://serenityslackinvitation.herokuapp.com/)
 
 ## What is Serenity Platform
@@ -15,11 +16,11 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 
 ## Documentation and Tutorials
 
-See [Serenity Developer Guide](https://www.gitbook.com/book/volkanceylan/serenity-guide) at https://www.gitbook.com/book/volkanceylan/serenity-guide for documentation, and step by step tutorials.
+See [Serenity Developer Guide](https://serenity.is/docs/) at https://serenity.is/docs/ for documentation, and step by step tutorials.
 
 **Translations of Serenity Developer Guide:**
-- [Chinese Simplified (thanks @WuShenghui)](https://www.gitbook.com/book/volkanceylan/serenity-zh-cn)
-- [Türkçe Başlangıç Kılavuzu (thanks @ademc)](https://www.gitbook.com/book/ademc/serenity-gelistirici-dokumani)
+- [Chinese Simplified (thanks @WuShenghui)](https://volkanceylan.gitbooks.io/serenity-zh-cn)
+- [Türkçe Başlangıç Kılavuzu (thanks @ademc)](https://ademc.gitbooks.io/serenity-gelistirici-dokumani)
 
 **Serenity Blog:**
 - http://serenity.is/blog/
@@ -66,26 +67,29 @@ Visit [this blog post](http://serenity.is/blog/2017/08/08/what-is-in-premium) fo
 
 Paid support options are available from the author and a team of Serenity professionals. [Contact us](mailto:volkanceylan@gmail.com) for details.
 
-## Donating
+## Video Tutorials (thanks a lot to @samdubey and @sayuga for these contributions)
 
-If Serenity was helpful to you, please consider donating to keep Serenity alive and moving forward.
+**Starting Point Videos (by @sayuga):**
 
-http://serenity.is/#Donate
-## Video Tutorials (thanks a lot to @samdubey for these contributions)
+https://www.youtube.com/channel/UCHGyxXj-vI32YaRs0v3HvKw (misses captions at the moment)
 
-**Serenity Youtube Channel:** 
+**Serenity Youtube Channel (by @samdubey):** 
 
 https://www.youtube.com/c/SerenityApplicationFramework
 
-**Introduction to Serene:**
+**Introduction to Serene: (by @samdubey)**
 
 https://www.youtube.com/watch?v=_AqRl_U_gcw
 
-**Setting up Continuous Deployment on Microsoft Azure for Serenity Applications:**
+**Movie Tutorial**
+
+https://www.youtube.com/playlist?list=PLMr_-cvwVIMWBsgWWUYdbHxBHPrOSzWVf
+
+**Setting up Continuous Deployment on Microsoft Azure for Serenity Applications: (by @samdubey)**
 
 https://www.youtube.com/watch?v=tcywhS9k9Wc
 
-**Serenity Application Deployment to Microsoft Azure**:
+**Serenity Application Deployment to Microsoft Azure (by @samdubey)**:
 
 https://www.youtube.com/watch?v=hkU6iVFlWl8
 

@@ -82,7 +82,7 @@ namespace Serenity.Test
                 registrar.RegisterInstance<IAuthorizationService>(
                     new TestAuthorizationService(() => testUser));
 
-                Assert.Equal(null, Authorization.Username);
+                Assert.Null(Authorization.Username);
 
                 testUser = new TestUserDefinition();
 
@@ -105,11 +105,11 @@ namespace Serenity.Test
                 registrar.RegisterInstance<IAuthorizationService>(
                     new TestAuthorizationService(() => testUser));
 
-                Assert.Equal(false, Authorization.IsLoggedIn);
+                Assert.False(Authorization.IsLoggedIn);
 
                 testUser = new TestUserDefinition();
 
-                Assert.Equal(true, Authorization.IsLoggedIn);
+                Assert.True(Authorization.IsLoggedIn);
             }
         }
 
@@ -128,11 +128,11 @@ namespace Serenity.Test
                 registrar.RegisterInstance<IUserRetrieveService>(
                     new TestUserRetrieveService(() => new[] { testUser }));
 
-                Assert.Equal(null, Authorization.UserDefinition);
+                Assert.Null(Authorization.UserDefinition);
 
                 testUser = new TestUserDefinition();
 
-                Assert.Equal(true, Authorization.IsLoggedIn);
+                Assert.True(Authorization.IsLoggedIn);
             }
         }
 
@@ -151,7 +151,7 @@ namespace Serenity.Test
                 registrar.RegisterInstance<IUserRetrieveService>(
                     new TestUserRetrieveService(() => new[] { testUser }));
 
-                Assert.Equal(null, Authorization.UserId);
+                Assert.Null(Authorization.UserId);
 
                 testUser = new TestUserDefinition();
 
@@ -170,13 +170,13 @@ namespace Serenity.Test
                 registrar.RegisterInstance<IPermissionService>(
                     new TestPermissionService((s) => s == "y" && hasYPermission));
 
-                Assert.Equal(false, Authorization.HasPermission("x"));
-                Assert.Equal(false, Authorization.HasPermission("y"));
+                Assert.False(Authorization.HasPermission("x"));
+                Assert.False(Authorization.HasPermission("y"));
 
                 hasYPermission = true;
 
-                Assert.Equal(false, Authorization.HasPermission("x"));
-                Assert.Equal(true, Authorization.HasPermission("y"));
+                Assert.False(Authorization.HasPermission("x"));
+                Assert.True(Authorization.HasPermission("y"));
             }
         }
 
@@ -228,7 +228,7 @@ namespace Serenity.Test
         {
             using (new MunqContext())
             {
-                Assert.Equal(true, Authorization.HasPermission("*"));
+                Assert.True(Authorization.HasPermission("*"));
             }
         }
 
@@ -245,13 +245,13 @@ namespace Serenity.Test
                 A.CallTo(() => fake.Username).ReturnsLazily(() => isLoggedIn ? "dummy": null);
                 registrar.RegisterInstance<IAuthorizationService>(fake);
 
-                Assert.Equal(false, Authorization.HasPermission("?"));
-                Assert.Equal(false, Authorization.HasPermission(""));
-                Assert.Equal(false, Authorization.HasPermission(null));
+                Assert.False(Authorization.HasPermission("?"));
+                Assert.False(Authorization.HasPermission(""));
+                Assert.False(Authorization.HasPermission(null));
                 isLoggedIn = true;
-                Assert.Equal(true, Authorization.HasPermission("?"));
-                Assert.Equal(true, Authorization.HasPermission(""));
-                Assert.Equal(false, Authorization.HasPermission(null));
+                Assert.True(Authorization.HasPermission("?"));
+                Assert.True(Authorization.HasPermission(""));
+                Assert.False(Authorization.HasPermission(null));
             }
         }
     }

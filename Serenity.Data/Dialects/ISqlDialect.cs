@@ -24,6 +24,7 @@
         string SkipKeyword { get; }
         string TakeKeyword { get; }
         string TimeFormat { get; }
+        string UnionKeyword(SqlUnionType unionType);
         bool UseDateTime2 { get; }
         bool UseReturningIdentity { get; }
         bool UseReturningIntoVar { get; }

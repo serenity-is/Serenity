@@ -76,7 +76,15 @@ namespace Serenity.Data
             if (value == null)
                 _setValue(row, null);
             else
-                _setValue(row, (TValue)value);
+            {
+                try
+                {
+                    _setValue(row, (TValue)value);
+                } catch (InvalidCastException ex)
+                {
+                    throw new InvalidCastException($"Invalid cast exception while trying to set the value of {this.Name} field on {row.GetType().Name} as object.", ex);
+                }
+            }
 
             if (row.tracking)
                 row.FieldAssignedValue(this);

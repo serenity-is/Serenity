@@ -14,11 +14,6 @@
                 <TextBox Text="{Binding Path=WebProjectFile}" />
             </DockPanel>
             <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 6 0 0">
-                <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Script Project (.csproj)</TextBlock>
-                <Button DockPanel.Dock="Right" Content="..." Click="ScriptProjectFileBrowse" Width="20" />
-                <TextBox Text="{Binding Path=ScriptProjectFile}"></TextBox>
-            </DockPanel>
-            <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 6 0 0">
                 <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Root Namespace</TextBlock>
                 <TextBox Text="{Binding Path=RootNamespace}"></TextBox>
             </DockPanel>
@@ -34,22 +29,13 @@
                 <Button Name="GenerateCodeButton" IsEnabled="False" Padding="6" FontWeight="Bold" 
                         Click="GenerateCodes_Click">Generate Code for Checked Entities</Button>
             </DockPanel>
-            <DockPanel DockPanel.Dock="Bottom" Margin="0 6 0 0">
-                <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120"></TextBlock>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateGrid}">Grid</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateDialog}">Dialog</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateGridEditor}">Grid Editor</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateGridEditorDialog}">Grid Editor Dialog</CheckBox>
-            </DockPanel>
 
             <DockPanel DockPanel.Dock="Bottom" Margin="0 6 0 0">
                 <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Files To Generate</TextBlock>
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateRow}">Row</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateColumn}">Column</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateForm}">Form</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateEndpoint}">Endpoint</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateRepository}">Repository</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GeneratePage}">Page</CheckBox>
+                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateService}">Service</CheckBox>
+                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateUI}">UI</CheckBox>
+                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateCustom}">Custom</CheckBox>
             </DockPanel>
             <DockPanel HorizontalAlignment="Stretch" DockPanel.Dock="Bottom" Margin="0 6 0 0">
                 <DataGrid ItemsSource="{Binding Tables}" AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="None" RowHeight="20" CanUserResizeRows="False" 
@@ -122,10 +108,10 @@
             </DockPanel>
         </DockPanel>
 
-        <Popup x:Name="ToggledPopup" StaysOpen="False" Width="500" PopupAnimation="Slide" Placement="Center"
+        <Popup x:Name="ToggledPopup" StaysOpen="False" Width="800" PopupAnimation="Slide" Placement="Center"
                    IsOpen="{Binding IsChecked, ElementName=TogglePopupButton, Mode=TwoWay}">
             <Border BorderThickness="1" Background="LightGray">
-                <StackPanel>
+                <StackPanel Name="GenerationOptions" Margin="10">
                     <TextBlock HorizontalAlignment="Stretch" TextAlignment="Center" Padding="10" Foreground="White" Margin="0,0,0,10" FontWeight="Bold" >
                         <TextBlock.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -135,26 +121,25 @@
                         </TextBlock.Background>Generation Options
                     </TextBlock>
 
-                    <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="10">
-                        <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="60">TSC Path :</TextBlock>
+                    <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="5">
+                        <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="200">TSC Path :</TextBlock>
                         <Button Name="btnTSCtPathBrowse" DockPanel.Dock="Right" Content="..." Width="20" Click="btnTSCPathBrowse_Click" />
                         <TextBox Text="{Binding Path=TSCPath}" />
                     </DockPanel>
 
-                    <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="10">
-                        <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="60">KDiff3 Path :</TextBlock>
+                    <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="5">
+                        <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="200">KDiff3 Path :</TextBlock>
                         <Button Name="btnKDiff3PathBrowse" DockPanel.Dock="Right" Content="..." Width="20" Click="btnKDiff3PathBrowse_Click" />
                         <TextBox Text="{Binding Path=KDiff3Path}" />
                     </DockPanel>
+                    
+                    <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="5">
+                        <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="200">Custom Templates Path :</TextBlock>
+                        <Button Name="CustomTemplatesBrowse" DockPanel.Dock="Right" Content="..." Width="20" Click="btnCustomTemplates_Click" />
+                        <TextBox Text="{Binding Path=CustomTemplates}" />
+                    </DockPanel>
 
-
-                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=GenerateTSCode}">Grid/Dialog in TypeScript (instead of Saltaralle)</CheckBox>
-                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=GenerateTSTypings}">TypeScript Typings</CheckBox>
-                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 10" IsChecked="{Binding Path=GenerateSSImports}">Saltaralle Imports</CheckBox>
-
-                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=RowFieldsSurroundWithRegion}">Row Fields Surround With Region</CheckBox>
-                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=GenerateLookupEditor}">Generate Lookup</CheckBox>
-                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 10" IsChecked="{Binding Path=MaximizableDialog}">Maximizable Dialog</CheckBox>
+                    <!--<CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=GenerateTSCode}">Grid/Dialog in TypeScript (instead of Saltaralle)</CheckBox>-->
                 </StackPanel>
             </Border>
         </Popup>

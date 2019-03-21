@@ -19,16 +19,18 @@ namespace Serenity.CodeGenerator
         private readonly ICompilationAssemblyResolver assemblyResolver;
         private readonly DependencyContext dependencyContext;
         private readonly AssemblyLoadContext loadContext;
+        private readonly string path;
 
-        public AssemblyResolver(string path)
+        public AssemblyResolver(string assemblyFile)
         {
-            this.Assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
+            this.path = Path.GetDirectoryName(assemblyFile);
+            this.Assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyFile);
             this.dependencyContext = DependencyContext.Load(this.Assembly);
 
             this.assemblyResolver = new CompositeCompilationAssemblyResolver(
                 new ICompilationAssemblyResolver[]
                 {
-                    new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)),
+                    new AppBaseCompilationAssemblyResolver(path),
                     new ReferenceAssemblyPathResolver(),
                     new PackageCompilationAssemblyResolver()
                 });
@@ -70,6 +72,10 @@ namespace Serenity.CodeGenerator
                 if (assemblies.Count > 0)
                     return this.loadContext.LoadFromAssemblyPath(assemblies[0]);
             }
+
+            var file = Path.Combine(this.path, name.Name + ".dll");
+            if (File.Exists(file))
+                return this.loadContext.LoadFromAssemblyPath(file);
 
             return null;
         }

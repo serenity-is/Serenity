@@ -1,4 +1,5 @@
-﻿using Serenity.CodeGeneration;
+﻿using Newtonsoft.Json.Linq;
+using Serenity.CodeGeneration;
 using Serenity.Data;
 using Serenity.Localization;
 using Serenity.Services;
@@ -120,6 +121,30 @@ namespace Serenity.CodeGenerator
                 Environment.Exit(1);
             }
 
+            var generator = new ServerTypingsGenerator(assemblyFiles.ToArray());
+            generator.LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts;
+
+            var appSettings = Path.Combine(projectDir, "appsettings.json");
+            if (generator.LocalTexts && File.Exists(appSettings))
+            {
+                try
+                {
+                    var obj = JObject.Parse(File.ReadAllText(appSettings));
+                    var packages = ((obj["AppSettings"] as JObject)?["LocalTextPackages"] as JObject);
+                    if (packages != null)
+                    {
+                        foreach (var p in packages.PropertyValues())
+                            foreach (var x in p.Values<string>())
+                                generator.LocalTextFilters.Add(x);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Console.WriteLine("Error occured while parsing appsettings.json!" + Environment.NewLine + 
+                        ex.ToString());
+                }
+            }
+
             var outDir = Path.Combine(projectDir, (config.ServerTypings.OutDir.TrimToNull() ?? "Imports/ServerTypings")
                 .Replace('/', Path.DirectorySeparatorChar));
 
@@ -128,48 +153,6 @@ namespace Serenity.CodeGenerator
             Console.ResetColor();
             Console.WriteLine(outDir);
 
-            List<Assembly> assemblies = new List<Assembly>();
-            foreach (var assemblyFile in assemblyFiles)
-            {
-#if COREFX
-                using (var dynamicContext = new AssemblyResolver(assemblyFile))
-                {
-                    var asm = dynamicContext.Assembly;
-#else
-                {
-                    var asm = Assembly.LoadFrom(assemblyFile);
-#endif
-                    try
-                    {
-                        asm.GetTypes();
-                        assemblies.Add(asm);
-                    }
-                    catch (ReflectionTypeLoadException ex1)
-                    {
-                        System.Console.Error.WriteLine(String.Format("Couldn't list types in project assembly: '{0}'!", assemblyFile) +
-                            Environment.NewLine + Environment.NewLine +
-                            string.Join(Environment.NewLine, ex1.LoaderExceptions.Select(x => x.Message).Distinct()));
-                        Environment.Exit(1);
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Console.Error.WriteLine(String.Format("Couldn't list types in project assembly: '{0}'! ", assemblyFile)
-                            + Environment.NewLine + Environment.NewLine + ex.ToString());
-                        Environment.Exit(1);
-                    }
-                }
-            }
-
-            Extensibility.ExtensibilityHelper.SelfAssemblies = new Assembly[]
-            {
-                typeof(LocalTextRegistry).Assembly,
-                typeof(SqlConnections).Assembly,
-                typeof(Row).Assembly,
-                typeof(SaveRequestHandler<>).Assembly,
-                typeof(WebSecurityHelper).Assembly
-            }.Concat(assemblies).Distinct().ToArray();
-
-            var generator = new ServerTypingsGenerator(assemblies.ToArray());
             generator.RootNamespaces.Add(config.RootNamespace);
 
             foreach (var type in tsTypes)

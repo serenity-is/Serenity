@@ -189,7 +189,7 @@ namespace Serenity.Test
                 var target = new Dictionary<string, string>();
                 JsonLocalTextRegistration.ProcessNestedDictionary(dict, "Db.", target);
 
-                Assert.Equal(1, target.Count);
+                Assert.StrictEqual(1, target.Count);
 
                 Assert.True(target.ContainsKey("Db.x"));
                 Assert.Equal("x", target["Db.x"]);

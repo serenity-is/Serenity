@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Remove="node_modules\" />
+  </ItemGroup>
+  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\@types\jquery\index.d.ts')">
+    <Message Text="Installing NPM packages..." Importance="high">
+    </Message>
+    <Exec Command="cmd /c &quot;$(NpmPath)npm&quot; install" />
+  </Target>
+  <Target Name="CreateInputsOutputs" BeforeTargets="BeforeBuild">
+    <CreateItem Include="CoreLib\**\*.ts">
+      <Output TaskParameter="Include" ItemName="CompileCoreLibInputs" />
+    </CreateItem>
+    <CreateItem Include="CodeGeneration\**\*.ts">
+      <Output TaskParameter="Include" ItemName="CompileCodeGenerationInputs" />
+    </CreateItem>
+  </Target>
+  <Target Name="CompileCoreLib" AfterTargets="AfterBuild" Inputs="@(CompileCoreLibInputs)" Outputs="dist\Serenity.CoreLib.js;Serenity.CoreLib.d.ts;Serenity.CoreLib.js.map">
+    <Message Text="TSC CoreLib..." Importance="high">
+    </Message>
+    <Exec Command="&quot;$(ProjectDir)..\tools\TypeScript\tsc.exe&quot; -p ./CoreLib/tsconfig.json" ContinueOnError="true" />
+  </Target>
+  <Target Name="CompileCodeGeneration" AfterTargets="AfterBuild" Inputs="@(CompileCodeGenerationInputs)" Outputs="dist\Serenity.CodeGeneration.js;Serenity.CodeGeneration.d.ts;Serenity.CodeGeneration.js.map">
+    <Message Text="TSC CodeGeneration..." Importance="high">
+    </Message>
+    <Exec Command="&quot;$(ProjectDir)..\tools\TypeScript\tsc.exe&quot; -p ./CodeGeneration/tsconfig.json" ContinueOnError="true" />
+  </Target>
+  <Target Name="MinimizeCoreLib" AfterTargets="AfterBuild" Inputs="dist\Serenity.CoreLib.js" Outputs="dist\Serenity.CoreLib.min.js">
+    <Message Text="Minimizing Serenity.CoreLib.js..." Importance="high">
+    </Message>
+    <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)dist\Serenity.CoreLib.js&quot; -o &quot;$(ProjectDir)dist\Serenity.CoreLib.min.js&quot; --comments --mangle" />
+  </Target>
+  <Target Name="MinimizeCodeGeneration" AfterTargets="AfterBuild" Inputs="dist\Serenity.CodeGeneration.js" Outputs="dist\Serenity.CodeGeneration.min.js">
+    <Message Text="Minimizing Serenity.CodeGeneration.js..." Importance="high">
+    </Message>
+    <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)dist\Serenity.CodeGeneration.js&quot; -o &quot;$(ProjectDir)dist\Serenity.CodeGeneration.min.js&quot; --comments --mangle" />
+  </Target>
+</Project>

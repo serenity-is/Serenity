@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace Serenity.ComponentModel
@@ -23,10 +24,14 @@ namespace Serenity.ComponentModel
         public bool? Collapsible { get; set; }
         [JsonProperty("collapsed")]
         public bool? Collapsed { get; set; }
+        [JsonProperty("tab")]
+        public string Tab { get; set; }
         [JsonProperty("cssClass")]
         public string CssClass { get; set; }
         [JsonProperty("headerCssClass")]
         public string HeaderCssClass { get; set; }
+        [JsonProperty("formCssClass")]
+        public string FormCssClass { get; set; }
         [JsonProperty("maxLength")]
         public int? MaxLength { get; set; }
         [JsonProperty("required")]
@@ -55,6 +60,8 @@ namespace Serenity.ComponentModel
         public bool? Localizable { get; set; }
         [JsonProperty("visible")]
         public bool? Visible { get; set; }
+        [JsonProperty("allowHide")]
+        public bool? AllowHide { get; set; }
 
         [JsonProperty("formatterType")]
         public string FormatterType { get; set; }
@@ -67,16 +74,24 @@ namespace Serenity.ComponentModel
         public string Alignment { get; set; }
         [JsonProperty("width")]
         public int? Width { get; set; }
-        [JsonProperty("minWidth")]
+		[JsonProperty("widthSet")]
+		public bool? WidthSet { get; set; }
+		[JsonProperty("minWidth")]
         public int? MinWidth { get; set; }
         [JsonProperty("maxWidth")]
         public int? MaxWidth { get; set; }
+        [JsonProperty("labelWidth")]
+        public string LabelWidth { get; set; }
         [JsonProperty("resizable")]
         public bool? Resizable { get; set; }
         [JsonProperty("sortable")]
         public bool? Sortable { get; set; }
         [JsonProperty("sortOrder")]
         public int? SortOrder { get; set; }
+        [JsonProperty("groupOrder")]
+        public int? GroupOrder { get; set; }
+        [JsonProperty("summaryType")]
+        public SummaryType? SummaryType { get; set; }
 
         [JsonProperty("editLink")]
         public bool? EditLink { get; set; }
@@ -103,9 +118,12 @@ namespace Serenity.ComponentModel
         [JsonProperty("quickFilterParams")]
         public Dictionary<string, object> QuickFilterParams { get; set; }
         [JsonProperty("quickFilterSeparator")]
-        public bool QuickFilterSeparator { get; set; }
+        public bool? QuickFilterSeparator { get; set; }
         [JsonProperty("quickFilterCssClass")]
         public string QuickFilterCssClass { get; set; }
+
+        [JsonExtensionData]
+        public IDictionary<string, JToken> ExtensionData { get; set; }
 
         public bool ShouldSerializeEditorType()
         {
@@ -143,6 +161,7 @@ namespace Serenity.ComponentModel
             FormatterParams = new Dictionary<string, object>();
             FilteringParams = new Dictionary<string, object>();
             QuickFilterParams = new Dictionary<string, object>();
+            ExtensionData = new Dictionary<string, JToken>();
         }
     }
 }

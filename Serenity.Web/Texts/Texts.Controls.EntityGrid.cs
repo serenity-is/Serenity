@@ -5,6 +5,11 @@ namespace Serenity.Web
     {
         public static partial class Controls
         {
+            public static class DataGrid
+            {
+                public static LocalText NewButton = "New";
+            }
+
             public static class EntityGrid
             {
                 public static LocalText NewButton = "New {0}";

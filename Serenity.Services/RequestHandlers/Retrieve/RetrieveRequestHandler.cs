@@ -8,7 +8,7 @@
     using System.Linq;
     using System.Reflection;
 
-    public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestHandler
+    public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestHandler, IRetrieveRequestProcessor
         where TRow: Row, new()
         where TRetrieveRequest: RetrieveRequest
         where TRetrieveResponse: RetrieveResponse<TRow>, new()
@@ -65,9 +65,22 @@
 
             if (mode == SelectLevel.Auto)
             {
-                // assume that non-foreign calculated and reflective fields should be selected in list mode
-                bool isForeign = (field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign;
-                mode = isForeign ? SelectLevel.Details : SelectLevel.List;
+                bool notMapped = (field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped;
+                if (notMapped)
+                {
+                    // normally not-mapped fields are skipped in SelectFields method, 
+                    // but some relations like MasterDetailRelation etc. use this method (ShouldSelectFields)
+                    // to determine if they should populate those fields themselves.
+                    // so we return here Details so that edit forms works properly on default retrieve
+                    // mode (Details) without having to include such columns explicitly.
+                    mode = SelectLevel.Details;
+                }
+                else
+                {
+                    // assume that non-foreign calculated and reflective fields should be selected in list mode
+                    bool isForeign = (field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign;
+                    mode = isForeign ? SelectLevel.Details : SelectLevel.List;
+                }
             }
 
             bool explicitlyExcluded = Request.ExcludeColumns != null &&
@@ -227,11 +240,22 @@
         IRetrieveResponse IRetrieveRequestHandler.Response { get { return this.Response; } }
         bool IRetrieveRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
         bool IRetrieveRequestHandler.AllowSelectField(Field field) { return AllowSelectField(field); }
+
+        IRetrieveResponse IRetrieveRequestProcessor.Process(IDbConnection connection, RetrieveRequest request)
+        {
+            return Process(connection, (TRetrieveRequest)request);
+        }
+
         public IDictionary<string, object> StateBag { get; private set; }
     }
 
     public class RetrieveRequestHandler<TRow> : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>
         where TRow : Row, new()
     {
+    }
+
+    public interface IRetrieveRequestProcessor
+    {
+        IRetrieveResponse Process(IDbConnection connection, RetrieveRequest request);
     }
 }

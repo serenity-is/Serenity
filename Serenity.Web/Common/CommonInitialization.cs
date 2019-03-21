@@ -135,6 +135,7 @@ namespace Serenity.Web
         {
             DynamicScriptRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
             LookupScriptRegistration.RegisterLookupScripts();
+            DistinctValuesRegistration.RegisterDistinctValueScripts();
             RunStartupRegistrars<ScriptRegistrarAttribute>();
             FormScriptRegistration.RegisterFormScripts();
             ColumnsScriptRegistration.RegisterColumnsScripts();
@@ -178,7 +179,7 @@ namespace Serenity.Caching
         {
             if (expiration == TimeSpan.Zero)
                 cache.Set(key, value);
-            else
+            else if (expiration > TimeSpan.Zero)
                 cache.Set(key, value, expiration);
         }
 

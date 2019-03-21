@@ -55,7 +55,7 @@ namespace Serenity.Test.Data
         [Fact]
         public void FirstIntoRowShouldReturnNullIfNoEntityUsedYet()
         {
-            Assert.Equal(null, ((ISqlQueryExtensible)new SqlQuery()).FirstIntoRow);
+            Assert.Null(((ISqlQueryExtensible)new SqlQuery()).FirstIntoRow);
         }
 
         [Fact]
@@ -260,8 +260,8 @@ namespace Serenity.Test.Data
         public void GetExpressionsWithOutOfBoundsIndexThrowsArgumentOutOfRange()
         {
             var query = new SqlQuery().Select("a").Select("b");
-            Assert.Throws(typeof(ArgumentOutOfRangeException), () => ((ISqlQueryExtensible)query).Columns[2].Expression);
-            Assert.Throws(typeof(ArgumentOutOfRangeException), () => ((ISqlQueryExtensible)query).Columns[-1].Expression);
+            Assert.Throws<ArgumentOutOfRangeException>(() => ((ISqlQueryExtensible)query).Columns[2].Expression);
+            Assert.Throws<ArgumentOutOfRangeException>(() => ((ISqlQueryExtensible)query).Columns[-1].Expression);
         }
 
         [Fact]
@@ -561,18 +561,18 @@ namespace Serenity.Test.Data
                 .Where("c > 2")
                 .OrderBy("x")
                 .OrderBy("y")
-                
+
                 .Skip(100)
                 .Take(50);
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "DECLARE @Value0 SQL_VARIANT;" + 
+                    "DECLARE @Value0 SQL_VARIANT;" +
                     "DECLARE @Value1 SQL_VARIANT;" +
                     "SELECT TOP 100 @Value0 = x,@Value1 = y FROM t WHERE c > 2 ORDER BY x, y;" +
-                    "SELECT TOP 50 c FROM t WHERE c > 2 AND " + 
-                        "((((x IS NOT NULL AND @Value0 IS NULL) OR (x > @Value0))) " + 
-                            "OR (((x IS NULL AND @Value0 IS NULL) OR (x = @Value0)) " + 
+                    "SELECT TOP 50 c FROM t WHERE c > 2 AND " +
+                        "((((x IS NOT NULL AND @Value0 IS NULL) OR (x > @Value0))) " +
+                            "OR (((x IS NULL AND @Value0 IS NULL) OR (x = @Value0)) " +
                             "AND ((y IS NOT NULL AND @Value1 IS NULL) OR (y > @Value1)))) ORDER BY x, y"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
@@ -592,7 +592,7 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT * FROM (\n" +
-                        "SELECT TOP 30 c, ROW_NUMBER() OVER (ORDER BY x) AS __num__ FROM t) __results__ " + 
+                        "SELECT TOP 30 c, ROW_NUMBER() OVER (ORDER BY x) AS __num__ FROM t) __results__ " +
                     "WHERE __num__ > 10"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
@@ -623,7 +623,7 @@ namespace Serenity.Test.Data
         {
             var entity = new MyEntity() { Table = "x" };
             var query = new SqlQuery().From(entity).Select("x1");
-            Assert.Equal(((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex, 0);
+            Assert.Equal(0, ((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex);
             query.Into(null).Select("x2");
             Assert.Equal(((ISqlQueryExtensible)query).Columns.ElementAt(1).IntoRowIndex, -1);
             Assert.Equal(1, ((ISqlQueryExtensible)query).IntoRows.Count);
@@ -635,7 +635,7 @@ namespace Serenity.Test.Data
         {
             var entity1 = new MyEntity() { Table = "x" };
             var query = new SqlQuery().From(entity1).Select("x1");
-            Assert.Equal(((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex, 0);
+            Assert.Equal(0, ((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex);
             var entity2 = new MyEntity() { Table = "y" };
             query.Into(entity2).Select("y1");
             Assert.Equal(1, ((ISqlQueryExtensible)query).Columns.ElementAt(1).IntoRowIndex);
@@ -690,7 +690,7 @@ namespace Serenity.Test.Data
             var sub = query.SubQuery();
             sub.AddParam("@px1", "value");
             Assert.Equal(1, query.ParamCount);
-            Assert.Equal((string)query.Params["@px1"], "value");
+            Assert.Equal("value", (string)query.Params["@px1"]);
         }
 
         [Fact]
@@ -711,7 +711,7 @@ namespace Serenity.Test.Data
             Assert.Throws<ArgumentNullException>(() => new SqlQuery().Where((string)null));
             Assert.Throws<ArgumentNullException>(() => new SqlQuery().Where(String.Empty));
         }
-        
+
         [Fact]
         public void WithPassesAndReturnsTheQueryItself()
         {
@@ -798,6 +798,24 @@ namespace Serenity.Test.Data
         }
 
         [Fact]
+        public void SkipTakeWithOrderByUsesCorrectSyntaxForOracleDialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(OracleDialect.Instance)
+                .Select("c")
+                .From("t")
+                .OrderBy("x")
+                .Take(20)
+                .Skip(50);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT * FROM ( SELECT c, ROW_NUMBER() OVER (ORDER BY x) AS numberingofrow FROM t ORDER BY x) WHERE numberingofrow > 50 AND ROWNUM <= 20"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
         public void TakeUsesCorrectSyntaxForOracleDialect()
         {
             var query = new SqlQuery()
@@ -864,6 +882,89 @@ namespace Serenity.Test.Data
             Assert.Contains("already has a join 'c'", exception.Message);
             Assert.Contains("LEFT JOIN TheCountryTable c ON (c.TheCountryID = T0.CountryID)", exception.Message);
             Assert.Contains("Attempted join expression is 'LEFT JOIN City c ON (c.CityID = T0.CountryID)", exception.Message);
+        }
+
+        [Fact]
+        public void UnionWorksProperly()
+        {
+            var query = new SqlQuery()
+                .Dialect(SqlServer2000Dialect.Instance)
+                .From("T")
+                .Select("A")
+                .Select("B")
+                .Union()
+                .From("X")
+                .Select("U", "A")
+                .Select("W", "B")
+                .OrderBy("A");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "(SELECT A, B FROM T) UNION SELECT U AS [A], W AS [B] FROM X ORDER BY A"),
+                TestSqlHelper.Normalize(query.ToString()));
+        }
+
+        [Fact]
+        public void UnionClearsSkipTake()
+        {
+            var query = new SqlQuery()
+                .Dialect(SqlServer2012Dialect.Instance)
+                .From("T")
+                .Skip(4)
+                .Take(3)
+                .Select("A")
+                .Select("B")
+                .OrderBy("C")
+                .Union()
+                .From("X")
+                .Select("U", "A")
+                .Select("W", "B")
+                .OrderBy("A");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "(SELECT A, B FROM T ORDER BY C OFFSET 4 ROWS FETCH NEXT 3 ROWS ONLY) UNION SELECT U AS [A], W AS [B] FROM X ORDER BY A"),
+                TestSqlHelper.Normalize(query.ToString()));
+        }
+
+        [Fact]
+        public void UnionIntersectWorksProperly()
+        {
+            var query = new SqlQuery()
+                .Dialect(SqlServer2000Dialect.Instance)
+                .From("T")
+                .Select("A")
+                .Select("B")
+                .Union(SqlUnionType.Intersect)
+                .From("X")
+                .Select("U", "A")
+                .Select("W", "B")
+                .OrderBy("A");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "(SELECT A, B FROM T) INTERSECT SELECT U AS [A], W AS [B] FROM X ORDER BY A"),
+                TestSqlHelper.Normalize(query.ToString()));
+        }
+
+        [Fact]
+        public void UnionExceptWorksProperly()
+        {
+            var query = new SqlQuery()
+                .Dialect(SqlServer2000Dialect.Instance)
+                .From("T")
+                .Select("A")
+                .Select("B")
+                .Union(SqlUnionType.Except)
+                .From("X")
+                .Select("U", "A")
+                .Select("W", "B")
+                .OrderBy("A");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "(SELECT A, B FROM T) EXCEPT SELECT U AS [A], W AS [B] FROM X ORDER BY A"),
+                TestSqlHelper.Normalize(query.ToString()));
         }
     }
 }

@@ -79,6 +79,9 @@ if (typeof Slick === "undefined") {
             footerRowHeight: 25,
             showTopPanel: false,
             topPanelHeight: 25,
+            groupingPanel: false,
+            showGroupingPanel: true,
+            groupingPanelHeight: 34,
             formatterFactory: null,
             editorFactory: null,
             cellFlashingCssClass: "flashing",
@@ -133,6 +136,7 @@ if (typeof Slick === "undefined") {
         var $headers;
         var $headerRow, $headerRowScroller, $headerRowSpacerL, $headerRowSpacerR;
         var $footerRow, $footerRowScroller, $footerRowSpacerL, $footerRowSpacerR;
+        var $groupingPanel, $groupingPanelScroller, $groupingPanelSpacer;
         var $topPanelScroller;
         var $topPanel;
         var $viewport;
@@ -156,6 +160,8 @@ if (typeof Slick === "undefined") {
         var viewportTopH = 0;
         var viewportBottomH = 0;
         var topPanelH = 0;
+        var groupPanelH = 0;
+        var headerH = 0;
         var headerRowH = 0;
         var footerRowH = 0;
 
@@ -287,6 +293,9 @@ if (typeof Slick === "undefined") {
             maxSupportedCssHeight = maxSupportedCssHeight || getMaxSupportedCssHeight();
             scrollbarDimensions = scrollbarDimensions || measureScrollbar();
 
+            if ($groupingPanelSpacer)
+                $groupingPanelSpacer.css("width", getCanvasWidth() + scrollbarDimensions.width + "px");
+
             options = $.extend({}, defaults, options);
             validateAndEnforceOptions();
             columnDefaults.width = options.defaultColumnWidth;
@@ -296,7 +305,11 @@ if (typeof Slick === "undefined") {
 
             columnsById = {};
             for (var i = 0; i < columns.length; i++) {
-                var m = columns[i] = $.extend({}, columnDefaults, columns[i]);
+                var m = columns[i];
+                for (var k in columnDefaults) {
+                    if (m[k] === undefined)
+                        m[k] = columnDefaults[k];
+                }
                 columnsById[m.id] = i;
                 if (m.minWidth && m.width < m.minWidth) {
                     m.width = m.minWidth;
@@ -329,6 +342,18 @@ if (typeof Slick === "undefined") {
             }
 
             $focusSink = $("<div tabIndex='0' hideFocus style='position:fixed;width:0;height:0;top:0;" + xLeft + ":0;outline:0;'></div>").appendTo($container);
+
+            if (options.groupingPanel) {
+                $groupingPanelScroller = $("<div class='slick-grouping-panel ui-state-default' style='overflow:hidden;position:relative;' />")
+                    .appendTo($container);
+                $groupingPanel = $("<div />").appendTo($groupingPanelScroller);
+                $groupingPanelSpacer = $("<div style='display:block;height:1px;position:absolute;top:0;left:0;'></div>")
+                  .appendTo($groupingPanelScroller);
+
+                if (!options.showGroupingPanel) {
+                    $groupingPanelScroller.hide();
+                }
+            }
 
             // Containers used for scrolling frozen columns and rows
             $paneHeaderL = $("<div class='slick-pane slick-pane-header slick-pane-" + xLeft + " tabIndex='0' />").appendTo($container);
@@ -517,6 +542,11 @@ if (typeof Slick === "undefined") {
 
                 $footerRowScroller
                     .bind("scroll", handleFooterRowScroll);
+
+                if (options.groupingPanel) {
+                    $groupingPanelScroller
+                        .on("scroll", handleGroupingPanelScroll);
+                }
 
                 $focusSink.add($focusSink2)
                     .bind("keydown", handleKeyDown);
@@ -718,6 +748,9 @@ if (typeof Slick === "undefined") {
             if (widthChanged || hasFrozenColumns() || hasFrozenRows) {
                 $canvasTopL.width(canvasWidthL);
 
+                if (options.groupingPanel)
+                    $groupingPanel.width(canvasWidth);
+
                 getHeadersWidth();
 
                 $headerL.width(headersWidthL);
@@ -760,22 +793,22 @@ if (typeof Slick === "undefined") {
                         $canvasBottomR.width(canvasWidthR);
                     }
                 } else {
-                    $paneHeaderL.width('100%');
+                    $paneHeaderL.css('width', '100%');
 
-                    $paneTopL.width('100%');
+                    $paneTopL.css('width', '100%');
 
-                    $headerRowScrollerL.width('100%');
+                    $headerRowScrollerL.css('width', '100%');
 
                     $headerRowL.width(canvasWidth);
 
-                    $footerRowScrollerL.width('100%');
+                    $footerRowScrollerL.css('width', '100%');
 
                     $footerRowL.width(canvasWidth);
 
-                    $viewportTopL.width('100%');
+                    $viewportTopL.css('width', '100%');
 
                     if (hasFrozenRows) {
-                        $viewportBottomL.width('100%');
+                        $viewportBottomL.css('width', '100%');
                         $canvasBottomL.width(canvasWidthL);
                     }
                 }
@@ -783,11 +816,16 @@ if (typeof Slick === "undefined") {
                 viewportHasHScroll = (canvasWidth > viewportW - scrollbarDimensions.width);
             }
 
-            $headerRowSpacerL.width(canvasWidth + (viewportHasVScroll ? scrollbarDimensions.width : 0));
-            $headerRowSpacerR.width(canvasWidth + (viewportHasVScroll ? scrollbarDimensions.width : 0));
+            var w = canvasWidth + (viewportHasVScroll ? scrollbarDimensions.width : 0);
+            
+            if (options.groupingPanel)
+                $groupingPanelSpacer.width(w);
 
-            $footerRowSpacerL.width(canvasWidth + (viewportHasVScroll ? scrollbarDimensions.width : 0));
-            $footerRowSpacerR.width(canvasWidth + (viewportHasVScroll ? scrollbarDimensions.width : 0));
+            $headerRowSpacerL.width(w);
+            $headerRowSpacerR.width(w);
+
+            $footerRowSpacerL.width(w);
+            $footerRowSpacerR.width(w);
 
             if (widthChanged || forceColumnWidthsUpdate) {
                 applyColumnWidths();
@@ -885,6 +923,20 @@ if (typeof Slick === "undefined") {
             }
         }
 
+        function getHeader() {
+            return $headers[0];
+        }
+
+        function getHeaderColumn(columnIdOrIdx) {
+          var idx = (typeof columnIdOrIdx === "number" ? columnIdOrIdx : getColumnIndex(columnIdOrIdx));
+          var $rtn = $headers.children().eq(idx);
+          return $rtn && $rtn[0];
+        }
+
+        function getGroupingPanel() {
+            return $groupingPanel == null ? null : $groupingPanel[0];
+        }
+
         function getHeaderRow() {
             return hasFrozenColumns() ? $headerRow : $headerRow[0];
         }
@@ -967,18 +1019,34 @@ if (typeof Slick === "undefined") {
             }
         }
 
+        function formatGroupTotal(total, columnDef) {
+            if (columnDef.formatter != null) {
+                var item = {};
+                item[columnDef.field] = total;
+                try {
+                    return columnDef.formatter(-1, -1, total, columnDef, item);
+                }
+                catch(e) {
+                }
+            }
+
+            if (typeof total == "number" && Q && Q.formatNumber) {
+                if (columnDef.sourceItem && columnDef.sourceItem.displayFormat) {
+                    return Q.formatNumber(total, columnDef.sourceItem.displayFormat);
+                }
+                else
+                    return Q.formatNumber(total, "#,##0.##");
+            }
+            else
+                return Q.htmlEncode(total);
+        }
+
         function groupTotalText(totals, columnDef, key) {
             var ltKey = (key.substr(0, 1).toUpperCase() + key.substr(1));
             text = (window.Q && Q.tryGetText && Q.tryGetText(ltKey)) || ltKey;
 
             var total = totals[key][columnDef.field];
-            if (typeof total == "number" && Q && Q.formatNumber) {
-                if (columnDef.sourceItem && columnDef.sourceItem.displayFormat) {
-                    total = Q.formatNumber(total, columnDef.sourceItem.displayFormat);
-                }
-                else
-                    total = Q.formatNumber(total, "#,##0.##");
-            }
+            total = formatGroupTotal(total, columnDef);
 
             return "<span class='aggregate agg-" + key + "'  title='" + text + "'>" +
                 total +
@@ -1135,9 +1203,8 @@ if (typeof Slick === "undefined") {
 
             setSortColumns(sortColumns);
             setupColumnResize();
-            if (options.enableColumnReorder) {
+            if (options.enableColumnReorder)
                 setupColumnReorder();
-            }
         }
 
         function setupColumnSort() {
@@ -1286,14 +1353,19 @@ if (typeof Slick === "undefined") {
             }
 
             var canDragScroll;
+            
+            var hasGrouping = options.groupingPanel;
+            var columns = getColumns();
             $headers.sortable({
-                containment: "parent",
+                containment: hasGrouping ? undefined : "parent",
                 distance: 3,
-                axis: "x",
+                axis: hasGrouping ? undefined : "x",
                 cursor: "default",
                 tolerance: "intersection",
                 helper: "clone",
                 placeholder: "slick-sortable-placeholder ui-state-default slick-header-column",
+                forcePlaceholderSize: hasGrouping ? true : undefined,
+                appendTo: hasGrouping ? "body" : undefined,
                 start: function (e, ui) {
                     ui.placeholder.width(ui.helper.outerWidth() - headerColumnWidthDiff);
                     canDragScroll = !hasFrozenColumns() ||
@@ -1302,6 +1374,15 @@ if (typeof Slick === "undefined") {
                 },
                 beforeStop: function (e, ui) {
                     $(ui.helper).removeClass("slick-header-column-active");
+                    if (hasGrouping) {
+                        var $headerDraggableGroupBy = $(getGroupingPanel());
+                        var hasDroppedColumn = $headerDraggableGroupBy
+                        	.find(".slick-dropped-grouping").length;
+                        if (hasDroppedColumn > 0) {
+                            $headerDraggableGroupBy.find(".slick-dropped-placeholder").hide();
+                            $headerDraggableGroupBy.find(".slick-dropped-grouping").show();
+                        }
+                    }
                 },
                 sort: function (e, ui) {
                     if (canDragScroll && e.originalEvent.pageX > $container[0].clientWidth) {
@@ -1349,7 +1430,7 @@ if (typeof Slick === "undefined") {
                     }
                     setColumns(reorderedColumns);
 
-                    trigger(self.onColumnsReordered, { impactedColumns: getImpactedColumns(limit), grid: self });
+                    trigger(self.onColumnsReordered, { impactedColumns: getImpactedColumns(limit) });
                     e.stopPropagation();
                     setupColumnResize();
                 }
@@ -1609,6 +1690,9 @@ if (typeof Slick === "undefined") {
         }
 
         function getVBoxDelta($el) {
+            if ($el.css('box-sizing') == 'border-box')
+                return 0;
+
             var p = ["borderTopWidth", "borderBottomWidth", "paddingTop", "paddingBottom"];
             var delta = 0;
             $.each(p, function (n, val) {
@@ -1772,6 +1856,7 @@ if (typeof Slick === "undefined") {
                 "." + uid + " .slick-group-header-column { " + xLeft + ": 1000px; }",
                 "." + uid + " .slick-header-column { " + xLeft + ": 1000px; }",
                 "." + uid + " .slick-top-panel { height:" + options.topPanelHeight + "px; }",
+                "." + uid + " .slick-grouping-panel { height:" + options.groupingPanelHeight + "px; }",
                 "." + uid + " .slick-headerrow-columns { height:" + options.headerRowHeight + "px; }",
                 "." + uid + " .slick-cell { height:" + rowHeight + "px; }",
                 "." + uid + " .slick-row { height:" + options.rowHeight + "px; }",
@@ -2118,7 +2203,11 @@ if (typeof Slick === "undefined") {
 
             columnsById = {};
             for (var i = 0; i < columns.length; i++) {
-                var m = columns[i] = $.extend({}, columnDefaults, columns[i]);
+                var m = columns[i];
+                for (var k in columnDefaults) {
+                    if (m[k] === undefined)
+                        m[k] = columnDefaults[k];
+                }
                 columnsById[m.id] = i;
                 if (m.minWidth && m.width < m.minWidth) {
                     m.width = m.minWidth;
@@ -2138,6 +2227,7 @@ if (typeof Slick === "undefined") {
                 createColumnHeaders();
                 createColumnGroupHeaders();
                 createColumnFooter();
+                updateFooterTotals();
                 removeCssRules();
                 createCssRules();
                 resizeCanvas();
@@ -2209,7 +2299,7 @@ if (typeof Slick === "undefined") {
             if (data) {
                 data.onRowCountChanged && data.onRowCountChanged.unsubscribe(viewOnRowCountChanged);
                 data.onRowsChanged && data.onRowsChanged.unsubscribe(viewOnRowsChanged);
-                data.onDataChanged && data.onDataChanged.unsubscribe(viewonDataChanged);
+                data.onDataChanged && data.onDataChanged.unsubscribe(viewOnDataChanged);
             }
         }
 
@@ -2285,8 +2375,23 @@ if (typeof Slick === "undefined") {
             }
         }
 
+        function setGroupingPanelVisibility(visible) {
+            if (options.showGroupingPanel != visible) {
+                options.showGroupingPanel = visible;
+                if (visible) {
+                    $groupingPanelScroller.slideDown("fast", resizeCanvas);
+                } else {
+                    $groupingPanelScroller.slideUp("fast", resizeCanvas);
+                }
+            }
+        }
+
         function getContainerNode() {
             return $container.get(0);
+        }
+
+        function getUID() {
+            return uid;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////
@@ -2686,6 +2791,9 @@ if (typeof Slick === "undefined") {
                   ? options.topPanelHeight + getVBoxDelta($topPanelScroller)
                   : 0;
 
+                groupPanelH = (options.groupingPanel && options.showGroupingPanel)
+                  ? options.groupingPanelHeight + getVBoxDelta($groupingPanelScroller) : 0;
+
                 headerRowH = (options.showHeaderRow)
                   ? options.headerRowHeight + getVBoxDelta($headerRowScroller)
                   : 0;
@@ -2694,12 +2802,14 @@ if (typeof Slick === "undefined") {
                   ? options.footerRowHeight + getVBoxDelta($footerRowScroller)
                   : 0;
 
+                headerH = parseFloat($.css($headerScroller[0], "height")) + getVBoxDelta($headerScroller);
+
                 viewportH = parseFloat($.css($container[0], "height", true))
                   - parseFloat($.css($container[0], "paddingTop", true))
                   - parseFloat($.css($container[0], "paddingBottom", true))
-                  - parseFloat($.css($headerScroller[0], "height"))
-                  - getVBoxDelta($headerScroller)
+                  - headerH
                   - topPanelH
+                  - groupPanelH
                   - headerRowH
                   - footerRowH;
             }
@@ -2756,12 +2866,19 @@ if (typeof Slick === "undefined") {
                     );
                 }
 
-                $paneTopL.css('position', 'relative');
+                $paneTopL.css({
+                    'position': 'relative',
+                    'top': headerH, 
+                    'height': paneTopH
+                });
             }
-
-            $paneTopL.css({
-                'top': Math.round($paneHeaderL.height()), 'height': paneTopH
-            });
+            else {
+                $paneTopL.css({
+                    'position': '',
+                    'top': headerH + groupPanelH, 
+                    'height': paneTopH
+                });
+            }
 
             var paneBottomTop = $paneTopL.position().top
               + paneTopH;
@@ -3351,6 +3468,17 @@ if (typeof Slick === "undefined") {
             }
         }
 
+        function handleGroupingPanelScroll() {
+            handleElementScroll($groupingPanelScroller[0]);
+        }
+
+        function handleElementScroll(element) {
+            var scrollLeft = element.scrollLeft;
+            if (scrollLeft != $viewport[0].scrollLeft) {
+                $viewport[0].scrollLeft = scrollLeft;
+            }
+        }
+
         function handleMouseWheel(e, delta, deltaX, deltaY) {
             var $rowNode = $(e.target).closest(".slick-row");
             var rowNode = $rowNode[0];
@@ -3425,6 +3553,11 @@ if (typeof Slick === "undefined") {
                     if (hasFrozenRows) {
                         $viewportTopL[0].scrollLeft = scrollLeft;
                     }
+                }
+
+                
+                if (options.groupingPanel) {
+                    $groupingPanelScroller[0].scrollLeft = scrollLeft;
                 }
             }
 
@@ -4613,8 +4746,8 @@ if (typeof Slick === "undefined") {
                 "next": 1
             };
 
-            tabbingDirection[xLeft] = -1;
-            tabbingDirection[xRight] = 1;
+            tabbingDirections[xLeft] = -1;
+            tabbingDirections[xRight] = 1;
 
             tabbingDirection = tabbingDirections[dir];
 
@@ -4992,6 +5125,10 @@ if (typeof Slick === "undefined") {
             "getHeaderRow": getHeaderRow,
             "getHeaderRowColumn": getHeaderRowColumn,
             "setFooterRowVisibility": setFooterRowVisibility,
+            "getGroupingPanel": getGroupingPanel,
+            "setGroupingPanelVisibility": setGroupingPanelVisibility,
+            "getHeader": getHeader,
+            "getHeaderColumn": getHeaderColumn,
             "getFooterRow": getFooterRow,
             "getFooterRowColumn": getFooterRowColumn,
             "getGridPosition": getGridPosition,
@@ -5001,6 +5138,7 @@ if (typeof Slick === "undefined") {
             "removeCellCssStyles": removeCellCssStyles,
             "getCellCssStyles": getCellCssStyles,
             "getFrozenRowOffset": getFrozenRowOffset,
+            "getUID": getUID,
 
             "groupTotalsFormatter": groupTotalsFormatter,
             "updateFooterTotals": updateFooterTotals,

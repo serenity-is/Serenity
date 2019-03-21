@@ -8,6 +8,9 @@ if (target == "")
 	target = "Pack";
 	
 var configuration = Argument("configuration", "Release");
+var msBuildPath = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\msbuild.exe";
+if (!System.IO.File.Exists(msBuildPath))
+	msBuildPath = null;
 
 string serenityVersion = null;
 
@@ -22,18 +25,6 @@ var nuspecParams = new Dictionary<string, string> {
     { "tags", "Serenity" },
     { "framework", "net45" },
     { "configuration", configuration }
-};
-
-var dotnetBuildOrder = new string[] {
-    "Serenity.Core",
-    "Serenity.Configuration",
-    "Serenity.Caching.Couchbase",
-    "Serenity.Caching.Redis",
-    "Serenity.Data",
-    "Serenity.Data.Entity",
-    "Serenity.Services",
-    "Serenity.Web",
-	"Serenity.CodeGenerator"
 };
 
 Func<string, XElement> loadCsProj = (csproj) => {
@@ -54,10 +45,8 @@ Func<string, System.Xml.XmlDocument> loadXml = path =>
     return xml;
 };
 
-nuspecParams["scriptFramework"] = loadXml(@".\Serenity.Script.Imports\packages.config").SelectSingleNode("//package[@id='Saltarelle.Runtime']/@targetFramework").Value; 
 nuspecParams["serenityWebAssetsVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Assets.nuspec");
 nuspecParams["serenityWebToolingVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Tooling.nuspec");
-
 
 var nugetPackages = new List<string>();
 
@@ -106,11 +95,19 @@ Action<string> minimizeJs = filename => {
     });
 };
 
-Action runGitLink = () => {
-    StartProcess("./Tools/GitLink/GitLink.exe", new ProcessSettings
-    { 
-        Arguments = System.IO.Path.GetFullPath(@".\") + " -u https://github.com/volkanceylan/serenity"
+Action runSourceLink = () => {
+
+    MSBuild(@".\Serenity.Web\Serenity.Web.Net45.csproj", s => {
+        s.SetConfiguration(configuration);
+		s.ToolPath = msBuildPath;
+        s.WithProperty("SourceLinkCreate", "true");
     });
+
+    MSBuild(@".\Serenity.Testing\Serenity.Testing.Net45.csproj", s => {
+        s.SetConfiguration(configuration);
+		s.ToolPath = msBuildPath;
+        s.WithProperty("SourceLinkCreate", "true");
+    });    
 };
 
 Func<string, List<Tuple<string, string, string>>> parsePackageVersions = (path) => {
@@ -140,55 +137,68 @@ Action<string, string, string> myPack = (s, id, project) => {
     if (!System.IO.File.Exists(csproj))
         csproj = null;
 
-    if (id == "Serenity.Web" || id == "Serenity.Web.AspNetCore")
+    if (id == "Serenity.Web" || id == "Serenity.Web.AspNetCore" || id == "Serenity.Web.Assets")
         setPackageVersions(prm, null, "./Serenity.Test/packages.Serenity.Test.Net45.config");
         
     setPackageVersions(prm, csproj, packagesConfig);
     
     var filename = "./" + s + "/" + id + ".nuspec";
-    var nuspec = System.IO.File.ReadAllText(filename);
     string version;
-  
-    if (nuspec.IndexOf("<version>${version}</version>") < 0) {
-        version = getVersionFromNuspec(filename);
-    }
-    else {
+    if (!System.IO.File.Exists(filename) &&
+        csproj != null) {
+        writeHeader("dotnet pack " + csproj);
+        var exitCode = StartProcess("dotnet", "pack " + csproj + " -c:" + configuration + " -o:../.nupkg/");
+        if (exitCode > 0)
+            throw new Exception("Error while packing " + csproj);
         version = serenityVersion;
-        nuspec = nuspec.Replace("${version}", version);
     }
-    nuspec = nuspec.Replace("${id}", id);
-    
-    foreach (var p in prm)
-        nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
+    else {        
+        var nuspec = System.IO.File.ReadAllText(filename);
       
-    var assembly = "./" + s + ".Net45/bin/" + configuration + "/" + project + ".dll";
-    if (!System.IO.File.Exists(assembly))
-        assembly = "./" + s + ".Net45/bin/" + configuration + "/" + project + ".exe";
-	if (!System.IO.File.Exists(assembly))
-		assembly = "./" + s + "/bin/" + configuration + "/" + project + ".dll";
-    if (!System.IO.File.Exists(assembly))
-        assembly = "./" + s + "/bin/" + configuration + "/" + project + ".exe";
-      
-    if (System.IO.File.Exists(assembly)) 
-    {
-        var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly);
-        nuspec = nuspec.Replace("${title}", vi.FileDescription);
-        nuspec = nuspec.Replace("${description}", vi.Comments);
-    }
+        if (nuspec.IndexOf("<version>${version}</version>") < 0) {
+            version = getVersionFromNuspec(filename);
+        }
+        else {
+            version = serenityVersion;
+            nuspec = nuspec.Replace("${version}", version);
+        }
+        nuspec = nuspec.Replace("${id}", id);
+        
+        foreach (var p in prm)
+            nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
+          
+        var assembly = "./" + s + ".Net45/bin/" + configuration + "/" + project + ".dll";
+        if (!System.IO.File.Exists(assembly))
+            assembly = "./" + s + ".Net45/bin/" + configuration + "/" + project + ".exe";
+        if (!System.IO.File.Exists(assembly))
+            assembly = "./" + s + "/bin/" + configuration + "/" + project + ".dll";
+        if (!System.IO.File.Exists(assembly))
+            assembly = "./" + s + "/bin/" + configuration + "/" + project + ".exe";
+          
+        if (System.IO.File.Exists(assembly)) 
+        {
+            var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly);
+            nuspec = nuspec.Replace("${title}", vi.FileDescription);
+            nuspec = nuspec.Replace("${description}", vi.Comments);
+        }
 
-    var temp = "./.nupkg/" + id + ".temp.nuspec";
-    System.IO.File.WriteAllText(temp, nuspec);
-     
-    var basePath = @"./" + s;
-     
-    NuGetPack(temp, new NuGetPackSettings {
-        BasePath = basePath,
-        OutputDirectory = "./.nupkg",
-        NoPackageAnalysis = true
-    });
-    
-    System.IO.File.Delete(temp);
-    nugetPackages.Add("./.nupkg/" + id + "." + version + ".nupkg");
+        var temp = "./.nupkg/" + id + ".temp.nuspec";
+        System.IO.File.WriteAllText(temp, nuspec);
+         
+        var basePath = @"./" + s;
+         
+        NuGetPack(temp, new NuGetPackSettings {
+            BasePath = basePath,
+            OutputDirectory = "./.nupkg",
+            NoPackageAnalysis = true
+        });
+        
+        System.IO.File.Delete(temp);
+    }
+    var pkg = "./.nupkg/" + id + "." + version + ".nupkg";
+    if (!System.IO.File.Exists(pkg))
+        throw new Exception("Package " + pkg + " is not found!");
+    nugetPackages.Add(pkg);
 };
 
 Action fixNugetCache = delegate() {
@@ -271,32 +281,29 @@ Task("Restore")
     .IsDependentOn("Clean")
     .Does(context =>
 {
-    NuGetRestore("./Serenity.Net45.sln");
-	NuGetRestore("./Serenity.DotNet.sln");
+	var dotnetSln = @"./Serenity.sln";
+	writeHeader("dotnet restore " + dotnetSln);
+	var exitCode = StartProcess("dotnet", "restore " + dotnetSln);
+	if (exitCode > 0)
+		throw new Exception("Error while restoring " + dotnetSln);
 });
 
 Task("Compile")
     .IsDependentOn("Restore")
     .Does(context => 
 {
-    MSBuild("./Serenity.Net45.sln", s => {
-        s.SetConfiguration(configuration);
-    });
-    
-    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/Serenity.Core.dll");
-    serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
-           
+
+    var sasmi = System.IO.File.ReadAllText(@".\SharedAssemblyInfo.cs");
+    var sasmi1 = sasmi.IndexOf("AssemblyVersion(\"");
+    serenityVersion = sasmi.Substring(sasmi1 + "AssemblyVersion(\"".Length).Split('"')[0];
+               
 	patchProjectVer(@"./SharedProperties.xml", serenityVersion);
 
-	var dotnetSln = @"./Serenity.DotNet.sln";
-	writeHeader("dotnet restore " + dotnetSln);
-	var exitCode = StartProcess("dotnet", "restore " + dotnetSln);
-	if (exitCode > 0)
-		throw new Exception("Error while restoring " + dotnetSln);
-	writeHeader("dotnet build " + dotnetSln);
-	exitCode = StartProcess("dotnet", "build " + dotnetSln + " -c " + configuration);
-	if (exitCode > 0)
-		throw new Exception("Error while building " + dotnetSln);
+	writeHeader("Building Serenity.sln");
+    MSBuild("./Serenity.sln", s => {
+        s.SetConfiguration(configuration);
+		s.ToolPath = msBuildPath;
+    });
 });
 
 Task("Test")
@@ -312,7 +319,7 @@ Task("PdbPatch")
 {
     if ((target ?? "").ToLowerInvariant() == "push" ||
         (target ?? "").ToLowerInvariant() == "pdbpatch")
-        runGitLink();
+        runSourceLink();
 });
 
 Task("Pack")
@@ -327,9 +334,9 @@ Task("Pack")
     myPack("Serenity.Data.Entity", null, null);
     myPack("Serenity.Services", null, null);
     myPack("Serenity.Testing", null, null);
-    myPack("Serenity.Script.UI", "Serenity.Script", null);
     myPack("Serenity.Web", null, null);
     myPack("Serenity.Web", "Serenity.Web.AspNetCore", "Serenity.Web");
+    myPack("Serenity.Web", "Serenity.Scripts", null);
     myPack("Serenity.CodeGenerator", null, null);
     
     fixNugetCache();
@@ -371,5 +378,5 @@ Task("Tooling-Push")
     {
         myPush();
     });
-    
+
 RunTarget(target);

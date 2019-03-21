@@ -182,6 +182,27 @@ namespace Serenity.Data
             }
         }
 
+        public string UnionKeyword(SqlUnionType unionType)
+        {
+            switch (unionType)
+            {
+                case SqlUnionType.Union:
+                    return "UNION";
+                case SqlUnionType.UnionAll:
+                    return "UNION ALL";
+                case SqlUnionType.Intersect:
+                    return "INTERSECT";
+                case SqlUnionType.IntersectAll:
+                    return "INTERSECT ALL";
+                case SqlUnionType.Except:
+                    return "EXCEPT";
+                case SqlUnionType.ExceptAll:
+                    return "EXCEPT ALL";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         public virtual bool UseDateTime2
         {
             get

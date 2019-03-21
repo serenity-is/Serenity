@@ -75,3 +75,34 @@
     border: 0;
     margin-bottom: 6px;
 }
+
+.property-tabs {
+    padding-left: 8px;
+}
+
+.property-tabs > li > a {
+    line-height: 1;
+    border-radius: 0;
+    padding: 6px 10px;
+    color: #666;
+    font-weight: 600;
+}
+
+.property-tabs > li.active > a,
+.property-tabs > li.active > a:hover, 
+.property-tabs > li.active > a:focus {
+    color: slateblue;
+}
+
+.property-panes .tab-pane {
+    padding: 6px 0;
+}
+
+.property-panes > .tab-pane:not(.active) {
+    visibility: hidden !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}

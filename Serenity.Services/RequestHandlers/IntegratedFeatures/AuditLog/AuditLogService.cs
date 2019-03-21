@@ -208,12 +208,12 @@ namespace Serenity.Services
                     if (entity != null)
                     {
                         var idRow = entity as IIdRow;
-                        var nameRow = entity as INameRow;
+                        var nameField = entity.GetNameField() as StringField;
                         if (idRow != null &&
-                            nameRow != null)
+                            !ReferenceEquals(null, nameField))
                         {
                             var lookup = pair.Value;
-                            var idName = GetIdNameDictionary(connection, (IIdRow)entity, ((INameRow)entity).NameField, lookup.Keys);
+                            var idName = GetIdNameDictionary(connection, (IIdRow)entity, nameField, lookup.Keys);
                             foreach (var p in idName)
                                 lookup[p.Key] = p.Value;
                         }

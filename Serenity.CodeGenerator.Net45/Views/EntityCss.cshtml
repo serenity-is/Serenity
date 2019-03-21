@@ -1,9 +1,0 @@
-﻿@* Generator: Template *@
-@functions { public dynamic Model { get; set; } }@{
-    var moduleDash = Model.Module == null ? "" : (Model.Module + "-");
-}
-
-.s-@(moduleDash)@(Model.ClassName)Dialog {
-    > .size { width: 650px; }
-    .caption { width: 150px; }
-}

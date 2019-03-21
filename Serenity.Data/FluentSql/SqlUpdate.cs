@@ -185,6 +185,20 @@
             return this;
         }
 
+        /// <summary>
+        /// Sets the dialect (SQL server type / version) for query.
+        /// </summary>
+        public SqlUpdate Dialect(ISqlDialect dialect)
+        {
+            if (dialect == null)
+                throw new ArgumentNullException("dialect");
+
+            this.dialect = dialect;
+            this.dialectOverridden = true;
+
+            return this;
+        }
+
         public static string RemoveT0Reference(string expression)
         {
             var index = expression.IndexOf("T0.", StringComparison.OrdinalIgnoreCase);

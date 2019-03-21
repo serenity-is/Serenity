@@ -1,0 +1,23 @@
+﻿
+namespace {{RootNamespace}}{{DotModule}} {
+    export interface {{RowClassName}} {%{{}%}{{for f in Fields}}
+        {{f.Ident}}?: {{f.TSType}};{{end}}{{for j in Joins}}{{for k in j.Fields}}
+        {{k.Ident}}?: {{k.TSType}};{{end}}{{end}}
+    }
+
+    export namespace {{RowClassName}} {%{{}%}{{if Identity}}
+        export const idProperty = '{{Identity}}';{{end}}{{if NameField}}
+        export const nameProperty = '{{NameField}}';{{end}}
+        export const localTextPrefix = '{{ModuleDot}}{{ClassName}}';
+
+        export namespace Fields {%{{}%}{{for f in Fields}}
+            export declare const {{f.Ident}};{{end}}{{for j in Joins}}{{for k in j.Fields}}
+            export declare const {{k.Ident}};{{end}}{{end}}
+        }
+
+        [{{for f in Fields}}{{if !for.first}},{{end}}
+            '{{f.Ident}}'{{end}}{{for j in Joins}}{{for k in j.Fields}},
+            '{{k.Ident}}'{{end}}{{end}}
+        ].forEach(x => (<any>Fields)[x] = x);
+    }
+}

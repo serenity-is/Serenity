@@ -218,7 +218,7 @@ namespace Serenity.Data.Test
 
                 var row = connection.ById<DisplayOrderRow>(id, q => q.Select(fld.ID).Select(fld.GroupID));
                 Assert.NotNull(row);
-                Assert.Equal(true, row.TrackWithChecks);
+                Assert.True(row.TrackWithChecks);
                 Assert.True(row.IsAssigned(fld.ID));
                 Assert.Equal(id, row.ID.Value);
                 Assert.True(row.IsAssigned(fld.GroupID));
@@ -416,7 +416,7 @@ namespace Serenity.Data.Test
 
                 var row = connection.TryById<DisplayOrderRow>(id, q => q.Select(fld.ID).Select(fld.GroupID));
                 Assert.NotNull(row);
-                Assert.Equal(true, row.TrackWithChecks);
+                Assert.True(row.TrackWithChecks);
                 Assert.True(row.IsAssigned(fld.ID));
                 Assert.Equal(id, row.ID.Value);
                 Assert.True(row.IsAssigned(fld.GroupID));
@@ -633,7 +633,7 @@ namespace Serenity.Data.Test
                 var row = connection.Single<DisplayOrderRow>(q => 
                     q.Where(new Criteria(fld.ID) == id).Select(fld.ID).Select(fld.GroupID));
                 Assert.NotNull(row);
-                Assert.Equal(true, row.TrackWithChecks);
+                Assert.True(row.TrackWithChecks);
                 Assert.True(row.IsAssigned(fld.ID));
                 Assert.Equal(id, row.ID.Value);
                 Assert.True(row.IsAssigned(fld.GroupID));
@@ -836,7 +836,7 @@ namespace Serenity.Data.Test
                 var row = connection.TrySingle<DisplayOrderRow>(q => 
                     q.Where(new Criteria(fld.ID) == id).Select(fld.ID).Select(fld.GroupID));
                 Assert.NotNull(row);
-                Assert.Equal(true, row.TrackWithChecks);
+                Assert.True(row.TrackWithChecks);
                 Assert.True(row.IsAssigned(fld.ID));
                 Assert.Equal(id, row.ID.Value);
                 Assert.True(row.IsAssigned(fld.GroupID));
@@ -1051,7 +1051,7 @@ namespace Serenity.Data.Test
                 var row = connection.First<DisplayOrderRow>(q =>
                     q.Where(new Criteria(fld.ID) == id).Select(fld.ID).Select(fld.GroupID));
                 Assert.NotNull(row);
-                Assert.Equal(true, row.TrackWithChecks);
+                Assert.True(row.TrackWithChecks);
                 Assert.True(row.IsAssigned(fld.ID));
                 Assert.Equal(id, row.ID.Value);
                 Assert.True(row.IsAssigned(fld.GroupID));
@@ -1254,7 +1254,7 @@ namespace Serenity.Data.Test
                 var row = connection.TryFirst<DisplayOrderRow>(q =>
                     q.Where(new Criteria(fld.ID) == id).Select(fld.ID).Select(fld.GroupID));
                 Assert.NotNull(row);
-                Assert.Equal(true, row.TrackWithChecks);
+                Assert.True(row.TrackWithChecks);
                 Assert.True(row.IsAssigned(fld.ID));
                 Assert.Equal(id, row.ID.Value);
                 Assert.True(row.IsAssigned(fld.GroupID));
@@ -1282,7 +1282,7 @@ namespace Serenity.Data.Test
                 var list = connection.List<DisplayOrderRow>(new Criteria(fld.ID) == (id + 1));
 
                 Assert.NotNull(list);
-                Assert.Equal(0, list.Count);
+                Assert.StrictEqual(0, list.Count);
             }
         }
 
@@ -1311,7 +1311,7 @@ namespace Serenity.Data.Test
 
                 var list = connection.List<FakeDisplayOrderRow>(new Criteria(fld.GroupID) == 777);
                 Assert.NotNull(list);
-                Assert.Equal(list.Count, 2);
+                Assert.StrictEqual(2, list.Count);
                 Assert.True((list[0].ID == firstID && list[1].ID == secondID) ||
                     (list[0].ID == secondID && list[1].ID == firstID));
             }
@@ -1335,7 +1335,7 @@ namespace Serenity.Data.Test
                 var list = connection.List<DisplayOrderRow>(new Criteria(fld.ID) == (id + 1));
 
                 Assert.NotNull(list);
-                Assert.Equal(0, list.Count);
+                Assert.StrictEqual(0, list.Count);
             }
         }
 
@@ -1366,7 +1366,7 @@ namespace Serenity.Data.Test
                         q.Where(new Criteria(fld.GroupID) == 777).Select(fld.ID));
 
                 Assert.NotNull(list);
-                Assert.Equal(list.Count, 2);
+                Assert.StrictEqual(2, list.Count);
                 Assert.True((list[0].ID == firstID && list[1].ID == secondID) ||
                     (list[0].ID == secondID && list[1].ID == firstID));
             }
@@ -1389,7 +1389,7 @@ namespace Serenity.Data.Test
 
                 var list = connection.List<DisplayOrderRow>(new Criteria(fld.ID) == id);
                 Assert.NotNull(list);
-                Assert.Equal(1, list.Count);
+                Assert.StrictEqual(1, list.Count);
                 var row = list[0];
                 Assert.NotNull(row);
                 Assert.Equal(7, row.GroupID);
@@ -1415,7 +1415,7 @@ namespace Serenity.Data.Test
 
                 var list = connection.List<DisplayOrderRow>(new Criteria(fld.ID) == id);
                 Assert.NotNull(list);
-                Assert.Equal(1, list.Count);
+                Assert.StrictEqual(1, list.Count);
                 var row = list[0];
                 Assert.True(row.TrackWithChecks);
                 Assert.True(row.IsAssigned(fld.ID));
@@ -1443,7 +1443,7 @@ namespace Serenity.Data.Test
                 var list = connection.List<DisplayOrderRow>(q =>
                     q.Where(new Criteria(fld.ID) == id).Select(fld.ID).Select(fld.GroupID));
                 Assert.NotNull(list);
-                Assert.Equal(1, list.Count);
+                Assert.StrictEqual(1, list.Count);
                 var row = list[0];
                 Assert.NotNull(row);
                 Assert.True(row.TrackWithChecks);
@@ -1472,10 +1472,10 @@ namespace Serenity.Data.Test
                 var list = connection.List<DisplayOrderRow>(q =>
                     q.Where(new Criteria(fld.ID) == id).Select(fld.ID).Select(fld.GroupID));
                 Assert.NotNull(list);
-                Assert.Equal(1, list.Count);
+                Assert.StrictEqual(1, list.Count);
                 var row = list[0];
                 Assert.NotNull(row);
-                Assert.Equal(true, row.TrackWithChecks);
+                Assert.True(row.TrackWithChecks);
                 Assert.True(row.IsAssigned(fld.ID));
                 Assert.Equal(id, row.ID.Value);
                 Assert.True(row.IsAssigned(fld.GroupID));

@@ -15,7 +15,7 @@ namespace Serenity.Test
         {
             try
             {
-                Assert.Equal(false, Dependency.HasResolver);
+                Assert.False(Dependency.HasResolver);
                 Dependency.SetResolver(new MunqContainer());
                 Assert.True(Dependency.HasResolver);
                 Dependency.SetResolver(null);

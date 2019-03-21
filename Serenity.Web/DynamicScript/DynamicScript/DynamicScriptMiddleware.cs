@@ -9,6 +9,8 @@ using System;
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
+using System.Linq;
+using Serenity.Services;
 
 namespace Serenity.Web.Middleware
 {
@@ -29,15 +31,37 @@ namespace Serenity.Web.Middleware
 
             var scriptKey = context.Request.Path.Value;
             scriptKey = scriptKey.Substring(dynJSPath.Length);
+
+            var contentType = "text/javascript";
             if (scriptKey.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
                 scriptKey = scriptKey.Substring(0, scriptKey.Length - 3);
+            else if (scriptKey.EndsWith(".css", StringComparison.OrdinalIgnoreCase))
+            {
+                contentType = "text/css";
+                scriptKey = scriptKey.Substring(0, scriptKey.Length - 4);
+            }
 
-            return ReturnScript(context, scriptKey, "text/javascript");
+            return ReturnScript(context, scriptKey, contentType);
         }
 
         public async static Task ReturnScript(HttpContext context, string scriptKey, string contentType)
         {
-            var dynamicScript = DynamicScriptManager.GetScript(scriptKey);
+            DynamicScriptManager.Script dynamicScript;
+            try
+            {
+                dynamicScript = DynamicScriptManager.GetScript(scriptKey);
+            }
+            catch (ValidationError ve)
+            {
+                if (ve.ErrorCode == "AccessDenied")
+                {
+                    context.Response.StatusCode = 403;
+                    return;
+                }
+
+                throw;
+            }
+
             if (dynamicScript == null)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NotFound;
@@ -50,14 +74,21 @@ namespace Serenity.Web.Middleware
             context.Response.ContentType = mediaType.ToString();
 
             var responseHeaders = context.Response.GetTypedHeaders();
-            var cacheControl = responseHeaders.CacheControl = new CacheControlHeaderValue();
+            var cacheControl = new CacheControlHeaderValue();
             cacheControl.MaxAge = TimeSpan.FromDays(365);
-            cacheControl.Private = true;
+            
+            // allow CDNs to cache anonymous resources
+            if (!string.IsNullOrEmpty((string)context.Request.Query["v"]) &&
+                !Authorization.IsLoggedIn)
+                cacheControl.Public = true;
+            else                
+                cacheControl.Private = true;
+
             cacheControl.MustRevalidate = false;
+            responseHeaders.CacheControl = cacheControl;
 
             var supportsGzip = dynamicScript.CompressedBytes != null &&
-                context.Request.GetTypedHeaders().AcceptEncoding.ToString()
-                    .IndexOf("gzip", StringComparison.OrdinalIgnoreCase) >= 0;
+                context.Request.Headers["Accept-Encoding"].Any(x => x.IndexOf("gzip") >= 0);
 
             byte[] contentBytes;
             if (supportsGzip)
@@ -108,6 +139,7 @@ namespace Serenity.Web.Middleware
         {
             DynamicScriptRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
             LookupScriptRegistration.RegisterLookupScripts();
+            DistinctValuesRegistration.RegisterDistinctValueScripts();
             FormScriptRegistration.RegisterFormScripts();
             ColumnsScriptRegistration.RegisterColumnsScripts();
 

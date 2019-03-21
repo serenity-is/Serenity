@@ -180,12 +180,6 @@ namespace Serenity.Services
             return s;
         }
 
-        private class UploadedFile
-        {
-            public string Filename { get; set; }
-            public string OriginalName { get; set; }
-        }
-
         public override void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query)
         {
             base.OnPrepareQuery(handler, query);
@@ -272,6 +266,7 @@ namespace Serenity.Services
         public override void OnAfterDelete(IDeleteRequestHandler handler)
         {
             if (handler.Row is IIsActiveDeletedRow ||
+                handler.Row is IIsDeletedRow ||
                 handler.Row is IDeleteLogRow)
                 return;
 
@@ -319,6 +314,8 @@ namespace Serenity.Services
                 .Set(filename, copyResult.DbFileName)
                 .Where(idField == new ValueCriteria(idField.AsObject(handler.Row)))
                 .Execute(handler.UnitOfWork.Connection);
+
+            filename[handler.Row] = copyResult.DbFileName;
         }
 
         public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attr, ref string temporaryFile)

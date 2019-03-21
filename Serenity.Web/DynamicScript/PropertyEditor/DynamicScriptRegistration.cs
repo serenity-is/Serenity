@@ -21,26 +21,38 @@ namespace Serenity.Web
         {
             Check.NotNull(assemblies, "assemblies");
 
+            DataScriptAttribute attr;
+
             foreach (var assembly in assemblies)
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (type.IsAbstract || 
-                        type.IsInterface || 
+                    if (type.IsAbstract ||
+                        type.IsInterface ||
                         type.IsGenericTypeDefinition ||
-                        !type.IsPublic ||
-                        !type.IsSubclassOf(typeof(Controller)))
+                        !type.IsPublic)
+                        continue;
+
+                    attr = type.GetCustomAttribute<DataScriptAttribute>();
+                    if (attr != null)
+                    {
+                        var script = (INamedDynamicScript)Activator.CreateInstance(type);
+                        DynamicScriptManager.Register(script);
+                        continue;
+                    }
+
+                    if (!type.IsSubclassOf(typeof(Controller)))
                         continue;
 
                     foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
                     {
-                        var attr = method.GetCustomAttribute<DynamicScriptAttribute>();
+                        attr = method.GetCustomAttribute<DataScriptAttribute>();
                         if (attr == null)
                             continue;
 
                         if (string.IsNullOrEmpty(attr.Key))
                             throw new ArgumentNullException("scripKey", String.Format(
-                                "DynamicScript attribute on method {1} of type {0} has empty key!",
+                                "DataScript attribute on method {1} of type {0} has empty key!",
                                 type.Name, method.Name));
 
                         var parameters = method.GetParameters();
@@ -49,9 +61,9 @@ namespace Serenity.Web
                                 x.ParameterType != typeof(IDbConnection)))
                         {
                             throw new ArgumentOutOfRangeException("parameters", String.Format(
-                                "DynamicScript actions shouldn't have any parameters other " + 
+                                "DataScript actions shouldn't have any parameters other " + 
                                 "than an a base ServiceRequest and optional IDbConnection. Method {0} of type {1} has {2} arguments",
-                                type.Name, method.Name));
+                                type.Name, method.Name, parameters.Length));
                         }
 
                         string connectionKey = null;
@@ -61,7 +73,7 @@ namespace Serenity.Web
                             var connectionKeyAttr = type.GetCustomAttribute<ConnectionKeyAttribute>();
                             if (connectionKeyAttr == null || connectionKeyAttr.Value.IsEmptyOrNull())
                                 throw new ArgumentOutOfRangeException("connectionKey", String.Format(
-                                    "Cannot determine connection key for DynamicScript defined on type {1}, method {2}",
+                                    "Cannot determine connection key for DynamicScript defined on type {0}, method {1}",
                                     type.Name, method.Name));
 
                             connectionKey = connectionKeyAttr.Value;
@@ -71,14 +83,14 @@ namespace Serenity.Web
 
                         if (returnType == typeof(void))
                             throw new ArgumentOutOfRangeException("returnType", String.Format(
-                                "DynamicScript defined on method {2} of type {1} has void return type",
+                                "DynamicScript defined on method {1} of type {0} has void return type",
                                 type.Name, method.Name));
 
                         var isResult = returnType.IsGenericType && 
                             returnType.GetGenericTypeDefinition() == typeof(Result<>);
                         if (!isResult && typeof(ActionResult).IsAssignableFrom(returnType))
                             throw new ArgumentOutOfRangeException("returnType", String.Format(
-                                "DynamicScript defined on method {2} of type {1} has ActionResult descendant return type. " +
+                                "DynamicScript defined on method {1} of type {0} has ActionResult descendant return type. " +
                                 "It must be Result<T> or a regular class!",
                                 type.Name, method.Name));
 

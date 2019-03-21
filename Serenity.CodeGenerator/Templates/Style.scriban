@@ -1,0 +1,6 @@
+﻿
+
+.s-{{ModuleDash}}{{ClassName}}Dialog {
+    > .size { width: 650px; }
+    .caption { width: 150px; }
+}

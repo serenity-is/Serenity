@@ -70,7 +70,7 @@ namespace Serenity.Data
                 return "'" + ((DateTimeOffset)value).ToString("o") + "'";
 
             if (value is Guid)
-                return ((Guid)value).ToString();
+                return "'" + ((Guid)value).ToString() + "'";
 
             if (value is MemoryStream)
                 value = ((MemoryStream)value).ToArray();

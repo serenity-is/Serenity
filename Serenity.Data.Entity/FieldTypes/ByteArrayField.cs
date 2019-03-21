@@ -62,7 +62,7 @@ namespace Serenity.Data
                     return c;
             }
 
-            return value2.Length.CompareTo(value2.Length);
+            return value1.Length.CompareTo(value2.Length);
         }
 
         protected override byte[] Clone(byte[] value)
