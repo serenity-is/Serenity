@@ -114,6 +114,15 @@ namespace Serenity.CodeGenerator
                             continue;
 
                         var relative = file.Substring(contentRoot.Length);
+
+                        // toastr!
+                        if (relative.StartsWith("content/".Replace('/', Path.DirectorySeparatorChar), StringComparison.Ordinal))
+                            relative = "Content/".Replace('/', Path.DirectorySeparatorChar) + relative.Substring("content/".Length);
+                        else if (relative.StartsWith("scripts/", StringComparison.Ordinal))
+                            relative = "Scripts/".Replace('/', Path.DirectorySeparatorChar) + relative.Substring("content/".Length);
+                        else if (relative.StartsWith("Fonts/", StringComparison.Ordinal))
+                            relative = "fonts/".Replace('/', Path.DirectorySeparatorChar) + relative.Substring("fonts/".Length);
+
                         if (relative.StartsWith("scripts/typings/".Replace('/', Path.DirectorySeparatorChar),
                                 StringComparison.OrdinalIgnoreCase))
                         {
