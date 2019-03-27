@@ -55,7 +55,22 @@ namespace ICSharpCode.Decompiler
             if (File.Exists(depsJsonFileName))
                 packages = LoadPackageInfos(depsJsonFileName, targetFrameworkId).ToDictionary(i => i.Name);
 
-            foreach (var path in LookupPaths)
+            var lookupPaths = LookupPaths.Where(x => Directory.Exists(x)).ToList();
+
+            var runtimeConfigFileName = Path.Combine(basePath, $"{assemblyName}.runtimeconfig.dev.json");
+            if (File.Exists(runtimeConfigFileName))
+            {
+                var runtimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFileName));
+                var probingPaths = runtimeConfig["runtimeOptions"]?["additionalProbingPaths"];
+                if (probingPaths != null)
+                {
+                    foreach (var x in probingPaths.ToArray().OfType<JValue>().Select(x => x.ToString()))
+                        if (x.IndexOf('|') < 0 && lookupPaths.IndexOf(x) < 0 && Directory.Exists(x))
+                            lookupPaths.Add(x);
+                }
+            }
+
+            foreach (var path in lookupPaths)
             {
                 foreach (var pk in packages)
                 {
