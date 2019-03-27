@@ -2,7 +2,7 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>Serenity.Web.Assets</id>
-    <version>3.9.1</version>
+    <version>3.9.2</version>
     <authors>${authors}</authors>
     <owners>${owners}</owners>
     <title>Serenity Platform - Web Assets</title>
@@ -23,7 +23,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Assets\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content" />
+    <file src="Assets\Content\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content\Content" />
+    <file src="Assets\fonts\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content\fonts" />
+    <file src="Assets\Scripts\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content\Scripts" />
     <file src="Style\images\*.png" target="content/Content/serenity/images" />
     <file src="Style\images\*.gif" target="content/Content/serenity/images" />
     <file src="Style\images\*.jpg" target="content/Content/serenity/images" />
