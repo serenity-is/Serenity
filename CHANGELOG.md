@@ -1,3 +1,8 @@
+## 3.9.1 (2019-03-27)
+
+Features:
+  - check runtimeconfig.dev.json for nuget folders (attempting to fix linux / mac transform issue)
+
 ## 3.9.0 (2019-03-15)
 
 Features:
