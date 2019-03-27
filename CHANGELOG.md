@@ -1,3 +1,8 @@
+## 3.9.2 (2019-03-27)
+
+Features:
+  - skip packages without id for dotnet sergen restore, e.g. Microsoft.AspNetCore.App
+
 ## 3.9.1 (2019-03-27)
 
 Features:
