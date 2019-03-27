@@ -56,13 +56,18 @@ namespace ICSharpCode.Decompiler
                 packages = LoadPackageInfos(depsJsonFileName, targetFrameworkId).ToDictionary(i => i.Name);
 
             var lookupPaths = LookupPaths.Where(x => Directory.Exists(x)).ToList();
+            if (Directory.Exists("/usr/share/dotnet/sdk/NuGetFallbackFolder"))
+                lookupPaths.Add("/usr/share/dotnet/sdk/NuGetFallbackFolder");
+
+            if (Directory.Exists("/usr/local/share/dotnet/sdk/NuGetFallbackFolder"))
+                lookupPaths.Add("/usr/local/share/dotnet/sdk/NuGetFallbackFolder");
 
             var runtimeConfigFileName = Path.Combine(basePath, $"{assemblyName}.runtimeconfig.dev.json");
             if (File.Exists(runtimeConfigFileName))
             {
                 var runtimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFileName));
                 var probingPaths = runtimeConfig["runtimeOptions"]?["additionalProbingPaths"];
-                if (probingPaths != null)
+                if (probingPaths != null);
                 {
                     foreach (var x in probingPaths.ToArray().OfType<JValue>().Select(x => x.ToString()))
                         if (x.IndexOf('|') < 0 && lookupPaths.IndexOf(x) < 0 && Directory.Exists(x))
@@ -77,9 +82,15 @@ namespace ICSharpCode.Decompiler
                     foreach (var item in pk.Value.RuntimeComponents)
                     {
                         var itemPath = Path.GetDirectoryName(item);
-                        var fullPath = Path.Combine(path, pk.Value.Name, pk.Value.Version, itemPath).ToLowerInvariant();
+                        var fullPath = Path.Combine(path, pk.Value.Name, pk.Value.Version, itemPath);
                         if (Directory.Exists(fullPath))
                             packageBasePaths.Add(fullPath);
+                        else
+                        {
+                            fullPath = Path.Combine(path, pk.Value.Name?.ToLowerInvariant(), pk.Value.Version, itemPath);
+                            if (Directory.Exists(fullPath))
+                                packageBasePaths.Add(fullPath);
+                        }
                     }
                 }
             }

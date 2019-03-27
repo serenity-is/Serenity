@@ -1,3 +1,8 @@
+## 3.9.3 (2019-03-27)
+
+Features:
+  - better handling for nuget locations in linux / mac
+
 ## 3.9.2 (2019-03-27)
 
 Features:
