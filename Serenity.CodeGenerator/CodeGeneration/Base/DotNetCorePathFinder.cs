@@ -67,7 +67,7 @@ namespace ICSharpCode.Decompiler
             {
                 var runtimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFileName));
                 var probingPaths = runtimeConfig["runtimeOptions"]?["additionalProbingPaths"];
-                if (probingPaths != null);
+                if (probingPaths != null)
                 {
                     foreach (var x in probingPaths.ToArray().OfType<JValue>().Select(x => x.ToString()))
                         if (x.IndexOf('|') < 0 && lookupPaths.IndexOf(x) < 0 && Directory.Exists(x))
