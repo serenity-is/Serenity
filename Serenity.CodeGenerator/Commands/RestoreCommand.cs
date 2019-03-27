@@ -15,6 +15,7 @@ namespace Serenity.CodeGenerator
             "Dapper",
             "EPPlus",
             "FastMember",
+            "FluentMigrator.",
             "FirebirdSql.",
             "MailKit",
             "MySql",
@@ -65,7 +66,7 @@ namespace Serenity.CodeGenerator
 
             EnumerateProjectDeps(csprojElement, (fw, id, ver) =>
             {
-                if (!skipPackage(id))
+                if (!skipPackage(id) && !string.IsNullOrEmpty(ver))
                     queue.Enqueue(new Tuple<string, string, string>(fw, id, ver));
             });
 
@@ -213,7 +214,7 @@ namespace Serenity.CodeGenerator
 
                 foreach (var packageReference in itemGroup.Descendants("PackageReference"))
                 {
-                    dependency(target, packageReference.Attribute("Include").Value, packageReference.Attribute("Version").Value);
+                    dependency(target, packageReference.Attribute("Include").Value, packageReference.Attribute("Version")?.Value);
                 }
             }
         }
