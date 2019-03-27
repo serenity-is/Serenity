@@ -94,8 +94,8 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="WebDriver, Version=3.14.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Selenium.WebDriver.3.14.0\lib\net45\WebDriver.dll</HintPath>
+    <Reference Include="WebDriver, Version=3.141.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Selenium.WebDriver.3.141.0\lib\net45\WebDriver.dll</HintPath>
     </Reference>
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.3\lib\net35\xunit.abstractions.dll</HintPath>
@@ -409,11 +409,11 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.2.43.0\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Selenium.WebDriver.ChromeDriver.2.43.0\build\Selenium.WebDriver.ChromeDriver.targets'))" />
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.4.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.4.0\build\net20\xunit.runner.visualstudio.props'))" />
     <Error Condition="!Exists('..\..\packages\xunit.core.2.4.0\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.core.2.4.0\build\xunit.core.props'))" />
     <Error Condition="!Exists('..\..\packages\xunit.core.2.4.0\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.core.2.4.0\build\xunit.core.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.73.0.3683.68\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Selenium.WebDriver.ChromeDriver.73.0.3683.68\build\Selenium.WebDriver.ChromeDriver.targets'))" />
   </Target>
-  <Import Project="..\..\packages\Selenium.WebDriver.ChromeDriver.2.43.0\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.2.43.0\build\Selenium.WebDriver.ChromeDriver.targets')" />
   <Import Project="..\..\packages\xunit.core.2.4.0\build\xunit.core.targets" Condition="Exists('..\..\packages\xunit.core.2.4.0\build\xunit.core.targets')" />
+  <Import Project="..\..\packages\Selenium.WebDriver.ChromeDriver.73.0.3683.68\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.73.0.3683.68\build\Selenium.WebDriver.ChromeDriver.targets')" />
 </Project>
