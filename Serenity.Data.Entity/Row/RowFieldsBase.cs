@@ -1,5 +1,6 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data.Mapping;
+using Serenity.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -184,10 +185,12 @@ namespace Serenity.Data
 
         private void GetRowFieldsAndProperties(
             out Dictionary<string, FieldInfo> rowFields,
-            out Dictionary<string, PropertyInfo> rowProperties)
+            out Dictionary<string, IPropertyInfo> rowProperties)
         {
+            var annotationTypes = Dependency.TryResolve<IAnnotationTypeRegistry>();
+            var annotationType = annotationTypes != null ? annotationTypes.GetAnnotatedType(rowType) : null;
             rowFields = new Dictionary<string, FieldInfo>(StringComparer.OrdinalIgnoreCase);
-            rowProperties = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
+            rowProperties = new Dictionary<string, IPropertyInfo>(StringComparer.Ordinal);
 
             var members = rowType.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var member in members)
@@ -199,7 +202,10 @@ namespace Serenity.Data
                 {
                     var pi = member as PropertyInfo;
                     if (pi != null)
-                        rowProperties[pi.Name] = pi;
+                    {
+                        rowProperties[pi.Name] = annotationType != null ? 
+                            annotationType.GetAnnotatedProperty(pi) : new WrappedProperty(pi);
+                    }
                 }
             }
         }
@@ -216,7 +222,7 @@ namespace Serenity.Data
             lock (this.initializeLock)
             {
                 Dictionary<string, FieldInfo> rowFields;
-                Dictionary<string, PropertyInfo> rowProperties;
+                Dictionary<string, IPropertyInfo> rowProperties;
                 GetRowFieldsAndProperties(out rowFields, out rowProperties);
 
                 var expressionSelector = new DialectExpressionSelector(connectionKey);
@@ -228,7 +234,7 @@ namespace Serenity.Data
                     {
                         var field = (Field)fieldInfo.GetValue(this);
 
-                        PropertyInfo property;
+                        IPropertyInfo property;
                         if (!rowProperties.TryGetValue(fieldInfo.Name, out property))
                             property = null;
 
@@ -255,32 +261,31 @@ namespace Serenity.Data
 
                         if (property != null)
                         {
-                            var origin = property.GetCustomAttribute<OriginAttribute>();
+                            var origin = property.GetAttribute<OriginAttribute>();
 
+                            column = property.GetAttribute<ColumnAttribute>();
+                            display = property.GetAttribute<DisplayNameAttribute>();
+                            size = property.GetAttribute<SizeAttribute>();
 
-                            column = property.GetCustomAttribute<ColumnAttribute>(false);
-                            display = property.GetCustomAttribute<DisplayNameAttribute>(false);
-                            size = property.GetCustomAttribute<SizeAttribute>(false);
-
-                            var expressions = property.GetCustomAttributes<ExpressionAttribute>(false);
+                            var expressions = property.GetAttributes<ExpressionAttribute>();
                             if (expressions.Any())
                                 expression = expressionSelector.GetBestMatch(expressions, x => x.Dialect);
 
-                            scale = property.GetCustomAttribute<ScaleAttribute>(false);
-                            selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
-                            foreignKey = property.GetCustomAttribute<ForeignKeyAttribute>(false);
-                            leftJoin = property.GetCustomAttributes<LeftJoinAttribute>(false)
+                            scale = property.GetAttribute<ScaleAttribute>();
+                            selectLevel = property.GetAttribute<MinSelectLevelAttribute>();
+                            foreignKey = property.GetAttribute<ForeignKeyAttribute>();
+                            leftJoin = property.GetAttributes<LeftJoinAttribute>()
                                 .FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
-                            innerJoin = property.GetCustomAttributes<InnerJoinAttribute>(false)
+                            innerJoin = property.GetAttributes<InnerJoinAttribute>()
                                 .FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
-                            defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
-                            textualField = property.GetCustomAttribute<TextualFieldAttribute>(false);
-                            dateTimeKind = property.GetCustomAttribute<DateTimeKindAttribute>(false);
-                            readPermission = property.GetCustomAttribute<ReadPermissionAttribute>(false);
-                            insertPermission = property.GetCustomAttribute<InsertPermissionAttribute>(false) ??
-                                property.GetCustomAttribute<ModifyPermissionAttribute>(false) ?? readPermission;
-                            updatePermission = property.GetCustomAttribute<UpdatePermissionAttribute>(false) ??
-                                property.GetCustomAttribute<ModifyPermissionAttribute>(false) ?? readPermission;
+                            defaultValue = property.GetAttribute<DefaultValueAttribute>();
+                            textualField = property.GetAttribute<TextualFieldAttribute>();
+                            dateTimeKind = property.GetAttribute<DateTimeKindAttribute>();
+                            readPermission = property.GetAttribute<ReadPermissionAttribute>();
+                            insertPermission = property.GetAttribute<InsertPermissionAttribute>() ??
+                                property.GetAttribute<ModifyPermissionAttribute>() ?? readPermission;
+                            updatePermission = property.GetAttribute<UpdatePermissionAttribute>() ??
+                                property.GetAttribute<ModifyPermissionAttribute>() ?? readPermission;
 
                             if (origin != null)
                             {
@@ -289,16 +294,16 @@ namespace Serenity.Data
                                 {
                                     if (!expressions.Any() && expression == null)
                                         expression = new ExpressionAttribute(propertyDictionary.OriginExpression(
-                                            property, origin, expressionSelector, "", rowCustomAttributes));
+                                            property.Name, origin, expressionSelector, "", rowCustomAttributes));
 
                                     if (display == null)
-                                        display = new DisplayNameAttribute(propertyDictionary.OriginDisplayName(property, origin));
+                                        display = new DisplayNameAttribute(propertyDictionary.OriginDisplayName(property.Name, origin));
 
                                     if (size == null)
-                                        size = propertyDictionary.OriginAttribute<SizeAttribute>(property, origin);
+                                        size = propertyDictionary.OriginAttribute<SizeAttribute>(property.Name, origin);
 
                                     if (scale == null)
-                                        scale = propertyDictionary.OriginAttribute<ScaleAttribute>(property, origin);
+                                        scale = propertyDictionary.OriginAttribute<ScaleAttribute>(property.Name, origin);
                                 }
                                 catch (DivideByZeroException)
                                 {
@@ -309,8 +314,8 @@ namespace Serenity.Data
                                 }
                             }
 
-                            var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
-                            var updatable = property.GetCustomAttribute<UpdatableAttribute>(false);
+                            var insertable = property.GetAttribute<InsertableAttribute>();
+                            var updatable = property.GetAttribute<UpdatableAttribute>();
 
                             if (insertable != null && !insertable.Value)
                                 removeFlags |= FieldFlags.Insertable;
@@ -318,7 +323,7 @@ namespace Serenity.Data
                             if (updatable != null && !updatable.Value)
                                 removeFlags |= FieldFlags.Updatable;
 
-                            foreach (var attr in property.GetCustomAttributes<SetFieldFlagsAttribute>(false))
+                            foreach (var attr in property.GetAttributes<SetFieldFlagsAttribute>())
                             {
                                 addFlags |= attr.Add;
                                 removeFlags |= attr.Remove;
@@ -459,12 +464,12 @@ namespace Serenity.Data
                                 }
                             }
 
-                            foreach (var attr in property.GetCustomAttributes<LeftJoinAttribute>())
+                            foreach (var attr in property.GetAttributes<LeftJoinAttribute>())
                                 if (attr.ToTable != null && attr.OnCriteria != null)
                                     new LeftJoin(this.joins, attr.ToTable, attr.Alias,
                                         new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
 
-                            foreach (var attr in property.GetCustomAttributes<InnerJoinAttribute>())
+                            foreach (var attr in property.GetAttributes<InnerJoinAttribute>())
                                 if (attr.ToTable != null && attr.OnCriteria != null)
                                     new InnerJoin(this.joins, attr.ToTable, attr.Alias,
                                         new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
@@ -472,7 +477,7 @@ namespace Serenity.Data
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;
 
-                            field.customAttributes = property.GetCustomAttributes(false).ToArray();
+                            field.customAttributes = property.GetAttributes<Attribute>().ToArray();
                         }
                     }
                 }
@@ -826,7 +831,7 @@ namespace Serenity.Data
         {
             get { return alias; }
         }
-
+        
         string IAlias.NameDot
         {
             get { return aliasDot; }

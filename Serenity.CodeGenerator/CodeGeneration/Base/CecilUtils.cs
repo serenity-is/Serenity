@@ -166,6 +166,29 @@ namespace Serenity.Reflection
             return null;
         }
 
+        public static IEnumerable<CustomAttribute> GetAttrs(IEnumerable<CustomAttribute> attrList, 
+            string ns, string name, TypeDefinition[] baseClasses = null)
+        {
+            if (attrList == null)
+                yield break;
+
+            foreach (var x in attrList)
+                if (x.AttributeType != null && IsOrSubClassOf(x.AttributeType.Resolve(), ns, name))
+                    yield return x;
+
+            if (baseClasses != null)
+            {
+                foreach (var b in baseClasses)
+                {
+                    foreach (var x in b.CustomAttributes)
+                        if (x.AttributeType != null && IsOrSubClassOf(x.AttributeType.Resolve(), ns, name))
+                            yield return x;
+                }
+            }
+
+            yield break;
+        }
+
         public static CustomAttribute FindAttr(IEnumerable<CustomAttribute> attrList, string ns, string name)
         {
             if (attrList == null)
@@ -180,10 +203,10 @@ namespace Serenity.Reflection
 
         public static bool IsAssignableFrom(TypeReference baseType, TypeReference type)
         {
-            return IsAssignableFrom(baseType.Resolve(), type.Resolve());
+            return IsAssignableFrom(baseType.FullName, type.Resolve());
         }
 
-        public static bool IsAssignableFrom(TypeDefinition baseType, TypeDefinition type)
+        public static bool IsAssignableFrom(string baseTypeFullName, TypeDefinition type)
         {
             Queue<TypeDefinition> queue = new Queue<TypeDefinition>();
             queue.Enqueue(type);
@@ -192,7 +215,7 @@ namespace Serenity.Reflection
             {
                 var current = queue.Dequeue();
 
-                if (baseType.FullName == current.FullName)
+                if (baseTypeFullName == current.FullName)
                     return true;
 
                 if (current.BaseType != null)
