@@ -734,6 +734,15 @@ declare namespace Serenity {
     type ServiceOptions<TResponse extends ServiceResponse> = Q.ServiceOptions<TResponse>;
 }
 declare namespace Q {
+    namespace LayoutTimer {
+        function on(key: string, handler: () => void): () => void;
+        function onSizeChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function onWidthChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function onHeightChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function off(key: string, handler?: () => void): void;
+    }
+}
+declare namespace Q {
     function autoFullHeight(element: JQuery): void;
     function initFullHeightGridPage(gridDiv: JQuery): void;
     function layoutFillHeightValue(element: JQuery): number;

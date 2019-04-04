@@ -38,6 +38,7 @@
     "Q/Q.ErrorHandling.ts",
     "Q/Q.Config.ts",
     "Q/Q.Services.ts",
+    "Q/Q.LayoutTimer.ts",
     "Q/Q.Layout.ts",
     "Q/Q.ScriptData.ts",
     "Q/Q.TypeSystem.ts",
