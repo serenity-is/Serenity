@@ -1,3 +1,21 @@
+## 3.9.6 (2019-04-05)
+
+Features:
+  - added annotation type support, which allows separating undesired dependencies, like UI related attributes from row properties into a annotation class.
+  - added AutoColumnWidthMixin which auto sizes grid columns based on content width [StartSharp]
+  - improve responsive layout algorithm for data grids in mobile devices
+  - recommended method to ignore checking a property name when form/columns class has a BasedOnRow(CheckNames = true) is now [IgnoreName], not [NotMapped] attribute, though old one still works for compability.
+
+## 3.9.5 (2019-03-27)
+
+Features:
+  - handle toastr invalid path casing
+  
+## 3.9.4 (2019-03-27)
+
+Bugfixes:
+  - fix syntax error in DotnetCorePathFinder
+  
 ## 3.9.3 (2019-03-27)
 
 Features:
