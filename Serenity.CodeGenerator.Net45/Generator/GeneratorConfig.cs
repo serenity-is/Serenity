@@ -25,6 +25,7 @@ namespace Serenity.CodeGenerator
         public bool GenerateService { get; set; }
         public bool GenerateUI { get; set; }
         public bool GenerateCustom { get; set; }
+        public bool UseDBIdentifiers { get; set; }
 
         public GeneratorConfig()
         {
@@ -38,6 +39,7 @@ namespace Serenity.CodeGenerator
             GenerateService = true;
             GenerateUI = true;
             GenerateCustom = true;
+            UseDBIdentifiers = false;
             SetDefaults();
         }
 

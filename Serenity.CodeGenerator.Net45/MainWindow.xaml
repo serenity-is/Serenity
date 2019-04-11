@@ -140,6 +140,9 @@
                     </DockPanel>
 
                     <!--<CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=GenerateTSCode}">Grid/Dialog in TypeScript (instead of Saltaralle)</CheckBox>-->
+
+                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=UseDBIdentifiers}">Don't titleize identifiers</CheckBox>
+
                 </StackPanel>
             </Border>
         </Popup>

@@ -18,6 +18,7 @@ namespace Serenity.CodeGenerator
         public string CustomTemplates { get; set; }
         public Dictionary<string, string> CustomGenerate { get; set; }
         public Dictionary<string, object> CustomSettings { get; set; }
+        public bool UseDBIdentifiers { get; set; }
         [JsonIgnore]
         public bool GenerateRow { get; set; }
         [JsonIgnore]
@@ -37,6 +38,7 @@ namespace Serenity.CodeGenerator
             GenerateService = true;
             GenerateUI = true;
             GenerateCustom = true;
+            UseDBIdentifiers = false;
         }
 
         public string SaveToJson()

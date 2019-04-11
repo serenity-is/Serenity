@@ -325,6 +325,20 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        public bool UseDBIdentifiers
+        {
+            get { return config.UseDBIdentifiers; }
+            set
+            {
+                if (value != config.UseDBIdentifiers)
+                {
+                    config.UseDBIdentifiers = value;
+                    config.Save();
+                    Changed("UseDBIdentifiers");
+                }
+            }
+        }
+
         private void AddConnection_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new AddConnectionStringWindow();
