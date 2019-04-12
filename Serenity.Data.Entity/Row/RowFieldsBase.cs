@@ -307,7 +307,7 @@ namespace Serenity.Data
                                 }
                                 catch (DivideByZeroException)
                                 {
-                                    throw new Exception(String.Format(
+                                    throw new InvalidProgramException(String.Format(
                                         "Infinite recursion detected while determining origins " +
                                         "for property '{0}' on row type '{1}'",
                                         property.Name, rowType.FullName));
@@ -370,7 +370,7 @@ namespace Serenity.Data
                             if (size != null)
                                 throw new InvalidProgramException(String.Format(
                                     "Field size '{0}' in type {1} can't be overridden by Size attribute!",
-                                        fieldInfo.Name, rowType.Name));
+                                        fieldInfo.Name, rowType.FullName));
 
                             if (display != null)
                                 field.Caption = new LocalText(display.DisplayName);
@@ -381,7 +381,7 @@ namespace Serenity.Data
                             if (column != null && String.Compare(column.Name, field.Name, StringComparison.OrdinalIgnoreCase) != 0)
                                 throw new InvalidProgramException(String.Format(
                                     "Field name '{0}' in type {1} can't be overridden by Column name attribute!",
-                                        fieldInfo.Name, rowType.Name));
+                                        fieldInfo.Name, rowType.FullName));
                         }
 
                         if (scale != null)
@@ -409,6 +409,16 @@ namespace Serenity.Data
                             field.ForeignTable = foreignKey.Table;
                             field.ForeignField = foreignKey.Field;
                         }
+
+                        if ((leftJoin != null || innerJoin != null) && field.ForeignTable.IsEmptyOrNull())
+                            throw new InvalidProgramException(String.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
+                                "but its foreign table is undefined. Make sure it has a valid [ForeignKey] attribute!",
+                                    fieldInfo.Name, rowType.FullName));
+
+                        if ((leftJoin != null || innerJoin != null) && field.ForeignField.IsEmptyOrNull())
+                            throw new InvalidProgramException(String.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
+                                "but its foreign field is undefined. Make sure it has a valid [ForeignKey] attribute!",
+                                    fieldInfo.Name, rowType.FullName));
 
                         if (leftJoin != null)
                         {
