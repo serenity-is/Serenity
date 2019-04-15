@@ -1,3 +1,9 @@
+## 3.9.7 (2019-04-15)
+
+Features:
+  - update to asp.net core 2.2, make sure you install 2.2 sdk for your Visual Studio version (SDK 2.2.106 for VS 2017, SDK 2.2.203 for VS 2019 as of writing), updated many packages including Newtonsoft.Json, FakeItEasy, Microsoft.AspNet.Mvc
+  - add better error handling when a property has [LeftJoin] or [InnerJoin] attribute but no [ForeignKey] attribute.
+
 ## 3.9.6 (2019-04-05)
 
 Features:
