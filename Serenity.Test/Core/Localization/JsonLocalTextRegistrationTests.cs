@@ -50,10 +50,10 @@ namespace Serenity.Test
                 JsonLocalTextRegistration.AddFromNestedDictionary(dict, "pre", "en");
 
                 A.CallTo(() => registry.Add("en", "prex", "5"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -70,13 +70,13 @@ namespace Serenity.Test
                 JsonLocalTextRegistration.AddFromNestedDictionary(dict, "pre.", "es");
 
                 A.CallTo(() => registry.Add("es", "pre.x", "5"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add("es", "pre.y.z", "a.b.c"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Twice);
+                    .MustHaveHappened(2, Times.Exactly);
             }
         }
 
@@ -93,19 +93,19 @@ namespace Serenity.Test
                 JsonLocalTextRegistration.AddFromNestedDictionary(dict, "Db.", "jp");
 
                 A.CallTo(() => registry.Add("jp", "Db.x", "x"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add("jp", "Db.y.z.u.l", "l"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add("jp", "Db.y.z.u.m", "m"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add("jp", "Db.y.z.t", "t"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Times(4));
+                    .MustHaveHappened(4, Times.Exactly);
             }
         }
 
@@ -122,10 +122,10 @@ namespace Serenity.Test
                 JsonLocalTextRegistration.AddFromNestedDictionary(dict, "Db.", "jp");
 
                 A.CallTo(() => registry.Add("jp", "Db.x", "x"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -258,10 +258,10 @@ namespace Serenity.Test
                     JsonLocalTextRegistration.AddFromFilesInFolder(temporary);
 
                     A.CallTo(() => registry.Add("en", "x", "5"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
                 }
                 finally
                 {
@@ -288,13 +288,13 @@ namespace Serenity.Test
                     JsonLocalTextRegistration.AddFromFilesInFolder(temporary);
 
                     A.CallTo(() => registry.Add("es", "x", "5"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add("es", "y.z", "a.b.c"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
-                        .MustHaveHappened(Repeated.Exactly.Twice);
+                        .MustHaveHappened(2, Times.Exactly);
                 }
                 finally
                 {
@@ -321,19 +321,19 @@ namespace Serenity.Test
                     JsonLocalTextRegistration.AddFromFilesInFolder(temporary);
 
                     A.CallTo(() => registry.Add("jp", "x", "x"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add("jp", "y.z.u.l", "l"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add("jp", "y.z.u.m", "m"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add("jp", "y.z.t", "t"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
-                        .MustHaveHappened(Repeated.Exactly.Times(4));
+                        .MustHaveHappened(4, Times.Exactly);
 
                 }
                 finally
@@ -361,10 +361,10 @@ namespace Serenity.Test
                     JsonLocalTextRegistration.AddFromFilesInFolder(temporary);
 
                     A.CallTo(() => registry.Add("jp", "x", "x"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                 }
                 finally
@@ -395,22 +395,22 @@ namespace Serenity.Test
                     JsonLocalTextRegistration.AddFromFilesInFolder(temporary);
 
                     A.CallTo(() => registry.Add("jp", "x", "1"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add("en-US", "x", "2"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add("en-GB", "x", "3"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add("en", "x", "4"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add("tr-TR", "x", "5"))
-                        .MustHaveHappened(Repeated.Exactly.Once);
+                        .MustHaveHappened(1, Times.Exactly);
 
                     A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
-                        .MustHaveHappened(Repeated.Exactly.Times(5));
+                        .MustHaveHappened(5, Times.Exactly);
                 }
                 finally
                 {

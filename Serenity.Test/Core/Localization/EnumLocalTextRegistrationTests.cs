@@ -52,7 +52,7 @@ namespace Serenity.Test
                 EnumLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.AtLeast.Twice);
+                    .MustHaveHappened(2, Times.OrMore);
             }
         }
 
@@ -89,7 +89,7 @@ namespace Serenity.Test
                     EnumWithoutKey.WithDescriptionNoKey.GetName();
 
                 A.CallTo(() => registry.Add(A<string>._, expectedKey, "Description for WithDescriptionNoKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Serenity.Test
                     EnumWithKey.WithDescriptionKey.GetName();
 
                 A.CallTo(() => registry.Add(A<string>._, expectedKey, "Description for WithDescriptionKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 

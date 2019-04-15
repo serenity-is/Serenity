@@ -105,9 +105,5 @@
     "Externals/Serenity.Externals.Slick.ts",
     "Externals/Serenity.Externals.ts",
     "UI/Serenity.Script.UI.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "Serenity.CoreLib.d.ts"
   ]
 }

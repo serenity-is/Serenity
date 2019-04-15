@@ -73,7 +73,7 @@ namespace Serenity.Test
                     .MustNotHaveHappened();
 
                 A.CallTo(() => registry.Add(LocalText.InvariantLanguageID, "Y.Y1", "1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
             }
         }
@@ -90,16 +90,16 @@ namespace Serenity.Test
                 NestedLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 A.CallTo(() => registry.Add(LocalText.InvariantLanguageID, "Y.Y1", "1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add(LocalText.InvariantLanguageID, "Y.Y2", "2"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add(LocalText.InvariantLanguageID, "Y.YI.Y3", "3"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add(LocalText.InvariantLanguageID, "Y4", "4"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -116,16 +116,16 @@ namespace Serenity.Test
                 NestedLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 A.CallTo(() => registry.Add("es", "Z.Z1", "1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add("es", "Z.Z2", "2"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add("es", "Z.ZI.Z3", "3"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add("es", "Z4", "4"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -141,16 +141,16 @@ namespace Serenity.Test
                 NestedLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 A.CallTo(() => registry.Add(LocalText.InvariantLanguageID, "p.P.P1", "1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add(LocalText.InvariantLanguageID, "p.P.P2", "2"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add(LocalText.InvariantLanguageID, "p.P.PI.P3", "3"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add(LocalText.InvariantLanguageID, "p.P4", "4"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -166,16 +166,16 @@ namespace Serenity.Test
                 NestedLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 A.CallTo(() => registry.Add("jp", "x.X.X1", "1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add("jp", "x.X.X2", "2"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add("jp", "x.X.XI.X3", "3"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.Add("jp", "x.X4", "4"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -212,16 +212,16 @@ namespace Serenity.Test
                 NestedLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 A.CallTo(() => registry1.Add(LocalText.InvariantLanguageID, "Y.Y1", "1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry1.Add(LocalText.InvariantLanguageID, "Y.Y2", "2"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry1.Add(LocalText.InvariantLanguageID, "Y.YI.Y3", "3"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry1.Add(LocalText.InvariantLanguageID, "Y4", "4"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 var registry2 = A.Fake<ILocalTextRegistry>();
                 Dependency.Resolve<IDependencyRegistrar>()
@@ -230,16 +230,16 @@ namespace Serenity.Test
                 NestedLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 A.CallTo(() => registry2.Add(LocalText.InvariantLanguageID, "Y.Y1", "1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry2.Add(LocalText.InvariantLanguageID, "Y.Y2", "2"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry2.Add(LocalText.InvariantLanguageID, "Y.YI.Y3", "3"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry2.Add(LocalText.InvariantLanguageID, "Y4", "4"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -255,10 +255,10 @@ namespace Serenity.Test
                 NestedLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 A.CallTo(() => registry1.Add(LocalText.InvariantLanguageID, "Y4", "4"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry1.Add(LocalText.InvariantLanguageID, "Y4.Y5", "5"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
