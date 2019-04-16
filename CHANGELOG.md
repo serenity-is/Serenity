@@ -1,3 +1,8 @@
+## 3.9.8 (2019-04-16)
+
+Bugfixes:
+  - sergen nuget package missing System.Threading.Tasks.Extensions.dll used by scriban 2.0
+
 ## 3.9.7 (2019-04-15)
 
 Features:

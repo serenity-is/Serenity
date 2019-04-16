@@ -38,6 +38,8 @@
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.CodeGenerator.exe" target="tools/sergen.exe" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Newtonsoft.Json.dll" target="tools" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Scriban.dll" target="tools" />
+    <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/System.Runtime.CompilerServices.Unsafe.dll" target="tools" />
+    <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/System.Threading.Tasks.Extensions.dll" target="tools" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.Core.dll" target="tools" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.Data.dll" target="tools" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.Data.Entity.dll" target="tools" />
