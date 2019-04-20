@@ -3,11 +3,9 @@
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>dotnet-sergen</AssemblyName>
-    <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.2;net461</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <PackageId>Serenity.CodeGenerator</PackageId>
-    <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
-    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8;dnxcore50</AssetTargetFallback>
     <DefineConstants>$(DefineConstants);ASPNETCORE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
@@ -23,16 +21,15 @@
     <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="Scriban" Version="1.2.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Scriban" Version="2.0.0" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="6.3.0" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="6.6.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
-    <PackageReference Include="MySqlConnector" Version="0.40.3" />
-    <PackageReference Include="Npgsql" Version="4.0.3" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
+    <PackageReference Include="MySqlConnector" Version="0.52.0" />
+    <PackageReference Include="Npgsql" Version="4.0.6" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
     <Reference Include="Mono.Cecil">
       <HintPath>..\Tools\Cecil\netstandard1.3\Mono.Cecil.dll</HintPath>
     </Reference>
@@ -42,7 +39,7 @@
       <HintPath>..\Tools\Cecil\net40\Mono.Cecil.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
     <DefineConstants>$(DefineConstants);COREFX</DefineConstants>
   </PropertyGroup>
 </Project>

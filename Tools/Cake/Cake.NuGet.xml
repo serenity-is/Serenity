@@ -6,8 +6,33 @@
     <members>
         <member name="F:Cake.NuGet.Constants.NuGet.Source">
             <summary>
-            The config key name for overriding the default nuget package source
+            The config key name for overriding the default NuGet package source
             </summary>
+        </member>
+        <member name="F:Cake.NuGet.Constants.NuGet.UseInProcessClient">
+            <summary>
+            The config key name for using the in process client for installing packages
+            </summary>
+        </member>
+        <member name="F:Cake.NuGet.Constants.NuGet.LoadDependencies">
+            <summary>
+            The config key name for enabling loading of NuGet package dependencies
+            </summary>
+        </member>
+        <member name="F:Cake.NuGet.Constants.NuGet.ConfigFile">
+            <summary>
+            The config key name for overriding the default NuGet config file
+            </summary>
+        </member>
+        <member name="M:Cake.NuGet.Install.NuGetPackageInstaller.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.NuGet.INuGetContentResolver,Cake.Core.Diagnostics.ICakeLog,Cake.Core.Configuration.ICakeConfiguration)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.NuGet.Install.NuGetPackageInstaller"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="contentResolver">The content resolver.</param>
+            <param name="log">The log.</param>
+            <param name="config">the configuration</param>
         </member>
         <member name="T:Cake.NuGet.INuGetContentResolver">
             <summary>
@@ -25,11 +50,22 @@
             <param name="type">The resource type.</param>
             <returns>A collection of files.</returns>
         </member>
+        <member name="T:Cake.NuGet.INuGetPackageInstaller">
+            <summary>
+            Represents a NuGet package installer.
+            </summary>
+        </member>
         <member name="T:Cake.NuGet.NuGetModule">
             <summary>
             The module responsible for registering
             default types in the Cake.NuGet assembly.
             </summary>
+        </member>
+        <member name="M:Cake.NuGet.NuGetModule.#ctor(Cake.Core.Configuration.ICakeConfiguration)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.NuGet.NuGetModule"/> class.
+            </summary>
+            <param name="config">The config.</param>
         </member>
         <member name="M:Cake.NuGet.NuGetModule.Register(Cake.Core.Composition.ICakeContainerRegistrar)">
             <summary>
@@ -52,7 +88,7 @@
             <param name="toolResolver">The NuGet tool resolver.</param>
             <param name="contentResolver">The content resolver.</param>
             <param name="log">The log.</param>
-            <param name="config">the configuration</param>
+            <param name="config">The configuration.</param>
         </member>
         <member name="M:Cake.NuGet.NuGetPackageInstaller.CanInstall(Cake.Core.Packaging.PackageReference,Cake.Core.Packaging.PackageType)">
             <summary>
@@ -73,12 +109,6 @@
             <param name="type">The package type.</param>
             <param name="path">The location where to install the package.</param>
             <returns>The installed files.</returns>
-        </member>
-        <member name="T:Cake.NuGet.V2.NuGetV2ContentResolver">
-            <summary>
-            Implementation of a file locator for NuGet packages that
-            returns relevant files for the current framework given a resource type.
-            </summary>
         </member>
     </members>
 </doc>

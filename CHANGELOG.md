@@ -1,3 +1,101 @@
+## 3.9.8 (2019-04-16)
+
+Bugfixes:
+  - sergen nuget package missing System.Threading.Tasks.Extensions.dll used by scriban 2.0
+
+## 3.9.7 (2019-04-15)
+
+Features:
+  - update to asp.net core 2.2, make sure you install 2.2 sdk for your Visual Studio version (SDK 2.2.106 for VS 2017, SDK 2.2.203 for VS 2019 as of writing), updated many packages including Newtonsoft.Json, FakeItEasy, Microsoft.AspNet.Mvc
+  - add better error handling when a property has [LeftJoin] or [InnerJoin] attribute but no [ForeignKey] attribute.
+
+## 3.9.6 (2019-04-05)
+
+Features:
+  - added annotation type support, which allows separating undesired dependencies, like UI related attributes from row properties into a annotation class.
+  - added AutoColumnWidthMixin which auto sizes grid columns based on content width [StartSharp]
+  - improve responsive layout algorithm for data grids in mobile devices
+  - recommended method to ignore checking a property name when form/columns class has a BasedOnRow(CheckNames = true) is now [IgnoreName], not [NotMapped] attribute, though old one still works for compability.
+
+## 3.9.5 (2019-03-27)
+
+Features:
+  - handle toastr invalid path casing
+  
+## 3.9.4 (2019-03-27)
+
+Bugfixes:
+  - fix syntax error in DotnetCorePathFinder
+  
+## 3.9.3 (2019-03-27)
+
+Features:
+  - better handling for nuget locations in linux / mac
+
+## 3.9.2 (2019-03-27)
+
+Features:
+  - skip packages without id for dotnet sergen restore, e.g. Microsoft.AspNetCore.App
+
+## 3.9.1 (2019-03-27)
+
+Features:
+  - check runtimeconfig.dev.json for nuget folders (attempting to fix linux / mac transform issue)
+
+## 3.9.0 (2019-03-15)
+
+Features:
+  - added basic attributes to support plugin architecture (work in progress...)
+  - [Breaking Change] Serenity.Web NuGet package no longer contains / has reference to Serenity script, css and image files, so you need to manually install Serenity.Scripts NuGet package in your project after updating. 
+  Also update Serenity.Web.Assets package. If using AspNetCore add reference to Serenity.Web.Assets and Serenity.Web.Scripts packages in CSPROJ file next to Serenity.Web reference.
+
+Bugfixes:
+  - StackExchange.Exceptional delete, protect etc. actions wasn't working in ASP.NET Core properly due to AntiForgery system [StartSharp]
+
+## 3.8.7 (2019-02-27)
+
+Features:
+  - update bootstrap dependency to 3.4.1
+
+## 3.8.6 (2019-02-09)
+
+Features:
+  - modern flat design for grids, dialogs and toolbars [StartSharp]
+  - when there are items without a tab, instead of showing an empty tab caption, create those property items before the tab (thanks @dfaruque)
+  - ability to register data scripts using classes like lookup scripts
+  - row field value name indexed get access should also look field by property name and also in dictionary data if available
+  - made target optional for PropertyGrid.save and it returns the new/passed target object. added value property to PropertyGrid.
+  
+## 3.8.5 (2019-01-03)
+
+Bugfixes:
+  - ensure not-mapped fields that are populated by MasterDetailRelation or LinkingSetRelation are only loaded if explicitly included (e.g. column is visible) for ListRequestHandler and loaded in default Details mode for RetrieveRequestHandler
+
+## 3.8.4 (2019-01-02)
+
+Bugfixes:
+  - fix inplace add script error in lookup editor
+
+## 3.8.3 (2018-12-29)
+
+Features:
+  - added idle (session) timeout feature and related sample [StartSharp]
+  - implemented impersonate as (login as) functionality in users page [StartSharp]
+  - backported two factor authentication sample to .NET core [StartSharp]
+  - added from address setting for mailing in .NET core version [StartSharp]
+  - added selectedItem getter in SelectEditor (thanks @dfaruque)
+  - changed protection level of clearItems, addItem and addOption in lookup editor to public (thanks @dfaruque)
+  - ability to specify location of button separator (thanks @Jin)
+  - added GridRadioSelectionMixin (thanks @Jin)
+  - moved most of lookup editor code like cascading, filtering etc. into select2editor base class so that they can be reused in custom editors
+  - enum editor supports multiple option
+  
+Bugfixes:
+  - fix ui look of datetimeeditor (thanks @adam feng)
+  - fix fonts folder casing issue in linux
+  - fixed OracleSchemaProvider based on pull request by @kilroyFR
+  - hotkeyContext of tool button definition is ignored (thanks @hannesb)
+
 ## 3.8.2 (2018-12-04)
 
 Features:

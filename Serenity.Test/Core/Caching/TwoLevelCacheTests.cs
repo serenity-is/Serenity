@@ -70,28 +70,28 @@ namespace Serenity.Test
                 Assert.NotNull(generationKey);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey", "xyz", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", generationKey.Value, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeGenerationKey", generationKey.Value))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeKey", "xyz", TimeSpan.FromMinutes(30)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(30)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -128,13 +128,13 @@ namespace Serenity.Test
                 Assert.Equal("LocalValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeGenerationKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add(A<String>.Ignored, A<String>.Ignored, A<TimeSpan>.Ignored))
                     .MustNotHaveHappened();
@@ -143,10 +143,10 @@ namespace Serenity.Test
                     .MustNotHaveHappened();
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", 987UL, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeGenerationKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<string>(A<string>.Ignored))
                     .MustNotHaveHappened();
@@ -186,13 +186,13 @@ namespace Serenity.Test
                 Assert.Equal("SomeValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeGenerationKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>(A<string>.Ignored))
                     .MustNotHaveHappened();
@@ -241,28 +241,28 @@ namespace Serenity.Test
                 Assert.Equal("DistributedCacheValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
                     .MustNotHaveHappened();
 
                 A.CallTo(() => localCache.Add("SomeKey", "DistributedCacheValue", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, 987UL, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", 987UL, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeGenerationKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<string>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set<ulong>(A<string>.Ignored, A<ulong>.Ignored))
                     .MustNotHaveHappened();
@@ -308,28 +308,28 @@ namespace Serenity.Test
                 Assert.Equal("DistributedCacheValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey", "DistributedCacheValue", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, 987UL, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", 987UL, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeGenerationKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<string>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set<ulong>(A<string>.Ignored, A<ulong>.Ignored))
                     .MustNotHaveHappened();
@@ -372,25 +372,25 @@ namespace Serenity.Test
                 Assert.Equal("AnotherValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey", "AnotherValue", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, 987UL, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", 987UL, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeGenerationKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<string>("SomeKey"))
                     .MustNotHaveHappened();
@@ -399,10 +399,10 @@ namespace Serenity.Test
                     .MustNotHaveHappened();
 
                 A.CallTo(() => distributedCache.Set("SomeKey", "AnotherValue", TimeSpan.FromMinutes(30)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeKey" + TwoLevelCache.GenerationSuffix, 987UL, TimeSpan.FromMinutes(30)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -439,37 +439,37 @@ namespace Serenity.Test
                 Assert.Equal("AnotherValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
                     .MustNotHaveHappened();
 
                 A.CallTo(() => localCache.Add("SomeKey", "AnotherValue", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", generationKey.Value, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeGenerationKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<string>("SomeKey"))
                     .MustNotHaveHappened();
 
                 A.CallTo(() => distributedCache.Set("SomeGenerationKey", generationKey.Value))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeKey", "AnotherValue", TimeSpan.FromMinutes(30)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(30)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -506,37 +506,37 @@ namespace Serenity.Test
                 Assert.Equal("AnotherValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
                     .MustNotHaveHappened();
 
                 A.CallTo(() => localCache.Add("SomeKey", "AnotherValue", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", generationKey.Value, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeGenerationKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<string>("SomeKey"))
                     .MustNotHaveHappened();
 
                 A.CallTo(() => distributedCache.Set("SomeGenerationKey", generationKey.Value))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeKey", "AnotherValue", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -604,28 +604,28 @@ namespace Serenity.Test
                 Assert.NotNull(generationKey);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey", "xyz", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", generationKey.Value, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeGenerationKey", generationKey.Value))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeKey", "serialized:xyz", TimeSpan.FromMinutes(30)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(30)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -652,10 +652,10 @@ namespace Serenity.Test
                 Assert.Equal("xyz", value);
 
                 A.CallTo(() => localCache.Add("SomeKey", "xyz", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set("SomeKey", "serialized:xyz", TimeSpan.FromMinutes(30)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -748,22 +748,22 @@ namespace Serenity.Test
                 Assert.NotNull(generationKey);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey", "xyz", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", generationKey.Value, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix))
                     .MustNotHaveHappened();
 
                 A.CallTo(() => distributedCache.Set("SomeGenerationKey", generationKey.Value))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Set(A<string>.Ignored, A<string>.Ignored, A<TimeSpan>.Ignored))
                     .MustNotHaveHappened();
@@ -800,25 +800,25 @@ namespace Serenity.Test
                 Assert.Equal("AnotherValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeGenerationKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey", "AnotherValue", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, 987UL, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", 987UL, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>(A<string>.Ignored))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<string>(A<string>.Ignored))
                     .MustNotHaveHappened();
@@ -856,7 +856,7 @@ namespace Serenity.Test
                 Assert.Equal("AnotherValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
                     .MustNotHaveHappened();
@@ -865,16 +865,16 @@ namespace Serenity.Test
                     .MustNotHaveHappened();
 
                 A.CallTo(() => localCache.Add("SomeKey", "AnotherValue", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, 987UL, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", 987UL, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>(A<string>.Ignored))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<string>(A<string>.Ignored))
                     .MustNotHaveHappened();
@@ -914,25 +914,25 @@ namespace Serenity.Test
                 Assert.Equal("AnotherValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeGenerationKey"))
                     .MustNotHaveHappened();
 
                 A.CallTo(() => localCache.Add("SomeKey", "AnotherValue", TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, 987UL, TimeSpan.FromMinutes(5)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", 987UL, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>(A<string>.Ignored))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<string>(A<string>.Ignored))
                     .MustNotHaveHappened();
@@ -975,13 +975,13 @@ namespace Serenity.Test
                 Assert.Equal("LocalValue", value);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Get<object>("SomeGenerationKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => localCache.Add(A<String>.Ignored, A<String>.Ignored, A<TimeSpan>.Ignored))
                     .MustNotHaveHappened();
@@ -990,10 +990,10 @@ namespace Serenity.Test
                     .MustNotHaveHappened();
 
                 A.CallTo(() => localCache.Add("SomeGenerationKey", 987UL, TwoLevelCache.GenerationCacheExpiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<ulong?>(A<string>.Ignored))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => distributedCache.Get<string>(A<string>.Ignored))
                     .MustNotHaveHappened();

@@ -4,6 +4,37 @@
         <name>Cake</name>
     </assembly>
     <members>
+        <member name="T:Cake.Arguments.IArgumentParser">
+            <summary>
+            Represents an argument parser.
+            </summary>
+        </member>
+        <member name="M:Cake.Arguments.IArgumentParser.Parse(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Parses the specified arguments.
+            </summary>
+            <param name="args">The arguments to parse.</param>
+            <returns>A <see cref="T:Cake.CakeOptions"/> instance representing the arguments.</returns>
+        </member>
+        <member name="T:Cake.Arguments.VerbosityParser">
+            <summary>
+            Responsible for parsing <see cref="T:Cake.Core.Diagnostics.Verbosity"/>.
+            </summary>
+        </member>
+        <member name="M:Cake.Arguments.VerbosityParser.#ctor(Cake.Core.Diagnostics.ICakeLog)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Arguments.VerbosityParser"/> class.
+            </summary>
+            <param name="log">The log.</param>
+        </member>
+        <member name="M:Cake.Arguments.VerbosityParser.TryParse(System.String,Cake.Core.Diagnostics.Verbosity@)">
+            <summary>
+            Parses the provided string to a <see cref="T:Cake.Core.Diagnostics.Verbosity"/>.
+            </summary>
+            <param name="value">The string to parse.</param>
+            <param name="verbosity">The verbosity.</param>
+            <returns><c>true</c> if parsing succeeded; otherwise <c>false</c>.</returns>
+        </member>
         <member name="T:Cake.CakeApplication">
             <summary>
             The Cake application.
@@ -50,57 +81,6 @@
             <param name="name">The argument name.</param>
             <returns>The argument value.</returns>
         </member>
-        <member name="P:Cake.CakeConsole.ForegroundColor">
-            <summary>
-            Gets or sets the foreground color.
-            </summary>
-            <value>The foreground color.</value>
-        </member>
-        <member name="P:Cake.CakeConsole.BackgroundColor">
-            <summary>
-            Gets or sets the background color.
-            </summary>
-            <value>The background color.</value>
-        </member>
-        <member name="M:Cake.CakeConsole.Write(System.String,System.Object[])">
-            <summary>
-            Writes the text representation of the specified array of objects to the
-            console output using the specified format information.
-            </summary>
-            <param name="format">A composite format string</param>
-            <param name="arg">An array of objects to write using format.</param>
-        </member>
-        <member name="M:Cake.CakeConsole.WriteLine(System.String,System.Object[])">
-            <summary>
-            Writes the text representation of the specified array of objects, followed
-            by the current line terminator, to the console output using the specified
-            format information.
-            </summary>
-            <param name="format">A composite format string</param>
-            <param name="arg">An array of objects to write using format.</param>
-        </member>
-        <member name="M:Cake.CakeConsole.WriteError(System.String,System.Object[])">
-            <summary>
-            Writes the text representation of the specified array of objects to the
-            console error output using the specified format information.
-            </summary>
-            <param name="format">A composite format string</param>
-            <param name="arg">An array of objects to write using format.</param>
-        </member>
-        <member name="M:Cake.CakeConsole.WriteErrorLine(System.String,System.Object[])">
-            <summary>
-            Writes the text representation of the specified array of objects, followed
-            by the current line terminator, to the console error output using the
-            specified format information.
-            </summary>
-            <param name="format">A composite format string</param>
-            <param name="arg">An array of objects to write using format.</param>
-        </member>
-        <member name="M:Cake.CakeConsole.ResetColor">
-            <summary>
-            Sets the foreground and background console colors to their defaults.
-            </summary>
-        </member>
         <member name="T:Cake.CakeOptions">
             <summary>
             The options that determines how the application should behave.
@@ -130,6 +110,14 @@
             </summary>
             <value>
               <c>true</c> to show task description; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Cake.CakeOptions.ShowTree">
+            <summary>
+            Gets or sets a value indicating whether to show the task dependency tree
+            </summary>
+            <value>
+              <c>true</c> to show task tree; otherwise, <c>false</c>.
             </value>
         </member>
         <member name="P:Cake.CakeOptions.PerformDryRun">
@@ -164,20 +152,12 @@
               <c>true</c> to show version information; otherwise, <c>false</c>.
             </value>
         </member>
-        <member name="P:Cake.CakeOptions.Mono">
+        <member name="P:Cake.CakeOptions.ShowInfo">
             <summary>
-            Gets or sets a value indicating whether to use the Mono compiler or not.
+            Gets or sets a value indicating whether to show additional information.
             </summary>
             <value>
-              <c>true</c> if the mono compiler should be used; otherwise, <c>false</c>.
-            </value>
-        </member>
-        <member name="P:Cake.CakeOptions.Experimental">
-            <summary>
-            Gets or sets a value indicating whether to use the latest roslyn.
-            </summary>
-            <value>
-              <c>true</c> if latest roslyn should be used; otherwise, <c>false</c>.
+              <c>true</c> to show additional information; otherwise, <c>false</c>.
             </value>
         </member>
         <member name="P:Cake.CakeOptions.HasError">
@@ -188,52 +168,20 @@
               <c>true</c> if an error occurred during parsing; otherwise, <c>false</c>.
             </value>
         </member>
+        <member name="P:Cake.CakeOptions.Bootstrap">
+            <summary>
+            Gets or sets a value indicating whether to bootstrap Cake modules.
+            </summary>
+        </member>
+        <member name="P:Cake.CakeOptions.Exclusive">
+            <summary>
+            Gets or sets a value indicating whether or not to use the target exclusively.
+            </summary>
+        </member>
         <member name="M:Cake.CakeOptions.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:Cake.CakeOptions"/> class.
             </summary>
-        </member>
-        <member name="T:Cake.Program">
-            <summary>
-            The Cake program.
-            </summary>
-        </member>
-        <member name="M:Cake.Program.Main">
-            <summary>
-            The application entry point.
-            </summary>
-            <returns>The application exit code.</returns>
-        </member>
-        <member name="T:Cake.Arguments.IArgumentParser">
-            <summary>
-            Represents an argument parser.
-            </summary>
-        </member>
-        <member name="M:Cake.Arguments.IArgumentParser.Parse(System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            Parses the specified arguments.
-            </summary>
-            <param name="args">The arguments to parse.</param>
-            <returns>A <see cref="T:Cake.CakeOptions"/> instance representing the arguments.</returns>
-        </member>
-        <member name="T:Cake.Arguments.VerbosityParser">
-            <summary>
-            Responsible for parsing <see cref="T:Cake.Core.Diagnostics.Verbosity"/>.
-            </summary>
-        </member>
-        <member name="M:Cake.Arguments.VerbosityParser.#ctor(Cake.Core.Diagnostics.ICakeLog)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Cake.Arguments.VerbosityParser"/> class.
-            </summary>
-            <param name="log">The log.</param>
-        </member>
-        <member name="M:Cake.Arguments.VerbosityParser.TryParse(System.String,Cake.Core.Diagnostics.Verbosity@)">
-            <summary>
-            Parses the provided string to a <see cref="T:Cake.Core.Diagnostics.Verbosity"/>.
-            </summary>
-            <param name="value">The string to parse.</param>
-            <param name="verbosity">The verbosity.</param>
-            <returns><c>true</c> if parsing succeeded; otherwise <c>false</c>.</returns>
         </member>
         <member name="T:Cake.Commands.BuildCommand">
             <summary>
@@ -282,6 +230,12 @@
             Represents a command factory.
             </summary>
         </member>
+        <member name="M:Cake.Commands.ICommandFactory.CreateBootstrapCommand">
+            <summary>
+            Creates the bootstrap command.
+            </summary>
+            <returns>The bootstrap command.</returns>
+        </member>
         <member name="M:Cake.Commands.ICommandFactory.CreateBuildCommand">
             <summary>
             Creates the build command.
@@ -300,6 +254,12 @@
             </summary>
             <returns>The description command.</returns>
         </member>
+        <member name="M:Cake.Commands.ICommandFactory.CreateTaskTreeCommand">
+            <summary>
+            Creates the task tree command.
+            </summary>
+            <returns>The task tree command.</returns>
+        </member>
         <member name="M:Cake.Commands.ICommandFactory.CreateDryRunCommand">
             <summary>
             Creates the dry run command.
@@ -317,6 +277,22 @@
             Creates the version command.
             </summary>
             <returns>The version command.</returns>
+        </member>
+        <member name="M:Cake.Commands.ICommandFactory.CreateInfoCommand">
+            <summary>
+            Create the info command.
+            </summary>
+            <returns>The info command.</returns>
+        </member>
+        <member name="T:Cake.Commands.InfoCommand">
+            <summary>
+            A command that shows additional information about Cake execution
+            </summary>
+        </member>
+        <member name="T:Cake.Commands.TaskTreeCommand">
+            <summary>
+            A command that displays the script task graph.
+            </summary>
         </member>
         <member name="T:Cake.Commands.VersionCommand">
             <summary>
@@ -342,6 +318,17 @@
             or a TimeSpan that represents -1 milliseconds to wait indefinitely.</param>
             <returns>true if the debugger is attached within the timeout; otherwise, false.</returns>
         </member>
+        <member name="T:Cake.Program">
+            <summary>
+            The Cake program.
+            </summary>
+        </member>
+        <member name="M:Cake.Program.Main">
+            <summary>
+            The application entry point.
+            </summary>
+            <returns>The application exit code.</returns>
+        </member>
         <member name="T:Cake.Scripting.BuildScriptHost">
             <summary>
             The script host used to execute Cake scripts.
@@ -356,7 +343,7 @@
             <param name="reportPrinter">The report printer.</param>
             <param name="log">The log.</param>
         </member>
-        <member name="M:Cake.Scripting.BuildScriptHost.RunTarget(System.String)">
+        <member name="M:Cake.Scripting.BuildScriptHost.RunTargetAsync(System.String)">
             <summary>
             Runs the specified target.
             </summary>
@@ -376,7 +363,7 @@
             <param name="context">The context.</param>
             <param name="console">The console.</param>
         </member>
-        <member name="M:Cake.Scripting.DescriptionScriptHost.RunTarget(System.String)">
+        <member name="M:Cake.Scripting.DescriptionScriptHost.RunTargetAsync(System.String)">
             <summary>
             Runs the specified target.
             </summary>
@@ -396,122 +383,32 @@
             <param name="context">The context.</param>
             <param name="log">The log.</param>
         </member>
-        <member name="M:Cake.Scripting.DryRunScriptHost.RunTarget(System.String)">
+        <member name="M:Cake.Scripting.DryRunScriptHost.RunTargetAsync(System.String)">
             <summary>
             Runs the specified target.
             </summary>
             <param name="target">The target to run.</param>
             <returns>The resulting report.</returns>
         </member>
-        <member name="T:Cake.Scripting.Mono.MonoScriptHostProxy">
+        <member name="T:Cake.Scripting.TaskTreeScriptHost">
             <summary>
-            Mono script host proxy.
+            The script host used for showing task descriptions.
             </summary>
         </member>
-        <member name="P:Cake.Scripting.Mono.MonoScriptHostProxy.ScriptHost">
+        <member name="M:Cake.Scripting.TaskTreeScriptHost.#ctor(Cake.Core.ICakeEngine,Cake.Core.ICakeContext,Cake.Core.IConsole)">
             <summary>
-            Gets or sets the script host.
+            Initializes a new instance of the <see cref="T:Cake.Scripting.TaskTreeScriptHost"/> class.
             </summary>
-            <value>The script host.</value>
+            <param name="engine">The engine.</param>
+            <param name="context">The context.</param>
+            <param name="console">The console.</param>
         </member>
-        <member name="T:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase">
-            <summary>
-            Base class used for the Mono script code generation
-            </summary>
-        </member>
-        <member name="P:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.ScriptHost">
-            <summary>
-            Gets the script host.
-            </summary>
-            <value>The script host.</value>
-        </member>
-        <member name="P:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.Context">
-            <summary>
-            Gets the context.
-            </summary>
-            <value>The context.</value>
-        </member>
-        <member name="P:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.Tasks">
-            <summary>
-            Gets all registered tasks.
-            </summary>
-            <value>The registered tasks.</value>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.Task(System.String)">
-            <summary>
-            Registers a new task.
-            </summary>
-            <param name="name">The name of the task.</param>
-            <returns>A <see cref="T:Cake.Core.CakeTaskBuilder`1"/>.</returns>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.Setup(System.Action)">
-            <summary>
-            Allows registration of an action that's executed before any tasks are run.
-            If setup fails, no tasks will be executed but teardown will be performed.
-            </summary>
-            <param name="action">The action to be executed.</param>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.Setup(System.Action{Cake.Core.ICakeContext})">
-            <summary>
-            Allows registration of an action that's executed before any tasks are run.
-            If setup fails, no tasks will be executed but teardown will be performed.
-            </summary>
-            <param name="action">The action to be executed.</param>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.Teardown(System.Action)">
-            <summary>
-            Allows registration of an action that's executed after all other tasks have been run.
-            If a setup action or a task fails with or without recovery, the specified teardown action will still be executed.
-            </summary>
-            <param name="action">The action to be executed.</param>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.Teardown(System.Action{Cake.Core.ITeardownContext})">
-            <summary>
-            Allows registration of an action that's executed after all other tasks have been run.
-            If a setup action or a task fails with or without recovery, the specified teardown action will still be executed.
-            </summary>
-            <param name="action">The action to be executed.</param>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.TaskSetup(System.Action{Cake.Core.ICakeContext,Cake.Core.ITaskSetupContext})">
-            <summary>
-            Allows registration of an action that's executed before each task is run.
-            If the task setup fails, its task will not be executed but the task teardown will be performed.
-            </summary>
-            <param name="action">The action to be executed.</param>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.TaskSetup(System.Action{Cake.Core.ITaskSetupContext})">
-            <summary>
-            Allows registration of an action that's executed before each task is run.
-            If the task setup fails, its task will not be executed but the task teardown will be performed.
-            </summary>
-            <param name="action">The action to be executed.</param>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.TaskTeardown(System.Action{Cake.Core.ICakeContext,Cake.Core.ITaskTeardownContext})">
-            <summary>
-            Allows registration of an action that's executed after each task has been run.
-            If a task setup action or a task fails with or without recovery, the specified task teardown action will still be executed.
-            </summary>
-            <param name="action">The action to be executed.</param>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.TaskTeardown(System.Action{Cake.Core.ITaskTeardownContext})">
-            <summary>
-            Allows registration of an action that's executed after each task has been run.
-            If a task setup action or a task fails with or without recovery, the specified task teardown action will still be executed.
-            </summary>
-            <param name="action">The action to be executed.</param>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.RunTarget(System.String)">
+        <member name="M:Cake.Scripting.TaskTreeScriptHost.RunTargetAsync(System.String)">
             <summary>
             Runs the specified target.
             </summary>
             <param name="target">The target to run.</param>
             <returns>The resulting report.</returns>
-        </member>
-        <member name="M:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase.#ctor(Cake.Core.Scripting.IScriptHost)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Cake.Scripting.Mono.CodeGen.CakeBuildScriptImplBase"/> class.
-            </summary>
-            <param name="scriptHost">The script host.</param>
         </member>
     </members>
 </doc>

@@ -21,26 +21,38 @@ namespace Serenity.Web
         {
             Check.NotNull(assemblies, "assemblies");
 
+            DataScriptAttribute attr;
+
             foreach (var assembly in assemblies)
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (type.IsAbstract || 
-                        type.IsInterface || 
+                    if (type.IsAbstract ||
+                        type.IsInterface ||
                         type.IsGenericTypeDefinition ||
-                        !type.IsPublic ||
-                        !type.IsSubclassOf(typeof(Controller)))
+                        !type.IsPublic)
+                        continue;
+
+                    attr = type.GetCustomAttribute<DataScriptAttribute>();
+                    if (attr != null)
+                    {
+                        var script = (INamedDynamicScript)Activator.CreateInstance(type);
+                        DynamicScriptManager.Register(script);
+                        continue;
+                    }
+
+                    if (!type.IsSubclassOf(typeof(Controller)))
                         continue;
 
                     foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
                     {
-                        var attr = method.GetCustomAttribute<DynamicScriptAttribute>();
+                        attr = method.GetCustomAttribute<DataScriptAttribute>();
                         if (attr == null)
                             continue;
 
                         if (string.IsNullOrEmpty(attr.Key))
                             throw new ArgumentNullException("scripKey", String.Format(
-                                "DynamicScript attribute on method {1} of type {0} has empty key!",
+                                "DataScript attribute on method {1} of type {0} has empty key!",
                                 type.Name, method.Name));
 
                         var parameters = method.GetParameters();
@@ -49,7 +61,7 @@ namespace Serenity.Web
                                 x.ParameterType != typeof(IDbConnection)))
                         {
                             throw new ArgumentOutOfRangeException("parameters", String.Format(
-                                "DynamicScript actions shouldn't have any parameters other " + 
+                                "DataScript actions shouldn't have any parameters other " + 
                                 "than an a base ServiceRequest and optional IDbConnection. Method {0} of type {1} has {2} arguments",
                                 type.Name, method.Name, parameters.Length));
                         }

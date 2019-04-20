@@ -734,6 +734,15 @@ declare namespace Serenity {
     type ServiceOptions<TResponse extends ServiceResponse> = Q.ServiceOptions<TResponse>;
 }
 declare namespace Q {
+    namespace LayoutTimer {
+        function on(key: string, handler: () => void): () => void;
+        function onSizeChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function onWidthChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function onHeightChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function off(key: string, handler?: () => void): void;
+    }
+}
+declare namespace Q {
     function autoFullHeight(element: JQuery): void;
     function initFullHeightGridPage(gridDiv: JQuery): void;
     function layoutFillHeightValue(element: JQuery): number;
@@ -1445,6 +1454,7 @@ declare namespace Serenity {
         get_value(): any;
         value: string;
         set_value(value: string): void;
+        readonly selectedItem: TItem;
         protected get_values(): string[];
         values: string[];
         protected set_values(value: string[]): void;
@@ -2300,7 +2310,8 @@ declare namespace Serenity {
         private static setRequired;
         private static setMaxLength;
         load(source: any): void;
-        save(target: any): void;
+        save(target?: any): any;
+        value: any;
         private canModifyItem;
         updateInterface(): void;
         enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
@@ -2329,6 +2340,7 @@ declare namespace Serenity {
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
+        hotkeyContext?: any;
         separator?: (false | true | 'left' | 'right' | 'both');
     }
     interface PopupMenuButtonOptions {

@@ -65,9 +65,22 @@
 
             if (mode == SelectLevel.Auto)
             {
-                // assume that non-foreign calculated and reflective fields should be selected in list mode
-                bool isForeign = (field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign;
-                mode = isForeign ? SelectLevel.Details : SelectLevel.List;
+                bool notMapped = (field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped;
+                if (notMapped)
+                {
+                    // normally not-mapped fields are skipped in SelectFields method, 
+                    // but some relations like MasterDetailRelation etc. use this method (ShouldSelectFields)
+                    // to determine if they should populate those fields themselves.
+                    // so we return here Details so that edit forms works properly on default retrieve
+                    // mode (Details) without having to include such columns explicitly.
+                    mode = SelectLevel.Details;
+                }
+                else
+                {
+                    // assume that non-foreign calculated and reflective fields should be selected in list mode
+                    bool isForeign = (field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign;
+                    mode = isForeign ? SelectLevel.Details : SelectLevel.List;
+                }
             }
 
             bool explicitlyExcluded = Request.ExcludeColumns != null &&

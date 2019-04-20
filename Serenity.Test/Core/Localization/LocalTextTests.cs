@@ -134,10 +134,10 @@ namespace Serenity.Test
                 string translation = text;
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(A<string>._, "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -166,13 +166,13 @@ namespace Serenity.Test
                 }
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Twice);
+                    .MustHaveHappened(2, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet("tr-TR", "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet("en-GB", "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -195,10 +195,10 @@ namespace Serenity.Test
                 Assert.Equal(key, translation);
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(A<string>._, key))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -221,13 +221,13 @@ namespace Serenity.Test
                 Assert.Equal(uiCulture + ":Translation2", translation2);
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Twice);
+                    .MustHaveHappened(2, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(uiCulture, "Translation1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(uiCulture, "Translation2"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -276,10 +276,10 @@ namespace Serenity.Test
                 new LocalText("Dummy").ToString();
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(A<string>._, "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -306,13 +306,13 @@ namespace Serenity.Test
                 }
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Twice);
+                    .MustHaveHappened(2, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet("tr-TR", "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet("en-GB", "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -334,10 +334,10 @@ namespace Serenity.Test
                 Assert.Equal(key, translation);
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(A<string>._, key))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -360,13 +360,13 @@ namespace Serenity.Test
                 Assert.Equal(uiCulture + ":Translation2", translation2);
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Twice);
+                    .MustHaveHappened(2, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(uiCulture, "Translation1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(uiCulture, "Translation2"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -415,10 +415,10 @@ namespace Serenity.Test
                 LocalText.Get("Dummy");
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(A<string>._, "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -445,13 +445,13 @@ namespace Serenity.Test
                 }
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Twice);
+                    .MustHaveHappened(2, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet("tr-TR", "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet("en-GB", "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -473,10 +473,10 @@ namespace Serenity.Test
                 Assert.Equal(key, translation);
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(A<string>._, key))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -499,13 +499,13 @@ namespace Serenity.Test
                 Assert.Equal(uiCulture + ":Translation2", translation2);
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Twice);
+                    .MustHaveHappened(2, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(uiCulture, "Translation1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(uiCulture, "Translation2"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -554,10 +554,10 @@ namespace Serenity.Test
                 LocalText.TryGet("Dummy");
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(A<string>._, "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -584,13 +584,13 @@ namespace Serenity.Test
                 }
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Twice);
+                    .MustHaveHappened(2, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet("tr-TR", "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet("en-GB", "Dummy"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -612,10 +612,10 @@ namespace Serenity.Test
                 Assert.Null(translation);
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(A<string>._, key))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -638,13 +638,13 @@ namespace Serenity.Test
                 Assert.Equal(uiCulture + ":Translation2", translation2);
 
                 A.CallTo(() => registry.TryGet(A<string>._, A<string>._))
-                    .MustHaveHappened(Repeated.Exactly.Twice);
+                    .MustHaveHappened(2, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(uiCulture, "Translation1"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => registry.TryGet(uiCulture, "Translation2"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 

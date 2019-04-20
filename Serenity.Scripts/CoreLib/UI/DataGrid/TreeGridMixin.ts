@@ -42,10 +42,12 @@
             };
 
             if (options.toggleField) {
-                var col = Q.first(dg.getGrid().getColumns(), x => x.field == options.toggleField);
-                col.format = SlickFormatting.treeToggle(() => dg.view, getId,
-                    col.format || (ctx => Q.htmlEncode(ctx.value)));
-                col.formatter = SlickHelper.convertToFormatter(col.format);
+                var col = Q.tryFirst(dg['allColumns'] || dg.slickGrid.getColumns() || [], x => x.field == options.toggleField);
+                if (col) {
+                    col.format = SlickFormatting.treeToggle(() => dg.view, getId,
+                        col.format || (ctx => Q.htmlEncode(ctx.value)));
+                    col.formatter = SlickHelper.convertToFormatter(col.format);
+                }
             }
         }
 

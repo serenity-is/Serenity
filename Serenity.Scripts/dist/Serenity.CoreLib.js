@@ -222,11 +222,11 @@ var Q;
     }
     Q.isTrimmedEmpty = isTrimmedEmpty;
     function format(msg) {
+        var _a;
         var prm = [];
         for (var _i = 1; _i < arguments.length; _i++) {
             prm[_i - 1] = arguments[_i];
         }
-        var _a;
         return (_a = ss).formatString.apply(_a, [msg].concat(prm));
     }
     Q.format = format;
@@ -1738,6 +1738,114 @@ var Q;
         return url;
     }
     Q.resolveUrl = resolveUrl;
+})(Q || (Q = {}));
+var Q;
+(function (Q) {
+    var LayoutTimer;
+    (function (LayoutTimer) {
+        var timeout;
+        var regs = [];
+        var regByKey = {};
+        function startTimer() {
+            if (timeout == null && regs.length) {
+                timeout = window.setTimeout(onTimeout, 100);
+            }
+        }
+        function clearTimer() {
+            if (timeout != null) {
+                window.clearTimeout(timeout);
+                timeout = null;
+            }
+        }
+        function onTimeout() {
+            for (var _i = 0, regs_1 = regs; _i < regs_1.length; _i++) {
+                var reg = regs_1[_i];
+                try {
+                    reg();
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            }
+            clearTimer();
+            startTimer();
+        }
+        function on(key, handler) {
+            if (handler == null)
+                throw "Layout handler can't be null!";
+            if (regByKey[key] !== undefined)
+                throw "There is already a registered layout handler with key: " + key;
+            if (key != null)
+                regByKey[key] = regs.length;
+            regs.push(handler);
+            startTimer();
+            return handler;
+        }
+        LayoutTimer.on = on;
+        function onSizeChange(key, element, handler) {
+            var oldWidth = element.offsetWidth;
+            var oldHeight = element.offsetHeight;
+            on(key, function () {
+                var offsetWidth = element.offsetWidth;
+                var offsetHeight = element.offsetHeight;
+                if (offsetWidth !== oldWidth ||
+                    offsetHeight !== oldHeight) {
+                    oldWidth = offsetWidth;
+                    oldHeight = offsetHeight;
+                    handler();
+                }
+            });
+            return handler;
+        }
+        LayoutTimer.onSizeChange = onSizeChange;
+        function onWidthChange(key, element, handler) {
+            var oldWidth = element.offsetWidth;
+            on(key, function () {
+                var offsetWidth = element.offsetWidth;
+                if (offsetWidth !== oldWidth) {
+                    oldWidth = offsetWidth;
+                    handler();
+                }
+            });
+            return handler;
+        }
+        LayoutTimer.onWidthChange = onWidthChange;
+        function onHeightChange(key, element, handler) {
+            var oldHeight = element.offsetHeight;
+            on(key, function () {
+                var offsetHeight = element.offsetHeight;
+                if (offsetHeight !== oldHeight) {
+                    oldHeight = offsetHeight;
+                    handler();
+                }
+            });
+            return handler;
+        }
+        LayoutTimer.onHeightChange = onHeightChange;
+        function off(key, handler) {
+            if (key != null) {
+                var index = regByKey[key];
+                if (index !== undefined) {
+                    delete regByKey[key];
+                    if (handler == null || handler === regs[index]) {
+                        regs.splice(index, 1);
+                        !regs.length && this.clearTimer();
+                        return;
+                    }
+                }
+            }
+            if (handler != null) {
+                for (var l = regs.length - 1; l >= 0; l++) {
+                    if (regs[l] === handler) {
+                        regs.splice(l, 1);
+                        !regs.length && this.clearTimer();
+                        break;
+                    }
+                }
+            }
+        }
+        LayoutTimer.off = off;
+    })(LayoutTimer = Q.LayoutTimer || (Q.LayoutTimer = {}));
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
@@ -5282,7 +5390,7 @@ var Serenity;
         ], DateTimeEditor.prototype, "get_sqlMinMax", null);
         DateTimeEditor = DateTimeEditor_1 = __decorate([
             Serenity.Decorators.registerEditor('Serenity.DateTimeEditor', [Serenity.IStringValue, Serenity.IReadOnly]),
-            Serenity.Decorators.element('<input/>')
+            Serenity.Decorators.element('<input type="text"/>')
         ], DateTimeEditor);
         return DateTimeEditor;
     }(Serenity.Widget));
@@ -5566,6 +5674,19 @@ var Serenity;
                 this.updateInplaceReadOnly();
             }
         };
+        Object.defineProperty(Select2Editor.prototype, "selectedItem", {
+            get: function () {
+                var selectedValue = this.get_value();
+                if (selectedValue && this.itemById) {
+                    var item = this.itemById[selectedValue];
+                    if (item)
+                        return item.source;
+                }
+                return null;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Select2Editor.prototype.get_values = function () {
             var val = this.element.select2('val');
             if (val == null) {
@@ -6067,8 +6188,8 @@ var Serenity;
         LookupEditorBase.prototype.getDialogTypeKey = function () {
             var dialogTypeKey = _super.prototype.getDialogTypeKey.call(this);
             if (dialogTypeKey)
-                return this.getLookupKey();
-            return dialogTypeKey;
+                return dialogTypeKey;
+            return this.getLookupKey();
         };
         LookupEditorBase.prototype.setCreateTermOnNewEntity = function (entity, term) {
             entity[this.getLookup().textField] = term;
@@ -10065,20 +10186,26 @@ var Serenity;
                 return !Q.isEmptyOrNull(x.tab);
             });
             if (useTabs) {
+                var itemsWithoutTab = _this.items.filter(function (f) { return Q.isEmptyOrNull(f.tab); });
+                if (itemsWithoutTab.length > 0) {
+                    _this.createItems(_this.element, itemsWithoutTab);
+                    $("<div class='pad'></div>").appendTo(_this.element);
+                }
+                var itemsWithTab = _this.items.filter(function (f) { return !Q.isEmptyOrNull(f.tab); });
                 var ul = $("<ul class='nav nav-tabs property-tabs' role='tablist'></ul>")
                     .appendTo(_this.element);
                 var tc = $("<div class='tab-content property-panes'></div>")
                     .appendTo(_this.element);
                 var tabIndex = 0;
                 var i = 0;
-                while (i < _this.items.length) {
-                    var tab = { $: Q.trimToEmpty(_this.items[i].tab) };
+                while (i < itemsWithTab.length) {
+                    var tab = { $: Q.trimToEmpty(itemsWithTab[i].tab) };
                     var tabItems = [];
                     var j = i;
                     do {
-                        tabItems.push(_this.items[j]);
-                    } while (++j < _this.items.length &&
-                        Q.trimToEmpty(_this.items[j].tab) === tab.$);
+                        tabItems.push(itemsWithTab[j]);
+                    } while (++j < itemsWithTab.length &&
+                        Q.trimToEmpty(itemsWithTab[j].tab) === tab.$);
                     i = j;
                     var li = $("<li><a data-toggle='tab' role='tab'></a></li>")
                         .appendTo(ul);
@@ -10462,6 +10589,8 @@ var Serenity;
             }
         };
         PropertyGrid.prototype.save = function (target) {
+            if (target == null)
+                target = Object.create(null);
             for (var i = 0; i < this.editors.length; i++) {
                 var item = this.items[i];
                 if (item.oneWay !== true && this.canModifyItem(item)) {
@@ -10469,7 +10598,20 @@ var Serenity;
                     Serenity.EditorUtils.saveValue(editor, item, target);
                 }
             }
+            return target;
         };
+        Object.defineProperty(PropertyGrid.prototype, "value", {
+            get: function () {
+                return this.save();
+            },
+            set: function (val) {
+                if (val == null)
+                    val = Object.create(null);
+                this.load(val);
+            },
+            enumerable: true,
+            configurable: true
+        });
         PropertyGrid.prototype.canModifyItem = function (item) {
             if (this.get_mode() === 1 /* insert */) {
                 if (item.insertable === false) {
@@ -10653,7 +10795,7 @@ var Serenity;
                 btn.find('span').html(text);
             }
             if (!!(!Q.isEmptyOrNull(b.hotkey) && window['Mousetrap'] != null)) {
-                this.mouseTrap = this.mouseTrap || window['Mousetrap'](this.options.hotkeyContext || window.document.documentElement);
+                this.mouseTrap = this.mouseTrap || window['Mousetrap'](b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
                 this.mouseTrap.bind(b.hotkey, function (e1, action) {
                     if (btn.is(':visible')) {
                         btn.triggerHandler('click');
@@ -11347,28 +11489,31 @@ var Serenity;
             this.submitHandlers = ss.delegateRemove(this.submitHandlers, action);
         };
         DataGrid.prototype.layout = function () {
-            if (!this.element.is(':visible')) {
+            if (!this.element.is(':visible') || this.slickContainer == null)
                 return;
-            }
-            if (this.slickContainer == null) {
-                return;
-            }
-            Q.layoutFillHeight(this.slickContainer);
-            if (this.element.hasClass('responsive-height')) {
-                if (this.slickGrid != null && this.slickGrid.getOptions().autoHeight) {
-                    this.slickContainer.children('.slick-viewport').css('height', 'auto');
-                    this.slickGrid.setOptions({ autoHeight: false });
-                }
-                if (this.slickGrid != null && (this.slickContainer.height() < 200 || $(window.window).width() < 768)) {
-                    this.element.css('height', 'auto');
-                    this.slickContainer.css('height', 'auto').children('.slick-viewport').css('height', 'auto');
+            var responsiveHeight = this.element.hasClass('responsive-height');
+            var madeAutoHeight = this.slickGrid != null && this.slickGrid.getOptions().autoHeight;
+            var shouldAutoHeight = responsiveHeight && window.innerWidth < 768;
+            if (shouldAutoHeight) {
+                if (this.element[0] && this.element[0].style.height != "auto")
+                    this.element[0].style.height = "auto";
+                if (!madeAutoHeight) {
+                    this.slickContainer.css('height', 'auto')
+                        .children('.slick-pane').each(function (i, e) {
+                        if (e.style.height != null && e.style.height != "auto")
+                            e.style.height = "auto";
+                    });
                     this.slickGrid.setOptions({ autoHeight: true });
                 }
             }
-            if (this.slickGrid != null) {
-                this.slickGrid.resizeCanvas();
-                this.slickGrid.invalidate();
+            else {
+                if (madeAutoHeight) {
+                    this.slickContainer.children('.slick-viewport').css('height', 'auto');
+                    this.slickGrid.setOptions({ autoHeight: false });
+                }
+                Q.layoutFillHeight(this.slickContainer);
             }
+            this.slickGrid.resizeCanvas();
         };
         DataGrid.prototype.getInitialTitle = function () {
             return null;
@@ -11712,6 +11857,7 @@ var Serenity;
         };
         DataGrid.prototype.viewDataChanged = function (e, rows) {
             this.markupReady();
+            this.layout();
         };
         DataGrid.prototype.bindToViewEvents = function () {
             var self = this;
@@ -12658,7 +12804,8 @@ var Serenity;
             return (this.filterBar == null) ? null : this.filterBar.get_store();
         };
         DataGrid = __decorate([
-            Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid])
+            Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid]),
+            Serenity.Decorators.element("<div/>")
         ], DataGrid);
         return DataGrid;
     }(Serenity.Widget));
@@ -14996,9 +15143,11 @@ var Serenity;
                 return response;
             };
             if (options.toggleField) {
-                var col = Q.first(dg.getGrid().getColumns(), function (x) { return x.field == options.toggleField; });
-                col.format = Serenity.SlickFormatting.treeToggle(function () { return dg.view; }, getId, col.format || (function (ctx) { return Q.htmlEncode(ctx.value); }));
-                col.formatter = Serenity.SlickHelper.convertToFormatter(col.format);
+                var col = Q.tryFirst(dg['allColumns'] || dg.slickGrid.getColumns() || [], function (x) { return x.field == options.toggleField; });
+                if (col) {
+                    col.format = Serenity.SlickFormatting.treeToggle(function () { return dg.view; }, getId, col.format || (function (ctx) { return Q.htmlEncode(ctx.value); }));
+                    col.formatter = Serenity.SlickHelper.convertToFormatter(col.format);
+                }
             }
         }
         /**

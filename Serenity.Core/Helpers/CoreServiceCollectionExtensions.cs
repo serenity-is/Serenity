@@ -6,10 +6,11 @@ using Serenity.Abstractions;
 using Serenity.Caching;
 using Serenity.Localization;
 using Serenity.Logging;
+using Serenity.Reflection;
 
 namespace Serenity.Extensions.DependencyInjection
 {
-    public static class DataServiceCollectionExtensions
+    public static class CoreServiceCollectionExtensions
     {
         public static void AddCaching(this IServiceCollection services)
         {
@@ -26,6 +27,11 @@ namespace Serenity.Extensions.DependencyInjection
         public static void AddTextRegistry(this IServiceCollection services)
         {
             services.TryAddSingleton<ILocalTextRegistry, LocalTextRegistry>();
+        }
+
+        public static void AddAnnotationTypes(this IServiceCollection services)
+        {
+            services.TryAddSingleton<IAnnotationTypeRegistry, AnnotationTypeRegistry>();
         }
     }
 }

@@ -8,28 +8,17 @@
   <ItemGroup>
     <Folder Remove="node_modules\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="3.4.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
   <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\@types\jquery\index.d.ts')">
     <Message Text="Installing NPM packages..." Importance="high">
     </Message>
     <Exec Command="cmd /c &quot;$(NpmPath)npm&quot; install" />
-  </Target>
-  <Target Name="CreateInputsOutputs" BeforeTargets="BeforeBuild">
-    <CreateItem Include="CoreLib\**\*.ts">
-      <Output TaskParameter="Include" ItemName="CompileCoreLibInputs" />
-    </CreateItem>
-    <CreateItem Include="CodeGeneration\**\*.ts">
-      <Output TaskParameter="Include" ItemName="CompileCodeGenerationInputs" />
-    </CreateItem>
-  </Target>
-  <Target Name="CompileCoreLib" AfterTargets="AfterBuild" Inputs="@(CompileCoreLibInputs)" Outputs="dist\Serenity.CoreLib.js;Serenity.CoreLib.d.ts;Serenity.CoreLib.js.map">
-    <Message Text="TSC CoreLib..." Importance="high">
-    </Message>
-    <Exec Command="&quot;$(ProjectDir)..\tools\TypeScript\tsc.exe&quot; -p ./CoreLib/tsconfig.json" ContinueOnError="true" />
-  </Target>
-  <Target Name="CompileCodeGeneration" AfterTargets="AfterBuild" Inputs="@(CompileCodeGenerationInputs)" Outputs="dist\Serenity.CodeGeneration.js;Serenity.CodeGeneration.d.ts;Serenity.CodeGeneration.js.map">
-    <Message Text="TSC CodeGeneration..." Importance="high">
-    </Message>
-    <Exec Command="&quot;$(ProjectDir)..\tools\TypeScript\tsc.exe&quot; -p ./CodeGeneration/tsconfig.json" ContinueOnError="true" />
   </Target>
   <Target Name="MinimizeCoreLib" AfterTargets="AfterBuild" Inputs="dist\Serenity.CoreLib.js" Outputs="dist\Serenity.CoreLib.min.js">
     <Message Text="Minimizing Serenity.CoreLib.js..." Importance="high">

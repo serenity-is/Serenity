@@ -82,9 +82,22 @@
 
             if (mode == SelectLevel.Auto)
             {
-                // assume that non-foreign calculated and reflective fields should be selected in list mode
-                bool isForeign = (field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign;
-                mode = isForeign ? SelectLevel.Details : SelectLevel.List;
+                bool notMapped = (field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped;
+                if (notMapped)
+                {
+                    // normally not-mapped fields are skipped in SelectFields method, 
+                    // but some relations like MasterDetailRelation etc. use this method (ShouldSelectFields)
+                    // to determine if they should populate those fields themselves.
+                    // so we return here Explicit so that they only populate them if such 
+                    // fields are explicitly included (e.g. related column is visible)
+                    mode = SelectLevel.Explicit;
+                }
+                else
+                {
+                    // assume that non-foreign calculated and reflective fields should be selected in list mode
+                    bool isForeign = (field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign;
+                    mode = isForeign ? SelectLevel.Details : SelectLevel.List;
+                }
             }
 
             bool explicitlyExcluded = Request.ExcludeColumns != null &&

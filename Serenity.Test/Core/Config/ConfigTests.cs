@@ -62,7 +62,7 @@ namespace Serenity.Test
                 Config.Get(typeof(ServerSettings));
 
                 A.CallTo(() => repository.Load(typeof(ServerSettings)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ServerSettings))))
                     .MustNotHaveHappened();
@@ -84,7 +84,7 @@ namespace Serenity.Test
                 Config.Get(typeof(ApplicationSettings));
 
                 A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ApplicationSettings))))
                     .MustNotHaveHappened();
@@ -135,7 +135,7 @@ namespace Serenity.Test
                 Config.Get<ServerSettings>();
 
                 A.CallTo(() => repository.Load(typeof(ServerSettings)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ServerSettings))))
                     .MustNotHaveHappened();
@@ -157,7 +157,7 @@ namespace Serenity.Test
                 Config.Get<ApplicationSettings>();
 
                 A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ApplicationSettings))))
                     .MustNotHaveHappened();
@@ -201,7 +201,7 @@ namespace Serenity.Test
                 Config.TryGet(typeof(ServerSettings));
 
                 A.CallTo(() => repository.Load(typeof(ServerSettings)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ServerSettings))))
                     .MustNotHaveHappened();
@@ -223,7 +223,7 @@ namespace Serenity.Test
                 Config.TryGet(typeof(ApplicationSettings));
 
                 A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ApplicationSettings))))
                     .MustNotHaveHappened();
@@ -272,7 +272,7 @@ namespace Serenity.Test
                 Config.Get(typeof(ServerSettings));
 
                 A.CallTo(() => repository.Load(typeof(ServerSettings)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ServerSettings))))
                     .MustNotHaveHappened();
@@ -294,7 +294,7 @@ namespace Serenity.Test
                 Config.Get<ApplicationSettings>();
 
                 A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ApplicationSettings))))
                     .MustNotHaveHappened();

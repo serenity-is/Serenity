@@ -43,6 +43,7 @@ namespace Serenity.CodeGenerator
                 { "ntext", "String" },
                 { "numeric", "Decimal" },
                 { "nvarchar", "String" },
+                { "nvarchar2", "String" },
                 { "real", "Single" },
                 { "rowversion", "ByteArray" },
                 { "smalldatetime", "DateTime" },
@@ -55,7 +56,8 @@ namespace Serenity.CodeGenerator
                 { "tinyint", "Int16" },
                 { "uniqueidentifier", "Guid" },
                 { "varbinary", "Stream" },
-                { "varchar", "String" }
+                { "varchar", "String" },
+                { "varchar2", "String" }
             };
 
         public static string SqlTypeNameToFieldType(string sqlTypeName, int size, out string dataType)

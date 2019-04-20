@@ -3,7 +3,7 @@
     import Option = Serenity.Decorators.option
 
     @Decorators.registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])
-    @Decorators.element('<input/>')
+    @Decorators.element('<input type="text"/>')
     export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements IStringValue, IReadOnly {
 
         private minValue: string;
