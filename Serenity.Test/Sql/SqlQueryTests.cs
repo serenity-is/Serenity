@@ -966,5 +966,73 @@ namespace Serenity.Test.Data
                     "(SELECT A, B FROM T) EXCEPT SELECT U AS [A], W AS [B] FROM X ORDER BY A"),
                 TestSqlHelper.Normalize(query.ToString()));
         }
+
+        //=============
+        [Fact]
+        public void SkipTakeUsesCorrectSyntaxForOracle12cDialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(Oracle12cDialect.Instance)
+                .Select("c")
+                .From("t")
+                .Take(20)
+                .Skip(50);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT c FROM t OFFSET 50 ROWS FETCH NEXT 20 ROWS ONLY"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void SkipTakeWithOrderByUsesCorrectSyntaxForOracle12cDialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(Oracle12cDialect.Instance)
+                .Select("c")
+                .From("t")
+                .OrderBy("x")
+                .Take(20)
+                .Skip(50);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT c FROM t ORDER BY x OFFSET 50 ROWS FETCH NEXT 20 ROWS ONLY"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void TakeUsesCorrectSyntaxForOracle12cDialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(Oracle12cDialect.Instance)
+                .Select("c")
+                .From("t")
+                .Take(10);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT c FROM t OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void WithoutTakeUsesCorrectSyntaxForOracle12cDialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(Oracle12cDialect.Instance)
+                .Select("c")
+                .From("t");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT c FROM t"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+
+        }
     }
 }

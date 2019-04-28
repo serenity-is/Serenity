@@ -28,5 +28,23 @@ namespace Serenity.Data
                 return " OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY";
             }
         }
+
+        //Force to use OffsetFetch - this may not require if SqlQuery.ToString() is fixed
+        public override bool UseRowNum
+        {
+            get
+            {
+                return false;
+            }
+        }
+        
+        public override bool CanUseRowNumber
+        {
+            get
+            {
+                return false;
+            }
+        }
+
     }
 }
