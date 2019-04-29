@@ -8,6 +8,9 @@ namespace Serenity.ComponentModel
     /// </summary>
     public class ThreeQuarterWidthAttribute : FormWidthAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ThreeQuarterWidthAttribute"/> class.
+        /// </summary>
         public ThreeQuarterWidthAttribute()
             : base("col-lg-9")
         {

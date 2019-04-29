@@ -5,8 +5,19 @@ using System;
 
 namespace Serenity.ComponentModel
 {
+    /// <summary>
+    /// Sets editor type as "ImageUpload", which only allows image files.
+    /// Make sure you use this attribute in Row.cs, not Form.cs as 
+    /// the image upload behavior only works if it is in row, otherwise
+    /// your files will stay in temporary directory.
+    /// </summary>
+    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
     public partial class ImageUploadEditorAttribute : CustomEditorAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageUploadEditorAttribute"/> class.
+        /// </summary>
+        /// <param name="editorType">Type of the editor.</param>
         protected ImageUploadEditorAttribute(string editorType)
             : base(editorType)
         {
@@ -16,6 +27,9 @@ namespace Serenity.ComponentModel
 #endif
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageUploadEditorAttribute"/> class.
+        /// </summary>
         public ImageUploadEditorAttribute()
             : this("ImageUpload")
         {

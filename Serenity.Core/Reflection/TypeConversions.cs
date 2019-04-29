@@ -5,8 +5,19 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Type conversion helper
+    /// </summary>
     public static class TypeConversions
     {
+        /// <summary>
+        /// Changes the type using Convert.ChangeType but also handling NULL values properly.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="conversionType">Type of the conversion.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>Converted type</returns>
+        /// <exception cref="ArgumentNullException">conversion type is null</exception>
         public static object ChangeType(object value, Type conversionType,
             CultureInfo culture = null)
         {

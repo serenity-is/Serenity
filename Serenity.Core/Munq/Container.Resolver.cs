@@ -12,21 +12,43 @@ namespace Munq
 {
     public partial class IocContainer : IDependencyResolver
     {
+        /// <summary>
+        /// Resolves this instance.
+        /// </summary>
+        /// <typeparam name="TType">The type of the type.</typeparam>
+        /// <returns></returns>
         public TType Resolve<TType>() where TType : class
         {
             return Resolve(null, typeof(TType)) as TType;
         }
-        
+
+        /// <summary>
+        /// Resolves the specified name.
+        /// </summary>
+        /// <typeparam name="TType">The type of the type.</typeparam>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
         public TType Resolve<TType>(string name) where TType : class
         {
             return Resolve(name, typeof(TType)) as TType;
         }
 
+        /// <summary>
+        /// Resolves the specified type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
         public object Resolve(Type type)
         {
             return Resolve(null, type);
         }
 
+        /// <summary>
+        /// Resolves the specified name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
         public object Resolve(string name, Type type)
         {
             try
@@ -114,34 +136,66 @@ namespace Munq
             return null;
         }
 
+        /// <summary>
+        /// Tries the resolve.
+        /// </summary>
+        /// <typeparam name="TType">The type of the type.</typeparam>
+        /// <returns></returns>
         public TType TryResolve<TType>()
                 where TType : class
         {
             return (TType)TryResolve(null, typeof(TType));
         }
 
+        /// <summary>
+        /// Tries the resolve.
+        /// </summary>
+        /// <typeparam name="TType">The type of the type.</typeparam>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
         public TType TryResolve<TType>(string name)
                 where TType : class
         {
             return (TType)TryResolve(name, typeof(TType));
         }
 
+        /// <summary>
+        /// Tries the resolve.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
         public object TryResolve(Type type)
         {
             return TryResolve(null, type);
         }
 
+        /// <summary>
+        /// Tries the resolve.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
         public object TryResolve(string name, Type type)
         {
             var registration = typeRegistry.TryGet(name, type);
             return registration != null ? registration.GetInstance() : null;
         }
 
+        /// <summary>
+        /// Resolves all.
+        /// </summary>
+        /// <typeparam name="TType">The type of the type.</typeparam>
+        /// <returns></returns>
         public IEnumerable<TType> ResolveAll<TType>() where TType : class
         {
             return ResolveAll(typeof(TType)).Cast<TType>();
         }
 
+        /// <summary>
+        /// Resolves all.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
         public IEnumerable<object> ResolveAll(Type type)
         {
             var registrations = typeRegistry.GetDerived(type);
@@ -153,21 +207,43 @@ namespace Munq
             return instances;
         }
 
+        /// <summary>
+        /// Lazies the resolve.
+        /// </summary>
+        /// <typeparam name="TType">The type of the type.</typeparam>
+        /// <returns></returns>
         public Func<TType> LazyResolve<TType>() where TType : class
         {
             return LazyResolve<TType>(null);
         }
 
+        /// <summary>
+        /// Lazies the resolve.
+        /// </summary>
+        /// <typeparam name="TType">The type of the type.</typeparam>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
         public Func<TType> LazyResolve<TType>(string name) where TType : class
         {
             return () => Resolve<TType>(name);
         }
 
+        /// <summary>
+        /// Lazies the resolve.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
         public Func<Object> LazyResolve(Type type)
         {
             return LazyResolve(null, type);
         }
 
+        /// <summary>
+        /// Lazies the resolve.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
         public Func<Object> LazyResolve(string name, Type type)
         {
             return () => Resolve(name, type);

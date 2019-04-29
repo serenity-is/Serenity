@@ -7,6 +7,9 @@ namespace Serenity.ComponentModel
     /// </summary>
     public class ResetFormWidthAttribute : FormWidthAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ResetFormWidthAttribute"/> class.
+        /// </summary>
         public ResetFormWidthAttribute()
             : base(null)
         {

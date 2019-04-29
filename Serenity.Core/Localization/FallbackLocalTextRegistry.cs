@@ -9,7 +9,11 @@ namespace Serenity.Localization
     public class FallbackLocalTextRegistry : ILocalTextRegistry
     {
         private ILocalTextRegistry localTextRegistry;
-       
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FallbackLocalTextRegistry"/> class.
+        /// </summary>
+        /// <param name="localTextRegistry">The local text registry.</param>
         public FallbackLocalTextRegistry(ILocalTextRegistry localTextRegistry)
         {
             Check.NotNull(localTextRegistry, "localTextRegistry");

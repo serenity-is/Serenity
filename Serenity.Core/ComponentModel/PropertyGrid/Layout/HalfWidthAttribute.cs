@@ -8,6 +8,9 @@ namespace Serenity.ComponentModel
     /// </summary>
     public class HalfWidthAttribute : FormWidthAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HalfWidthAttribute"/> class.
+        /// </summary>
         public HalfWidthAttribute()
             : base("col-sm-6")
         {

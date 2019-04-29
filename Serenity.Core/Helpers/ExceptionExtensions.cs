@@ -2,6 +2,9 @@
 
 namespace Serenity
 {
+    /// <summary>
+    /// Exception data extensions
+    /// </summary>
     public static class ExceptionExtensions
     {
         /// <summary>

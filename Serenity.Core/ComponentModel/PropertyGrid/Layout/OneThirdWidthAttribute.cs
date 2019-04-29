@@ -8,6 +8,9 @@ namespace Serenity.ComponentModel
     /// </summary>
     public class OneThirdWidthAttribute : FormWidthAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OneThirdWidthAttribute"/> class.
+        /// </summary>
         public OneThirdWidthAttribute()
             : base("col-md-4")
         {

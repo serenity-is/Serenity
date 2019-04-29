@@ -2,6 +2,9 @@
 
 namespace Serenity
 {
+    /// <summary>
+    /// Contains URI related helper functions.
+    /// </summary>
     public static class UriHelper
     {
         /// <summary>

@@ -8,6 +8,11 @@ using System.Text;
 
 namespace Serenity.Logging
 {
+    /// <summary>
+    /// A simple file logger implementation
+    /// </summary>
+    /// <seealso cref="Serenity.Abstractions.ILogger" />
+    /// <seealso cref="System.IDisposable" />
     public class FileLogger : ILogger, IDisposable
     {
         private string file;
@@ -18,6 +23,10 @@ namespace Serenity.Logging
         private object sync = new object();
         private StreamWriter stream;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileLogger"/> class.
+        /// </summary>
+        /// <param name="log">The log.</param>
         public FileLogger(LogSettings log = null)
         {
             queue = new Queue<string>();
@@ -28,17 +37,32 @@ namespace Serenity.Logging
             FlushTimeout = TimeSpan.FromSeconds(settings.FlushTimeout);
         }
 
+        /// <summary>
+        /// Finalizes an instance of the <see cref="FileLogger"/> class.
+        /// </summary>
         ~FileLogger()
         {
             Dispose(false);
         }
 
+        /// <summary>
+        /// Gets or sets the flush timeout.
+        /// </summary>
+        /// <value>
+        /// The flush timeout.
+        /// </value>
         public TimeSpan FlushTimeout
         {
             get { return flushTimeout; }
             set { flushTimeout = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the file.
+        /// </summary>
+        /// <value>
+        /// The file.
+        /// </value>
         public string File
         {
             get { return file; }
@@ -60,6 +84,10 @@ namespace Serenity.Logging
             }
         }
 
+        /// <summary>
+        /// Generates a random file code.
+        /// </summary>
+        /// <returns></returns>
         public static string RandomFileCode()
         {
             Guid guid = Guid.NewGuid();
@@ -70,13 +98,32 @@ namespace Serenity.Logging
             return Base32.Encode(eightBytes);
         }
 
+        /// <summary>
+        /// File logger settings
+        /// </summary>
         [SettingScope("Application"), SettingKey("Logging"), Ignore]
         public class LogSettings
         {
+            /// <summary>
+            /// Gets or sets the file name.
+            /// </summary>
+            /// <value>
+            /// The file.
+            /// </value>
             public string File { get; set; }
+
+            /// <summary>
+            /// Gets or sets the flush timeout.
+            /// </summary>
+            /// <value>
+            /// The flush timeout.
+            /// </value>
             public int FlushTimeout { get; set; }
         }
 
+        /// <summary>
+        /// Flushes this instance.
+        /// </summary>
         public void Flush()
         {
             InternalFlush();
@@ -106,6 +153,9 @@ namespace Serenity.Logging
             lastFlush = DateTimeProvider.Now;
         }
 
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -138,6 +188,13 @@ namespace Serenity.Logging
 
         private static string[] SeverityChar = new string[] { "[V] ", "[D] ", "[I] ", "[W] ", "[E] ", "[F] " };
 
+        /// <summary>
+        /// Writes the specified level log message.
+        /// </summary>
+        /// <param name="level">The level.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="exception">The exception.</param>
+        /// <param name="source">The source.</param>
         public void Write(LoggingLevel level, string message, Exception exception, Type source)
         {
             lock (sync)

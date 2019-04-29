@@ -152,11 +152,21 @@ namespace Serenity
             return str.Substring(0, maxLength) + "...";
         }
 
+        /// <summary>
+        /// Converts the string to single line by replacing line endings with space.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <returns>Single lined string.</returns>
         public static string ToSingleLine(this string str)
         {
             return str.TrimToEmpty().Replace("\r\n", " ").Replace("\n", " ").Trim();
         }
 
+        /// <summary>
+        /// Converts the string to its single quoted representation.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <returns>Single quoted string.</returns>
         public static string ToSingleQuoted(this string str)
         {
             if (String.IsNullOrEmpty(str))
@@ -245,11 +255,25 @@ namespace Serenity
             sb.Append(quoteChar);
         }
 
+        /// <summary>
+        /// Determines whether the collection is empty or null.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <returns>
+        ///   <c>true</c> if the collection is empty or null; otherwise, <c>false</c>.
+        /// </returns>
         public static bool IsEmptyOrNull(this ICollection collection)
         {
             return collection == null || collection.Count == 0;
         }
 
+        /// <summary>
+        /// A substring function that doesn't raise out of bound errors or null reference exception.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="maxLength">The maximum length.</param>
+        /// <returns>Substring or empty string.</returns>
         public static string SafeSubstring(this string value, int startIndex, int maxLength)
         {
             if (value.IsNullOrEmpty())
@@ -265,6 +289,12 @@ namespace Serenity
             return value.Substring(startIndex, maxLength);
         }
 
+        /// <summary>
+        /// Sanitizes the filename by replacing /, :, &amp;, ı characters.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">s is null</exception>
         public static String SanitizeFilename(string s)
         {
             if (s == null)
@@ -278,6 +308,11 @@ namespace Serenity
             return s.TrimToEmpty();
         }
 
+        /// <summary>
+        /// Removes the diacritic characters from string by replacing them with ASCII versions.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns>String with diacritics replaced.</returns>
         public static String RemoveDiacritics(string s)
         {
             var normalizedString = s.Normalize(NormalizationForm.FormKD);
