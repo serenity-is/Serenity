@@ -26,7 +26,7 @@ namespace Serenity.Data
             if (this.parent != null)
                 sb.Append("(");
 
-            if (skip > 0 && orderBy == null && !dialect.CanUseSkipKeyword && !dialect.UseRowNum)
+            if (skip > 0 && orderBy == null && !dialect.CanUseSkipKeyword && !dialect.CanUseOffsetFetch && !dialect.UseRowNum)
                 throw new InvalidOperationException("A query must be ordered by unique fields " +
                     "to be able to skip records!");
 

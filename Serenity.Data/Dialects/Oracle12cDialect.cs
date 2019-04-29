@@ -29,7 +29,15 @@ namespace Serenity.Data
             }
         }
 
-        //Force to use OffsetFetch - this may not require if SqlQuery.ToString() is fixed
+        public override string TakeKeyword
+        {
+            get
+            {
+                return "RowNum <=";
+            }
+        }
+
+        //Force to use OffsetFetch - this may not require if SqlQuery.ToString() is optimized
         public override bool UseRowNum
         {
             get

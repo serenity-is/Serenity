@@ -967,7 +967,7 @@ namespace Serenity.Test.Data
                 TestSqlHelper.Normalize(query.ToString()));
         }
 
-        //=============
+        #region Oracle12c
         [Fact]
         public void SkipTakeUsesCorrectSyntaxForOracle12cDialect()
         {
@@ -1014,7 +1014,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT c FROM t OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY"),
+                    "SELECT c FROM t RowNum <= 10"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
@@ -1034,5 +1034,6 @@ namespace Serenity.Test.Data
                     query.ToString()));
 
         }
+        #endregion
     }
 }
