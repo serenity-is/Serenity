@@ -7,10 +7,18 @@ using System.Reflection;
 
 namespace Serenity.Reflection
 {
+    /// <summary>
+    /// Default annotation type registry
+    /// </summary>
+    /// <seealso cref="Serenity.Reflection.IAnnotationTypeRegistry" />
     public class AnnotationTypeRegistry : IAnnotationTypeRegistry
     {
         private Type[] annotationTypes;
 
+        /// <summary>
+        /// Gets the annotation types.
+        /// </summary>
+        /// <returns></returns>
         protected IEnumerable<Type> GetAnnotationTypes()
         {
             var annotationTypes = this.annotationTypes;
@@ -32,11 +40,19 @@ namespace Serenity.Reflection
             return annotationTypes;
         }
 
+        /// <summary>
+        /// Resets this instance.
+        /// </summary>
         public void Reset()
         {
             this.annotationTypes = null;
         }
 
+        /// <summary>
+        /// Gets the annotation types for given type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
         public IEnumerable<Type> GetAnnotationTypesFor(Type type)
         {
             var list = new List<Type>();
@@ -104,6 +120,13 @@ namespace Serenity.Reflection
             return list;
         }
 
+        /// <summary>
+        /// Gets the annotated type information for given type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>
+        /// Annotated type information
+        /// </returns>
         public IAnnotatedType GetAnnotatedType(Type type)
         {
             return new AnnotatedType(type, GetAnnotationTypesFor(type));

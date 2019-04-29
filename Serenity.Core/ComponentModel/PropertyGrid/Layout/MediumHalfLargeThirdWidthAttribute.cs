@@ -6,6 +6,9 @@
     /// </summary>
     public class MediumHalfLargeThirdWidthAttribute : FormWidthAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MediumHalfLargeThirdWidthAttribute"/> class.
+        /// </summary>
         public MediumHalfLargeThirdWidthAttribute()
             : base("col-md-6 col-lg-4")
         {

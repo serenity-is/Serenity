@@ -5,7 +5,7 @@
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>    
     <Title>Serenity Platform - Core Library</Title>
     <Description>Contains abstractions and implementations for some basic Serenity features like authorization, caching, localization, dependency resolution, reflection...</Description>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />

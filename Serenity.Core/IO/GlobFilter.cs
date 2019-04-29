@@ -256,6 +256,13 @@ namespace Serenity.IO
             return regex.IsMatch;
         }
 
+        /// <summary>
+        /// Determines whether the specified path is matching this filter.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified path is match; otherwise, <c>false</c>.
+        /// </returns>
         public bool IsMatch(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -359,7 +366,11 @@ namespace Serenity.IO
             return false;
         }
 
-        // this method is inspired from NuGet source code
+        /// <summary>
+        /// Wildcards to regex conversion. Inspired from NuGet source code.
+        /// </summary>
+        /// <param name="wildcard">The wildcard.</param>
+        /// <returns></returns>
         public static Regex WildcardToRegex(string wildcard)
         {
             var pattern = Regex.Escape(wildcard);
@@ -388,6 +399,11 @@ namespace Serenity.IO
             return new Regex('^' + pattern + '$', RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture | RegexOptions.CultureInvariant);
         }
 
+        /// <summary>
+        /// Normalizes the glob by replacing back slashes etc.
+        /// </summary>
+        /// <param name="glob">The glob.</param>
+        /// <returns></returns>
         public static string NormalizeGlob(string glob)
         {
             if (string.IsNullOrEmpty(glob))

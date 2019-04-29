@@ -4,6 +4,10 @@ using System.IO;
 
 namespace Serenity
 {
+    /// <summary>
+    /// Contains shortcuts to Newtonsoft.Json serialization / deserialization methods, and default
+    /// Serenity settings.
+    /// </summary>
     public static class JSON
     {
         /// <summary>

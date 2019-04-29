@@ -8,6 +8,9 @@ namespace Serenity.ComponentModel
     /// </summary>
     public class QuarterWidthAttribute : FormWidthAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuarterWidthAttribute"/> class.
+        /// </summary>
         public QuarterWidthAttribute()
             : base("col-lg-3 col-sm-6")
         {

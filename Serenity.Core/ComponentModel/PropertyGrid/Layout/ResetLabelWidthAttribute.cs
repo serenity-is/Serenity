@@ -7,6 +7,9 @@ namespace Serenity.ComponentModel
     /// </summary>
     public class ResetLabelWidthAttribute : LabelWidthAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ResetLabelWidthAttribute"/> class.
+        /// </summary>
         public ResetLabelWidthAttribute()
             : base(null)
         {

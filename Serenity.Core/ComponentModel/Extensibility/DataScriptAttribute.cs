@@ -12,6 +12,9 @@ namespace Serenity.ComponentModel
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple=false)]
     public class DataScriptAttribute : Attribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataScriptAttribute"/> class.
+        /// </summary>
         public DataScriptAttribute()
         {
         }
@@ -26,6 +29,12 @@ namespace Serenity.ComponentModel
             this.Key = key;
         }
 
+        /// <summary>
+        /// Gets the key.
+        /// </summary>
+        /// <value>
+        /// The key.
+        /// </value>
         public string Key { get; private set; }
 
         /// <summary>
@@ -49,6 +58,11 @@ namespace Serenity.ComponentModel
         /// </value>
         public string CacheGroupKey { get; set; }
 
+        /// <summary>
+        /// Gets the automatically generated key for given type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
         public static string AutoKeyFor(Type type)
         {
             string module;

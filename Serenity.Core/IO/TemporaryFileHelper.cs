@@ -251,6 +251,10 @@ namespace Serenity.IO
 
         private static List<TempFile> _tempFiles = new List<TempFile>();
 
+        /// <summary>
+        /// Clears the temporary files.
+        /// </summary>
+        /// <param name="ignoreExpiry">if set to <c>true</c> ignore expiry dates.</param>
         public static void ClearTempFiles(bool ignoreExpiry)
         {
             lock (_tempFiles)
@@ -279,6 +283,12 @@ namespace Serenity.IO
             }
         }
 
+        /// <summary>
+        /// Registers the temporary file.
+        /// </summary>
+        /// <param name="filename">The filename.</param>
+        /// <param name="expiry">The expiry.</param>
+        /// <param name="removeFolder">if set to <c>true</c> [remove folder].</param>
         public static void RegisterTempFile(string filename, DateTime? expiry, bool removeFolder)
         {
             TempFile tf = new TempFile();

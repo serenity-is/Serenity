@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace Serenity
 {
+    /// <summary>
+    /// Static class with common date utilities and constants
+    /// </summary>
     public static class DateHelper
     {
         /// <summary>
@@ -55,6 +58,11 @@ namespace Serenity
             }
         }
 
+        /// <summary>
+        /// Gets the date element order for specified short date time format.
+        /// </summary>
+        /// <param name="shortDatePattern">The short date pattern.</param>
+        /// <returns>Date element order</returns>
         public static DateElementOrder DateElementOrderFor(string shortDatePattern)
         {
             int m = shortDatePattern.IndexOf('M');

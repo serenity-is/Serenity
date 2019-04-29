@@ -22,8 +22,19 @@ namespace Munq
         private bool disposed;
 
         // null for the lifetime manager is the same as AlwaysNew, but slightly faster.
+        /// <summary>
+        /// Gets or sets the default lifetime manager.
+        /// </summary>
+        /// <value>
+        /// The default lifetime manager.
+        /// </value>
         public ILifetimeManager DefaultLifetimeManager { get; set; }
 
+        /// <summary>
+        /// Useses the default lifetime manager of.
+        /// </summary>
+        /// <param name="lifetimeManager">The lifetime manager.</param>
+        /// <returns></returns>
         public IContainerFluent UsesDefaultLifetimeManagerOf(ILifetimeManager lifetimeManager)
         {
             DefaultLifetimeManager = lifetimeManager;

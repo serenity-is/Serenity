@@ -10,12 +10,23 @@ namespace Serenity.Localization
     {
         private string initialText;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InitializedLocalText"/> class.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="initialText">The initial text.</param>
         public InitializedLocalText(string key, string initialText)
             : base(key)
         {
             this.initialText = initialText;
         }
 
+        /// <summary>
+        /// Gets the initial text.
+        /// </summary>
+        /// <value>
+        /// The initial text.
+        /// </value>
         public string InitialText
         {
             get { return initialText; }

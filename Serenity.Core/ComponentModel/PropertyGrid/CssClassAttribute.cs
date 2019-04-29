@@ -10,11 +10,21 @@ namespace Serenity.ComponentModel
     /// </summary>
     public class CssClassAttribute : Attribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CssClassAttribute"/> class.
+        /// </summary>
+        /// <param name="cssClass">The CSS class.</param>
         public CssClassAttribute(string cssClass)
         {
             CssClass = cssClass;
         }
 
+        /// <summary>
+        /// Gets the CSS class.
+        /// </summary>
+        /// <value>
+        /// The CSS class.
+        /// </value>
         public string CssClass { get; private set; }
     }
 }
