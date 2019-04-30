@@ -969,7 +969,7 @@ namespace Serenity.Test.Data
 
         #region Oracle12c
         [Fact]
-        public void SkipTakeUsesCorrectSyntaxForOracle12cDialect()
+        public void SkipTakeUsesCorrectSyntaxForOracle12c()
         {
             var query = new SqlQuery()
                 .Dialect(Oracle12cDialect.Instance)
@@ -986,7 +986,7 @@ namespace Serenity.Test.Data
         }
 
         [Fact]
-        public void SkipTakeWithOrderByUsesCorrectSyntaxForOracle12cDialect()
+        public void SkipTakeWithOrderByUsesCorrectSyntaxForOracle12c()
         {
             var query = new SqlQuery()
                 .Dialect(Oracle12cDialect.Instance)
@@ -1004,7 +1004,7 @@ namespace Serenity.Test.Data
         }
 
         [Fact]
-        public void TakeUsesCorrectSyntaxForOracle12cDialect()
+        public void TakeUsesCorrectSyntaxForOracle12c()
         {
             var query = new SqlQuery()
                 .Dialect(Oracle12cDialect.Instance)
@@ -1020,7 +1020,7 @@ namespace Serenity.Test.Data
         }
 
         [Fact]
-        public void WithoutTakeUsesCorrectSyntaxForOracle12cDialect()
+        public void WithoutTakeUsesCorrectSyntaxForOracle12c()
         {
             var query = new SqlQuery()
                 .Dialect(Oracle12cDialect.Instance)
@@ -1034,6 +1034,95 @@ namespace Serenity.Test.Data
                     query.ToString()));
 
         }
+        
+        /// <summary>
+        /// In case of Oracle Union with Order By query the name of Order By params should match the name of first part of Union clause, alternatively we can use the serial number of the selected fields 
+        /// Ref: https://docs.oracle.com/database/121/SQLRF/queries004.htm#SQLRF52341, https://www.techonthenet.com/oracle/union_all.php
+        /// </summary>
+        [Fact]
+        public void UnionWorksProperlyOracle12c()
+        {
+            var query = new SqlQuery()
+                .Dialect(Oracle12cDialect.Instance)
+                .From("T")
+                .Select("A")
+                .Select("B")
+                .Union()
+                .From("X")
+                .Select("U")
+                .Select("W")
+                .OrderBy("A")  //Sort by U, but with Alias A
+                //.OrderBy("1") //Alternatively we could use the serial# or position of columns
+                ;
+
+            var a = TestSqlHelper.Normalize(@"(SELECT A, B FROM T) UNION SELECT U, W FROM X ORDER BY A");
+            var b = TestSqlHelper.Normalize(query.ToString());
+            Assert.Equal(a,b);
+        }
+
+        [Fact]
+        public void UnionClearsSkipTakeOracle12c()
+        {
+            var query = new SqlQuery()
+                .Dialect(Oracle12cDialect.Instance)
+                .From("T")
+                .Skip(4)
+                .Take(3)
+                .Select("A", "AliasA")
+                .Select("B", "AliasB")
+                .OrderBy("C")
+                .Union()
+                .From("X")
+                .Select("U")
+                .Select("W")
+                .OrderBy("AliasA") //Sort by U, whose alias becomes AliasA
+                ;
+
+            var a = TestSqlHelper.Normalize(@"(SELECT A AS ""ALIASA"", B AS ""ALIASB"" FROM T ORDER BY C OFFSET 4 ROWS FETCH NEXT 3 ROWS ONLY) UNION SELECT U, W FROM X ORDER BY AliasA");
+            var b = TestSqlHelper.Normalize(query.ToString());
+            Assert.Equal(a,b);
+        }
+
+        [Fact]
+        public void UnionIntersectWorksProperlyOracle12c()
+        {
+            var query = new SqlQuery()
+                .Dialect(Oracle12cDialect.Instance)
+                .From("T")
+                .Select("A", "AliasA")
+                .Select("B", "AliasB")
+                .Union(SqlUnionType.Intersect)
+                .From("X")
+                .Select("U")
+                .Select("W")
+                .OrderBy("1") //Sort by 1st position cloumn
+                ;
+
+            var a = TestSqlHelper.Normalize(@"(SELECT A AS ""ALIASA"", B AS ""ALIASB"" FROM T) INTERSECT SELECT U, W FROM X ORDER BY 1");
+            var b = TestSqlHelper.Normalize(query.ToString());
+            Assert.Equal(a,b);
+        }
+
+        [Fact]
+        public void UnionExceptWorksProperlyOracle12c()
+        {
+            var query = new SqlQuery()
+                .Dialect(Oracle12cDialect.Instance)
+                .From("T")
+                .Select("A", "AliasA")
+                .Select("B", "AliasB")
+                .Union(SqlUnionType.Except)
+                .From("X")
+                .Select("U")
+                .Select("W")
+                .OrderBy("2") //Sort by 2nd position cloumn
+                ;
+
+            var a = TestSqlHelper.Normalize(@"(SELECT A AS ""ALIASA"", B AS ""ALIASB"" FROM T) MINUS SELECT U, W FROM X ORDER BY 2");
+            var b = TestSqlHelper.Normalize(query.ToString());
+            Assert.Equal(a,b);
+        }
+
         #endregion
     }
 }
