@@ -28,31 +28,5 @@ namespace Serenity.Data
                 return " OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY";
             }
         }
-
-        public override string TakeKeyword
-        {
-            get
-            {
-                return "RowNum <=";
-            }
-        }
-
-        //Force to use OffsetFetch - this may not require if SqlQuery.ToString() is optimized
-        public override bool UseRowNum
-        {
-            get
-            {
-                return false;
-            }
-        }
-        
-        public override bool CanUseRowNumber
-        {
-            get
-            {
-                return false;
-            }
-        }
-
     }
 }

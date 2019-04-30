@@ -35,7 +35,10 @@ namespace Serenity.Data
 
             bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword;
             bool useOffset = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch;
-            bool useRowNum = (skip > 0 || take > 0) && dialect.UseRowNum;
+            if (dialect.ServerType.Equals("Oracle")) {
+                useOffset = (skip > 0 || take > 0) && !useSkipKeyword && dialect.CanUseOffsetFetch;
+            }
+            bool useRowNum = (skip > 0 || take > 0) && !useOffset && dialect.UseRowNum;
             bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && !useRowNum && dialect.CanUseRowNumber;
             bool useSecondQuery = skip > 0 && !useSkipKeyword && !useOffset && !useRowNumber;
 

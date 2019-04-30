@@ -1012,11 +1012,43 @@ namespace Serenity.Test.Data
                 .From("t")
                 .Take(10);
 
-            Assert.Equal(
-                TestSqlHelper.Normalize(
-                    "SELECT c FROM t RowNum <= 10"),
-                TestSqlHelper.Normalize(
-                    query.ToString()));
+            //var a = TestSqlHelper.Normalize(@"(SELECT c FROM t WHERE RowNum <= 10");
+            var a = TestSqlHelper.Normalize(@"SELECT c FROM t OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
+            var b = TestSqlHelper.Normalize(query.ToString());
+            Assert.Equal(a,b);
+        }
+
+        [Fact]
+        public void TakeOrderByUsesCorrectSyntaxForOracle12c()
+        {
+            var query = new SqlQuery()
+                .Dialect(Oracle12cDialect.Instance)
+                .Select("c")
+                .From("t")
+                .OrderBy("c")
+                .Take(10);
+
+            //var a = TestSqlHelper.Normalize(@"SELECT c FROM t ORDER BY c WHERE RowNum <= 10");
+            var a = TestSqlHelper.Normalize(@"SELECT c FROM t ORDER BY c OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
+            var b = TestSqlHelper.Normalize(query.ToString());
+            Assert.Equal(a, b);
+        }
+
+        [Fact]
+        public void TakeWhereOrderByUsesCorrectSyntaxForOracle12c()
+        {
+            var query = new SqlQuery()
+                .Dialect(Oracle12cDialect.Instance)
+                .Select("c")
+                .From("t")
+                .Where("c = 1")
+                .OrderBy("c")
+                .Take(10);
+
+            //var a = TestSqlHelper.Normalize(@"SELECT c FROM t WHERE c = 1 ORDER BY c WHERE RowNum <= 10");
+            var a = TestSqlHelper.Normalize(@"SELECT c FROM t WHERE c = 1 ORDER BY c OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
+            var b = TestSqlHelper.Normalize(query.ToString());
+            Assert.Equal(a, b);
         }
 
         [Fact]
