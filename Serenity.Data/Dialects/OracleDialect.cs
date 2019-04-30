@@ -222,7 +222,7 @@ namespace Serenity.Data
                 case SqlUnionType.Intersect:
                     return "INTERSECT";
                 case SqlUnionType.Except:
-                    return "EXCEPT";
+                    return "MINUS"; //Oracle Equivalent of Except
                 default:
                     throw new NotImplementedException();
             }
