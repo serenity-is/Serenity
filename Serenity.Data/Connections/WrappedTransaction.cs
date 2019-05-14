@@ -2,6 +2,10 @@
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Wraps a transaction instance to add current transaction support for the wrapped connection.
+    /// </summary>
+    /// <seealso cref="System.Data.IDbTransaction" />
     public class WrappedTransaction : IDbTransaction
     {
         private WrappedConnection wrappedConnection;

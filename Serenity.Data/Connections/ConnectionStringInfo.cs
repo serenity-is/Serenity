@@ -5,6 +5,9 @@ using System.Data.Common;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Contains a connection string, its key and provider name.
+    /// </summary>
     public class ConnectionStringInfo
     {
         private static readonly string[] databaseNameKeys = new string[]
@@ -30,6 +33,12 @@ namespace Serenity.Data
         private ISqlDialect dialect;
         private DbProviderFactory providerFactory;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConnectionStringInfo"/> class.
+        /// </summary>
+        /// <param name="connectionKey">The connection key.</param>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="providerName">Name of the provider.</param>
         public ConnectionStringInfo(string connectionKey, string connectionString, string providerName)
         {
             this.ConnectionKey = connectionKey;
@@ -37,6 +46,13 @@ namespace Serenity.Data
             this.ProviderName = providerName;
         }
 
+        /// <summary>
+        /// Tries to get the name of the database corresponding to a connection key
+        /// by parsing the connection string, returns null if it can't be parsed.
+        /// </summary>
+        /// <value>
+        /// The name of the database.
+        /// </value>
         public string DatabaseName
         {
             get
@@ -61,6 +77,13 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets or sets the dialect.
+        /// </summary>
+        /// <value>
+        /// The dialect.
+        /// </value>
+        /// <exception cref="System.ArgumentException"></exception>
         public ISqlDialect Dialect
         {
             get
@@ -94,6 +117,11 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the name of the dialect by provider name.
+        /// </summary>
+        /// <param name="providerName">Name of the provider.</param>
+        /// <returns></returns>
         public static ISqlDialect GetDialectByProviderName(string providerName)
         {
             ISqlDialect dialect;
@@ -104,10 +132,36 @@ namespace Serenity.Data
             return null;
         }
 
+        /// <summary>
+        /// Gets the connection key.
+        /// </summary>
+        /// <value>
+        /// The connection key.
+        /// </value>
         public string ConnectionKey { get; private set; }
+
+        /// <summary>
+        /// Gets the connection string.
+        /// </summary>
+        /// <value>
+        /// The connection string.
+        /// </value>
         public string ConnectionString { get; private set; }
+
+        /// <summary>
+        /// Gets the name of the provider.
+        /// </summary>
+        /// <value>
+        /// The name of the provider.
+        /// </value>
         public string ProviderName { get; private set; }
 
+        /// <summary>
+        /// Gets the provider factory.
+        /// </summary>
+        /// <value>
+        /// The provider factory.
+        /// </value>
         public DbProviderFactory ProviderFactory
         {
             get
@@ -119,8 +173,22 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the connection string, obselete, use ConnectionString.
+        /// </summary>
+        /// <value>
+        /// Connection string.
+        /// </value>
         [Obsolete("Use ConnectionString")]
         public string Item1 { get { return ConnectionString; } }
+
+
+        /// <summary>
+        /// Gets the provider name, obsolete, use ProviderName.
+        /// </summary>
+        /// <value>
+        /// The provider name.
+        /// </value>
         [Obsolete("Use ProviderName")]
         public string Item2 { get { return ProviderName; } }
 
