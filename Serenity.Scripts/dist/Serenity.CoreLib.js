@@ -222,11 +222,11 @@ var Q;
     }
     Q.isTrimmedEmpty = isTrimmedEmpty;
     function format(msg) {
+        var _a;
         var prm = [];
         for (var _i = 1; _i < arguments.length; _i++) {
             prm[_i - 1] = arguments[_i];
         }
-        var _a;
         return (_a = ss).formatString.apply(_a, [msg].concat(prm));
     }
     Q.format = format;

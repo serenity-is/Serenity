@@ -492,6 +492,11 @@
             get { return ToString(); }
         }
 
+        /// <summary>
+        /// Adds a union to query with the specified union type.
+        /// </summary>
+        /// <param name="unionType">Type of the union.</param>
+        /// <returns></returns>
         public SqlQuery Union(SqlUnionType unionType = SqlUnionType.Union)
         {
             this.unionQuery = this.Clone();
@@ -659,6 +664,13 @@
             /// <summary>Used by entity system, to determine which field this column value will be read into</summary>
             public readonly object IntoField;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Column"/> class.
+            /// </summary>
+            /// <param name="expression">The expression.</param>
+            /// <param name="columnName">Name of the column.</param>
+            /// <param name="intoRow">The select into row index.</param>
+            /// <param name="intoField">The select into field.</param>
             public Column(string expression, string columnName, int intoRow, object intoField)
             {
                 this.Expression = expression;
@@ -667,6 +679,13 @@
                 this.IntoField = intoField;
             }
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Column"/> class.
+            /// </summary>
+            /// <param name="query">The query.</param>
+            /// <param name="expression">The expression.</param>
+            /// <param name="columnName">Name of the column.</param>
+            /// <param name="intoField">The select into field.</param>
             public Column(SqlQuery query, string expression, string columnName, object intoField)
                 : this(expression, columnName, query.intoIndex, intoField)
             {
