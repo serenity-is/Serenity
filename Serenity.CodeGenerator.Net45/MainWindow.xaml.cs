@@ -461,7 +461,8 @@ namespace Serenity.CodeGenerator
                 MessageBox.Show("Identifier for table " + noIdentifier.FullName + " is empty!");
                 return;
             };
-
+            //BUG: if user changed CustomTemplates via the config UI, it was not transfered to  Templates.TemplatePath
+            Templates.TemplatePath = this.CustomTemplates;
             foreach (var table in tables)
             {
                 try
