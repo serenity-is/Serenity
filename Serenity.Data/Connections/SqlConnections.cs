@@ -207,6 +207,15 @@ namespace Serenity.Data
             return null;
         }
 
+        public static void SetCommandTimeout(this IDbConnection connection, int? value)
+        {
+            var wrapped = connection as WrappedConnection;
+            if (wrapped != null)
+                wrapped.CommandTimeout = value;
+            else
+                throw new ArgumentOutOfRangeException(nameof(connection));
+        }
+
         /// <summary>
         /// Gets the dialect for given connection.
         /// </summary>

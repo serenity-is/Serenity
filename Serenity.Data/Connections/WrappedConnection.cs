@@ -136,6 +136,8 @@ namespace Serenity.Data
             }
         }
 
+        public int? CommandTimeout { get; set; }
+
         /// <summary>
         /// Gets the time to wait while trying to establish a connection before terminating the attempt and generating an error.
         /// </summary>
@@ -162,6 +164,11 @@ namespace Serenity.Data
             var command = actualConnection.CreateCommand();
             try
             {
+                if (CommandTimeout.HasValue)
+                    command.CommandTimeout = CommandTimeout.Value;
+                else if (SqlSettings.DefaultCommandTimeout.HasValue)
+                    command.CommandTimeout = SqlSettings.DefaultCommandTimeout.Value;
+
                 var transaction = this.currentTransaction != null ? this.currentTransaction.ActualTransaction : null;
                 if (transaction != null && transaction.Connection == null)
                     throw new System.Exception("Active transaction for connection is in invalid state! " + 
