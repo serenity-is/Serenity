@@ -137,7 +137,7 @@ Action<string, string, string> myPack = (s, id, project) => {
     if (!System.IO.File.Exists(csproj))
         csproj = null;
 
-    if (id == "Serenity.Web" || id == "Serenity.Web.AspNetCore")
+    if (id == "Serenity.Web" || id == "Serenity.Web.AspNetCore" || id == "Serenity.Web.Assets")
         setPackageVersions(prm, null, "./Serenity.Test/packages.Serenity.Test.Net45.config");
         
     setPackageVersions(prm, csproj, packagesConfig);
@@ -336,6 +336,7 @@ Task("Pack")
     myPack("Serenity.Testing", null, null);
     myPack("Serenity.Web", null, null);
     myPack("Serenity.Web", "Serenity.Web.AspNetCore", "Serenity.Web");
+    myPack("Serenity.Web", "Serenity.Scripts", null);
     myPack("Serenity.CodeGenerator", null, null);
     
     fixNugetCache();
@@ -377,26 +378,5 @@ Task("Tooling-Push")
     {
         myPush();
     });
-	
-Task("Script-Pack")
-    .IsDependentOn("Clean")
-    .Does(() =>
-    {
-		NuGetRestore("./Serenity.Script.UI/Serenity.Script.UI.sln");
-		MSBuild("./Serenity.Script.UI/Serenity.Script.UI.sln", s => {
-			s.SetConfiguration(configuration);
-			s.ToolPath = msBuildPath;
-		});
 
-        myPack("Serenity.Script.UI", "Serenity.Script", null);
-        fixNugetCache();
-    });
-
-Task("Script-Push")
-    .IsDependentOn("Script-Pack")
-    .Does(() =>
-    {
-        myPush();
-    });
-    
 RunTarget(target);

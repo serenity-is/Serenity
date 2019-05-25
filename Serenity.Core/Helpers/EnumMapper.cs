@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
+using Serenity.Abstractions;
+using Serenity.ComponentModel;
+using System.Collections.Concurrent;
 
 namespace Serenity
 {
-    using System.Reflection;
-    using Serenity.Abstractions;
-    using Serenity.ComponentModel;
-    using System.Collections.Concurrent;
-
+    /// <summary>
+    /// Contains Enum mapping and other helper functions
+    /// </summary>
     public static class EnumMapper
     {
         private static ConcurrentDictionary<Type, EnumTypeItem> cache;
@@ -50,6 +52,13 @@ namespace Serenity
             return item;
         }
 
+        /// <summary>
+        /// Tries to parse the enum string.
+        /// </summary>
+        /// <typeparam name="TEnum">The type of the enum.</typeparam>
+        /// <param name="key">The enumeration key or integer value.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>If parsed successfully true</returns>
         public static bool TryParse<TEnum>(string key, out TEnum value)
         {
             var item = Get(typeof(TEnum));
@@ -66,6 +75,13 @@ namespace Serenity
             }
         }
 
+        /// <summary>
+        /// Parses the specified enum key.
+        /// </summary>
+        /// <typeparam name="TEnum">The type of the enum.</typeparam>
+        /// <param name="key">The enum key or numeric value.</param>
+        /// <returns>Parsed enum value</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enum value is not valid.</exception>
         public static TEnum Parse<TEnum>(string key)
         {
             var item = Get(typeof(TEnum));
@@ -77,6 +93,15 @@ namespace Serenity
                 typeof(TEnum).FullName, key));
         }
 
+        /// <summary>
+        /// Converts an enum value to string.
+        /// </summary>
+        /// <param name="enumType">Type of the enum.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents enum value.
+        /// This is the identifier of the enum value or a numeric value.
+        /// </returns>
         public static string ToString(Type enumType, object value)
         {
             var item = Get(enumType);
@@ -88,22 +113,43 @@ namespace Serenity
             return intValue.ToString();
         }
 
+        /// <summary>
+        /// Gets the name of the enum value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>Enum name.</returns>
         public static string GetName(this Enum value)
         {
             return System.Enum.GetName(value.GetType(), value);
         }
 
+        /// <summary>
+        /// Gets the display text of the enum value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
         public static string GetText(this Enum value)
         {
             return FormatEnum(value.GetType(), value);
         }
 
+        /// <summary>
+        /// Gets the enum type key.
+        /// </summary>
+        /// <param name="enumType">Type of the enum.</param>
+        /// <returns>Enum type key</returns>
         public static string GetEnumTypeKey(Type enumType)
         {
             var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
             return enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
         }
 
+        /// <summary>
+        /// Formats the enum.
+        /// </summary>
+        /// <param name="enumType">Type of the enum.</param>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
         public static string FormatEnum(Type enumType, object value)
         {
             if (value == null)

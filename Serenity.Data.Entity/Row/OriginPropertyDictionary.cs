@@ -211,13 +211,13 @@ namespace Serenity.Data
             return originProperty;
         }
 
-        public string OriginExpression(PropertyInfo property, OriginAttribute origin,
+        public string OriginExpression(string propertyName, OriginAttribute origin,
             DialectExpressionSelector expressionSelector, string aliasPrefix, List<Attribute> extraJoins)
         {
             if (aliasPrefix.Length >= 1000)
                 throw new DivideByZeroException("Infinite origin recursion detected!");
 
-            var org = GetOriginProperty(property.Name);
+            var org = GetOriginProperty(propertyName);
             var originProperty = org.Item1;
 
             if (aliasPrefix.Length == 0)
@@ -245,7 +245,7 @@ namespace Serenity.Data
                     if (originOrigin != null)
                     {
                         originDictionary.PrefixAliases(originOrigin.Join + ".Dummy", aliasPrefix, expressionSelector, extraJoins);
-                        return originDictionary.OriginExpression(originProperty, originOrigin, expressionSelector, aliasPrefix, extraJoins);
+                        return originDictionary.OriginExpression(originProperty.Name, originOrigin, expressionSelector, aliasPrefix, extraJoins);
                     }
                     else
                         return aliasPrefix + "." + SqlSyntax.AutoBracket(originProperty.Name);
@@ -253,13 +253,13 @@ namespace Serenity.Data
             }
         }
 
-        public TAttr OriginAttribute<TAttr>(PropertyInfo property, OriginAttribute origin, int recursion = 0)
+        public TAttr OriginAttribute<TAttr>(string propertyName, OriginAttribute origin, int recursion = 0)
             where TAttr: Attribute
         {
             if (recursion++ > 1000)
                 throw new DivideByZeroException("Infinite origin recursion detected!");
 
-            var org = GetOriginProperty(property.Name);
+            var org = GetOriginProperty(propertyName);
             var originProperty = org.Item1;
 
             var attr = originProperty.GetCustomAttribute(typeof(TAttr));
@@ -270,13 +270,13 @@ namespace Serenity.Data
             if (originOrigin != null)
             {
                 var originDictionary = GetPropertyDictionary(org.Item2);
-                return originDictionary.OriginAttribute<TAttr>(originProperty, originOrigin);
+                return originDictionary.OriginAttribute<TAttr>(originProperty.Name, originOrigin);
             }
 
             return null;
         }
 
-        public string OriginDisplayName(PropertyInfo property, OriginAttribute origin, int recursion = 0)
+        public string OriginDisplayName(string propertyName, OriginAttribute origin, int recursion = 0)
         {
             if (recursion++ > 1000)
                 throw new DivideByZeroException("Infinite origin recursion detected!");
@@ -313,7 +313,7 @@ namespace Serenity.Data
                 return prefix + " " + s;
             };
 
-            var org = GetOriginProperty(property.Name);
+            var org = GetOriginProperty(propertyName);
             var originProperty = org.Item1;
 
             attr = originProperty.GetCustomAttribute<DisplayNameAttribute>();
@@ -324,7 +324,7 @@ namespace Serenity.Data
             if (originOrigin != null)
             {
                 var originDictionary = GetPropertyDictionary(org.Item2);
-                return addPrefix(originDictionary.OriginDisplayName(originProperty, originOrigin));
+                return addPrefix(originDictionary.OriginDisplayName(originProperty.Name, originOrigin));
             }
 
             return addPrefix(originProperty.Name);
@@ -379,7 +379,7 @@ namespace Serenity.Data
                         {
                             var origin = propertyInfo.GetCustomAttribute<OriginAttribute>();
                             if (origin != null)
-                                leftExpression = OriginExpression(propertyInfo, origin, expressionSelector, alias, extraJoins);
+                                leftExpression = OriginExpression(propertyInfo.Name, origin, expressionSelector, alias, extraJoins);
                             else
                                 leftExpression = alias + "." + SqlSyntax.AutoBracket(propertyInfo.Name);
                         }

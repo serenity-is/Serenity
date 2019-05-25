@@ -16,6 +16,12 @@ namespace Serenity.ComponentModel
             this.Value = value;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="HideOnUpdateAttribute"/> is on.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if on; otherwise, <c>false</c>.
+        /// </value>
         public bool Value
         {
             get;

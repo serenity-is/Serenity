@@ -8,11 +8,21 @@ namespace Serenity.ComponentModel
     /// </summary>
     public class HeaderCssClassAttribute : Attribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HeaderCssClassAttribute"/> class.
+        /// </summary>
+        /// <param name="value">The value.</param>
         public HeaderCssClassAttribute(string value)
         {
             Value = value;
         }
 
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
+        /// <value>
+        /// The value.
+        /// </value>
         public string Value { get; private set; }
     }
 }

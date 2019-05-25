@@ -8,6 +8,7 @@ using Serenity.Logging;
 using Serenity.Services;
 using System.Reflection;
 using System.Web.Hosting;
+using Serenity.Reflection;
 #if ASPNETCORE
 using Microsoft.Extensions.Caching.Memory;
 #else
@@ -25,6 +26,7 @@ namespace Serenity.Web
             InitializeServiceLocator();
 #endif
             InitializeSelfAssemblies();
+            InitializeAnnotatedTypes();
             InitializeCaching();
             InitializeConfigurationSystem();
             InitializeLogging();
@@ -94,6 +96,14 @@ namespace Serenity.Web
 
             if (Dependency.TryResolve<IImplicitBehaviorRegistry>() == null)
                 registrar.RegisterInstance<IImplicitBehaviorRegistry>(DefaultImplicitBehaviorRegistry.Instance);
+        }
+
+        public static void InitializeAnnotatedTypes()
+        {
+            var registrar = Dependency.Resolve<IDependencyRegistrar>();
+
+            if (Dependency.TryResolve<IAnnotationTypeRegistry>() == null)
+                registrar.RegisterInstance<IAnnotationTypeRegistry>(new AnnotationTypeRegistry());
         }
 
         public static void InitializeConfigurationSystem()

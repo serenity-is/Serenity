@@ -222,11 +222,11 @@ var Q;
     }
     Q.isTrimmedEmpty = isTrimmedEmpty;
     function format(msg) {
+        var _a;
         var prm = [];
         for (var _i = 1; _i < arguments.length; _i++) {
             prm[_i - 1] = arguments[_i];
         }
-        var _a;
         return (_a = ss).formatString.apply(_a, [msg].concat(prm));
     }
     Q.format = format;
@@ -1738,6 +1738,114 @@ var Q;
         return url;
     }
     Q.resolveUrl = resolveUrl;
+})(Q || (Q = {}));
+var Q;
+(function (Q) {
+    var LayoutTimer;
+    (function (LayoutTimer) {
+        var timeout;
+        var regs = [];
+        var regByKey = {};
+        function startTimer() {
+            if (timeout == null && regs.length) {
+                timeout = window.setTimeout(onTimeout, 100);
+            }
+        }
+        function clearTimer() {
+            if (timeout != null) {
+                window.clearTimeout(timeout);
+                timeout = null;
+            }
+        }
+        function onTimeout() {
+            for (var _i = 0, regs_1 = regs; _i < regs_1.length; _i++) {
+                var reg = regs_1[_i];
+                try {
+                    reg();
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            }
+            clearTimer();
+            startTimer();
+        }
+        function on(key, handler) {
+            if (handler == null)
+                throw "Layout handler can't be null!";
+            if (regByKey[key] !== undefined)
+                throw "There is already a registered layout handler with key: " + key;
+            if (key != null)
+                regByKey[key] = regs.length;
+            regs.push(handler);
+            startTimer();
+            return handler;
+        }
+        LayoutTimer.on = on;
+        function onSizeChange(key, element, handler) {
+            var oldWidth = element.offsetWidth;
+            var oldHeight = element.offsetHeight;
+            on(key, function () {
+                var offsetWidth = element.offsetWidth;
+                var offsetHeight = element.offsetHeight;
+                if (offsetWidth !== oldWidth ||
+                    offsetHeight !== oldHeight) {
+                    oldWidth = offsetWidth;
+                    oldHeight = offsetHeight;
+                    handler();
+                }
+            });
+            return handler;
+        }
+        LayoutTimer.onSizeChange = onSizeChange;
+        function onWidthChange(key, element, handler) {
+            var oldWidth = element.offsetWidth;
+            on(key, function () {
+                var offsetWidth = element.offsetWidth;
+                if (offsetWidth !== oldWidth) {
+                    oldWidth = offsetWidth;
+                    handler();
+                }
+            });
+            return handler;
+        }
+        LayoutTimer.onWidthChange = onWidthChange;
+        function onHeightChange(key, element, handler) {
+            var oldHeight = element.offsetHeight;
+            on(key, function () {
+                var offsetHeight = element.offsetHeight;
+                if (offsetHeight !== oldHeight) {
+                    oldHeight = offsetHeight;
+                    handler();
+                }
+            });
+            return handler;
+        }
+        LayoutTimer.onHeightChange = onHeightChange;
+        function off(key, handler) {
+            if (key != null) {
+                var index = regByKey[key];
+                if (index !== undefined) {
+                    delete regByKey[key];
+                    if (handler == null || handler === regs[index]) {
+                        regs.splice(index, 1);
+                        !regs.length && this.clearTimer();
+                        return;
+                    }
+                }
+            }
+            if (handler != null) {
+                for (var l = regs.length - 1; l >= 0; l++) {
+                    if (regs[l] === handler) {
+                        regs.splice(l, 1);
+                        !regs.length && this.clearTimer();
+                        break;
+                    }
+                }
+            }
+        }
+        LayoutTimer.off = off;
+    })(LayoutTimer = Q.LayoutTimer || (Q.LayoutTimer = {}));
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
@@ -11381,28 +11489,31 @@ var Serenity;
             this.submitHandlers = ss.delegateRemove(this.submitHandlers, action);
         };
         DataGrid.prototype.layout = function () {
-            if (!this.element.is(':visible')) {
+            if (!this.element.is(':visible') || this.slickContainer == null)
                 return;
-            }
-            if (this.slickContainer == null) {
-                return;
-            }
-            Q.layoutFillHeight(this.slickContainer);
-            if (this.element.hasClass('responsive-height')) {
-                if (this.slickGrid != null && this.slickGrid.getOptions().autoHeight) {
-                    this.slickContainer.children('.slick-viewport').css('height', 'auto');
-                    this.slickGrid.setOptions({ autoHeight: false });
-                }
-                if (this.slickGrid != null && (this.slickContainer.height() < 200 || $(window.window).width() < 768)) {
-                    this.element.css('height', 'auto');
-                    this.slickContainer.css('height', 'auto').children('.slick-viewport').css('height', 'auto');
+            var responsiveHeight = this.element.hasClass('responsive-height');
+            var madeAutoHeight = this.slickGrid != null && this.slickGrid.getOptions().autoHeight;
+            var shouldAutoHeight = responsiveHeight && window.innerWidth < 768;
+            if (shouldAutoHeight) {
+                if (this.element[0] && this.element[0].style.height != "auto")
+                    this.element[0].style.height = "auto";
+                if (!madeAutoHeight) {
+                    this.slickContainer.css('height', 'auto')
+                        .children('.slick-pane').each(function (i, e) {
+                        if (e.style.height != null && e.style.height != "auto")
+                            e.style.height = "auto";
+                    });
                     this.slickGrid.setOptions({ autoHeight: true });
                 }
             }
-            if (this.slickGrid != null) {
-                this.slickGrid.resizeCanvas();
-                this.slickGrid.invalidate();
+            else {
+                if (madeAutoHeight) {
+                    this.slickContainer.children('.slick-viewport').css('height', 'auto');
+                    this.slickGrid.setOptions({ autoHeight: false });
+                }
+                Q.layoutFillHeight(this.slickContainer);
             }
+            this.slickGrid.resizeCanvas();
         };
         DataGrid.prototype.getInitialTitle = function () {
             return null;
@@ -11746,6 +11857,7 @@ var Serenity;
         };
         DataGrid.prototype.viewDataChanged = function (e, rows) {
             this.markupReady();
+            this.layout();
         };
         DataGrid.prototype.bindToViewEvents = function () {
             var self = this;

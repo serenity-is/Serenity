@@ -115,6 +115,8 @@ namespace Serenity.CodeGeneration
                 basedOnRowAttr.ConstructorArguments[0].Type.FullName == "System.Type")
                 basedOnRow = (basedOnRowAttr.ConstructorArguments[0].Value as TypeReference).Resolve();
 
+            var rowAnnotations = basedOnRow != null ? GetAnnotationTypesFor(basedOnRow) : null;
+
             ILookup<string, PropertyDefinition> basedOnByName = null;
             if (basedOnRowAttr != null)
             {
@@ -136,13 +138,45 @@ namespace Serenity.CodeGeneration
                     if (CecilUtils.FindAttr(item.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
                         continue;
 
-                    if (basedOnField != null &&
-                        CecilUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
-                        continue;
+                    if (basedOnField != null)
+                    {
+                        if (CecilUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                            continue;
+
+                        bool ignored = false;
+                        foreach (var annotationType in rowAnnotations)
+                        {
+                            PropertyDefinition annotation;
+                            if (annotationType.PropertyByName.TryGetValue(item.Name, out annotation) &&
+                                CecilUtils.FindAttr(annotation.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                            {
+                                ignored = true;
+                                break;
+                            }
+                        }
+
+                        if (ignored)
+                            continue;
+                    }
 
                     var editorTypeAttr = CecilUtils.FindAttr(item.CustomAttributes, "Serenity.ComponentModel", "EditorTypeAttribute");
                     if (editorTypeAttr == null && basedOnField != null)
                         editorTypeAttr = CecilUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "EditorTypeAttribute");
+
+                    if (editorTypeAttr == null && basedOnRow != null)
+                    {
+                        foreach (var annotationType in rowAnnotations)
+                        {
+                            PropertyDefinition annotation;
+                            if (!annotationType.PropertyByName.TryGetValue(item.Name, out annotation))
+                                continue;
+
+                            editorTypeAttr = CecilUtils.FindAttr(annotation.CustomAttributes,
+                                "Serenity.ComponentModel", "EditorTypeAttribute");
+                            if (editorTypeAttr != null)
+                                break;
+                        }
+                    }
 
                     var editorType = GetEditorTypeKeyFrom(item.PropertyType, basedOnField != null ? basedOnField.PropertyType : (TypeReference)null, editorTypeAttr);
 

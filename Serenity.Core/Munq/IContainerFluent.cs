@@ -6,8 +6,16 @@
 
 namespace Munq
 {
+    /// <summary>
+    /// Fluent container
+    /// </summary>
     public interface IContainerFluent
     {
+        /// <summary>
+        /// Gets uses the default lifetime manager of.
+        /// </summary>
+        /// <param name="lifetimeManager">The lifetime manager.</param>
+        /// <returns></returns>
         IContainerFluent UsesDefaultLifetimeManagerOf(ILifetimeManager lifetimeManager);
     }
 }

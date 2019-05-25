@@ -6,8 +6,16 @@ using System.Reflection.Emit;
 
 namespace Serenity.Reflection
 {
+    /// <summary>
+    /// IL Generation helpers
+    /// </summary>
     public static class ILGeneration
     {
+        /// <summary>
+        /// Generates the field getter.
+        /// </summary>
+        /// <param name="fieldInfo">The field information.</param>
+        /// <returns></returns>
         public static Func<object, object> GenerateGetter(FieldInfo fieldInfo)
         {
 #if COREFX
@@ -31,6 +39,11 @@ namespace Serenity.Reflection
 #endif
         }
 
+        /// <summary>
+        /// Generates the field setter.
+        /// </summary>
+        /// <param name="fieldInfo">The field information.</param>
+        /// <returns></returns>
         public static Action<object, object> GenerateSetter(FieldInfo fieldInfo)
         {
 #if COREFX

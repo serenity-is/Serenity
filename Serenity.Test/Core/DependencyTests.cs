@@ -117,7 +117,7 @@ namespace Serenity.Test
                 Assert.Equal(provider, actual);
 
                 A.CallTo(() => resolver.Resolve<IAuthenticationService>())
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => resolver.Resolve<IAuthenticationService>(A<string>.Ignored))
                     .MustNotHaveHappened();
@@ -160,7 +160,7 @@ namespace Serenity.Test
                 Assert.Equal(provider, actual);
 
                 A.CallTo(() => resolver.Resolve<IAuthenticationService>("Scope"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => resolver.Resolve<IAuthenticationService>(A<string>.That.Matches(x => x != "Scope")))
                     .MustNotHaveHappened();
@@ -208,7 +208,7 @@ namespace Serenity.Test
                 Assert.Equal(provider, actual);
 
                 A.CallTo(() => resolver.TryResolve<IAuthenticationService>())
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => resolver.TryResolve<IAuthenticationService>(A<string>.Ignored))
                     .MustNotHaveHappened();
@@ -253,7 +253,7 @@ namespace Serenity.Test
                 Assert.Equal(provider, actual);
 
                 A.CallTo(() => resolver.TryResolve<IAuthenticationService>("Scope"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
 
                 A.CallTo(() => resolver.TryResolve<IAuthenticationService>(A<string>.That.Matches(x => x != "Scope")))
                     .MustNotHaveHappened();

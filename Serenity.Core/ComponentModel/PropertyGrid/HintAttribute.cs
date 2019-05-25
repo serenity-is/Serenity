@@ -9,11 +9,21 @@ namespace Serenity.ComponentModel
     /// </summary>
     public class HintAttribute : Attribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HintAttribute"/> class.
+        /// </summary>
+        /// <param name="hint">The hint.</param>
         public HintAttribute(string hint)
         {
             Hint = hint;
         }
 
+        /// <summary>
+        /// Gets the hint.
+        /// </summary>
+        /// <value>
+        /// The hint.
+        /// </value>
         public string Hint { get; private set; }
     }
 }

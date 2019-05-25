@@ -99,32 +99,38 @@
         }
 
         protected layout(): void {
-            if (!this.element.is(':visible')) {
+            if (!this.element.is(':visible') || this.slickContainer == null)
                 return;
-            }
 
-            if (this.slickContainer == null) {
-                return;
-            }
+            var responsiveHeight = this.element.hasClass('responsive-height');
+            var madeAutoHeight = this.slickGrid != null && this.slickGrid.getOptions().autoHeight;
+            var shouldAutoHeight = responsiveHeight && window.innerWidth < 768;
 
-            Q.layoutFillHeight(this.slickContainer);
+            if (shouldAutoHeight) {
+                if (this.element[0] && this.element[0].style.height != "auto")
+                    this.element[0].style.height = "auto";
 
-            if (this.element.hasClass('responsive-height')) {
-                if (this.slickGrid != null && this.slickGrid.getOptions().autoHeight) {
-                    this.slickContainer.children('.slick-viewport').css('height', 'auto');
-                    this.slickGrid.setOptions({ autoHeight: false });
-                }
-                if (this.slickGrid != null && (this.slickContainer.height() < 200 || $(window.window).width() < 768)) {
-                    this.element.css('height', 'auto');
-                    this.slickContainer.css('height', 'auto').children('.slick-viewport').css('height', 'auto');
+                if (!madeAutoHeight) {
+
+                    this.slickContainer.css('height', 'auto')
+                        .children('.slick-pane').each((i, e: HTMLElement) => {
+                            if (e.style.height != null && e.style.height != "auto")
+                                e.style.height = "auto";
+                        });
+
                     this.slickGrid.setOptions({ autoHeight: true });
                 }
             }
+            else {
+                if (madeAutoHeight) {
+                    this.slickContainer.children('.slick-viewport').css('height', 'auto');
+                    this.slickGrid.setOptions({ autoHeight: false });
+                }
 
-            if (this.slickGrid != null) {
-                this.slickGrid.resizeCanvas();
-                this.slickGrid.invalidate();
+                Q.layoutFillHeight(this.slickContainer);
             }
+
+            this.slickGrid.resizeCanvas();
         }
 
         protected getInitialTitle(): string {
@@ -530,6 +536,7 @@
 
         protected viewDataChanged(e: any, rows: TItem[]): void {
             this.markupReady();
+            this.layout();
         }
 
         protected bindToViewEvents(): void {

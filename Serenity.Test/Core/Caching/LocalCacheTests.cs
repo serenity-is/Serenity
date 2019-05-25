@@ -33,7 +33,7 @@ namespace Serenity.Test
                 LocalCache.Add("SomeKey", 1, TimeSpan.FromHours(1));
 
                 A.CallTo(() => cache.Add("SomeKey", 1, TimeSpan.FromHours(1)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -62,7 +62,7 @@ namespace Serenity.Test
                 LocalCache.Get<object>("KeyToGet", TimeSpan.Zero, () => "a");
 
                 A.CallTo(() => cache.Get<object>("KeyToGet"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -83,7 +83,7 @@ namespace Serenity.Test
                 Assert.Null(actual);
 
                 A.CallTo(() => cache.Get<object>("NullKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -105,7 +105,7 @@ namespace Serenity.Test
                 Assert.Equal("LoaderReturn", actual);
 
                 A.CallTo(() => cache.Add("NotFound", "LoaderReturn", TimeSpan.FromMinutes(1)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -126,7 +126,7 @@ namespace Serenity.Test
                 Assert.Null(actual);
 
                 A.CallTo(() => cache.Add("NotFound", DBNull.Value, TimeSpan.FromMinutes(1)))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -173,7 +173,7 @@ namespace Serenity.Test
                 LocalCache.TryGet<string>("KeyToGet");
 
                 A.CallTo(() => cache.Get<object>("KeyToGet"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -194,7 +194,7 @@ namespace Serenity.Test
                 Assert.Null(actual);
 
                 A.CallTo(() => cache.Get<object>("NotInCache"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -215,7 +215,7 @@ namespace Serenity.Test
                 Assert.Equal(DBNull.Value, actual);
 
                 A.CallTo(() => cache.Get<object>("DbNullValue"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -262,7 +262,7 @@ namespace Serenity.Test
                 LocalCache.Remove("KeyToRemove");
 
                 A.CallTo(() => cache.Remove("KeyToRemove"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -283,7 +283,7 @@ namespace Serenity.Test
                 Assert.Equal("Old", actual);
 
                 A.CallTo(() => cache.Remove("OldValue"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -304,7 +304,7 @@ namespace Serenity.Test
                 Assert.Null(actual);
 
                 A.CallTo(() => cache.Remove("OldValue"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -333,7 +333,7 @@ namespace Serenity.Test
                 LocalCache.RemoveAll();
 
                 A.CallTo(() => cache.RemoveAll())
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
     }

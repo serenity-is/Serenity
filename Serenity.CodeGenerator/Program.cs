@@ -113,8 +113,7 @@ namespace Serenity.CodeGenerator
         {
             Console.WriteLine("Serenity Code Generator " +
 #if COREFX
-
-                new Microsoft.Extensions.PlatformAbstractions.ApplicationEnvironment().ApplicationVersion);
+                System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
 #else
                 typeof(Program).GetType().Assembly.GetName().Version.ToString());
 #endif

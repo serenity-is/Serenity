@@ -1,3 +1,64 @@
+## 3.9.9 (2019-05-24)
+
+Features:
+  - SqlSettings.DefaultCommandTimeout global setting to set command timeouts, and connection.SetCommandTimeout extension method to set timeout for a connection (only works with WrappedConnection)
+  - made set of criteria operator constants available in script side as Serenity.Criteria.Operator
+  - complete missing XML documentation for Serenity.Core
+
+## 3.9.8 (2019-04-16)
+
+Bugfixes:
+  - sergen nuget package missing System.Threading.Tasks.Extensions.dll used by scriban 2.0
+
+## 3.9.7 (2019-04-15)
+
+Features:
+  - update to asp.net core 2.2, make sure you install 2.2 sdk for your Visual Studio version (SDK 2.2.106 for VS 2017, SDK 2.2.203 for VS 2019 as of writing), updated many packages including Newtonsoft.Json, FakeItEasy, Microsoft.AspNet.Mvc
+  - add better error handling when a property has [LeftJoin] or [InnerJoin] attribute but no [ForeignKey] attribute.
+
+## 3.9.6 (2019-04-05)
+
+Features:
+  - added annotation type support, which allows separating undesired dependencies, like UI related attributes from row properties into a annotation class.
+  - added AutoColumnWidthMixin which auto sizes grid columns based on content width [StartSharp]
+  - improve responsive layout algorithm for data grids in mobile devices
+  - recommended method to ignore checking a property name when form/columns class has a BasedOnRow(CheckNames = true) is now [IgnoreName], not [NotMapped] attribute, though old one still works for compability.
+
+## 3.9.5 (2019-03-27)
+
+Features:
+  - handle toastr invalid path casing
+  
+## 3.9.4 (2019-03-27)
+
+Bugfixes:
+  - fix syntax error in DotnetCorePathFinder
+  
+## 3.9.3 (2019-03-27)
+
+Features:
+  - better handling for nuget locations in linux / mac
+
+## 3.9.2 (2019-03-27)
+
+Features:
+  - skip packages without id for dotnet sergen restore, e.g. Microsoft.AspNetCore.App
+
+## 3.9.1 (2019-03-27)
+
+Features:
+  - check runtimeconfig.dev.json for nuget folders (attempting to fix linux / mac transform issue)
+
+## 3.9.0 (2019-03-15)
+
+Features:
+  - added basic attributes to support plugin architecture (work in progress...)
+  - [Breaking Change] Serenity.Web NuGet package no longer contains / has reference to Serenity script, css and image files, so you need to manually install Serenity.Scripts NuGet package in your project after updating. 
+  Also update Serenity.Web.Assets package. If using AspNetCore add reference to Serenity.Web.Assets and Serenity.Web.Scripts packages in CSPROJ file next to Serenity.Web reference.
+
+Bugfixes:
+  - StackExchange.Exceptional delete, protect etc. actions wasn't working in ASP.NET Core properly due to AntiForgery system [StartSharp]
+
 ## 3.8.7 (2019-02-27)
 
 Features:

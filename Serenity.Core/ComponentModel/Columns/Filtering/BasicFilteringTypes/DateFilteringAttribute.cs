@@ -8,6 +8,7 @@ namespace Serenity.ComponentModel
     /// <seealso cref="Serenity.ComponentModel.CustomFilteringAttribute" />
     public class DateFilteringAttribute : CustomFilteringAttribute
     {
+        /// <summary>Initializes a new instance of the <see cref="DateFilteringAttribute"/> class.</summary>
         public DateFilteringAttribute()
             : base("Date")
         {

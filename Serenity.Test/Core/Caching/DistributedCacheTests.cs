@@ -36,7 +36,7 @@ namespace Serenity.Test
                 Assert.Equal(7, actual);
 
                 A.CallTo(() => cache.Increment("SomeKey", 3))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -63,7 +63,7 @@ namespace Serenity.Test
                 DistributedCache.Set("SomeKey", 789);
 
                 A.CallTo(() => cache.Set("SomeKey", 789))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -92,7 +92,7 @@ namespace Serenity.Test
                 DistributedCache.Set("SomeKey", 789, expiration);
 
                 A.CallTo(() => cache.Set("SomeKey", 789, expiration))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
@@ -123,7 +123,7 @@ namespace Serenity.Test
                 Assert.Equal(13579, actual);
 
                 A.CallTo(() => cache.Get<int>("SomeKey"))
-                    .MustHaveHappened(Repeated.Exactly.Once);
+                    .MustHaveHappened(1, Times.Exactly);
             }
         }
 
