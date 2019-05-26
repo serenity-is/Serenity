@@ -1,3 +1,10 @@
+## 3.9.9 (2019-05-24)
+
+Features:
+  - SqlSettings.DefaultCommandTimeout global setting to set command timeouts, and connection.SetCommandTimeout extension method to set timeout for a connection (only works with WrappedConnection)
+  - made set of criteria operator constants available in script side as Serenity.Criteria.Operator
+  - complete missing XML documentation for Serenity.Core
+
 ## 3.9.8 (2019-04-16)
 
 Bugfixes:
