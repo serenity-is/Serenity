@@ -26,7 +26,7 @@ namespace Serenity.Data
                 { "System.Data.SQLite", SqliteDialect.Instance },
                 { "Microsoft.Data.SQLite", SqliteDialect.Instance },
                 { "System.Data.OracleClient", OracleDialect.Instance },
-                { "Oracle.ManagedDataAccess.Client", Oracle12cDialect.Instance }
+                { "Oracle.ManagedDataAccess.Client", OracleDialect.Instance }
             };
 
         private string databaseName;
