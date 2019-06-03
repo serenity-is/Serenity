@@ -7,6 +7,10 @@
     using System.Diagnostics;
     using System.Text;
 
+    /// <summary>
+    /// Base criteria object type
+    /// </summary>
+    /// <seealso cref="Serenity.ICriteria" />
     [DebuggerDisplay("{ToStringIgnoreParams()}")]
     [JsonConverter(typeof(JsonCriteriaConverter))]
     public abstract class BaseCriteria : ICriteria
@@ -14,31 +18,61 @@
         private static NoParamsChecker noParamsChecker = new NoParamsChecker();
         private static IgnoreParams ignoreParams = new IgnoreParams();
 
+        /// <summary>
+        /// Gets a value indicating whether this criteria instance is empty.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is empty; otherwise, <c>false</c>.
+        /// </value>
         public virtual bool IsEmpty
         {
             get { return false; }
         }
-        
+
+        /// <summary>
+        /// Creates a new unary IsNull criteria containing this criteria as the operand.
+        /// </summary>
+        /// <returns></returns>
         public BaseCriteria IsNull()
         {
             return new UnaryCriteria(CriteriaOperator.IsNull, this);
         }
 
+        /// <summary> 
+        /// Creates a new unary IsNotNull criteria containing this criteria as the operand.
+        /// </summary>
+        /// <returns></returns>
         public BaseCriteria IsNotNull()
         {
             return new UnaryCriteria(CriteriaOperator.IsNotNull, this);
         }
 
+        /// <summary>
+        /// Creates a new binary Like criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="mask">The LIKE mask.</param>
+        /// <returns></returns>
         public BaseCriteria Like(string mask)
         {
             return new BinaryCriteria(this, CriteriaOperator.Like, new ValueCriteria(mask));
         }
 
+        /// <summary>
+        /// Creates a new binary Not Like criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="mask">The like mask.</param>
+        /// <returns></returns>
         public BaseCriteria NotLike(string mask)
         {
             return new BinaryCriteria(this, CriteriaOperator.NotLike, new ValueCriteria(mask));
         }
 
+        /// <summary>
+        /// Creates a new binary Stars With (LIKE '...%') criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="mask">The starts with mask.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">mask is null</exception>
         public BaseCriteria StartsWith(string mask)
         {
             if (mask == null)
@@ -47,6 +81,12 @@
             return Like(mask + "%");
         }
 
+        /// <summary>
+        /// Creates a new binary Ends With (LIKE '%...') criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="mask">The ends with mask.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">mask is null</exception>
         public BaseCriteria EndsWith(string mask)
         {
             if (mask == null)
@@ -55,11 +95,21 @@
             return Like("%" + mask);
         }
 
+        /// <summary>
+        /// Creates a new binary Contains criteria (LIKE '%...%') containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="mask">The contains mask.</param>
+        /// <returns></returns>
         public BaseCriteria Contains(string mask)
         {
             return Like("%" + mask + "%");
         }
 
+        /// <summary>
+        /// Creates a new binary Not Contains criteria (NOT LIKE '%...%') containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="mask">The contains mask.</param>
+        /// <returns></returns>
         public BaseCriteria NotContains(string mask)
         {
             return NotLike("%" + mask + "%");
@@ -531,11 +581,23 @@
             return base.Equals(obj);
         }
 
+        /// <summary>
+        /// Converts the criteria to string while ignoring its params if any.
+        /// ToString() raises an exception if a criteria has params, while this not.
+        /// </summary>
+        /// <returns></returns>
         public string ToStringIgnoreParams()
         {
             return ToString(ignoreParams);
         }
 
+        /// <summary>
+        /// Converts the criteria to string representation while adding params to the target query.
+        /// </summary>
+        /// <param name="query">The target query to add params to.</param>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public string ToString(IQueryWithParams query)
         {
             var sb = new StringBuilder(256);
@@ -543,11 +605,24 @@
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Converts the criteria to string. Raises an exception if
+        /// criteria contains parameters.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public override string ToString()
         {
             return ToString(noParamsChecker);
         }
 
+        /// <summary>
+        /// Converts the criteria to string representation into a string builder, while adding
+        /// its params to the target query.
+        /// </summary>
+        /// <param name="sb">The string builder.</param>
+        /// <param name="query">The target query to add params to.</param>
         public virtual void ToString(StringBuilder sb, IQueryWithParams query)
         {
             throw new NotImplementedException();

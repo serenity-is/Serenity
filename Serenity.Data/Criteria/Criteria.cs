@@ -11,8 +11,21 @@
 #endif
     public class Criteria : BaseCriteria
     {
+        /// <summary>
+        /// An empty criteria instance
+        /// </summary>
         public static readonly BaseCriteria Empty = new Criteria();
+
+
+        /// <summary>
+        /// The false criteria instance (0 = 1)
+        /// </summary>
         public static readonly BaseCriteria False = new Criteria("0=1");
+
+
+        /// <summary>
+        /// The true criteria instance (1 = 1)
+        /// </summary>
         public static readonly BaseCriteria True = new Criteria("1=1");
         
         private string expression;
@@ -48,12 +61,14 @@
         }
 
         /// <summary>
-        ///   Belirtilen tablo alias'ı ve alan adını aralarına nokta koyarak içeren yeni bir 
-        ///   kriter oluşturur.</summary>
-        /// <param name="alias">
-        ///   Tablo alias'ı. Null ya da boş olursa önemsenmez.</param>
-        /// <param name="field">
-        ///   Alan adı (zorunlu).</param>
+        /// Initializes a new instance of the <see cref="Criteria"/> class
+        /// containing an expression like "alias.field".
+        /// </summary>
+        /// <param name="alias">The alias.</param>
+        /// <param name="field">The field.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Field or alias is null or empty string.
+        /// </exception>
         public Criteria(string alias, string field)
         {
             if (String.IsNullOrEmpty(field))
@@ -65,13 +80,13 @@
         }
 
         /// <summary>
-        ///   Belirtilen numerik tablo alias'ı (başına T konarak) ve alan adını aralarına 
-        ///   nokta koyarak içeren yeni bir kriter oluşturur.</summary>
-        /// <param name="joinNumber">
-        ///   Join numarası (T1 gibi kullanılır). Değer sıfırdan küçükse alan adı tek başına
-        ///   kullanılır.</param>
-        /// <param name="field">
-        ///   Alan adı (zorunlu).</param>
+        /// Initializes a new instance of the <see cref="Criteria"/> class
+        /// containing an expression like "tjoinnumber.field" (t7.field).
+        /// </summary>
+        /// <param name="joinNumber">The join number.</param>
+        /// <param name="field">The field.</param>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentOutOfRangeException">joinNumber is less than zero</exception>
         public Criteria(int joinNumber, string field)
         {
             if (String.IsNullOrEmpty(field))
@@ -84,58 +99,54 @@
         }
 
         /// <summary>
-        ///   Belirtilen numerik tablo alias'ı (başına T konarak) ve alanın adını aralarına 
-        ///   nokta koyarak içeren yeni bir kriter oluşturur.</summary>
-        /// <param name="alias">
-        ///   Join aliası (T1 gibi kullanılır)</param>
-        /// <param name="field">
-        ///   Alan nesnesi (zorunlu).</param>
+        /// Initializes a new instance of the <see cref="Criteria"/> class containing
+        /// an expression like "alias.field".
+        /// </summary>
+        /// <param name="alias">The alias.</param>
+        /// <param name="field">The field.</param>
         public Criteria(IAlias alias, IField field)
             : this(alias.Name, field.Name)
         {
         }
 
         /// <summary>
-        ///   Belirtilen numerik tablo alias'ı (başına T konarak) ve alanın adını aralarına 
-        ///   nokta koyarak içeren yeni bir kriter oluşturur.</summary>
-        /// <param name="alias">
-        ///   Join aliası (T1 gibi kullanılır)</param>
-        /// <param name="field">
-        ///   Alan nesnesi (zorunlu).</param>
+        /// Initializes a new instance of the <see cref="Criteria"/> class containing
+        /// an expression like "alias.field".
+        /// </summary>
+        /// <param name="alias">The alias.</param>
+        /// <param name="field">The field.</param>
         public Criteria(IAlias alias, string field)
             : this(alias.Name, field)
         {
         }
 
         /// <summary>
-        ///   Belirtilen numerik tablo alias'ı (başına T konarak) ve alanın adını aralarına 
-        ///   nokta koyarak içeren yeni bir kriter oluşturur.</summary>
-        /// <param name="joinNumber">
-        ///   Join numarası (T1 gibi kullanılır)</param>
-        /// <param name="field">
-        ///   Alan nesnesi (zorunlu).</param>
+        /// Initializes a new instance of the <see cref="Criteria"/> class containing
+        /// an expression like "tjoinNumber.field"
+        /// </summary>
+        /// <param name="joinNumber">The join number.</param>
+        /// <param name="field">The field.</param>
         public Criteria(int joinNumber, IField field)
             : this(joinNumber, field.Name)
         {
         }
 
         /// <summary>
-        ///   Belirtilen join ve meta alanın adını aralarına nokta koyarak içeren yeni bir 
-        ///   kriter oluşturur.</summary>
-        /// <param name="join">
-        ///   Tablo alias bilgisini içeren LeftJoin nesnesi (zorunlu).</param>
-        /// <param name="field">
-        ///   Field alan (zorunlu).</param>
+        /// Initializes a new instance of the <see cref="Criteria"/> class containing
+        /// an expression like "join.field".
+        /// </summary>
+        /// <param name="join">The join.</param>
+        /// <param name="field">The field.</param>
         public Criteria(string join, IField field)
             : this(join, field.Name)
         {
         }
 
         /// <summary>
-        ///   Belirtilen SqlQuery i içeren yeni bir 
-        ///   kriter oluşturur.</summary>
-        /// <param name="query">
-        ///   Query nesnesi (genellikle sub query).</param>
+        /// Initializes a new instance of the <see cref="Criteria"/> class containing
+        /// a query's string representation.
+        /// </summary>
+        /// <param name="query">The query.</param>
         public Criteria(ISqlQuery query)
             : this(query.ToString())
         {
@@ -143,13 +154,11 @@
 
 
         /// <summary>
-        ///   Verilen alan adını köşeli parantez içine alarak yeni bir kriter oluşturur.
-        ///   SQL'de boşluk içeren ya da keyword olan alan adlarının kullanılabilmesi 
-        ///   için gerekebilir.</summary>
-        /// <param name="fieldName">
-        ///   Köşeli parantez içine alınıp kriterye çevrilecek alan adı (zorunlu).</param>
-        /// <returns>
-        ///   Alan adını köşeli parantez içinde içeren yeni bir kriter.</returns>
+        /// Creates a new criteria containing field name in brackets.
+        /// </summary>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">fieldName is null or empty string.</exception>
         public static Criteria Bracket(string fieldName)
         {
             if (String.IsNullOrEmpty(fieldName))
@@ -188,11 +197,23 @@
             }
         }
 
+        /// <summary>
+        /// Converts the criteria to its string representation while
+        /// adding its parameters to the target query.
+        /// </summary>
+        /// <param name="sb">The string builder.</param>
+        /// <param name="query">The target query to add params into.</param>
         public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
             sb.Append(this.expression);
         }
 
+        /// <summary>
+        /// Gets the criteria expression.
+        /// </summary>
+        /// <value>
+        /// The raw criteria expression.
+        /// </value>
         public string Expression
         {
             get { return expression; }

@@ -136,6 +136,12 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets or sets default command timeout.
+        /// </summary>
+        /// <value>
+        /// Default command timeout.
+        /// </value>
         public int? CommandTimeout { get; set; }
 
         /// <summary>

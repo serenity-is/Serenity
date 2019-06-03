@@ -3,12 +3,26 @@
     using System;
     using System.Text;
 
+    /// <summary>
+    /// Binary criteria object, which has two operands and a operator.
+    /// </summary>
+    /// <seealso cref="Serenity.Data.BaseCriteria" />
     public class BinaryCriteria : BaseCriteria
     {
         private BaseCriteria left;
         private BaseCriteria right;
         private CriteriaOperator op;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BinaryCriteria"/> class.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="op">The operator.</param>
+        /// <param name="right">The right operand.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Left or right operand is null.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Operator is not a binary one.</exception>
         public BinaryCriteria(BaseCriteria left, CriteriaOperator op, BaseCriteria right)
         {
             if (ReferenceEquals(left, null))
@@ -25,6 +39,12 @@
             this.op = op;
         }
 
+        /// <summary>
+        /// Converts the criteria to string in a string builder, 
+        /// while adding its params to the target query.
+        /// </summary>
+        /// <param name="sb">The string builder.</param>
+        /// <param name="query">The target query.</param>
         public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
             if (this.op == CriteriaOperator.Like ||
@@ -73,16 +93,34 @@
             " NOT IN "
         };
 
+        /// <summary>
+        /// Gets the operator.
+        /// </summary>
+        /// <value>
+        /// The operator.
+        /// </value>
         public CriteriaOperator Operator
         {
             get { return op; }
         }
 
+        /// <summary>
+        /// Gets the left operand.
+        /// </summary>
+        /// <value>
+        /// The left operand.
+        /// </value>
         public BaseCriteria LeftOperand
         {
             get { return left; }
         }
 
+        /// <summary>
+        /// Gets the right operand.
+        /// </summary>
+        /// <value>
+        /// The right operand.
+        /// </value>
         public BaseCriteria RightOperand
         {
             get { return right; }
