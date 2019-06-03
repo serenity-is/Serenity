@@ -4,15 +4,29 @@
     using System.Collections;
     using System.Text;
 
+    /// <summary>
+    /// Criteria object with one value
+    /// </summary>
+    /// <seealso cref="Serenity.Data.BaseCriteria" />
     public class ValueCriteria : BaseCriteria
     {
         private object value;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValueCriteria"/> class.
+        /// </summary>
+        /// <param name="value">The value.</param>
         public ValueCriteria(object value)
         {
             this.value = value;
         }
 
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
+        /// <value>
+        /// The value.
+        /// </value>
         public object Value
         {
             get
@@ -21,6 +35,11 @@
             }
         }
 
+        /// <summary>
+        /// Converts the criteria to string.
+        /// </summary>
+        /// <param name="sb">The string builder.</param>
+        /// <param name="query">The target query to add params to.</param>
         public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
             var enumerable = value as IEnumerable;

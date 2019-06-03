@@ -115,6 +115,13 @@
             return NotLike("%" + mask + "%");
         }
 
+        /// <summary>
+        /// Creates a new binary IN criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <typeparam name="T">Type of values</typeparam>
+        /// <param name="values">The values.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">values</exception>
         public BaseCriteria In<T>(params T[] values)
         {
             if (values == null || values.Length == 0)
@@ -142,19 +149,36 @@
             return new BinaryCriteria(this, CriteriaOperator.In, new ValueCriteria(values));
         }
 
+        /// <summary>
+        /// Creates a new binary IN criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="statement">The statement.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">statement is null or empty</exception>
         public BaseCriteria In(BaseCriteria statement)
         {
             if (Object.ReferenceEquals(null, statement) || statement.IsEmpty)
                 throw new ArgumentNullException("statement");
 
-            return new BinaryCriteria(this, CriteriaOperator.In, statement); 
+            return new BinaryCriteria(this, CriteriaOperator.In, statement);
         }
 
+        /// <summary>
+        /// Creates a new binary IN criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="statement">The statement.</param>
+        /// <returns></returns>
         public BaseCriteria InStatement(BaseCriteria statement)
         {
             return In(statement);
         }
 
+        /// <summary>
+        /// Creates a new binary IN criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="statement">The statement query.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">statement is null</exception>
         public BaseCriteria In(ISqlQuery statement)
         {
             if (Object.ReferenceEquals(null, statement))
@@ -163,6 +187,13 @@
             return new BinaryCriteria(this, CriteriaOperator.In, new Criteria(statement));
         }
 
+        /// <summary>
+        /// Creates a new binary NOT IN criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <typeparam name="T">Type of values</typeparam>
+        /// <param name="values">The values.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">values is null or zero length array</exception>
         public BaseCriteria NotIn<T>(params T[] values)
         {
             if (values == null || values.Length == 0)
@@ -190,6 +221,12 @@
             return new BinaryCriteria(this, CriteriaOperator.NotIn, new ValueCriteria(values));
         }
 
+        /// <summary>
+        /// Creates a new binary NOT IN criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="statement">The statement.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">statement is null or empty</exception>
         public BaseCriteria NotIn(BaseCriteria statement)
         {
             if (Object.ReferenceEquals(null, statement) || statement.IsEmpty)
@@ -198,6 +235,12 @@
             return new BinaryCriteria(this, CriteriaOperator.NotIn, statement);
         }
 
+        /// <summary>
+        /// Creates a new binary NOT IN criteria containing this criteria as the left operand.
+        /// </summary>
+        /// <param name="statement">The statement.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">statement is null</exception>
         public BaseCriteria NotIn(ISqlQuery statement)
         {
             if (Object.ReferenceEquals(null, statement))
@@ -206,306 +249,793 @@
             return new BinaryCriteria(this, CriteriaOperator.NotIn, new Criteria(statement));
         }
 
+        /// <summary>
+        /// Implements the operator !.
+        /// </summary>
+        /// <param name="criteria">The criteria.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !(BaseCriteria criteria)
         {
             return new UnaryCriteria(CriteriaOperator.Not, criteria);
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="criteria2">The criteria2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ==(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, criteria2);
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="param">The parameter.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ==(BaseCriteria criteria1, Parameter param)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ParamCriteria(param.Name));
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ==(BaseCriteria criteria1, int value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ==(BaseCriteria criteria1, Int64 value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ==(BaseCriteria criteria1, string value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ==(BaseCriteria criteria1, Double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ==(BaseCriteria criteria1, Decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ==(BaseCriteria criteria1, DateTime value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ==(BaseCriteria criteria1, Guid value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ==(BaseCriteria criteria1, Enum value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="criteria2">The criteria2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !=(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, criteria2);
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="param">The parameter.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !=(BaseCriteria criteria1, Parameter param)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ParamCriteria(param.Name));
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !=(BaseCriteria criteria1, int value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !=(BaseCriteria criteria1, Int64 value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !=(BaseCriteria criteria1, string value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !=(BaseCriteria criteria1, Double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !=(BaseCriteria criteria1, Decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !=(BaseCriteria criteria1, DateTime value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !=(BaseCriteria criteria1, Guid value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator !=(BaseCriteria criteria1, Enum value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="criteria2">The criteria2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, criteria2);
         }
 
+        /// <summary>
+        /// Implements the operator &gt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="param">The parameter.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >(BaseCriteria criteria1, Parameter param)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ParamCriteria(param.Name));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >(BaseCriteria criteria1, Int32 value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >(BaseCriteria criteria1, Int64 value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >(BaseCriteria criteria1, string value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >(BaseCriteria criteria1, Double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >(BaseCriteria criteria1, Decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >(BaseCriteria criteria1, DateTime value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >(BaseCriteria criteria1, Guid value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >(BaseCriteria criteria1, Enum value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="criteria2">The criteria2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >=(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, criteria2);
         }
 
+        /// <summary>
+        /// Implements the operator &gt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="param">The parameter.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >=(BaseCriteria criteria1, Parameter param)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ParamCriteria(param.Name));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >=(BaseCriteria criteria1, Int32 value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >=(BaseCriteria criteria1, Int64 value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >=(BaseCriteria criteria1, string value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >=(BaseCriteria criteria1, Double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >=(BaseCriteria criteria1, Decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >=(BaseCriteria criteria1, DateTime value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >=(BaseCriteria criteria1, Guid value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &gt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator >=(BaseCriteria criteria1, Enum value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="criteria2">The criteria2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, criteria2);
         }
 
+        /// <summary>
+        /// Implements the operator &lt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="param">The parameter.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <(BaseCriteria criteria1, Parameter param)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ParamCriteria(param.Name));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <(BaseCriteria criteria1, Int32 value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <(BaseCriteria criteria1, Int64 value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <(BaseCriteria criteria1, string value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <(BaseCriteria criteria1, Double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <(BaseCriteria criteria1, Decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <(BaseCriteria criteria1, DateTime value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <(BaseCriteria criteria1, Guid value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <(BaseCriteria criteria1, Enum value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="criteria2">The criteria2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <=(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, criteria2);
         }
 
+        /// <summary>
+        /// Implements the operator &lt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="param">The parameter.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <=(BaseCriteria criteria1, Parameter param)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ParamCriteria(param.Name));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <=(BaseCriteria criteria1, Int32 value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <=(BaseCriteria criteria1, Int64 value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <=(BaseCriteria criteria1, string value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <=(BaseCriteria criteria1, Double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <=(BaseCriteria criteria1, Decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <=(BaseCriteria criteria1, DateTime value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <=(BaseCriteria criteria1, Guid value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
 
+        /// <summary>
+        /// Implements the operator &lt;=.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator <=(BaseCriteria criteria1, Enum value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
@@ -521,22 +1051,53 @@
 
             return new BinaryCriteria(criteria1, op, criteria2);
         }
-        
+
+        /// <summary>
+        /// Implements the operator &amp;.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="criteria2">The criteria2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator &(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return JoinIf(criteria1, criteria2, CriteriaOperator.AND);
         }
 
+        /// <summary>
+        /// Implements the operator |.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="criteria2">The criteria2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator |(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return JoinIf(criteria1, criteria2, CriteriaOperator.OR);
         }
 
+        /// <summary>
+        /// Implements the operator ^.
+        /// </summary>
+        /// <param name="criteria1">The criteria1.</param>
+        /// <param name="criteria2">The criteria2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ^(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return JoinIf(criteria1, criteria2, CriteriaOperator.XOR);
         }
 
+        /// <summary>
+        /// Implements the operator ~.
+        /// </summary>
+        /// <param name="criteria">The criteria.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static BaseCriteria operator ~(BaseCriteria criteria)
         {
             if (!criteria.IsEmpty)

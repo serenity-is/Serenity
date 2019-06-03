@@ -3,8 +3,18 @@ using System.Text;
 
 namespace Serenity.Data
 {
-    public class BracketLocator
+    /// <summary>
+    /// Contains helper methods for locating / replacing brackets in an SQL expression
+    /// </summary>
+    public static class BracketLocator
     {
+        /// <summary>
+        /// Replaces the bracket contents in SQL expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="validChar1">An additional character allowed to be in brackets.</param>
+        /// <param name="replace">The replace function.</param>
+        /// <returns></returns>
         public static string ReplaceBracketContents(string expression, char validChar1, Func<string, string> replace)
         {
             if (expression == null)
@@ -60,6 +70,12 @@ namespace Serenity.Data
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Replaces the brackets in an SQL expression with the dialect specific ones.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="dialect">The dialect.</param>
+        /// <returns></returns>
         public static string ReplaceBrackets(string expression, ISqlDialect dialect)
         {
             if (expression == null)

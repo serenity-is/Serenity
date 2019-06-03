@@ -35,6 +35,13 @@
             }
         }
 
+        /// <summary>
+        /// Joins the specified join.
+        /// </summary>
+        /// <param name="join">The join.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">join</exception>
+        /// <exception cref="InvalidOperationException">Another join with different expression is already in the query.</exception>
         public SqlQuery Join(Join join)
         {
             if (join == null)
@@ -72,6 +79,16 @@
             return this;
         }
 
+        /// <summary>
+        /// Adds a LEFT JOIN to the query.
+        /// </summary>
+        /// <param name="toTable">To table.</param>
+        /// <param name="alias">The alias.</param>
+        /// <param name="onCriteria">The on criteria.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">
+        /// alias is null or alias.table is null or empty
+        /// </exception>
         public SqlQuery LeftJoin(string toTable, IAlias alias, ICriteria onCriteria)
         {
             if (alias == null)
@@ -91,6 +108,15 @@
             return this;
         }
 
+        /// <summary>
+        /// Adds a LEFT JOIN to the query
+        /// </summary>
+        /// <param name="alias">The alias.</param>
+        /// <param name="onCriteria">The on criteria.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">
+        /// alias is null or alias.table is null or empty.
+        /// </exception>
         public SqlQuery LeftJoin(IAlias alias, ICriteria onCriteria)
         {
             if (alias == null)

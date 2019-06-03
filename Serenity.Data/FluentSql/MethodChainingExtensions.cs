@@ -2,6 +2,9 @@
 
 namespace Serenity
 {
+    /// <summary>
+    /// Contains method chaining extensions
+    /// </summary>
     public static class MethodChainingExtensions
     {
         /// <summary>
