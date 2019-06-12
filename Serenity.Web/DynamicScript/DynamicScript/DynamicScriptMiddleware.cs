@@ -147,7 +147,7 @@ namespace Serenity.Web.Middleware
             new TemplateScriptRegistrar()
                 .Initialize(new[] 
                 {
-                    System.IO.Path.Combine(contentPath, "Views/Templates"),
+                    System.IO.Path.Combine(contentPath, "Views" + System.IO.Path.DirectorySeparatorChar + "Templates"),
                     System.IO.Path.Combine(contentPath, "Modules")
                 }, watchForChanges: true);
 

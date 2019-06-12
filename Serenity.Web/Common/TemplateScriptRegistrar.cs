@@ -12,24 +12,25 @@ namespace Serenity.Web
         private ConcatenatedScript bundle;
         private Dictionary<string, TemplateScript> scriptByKey = new Dictionary<string, TemplateScript>(StringComparer.OrdinalIgnoreCase);
 
-        private static string GetKey(string filename)
+        private static string GetKey(string rootPath, string filename)
         {
             string key = Path.GetFileName(filename);
+            bool isModulesFolder = rootPath.EndsWith(Path.DirectorySeparatorChar + "Modules" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
 
             foreach (var suffix in TemplateSuffixes)
                 if (key.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
                 {
                     key = key.Substring(0, key.Length - suffix.Length);
 
-                    var modulePrefix = "modules" + Path.DirectorySeparatorChar;
-                    var moduleIdx = filename.IndexOf(modulePrefix, StringComparison.OrdinalIgnoreCase);
-                    if (moduleIdx >= 0)
+                    if (isModulesFolder && filename.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
                     {
-                        var moduleEnd = filename.IndexOf(Path.DirectorySeparatorChar, moduleIdx + modulePrefix.Length);
+                        filename = filename.Substring(rootPath.Length);
+
+                        var moduleEnd = filename.IndexOf(Path.DirectorySeparatorChar);
                         if (moduleEnd >= 0)
                         {
-                            var module = filename.Substring(moduleIdx + modulePrefix.Length, moduleEnd - moduleIdx - modulePrefix.Length);
-                            if (!key.StartsWith(module + ".", StringComparison.Ordinal))
+                            var module = filename.Substring(0, moduleEnd);
+                            if (!key.StartsWith(module + ".", StringComparison.OrdinalIgnoreCase))
                                 return module + "." + key;
                         }
                     }
@@ -40,25 +41,22 @@ namespace Serenity.Web
             return null;
         }
 
-        private void WatchForChanges(string path)
+        private void WatchForChanges(string rootPath)
         {
-            if (path.StartsWith("~/"))
-                path = HostingEnvironment.MapPath(path);
-
-            var sw = new FileSystemWatcher(path);
+            var sw = new FileSystemWatcher(rootPath);
             sw.IncludeSubdirectories = true;
             sw.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite;
-            sw.Changed += (s, e) => Changed(e.Name);
-            sw.Created += (s, e) => Changed(e.Name);
-            sw.Deleted += (s, e) => Changed(e.Name);
-            sw.Renamed += (s, e) => Changed(e.OldName);
+            sw.Changed += (s, e) => Changed(rootPath, e.Name);
+            sw.Created += (s, e) => Changed(rootPath, e.Name);
+            sw.Deleted += (s, e) => Changed(rootPath, e.Name);
+            sw.Renamed += (s, e) => Changed(rootPath, e.OldName);
 
             sw.EnableRaisingEvents = true;
         }
 
-        private void Changed(string name)
+        private void Changed(string rootPath, string name)
         {
-            string key = GetKey(name);
+            string key = GetKey(rootPath, rootPath + name);
             if (key == null)
                 return;
 
@@ -80,12 +78,15 @@ namespace Serenity.Web
                 if (path.StartsWith("~/"))
                     path = HostingEnvironment.MapPath(path);
 
+                if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    path = path + Path.DirectorySeparatorChar;
+
                 if (!Directory.Exists(path))
                     continue;
 
                 foreach (var file in Directory.EnumerateFiles(path, "*.html", SearchOption.AllDirectories))
                 {
-                    var key = GetKey(file);
+                    var key = GetKey(path, file);
                     if (key == null)
                         continue;
 
@@ -96,7 +97,7 @@ namespace Serenity.Web
                 }
 
                 if (watchForChanges)
-                    WatchForChanges(rootUrl);
+                    WatchForChanges(path);
             }
 
             bundle = new ConcatenatedScript(bundleList);
