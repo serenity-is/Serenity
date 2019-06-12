@@ -6,6 +6,9 @@ namespace Serenity.Data.Mapping
     /// </summary>
     public class NotMappedAttribute : SetFieldFlagsAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NotMappedAttribute"/> class.
+        /// </summary>
         public NotMappedAttribute()
             : base(FieldFlags.NotMapped)
         {

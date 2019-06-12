@@ -2,6 +2,9 @@
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Select level enumeration
+    /// </summary>
     public enum SelectLevel
     {
         /// <summary>

@@ -6,10 +6,27 @@ using System.Linq;
 
 namespace Serenity.Data.Schema
 {
+    /// <summary>
+    /// Firebird metadata provider.
+    /// </summary>
+    /// <seealso cref="Serenity.Data.Schema.ISchemaProvider" />
     public class FirebirdSchemaProvider : ISchemaProvider
     {
+        /// <summary>
+        /// Gets the default schema.
+        /// </summary>
+        /// <value>
+        /// The default schema.
+        /// </value>
         public string DefaultSchema { get { return null; } }
 
+        /// <summary>
+        /// Gets the field infos.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
         {
             return connection.Query(@"
@@ -57,6 +74,13 @@ namespace Serenity.Data.Schema
             });
         }
 
+        /// <summary>
+        /// Gets the foreign keys.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
         {
             return connection.Query<ForeignKeyInfo>(@"
@@ -89,6 +113,13 @@ namespace Serenity.Data.Schema
             });
         }
 
+        /// <summary>
+        /// Gets the identity fields.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
         {
             var match = connection.Query<string>(@"
@@ -127,6 +158,13 @@ namespace Serenity.Data.Schema
                 .Select(StringHelper.TrimToNull);
         }
 
+        /// <summary>
+        /// Gets the primary key fields.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
         {
             return connection.Query<string>(@"
@@ -139,6 +177,11 @@ namespace Serenity.Data.Schema
                     .Select(StringHelper.TrimToNull);
         }
 
+        /// <summary>
+        /// Gets the table names.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns></returns>
         public IEnumerable<TableName> GetTableNames(IDbConnection connection)
         {
             return connection.Query(@"
@@ -175,6 +218,14 @@ namespace Serenity.Data.Schema
             public const int blr_bool = 23;
         }
 
+        /// <summary>
+        /// Gets the type of the SQL type from BLR.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="subType">Type of the sub.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="scale">The scale.</param>
+        /// <returns></returns>
         public static string GetSqlTypeFromBlrType(int type, int subType, int size, int scale)
         {
             switch (type)

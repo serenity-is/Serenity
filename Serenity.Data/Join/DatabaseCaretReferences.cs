@@ -1,8 +1,16 @@
 ﻿
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Helper class for replacing database caret references in format [^ConnectionKey] in SQL expressions.
+    /// </summary>
     public class DatabaseCaretReferences
     {
+        /// <summary>
+        /// Replaces caret references like [^ConnectionKey] in the specified expression with actual database names.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>Replaced expression.</returns>
         public static string Replace(string expression)
         {
             if (expression == null || expression.IndexOf('^') < 0)

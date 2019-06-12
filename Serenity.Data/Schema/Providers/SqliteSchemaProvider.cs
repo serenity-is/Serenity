@@ -6,10 +6,27 @@ using System;
 
 namespace Serenity.Data.Schema
 {
+    /// <summary>
+    /// SQLite metadata provider
+    /// </summary>
+    /// <seealso cref="Serenity.Data.Schema.ISchemaProvider" />
     public class SqliteSchemaProvider : ISchemaProvider
     {
+        /// <summary>
+        /// Gets the default schema.
+        /// </summary>
+        /// <value>
+        /// The default schema.
+        /// </value>
         public string DefaultSchema { get { return null; } }
 
+        /// <summary>
+        /// Gets the field infos.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
         {
             return connection.Query("PRAGMA table_info([" + table + "])")
@@ -22,6 +39,13 @@ namespace Serenity.Data.Schema
                 });
         }
 
+        /// <summary>
+        /// Gets the foreign keys.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
         {
             return connection.Query("PRAGMA foreign_key_list([" + table + "])")
@@ -34,6 +58,13 @@ namespace Serenity.Data.Schema
                 });
         }
 
+        /// <summary>
+        /// Gets the identity fields.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
         {
             var fields = connection.Query("PRAGMA table_info([" + table + "])")
@@ -48,6 +79,13 @@ namespace Serenity.Data.Schema
             return new List<string> { "ROWID" };
         }
 
+        /// <summary>
+        /// Gets the primary key fields.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
         {
             return connection.Query("PRAGMA table_info([" + table + "])")
@@ -56,6 +94,11 @@ namespace Serenity.Data.Schema
                 .Select(x => (string)x.name);
         }
 
+        /// <summary>
+        /// Gets the table names.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns></returns>
         public IEnumerable<TableName> GetTableNames(IDbConnection connection)
         {
             return connection.Query(

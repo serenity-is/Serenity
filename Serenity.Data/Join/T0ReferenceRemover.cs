@@ -3,8 +3,17 @@ using System.Text;
 
 namespace Serenity.Data
 {
-    public class T0ReferenceRemover
+    /// <summary>
+    /// Removes T0. references in SQL expression
+    /// </summary>
+    public static class T0ReferenceRemover
     {
+        /// <summary>
+        /// Removes the "t0." aliases in SQL expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">expression</exception>
         public static string RemoveT0Aliases(string expression)
         {
             if (expression == null)

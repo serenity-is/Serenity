@@ -5,14 +5,17 @@ using System.Text;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Contains SQL expression generation helpers
+    /// </summary>
     public static partial class Sql
     {
         /// <summary>
-        ///   Verilen alanı SUM(..) içerisine alır.</summary>
-        /// <param name="field">
-        ///   SUM(...) içerisine yazılacak alan adı (zorunlu).</param>
-        /// <returns>
-        ///   "SUM(field)"</returns>
+        /// Creates a SUM() expression
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
         public static string Sum(string field)
         {
             if (field == null || field.Length == 0)
@@ -23,11 +26,11 @@ namespace Serenity.Data
 
 
         /// <summary>
-        ///   Verilen alanı COUNT(..) içerisine alır.</summary>
-        /// <param name="field">
-        ///   COUNT(...) içerisine alınacak alan adı (zorunlu).</param>
-        /// <returns>
-        ///   "COUNT(field)".</returns>
+        /// Creates a COUNT() expression
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
         public static string Count(string field)
         {
             if (field == null || field.Length == 0)
@@ -36,13 +39,12 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Verilen alanı başına join indeksini getirerek COUNT(..) içerisine alır.</summary>
-        /// <param name="joinNumber">
-        ///   Alanın bağlı olduğu join indeksi.</param>
-        /// <param name="field">
-        ///   COUNT(...) içerisine alınacak alan adı.</param>
-        /// <returns>
-        ///   "COUNT(T5.field)".</returns>
+        /// Creates a COUNT() expression
+        /// </summary>
+        /// <param name="joinNumber">The join number.</param>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
         public static string Count(int joinNumber, string field)
         {
             if (field == null || field.Length == 0)
@@ -52,20 +54,20 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   SQL'de sıkça kullanılan COUNT(*) sabitini verir.</summary>
-        /// <returns>
-        ///   "COUNT(*)"</returns>
+        /// Returns COUNT(*)
+        /// </summary>
+        /// <returns>COUNT(*)</returns>
         public static string Count()
         {
             return "COUNT(*)";
         }
 
         /// <summary>
-        ///   Verilen alanı COALESCE(..) içerisine alır.</summary>
-        /// <param name="statements">
-        ///   COALESCE(...) içerisine alınacak alan adları (zorunlu).</param>
-        /// <returns>
-        ///   "COALESCE(field)".</returns>
+        /// Creates a COALESCE() expression.
+        /// </summary>
+        /// <param name="statements">The statements.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">fields is null or empty</exception>
         public static string Coalesce(params string[] statements)
         {
             if (statements == null || statements.Length == 0)
@@ -82,6 +84,13 @@ namespace Serenity.Data
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Creates a COALESCE() expression while adding values to specified query as params.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="values">The values.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">values is null or empty</exception>
         public static string Coalesce(this IQueryWithParams query, params object[] values)
         {
             if (values == null || values.Length == 0)
@@ -117,11 +126,11 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Verilen alanı MIN(..) içerisine alır.</summary>
-        /// <param name="field">
-        ///   MIN(...) içerisine yazılacak alan adı (zorunlu).</param>
-        /// <returns>
-        ///   MIN(field)</returns>
+        /// Creates a MIN() expression
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
         public static string Min(string field)
         {
             if (field == null || field.Length == 0)
@@ -132,13 +141,12 @@ namespace Serenity.Data
 
 
         /// <summary>
-        ///   Verilen alanı başına join indeksini getirerek MIN(..) içerisine alır.</summary>
-        /// <param name="joinNumber">
-        ///   Alanın bağlı olduğu join indeksi.</param>
-        /// <param name="field">
-        ///   MIN(...) içerisine alınacak alan adı (zorunlu).</param>
-        /// <returns>
-        ///   "MIN(T5.field)".</returns>
+        /// Creates a MIN() expression.
+        /// </summary>
+        /// <param name="joinNumber">The join number.</param>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
         public static string Min(int joinNumber, string field)
         {
             if (field == null || field.Length == 0)
@@ -148,11 +156,11 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Verilen alanı MAX(..) içerisine alır.</summary>
-        /// <param name="field">
-        ///   MAX(...) içerisine yazılacak alan adı (zorunlu).</param>
-        /// <returns>
-        ///   MAX(T5.field)</returns>
+        /// Creates a MAX() expression.
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
         public static string Max(string field)
         {
             if (field == null || field.Length == 0)
@@ -162,13 +170,12 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Verilen alanı başına join indeksini getirerek MAX(..) içerisine alır.</summary>
-        /// <param name="joinNumber">
-        ///   Alanın bağlı olduğu join indeksi.</param>
-        /// <param name="field">
-        ///   MAX(...) içerisine alınacak alan adı (zorunlu).</param>
-        /// <returns>
-        ///   "MAX(T5.field)".</returns>      
+        /// Creates a MAX() expression.
+        /// </summary>
+        /// <param name="joinNumber">The join number.</param>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
         public static string Max(int joinNumber, string field)
         {
             if (field == null || field.Length == 0)
@@ -178,13 +185,12 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Verilen alanı başına join indeksini getirerek SUM(..) içerisine alır.</summary>
-        /// <param name="joinNumber">
-        ///   Alanın bağlı olduğu join indeksi.</param>
-        /// <param name="field">
-        ///   SUM(...) içerisine alınacak alan adı (zorunlu).</param>
-        /// <returns>
-        ///   "SUM(T5.field)".</returns>      
+        /// Creates a SUM() expression.
+        /// </summary>
+        /// <param name="joinNumber">The join number.</param>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty.</exception>
         public static string Sum(int joinNumber, string field)
         {
             if (field == null || field.Length == 0)
@@ -194,11 +200,11 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Verilen alanı AVG(..) içerisine alır.</summary>
-        /// <param name="field">
-        ///   AVG(...) içerisine yazılacak alan adı (zorunlu).</param>
-        /// <returns>
-        ///   "AVG(field)"</returns>
+        /// Creates a AVG expression.
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
         public static string Avg(string field)
         {
             if (field == null || field.Length == 0)
@@ -208,13 +214,12 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Verilen alanı başına join indeksini getirerek AVG(..) içerisine alır.</summary>
-        /// <param name="joinNumber">
-        ///   Alanın bağlı olduğu join indeksi.</param>
-        /// <param name="field">
-        ///   AVG(...) içerisine alınacak alan adı (zorunlu).</param>
-        /// <returns>
-        ///   "AVG(T5.field)".</returns>      
+        /// Creates a AVG() expression.
+        /// </summary>
+        /// <param name="joinNumber">The join number.</param>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
         public static string Avg(int joinNumber, string field)
         {
             if (field == null || field.Length == 0)
@@ -223,6 +228,15 @@ namespace Serenity.Data
             return String.Format("AVG(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
         }
 
+        /// <summary>
+        /// Creates a Convert() expression.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// type or field is null or empty.
+        /// </exception>
         public static string Convert(string type, string field)
         {
             if (string.IsNullOrEmpty(type))
@@ -234,14 +248,28 @@ namespace Serenity.Data
             return String.Format(" Convert({0},{1}) ", type, field);
         }
 
-        public static string SubString(string expression,int startIndex, int endIndex)
+        /// <summary>
+        /// Creates a SUBSTRING() expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="endIndex">The end index.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">expression</exception>
+        public static string SubString(string expression, int startIndex, int endIndex)
         {
             if (string.IsNullOrEmpty(expression))
                 throw new ArgumentNullException("expression");
 
             return string.Format(" substring({0},{1},{2}) ", expression, startIndex, endIndex);
         }
-        
+
+        /// <summary>
+        /// Creates a CASE() expression.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="builder">The action which will receive CASE statement builder.</param>
+        /// <returns></returns>
         public static string Case(this IQueryWithParams query, Action<CaseBuilder> builder)
         {
             var cb = new CaseBuilder();
@@ -257,6 +285,7 @@ namespace Serenity.Data
         /// statement like CASE WHEN A = 1 THEN 'Result1' WHEN A = 2 THEN 'Result2' END.</param>
         /// <param name="elseStatement">Optional ELSE statement</param>
         /// <returns></returns>
+        /// <exception cref="System.ArgumentOutOfRangeException">whenThenPairs is empty or contains odd number of elements</exception>
         public static string Case(string condition, string[] whenThenPairs, string elseStatement)
         {
             StringBuilder sb = new StringBuilder("CASE ");
@@ -285,18 +314,30 @@ namespace Serenity.Data
             return sb.ToString();
         }
 
+        /// <summary>
+        /// CASE statement builder
+        /// </summary>
         public class CaseBuilder
         {
             private List<ICriteria> when;
             private List<object> then;
             private object elseValue;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CaseBuilder"/> class.
+            /// </summary>
             public CaseBuilder()
             {
                 when = new List<ICriteria>();
                 then = new List<object>();
             }
 
+            /// <summary>
+            /// Adds a WHEN THEN part
+            /// </summary>
+            /// <param name="when">The when.</param>
+            /// <param name="then">The then.</param>
+            /// <returns></returns>
             public CaseBuilder WhenThen(ICriteria when, object then)
             {
                 this.when.Add(when);
@@ -304,18 +345,34 @@ namespace Serenity.Data
                 return this;
             }
 
+            /// <summary>
+            /// Adds a WHEN part
+            /// </summary>
+            /// <param name="when">The when.</param>
+            /// <returns></returns>
             public CaseBuilder When(ICriteria when)
             {
                 this.when.Add(when);
                 return this;
             }
 
+            /// <summary>
+            /// Adds a THEN PART
+            /// </summary>
+            /// <param name="then">The then.</param>
+            /// <returns></returns>
             public CaseBuilder Then(object then)
             {
                 this.then.Add(then);
                 return this;
             }
 
+            /// <summary>
+            /// Adds a ELSE part
+            /// </summary>
+            /// <param name="elseValue">The else value.</param>
+            /// <returns></returns>
+            /// <exception cref="System.InvalidOperationException">Internal else value is not null</exception>
             public CaseBuilder Else(object elseValue)
             {
                 if (!ReferenceEquals(null, this.elseValue))
@@ -326,6 +383,18 @@ namespace Serenity.Data
                 return this;
             }
 
+            /// <summary>
+            /// Converts to string.
+            /// </summary>
+            /// <param name="query">The query.</param>
+            /// <returns>
+            /// A <see cref="System.String" /> that represents this instance.
+            /// </returns>
+            /// <exception cref="System.InvalidOperationException">
+            /// There should be at least one WHEN/THEN pair.
+            /// or
+            /// WHEN/THEN pairs doesn't match.
+            /// </exception>
             public string ToString(IQueryWithParams query)
             {
                 StringBuilder sb = new StringBuilder();

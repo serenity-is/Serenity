@@ -4,10 +4,27 @@ using System.Linq;
 
 namespace Serenity.Data.Schema
 {
+    /// <summary>
+    /// SQL server metadata provider
+    /// </summary>
+    /// <seealso cref="Serenity.Data.Schema.ISchemaProvider" />
     public class SqlServerSchemaProvider : ISchemaProvider
     {
+        /// <summary>
+        /// Gets the default schema.
+        /// </summary>
+        /// <value>
+        /// The default schema.
+        /// </value>
         public string DefaultSchema { get { return "dbo"; } }
 
+        /// <summary>
+        /// Gets the field infos.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
         {
             return connection.Query<FieldInfo>(@"
@@ -30,6 +47,13 @@ namespace Serenity.Data.Schema
             });
         }
 
+        /// <summary>
+        /// Gets the foreign keys.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
         {
             return connection.Query<ForeignKeyInfo>(@"
@@ -56,6 +80,13 @@ namespace Serenity.Data.Schema
             });
         }
 
+        /// <summary>
+        /// Gets the identity fields.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
         {
             return connection.Query<string>(@"
@@ -70,6 +101,13 @@ namespace Serenity.Data.Schema
                 });
         }
 
+        /// <summary>
+        /// Gets the primary key fields.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
         public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
         {
             return connection.Query<string>(
@@ -88,6 +126,11 @@ namespace Serenity.Data.Schema
                 });
         }
 
+        /// <summary>
+        /// Gets the table names.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns></returns>
         public IEnumerable<TableName> GetTableNames(IDbConnection connection)
         {
             return connection.Query(

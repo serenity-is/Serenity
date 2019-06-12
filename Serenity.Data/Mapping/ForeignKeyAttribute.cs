@@ -78,8 +78,28 @@ namespace Serenity.Data.Mapping
                 Field = field;
         }
 
+        /// <summary>
+        /// Gets the table.
+        /// </summary>
+        /// <value>
+        /// The table.
+        /// </value>
         public string Table { get; private set; }
+
+        /// <summary>
+        /// Gets the field.
+        /// </summary>
+        /// <value>
+        /// The field.
+        /// </value>
         public string Field { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the type of the row.
+        /// </summary>
+        /// <value>
+        /// The type of the row.
+        /// </value>
         public Type RowType { get; set; }
     }
 }

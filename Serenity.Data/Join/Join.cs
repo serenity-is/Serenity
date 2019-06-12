@@ -4,15 +4,27 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    ///   SQL sorgusundaki bir JOIN ifadesine karşılık gelir (INNER, OUTER, CROSS vs.)</summary>
+    ///   Corresponds to an SQL JOIN (INNER, OUTER, CROSS etc.)</summary>
     public abstract class Join : Alias
     {
         private IDictionary<string, Join> joins;
         private ICriteria onCriteria;
         private HashSet<string> referencedAliases;
 
+        /// <summary>
+        /// Gets the keyword.
+        /// </summary>
+        /// <returns></returns>
         public abstract string GetKeyword();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Join"/> class.
+        /// </summary>
+        /// <param name="joins">The joins dictionary.</param>
+        /// <param name="toTable">To table.</param>
+        /// <param name="alias">The alias.</param>
+        /// <param name="onCriteria">The ON criteria.</param>
+        /// <exception cref="System.ArgumentException"></exception>
         protected Join(IDictionary<string, Join> joins, string toTable, string alias, ICriteria onCriteria)
             : base(toTable, alias)
         {
@@ -49,7 +61,11 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Left outer join'in "ON(...)" kısmında yazılan ifadeyi verir.</summary>
+        /// Gets the ON criteria.
+        /// </summary>
+        /// <value>
+        /// The ON criteria.
+        /// </value>
         public ICriteria OnCriteria
         {
             get
@@ -59,7 +75,11 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Left outer join'in "ON(...)" kısmında yazılan ifadedeki alias ların listesini verir.</summary>
+        /// Gets the referenced aliases.
+        /// </summary>
+        /// <value>
+        /// The referenced aliases.
+        /// </value>
         public HashSet<string> ReferencedAliases
         {
             get
@@ -68,11 +88,23 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the joins.
+        /// </summary>
+        /// <value>
+        /// The joins.
+        /// </value>
         public IDictionary<string, Join> Joins
         {
             get { return joins; }
         }
 
+        /// <summary>
+        /// Gets or sets the type of the row.
+        /// </summary>
+        /// <value>
+        /// The type of the row.
+        /// </value>
         public Type RowType { get; set; }
     }
 }

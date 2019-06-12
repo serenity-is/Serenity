@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Contains SQL syntax helpers.
+    /// </summary>
     public static class SqlSyntax
     {
         private static string[] _indexParam;
@@ -32,6 +35,11 @@ namespace Serenity.Data
                 return "@p" + param;
         }
 
+        /// <summary>
+        /// Creates a table alias like T0
+        /// </summary>
+        /// <param name="joinIndex">Index of the join.</param>
+        /// <returns></returns>
         public static string TableAlias(this int joinIndex)
         {
             if (_tableAlias == null)
@@ -48,6 +56,11 @@ namespace Serenity.Data
                 return "T" + joinIndex.ToString(_invariant);
         }
 
+        /// <summary>
+        /// Creates a table alias dot like "T0."
+        /// </summary>
+        /// <param name="joinIndex">Index of the join.</param>
+        /// <returns></returns>
         public static string TableAliasDot(this int joinIndex)
         {
             if (_tableAliasDot == null)
@@ -64,6 +77,13 @@ namespace Serenity.Data
                 return "T" + joinIndex.ToString(_invariant) + ".";
         }
 
+        /// <summary>
+        /// Determines whether the specified string is a valid SQL identifier.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns>
+        ///   <c>true</c> if is valid identifier; otherwise, <c>false</c>.
+        /// </returns>
         public static bool IsValidIdentifier(string s)
         {
             if (string.IsNullOrEmpty(s))
@@ -83,6 +103,13 @@ namespace Serenity.Data
             return true;
         }
 
+        /// <summary>
+        /// Determines whether the specified string is a valid quoted SQL identifier.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns>
+        ///   <c>true</c> if valid quoted identifier; otherwise, <c>false</c>.
+        /// </returns>
         public static bool IsValidQuotedIdentifier(string s)
         {
             if (!IsQuoted(s))
@@ -104,6 +131,13 @@ namespace Serenity.Data
             return true;
         }
 
+        /// <summary>
+        /// Determines whether the specified string is quoted.
+        /// </summary>
+        /// <param name="s">The s.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified string is quoted; otherwise, <c>false</c>.
+        /// </returns>
         public static bool IsQuoted(string s)
         {
             if (string.IsNullOrEmpty(s) || s.Length < 3)
@@ -122,6 +156,11 @@ namespace Serenity.Data
             return false;
         }
 
+        /// <summary>
+        /// Automatically brackets the string based on SqlSettings.AutoQuotedIdentifier setting.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns></returns>
         public static string AutoBracket(string s)
         {
             if (!SqlSettings.AutoQuotedIdentifiers)
@@ -136,6 +175,11 @@ namespace Serenity.Data
             return '[' + s + ']';
         }
 
+        /// <summary>
+        /// Automatically brackets the string based on SqlSettings.AutoQuotedIdentifier setting, only if the identifier is valid.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns></returns>
         public static string AutoBracketValid(string s)
         {
             if (!SqlSettings.AutoQuotedIdentifiers)
@@ -147,6 +191,11 @@ namespace Serenity.Data
             return '[' + s + ']';
         }
 
+        /// <summary>
+        /// Unquotes the specified string.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns></returns>
         public static string Unquote(string s)
         {
             if (!IsQuoted(s))

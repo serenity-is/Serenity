@@ -10,6 +10,11 @@ namespace Serenity.Data
     /// </summary>
     public class SqlCommandDumper
     {
+        /// <summary>
+        /// Gets the command text.
+        /// </summary>
+        /// <param name="sqc">The SQL command.</param>
+        /// <returns></returns>
         public static string GetCommandText(SqlCommand sqc)
         {
             var sbCommandText = new StringBuilder();

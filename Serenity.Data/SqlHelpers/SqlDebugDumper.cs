@@ -7,8 +7,18 @@ using System.Text;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Formats a debug version of a query, replacing parameters with SQL constants, fixing brackets, database caret references etc.
+    /// </summary>
     public class SqlDebugDumper
     {
+        /// <summary>
+        /// Dumps the specified SQL.
+        /// </summary>
+        /// <param name="sql">The SQL.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="dialect">The dialect.</param>
+        /// <returns></returns>
         public static string Dump(string sql, IDictionary<string, object> parameters, ISqlDialect dialect = null)
         {
             if (parameters == null)

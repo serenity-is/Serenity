@@ -8,6 +8,11 @@ namespace Serenity.Data.Mapping
     /// </summary>
     public class ColumnAttribute : Attribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnAttribute"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <exception cref="System.ArgumentNullException">name</exception>
         public ColumnAttribute(string name)
         {
             if (string.IsNullOrEmpty(name))
@@ -16,6 +21,12 @@ namespace Serenity.Data.Mapping
             this.Name = name;
         }
 
+        /// <summary>
+        /// Gets the name.
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
         public string Name { get; private set; }
     }
 }

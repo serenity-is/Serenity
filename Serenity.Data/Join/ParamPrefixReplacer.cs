@@ -2,8 +2,17 @@
 
 namespace Serenity.Data
 {
-    public class ParamPrefixReplacer
+    /// <summary>
+    /// Param prefix replacer
+    /// </summary>
+    public static class ParamPrefixReplacer
     {
+        /// <summary>
+        /// Replaces the param prefixes in specified expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="paramPrefix">The parameter prefix.</param>
+        /// <returns></returns>
         public static string Replace(string expression, char paramPrefix)
         {
             if (expression == null)
