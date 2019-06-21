@@ -49,7 +49,7 @@ namespace Serenity.PropertyGrid
                             "doesn't have a matching field with same property / field name in the row.\n\n" +
                             "Please check if property is named correctly.\n\n" +
                             "To remove this validation you may set CheckNames to false on [BasedOnRow] attribute.\n\n" +
-                            "To disable check for this specific property add a [NotMapped] attribute to the property itself.",
+                            "To disable check for this specific property add a [IgnoreName] attribute to the property itself.",
                             type.FullName, property.Name, basedOnRow.GetType().FullName));
                     }
                     else if (
@@ -63,7 +63,7 @@ namespace Serenity.PropertyGrid
                                 "doesn't match the property/field name '{2}' in the row.\n\n" +
                                 "Property names must match case sensitively. Please change property name to '{2}'.\n\n" +
                                 "To remove this validation you may set CheckNames to false on [BasedOnRow] attribute.\n\n" +
-                                "To disable check for this specific property add a [NotMapped] attribute to the property itself.",
+                                "To disable check for this specific property add a [IgnoreName] attribute to the property itself.",
                                 type.FullName, property.Name, source.BasedOnField.PropertyName.TrimToNull() ?? 
                                     source.BasedOnField.Name, basedOnRow.GetType().FullName));
                     }
