@@ -6,9 +6,13 @@
   "dependencies": {
     "inquirer": "^2.0.0",
     "inquirer-autocomplete-prompt": "^0.3.0",
-    "temp": "^0.8.3"
+    "temp": "^0.8.3",
+    "snyk": "^1.189.0"
   },
-  "scripts": {},
+  "scripts": {
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/volkanceylan/serenity.git"
@@ -29,5 +33,6 @@
   },
   "files": [
     "index.js"
-  ]
+  ],
+  "snyk": true
 }
