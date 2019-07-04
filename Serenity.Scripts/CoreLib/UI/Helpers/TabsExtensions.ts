@@ -20,6 +20,26 @@
             tabs.tabs(isDisabled ? 'disable' : 'enable', index);
         }
 
+        export function toggle(tabs: JQuery, tabKey: string, visible: boolean) {
+            if (!tabs)
+                return;
+
+            var ibk = indexByKey(tabs);
+            if (!ibk)
+                return;
+
+            var index = ibk[tabKey];
+            if (index == null) {
+                return;
+            }
+
+            if (!visible && index === tabs.tabs('option', 'active')) {
+                tabs.tabs('option', 'active', 0);
+            }
+
+            tabs.find('li').eq(index).toggle(visible);
+        }
+
         export function activeTabKey(tabs: JQuery) {
             var href = tabs.children('ul')
                 .children('li')
