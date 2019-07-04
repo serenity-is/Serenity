@@ -4187,7 +4187,7 @@ var Serenity;
             if (!visible && index === tabs.tabs('option', 'active')) {
                 tabs.tabs('option', 'active', 0);
             }
-            tabs.find('li').eq(index).toggle(visible);
+            tabs.children('ul').children('li').eq(index).toggle(visible);
         }
         TabsExtensions.toggle = toggle;
         function activeTabKey(tabs) {

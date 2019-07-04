@@ -37,7 +37,7 @@
                 tabs.tabs('option', 'active', 0);
             }
 
-            tabs.find('li').eq(index).toggle(visible);
+            tabs.children('ul').children('li').eq(index).toggle(visible);
         }
 
         export function activeTabKey(tabs: JQuery) {
