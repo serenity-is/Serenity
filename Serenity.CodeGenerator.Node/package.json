@@ -4,8 +4,8 @@
   "description": "Node CLI interface to dotnet-sergen tool",
   "preferGlobal": true,
   "dependencies": {
-    "inquirer": "^2.0.0",
-    "inquirer-autocomplete-prompt": "^0.3.0",
+    "inquirer": "^6.4.1",
+    "inquirer-autocomplete-prompt": "^1.0.1",
     "temp": "^0.8.3"
   },
   "scripts": {},
