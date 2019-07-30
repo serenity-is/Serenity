@@ -1,3 +1,20 @@
+## 3.9.10 (2019-07-30)
+
+Features:
+  - introduce EntityGridDialog which is a mixture of an EntityGrid and EntityDialog, than allows editing 
+    records in a side panel on grid [StartSharp]
+  - complete missing XML docs for Serenity.Data
+  - change error message to suggest IgnoreName instead of NotMapped for skipping property name check with CheckNames
+  - update packages in node based sergen cli
+  - added a toggle method to Serenity.TabsExtensions
+  
+Bugfixes:
+  - if user changed CustomTemplates via the config UI, it was not used properly in sergen until restart
+  - handle issue with template registration when a project directory has a Modules parent directory in full path
+  - [IMPORTANT!] fluentmigrator output might reveal connection string in exception message when migrations fail. 
+    please set CustomErrors=RemoteOnly in your web.config, and ASPNETCORE_ENVIRONMENT to PRODUCTION for .NET Core. 
+	Also apply changes in SiteInitialization.DataMigrations.cs and DataMigrations.cs.
+
 ## 3.9.9 (2019-05-24)
 
 Features:
