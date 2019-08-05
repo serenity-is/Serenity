@@ -102,8 +102,8 @@ namespace Serenity.Web
                         fileContent.Seek(0, SeekOrigin.Begin);
                         using (FileStream fs = new FileStream(FilePath, FileMode.Create))
                         {
-                            fileContent.CopyTo(fs);
                             FileSize = fs.Length;
+                            fileContent.CopyTo(fs);
                         }
 #else
                         success = ProcessImageStream(fileContent, extension);
@@ -115,8 +115,8 @@ namespace Serenity.Web
                         fileContent.Seek(0, SeekOrigin.Begin);
                         using (FileStream fs = new FileStream(FilePath, FileMode.Create))
                         {
-                            fileContent.CopyTo(fs);
                             FileSize = fs.Length;
+                            fileContent.CopyTo(fs);
                         }
                         success = true;
                     }
