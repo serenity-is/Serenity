@@ -3311,11 +3311,12 @@ var Serenity;
 var Serenity;
 (function (Serenity) {
     var GridRowSelectionMixin = /** @class */ (function () {
-        function GridRowSelectionMixin(grid) {
+        function GridRowSelectionMixin(grid, options) {
             var _this = this;
             this.include = {};
             this.grid = grid;
             this.idField = grid.getView().idField;
+            this.options = options || {};
             grid.getGrid().onClick.subscribe(function (e, p) {
                 if ($(e.target).hasClass('select-item')) {
                     e.preventDefault();
@@ -3345,8 +3346,8 @@ var Serenity;
                     }
                     else {
                         var items = grid.getView().getItems();
-                        for (var _i = 0, items_2 = items; _i < items_2.length; _i++) {
-                            var x = items_2[_i];
+                        for (var _i = 0, _a = items.filter(_this.isSelectable.bind(_this)); _i < _a.length; _i++) {
+                            var x = _a[_i];
                             var id1 = x[_this.idField];
                             _this.include[id1] = true;
                         }
@@ -3365,7 +3366,7 @@ var Serenity;
             if (selectAllButton) {
                 var keys = Object.keys(this.include);
                 selectAllButton.toggleClass('checked', keys.length > 0 &&
-                    this.grid.getView().getItems().length === keys.length);
+                    this.grid.getView().getItems().filter(this.isSelectable.bind(this)).length <= keys.length);
             }
         };
         GridRowSelectionMixin.prototype.clear = function () {
@@ -3405,6 +3406,10 @@ var Serenity;
             }
             this.updateSelectAll();
         };
+        GridRowSelectionMixin.prototype.isSelectable = function (item) {
+            return item && (this.options.selectable == null ||
+                this.options.selectable(item));
+        };
         GridRowSelectionMixin.createSelectColumn = function (getMixin) {
             return {
                 name: '<span class="select-all-items check-box no-float "></span>',
@@ -3417,7 +3422,7 @@ var Serenity;
                 format: function (ctx) {
                     var item = ctx.item;
                     var mixin = getMixin();
-                    if (!mixin) {
+                    if (!mixin || !mixin.isSelectable(item)) {
                         return '';
                     }
                     var isChecked = mixin.include[ctx.item[mixin.idField]];
@@ -3936,8 +3941,8 @@ var Serenity;
         SlickTreeHelper.filterById = filterById;
         function setCollapsed(items, collapsed) {
             if (items != null) {
-                for (var _i = 0, items_3 = items; _i < items_3.length; _i++) {
-                    var item = items_3[_i];
+                for (var _i = 0, items_2 = items; _i < items_2.length; _i++) {
+                    var item = items_2[_i];
                     item._collapsed = collapsed;
                 }
             }
@@ -6036,8 +6041,8 @@ var Serenity;
             this.clearItems();
             if (items.length > 0) {
                 var isStrings = typeof (items[0]) === 'string';
-                for (var _i = 0, items_4 = items; _i < items_4.length; _i++) {
-                    var item = items_4[_i];
+                for (var _i = 0, items_3 = items; _i < items_3.length; _i++) {
+                    var item = items_3[_i];
                     var key = isStrings ? item : item[0];
                     var text = isStrings ? item : Q.coalesce(item[1], item[0]);
                     this.addOption(key, text, item, false);
@@ -8861,8 +8866,8 @@ var Serenity;
         FilterPanel.prototype.updateRowsFromStore = function () {
             this.rowsDiv.empty();
             var items = this.get_store().get_items();
-            for (var _i = 0, items_5 = items; _i < items_5.length; _i++) {
-                var item = items_5[_i];
+            for (var _i = 0, items_4 = items; _i < items_4.length; _i++) {
+                var item = items_4[_i];
                 this.addEmptyRow(false);
                 var row = this.rowsDiv.children().last();
                 var divl = row.children('div.l');
@@ -10470,8 +10475,8 @@ var Serenity;
                     result[x] = order++;
                 }
             }
-            for (var _a = 0, items_6 = items; _a < items_6.length; _a++) {
-                var x1 = items_6[_a];
+            for (var _a = 0, items_5 = items; _a < items_5.length; _a++) {
+                var x1 = items_5[_a];
                 var category = x1.category;
                 if (category == null) {
                     category = Q.coalesce(this.options.defaultCategory, '');
@@ -10486,8 +10491,8 @@ var Serenity;
             var idx = 0;
             var itemIndex = {};
             var itemCategory = {};
-            for (var _i = 0, items_7 = items; _i < items_7.length; _i++) {
-                var x = items_7[_i];
+            for (var _i = 0, items_6 = items; _i < items_6.length; _i++) {
+                var x = items_6[_i];
                 var name1 = x.name;
                 var cat1 = x.category;
                 if (cat1 == null) {
@@ -15203,8 +15208,8 @@ var Serenity;
                     takeChildren(getId(child));
                 }
             }
-            for (var _i = 0, items_8 = items; _i < items_8.length; _i++) {
-                var item = items_8[_i];
+            for (var _i = 0, items_7 = items; _i < items_7.length; _i++) {
+                var item = items_7[_i];
                 var parentId = getParentId(item);
                 if (parentId == null ||
                     !((byId[parentId] || []).length)) {

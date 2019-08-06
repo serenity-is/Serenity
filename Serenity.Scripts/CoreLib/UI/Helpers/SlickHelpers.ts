@@ -5,18 +5,24 @@
         title: string;
     }
 
+    export interface GridRowSelectionMixinOptions {
+        selectable?: (item: any) => boolean;
+    }
+
     @Decorators.registerClass('Serenity.GridRowSelectionMixin')
     export class GridRowSelectionMixin {
 
         private idField: string;
         private include: Q.Dictionary<boolean>;
         private grid: IDataGrid;
+        private options: GridRowSelectionMixinOptions;
 
-        constructor(grid: IDataGrid) {
+        constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions) {
 
             this.include = {};
             this.grid = grid;
             this.idField = (grid.getView() as any).idField;
+            this.options = options || {};
 
             grid.getGrid().onClick.subscribe((e, p) => {
                 if ($(e.target).hasClass('select-item')) {
@@ -51,7 +57,7 @@
                     }
                     else {
                         var items = grid.getView().getItems();
-                        for (var x of items) {
+                        for (var x of items.filter(this.isSelectable.bind(this)) {
                             var id1 = x[this.idField];
                             this.include[id1] = true;
                         }
@@ -74,7 +80,8 @@
                 var keys = Object.keys(this.include);
                 selectAllButton.toggleClass('checked',
                     keys.length > 0 &&
-                    this.grid.getView().getItems().length === keys.length);
+                    this.grid.getView().getItems().filter(
+                        this.isSelectable.bind(this)).length <= keys.length);
             }
         }
 
@@ -122,6 +129,12 @@
             this.updateSelectAll();
         }
 
+        private isSelectable(item: any) {
+            return item && (
+                this.options.selectable == null ||
+                this.options.selectable(item));
+        }
+
         static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column {
             return {
                 name: '<span class="select-all-items check-box no-float "></span>',
@@ -134,7 +147,7 @@
                 format: function (ctx) {
                     var item = ctx.item;
                     var mixin = getMixin();
-                    if (!mixin) {
+                    if (!mixin || !mixin.isSelectable(item)) {
                         return '';
                     }
                     var isChecked = mixin.include[ctx.item[mixin.idField]];

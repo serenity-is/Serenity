@@ -1029,11 +1029,15 @@ declare namespace Serenity {
         name: string;
         title: string;
     }
+    interface GridRowSelectionMixinOptions {
+        selectable?: (item: any) => boolean;
+    }
     class GridRowSelectionMixin {
         private idField;
         private include;
         private grid;
-        constructor(grid: IDataGrid);
+        private options;
+        constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions);
         updateSelectAll(): void;
         clear(): void;
         resetCheckedAndRefresh(): void;
@@ -1042,6 +1046,7 @@ declare namespace Serenity {
         getSelectedAsInt32(): number[];
         getSelectedAsInt64(): number[];
         setSelectedKeys(keys: string[]): void;
+        private isSelectable;
         static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column;
     }
     class GridRadioSelectionMixin {
