@@ -57,7 +57,7 @@
                     }
                     else {
                         var items = grid.getView().getItems();
-                        for (var x of items.filter(this.isSelectable.bind(this)) {
+                        for (var x of items.filter(this.isSelectable.bind(this))) {
                             var id1 = x[this.idField];
                             this.include[id1] = true;
                         }
