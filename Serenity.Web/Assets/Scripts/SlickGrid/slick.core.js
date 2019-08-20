@@ -148,7 +148,7 @@
     };
 
     this.clear = function(fn) {
-        this.handlers = [];
+        handlers = [];
     };
   }
 
