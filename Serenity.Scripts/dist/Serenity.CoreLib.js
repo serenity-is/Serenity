@@ -10202,17 +10202,18 @@ var Serenity;
                 opt.mode = 1;
             div.addClass('s-PropertyGrid');
             _this.editors = [];
-            _this.items = _this.options.items || [];
-            var useTabs = Q.any(_this.items, function (x) {
+            var items = _this.options.items || [];
+            _this.items = [];
+            var useTabs = Q.any(items, function (x) {
                 return !Q.isEmptyOrNull(x.tab);
             });
             if (useTabs) {
-                var itemsWithoutTab = _this.items.filter(function (f) { return Q.isEmptyOrNull(f.tab); });
+                var itemsWithoutTab = items.filter(function (f) { return Q.isEmptyOrNull(f.tab); });
                 if (itemsWithoutTab.length > 0) {
                     _this.createItems(_this.element, itemsWithoutTab);
                     $("<div class='pad'></div>").appendTo(_this.element);
                 }
-                var itemsWithTab = _this.items.filter(function (f) { return !Q.isEmptyOrNull(f.tab); });
+                var itemsWithTab = items.filter(function (f) { return !Q.isEmptyOrNull(f.tab); });
                 var ul = $("<ul class='nav nav-tabs property-tabs' role='tablist'></ul>")
                     .appendTo(_this.element);
                 var tc = $("<div class='tab-content property-panes'></div>")
@@ -10251,7 +10252,7 @@ var Serenity;
                 }
             }
             else {
-                _this.createItems(_this.element, _this.items);
+                _this.createItems(_this.element, items);
             }
             _this.updateInterface();
             return _this;
@@ -10308,6 +10309,7 @@ var Serenity;
                     fieldContainer = categoryDiv;
                 }
                 var editor = this.createField(fieldContainer, item);
+                this.items.push(item);
                 this.editors.push(editor);
             }
         };
