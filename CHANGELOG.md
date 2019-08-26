@@ -1,3 +1,13 @@
+## 3.9.11 (2019-08-26)
+
+Features:
+  - removing mono.cecil from tooling, please take latest CodeGenerationHelpers.ttinclude from Serene/StartSharp that doesn't require Cecil reference
+  - add option to show checkboxes only in some rows for GridRowSelectionMixin
+
+Bugfixes:
+  - fix bug with clearing slick event handlers
+  - fix property grid item orders might get messed up, if tabs and categories are in mixed order, e.g. same category name used in a tab, but separate locations
+
 ## 3.9.10 (2019-07-30)
 
 Features:
