@@ -8,6 +8,14 @@ namespace Serenity.Test
     [Collection("AvoidParallel")]
     public partial class LogicOperatorPermissionServiceTests
     {
+        private class OneZeroPermissionService : IPermissionService
+        {
+            public bool HasPermission(string permission)
+            {
+                return permission != null && permission.IndexOf("1") >= 0;
+            }
+        }
+
         [Fact]
         public void ShouldDelegateSimplePermissionsToUnderlyingOne()
         {
@@ -114,6 +122,66 @@ namespace Serenity.Test
             Assert.False(lops.HasPermission("T&F|F|F&T"));
             Assert.False(lops.HasPermission("T&T&T&F|F&F&F&T"));
             Assert.True( lops.HasPermission("T&T&T&F|T&T|F&F&F&T"));
+        }
+
+        [Theory]
+        [InlineData("1", true)]
+        [InlineData("0", false)]
+        [InlineData("!1", false)]
+        [InlineData("!0", true)]
+        [InlineData("0&0", false)]
+        [InlineData("0&1", false)]
+        [InlineData("1&0", false)]
+        [InlineData("1&1", true)]
+        [InlineData("0|0", false)]
+        [InlineData("0|1", true)]
+        [InlineData("1|0", true)]
+        [InlineData("1|1", true)]
+        [InlineData("!0&0", false)]
+        [InlineData("0&!0", false)]
+        [InlineData("!0&!0", true)]
+        [InlineData("!0&1", true)]
+        [InlineData("0&!1", false)]
+        [InlineData("!0&!1", false)]
+        [InlineData("!1&0", false)]
+        [InlineData("!1&!0", false)]
+        [InlineData("1&!0", true)]
+        [InlineData("!1&1", false)]
+        [InlineData("!1&!1", false)]
+        [InlineData("1&!1", false)]
+        [InlineData("!0|0", true)]
+        [InlineData("!0|!0", true)]
+        [InlineData("0|!0", true)]
+        [InlineData("!0|1", true)]
+        [InlineData("!0|!1", true)]
+        [InlineData("0|!1", false)]
+        [InlineData("!1|0", false)]
+        [InlineData("!1|!0", true)]
+        [InlineData("1|!0", true)]
+        [InlineData("!1|1", true)]
+        [InlineData("!1|!1", false)]
+        [InlineData("1|!1", true)]
+        [InlineData("(1)", true)]
+        [InlineData("(0)", false)]
+        [InlineData("(1|1)", true)]
+        [InlineData("(1|0)", true)]
+        [InlineData("(1&0)", false)]
+        [InlineData("1 | 1 & !1", true)]
+        [InlineData("(1 | 1) & !1", false)]
+        [InlineData("!(0 | 0) & !1", false)]
+        [InlineData("(1 | !0) & !1 | !(0 & 0)", true)]
+        [InlineData("(1 | !0) & !1 | (!(0 & 0) & 0)", false)]
+        [InlineData("(!0 | (1 | !0) & !1 | (!(0 & 0) & 0))", true)]
+        [InlineData("(!(!0 | (1 | !0) & !1 | (!(0 & 0) & 0)))", false)]
+        [InlineData("(!(!Module:0 | (Module:1 | !0) & !Module:1 | (!(Module:Permission:0 & Module:SubModule:0) & Module:SubModule:0)))", false)]
+        public void Evaluate_Permission(string permission, bool expected)
+        {
+            var lops = new LogicOperatorPermissionService(new OneZeroPermissionService());
+            var actual = lops.HasPermission(permission);
+            if (expected)
+                Assert.True(actual);
+            else
+                Assert.False(actual);
         }
     }
 }
