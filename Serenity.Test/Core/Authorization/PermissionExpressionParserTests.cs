@@ -1,4 +1,6 @@
-﻿using Serenity.Services;
+﻿
+using Serenity.Services;
+using System;
 using Xunit;
 
 namespace Serenity.Test
@@ -68,6 +70,28 @@ namespace Serenity.Test
                 Assert.True(actual);
             else
                 Assert.False(actual);
+        }
+
+        [Theory]
+        [InlineData("!")]
+        [InlineData("&")]
+        [InlineData("|")]
+        [InlineData(" ")]
+        [InlineData("(")]
+        [InlineData(")")]
+        [InlineData("!:&")]
+        [InlineData("A !! B")]
+        [InlineData("A B")]
+        [InlineData("A && B")]
+        [InlineData("(&) | B & ||")]
+        public void Evaluate_InvalidExpressionThrows(string expression)
+        {
+            var tokens = PermissionExpressionParser.Tokenize(expression);
+            var rpn = PermissionExpressionParser.ShuntingYard(tokens);
+            Assert.Throws<InvalidOperationException>(() => 
+            {
+                PermissionExpressionParser.Evaluate(rpn, HasPermission);
+            });
         }
     }
 }

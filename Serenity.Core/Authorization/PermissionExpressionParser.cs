@@ -114,7 +114,7 @@ namespace Serenity.Services
                 var tok = stack.Pop();
 
                 if (tok == openParen || tok == closeParen)
-                    throw new Exception("Mismatched parentheses in permission expression!");
+                    throw new InvalidOperationException("Mismatched parentheses in permission expression!");
 
                 yield return tok;
             }
@@ -156,7 +156,7 @@ namespace Serenity.Services
             }
 
             if (stack.Count != 1)
-                throw new Exception("Error evaluating permission expression!");
+                throw new InvalidOperationException("Error evaluating permission expression!");
 
             return stack.Pop();
         }
