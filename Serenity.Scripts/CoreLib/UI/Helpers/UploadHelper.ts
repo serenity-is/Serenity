@@ -90,8 +90,8 @@
         export function fileSizeDisplay(bytes: number): string {
             var byteSize = (ss as any).round(bytes * 100 / 1024) * 0.01;
             var suffix = 'KB';
-            if (byteSize > 1000) {
-                byteSize = (ss as any).round(byteSize * 0.001 * 100) * 0.01;
+            if (byteSize >= 1024) {
+                byteSize = (ss as any).round(byteSize * 100 / 1024) * 0.01;
                 suffix = 'MB';
             }
             var sizeParts = byteSize.toString().split(String.fromCharCode(46));
