@@ -429,7 +429,7 @@
             this.slickGrid.setSortColumns(mapped);
         }
 
-        itemAt(row: number) {
+        itemAt(row: number): TItem {
             return this.slickGrid.getDataItem(row);
         }
 

@@ -13,6 +13,7 @@ declare const __skipExtends: {
 declare var __extends: any;
 declare var __assign: any;
 declare var __rest: (s: any, e: any) => {};
+declare var __spreadArrays: () => any[];
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }
@@ -2567,7 +2568,7 @@ declare namespace Serenity {
         protected initializeAsync(): PromiseLike<void>;
         protected createSlickGrid(): Slick.Grid;
         protected setInitialSortOrder(): void;
-        itemAt(row: number): any;
+        itemAt(row: number): TItem;
         rowCount(): number;
         getItems(): TItem[];
         setItems(value: TItem[]): void;
