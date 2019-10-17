@@ -40,6 +40,14 @@ var __rest = function (s, e) {
                 t[p[i]] = s[p[i]];
     return t;
 };
+var __spreadArrays = function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++)
+        s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 /**
  * Represents the completion of an asynchronous operation
  */
@@ -227,7 +235,7 @@ var Q;
         for (var _i = 1; _i < arguments.length; _i++) {
             prm[_i - 1] = arguments[_i];
         }
-        return (_a = ss).formatString.apply(_a, [msg].concat(prm));
+        return (_a = ss).formatString.apply(_a, __spreadArrays([msg], prm));
     }
     Q.format = format;
     function padLeft(s, len, ch) {
@@ -4330,8 +4338,8 @@ var Serenity;
         function fileSizeDisplay(bytes) {
             var byteSize = ss.round(bytes * 100 / 1024) * 0.01;
             var suffix = 'KB';
-            if (byteSize > 1000) {
-                byteSize = ss.round(byteSize * 0.001 * 100) * 0.01;
+            if (byteSize >= 1024) {
+                byteSize = ss.round(byteSize * 100 / 1024) * 0.01;
                 suffix = 'MB';
             }
             var sizeParts = byteSize.toString().split(String.fromCharCode(46));
@@ -14923,6 +14931,7 @@ var Serenity;
                     _this.element.find('li').each(function (x, e) {
                         $(e).toggle(!txt || Select2.util.stripDiacritics($(e).text().toLowerCase()).indexOf(txt) >= 0);
                     });
+                    done && done(true);
                 }
             });
             _this.ulVisible = _this.byId("VisibleCols");
