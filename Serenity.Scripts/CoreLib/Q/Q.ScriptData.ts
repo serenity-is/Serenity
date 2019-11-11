@@ -53,7 +53,7 @@ namespace Q {
                         return;
                     }
 
-                    Q.notifyError("An error occured while trying to load " +
+                    Q.notifyError("An error occurred while trying to load " +
                         (isLookup ? ' the lookup: "' + name.substr(7) :
                             ' dynamic script: "' + name) +
                         '"!. Please check the error message displayed in the dialog below for more info.');
@@ -61,7 +61,7 @@ namespace Q {
                     var html = xhr.responseText;
                     if (!html) {
                         if (!xhr.status)
-                            Q.alert("An unknown connection error occured! Check browser console for details.");
+                            Q.alert("An unknown connection error occurred! Check browser console for details.");
                         else if (xhr.status == 500)
                             Q.alert("HTTP 500: Connection refused! Check browser console for details.");
                         else

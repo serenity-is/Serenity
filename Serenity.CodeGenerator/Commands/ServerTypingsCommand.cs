@@ -140,7 +140,7 @@ namespace Serenity.CodeGenerator
                 }
                 catch (Exception ex)
                 {
-                    System.Console.WriteLine("Error occured while parsing appsettings.json!" + Environment.NewLine + 
+                    System.Console.WriteLine("Error occurred while parsing appsettings.json!" + Environment.NewLine + 
                         ex.ToString());
                 }
             }

@@ -156,7 +156,7 @@ namespace Serenity.Reporting
                 };
 
                 if (!process.Start())
-                    throw new InvalidOperationException("An error occured while starting PDF generator!");
+                    throw new InvalidOperationException("An error occurred while starting PDF generator!");
 
                 if (!process.WaitForExit(TimeoutSeconds * 1000)) // max 300 seconds
                     throw new InvalidOperationException("Timeout while PDF generation!");

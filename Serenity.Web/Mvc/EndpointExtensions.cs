@@ -48,7 +48,7 @@ namespace Serenity.Services
                     error.Details = exception.ToString();
                 }
                 else
-                    error.Message = "An error occured while processing your request.";
+                    error.Message = "An error occurred while processing your request.";
             }
 
             response.Error = error;
