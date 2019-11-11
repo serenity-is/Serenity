@@ -1,6 +1,4 @@
-﻿#if !COREFX
-using Serenity.Web;
-#endif
+﻿using Serenity.Web;
 using System;
 
 namespace Serenity.ComponentModel
@@ -21,10 +19,8 @@ namespace Serenity.ComponentModel
         protected ImageUploadEditorAttribute(string editorType)
             : base(editorType)
         {
-#if !COREFX
             ScaleMode = ImageScaleMode.PreserveRatioNoFill;
             ThumbMode = ImageScaleMode.PreserveRatioNoFill;
-#endif
         }
 
         /// <summary>
@@ -62,7 +58,6 @@ namespace Serenity.ComponentModel
             set { SetOption("minSize", value); }
         }
 
-#if !COREFX
         /// <summary>
         /// Maximum height in pixels of the uploaded image.
         /// </summary>
@@ -129,7 +124,6 @@ namespace Serenity.ComponentModel
         /// What kind of image scaling should be used to generate thumbnails.
         /// </summary>
         public ImageScaleMode ThumbMode { get; set; }
-#endif
 
         /// <summary>
         /// Only useful for MultipleImageUploadeEditor. Specifies
