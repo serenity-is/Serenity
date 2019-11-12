@@ -1,3 +1,17 @@
+## 3.9.12 (2019-11-12)
+
+Features:
+  - add support for NOT "!" and Parenthesis "()" to LogicOperatorPermissionService
+  - activated thumbnail generation in .NET Core using System.Drawing.Common, make sure to run "sudo apt install libc6-dev " and "sudo apt install libgdiplus" if using Linux
+  - update TypeScript to 3.6.4, this is now the recommended version 
+  
+Bugfixes:
+  - use occurred instead of occured in error messages
+  - fileSizeDisplay inconsistency
+  - file upload editor, maxsize only works for images
+  - wait cursor not removed after columnpicker quick search
+  - datagrid.itemAt should return an object of TItem type, not any.
+
 ## 3.9.11 (2019-08-26)
 
 Features:
