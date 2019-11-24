@@ -12,9 +12,9 @@
             else {
                 var uiTabs = element.closest('.ui-tabs');
                 if (uiTabs.length > 0) {
-                    uiTabs.bind('tabsshow.' + eventClass, function (e) {
+                    uiTabs.bind('tabsactivate.' + eventClass, function (e) {
                         if (element.is(':visible')) {
-                            uiTabs.unbind('tabsshow.' + eventClass);
+                            uiTabs.unbind('tabsactivate.' + eventClass);
                             if (!executed) {
                                 executed = true;
                                 element.unbind('shown.' + eventClass);
