@@ -1,6 +1,7 @@
 ﻿using Mono.Cecil;
 using Newtonsoft.Json;
 using Serenity.Data;
+using Serenity.Reflection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,10 +15,14 @@ namespace Serenity.CodeGeneration
     {
         protected override void AddNestedLocalTexts(TypeDefinition type, string prefix)
         {
+            if (CecilUtils.FindAttr(type.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+                return;
+
             foreach (var fi in type.Fields.Where(x => 
                 x.IsPublic && x.IsStatic && 
                 x.DeclaringType.FullName == type.FullName &&
-                x.FieldType.FullName == "Serenity.LocalText"))
+                x.FieldType.FullName == "Serenity.LocalText" &&
+                CecilUtils.FindAttr(x.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute") == null))
             {
                 localTextKeys.Add(prefix + fi.Name);
             }

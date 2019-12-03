@@ -162,6 +162,9 @@
     <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.MemberType.cs">
       <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.MemberType.cs</Link>
     </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.PermissionKeys.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.PermissionKeys.cs</Link>
+    </Compile>
     <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.Row.cs">
       <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.Row.cs</Link>
     </Compile>
