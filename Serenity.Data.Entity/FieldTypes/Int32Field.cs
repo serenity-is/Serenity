@@ -30,6 +30,8 @@ namespace Serenity.Data
                 _setValue(row, null);
             else if (value is Int32)
                 _setValue(row, (Int32)value);
+            else if (this.EnumType != null)
+                _setValue(row, (int)Enum.Parse(this.EnumType, (string)value, true));
             else
                 _setValue(row, Convert.ToInt32(value, CultureInfo.InvariantCulture));
 
