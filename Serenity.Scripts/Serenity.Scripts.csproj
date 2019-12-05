@@ -12,6 +12,7 @@
   <ItemGroup>
     <None Remove="CodeGeneration\tsconfig.json" />
     <None Remove="CoreLib\tsconfig.json" />
+    <None Remove="CoreLib\UI\DataGrid\QuickFilterBar.ts" />
   </ItemGroup>
 
   <ItemGroup>

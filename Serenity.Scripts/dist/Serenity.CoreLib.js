@@ -11462,6 +11462,374 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var QuickFilterBar = /** @class */ (function (_super) {
+        __extends(QuickFilterBar, _super);
+        function QuickFilterBar(container, options) {
+            var _this = _super.call(this, container, options) || this;
+            container.addClass('quick-filters-bar').addClass('clear');
+            var filters = _this.options.filters;
+            for (var f = 0; f < filters.length; f++) {
+                var filter = filters[f];
+                _this.add(filter);
+            }
+            _this.options.idPrefix = Q.coalesce(_this.options.idPrefix, _this.uniqueName + '_');
+            return _this;
+        }
+        QuickFilterBar_1 = QuickFilterBar;
+        QuickFilterBar.prototype.addSeparator = function () {
+            this.element.append($('<hr/>'));
+        };
+        QuickFilterBar.prototype.add = function (opt) {
+            var _this = this;
+            if (opt == null) {
+                throw new ss.ArgumentNullException('opt');
+            }
+            if (opt.separator) {
+                this.addSeparator();
+            }
+            var item = $("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
+                .appendTo(this.element)
+                .data('qffield', opt.field).children();
+            var title = opt.title;
+            if (title == null) {
+                title = this.options.getTitle ? this.options.getTitle(opt) : null;
+                if (title == null) {
+                    title = opt.field;
+                }
+            }
+            var quickFilter = item.text(title).parent();
+            if (opt.displayText != null) {
+                quickFilter.data('qfdisplaytext', opt.displayText);
+            }
+            if (opt.saveState != null) {
+                quickFilter.data('qfsavestate', opt.saveState);
+            }
+            if (opt.loadState != null) {
+                quickFilter.data('qfloadstate', opt.loadState);
+            }
+            if (!Q.isEmptyOrNull(opt.cssClass)) {
+                quickFilter.addClass(opt.cssClass);
+            }
+            var widget = Serenity.Widget.create({
+                type: opt.type,
+                element: function (e) {
+                    if (!Q.isEmptyOrNull(opt.field)) {
+                        e.attr('id', _this.options.idPrefix + opt.field);
+                    }
+                    e.attr('placeholder', ' ');
+                    e.appendTo(quickFilter);
+                    if (opt.element != null) {
+                        opt.element(e);
+                    }
+                },
+                options: opt.options,
+                init: opt.init
+            });
+            var submitHandler = function (request) {
+                if (quickFilter.hasClass('ignore')) {
+                    return;
+                }
+                request.EqualityFilter = request.EqualityFilter || {};
+                var value = Serenity.EditorUtils.getValue(widget);
+                var active = value != null && !Q.isEmptyOrNull(value.toString());
+                if (opt.handler != null) {
+                    var args = {
+                        field: opt.field,
+                        request: request,
+                        equalityFilter: request.EqualityFilter,
+                        value: value,
+                        active: active,
+                        widget: widget,
+                        handled: true
+                    };
+                    opt.handler(args);
+                    quickFilter.toggleClass('quick-filter-active', args.active);
+                    if (!args.handled) {
+                        request.EqualityFilter[opt.field] = value;
+                    }
+                }
+                else {
+                    request.EqualityFilter[opt.field] = value;
+                    quickFilter.toggleClass('quick-filter-active', active);
+                }
+            };
+            Serenity.WX.changeSelect2(widget, function (e1) {
+                // use timeout give cascaded dropdowns a chance to update / clear themselves
+                window.setTimeout(function () { return _this.onChange && _this.onChange(e1); }, 0);
+            });
+            this.add_submitHandlers(submitHandler);
+            widget.element.bind('remove.' + this.uniqueName, function (x) {
+                _this.remove_submitHandlers(submitHandler);
+            });
+            return widget;
+        };
+        QuickFilterBar.prototype.addDateRange = function (field, title) {
+            return this.add(QuickFilterBar_1.dateRange(field, title));
+        };
+        QuickFilterBar.dateRange = function (field, title) {
+            var end = null;
+            return {
+                field: field,
+                type: Serenity.DateEditor,
+                title: title,
+                element: function (e1) {
+                    end = Serenity.Widget.create({
+                        type: Serenity.DateEditor,
+                        element: function (e2) {
+                            e2.insertAfter(e1);
+                        },
+                        options: null,
+                        init: null
+                    });
+                    end.element.change(function (x) {
+                        e1.triggerHandler('change');
+                    });
+                    $('<span/>').addClass('range-separator').text('-').insertAfter(e1);
+                },
+                handler: function (args) {
+                    var active1 = !Q.isTrimmedEmpty(args.widget.value);
+                    var active2 = !Q.isTrimmedEmpty(end.value);
+                    if (active1 && !Q.parseDate(args.widget.element.val())) {
+                        active1 = false;
+                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+                        args.widget.element.val('');
+                    }
+                    if (active2 && !Q.parseDate(end.element.val())) {
+                        active2 = false;
+                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+                        end.element.val('');
+                    }
+                    args.active = active1 || active2;
+                    if (active1) {
+                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '>=', args.widget.value]);
+                    }
+                    if (active2) {
+                        var next = new Date(end.valueAsDate.valueOf());
+                        next.setDate(next.getDate() + 1);
+                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '<', Q.formatDate(next, 'yyyy-MM-dd')]);
+                    }
+                },
+                displayText: function (w, l) {
+                    var v1 = Serenity.EditorUtils.getDisplayText(w);
+                    var v2 = Serenity.EditorUtils.getDisplayText(end);
+                    if (Q.isEmptyOrNull(v1) && Q.isEmptyOrNull(v2)) {
+                        return null;
+                    }
+                    var text1 = l + ' >= ' + v1;
+                    var text2 = l + ' <= ' + v2;
+                    if (!Q.isEmptyOrNull(v1) && !Q.isEmptyOrNull(v2)) {
+                        return text1 + ' ' + Q.coalesce(Q.tryGetText('Controls.FilterPanel.And'), 'and') + ' ' + text2;
+                    }
+                    else if (!Q.isEmptyOrNull(v1)) {
+                        return text1;
+                    }
+                    else {
+                        return text2;
+                    }
+                },
+                saveState: function (w1) {
+                    return [Serenity.EditorUtils.getValue(w1), Serenity.EditorUtils.getValue(end)];
+                },
+                loadState: function (w2, state) {
+                    if (state == null || !Q.isArray(state) || state.length !== 2) {
+                        state = [null, null];
+                    }
+                    Serenity.EditorUtils.setValue(w2, state[0]);
+                    Serenity.EditorUtils.setValue(end, state[1]);
+                }
+            };
+        };
+        QuickFilterBar.prototype.addDateTimeRange = function (field, title) {
+            return this.add(QuickFilterBar_1.dateTimeRange(field, title));
+        };
+        QuickFilterBar.dateTimeRange = function (field, title) {
+            var end = null;
+            return {
+                field: field,
+                type: Serenity.DateTimeEditor,
+                title: title,
+                element: function (e1) {
+                    end = Serenity.Widget.create({
+                        type: Serenity.DateTimeEditor,
+                        element: function (e2) {
+                            e2.insertAfter(e1);
+                        },
+                        options: null,
+                        init: null
+                    });
+                    end.element.change(function (x) {
+                        e1.triggerHandler('change');
+                    });
+                    $('<span/>').addClass('range-separator').text('-').insertAfter(e1);
+                },
+                init: function (i) {
+                    i.element.parent().find('.time').change(function (x1) {
+                        i.element.triggerHandler('change');
+                    });
+                },
+                handler: function (args) {
+                    var active1 = !Q.isTrimmedEmpty(args.widget.value);
+                    var active2 = !Q.isTrimmedEmpty(end.value);
+                    if (active1 && !Q.parseDate(args.widget.element.val())) {
+                        active1 = false;
+                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+                        args.widget.element.val('');
+                    }
+                    if (active2 && !Q.parseDate(end.element.val())) {
+                        active2 = false;
+                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+                        end.element.val('');
+                    }
+                    args.active = active1 || active2;
+                    if (active1) {
+                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '>=', args.widget.value]);
+                    }
+                    if (active2) {
+                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '<=', end.value]);
+                    }
+                },
+                displayText: function (w, l) {
+                    var v1 = Serenity.EditorUtils.getDisplayText(w);
+                    var v2 = Serenity.EditorUtils.getDisplayText(end);
+                    if (Q.isEmptyOrNull(v1) && Q.isEmptyOrNull(v2)) {
+                        return null;
+                    }
+                    var text1 = l + ' >= ' + v1;
+                    var text2 = l + ' <= ' + v2;
+                    if (!Q.isEmptyOrNull(v1) && !Q.isEmptyOrNull(v2)) {
+                        return text1 + ' ' + Q.coalesce(Q.tryGetText('Controls.FilterPanel.And'), 'and') + ' ' + text2;
+                    }
+                    else if (!Q.isEmptyOrNull(v1)) {
+                        return text1;
+                    }
+                    else {
+                        return text2;
+                    }
+                },
+                saveState: function (w1) {
+                    return [Serenity.EditorUtils.getValue(w1), Serenity.EditorUtils.getValue(end)];
+                },
+                loadState: function (w2, state) {
+                    if (state == null || !Q.isArray(state) || state.length !== 2) {
+                        state = [null, null];
+                    }
+                    Serenity.EditorUtils.setValue(w2, state[0]);
+                    Serenity.EditorUtils.setValue(end, state[1]);
+                }
+            };
+        };
+        QuickFilterBar.prototype.addBoolean = function (field, title, yes, no) {
+            return this.add(QuickFilterBar_1.boolean(field, title, yes, no));
+        };
+        QuickFilterBar.boolean = function (field, title, yes, no) {
+            var opt = {};
+            var items = [];
+            var trueText = yes;
+            if (trueText == null) {
+                trueText = Q.text('Controls.FilterPanel.OperatorNames.true');
+            }
+            items.push(['1', trueText]);
+            var falseText = no;
+            if (falseText == null) {
+                falseText = Q.text('Controls.FilterPanel.OperatorNames.false');
+            }
+            items.push(['0', falseText]);
+            opt.items = items;
+            return {
+                field: field,
+                type: Serenity.SelectEditor,
+                title: title,
+                options: opt,
+                handler: function (args) {
+                    args.equalityFilter[args.field] = args.value == null || Q.isEmptyOrNull(args.value.toString()) ?
+                        null : !!Q.toId(args.value);
+                }
+            };
+        };
+        QuickFilterBar.propertyItemToQuickFilter = function (item) {
+            var quick = {};
+            var name = item.name;
+            var title = Q.tryGetText(item.title);
+            if (title == null) {
+                title = item.title;
+                if (title == null) {
+                    title = name;
+                }
+            }
+            var filteringType = Serenity.FilteringTypeRegistry.get(Q.coalesce(item.filteringType, 'String'));
+            if (filteringType === Serenity.DateFiltering) {
+                quick = QuickFilterBar_1.dateRange(name, title);
+            }
+            else if (filteringType === Serenity.DateTimeFiltering) {
+                quick = QuickFilterBar_1.dateTimeRange(name, title);
+            }
+            else if (filteringType === Serenity.BooleanFiltering) {
+                var q = item.quickFilterParams || {};
+                var f = item.filteringParams || {};
+                var trueText = q['trueText'];
+                if (trueText == null) {
+                    trueText = f['trueText'];
+                }
+                var falseText = q['falseText'];
+                if (falseText == null) {
+                    falseText = f['falseText'];
+                }
+                quick = QuickFilterBar_1.boolean(name, title, trueText, falseText);
+            }
+            else {
+                var filtering = new filteringType();
+                if (filtering && ss.isInstanceOfType(filtering, Serenity.IQuickFiltering)) {
+                    Serenity.ReflectionOptionsSetter.set(filtering, item.filteringParams);
+                    filtering.set_field(item);
+                    filtering.set_operator({ key: Serenity.FilterOperators.EQ });
+                    filtering.initQuickFilter(quick);
+                    quick.options = Q.deepClone(quick.options, item.quickFilterParams);
+                }
+                else {
+                    return null;
+                }
+            }
+            if (!!item.quickFilterSeparator) {
+                quick.separator = true;
+            }
+            quick.cssClass = item.quickFilterCssClass;
+            return quick;
+        };
+        QuickFilterBar.prototype.destroy = function () {
+            this.submitHandlers = null;
+            _super.prototype.destroy.call(this);
+        };
+        QuickFilterBar.prototype.onSubmit = function (request) {
+            this.submitHandlers && this.submitHandlers(request);
+        };
+        QuickFilterBar.prototype.add_submitHandlers = function (action) {
+            this.submitHandlers = ss.delegateCombine(this.submitHandlers, action);
+        };
+        QuickFilterBar.prototype.remove_submitHandlers = function (action) {
+            this.submitHandlers = ss.delegateRemove(this.submitHandlers, action);
+        };
+        QuickFilterBar.prototype.clear_submitHandlers = function () {
+        };
+        QuickFilterBar.prototype.find = function (type, field) {
+            return $('#' + this.options.idPrefix + field).getWidget(type);
+        };
+        QuickFilterBar.prototype.tryFind = function (type, field) {
+            var el = $('#' + this.options.idPrefix + field);
+            if (!el.length)
+                return null;
+            return el.tryGetWidget(type);
+        };
+        var QuickFilterBar_1;
+        QuickFilterBar = QuickFilterBar_1 = __decorate([
+            Serenity.Decorators.registerClass('Serenity.QuickFilterBar'),
+            Serenity.Decorators.element("<div/>")
+        ], QuickFilterBar);
+        return QuickFilterBar;
+    }(Serenity.Widget));
+    Serenity.QuickFilterBar = QuickFilterBar;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var IDataGrid = /** @class */ (function () {
         function IDataGrid() {
         }
@@ -11513,12 +11881,6 @@ var Serenity;
         DataGrid.prototype.attrs = function (attrType) {
             return ss.getAttributes(ss.getInstanceType(this), attrType, true);
         };
-        DataGrid.prototype.add_submitHandlers = function (action) {
-            this.submitHandlers = ss.delegateCombine(this.submitHandlers, action);
-        };
-        DataGrid.prototype.remove_submitHandlers = function (action) {
-            this.submitHandlers = ss.delegateRemove(this.submitHandlers, action);
-        };
         DataGrid.prototype.layout = function () {
             if (!this.element.is(':visible') || this.slickContainer == null)
                 return;
@@ -11551,78 +11913,42 @@ var Serenity;
         };
         DataGrid.prototype.createToolbarExtensions = function () {
         };
-        DataGrid.prototype.createQuickFilters = function () {
-            var filters = this.getQuickFilters();
-            for (var f = 0; f < filters.length; f++) {
-                var filter = filters[f];
-                this.addQuickFilter(filter);
+        DataGrid.prototype.ensureQuickFilterBar = function () {
+            if (this.quickFiltersDiv == null)
+                this.createQuickFilters([]);
+            return this.quickFiltersBar;
+        };
+        DataGrid.prototype.createQuickFilters = function (filters) {
+            var _this = this;
+            if (this.quickFiltersDiv == null && (filters != null ||
+                ((filters = this.getQuickFilters()) && filters != null && filters.length))) {
+                $('<div/>').addClass('clear').appendTo(this.toolbar.element);
+                this.quickFiltersDiv = $('<div/>').addClass('quick-filters-bar').appendTo(this.toolbar.element);
+                this.quickFiltersBar = new Serenity.QuickFilterBar(this.quickFiltersDiv, {
+                    filters: filters,
+                    getTitle: function (filter) { return _this.determineText(function (pre) { return pre + filter.field; }); },
+                    idPrefix: this.uniqueName + '_QuickFilter_'
+                });
+                this.quickFiltersBar.onChange = function (e) { return _this.quickFilterChange(e); };
             }
         };
         DataGrid.prototype.getQuickFilters = function () {
-            var list = [];
-            var columns = this.allColumns.filter(function (x) {
+            return this.allColumns.filter(function (x) {
                 return x.sourceItem &&
                     x.sourceItem.quickFilter === true &&
                     (x.sourceItem.readPermission == null ||
                         Q.Authorization.hasPermission(x.sourceItem.readPermission));
-            });
-            for (var _i = 0, columns_2 = columns; _i < columns_2.length; _i++) {
-                var column = columns_2[_i];
-                var item = column.sourceItem;
-                var quick = {};
-                var name = item.name;
-                var title = Q.tryGetText(item.title);
-                if (title == null) {
-                    title = item.title;
-                    if (title == null) {
-                        title = name;
-                    }
-                }
-                var filteringType = Serenity.FilteringTypeRegistry.get(Q.coalesce(item.filteringType, 'String'));
-                if (filteringType === Serenity.DateFiltering) {
-                    quick = this.dateRangeQuickFilter(name, title);
-                }
-                else if (filteringType === Serenity.DateTimeFiltering) {
-                    quick = this.dateTimeRangeQuickFilter(name, title);
-                }
-                else if (filteringType === Serenity.BooleanFiltering) {
-                    var q = item.quickFilterParams || {};
-                    var f = item.filteringParams || {};
-                    var trueText = q['trueText'];
-                    if (trueText == null) {
-                        trueText = f['trueText'];
-                    }
-                    var falseText = q['falseText'];
-                    if (falseText == null) {
-                        falseText = f['falseText'];
-                    }
-                    quick = this.booleanQuickFilter(name, title, trueText, falseText);
-                }
-                else {
-                    var filtering = new filteringType();
-                    if (filtering && ss.isInstanceOfType(filtering, Serenity.IQuickFiltering)) {
-                        Serenity.ReflectionOptionsSetter.set(filtering, item.filteringParams);
-                        filtering.set_field(item);
-                        filtering.set_operator({ key: Serenity.FilterOperators.EQ });
-                        filtering.initQuickFilter(quick);
-                        quick.options = Q.deepClone(quick.options, item.quickFilterParams);
-                    }
-                    else {
-                        continue;
-                    }
-                }
-                if (!!item.quickFilterSeparator) {
-                    quick.separator = true;
-                }
-                quick.cssClass = item.quickFilterCssClass;
-                list.push(quick);
-            }
-            return list;
+            }).map(function (x) { return Serenity.QuickFilterBar.propertyItemToQuickFilter(x.sourceItem); })
+                .filter(function (x) { return x != null; });
         };
         DataGrid.prototype.findQuickFilter = function (type, field) {
+            if (this.quickFiltersBar != null)
+                return this.quickFiltersBar.find(type, field);
             return $('#' + this.uniqueName + '_QuickFilter_' + field).getWidget(type);
         };
         DataGrid.prototype.tryFindQuickFilter = function (type, field) {
+            if (this.quickFiltersBar != null)
+                return this.quickFiltersBar.tryFind(type, field);
             var el = $('#' + this.uniqueName + '_QuickFilter_' + field);
             if (!el.length)
                 return null;
@@ -11641,7 +11967,10 @@ var Serenity;
             Serenity.GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields());
         };
         DataGrid.prototype.destroy = function () {
-            this.submitHandlers = null;
+            if (this.quickFiltersBar) {
+                this.quickFiltersBar.destroy();
+                this.quickFiltersBar = null;
+            }
             if (this.toolbar) {
                 this.toolbar.destroy();
                 this.toolbar = null;
@@ -11913,8 +12242,8 @@ var Serenity;
         };
         DataGrid.prototype.getIncludeColumns = function (include) {
             var columns = this.slickGrid.getColumns();
-            for (var _i = 0, columns_3 = columns; _i < columns_3.length; _i++) {
-                var column = columns_3[_i];
+            for (var _i = 0, columns_2 = columns; _i < columns_2.length; _i++) {
+                var column = columns_2[_i];
                 if (column.field) {
                     include[column.field] = true;
                 }
@@ -12233,9 +12562,7 @@ var Serenity;
             this.refresh();
         };
         DataGrid.prototype.addFilterSeparator = function () {
-            if (this.quickFiltersDiv) {
-                this.quickFiltersDiv.append($('<hr/>'));
-            }
+            this.ensureQuickFilterBar().addSeparator();
         };
         DataGrid.prototype.determineText = function (getKey) {
             var localTextPrefix = this.getLocalTextDbPrefix();
@@ -12248,282 +12575,29 @@ var Serenity;
             return null;
         };
         DataGrid.prototype.addQuickFilter = function (opt) {
-            var _this = this;
-            if (opt == null) {
-                throw new ss.ArgumentNullException('opt');
-            }
-            if (this.quickFiltersDiv == null) {
-                $('<div/>').addClass('clear').appendTo(this.toolbar.element);
-                this.quickFiltersDiv = $('<div/>').addClass('quick-filters-bar').appendTo(this.toolbar.element);
-            }
-            if (opt.separator) {
-                this.addFilterSeparator();
-            }
-            var item = $("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
-                .appendTo(this.quickFiltersDiv)
-                .data('qffield', opt.field).children();
-            var title = opt.title;
-            if (title == null) {
-                title = this.determineText(function (pre) {
-                    return pre + opt.field;
-                });
-                if (title == null) {
-                    title = opt.field;
-                }
-            }
-            var quickFilter = item.text(title).parent();
-            if (opt.displayText != null) {
-                quickFilter.data('qfdisplaytext', opt.displayText);
-            }
-            if (opt.saveState != null) {
-                quickFilter.data('qfsavestate', opt.saveState);
-            }
-            if (opt.loadState != null) {
-                quickFilter.data('qfloadstate', opt.loadState);
-            }
-            if (!Q.isEmptyOrNull(opt.cssClass)) {
-                quickFilter.addClass(opt.cssClass);
-            }
-            var widget = Serenity.Widget.create({
-                type: opt.type,
-                element: function (e) {
-                    if (!Q.isEmptyOrNull(opt.field)) {
-                        e.attr('id', _this.uniqueName + '_QuickFilter_' + opt.field);
-                    }
-                    e.attr('placeholder', ' ');
-                    e.appendTo(quickFilter);
-                    if (opt.element != null) {
-                        opt.element(e);
-                    }
-                },
-                options: opt.options,
-                init: opt.init
-            });
-            var submitHandler = function () {
-                if (quickFilter.hasClass('ignore')) {
-                    return;
-                }
-                var request = _this.view.params;
-                request.EqualityFilter = request.EqualityFilter || {};
-                var value = Serenity.EditorUtils.getValue(widget);
-                var active = value != null && !Q.isEmptyOrNull(value.toString());
-                if (opt.handler != null) {
-                    var args = {
-                        field: opt.field,
-                        request: request,
-                        equalityFilter: request.EqualityFilter,
-                        value: value,
-                        active: active,
-                        widget: widget,
-                        handled: true
-                    };
-                    opt.handler(args);
-                    quickFilter.toggleClass('quick-filter-active', args.active);
-                    if (!args.handled) {
-                        request.EqualityFilter[opt.field] = value;
-                    }
-                }
-                else {
-                    request.EqualityFilter[opt.field] = value;
-                    quickFilter.toggleClass('quick-filter-active', active);
-                }
-            };
-            Serenity.WX.changeSelect2(widget, function (e1) {
-                // use timeout give cascaded dropdowns a chance to update / clear themselves
-                window.setTimeout(function () { return _this.quickFilterChange(e1); }, 0);
-            });
-            this.add_submitHandlers(submitHandler);
-            widget.element.bind('remove.' + this.uniqueName, function (x) {
-                _this.remove_submitHandlers(submitHandler);
-            });
-            return widget;
+            return this.ensureQuickFilterBar().add(opt);
         };
         DataGrid.prototype.addDateRangeFilter = function (field, title) {
-            return this.addQuickFilter(this.dateRangeQuickFilter(field, title));
+            return this.ensureQuickFilterBar().addDateRange(field, title);
         };
         DataGrid.prototype.dateRangeQuickFilter = function (field, title) {
-            var end = null;
-            return {
-                field: field,
-                type: Serenity.DateEditor,
-                title: title,
-                element: function (e1) {
-                    end = Serenity.Widget.create({
-                        type: Serenity.DateEditor,
-                        element: function (e2) {
-                            e2.insertAfter(e1);
-                        },
-                        options: null,
-                        init: null
-                    });
-                    end.element.change(function (x) {
-                        e1.triggerHandler('change');
-                    });
-                    $('<span/>').addClass('range-separator').text('-').insertAfter(e1);
-                },
-                handler: function (args) {
-                    var active1 = !Q.isTrimmedEmpty(args.widget.value);
-                    var active2 = !Q.isTrimmedEmpty(end.value);
-                    if (active1 && !Q.parseDate(args.widget.element.val())) {
-                        active1 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
-                        args.widget.element.val('');
-                    }
-                    if (active2 && !Q.parseDate(end.element.val())) {
-                        active2 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
-                        end.element.val('');
-                    }
-                    args.active = active1 || active2;
-                    if (active1) {
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '>=', args.widget.value]);
-                    }
-                    if (active2) {
-                        var next = new Date(end.valueAsDate.valueOf());
-                        next.setDate(next.getDate() + 1);
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '<', Q.formatDate(next, 'yyyy-MM-dd')]);
-                    }
-                },
-                displayText: function (w, l) {
-                    var v1 = Serenity.EditorUtils.getDisplayText(w);
-                    var v2 = Serenity.EditorUtils.getDisplayText(end);
-                    if (Q.isEmptyOrNull(v1) && Q.isEmptyOrNull(v2)) {
-                        return null;
-                    }
-                    var text1 = l + ' >= ' + v1;
-                    var text2 = l + ' <= ' + v2;
-                    if (!Q.isEmptyOrNull(v1) && !Q.isEmptyOrNull(v2)) {
-                        return text1 + ' ' + Q.coalesce(Q.tryGetText('Controls.FilterPanel.And'), 'and') + ' ' + text2;
-                    }
-                    else if (!Q.isEmptyOrNull(v1)) {
-                        return text1;
-                    }
-                    else {
-                        return text2;
-                    }
-                },
-                saveState: function (w1) {
-                    return [Serenity.EditorUtils.getValue(w1), Serenity.EditorUtils.getValue(end)];
-                },
-                loadState: function (w2, state) {
-                    if (state == null || !Q.isArray(state) || state.length !== 2) {
-                        state = [null, null];
-                    }
-                    Serenity.EditorUtils.setValue(w2, state[0]);
-                    Serenity.EditorUtils.setValue(end, state[1]);
-                }
-            };
+            return Serenity.QuickFilterBar.dateRange(field, title);
         };
         DataGrid.prototype.addDateTimeRangeFilter = function (field, title) {
-            return this.addQuickFilter(this.dateTimeRangeQuickFilter(field, title));
+            return this.ensureQuickFilterBar().addDateTimeRange(field, title);
         };
         DataGrid.prototype.dateTimeRangeQuickFilter = function (field, title) {
-            var end = null;
-            return {
-                field: field,
-                type: Serenity.DateTimeEditor,
-                title: title,
-                element: function (e1) {
-                    end = Serenity.Widget.create({
-                        type: Serenity.DateTimeEditor,
-                        element: function (e2) {
-                            e2.insertAfter(e1);
-                        },
-                        options: null,
-                        init: null
-                    });
-                    end.element.change(function (x) {
-                        e1.triggerHandler('change');
-                    });
-                    $('<span/>').addClass('range-separator').text('-').insertAfter(e1);
-                },
-                init: function (i) {
-                    i.element.parent().find('.time').change(function (x1) {
-                        i.element.triggerHandler('change');
-                    });
-                },
-                handler: function (args) {
-                    var active1 = !Q.isTrimmedEmpty(args.widget.value);
-                    var active2 = !Q.isTrimmedEmpty(end.value);
-                    if (active1 && !Q.parseDate(args.widget.element.val())) {
-                        active1 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
-                        args.widget.element.val('');
-                    }
-                    if (active2 && !Q.parseDate(end.element.val())) {
-                        active2 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
-                        end.element.val('');
-                    }
-                    args.active = active1 || active2;
-                    if (active1) {
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '>=', args.widget.value]);
-                    }
-                    if (active2) {
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '<=', end.value]);
-                    }
-                },
-                displayText: function (w, l) {
-                    var v1 = Serenity.EditorUtils.getDisplayText(w);
-                    var v2 = Serenity.EditorUtils.getDisplayText(end);
-                    if (Q.isEmptyOrNull(v1) && Q.isEmptyOrNull(v2)) {
-                        return null;
-                    }
-                    var text1 = l + ' >= ' + v1;
-                    var text2 = l + ' <= ' + v2;
-                    if (!Q.isEmptyOrNull(v1) && !Q.isEmptyOrNull(v2)) {
-                        return text1 + ' ' + Q.coalesce(Q.tryGetText('Controls.FilterPanel.And'), 'and') + ' ' + text2;
-                    }
-                    else if (!Q.isEmptyOrNull(v1)) {
-                        return text1;
-                    }
-                    else {
-                        return text2;
-                    }
-                },
-                saveState: function (w1) {
-                    return [Serenity.EditorUtils.getValue(w1), Serenity.EditorUtils.getValue(end)];
-                },
-                loadState: function (w2, state) {
-                    if (state == null || !Q.isArray(state) || state.length !== 2) {
-                        state = [null, null];
-                    }
-                    Serenity.EditorUtils.setValue(w2, state[0]);
-                    Serenity.EditorUtils.setValue(end, state[1]);
-                }
-            };
+            return Serenity.QuickFilterBar.dateTimeRange(field, title);
         };
         DataGrid.prototype.addBooleanFilter = function (field, title, yes, no) {
-            return this.addQuickFilter(this.booleanQuickFilter(field, title, yes, no));
+            return this.ensureQuickFilterBar().addBoolean(field, title, yes, no);
         };
         DataGrid.prototype.booleanQuickFilter = function (field, title, yes, no) {
-            var opt = {};
-            var items = [];
-            var trueText = yes;
-            if (trueText == null) {
-                trueText = Q.text('Controls.FilterPanel.OperatorNames.true');
-            }
-            items.push(['1', trueText]);
-            var falseText = no;
-            if (falseText == null) {
-                falseText = Q.text('Controls.FilterPanel.OperatorNames.false');
-            }
-            items.push(['0', falseText]);
-            opt.items = items;
-            return {
-                field: field,
-                type: Serenity.SelectEditor,
-                title: title,
-                options: opt,
-                handler: function (args) {
-                    args.equalityFilter[args.field] = args.value == null || Q.isEmptyOrNull(args.value.toString()) ?
-                        null : !!Q.toId(args.value);
-                }
-            };
+            return Serenity.QuickFilterBar.boolean(field, title, yes, no);
         };
         DataGrid.prototype.invokeSubmitHandlers = function () {
-            if (this.submitHandlers != null) {
-                this.submitHandlers();
+            if (this.quickFiltersBar != null) {
+                this.quickFiltersBar.onSubmit(this.view.params);
             }
         };
         DataGrid.prototype.quickFilterChange = function (e) {

@@ -90,6 +90,7 @@
     "UI/Dialogs/TemplatedDialog.ts",
     "UI/Dialogs/PropertyDialog.ts",
     "UI/Filtering/FilterDialog.ts",
+    "UI/Filtering/QuickFilterBar.ts",
     "UI/DataGrid/DataGrid.ts",
     "UI/Widgets/EntityGrid.ts",
     "UI/Editors/CheckTreeEditor.ts",

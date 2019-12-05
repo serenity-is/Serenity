@@ -2507,6 +2507,38 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    interface QuickFilterBarOptions {
+        filters: QuickFilter<Widget<any>, any>[];
+        getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
+        idPrefix?: string;
+    }
+    class QuickFilterBar extends Widget<QuickFilterBarOptions> {
+        constructor(container: JQuery, options?: QuickFilterBarOptions);
+        addSeparator(): void;
+        add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
+        addDateRange(field: string, title?: string): Serenity.DateEditor;
+        static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
+        addDateTimeRange(field: string, title?: string): DateTimeEditor;
+        static dateTimeRange(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
+        addBoolean(field: string, title?: string, yes?: string, no?: string): SelectEditor;
+        static boolean(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
+        static propertyItemToQuickFilter(item: PropertyItem): any;
+        onChange: (e: JQueryEventObject) => void;
+        private submitHandlers;
+        destroy(): void;
+        onSubmit(request: Serenity.ListRequest): void;
+        protected add_submitHandlers(action: (request: Serenity.ListRequest) => void): void;
+        protected remove_submitHandlers(action: (request: Serenity.ListRequest) => void): void;
+        protected clear_submitHandlers(): void;
+        find<TWidget>(type: {
+            new (...args: any[]): TWidget;
+        }, field: string): TWidget;
+        tryFind<TWidget>(type: {
+            new (...args: any[]): TWidget;
+        }, field: string): TWidget;
+    }
+}
+declare namespace Serenity {
     interface IDataGrid {
         getElement(): JQuery;
         getGrid(): Slick.Grid;
@@ -2520,6 +2552,7 @@ declare namespace Serenity {
         protected toolbar: Toolbar;
         protected filterBar: FilterDisplayBar;
         protected quickFiltersDiv: JQuery;
+        protected quickFiltersBar: QuickFilterBar;
         protected slickContainer: JQuery;
         protected allColumns: Slick.Column[];
         protected initialSettings: PersistedGridSettings;
@@ -2528,7 +2561,6 @@ declare namespace Serenity {
         private isActiveProperty;
         private localTextDbPrefix;
         private isDisabled;
-        private submitHandlers;
         private rows;
         private slickGridOnSort;
         private slickGridOnClick;
@@ -2542,12 +2574,11 @@ declare namespace Serenity {
         protected attrs<TAttr>(attrType: {
             new (...args: any[]): TAttr;
         }): TAttr[];
-        protected add_submitHandlers(action: () => void): void;
-        protected remove_submitHandlers(action: () => void): void;
         protected layout(): void;
         protected getInitialTitle(): string;
         protected createToolbarExtensions(): void;
-        protected createQuickFilters(): void;
+        protected ensureQuickFilterBar(): QuickFilterBar;
+        protected createQuickFilters(filters?: QuickFilter<Widget<any>, any>[]): void;
         protected getQuickFilters(): QuickFilter<Widget<any>, any>[];
         protected findQuickFilter<TWidget>(type: {
             new (...args: any[]): TWidget;
