@@ -10,9 +10,9 @@
     export class IDataGrid {
     }
 
-    @Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid])
+    @Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid, IReadOnly])
     @Serenity.Decorators.element("<div/>")
-    export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid {
+    export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid, IReadOnly {
 
         protected titleDiv: JQuery;
         protected toolbar: Toolbar;
@@ -78,6 +78,7 @@
             this.createQuickFilters();
 
             this.updateDisabledState();
+            this.updateInterface();
 
             if (!this.isAsyncWidget()) {
                 this.initialSettings = this.getCurrentSettings(null);
@@ -848,6 +849,31 @@
 
                 this.updateDisabledState();
             }
+        }
+
+        private _readonly: boolean;
+
+        public get readOnly(): boolean {
+            return this.get_readOnly();
+        }
+
+        public set readOnly(value: boolean) {
+            this.set_readOnly(value);
+        }
+
+        public get_readOnly() {
+            return !!this._readonly;
+        }
+
+        public set_readOnly(value: boolean) {
+            if (!!this._readonly != !!value) {
+                this._readonly = !!value;
+                this.updateInterface();
+            }
+        }
+
+        protected updateInterface() {
+            this.toolbar.updateInterface();
         }
 
         protected getLocalTextDbPrefix(): string {
