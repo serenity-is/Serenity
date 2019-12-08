@@ -144,8 +144,9 @@
                 hotkey: 'alt+n',
                 onClick: () => {
                     this.addButtonClick();
-                }
-            });
+                },
+                disabled: () => !this.hasInsertPermission() || this.readOnly
+             });
 
             buttons.push(this.newRefreshButton(true));
             buttons.push(Serenity.ColumnPickerDialog.createToolButton(this as any));
@@ -247,11 +248,26 @@
             });
         }
 
+        protected getInsertPermission(): string {
+            return null;
+        }
+
+        protected hasInsertPermission(): boolean {
+            var insertPermission = this.getInsertPermission();
+            return insertPermission == null || Q.Authorization.hasPermission(this.getInsertPermission());
+        }
+
+        protected transferDialogReadOnly(dialog: Widget<any>) {
+            if (this.readOnly)
+                Serenity.EditorUtils.setReadOnly(dialog, true);
+        }
+
         protected initDialog(dialog: Widget<any>): void {
             Serenity.SubDialogHelper.bindToDataChange(dialog, this, (e, dci) => {
                 this.subDialogDataChange();
             }, true);
 
+            this.transferDialogReadOnly(dialog);
             this.routeDialog(this.getItemType(), dialog);
         }
 
@@ -265,6 +281,7 @@
                 this.subDialogDataChange();
             }, true);
 
+            this.transferDialogReadOnly(dialog);
             this.routeDialog(itemType, dialog);
         }
 
