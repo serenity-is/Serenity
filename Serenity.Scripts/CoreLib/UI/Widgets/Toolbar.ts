@@ -10,6 +10,8 @@
         hotkeyAllowDefault?: boolean;
         hotkeyContext?: any;
         separator?: (false | true | 'left' | 'right' | 'both');
+        visible?: boolean | (() => boolean);
+        disabled?: boolean | (() => boolean);
     }
 
     export interface PopupMenuButtonOptions {
@@ -163,6 +165,22 @@
 				btn.find('span').html(text);
             }
 
+            if (b.visible === false)
+                btn.hide();
+
+            if (b.disabled != null && typeof b.disabled !== "function")
+                btn.toggleClass('disabled', !!b.disabled);
+
+            if (typeof b.visible === "function" || typeof b.disabled == "function") {
+                btn.on('updateInterface', () => {
+                    if (typeof b.visible === "function")
+                        btn.toggle(!!b.visible());
+
+                    if (typeof b.disabled === "function")
+                        btn.toggleClass("disabled", !!b.disabled());
+                });
+            }
+
             if (!!(!Q.isEmptyOrNull(b.hotkey) && window['Mousetrap'] != null)) {
                 this.mouseTrap = this.mouseTrap || window['Mousetrap'](
                     b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
@@ -174,12 +192,19 @@
 					return b.hotkeyAllowDefault;
 				});
 			}
-		}
+        }
+
         findButton(className: string): JQuery {
             if (className != null && Q.startsWith(className, '.')) {
                 className = className.substr(1);
             }
             return $('div.tool-button.' + className, this.element);
+        }
+
+        updateInterface() {
+            this.element.find('.tool-button').each(function (i: number, el: Element) {
+                $(el).triggerHandler('updateInterface')
+            });
         }
     }
 }
