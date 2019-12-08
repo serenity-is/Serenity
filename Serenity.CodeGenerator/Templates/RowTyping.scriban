@@ -9,6 +9,10 @@ namespace {{RootNamespace}}{{DotModule}} {
         export const idProperty = '{{Identity}}';{{end}}{{if NameField}}
         export const nameProperty = '{{NameField}}';{{end}}
         export const localTextPrefix = '{{ModuleDot}}{{ClassName}}';
+        export const deletePermission = '{{Permission}}';
+        export const insertPermission = '{{Permission}}';
+        export const readPermission = '{{Permission}}';
+        export const updatePermission = '{{Permission}}';
 
         export namespace Fields {%{{}%}{{for f in Fields}}
             export declare const {{f.Ident}};{{end}}{{for j in Joins}}{{for k in j.Fields}}

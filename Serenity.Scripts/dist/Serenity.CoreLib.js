@@ -6505,6 +6505,42 @@ var Serenity;
             }
         }
         EditorUtils.setRequired = setRequired;
+        function setContainerReadOnly(container, readOnly) {
+            if (!readOnly) {
+                if (!container.hasClass('readonly-container'))
+                    return;
+                container.removeClass('readonly-container').find(".editor.container-readonly")
+                    .removeClass('container-readonly').each(function (i, e) {
+                    var w = $(e).tryGetWidget(Serenity.Widget);
+                    if (w != null)
+                        Serenity.EditorUtils.setReadOnly(w, false);
+                    else
+                        Serenity.EditorUtils.setReadonly($(e), false);
+                });
+                return;
+            }
+            container.addClass('readonly-container').find(".editor")
+                .not('.container-readonly')
+                .each(function (i, e) {
+                var w = $(e).tryGetWidget(Serenity.Widget);
+                if (w != null) {
+                    if (w['get_readOnly']) {
+                        if (w['get_readOnly']())
+                            return;
+                    }
+                    else if ($(e).is('[readonly]') || $(e).is('[disabled]') || $(e).is('.readonly') || $(e).is('.disabled'))
+                        return;
+                    $(e).addClass('container-readonly');
+                    Serenity.EditorUtils.setReadOnly(w, true);
+                }
+                else {
+                    if ($(e).is('[readonly]') || $(e).is('[disabled]') || $(e).is('.readonly') || $(e).is('.disabled'))
+                        return;
+                    Serenity.EditorUtils.setReadonly($(e).addClass('container-readonly'), true);
+                }
+            });
+        }
+        EditorUtils.setContainerReadOnly = setContainerReadOnly;
     })(EditorUtils = Serenity.EditorUtils || (Serenity.EditorUtils = {}));
     function Editor(name, intf) {
         return Serenity.Decorators.registerEditor('Serenity.' + name + 'Editor', intf);
@@ -10825,6 +10861,18 @@ var Serenity;
             else {
                 btn.find('span').html(text);
             }
+            if (b.visible === false)
+                btn.hide();
+            if (b.disabled != null && typeof b.disabled !== "function")
+                btn.toggleClass('disabled', !!b.disabled);
+            if (typeof b.visible === "function" || typeof b.disabled == "function") {
+                btn.on('updateInterface', function () {
+                    if (typeof b.visible === "function")
+                        btn.toggle(!!b.visible());
+                    if (typeof b.disabled === "function")
+                        btn.toggleClass("disabled", !!b.disabled());
+                });
+            }
             if (!!(!Q.isEmptyOrNull(b.hotkey) && window['Mousetrap'] != null)) {
                 this.mouseTrap = this.mouseTrap || window['Mousetrap'](b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
                 this.mouseTrap.bind(b.hotkey, function (e1, action) {
@@ -10840,6 +10888,11 @@ var Serenity;
                 className = className.substr(1);
             }
             return $('div.tool-button.' + className, this.element);
+        };
+        Toolbar.prototype.updateInterface = function () {
+            this.element.find('.tool-button').each(function (i, el) {
+                $(el).triggerHandler('updateInterface');
+            });
         };
         Toolbar = __decorate([
             Serenity.Decorators.registerClass('Serenity.Toolbar')
@@ -11871,6 +11924,7 @@ var Serenity;
             }
             _this.createQuickFilters();
             _this.updateDisabledState();
+            _this.updateInterface();
             if (!_this.isAsyncWidget()) {
                 _this.initialSettings = _this.getCurrentSettings(null);
                 _this.restoreSettings(null, null);
@@ -12510,6 +12564,28 @@ var Serenity;
                 this.updateDisabledState();
             }
         };
+        Object.defineProperty(DataGrid.prototype, "readOnly", {
+            get: function () {
+                return this.get_readOnly();
+            },
+            set: function (value) {
+                this.set_readOnly(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        DataGrid.prototype.get_readOnly = function () {
+            return !!this._readonly;
+        };
+        DataGrid.prototype.set_readOnly = function (value) {
+            if (!!this._readonly != !!value) {
+                this._readonly = !!value;
+                this.updateInterface();
+            }
+        };
+        DataGrid.prototype.updateInterface = function () {
+            this.toolbar.updateInterface();
+        };
         DataGrid.prototype.getLocalTextDbPrefix = function () {
             if (this.localTextDbPrefix == null) {
                 this.localTextDbPrefix = Q.coalesce(this.getLocalTextPrefix(), '');
@@ -12909,7 +12985,7 @@ var Serenity;
             return (this.filterBar == null) ? null : this.filterBar.get_store();
         };
         DataGrid = __decorate([
-            Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid]),
+            Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid, Serenity.IReadOnly]),
             Serenity.Decorators.element("<div/>")
         ], DataGrid);
         return DataGrid;
@@ -13029,7 +13105,8 @@ var Serenity;
                 hotkey: 'alt+n',
                 onClick: function () {
                     _this.addButtonClick();
-                }
+                },
+                disabled: function () { return !_this.hasInsertPermission() || _this.readOnly; }
             });
             buttons.push(this.newRefreshButton(true));
             buttons.push(Serenity.ColumnPickerDialog.createToolButton(this));
@@ -13110,11 +13187,23 @@ var Serenity;
                 return hash;
             });
         };
+        EntityGrid.prototype.getInsertPermission = function () {
+            return null;
+        };
+        EntityGrid.prototype.hasInsertPermission = function () {
+            var insertPermission = this.getInsertPermission();
+            return insertPermission == null || Q.Authorization.hasPermission(this.getInsertPermission());
+        };
+        EntityGrid.prototype.transferDialogReadOnly = function (dialog) {
+            if (this.readOnly)
+                Serenity.EditorUtils.setReadOnly(dialog, true);
+        };
         EntityGrid.prototype.initDialog = function (dialog) {
             var _this = this;
             Serenity.SubDialogHelper.bindToDataChange(dialog, this, function (e, dci) {
                 _this.subDialogDataChange();
             }, true);
+            this.transferDialogReadOnly(dialog);
             this.routeDialog(this.getItemType(), dialog);
         };
         EntityGrid.prototype.initEntityDialog = function (itemType, dialog) {
@@ -13126,6 +13215,7 @@ var Serenity;
             Serenity.SubDialogHelper.bindToDataChange(dialog, this, function (e, dci) {
                 _this.subDialogDataChange();
             }, true);
+            this.transferDialogReadOnly(dialog);
             this.routeDialog(itemType, dialog);
         };
         EntityGrid.prototype.createEntityDialog = function (itemType, callback) {
@@ -14013,6 +14103,9 @@ var Serenity;
             this.applyChangesButton = null;
             this.deleteButton = null;
             this.saveAndCloseButton = null;
+            this.editButton = null;
+            this.cloneButton = null;
+            this.toolbar = null;
             _super.prototype.destroy.call(this);
         };
         EntityDialog.prototype.get_entity = function () {
@@ -14035,8 +14128,10 @@ var Serenity;
                 return Q.format(Q.text('Controls.EntityDialog.NewRecordTitle'), this.getEntitySingular());
             }
             else {
+                var titleFormat = (this.isViewMode() || this.readOnly || !this.hasSavePermission()) ?
+                    Q.text('Controls.EntityDialog.ViewRecordTitle') : Q.text('Controls.EntityDialog.EditRecordTitle');
                 var title = Q.coalesce(this.getEntityNameFieldValue(), '');
-                return Q.format(Q.text('Controls.EntityDialog.EditRecordTitle'), this.getEntitySingular(), (Q.isEmptyOrNull(title) ? '' : (' (' + title + ')')));
+                return Q.format(titleFormat, this.getEntitySingular(), (Q.isEmptyOrNull(title) ? '' : (' (' + title + ')')));
             }
         };
         EntityDialog.prototype.updateTitle = function () {
@@ -14649,6 +14744,7 @@ var Serenity;
             this.applyChangesButton = this.toolbar.findButton('apply-changes-button');
             this.deleteButton = this.toolbar.findButton('delete-button');
             this.undeleteButton = this.toolbar.findButton('undo-delete-button');
+            this.editButton = this.toolbar.findButton('edit-button');
             this.cloneButton = this.toolbar.findButton('clone-button');
             this.localizationButton = this.toolbar.findButton('localization-button');
         };
@@ -14666,7 +14762,9 @@ var Serenity;
                     _this.save(function (response) {
                         _this.dialogClose();
                     });
-                }
+                },
+                visible: function () { return !_this.isDeleted() && !_this.isViewMode(); },
+                disabled: function () { return !_this.hasSavePermission() || _this.readOnly; }
             });
             list.push({
                 title: '',
@@ -14687,7 +14785,9 @@ var Serenity;
                         }
                         _this.showSaveSuccessMessage(response1);
                     });
-                }
+                },
+                visible: function () { return !_this.isDeleted() && !_this.isViewMode(); },
+                disabled: function () { return !_this.hasSavePermission() || _this.readOnly; }
             });
             list.push({
                 title: Q.text('Controls.EntityDialog.DeleteButton'),
@@ -14697,7 +14797,9 @@ var Serenity;
                     Q.confirm(Q.text('Controls.EntityDialog.DeleteConfirmation'), function () {
                         _this.doDelete(function () { return _this.dialogClose(); });
                     });
-                }
+                },
+                visible: function () { return _this.isEditMode() && !_this.isDeleted() && !_this.isViewMode(); },
+                disabled: function () { return !_this.hasDeletePermission() || _this.readOnly; }
             });
             list.push({
                 title: Q.text('Controls.EntityDialog.UndeleteButton'),
@@ -14708,8 +14810,26 @@ var Serenity;
                             _this.undelete(function () { return _this.loadById(_this.get_entityId()); });
                         });
                     }
-                }
+                },
+                visible: function () { return _this.isEditMode() && _this.isDeleted() && !_this.isViewMode(); },
+                disabled: function () { return !_this.hasDeletePermission() || _this.readOnly; }
             });
+            if (this.useViewMode()) {
+                list.push({
+                    title: Q.text('Controls.EntityDialog.EditButton'),
+                    cssClass: 'edit-button',
+                    icon: 'fa-edit',
+                    onClick: function () {
+                        if (!_this.isEditMode())
+                            return;
+                        _this.editClicked = true;
+                        _this.updateInterface();
+                        _this.updateTitle();
+                    },
+                    visible: function () { return _this.isViewMode(); },
+                    disabled: function () { return !_this.hasSavePermission() || _this.readOnly; }
+                });
+            }
             list.push({
                 title: Q.text('Controls.EntityDialog.LocalizationButton'),
                 cssClass: 'localization-button',
@@ -14728,7 +14848,9 @@ var Serenity;
                         init: function (w) { return Serenity.SubDialogHelper.bubbleDataChange(Serenity.SubDialogHelper.cascade(w, _this.element), _this, true)
                             .loadEntityAndOpenDialog(cloneEntity, null); }
                     });
-                }
+                },
+                visible: function () { return false; },
+                disabled: function () { return !_this.hasInsertPermission() || _this.readOnly; }
             });
             return list;
         };
@@ -14750,8 +14872,14 @@ var Serenity;
             return clone;
         };
         EntityDialog.prototype.updateInterface = function () {
+            Serenity.EditorUtils.setContainerReadOnly(this.byId('Form'), false);
             var isDeleted = this.isDeleted();
             var isLocalizationMode = this.isLocalizationMode();
+            var hasSavePermission = this.hasSavePermission();
+            var viewMode = this.isViewMode();
+            var isDeleted = this.isDeleted();
+            var readOnly = this.readOnly;
+            this.toolbar.updateInterface();
             if (this.tabs != null) {
                 Serenity.TabsExtensions.setDisabled(this.tabs, 'Log', this.isNewOrDeleted());
             }
@@ -14778,16 +14906,11 @@ var Serenity;
             }
             this.toolbar.findButton('localization-hidden')
                 .removeClass('localization-hidden').show();
-            this.deleteButton && this.deleteButton.toggle(this.isEditMode() && !isDeleted);
-            this.undeleteButton && this.undeleteButton.toggle(this.isEditMode() && isDeleted);
-            if (this.saveAndCloseButton) {
-                this.saveAndCloseButton.toggle(!isDeleted);
-                this.saveAndCloseButton.find('.button-inner')
-                    .text(Q.text((this.isNew() ? 'Controls.EntityDialog.SaveButton' :
-                    'Controls.EntityDialog.UpdateButton')));
-            }
-            this.applyChangesButton && this.applyChangesButton.toggle(!isDeleted);
-            this.cloneButton && this.cloneButton.toggle(false);
+            this.saveAndCloseButton && this.saveAndCloseButton
+                .find('.button-inner').text(Q.text((this.isNew() ? 'Controls.EntityDialog.SaveButton' :
+                'Controls.EntityDialog.UpdateButton')));
+            if (!hasSavePermission || viewMode || readOnly)
+                Serenity.EditorUtils.setContainerReadOnly(this.byId("Form"), true);
         };
         EntityDialog.prototype.getUndeleteOptions = function (callback) {
             return {};
@@ -14814,8 +14937,58 @@ var Serenity;
             var finalOptions = $.extend(baseOptions, thisOptions);
             this.undeleteHandler(finalOptions, callback);
         };
+        Object.defineProperty(EntityDialog.prototype, "readOnly", {
+            get: function () {
+                return this.get_readOnly();
+            },
+            set: function (value) {
+                this.set_readOnly(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        EntityDialog.prototype.get_readOnly = function () {
+            return !!this._readonly;
+        };
+        EntityDialog.prototype.set_readOnly = function (value) {
+            if (!!this._readonly != !!value) {
+                this._readonly = !!value;
+                this.updateInterface();
+                this.updateTitle();
+            }
+        };
+        EntityDialog.prototype.getInsertPermission = function () {
+            return null;
+        };
+        EntityDialog.prototype.getUpdatePermission = function () {
+            return null;
+        };
+        EntityDialog.prototype.getDeletePermission = function () {
+            return null;
+        };
+        EntityDialog.prototype.hasDeletePermission = function () {
+            var deletePermission = this.getDeletePermission();
+            return deletePermission == null || Q.Authorization.hasPermission(deletePermission);
+        };
+        EntityDialog.prototype.hasInsertPermission = function () {
+            var insertPermission = this.getInsertPermission();
+            return insertPermission == null || Q.Authorization.hasPermission(insertPermission);
+        };
+        EntityDialog.prototype.hasUpdatePermission = function () {
+            var updatePermission = this.getUpdatePermission();
+            return updatePermission == null || Q.Authorization.hasPermission(updatePermission);
+        };
+        EntityDialog.prototype.hasSavePermission = function () {
+            return this.isNew() ? this.hasInsertPermission() : this.hasUpdatePermission();
+        };
+        EntityDialog.prototype.isViewMode = function () {
+            return this.useViewMode() && this.isEditMode() && !this.editClicked;
+        };
+        EntityDialog.prototype.useViewMode = function () {
+            return false;
+        };
         EntityDialog = __decorate([
-            Serenity.Decorators.registerClass('Serenity.EntityDialog', [Serenity['IEditDialog']])
+            Serenity.Decorators.registerClass('Serenity.EntityDialog', [Serenity['IEditDialog'], Serenity.IReadOnly])
         ], EntityDialog);
         return EntityDialog;
     }(Serenity.TemplatedDialog));

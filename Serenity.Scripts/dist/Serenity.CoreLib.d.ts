@@ -1588,6 +1588,7 @@ declare namespace Serenity {
         function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
         function setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void;
         function setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
+        function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
     }
     class BooleanEditor extends Widget<any> {
         constructor(input: JQuery);
@@ -2369,6 +2370,8 @@ declare namespace Serenity {
         hotkeyAllowDefault?: boolean;
         hotkeyContext?: any;
         separator?: (false | true | 'left' | 'right' | 'both');
+        visible?: boolean | (() => boolean);
+        disabled?: boolean | (() => boolean);
     }
     interface PopupMenuButtonOptions {
         menu?: JQuery;
@@ -2395,6 +2398,7 @@ declare namespace Serenity {
         protected mouseTrap: any;
         protected createButton(container: JQuery, b: ToolButton): void;
         findButton(className: string): JQuery;
+        updateInterface(): void;
     }
 }
 declare namespace Serenity {
@@ -2547,7 +2551,7 @@ declare namespace Serenity {
     }
     class IDataGrid {
     }
-    class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid {
+    class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid, IReadOnly {
         protected titleDiv: JQuery;
         protected toolbar: Toolbar;
         protected filterBar: FilterDisplayBar;
@@ -2650,6 +2654,11 @@ declare namespace Serenity {
         protected refreshIfNeeded(): void;
         protected internalRefresh(): void;
         setIsDisabled(value: boolean): void;
+        private _readonly;
+        readOnly: boolean;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+        protected updateInterface(): void;
         protected getLocalTextDbPrefix(): string;
         protected getLocalTextPrefix(): string;
         protected getIdProperty(): string;
@@ -2707,6 +2716,9 @@ declare namespace Serenity {
         protected getViewOptions(): Slick.RemoteViewOptions;
         protected getItemType(): string;
         protected routeDialog(itemType: string, dialog: Widget<any>): void;
+        protected getInsertPermission(): string;
+        protected hasInsertPermission(): boolean;
+        protected transferDialogReadOnly(dialog: Widget<any>): void;
         protected initDialog(dialog: Widget<any>): void;
         protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
         protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
@@ -2855,7 +2867,7 @@ declare namespace Serenity {
     interface IEditDialog {
         load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
     }
-    class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog {
+    class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
         protected entity: TItem;
         protected entityId: any;
         protected propertyGrid: PropertyGrid;
@@ -2865,6 +2877,7 @@ declare namespace Serenity {
         protected deleteButton: JQuery;
         protected undeleteButton: JQuery;
         protected cloneButton: JQuery;
+        protected editButton: JQuery;
         protected localizationGrid: PropertyGrid;
         protected localizationButton: JQuery;
         protected localizationPendingValue: any;
@@ -2958,6 +2971,20 @@ declare namespace Serenity {
         protected getUndeleteOptions(callback?: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse>;
         protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void;
         protected undelete(callback?: (response: UndeleteResponse) => void): void;
+        private _readonly;
+        readOnly: boolean;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+        protected getInsertPermission(): string;
+        protected getUpdatePermission(): string;
+        protected getDeletePermission(): string;
+        protected hasDeletePermission(): boolean;
+        protected hasInsertPermission(): boolean;
+        protected hasUpdatePermission(): boolean;
+        protected hasSavePermission(): boolean;
+        protected editClicked: boolean;
+        protected isViewMode(): boolean;
+        protected useViewMode(): boolean;
     }
 }
 declare namespace Serenity {
