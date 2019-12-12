@@ -140,8 +140,8 @@
                 name: '<span class="select-all-items check-box no-float "></span>',
                 toolTip: ' ',
                 field: '__select__',
-                width: 26,
-                minWidth: 26,
+                width: 27,
+                minWidth: 27,
                 headerCssClass: 'select-all-header',
                 sortable: false,
                 format: function (ctx) {
@@ -260,8 +260,8 @@
                 name: '',
                 toolTip: ' ',
                 field: '__select__',
-                width: 26,
-                minWidth: 26,
+                width: 27,
+                minWidth: 27,
                 headerCssClass: '',
                 sortable: false,
                 formatter: function (row, cell, value, column, item) {
