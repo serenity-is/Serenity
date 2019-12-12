@@ -157,23 +157,34 @@
         }
     }
 
+    export interface GridRadioSelectionMixinOptions {
+        selectable?: (item: any) => boolean;
+    }
+
     @Serenity.Decorators.registerClass('Serenity.GridRadioSelectionMixin')
     export class GridRadioSelectionMixin {
 
         private idField: string;
         private include: Q.Dictionary<boolean>;
         private grid: Serenity.IDataGrid;
+        private options: GridRadioSelectionMixinOptions;
 
-        constructor(grid: Serenity.IDataGrid) {
+        constructor(grid: Serenity.IDataGrid, options?: GridRadioSelectionMixinOptions) {
 
             this.include = {};
             this.grid = grid;
             this.idField = (grid.getView() as any).idField;
+            this.options = options || {};
 
             grid.getGrid().onClick.subscribe((e, p) => {
                 if ($(e.target).hasClass('rad-select-item')) {
                     e.preventDefault();
                     var item = grid.getView().getItem(p.row);
+
+                    if (!this.isSelectable(item)) {
+                        return;
+                    }
+
                     var id = item[this.idField].toString();
 
                     if (this.include[id] == true) {
@@ -189,6 +200,12 @@
                     }
                 }
             });
+        }
+
+        private isSelectable(item: any) {
+            return item && (
+                this.options.selectable == null ||
+                this.options.selectable(item));
         }
 
         clear(): void {
@@ -249,7 +266,7 @@
                 sortable: false,
                 formatter: function (row, cell, value, column, item) {
                     var mixin = getMixin();
-                    if (!mixin) {
+                    if (!mixin || !mixin.isSelectable(item)) {
                         return '';
                     }
 
