@@ -199,10 +199,7 @@ namespace Serenity.Services
             if (unitOfWork == null)
                 throw new ArgumentNullException("unitOfWork");
 
-            ValidatePermissions();
-
             UnitOfWork = unitOfWork;
-
             Request = request;
             Response = new TDeleteResponse();
 
@@ -214,7 +211,7 @@ namespace Serenity.Services
             var idField = (Field)Row.IdField;
 
             LoadEntity();
-
+            ValidatePermissions();
             ValidateRequest();
 
             var isActiveDeletedRow = Row as IIsActiveDeletedRow;
