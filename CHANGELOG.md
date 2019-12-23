@@ -1,3 +1,12 @@
+## 3.9.14 (2019-12-23)
+
+Features:
+  - Int64Field should serialize big values into strings just like JsonSafeInt64Converter to avoid loss of precision due to javascript JSON deserialization
+  - call ValidatePermissions in DeleteRequestHandler just before ValidateRequest, so that Request can be accessible there, closes #4785
+
+Bugfixes:
+  - latest changes for permissions in Dialog.scriban and Grid.scriban had syntax errors.
+
 ## 3.9.13 (2019-12-10)
 Features:
   - generate TS code for types with NestedPermissionKeys attribute
