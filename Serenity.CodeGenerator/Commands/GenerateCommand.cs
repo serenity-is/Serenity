@@ -174,6 +174,7 @@ namespace Serenity.CodeGenerator
             DbProviderFactories.RegisterFactory("Npgsql", Npgsql.NpgsqlFactory.Instance);
             DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient", FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
             DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
+            DbProviderFactories.RegisterFactory("Oracle.ManagedDataAccess.Client", Oracle.ManagedDataAccess.Client.OracleClientFactory.Instance);
 #endif
 
             if (connectionString.IndexOf("../../..") >= 0)
