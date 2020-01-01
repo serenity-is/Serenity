@@ -38,6 +38,8 @@ namespace Serenity.CodeGenerator
                 { "int4", "Int32" },
                 { "int8", "Int64" },
                 { "integer", "Int32" },
+                //Oracle Interger issue fixed.. as oracle also treats integer data as number
+                { "number", "Int32" },
                 { "money", "Decimal" },
                 { "nchar", "String" },
                 { "ntext", "String" },
