@@ -451,7 +451,8 @@ namespace Serenity.Services
         protected virtual void ValidateAndClearIdField()
         {
             var idField = (Field)(Row.IdField);
-            Row.ValidateRequired(idField);
+            if (Row.IsAssigned(idField))
+                Row.ValidateRequired(idField);
 
             if ((idField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
                 Row.ClearAssignment(idField);
