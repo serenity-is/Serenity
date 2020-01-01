@@ -25,8 +25,8 @@ namespace Serenity.Services
         public static void ValidateRequired(this Row row, Field field)
         {
             var str = field as StringField;
-            if (!ReferenceEquals(null, str) &&
-                str[row].IsTrimmedEmpty())
+            if ((!ReferenceEquals(null, str) && str[row].IsTrimmedEmpty()) ||
+                (ReferenceEquals(null, str) && field.AsObject(row) == null))
             { 
                 throw RequiredError(row, field);
             }
