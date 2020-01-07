@@ -49,7 +49,7 @@
     </dependencies>
 	<frameworkReferences>
       <group targetFramework=".NETCoreApp3.1">
-          <dependency name="Microsoft.AspNetCore.App"/>
+          <frameworkReference name="Microsoft.AspNetCore.App"/>
       </group>
     </frameworkReferences>	
   </metadata>

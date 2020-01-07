@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
     <id>${id}</id>
     <version>${version}</version>
     <authors>${authors}</authors>
@@ -46,6 +46,11 @@
         <dependency id="Serenity.Services" version="${version}" />
       </group>
     </dependencies>
+    <frameworkReferences>
+      <group targetFramework=".NETCoreApp3.1">
+          <frameworkReference name="Microsoft.AspNetCore.App"/>
+      </group>
+    </frameworkReferences>
   </metadata>
   <files>
     <file src="bin\${configuration}\netcoreapp3.1\Serenity.Web.dll" target="lib/netcoreapp3.1" />
