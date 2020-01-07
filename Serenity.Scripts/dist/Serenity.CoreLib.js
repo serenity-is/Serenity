@@ -3423,8 +3423,8 @@ var Serenity;
                 name: '<span class="select-all-items check-box no-float "></span>',
                 toolTip: ' ',
                 field: '__select__',
-                width: 26,
-                minWidth: 26,
+                width: 27,
+                minWidth: 27,
                 headerCssClass: 'select-all-header',
                 sortable: false,
                 format: function (ctx) {
@@ -3445,15 +3445,19 @@ var Serenity;
     }());
     Serenity.GridRowSelectionMixin = GridRowSelectionMixin;
     var GridRadioSelectionMixin = /** @class */ (function () {
-        function GridRadioSelectionMixin(grid) {
+        function GridRadioSelectionMixin(grid, options) {
             var _this = this;
             this.include = {};
             this.grid = grid;
             this.idField = grid.getView().idField;
+            this.options = options || {};
             grid.getGrid().onClick.subscribe(function (e, p) {
                 if ($(e.target).hasClass('rad-select-item')) {
                     e.preventDefault();
                     var item = grid.getView().getItem(p.row);
+                    if (!_this.isSelectable(item)) {
+                        return;
+                    }
                     var id = item[_this.idField].toString();
                     if (_this.include[id] == true) {
                         ss.clearKeys(_this.include);
@@ -3468,6 +3472,10 @@ var Serenity;
                 }
             });
         }
+        GridRadioSelectionMixin.prototype.isSelectable = function (item) {
+            return item && (this.options.selectable == null ||
+                this.options.selectable(item));
+        };
         GridRadioSelectionMixin.prototype.clear = function () {
             ss.clearKeys(this.include);
         };
@@ -3509,13 +3517,13 @@ var Serenity;
                 name: '',
                 toolTip: ' ',
                 field: '__select__',
-                width: 26,
-                minWidth: 26,
+                width: 27,
+                minWidth: 27,
                 headerCssClass: '',
                 sortable: false,
                 formatter: function (row, cell, value, column, item) {
                     var mixin = getMixin();
-                    if (!mixin) {
+                    if (!mixin || !mixin.isSelectable(item)) {
                         return '';
                     }
                     var isChecked = mixin.include[item[mixin.idField]];

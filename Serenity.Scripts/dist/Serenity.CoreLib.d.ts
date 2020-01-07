@@ -1050,11 +1050,16 @@ declare namespace Serenity {
         private isSelectable;
         static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column;
     }
+    interface GridRadioSelectionMixinOptions {
+        selectable?: (item: any) => boolean;
+    }
     class GridRadioSelectionMixin {
         private idField;
         private include;
         private grid;
-        constructor(grid: Serenity.IDataGrid);
+        private options;
+        constructor(grid: Serenity.IDataGrid, options?: GridRadioSelectionMixinOptions);
+        private isSelectable;
         clear(): void;
         resetCheckedAndRefresh(): void;
         getSelectedKey(): string;
@@ -1369,11 +1374,13 @@ declare namespace Serenity {
         private sqlMinMax;
         constructor(input: JQuery);
         get_value(): string;
-        value: string;
+        get value(): string;
         set_value(value: string): void;
+        set value(v: string);
         private get_valueAsDate;
-        valueAsDate: Date;
+        get valueAsDate(): Date;
         private set_valueAsDate;
+        set valueAsDate(v: Date);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         yearRange: string;
@@ -1401,11 +1408,13 @@ declare namespace Serenity {
         private time;
         constructor(input: JQuery, opt?: DateTimeEditorOptions);
         get_value(): string;
-        value: string;
+        get value(): string;
         set_value(value: string): void;
+        set value(v: string);
         private get_valueAsDate;
-        valueAsDate: Date;
+        get valueAsDate(): Date;
         private set_valueAsDate;
+        set valueAsDate(value: Date);
         get_minValue(): string;
         set_minValue(value: string): void;
         get_maxValue(): string;
@@ -1479,36 +1488,44 @@ declare namespace Serenity {
         protected get_items(): Select2Item[];
         protected get_itemByKey(): Q.Dictionary<Select2Item>;
         get_value(): any;
-        value: string;
+        get value(): string;
         set_value(value: string): void;
-        readonly selectedItem: TItem;
+        set value(v: string);
+        get selectedItem(): TItem;
         protected get_values(): string[];
-        values: string[];
+        get values(): string[];
         protected set_values(value: string[]): void;
+        set values(value: string[]);
         protected get_text(): string;
-        readonly text: string;
+        get text(): string;
         get_readOnly(): boolean;
-        readOnly: boolean;
+        get readOnly(): boolean;
         private updateInplaceReadOnly;
         set_readOnly(value: boolean): void;
+        set readOnly(value: boolean);
         protected getCascadeFromValue(parent: Serenity.Widget<any>): any;
         protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
         protected setCascadeFrom(value: string): void;
         protected get_cascadeFrom(): string;
-        cascadeFrom: string;
+        get cascadeFrom(): string;
         protected set_cascadeFrom(value: string): void;
+        set cascadeFrom(value: string);
         protected get_cascadeField(): any;
-        cascadeField: string;
+        get cascadeField(): string;
         protected set_cascadeField(value: string): void;
+        set cascadeField(value: string);
         protected get_cascadeValue(): any;
-        cascadeValue: any;
+        get cascadeValue(): any;
         protected set_cascadeValue(value: any): void;
+        set cascadeValue(value: any);
         protected get_filterField(): string;
-        filterField: string;
+        get filterField(): string;
         protected set_filterField(value: string): void;
+        set filterField(value: string);
         protected get_filterValue(): any;
-        filterValue: any;
+        get filterValue(): any;
         protected set_filterValue(value: any): void;
+        set filterValue(value: any);
         protected cascadeItems(items: TItem[]): TItem[];
         protected filterItems(items: TItem[]): TItem[];
         protected updateItems(): void;
@@ -1592,15 +1609,17 @@ declare namespace Serenity {
     }
     class BooleanEditor extends Widget<any> {
         constructor(input: JQuery);
-        value: boolean;
+        get value(): boolean;
         protected get_value(): boolean;
+        set value(value: boolean);
         protected set_value(value: boolean): void;
     }
     class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
         constructor(input: JQuery, opt?: DecimalEditorOptions);
         get_value(): number;
-        value: number;
+        get value(): number;
         set_value(value: number): void;
+        set value(v: number);
         get_isValid(): boolean;
         static defaultAutoNumericOptions(): any;
     }
@@ -1612,8 +1631,9 @@ declare namespace Serenity {
     class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
         constructor(input: JQuery, opt?: IntegerEditorOptions);
         get_value(): number;
-        value: number;
+        get value(): number;
         set_value(value: number): void;
+        set value(v: number);
         get_isValid(): boolean;
     }
     interface DecimalEditorOptions {
@@ -1631,8 +1651,9 @@ declare namespace Serenity {
         constructor(input: JQuery, opt: EmailEditorOptions);
         static registerValidationMethods(): void;
         get_value(): string;
-        value: string;
+        get value(): string;
         set_value(value: string): void;
+        set value(v: string);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
     }
@@ -1672,8 +1693,9 @@ declare namespace Serenity {
         protected getEditorInstance(): any;
         destroy(): void;
         get_value(): string;
-        value: string;
+        get value(): string;
         set_value(value: string): void;
+        set value(v: string);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         static CKEditorVer: string;
@@ -1709,8 +1731,9 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         get_value(): UploadedFile;
-        value: UploadedFile;
+        get value(): UploadedFile;
         set_value(value: UploadedFile): void;
+        set value(v: UploadedFile);
         getEditValue(property: PropertyItem, target: any): void;
         setEditValue(source: any, property: PropertyItem): void;
         protected entity: UploadedFile;
@@ -1732,16 +1755,18 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         get_value(): UploadedFile[];
-        value: UploadedFile[];
+        get value(): UploadedFile[];
         set_value(value: UploadedFile[]): void;
+        set value(v: UploadedFile[]);
         getEditValue(property: PropertyItem, target: any): void;
         setEditValue(source: any, property: PropertyItem): void;
         jsonEncodeValue: boolean;
     }
     class MaskedEditor extends Widget<MaskedEditorOptions> {
         constructor(input: JQuery, opt?: MaskedEditorOptions);
-        value: string;
+        get value(): string;
         protected get_value(): string;
+        set value(value: string);
         protected set_value(value: string): void;
     }
     interface MaskedEditorOptions {
@@ -1750,8 +1775,9 @@ declare namespace Serenity {
     }
     class StringEditor extends Widget<any> {
         constructor(input: JQuery);
-        value: string;
+        get value(): string;
         protected get_value(): string;
+        set value(value: string);
         protected set_value(value: string): void;
     }
     class EmailAddressEditor extends Serenity.StringEditor {
@@ -1769,8 +1795,9 @@ declare namespace Serenity {
         constructor(input: JQuery, opt: RadioButtonEditorOptions);
         protected addRadio(value: string, text: string): void;
         get_value(): string;
-        value: string;
+        get value(): string;
         set_value(value: string): void;
+        set value(v: string);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
     }
@@ -1789,8 +1816,9 @@ declare namespace Serenity {
     }
     class TextAreaEditor extends Widget<TextAreaEditorOptions> {
         constructor(input: JQuery, opt?: TextAreaEditorOptions);
-        value: string;
+        get value(): string;
         protected get_value(): string;
+        set value(value: string);
         protected set_value(value: string): void;
     }
     interface TimeEditorOptions {
@@ -1802,8 +1830,9 @@ declare namespace Serenity {
     class TimeEditor extends Widget<TimeEditorOptions> {
         private minutes;
         constructor(input: JQuery, opt?: TimeEditorOptions);
-        value: number;
+        get value(): number;
         protected get_value(): number;
+        set value(value: number);
         protected set_value(value: number): void;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
@@ -1828,8 +1857,9 @@ declare namespace Serenity {
         protected inplaceCreateClick(e: any): void;
         protected get_select2Container(): JQuery;
         get_value(): string;
-        value: string;
+        get value(): string;
         set_value(value: string): void;
+        set value(v: string);
     }
 }
 declare namespace Serenity {
@@ -2339,7 +2369,8 @@ declare namespace Serenity {
         private static setMaxLength;
         load(source: any): void;
         save(target?: any): any;
-        value: any;
+        get value(): any;
+        set value(val: any);
         private canModifyItem;
         updateInterface(): void;
         enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
@@ -2442,8 +2473,8 @@ declare namespace Serenity {
         protected toolbar: Serenity.Toolbar;
         protected validator: JQueryValidation.Validator;
         constructor(options?: TOptions);
-        private readonly isMarkedAsPanel;
-        private readonly isResponsive;
+        private get isMarkedAsPanel();
+        private get isResponsive();
         private static getCssSize;
         private static applyCssSizes;
         destroy(): void;
@@ -2464,8 +2495,9 @@ declare namespace Serenity {
         protected getDialogOptions(): JQueryUI.DialogOptions;
         protected getDialogTitle(): string;
         dialogClose(): void;
-        dialogTitle: string;
+        get dialogTitle(): string;
         private setupPanelTitle;
+        set dialogTitle(value: string);
         set_dialogTitle(value: string): void;
         protected initTabs(): void;
         protected handleResponsive(): void;
@@ -2655,7 +2687,8 @@ declare namespace Serenity {
         protected internalRefresh(): void;
         setIsDisabled(value: boolean): void;
         private _readonly;
-        readOnly: boolean;
+        get readOnly(): boolean;
+        set readOnly(value: boolean);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         protected updateInterface(): void;
@@ -2768,8 +2801,9 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         private get_value;
-        value: string[];
+        get value(): string[];
         private set_value;
+        set value(v: string[]);
     }
     interface CheckLookupEditorOptions {
         lookupKey?: string;
@@ -2799,23 +2833,28 @@ declare namespace Serenity {
         protected onViewFilter(item: CheckTreeItem<TItem>): boolean;
         protected moveSelectedUp(): boolean;
         protected get_cascadeFrom(): string;
-        cascadeFrom: string;
+        get cascadeFrom(): string;
         protected getCascadeFromValue(parent: Serenity.Widget<any>): any;
         protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
         protected setCascadeFrom(value: string): void;
         protected set_cascadeFrom(value: string): void;
+        set cascadeFrom(value: string);
         protected get_cascadeField(): any;
-        cascadeField: string;
+        get cascadeField(): string;
         protected set_cascadeField(value: string): void;
+        set cascadeField(value: string);
         protected get_cascadeValue(): any;
-        cascadeValue: any;
+        get cascadeValue(): any;
         protected set_cascadeValue(value: any): void;
+        set cascadeValue(value: any);
         protected get_filterField(): string;
-        filterField: string;
+        get filterField(): string;
         protected set_filterField(value: string): void;
+        set filterField(value: string);
         protected get_filterValue(): any;
-        filterValue: any;
+        get filterValue(): any;
         protected set_filterValue(value: any): void;
+        set filterValue(value: any);
     }
 }
 declare namespace Serenity {
@@ -2972,7 +3011,8 @@ declare namespace Serenity {
         protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void;
         protected undelete(callback?: (response: UndeleteResponse) => void): void;
         private _readonly;
-        readOnly: boolean;
+        get readOnly(): boolean;
+        set readOnly(value: boolean);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         protected getInsertPermission(): string;
