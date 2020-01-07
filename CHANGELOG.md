@@ -1,3 +1,12 @@
+## 3.10.0 (2020-01-08)
+
+Features:
+  - support for .NET Core / ASP.NET Core 3.1 (you'll need Visual Studio 2019 as .NET Core 3 SDK is not supported in VS 2017 or older versions.)
+  - selectable ability like checkbox selection for radio (#4777)
+
+Bugfixes:
+  - make sure required field validation server side also runs for non-string fields
+  - only validate idField if it is actually assigned in saverequesthandler
 ## 3.9.14 (2019-12-23)
 
 Features:

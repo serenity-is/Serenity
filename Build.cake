@@ -10,7 +10,7 @@ if (target == "")
 var configuration = Argument("configuration", "Release");
 var rootPath = System.IO.Path.GetFullPath(".");
 
-var msBuildPath = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\msbuild.exe";
+var msBuildPath = @"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe";
 if (!System.IO.File.Exists(msBuildPath))
 	msBuildPath = null;
 
