@@ -407,7 +407,7 @@
     <Copy SourceFiles="$(ProjectDir)..\Serenity.Scripts\dist\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
   </Target>
   <Target Name="AfterBuild">
-    <Exec Command="&quot;$(ProjectDir)..\tools\TypeScript\tsc.exe&quot; -p ./tsconfig.json" ContinueOnError="true" />
+    <Exec Command="&quot;$(NodePath)\node&quot; &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" />
   </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

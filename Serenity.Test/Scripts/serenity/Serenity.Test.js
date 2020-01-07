@@ -4,7 +4,7 @@
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -147,12 +147,12 @@ var Serenity;
             formatter = new Serenity.UrlFormatter();
             formatter.target = 'my';
             assert.strictEqual("<a href='http://s' target='my'>http://s</a>", formatter.format({
-                value: 'http://s'
+                value: 'http://s',
             }), 'respects target');
             formatter = new Serenity.UrlFormatter();
             formatter.displayFormat = 'http://s/{0}';
             assert.strictEqual("<a href='x'>http://s/x</a>", formatter.format({
-                value: 'x'
+                value: 'x',
             }), 'respects target');
         });
     })(Test = Serenity.Test || (Serenity.Test = {}));
