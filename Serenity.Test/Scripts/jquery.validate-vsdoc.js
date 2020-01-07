@@ -4,7 +4,7 @@
 * intended to be used only for design-time IntelliSense.  Please use the
 * standard jQuery library for all production use.
 *
-* Comment version: 1.17.0
+* Comment version: 1.19.1
 */
 
 /*
@@ -15,7 +15,7 @@
 * for informational purposes only and are not the license terms under
 * which Microsoft distributed this file.
 *
-* jQuery Validation Plugin - v1.17.0 - 12/5/2016
+* jQuery Validation Plugin - v1.19.1 - 12/5/2016
 * https://github.com/jzaefferer/jquery-validation
 * Copyright (c) 2013 Jörn Zaefferer; Licensed MIT
 *
@@ -608,7 +608,7 @@ $.extend($.validator, {
 						return false;
 					}
 				} catch(e) {
-					this.settings.debug && window.console && console.log("exception occurred when checking element " + element.id
+					this.settings.debug && window.console && console.log("exception occured when checking element " + element.id
 						 + ", check the '" + rule.method + "' method", e);
 					throw e;
 				}
