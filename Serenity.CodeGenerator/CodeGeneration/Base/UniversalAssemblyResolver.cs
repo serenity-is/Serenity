@@ -28,29 +28,27 @@ namespace ICSharpCode.Decompiler
     // This inspired by Mono.Cecil's BaseAssemblyResolver/DefaultAssemblyResolver.
     public class UniversalAssemblyResolver : IAssemblyResolver
     {
+        static UniversalAssemblyResolver()
+        {
+            // TODO : test whether this works with Mono on *Windows*, not sure if we'll
+            // ever need this...
+            if (Type.GetType("Mono.Runtime") != null)
+                decompilerRuntime = DecompilerRuntime.Mono;
+            else if (typeof(object).Assembly.GetName().Name == "System.Private.CoreLib")
+                decompilerRuntime = DecompilerRuntime.NETCoreApp;
+            else if (Environment.OSVersion.Platform == PlatformID.Unix)
+                decompilerRuntime = DecompilerRuntime.Mono;
+        }
+
+        static readonly DecompilerRuntime decompilerRuntime;
         DotNetCorePathFinder dotNetCorePathFinder;
         readonly bool throwOnError;
         readonly string mainAssemblyFileName;
         readonly string baseDirectory;
         readonly List<string> directories = new List<string>();
+        HashSet<string> targetFrameworkSearchPaths;
         readonly List<string> gac_paths = GetGacPaths();
         readonly Dictionary<AssemblyNameReference, AssemblyDefinition> cache = new Dictionary<AssemblyNameReference, AssemblyDefinition>();
-        HashSet<string> targetFrameworkSearchPaths;
-
-        /// <summary>
-        /// Detect whether we're in a Mono environment.
-        /// </summary>
-        /// <remarks>This is used whenever we're trying to decompile a plain old .NET framework assembly on Unix.</remarks>
-        static bool DetectMono()
-        {
-            // TODO : test whether this works with Mono on *Windows*, not sure if we'll
-            // ever need this...
-            if (Type.GetType("Mono.Runtime") != null)
-                return true;
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
-                return true;
-            return false;
-        }
 
         public void AddSearchDirectory(string directory)
         {
@@ -67,12 +65,19 @@ namespace ICSharpCode.Decompiler
             return directories.ToArray();
         }
 
-        enum TargetFrameworkIdentifier
+        public enum TargetFrameworkIdentifier
         {
             NETFramework,
             NETCoreApp,
             NETStandard,
             Silverlight
+        }
+
+        enum DecompilerRuntime
+        {
+            NETFramework,
+            NETCoreApp,
+            Mono
         }
 
         string targetFramework;
@@ -91,7 +96,7 @@ namespace ICSharpCode.Decompiler
             AddSearchDirectory(baseDirectory);
         }
 
-        TargetFrameworkIdentifier ParseTargetFramework(string targetFramework, out Version version)
+        public static TargetFrameworkIdentifier ParseTargetFramework(string targetFramework, out Version version)
         {
             string[] tokens = targetFramework.Split(',');
             TargetFrameworkIdentifier identifier;
@@ -124,7 +129,7 @@ namespace ICSharpCode.Decompiler
                 switch (pair[0].Trim().ToUpperInvariant())
                 {
                     case "VERSION":
-                        var versionString = pair[1].TrimStart('v');
+                        var versionString = pair[1].TrimStart('v', ' ', '\t');
                         if (identifier == TargetFrameworkIdentifier.NETCoreApp ||
                             identifier == TargetFrameworkIdentifier.NETStandard)
                         {
@@ -188,7 +193,7 @@ namespace ICSharpCode.Decompiler
                         goto default;
                     if (dotNetCorePathFinder == null)
                     {
-                        dotNetCorePathFinder = new DotNetCorePathFinder(mainAssemblyFileName, targetFramework, targetFrameworkVersion);
+                        dotNetCorePathFinder = new DotNetCorePathFinder(mainAssemblyFileName, targetFramework, targetFrameworkIdentifier, targetFrameworkVersion);
                     }
                     file = dotNetCorePathFinder.TryResolveDotNetCore(name);
                     if (file != null)
@@ -305,7 +310,7 @@ namespace ICSharpCode.Decompiler
                 return assembly;
 
             var framework_dir = Path.GetDirectoryName(typeof(object).Module.FullyQualifiedName);
-            var framework_dirs = DetectMono()
+            var framework_dirs = decompilerRuntime == DecompilerRuntime.Mono
                 ? new[] { framework_dir, Path.Combine(framework_dir, "Facades") }
                 : new[] { framework_dir };
 
@@ -388,17 +393,20 @@ namespace ICSharpCode.Decompiler
             var version = reference.Version;
             var corlib = typeof(object).Assembly.GetName();
 
-            if (corlib.Version == version || IsSpecialVersionOrRetargetable(reference))
-                return typeof(object).Module.FullyQualifiedName;
+            if (decompilerRuntime != DecompilerRuntime.NETCoreApp)
+            {
+                if (corlib.Version == version || IsSpecialVersionOrRetargetable(reference))
+                    return typeof(object).Module.FullyQualifiedName;
+            }
 
             string path;
-            if (DetectMono())
+            if (decompilerRuntime == DecompilerRuntime.Mono)
             {
                 path = GetMonoMscorlibBasePath(version);
             }
             else
             {
-                path = GetMscorlibBasePath(version);
+                path = GetMscorlibBasePath(version, ToHexString(reference.PublicKeyToken, 8));
             }
 
             if (path == null)
@@ -411,21 +419,45 @@ namespace ICSharpCode.Decompiler
             return null;
         }
 
-        string GetMscorlibBasePath(Version version)
+        public static string ToHexString(IEnumerable<byte> bytes, int estimatedLength)
         {
-            string rootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Microsoft.NET");
-            string[] frameworkPaths = new[] {
-                Path.Combine(rootPath, "Framework"),
-                Path.Combine(rootPath, "Framework64")
-            };
+            StringBuilder sb = new StringBuilder(estimatedLength * 2);
+            foreach (var b in bytes)
+                sb.AppendFormat("{0:x2}", b);
+            return sb.ToString();
+        }
 
-            string folder = GetSubFolderForVersion();
-
-            foreach (var path in frameworkPaths)
+        string GetMscorlibBasePath(Version version, string publicKeyToken)
+        {
+            if (publicKeyToken == "969db8053d3322ac")
             {
-                var basePath = Path.Combine(path, folder);
-                if (Directory.Exists(basePath))
-                    return basePath;
+                string programFiles = Environment.Is64BitOperatingSystem ?
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) :
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+                string cfPath = $@"Microsoft.NET\SDK\CompactFramework\v{version.Major}.{version.Minor}\WindowsCE\";
+                string cfBasePath = Path.Combine(programFiles, cfPath);
+                if (Directory.Exists(cfBasePath))
+                    return cfBasePath;
+            }
+            else
+            {
+                string rootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Microsoft.NET");
+                string[] frameworkPaths = new[] {
+                    Path.Combine(rootPath, "Framework"),
+                    Path.Combine(rootPath, "Framework64")
+                };
+
+                string folder = GetSubFolderForVersion();
+
+                if (folder != null)
+                {
+                    foreach (var path in frameworkPaths)
+                    {
+                        var basePath = Path.Combine(path, folder);
+                        if (Directory.Exists(basePath))
+                            return basePath;
+                    }
+                }
             }
 
             if (throwOnError)
@@ -477,7 +509,7 @@ namespace ICSharpCode.Decompiler
 
         static List<string> GetGacPaths()
         {
-            if (DetectMono())
+            if (decompilerRuntime == DecompilerRuntime.Mono)
                 return GetDefaultMonoGacPaths();
 
             var paths = new List<string>(2);
@@ -528,7 +560,7 @@ namespace ICSharpCode.Decompiler
             if (reference.PublicKeyToken == null || reference.PublicKeyToken.Length == 0)
                 return null;
 
-            if (DetectMono())
+            if (decompilerRuntime == DecompilerRuntime.Mono)
                 return GetAssemblyInMonoGac(reference);
 
             return GetAssemblyInNetGac(reference);
