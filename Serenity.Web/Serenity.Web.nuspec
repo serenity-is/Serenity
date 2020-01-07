@@ -26,6 +26,16 @@
         <dependency id="Serenity.Data.Entity" version="${version}" />
         <dependency id="Serenity.Services" version="${version}" />
       </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.AspNetCore.Mvc.Core" version="${netstandard2.0:Microsoft.AspNetCore.Mvc.Core}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Razor" version="${netstandard2.0:Microsoft.AspNetCore.Mvc.Razor}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.ViewFeatures" version="${netstandard2.0:Microsoft.AspNetCore.Mvc.ViewFeatures}" />
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="${netstandard2.0:Microsoft.Extensions.Configuration.Binder}" />
+        <dependency id="Serenity.Core" version="${version}" />
+        <dependency id="Serenity.Data" version="${version}" />
+        <dependency id="Serenity.Data.Entity" version="${version}" />
+        <dependency id="Serenity.Services" version="${version}" />
+      </group>
       <group targetFramework=".NETCoreApp3.1">
         <dependency id="Microsoft.Extensions.Configuration.Binder" version="${netcoreapp3.1:Microsoft.Extensions.Configuration.Binder}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
