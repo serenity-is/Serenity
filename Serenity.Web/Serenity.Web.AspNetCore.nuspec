@@ -20,39 +20,31 @@
         <dependency id="Microsoft.AspNetCore.Mvc.Core" version="${net461:Microsoft.AspNetCore.Mvc.Core}" />
         <dependency id="Microsoft.AspNetCore.Mvc.Razor" version="${net461:Microsoft.AspNetCore.Mvc.Razor}" />
         <dependency id="Microsoft.AspNetCore.Mvc.ViewFeatures" version="${net461:Microsoft.AspNetCore.Mvc.ViewFeatures}" />
-        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard2.0:Microsoft.Extensions.Configuration.Abstractions}" />
-        <dependency id="Microsoft.Extensions.Configuration.Binder" version="${netstandard2.0:Microsoft.Extensions.Configuration.Binder}" />        
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${net461:Microsoft.Extensions.Configuration.Abstractions}" />
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="${net461:Microsoft.Extensions.Configuration.Binder}" />        
         <dependency id="Serenity.Core" version="${version}" />
         <dependency id="Serenity.Data" version="${version}" />
         <dependency id="Serenity.Data.Entity" version="${version}" />
         <dependency id="Serenity.Services" version="${version}" />
       </group>
-      <group targetFramework=".NETStandard2.0">
-        <dependency id="Dapper" version="${netstandard2.0:Dapper}" />
-        <dependency id="Microsoft.AspNetCore.Mvc.Core" version="${netstandard2.0:Microsoft.AspNetCore.Mvc.Core}" />
-        <dependency id="Microsoft.AspNetCore.Mvc.Razor" version="${netstandard2.0:Microsoft.AspNetCore.Mvc.Razor}" />
-        <dependency id="Microsoft.AspNetCore.Mvc.ViewFeatures" version="${netstandard2.0:Microsoft.AspNetCore.Mvc.ViewFeatures}" />
-        <dependency id="Microsoft.Extensions.Caching.Abstractions" version="${netstandard2.0:Microsoft.Extensions.Caching.Abstractions}" />
-        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard2.0:Microsoft.Extensions.Configuration.Abstractions}" />
-        <dependency id="Microsoft.Extensions.Configuration.Binder" version="${netstandard2.0:Microsoft.Extensions.Configuration.Binder}" />
+      <group targetFramework=".NETCoreApp3.1">
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="${netcoreapp3.1:Microsoft.Extensions.Configuration.Binder}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
         <dependency id="NUglify" version="${*:NUglify}" />
         <dependency id="Serenity.Core" version="${version}" />
         <dependency id="Serenity.Data" version="${version}" />
         <dependency id="Serenity.Data.Entity" version="${version}" />
         <dependency id="Serenity.Services" version="${version}" />
-        <dependency id="System.Data.Common" version="${netstandard2.0:System.Data.Common}" />
-        <dependency id="System.Data.SqlClient" version="${netstandard2.0:System.Data.SqlClient}" />
-        <dependency id="System.Diagnostics.Process" version="${netstandard2.0:System.Diagnostics.Process}" />
-        <dependency id="System.IO.FileSystem.Watcher" version="${netstandard2.0:System.IO.FileSystem.Watcher}" />
-        <dependency id="System.Net.Requests" version="${netstandard2.0:System.Net.Requests}" />
-        <dependency id="System.Runtime.Extensions" version="${netstandard2.0:System.Runtime.Extensions}" />
-        <dependency id="System.Threading.Thread" version="${netstandard2.0:System.Threading.Thread}" />
-      </group>      
+      </group>
     </dependencies>
+	<frameworkReferences>
+      <group targetFramework=".NETCoreApp3.1">
+          <dependency name="Microsoft.AspNetCore.App"/>
+      </group>
+    </frameworkReferences>	
   </metadata>
   <files>
-    <file src="bin\${configuration}\netstandard2.0\Serenity.Web.dll" target="lib/netstandard2.0" />
+    <file src="bin\${configuration}\netcoreapp3.1\Serenity.Web.dll" target="lib/netcoreapp3.1" />
     <file src="bin\${configuration}\net461\Serenity.Web.dll" target="lib/net461" />
     <file src="bin\${configuration}\net461\Serenity.Web.pdb" target="lib/net461" />
     <file src="..\Serenity.Scripts\dist\Serenity.CoreLib.js" target="content/Scripts/serenity" />

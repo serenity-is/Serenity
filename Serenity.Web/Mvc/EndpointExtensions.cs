@@ -22,15 +22,19 @@ namespace Serenity.Services
 
 #if ASPNETCORE
             var context = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
+#if ASPNETCORE22
             bool showDetails = context != null && context.RequestServices.GetService<IHostingEnvironment>().IsDevelopment();
+#else
+            bool showDetails = context != null && context.RequestServices
+                .GetService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>().EnvironmentName?.ToLowerInvariant() == "development";
+#endif
 #else
             bool showDetails = HttpContext.Current != null && !HttpContext.Current.IsCustomErrorEnabled;
 #endif
 
             var response = new TResponse();
             var error = new ServiceError();
-            var ve = exception as ValidationError;
-            if (ve != null)
+            if (exception is ValidationError ve)
             {
                 error.Code = ve.ErrorCode;
                 error.Arguments = ve.Arguments;
