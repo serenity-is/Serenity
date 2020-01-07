@@ -73,7 +73,12 @@ namespace Serenity.Web.HttpHandlers
         {
             var request = context.Request;
 
-            var path = request.Url.AbsolutePath;
+            
+            /*WPS change .Url.AbsolutePath from to .Url.LocalPath for Non-Ascii Entity Names
+		        AbsolutePath	"/DynJS.axd/Lookup.ACMS.Vw%E9%83%A8%E9%97%A8%E5%90%8D%E7%A7%B0.js"	string
+		        LocalPath	    "/DynJS.axd/Lookup.ACMS.Vw部门名称.js"	string
+             */
+            var path = request.Url.LocalPath;            
             string dyn = "/DynJS.axd/";
             var pos = path.IndexOf(dyn, StringComparison.InvariantCultureIgnoreCase);
             if (pos >= 0)
