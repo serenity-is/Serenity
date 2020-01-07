@@ -80,9 +80,9 @@ namespace ICSharpCode.Decompiler
             Mono
         }
 
-        string targetFramework;
-        TargetFrameworkIdentifier targetFrameworkIdentifier;
-        Version targetFrameworkVersion;
+        readonly string targetFramework;
+        readonly TargetFrameworkIdentifier targetFrameworkIdentifier;
+        readonly Version targetFrameworkVersion;
 
         public UniversalAssemblyResolver(string mainAssemblyFileName, bool throwOnError, string targetFramework)
         {
@@ -147,8 +147,7 @@ namespace ICSharpCode.Decompiler
 
         public AssemblyDefinition Resolve(AssemblyNameReference name)
         {
-            AssemblyDefinition ad;
-            if (cache.TryGetValue(name, out ad))
+            if (cache.TryGetValue(name, out var ad))
                 return ad;
 
             var result = Resolve(name, new ReaderParameters());
@@ -184,7 +183,7 @@ namespace ICSharpCode.Decompiler
                 return FindWindowsMetadataFile(name);
             }
 
-            string file = null;
+            string file;
             switch (targetFrameworkIdentifier)
             {
                 case TargetFrameworkIdentifier.NETCoreApp:

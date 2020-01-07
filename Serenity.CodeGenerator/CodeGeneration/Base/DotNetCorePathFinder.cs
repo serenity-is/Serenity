@@ -46,7 +46,7 @@ namespace ICSharpCode.Decompiler
         };
 
         readonly Dictionary<string, DotNetCorePackageInfo> packages;
-        ISet<string> packageBasePaths = new HashSet<string>(StringComparer.Ordinal);
+        readonly ISet<string> packageBasePaths = new HashSet<string>(StringComparer.Ordinal);
         readonly string assemblyName;
         readonly string basePath;
         readonly Version version;
@@ -132,8 +132,7 @@ namespace ICSharpCode.Decompiler
 
         internal string GetReferenceAssemblyPath(string targetFramework)
         {
-            Version version;
-            var tfi = UniversalAssemblyResolver.ParseTargetFramework(targetFramework, out version);
+            var tfi = UniversalAssemblyResolver.ParseTargetFramework(targetFramework, out var version);
             string identifier, identifierExt;
             switch (tfi)
             {
@@ -283,20 +282,16 @@ namespace ICSharpCode.Decompiler
         public static string ReadSerString(byte[] buffer, int position)
         {
             if (buffer[position] == 0xff)
-            {
-                position++;
                 return null;
-            }
 
             int length = (int)ReadCompressedUInt32(buffer, ref position);
             if (length == 0)
                 return string.Empty;
 
-            string str = System.Text.Encoding.UTF8.GetString(
+            string str = Encoding.UTF8.GetString(
                 buffer, position,
                 buffer[position + length - 1] == 0 ? length - 1 : length);
 
-            position += length;
             return str;
         }
 
