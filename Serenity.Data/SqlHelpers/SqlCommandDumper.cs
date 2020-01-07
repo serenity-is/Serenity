@@ -21,7 +21,7 @@ namespace Serenity.Data
 
             // params
             for (int i = 0; i < sqc.Parameters.Count; i++)
-                logParameterToSqlBatch(sqc.Parameters[i], sbCommandText);
+                LogParameterToSqlBatch(sqc.Parameters[i], sbCommandText);
             
             sbCommandText.AppendLine("");
 
@@ -104,7 +104,7 @@ namespace Serenity.Data
             return sbCommandText.ToString();
         }
 
-        private static void logParameterToSqlBatch(SqlParameter param, StringBuilder sbCommandText)
+        private static void LogParameterToSqlBatch(SqlParameter param, StringBuilder sbCommandText)
         {
             sbCommandText.Append("DECLARE ");
             if (param.Direction == ParameterDirection.ReturnValue)
@@ -118,46 +118,20 @@ namespace Serenity.Data
                 sbCommandText.Append(' ');
                 if (param.SqlDbType != SqlDbType.Structured)
                 {
-                    logParameterType(param, sbCommandText);
+                    LogParameterType(param, sbCommandText);
                     sbCommandText.Append(" = ");
-                    logQuotedParameterValue(param.Value, sbCommandText);
+                    LogQuotedParameterValue(param.Value, sbCommandText);
 
                     sbCommandText.AppendLine(";");
                 }
                 else
                 {
-                    logStructuredParameter(param, sbCommandText);
+                    throw new NotImplementedException();
                 }
             }
         }
 
-        private static void logStructuredParameter(SqlParameter param, StringBuilder sbCommandText)
-        {
-            throw new NotImplementedException();
-            /*sbCommandText.AppendLine(" {List Type};");
-            var dataTable = (DataTable)param.Value;
-
-            for (int rowNo = 0; rowNo < dataTable.Rows.Count; rowNo++)
-            {
-                sbCommandText.Append("INSERT INTO ");
-                sbCommandText.Append(param.ParameterName);
-                sbCommandText.Append(" VALUES (");
-
-                bool hasPrev = true;
-                for (int colNo = 0; colNo < dataTable.Columns.Count; colNo++)
-                {
-                    if (hasPrev)
-                    {
-                        sbCommandText.Append(", ");
-                    }
-                    logQuotedParameterValue(dataTable.Rows[rowNo].ItemArray[colNo], sbCommandText);
-                    hasPrev = true;
-                }
-                sbCommandText.AppendLine(");");
-            }*/
-        }
-
-        private static void logQuotedParameterValue(object value, StringBuilder sbCommandText)
+        private static void LogQuotedParameterValue(object value, StringBuilder sbCommandText)
         {
             try
             {
@@ -167,7 +141,7 @@ namespace Serenity.Data
                 }
                 else
                 {
-                    value = unboxNullable(value);
+                    value = UnboxNullable(value);
 
                     if (value is string
                         || value is char
@@ -214,9 +188,8 @@ namespace Serenity.Data
                         sbCommandText.Append(((Guid)value).ToString());
                         sbCommandText.Append('\'');
                     }
-                    else if (value is byte[])
+                    else if (value is byte[] data)
                     {
-                        var data = (byte[])value;
                         if (data.Length == 0)
                         {
                             sbCommandText.Append("NULL");
@@ -249,7 +222,7 @@ namespace Serenity.Data
             }
         }
 
-        private static object unboxNullable(object value)
+        private static object UnboxNullable(object value)
         {
             var typeOriginal = value.GetType();
             if (typeOriginal.IsGenericType
@@ -272,7 +245,7 @@ namespace Serenity.Data
             }
         }
 
-        private static void logParameterType(SqlParameter param, StringBuilder sbCommandText)
+        private static void LogParameterType(SqlParameter param, StringBuilder sbCommandText)
         {
             switch (param.SqlDbType)
             {
