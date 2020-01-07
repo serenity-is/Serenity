@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>dotnet-sergen</AssemblyName>
-    <TargetFrameworks>netcoreapp3.1;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.2;netcoreapp3.1;net461</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <PackageId>Serenity.CodeGenerator</PackageId>
     <DefineConstants>$(DefineConstants);ASPNETCORE</DefineConstants>
@@ -25,6 +25,14 @@
     <PackageReference Include="Scriban" Version="2.1.1" />
     <PackageReference Include="Mono.Cecil" Version="0.11.1" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.1.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
+    <PackageReference Include="MySqlConnector" Version="0.61.0" />
+    <PackageReference Include="Npgsql" Version="4.1.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
+  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.1.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.0" />
@@ -36,6 +44,9 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <DefineConstants>$(DefineConstants);COREFX</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
     <DefineConstants>$(DefineConstants);COREFX</DefineConstants>
   </PropertyGroup>
 </Project>

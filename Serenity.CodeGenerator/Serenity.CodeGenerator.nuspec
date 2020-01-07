@@ -16,24 +16,37 @@
     <dependencies>
       <group targetFramework=".NETFramework4.5">
       </group>
-      <group targetFramework=".netcoreapp3.1">
+      <group targetFramework=".NETCoreApp2.2">
+        <dependency id="FirebirdSql.Data.FirebirdClient" version="${netcoreapp2.2:FirebirdSql.Data.FirebirdClient}" />
+        <dependency id="Microsoft.Data.Sqlite" version="${netcoreapp2.2:Microsoft.Data.Sqlite}" />
+        <dependency id="Microsoft.Extensions.DependencyModel" version="${netcoreapp2.2:Microsoft.Extensions.DependencyModel}" />
+        <dependency id="Mono.Cecil" version="${*:Mono.Cecil}" />
+        <dependency id="MySqlConnector" version="${netcoreapp2.2:MySqlConnector}" />
+        <dependency id="Npgsql" version="${netcoreapp2.2:Npgsql}" />
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Scriban" version="${*:Scriban}" />
+        <dependency id="System.Data.SqlClient" version="${netcoreapp2.2:System.Data.SqlClient}" />
+      </group>
+      <group targetFramework=".NETCoreApp3.1">
         <dependency id="FirebirdSql.Data.FirebirdClient" version="${netcoreapp3.1:FirebirdSql.Data.FirebirdClient}" />
         <dependency id="Microsoft.Data.Sqlite" version="${netcoreapp3.1:Microsoft.Data.Sqlite}" />
-        <dependency id="Microsoft.NETCore.App" version="2.2.8" />
+        <dependency id="Microsoft.Extensions.DependencyModel" version="${netcoreapp3.1:Microsoft.Extensions.DependencyModel}" />
+        <dependency id="Mono.Cecil" version="${*:Mono.Cecil}" />
         <dependency id="MySqlConnector" version="${netcoreapp3.1:MySqlConnector}" />
         <dependency id="Npgsql" version="${netcoreapp3.1:Npgsql}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
         <dependency id="Scriban" version="${*:Scriban}" />
         <dependency id="System.Data.SqlClient" version="${netcoreapp3.1:System.Data.SqlClient}" />
-        <dependency id="Serenity.Web" version="${version}" />
       </group>
     </dependencies>
   </metadata>
   <files>
     <file src="bin/${configuration}/netcoreapp3.1/dotnet-sergen.dll" target="lib/netcoreapp3.1/dotnet-sergen.dll" />	
-	<file src="bin/${configuration}/netcoreapp3.1/Mono.Cecil.dll" target="lib/netcoreapp3.1/Mono.Cecil.dll" />
     <file src="bin/${configuration}/netcoreapp3.1/dotnet-sergen.deps.json" target="lib/netcoreapp3.1/dotnet-sergen.deps.json" />	
-    <file src="bin/${configuration}/netcoreapp3.1/dotnet-sergen.runtimeconfig.json" target="lib/netcoreapp3.1/dotnet-sergen.runtimeconfig.json" />	
+    <file src="bin/${configuration}/netcoreapp3.1/dotnet-sergen.runtimeconfig.json" target="lib/netcoreapp3.1/dotnet-sergen.runtimeconfig.json" />
+    <file src="bin/${configuration}/netcoreapp2.2/dotnet-sergen.dll" target="lib/netcoreapp2.2/dotnet-sergen.dll" />
+    <file src="bin/${configuration}/netcoreapp2.2/dotnet-sergen.deps.json" target="lib/netcoreapp2.2/dotnet-sergen.deps.json" />
+    <file src="bin/${configuration}/netcoreapp2.2/dotnet-sergen.runtimeconfig.json" target="lib/netcoreapp2.2/dotnet-sergen.runtimeconfig.json" />
     <file src="../Serenity.CodeGenerator.Net45/Readme.CodeGenerator.txt" target="content/Readme.CodeGenerator.txt" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.CodeGenerator.exe" target="tools/sergen.exe" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Newtonsoft.Json.dll" target="tools" />

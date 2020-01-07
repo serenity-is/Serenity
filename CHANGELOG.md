@@ -1,3 +1,9 @@
+## 3.10.1 (2020-01-08)
+
+Bugfixes:
+  - compatibility issue with dotnet sergen
+
+
 ## 3.10.0 (2020-01-08)
 
 Features:
