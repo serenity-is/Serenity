@@ -103,7 +103,7 @@ namespace Serenity.Data.Schema
                     AND cons.constraint_type = 'P'
                     AND cons.constraint_name = cols.constraint_name
                     AND cons.owner = :sch
-                    ORDER BY cols.position;",
+                    ORDER BY cols.position",
                 new
                 {
                     sch = schema,
