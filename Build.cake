@@ -149,6 +149,7 @@ Action<string, string, string> myPack = (s, id, project) => {
     if (!System.IO.File.Exists(filename) &&
         csproj != null) {
         writeHeader("dotnet pack " + csproj);
+
         var exitCode = StartProcess("dotnet", "pack " + csproj + " -c:" + configuration + " -o:" + rootPath + "/.nupkg/");
         if (exitCode > 0)
             throw new Exception("Error while packing " + csproj);
@@ -328,6 +329,24 @@ Task("Pack")
     .IsDependentOn("PdbPatch")
     .Does(() =>
 {   
+	// https://github.com/NuGet/Home/issues/7001
+	var dateTime = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+	foreach (var fileInfo in new System.IO.DirectoryInfo(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget")).GetFiles("*.*", System.IO.SearchOption.AllDirectories)) {
+		if (fileInfo.Exists && fileInfo.LastWriteTimeUtc < dateTime)
+		{
+			try
+			{
+				fileInfo.LastWriteTimeUtc = dateTime;
+			}
+			catch (Exception)
+			{
+				Console.WriteLine(String.Format("Could not reset {LastWriteTime} {File} in nuspec",
+					nameof(fileInfo.LastWriteTimeUtc),
+					fileInfo.FullName));
+			}
+		}
+	}
+		
     myPack("Serenity.Core", null, null);
     myPack("Serenity.Configuration", null, null);
     myPack("Serenity.Caching.Couchbase", null, null);
@@ -340,6 +359,7 @@ Task("Pack")
     myPack("Serenity.Web", "Serenity.Web.AspNetCore", "Serenity.Web");
     myPack("Serenity.Web", "Serenity.Scripts", null);
     myPack("Serenity.CodeGenerator", null, null);
+	myPack("Serenity.CodeGenerator", "sergen", "Serenity.CodeGenerator.Tool");
     
     fixNugetCache();
 });

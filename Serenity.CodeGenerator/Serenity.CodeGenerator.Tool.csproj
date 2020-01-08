@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\SharedProperties.xml" />
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>sergen</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PackAsTool>true</PackAsTool>
+    <PackageId>sergen</PackageId>
+    <DefineConstants>$(DefineConstants);ASPNETCORE;COREFX</DefineConstants>
+    <Deterministic>false</Deterministic>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Serenity.Scripts\dist\Serenity.CodeGeneration.js">
+      <Link>Serenity.CodeGeneration.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
+      <Link>typeScriptServices.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\*.scriban" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Scriban" Version="2.1.1" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.1" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.1.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.1.0" />
+    <PackageReference Include="MySqlConnector" Version="0.61.0" />
+    <PackageReference Include="Npgsql" Version="4.1.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
+  </ItemGroup>
+</Project>
