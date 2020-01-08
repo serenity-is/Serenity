@@ -1,3 +1,4 @@
 @echo off
-.\Tools\Cake\Cake.exe .\Build.cake -target=%1 %2 %3 %4 %5
+dotnet tool restore --verbosity quiet
+dotnet dotnet-cake .\Build.cake -target=%1 %2 %3 %4 %5
 pause
