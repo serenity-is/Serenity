@@ -4,6 +4,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AssemblyName>sergen</AssemblyName>
     <OutputType>Exe</OutputType>
+    <RootNamespace>Serenity.CodeGenerator</RootNamespace>
     <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackAsTool>true</PackAsTool>

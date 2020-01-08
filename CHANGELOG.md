@@ -1,7 +1,12 @@
 ## 3.11.0 (2020-01-08)
 
+Bugfixes:
+  - fix embedded resource issue with new sergen tool
+
+## 3.11.0 (2020-01-08)
+
 Features:
-  - introduce sergen as a global/local dotnet tool as DotNetCliToolReference can't be used with .NET Core 3+
+  - introduce sergen as a global/local dotnet tool as DotNetCliToolReference can't be used with .NET Core 3+ (remove DotNetCliToolReference from CSPROJ, run "dotnet new tool-manifest" in CSPROJ dir, followed by "dotnet tool install sergen", then "dotnet tool restore" and use "dotnet sergen" as before)
 
 
 ## 3.10.1 (2020-01-08)
