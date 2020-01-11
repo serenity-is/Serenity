@@ -1,4 +1,9 @@
-## 3.11.0 (2020-01-08)
+## 3.12.1 (2020-01-11)
+
+Bugfixes:
+  - revert updates to System.Threading.Tasks.Extensions and System.Runtime.CompilerServices.Unsafe in Sergen (NET45)
+
+## 3.12.0 (2020-01-08)
 
 Bugfixes:
   - fix embedded resource issue with new sergen tool
