@@ -12592,7 +12592,7 @@ var Serenity;
             }
         };
         DataGrid.prototype.updateInterface = function () {
-            this.toolbar.updateInterface();
+            this.toolbar && this.toolbar.updateInterface();
         };
         DataGrid.prototype.getLocalTextDbPrefix = function () {
             if (this.localTextDbPrefix == null) {

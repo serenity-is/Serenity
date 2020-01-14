@@ -873,7 +873,7 @@
         }
 
         protected updateInterface() {
-            this.toolbar.updateInterface();
+            this.toolbar && this.toolbar.updateInterface();
         }
 
         protected getLocalTextDbPrefix(): string {
