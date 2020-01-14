@@ -1,3 +1,9 @@
+## 3.12.2 (2020-01-11)
+
+Bugfixes:
+  - DataGrid.updateInterface might fail if grid has no toolbar
+  - make sure quick filters bar can still be created within a fake toolbar div, even when grid has no toolbar
+
 ## 3.12.1 (2020-01-11)
 
 Bugfixes:
