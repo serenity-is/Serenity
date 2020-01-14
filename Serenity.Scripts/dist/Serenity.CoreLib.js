@@ -11984,8 +11984,14 @@ var Serenity;
             var _this = this;
             if (this.quickFiltersDiv == null && (filters != null ||
                 ((filters = this.getQuickFilters()) && filters != null && filters.length))) {
-                $('<div/>').addClass('clear').appendTo(this.toolbar.element);
-                this.quickFiltersDiv = $('<div/>').addClass('quick-filters-bar').appendTo(this.toolbar.element);
+                this.quickFiltersDiv = $('<div/>').addClass('quick-filters-bar');
+                if (this.toolbar) {
+                    $('<div/>').addClass('clear').appendTo(this.toolbar.element);
+                    this.quickFiltersDiv.appendTo(this.toolbar.element);
+                }
+                else {
+                    this.quickFiltersDiv.appendTo($('<div/>').addClass('s-Toolbar').insertBefore(this.slickContainer));
+                }
                 this.quickFiltersBar = new Serenity.QuickFilterBar(this.quickFiltersDiv, {
                     filters: filters,
                     getTitle: function (filter) { return _this.determineText(function (pre) { return pre + filter.field; }); },
