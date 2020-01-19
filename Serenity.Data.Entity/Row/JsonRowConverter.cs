@@ -37,7 +37,7 @@ namespace Serenity.Data
                         if (modified[i])
                         {
                             var f = fields[i];
-                            if (!f.IsNull(row))
+                            if (!f.IsNull(row) || serializer.NullValueHandling == NullValueHandling.Include)
                             {
                                 writer.WritePropertyName(f.PropertyName ?? f.Name);
                                 f.ValueToJson(writer, row, serializer);
@@ -49,7 +49,7 @@ namespace Serenity.Data
             {
                 var fields = row.fields;
                 foreach (var f in fields)  
-                    if (!f.IsNull(row))
+                    if (!f.IsNull(row) || serializer.NullValueHandling == NullValueHandling.Include)
                     {
                         writer.WritePropertyName(f.PropertyName ?? f.Name);
                         f.ValueToJson(writer, row, serializer);
