@@ -15,10 +15,11 @@ namespace Serenity
         /// </summary>
         /// <typeparam name="T">Type to deserialize</typeparam>
         /// <param name="input">JSON string</param>
+        /// <param name="includeNulls">If true, if a value is null and target property is not nullable, raises error.</param>
         /// <returns>Deserialized object</returns>
-        public static T Parse<T>(string input)
+        public static T Parse<T>(string input, bool includeNulls = false)
         {
-            return JsonConvert.DeserializeObject<T>(input, JsonSettings.Strict);
+            return JsonConvert.DeserializeObject<T>(input, includeNulls ? JsonSettings.StrictIncludeNulls : JsonSettings.Strict);
         }
 
         /// <summary>
@@ -26,10 +27,11 @@ namespace Serenity
         /// </summary>
         /// <param name="targetType">Type to deserialize</param>
         /// <param name="input">JSON string</param>
+        /// <param name="includeNulls">If true, if a value is null and target property is not nullable, raises error.</param>
         /// <returns>Deserialized object</returns>
-        public static object Parse(string input, Type targetType)
+        public static object Parse(string input, Type targetType, bool includeNulls = false)
         {
-            return JsonConvert.DeserializeObject(input, targetType, JsonSettings.Strict);
+            return JsonConvert.DeserializeObject(input, targetType, includeNulls ? JsonSettings.StrictIncludeNulls : JsonSettings.Strict);
         }
 
         /// <summary>
@@ -37,10 +39,11 @@ namespace Serenity
         /// </summary>
         /// <typeparam name="T">Type to deserialize</typeparam>
         /// <param name="input">JSON strng</param>
+        /// <param name="includeNulls">If true, if a value is null and target property is not nullable, raises error.</param>
         /// <returns>Deserialized object</returns>
-        public static T ParseTolerant<T>(string input)
+        public static T ParseTolerant<T>(string input, bool includeNulls = false)
         {
-            return JsonConvert.DeserializeObject<T>(input, JsonSettings.Tolerant);
+            return JsonConvert.DeserializeObject<T>(input, includeNulls ? JsonSettings.TolerantIncludeNulls : JsonSettings.Tolerant);
         }
 
         /// <summary>
@@ -48,20 +51,22 @@ namespace Serenity
         /// </summary>
         /// <param name="targetType">Type to deserialize</param>
         /// <param name="input">JSON string</param>
+        /// <param name="includeNulls">If true, if a value is null and target property is not nullable, raises error.</param>
         /// <returns>Deserialized object</returns>
-        public static object ParseTolerant(string input, Type targetType)
+        public static object ParseTolerant(string input, Type targetType, bool includeNulls = false)
         {
-            return JsonConvert.DeserializeObject(input, targetType, JsonSettings.Tolerant);
+            return JsonConvert.DeserializeObject(input, targetType, includeNulls ? JsonSettings.TolerantIncludeNulls : JsonSettings.Tolerant);
         }
 
         /// <summary>
         /// Converts object to its JSON representation
         /// </summary>
         /// <param name="value">Value to convert to JSON</param>
+        /// <param name="includeNulls">If true, serializes null values.</param>
         /// <returns>Serialized JSON string</returns>
-        public static string Stringify(object value)
+        public static string Stringify(object value, bool includeNulls = false)
         {
-            return JsonConvert.SerializeObject(value, JsonSettings.Strict);
+            return JsonConvert.SerializeObject(value, includeNulls ? JsonSettings.StrictIncludeNulls : JsonSettings.Strict);
         }
 
         /// <summary>
@@ -69,8 +74,9 @@ namespace Serenity
         /// </summary>
         /// <param name="value">Value to convert to JSON</param>
         /// <param name="indentation">Indentation (default 4)</param>
+        /// <param name="includeNulls">If true, serializes null values.</param>
         /// <returns>Serialized JSON string</returns>
-        public static string StringifyIndented(object value, int indentation = 4)
+        public static string StringifyIndented(object value, int indentation = 4, bool includeNulls = false)
         {
             using (var sw = new StringWriter())
             using (var jw = new JsonTextWriter(sw))
@@ -79,7 +85,7 @@ namespace Serenity
                 jw.IndentChar = ' ';
                 jw.Indentation = indentation;
 
-                var serializer = JsonSerializer.Create(JsonSettings.Strict);
+                var serializer = JsonSerializer.Create(includeNulls ? JsonSettings.StrictIncludeNulls : JsonSettings.Strict);
                 serializer.Serialize(jw, value);
                 return sw.ToString();
             }
@@ -89,14 +95,15 @@ namespace Serenity
         ///   Converts an object to its JSON representation (extension method for Stringify)</summary>
         /// <param name="value">
         ///   Object</param>
+        /// <param name="includeNulls">If true, serializes null values.</param>
         /// <returns>
         ///   JSON representation string.</returns>
         /// <remarks>
         ///   null, Int32, Boolean, DateTime, Decimal, Double, Guid types handled automatically.
         ///   If object has a ToJson method it is used, otherwise value.ToString() is used as last fallback.</remarks>
-        public static string ToJson(this object value)
+        public static string ToJson(this object value, bool includeNulls = false)
         {
-            return Stringify(value);
+            return Stringify(value, includeNulls);
         }
     }
 }

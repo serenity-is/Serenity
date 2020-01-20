@@ -123,6 +123,7 @@
     <Compile Include="Core\Authorization\PermissionExpressionParserTests.cs" />
     <Compile Include="Core\ComponentModel\PropertyGrid\FormWidthAttributeTests.cs" />
     <Compile Include="Core\IO\GlobFilterTests.cs" />
+    <Compile Include="Core\Json\JsonSettingsTests.cs" />
     <Compile Include="Core\Logging\FileLoggerTests.cs" />
     <Compile Include="Core\Authorization\LogicOperatorPermissionServiceTests.cs" />
     <Compile Include="Data\DateTimeFieldKindTests.cs" />
