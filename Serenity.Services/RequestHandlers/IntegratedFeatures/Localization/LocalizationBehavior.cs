@@ -308,7 +308,7 @@ namespace Serenity.Services
                     .From(localRow)
                     .Select(localRowIdField)
                     .Where(
-                        foreignKeyField == new ValueCriteria(idField.AsObject(handler.Row)))
+                        foreignKeyField == new ValueCriteria(idField.AsSqlValue(handler.Row)))
                     .ForEach(handler.Connection, () =>
                     {
                         deleteList.Add(localRowIdField.AsObject(localRow));

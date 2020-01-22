@@ -117,7 +117,7 @@ namespace Serenity.Services
                 .Dialect(connection.GetDialect())
                 .From(row).Select(idField);
             foreach (var field in indexFields)
-                query.WhereEqual(field, field.AsObject(newRow));
+                query.WhereEqual(field, field.AsSqlValue(newRow));
 
             if (!query.GetFirst(connection))
                 return false;
