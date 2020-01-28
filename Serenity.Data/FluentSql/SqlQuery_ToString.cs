@@ -184,8 +184,9 @@ namespace Serenity.Data
                 sb.Append(SqlKeywords.Distinct);
             }
 
+            bool useTop = (take != 0 && (!useOffset) && (!useRowNum) && (useRowNumber || !dialect.UseTakeAtEnd));
             // add TOP N if number of records to fetch is limited
-            if (take != 0 && (!useOffset) && (!useRowNum) && (useRowNumber || !dialect.UseTakeAtEnd))
+            if (useTop)
             {
                 sb.Append(dialect.TakeKeyword);
                 sb.Append(' ');
@@ -281,7 +282,7 @@ namespace Serenity.Data
             }
 
             // write remaining parts of the select query
-            AppendFromWhereOrderByGroupByHaving(sb, extraWhere, !useRowNumber);
+            AppendFromWhereOrderByGroupByHaving(sb, extraWhere, useTop); // instead of (!useRowNumber)
 
             if (useRowNumber)
             {
