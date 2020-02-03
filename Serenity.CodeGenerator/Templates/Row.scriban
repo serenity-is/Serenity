@@ -15,7 +15,6 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
     [InsertPermission(PermissionKeys.{{ClassName}}Insert)]
     [UpdatePermission(PermissionKeys.{{ClassName}}Update)]
     [DeletePermission(PermissionKeys.{{ClassName}}Delete)]
-    [ModifyPermission("{{Permission}}")]
 	[LookupScript(nameof({{RowClassName}}))]
     public sealed class {{RowClassName}} : {{RowBaseClassAndInterfaces}}
     {
