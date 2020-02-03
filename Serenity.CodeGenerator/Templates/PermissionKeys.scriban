@@ -1,0 +1,17 @@
+﻿using Serenity.Extensibility;
+using System.ComponentModel;
+
+namespace {{RootNamespace}}.Administration
+{
+    public partial class PermissionKeys
+    {
+            [Description("Read")]
+            public const string {{ClassName}}Read = "{{Module}}:{{ClassName}}:{{ClassName}}Read";
+            [Description("Insert")]
+            public const string {{ClassName}}Insert = "{{Module}}:{{ClassName}}:{{ClassName}}Insert";
+            [Description("Update")]
+            public const string {{ClassName}}Update = "{{Module}}:{{ClassName}}:{{ClassName}}Update";
+            [Description("Delete")]
+            public const string {{ClassName}}Delete = "{{Module}}:{{ClassName}}:{{ClassName}}Delete";
+    }
+}

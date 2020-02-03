@@ -18,6 +18,9 @@
     <EmbeddedResource Include="Templates\*.scriban" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Templates\PermissionKeys.scriban" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj" />
   </ItemGroup>
   <ItemGroup>

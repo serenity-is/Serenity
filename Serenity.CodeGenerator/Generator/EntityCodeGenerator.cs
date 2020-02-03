@@ -34,7 +34,7 @@ namespace Serenity.CodeGenerator
 
             typingClass = Path.Combine(serverTypings, model.ModuleDot + model.ClassName);
 
-            var modulePath = Path.Combine(rootDir, "Modules"); 
+            var modulePath = Path.Combine(rootDir, "Modules");
             if (!string.IsNullOrEmpty(model.Module))
                 modulePath = Path.Combine(modulePath, model.Module);
 
@@ -68,6 +68,7 @@ namespace Serenity.CodeGenerator
                 CreateFile(Templates.Render("Grid", model), moduleClass + "Grid.ts");
                 CreateFile(Templates.Render("FormTyping", model), typingClass + "Form.ts", serverTypingsTT);
                 GenerateNavigationLink();
+                GeneratePermissionKeys();
                 GenerateStyle();
             }
 
@@ -86,12 +87,12 @@ namespace Serenity.CodeGenerator
                         throw new ArgumentOutOfRangeException("templateFile");
 
                     var outputFile = pair.Value;
-                    if (outputFile.IndexOf("..") >= 0 || 
+                    if (outputFile.IndexOf("..") >= 0 ||
                         outputFile.StartsWith("\\") ||
                         outputFile.StartsWith("//"))
                         throw new ArgumentOutOfRangeException("outputFile");
 
-                    outputFile = String.Format(outputFile, model.ClassName, model.Module, 
+                    outputFile = String.Format(outputFile, model.ClassName, model.Module,
                         Path.GetDirectoryName(moduleClass), Path.GetDirectoryName(typingClass), rootDir);
 
                     var content = Templates.Render(templateKey, model);
@@ -122,7 +123,7 @@ namespace Serenity.CodeGenerator
             CodeFileHelper.CheckoutAndWrite(file, code, true);
             CodeFileHelper.MergeChanges(backup, file);
 #if !ASPNETCORE
-            ProjectFileHelper.AddFileToProject(this.csproj, 
+            ProjectFileHelper.AddFileToProject(this.csproj,
                 file.Substring(Path.GetDirectoryName(csproj).Length + 1).Replace('/', '\\'), dependentUpon);
 #endif
         }
@@ -219,8 +220,7 @@ namespace Serenity.CodeGenerator
 
                 foreach (var usng in toInsert.Where(x => x.TrimToEmpty().StartsWith("using ")))
                 {
-                    if (lines.Find(x => x.TrimToEmpty().Replace(" ", "")
-                        .IsTrimmedSame(usng.TrimToEmpty().Replace(" ", ""))) == null)
+                    if (lines.Find(x => x.TrimToEmpty().Replace(" ", "").IsTrimmedSame(usng.TrimToEmpty().Replace(" ", ""))) == null)
                     {
                         lines.Insert(usingIndex, usng);
                         usingIndex++;
@@ -230,9 +230,60 @@ namespace Serenity.CodeGenerator
                 if (!lines.Any(x => x.Contains("MyPages." + model.ClassName + "Controller")))
                 {
                     var insertIndex = lines.FindLastIndex(x => !string.IsNullOrWhiteSpace(x)) + 1;
-                    foreach (var z in toInsert.Where(x => !string.IsNullOrWhiteSpace(x) &&
-                        !x.TrimToEmpty().StartsWith("using ")))
+                    foreach (var z in toInsert.Where(x => !string.IsNullOrWhiteSpace(x) && !x.TrimToEmpty().StartsWith("using ")))
                         lines.Insert(insertIndex, z);
+                }
+
+                CodeFileHelper.CheckoutAndWrite(file, string.Join(Environment.NewLine, lines), false);
+            }
+        }
+
+        private void GeneratePermissionKeys()
+        {
+            string file = Path.Combine(rootDir, string.IsNullOrEmpty(model.Module) ?
+                "Modules/Common/PermissionKeys/PermissionKeys.cs" :
+                "Modules/" + model.ModuleSlash + model.Module + "PermissionKeys.cs");
+            file = file.Replace('/', Path.DirectorySeparatorChar);
+
+            string code = Templates.Render("PermissionKeys", model);
+
+            if (!File.Exists(file))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                CreateFile(code, file);
+            }
+            else
+            {
+                var lines = File.ReadAllLines(file).ToList();
+                var toInsert = code.Replace("\r", "").Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var usingIndex = lines.FindLastIndex(x => x.TrimToEmpty().StartsWith("using "));
+                if (usingIndex < 0)
+                    usingIndex = 0;
+
+                foreach (var usng in toInsert.Where(x => x.TrimToEmpty().StartsWith("using ")))
+                {
+                    if (lines.Find(x => x.TrimToEmpty().Replace(" ", "").IsTrimmedSame(usng.TrimToEmpty().Replace(" ", ""))) == null)
+                    {
+                        lines.Insert(usingIndex, usng);
+                        usingIndex++;
+                    }
+                }
+
+                if (!lines.Any(x => x.Contains(model.ClassName + "Read")))
+                {
+                    var insertIndex = lines.FindLastIndex(x => x.TrimToEmpty().StartsWith("{")) + 1;
+                    foreach (var z in toInsert.Where(x => !string.IsNullOrWhiteSpace(x)
+                                                && !x.TrimToEmpty().StartsWith("{")
+                                                && !x.TrimToEmpty().StartsWith("}")
+                                                && !x.TrimToEmpty().Contains("using ")
+                                                && !x.TrimToEmpty().Contains("partial class ")
+                                                && !x.TrimToEmpty().Contains("namespace ")
+
+                                                ))
+                    {
+                        lines.Insert(insertIndex, z);
+                        insertIndex++;
+                    }
                 }
 
                 CodeFileHelper.CheckoutAndWrite(file, string.Join(Environment.NewLine, lines), false);
