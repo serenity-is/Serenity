@@ -1460,18 +1460,47 @@ declare namespace Serenity {
     }
     interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
     }
+    interface Select2SearchPromise {
+        abort?(): void;
+        catch?(callback: () => void): void;
+        fail?(callback: () => void): void;
+    }
+    interface Select2SearchQuery {
+        searchTerm?: string;
+        idList?: string[];
+        skip?: number;
+        take?: number;
+        checkMore?: boolean;
+    }
+    interface Select2SearchResult<TItem> {
+        items: TItem[];
+        more: boolean;
+    }
     class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly {
-        items: Select2Item[];
-        protected itemById: Q.Dictionary<Select2Item>;
-        protected pageSize: number;
+        private _items;
+        private _itemById;
         protected lastCreateTerm: string;
         constructor(hidden: JQuery, opt?: any);
         destroy(): void;
+        protected hasAsyncSource(): boolean;
+        protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
+        protected getTypeDelay(): any;
         protected emptyItemText(): any;
+        protected getPageSize(): number;
+        protected getIdField(): any;
+        protected itemId(item: TItem): string;
+        protected getTextField(): any;
+        protected itemText(item: TItem): string;
+        protected itemDisabled(item: TItem): boolean;
+        protected mapItem(item: TItem): Select2Item;
         protected allowClear(): boolean;
         protected isMultiple(): boolean;
         protected getSelect2Options(): Select2Options;
         get_delimited(): boolean;
+        get items(): Select2Item[];
+        set items(value: Select2Item[]);
+        protected get itemById(): Q.Dictionary<Select2Item>;
+        protected set itemById(value: Q.Dictionary<Select2Item>);
         clearItems(): void;
         addItem(item: Select2Item): void;
         addOption(key: string, text: string, source?: any, disabled?: boolean): void;
@@ -1492,6 +1521,7 @@ declare namespace Serenity {
         set_value(value: string): void;
         set value(v: string);
         get selectedItem(): TItem;
+        get selectedItems(): TItem[];
         protected get_values(): string[];
         get values(): string[];
         protected set_values(value: string[]): void;
@@ -1570,25 +1600,60 @@ declare namespace Serenity {
 declare namespace Serenity {
     interface LookupEditorOptions extends Select2EditorOptions {
         lookupKey?: string;
+        async?: boolean;
     }
     class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
         constructor(input: JQuery, opt?: TOptions);
-        protected initializeAsync(): PromiseLike<void>;
         destroy(): void;
         protected getLookupKey(): string;
-        protected getLookup(): Q.Lookup<TItem>;
         protected getLookupAsync(): PromiseLike<Q.Lookup<TItem>>;
+        protected getLookup(): Q.Lookup<TItem>;
         protected getItems(lookup: Q.Lookup<TItem>): TItem[];
         protected getItemText(item: TItem, lookup: Q.Lookup<TItem>): any;
         protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>): boolean;
         updateItems(): void;
-        updateItemsAsync(): PromiseLike<void>;
         protected getDialogTypeKey(): string;
         protected setCreateTermOnNewEntity(entity: TItem, term: string): void;
         protected editDialogDataChange(): void;
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(hidden: JQuery, opt?: LookupEditorOptions);
+    }
+}
+declare namespace Serenity {
+    interface ServiceLookupEditorOptions extends Select2EditorOptions {
+        service?: string;
+        idField: string;
+        textField: string;
+        pageSize?: number;
+        minimumResultsForSearch?: any;
+        sort: string[];
+        columnSelection?: Serenity.ColumnSelection;
+        includeColumns?: string[];
+        excludeColumns?: string[];
+        includeDeleted?: boolean;
+        containsField?: string;
+        equalityFilter?: any;
+        criteria?: any[];
+    }
+    class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+        constructor(input: JQuery, opt?: TOptions);
+        protected getDialogTypeKey(): string;
+        protected getService(): string;
+        protected getServiceUrl(): string;
+        protected getIncludeColumns(): string[];
+        protected getSort(): any[];
+        protected getCascadeCriteria(): any[];
+        protected getFilterCriteria(): any[];
+        protected getIdListCriteria(idList: any[]): any[];
+        protected getCriteria(query: Select2SearchQuery): any[];
+        protected getListRequest(query: Select2SearchQuery): ListRequest;
+        protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): ServiceOptions<ListResponse<TItem>>;
+        protected hasAsyncSource(): boolean;
+        protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
+    }
+    class ServiceLookupEditor extends ServiceLookupEditorBase<ServiceLookupEditorOptions, any> {
+        constructor(hidden: JQuery, opt?: ServiceLookupEditorOptions);
     }
 }
 declare namespace Serenity {

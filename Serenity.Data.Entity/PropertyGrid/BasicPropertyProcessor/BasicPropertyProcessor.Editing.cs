@@ -1,7 +1,9 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data;
+using Serenity.Data.Mapping;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Serenity.PropertyGrid
 {
@@ -65,6 +67,7 @@ namespace Serenity.PropertyGrid
                         }
                     }
                 }
+
             }
 
             if (source.EnumType != null)
@@ -144,6 +147,53 @@ namespace Serenity.PropertyGrid
                     key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
 
                 item.EditorParams[key] = param.Value;
+            }
+
+
+            if (editorTypeAttr is ServiceLookupEditorAttribute sle &&
+                sle.ItemType != null)
+            {
+                if (!item.EditorParams.ContainsKey("service"))
+                    item.EditorParams["service"] = ServiceLookupEditorAttribute.AutoServiceFor(sle.ItemType);
+
+                if (sle.ItemType.IsSubclassOf(typeof(Row)) &&
+                    !sle.ItemType.IsAbstract &&
+                    (!item.EditorParams.ContainsKey("idField") ||
+                     !item.EditorParams.ContainsKey("textField") ||
+                     (!item.EditorParams.ContainsKey("includeColumns") &&
+                      !item.EditorParams.ContainsKey("columnSelection"))))
+                {
+                    try
+                    {
+                        var rowInstance = Activator.CreateInstance(sle.ItemType) as Row;
+                        if (rowInstance is IIdRow idRow &&
+                            !item.EditorParams.ContainsKey("idField"))
+                        {
+                            var idField = ((Field)idRow.IdField);
+                            item.EditorParams["idField"] = idField.PropertyName ?? idField.Name;
+                        }
+
+                        if (!item.EditorParams.ContainsKey("textField"))
+                        {
+                            var nameField = RowExtensions.GetNameField(rowInstance, false);
+                            if (!ReferenceEquals(nameField, null))
+                                item.EditorParams["textField"] = nameField.PropertyName ??
+                                    nameField.Name;
+                        }
+
+                        if (!item.EditorParams.ContainsKey("includeColumns") &&
+                            !item.EditorParams.ContainsKey("columnSelection"))
+                        {
+                            item.EditorParams["includeColumns"] = rowInstance.GetFields()
+                                .Where(x => x.GetAttribute<LookupIncludeAttribute>() != null)
+                                .Select(x => x.PropertyName ?? x.Name)
+                                .ToArray();
+                        }
+                    }
+                    catch 
+                    {
+                    }
+                }
             }
         }
 

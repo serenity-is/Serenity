@@ -1636,8 +1636,10 @@ var Q;
                     }
                     var html = xhr.responseText;
                     if (!html) {
-                        if (!xhr.status)
-                            Q.alert("An unknown AJAX connection error occurred! Check browser console for details.");
+                        if (!xhr.status) {
+                            if (xhr.statusText != "abort")
+                                Q.alert("An unknown AJAX connection error occurred! Check browser console for details.");
+                        }
                         else if (xhr.status == 500)
                             Q.alert("HTTP 500: Connection refused! Check browser console for details.");
                         else
@@ -2024,7 +2026,7 @@ var Q;
         function loadScriptAsync(name) {
             return Promise.resolve().then(function () {
                 Q.blockUI(null);
-                return Promise.resolve($.ajax(loadOptions(name, false))
+                return Promise.resolve($.ajax(loadOptions(name, true))
                     .always(function () {
                     Q.blockUndo();
                 }));
@@ -5439,9 +5441,8 @@ var Serenity;
         __extends(Select2Editor, _super);
         function Select2Editor(hidden, opt) {
             var _this = _super.call(this, hidden, opt) || this;
-            _this.pageSize = 100;
-            _this.items = [];
-            _this.itemById = {};
+            _this._items = [];
+            _this._itemById = {};
             var emptyItemText = _this.emptyItemText();
             if (emptyItemText != null) {
                 hidden.attr('placeholder', emptyItemText);
@@ -5468,8 +5469,55 @@ var Serenity;
             }
             _super.prototype.destroy.call(this);
         };
+        Select2Editor.prototype.hasAsyncSource = function () {
+            return false;
+        };
+        Select2Editor.prototype.asyncSearch = function (query, results) {
+            results({
+                items: [],
+                more: false
+            });
+            return null;
+        };
+        Select2Editor.prototype.getTypeDelay = function () {
+            return Q.coalesce(this.options['typeDelay'], 500);
+        };
         Select2Editor.prototype.emptyItemText = function () {
             return Q.coalesce(this.element.attr('placeholder'), Q.text('Controls.SelectEditor.EmptyItemText'));
+        };
+        Select2Editor.prototype.getPageSize = function () {
+            var _a;
+            return _a = this.options['pageSize'], (_a !== null && _a !== void 0 ? _a : 100);
+        };
+        Select2Editor.prototype.getIdField = function () {
+            return this.options['idField'];
+        };
+        Select2Editor.prototype.itemId = function (item) {
+            var value = item[this.getIdField()];
+            if (value == null)
+                return '';
+            return value.toString();
+        };
+        Select2Editor.prototype.getTextField = function () {
+            var _a;
+            return _a = this.options['textField'], (_a !== null && _a !== void 0 ? _a : this.getIdField());
+        };
+        Select2Editor.prototype.itemText = function (item) {
+            var value = item[this.getTextField()];
+            if (value == null)
+                return '';
+            return value.toString();
+        };
+        Select2Editor.prototype.itemDisabled = function (item) {
+            return false;
+        };
+        Select2Editor.prototype.mapItem = function (item) {
+            return {
+                id: this.itemId(item),
+                text: this.itemText(item),
+                disabled: this.itemDisabled(item),
+                source: item
+            };
         };
         Select2Editor.prototype.allowClear = function () {
             return this.options.allowClear != null ?
@@ -5482,35 +5530,124 @@ var Serenity;
             var _this = this;
             var emptyItemText = this.emptyItemText();
             var opt = {
-                data: this.items,
                 multiple: this.isMultiple(),
                 placeHolder: (!Q.isEmptyOrNull(emptyItemText) ? emptyItemText : null),
                 allowClear: this.allowClear(),
-                createSearchChoicePosition: 'bottom',
-                query: function (query) {
+                createSearchChoicePosition: 'bottom'
+            };
+            if (this.hasAsyncSource()) {
+                var typeTimeout = 0;
+                var queryPromise = null;
+                opt.query = function (query) {
+                    var pageSize = _this.getPageSize();
+                    var searchQuery = {
+                        searchTerm: Q.trimToNull(query.term),
+                        skip: (query.page - 1) * pageSize,
+                        take: pageSize,
+                        checkMore: true
+                    };
+                    queryPromise && queryPromise.abort && queryPromise.abort();
+                    queryPromise = null;
+                    if (typeTimeout != null)
+                        clearTimeout(typeTimeout);
+                    typeTimeout = setTimeout(function () {
+                        var _a, _b;
+                        queryPromise && queryPromise.abort && queryPromise.abort();
+                        queryPromise = _this.asyncSearch(searchQuery, function (result) {
+                            queryPromise = null;
+                            query.callback({
+                                results: result.items.map(_this.mapItem.bind(_this)),
+                                more: result.more
+                            });
+                        });
+                        if (queryPromise != null && (_a = queryPromise.catch, (_a !== null && _a !== void 0 ? _a : queryPromise.fail)))
+                            (_b = queryPromise.catch, (_b !== null && _b !== void 0 ? _b : queryPromise.fail))(function () { return queryPromise = null; });
+                    }, _this.getTypeDelay());
+                };
+                var initPromise = null;
+                opt.initSelection = function (element, callback) {
+                    var _a, _b;
+                    var val = element.val();
+                    if (val == null || val == '') {
+                        callback(null);
+                        return;
+                    }
+                    var isMultiple = _this.isMultiple();
+                    var idList = isMultiple ? val.split(',') : [val];
+                    var searchQuery = {
+                        idList: idList
+                    };
+                    initPromise && initPromise.abort && initPromise.abort();
+                    initPromise = _this.asyncSearch(searchQuery, function (result) {
+                        initPromise = null;
+                        if (isMultiple) {
+                            var items = (result.items || []).map(function (x) { return _this.mapItem(x); });
+                            _this._itemById = _this._itemById || {};
+                            for (var _i = 0, items_3 = items; _i < items_3.length; _i++) {
+                                var item = items_3[_i];
+                                _this._itemById[item.id] = item;
+                            }
+                            if (_this.isAutoComplete &&
+                                items.length != idList.length) {
+                                for (var _a = 0, idList_1 = idList; _a < idList_1.length; _a++) {
+                                    var v = idList_1[_a];
+                                    if (!Q.any(items, function (z) { return z.id == v; })) {
+                                        items.push({
+                                            id: v,
+                                            text: v
+                                        });
+                                    }
+                                }
+                            }
+                            callback(items);
+                        }
+                        else if (!result.items || !result.items.length) {
+                            if (_this.isAutoComplete) {
+                                callback({
+                                    id: val,
+                                    text: val
+                                });
+                            }
+                            else
+                                callback(null);
+                        }
+                        else {
+                            var item = _this.mapItem(result.items[0]);
+                            _this._itemById = _this._itemById || {};
+                            _this._itemById[item.id] = item;
+                            callback(item);
+                        }
+                    });
+                    if (initPromise != null && (_a = initPromise.catch, (_a !== null && _a !== void 0 ? _a : initPromise.fail)))
+                        (_b = initPromise.catch, (_b !== null && _b !== void 0 ? _b : initPromise.fail))(function () { return initPromise = null; });
+                };
+            }
+            else {
+                opt.data = this._items;
+                opt.query = function (query) {
                     var term = (Q.isEmptyOrNull(query.term) ? '' : Select2.util.stripDiacritics(Q.coalesce(query.term, '')).toUpperCase());
-                    var results = _this.items.filter(function (item) {
+                    var results = _this._items.filter(function (item) {
                         return term == null || Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(item.text, '')).toUpperCase(), term);
                     });
-                    results.push.apply(results, _this.items.filter(function (item1) {
+                    results.push.apply(results, _this._items.filter(function (item1) {
                         return term != null && !Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(item1.text, '')).toUpperCase(), term) &&
                             Select2.util.stripDiacritics(Q.coalesce(item1.text, ''))
                                 .toUpperCase().indexOf(term) >= 0;
                     }));
+                    var pageSize = _this.getPageSize();
                     query.callback({
-                        results: results.slice((query.page - 1) * _this.pageSize, query.page * _this.pageSize),
-                        more: results.length >= query.page * _this.pageSize
+                        results: results.slice((query.page - 1) * pageSize, query.page * pageSize),
+                        more: results.length >= query.page * pageSize
                     });
-                },
-                initSelection: function (element, callback) {
+                };
+                opt.initSelection = function (element, callback) {
                     var val = element.val();
                     var isAutoComplete = _this.isAutoComplete();
                     if (_this.isMultiple()) {
                         var list = [];
-                        var $t1 = val.split(',');
-                        for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-                            var z = $t1[$t2];
-                            var item2 = _this.itemById[z];
+                        for (var _i = 0, _a = val.split(','); _i < _a.length; _i++) {
+                            var z = _a[_i];
+                            var item2 = _this._itemById[z];
                             if (item2 == null && isAutoComplete) {
                                 item2 = { id: z, text: z };
                                 _this.addItem(item2);
@@ -5522,14 +5659,14 @@ var Serenity;
                         callback(list);
                         return;
                     }
-                    var it = _this.itemById[val];
+                    var it = _this._itemById[val];
                     if (it == null && isAutoComplete) {
                         it = { id: val, text: val };
                         _this.addItem(it);
                     }
                     callback(it);
-                }
-            };
+                };
+            }
             if (this.options.minimumResultsForSearch != null)
                 opt.minimumResultsForSearch = this.options.minimumResultsForSearch;
             if (this.isAutoComplete() || this.useInplaceAdd())
@@ -5539,13 +5676,50 @@ var Serenity;
         Select2Editor.prototype.get_delimited = function () {
             return !!this.options.delimited;
         };
+        Object.defineProperty(Select2Editor.prototype, "items", {
+            get: function () {
+                if (this.hasAsyncSource())
+                    throw new Error("Can't read items property of an async select editor!");
+                return this._items || [];
+            },
+            set: function (value) {
+                if (this.hasAsyncSource())
+                    throw new Error("Can't set items of an async select editor!");
+                this._items = value || [];
+                this._itemById = {};
+                for (var _i = 0, _a = this._items; _i < _a.length; _i++) {
+                    var item = _a[_i];
+                    this._itemById[item.id] = item;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Select2Editor.prototype, "itemById", {
+            get: function () {
+                if (this.hasAsyncSource())
+                    throw new Error("Can't read items property of an async select editor!");
+                return this._itemById;
+            },
+            set: function (value) {
+                if (this.hasAsyncSource())
+                    throw new Error("Can't set itemById of an async select editor!");
+                this._itemById = value || {};
+            },
+            enumerable: true,
+            configurable: true
+        });
         Select2Editor.prototype.clearItems = function () {
-            ss.clear(this.items);
-            this.itemById = {};
+            if (this.hasAsyncSource())
+                throw new Error("Can't clear items of an async select editor!");
+            ss.clear(this._items);
+            this._itemById = {};
         };
         Select2Editor.prototype.addItem = function (item) {
-            this.items.push(item);
-            this.itemById[item.id] = item;
+            if (this.hasAsyncSource())
+                throw new Error("Can't add item to an async select editor!");
+            this._items.push(item);
+            this._itemById[item.id] = item;
         };
         Select2Editor.prototype.addOption = function (key, text, source, disabled) {
             this.addItem({
@@ -5617,12 +5791,13 @@ var Serenity;
                 if (Q.isTrimmedEmpty(s)) {
                     return null;
                 }
-                if (Q.any(_this.get_items(), function (x) {
+                var isAsyncSource = false;
+                if (Q.any(_this._items || [], function (x) {
                     var text = getName ? getName(x.source) : x.text;
                     return Select2.util.stripDiacritics(Q.coalesce(text, '')).toLowerCase() == s;
                 }))
                     return null;
-                if (!Q.any(_this.get_items(), function (x1) {
+                if (!Q.any(_this._items || [], function (x1) {
                     return Q.coalesce(Select2.util.stripDiacritics(x1.text), '').toLowerCase().indexOf(s) !== -1;
                 })) {
                     if (_this.isAutoComplete()) {
@@ -5706,20 +5881,42 @@ var Serenity;
                         return x1 != null;
                     });
                 }
-                this.element.select2('val', val)
-                    .triggerHandler('change', [true]);
+                var el = this.element;
+                el.select2('val', val);
+                el.data('select2-change-triggered', true);
+                el.triggerHandler('change', [true]);
+                el.data('select2-change-triggered', false);
                 this.updateInplaceReadOnly();
             }
         };
         Object.defineProperty(Select2Editor.prototype, "selectedItem", {
             get: function () {
                 var selectedValue = this.get_value();
-                if (selectedValue && this.itemById) {
-                    var item = this.itemById[selectedValue];
+                if (selectedValue && this._itemById) {
+                    var item = this._itemById[selectedValue];
                     if (item)
                         return item.source;
                 }
                 return null;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Select2Editor.prototype, "selectedItems", {
+            get: function () {
+                var selectedValues = this.values;
+                var result = [];
+                for (var _i = 0, selectedValues_1 = selectedValues; _i < selectedValues_1.length; _i++) {
+                    var value = selectedValues_1[_i];
+                    if (value && this._itemById) {
+                        var item = this._itemById[value];
+                        if (item && item.source)
+                            result.push(item.source);
+                        else
+                            result.push(null);
+                    }
+                }
+                return result;
             },
             enumerable: true,
             configurable: true
@@ -6057,8 +6254,8 @@ var Serenity;
             this.clearItems();
             if (items.length > 0) {
                 var isStrings = typeof (items[0]) === 'string';
-                for (var _i = 0, items_3 = items; _i < items_3.length; _i++) {
-                    var item = items_3[_i];
+                for (var _i = 0, items_4 = items; _i < items_4.length; _i++) {
+                    var item = items_4[_i];
                     var key = isStrings ? item : item[0];
                     var text = isStrings ? item : Q.coalesce(item[1], item[0]);
                     this.addOption(key, text, item, false);
@@ -6135,22 +6332,12 @@ var Serenity;
         function LookupEditorBase(input, opt) {
             var _this = _super.call(this, input, opt) || this;
             var self = _this;
-            if (!_this.isAsyncWidget()) {
-                _this.updateItems();
-                Q.ScriptData.bindToChange('Lookup.' + _this.getLookupKey(), _this.uniqueName, function () {
-                    self.updateItems();
-                });
-            }
+            _this.updateItems();
+            Q.ScriptData.bindToChange('Lookup.' + _this.getLookupKey(), _this.uniqueName, function () {
+                self.updateItems();
+            });
             return _this;
         }
-        LookupEditorBase.prototype.initializeAsync = function () {
-            var _this = this;
-            return this.updateItemsAsync().then(function () {
-                Q.ScriptData.bindToChange('Lookup.' + _this.getLookupKey(), _this.uniqueName, function () {
-                    _this.updateItemsAsync();
-                });
-            }, null);
-        };
         LookupEditorBase.prototype.destroy = function () {
             Q.ScriptData.unbindFromChange(this.uniqueName);
             _super.prototype.destroy.call(this);
@@ -6169,58 +6356,47 @@ var Serenity;
             }
             return key;
         };
+        LookupEditorBase.prototype.getLookupAsync = function () {
+            return Q.getLookupAsync(this.getLookupKey());
+        };
         LookupEditorBase.prototype.getLookup = function () {
             return Q.getLookup(this.getLookupKey());
-        };
-        LookupEditorBase.prototype.getLookupAsync = function () {
-            var _this = this;
-            return Promise.resolve().then(function () {
-                var key = _this.getLookupKey();
-                return Q.getLookupAsync(key);
-            }, null);
         };
         LookupEditorBase.prototype.getItems = function (lookup) {
             return this.filterItems(this.cascadeItems(lookup.items));
         };
         LookupEditorBase.prototype.getItemText = function (item, lookup) {
+            if (lookup == null)
+                return _super.prototype.itemText.call(this, item);
             var textValue = lookup.textFormatter ? lookup.textFormatter(item) : item[lookup.textField];
             return textValue == null ? '' : textValue.toString();
         };
         LookupEditorBase.prototype.getItemDisabled = function (item, lookup) {
-            return false;
+            return _super.prototype.itemDisabled.call(this, item);
         };
         LookupEditorBase.prototype.updateItems = function () {
-            var lookup = this.getLookup();
-            this.clearItems();
-            var items = this.getItems(lookup);
-            for (var $t1 = 0; $t1 < items.length; $t1++) {
-                var item = items[$t1];
-                var text = this.getItemText(item, lookup);
-                var disabled = this.getItemDisabled(item, lookup);
-                var idValue = item[lookup.idField];
-                var id = (idValue == null ? '' : idValue.toString());
-                this.addItem({
-                    id: id,
-                    text: text,
-                    source: item,
-                    disabled: disabled
-                });
-            }
-        };
-        LookupEditorBase.prototype.updateItemsAsync = function () {
             var _this = this;
-            return this.getLookupAsync().then(function (lookup) {
+            var updateItemsFor = function (lookup) {
                 _this.clearItems();
                 var items = _this.getItems(lookup);
-                for (var $t1 = 0; $t1 < items.length; $t1++) {
-                    var item = items[$t1];
+                for (var _i = 0, items_5 = items; _i < items_5.length; _i++) {
+                    var item = items_5[_i];
                     var text = _this.getItemText(item, lookup);
                     var disabled = _this.getItemDisabled(item, lookup);
                     var idValue = item[lookup.idField];
                     var id = (idValue == null ? '' : idValue.toString());
-                    _this.addItem({ id: id, text: text, source: item, disabled: disabled });
+                    _this.addItem({
+                        id: id,
+                        text: text,
+                        source: item,
+                        disabled: disabled
+                    });
                 }
-            }, null);
+            };
+            if (this.options.async)
+                this.getLookupAsync().then(updateItemsFor);
+            else
+                updateItemsFor(this.getLookup());
         };
         LookupEditorBase.prototype.getDialogTypeKey = function () {
             var dialogTypeKey = _super.prototype.getDialogTypeKey.call(this);
@@ -6251,6 +6427,140 @@ var Serenity;
         return LookupEditor;
     }(LookupEditorBase));
     Serenity.LookupEditor = LookupEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var ServiceLookupEditorBase = /** @class */ (function (_super) {
+        __extends(ServiceLookupEditorBase, _super);
+        function ServiceLookupEditorBase(input, opt) {
+            return _super.call(this, input, opt) || this;
+        }
+        ServiceLookupEditorBase.prototype.getDialogTypeKey = function () {
+            var dialogTypeKey = _super.prototype.getDialogTypeKey.call(this);
+            if (dialogTypeKey)
+                return dialogTypeKey;
+            var service = this.getService();
+            if (Q.startsWith(service, "~/Services/"))
+                service = service.substr("~/Services/".length);
+            if (service.split('/').length == 3)
+                service = service.substr(0, service.lastIndexOf('/'));
+            return service.replace("/", ".");
+        };
+        ServiceLookupEditorBase.prototype.getService = function () {
+            return this.options.service;
+        };
+        ServiceLookupEditorBase.prototype.getServiceUrl = function () {
+            var url = this.getService();
+            if (url == null)
+                throw new Error("ServiceLookupEditor requires 'service' option to be configured!");
+            if (!Q.startsWith(url, "~") && !Q.startsWith(url, "/") && url.indexOf('://') < 0)
+                url = "~/Services/" + url;
+            if (Q.startsWith(url, "~"))
+                url = Q.resolveUrl(url);
+            return url;
+        };
+        ServiceLookupEditorBase.prototype.getIncludeColumns = function () {
+            var include = this.options.includeColumns || [];
+            var idField = this.getIdField();
+            if (idField && include.indexOf(idField) < 0)
+                include.push(idField);
+            var textField = this.getTextField();
+            if (textField && include.indexOf(textField) < 0)
+                include.push(textField);
+            return include;
+        };
+        ServiceLookupEditorBase.prototype.getSort = function () {
+            return this.options.sort || (this.getTextField() ? [this.getTextField()] : null);
+        };
+        ServiceLookupEditorBase.prototype.getCascadeCriteria = function () {
+            var val = this.get_cascadeValue();
+            if (val == null || val === '') {
+                if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+                    return ['1', '=', '0'];
+                }
+                return null;
+            }
+            var fld = this.get_cascadeField();
+            return [[fld], '=', val];
+        };
+        ServiceLookupEditorBase.prototype.getFilterCriteria = function () {
+            var val = this.get_filterValue();
+            if (val == null || val === '') {
+                return null;
+            }
+            var fld = this.get_filterField();
+            return [[fld], '=', val];
+        };
+        ServiceLookupEditorBase.prototype.getIdListCriteria = function (idList) {
+            if (idList == null)
+                return null;
+            if (idList.length == 0)
+                return ['0', '=', '1'];
+            var idField = this.getIdField();
+            if (idField == null)
+                throw new Error("ServiceLookupEditor requires 'idField' option to be configured!");
+            return [[idField], 'in', [idList]];
+        };
+        ServiceLookupEditorBase.prototype.getCriteria = function (query) {
+            return Serenity.Criteria.and(Serenity.Criteria.and(this.getIdListCriteria(query.idList), this.options.criteria), Serenity.Criteria.and(this.getCascadeCriteria(), this.getFilterCriteria()));
+        };
+        ServiceLookupEditorBase.prototype.getListRequest = function (query) {
+            var request = {};
+            if (query.searchTerm)
+                request.ContainsText = query.searchTerm;
+            request.Sort = this.getSort();
+            request.ColumnSelection = this.options.columnSelection || 1 /* KeyOnly */;
+            request.IncludeColumns = this.getIncludeColumns();
+            request.ExcludeColumns = this.options.excludeColumns;
+            request.ContainsField = this.options.containsField;
+            request.EqualityFilter = this.options.equalityFilter;
+            request.Criteria = this.getCriteria(query);
+            request.Skip = query.skip || 0;
+            request.Take = query.take ? (query.checkMore ? query.take + 1 : query.take) : 0;
+            request.IncludeDeleted = this.options.includeDeleted;
+            request.ExcludeTotalCount = true;
+            return request;
+        };
+        ServiceLookupEditorBase.prototype.getServiceCallOptions = function (query, results) {
+            return {
+                blockUI: false,
+                url: this.getServiceUrl(),
+                request: this.getListRequest(query),
+                onSuccess: function (response) {
+                    var items = response.Entities || [];
+                    if (items && query.take && query.checkMore && response.Entities.length > items.length)
+                        items = items.slice(0, query.take);
+                    results({
+                        items: items.slice(0, query.take),
+                        more: query.checkMore && query.take && items.length > query.take
+                    });
+                }
+            };
+        };
+        ServiceLookupEditorBase.prototype.hasAsyncSource = function () {
+            return true;
+        };
+        ServiceLookupEditorBase.prototype.asyncSearch = function (query, results) {
+            var opt = this.getServiceCallOptions(query, results);
+            return Q.serviceCall(opt);
+        };
+        ServiceLookupEditorBase = __decorate([
+            Serenity.Decorators.registerEditor("Serenity.ServiceLookupEditorBase")
+        ], ServiceLookupEditorBase);
+        return ServiceLookupEditorBase;
+    }(Serenity.Select2Editor));
+    Serenity.ServiceLookupEditorBase = ServiceLookupEditorBase;
+    var ServiceLookupEditor = /** @class */ (function (_super) {
+        __extends(ServiceLookupEditor, _super);
+        function ServiceLookupEditor(hidden, opt) {
+            return _super.call(this, hidden, opt) || this;
+        }
+        ServiceLookupEditor = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.ServiceLookupEditor')
+        ], ServiceLookupEditor);
+        return ServiceLookupEditor;
+    }(ServiceLookupEditorBase));
+    Serenity.ServiceLookupEditor = ServiceLookupEditor;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -7944,8 +8254,11 @@ var Serenity;
         });
         Select2AjaxEditor.prototype.set_value = function (value) {
             if (value !== this.get_value()) {
-                this.element.select2('val', value)
-                    .triggerHandler('change', [true]);
+                var el = this.element;
+                el.select2('val', value);
+                el.data('select2-change-triggered', true);
+                el.triggerHandler('change', [true]);
+                el.data('select2-change-triggered', false);
             }
         };
         Select2AjaxEditor = __decorate([
@@ -8918,8 +9231,8 @@ var Serenity;
         FilterPanel.prototype.updateRowsFromStore = function () {
             this.rowsDiv.empty();
             var items = this.get_store().get_items();
-            for (var _i = 0, items_4 = items; _i < items_4.length; _i++) {
-                var item = items_4[_i];
+            for (var _i = 0, items_6 = items; _i < items_6.length; _i++) {
+                var item = items_6[_i];
                 this.addEmptyRow(false);
                 var row = this.rowsDiv.children().last();
                 var divl = row.children('div.l');
@@ -10529,8 +10842,8 @@ var Serenity;
                     result[x] = order++;
                 }
             }
-            for (var _a = 0, items_5 = items; _a < items_5.length; _a++) {
-                var x1 = items_5[_a];
+            for (var _a = 0, items_7 = items; _a < items_7.length; _a++) {
+                var x1 = items_7[_a];
                 var category = x1.category;
                 if (category == null) {
                     category = Q.coalesce(this.options.defaultCategory, '');
@@ -10545,8 +10858,8 @@ var Serenity;
             var idx = 0;
             var itemIndex = {};
             var itemCategory = {};
-            for (var _i = 0, items_6 = items; _i < items_6.length; _i++) {
-                var x = items_6[_i];
+            for (var _i = 0, items_8 = items; _i < items_8.length; _i++) {
+                var x = items_8[_i];
                 var name1 = x.name;
                 var cat1 = x.category;
                 if (cat1 == null) {
@@ -15480,8 +15793,8 @@ var Serenity;
                     takeChildren(getId(child));
                 }
             }
-            for (var _i = 0, items_7 = items; _i < items_7.length; _i++) {
-                var item = items_7[_i];
+            for (var _i = 0, items_9 = items; _i < items_9.length; _i++) {
+                var item = items_9[_i];
                 var parentId = getParentId(item);
                 if (parentId == null ||
                     !((byId[parentId] || []).length)) {

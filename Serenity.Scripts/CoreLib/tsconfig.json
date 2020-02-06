@@ -66,6 +66,7 @@
     "UI/Widgets/Select2Editor.ts",
     "UI/Editors/DateYearEditor.ts",
     "UI/Editors/LookupEditor.ts",
+    "UI/Editors/ServiceLookupEditor.ts",
     "UI/Editors/Editors.ts",
     "UI/Filtering/FilterOperator.ts",
     "UI/Filtering/FilterLine.ts",
