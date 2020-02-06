@@ -96,8 +96,10 @@ namespace Q {
                     }
                     var html = xhr.responseText;
                     if (!html) {
-                        if (!xhr.status)
-                            Q.alert("An unknown AJAX connection error occurred! Check browser console for details.");
+                        if (!xhr.status) {
+                            if (xhr.statusText != "abort")
+                                Q.alert("An unknown AJAX connection error occurred! Check browser console for details.");
+                        }
                         else if (xhr.status == 500)
                             Q.alert("HTTP 500: Connection refused! Check browser console for details.");
                         else
