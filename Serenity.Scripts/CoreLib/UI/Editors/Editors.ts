@@ -1913,8 +1913,11 @@
 
         set_value(value: string) {
             if (value !== this.get_value()) {
-                this.element.select2('val', value)
-                    .triggerHandler('change', [true]);
+                var el = this.element;
+                el.select2('val', value);
+                el.data('select2-change-triggered', true);
+                el.triggerHandler('change', [true])
+                el.data('select2-change-triggered', false);
             }
         }
 
