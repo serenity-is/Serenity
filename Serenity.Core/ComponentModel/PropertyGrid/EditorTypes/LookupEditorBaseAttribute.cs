@@ -154,5 +154,14 @@
             get { return GetOption<bool>("openDialogAsPanel"); }
             set { SetOption("openDialogAsPanel", value); }
         }
+
+        /// <summary>
+        /// Load lookup in async mode, default false
+        /// </summary>
+        public bool Async
+        {
+            get { return GetOption<bool>("async"); }
+            set { SetOption("async", value); }
+        }
     }
 }
