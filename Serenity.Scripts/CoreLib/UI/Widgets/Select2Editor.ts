@@ -187,8 +187,12 @@ namespace Serenity {
                     if (typeTimeout != null)
                         clearTimeout(typeTimeout);
 
+                    var select2 = $(this.element).data('select2');
+                    select2 && select2.search && select2.search.removeClass('select2-active');
+
                     typeTimeout = setTimeout(() => {
                         queryPromise && queryPromise.abort && queryPromise.abort();
+                        select2 && select2.search.addClass('select2-active');
                         queryPromise = this.asyncSearch(searchQuery, result => {
                             queryPromise = null;
                             query.callback({
@@ -197,8 +201,11 @@ namespace Serenity {
                             });
                         });
                         if (queryPromise != null && (queryPromise.catch ?? queryPromise.fail))
-                            (queryPromise.catch ?? queryPromise.fail)(() => queryPromise = null);
-                    }, this.getTypeDelay());
+                            (queryPromise.catch ?? queryPromise.fail)(() => {
+                                queryPromise = null;
+                                select2 && select2.search && select2.search.removeClass('select2-active');
+                            });
+                    }, !query.term ? 0 : this.getTypeDelay());
                 }
 
                 var initPromise: Select2SearchPromise = null;
