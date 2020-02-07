@@ -2094,6 +2094,13 @@ declare namespace Serenity {
         protected useIdField(): boolean;
         getEditorText(): string;
     }
+    class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEditor> {
+        constructor();
+        getOperators(): FilterOperator[];
+        protected useEditor(): boolean;
+        protected useIdField(): boolean;
+        getEditorText(): string;
+    }
     class StringFiltering extends BaseFiltering {
         getOperators(): Serenity.FilterOperator[];
         validateEditorValue(value: string): string;

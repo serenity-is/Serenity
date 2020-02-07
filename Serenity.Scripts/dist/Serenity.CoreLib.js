@@ -5550,9 +5550,12 @@ var Serenity;
                     queryPromise = null;
                     if (typeTimeout != null)
                         clearTimeout(typeTimeout);
+                    var select2 = $(_this.element).data('select2');
+                    select2 && select2.search && select2.search.removeClass('select2-active');
                     typeTimeout = setTimeout(function () {
                         var _a, _b;
                         queryPromise && queryPromise.abort && queryPromise.abort();
+                        select2 && select2.search.addClass('select2-active');
                         queryPromise = _this.asyncSearch(searchQuery, function (result) {
                             queryPromise = null;
                             query.callback({
@@ -5561,8 +5564,11 @@ var Serenity;
                             });
                         });
                         if (queryPromise != null && (_a = queryPromise.catch, (_a !== null && _a !== void 0 ? _a : queryPromise.fail)))
-                            (_b = queryPromise.catch, (_b !== null && _b !== void 0 ? _b : queryPromise.fail))(function () { return queryPromise = null; });
-                    }, _this.getTypeDelay());
+                            (_b = queryPromise.catch, (_b !== null && _b !== void 0 ? _b : queryPromise.fail))(function () {
+                                queryPromise = null;
+                                select2 && select2.search && select2.search.removeClass('select2-active');
+                            });
+                    }, !query.term ? 0 : _this.getTypeDelay());
                 };
                 var initPromise = null;
                 opt.initSelection = function (element, callback) {
@@ -8979,6 +8985,34 @@ var Serenity;
         return LookupFiltering;
     }(BaseEditorFiltering));
     Serenity.LookupFiltering = LookupFiltering;
+    var ServiceLookupFiltering = /** @class */ (function (_super) {
+        __extends(ServiceLookupFiltering, _super);
+        function ServiceLookupFiltering() {
+            return _super.call(this, Serenity.ServiceLookupEditor) || this;
+        }
+        ServiceLookupFiltering.prototype.getOperators = function () {
+            var ops = [{ key: Operators.EQ }, { key: Operators.NE }, { key: Operators.contains }, { key: Operators.startsWith }];
+            return this.appendNullableOperators(ops);
+        };
+        ServiceLookupFiltering.prototype.useEditor = function () {
+            var op = this.get_operator().key;
+            return op == Operators.EQ || op == Operators.NE;
+        };
+        ServiceLookupFiltering.prototype.useIdField = function () {
+            return this.useEditor();
+        };
+        ServiceLookupFiltering.prototype.getEditorText = function () {
+            if (this.useEditor()) {
+                return this.editor.text;
+            }
+            return _super.prototype.getEditorText.call(this);
+        };
+        ServiceLookupFiltering = __decorate([
+            Filtering('ServiceLookup')
+        ], ServiceLookupFiltering);
+        return ServiceLookupFiltering;
+    }(BaseEditorFiltering));
+    Serenity.ServiceLookupFiltering = ServiceLookupFiltering;
     var StringFiltering = /** @class */ (function (_super) {
         __extends(StringFiltering, _super);
         function StringFiltering() {

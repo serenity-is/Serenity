@@ -75,10 +75,23 @@ namespace Serenity.PropertyGrid
             var filteringTypeAttr = source.GetAttribute<FilteringTypeAttribute>() ??
                 idField.GetAttribute<FilteringTypeAttribute>();
 
+            
             if (filteringTypeAttr == null)
             {
                 var editorAttr = source.GetAttribute<EditorTypeAttribute>() ??
                     idField.GetAttribute<EditorTypeAttribute>();
+
+                Action<string[]> copyParamsFromEditor = (keys) =>
+                {
+                    var prm = new Dictionary<string, object>();
+                    editorAttr.SetParams(prm);
+                    SetServiceLookupParams(editorAttr, prm);
+                    foreach (var key in keys)
+                    {
+                        if (prm.TryGetValue(key, out object o))
+                            item.FilteringParams[key] = o;
+                    }
+                };
 
                 if (idFieldName != null)
                 {
@@ -88,18 +101,24 @@ namespace Serenity.PropertyGrid
 
                 if (editorAttr != null && !standardFilteringEditors.Contains(editorAttr.EditorType))
                 {
-                    if (editorAttr is LookupEditorAttribute ||
-                        editorAttr is AsyncLookupEditorAttribute)
+                    if (editorAttr is LookupEditorAttribute lea)
                     {
-                        var async = editorAttr as AsyncLookupEditorAttribute;
-                        item.FilteringType = async != null ? "AsyncLookup" : "Lookup";
-                        item.FilteringParams["lookupKey"] = async != null ? async.LookupKey : ((LookupEditorAttribute)editorAttr).LookupKey;
+                        item.FilteringType = "Lookup";
+                        copyParamsFromEditor(lookupCopyToFilterParams);
+                    }
+                    else if (editorAttr is ServiceLookupEditorAttribute slea)
+                    {
+                        item.FilteringType = "ServiceLookup";
+                        copyParamsFromEditor(serviceLookupCopyToFilterParams);
                     }
                     else
                     {
                         item.FilteringType = "Editor";
                         item.FilteringParams["editorType"] = editorAttr.EditorType;
                         item.FilteringParams["useLike"] = source.ValueType == typeof(String);
+                        if (editorAttr is LookupEditorBaseAttribute leba &&
+                            leba.Async == true)
+                            item.FilteringParams["async"] = true;
                     }
                 }
                 else if (source.EnumType != null)
@@ -109,7 +128,7 @@ namespace Serenity.PropertyGrid
                 }
                 else if (valueType == typeof(DateTime))
                 {
-                    if (!ReferenceEquals(null, basedOnField) && 
+                    if (!ReferenceEquals(null, basedOnField) &&
                         basedOnField is DateTimeField &&
                         !((DateTimeField)basedOnField).DateOnly)
                     {
@@ -196,6 +215,25 @@ namespace Serenity.PropertyGrid
                 item.QuickFilterParams[key] = param.Value;
             }
         }
+
+        private static readonly string[] lookupCopyToFilterParams = new string[]
+        {
+            "lookupKey",
+            "async"
+        };
+
+        private static readonly string[] serviceLookupCopyToFilterParams = new string[]
+        {
+            "service",
+            "idField",
+            "textField",
+            "pageSize",
+            "sort",
+            "columnSelection",
+            "includeColumns",
+            "excludeColumns",
+            "includeDeleted"
+        };
 
         private static HashSet<string> standardFilteringEditors = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
