@@ -6411,19 +6411,26 @@ var Serenity;
             var _this = this;
             return this.getLookupAsync().then(function (lookup) {
                 _this.lookup = lookup;
-                var term = (Q.isEmptyOrNull(query.searchTerm) ? '' : Select2.util.stripDiacritics(Q.coalesce(query.searchTerm, '')).toUpperCase());
                 var items = _this.getItems(_this.lookup);
-                var result = items.filter(function (item) { return (term == null ||
-                    Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(_this.getItemText(item, _this.lookup), '')).toUpperCase(), term)); });
-                result.push.apply(result, items.filter(function (item1) {
-                    var text = _this.getItemText(item1, _this.lookup);
-                    return term != null && !Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(text, '')).toUpperCase(), term) &&
-                        Select2.util.stripDiacritics(Q.coalesce(text, ''))
-                            .toUpperCase().indexOf(term) >= 0;
-                }));
+                if (query.idList != null) {
+                    items = items.filter(function (x) { return query.idList.indexOf(_this.itemId(x)) >= 0; });
+                }
+                if (!Q.isEmptyOrNull(query.searchTerm)) {
+                    var term = Select2.util.stripDiacritics(query.searchTerm.toUpperCase());
+                    var allItems = items;
+                    items = items.filter(function (item) {
+                        return Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(_this.getItemText(item, _this.lookup), '')).toUpperCase(), term);
+                    });
+                    items.push.apply(items, allItems.filter(function (item1) {
+                        var text = _this.getItemText(item1, _this.lookup);
+                        return term != null && !Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(text, '')).toUpperCase(), term) &&
+                            Select2.util.stripDiacritics(Q.coalesce(text, ''))
+                                .toUpperCase().indexOf(term) >= 0;
+                    }));
+                }
                 results({
-                    items: result.slice(query.skip, query.take),
-                    more: results.length >= query.take
+                    items: items.slice(query.skip, query.take),
+                    more: items.length >= query.take
                 });
             });
         };

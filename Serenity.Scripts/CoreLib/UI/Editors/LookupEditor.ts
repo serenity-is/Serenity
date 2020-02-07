@@ -101,25 +101,31 @@
             return this.getLookupAsync().then(lookup => {
                 this.lookup = lookup;
 
-                var term = (Q.isEmptyOrNull(query.searchTerm) ? '' : Select2.util.stripDiacritics(
-                    Q.coalesce(query.searchTerm, '')).toUpperCase());
-
                 var items = this.getItems(this.lookup);
-                var result = items.filter((item) => (term == null ||
-                    Q.startsWith(Select2.util.stripDiacritics(
-                        Q.coalesce(this.getItemText(item, this.lookup), '')).toUpperCase(), term)));
 
-                result.push(...items.filter(item1 => {
-                    var text = this.getItemText(item1, this.lookup);
-                    return term != null && !Q.startsWith(Select2.util.stripDiacritics(
-                        Q.coalesce(text, '')).toUpperCase(), term) &&
-                        Select2.util.stripDiacritics(Q.coalesce(text, ''))
-                            .toUpperCase().indexOf(term) >= 0
-                }));
+                if (query.idList != null) {
+                    items = items.filter(x => query.idList.indexOf(this.itemId(x)) >= 0);
+                }
+
+                if (!Q.isEmptyOrNull(query.searchTerm)) {
+                    var term = Select2.util.stripDiacritics(query.searchTerm.toUpperCase());
+                    var allItems = items;
+                    items = items.filter((item) =>
+                        Q.startsWith(Select2.util.stripDiacritics(
+                            Q.coalesce(this.getItemText(item, this.lookup), '')).toUpperCase(), term));
+
+                    items.push(...allItems.filter(item1 => {
+                        var text = this.getItemText(item1, this.lookup);
+                        return term != null && !Q.startsWith(Select2.util.stripDiacritics(
+                            Q.coalesce(text, '')).toUpperCase(), term) &&
+                            Select2.util.stripDiacritics(Q.coalesce(text, ''))
+                                .toUpperCase().indexOf(term) >= 0
+                    }));
+                }
 
                 results({
-                    items: result.slice(query.skip, query.take),
-                    more: results.length >= query.take
+                    items: items.slice(query.skip, query.take),
+                    more: items.length >= query.take
                 });
             }) as any;
         }
