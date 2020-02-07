@@ -5519,6 +5519,9 @@ var Serenity;
                 source: item
             };
         };
+        Select2Editor.prototype.mapItems = function (items) {
+            return items.map(this.mapItem.bind(this));
+        };
         Select2Editor.prototype.allowClear = function () {
             return this.options.allowClear != null ?
                 !!this.options.allowClear : this.emptyItemText() != null;
@@ -5553,26 +5556,23 @@ var Serenity;
                     var select2 = $(_this.element).data('select2');
                     select2 && select2.search && select2.search.removeClass('select2-active');
                     typeTimeout = setTimeout(function () {
-                        var _a, _b;
                         queryPromise && queryPromise.abort && queryPromise.abort();
                         select2 && select2.search.addClass('select2-active');
                         queryPromise = _this.asyncSearch(searchQuery, function (result) {
                             queryPromise = null;
                             query.callback({
-                                results: result.items.map(_this.mapItem.bind(_this)),
+                                results: _this.mapItems(result.items),
                                 more: result.more
                             });
                         });
-                        if (queryPromise != null && (_a = queryPromise.catch, (_a !== null && _a !== void 0 ? _a : queryPromise.fail)))
-                            (_b = queryPromise.catch, (_b !== null && _b !== void 0 ? _b : queryPromise.fail))(function () {
-                                queryPromise = null;
-                                select2 && select2.search && select2.search.removeClass('select2-active');
-                            });
+                        (queryPromise && (queryPromise.catch || queryPromise.fail)).call(queryPromise, function () {
+                            queryPromise = null;
+                            select2 && select2.search && select2.search.removeClass('select2-active');
+                        });
                     }, !query.term ? 0 : _this.getTypeDelay());
                 };
                 var initPromise = null;
                 opt.initSelection = function (element, callback) {
-                    var _a, _b;
                     var val = element.val();
                     if (val == null || val == '') {
                         callback(null);
@@ -5624,8 +5624,9 @@ var Serenity;
                             callback(item);
                         }
                     });
-                    if (initPromise != null && (_a = initPromise.catch, (_a !== null && _a !== void 0 ? _a : initPromise.fail)))
-                        (_b = initPromise.catch, (_b !== null && _b !== void 0 ? _b : initPromise.fail))(function () { return initPromise = null; });
+                    (initPromise && (initPromise.catch || initPromise.fail)).call(initPromise, function () {
+                        initPromise = null;
+                    });
                 };
             }
             else {
@@ -6337,15 +6338,21 @@ var Serenity;
         __extends(LookupEditorBase, _super);
         function LookupEditorBase(input, opt) {
             var _this = _super.call(this, input, opt) || this;
-            var self = _this;
-            _this.updateItems();
-            Q.ScriptData.bindToChange('Lookup.' + _this.getLookupKey(), _this.uniqueName, function () {
-                self.updateItems();
-            });
+            if (!_this.hasAsyncSource()) {
+                _this.updateItems();
+                var self = _this;
+                Q.ScriptData.bindToChange('Lookup.' + _this.getLookupKey(), _this.uniqueName, function () {
+                    self.updateItems();
+                });
+            }
             return _this;
         }
+        LookupEditorBase.prototype.hasAsyncSource = function () {
+            return !!this.options.async;
+        };
         LookupEditorBase.prototype.destroy = function () {
-            Q.ScriptData.unbindFromChange(this.uniqueName);
+            if (!this.hasAsyncSource())
+                Q.ScriptData.unbindFromChange(this.uniqueName);
             _super.prototype.destroy.call(this);
         };
         LookupEditorBase.prototype.getLookupKey = function () {
@@ -6371,38 +6378,54 @@ var Serenity;
         LookupEditorBase.prototype.getItems = function (lookup) {
             return this.filterItems(this.cascadeItems(lookup.items));
         };
+        LookupEditorBase.prototype.getIdField = function () {
+            return this.lookup != null ? this.lookup.idField : _super.prototype.getIdField.call(this);
+        };
         LookupEditorBase.prototype.getItemText = function (item, lookup) {
             if (lookup == null)
                 return _super.prototype.itemText.call(this, item);
             var textValue = lookup.textFormatter ? lookup.textFormatter(item) : item[lookup.textField];
             return textValue == null ? '' : textValue.toString();
         };
+        LookupEditorBase.prototype.mapItem = function (item) {
+            return {
+                id: this.itemId(item),
+                text: this.getItemText(item, this.lookup),
+                disabled: this.getItemDisabled(item, this.lookup),
+                source: item
+            };
+        };
         LookupEditorBase.prototype.getItemDisabled = function (item, lookup) {
             return _super.prototype.itemDisabled.call(this, item);
         };
         LookupEditorBase.prototype.updateItems = function () {
+            this.clearItems();
+            this.lookup = this.getLookup();
+            var items = this.getItems(this.lookup);
+            for (var _i = 0, items_5 = items; _i < items_5.length; _i++) {
+                var item = items_5[_i];
+                this.addItem(this.mapItem(item));
+            }
+        };
+        LookupEditorBase.prototype.asyncSearch = function (query, results) {
             var _this = this;
-            var updateItemsFor = function (lookup) {
-                _this.clearItems();
-                var items = _this.getItems(lookup);
-                for (var _i = 0, items_5 = items; _i < items_5.length; _i++) {
-                    var item = items_5[_i];
-                    var text = _this.getItemText(item, lookup);
-                    var disabled = _this.getItemDisabled(item, lookup);
-                    var idValue = item[lookup.idField];
-                    var id = (idValue == null ? '' : idValue.toString());
-                    _this.addItem({
-                        id: id,
-                        text: text,
-                        source: item,
-                        disabled: disabled
-                    });
-                }
-            };
-            if (this.options.async)
-                this.getLookupAsync().then(updateItemsFor);
-            else
-                updateItemsFor(this.getLookup());
+            return this.getLookupAsync().then(function (lookup) {
+                _this.lookup = lookup;
+                var term = (Q.isEmptyOrNull(query.searchTerm) ? '' : Select2.util.stripDiacritics(Q.coalesce(query.searchTerm, '')).toUpperCase());
+                var items = _this.getItems(_this.lookup);
+                var result = items.filter(function (item) { return (term == null ||
+                    Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(_this.getItemText(item, _this.lookup), '')).toUpperCase(), term)); });
+                result.push.apply(result, items.filter(function (item1) {
+                    var text = _this.getItemText(item1, _this.lookup);
+                    return term != null && !Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(text, '')).toUpperCase(), term) &&
+                        Select2.util.stripDiacritics(Q.coalesce(text, ''))
+                            .toUpperCase().indexOf(term) >= 0;
+                }));
+                results({
+                    items: result.slice(query.skip, query.take),
+                    more: results.length >= query.take
+                });
+            });
         };
         LookupEditorBase.prototype.getDialogTypeKey = function () {
             var dialogTypeKey = _super.prototype.getDialogTypeKey.call(this);

@@ -11,16 +11,23 @@
         constructor(input: JQuery, opt?: TOptions) {
             super(input, opt);
 
-            var self = this;
+            if (!this.hasAsyncSource()) {
+                this.updateItems();
+                var self = this;
+                Q.ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName, function () {
+                    self.updateItems();
+                });
+            }
+        }
 
-            this.updateItems();
-            Q.ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName, function () {
-                self.updateItems();
-            });
+        hasAsyncSource(): boolean {
+            return !!this.options.async;
         }
 
         destroy(): void {
-            Q.ScriptData.unbindFromChange(this.uniqueName);
+            if (!this.hasAsyncSource())
+                Q.ScriptData.unbindFromChange(this.uniqueName);
+
             super.destroy();
         }
 
@@ -43,6 +50,8 @@
             return key;
         }
 
+        protected lookup: Q.Lookup<TItem>;
+
         protected getLookupAsync(): PromiseLike<Q.Lookup<TItem>> {
             return Q.getLookupAsync<TItem>(this.getLookupKey());
         }
@@ -55,6 +64,10 @@
             return this.filterItems(this.cascadeItems(lookup.items));
         }
 
+        protected getIdField() {
+            return this.lookup != null ? this.lookup.idField : super.getIdField();
+        }
+
         protected getItemText(item: TItem, lookup: Q.Lookup<TItem>) {
             if (lookup == null)
                 return super.itemText(item);
@@ -63,33 +76,52 @@
             return textValue == null ? '' : textValue.toString();
         }
 
+        protected mapItem(item: TItem): Select2Item {
+            return {
+                id: this.itemId(item),
+                text: this.getItemText(item, this.lookup),
+                disabled: this.getItemDisabled(item, this.lookup),
+                source: item
+            };
+        }
+
         protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>) {
             return super.itemDisabled(item);
         }
 
         public updateItems() {
+            this.clearItems();
+            this.lookup = this.getLookup();
+            var items = this.getItems(this.lookup);
+            for (var item of items)
+                this.addItem(this.mapItem(item));
+        }
 
-            var updateItemsFor = (lookup: Q.Lookup<TItem>) => {
-                this.clearItems();
-                var items = this.getItems(lookup);
-                for (var item of items) {
-                    var text = this.getItemText(item, lookup);
-                    var disabled = this.getItemDisabled(item, lookup);
-                    var idValue = item[lookup.idField];
-                    var id = (idValue == null ? '' : idValue.toString());
-                    this.addItem({
-                        id: id,
-                        text: text,
-                        source: item,
-                        disabled: disabled
-                    });
-                }
-            }
+        protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise {
+            return this.getLookupAsync().then(lookup => {
+                this.lookup = lookup;
 
-            if (this.options.async)
-                this.getLookupAsync().then(updateItemsFor);
-            else
-                updateItemsFor(this.getLookup());
+                var term = (Q.isEmptyOrNull(query.searchTerm) ? '' : Select2.util.stripDiacritics(
+                    Q.coalesce(query.searchTerm, '')).toUpperCase());
+
+                var items = this.getItems(this.lookup);
+                var result = items.filter((item) => (term == null ||
+                    Q.startsWith(Select2.util.stripDiacritics(
+                        Q.coalesce(this.getItemText(item, this.lookup), '')).toUpperCase(), term)));
+
+                result.push(...items.filter(item1 => {
+                    var text = this.getItemText(item1, this.lookup);
+                    return term != null && !Q.startsWith(Select2.util.stripDiacritics(
+                        Q.coalesce(text, '')).toUpperCase(), term) &&
+                        Select2.util.stripDiacritics(Q.coalesce(text, ''))
+                            .toUpperCase().indexOf(term) >= 0
+                }));
+
+                results({
+                    items: result.slice(query.skip, query.take),
+                    more: results.length >= query.take
+                });
+            }) as any;
         }
 
         protected getDialogTypeKey() {

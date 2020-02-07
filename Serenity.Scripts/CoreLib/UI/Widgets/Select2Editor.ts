@@ -151,6 +151,10 @@ namespace Serenity {
             };
         }
 
+        protected mapItems(items: TItem[]): Select2Item[] {
+            return items.map(this.mapItem.bind(this));
+        }
+
         protected allowClear() {
             return (this.options as Select2EditorOptions).allowClear != null ?
                 !!(this.options as Select2EditorOptions).allowClear : this.emptyItemText() != null;
@@ -196,15 +200,14 @@ namespace Serenity {
                         queryPromise = this.asyncSearch(searchQuery, result => {
                             queryPromise = null;
                             query.callback({
-                                results: result.items.map(this.mapItem.bind(this)),
+                                results: this.mapItems(result.items),
                                 more: result.more
                             });
                         });
-                        if (queryPromise != null && (queryPromise.catch ?? queryPromise.fail))
-                            (queryPromise.catch ?? queryPromise.fail)(() => {
-                                queryPromise = null;
-                                select2 && select2.search && select2.search.removeClass('select2-active');
-                            });
+                        (queryPromise && (queryPromise.catch || queryPromise.fail)).call(queryPromise, () => {
+                            queryPromise = null;
+                            select2 && select2.search && select2.search.removeClass('select2-active');
+                        });
                     }, !query.term ? 0 : this.getTypeDelay());
                 }
 
@@ -260,8 +263,9 @@ namespace Serenity {
                             callback(item);
                         }
                     });
-                    if (initPromise != null && (initPromise.catch ?? initPromise.fail))
-                        (initPromise.catch ?? initPromise.fail)(() => initPromise = null);
+                    (initPromise && (initPromise.catch || initPromise.fail)).call(initPromise, () => {
+                        initPromise = null;
+                    });
                 }
             }
             else {

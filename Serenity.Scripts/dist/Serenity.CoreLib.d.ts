@@ -1493,6 +1493,7 @@ declare namespace Serenity {
         protected itemText(item: TItem): string;
         protected itemDisabled(item: TItem): boolean;
         protected mapItem(item: TItem): Select2Item;
+        protected mapItems(items: TItem[]): Select2Item[];
         protected allowClear(): boolean;
         protected isMultiple(): boolean;
         protected getSelect2Options(): Select2Options;
@@ -1604,14 +1605,19 @@ declare namespace Serenity {
     }
     class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
         constructor(input: JQuery, opt?: TOptions);
+        hasAsyncSource(): boolean;
         destroy(): void;
         protected getLookupKey(): string;
+        protected lookup: Q.Lookup<TItem>;
         protected getLookupAsync(): PromiseLike<Q.Lookup<TItem>>;
         protected getLookup(): Q.Lookup<TItem>;
         protected getItems(lookup: Q.Lookup<TItem>): TItem[];
+        protected getIdField(): any;
         protected getItemText(item: TItem, lookup: Q.Lookup<TItem>): any;
+        protected mapItem(item: TItem): Select2Item;
         protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>): boolean;
         updateItems(): void;
+        protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
         protected getDialogTypeKey(): string;
         protected setCreateTermOnNewEntity(entity: TItem, term: string): void;
         protected editDialogDataChange(): void;
