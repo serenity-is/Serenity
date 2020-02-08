@@ -29,6 +29,10 @@
             if (field.MinSelectLevel == SelectLevel.Never)
                 return false;
 
+            if (field.ReadPermission != null &&
+                !Authorization.HasPermission(field.ReadPermission))
+                return false;
+
             return true;
         }
 

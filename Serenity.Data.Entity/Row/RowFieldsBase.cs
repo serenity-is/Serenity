@@ -823,6 +823,48 @@ namespace Serenity.Data
                 return null;
         }
 
+        private bool initializedInstance;
+
+        internal RowFieldsBase InitInstance(Row row)
+        {
+            this.Initialize();
+
+            if (initializedInstance)
+                return this;
+
+            var attr = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
+            if (attr != null && attr.Permission != null)
+            {
+                var permission = attr.Permission;
+                if (attr.ApplyToLookups)
+                {
+                    foreach (var field in this)
+                    {
+                        if (field.ReadPermission == null)
+                            field.ReadPermission = permission;
+                    }
+                }
+                else
+                {
+                    var idField = (row as IIdRow).IdField as Field;
+                    var nameField = row.GetNameField();
+                    foreach (var field in this)
+                    {
+                        if (field.ReadPermission == null &&
+                            !ReferenceEquals(idField, field) &&
+                            !ReferenceEquals(nameField, field) &&
+                            field.GetAttribute<LookupIncludeAttribute>() == null)
+                        {
+                            field.ReadPermission = permission;
+                        }
+                    }
+                }
+            }
+
+            initializedInstance = true;
+            return this;
+        }
+
         public Field FindFieldByPropertyName(string propertyName)
         {
             Field field;
