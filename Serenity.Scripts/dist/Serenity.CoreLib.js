@@ -5463,6 +5463,7 @@ var Serenity;
                 _this.addInplaceCreate(Q.text('Controls.SelectEditor.InplaceAdd'), null);
             return _this;
         }
+        Select2Editor_1 = Select2Editor;
         Select2Editor.prototype.destroy = function () {
             if (this.element != null) {
                 this.element.select2('destroy');
@@ -5632,19 +5633,11 @@ var Serenity;
             else {
                 opt.data = this._items;
                 opt.query = function (query) {
-                    var term = (Q.isEmptyOrNull(query.term) ? '' : Select2.util.stripDiacritics(Q.coalesce(query.term, '')).toUpperCase());
-                    var results = _this._items.filter(function (item) {
-                        return term == null || Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(item.text, '')).toUpperCase(), term);
-                    });
-                    results.push.apply(results, _this._items.filter(function (item1) {
-                        return term != null && !Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(item1.text, '')).toUpperCase(), term) &&
-                            Select2.util.stripDiacritics(Q.coalesce(item1.text, ''))
-                                .toUpperCase().indexOf(term) >= 0;
-                    }));
+                    var items = Select2Editor_1.filterByText(_this._items, function (x) { return x.text; }, query.term);
                     var pageSize = _this.getPageSize();
                     query.callback({
-                        results: results.slice((query.page - 1) * pageSize, query.page * pageSize),
-                        more: results.length >= query.page * pageSize
+                        results: items.slice((query.page - 1) * pageSize, query.page * pageSize),
+                        more: items.length >= query.page * pageSize
                     });
                 };
                 opt.initSelection = function (element, callback) {
@@ -5855,6 +5848,24 @@ var Serenity;
         };
         Select2Editor.prototype.get_itemByKey = function () {
             return this.itemById;
+        };
+        Select2Editor.filterByText = function (items, getText, term) {
+            if (term == null || term.length == 0)
+                return items;
+            term = Select2.util.stripDiacritics(term).toUpperCase();
+            var contains = [];
+            function filter(item) {
+                var text = getText(item);
+                if (text == null || !text.length)
+                    return false;
+                text = Select2.util.stripDiacritics(text).toUpperCase();
+                if (Q.startsWith(text, term))
+                    return true;
+                if (text.indexOf(term) >= 0)
+                    contains.push(item);
+                return false;
+            }
+            return items.filter(filter).concat(contains);
         };
         Select2Editor.prototype.get_value = function () {
             var val;
@@ -6233,7 +6244,8 @@ var Serenity;
                 }
             });
         };
-        Select2Editor = __decorate([
+        var Select2Editor_1;
+        Select2Editor = Select2Editor_1 = __decorate([
             Serenity.Decorators.registerClass('Serenity.Select2Editor', [Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly]),
             Serenity.Decorators.element("<input type=\"hidden\"/>")
         ], Select2Editor);
@@ -6415,19 +6427,10 @@ var Serenity;
                 if (query.idList != null) {
                     items = items.filter(function (x) { return query.idList.indexOf(_this.itemId(x)) >= 0; });
                 }
-                if (!Q.isEmptyOrNull(query.searchTerm)) {
-                    var term = Select2.util.stripDiacritics(query.searchTerm.toUpperCase());
-                    var allItems = items;
-                    items = items.filter(function (item) {
-                        return Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(_this.getItemText(item, _this.lookup), '')).toUpperCase(), term);
-                    });
-                    items.push.apply(items, allItems.filter(function (item1) {
-                        var text = _this.getItemText(item1, _this.lookup);
-                        return term != null && !Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(text, '')).toUpperCase(), term) &&
-                            Select2.util.stripDiacritics(Q.coalesce(text, ''))
-                                .toUpperCase().indexOf(term) >= 0;
-                    }));
+                function getText(item) {
+                    return this.getItemText(item, this.lookup);
                 }
+                items = Serenity.Select2Editor.filterByText(items, getText.bind(_this), query.searchTerm);
                 results({
                     items: items.slice(query.skip, query.take),
                     more: items.length >= query.take

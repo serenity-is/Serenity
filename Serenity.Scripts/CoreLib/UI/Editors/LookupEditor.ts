@@ -107,21 +107,11 @@
                     items = items.filter(x => query.idList.indexOf(this.itemId(x)) >= 0);
                 }
 
-                if (!Q.isEmptyOrNull(query.searchTerm)) {
-                    var term = Select2.util.stripDiacritics(query.searchTerm.toUpperCase());
-                    var allItems = items;
-                    items = items.filter((item) =>
-                        Q.startsWith(Select2.util.stripDiacritics(
-                            Q.coalesce(this.getItemText(item, this.lookup), '')).toUpperCase(), term));
-
-                    items.push(...allItems.filter(item1 => {
-                        var text = this.getItemText(item1, this.lookup);
-                        return term != null && !Q.startsWith(Select2.util.stripDiacritics(
-                            Q.coalesce(text, '')).toUpperCase(), term) &&
-                            Select2.util.stripDiacritics(Q.coalesce(text, ''))
-                                .toUpperCase().indexOf(term) >= 0
-                    }));
+                function getText(item: TItem) {
+                    return this.getItemText(item, this.lookup);
                 }
+
+                items = Select2Editor.filterByText(items, getText.bind(this), query.searchTerm);
 
                 results({
                     items: items.slice(query.skip, query.take),

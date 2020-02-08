@@ -271,25 +271,11 @@ namespace Serenity {
             else {
                 opt.data = this._items;
                 opt.query = (query) => {
-                    var term = (Q.isEmptyOrNull(query.term) ? '' : Select2.util.stripDiacritics(
-                        Q.coalesce(query.term, '')).toUpperCase());
-
-                    var results = this._items.filter(function (item) {
-                        return term == null || Q.startsWith(Select2.util.stripDiacritics(
-                            Q.coalesce(item.text, '')).toUpperCase(), term);
-                    });
-
-                    results.push(...this._items.filter(item1 =>
-                        term != null && !Q.startsWith(Select2.util.stripDiacritics(
-                            Q.coalesce(item1.text, '')).toUpperCase(), term) &&
-                        Select2.util.stripDiacritics(Q.coalesce(item1.text, ''))
-                            .toUpperCase().indexOf(term) >= 0));
-
+                    var items = Select2Editor.filterByText(this._items, x => x.text, query.term);
                     var pageSize = this.getPageSize();
-
                     query.callback({
-                        results: results.slice((query.page - 1) * pageSize, query.page * pageSize),
-                        more: results.length >= query.page * pageSize
+                        results: items.slice((query.page - 1) * pageSize, query.page * pageSize),
+                        more: items.length >= query.page * pageSize
                     });
                 }
                 opt.initSelection = (element, callback) => {
@@ -525,6 +511,28 @@ namespace Serenity {
 
         protected get_itemByKey() {
             return this.itemById;
+        }
+
+        static filterByText<TItem>(items: TItem[], getText: (item: TItem) => string, term: string): TItem[] {
+            if (term == null || term.length == 0)
+                return items;
+
+            term = Select2.util.stripDiacritics(term).toUpperCase();
+
+            var contains: TItem[] = [];
+            function filter(item: TItem): boolean {
+                var text = getText(item);
+                if (text == null || !text.length)
+                    return false;
+                text = Select2.util.stripDiacritics(text).toUpperCase();
+                if (Q.startsWith(text, term))
+                    return true;
+                if (text.indexOf(term) >= 0)
+                    contains.push(item);
+                return false;
+            }
+
+            return items.filter(filter).concat(contains);
         }
 
         get_value() {

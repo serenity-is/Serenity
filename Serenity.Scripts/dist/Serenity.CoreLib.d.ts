@@ -1517,6 +1517,7 @@ declare namespace Serenity {
         protected get_select2Container(): JQuery;
         protected get_items(): Select2Item[];
         protected get_itemByKey(): Q.Dictionary<Select2Item>;
+        static filterByText<TItem>(items: TItem[], getText: (item: TItem) => string, term: string): TItem[];
         get_value(): any;
         get value(): string;
         set_value(value: string): void;
