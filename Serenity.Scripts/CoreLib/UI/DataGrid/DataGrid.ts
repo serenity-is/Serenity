@@ -688,7 +688,7 @@
                 return null;
             }
 
-            return this.titleDiv.children().text();
+            return this.titleDiv.children('.title-text').text();
         }
 
         setTitle(value: string) {
@@ -704,7 +704,7 @@
                         this.titleDiv = $('<div class="grid-title"><div class="title-text"></div></div>')
                             .prependTo(this.element);
                     }
-                    this.titleDiv.children().text(value);
+                    this.titleDiv.children('.title-text').text(value);
                 }
 
                 this.layout();

@@ -1755,6 +1755,7 @@ var Q;
     (function (LayoutTimer) {
         var timeout;
         var regs = [];
+        var regByKey = {};
         function startTimer() {
             if (timeout == null && regs.length) {
                 timeout = window.setTimeout(onTimeout, 100);
@@ -1770,7 +1771,7 @@ var Q;
             for (var _i = 0, regs_1 = regs; _i < regs_1.length; _i++) {
                 var reg = regs_1[_i];
                 try {
-                    reg.handler();
+                    reg();
                 }
                 catch (e) {
                     console.log(e);
@@ -1782,12 +1783,11 @@ var Q;
         function on(key, handler) {
             if (handler == null)
                 throw "Layout handler can't be null!";
-            if (key != null && Q.any(regs, function (x) { return x.key === key; }))
+            if (regByKey[key] !== undefined)
                 throw "There is already a registered layout handler with key: " + key;
-            regs.push({
-                key: key,
-                handler: handler,
-            });
+            if (key != null)
+                regByKey[key] = regs.length;
+            regs.push(handler);
             startTimer();
             return handler;
         }
@@ -1833,11 +1833,26 @@ var Q;
         }
         LayoutTimer.onHeightChange = onHeightChange;
         function off(key, handler) {
-            if (key != null)
-                regs = regs.filter(function (x) { return x.key !== key; });
-            if (handler != null)
-                regs = regs.filter(function (x) { return x.handler === handler; });
-            !regs.length && this.clearTimer();
+            if (key != null) {
+                var index = regByKey[key];
+                if (index !== undefined) {
+                    delete regByKey[key];
+                    if (handler == null || handler === regs[index]) {
+                        regs.splice(index, 1);
+                        !regs.length && this.clearTimer();
+                        return;
+                    }
+                }
+            }
+            if (handler != null) {
+                for (var l = regs.length - 1; l >= 0; l++) {
+                    if (regs[l] === handler) {
+                        regs.splice(l, 1);
+                        !regs.length && this.clearTimer();
+                        break;
+                    }
+                }
+            }
         }
         LayoutTimer.off = off;
     })(LayoutTimer = Q.LayoutTimer || (Q.LayoutTimer = {}));
@@ -6412,10 +6427,19 @@ var Serenity;
                 if (query.idList != null) {
                     items = items.filter(function (x) { return query.idList.indexOf(_this.itemId(x)) >= 0; });
                 }
-                function getText(item) {
-                    return this.getItemText(item, this.lookup);
+                if (!Q.isEmptyOrNull(query.searchTerm)) {
+                    var term = Select2.util.stripDiacritics(query.searchTerm.toUpperCase());
+                    var allItems = items;
+                    items = items.filter(function (item) {
+                        return Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(_this.getItemText(item, _this.lookup), '')).toUpperCase(), term);
+                    });
+                    items.push.apply(items, allItems.filter(function (item1) {
+                        var text = _this.getItemText(item1, _this.lookup);
+                        return term != null && !Q.startsWith(Select2.util.stripDiacritics(Q.coalesce(text, '')).toUpperCase(), term) &&
+                            Select2.util.stripDiacritics(Q.coalesce(text, ''))
+                                .toUpperCase().indexOf(term) >= 0;
+                    }));
                 }
-                items = Serenity.Select2Editor.filterByText(items, getText.bind(_this), query.searchTerm);
                 results({
                     items: items.slice(query.skip, query.take),
                     more: items.length >= query.take
@@ -12802,7 +12826,7 @@ var Serenity;
             if (!this.titleDiv) {
                 return null;
             }
-            return this.titleDiv.children().text();
+            return this.titleDiv.children('.title-text').text();
         };
         DataGrid.prototype.setTitle = function (value) {
             if (value !== this.getTitle()) {
@@ -12817,7 +12841,7 @@ var Serenity;
                         this.titleDiv = $('<div class="grid-title"><div class="title-text"></div></div>')
                             .prependTo(this.element);
                     }
-                    this.titleDiv.children().text(value);
+                    this.titleDiv.children('.title-text').text(value);
                 }
                 this.layout();
             }

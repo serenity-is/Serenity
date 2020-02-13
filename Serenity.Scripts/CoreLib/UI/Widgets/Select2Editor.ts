@@ -513,7 +513,7 @@ namespace Serenity {
             return this.itemById;
         }
 
-        static filterByText<TItem>(items: TItem[], getText: (item: TItem) => string, term: string): TItem[] {
+        public static filterByText<TItem>(items: TItem[], getText: (item: TItem) => string, term: string): TItem[] {
             if (term == null || term.length == 0)
                 return items;
 
