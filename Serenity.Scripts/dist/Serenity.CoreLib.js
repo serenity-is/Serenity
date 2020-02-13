@@ -1755,7 +1755,6 @@ var Q;
     (function (LayoutTimer) {
         var timeout;
         var regs = [];
-        var regByKey = {};
         function startTimer() {
             if (timeout == null && regs.length) {
                 timeout = window.setTimeout(onTimeout, 100);
@@ -1771,7 +1770,7 @@ var Q;
             for (var _i = 0, regs_1 = regs; _i < regs_1.length; _i++) {
                 var reg = regs_1[_i];
                 try {
-                    reg();
+                    reg.handler();
                 }
                 catch (e) {
                     console.log(e);
@@ -1783,11 +1782,12 @@ var Q;
         function on(key, handler) {
             if (handler == null)
                 throw "Layout handler can't be null!";
-            if (regByKey[key] !== undefined)
+            if (key != null && Q.any(regs, function (x) { return x.key === key; }))
                 throw "There is already a registered layout handler with key: " + key;
-            if (key != null)
-                regByKey[key] = regs.length;
-            regs.push(handler);
+            regs.push({
+                key: key,
+                handler: handler,
+            });
             startTimer();
             return handler;
         }
@@ -1833,26 +1833,11 @@ var Q;
         }
         LayoutTimer.onHeightChange = onHeightChange;
         function off(key, handler) {
-            if (key != null) {
-                var index = regByKey[key];
-                if (index !== undefined) {
-                    delete regByKey[key];
-                    if (handler == null || handler === regs[index]) {
-                        regs.splice(index, 1);
-                        !regs.length && this.clearTimer();
-                        return;
-                    }
-                }
-            }
-            if (handler != null) {
-                for (var l = regs.length - 1; l >= 0; l++) {
-                    if (regs[l] === handler) {
-                        regs.splice(l, 1);
-                        !regs.length && this.clearTimer();
-                        break;
-                    }
-                }
-            }
+            if (key != null)
+                regs = regs.filter(function (x) { return x.key !== key; });
+            if (handler != null)
+                regs = regs.filter(function (x) { return x.handler === handler; });
+            !regs.length && this.clearTimer();
         }
         LayoutTimer.off = off;
     })(LayoutTimer = Q.LayoutTimer || (Q.LayoutTimer = {}));
