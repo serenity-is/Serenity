@@ -108,6 +108,12 @@ namespace Serenity.Reporting
             else
                 args.Add("--no-background");
 
+            if (HeaderHtmlUrl != null)
+            {
+                args.Add("--header-html");
+                args.Add(HeaderHtmlUrl);
+            }
+
             if (FooterHtmlUrl != null)
             {
                 args.Add("--footer-html");
@@ -197,6 +203,7 @@ namespace Serenity.Reporting
         public string MarginRight { get; set; }
         public string MarginBottom { get; set; }
         public string MarginTop { get; set; }
+        public string HeaderHtmlUrl { get; set; }
         public string FooterHtmlUrl { get; set; }
 
         public Dictionary<string, string> FooterHeaderReplace { get; private set; }
