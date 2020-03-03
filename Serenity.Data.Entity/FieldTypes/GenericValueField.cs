@@ -23,7 +23,7 @@ namespace Serenity.Data
         public override object ConvertValue(object source, IFormatProvider provider)
         {
 #if COREFX
-            if (source is JValue)
+            ; if (source is JValue)
                 source = ((JValue)source).Value;
 #endif
 

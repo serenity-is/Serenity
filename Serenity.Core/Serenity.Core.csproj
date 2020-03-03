@@ -7,6 +7,10 @@
     <Description>Contains abstractions and implementations for some basic Serenity features like authorization, caching, localization, dependency resolution, reflection...</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <OutputPath>C:\Users\marcu\.nuget\packages\serenity.web\3.9.12\lib\</OutputPath>
+    <DocumentationFile>C:\Users\marcu\.nuget\packages\serenity.web\3.9.12\lib\netstandard2.0\Serenity.Core.xml</DocumentationFile>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>

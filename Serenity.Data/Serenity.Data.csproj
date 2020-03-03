@@ -7,6 +7,10 @@
     <Description>Contains helper classes for SQL data connections, fluent SQL builders, criteria, join definitions, data mapping, validation...</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <DocumentationFile>C:\Users\marcu\.nuget\packages\serenity.web\3.9.12\lib\netstandard2.0\Serenity.Data.xml</DocumentationFile>
+    <OutputPath>C:\Users\marcu\.nuget\packages\serenity.web\3.9.12\lib</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
   </ItemGroup>

@@ -6,6 +6,9 @@
     <Title>Serenity Platform - Services Library</Title>
     <Description>Contains classes for CRUD service / repository implementations...</Description>            
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <OutputPath>C:\Users\marcu\.nuget\packages\serenity.web\3.9.12\lib</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj" />
