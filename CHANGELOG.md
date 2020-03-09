@@ -1,3 +1,8 @@
+## 3.12.4 (2020-03-09)
+
+Bugfixes:
+  - shouldn't validate not null fields with default values on insert, if they are not assigned explicitly as the default value will be applied automatically. resolves create service issues with notnull fields with defaultvalue attributes, where these fields are not visible in form.
+
 ## 3.12.3 (2020-02-22)
 
 Features:
