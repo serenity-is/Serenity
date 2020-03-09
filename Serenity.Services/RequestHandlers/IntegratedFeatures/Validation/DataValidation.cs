@@ -35,7 +35,10 @@ namespace Serenity.Services
         public static void ValidateRequired(this Row row, IEnumerable<Field> fields)
         {
             foreach (var field in fields)
-                ValidateRequired(row, field);
+            {
+                if (field.DefaultValue == null || row.IsAssigned(field))
+                    ValidateRequired(row, field);
+            }
         }
 
         public static void ValidateRequiredIfModified(this Row row, IEnumerable<Field> fields)
