@@ -93,7 +93,7 @@ https://www.youtube.com/watch?v=tcywhS9k9Wc
 
 https://www.youtube.com/watch?v=hkU6iVFlWl8
 
-** Serenity Videos in Arabic (by @MohamedEbrahimSaad)
+**Serenity Videos in Arabic (by @MohamedEbrahimSaad)**:
 
 https://www.youtube.com/watch?v=op15-Q2TDjg&list=PLZyQU-WOzZF0Ub4jHd-LXT_hzHsUd5oD4
 
