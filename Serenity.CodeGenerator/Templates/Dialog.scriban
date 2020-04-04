@@ -1,5 +1,4 @@
-﻿
-namespace {{RootNamespace}}{{DotModule}} {
+﻿namespace {{RootNamespace}}{{DotModule}} {
 
     @Serenity.Decorators.registerClass(){{if CustomSettings.MaximizableDialog}}
     @Serenity.Decorators.maximizable(){{end}}

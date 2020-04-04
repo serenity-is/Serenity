@@ -1,5 +1,4 @@
-﻿
-namespace {{RootNamespace}}{{DotModule}} {
+﻿namespace {{RootNamespace}}{{DotModule}} {
     export interface {{RowClassName}} {%{{}%}{{for f in Fields}}
         {{f.Ident}}?: {{f.TSType}};{{end}}{{for j in Joins}}{{for k in j.Fields}}
         {{k.Ident}}?: {{k.TSType}};{{end}}{{end}}

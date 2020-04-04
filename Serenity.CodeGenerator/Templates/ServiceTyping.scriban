@@ -1,5 +1,4 @@
-﻿
-namespace {{RootNamespace}}{{DotModule}} {
+﻿namespace {{RootNamespace}}{{DotModule}} {
     export namespace {{ClassName}}Service {
         export const baseUrl = '{{ModuleSlash}}{{ClassName}}';
 

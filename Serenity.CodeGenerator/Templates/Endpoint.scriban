@@ -1,5 +1,4 @@
-﻿
-namespace {{RootNamespace}}{{DotModule}}.Endpoints
+﻿namespace {{RootNamespace}}{{DotModule}}.Endpoints
 {
     using Serenity;
     using Serenity.Data;

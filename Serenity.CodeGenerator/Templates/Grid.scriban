@@ -1,5 +1,4 @@
-﻿
-namespace {{RootNamespace}}{{DotModule}} {
+﻿namespace {{RootNamespace}}{{DotModule}} {
 
     @Serenity.Decorators.registerClass()
     export class {{ClassName}}Grid extends Serenity.EntityGrid<{{RowClassName}}, any> {

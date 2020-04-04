@@ -1,5 +1,4 @@
-﻿
-namespace {{RootNamespace}}{{DotModule}} {
+﻿namespace {{RootNamespace}}{{DotModule}} {
     export class {{ClassName}}Form extends Serenity.PrefixedContext {
         static formKey = '{{ModuleDot}}{{ClassName}}';
     }

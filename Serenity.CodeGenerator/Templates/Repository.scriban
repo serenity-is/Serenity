@@ -1,5 +1,4 @@
-﻿
-namespace {{RootNamespace}}{{DotModule}}.Repositories
+﻿namespace {{RootNamespace}}{{DotModule}}.Repositories
 {
     using Serenity;
     using Serenity.Data;

@@ -1,5 +1,4 @@
-﻿
-namespace {{RootNamespace}}{{DotModule}}.Columns
+﻿namespace {{RootNamespace}}{{DotModule}}.Columns
 {
     using Serenity;
     using Serenity.ComponentModel;

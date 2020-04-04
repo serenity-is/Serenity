@@ -1,5 +1,4 @@
-﻿
-namespace {{RootNamespace}}{{DotModule}}.Forms
+﻿namespace {{RootNamespace}}{{DotModule}}.Forms
 {
     using Serenity;
     using Serenity.ComponentModel;

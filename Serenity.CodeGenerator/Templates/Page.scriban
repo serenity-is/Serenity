@@ -1,5 +1,4 @@
-﻿
-namespace {{RootNamespace}}{{DotModule}}.Pages
+﻿namespace {{RootNamespace}}{{DotModule}}.Pages
 {
     using Serenity;
     using Serenity.Web;{{if AspNetCore}}
