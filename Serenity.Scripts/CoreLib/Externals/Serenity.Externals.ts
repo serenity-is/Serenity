@@ -187,6 +187,9 @@ namespace Q {
         return $.extend({
             ignore: ":hidden",
             meta: 'v',
+            normalizer: function (value: any) {
+                return $.trim(value);
+            },
             errorClass: 'error',
             errorPlacement: function (error: any, element: any) {
                 let field: any = null;
