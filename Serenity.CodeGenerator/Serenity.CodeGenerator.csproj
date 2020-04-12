@@ -1,13 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project>
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>dotnet-sergen</AssemblyName>
+    <BaseIntermediateOutputPath>obj\Serenity.CodeGenerator\</BaseIntermediateOutputPath>
     <TargetFrameworks>netcoreapp2.2;netcoreapp3.1;net461</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <PackageId>Serenity.CodeGenerator</PackageId>
     <DefineConstants>$(DefineConstants);ASPNETCORE</DefineConstants>
   </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>
     <EmbeddedResource Include="..\Serenity.Scripts\dist\Serenity.CodeGeneration.js">
       <Link>Serenity.CodeGeneration.js</Link>
@@ -49,4 +51,5 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
     <DefineConstants>$(DefineConstants);COREFX</DefineConstants>
   </PropertyGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>
