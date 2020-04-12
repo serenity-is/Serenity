@@ -1,3 +1,8 @@
+## 3.12.6 (2020-04-12)
+
+Bugfixes:
+  - fix css bundle manager removes quotes in url for data uris while adjusting relative paths in css bundle
+
 ## 3.12.5 (2020-04-12)
 
 Bugfixes:
