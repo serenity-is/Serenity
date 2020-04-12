@@ -318,11 +318,11 @@ namespace Serenity.Web
         {
             if (string.IsNullOrWhiteSpace(url) ||
                 (url.IndexOf("://") >= 0))
-                return url;
+                return prefix + url + suffix;
 
             url = url.TrimStart();
             if (string.IsNullOrWhiteSpace(url) || url[0] == '/')
-                return url;
+                return prefix + url + suffix;
 
             if (url.StartsWith("data:"))
                 return prefix + url + suffix;
@@ -330,11 +330,11 @@ namespace Serenity.Web
             var question = url.IndexOf('?');
             if (question >= 0)
             {
-                return new Uri("x:" + absolutePath + url.Substring(0, question)).AbsolutePath.Substring(2)
-                    + url.Substring(question);
+                return prefix + new Uri("x:" + absolutePath + url.Substring(0, question)).AbsolutePath.Substring(2)
+                    + url.Substring(question) + suffix;
             }
 
-            return new Uri("x:" + absolutePath + url).AbsolutePath.Substring(2);
+            return prefix + new Uri("x:" + absolutePath + url).AbsolutePath.Substring(2) + suffix;
         }
 
         private static string RewriteUrlsToAbsolute(string virtualPath, string content)
