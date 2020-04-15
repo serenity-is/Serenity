@@ -353,7 +353,7 @@ namespace Serenity.Services
                         .From(row)
                         .Select((Field)rowIdField)
                         .Where(
-                            foreignKeyField == new ValueCriteria(masterKeyField.AsObject(handler.Row)) &
+                            foreignKeyField == new ValueCriteria(masterKeyField.AsSqlValue(handler.Row)) &
                             queryCriteria)
                         .ForEach(handler.Connection, () =>
                         {
@@ -393,7 +393,7 @@ namespace Serenity.Services
                     .From(row)
                     .Select((Field)rowIdField)
                     .Where(
-                            foreignKeyField == new ValueCriteria(masterKeyField.AsObject(handler.Row)) &
+                            foreignKeyField == new ValueCriteria(masterKeyField.AsSqlValue(handler.Row)) &
                             queryCriteria)
                     .ForEach(handler.Connection, () =>
                     {

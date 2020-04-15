@@ -381,6 +381,11 @@ namespace Serenity.Data
         public abstract void AsObject(Row row, object value);
         protected abstract bool GetIsNull(Row row);
 
+        public virtual object AsSqlValue(Row row)
+        {
+            return AsObject(row);
+        }
+
         public bool IsNull(Row row)
         {
             CheckUnassignedRead(row);

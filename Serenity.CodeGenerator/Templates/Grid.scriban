@@ -6,6 +6,7 @@ namespace {{RootNamespace}}{{DotModule}} {
         protected getColumnsKey() { return '{{ModuleDot}}{{ClassName}}'; }
         protected getDialogType() { return {{ClassName}}Dialog; }{{if Identity}}
         protected getIdProperty() { return {{RowClassName}}.idProperty; }{{end}}
+        protected getInsertPermission() { return {{RowClassName}}.insertPermission; }
         protected getLocalTextPrefix() { return {{RowClassName}}.localTextPrefix; }
         protected getService() { return {{ClassName}}Service.baseUrl; }
 

@@ -75,7 +75,7 @@ namespace Serenity.Services
                     {
                         var update = new SqlUpdate(Row.Table);
                         update.Set(Row);
-                        update.Where(idField == new ValueCriteria(idField.AsObject(Old)));
+                        update.Where(idField == new ValueCriteria(idField.AsSqlValue(Old)));
                         update.Execute(Connection, ExpectedRows.One);
                     }
                     else
@@ -236,7 +236,7 @@ namespace Serenity.Services
             var idField = (Field)(Row.IdField);
             var id = Request.EntityId != null ?
                 idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
-                : idField.AsObject(Row);
+                : idField.AsSqlValue(Row);
 
             var query = new SqlQuery()
                 .Dialect(Connection.GetDialect())
@@ -451,7 +451,8 @@ namespace Serenity.Services
         protected virtual void ValidateAndClearIdField()
         {
             var idField = (Field)(Row.IdField);
-            Row.ValidateRequired(idField);
+            if (Row.IsAssigned(idField))
+                Row.ValidateRequired(idField);
 
             if ((idField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
                 Row.ClearAssignment(idField);

@@ -101,6 +101,11 @@ namespace Serenity.Reporting
         string MarginTop { get; set; }
 
         /// <summary>
+        /// Url of header HTML page
+        /// </summary>
+        string HeaderHtmlUrl { get; set; }
+
+        /// <summary>
         /// Url of footer HTML page
         /// </summary>
         string FooterHtmlUrl { get; set; }

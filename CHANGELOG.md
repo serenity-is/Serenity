@@ -1,3 +1,109 @@
+## 3.12.6 (2020-04-12)
+
+Bugfixes:
+  - fix css bundle manager removes quotes in url for data uris while adjusting relative paths in css bundle
+
+## 3.12.5 (2020-04-12)
+
+Bugfixes:
+  - fix css bundle manager ignoring usemincss setting if the included file already has .min.css extension
+  - jquery.validate has changed required logic to not trim input value by default, so whitespace was considered valid for string inputs
+  
+## 3.12.4 (2020-03-09)
+
+Bugfixes:
+  - shouldn't validate not null fields with default values on insert, if they are not assigned explicitly as the default value will be applied automatically. resolves create service issues with notnull fields with defaultvalue attributes, where these fields are not visible in form.
+
+## 3.12.3 (2020-02-22)
+
+Features:
+  - if null value handling is set to include, row converter should also serialize null fields
+  - define JsonSettings.StrictIncludeNulls and JsonSettings.TolerantIncludeNulls which serializes null values, and checks them on deserialization. JSON class methods also has an additional includeNulls (default = false) to be able to use these settings.
+  - added NavigationPermissionAttribute which takes precedence over ReadPermissionAttribute on a row to determine permission for page and navigation item of the row.
+  - add AsSqlValue method which calls AsObject by default to Field object. this will be useful for fields which has a different storage type then their value type, e.g. JsonField
+  - added JsonField<TValue> type. it has no attributes that controls serialization options like nulls so such options must be set through Field.Settings property if required for now.
+  - don't show an error if xhr status is abort
+  - added async source support to Select2Editor
+  - added async option to use getLookupAsync to lookup editor
+  - added ServiceLookupEditor type
+  - don't use type delay for initial load, hide select2 spinner while waiting for type delay
+  - add async option to lookupeditor which makes it work like a service lookup editor
+  - added FieldReadPermissionAttribute which determines the default permission required to read fields of a row, optionally excluding [LookupInclude] and Id/Name fields. This will make it easier to use a ServiceLookupEditor with a row, for example by setting [ReadPermission("Northwind:Lookups")], [FieldReadPermission("Northwind:General", ApplyToLookups = false)], [NavigationPermission("Northwind:General")], so only users with Northwind.General can see the page and read all the fields through the list service / grid, while a user with Northwind.Lookups permission can call List service but can only read ID + Name + LookupInclude fields through it.
+  - adding missing field HeaderHtmlUrl to IHtmlToPdfOptions
+  - include pdb file for serenity.web for source link debug support
+  - ensure connection is open for better compatibility with mvc version in dapper interface
+  
+Bugfixes:
+  - fix Q.getLookupAsync not actually working async
+  - avoid double initSelection by setting select2-change-triggered
+  - fix layout timer registration cleanup
+  - title text should be read from child with .title-text class
+  - avoid exception while determining url when a controller has multiple action methods with same name
+  
+## 3.12.2 (2020-01-11)
+
+Bugfixes:
+  - DataGrid.updateInterface might fail if grid has no toolbar
+  - make sure quick filters bar can still be created within a fake toolbar div, even when grid has no toolbar
+
+## 3.12.1 (2020-01-11)
+
+Bugfixes:
+  - revert updates to System.Threading.Tasks.Extensions and System.Runtime.CompilerServices.Unsafe in Sergen (NET45)
+
+## 3.12.0 (2020-01-08)
+
+Bugfixes:
+  - fix embedded resource issue with new sergen tool
+
+## 3.11.0 (2020-01-08)
+
+Features:
+  - introduce sergen as a global/local dotnet tool as DotNetCliToolReference can't be used with .NET Core 3+ (remove DotNetCliToolReference from CSPROJ, run "dotnet new tool-manifest" in CSPROJ dir, followed by "dotnet tool install sergen", then "dotnet tool restore" and use "dotnet sergen" as before)
+
+
+## 3.10.1 (2020-01-08)
+
+Bugfixes:
+  - compatibility issue with dotnet sergen
+
+
+## 3.10.0 (2020-01-08)
+
+Features:
+  - support for .NET Core / ASP.NET Core 3.1 (you'll need Visual Studio 2019 as .NET Core 3 SDK is not supported in VS 2017 or older versions.)
+  - selectable ability like checkbox selection for radio (#4777)
+
+Bugfixes:
+  - make sure required field validation server side also runs for non-string fields
+  - only validate idField if it is actually assigned in saverequesthandler
+## 3.9.14 (2019-12-23)
+
+Features:
+  - Int64Field should serialize big values into strings just like JsonSafeInt64Converter to avoid loss of precision due to javascript JSON deserialization
+  - call ValidatePermissions in DeleteRequestHandler just before ValidateRequest, so that Request can be accessible there, closes #4785
+
+Bugfixes:
+  - latest changes for permissions in Dialog.scriban and Grid.scriban had syntax errors.
+
+## 3.9.13 (2019-12-10)
+Features:
+  - generate TS code for types with NestedPermissionKeys attribute
+  - added ScriptSkip attribute to optionally skip code generation for some types and service methods
+  - converted quick filter bar into a separate component, so that it can be used without a data grid
+  - added ability for toolbar buttons to control their own visibility and disabled states through updateInterface handler if a visible/disabled option as a function is set
+  - added readOnly property and reated interface methods to datagrid, updateInterface calls toolbar.updateInterface for new toolbutton disabled/visible methods
+  - added getInsertPermission method to EntityGrid, transfer readOnly property to opened dialogs if any
+  - implemented readOnly property for entity dialog
+  - added useViewMode method which when true opens entity dialog in view mode initially and shows an edit button
+  - added getInsertPermission, getUpdatePermission, getDeletePermission methods which controls button visibility to EntityDialog
+  - added EditorUtils.setContainerReadOnly method which is used by entity dialog to make all form editors readonly in readonly/view modes
+  - server typings generator generates row permissions in Row.ts
+  - use permissions in grid/dialog/row typings generated by sergen
+  
+Bugfixes:
+  - jquery ui tabsshow event is now tabsactivate
+
 ## 3.9.12 (2019-11-12)
 
 Features:

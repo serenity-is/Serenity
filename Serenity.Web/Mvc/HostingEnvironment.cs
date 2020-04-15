@@ -4,6 +4,9 @@ using System.IO;
 using Serenity;
 using Microsoft.AspNetCore.Http;
 using System;
+#if !ASPNETCORE22
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
+#endif
 
 namespace Serenity.Web
 {

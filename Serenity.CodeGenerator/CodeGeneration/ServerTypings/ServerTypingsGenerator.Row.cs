@@ -148,6 +148,23 @@ namespace Serenity.CodeGeneration
             return DetermineRowIdentifier(rowType);
         }
 
+        private string DeterminePermission(TypeDefinition rowType, params string[] attributeNames)
+        {
+            CustomAttribute permissionAttr = null;
+            foreach (var attributeName in attributeNames)
+            {
+                permissionAttr = CecilUtils.GetAttr(rowType, "Serenity.Data", attributeName + "PermissionAttribute");
+                if (permissionAttr != null)
+                    break;
+            }
+
+            if (permissionAttr == null)
+                return null;
+
+            return string.Join(":", permissionAttr.ConstructorArguments.Where(x => (x.Value as string) != null || (x.Value is CustomAttributeArgument))
+                .Select(x => (x.Value as string) ?? (((CustomAttributeArgument)x.Value).Value.ToString())));
+        }
+
         private string AutoLookupKeyFor(TypeDefinition type)
         {
             string module;
@@ -279,56 +296,49 @@ namespace Serenity.CodeGeneration
 
             cw.InBrace(delegate
             {
-                bool anyMetadata = false;
-
                 if (idProperty != null)
                 {
-                    cw.Indented("export const idProperty = '");
-                    sb.Append(idProperty);
-                    sb.AppendLine("';");
-                    anyMetadata = true;
+                    cw.Indented("export const idProperty = ");
+                    sb.Append(idProperty.ToSingleQuoted());
+                    sb.AppendLine(";");
                 }
 
                 if (isActiveProperty != null)
                 {
-                    cw.Indented("export const isActiveProperty = '");
-                    sb.Append(isActiveProperty);
-                    sb.AppendLine("';");
-                    anyMetadata = true;
+                    cw.Indented("export const isActiveProperty = ");
+                    sb.Append(isActiveProperty.ToSingleQuoted());
+                    sb.AppendLine(";");
                 }
 
                 if (isDeletedProperty != null)
                 {
-                    cw.Indented("export const isDeletedProperty = '");
-                    sb.Append(isDeletedProperty);
-                    sb.AppendLine("';");
-                    anyMetadata = true;
+                    cw.Indented("export const isDeletedProperty = ");
+                    sb.Append(isDeletedProperty.ToSingleQuoted());
+                    sb.AppendLine(";");
                 }
 
                 if (nameProperty != null)
                 {
-                    cw.Indented("export const nameProperty = '");
-                    sb.Append(nameProperty);
-                    sb.AppendLine("';");
-                    anyMetadata = true;
+                    cw.Indented("export const nameProperty = ");
+                    sb.Append(nameProperty.ToSingleQuoted());
+                    sb.AppendLine(";");
                 }
 
                 var localTextPrefix = DetermineLocalTextPrefix(rowType);
                 if (!string.IsNullOrEmpty(localTextPrefix))
                 {
-                    cw.Indented("export const localTextPrefix = '");
-                    sb.Append(localTextPrefix);
-                    sb.AppendLine("';");
-                    anyMetadata = true;
+                    cw.Indented("export const localTextPrefix = ");
+                    sb.Append(localTextPrefix.ToSingleQuoted());
+                    sb.AppendLine(";");
                 }
 
                 AddRowTexts(rowType, "Db." + (localTextPrefix.IsEmptyOrNull() ? "" : (localTextPrefix + ".")));
 
                 if (!string.IsNullOrEmpty(lookupKey))
                 {
-                    cw.Indented("export const lookupKey = '");
-                    sb.Append(lookupKey);
-                    sb.AppendLine("';");
+                    cw.Indented("export const lookupKey = ");
+                    sb.Append(lookupKey.ToSingleQuoted());
+                    sb.AppendLine(";");
 
                     sb.AppendLine();
                     cw.Indented("export function getLookup(): Q.Lookup<");
@@ -338,17 +348,32 @@ namespace Serenity.CodeGeneration
                     {
                         cw.Indented("return Q.getLookup<");
                         sb.Append(rowType.Name);
-                        sb.Append(">('");
-                        sb.Append(lookupKey);
-                        sb.AppendLine("');");
+                        sb.Append(">(");
+                        sb.Append(lookupKey.ToSingleQuoted());
+                        sb.AppendLine(");");
                     });
-
-                    anyMetadata = true;
-
                 }
 
-                if (anyMetadata)
-                    sb.AppendLine();
+                var deletePermission = DeterminePermission(rowType, "Delete", "Modify", "Read");
+                cw.Indented("export const deletePermission = ");
+                sb.Append(deletePermission == null ? "null" : deletePermission.ToSingleQuoted());
+                sb.AppendLine(";");
+
+                var insertPermission = DeterminePermission(rowType, "Insert", "Modify", "Read");
+                cw.Indented("export const insertPermission = ");
+                sb.Append(insertPermission == null ? "null" : insertPermission.ToSingleQuoted());
+                sb.AppendLine(";");
+
+                var readPermission = DeterminePermission(rowType, "Read") ?? "";
+                cw.Indented("export const readPermission = ");
+                sb.Append(readPermission == null ? "null" : readPermission.ToSingleQuoted());
+                sb.AppendLine(";");
+
+                var updatePermission = DeterminePermission(rowType, "Update", "Modify", "Read");
+                cw.Indented("export const updatePermission = ");
+                sb.Append(updatePermission == null ? "null" : updatePermission.ToSingleQuoted());
+                sb.AppendLine(";");
+                sb.AppendLine();
 
                 cw.Indented("export declare const enum ");
                 sb.Append("Fields");
@@ -362,9 +387,8 @@ namespace Serenity.CodeGeneration
                             sb.AppendLine(",");
 
                         cw.Indented(property.Name);
-                        sb.Append(" = \"");
-                        sb.Append(property.Name);
-                        sb.Append("\"");
+                        sb.Append(" = ");
+                        sb.Append(property.Name.ToJson());
 
                         inserted++;
                     }

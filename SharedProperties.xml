@@ -1,7 +1,7 @@
 ﻿<Project>
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <VersionPrefix>3.9.12</VersionPrefix>
+    <VersionPrefix>3.12.6</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -22,6 +22,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-	<None Include="$(MSBuildThisFileDirectory)tools\Images\serenity-logo-128.png" Pack="true" PackagePath="" />
+    <None Include="$(MSBuildThisFileDirectory)tools\Images\serenity-logo-128.png" Pack="true" PackagePath="" />
   </ItemGroup>
 </Project>

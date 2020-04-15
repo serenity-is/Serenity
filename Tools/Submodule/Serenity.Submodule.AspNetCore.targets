@@ -30,6 +30,6 @@
     <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Scripts\dist\Serenity.CoreLib.js" DestinationFiles="$(ProjectDir)wwwroot\Scripts\serenity\Serenity.CoreLib.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Scripts\dist\Serenity.CoreLib.js')" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Scripts\dist\Serenity.CoreLib.js.map" DestinationFiles="$(ProjectDir)wwwroot\Scripts\serenity\Serenity.CoreLib.js.map" Condition="Exists('$(SolutionDir)Serenity\Serenity.Scripts\dist\Serenity.CoreLib.js.map')" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Scripts\dist\Serenity.CoreLib.min.js" DestinationFiles="$(ProjectDir)wwwroot\Scripts\serenity\Serenity.CoreLib.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Scripts\dist\Serenity.CoreLib.min.js')" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Scripts\dist\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)wwwroot\Scripts\typings\serenity\Serenity.CoreLib.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.Scripts\dist\Serenity.CoreLib.d.ts')"  SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Scripts\dist\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)typings\serenity\Serenity.CoreLib.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.Scripts\dist\Serenity.CoreLib.d.ts')"  SkipUnchangedFiles="true" />
   </Target>
 </Project>

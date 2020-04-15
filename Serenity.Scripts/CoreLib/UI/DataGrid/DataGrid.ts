@@ -10,14 +10,15 @@
     export class IDataGrid {
     }
 
-    @Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid])
+    @Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid, IReadOnly])
     @Serenity.Decorators.element("<div/>")
-    export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid {
+    export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid, IReadOnly {
 
         protected titleDiv: JQuery;
         protected toolbar: Toolbar;
         protected filterBar: FilterDisplayBar;
         protected quickFiltersDiv: JQuery;
+        protected quickFiltersBar: QuickFilterBar;
         protected slickContainer: JQuery;
         protected allColumns: Slick.Column[];
         protected initialSettings: PersistedGridSettings;
@@ -26,7 +27,6 @@
         private isActiveProperty: string;
         private localTextDbPrefix: string;
         private isDisabled: boolean;
-        private submitHandlers: any;
         private rows: any;
         private slickGridOnSort: any;
         private slickGridOnClick: any;
@@ -78,6 +78,7 @@
             this.createQuickFilters();
 
             this.updateDisabledState();
+            this.updateInterface();
 
             if (!this.isAsyncWidget()) {
                 this.initialSettings = this.getCurrentSettings(null);
@@ -88,14 +89,6 @@
 
         protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
             return (ss as any).getAttributes((ss as any).getInstanceType(this), attrType, true);
-        }
-
-        protected add_submitHandlers(action: () => void): void {
-            this.submitHandlers = (ss as any).delegateCombine(this.submitHandlers, action);
-        }
-
-        protected remove_submitHandlers(action: () => void): void {
-            this.submitHandlers = (ss as any).delegateRemove(this.submitHandlers, action);
         }
 
         protected layout(): void {
@@ -140,87 +133,57 @@
         protected createToolbarExtensions(): void {
         }
 
-        protected createQuickFilters(): void {
-            var filters = this.getQuickFilters();
-            for (var f = 0; f < filters.length; f++) {
-                var filter = filters[f];
-                this.addQuickFilter(filter);
+        protected ensureQuickFilterBar(): QuickFilterBar {
+
+            if (this.quickFiltersDiv == null)
+                this.createQuickFilters([]);
+
+            return this.quickFiltersBar;
+        }
+
+        protected createQuickFilters(filters?: QuickFilter<Widget<any>, any>[]): void {
+
+            if (this.quickFiltersDiv == null && (filters != null ||
+                ((filters = this.getQuickFilters()) && filters != null && filters.length))) {
+                this.quickFiltersDiv = $('<div/>').addClass('quick-filters-bar');
+                if (this.toolbar) {
+                    $('<div/>').addClass('clear').appendTo(this.toolbar.element);
+                    this.quickFiltersDiv.appendTo(this.toolbar.element);
+                }
+                else {
+                    this.quickFiltersDiv.appendTo($('<div/>').addClass('s-Toolbar').insertBefore(this.slickContainer));
+                }
+
+                this.quickFiltersBar = new QuickFilterBar(this.quickFiltersDiv, {
+                    filters: filters,
+                    getTitle: (filter: QuickFilter<Widget<any>, any>) => this.determineText(pre => pre + filter.field),
+                    idPrefix: this.uniqueName + '_QuickFilter_'
+                });
+                this.quickFiltersBar.onChange = (e) => this.quickFilterChange(e);
             }
         }
 
         protected getQuickFilters(): QuickFilter<Widget<any>, any>[] {
-            var list = [];
-
-            var columns = this.allColumns.filter(function (x) {
-                return x.sourceItem && 
+            return this.allColumns.filter(function (x) {
+                return x.sourceItem &&
                     x.sourceItem.quickFilter === true &&
                     (x.sourceItem.readPermission == null ||
-                     Q.Authorization.hasPermission(x.sourceItem.readPermission));
-            });
-
-            for (var column of columns) {
-                var item = column.sourceItem;
-                var quick: any = {};
-
-                var name = item.name;
-                var title = Q.tryGetText(item.title);
-                if (title == null) {
-                    title = item.title;
-                    if (title == null) {
-                        title = name;
-                    }
-                }
-
-                var filteringType = Serenity.FilteringTypeRegistry.get(Q.coalesce(item.filteringType, 'String'));
-                if (filteringType === Serenity.DateFiltering) {
-                    quick = this.dateRangeQuickFilter(name, title);
-                }
-                else if (filteringType === Serenity.DateTimeFiltering) {
-                    quick = this.dateTimeRangeQuickFilter(name, title);
-                }
-                else if (filteringType === Serenity.BooleanFiltering) {
-                    var q = item.quickFilterParams || {};
-                    var f = item.filteringParams || {};
-                    var trueText = q['trueText'];
-                    if (trueText == null) {
-                        trueText = f['trueText'];
-                    }
-                    var falseText = q['falseText'];
-                    if (falseText == null) {
-                        falseText = f['falseText'];
-                    }
-                    quick = this.booleanQuickFilter(name, title, trueText, falseText);
-                }
-                else {
-                    var filtering = new (filteringType as any)() as IFiltering;
-                    if (filtering && (ss as any).isInstanceOfType(filtering, Serenity.IQuickFiltering)) {
-                        Serenity.ReflectionOptionsSetter.set(filtering, item.filteringParams);
-                        filtering.set_field(item);
-                        filtering.set_operator({ key: Serenity.FilterOperators.EQ });
-                        (filtering as any).initQuickFilter(quick);
-                        quick.options = Q.deepClone(quick.options, item.quickFilterParams);
-                    }
-                    else {
-                        continue;
-                    }
-                }
-
-                if (!!item.quickFilterSeparator) {
-                    quick.separator = true;
-                }
-
-                quick.cssClass = item.quickFilterCssClass;
-                list.push(quick);
-            }
-
-            return list;
+                        Q.Authorization.hasPermission(x.sourceItem.readPermission));
+            }).map(x => QuickFilterBar.propertyItemToQuickFilter(x.sourceItem))
+                .filter(x => x != null);
         }
 
         protected findQuickFilter<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
+            if (this.quickFiltersBar != null)
+                return this.quickFiltersBar.find(type, field);
+
             return $('#' + this.uniqueName + '_QuickFilter_' + field).getWidget(type);
         }
 
         protected tryFindQuickFilter<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
+            if (this.quickFiltersBar != null)
+                return this.quickFiltersBar.tryFind(type, field);
+
             var el = $('#' + this.uniqueName + '_QuickFilter_' + field);
             if (!el.length)
                 return null;
@@ -244,7 +207,11 @@
         }
 
         public destroy() {
-            this.submitHandlers = null;
+            if (this.quickFiltersBar) {
+                this.quickFiltersBar.destroy();
+                this.quickFiltersBar = null;
+            }
+
             if (this.toolbar) {
                 this.toolbar.destroy();
                 this.toolbar = null;
@@ -721,7 +688,7 @@
                 return null;
             }
 
-            return this.titleDiv.children().text();
+            return this.titleDiv.children('.title-text').text();
         }
 
         setTitle(value: string) {
@@ -737,7 +704,7 @@
                         this.titleDiv = $('<div class="grid-title"><div class="title-text"></div></div>')
                             .prependTo(this.element);
                     }
-                    this.titleDiv.children().text(value);
+                    this.titleDiv.children('.title-text').text(value);
                 }
 
                 this.layout();
@@ -891,6 +858,31 @@
             }
         }
 
+        private _readonly: boolean;
+
+        public get readOnly(): boolean {
+            return this.get_readOnly();
+        }
+
+        public set readOnly(value: boolean) {
+            this.set_readOnly(value);
+        }
+
+        public get_readOnly() {
+            return !!this._readonly;
+        }
+
+        public set_readOnly(value: boolean) {
+            if (!!this._readonly != !!value) {
+                this._readonly = !!value;
+                this.updateInterface();
+            }
+        }
+
+        protected updateInterface() {
+            this.toolbar && this.toolbar.updateInterface();
+        }
+
         protected getLocalTextDbPrefix(): string {
             if (this.localTextDbPrefix == null) {
                 this.localTextDbPrefix = Q.coalesce(this.getLocalTextPrefix(), '');
@@ -957,9 +949,7 @@
         }
 
         protected addFilterSeparator(): void {
-            if (this.quickFiltersDiv) {
-                this.quickFiltersDiv.append($('<hr/>'));
-            }
+            this.ensureQuickFilterBar().addSeparator();
         }
 
         protected determineText(getKey: (prefix: string) => string) {
@@ -975,317 +965,36 @@
         }
 
         protected addQuickFilter<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
-            if (opt == null) {
-                throw new (ss as any).ArgumentNullException('opt');
-            }
-
-            if (this.quickFiltersDiv == null) {
-                $('<div/>').addClass('clear').appendTo(this.toolbar.element);
-                this.quickFiltersDiv = $('<div/>').addClass('quick-filters-bar').appendTo(this.toolbar.element);
-            }
-
-            if (opt.separator) {
-                this.addFilterSeparator();
-            }
-
-            var item = $("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
-                .appendTo(this.quickFiltersDiv)
-                .data('qffield', opt.field).children();
-
-            var title = opt.title;
-            if (title == null) {
-                title = this.determineText(function (pre) {
-                    return pre + opt.field;
-                });
-                if (title == null) {
-                    title = opt.field;
-                }
-            }
-
-            var quickFilter = item.text(title).parent();
-
-            if (opt.displayText != null) {
-                quickFilter.data('qfdisplaytext', opt.displayText);
-            }
-
-            if (opt.saveState != null) {
-                quickFilter.data('qfsavestate', opt.saveState);
-            }
-
-            if (opt.loadState != null) {
-                quickFilter.data('qfloadstate', opt.loadState);
-            }
-
-            if (!Q.isEmptyOrNull(opt.cssClass)) {
-                quickFilter.addClass(opt.cssClass);
-            }
-
-            var widget = Serenity.Widget.create({
-                type: opt.type,
-                element: e => {
-                    if (!Q.isEmptyOrNull(opt.field)) {
-                        e.attr('id', this.uniqueName + '_QuickFilter_' + opt.field);
-                    }
-                    e.attr('placeholder', ' ');
-                    e.appendTo(quickFilter);
-                    if (opt.element != null) {
-                        opt.element(e);
-                    }
-                },
-                options: opt.options,
-                init: opt.init
-            });
-
-            var submitHandler = () => {
-                if (quickFilter.hasClass('ignore')) {
-                    return;
-                }
-                var request = this.view.params;
-                request.EqualityFilter = request.EqualityFilter || {};
-                var value = Serenity.EditorUtils.getValue(widget);
-                var active = value != null && !Q.isEmptyOrNull(value.toString());
-                if (opt.handler != null) {
-                    var args = {
-                        field: opt.field,
-                        request: request,
-                        equalityFilter: request.EqualityFilter,
-                        value: value,
-                        active: active,
-                        widget: widget,
-                        handled: true
-                    };
-                    opt.handler(args);
-                    quickFilter.toggleClass('quick-filter-active', args.active);
-                    if (!args.handled) {
-                        request.EqualityFilter[opt.field] = value;
-                    }
-                }
-                else {
-                    request.EqualityFilter[opt.field] = value;
-                    quickFilter.toggleClass('quick-filter-active', active);
-                }
-            };
-
-            Serenity.WX.changeSelect2(widget, (e1: JQueryEventObject) => {
-                // use timeout give cascaded dropdowns a chance to update / clear themselves
-                window.setTimeout(() => this.quickFilterChange(e1), 0);
-            });
-
-            this.add_submitHandlers(submitHandler);
-            widget.element.bind('remove.' + this.uniqueName, x => {
-                this.remove_submitHandlers(submitHandler);
-            });
-
-            return widget;
+            return this.ensureQuickFilterBar().add(opt);
         }
 
         protected addDateRangeFilter(field: string, title?: string): Serenity.DateEditor {
-            return this.addQuickFilter(this.dateRangeQuickFilter(field, title)) as Serenity.DateEditor;
+            return this.ensureQuickFilterBar().addDateRange(field, title);
         }
 
-        protected dateRangeQuickFilter(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions> {
-            var end: Serenity.DateEditor = null;
-            return <QuickFilter<DateEditor, DateTimeEditorOptions>>{
-                field: field,
-                type: Serenity.DateEditor,
-                title: title,
-                element: function (e1) {
-                    end = Serenity.Widget.create({
-                        type: Serenity.DateEditor,
-                        element: function (e2) {
-                            e2.insertAfter(e1);
-                        },
-                        options: null,
-                        init: null
-                    });
-
-                    end.element.change(function (x) {
-                        e1.triggerHandler('change');
-                    });
-
-                    $('<span/>').addClass('range-separator').text('-').insertAfter(e1);
-                },
-                handler: function (args) {
-                    var active1 = !Q.isTrimmedEmpty(args.widget.value);
-                    var active2 = !Q.isTrimmedEmpty(end.value);
-                    if (active1 && !Q.parseDate(args.widget.element.val())) {
-                        active1 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
-                        args.widget.element.val('');
-                    }
-                    if (active2 && !Q.parseDate(end.element.val())) {
-                        active2 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
-                        end.element.val('');
-                    }
-                    args.active = active1 || active2;
-                    if (active1) {
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and',
-                            [[args.field], '>=', args.widget.value]);
-                    }
-                    if (active2) {
-                        var next = new Date(end.valueAsDate.valueOf());
-                        next.setDate(next.getDate() + 1);
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and',
-                            [[args.field], '<', Q.formatDate(next, 'yyyy-MM-dd')]);
-                    }
-                },
-                displayText: function (w, l) {
-                    var v1 = Serenity.EditorUtils.getDisplayText(w);
-                    var v2 = Serenity.EditorUtils.getDisplayText(end);
-                    if (Q.isEmptyOrNull(v1) && Q.isEmptyOrNull(v2)) {
-                        return null;
-                    }
-                    var text1 = l + ' >= ' + v1;
-                    var text2 = l + ' <= ' + v2;
-                    if (!Q.isEmptyOrNull(v1) && !Q.isEmptyOrNull(v2)) {
-                        return text1 + ' ' + Q.coalesce(Q.tryGetText('Controls.FilterPanel.And'), 'and') + ' ' + text2;
-                    }
-                    else if (!Q.isEmptyOrNull(v1)) {
-                        return text1;
-                    }
-                    else {
-                        return text2;
-                    }
-                },
-                saveState: function (w1) {
-                    return [Serenity.EditorUtils.getValue(w1), Serenity.EditorUtils.getValue(end)];
-                },
-                loadState: function (w2, state) {
-                    if (state == null || !Q.isArray(state) || state.length !== 2) {
-                        state = [null, null];
-                    }
-
-                    Serenity.EditorUtils.setValue(w2, state[0]);
-                    Serenity.EditorUtils.setValue(end, state[1]);
-                }
-            };
+        protected dateRangeQuickFilter(field: string, title?: string) {
+            return QuickFilterBar.dateRange(field, title);
         }
 
         protected addDateTimeRangeFilter(field: string, title?: string) {
-            return this.addQuickFilter(this.dateTimeRangeQuickFilter(field, title)) as Serenity.DateTimeEditor;
+            return this.ensureQuickFilterBar().addDateTimeRange(field, title);
         }
 
-        protected dateTimeRangeQuickFilter(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions> {
-            var end: Serenity.DateTimeEditor = null;
-
-            return <QuickFilter<DateTimeEditor, DateTimeEditorOptions>>{
-                field: field,
-                type: Serenity.DateTimeEditor,
-                title: title,
-                element: function (e1) {
-                    end = Serenity.Widget.create({
-                        type: Serenity.DateTimeEditor,
-                        element: function (e2) {
-                            e2.insertAfter(e1);
-                        },
-                        options: null,
-                        init: null
-                    });
-
-                    end.element.change(function(x) {
-                        e1.triggerHandler('change');
-                    });
-
-                    $('<span/>').addClass('range-separator').text('-').insertAfter(e1);
-                },
-                init: function(i) {
-                    i.element.parent().find('.time').change(function (x1) {
-                        i.element.triggerHandler('change');
-                    });
-                },
-                handler: function (args) {
-                    var active1 = !Q.isTrimmedEmpty(args.widget.value);
-                    var active2 = !Q.isTrimmedEmpty(end.value);
-                    if (active1 && !Q.parseDate(args.widget.element.val())) {
-                        active1 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
-                        args.widget.element.val('');
-                    }
-                    if (active2 && !Q.parseDate(end.element.val())) {
-                        active2 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
-                        end.element.val('');
-                    }
-                    args.active = active1 || active2;
-                    if (active1) {
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and',
-                            [[args.field], '>=', args.widget.value]);
-                    }
-                    if (active2) {
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and',
-                            [[args.field], '<=', end.value]);
-                    }
-                },
-                displayText: function (w, l) {
-                    var v1 = Serenity.EditorUtils.getDisplayText(w);
-                    var v2 = Serenity.EditorUtils.getDisplayText(end);
-                    if (Q.isEmptyOrNull(v1) && Q.isEmptyOrNull(v2)) {
-                        return null;
-                    }
-                    var text1 = l + ' >= ' + v1;
-                    var text2 = l + ' <= ' + v2;
-                    if (!Q.isEmptyOrNull(v1) && !Q.isEmptyOrNull(v2)) {
-                        return text1 + ' ' + Q.coalesce(Q.tryGetText('Controls.FilterPanel.And'), 'and') + ' ' + text2;
-                    }
-                    else if (!Q.isEmptyOrNull(v1)) {
-                        return text1;
-                    }
-                    else {
-                        return text2;
-                    }
-                },
-                saveState: function (w1) {
-                    return [Serenity.EditorUtils.getValue(w1), Serenity.EditorUtils.getValue(end)];
-                },
-                loadState: function (w2, state) {
-                    if (state == null || !Q.isArray(state) || state.length !== 2) {
-                        state = [null, null];
-                    }
-                    Serenity.EditorUtils.setValue(w2, state[0]);
-                    Serenity.EditorUtils.setValue(end, state[1]);
-                }
-            };
+        protected dateTimeRangeQuickFilter(field: string, title?: string) {
+            return QuickFilterBar.dateTimeRange(field, title);
         }
 
         protected addBooleanFilter(field: string, title?: string, yes?: string, no?: string): SelectEditor {
-            return this.addQuickFilter(this.booleanQuickFilter(field, title, yes, no));
+            return this.ensureQuickFilterBar().addBoolean(field, title, yes, no);
         }
 
-        protected booleanQuickFilter(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions> {
-            var opt: SelectEditorOptions = {};
-            var items = [];
-
-            var trueText = yes;
-            if (trueText == null) {
-                trueText = Q.text('Controls.FilterPanel.OperatorNames.true');
-            }
-            items.push(['1', trueText]);
-
-            var falseText = no;
-            if (falseText == null) {
-                falseText = Q.text('Controls.FilterPanel.OperatorNames.false');
-            }
-
-            items.push(['0', falseText]);
-
-            opt.items = items;
-
-            return {
-                field: field,
-                type: Serenity.SelectEditor,
-                title: title,
-                options: opt,
-                handler: function(args) {
-                    args.equalityFilter[args.field] = args.value == null || Q.isEmptyOrNull(args.value.toString()) ? 
-                        null : !!Q.toId(args.value);
-                }
-            };
+        protected booleanQuickFilter(field: string, title?: string, yes?: string, no?: string) {
+            return QuickFilterBar.boolean(field, title, yes, no);
         }
 
         protected invokeSubmitHandlers() {
-            if (this.submitHandlers != null) {
-                this.submitHandlers();
+            if (this.quickFiltersBar != null) {
+                this.quickFiltersBar.onSubmit(this.view.params);
             }
         }
 

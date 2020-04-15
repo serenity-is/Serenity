@@ -403,6 +403,7 @@ namespace Serenity.Web
             else
                 mimeType = "application/unknown";
 
+#if !COREFX
             try
             {
                 Microsoft.Win32.RegistryKey regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext);
@@ -413,8 +414,9 @@ namespace Serenity.Web
             {
                 return "application/unknown";
             }
-
+#endif
             return mimeType;
+
         }
     }
 }

@@ -65,7 +65,7 @@ namespace Serenity.CodeGeneration
 
                     if (CecilUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
                     {
-                        AddFile(RemoveRootNamespace(codeNamespace, 
+                        AddFile(RemoveRootNamespace(codeNamespace,
                             this.fileIdentifier + (IsTS() ? ".ts" : ".cs")));
 
                         this.fileIdentifier = type.Name;
@@ -79,6 +79,10 @@ namespace Serenity.CodeGeneration
                     //GenerateColumns(type);
                     run(EnqueueTypeMembers);
                     return;
+                }
+                else if (CecilUtils.GetAttr(type, "Serenity.Extensibility", "NestedPermissionKeysAttribute") != null)
+                {
+                    run(GeneratePermissionKeys);
                 }
                 else
                     run(GenerateBasicType);

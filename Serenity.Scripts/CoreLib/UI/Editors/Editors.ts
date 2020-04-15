@@ -301,6 +301,51 @@
                 $(gridField.find('sup')[0]).remove();
             }
         }
+
+        export function setContainerReadOnly(container: JQuery, readOnly: boolean) {
+
+            if (!readOnly) {
+
+                if (!container.hasClass('readonly-container'))
+                    return;
+
+                container.removeClass('readonly-container').find(".editor.container-readonly")
+                    .removeClass('container-readonly').each((i, e) => {
+                        var w = $(e).tryGetWidget(Serenity.Widget);
+                        if (w != null)
+                            Serenity.EditorUtils.setReadOnly(w, false);
+                        else
+                            Serenity.EditorUtils.setReadonly($(e), false);
+                    });
+
+                return;
+            }
+
+            container.addClass('readonly-container').find(".editor")
+                .not('.container-readonly')
+                .each((i, e) => {
+                    var w = $(e).tryGetWidget(Serenity.Widget);
+                    if (w != null) {
+
+                        if (w['get_readOnly']) {
+                            if (w['get_readOnly']())
+                                return;
+                        }
+                        else if ($(e).is('[readonly]') || $(e).is('[disabled]') || $(e).is('.readonly') || $(e).is('.disabled'))
+                            return;
+
+                        $(e).addClass('container-readonly');
+                        Serenity.EditorUtils.setReadOnly(w, true);
+
+                    }
+                    else {
+                        if ($(e).is('[readonly]') || $(e).is('[disabled]') || $(e).is('.readonly') || $(e).is('.disabled'))
+                            return;
+
+                        Serenity.EditorUtils.setReadonly($(e).addClass('container-readonly'), true);
+                    }
+                });
+        }
     }
 
     function Editor(name: string, intf?: any[]) {
@@ -1868,8 +1913,11 @@
 
         set_value(value: string) {
             if (value !== this.get_value()) {
-                this.element.select2('val', value)
-                    .triggerHandler('change', [true]);
+                var el = this.element;
+                el.select2('val', value);
+                el.data('select2-change-triggered', true);
+                el.triggerHandler('change', [true])
+                el.data('select2-change-triggered', false);
             }
         }
 

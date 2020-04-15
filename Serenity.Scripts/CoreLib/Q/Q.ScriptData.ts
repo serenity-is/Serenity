@@ -77,7 +77,7 @@ namespace Q {
             return Promise.resolve().then(function () {
                 Q.blockUI(null);
                 return Promise.resolve(
-                    $.ajax(loadOptions(name, false))
+                    $.ajax(loadOptions(name, true))
                         .always(function () {
                             Q.blockUndo();
                         }));

@@ -200,9 +200,7 @@
 
             // TODO: find a workaround in new Dapper
 #if !COREFX
-            var bindByName = SqlMapper.GetBindByName(command.GetType());
-            if (bindByName != null)
-                bindByName(command, true);
+            SqlMapper.GetBindByName(command.GetType())?.Invoke(command, true);
 #endif
             commandText = FixCommandText(commandText, connection.GetDialect());
             command.CommandText = commandText;
@@ -345,8 +343,7 @@
                         param.DbType = DbType.DateTime2;
                 }
 
-                var str = value as string;
-                if (str != null && str.Length < 4000)
+                if (value is string str && str.Length < 4000)
                     param.Size = 4000;
             }
 
@@ -362,12 +359,9 @@
         /// <returns>True if exception is 10054, e.g. connection pool.</returns>
         private static bool CheckConnectionPoolException(IDbConnection connection, Exception exception)
         {
-            var ex = exception as System.Data.SqlClient.SqlException;
-
-            if (ex != null && ex.Number == 10054)
+            if (exception is SqlException ex && ex.Number == 10054)
             {
-                var wrapped = connection as WrappedConnection;
-                if (wrapped != null &&
+                if (connection is WrappedConnection wrapped && 
                     (wrapped.OpenedOnce || wrapped.CurrentTransaction != null))
                     return false;
 
@@ -564,8 +558,7 @@
         {
             try
             {
-                var sqlCmd = command as SqlCommand;
-                if (sqlCmd != null)
+                if (command is SqlCommand sqlCmd)
                 {
                     Log.Debug(type + "\r\n" + SqlCommandDumper.GetCommandText(sqlCmd));
                     return;

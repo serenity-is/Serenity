@@ -42,7 +42,7 @@ namespace Serenity.Web
 #if !COREFX
         private class GenericDictionaryWrapper : IDictionary
         {
-            private IDictionary<object, object> dictionary;
+            private readonly IDictionary<object, object> dictionary;
 
             public GenericDictionaryWrapper(IDictionary<object, object> dictionary)
             {

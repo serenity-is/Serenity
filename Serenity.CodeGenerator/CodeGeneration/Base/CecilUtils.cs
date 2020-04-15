@@ -38,27 +38,6 @@ namespace Serenity.Reflection
             return baseClasses.FirstOrDefault(b => b.Namespace == ns && b.Name == name);
         }
 
-        private static GenericInstanceType FindGenericInstanceType(TypeDefinition t, TypeDefinition[] baseClasses, 
-            string ns, string name)
-        {
-            if (t.BaseType != null &&
-                t.BaseType.IsGenericInstance &&
-                (t.BaseType as GenericInstanceType).ElementType.Name == name &&
-                (t.BaseType as GenericInstanceType).ElementType.Namespace == ns)
-                return t.BaseType as GenericInstanceType;
-
-            foreach (var b in baseClasses)
-            {
-                if (b.BaseType != null &&
-                    b.BaseType.IsGenericInstance &&
-                    (b.BaseType as GenericInstanceType).ElementType.Name == name &&
-                    (b.BaseType as GenericInstanceType).ElementType.Namespace == ns)
-                    return b.BaseType as GenericInstanceType;
-            }
-
-            return null;
-        }
-
         public static bool Contains(TypeDefinition[] classes, string ns, string name)
         {
             return FindByName(classes, ns, name) != null;
