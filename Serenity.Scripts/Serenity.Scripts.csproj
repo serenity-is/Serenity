@@ -4,17 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
   </PropertyGroup>
-
+ 
   <ItemGroup>
     <Folder Remove="node_modules\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="CodeGeneration\tsconfig.json" />
     <None Remove="CoreLib\tsconfig.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="CodeGeneration\tsconfig.json" />
     <Content Include="CoreLib\tsconfig.json" />
   </ItemGroup>
@@ -25,6 +19,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
   <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\@types\jquery\index.d.ts')">
     <Message Text="Installing NPM packages..." Importance="high">
     </Message>

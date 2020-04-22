@@ -150,14 +150,14 @@ namespace Serenity.DialogExtensions {
 namespace Serenity.DialogTypeRegistry {
     function search(typeName: string) {
 
-        var dialogType = (ss as any).getType(typeName);
-        if (dialogType != null && (ss as any).isAssignableFrom(Serenity.IDialog, dialogType)) {
+        var dialogType = ss.getType(typeName);
+        if (dialogType != null && ss.isAssignableFrom(Serenity.IDialog, dialogType)) {
             return dialogType;
         }
 
         for (var ns of Q.Config.rootNamespaces) {
-            dialogType = (ss as any).getType(ns + '.' + typeName);
-            if (dialogType != null && (ss as any).isAssignableFrom(Serenity.IDialog, dialogType)) {
+            dialogType = ss.getType(ns + '.' + typeName);
+            if (dialogType != null && ss.isAssignableFrom(Serenity.IDialog, dialogType)) {
                 return dialogType;
             }
         }

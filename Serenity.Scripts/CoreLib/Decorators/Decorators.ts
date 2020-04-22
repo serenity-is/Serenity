@@ -1,5 +1,4 @@
-﻿
-namespace Serenity {
+﻿namespace Serenity {
 
     export namespace Decorators {
         function distinct(arr: any[]) {
@@ -16,8 +15,7 @@ namespace Serenity {
         function registerType(target: any, name: string, intf: any[]) {
             if (name != null) {
                 target.__typeName = name;
-                target.__assembly = ss.__assemblies['App'];
-                target.__assembly.__types[name] = target;
+                ss.types[name] = target;
             }
             else if (!target.__typeName)
                 target.__register = true;
@@ -47,7 +45,7 @@ namespace Serenity {
 
                 (target as any).__interface = true;
                 (target as any).isAssignableFrom = function (type: any) {
-                    return (ss as any).contains((ss as any).getInterfaces(type), this);
+                    return ss.contains(type.__interfaces || [], this);
                 };
             }
         }
@@ -363,8 +361,7 @@ namespace Serenity.Decorators {
 
             if (name != null) {
                 target.__typeName = name;
-                target.__assembly = ss.__assemblies['App'];
-                target.__assembly.__types[name] = target;
+                ss.types[name] = target;
             }
             else if (!target.__typeName)
                 target.__register = true;
@@ -482,4 +479,20 @@ namespace Serenity.Decorators {
             addAttribute(target, new ServiceAttribute(value));
         }
     }
+
+    // @ts-ignore check for global
+    let g: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
+    if (g != null) {
+        if (g.Serenity) {
+            for (var n in Serenity) {
+                if (Serenity.hasOwnProperty(n))
+                    g.Serenity[n] = Serenity[n];
+            }
+        }
+        else {
+            g.Serenity = Serenity;
+        }
+    }
+
 }
+

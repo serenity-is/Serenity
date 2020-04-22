@@ -6,7 +6,7 @@ interface JQuery {
 // PAGER -----
 (function ($: JQueryStatic) {
 
-$.widget("ui.slickPager", {
+$.widget && $.widget("ui.slickPager", {
     options: {
         view: null,
         showRowsPerPage: true,

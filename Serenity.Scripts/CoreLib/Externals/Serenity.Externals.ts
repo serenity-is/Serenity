@@ -33,7 +33,7 @@ namespace Q {
 
                 var el = $(element);
                 for (var i = 0; !!(i < handlers.length); i++) {
-                    var handler = (ss as any).safeCast(handlers[i].handler, Function);
+                    var handler = ss.safeCast(handlers[i].handler, Function);
                     if (handler) {
                         var message = handler(el);
                         if (message != null) {
@@ -259,14 +259,11 @@ namespace Q {
         }, options);
     };
 
-    if (window['jQuery'] && window['jQuery']['validator'])
-        jQueryValidationInitialization();
-    else if (window['jQuery']) {
-        jQuery(function ($) {
-            if ($.validator)
-                jQueryValidationInitialization();
-        });
-    }
+    if ($.validator)
+        jQueryValidationInitialization()
+    else $(function () {
+        $.validator && jQueryValidationInitialization();
+    });
 
     function jQueryDatepickerInitialization(): void {
         let order = Q.Culture.dateOrder;
@@ -293,18 +290,11 @@ namespace Q {
         });
     };
 
-    if (window['jQuery'] &&
-        window['jQuery']['datepicker'] &&
-        window['jQuery']['datepicker']['regional'] &&
-        window['jQuery']['datepicker']['regional']['en']) {
+    if ($.datepicker && $.datepicker.regional && $.datepicker.regional.en)
         jQueryDatepickerInitialization();
-    }
-    else {
-        jQuery(function ($) {
-            if ($.datepicker)
-                jQueryDatepickerInitialization();
-        });
-    }
+    else $(function () {
+        $.datepicker && $.datepicker.regional && $.datepicker.regional.en && jQueryDatepickerInitialization();
+    });
 
     function jQueryUIInitialization(): void {
         $.ui.dialog.prototype._allowInteraction = function (event: any) {
@@ -330,14 +320,14 @@ namespace Q {
                 this.uiDialogTitlebar.find('.ui-dialog-titlebar-close').html('<i class="fa fa-times" />');
             }
         })($.ui.dialog.prototype._createTitlebar);
-    };
+    }
 
-    if (jQuery.ui) {
+    if ($.ui && $.ui.dialog && $.ui.dialog.prototype) {
         jQueryUIInitialization();
     }
     else {
         jQuery(function () {
-            if (jQuery.ui)
+            if ($.ui && $.ui.dialog && $.ui.dialog.prototype)
                 jQueryUIInitialization();
         });
     }
@@ -408,7 +398,7 @@ namespace Q {
             },
             render: function (createElement: any) {
                 var editorType = Serenity.EditorTypeRegistry.get(this.type);
-                var elementAttr = (ss as any).getAttributes(editorType, Serenity.ElementAttribute, true);
+                var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
                 var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>') as string;
                 var domProps: any = {};
                 var element = $(elementHtml)[0];

@@ -36,7 +36,7 @@
                 return this.options.lookupKey;
             }
 
-            var key = (ss as any).getTypeFullName((ss as any).getInstanceType(this));
+            var key = ss.getTypeFullName(ss.getInstanceType(this));
 
             var idx = key.indexOf('.');
             if (idx >= 0) {

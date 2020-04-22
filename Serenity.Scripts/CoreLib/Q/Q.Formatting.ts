@@ -3,19 +3,20 @@ namespace Q {
     export namespace Culture {
         export let decimalSeparator = '.';
         export let dateSeparator = '/';
+        export let groupSeparator = ',';
         export let dateOrder = 'dmy';
         export let dateFormat = 'dd/MM/yyyy';
         export let dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
-
-        export function get_groupSeparator(): string {
-            return ((decimalSeparator === ',') ? '.' : ',');
-        };
 
         var s = Q.trimToNull($('script#ScriptCulture').html());
         if (s != null) {
             var sc = $.parseJSON(s);
             if (sc.DecimalSeparator != null)
                 decimalSeparator = sc.DecimalSeparator;
+            if (sc.GroupSeparator != null && sc.GroupSeparator != decimalSeparator)
+                groupSeparator = sc.GroupSeparator;
+            else if (groupSeparator == decimalSeparator)
+                groupSeparator = decimalSeparator == '.' ? ',' : '.';
             if (sc.DateSeparator != null)
                 dateSeparator = sc.DateSeparator;
             if (sc.DateOrder != null)
@@ -34,13 +35,13 @@ namespace Q {
         }
 
         dec = dec || Culture.decimalSeparator;
-        grp = grp || Culture.get_groupSeparator();
+        grp = grp || Culture.groupSeparator;
 
         let r = "";
         if (fmt.indexOf(".") > -1) {
             let dp = dec;
             let df = fmt.substring(fmt.lastIndexOf(".") + 1);
-            n = roundNumber(n, df.length);
+            n = roundNumber(n, df.length); 
             let dv = n % 1;
             let ds = new String(dv.toFixed(df.length));
             ds = ds.substring(ds.lastIndexOf(".") + 1);
@@ -129,7 +130,7 @@ namespace Q {
 
     export function parseInteger(s: string): number {
         s = trim(s.toString());
-        let ts = Culture.get_groupSeparator();
+        let ts = Culture.groupSeparator;
         if (s && s.length && s.indexOf(ts) > 0) {
             s = s.replace(new RegExp("(\\b\\d{1,3})\\" + ts + "(?=\\d{3}(\\D|$))", "g"), '$1');
         }
@@ -146,7 +147,7 @@ namespace Q {
         if (s.length == 0)
             return null;
 
-        let ts = Culture.get_groupSeparator();
+        let ts = Culture.groupSeparator;
 
         if (s && s.length && s.indexOf(ts) > 0) {
             s = s.replace(new RegExp("(\\b\\d{1,3})\\" + ts + "(?=\\d{3}(\\D|$))", "g"), '$1');

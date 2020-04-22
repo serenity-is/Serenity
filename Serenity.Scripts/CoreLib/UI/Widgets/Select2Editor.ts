@@ -353,7 +353,7 @@ namespace Serenity {
             if (this.hasAsyncSource())
                 throw new Error("Can't clear items of an async select editor!");
 
-            (ss as any).clear(this._items);
+            this._items.length = 0;
             this._itemById = {};
         }
 

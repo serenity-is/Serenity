@@ -113,7 +113,7 @@
             }
 
             throw new ss.Exception(Q.format("Filtering '{0}' has no editor for '{1}' operator",
-                (ss as any).getTypeName((ss as any).getInstanceType(this)), this.get_operator().key));
+                ss.getTypeName(ss.getInstanceType(this)), this.get_operator().key));
         }
 
         protected operatorFormat(op: FilterOperator) {
@@ -198,7 +198,7 @@
             }
 
             throw new ss.Exception(Q.format("Filtering '{0}' has no handler for '{1}' operator",
-                (ss as any).getTypeName((ss as any).getInstanceType(this)), this.get_operator().key));
+                ss.getTypeName(ss.getInstanceType(this)), this.get_operator().key));
         }
 
         loadState(state: any) {
@@ -224,7 +224,7 @@
         }
 
         protected argumentNull() {
-            return new (ss as any).ArgumentNullException('value', Q.text('Controls.FilterPanel.ValueRequired'));
+            return new ss.ArgumentNullException('value', Q.text('Controls.FilterPanel.ValueRequired'));
         }
 
         validateEditorValue(value: string) {
@@ -677,7 +677,6 @@
 
         let knownTypes: Q.Dictionary<Function>;
 
-
         function initialize(): void {
 
             if (knownTypes != null)
@@ -685,25 +684,23 @@
             
             knownTypes = {};
 
-            for (var assembly of (ss as any).getAssemblies()) {
-                for (var type of (ss as any).getAssemblyTypes(assembly)) {
-                    if (!(ss as any).isAssignableFrom(Serenity.IFiltering, type))
-                        continue;
+            for (var type of ss.getTypes()) {
+                if (!ss.isAssignableFrom(Serenity.IFiltering, type))
+                    continue;
                     
-                    if ((ss as any).isGenericTypeDefinition(type))
-                        continue;
+                if (ss.isGenericTypeDefinition(type))
+                    continue;
 
-                    var fullName = (ss as any).getTypeFullName(type).toLowerCase();
+                var fullName = ss.getTypeFullName(type).toLowerCase();
 
-                    knownTypes[fullName] = type;
+                knownTypes[fullName] = type;
 
-                    for (var k of Q.Config.rootNamespaces) {
-                        if (Q.startsWith(fullName, k.toLowerCase() + '.')) {
-                            var kx = fullName.substr(k.length + 1).toLowerCase();
+                for (var k of Q.Config.rootNamespaces) {
+                    if (Q.startsWith(fullName, k.toLowerCase() + '.')) {
+                        var kx = fullName.substr(k.length + 1).toLowerCase();
 
-                            if (knownTypes[kx] == null) {
-                                knownTypes[kx] = type;
-                            }
+                        if (knownTypes[kx] == null) {
+                            knownTypes[kx] = type;
                         }
                     }
                 }
@@ -737,7 +734,7 @@
         export function get(key: string): Function {
 
             if (Q.isEmptyOrNull(key))
-                throw new (ss as any).ArgumentNullException('key');
+                throw new ss.ArgumentNullException('key');
 
             initialize();
             var formatterType = knownTypes[key.toLowerCase()];

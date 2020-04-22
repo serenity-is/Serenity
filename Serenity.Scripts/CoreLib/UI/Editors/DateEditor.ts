@@ -26,8 +26,8 @@
 
             input.bind('keyup.' + this.uniqueName, e => {
                 if (e.which === 32 && !this.get_readOnly()) {
-                    if (this.get_valueAsDate() != (ss as any).today()) {
-                        this.set_valueAsDate((ss as any).today());
+                    if (this.get_valueAsDate() != ss.today()) {
+                        this.set_valueAsDate(ss.today());
                         this.element.trigger('change');
                     }
                 }
@@ -44,11 +44,11 @@
                     return null;
                 }
 
-                if (!Q.isEmptyOrNull(this.get_minValue()) && (ss as any).compareStrings(value, this.get_minValue()) < 0) {
+                if (!Q.isEmptyOrNull(this.get_minValue()) && ss.compareStrings(value, this.get_minValue()) < 0) {
                     return Q.format(Q.text('Validation.MinDate'), Q.formatDate(this.get_minValue(), null));
                 }
 
-                if (!Q.isEmptyOrNull(this.get_maxValue()) && (ss as any).compareStrings(value, this.get_maxValue()) >= 0) {
+                if (!Q.isEmptyOrNull(this.get_maxValue()) && ss.compareStrings(value, this.get_maxValue()) >= 0) {
                     return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(this.get_maxValue(), null));
                 }
 
@@ -76,7 +76,7 @@
                 this.element.val('');
             }
 			else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
-                this.element.val(Q.formatDate((ss as any).today(), null));
+                this.element.val(Q.formatDate(ss.today(), null));
             }
 			else {
                 this.element.val(Q.formatDate(value, null));
@@ -193,7 +193,7 @@
             }
             var val = Q.coalesce(input.val(), '');
             var x = {};
-            if (val.length >= 6 && (ss as any).Int32.tryParse(val, x)) {
+            if (val.length >= 6 && !isNaN(parseInt(val, 10))) {
                 input.val(val.substr(0, 2) + Q.Culture.dateSeparator + val.substr(2, 2) + Q.Culture.dateSeparator + val.substr(4));
             }
             val = Q.coalesce(input.val(), '');

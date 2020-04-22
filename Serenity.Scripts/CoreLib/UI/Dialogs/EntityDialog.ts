@@ -180,7 +180,7 @@
         }
 
         protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
-            return (ss as any).getAttributes((ss as any).getInstanceType(this), attrType, true);
+            return ss.getAttributes(ss.getInstanceType(this), attrType, true);
         }
 
         private entityType: string;
@@ -196,7 +196,7 @@
                 return (this.entityType = typeAttributes[0].value);
 
             // remove global namespace
-            var name = (ss as any).getTypeFullName((ss as any).getInstanceType(this));
+            var name = ss.getTypeFullName(ss.getInstanceType(this));
             var px = name.indexOf('.');
             if (px >= 0)
                 name = name.substring(px + 1);
@@ -587,7 +587,7 @@
         private getLangs(): any {
 
             var langsTuple = this.getLanguages();
-            var langs = (ss as any).safeCast(langsTuple, Array);
+            var langs = ss.safeCast(langsTuple, Array);
             if (langs == null || langs.length === 0 ||
                 langs[0] == null || !Q.isArray(langs[0])) {
                 langs = Array.prototype.slice.call(langsTuple.map(function (x: any) {
@@ -994,7 +994,7 @@
                     var cloneEntity = this.getCloningEntity();
 
                     Serenity.Widget.create({
-                        type: (ss as any).getInstanceType(this),
+                        type: ss.getInstanceType(this),
                         init: w => Serenity.SubDialogHelper.bubbleDataChange(
                             Serenity.SubDialogHelper.cascade(w, this.element), this, true)
                             .loadEntityAndOpenDialog(cloneEntity, null)

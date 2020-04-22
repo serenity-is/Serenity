@@ -7,6 +7,16 @@
     "emitBOM": true,
     "noImplicitAny": true,
     "sourceMap": true,
+    "types": [
+      "jquery",
+      "jquery.blockui",
+      "jquery.cookie",
+      "jquery.validation",
+      "jqueryui",
+      "sortablejs",
+      "toastr",
+      "react"
+    ],
     "inlineSources": true,
     "outFile": "../dist/Serenity.CoreLib.js",
     "suppressImplicitAnyIndexErrors": true,
@@ -106,6 +116,7 @@
     "UI/jQuery/jQueryUI.ButtonNoConflict.ts",
     "Externals/Serenity.Externals.Slick.ts",
     "Externals/Serenity.Externals.ts",
-    "UI/Serenity.Script.UI.ts"
+    "UI/Serenity.Script.UI.ts",
+    "Externals/ExportNamespaces.ts"
   ]
 }

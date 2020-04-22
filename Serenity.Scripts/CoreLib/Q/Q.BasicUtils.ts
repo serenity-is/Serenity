@@ -4,11 +4,11 @@ namespace Q {
     export type Grouping<TItem> = { [key: string]: TItem[] };
 
     export function coalesce(a: any, b: any): any {
-        return (ss as any).coalesce(a, b);
+        return a != null ? a : b;
     }
 
     export function isValue(a: any): boolean {
-        return (ss as any).isValue(a);
+        return a != null;
     }
 
     /**
@@ -61,14 +61,14 @@ namespace Q {
      * Inserts an item to the array at specified index
      */
     export function insert<TItem>(array: TItem[], index: number, item: TItem): void {
-        (ss as any).insert(array, index, item);
+        ss.insert(array, index, item);
     }
 
     /**
      * Determines if the object is an array
      */
     export function isArray(obj: any): boolean {
-        return (ss as any).isArray(obj);
+        return Object.prototype.toString.call(obj) === '[object Array]';
     }
 
     /**
@@ -166,8 +166,12 @@ namespace Q {
                 return x;
     }
 
-    export function endsWith(s: string, search: string): boolean {
-        return (ss as any).endsWithString(s, search);
+    export function endsWith(s: string, suffix: string): boolean {
+        if (suffix == null || !suffix.length)
+            return true;
+        if (suffix.length > s.length)
+            return false;
+        return (s.substr(s.length - suffix.length) == suffix);
     }
 
     export function isEmptyOrNull(s: string) {
@@ -178,18 +182,13 @@ namespace Q {
         return trimToNull(s) == null;
     }
 
-    export function format(msg: string, ...prm: any[]): string {
-        return (ss as any).formatString(msg, ...prm);
-    }
+    export let format: (fmt: string, ...prm: any[]) => string = ss.formatString;
+    export let formatInvariant: (fmt: string, ...prm: any[]) => string = ss.formatString;
 
-    export function padLeft(s: string, len: number, ch: string = ' ') {
-        while (s.length < len)
-            s = "0" + s;
-        return s;
-    }
+    export let padLeft: (s: string, len: number, ch?: string) => string = ss.padLeftString; 
 
     export function startsWith(s: string, search: string): boolean {
-        return (ss as any).startsWithString(s, search);
+        return ss.startsWithString(s, search);
     }
 
     export function toSingleLine(str: string) {
@@ -258,7 +257,8 @@ namespace Q {
     }
 
     export function replaceAll(s: string, f: string, r: string): string {
-        return (ss as any).replaceAllString(s, f, r);
+        s = s || '';
+        return s.split(f).join(r);
     }
 
     export function zeroPad(n: number, digits: number): string {

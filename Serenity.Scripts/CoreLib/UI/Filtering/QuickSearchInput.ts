@@ -42,12 +42,12 @@
                 for (var item of this.options.fields) {
                     var field = { $: item };
                     $('<li><a/></li>').appendTo(menu).children().attr('href', '#')
-                        .text(Q.coalesce(item.title, '')).click((ss as any).mkdel({
+                        .text(Q.coalesce(item.title, '')).click(ss.mkdel({
                             field: field,
                             $this: this
                         }, function (e: any) {
                             e.preventDefault();
-                            this.$this.fieldChanged = !(ss as any).referenceEquals(self.field, this.field.$);
+                            this.$this.fieldChanged = self.field !== this.field.$;
                             self.field = this.field.$;
                             this.$this.updateInputPlaceHolder();
                             this.$this.checkIfValueChanged();

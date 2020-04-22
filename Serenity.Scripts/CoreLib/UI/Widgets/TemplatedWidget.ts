@@ -48,14 +48,14 @@
         }
 
         private getDefaultTemplateName(): string {
-            return TemplatedWidget.noGeneric((ss as any).getTypeName(
-                (ss as any).getInstanceType(this)));
+            return TemplatedWidget.noGeneric(ss.getTypeName(
+                ss.getInstanceType(this)));
         }
 
         protected getTemplateName(): string {
 
-            var type = (ss as any).getInstanceType(this);
-            var fullName = (ss as any).getTypeFullName(type);
+            var type = ss.getInstanceType(this);
+            var fullName = ss.getTypeFullName(type);
 
             var templateNames = TemplatedWidget.templateNames;
 
@@ -65,7 +65,7 @@
             }
             
             while (type && type !== Serenity.Widget) {
-                var name = TemplatedWidget.noGeneric((ss as any).getTypeFullName(type));
+                var name = TemplatedWidget.noGeneric(ss.getTypeFullName(type));
 
                 for (let k of Q.Config.rootNamespaces) {
                     if (Q.startsWith(name, k + '.')) {
@@ -86,14 +86,14 @@
                     return name;
                 }
 
-                name = TemplatedWidget.noGeneric((ss as any).getTypeName(type));
+                name = TemplatedWidget.noGeneric(ss.getTypeName(type));
                 if (Q.canLoadScriptData('Template.' + name) ||
                     $('script#Template_' + name).length > 0) {
                     TemplatedWidget.templateNames[fullName] = name;
                     return name;
                 }
 
-                type = (ss as any).getBaseType(type);
+                type = ss.getBaseType(type);
             }
 
             templateNames[fullName] = cachedName = this.getDefaultTemplateName();
@@ -125,7 +125,7 @@
             if (template == null) {
                 throw new Error(Q.format(
                     "Can't locate template for widget '{0}' with name '{1}'!",
-                    (ss as any).getTypeName((ss as any).getInstanceType(this)), templateName));
+                    ss.getTypeName(ss.getInstanceType(this)), templateName));
             }
 
             return template;

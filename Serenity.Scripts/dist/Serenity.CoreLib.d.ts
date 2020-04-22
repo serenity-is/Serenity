@@ -6,9 +6,9 @@
 declare var Reflect: any;
 declare var __decorate: any;
 declare const __skipExtends: {
-    "__metadata": boolean;
-    "__typeName": boolean;
-    "__componentFactory": boolean;
+    __metadata: boolean;
+    __typeName: boolean;
+    __componentFactory: boolean;
 };
 declare var __extends: any;
 declare var __assign: any;
@@ -329,26 +329,92 @@ interface JQuery {
     select2(cmd: 'val', value: string | string[]): JQuery;
     select2(cmd: 'data'): Select2Data;
 }
+declare let globalObj: any;
 declare namespace ss {
-    interface AssemblyReg {
-        name: string;
-        __types: ClassReg[];
-    }
-    interface ClassReg {
-        __register: boolean;
-        __class: boolean;
-        __assembly: AssemblyReg;
-        __interfaces: any[];
-    }
-    let __assemblies: {
-        [name: string]: AssemblyReg;
+    let types: {
+        [key: string]: Function;
     };
-    class Exception {
-        constructor(msg: string);
+    let isGenericTypeDefinition: (type: any) => any;
+    let getType: (name: string, target?: any) => any;
+    let getTypeFullName: (type: any) => string;
+    let getTypeName: (type: any) => string;
+    let getInstanceType: (instance: any) => any;
+    let isAssignableFrom: (target: any, type: any) => any;
+    let isInstanceOfType: (instance: any, type: any) => any;
+    let safeCast: (instance: any, type: any) => any;
+    let cast: (instance: any, type: any) => any;
+    let createInstance: (type: any) => any;
+    let getBaseType: (type: any) => any;
+    let getAttributes: (type: any, attrType: any, inherit?: boolean) => any[];
+    let getMembers: (type: any, memberTypes: number, bindingAttr: any, name?: string, params?: any) => any[];
+    let getTypes: (from?: any) => any[];
+    class Exception extends Error {
+        constructor(message: string);
     }
-    class NotSupportedException extends Exception {
-        constructor(msg: string);
+    class NullReferenceException extends Exception {
+        constructor(message?: string);
     }
+    class ArgumentNullException extends Exception {
+        constructor(paramName: string, message?: string);
+    }
+    class ArgumentOutOfRangeException extends Exception {
+        constructor(paramName: string, message?: string);
+    }
+    class InvalidCastException extends Exception {
+        constructor(message: string);
+    }
+    let clearKeys: (d: any) => void;
+    let compareValues: (a: any, b: any) => number;
+    let compareStrings: (s1: string, s2: string, ignoreCase?: boolean) => 1 | 0 | -1;
+    let lastIndexOfAnyString: (s: string, chars: string[], startIndex?: number, count?: number) => number;
+    let contains: (obj: any, item: any) => any;
+    let insert: (obj: any, index: number, item: any) => void;
+    let round: (n: number, d?: number, rounding?: boolean) => number;
+    let trunc: (n: number) => number;
+    let delegateCombine: (delegate1: any, delegate2: any) => any;
+    namespace Enum {
+        let toString: (enumType: any, value: number) => string;
+        let getValues: (enumType: any) => any[];
+    }
+    let arrayClone: (arr: any[]) => any;
+    let midel: (mi: any, target: any, typeArguments?: any) => any;
+    function fieldAccess(fi: any, obj: any, val?: any): any;
+    let mkdel: (object: any, method: any) => any;
+    let delegateRemove: (delegate1: any, delegate2: any) => any;
+    let startsWithString: (s: string, prefix: string) => boolean;
+    let today: () => Date;
+    function formatString(format: string, ...prm: any[]): string;
+    function formatStringInvariant(format: string, ...prm: any[]): string;
+    function padLeftString(s: string, len: number, ch?: string): any;
+    var trimEndString: (s: string, chars?: string[]) => string;
+    var trimStartString: (s: string, chars?: string[]) => string;
+    let formatNumber: (num: number, format: string, fi?: FormatInfo) => string;
+    interface FormatInfo {
+        dateSeparator: string;
+        dateFormat: string;
+        dateOrder: string;
+        dateTimeFormat: string;
+        decimalSeparator: string;
+        groupSeparator: string;
+        decimalDigits?: number;
+        negativeSign?: string;
+        positiveSign?: string;
+        percentSymbol?: string;
+        currencySymbol?: string;
+        amDesignator?: string;
+        pmDesignator?: string;
+        timeSeparator?: string;
+        firstDayOfWeek?: number;
+        dayNames?: string[];
+        shortDayNames?: string[];
+        minimizedDayNames?: string[];
+        monthNames?: string[];
+        shortMonthNames?: string[];
+    }
+    let InvariantFormatInfo: FormatInfo;
+    let formatDate: (date: Date, format: string, fi?: FormatInfo) => string;
+    let formatObject: (obj: any, fmt: string, fi?: FormatInfo) => string;
+    let isEnum: (type: any) => boolean;
 }
 interface JQueryStatic {
     extend<T>(target: T, object1?: T, ...objectN: T[]): T;
@@ -499,11 +565,12 @@ declare namespace Q {
      * Returns null if no match is found.
      */
     function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
-    function endsWith(s: string, search: string): boolean;
+    function endsWith(s: string, suffix: string): boolean;
     function isEmptyOrNull(s: string): boolean;
     function isTrimmedEmpty(s: string): boolean;
-    function format(msg: string, ...prm: any[]): string;
-    function padLeft(s: string, len: number, ch?: string): string;
+    let format: (fmt: string, ...prm: any[]) => string;
+    let formatInvariant: (fmt: string, ...prm: any[]) => string;
+    let padLeft: (s: string, len: number, ch?: string) => string;
     function startsWith(s: string, search: string): boolean;
     function toSingleLine(str: string): string;
     function trim(s: string): string;
@@ -529,10 +596,10 @@ declare namespace Q {
     namespace Culture {
         let decimalSeparator: string;
         let dateSeparator: string;
+        let groupSeparator: string;
         let dateOrder: string;
         let dateFormat: string;
         let dateTimeFormat: string;
-        function get_groupSeparator(): string;
     }
     function formatNumber(n: number, fmt: string, dec?: string, grp?: string): string;
     function parseInteger(s: string): number;
@@ -2038,7 +2105,7 @@ declare namespace Serenity {
         getCriteria(): CriteriaWithText;
         loadState(state: any): void;
         saveState(): any;
-        protected argumentNull(): any;
+        protected argumentNull(): ss.ArgumentNullException;
         validateEditorValue(value: string): string;
         getEditorValue(): string;
         getEditorText(): any;
@@ -2247,7 +2314,7 @@ declare namespace Serenity {
         enumKey: string;
         static format(enumType: any, value: any): string;
         static getText(enumKey: string, name: string): string;
-        static getName(enumType: any, value: any): any;
+        static getName(enumType: any, value: any): string;
     }
     class FileDownloadFormatter implements Slick.Formatter, IInitializeColumn {
         format(ctx: Slick.FormatterContext): string;
@@ -3634,4 +3701,6 @@ declare namespace Serenity.DialogExtensions {
 declare namespace Serenity.DialogTypeRegistry {
     function tryGet(key: string): WidgetDialogClass;
     function get(key: string): WidgetDialogClass;
+}
+declare namespace Q {
 }

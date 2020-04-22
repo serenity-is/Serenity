@@ -60,7 +60,7 @@
                     var tabID = this.uniqueName + '_Tab' + tabIndex;
 
                     li.children('a').attr('href', '#' + tabID)
-                        .text(this.determineText(tab.$, (ss as any).mkdel({
+                        .text(this.determineText(tab.$, ss.mkdel({
                             tab: tab
                         }, function (prefix: string) {
                             return prefix + 'Tabs.' + this.tab.$;
@@ -302,7 +302,7 @@
 
             var editorType = Serenity.EditorTypeRegistry
                 .get(Q.coalesce(item.editorType, 'String'));
-            var elementAttr = (ss as any).getAttributes(editorType,
+            var elementAttr = ss.getAttributes(editorType,
                 Serenity.ElementAttribute, true);
             var elementHtml = ((elementAttr.length > 0) ?
                 elementAttr[0].value : '<input/>');
@@ -320,7 +320,7 @@
             }
             var editorParams = item.editorParams;
             var optionsType = null;
-            var optionsAttr = (ss as any).getAttributes(editorType,
+            var optionsAttr = ss.getAttributes(editorType,
                 Serenity.OptionsTypeAttribute, true);
 
             if (optionsAttr != null && optionsAttr.length > 0) {
@@ -328,7 +328,7 @@
             }
             var editor;
             if (optionsType != null) {
-                editorParams = $.extend((ss as any).createInstance(optionsType),
+                editorParams = $.extend(ss.createInstance(optionsType),
                     item.editorParams);
 
                 editor = new (editorType as any)(element, editorParams);
@@ -340,12 +340,12 @@
 
             editor.initialize();
 
-            if ((ss as any).isInstanceOfType(editor, BooleanEditor) &&
+            if (ss.isInstanceOfType(editor, BooleanEditor) &&
                 (item.editorParams == null || !!!item.editorParams['labelFor'])) {
                 label.removeAttr('for');
             }
 
-            if ((ss as any).isInstanceOfType(editor, RadioButtonEditor) &&
+            if (ss.isInstanceOfType(editor, RadioButtonEditor) &&
                 (item.editorParams == null || !!!item.editorParams['labelFor'])) {
                 label.removeAttr('for');
             }
@@ -416,7 +416,7 @@
 				var c = 0;
 				var xcategory = itemCategory[x1.name];
 				var ycategory = itemCategory[y.name];
-				if (!(ss as any).referenceEquals(xcategory, ycategory)) {
+				if (xcategory != ycategory) {
 					var c1 = categoryOrder[xcategory];
 					var c2 = categoryOrder[ycategory];
 					if (c1 != null && c2 != null) {
@@ -430,10 +430,10 @@
 					}
 				}
 				if (c === 0) {
-					c = (ss as any).compareStrings(xcategory, ycategory);
+					c = ss.compareStrings(xcategory, ycategory);
 				}
 				if (c === 0) {
-					c = (ss as any).compare(itemIndex[x1.name], itemIndex[y.name]);
+					c = ss.compareValues(itemIndex[x1.name], itemIndex[y.name]);
 				}
 				return c;
             });
@@ -450,7 +450,7 @@
 					}
                     $('<a/>').addClass('category-link').text(
                         this.determineText(category.$,
-                            (ss as any).mkdel({ category: category },
+                            ss.mkdel({ category: category },
                                 function (prefix: string) {
                                     return prefix + 'Categories.' + this.category.$;
                                 })))

@@ -357,7 +357,7 @@
                 if (c !== 0) {
                     return c;
                 }
-                return (ss as any).compare(oldIndexes[x1.id], oldIndexes[y.id]);
+                return ss.compareValues(oldIndexes[x1.id], oldIndexes[y.id]);
             });
 
             this.view.setItems(list, true);

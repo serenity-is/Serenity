@@ -44,7 +44,7 @@
             var self = this;
 
             this.element.addClass('s-DataGrid').html('');
-            this.element.addClass('s-' + (ss as any).getTypeName((ss as any).getInstanceType(this)));
+            this.element.addClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
             this.element.addClass('require-layout').bind('layout.' + this.uniqueName, function () {
                 self.layout();
             });
@@ -88,7 +88,7 @@
         }
 
         protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
-            return (ss as any).getAttributes((ss as any).getInstanceType(this), attrType, true);
+            return ss.getAttributes(ss.getInstanceType(this), attrType, true);
         }
 
         protected layout(): void {
@@ -383,7 +383,7 @@
             var mapped = sortBy.map(function (s) {
                 var x: Slick.ColumnSort = {};
                 if (s && Q.endsWith(s.toLowerCase(), ' desc')) {
-                    x.columnId = (ss as any).trimEndString(s.substr(0, s.length - 5));
+                    x.columnId = ss.trimEndString(s.substr(0, s.length - 5));
                     x.sortAsc = false;
                 }
                 else {
@@ -473,7 +473,7 @@
         }
 
         protected editItem(entityOrId: any): void {
-            throw new (ss as any).NotImplementedException();
+            throw new Error("Not Implemented!");
         }
 
         protected editItemOfType(itemType: string, entityOrId: any): void {
@@ -482,7 +482,7 @@
                 return;
             }
 
-            throw new (ss as any).NotImplementedException();
+            throw new Error("Not Implemented!");
         }
 
         protected onClick(e: JQueryEventObject, row: number, cell: number): void {
@@ -606,7 +606,7 @@
 
                 if (columns.length > 0) {
                     columns.sort(function (x1, y) {
-                        return (ss as any).compare(Math.abs(x1.sortOrder), Math.abs(y.sortOrder));
+                        return ss.compareValues(Math.abs(x1.sortOrder), Math.abs(y.sortOrder));
                     });
 
                     var list = [];
@@ -776,13 +776,13 @@
                     column.format = this.itemLink(
                         item.editLinkItemType != null ? item.editLinkItemType : null,
                         item.editLinkIdField != null ? item.editLinkIdField : null,
-                        (ss as any).mkdel({ oldFormat: oldFormat }, function(ctx: Slick.FormatterContext) {
+                        ss.mkdel({ oldFormat: oldFormat }, function(ctx: Slick.FormatterContext) {
                             if (this.oldFormat.$ != null) {
                                 return this.oldFormat.$(ctx);
                             }
                             return Q.htmlEncode(ctx.value);
                         }),
-                        (ss as any).mkdel({ css: css }, function(ctx1: Slick.FormatterContext) {
+                        ss.mkdel({ css: css }, function(ctx1: Slick.FormatterContext) {
                             return Q.coalesce(this.css.$, '');
                         }), false);
 
@@ -1015,7 +1015,7 @@
                 key += path.substr(1).split(String.fromCharCode(47)).slice(0, 2).join('/') + ':';
             }
 
-            key += (ss as any).getTypeFullName((ss as any).getInstanceType(this));
+            key += ss.getTypeFullName(ss.getInstanceType(this));
             return key;
         }
 
@@ -1155,8 +1155,9 @@
                     flags.filterItems !== false &&
                     this.filterBar != null &&
                     this.filterBar.get_store() != null) {
-                    (ss as any).clear(this.filterBar.get_store().get_items());
-                    (ss as any).arrayAddRange(this.filterBar.get_store().get_items(), settings.filterItems);
+                    var items = this.filterBar.get_store().get_items();
+                    items.length = 0;
+                    items.push.apply(items, settings.filterItems);
                     this.filterBar.get_store().raiseChanged();
                 }
 
@@ -1261,7 +1262,7 @@
                     }
 
                     if (flags.sortColumns !== false) {
-                        var sort = Q.indexOf(sortColumns, (ss as any).mkdel({ column: column }, function(x: Slick.ColumnSort) {
+                        var sort = Q.indexOf(sortColumns, ss.mkdel({ column: column }, function(x: Slick.ColumnSort) {
                             return x.columnId === this.column.$.id;
                         }));
 

@@ -8,7 +8,7 @@
             this.items = [];
 
             if (fields == null) {
-                throw new (ss as any).ArgumentNullException('source');
+                throw new ss.ArgumentNullException('source');
             }
 
             this.fields = fields.slice();
@@ -152,15 +152,15 @@
 
         raiseChanged(): void {
             this.displayText = null;
-            this.changed && this.changed(this, (ss as any).EventArgs.Empty);
+            this.changed && this.changed(this, {});
         }
 
         add_changed(value: (e: JQueryEventObject, a: any) => void): void {
-            this.changed = (ss as any).delegateCombine(this.changed, value);
+            this.changed = ss.delegateCombine(this.changed, value);
         }
 
         remove_changed(value: (e: JQueryEventObject, a: any) => void): void {
-            this.changed = (ss as any).delegateRemove(this.changed, value);
+            this.changed = ss.delegateRemove(this.changed, value);
         }
 
         get_activeCriteria(): any[] {

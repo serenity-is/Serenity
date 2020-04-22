@@ -7,20 +7,18 @@
 
             if (knownTypes == null) {
                 knownTypes = {};
-                for (var assembly of (ss as any).getAssemblies()) {
-                    for (var type of (ss as any).getAssemblyTypes(assembly)) {
-                        if ((ss as any).isEnum(type)) {
-                            var fullName = (ss as any).getTypeFullName(type);
-                            knownTypes[fullName] = type;
-                            var enumKeyAttr = (ss as any).getAttributes(type, Serenity.EnumKeyAttribute, false);
-                            if (enumKeyAttr != null && enumKeyAttr.length > 0) {
-                                knownTypes[enumKeyAttr[0].value] = type;
-                            }
+                for (var type of ss.getTypes()) {
+                    if (ss.isEnum(type)) {
+                        var fullName = ss.getTypeFullName(type);
+                        knownTypes[fullName] = type;
+                        var enumKeyAttr = ss.getAttributes(type, Serenity.EnumKeyAttribute, false);
+                        if (enumKeyAttr != null && enumKeyAttr.length > 0) {
+                            knownTypes[enumKeyAttr[0].value] = type;
+                        }
 
-                            for (var k of Q.Config.rootNamespaces) {
-                                if (Q.startsWith(fullName, k + '.')) {
-                                    knownTypes[fullName.substr(k.length + 1)] = type;
-                                }
+                        for (var k of Q.Config.rootNamespaces) {
+                            if (Q.startsWith(fullName, k + '.')) {
+                                knownTypes[fullName.substr(k.length + 1)] = type;
                             }
                         }
                     }
@@ -42,7 +40,7 @@
                     "with capital letters, e.g.MyProject.Pascal.Cased namespace", key);
 
                 Q.notifyError(message, '', null);
-                throw new (ss as any).Exception(message);
+                throw new ss.Exception(message);
             }
 
             return type;
