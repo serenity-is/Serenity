@@ -73,7 +73,7 @@
                 }
                 else {
                     var f = fieldByName[cc] || fieldByName[k2];
-                    f && (target[f] = v);
+                    f && (target[f.name] = v);
                 }
             }
         }

@@ -57,6 +57,6 @@ namespace Q {
         if ($.unblockUI)
             $.unblockUI({ fadeOut: 0 });
         else 
-            $(document.body).children('.blockUI blockOverlay').remove();
+            $(document.body).children('.blockUI.blockOverlay').remove();
     }
 }
