@@ -383,7 +383,7 @@
             var mapped = sortBy.map(function (s) {
                 var x: Slick.ColumnSort = {};
                 if (s && Q.endsWith(s.toLowerCase(), ' desc')) {
-                    x.columnId = Q.trimEndString(s.substr(0, s.length - 5));
+                    x.columnId = Q.trimEnd(s.substr(0, s.length - 5));
                     x.sortAsc = false;
                 }
                 else {
@@ -606,7 +606,7 @@
 
                 if (columns.length > 0) {
                     columns.sort(function (x1, y) {
-                        return Q.compareValues(Math.abs(x1.sortOrder), Math.abs(y.sortOrder));
+                        return x1.sortOrder < y.sortOrder ? -1 : (x1.sortOrder > y.sortOrder ? 1 : 0);
                     });
 
                     var list = [];
@@ -776,15 +776,15 @@
                     column.format = this.itemLink(
                         item.editLinkItemType != null ? item.editLinkItemType : null,
                         item.editLinkIdField != null ? item.editLinkIdField : null,
-                        Q.mkdel({ oldFormat: oldFormat }, function(ctx: Slick.FormatterContext) {
+                        function(ctx: Slick.FormatterContext) {
                             if (this.oldFormat.$ != null) {
                                 return this.oldFormat.$(ctx);
                             }
                             return Q.htmlEncode(ctx.value);
-                        }),
-                        Q.mkdel({ css: css }, function(ctx1: Slick.FormatterContext) {
+                        }.bind({ oldFormat: oldFormat }),
+                        function(ctx1: Slick.FormatterContext) {
                             return Q.coalesce(this.css.$, '');
-                        }), false);
+                        }.bind({ css: css }), false);
 
                     if (!Q.isEmptyOrNull(item.editLinkIdField)) {
                         column.referencedFields = column.referencedFields || [];
@@ -1246,26 +1246,22 @@
             var settings: PersistedGridSettings = {};
             if (flags.columnVisibility !== false || flags.columnWidths !== false || flags.sortColumns !== false) {
                 settings.columns = [];
-                var sortColumns = this.slickGrid.getSortColumns();
-                var $t1 = this.slickGrid.getColumns();
-                for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-                    var column = { $: $t1[$t2] };
+                var sortColumns = this.slickGrid.getSortColumns() as any[];
+                var columns = this.slickGrid.getColumns();
+                for (var column of columns) {
                     var p: PersistedGridColumn = {
-                        id: column.$.id
+                        id: column.id
                     };
 
                     if (flags.columnVisibility !== false) {
                         p.visible = true;
                     }
                     if (flags.columnWidths !== false) {
-                        p.width = column.$.width;
+                        p.width = column.width;
                     }
 
                     if (flags.sortColumns !== false) {
-                        var sort = Q.indexOf(sortColumns, Q.mkdel({ column: column }, function(x: Slick.ColumnSort) {
-                            return x.columnId === this.column.$.id;
-                        }));
-
+                        var sort = Q.indexOf(sortColumns, x => x.columnId == column.id);
                         p.sort = ((sort >= 0) ? ((sortColumns[sort].sortAsc !== false) ? (sort + 1) : (-sort - 1)) : 0);
                     }
                     settings.columns.push(p);

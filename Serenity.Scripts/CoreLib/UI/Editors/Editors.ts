@@ -16,10 +16,10 @@
             var editorType = knownTypes[key.toLowerCase()];
             if (editorType == null) {
 
-                var type = Q.typeByFullName(key);
+                var type = Q.getType(key) ?? Q.getType(key, globalObj);
                 if (type != null) {
-                    knownTypes[key.toLowerCase()] = type;
-                    return type;
+                    knownTypes[key.toLowerCase()] = type as any;
+                    return type as any;
                 }
 
                 throw new Q.Exception(Q.format("Can't find {0} editor type!", key));
@@ -38,10 +38,6 @@
             for (var type of Q.getTypes()) {
 
                 if (!(type.prototype instanceof Serenity.Widget)) {
-                    continue;
-                }
-
-                if (Q.isGenericTypeDefinition(type)) {
                     continue;
                 }
 
@@ -1199,7 +1195,7 @@
 
                 if (this.options.displayFileName) {
                     var s = Q.coalesce(value.Filename, '');
-                    var idx = Q.lastIndexOfAnyString(s, ['/', '\\']);
+                    var idx = Q.replaceAll(s, '\\', '/').lastIndexOf('/');
                     if (idx >= 0) {
                         value.OriginalName = s.substr(idx + 1);
                     }

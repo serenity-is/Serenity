@@ -414,7 +414,7 @@
                 Q.coalesce(field.filteringType, 'String'));
 
             var editorDiv = row.children('div.v');
-            filtering = Q.cast(Q.createInstance(filteringType), IFiltering);
+            filtering = new (filteringType as any)() as IFiltering;
             ReflectionOptionsSetter.set(filtering, field.filteringParams);
             filtering.set_container(editorDiv);
             filtering.set_field(field);

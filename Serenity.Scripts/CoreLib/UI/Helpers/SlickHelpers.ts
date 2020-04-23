@@ -559,8 +559,8 @@
 
             if (item.formatterType != null && item.formatterType.length > 0) {
 
-                var formatter = Q.cast(Q.createInstance(
-                    Serenity.FormatterTypeRegistry.get(item.formatterType)), Serenity.ISlickFormatter);
+                var formatterType = FormatterTypeRegistry.get(item.formatterType) as any;
+                var formatter = new formatterType() as Slick.Formatter;
 
                 if (item.formatterParams != null) {
                     ReflectionOptionsSetter.set(formatter, item.formatterParams);

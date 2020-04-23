@@ -338,9 +338,6 @@
                 if (!Q.isAssignableFrom(Serenity.ISlickFormatter, type))
                     continue;
                     
-                if (Q.isGenericTypeDefinition(type))
-                    continue;
-                    
                 var fullName = Q.getTypeFullName(type).toLowerCase();
                 knownTypes[fullName] = type;
 

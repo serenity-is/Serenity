@@ -196,73 +196,49 @@ namespace Q {
         return s;
     }
 
-    export function startsWith(s: string, search: string): boolean {
-        return Q.startsWithString(s, search);
+    export function startsWith(s: string, prefix: string): boolean {
+        if (prefix == null || !prefix.length)
+            return true;
+        if (prefix.length > s.length)
+            return false;
+        return (s.substr(0, prefix.length) == prefix);
     }
 
     export function toSingleLine(str: string) {
         return Q.replaceAll(Q.replaceAll(trimToEmpty(str), '\r\n', ' '), '\n', ' ').trim();
     }
 
+    export let today = (): Date => {
+        var d = new Date();
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
+    export var trimEnd = function(s: string) {
+        return s.replace(/\s*$/, '');
+    };
+
+    export var trimStart = function(s: string) {
+        return s.replace(/^\s*/, '');
+    };
+
     export function trim(s: string) {
-        return (s == null ? '' : s).replace(new RegExp('^\\s+|\\s+$', 'g'), '');
+        if (s == null)
+            return '';
+        return s.replace(new RegExp('^\\s+|\\s+$', 'g'), '');
     }
 
     export function trimToEmpty(s: string) {
-        if (s == null || s.length === 0) {
+        if (s == null || s.length === 0)
             return '';
-        }
 
         return trim(s);
     }
 
     export function trimToNull(s: string) {
-        if (s == null || s.length === 0) {
-            return null;
-        }
-
         s = trim(s);
-        if (s.length === 0) {
+        if (s.length === 0)
             return null;
-        }
-        else {
-            return s;
-        }
-    }
-
-    let turkishOrder: {};
-
-    export function turkishLocaleCompare(a: string, b: string): number {
-        let alphabet = "AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz";
-        a = a || "";
-        b = b || "";
-        if (a == b)
-            return 0;
-        if (!turkishOrder) {
-            turkishOrder = {};
-            for (let z = 0; z < alphabet.length; z++) {
-                turkishOrder[alphabet.charAt(z)] = z + 1;
-            }
-        }
-        for (let i = 0, _len = Math.min(a.length, b.length); i < _len; i++) {
-            let x = a.charAt(i), y = b.charAt(i);
-            if (x === y)
-                continue;
-            let ix = turkishOrder[x], iy = turkishOrder[y];
-            if (ix != null && iy != null)
-                return ix < iy ? -1 : 1;
-            let c = x.localeCompare(y);
-            if (c == 0)
-                continue;
-            return c;
-        }
-        return a.localeCompare(b);
-    }
-
-    export function turkishLocaleToUpper(a: string): string {
-        if (!a)
-            return a;
-        return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
+        return s;
     }
 
     export function replaceAll(s: string, f: string, r: string): string {

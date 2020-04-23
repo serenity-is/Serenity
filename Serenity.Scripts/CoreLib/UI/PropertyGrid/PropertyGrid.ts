@@ -60,11 +60,11 @@
                     var tabID = this.uniqueName + '_Tab' + tabIndex;
 
                     li.children('a').attr('href', '#' + tabID)
-                        .text(this.determineText(tab.$, Q.mkdel({
-                            tab: tab
-                        }, function (prefix: string) {
+                        .text(this.determineText(tab.$, function (prefix: string) {
                             return prefix + 'Tabs.' + this.tab.$;
-                            })));
+                        }.bind({
+                            tab: tab
+                        })));
 
                     var pane = $("<div class='tab-pane fade' role='tabpanel'>")
                         .appendTo(tc);
@@ -328,9 +328,7 @@
             }
             var editor;
             if (optionsType != null) {
-                editorParams = $.extend(Q.createInstance(optionsType),
-                    item.editorParams);
-
+                editorParams = $.extend(new optionsType(), item.editorParams);
                 editor = new (editorType as any)(element, editorParams);
             }
             else {
@@ -430,10 +428,10 @@
 					}
 				}
 				if (c === 0) {
-					c = Q.compareStrings(xcategory, ycategory);
+					c = Q.Culture.compareString(xcategory, ycategory);
 				}
 				if (c === 0) {
-					c = Q.compareValues(itemIndex[x1.name], itemIndex[y.name]);
+					c = itemIndex[x1.name] < itemIndex[y.name] ? -1 : (itemIndex[x1.name] > itemIndex[y.name] ? 1 : 0)
 				}
 				return c;
             });
@@ -450,10 +448,9 @@
 					}
                     $('<a/>').addClass('category-link').text(
                         this.determineText(category.$,
-                            Q.mkdel({ category: category },
-                                function (prefix: string) {
-                                    return prefix + 'Categories.' + this.category.$;
-                                })))
+                            function (prefix: string) {
+                                return prefix + 'Categories.' + this.category.$;
+                            }.bind({ category: category })))
                         .attr('tabindex', '-1')
                         .attr('href', '#' + this.options.idPrefix +
                             'Category' + index.toString())

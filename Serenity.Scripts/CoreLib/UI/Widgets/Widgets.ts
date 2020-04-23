@@ -27,7 +27,7 @@
             var propByName = type.__propByName;
             var fieldByName = type.__fieldByName;
             if (propByName == null) {
-                var props = Q.getMembers(type, 16, 20);
+                var props = Q.getMembers(type, Q.MemberType.property);
                 var propList = props.filter(function (x: any) {
                     return !!x.setter && ((x.attr || []).filter(function (a: any) {
                         return Q.isInstanceOfType(a, Serenity.OptionAttribute);
@@ -45,7 +45,7 @@
             }
 
             if (fieldByName == null) {
-                var fields = Q.getMembers(type, 4, 20);
+                var fields = Q.getMembers(type, Q.MemberType.field);
                 var fieldList = fields.filter(function (x1: any) {
                     return (x1.attr || []).filter(function (a: any) {
                         return Q.isInstanceOfType(a, Serenity.OptionAttribute);
@@ -68,13 +68,12 @@
                 var cc = ReflectionUtils.makeCamelCase(k2);
                 var p = propByName[cc] || propByName[k2];
                 if (p != null) {
-                    Q.midel(p.setter, target)(v);
+                    var func = (target[p.setter] as Function);
+                    func && func.call(target, v);
                 }
                 else {
                     var f = fieldByName[cc] || fieldByName[k2];
-                    if (f != null) {
-                        Q.fieldAccess(f, target, v);
-                    }
+                    f && (target[f] = v);
                 }
             }
         }

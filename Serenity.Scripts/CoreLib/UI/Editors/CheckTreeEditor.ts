@@ -353,11 +353,11 @@
                 if (y.isSelected && !x1.isSelected) {
                     return 1;
                 }
-                var c = Q.turkishLocaleCompare(x1.text, y.text);
+                var c = Q.Culture.compareString(x1.text, y.text);
                 if (c !== 0) {
                     return c;
                 }
-                return Q.compareValues(oldIndexes[x1.id], oldIndexes[y.id]);
+                return oldIndexes[x1.id] < oldIndexes[y.id] ? -1 : (oldIndexes[x1.id] > oldIndexes[y.id] ? 1 : 0);
             });
 
             this.view.setItems(list, true);

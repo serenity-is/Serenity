@@ -45,7 +45,7 @@
 
                 (target as any).__interface = true;
                 (target as any).isAssignableFrom = function (type: any) {
-                    return Q.contains(type.__interfaces || [], this);
+                    return type.__interfaces != null && type.__interfaces.indexOf(this) >= 0;
                 };
             }
         }
@@ -413,32 +413,22 @@ namespace Serenity.Decorators {
             if (!member) {
                 member = {
                     attr: [new Serenity.OptionAttribute()],
-                    name: memberName,
-                    returnType: Object
+                    name: memberName
                 };
 
                 if (isGetSet) {
-                    member.type = 16;
+                    member.type = Q.MemberType.property;
 
                     member.getter = {
-                        name: 'get_' + memberName,
-                        type: 8,
-                        sname: 'get_' + memberName,
-                        returnType: Object,
-                        params: []
+                        name: 'get_' + memberName
                     };
 
                     member.setter = {
                         name: 'set_' + memberName,
-                        type: 8,
-                        sname: 'set_' + memberName,
-                        returnType: Object,
-                        params: [Object]
                     };
                 }
                 else {
-                    member.type = 4;
-                    member.sname = memberName;
+                    member.type = Q.MemberType.field;
                 }
 
                 type.__metadata.members.push(member);

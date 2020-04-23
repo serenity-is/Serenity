@@ -29,6 +29,8 @@ namespace Q {
     }
     
     export interface Locale extends NumberFormat, DateFormat {
+        compareString?: (a: string, b: string) => number;
+        toUpper?: (a: string) => string;
     }
     
     export let Invariant: Locale = {
@@ -51,8 +53,38 @@ namespace Q {
         shortDayNames: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
         minimizedDayNames: ['Su','Mo','Tu','We','Th','Fr','Sa'],
         monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December',''],
-        shortMonthNames: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','']
+        shortMonthNames: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec',''],
+        compareString: (a, b) => a < b ? -1 : (a > b ? 1 : 0)
     }
+
+    export function compareStringFactory(order: string): ((a: string, b: string) => number) {
+
+        var o: Q.Dictionary<number> = {};
+        for (let z = 0; z < order.length; z++) {
+            o[order.charAt(z)] = z + 1;
+        }
+
+        return function(a: string, b: string) {
+            a = a || "";
+            b = b || "";
+            if (a == b)
+                return 0;
+            
+            for (let i = 0, _len = Math.min(a.length, b.length); i < _len; i++) {
+                let x = a.charAt(i), y = b.charAt(i);
+                if (x === y)
+                    continue;
+                let ix = o[x], iy = o[y];
+                if (ix != null && iy != null)
+                    return ix < iy ? -1 : 1;
+                let c = x.localeCompare(y);
+                if (c == 0)
+                    continue;
+                return c;
+            }
+            return a.localeCompare(b);
+        }
+    }   
 
     export let Culture: Locale = {
         decimalSeparator: '.',
@@ -61,6 +93,7 @@ namespace Q {
         dateOrder: 'dmy',
         dateFormat: 'dd/MM/yyyy',
         dateTimeFormat: 'dd/MM/yyyy HH:mm:ss',
+        compareString: compareStringFactory("AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz")
     };
 
     (function() {
@@ -87,6 +120,12 @@ namespace Q {
         }
     })();
 
+    export function turkishLocaleToUpper(a: string): string {
+        if (!a)
+            return a;
+        return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
+    }
+
     function insertGroupSeperator(num: string, dec: string, grp: string, neg: string) {
         var decPart = null;
         var decIndex = num.indexOf(dec);
@@ -95,7 +134,7 @@ namespace Q {
             num = num.substr(0, decIndex);
         }
 
-        var negative = Q.startsWithString(num, neg);
+        var negative = Q.startsWith(num, neg);
         if (negative) {
             num = num.substr(1);
         }
@@ -179,6 +218,20 @@ namespace Q {
         else
             return obj.format(format);
     };
+
+    export let round = (n: number, d?: number, rounding?: boolean) => {
+        var m = Math.pow(10, d || 0);
+        n *= m;
+        var sign = ((n > 0) as any) | -(n < 0);
+        if (n % 1 === 0.5 * sign) {
+            var f = Math.floor(n);
+            return (f + (rounding ? (sign > 0) as any : (f % 2 * sign))) / m;
+        }
+
+        return Math.round(n) / m;
+    };
+
+    export let trunc = (n: number): number => n != null ? (n > 0 ? Math.floor(n) : Math.ceil(n)) : null;
 
     export function formatNumber(num: number, format?: string, decOrLoc?: string | Q.NumberFormat, grp?: string): string {
         
