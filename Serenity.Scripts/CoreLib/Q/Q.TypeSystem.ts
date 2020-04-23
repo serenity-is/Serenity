@@ -9,6 +9,8 @@ namespace Q {
         __metadata?: {
             __interfaces: any[];
         };
+        __propByName?: { [key: string]: any },
+        __fieldByName?: { [key: string]: any }
         isInstanceOfType?: (type: Function) => boolean;
     }
 

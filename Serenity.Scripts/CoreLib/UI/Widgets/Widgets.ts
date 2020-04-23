@@ -156,12 +156,6 @@
 
 declare namespace Serenity {
 
-    const enum RetrieveColumnSelection {
-        details = 0,
-        keyOnly = 1,
-        list = 2
-    }
-
     class CheckListEditor extends Widget<CheckListEditorOptions> {
         constructor(div: JQuery, opt: CheckListEditorOptions);
         getItems(): CheckListItem[];
@@ -188,12 +182,6 @@ declare namespace Serenity {
         parentId?: string;
         children?: CheckTreeItem<TSource>[];
         source?: TSource;
-    }
-
-    const enum ColumnSelection {
-        List = 0,
-        KeyOnly = 1,
-        Details = 2
     }
 
     interface HtmlContentEditorOptions {

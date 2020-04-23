@@ -102,10 +102,5 @@ namespace Q {
 
     $(function () {
         initializeTypes();
-
-        setMobileDeviceMode();
-        globalObj && $(globalObj).bind('resize', function () {
-            setMobileDeviceMode();
-        });
     });
 }

@@ -30,7 +30,8 @@
     ],
     "moduleNameMapper": {
       "^jQuery$": "<rootDir>/node_modules/jquery/dist/jquery.js",
-      "^SerenityCoreLib$": "<rootDir>/dist/Serenity.CoreLib.js"
+      "^SerenityCoreLib$": "<rootDir>/dist/Serenity.CoreLib.js",
+      "^SerenityCoreLibBase$": "<rootDir>/dist/Serenity.CoreLib.base.js"
     }
   }
 }

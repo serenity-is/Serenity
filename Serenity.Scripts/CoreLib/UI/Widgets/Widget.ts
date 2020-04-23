@@ -203,4 +203,7 @@
     Widget.prototype.addValidationRule = function (eventClass: string, rule: (p1: JQuery) => string): JQuery {
         return VX.addValidationRule(this.element, eventClass, rule);
     }
+
+
 }
+

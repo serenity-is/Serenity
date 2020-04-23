@@ -85,6 +85,13 @@
         }
     }
 
+    setMobileDeviceMode();
+    $(function() {
+        globalObj && $(globalObj).bind('resize', function () {
+            setMobileDeviceMode();
+        });
+    });
+
     export function triggerLayoutOnShow(element: JQuery) {
         Serenity.LazyLoadHelper.executeEverytimeWhenShown(element, function () {
             element.triggerHandler('layout');
