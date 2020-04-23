@@ -180,8 +180,8 @@ namespace Serenity.DialogTypeRegistry {
                 return null;
             }
 
-            knownTypes[key] = dialogType;
-            return dialogType;
+            knownTypes[key] = dialogType as any;
+            return dialogType as any;
         }
 
         return knownTypes[key];

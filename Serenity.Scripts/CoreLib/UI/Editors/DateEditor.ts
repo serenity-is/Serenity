@@ -44,11 +44,11 @@
                     return null;
                 }
 
-                if (!Q.isEmptyOrNull(this.get_minValue()) && Q.compareStrings(value, this.get_minValue()) < 0) {
+                if (!Q.isEmptyOrNull(this.get_minValue()) && Q.Invariant.stringCompare(value, this.get_minValue()) < 0) {
                     return Q.format(Q.text('Validation.MinDate'), Q.formatDate(this.get_minValue(), null));
                 }
 
-                if (!Q.isEmptyOrNull(this.get_maxValue()) && Q.compareStrings(value, this.get_maxValue()) >= 0) {
+                if (!Q.isEmptyOrNull(this.get_maxValue()) && Q.Invariant.stringCompare(value, this.get_maxValue()) >= 0) {
                     return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(this.get_maxValue(), null));
                 }
 

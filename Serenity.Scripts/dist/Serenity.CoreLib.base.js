@@ -67,22 +67,23 @@ var globalObj = typeof (global) !== "undefined" ? global : (typeof (window) !== 
 var Q;
 (function (Q) {
     Q.types = {};
-    Q.getType = function (name, target) {
-        if (target == null) {
-            var type = Q.types[name];
-            if (type != null)
-                return;
-        }
+    function getNested(from, name) {
         var a = name.split('.');
-        type = target;
         for (var i = 0; i < a.length; i++) {
-            type = type[a[i]];
-            if (type == null)
+            from = from[a[i]];
+            if (from == null)
                 return null;
         }
-        if (typeof type !== 'function')
+        return from;
+    }
+    Q.getNested = getNested;
+    Q.getType = function (name, target) {
+        if (target == null)
+            return Q.types[name];
+        target = getNested(target, name);
+        if (typeof target !== 'function')
             return null;
-        return type;
+        return target;
     };
     Q.getTypeFullName = function (type) {
         return type.__typeName || type.name ||
@@ -409,6 +410,52 @@ var Q;
         });
     }
     Q.prop = prop;
+    function initializeTypes(root, pre, limit) {
+        if (!root)
+            return;
+        for (var _i = 0, _a = Object.keys(root); _i < _a.length; _i++) {
+            var k = _a[_i];
+            if (k.charAt(0) < 'A' || k.charAt(0) > 'Z')
+                continue;
+            if (k.indexOf('$') >= 0)
+                continue;
+            if (k == "prototype")
+                continue;
+            if (!root.hasOwnProperty(k))
+                continue;
+            var obj = root[k];
+            if ($.isArray(obj) ||
+                root instanceof Date)
+                continue;
+            var t = typeof (obj);
+            if (t == "string" || t == "number")
+                continue;
+            if ($.isFunction(obj) || (obj.__enum && obj.__register)) {
+                if (obj.hasOwnProperty("__typeName") &&
+                    !obj.__register)
+                    continue;
+                if (!obj.__interfaces &&
+                    obj.prototype.format &&
+                    k.substr(-9) == "Formatter") {
+                    obj.__class = true;
+                    obj.__interfaces = [Serenity.ISlickFormatter];
+                }
+                if (!obj.__class) {
+                    var baseType = Q.getBaseType(obj);
+                    if (baseType && baseType.__class)
+                        obj.__class = true;
+                }
+                if (obj.__class || obj.__enum || obj.__interface) {
+                    obj.__typeName = pre + k;
+                    Q.types[pre + k] = obj;
+                }
+                delete obj.__register;
+            }
+            if (limit > 0)
+                initializeTypes(obj, pre + k + ".", limit - 1);
+        }
+    }
+    Q.initializeTypes = initializeTypes;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
@@ -784,7 +831,7 @@ var Q;
         minimizedDayNames: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
         monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', ''],
         shortMonthNames: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', ''],
-        compareString: function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); }
+        stringCompare: function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); }
     };
     function compareStringFactory(order) {
         var o = {};
@@ -819,7 +866,7 @@ var Q;
         dateOrder: 'dmy',
         dateFormat: 'dd/MM/yyyy',
         dateTimeFormat: 'dd/MM/yyyy HH:mm:ss',
-        compareString: compareStringFactory("AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz")
+        stringCompare: compareStringFactory("AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz")
     };
     (function () {
         var k;
@@ -1794,7 +1841,13 @@ var Q;
             blockUICount++;
             return;
         }
-        $.blockUI(opt);
+        if ($.blockUI) {
+            $.blockUI && $.blockUI(opt);
+        }
+        else {
+            $('<div class="blockUI blockOverlay" style="z-index: 2000; border: none; margin: 0px; padding: 0px; width: 100%; height: 100%; top: 0px; left: 0px; opacity: 0; cursor: wait; position: fixed;"></div>')
+                .appendTo(document.body);
+        }
         blockUICount++;
     }
     /**
@@ -1831,7 +1884,10 @@ var Q;
             return;
         }
         blockUICount--;
-        $.unblockUI({ fadeOut: 0 });
+        if ($.unblockUI)
+            $.unblockUI({ fadeOut: 0 });
+        else
+            $(document.body).children('.blockUI blockOverlay').remove();
     }
     Q.blockUndo = blockUndo;
 })(Q || (Q = {}));
@@ -2919,91 +2975,12 @@ var Serenity;
     Serenity.Decorators.registerEnum(SummaryType, "Serenity.SummaryType");
 })(Serenity || (Serenity = {}));
 if (globalObj != null) {
-    function copyToGlobal(src, target) {
-        for (var n in src) {
+    function copyTo(src, target) {
+        for (var n in src)
             if (src.hasOwnProperty(n))
                 target[n] = Q[n];
-        }
     }
-    globalObj.ss ? copyToGlobal(Q, globalObj.ss) : globalObj.ss = Q;
-    globalObj.Q ? copyToGlobal(Q, globalObj.Q) : globalObj.Q = Q;
-    globalObj.Serenity ? copyToGlobal(Serenity, globalObj.Serenity) : globalObj.Serenity = Serenity;
+    globalObj.Q ? copyTo(Q, globalObj.Q) : globalObj.Q = Q;
+    globalObj.Serenity ? copyTo(Serenity, globalObj.Serenity) : globalObj.Serenity = Serenity;
 }
-var Q;
-(function (Q) {
-    function enumerateTypes(global, namespaces, callback) {
-        function scan(root, fullName, depth) {
-            if (!root)
-                return;
-            if ($.isArray(root) ||
-                root instanceof Date)
-                return;
-            var t = typeof (root);
-            if (t == "string" ||
-                t == "number")
-                return;
-            if ($.isFunction(root) || (root.__enum && root.__register))
-                callback(root, fullName);
-            if (depth > 3)
-                return;
-            for (var _i = 0, _a = Object.keys(root); _i < _a.length; _i++) {
-                var k = _a[_i];
-                if (k.charAt(0) < 'A' || k.charAt(0) > 'Z')
-                    continue;
-                if (k.indexOf('$') >= 0)
-                    continue;
-                if (k == "prototype")
-                    continue;
-                scan(root[k], fullName + '.' + k, depth + 1);
-            }
-        }
-        for (var _i = 0, namespaces_1 = namespaces; _i < namespaces_1.length; _i++) {
-            var nsRoot = namespaces_1[_i];
-            if (nsRoot == null || !nsRoot.length) {
-                continue;
-            }
-            if (nsRoot.indexOf('.') >= 0) {
-                var g = global;
-                var parts = nsRoot.split('.');
-                for (var _a = 0, parts_1 = parts; _a < parts_1.length; _a++) {
-                    var p = parts_1[_a];
-                    if (!p.length)
-                        continue;
-                    g = g[p];
-                    if (!g)
-                        continue;
-                }
-                scan(g, nsRoot, 0);
-            }
-            scan(global[nsRoot], nsRoot, 0);
-        }
-    }
-    function initializeTypes() {
-        enumerateTypes(globalObj, Q.Config.rootNamespaces, function (obj, fullName) {
-            // probably Saltaralle class
-            if (obj.hasOwnProperty("__typeName") &&
-                !obj.__register)
-                return;
-            if (!obj.__interfaces &&
-                obj.prototype.format &&
-                fullName.substr(-9) == "Formatter") {
-                obj.__class = true;
-                obj.__interfaces = [Serenity.ISlickFormatter];
-            }
-            if (!obj.__class) {
-                var baseType = Q.getBaseType(obj);
-                if (baseType && baseType.__class)
-                    obj.__class = true;
-            }
-            if (obj.__class || obj.__enum || obj.__interface) {
-                obj.__typeName = fullName;
-                Q.types[fullName] = obj;
-            }
-            delete obj.__register;
-        });
-    }
-    $(function () {
-        initializeTypes();
-    });
-})(Q || (Q = {}));
 //# sourceMappingURL=Serenity.CoreLib.base.js.map

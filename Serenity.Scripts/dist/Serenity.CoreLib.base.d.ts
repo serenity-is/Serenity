@@ -444,10 +444,11 @@ declare namespace Q {
     let types: {
         [key: string]: Type;
     };
+    function getNested(from: any, name: string): any;
     let getType: (name: string, target?: any) => Type;
     let getTypeFullName: (type: Type) => string;
     let getTypeName: (type: Type) => string;
-    let getInstanceType: (instance: any) => Type;
+    let getInstanceType: (instance: any) => any;
     let isAssignableFrom: (target: any, type: Type) => any;
     let isInstanceOfType: (instance: any, type: Type) => any;
     let safeCast: (instance: any, type: Type) => any;
@@ -485,6 +486,7 @@ declare namespace Q {
     let isEnum: (type: any) => boolean;
     function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function prop(type: any, name: string, getter?: string, setter?: string): void;
+    function initializeTypes(root: any, pre: string, limit: number): void;
 }
 declare namespace Q {
     type Dictionary<TItem> = {
@@ -603,7 +605,7 @@ declare namespace Q {
         shortMonthNames?: string[];
     }
     interface Locale extends NumberFormat, DateFormat {
-        compareString?: (a: string, b: string) => number;
+        stringCompare?: (a: string, b: string) => number;
         toUpper?: (a: string) => string;
     }
     let Invariant: Locale;
@@ -977,6 +979,4 @@ declare namespace Serenity {
         Min = 3,
         Max = 4
     }
-}
-declare namespace Q {
 }

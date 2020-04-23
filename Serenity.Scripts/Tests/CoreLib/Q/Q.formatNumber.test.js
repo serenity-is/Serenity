@@ -1,6 +1,6 @@
 var $ = require("jQuery");
 global.$ = global.jQuery = $;
-require("SerenityCoreLib");
+require("SerenityCoreLibBase");
 
 test('format number with "." as decimal separator', function() {
     Q.Culture.decimalSeparator = '.';

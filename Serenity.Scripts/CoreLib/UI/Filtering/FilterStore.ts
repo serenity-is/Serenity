@@ -28,7 +28,7 @@
                         titleY = y.name;
                 }
 
-                return Q.turkishLocaleCompare(titleX, titleY);
+                return Q.Culture.stringCompare(titleX, titleY);
             });
 
             this.fieldByName = {};

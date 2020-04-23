@@ -67,39 +67,23 @@ var globalObj = typeof (global) !== "undefined" ? global : (typeof (window) !== 
 var Q;
 (function (Q) {
     Q.types = {};
-    function _makeGenericTypeName(genericType, typeArguments) {
-        var result = genericType.__typeName;
-        for (var i = 0; i < typeArguments.length; i++)
-            result += (i === 0 ? '[' : ',') + '[' + Q.getTypeFullName(typeArguments[i]) + ']';
-        result += ']';
-        return result;
-    }
-    ;
-    var __genericCache = {};
-    function makeGenericType(genericType, typeArguments) {
-        var name = _makeGenericTypeName(genericType, typeArguments);
-        return __genericCache[name] || genericType.apply(null, typeArguments);
-    }
-    ;
-    Q.isGenericTypeDefinition = function (type) {
-        return type.__isGenericTypeDefinition || false;
-    };
-    Q.getType = function (name, target) {
-        if (target == null) {
-            var type = Q.types[name];
-            if (type != null)
-                return;
-        }
+    function getNested(from, name) {
         var a = name.split('.');
-        type = target;
         for (var i = 0; i < a.length; i++) {
-            type = type[a[i]];
-            if (type == null)
+            from = from[a[i]];
+            if (from == null)
                 return null;
         }
-        if (typeof type !== 'function')
+        return from;
+    }
+    Q.getNested = getNested;
+    Q.getType = function (name, target) {
+        if (target == null)
+            return Q.types[name];
+        target = getNested(target, name);
+        if (typeof target !== 'function')
             return null;
-        return type;
+        return target;
     };
     Q.getTypeFullName = function (type) {
         return type.__typeName || type.name ||
@@ -144,20 +128,6 @@ var Q;
             return instance;
         throw new InvalidCastException('Cannot cast object to type ' + Q.getTypeFullName(type));
     };
-    Q.createInstance = function ss$createInstance(type) {
-        if (typeof (type.createInstance) === 'function')
-            return type.createInstance();
-        else if (type === Boolean)
-            return false;
-        else if (type === Date)
-            return new Date(0);
-        else if (type === Number)
-            return 0;
-        else if (type === String)
-            return '';
-        else
-            return new type();
-    };
     Q.getBaseType = function (type) {
         if (type === Object || type.__interface) {
             return null;
@@ -188,8 +158,7 @@ var Q;
                 var a = Q.getAttributes(b, attrType, true);
                 for (var i = 0; i < a.length; i++) {
                     var t = Q.getInstanceType(a[i]);
-                    if (!t.__metadata || !t.__metadata.attrNoInherit)
-                        result.push(a[i]);
+                    result.push(a[i]);
                 }
             }
         }
@@ -198,11 +167,9 @@ var Q;
                 var a = type.__metadata.attr[i];
                 if (attrType == null || Q.isInstanceOfType(a, attrType)) {
                     var t = Q.getInstanceType(a);
-                    if (!t.__metadata || !t.__metadata.attrAllowMultiple) {
-                        for (var j = result.length - 1; j >= 0; j--) {
-                            if (Q.isInstanceOfType(result[j], t))
-                                result.splice(j, 1);
-                        }
+                    for (var j = result.length - 1; j >= 0; j--) {
+                        if (Q.isInstanceOfType(result[j], t))
+                            result.splice(j, 1);
                     }
                     result.push(a);
                 }
@@ -210,53 +177,17 @@ var Q;
         }
         return result;
     };
-    Q.getMembers = function (type, memberTypes, bindingAttr, name, params) {
+    Q.getMembers = function (type, memberTypes) {
         var result = [];
-        if ((bindingAttr & 72) == 72 || (bindingAttr & 6) == 4) {
-            var b = Q.getBaseType(type);
-            if (b)
-                result = Q.getMembers(b, memberTypes & ~1, bindingAttr &
-                    (bindingAttr & 64 ? 255 : 247) & (bindingAttr & 2 ? 251 : 255), name, params);
-        }
-        var f = function (m) {
-            if ((memberTypes & m.type) && (((bindingAttr & 4) && !m.isStatic) ||
-                ((bindingAttr & 8) && m.isStatic)) && (!name || m.name === name)) {
-                if (params) {
-                    if ((m.params || []).length !== params.length)
-                        return;
-                    for (var i = 0; i < params.length; i++) {
-                        if (params[i] !== m.params[i])
-                            return;
-                    }
-                }
-                result.push(m);
-            }
-        };
+        var b = Q.getBaseType(type);
+        if (b)
+            result = Q.getMembers(b, memberTypes & ~1);
         if (type.__metadata && type.__metadata.members) {
-            for (var i = 0; i < type.__metadata.members.length; i++) {
-                var m = type.__metadata.members[i];
-                f(m);
-                for (var j = 0; j < 4; j++) {
-                    var a = ['getter', 'setter', 'adder', 'remover'][j];
-                    if (m[a])
-                        f(m[a]);
-                }
+            for (var _i = 0, _a = type.__metadata.members; _i < _a.length; _i++) {
+                var m = _a[_i];
+                if (memberTypes & m.type)
+                    result.push(m);
             }
-        }
-        if (bindingAttr & 256) {
-            while (type) {
-                var r = [];
-                for (var i = 0; i < result.length; i++) {
-                    if (result[i].typeDef === type)
-                        r.push(result[i]);
-                }
-                if (r.length > 1)
-                    throw new Error('Ambiguous match');
-                else if (r.length === 1)
-                    return r[0];
-                type = Q.getBaseType(type);
-            }
-            return null;
         }
         return result;
     };
@@ -340,73 +271,16 @@ var Q;
                 delete d[n];
         }
     };
-    Q.compareValues = function (a, b) {
-        if (a == null)
-            throw new NullReferenceException('Object is null');
-        else if (typeof (a) === 'number' || typeof (a) === 'string' || typeof (a) === 'boolean')
-            return b != null ? (a < b ? -1 : (a > b ? 1 : 0)) : 1;
-        else if (Object.prototype.toString.call(a) === '[object Date]')
-            return b != null ? Q.compareValues(a.valueOf(), b.valueOf()) : 1;
-        else
-            return a.compareTo(b);
-    };
-    Q.compareStrings = function (s1, s2, ignoreCase) {
-        if (s1 == null)
-            return s2 != null ? -1 : 0;
-        if (s2 == null)
-            return 1;
-        if (ignoreCase) {
-            s1 = s1.toUpperCase();
-            s2 = s2.toUpperCase();
-        }
-        return s1 == s2 ? 0 : (s1 < s2 ? -1 : 1);
-    };
-    Q.lastIndexOfAnyString = function (s, chars, startIndex, count) {
-        var length = s.length;
-        if (!length) {
-            return -1;
-        }
-        chars = String.fromCharCode.apply(null, chars);
-        startIndex = startIndex || length - 1;
-        count = count || length;
-        var endIndex = startIndex - count + 1;
-        if (endIndex < 0) {
-            endIndex = 0;
-        }
-        for (var i = startIndex; i >= endIndex; i--) {
-            if (chars.indexOf(s.charAt(i)) >= 0) {
-                return i;
-            }
-        }
-        return -1;
-    };
-    Q.contains = function (obj, item) {
-        if (obj.contains)
-            return obj.contains(item);
-        else
-            return obj.indexOf(item) >= 0;
-    };
-    Q.round = function (n, d, rounding) {
-        var m = Math.pow(10, d || 0);
-        n *= m;
-        var sign = (n > 0) | -(n < 0);
-        if (n % 1 === 0.5 * sign) {
-            var f = Math.floor(n);
-            return (f + (rounding ? (sign > 0) : (f % 2 * sign))) / m;
-        }
-        return Math.round(n) / m;
-    };
-    Q.trunc = function (n) { return n != null ? (n > 0 ? Math.floor(n) : Math.ceil(n)) : null; };
     Q.delegateCombine = function (delegate1, delegate2) {
         if (!delegate1) {
             if (!delegate2._targets) {
-                return Q.mkdel(null, delegate2);
+                return delegate2;
             }
             return delegate2;
         }
         if (!delegate2) {
             if (!delegate1._targets) {
-                return Q.mkdel(null, delegate1);
+                return delegate1;
             }
             return delegate1;
         }
@@ -448,14 +322,6 @@ var Q;
             return parts;
         };
     })(Enum = Q.Enum || (Q.Enum = {}));
-    Q.arrayClone = function (arr) {
-        if (arr.length === 1) {
-            return [arr[0]];
-        }
-        else {
-            return Array.apply(null, arr);
-        }
-    };
     function delegateContains(targets, object, method) {
         for (var i = 0; i < targets.length; i += 2) {
             if (targets[i] === object && targets[i + 1] === method) {
@@ -465,60 +331,13 @@ var Q;
         return false;
     }
     ;
-    Q.midel = function (mi, target, typeArguments) {
-        if (mi.isStatic && !!target)
-            throw new ArgumentNullException('Cannot specify target for static method');
-        else if (!mi.isStatic && !target)
-            throw new ArgumentNullException('Must specify target for instance method');
-        var method;
-        if (mi.fget) {
-            method = function () { return (mi.isStatic ? mi.typeDef : this)[mi.fget]; };
-        }
-        else if (mi.fset) {
-            method = function (v) { (mi.isStatic ? mi.typeDef : this)[mi.fset] = v; };
-        }
-        else {
-            method = mi.def || (mi.isStatic || mi.sm ? mi.typeDef[mi.sname] : target[mi.sname]);
-            if (mi.tpcount) {
-                if (!typeArguments || typeArguments.length !== mi.tpcount)
-                    throw new ArgumentOutOfRangeException('Wrong number of type arguments');
-                method = method.apply(null, typeArguments);
-            }
-            else {
-                if (typeArguments && typeArguments.length)
-                    throw new ArgumentOutOfRangeException('Cannot specify type arguments for non-generic method');
-            }
-            if (mi.exp) {
-                var _m1 = method;
-                method = function () { return _m1.apply(this, Array.prototype.slice.call(arguments, 0, arguments.length - 1).concat(arguments[arguments.length - 1])); };
-            }
-            if (mi.sm) {
-                var _m2 = method;
-                method = function () { return _m2.apply(null, [this].concat(Array.prototype.slice.call(arguments))); };
-            }
-        }
-        return Q.mkdel(target, method);
-    };
-    function fieldAccess(fi, obj, val) {
-        if (fi.isStatic && !!obj)
-            throw new Error('Cannot specify target for static field');
-        else if (!fi.isStatic && !obj)
-            throw new Error('Must specify target for instance field');
-        obj = fi.isStatic ? fi.typeDef : obj;
-        if (arguments.length === 3)
-            obj[fi.sname] = arguments[2];
-        else
-            return obj[fi.sname];
-    }
-    Q.fieldAccess = fieldAccess;
-    ;
     var _mkdel = function (targets) {
         var delegate = function () {
             if (targets.length == 2) {
                 return targets[1].apply(targets[0], arguments);
             }
             else {
-                var clone = Q.arrayClone(targets);
+                var clone = targets.slice();
                 for (var i = 0; i < clone.length; i += 2) {
                     if (delegateContains(targets, clone[i], clone[i + 1])) {
                         clone[i + 1].apply(clone[i], arguments);
@@ -529,15 +348,6 @@ var Q;
         };
         delegate._targets = targets;
         return delegate;
-    };
-    Q.mkdel = function (object, method) {
-        if (!object) {
-            return method;
-        }
-        if (typeof method === 'string') {
-            method = object[method];
-        }
-        return _mkdel([object, method]);
     };
     Q.delegateRemove = function (delegate1, delegate2) {
         if (!delegate1 || (delegate1 === delegate2)) {
@@ -561,35 +371,91 @@ var Q;
                 if (targets.length == 2) {
                     return null;
                 }
-                var t = Q.arrayClone(targets);
+                var t = targets.slice();
                 t.splice(i, 2);
                 return _mkdel(t);
             }
         }
         return delegate1;
     };
-    Q.startsWithString = function (s, prefix) {
-        if (prefix == null || !prefix.length) {
-            return true;
-        }
-        if (prefix.length > s.length) {
-            return false;
-        }
-        return (s.substr(0, prefix.length) == prefix);
-    };
-    Q.today = function () {
-        var d = new Date();
-        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    };
-    Q.trimEndString = function (s, chars) {
-        return s.replace(chars ? new RegExp('[' + String.fromCharCode.apply(null, chars) + ']+$') : /\s*$/, '');
-    };
-    Q.trimStartString = function (s, chars) {
-        return s.replace(chars ? new RegExp('^[' + String.fromCharCode.apply(null, chars) + ']+') : /^\s*/, '');
-    };
     Q.isEnum = function (type) {
         return !!type.__enum;
     };
+    function initFormType(typ, nameWidgetPairs) {
+        for (var i = 0; i < nameWidgetPairs.length - 1; i += 2) {
+            (function (name, widget) {
+                Object.defineProperty(typ.prototype, name, {
+                    get: function () {
+                        return this.w(name, widget);
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+            })(nameWidgetPairs[i], nameWidgetPairs[i + 1]);
+        }
+    }
+    Q.initFormType = initFormType;
+    function prop(type, name, getter, setter) {
+        getter = getter || "get_" + name;
+        setter = setter || "set_" + name;
+        Object.defineProperty(type.prototype, name, {
+            get: function () {
+                return this[getter]();
+            },
+            set: function (value) {
+                return this[setter](value);
+            },
+            configurable: true,
+            enumerable: true
+        });
+    }
+    Q.prop = prop;
+    function initializeTypes(root, pre, limit) {
+        if (!root)
+            return;
+        for (var _i = 0, _a = Object.keys(root); _i < _a.length; _i++) {
+            var k = _a[_i];
+            if (k.charAt(0) < 'A' || k.charAt(0) > 'Z')
+                continue;
+            if (k.indexOf('$') >= 0)
+                continue;
+            if (k == "prototype")
+                continue;
+            if (!root.hasOwnProperty(k))
+                continue;
+            var obj = root[k];
+            if ($.isArray(obj) ||
+                root instanceof Date)
+                continue;
+            var t = typeof (obj);
+            if (t == "string" || t == "number")
+                continue;
+            if ($.isFunction(obj) || (obj.__enum && obj.__register)) {
+                if (obj.hasOwnProperty("__typeName") &&
+                    !obj.__register)
+                    continue;
+                if (!obj.__interfaces &&
+                    obj.prototype.format &&
+                    k.substr(-9) == "Formatter") {
+                    obj.__class = true;
+                    obj.__interfaces = [Serenity.ISlickFormatter];
+                }
+                if (!obj.__class) {
+                    var baseType = Q.getBaseType(obj);
+                    if (baseType && baseType.__class)
+                        obj.__class = true;
+                }
+                if (obj.__class || obj.__enum || obj.__interface) {
+                    obj.__typeName = pre + k;
+                    Q.types[pre + k] = obj;
+                }
+                delete obj.__register;
+            }
+            if (limit > 0)
+                initializeTypes(obj, pre + k + ".", limit - 1);
+        }
+    }
+    Q.initializeTypes = initializeTypes;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
@@ -775,72 +641,47 @@ var Q;
         return s;
     }
     Q.padLeft = padLeft;
-    function startsWith(s, search) {
-        return Q.startsWithString(s, search);
+    function startsWith(s, prefix) {
+        if (prefix == null || !prefix.length)
+            return true;
+        if (prefix.length > s.length)
+            return false;
+        return (s.substr(0, prefix.length) == prefix);
     }
     Q.startsWith = startsWith;
     function toSingleLine(str) {
         return Q.replaceAll(Q.replaceAll(trimToEmpty(str), '\r\n', ' '), '\n', ' ').trim();
     }
     Q.toSingleLine = toSingleLine;
+    Q.today = function () {
+        var d = new Date();
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    };
+    Q.trimEnd = function (s) {
+        return s.replace(/\s*$/, '');
+    };
+    Q.trimStart = function (s) {
+        return s.replace(/^\s*/, '');
+    };
     function trim(s) {
-        return (s == null ? '' : s).replace(new RegExp('^\\s+|\\s+$', 'g'), '');
+        if (s == null)
+            return '';
+        return s.replace(new RegExp('^\\s+|\\s+$', 'g'), '');
     }
     Q.trim = trim;
     function trimToEmpty(s) {
-        if (s == null || s.length === 0) {
+        if (s == null || s.length === 0)
             return '';
-        }
         return trim(s);
     }
     Q.trimToEmpty = trimToEmpty;
     function trimToNull(s) {
-        if (s == null || s.length === 0) {
-            return null;
-        }
         s = trim(s);
-        if (s.length === 0) {
+        if (s.length === 0)
             return null;
-        }
-        else {
-            return s;
-        }
+        return s;
     }
     Q.trimToNull = trimToNull;
-    var turkishOrder;
-    function turkishLocaleCompare(a, b) {
-        var alphabet = "AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz";
-        a = a || "";
-        b = b || "";
-        if (a == b)
-            return 0;
-        if (!turkishOrder) {
-            turkishOrder = {};
-            for (var z = 0; z < alphabet.length; z++) {
-                turkishOrder[alphabet.charAt(z)] = z + 1;
-            }
-        }
-        for (var i = 0, _len = Math.min(a.length, b.length); i < _len; i++) {
-            var x = a.charAt(i), y = b.charAt(i);
-            if (x === y)
-                continue;
-            var ix = turkishOrder[x], iy = turkishOrder[y];
-            if (ix != null && iy != null)
-                return ix < iy ? -1 : 1;
-            var c = x.localeCompare(y);
-            if (c == 0)
-                continue;
-            return c;
-        }
-        return a.localeCompare(b);
-    }
-    Q.turkishLocaleCompare = turkishLocaleCompare;
-    function turkishLocaleToUpper(a) {
-        if (!a)
-            return a;
-        return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
-    }
-    Q.turkishLocaleToUpper = turkishLocaleToUpper;
     function replaceAll(s, f, r) {
         s = s || '';
         return s.split(f).join(r);
@@ -989,8 +830,35 @@ var Q;
         shortDayNames: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
         minimizedDayNames: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
         monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', ''],
-        shortMonthNames: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', '']
+        shortMonthNames: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', ''],
+        stringCompare: function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); }
     };
+    function compareStringFactory(order) {
+        var o = {};
+        for (var z = 0; z < order.length; z++) {
+            o[order.charAt(z)] = z + 1;
+        }
+        return function (a, b) {
+            a = a || "";
+            b = b || "";
+            if (a == b)
+                return 0;
+            for (var i = 0, _len = Math.min(a.length, b.length); i < _len; i++) {
+                var x = a.charAt(i), y = b.charAt(i);
+                if (x === y)
+                    continue;
+                var ix = o[x], iy = o[y];
+                if (ix != null && iy != null)
+                    return ix < iy ? -1 : 1;
+                var c = x.localeCompare(y);
+                if (c == 0)
+                    continue;
+                return c;
+            }
+            return a.localeCompare(b);
+        };
+    }
+    Q.compareStringFactory = compareStringFactory;
     Q.Culture = {
         decimalSeparator: '.',
         groupSeparator: ',',
@@ -998,6 +866,7 @@ var Q;
         dateOrder: 'dmy',
         dateFormat: 'dd/MM/yyyy',
         dateTimeFormat: 'dd/MM/yyyy HH:mm:ss',
+        stringCompare: compareStringFactory("AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz")
     };
     (function () {
         var k;
@@ -1020,6 +889,12 @@ var Q;
             }
         }
     })();
+    function turkishLocaleToUpper(a) {
+        if (!a)
+            return a;
+        return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
+    }
+    Q.turkishLocaleToUpper = turkishLocaleToUpper;
     function insertGroupSeperator(num, dec, grp, neg) {
         var decPart = null;
         var decIndex = num.indexOf(dec);
@@ -1027,7 +902,7 @@ var Q;
             decPart = num.substr(decIndex);
             num = num.substr(0, decIndex);
         }
-        var negative = Q.startsWithString(num, neg);
+        var negative = Q.startsWith(num, neg);
         if (negative) {
             num = num.substr(1);
         }
@@ -1110,6 +985,17 @@ var Q;
             return obj.format(format);
     }
     ;
+    Q.round = function (n, d, rounding) {
+        var m = Math.pow(10, d || 0);
+        n *= m;
+        var sign = (n > 0) | -(n < 0);
+        if (n % 1 === 0.5 * sign) {
+            var f = Math.floor(n);
+            return (f + (rounding ? (sign > 0) : (f % 2 * sign))) / m;
+        }
+        return Math.round(n) / m;
+    };
+    Q.trunc = function (n) { return n != null ? (n > 0 ? Math.floor(n) : Math.ceil(n)) : null; };
     function formatNumber(num, format, decOrLoc, grp) {
         var _a, _b, _c, _d, _e, _f;
         if (num == null)
@@ -1955,7 +1841,13 @@ var Q;
             blockUICount++;
             return;
         }
-        $.blockUI(opt);
+        if ($.blockUI) {
+            $.blockUI && $.blockUI(opt);
+        }
+        else {
+            $('<div class="blockUI blockOverlay" style="z-index: 2000; border: none; margin: 0px; padding: 0px; width: 100%; height: 100%; top: 0px; left: 0px; opacity: 0; cursor: wait; position: fixed;"></div>')
+                .appendTo(document.body);
+        }
         blockUICount++;
     }
     /**
@@ -1992,7 +1884,10 @@ var Q;
             return;
         }
         blockUICount--;
-        $.unblockUI({ fadeOut: 0 });
+        if ($.unblockUI)
+            $.unblockUI({ fadeOut: 0 });
+        else
+            $(document.body).children('.blockUI blockOverlay').remove();
     }
     Q.blockUndo = blockUndo;
 })(Q || (Q = {}));
@@ -2762,7 +2657,7 @@ var Q;
     Q.layoutFillHeight = layoutFillHeight;
     function setMobileDeviceMode() {
         var isMobile = navigator.userAgent.indexOf('Mobi') >= 0 ||
-            window.matchMedia('(max-width: 767px)').matches;
+            (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
         var body = $(document.body);
         if (body.hasClass('mobile-device')) {
             if (!isMobile) {
@@ -2774,6 +2669,20 @@ var Q;
         }
     }
     Q.setMobileDeviceMode = setMobileDeviceMode;
+    setMobileDeviceMode();
+    $(function () {
+        if (globalObj && Q.Config.rootNamespaces) {
+            for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
+                var ns = _a[_i];
+                var obj = Q.getNested(globalObj, ns);
+                if (obj != null)
+                    Q.initializeTypes(obj, ns + ".", 3);
+            }
+        }
+        globalObj && $(globalObj).bind('resize', function () {
+            setMobileDeviceMode();
+        });
+    });
     function triggerLayoutOnShow(element) {
         Serenity.LazyLoadHelper.executeEverytimeWhenShown(element, function () {
             element.triggerHandler('layout');
@@ -3013,53 +2922,6 @@ var Q;
         return ScriptData.canLoad(name);
     }
     Q.canLoadScriptData = canLoadScriptData;
-})(Q || (Q = {}));
-var Q;
-(function (Q) {
-    function initFormType(typ, nameWidgetPairs) {
-        for (var i = 0; i < nameWidgetPairs.length - 1; i += 2) {
-            (function (name, widget) {
-                Object.defineProperty(typ.prototype, name, {
-                    get: function () {
-                        return this.w(name, widget);
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-            })(nameWidgetPairs[i], nameWidgetPairs[i + 1]);
-        }
-    }
-    Q.initFormType = initFormType;
-    function prop(type, name, getter, setter) {
-        getter = getter || "get_" + name;
-        setter = setter || "set_" + name;
-        Object.defineProperty(type.prototype, name, {
-            get: function () {
-                return this[getter]();
-            },
-            set: function (value) {
-                return this[setter](value);
-            },
-            configurable: true,
-            enumerable: true
-        });
-    }
-    Q.prop = prop;
-    function typeByFullName(fullName, global) {
-        if (!fullName)
-            return null;
-        var parts = fullName.split('.');
-        var root = global || window;
-        for (var i = 0; i < parts.length; i++) {
-            root = root[parts[i]];
-            if (root == null)
-                return null;
-        }
-        if (typeof root != "function")
-            return null;
-        return root;
-    }
-    Q.typeByFullName = typeByFullName;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
@@ -3391,16 +3253,76 @@ var Serenity;
                     registerType(target, null, nameOrIntf);
                 target.__interface = true;
                 target.isAssignableFrom = function (type) {
-                    return Q.contains(type.__interfaces || [], this);
+                    return type.__interfaces != null && type.__interfaces.indexOf(this) >= 0;
                 };
             };
         }
         Decorators.registerInterface = registerInterface;
-        function registerEditor(nameOrIntf, intf2) {
-            return registerClass(nameOrIntf, intf2);
+        function addAttribute(type, attr) {
+            type.__metadata = type.__metadata || {};
+            type.__metadata.attr = type.__metadata.attr || [];
+            type.__metadata.attr.push(attr);
         }
-        Decorators.registerEditor = registerEditor;
+        Decorators.addAttribute = addAttribute;
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
+    var ISlickFormatter = /** @class */ (function () {
+        function ISlickFormatter() {
+        }
+        ISlickFormatter = __decorate([
+            Decorators.registerInterface('Serenity.ISlickFormatter')
+        ], ISlickFormatter);
+        return ISlickFormatter;
+    }());
+    Serenity.ISlickFormatter = ISlickFormatter;
+    function Attr(name) {
+        return Decorators.registerClass('Serenity.' + name + 'Attribute');
+    }
+    (function (Decorators) {
+        function enumKey(value) {
+            return function (target) {
+                Decorators.addAttribute(target, new EnumKeyAttribute(value));
+            };
+        }
+        Decorators.enumKey = enumKey;
+        function registerEnum(target, enumKey, name) {
+            if (!target.__enum) {
+                Object.defineProperty(target, '__enum', {
+                    get: function () {
+                        return true;
+                    }
+                });
+                target.prototype = target.prototype || {};
+                for (var _i = 0, _a = Object.keys(target); _i < _a.length; _i++) {
+                    var k = _a[_i];
+                    if (isNaN(Q.parseInteger(k)) && target[k] != null && !isNaN(Q.parseInteger(target[k])))
+                        target.prototype[k] = target[k];
+                }
+                if (name != null) {
+                    target.__typeName = name;
+                    Q.types[name] = target;
+                }
+                else if (!target.__typeName)
+                    target.__register = true;
+                if (enumKey)
+                    Decorators.addAttribute(target, new EnumKeyAttribute(enumKey));
+            }
+        }
+        Decorators.registerEnum = registerEnum;
+        function registerEnumType(target, name, enumKey) {
+            registerEnum(target, Q.coalesce(enumKey, name), name);
+        }
+        Decorators.registerEnumType = registerEnumType;
+    })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
+    var EnumKeyAttribute = /** @class */ (function () {
+        function EnumKeyAttribute(value) {
+            this.value = value;
+        }
+        EnumKeyAttribute = __decorate([
+            Attr('EnumKey')
+        ], EnumKeyAttribute);
+        return EnumKeyAttribute;
+    }());
+    Serenity.EnumKeyAttribute = EnumKeyAttribute;
 })(Serenity || (Serenity = {}));
 var System;
 (function (System) {
@@ -3418,18 +3340,17 @@ var System;
         ComponentModel.DisplayNameAttribute = DisplayNameAttribute;
     })(ComponentModel = System.ComponentModel || (System.ComponentModel = {}));
 })(System || (System = {}));
+var Serenity;
 (function (Serenity) {
-    var ISlickFormatter = /** @class */ (function () {
-        function ISlickFormatter() {
+    var Decorators;
+    (function (Decorators) {
+        function registerEditor(nameOrIntf, intf2) {
+            return Decorators.registerClass(nameOrIntf, intf2);
         }
-        ISlickFormatter = __decorate([
-            Serenity.Decorators.registerInterface('Serenity.ISlickFormatter')
-        ], ISlickFormatter);
-        return ISlickFormatter;
-    }());
-    Serenity.ISlickFormatter = ISlickFormatter;
+        Decorators.registerEditor = registerEditor;
+    })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
     function Attr(name) {
-        return Serenity.Decorators.registerClass('Serenity.' + name + 'Attribute');
+        return Decorators.registerClass('Serenity.' + name + 'Attribute');
     }
     var CategoryAttribute = /** @class */ (function () {
         function CategoryAttribute(category) {
@@ -3508,7 +3429,7 @@ var System;
         EditorTypeAttributeBase.prototype.setParams = function (editorParams) {
         };
         EditorTypeAttributeBase = __decorate([
-            Serenity.Decorators.registerClass('Serenity.EditorTypeAttributeBase')
+            Decorators.registerClass('Serenity.EditorTypeAttributeBase')
         ], EditorTypeAttributeBase);
         return EditorTypeAttributeBase;
     }());
@@ -3544,16 +3465,6 @@ var System;
         return EntityTypeAttribute;
     }());
     Serenity.EntityTypeAttribute = EntityTypeAttribute;
-    var EnumKeyAttribute = /** @class */ (function () {
-        function EnumKeyAttribute(value) {
-            this.value = value;
-        }
-        EnumKeyAttribute = __decorate([
-            Attr('EnumKey')
-        ], EnumKeyAttribute);
-        return EnumKeyAttribute;
-    }());
-    Serenity.EnumKeyAttribute = EnumKeyAttribute;
     var FlexifyAttribute = /** @class */ (function () {
         function FlexifyAttribute(value) {
             if (value === void 0) { value = true; }
@@ -3811,104 +3722,7 @@ var System;
         return UpdatableAttribute;
     }());
     Serenity.UpdatableAttribute = UpdatableAttribute;
-})(Serenity || (Serenity = {}));
-(function (Serenity) {
-    var Decorators;
     (function (Decorators) {
-        function registerFormatter(nameOrIntf, intf2) {
-            if (nameOrIntf === void 0) { nameOrIntf = [Serenity.ISlickFormatter]; }
-            if (intf2 === void 0) { intf2 = [Serenity.ISlickFormatter]; }
-            return Decorators.registerClass(nameOrIntf, intf2);
-        }
-        Decorators.registerFormatter = registerFormatter;
-        function addAttribute(type, attr) {
-            type.__metadata = type.__metadata || {};
-            type.__metadata.attr = type.__metadata.attr || [];
-            type.__metadata.attr.push(attr);
-        }
-        Decorators.addAttribute = addAttribute;
-        function dialogType(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.DialogTypeAttribute(value));
-            };
-        }
-        Decorators.dialogType = dialogType;
-        function editor(key) {
-            return function (target) {
-                var attr = new Serenity.EditorAttribute();
-                if (key !== undefined)
-                    attr.key = key;
-                addAttribute(target, attr);
-            };
-        }
-        Decorators.editor = editor;
-        function element(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.ElementAttribute(value));
-            };
-        }
-        Decorators.element = element;
-        function enumKey(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.EnumKeyAttribute(value));
-            };
-        }
-        Decorators.enumKey = enumKey;
-        function flexify(value) {
-            if (value === void 0) { value = true; }
-            return function (target) {
-                addAttribute(target, new Serenity.FlexifyAttribute(value));
-            };
-        }
-        Decorators.flexify = flexify;
-        function registerEnum(target, enumKey, name) {
-            if (!target.__enum) {
-                Object.defineProperty(target, '__enum', {
-                    get: function () {
-                        return true;
-                    }
-                });
-                target.prototype = target.prototype || {};
-                for (var _i = 0, _a = Object.keys(target); _i < _a.length; _i++) {
-                    var k = _a[_i];
-                    if (isNaN(Q.parseInteger(k)) && target[k] != null && !isNaN(Q.parseInteger(target[k])))
-                        target.prototype[k] = target[k];
-                }
-                if (name != null) {
-                    target.__typeName = name;
-                    Q.types[name] = target;
-                }
-                else if (!target.__typeName)
-                    target.__register = true;
-                if (enumKey)
-                    addAttribute(target, new Serenity.EnumKeyAttribute(enumKey));
-            }
-        }
-        Decorators.registerEnum = registerEnum;
-        function registerEnumType(target, name, enumKey) {
-            registerEnum(target, Q.coalesce(enumKey, name), name);
-        }
-        Decorators.registerEnumType = registerEnumType;
-        function filterable(value) {
-            if (value === void 0) { value = true; }
-            return function (target) {
-                addAttribute(target, new Serenity.FilterableAttribute(value));
-            };
-        }
-        Decorators.filterable = filterable;
-        function itemName(value) {
-            return function (target) {
-                addAttribute(target, new Serenity.ItemNameAttribute(value));
-            };
-        }
-        Decorators.itemName = itemName;
-        function maximizable(value) {
-            if (value === void 0) { value = true; }
-            return function (target) {
-                addAttribute(target, new Serenity.MaximizableAttribute(value));
-            };
-        }
-        Decorators.maximizable = maximizable;
         function option() {
             return function (target, propertyKey) {
                 var isGetSet = Q.startsWith(propertyKey, 'get_') || Q.startsWith(propertyKey, 'set_');
@@ -3927,85 +3741,116 @@ var System;
                 if (!member) {
                     member = {
                         attr: [new Serenity.OptionAttribute()],
-                        name: memberName,
-                        returnType: Object
+                        name: memberName
                     };
                     if (isGetSet) {
-                        member.type = 16;
+                        member.type = 16 /* property */;
                         member.getter = {
-                            name: 'get_' + memberName,
-                            type: 8,
-                            sname: 'get_' + memberName,
-                            returnType: Object,
-                            params: []
+                            name: 'get_' + memberName
                         };
                         member.setter = {
                             name: 'set_' + memberName,
-                            type: 8,
-                            sname: 'set_' + memberName,
-                            returnType: Object,
-                            params: [Object]
                         };
                     }
                     else {
-                        member.type = 4;
-                        member.sname = memberName;
+                        member.type = 4 /* field */;
                     }
                     type.__metadata.members.push(member);
                 }
                 else {
                     member.attr = member.attr || [];
-                    member.attr.push(new Serenity.OptionAttribute());
+                    member.attr.push(new OptionAttribute());
                 }
             };
         }
         Decorators.option = option;
+        function registerFormatter(nameOrIntf, intf2) {
+            if (nameOrIntf === void 0) { nameOrIntf = [Serenity.ISlickFormatter]; }
+            if (intf2 === void 0) { intf2 = [Serenity.ISlickFormatter]; }
+            return Decorators.registerClass(nameOrIntf, intf2);
+        }
+        Decorators.registerFormatter = registerFormatter;
+        function dialogType(value) {
+            return function (target) {
+                Decorators.addAttribute(target, new DialogTypeAttribute(value));
+            };
+        }
+        Decorators.dialogType = dialogType;
+        function editor(key) {
+            return function (target) {
+                var attr = new EditorAttribute();
+                if (key !== undefined)
+                    attr.key = key;
+                Decorators.addAttribute(target, attr);
+            };
+        }
+        Decorators.editor = editor;
+        function element(value) {
+            return function (target) {
+                Decorators.addAttribute(target, new ElementAttribute(value));
+            };
+        }
+        Decorators.element = element;
+        function flexify(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                Decorators.addAttribute(target, new FlexifyAttribute(value));
+            };
+        }
+        Decorators.flexify = flexify;
+        function filterable(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                Decorators.addAttribute(target, new FilterableAttribute(value));
+            };
+        }
+        Decorators.filterable = filterable;
+        function itemName(value) {
+            return function (target) {
+                Decorators.addAttribute(target, new ItemNameAttribute(value));
+            };
+        }
+        Decorators.itemName = itemName;
+        function maximizable(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                Decorators.addAttribute(target, new MaximizableAttribute(value));
+            };
+        }
+        Decorators.maximizable = maximizable;
         function optionsType(value) {
             return function (target) {
-                addAttribute(target, new Serenity.OptionsTypeAttribute(value));
+                Decorators.addAttribute(target, new OptionsTypeAttribute(value));
             };
         }
         Decorators.optionsType = optionsType;
         function panel(value) {
             if (value === void 0) { value = true; }
             return function (target) {
-                addAttribute(target, new Serenity.PanelAttribute(value));
+                Decorators.addAttribute(target, new PanelAttribute(value));
             };
         }
         Decorators.panel = panel;
         function resizable(value) {
             if (value === void 0) { value = true; }
             return function (target) {
-                addAttribute(target, new Serenity.ResizableAttribute(value));
+                Decorators.addAttribute(target, new ResizableAttribute(value));
             };
         }
         Decorators.resizable = resizable;
         function responsive(value) {
             if (value === void 0) { value = true; }
             return function (target) {
-                addAttribute(target, new Serenity.ResponsiveAttribute(value));
+                Decorators.addAttribute(target, new ResponsiveAttribute(value));
             };
         }
         Decorators.responsive = responsive;
         function service(value) {
             return function (target) {
-                addAttribute(target, new Serenity.ServiceAttribute(value));
+                Decorators.addAttribute(target, new ServiceAttribute(value));
             };
         }
         Decorators.service = service;
-        // @ts-ignore check for global
-        var g = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
-        if (g != null) {
-            if (g.Serenity) {
-                for (var n in Serenity) {
-                    if (Serenity.hasOwnProperty(n))
-                        g.Serenity[n] = Serenity[n];
-                }
-            }
-            else {
-                g.Serenity = Serenity;
-            }
-        }
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
 })(Serenity || (Serenity = {}));
 var Serenity;
@@ -4534,7 +4379,8 @@ var Serenity;
                 }
             }
             if (item.formatterType != null && item.formatterType.length > 0) {
-                var formatter = Q.cast(Q.createInstance(Serenity.FormatterTypeRegistry.get(item.formatterType)), Serenity.ISlickFormatter);
+                var formatterType = Serenity.FormatterTypeRegistry.get(item.formatterType);
+                var formatter = new formatterType();
                 if (item.formatterParams != null) {
                     Serenity.ReflectionOptionsSetter.set(formatter, item.formatterParams);
                 }
@@ -5641,10 +5487,10 @@ var Serenity;
                 if (Q.isEmptyOrNull(value)) {
                     return null;
                 }
-                if (!Q.isEmptyOrNull(_this.get_minValue()) && Q.compareStrings(value, _this.get_minValue()) < 0) {
+                if (!Q.isEmptyOrNull(_this.get_minValue()) && Q.Invariant.stringCompare(value, _this.get_minValue()) < 0) {
                     return Q.format(Q.text('Validation.MinDate'), Q.formatDate(_this.get_minValue(), null));
                 }
-                if (!Q.isEmptyOrNull(_this.get_maxValue()) && Q.compareStrings(value, _this.get_maxValue()) >= 0) {
+                if (!Q.isEmptyOrNull(_this.get_maxValue()) && Q.Invariant.stringCompare(value, _this.get_maxValue()) >= 0) {
                     return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(_this.get_maxValue(), null));
                 }
                 return null;
@@ -5991,11 +5837,11 @@ var Serenity;
                     return null;
                 }
                 if (!Q.isEmptyOrNull(_this.get_minValue()) &&
-                    Q.compareStrings(value, _this.get_minValue()) < 0) {
+                    Q.Invariant.stringCompare(value, _this.get_minValue()) < 0) {
                     return Q.format(Q.text('Validation.MinDate'), Q.formatDate(_this.get_minValue(), null));
                 }
                 if (!Q.isEmptyOrNull(_this.get_maxValue()) &&
-                    Q.compareStrings(value, _this.get_maxValue()) >= 0) {
+                    Q.Invariant.stringCompare(value, _this.get_maxValue()) >= 0) {
                     return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(_this.get_maxValue(), null));
                 }
                 return null;
@@ -7358,13 +7204,14 @@ var Serenity;
     (function (EditorTypeRegistry) {
         var knownTypes;
         function get(key) {
+            var _a;
             if (Q.isEmptyOrNull(key)) {
                 throw new Q.ArgumentNullException('key');
             }
             initialize();
             var editorType = knownTypes[key.toLowerCase()];
             if (editorType == null) {
-                var type = Q.typeByFullName(key);
+                var type = (_a = Q.getType(key)) !== null && _a !== void 0 ? _a : Q.getType(key, globalObj);
                 if (type != null) {
                     knownTypes[key.toLowerCase()] = type;
                     return type;
@@ -7381,9 +7228,6 @@ var Serenity;
             for (var _i = 0, _a = Q.getTypes(); _i < _a.length; _i++) {
                 var type = _a[_i];
                 if (!(type.prototype instanceof Serenity.Widget)) {
-                    continue;
-                }
-                if (Q.isGenericTypeDefinition(type)) {
                     continue;
                 }
                 var fullName = Q.getTypeFullName(type).toLowerCase();
@@ -8386,7 +8230,7 @@ var Serenity;
             if (Q.isEmptyOrNull(this.options.originalNameProperty)) {
                 if (this.options.displayFileName) {
                     var s = Q.coalesce(value.Filename, '');
-                    var idx = Q.lastIndexOfAnyString(s, ['/', '\\']);
+                    var idx = Q.replaceAll(s, '\\', '/').lastIndexOf('/');
                     if (idx >= 0) {
                         value.OriginalName = s.substr(idx + 1);
                     }
@@ -9104,7 +8948,7 @@ var Serenity;
                     if (titleY == null)
                         titleY = y.name;
                 }
-                return Q.turkishLocaleCompare(titleX, titleY);
+                return Q.Culture.stringCompare(titleX, titleY);
             });
             this.fieldByName = {};
             for (var _i = 0, fields_1 = fields; _i < fields_1.length; _i++) {
@@ -9829,8 +9673,6 @@ var Serenity;
                 var type = _a[_i];
                 if (!Q.isAssignableFrom(Serenity.IFiltering, type))
                     continue;
-                if (Q.isGenericTypeDefinition(type))
-                    continue;
                 var fullName = Q.getTypeFullName(type).toLowerCase();
                 knownTypes[fullName] = type;
                 for (var _b = 0, _c = Q.Config.rootNamespaces; _b < _c.length; _b++) {
@@ -10302,7 +10144,7 @@ var Serenity;
                 return filtering;
             var filteringType = Serenity.FilteringTypeRegistry.get(Q.coalesce(field.filteringType, 'String'));
             var editorDiv = row.children('div.v');
-            filtering = Q.cast(Q.createInstance(filteringType), Serenity.IFiltering);
+            filtering = new filteringType();
             Serenity.ReflectionOptionsSetter.set(filtering, field.filteringParams);
             filtering.set_container(editorDiv);
             filtering.set_field(field);
@@ -10430,15 +10272,15 @@ var Serenity;
                     var item = _a[_i];
                     var field = { $: item };
                     $('<li><a/></li>').appendTo(menu).children().attr('href', '#')
-                        .text(Q.coalesce(item.title, '')).click(Q.mkdel({
-                        field: field,
-                        $this: _this
-                    }, function (e) {
+                        .text(Q.coalesce(item.title, '')).click(function (e) {
                         e.preventDefault();
                         this.$this.fieldChanged = self.field !== this.field.$;
                         self.field = this.field.$;
                         this.$this.updateInputPlaceHolder();
                         this.$this.checkIfValueChanged();
+                    }.bind({
+                        field: field,
+                        $this: _this
                     }));
                 }
                 new Serenity.PopupMenuButton(a, {
@@ -10861,8 +10703,6 @@ var Serenity;
                 var type = types_1[_i];
                 if (!Q.isAssignableFrom(Serenity.ISlickFormatter, type))
                     continue;
-                if (Q.isGenericTypeDefinition(type))
-                    continue;
                 var fullName = Q.getTypeFullName(type).toLowerCase();
                 knownTypes[fullName] = type;
                 for (var _a = 0, _b = Q.Config.rootNamespaces; _a < _b.length; _a++) {
@@ -11082,7 +10922,7 @@ var Serenity;
             var propByName = type.__propByName;
             var fieldByName = type.__fieldByName;
             if (propByName == null) {
-                var props = Q.getMembers(type, 16, 20);
+                var props = Q.getMembers(type, 16 /* property */);
                 var propList = props.filter(function (x) {
                     return !!x.setter && ((x.attr || []).filter(function (a) {
                         return Q.isInstanceOfType(a, Serenity.OptionAttribute);
@@ -11098,7 +10938,7 @@ var Serenity;
                 type.__propByName = propByName;
             }
             if (fieldByName == null) {
-                var fields = Q.getMembers(type, 4, 20);
+                var fields = Q.getMembers(type, 4 /* field */);
                 var fieldList = fields.filter(function (x1) {
                     return (x1.attr || []).filter(function (a) {
                         return Q.isInstanceOfType(a, Serenity.OptionAttribute);
@@ -11120,13 +10960,12 @@ var Serenity;
                 var cc = ReflectionUtils.makeCamelCase(k2);
                 var p = propByName[cc] || propByName[k2];
                 if (p != null) {
-                    Q.midel(p.setter, target)(v);
+                    var func = target[p.setter];
+                    func && func.call(target, v);
                 }
                 else {
                     var f = fieldByName[cc] || fieldByName[k2];
-                    if (f != null) {
-                        Q.fieldAccess(f, target, v);
-                    }
+                    f && (target[f] = v);
                 }
             }
         }
@@ -11383,10 +11222,10 @@ var Serenity;
                     }
                     var tabID = _this.uniqueName + '_Tab' + tabIndex;
                     li.children('a').attr('href', '#' + tabID)
-                        .text(_this.determineText(tab.$, Q.mkdel({
-                        tab: tab
-                    }, function (prefix) {
+                        .text(_this.determineText(tab.$, function (prefix) {
                         return prefix + 'Tabs.' + this.tab.$;
+                    }.bind({
+                        tab: tab
                     })));
                     var pane = $("<div class='tab-pane fade' role='tabpanel'>")
                         .appendTo(tc);
@@ -11580,7 +11419,7 @@ var Serenity;
             }
             var editor;
             if (optionsType != null) {
-                editorParams = $.extend(Q.createInstance(optionsType), item.editorParams);
+                editorParams = $.extend(new optionsType(), item.editorParams);
                 editor = new editorType(element, editorParams);
             }
             else {
@@ -11670,10 +11509,10 @@ var Serenity;
                     }
                 }
                 if (c === 0) {
-                    c = Q.compareStrings(xcategory, ycategory);
+                    c = Q.Culture.stringCompare(xcategory, ycategory);
                 }
                 if (c === 0) {
-                    c = Q.compareValues(itemIndex[x1.name], itemIndex[y.name]);
+                    c = itemIndex[x1.name] < itemIndex[y.name] ? -1 : (itemIndex[x1.name] > itemIndex[y.name] ? 1 : 0);
                 }
                 return c;
             });
@@ -11687,9 +11526,9 @@ var Serenity;
                     if (index > 1) {
                         $('<span/>').addClass('separator').text('|').prependTo(container);
                     }
-                    $('<a/>').addClass('category-link').text(this.determineText(category.$, Q.mkdel({ category: category }, function (prefix) {
+                    $('<a/>').addClass('category-link').text(this.determineText(category.$, function (prefix) {
                         return prefix + 'Categories.' + this.category.$;
-                    })))
+                    }.bind({ category: category })))
                         .attr('tabindex', '-1')
                         .attr('href', '#' + this.options.idPrefix +
                         'Category' + index.toString())
@@ -13280,7 +13119,7 @@ var Serenity;
             var mapped = sortBy.map(function (s) {
                 var x = {};
                 if (s && Q.endsWith(s.toLowerCase(), ' desc')) {
-                    x.columnId = Q.trimEndString(s.substr(0, s.length - 5));
+                    x.columnId = Q.trimEnd(s.substr(0, s.length - 5));
                     x.sortAsc = false;
                 }
                 else {
@@ -13465,7 +13304,7 @@ var Serenity;
                 });
                 if (columns.length > 0) {
                     columns.sort(function (x1, y) {
-                        return Q.compareValues(Math.abs(x1.sortOrder), Math.abs(y.sortOrder));
+                        return x1.sortOrder < y.sortOrder ? -1 : (x1.sortOrder > y.sortOrder ? 1 : 0);
                     });
                     var list = [];
                     for (var i = 0; i < columns.length; i++) {
@@ -13603,14 +13442,14 @@ var Serenity;
                 if (item.editLink === true) {
                     var oldFormat = { $: column.format };
                     var css = { $: (item.editLinkCssClass) != null ? item.editLinkCssClass : null };
-                    column.format = this.itemLink(item.editLinkItemType != null ? item.editLinkItemType : null, item.editLinkIdField != null ? item.editLinkIdField : null, Q.mkdel({ oldFormat: oldFormat }, function (ctx) {
+                    column.format = this.itemLink(item.editLinkItemType != null ? item.editLinkItemType : null, item.editLinkIdField != null ? item.editLinkIdField : null, function (ctx) {
                         if (this.oldFormat.$ != null) {
                             return this.oldFormat.$(ctx);
                         }
                         return Q.htmlEncode(ctx.value);
-                    }), Q.mkdel({ css: css }, function (ctx1) {
+                    }.bind({ oldFormat: oldFormat }), function (ctx1) {
                         return Q.coalesce(this.css.$, '');
-                    }), false);
+                    }.bind({ css: css }), false);
                     if (!Q.isEmptyOrNull(item.editLinkIdField)) {
                         column.referencedFields = column.referencedFields || [];
                         column.referencedFields.push(item.editLinkIdField);
@@ -14007,22 +13846,20 @@ var Serenity;
             if (flags.columnVisibility !== false || flags.columnWidths !== false || flags.sortColumns !== false) {
                 settings.columns = [];
                 var sortColumns = this.slickGrid.getSortColumns();
-                var $t1 = this.slickGrid.getColumns();
-                for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-                    var column = { $: $t1[$t2] };
+                var columns = this.slickGrid.getColumns();
+                for (var _i = 0, columns_3 = columns; _i < columns_3.length; _i++) {
+                    var column = columns_3[_i];
                     var p = {
-                        id: column.$.id
+                        id: column.id
                     };
                     if (flags.columnVisibility !== false) {
                         p.visible = true;
                     }
                     if (flags.columnWidths !== false) {
-                        p.width = column.$.width;
+                        p.width = column.width;
                     }
                     if (flags.sortColumns !== false) {
-                        var sort = Q.indexOf(sortColumns, Q.mkdel({ column: column }, function (x) {
-                            return x.columnId === this.column.$.id;
-                        }));
+                        var sort = Q.indexOf(sortColumns, function (x) { return x.columnId == column.id; });
                         p.sort = ((sort >= 0) ? ((sortColumns[sort].sortAsc !== false) ? (sort + 1) : (-sort - 1)) : 0);
                     }
                     settings.columns.push(p);
@@ -14686,11 +14523,11 @@ var Serenity;
                 if (y.isSelected && !x1.isSelected) {
                     return 1;
                 }
-                var c = Q.turkishLocaleCompare(x1.text, y.text);
+                var c = Q.Culture.stringCompare(x1.text, y.text);
                 if (c !== 0) {
                     return c;
                 }
-                return Q.compareValues(oldIndexes[x1.id], oldIndexes[y.id]);
+                return oldIndexes[x1.id] < oldIndexes[y.id] ? -1 : (oldIndexes[x1.id] > oldIndexes[y.id] ? 1 : 0);
             });
             this.view.setItems(list, true);
         };
@@ -16432,7 +16269,7 @@ var Serenity;
                     hidden.push(c_2);
                 }
             }
-            var hiddenColumns = hidden.sort(function (a, b) { return Q.turkishLocaleCompare(_this.getTitle(a), _this.getTitle(b)); });
+            var hiddenColumns = hidden.sort(function (a, b) { return Q.Culture.stringCompare(_this.getTitle(a), _this.getTitle(b)); });
             for (var _f = 0, _g = this.visibleColumns; _f < _g.length; _f++) {
                 var id = _g[_f];
                 var c = this.colById[id];
@@ -18563,95 +18400,12 @@ var Serenity;
     })(DialogTypeRegistry = Serenity.DialogTypeRegistry || (Serenity.DialogTypeRegistry = {}));
 })(Serenity || (Serenity = {}));
 if (globalObj != null) {
-    function copyToGlobal(src, target) {
-        for (var n in src) {
+    function copyTo(src, target) {
+        for (var n in src)
             if (src.hasOwnProperty(n))
                 target[n] = Q[n];
-        }
     }
-    globalObj.ss ? copyToGlobal(Q, globalObj.ss) : globalObj.ss = Q;
-    globalObj.Q ? copyToGlobal(Q, globalObj.Q) : globalObj.Q = Q;
-    globalObj.Serenity ? copyToGlobal(Serenity, globalObj.Serenity) : globalObj.Serenity = Serenity;
+    globalObj.Q ? copyTo(Q, globalObj.Q) : globalObj.Q = Q;
+    globalObj.Serenity ? copyTo(Serenity, globalObj.Serenity) : globalObj.Serenity = Serenity;
 }
-var Q;
-(function (Q) {
-    function enumerateTypes(global, namespaces, callback) {
-        function scan(root, fullName, depth) {
-            if (!root)
-                return;
-            if ($.isArray(root) ||
-                root instanceof Date)
-                return;
-            var t = typeof (root);
-            if (t == "string" ||
-                t == "number")
-                return;
-            if ($.isFunction(root) || (root.__enum && root.__register))
-                callback(root, fullName);
-            if (depth > 3)
-                return;
-            for (var _i = 0, _a = Object.keys(root); _i < _a.length; _i++) {
-                var k = _a[_i];
-                if (k.charAt(0) < 'A' || k.charAt(0) > 'Z')
-                    continue;
-                if (k.indexOf('$') >= 0)
-                    continue;
-                if (k == "prototype")
-                    continue;
-                scan(root[k], fullName + '.' + k, depth + 1);
-            }
-        }
-        for (var _i = 0, namespaces_1 = namespaces; _i < namespaces_1.length; _i++) {
-            var nsRoot = namespaces_1[_i];
-            if (nsRoot == null || !nsRoot.length) {
-                continue;
-            }
-            if (nsRoot.indexOf('.') >= 0) {
-                var g = global;
-                var parts = nsRoot.split('.');
-                for (var _a = 0, parts_1 = parts; _a < parts_1.length; _a++) {
-                    var p = parts_1[_a];
-                    if (!p.length)
-                        continue;
-                    g = g[p];
-                    if (!g)
-                        continue;
-                }
-                scan(g, nsRoot, 0);
-            }
-            scan(global[nsRoot], nsRoot, 0);
-        }
-    }
-    function initializeTypes() {
-        enumerateTypes(globalObj, Q.Config.rootNamespaces, function (obj, fullName) {
-            // probably Saltaralle class
-            if (obj.hasOwnProperty("__typeName") &&
-                !obj.__register)
-                return;
-            if (!obj.__interfaces &&
-                obj.prototype.format &&
-                fullName.substr(-9) == "Formatter") {
-                obj.__class = true;
-                obj.__interfaces = [Serenity.ISlickFormatter];
-            }
-            if (!obj.__class) {
-                var baseType = Q.getBaseType(obj);
-                if (baseType && baseType.__class)
-                    obj.__class = true;
-            }
-            if (obj.__class || obj.__enum || obj.__interface) {
-                obj.__typeName = fullName;
-                Q.types[fullName] = obj;
-            }
-            delete obj.__register;
-        });
-    }
-    $(function () {
-        initializeTypes();
-        Q.setMobileDeviceMode();
-        globalObj && $(globalObj).bind('resize', function () {
-            Q.setMobileDeviceMode();
-        });
-    });
-})(Q || (Q = {}));
 //# sourceMappingURL=Serenity.CoreLib.js.map

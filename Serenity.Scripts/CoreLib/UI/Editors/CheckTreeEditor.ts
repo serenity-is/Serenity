@@ -353,7 +353,7 @@
                 if (y.isSelected && !x1.isSelected) {
                     return 1;
                 }
-                var c = Q.Culture.compareString(x1.text, y.text);
+                var c = Q.Culture.stringCompare(x1.text, y.text);
                 if (c !== 0) {
                     return c;
                 }

@@ -337,6 +337,18 @@ declare interface JQBlockUIOptions {
     useTimeout?: boolean;
 }
 declare namespace Serenity {
+    const enum ColumnSelection {
+        List = 0,
+        KeyOnly = 1,
+        Details = 2
+    }
+    const enum RetrieveColumnSelection {
+        details = 0,
+        keyOnly = 1,
+        list = 2
+    }
+}
+declare namespace Serenity {
     interface ServiceError {
         Code?: string;
         Arguments?: string;
@@ -416,22 +428,39 @@ declare namespace Serenity {
 }
 declare let globalObj: any;
 declare namespace Q {
+    interface Type extends Function {
+        name?: string;
+        __typeName?: string;
+        __metadata?: {
+            __interfaces: any[];
+        };
+        __propByName?: {
+            [key: string]: any;
+        };
+        __fieldByName?: {
+            [key: string]: any;
+        };
+        isInstanceOfType?: (type: Function) => boolean;
+    }
     let types: {
-        [key: string]: Function;
+        [key: string]: Type;
     };
-    let isGenericTypeDefinition: (type: any) => any;
-    let getType: (name: string, target?: any) => any;
-    let getTypeFullName: (type: any) => string;
-    let getTypeName: (type: any) => string;
+    function getNested(from: any, name: string): any;
+    let getType: (name: string, target?: any) => Type;
+    let getTypeFullName: (type: Type) => string;
+    let getTypeName: (type: Type) => string;
     let getInstanceType: (instance: any) => any;
-    let isAssignableFrom: (target: any, type: any) => any;
-    let isInstanceOfType: (instance: any, type: any) => any;
-    let safeCast: (instance: any, type: any) => any;
-    let cast: (instance: any, type: any) => any;
-    let createInstance: (type: any) => any;
+    let isAssignableFrom: (target: any, type: Type) => any;
+    let isInstanceOfType: (instance: any, type: Type) => any;
+    let safeCast: (instance: any, type: Type) => any;
+    let cast: (instance: any, type: Type) => any;
     let getBaseType: (type: any) => any;
     let getAttributes: (type: any, attrType: any, inherit?: boolean) => any[];
-    let getMembers: (type: any, memberTypes: number, bindingAttr: any, name?: string, params?: any) => any[];
+    const enum MemberType {
+        field = 4,
+        property = 16
+    }
+    let getMembers: (type: any, memberTypes: MemberType) => any[];
     let getTypes: (from?: any) => any[];
     class Exception extends Error {
         constructor(message: string);
@@ -449,27 +478,16 @@ declare namespace Q {
         constructor(message: string);
     }
     let clearKeys: (d: any) => void;
-    let compareValues: (a: any, b: any) => number;
-    let compareStrings: (s1: string, s2: string, ignoreCase?: boolean) => 1 | 0 | -1;
-    let lastIndexOfAnyString: (s: string, chars: string[], startIndex?: number, count?: number) => number;
-    let contains: (obj: any, item: any) => any;
-    let round: (n: number, d?: number, rounding?: boolean) => number;
-    let trunc: (n: number) => number;
     let delegateCombine: (delegate1: any, delegate2: any) => any;
     namespace Enum {
         let toString: (enumType: any, value: number) => string;
         let getValues: (enumType: any) => any[];
     }
-    let arrayClone: (arr: any[]) => any;
-    let midel: (mi: any, target: any, typeArguments?: any) => any;
-    function fieldAccess(fi: any, obj: any, val?: any): any;
-    let mkdel: (object: any, method: any) => any;
     let delegateRemove: (delegate1: any, delegate2: any) => any;
-    let startsWithString: (s: string, prefix: string) => boolean;
-    let today: () => Date;
-    var trimEndString: (s: string, chars?: string[]) => string;
-    var trimStartString: (s: string, chars?: string[]) => string;
     let isEnum: (type: any) => boolean;
+    function initFormType(typ: Function, nameWidgetPairs: any[]): void;
+    function prop(type: any, name: string, getter?: string, setter?: string): void;
+    function initializeTypes(root: any, pre: string, limit: number): void;
 }
 declare namespace Q {
     type Dictionary<TItem> = {
@@ -539,13 +557,14 @@ declare namespace Q {
     function isEmptyOrNull(s: string): boolean;
     function isTrimmedEmpty(s: string): boolean;
     function padLeft(s: string | number, len: number, ch?: string): any;
-    function startsWith(s: string, search: string): boolean;
+    function startsWith(s: string, prefix: string): boolean;
     function toSingleLine(str: string): string;
+    let today: () => Date;
+    var trimEnd: (s: string) => string;
+    var trimStart: (s: string) => string;
     function trim(s: string): string;
     function trimToEmpty(s: string): string;
     function trimToNull(s: string): string;
-    function turkishLocaleCompare(a: string, b: string): number;
-    function turkishLocaleToUpper(a: string): string;
     function replaceAll(s: string, f: string, r: string): string;
     function zeroPad(n: number, digits: number): string;
     /**
@@ -587,11 +606,17 @@ declare namespace Q {
         shortMonthNames?: string[];
     }
     interface Locale extends NumberFormat, DateFormat {
+        stringCompare?: (a: string, b: string) => number;
+        toUpper?: (a: string) => string;
     }
     let Invariant: Locale;
+    function compareStringFactory(order: string): ((a: string, b: string) => number);
     let Culture: Locale;
+    function turkishLocaleToUpper(a: string): string;
     function format(format: string, ...prm: any[]): string;
     function localeFormat(format: string, l: Locale, ...prm: any[]): string;
+    let round: (n: number, d?: number, rounding?: boolean) => number;
+    let trunc: (n: number) => number;
     function formatNumber(num: number, format?: string, decOrLoc?: string | Q.NumberFormat, grp?: string): string;
     function parseInteger(s: string): number;
     function parseDecimal(s: string): number;
@@ -838,11 +863,6 @@ declare namespace Q {
     function canLoadScriptData(name: string): boolean;
 }
 declare namespace Q {
-    function initFormType(typ: Function, nameWidgetPairs: any[]): void;
-    function prop(type: any, name: string, getter?: string, setter?: string): void;
-    function typeByFullName(fullName: string, global?: any): any;
-}
-declare namespace Q {
     namespace Authorization {
         function hasPermission(permission: string): boolean;
         function validatePermission(permission: string): void;
@@ -875,7 +895,18 @@ declare namespace Serenity {
     namespace Decorators {
         function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
         function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
-        function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
+        function addAttribute(type: any, attr: any): void;
+    }
+    class ISlickFormatter {
+    }
+    namespace Decorators {
+        function enumKey(value: string): (target: Function) => void;
+        function registerEnum(target: any, enumKey?: string, name?: string): void;
+        function registerEnumType(target: any, name?: string, enumKey?: string): void;
+    }
+    class EnumKeyAttribute {
+        value: string;
+        constructor(value: string);
     }
 }
 declare namespace System.ComponentModel {
@@ -885,7 +916,8 @@ declare namespace System.ComponentModel {
     }
 }
 declare namespace Serenity {
-    class ISlickFormatter {
+    namespace Decorators {
+        function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
     }
     class CategoryAttribute {
         category: string;
@@ -904,8 +936,8 @@ declare namespace Serenity {
         constructor(value: any);
     }
     class DialogTypeAttribute {
-        value: WidgetDialogClass;
-        constructor(value: WidgetDialogClass);
+        value: any;
+        constructor(value: any);
     }
     class EditorAttribute {
         constructor();
@@ -929,10 +961,6 @@ declare namespace Serenity {
         constructor(value: string);
     }
     class EntityTypeAttribute {
-        value: string;
-        constructor(value: string);
-    }
-    class EnumKeyAttribute {
         value: string;
         constructor(value: string);
     }
@@ -1032,26 +1060,22 @@ declare namespace Serenity {
         value: boolean;
         constructor(value?: boolean);
     }
-}
-declare namespace Serenity.Decorators {
-    function registerFormatter(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
-    function addAttribute(type: any, attr: any): void;
-    function dialogType(value: WidgetDialogClass): (target: Function) => void;
-    function editor(key?: string): (target: Function) => void;
-    function element(value: string): (target: Function) => void;
-    function enumKey(value: string): (target: Function) => void;
-    function flexify(value?: boolean): (target: Function) => void;
-    function registerEnum(target: any, enumKey?: string, name?: string): void;
-    function registerEnumType(target: any, name?: string, enumKey?: string): void;
-    function filterable(value?: boolean): (target: Function) => void;
-    function itemName(value: string): (target: Function) => void;
-    function maximizable(value?: boolean): (target: Function) => void;
-    function option(): (target: Object, propertyKey: string) => void;
-    function optionsType(value: Function): (target: Function) => void;
-    function panel(value?: boolean): (target: Function) => void;
-    function resizable(value?: boolean): (target: Function) => void;
-    function responsive(value?: boolean): (target: Function) => void;
-    function service(value: string): (target: Function) => void;
+    namespace Decorators {
+        function option(): (target: Object, propertyKey: string) => void;
+        function registerFormatter(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
+        function dialogType(value: any): (target: Function) => void;
+        function editor(key?: string): (target: Function) => void;
+        function element(value: string): (target: Function) => void;
+        function flexify(value?: boolean): (target: Function) => void;
+        function filterable(value?: boolean): (target: Function) => void;
+        function itemName(value: string): (target: Function) => void;
+        function maximizable(value?: boolean): (target: Function) => void;
+        function optionsType(value: Function): (target: Function) => void;
+        function panel(value?: boolean): (target: Function) => void;
+        function resizable(value?: boolean): (target: Function) => void;
+        function responsive(value?: boolean): (target: Function) => void;
+        function service(value: string): (target: Function) => void;
+    }
 }
 declare namespace Serenity {
     function Criteria(field: string): any[];
@@ -2384,11 +2408,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    const enum RetrieveColumnSelection {
-        details = 0,
-        keyOnly = 1,
-        list = 2
-    }
     class CheckListEditor extends Widget<CheckListEditorOptions> {
         constructor(div: JQuery, opt: CheckListEditorOptions);
         getItems(): CheckListItem[];
@@ -2412,11 +2431,6 @@ declare namespace Serenity {
         parentId?: string;
         children?: CheckTreeItem<TSource>[];
         source?: TSource;
-    }
-    const enum ColumnSelection {
-        List = 0,
-        KeyOnly = 1,
-        Details = 2
     }
     interface HtmlContentEditorOptions {
     }
@@ -3692,6 +3706,4 @@ declare namespace Serenity.DialogExtensions {
 declare namespace Serenity.DialogTypeRegistry {
     function tryGet(key: string): WidgetDialogClass;
     function get(key: string): WidgetDialogClass;
-}
-declare namespace Q {
 }

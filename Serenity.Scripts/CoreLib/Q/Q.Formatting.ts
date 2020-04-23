@@ -29,7 +29,7 @@ namespace Q {
     }
     
     export interface Locale extends NumberFormat, DateFormat {
-        compareString?: (a: string, b: string) => number;
+        stringCompare?: (a: string, b: string) => number;
         toUpper?: (a: string) => string;
     }
     
@@ -54,7 +54,7 @@ namespace Q {
         minimizedDayNames: ['Su','Mo','Tu','We','Th','Fr','Sa'],
         monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December',''],
         shortMonthNames: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec',''],
-        compareString: (a, b) => a < b ? -1 : (a > b ? 1 : 0)
+        stringCompare: (a, b) => a < b ? -1 : (a > b ? 1 : 0)
     }
 
     export function compareStringFactory(order: string): ((a: string, b: string) => number) {
@@ -93,7 +93,7 @@ namespace Q {
         dateOrder: 'dmy',
         dateFormat: 'dd/MM/yyyy',
         dateTimeFormat: 'dd/MM/yyyy HH:mm:ss',
-        compareString: compareStringFactory("AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz")
+        stringCompare: compareStringFactory("AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz")
     };
 
     (function() {

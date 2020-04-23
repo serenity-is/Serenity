@@ -16,23 +16,25 @@ namespace Q {
 
     export let types: { [key: string]: Type } = {};
 
-    export let getType = (name: string, target?: any): Type => {
-        if (target == null) {
-            var type = types[name];
-            if (type != null)
-                return;
-        }
-
+    export function getNested(from: any, name: string) {
         var a = name.split('.');
-        type = target;
         for (var i = 0; i < a.length; i++) {
-            type = type[a[i]];
-            if (type == null)
+            from = from[a[i]];
+            if (from == null)
                 return null;
         }
-        if (typeof type !== 'function')
+        return from;
+    }
+
+    export let getType = (name: string, target?: any): Type => {
+        if (target == null)
+            return types[name];
+
+        target = getNested(target, name)
+        if (typeof target !== 'function')
             return null;
-        return type;
+
+        return target;
     }
 
     export let getTypeFullName = (type: Type): string => {
@@ -47,7 +49,7 @@ namespace Q {
         return nsIndex > 0 ? fullName.substr(nsIndex + 1) : fullName;
     };
 
-    export let getInstanceType = (instance: any): Type => {
+    export let getInstanceType = (instance: any): any => {
         if (instance == null)
             throw new NullReferenceException('Cannot get type of null');
 
@@ -378,5 +380,64 @@ namespace Q {
             configurable: true,
             enumerable: true
         });
+    }
+
+    export function initializeTypes(root: any, pre: string, limit: number) {
+
+        if (!root)
+            return;
+
+        for (var k of Object.keys(root)) {
+            if (k.charAt(0) < 'A' || k.charAt(0) > 'Z')
+                continue;
+
+            if (k.indexOf('$') >= 0)
+                continue;
+
+            if (k == "prototype")
+                continue;
+
+            if (!root.hasOwnProperty(k))
+                continue;
+
+            var obj = root[k];
+
+            if ($.isArray(obj) ||
+                root instanceof Date)
+                continue;
+
+            var t = typeof (obj);
+            if (t == "string" || t == "number")
+                continue;
+
+            if ($.isFunction(obj) || (obj.__enum && obj.__register)) {
+                if (obj.hasOwnProperty("__typeName") &&
+                    !obj.__register)
+                    continue;
+ 
+                if (!obj.__interfaces &&
+                    obj.prototype.format &&
+                    k.substr(-9) == "Formatter") {
+                    obj.__class = true;
+                    obj.__interfaces = [Serenity.ISlickFormatter]
+                }
+ 
+                if (!obj.__class) {
+                    var baseType = Q.getBaseType(obj);
+                    if (baseType && baseType.__class)
+                        obj.__class = true;
+                }
+ 
+                if (obj.__class || obj.__enum || obj.__interface) {
+                    obj.__typeName = pre + k;
+                    Q.types[pre + k] = obj;
+                }
+ 
+                delete obj.__register;
+            }
+            
+            if (limit > 0) 
+                initializeTypes(obj, pre + k + ".", limit - 1);
+        }
     }
 }

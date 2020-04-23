@@ -428,7 +428,7 @@
 					}
 				}
 				if (c === 0) {
-					c = Q.Culture.compareString(xcategory, ycategory);
+					c = Q.Culture.stringCompare(xcategory, ycategory);
 				}
 				if (c === 0) {
 					c = itemIndex[x1.name] < itemIndex[y.name] ? -1 : (itemIndex[x1.name] > itemIndex[y.name] ? 1 : 0)

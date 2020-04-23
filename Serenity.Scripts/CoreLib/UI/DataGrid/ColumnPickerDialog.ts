@@ -198,7 +198,7 @@ namespace Serenity {
                 }
             }
 
-            let hiddenColumns = hidden.sort((a, b) => Q.Culture.compareString(this.getTitle(a), this.getTitle(b)));
+            let hiddenColumns = hidden.sort((a, b) => Q.Culture.stringCompare(this.getTitle(a), this.getTitle(b)));
 
             for (let id of this.visibleColumns) {
                 var c = this.colById[id];

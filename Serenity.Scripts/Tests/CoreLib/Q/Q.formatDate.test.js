@@ -1,6 +1,6 @@
 var $ = require("jQuery");
 global.$ = global.jQuery = $;
-require("SerenityCoreLib");
+require("SerenityCoreLibBase");
 
 test('FormatDateWorks', function() {
     var backupDec = Q.Culture.dateSeparator;
