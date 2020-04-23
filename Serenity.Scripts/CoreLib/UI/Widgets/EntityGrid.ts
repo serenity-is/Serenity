@@ -26,13 +26,13 @@
 
                     if (!!(parts.length === 2 && parts[1] === 'new')) {
                         arg.handled = true;
-                        this.editItemOfType(ss.cast(parts[0], String), null);
+                        this.editItemOfType(Q.cast(parts[0], String), null);
                         return;
                     }
 
                     if (!!(parts.length === 3 && parts[1] === 'edit')) {
                         arg.handled = true;
-                        this.editItemOfType(ss.cast(parts[0], String), parts[2]);
+                        this.editItemOfType(Q.cast(parts[0], String), parts[2]);
                     }
                 });
         }
@@ -72,7 +72,7 @@
                 return (this.entityType = attr[0].value);
             }
 
-            var name = ss.getTypeFullName(ss.getInstanceType(this));
+            var name = Q.getTypeFullName(Q.getInstanceType(this));
 
             var px = name.indexOf('.');
             if (px >= 0) {
@@ -171,7 +171,7 @@
 
         protected editItem(entityOrId: any): void {
             this.createEntityDialog(this.getItemType(), dlg => {
-                var dialog = ss.safeCast(dlg, Serenity['IEditDialog']);
+                var dialog = Q.safeCast(dlg, Serenity['IEditDialog']);
                 if (dialog != null) {
                     dialog.load(entityOrId, () => {
                         dialog.dialogOpen(this.openDialogsAsPanel);
@@ -182,7 +182,7 @@
 
                 throw new Error(
                     Q.format("{0} doesn't implement IEditDialog!",
-                        ss.getTypeFullName(ss.getInstanceType(dlg))));
+                        Q.getTypeFullName(Q.getInstanceType(dlg))));
             });
         }
 
@@ -194,7 +194,7 @@
             }
 
             this.createEntityDialog(itemType, dlg => {
-                var dialog = ss.safeCast(dlg, Serenity['IEditDialog']);
+                var dialog = Q.safeCast(dlg, Serenity['IEditDialog']);
                 if (dialog != null) {
                     dialog.load(entityOrId, () =>
                         dialog.dialogOpen(this.openDialogsAsPanel));
@@ -203,7 +203,7 @@
 
                 throw new Error(
                     Q.format("{0} doesn't implement IEditDialog!",
-                        ss.getTypeFullName(ss.getInstanceType(dlg))));
+                        Q.getTypeFullName(Q.getInstanceType(dlg))));
             });
         }
 

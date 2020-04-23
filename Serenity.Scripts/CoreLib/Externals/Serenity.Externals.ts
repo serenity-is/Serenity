@@ -33,7 +33,7 @@ namespace Q {
 
                 var el = $(element);
                 for (var i = 0; !!(i < handlers.length); i++) {
-                    var handler = ss.safeCast(handlers[i].handler, Function);
+                    var handler = Q.safeCast(handlers[i].handler, Function);
                     if (handler) {
                         var message = handler(el);
                         if (message != null) {
@@ -353,16 +353,16 @@ namespace Q {
     })((jQuery as any).cleanData);
 
     function ssExceptionInitialization() {
-        ss.Exception.prototype.toString = function () {
+        Q.Exception.prototype.toString = function () {
             return this.get_message();
         };
     };
 
-    if (ss && ss.Exception)
+    if (Q && Q.Exception)
         ssExceptionInitialization();
     else {
         jQuery(function ($) {
-            if (ss && ss.Exception)
+            if (Q && Q.Exception)
                 ssExceptionInitialization();
         });
     }
@@ -398,7 +398,7 @@ namespace Q {
             },
             render: function (createElement: any) {
                 var editorType = Serenity.EditorTypeRegistry.get(this.type);
-                var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
+                var elementAttr = Q.getAttributes(editorType, Serenity.ElementAttribute, true);
                 var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>') as string;
                 var domProps: any = {};
                 var element = $(elementHtml)[0];

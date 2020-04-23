@@ -112,8 +112,8 @@
                 }
             }
 
-            throw new ss.Exception(Q.format("Filtering '{0}' has no editor for '{1}' operator",
-                ss.getTypeName(ss.getInstanceType(this)), this.get_operator().key));
+            throw new Q.Exception(Q.format("Filtering '{0}' has no editor for '{1}' operator",
+                Q.getTypeName(Q.getInstanceType(this)), this.get_operator().key));
         }
 
         protected operatorFormat(op: FilterOperator) {
@@ -197,8 +197,8 @@
                 }
             }
 
-            throw new ss.Exception(Q.format("Filtering '{0}' has no handler for '{1}' operator",
-                ss.getTypeName(ss.getInstanceType(this)), this.get_operator().key));
+            throw new Q.Exception(Q.format("Filtering '{0}' has no handler for '{1}' operator",
+                Q.getTypeName(Q.getInstanceType(this)), this.get_operator().key));
         }
 
         loadState(state: any) {
@@ -224,7 +224,7 @@
         }
 
         protected argumentNull() {
-            return new ss.ArgumentNullException('value', Q.text('Controls.FilterPanel.ValueRequired'));
+            return new Q.ArgumentNullException('value', Q.text('Controls.FilterPanel.ValueRequired'));
         }
 
         validateEditorValue(value: string) {
@@ -237,7 +237,7 @@
         getEditorValue() {
             var input = this.get_container().find(':input').not('.select2-focusser').first();
             if (input.length !== 1) {
-                throw new ss.Exception(Q.format("Couldn't find input in filter container for {0}",
+                throw new Q.Exception(Q.format("Couldn't find input in filter container for {0}",
                     Q.coalesce(this.field.title, this.field.name)));
             }
 
@@ -684,14 +684,14 @@
             
             knownTypes = {};
 
-            for (var type of ss.getTypes()) {
-                if (!ss.isAssignableFrom(Serenity.IFiltering, type))
+            for (var type of Q.getTypes()) {
+                if (!Q.isAssignableFrom(Serenity.IFiltering, type))
                     continue;
                     
-                if (ss.isGenericTypeDefinition(type))
+                if (Q.isGenericTypeDefinition(type))
                     continue;
 
-                var fullName = ss.getTypeFullName(type).toLowerCase();
+                var fullName = Q.getTypeFullName(type).toLowerCase();
 
                 knownTypes[fullName] = type;
 
@@ -734,12 +734,12 @@
         export function get(key: string): Function {
 
             if (Q.isEmptyOrNull(key))
-                throw new ss.ArgumentNullException('key');
+                throw new Q.ArgumentNullException('key');
 
             initialize();
             var formatterType = knownTypes[key.toLowerCase()];
             if (formatterType == null)
-                throw new ss.Exception(Q.format(
+                throw new Q.Exception(Q.format(
                     "Can't find {0} filter handler type!", key));
 
             return formatterType;

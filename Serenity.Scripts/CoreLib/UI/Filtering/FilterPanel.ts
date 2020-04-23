@@ -405,7 +405,7 @@
             if (field == null)
                 return null;
 
-            var filtering = ss.cast(row.data('Filtering'), IFiltering);
+            var filtering = Q.cast(row.data('Filtering'), IFiltering);
 
             if (filtering != null)
                 return filtering;
@@ -414,7 +414,7 @@
                 Q.coalesce(field.filteringType, 'String'));
 
             var editorDiv = row.children('div.v');
-            filtering = ss.cast(ss.createInstance(filteringType), IFiltering);
+            filtering = Q.cast(Q.createInstance(filteringType), IFiltering);
             ReflectionOptionsSetter.set(filtering, field.filteringParams);
             filtering.set_container(editorDiv);
             filtering.set_field(field);

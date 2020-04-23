@@ -52,11 +52,11 @@
             this.element = element;
             this.options = options || ({} as TOptions);
 
-            this.widgetName = Widget.getWidgetName(ss.getInstanceType(this));
+            this.widgetName = Widget.getWidgetName(Q.getInstanceType(this));
             this.uniqueName = this.widgetName + (Widget.nextWidgetNumber++).toString();
 
             if (element.data(this.widgetName)) {
-                throw new ss.Exception(Q.format("The element already has widget '{0}'!", this.widgetName));
+                throw new Q.Exception(Q.format("The element already has widget '{0}'!", this.widgetName));
             }
 
             element.bind('remove.' + this.widgetName, e => {
@@ -78,7 +78,7 @@
         }
 
         public destroy(): void {
-            this.element.removeClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
+            this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
             this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
             this.asyncPromise = null;
@@ -89,9 +89,9 @@
         }
 
         protected getCssClass(): string {
-            var type = ss.getInstanceType(this);
-            var klass = 's-' + ss.getTypeName(type);
-            var fullClass = Q.replaceAll(ss.getTypeFullName(type), '.', '-');
+            var type = Q.getInstanceType(this);
+            var klass = 's-' + Q.getTypeName(type);
+            var fullClass = Q.replaceAll(Q.getTypeFullName(type), '.', '-');
 
             for (let k of Q.Config.rootNamespaces) {
                 if (Q.startsWith(fullClass, k + '-')) {
@@ -113,15 +113,15 @@
         }
 
         protected isAsyncWidget(): boolean {
-            return ss.isInstanceOfType(this, Serenity.IAsyncInit);
+            return Q.isInstanceOfType(this, Serenity.IAsyncInit);
         }
 
         public static getWidgetName(type: Function): string {
-            return Q.replaceAll(ss.getTypeFullName(type), '.', '_');
+            return Q.replaceAll(Q.getTypeFullName(type), '.', '_');
         }
 
         public static elementFor<TWidget>(editorType: { new (...args: any[]): TWidget }): JQuery {
-            var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
+            var elementAttr = Q.getAttributes(editorType, Serenity.ElementAttribute, true);
             var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>');
             return $(elementHtml);
         };
@@ -129,7 +129,7 @@
         public static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>) {
             let widget: TWidget;
 
-            if (ss.isAssignableFrom(Serenity.IDialog, params.type)) {
+            if (Q.isAssignableFrom(Serenity.IDialog, params.type)) {
                 widget = new (params.type as any)(params.options);
                 if (params.container)
                     widget.element.appendTo(params.container);

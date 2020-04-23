@@ -60,8 +60,13 @@ namespace Q {
     /**
      * Inserts an item to the array at specified index
      */
-    export function insert<TItem>(array: TItem[], index: number, item: TItem): void {
-        ss.insert(array, index, item);
+    export function insert(obj: any, index: number, item: any): void {
+        if (obj.insert)
+            obj.insert(index, item);
+        else if (Object.prototype.toString.call(obj) === '[object Array]')
+            obj.splice(index, 0, item);
+        else
+            throw new Error("Object does not support insert!");
     }
 
     /**
@@ -182,13 +187,17 @@ namespace Q {
         return trimToNull(s) == null;
     }
 
-    export let format: (fmt: string, ...prm: any[]) => string = ss.formatString;
-    export let formatInvariant: (fmt: string, ...prm: any[]) => string = ss.formatString;
-
-    export let padLeft: (s: string, len: number, ch?: string) => string = ss.padLeftString; 
+    export function padLeft(s: string | number, len: number, ch: string = ' ') {
+        if (s["padStart"])
+            return s["padStart"](len, ch);
+        s = s.toString();
+        while (s.length < len)
+            s = ch + s;
+        return s;
+    }
 
     export function startsWith(s: string, search: string): boolean {
-        return ss.startsWithString(s, search);
+        return Q.startsWithString(s, search);
     }
 
     export function toSingleLine(str: string) {

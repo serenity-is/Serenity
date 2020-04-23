@@ -7,11 +7,11 @@
 
             if (knownTypes == null) {
                 knownTypes = {};
-                for (var type of ss.getTypes()) {
-                    if (ss.isEnum(type)) {
-                        var fullName = ss.getTypeFullName(type);
+                for (var type of Q.getTypes()) {
+                    if (Q.isEnum(type)) {
+                        var fullName = Q.getTypeFullName(type);
                         knownTypes[fullName] = type;
-                        var enumKeyAttr = ss.getAttributes(type, Serenity.EnumKeyAttribute, false);
+                        var enumKeyAttr = Q.getAttributes(type, Serenity.EnumKeyAttribute, false);
                         if (enumKeyAttr != null && enumKeyAttr.length > 0) {
                             knownTypes[enumKeyAttr[0].value] = type;
                         }
@@ -40,7 +40,7 @@
                     "with capital letters, e.g.MyProject.Pascal.Cased namespace", key);
 
                 Q.notifyError(message, '', null);
-                throw new ss.Exception(message);
+                throw new Q.Exception(message);
             }
 
             return type;

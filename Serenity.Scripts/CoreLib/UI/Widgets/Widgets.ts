@@ -18,7 +18,7 @@
                 return;
             }
 
-            var type = ss.getInstanceType(target);
+            var type = Q.getInstanceType(target);
 
             if (type === Object) {
                 return;
@@ -27,12 +27,12 @@
             var propByName = type.__propByName;
             var fieldByName = type.__fieldByName;
             if (propByName == null) {
-                var props = ss.getMembers(type, 16, 20);
+                var props = Q.getMembers(type, 16, 20);
                 var propList = props.filter(function (x: any) {
                     return !!x.setter && ((x.attr || []).filter(function (a: any) {
-                        return ss.isInstanceOfType(a, Serenity.OptionAttribute);
+                        return Q.isInstanceOfType(a, Serenity.OptionAttribute);
                     }).length > 0 || (x.attr || []).filter(function (a: any) {
-                        return ss.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
+                        return Q.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
                     }).length > 0);
                 });
 
@@ -45,12 +45,12 @@
             }
 
             if (fieldByName == null) {
-                var fields = ss.getMembers(type, 4, 20);
+                var fields = Q.getMembers(type, 4, 20);
                 var fieldList = fields.filter(function (x1: any) {
                     return (x1.attr || []).filter(function (a: any) {
-                        return ss.isInstanceOfType(a, Serenity.OptionAttribute);
+                        return Q.isInstanceOfType(a, Serenity.OptionAttribute);
                     }).length > 0 || (x1.attr || []).filter(function (a: any) {
-                        return ss.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
+                        return Q.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
                     }).length > 0;
                 });
 
@@ -68,12 +68,12 @@
                 var cc = ReflectionUtils.makeCamelCase(k2);
                 var p = propByName[cc] || propByName[k2];
                 if (p != null) {
-                    ss.midel(p.setter, target)(v);
+                    Q.midel(p.setter, target)(v);
                 }
                 else {
                     var f = fieldByName[cc] || fieldByName[k2];
                     if (f != null) {
-                        ss.fieldAccess(f, target, v);
+                        Q.fieldAccess(f, target, v);
                     }
                 }
             }

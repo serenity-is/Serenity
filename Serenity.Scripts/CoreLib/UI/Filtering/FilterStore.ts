@@ -8,7 +8,7 @@
             this.items = [];
 
             if (fields == null) {
-                throw new ss.ArgumentNullException('source');
+                throw new Q.ArgumentNullException('source');
             }
 
             this.fields = fields.slice();
@@ -156,11 +156,11 @@
         }
 
         add_changed(value: (e: JQueryEventObject, a: any) => void): void {
-            this.changed = ss.delegateCombine(this.changed, value);
+            this.changed = Q.delegateCombine(this.changed, value);
         }
 
         remove_changed(value: (e: JQueryEventObject, a: any) => void): void {
-            this.changed = ss.delegateRemove(this.changed, value);
+            this.changed = Q.delegateRemove(this.changed, value);
         }
 
         get_activeCriteria(): any[] {

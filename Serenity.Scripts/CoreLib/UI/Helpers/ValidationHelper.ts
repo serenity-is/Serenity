@@ -54,7 +54,7 @@ namespace Serenity {
                 return element;
             }
             if (rule == null) {
-                throw new ss.Exception('rule is null!');
+                throw new Q.Exception('rule is null!');
             }
             element.addClass('customValidate').bind('customValidate.' + eventClass, rule as any);
             return element;

@@ -30,7 +30,7 @@
         public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
 
             if (opt == null) {
-                throw new ss.ArgumentNullException('opt');
+                throw new Q.ArgumentNullException('opt');
             }
 
             if (opt.separator) {
@@ -365,7 +365,7 @@
             }
             else {
                 var filtering = new (filteringType as any)() as IFiltering;
-                if (filtering && ss.isInstanceOfType(filtering, Serenity.IQuickFiltering)) {
+                if (filtering && Q.isInstanceOfType(filtering, Serenity.IQuickFiltering)) {
                     Serenity.ReflectionOptionsSetter.set(filtering, item.filteringParams);
                     filtering.set_field(item);
                     filtering.set_operator({ key: Serenity.FilterOperators.EQ });
@@ -399,11 +399,11 @@
         }
 
         protected add_submitHandlers(action: (request: Serenity.ListRequest) => void): void {
-            this.submitHandlers = ss.delegateCombine(this.submitHandlers, action);
+            this.submitHandlers = Q.delegateCombine(this.submitHandlers, action);
         }
 
         protected remove_submitHandlers(action: (request: Serenity.ListRequest) => void): void {
-            this.submitHandlers = ss.delegateRemove(this.submitHandlers, action);
+            this.submitHandlers = Q.delegateRemove(this.submitHandlers, action);
         }
 
         protected clear_submitHandlers() {

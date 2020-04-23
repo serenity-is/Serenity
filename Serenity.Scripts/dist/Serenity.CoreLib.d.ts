@@ -329,93 +329,6 @@ interface JQuery {
     select2(cmd: 'val', value: string | string[]): JQuery;
     select2(cmd: 'data'): Select2Data;
 }
-declare let globalObj: any;
-declare namespace ss {
-    let types: {
-        [key: string]: Function;
-    };
-    let isGenericTypeDefinition: (type: any) => any;
-    let getType: (name: string, target?: any) => any;
-    let getTypeFullName: (type: any) => string;
-    let getTypeName: (type: any) => string;
-    let getInstanceType: (instance: any) => any;
-    let isAssignableFrom: (target: any, type: any) => any;
-    let isInstanceOfType: (instance: any, type: any) => any;
-    let safeCast: (instance: any, type: any) => any;
-    let cast: (instance: any, type: any) => any;
-    let createInstance: (type: any) => any;
-    let getBaseType: (type: any) => any;
-    let getAttributes: (type: any, attrType: any, inherit?: boolean) => any[];
-    let getMembers: (type: any, memberTypes: number, bindingAttr: any, name?: string, params?: any) => any[];
-    let getTypes: (from?: any) => any[];
-    class Exception extends Error {
-        constructor(message: string);
-    }
-    class NullReferenceException extends Exception {
-        constructor(message?: string);
-    }
-    class ArgumentNullException extends Exception {
-        constructor(paramName: string, message?: string);
-    }
-    class ArgumentOutOfRangeException extends Exception {
-        constructor(paramName: string, message?: string);
-    }
-    class InvalidCastException extends Exception {
-        constructor(message: string);
-    }
-    let clearKeys: (d: any) => void;
-    let compareValues: (a: any, b: any) => number;
-    let compareStrings: (s1: string, s2: string, ignoreCase?: boolean) => 1 | 0 | -1;
-    let lastIndexOfAnyString: (s: string, chars: string[], startIndex?: number, count?: number) => number;
-    let contains: (obj: any, item: any) => any;
-    let insert: (obj: any, index: number, item: any) => void;
-    let round: (n: number, d?: number, rounding?: boolean) => number;
-    let trunc: (n: number) => number;
-    let delegateCombine: (delegate1: any, delegate2: any) => any;
-    namespace Enum {
-        let toString: (enumType: any, value: number) => string;
-        let getValues: (enumType: any) => any[];
-    }
-    let arrayClone: (arr: any[]) => any;
-    let midel: (mi: any, target: any, typeArguments?: any) => any;
-    function fieldAccess(fi: any, obj: any, val?: any): any;
-    let mkdel: (object: any, method: any) => any;
-    let delegateRemove: (delegate1: any, delegate2: any) => any;
-    let startsWithString: (s: string, prefix: string) => boolean;
-    let today: () => Date;
-    function formatString(format: string, ...prm: any[]): string;
-    function formatStringInvariant(format: string, ...prm: any[]): string;
-    function padLeftString(s: string, len: number, ch?: string): any;
-    var trimEndString: (s: string, chars?: string[]) => string;
-    var trimStartString: (s: string, chars?: string[]) => string;
-    let formatNumber: (num: number, format: string, fi?: FormatInfo) => string;
-    interface FormatInfo {
-        dateSeparator: string;
-        dateFormat: string;
-        dateOrder: string;
-        dateTimeFormat: string;
-        decimalSeparator: string;
-        groupSeparator: string;
-        decimalDigits?: number;
-        negativeSign?: string;
-        positiveSign?: string;
-        percentSymbol?: string;
-        currencySymbol?: string;
-        amDesignator?: string;
-        pmDesignator?: string;
-        timeSeparator?: string;
-        firstDayOfWeek?: number;
-        dayNames?: string[];
-        shortDayNames?: string[];
-        minimizedDayNames?: string[];
-        monthNames?: string[];
-        shortMonthNames?: string[];
-    }
-    let InvariantFormatInfo: FormatInfo;
-    let formatDate: (date: Date, format: string, fi?: FormatInfo) => string;
-    let formatObject: (obj: any, fmt: string, fi?: FormatInfo) => string;
-    let isEnum: (type: any) => boolean;
-}
 interface JQueryStatic {
     extend<T>(target: T, object1?: T, ...objectN: T[]): T;
     toJSON(obj: any): string;
@@ -501,6 +414,63 @@ declare namespace Serenity {
         };
     }
 }
+declare let globalObj: any;
+declare namespace Q {
+    let types: {
+        [key: string]: Function;
+    };
+    let isGenericTypeDefinition: (type: any) => any;
+    let getType: (name: string, target?: any) => any;
+    let getTypeFullName: (type: any) => string;
+    let getTypeName: (type: any) => string;
+    let getInstanceType: (instance: any) => any;
+    let isAssignableFrom: (target: any, type: any) => any;
+    let isInstanceOfType: (instance: any, type: any) => any;
+    let safeCast: (instance: any, type: any) => any;
+    let cast: (instance: any, type: any) => any;
+    let createInstance: (type: any) => any;
+    let getBaseType: (type: any) => any;
+    let getAttributes: (type: any, attrType: any, inherit?: boolean) => any[];
+    let getMembers: (type: any, memberTypes: number, bindingAttr: any, name?: string, params?: any) => any[];
+    let getTypes: (from?: any) => any[];
+    class Exception extends Error {
+        constructor(message: string);
+    }
+    class NullReferenceException extends Exception {
+        constructor(message?: string);
+    }
+    class ArgumentNullException extends Exception {
+        constructor(paramName: string, message?: string);
+    }
+    class ArgumentOutOfRangeException extends Exception {
+        constructor(paramName: string, message?: string);
+    }
+    class InvalidCastException extends Exception {
+        constructor(message: string);
+    }
+    let clearKeys: (d: any) => void;
+    let compareValues: (a: any, b: any) => number;
+    let compareStrings: (s1: string, s2: string, ignoreCase?: boolean) => 1 | 0 | -1;
+    let lastIndexOfAnyString: (s: string, chars: string[], startIndex?: number, count?: number) => number;
+    let contains: (obj: any, item: any) => any;
+    let round: (n: number, d?: number, rounding?: boolean) => number;
+    let trunc: (n: number) => number;
+    let delegateCombine: (delegate1: any, delegate2: any) => any;
+    namespace Enum {
+        let toString: (enumType: any, value: number) => string;
+        let getValues: (enumType: any) => any[];
+    }
+    let arrayClone: (arr: any[]) => any;
+    let midel: (mi: any, target: any, typeArguments?: any) => any;
+    function fieldAccess(fi: any, obj: any, val?: any): any;
+    let mkdel: (object: any, method: any) => any;
+    let delegateRemove: (delegate1: any, delegate2: any) => any;
+    let startsWithString: (s: string, prefix: string) => boolean;
+    let today: () => Date;
+    var trimEndString: (s: string, chars?: string[]) => string;
+    var trimStartString: (s: string, chars?: string[]) => string;
+    let isEnum: (type: any) => boolean;
+}
 declare namespace Q {
     type Dictionary<TItem> = {
         [key: string]: TItem;
@@ -530,7 +500,7 @@ declare namespace Q {
     /**
      * Inserts an item to the array at specified index
      */
-    function insert<TItem>(array: TItem[], index: number, item: TItem): void;
+    function insert(obj: any, index: number, item: any): void;
     /**
      * Determines if the object is an array
      */
@@ -568,9 +538,7 @@ declare namespace Q {
     function endsWith(s: string, suffix: string): boolean;
     function isEmptyOrNull(s: string): boolean;
     function isTrimmedEmpty(s: string): boolean;
-    let format: (fmt: string, ...prm: any[]) => string;
-    let formatInvariant: (fmt: string, ...prm: any[]) => string;
-    let padLeft: (s: string, len: number, ch?: string) => string;
+    function padLeft(s: string | number, len: number, ch?: string): any;
     function startsWith(s: string, search: string): boolean;
     function toSingleLine(str: string): string;
     function trim(s: string): string;
@@ -593,19 +561,42 @@ declare namespace Q {
     function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem;
 }
 declare namespace Q {
-    namespace Culture {
-        let decimalSeparator: string;
-        let dateSeparator: string;
-        let groupSeparator: string;
-        let dateOrder: string;
-        let dateFormat: string;
-        let dateTimeFormat: string;
+    interface NumberFormat {
+        decimalSeparator: string;
+        groupSeparator?: string;
+        decimalDigits?: number;
+        positiveSign?: string;
+        negativeSign?: string;
+        nanSymbol?: string;
+        percentSymbol?: string;
+        currencySymbol?: string;
     }
-    function formatNumber(n: number, fmt: string, dec?: string, grp?: string): string;
+    interface DateFormat {
+        dateSeparator?: string;
+        dateFormat?: string;
+        dateOrder?: string;
+        dateTimeFormat?: string;
+        amDesignator?: string;
+        pmDesignator?: string;
+        timeSeparator?: string;
+        firstDayOfWeek?: number;
+        dayNames?: string[];
+        shortDayNames?: string[];
+        minimizedDayNames?: string[];
+        monthNames?: string[];
+        shortMonthNames?: string[];
+    }
+    interface Locale extends NumberFormat, DateFormat {
+    }
+    let Invariant: Locale;
+    let Culture: Locale;
+    function format(format: string, ...prm: any[]): string;
+    function localeFormat(format: string, l: Locale, ...prm: any[]): string;
+    function formatNumber(num: number, format?: string, decOrLoc?: string | Q.NumberFormat, grp?: string): string;
     function parseInteger(s: string): number;
     function parseDecimal(s: string): number;
     function toId(id: any): any;
-    function formatDate(d: Date | string, format?: string): string;
+    function formatDate(d: Date | string, format?: string, locale?: Locale): string;
     function formatDayHourAndMin(n: number): string;
     function formatISODateTimeUTC(d: Date): string;
     function parseISODateTime(s: string): Date;
@@ -2105,7 +2096,7 @@ declare namespace Serenity {
         getCriteria(): CriteriaWithText;
         loadState(state: any): void;
         saveState(): any;
-        protected argumentNull(): ss.ArgumentNullException;
+        protected argumentNull(): Q.ArgumentNullException;
         validateEditorValue(value: string): string;
         getEditorValue(): string;
         getEditorText(): any;
@@ -3108,7 +3099,7 @@ declare namespace Serenity {
         protected getIsDeletedProperty(): string;
         protected service: string;
         protected getService(): string;
-        load(entityOrId: any, done: () => void, fail: (ex: ss.Exception) => void): void;
+        load(entityOrId: any, done: () => void, fail: (ex: Q.Exception) => void): void;
         loadNewAndOpenDialog(asPanel?: boolean): void;
         loadEntityAndOpenDialog(entity: TItem, asPanel?: boolean): void;
         protected loadResponse(data: any): void;

@@ -15,7 +15,7 @@
         function registerType(target: any, name: string, intf: any[]) {
             if (name != null) {
                 target.__typeName = name;
-                ss.types[name] = target;
+                Q.types[name] = target;
             }
             else if (!target.__typeName)
                 target.__register = true;
@@ -45,7 +45,7 @@
 
                 (target as any).__interface = true;
                 (target as any).isAssignableFrom = function (type: any) {
-                    return ss.contains(type.__interfaces || [], this);
+                    return Q.contains(type.__interfaces || [], this);
                 };
             }
         }
@@ -361,7 +361,7 @@ namespace Serenity.Decorators {
 
             if (name != null) {
                 target.__typeName = name;
-                ss.types[name] = target;
+                Q.types[name] = target;
             }
             else if (!target.__typeName)
                 target.__register = true;

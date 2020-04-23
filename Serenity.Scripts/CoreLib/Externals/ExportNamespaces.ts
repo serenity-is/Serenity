@@ -3,11 +3,11 @@
 	function copyToGlobal(src: any, target: any) {
 		for (var n in src) {
 			if (src.hasOwnProperty(n))
-				target[n] = ss[n];
+				target[n] = Q[n];
 		}
 	}
 
-	globalObj.ss ? copyToGlobal(ss, globalObj.ss) : globalObj.ss = ss;
+	globalObj.ss ? copyToGlobal(Q, globalObj.ss) : globalObj.ss = Q;
 	globalObj.Q ? copyToGlobal(Q, globalObj.Q) : globalObj.Q = Q;
 	globalObj.Serenity ? copyToGlobal(Serenity, globalObj.Serenity) : globalObj.Serenity = Serenity;
 }
@@ -86,14 +86,14 @@ namespace Q {
             }
 
             if (!obj.__class) {
-                var baseType = ss.getBaseType(obj);
+                var baseType = Q.getBaseType(obj);
                 if (baseType && baseType.__class)
                     obj.__class = true;
             }
 
             if (obj.__class || obj.__enum || obj.__interface) {
                 obj.__typeName = fullName;
-                ss.types[fullName] = obj;
+                Q.types[fullName] = obj;
             }
 
             delete obj.__register;

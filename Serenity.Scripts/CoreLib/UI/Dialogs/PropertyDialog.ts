@@ -90,13 +90,13 @@
         }
 
         protected getFormKey(): string {
-            var attributes = ss.getAttributes(
-                ss.getInstanceType(this), Serenity.FormKeyAttribute, true);
+            var attributes = Q.getAttributes(
+                Q.getInstanceType(this), Serenity.FormKeyAttribute, true);
             if (attributes.length >= 1) {
                 return attributes[0].value;
             }
             else {
-                var name = ss.getTypeFullName(ss.getInstanceType(this));
+                var name = Q.getTypeFullName(Q.getInstanceType(this));
                 var px = name.indexOf('.');
                 if (px >= 0) {
                     name = name.substring(px + 1);

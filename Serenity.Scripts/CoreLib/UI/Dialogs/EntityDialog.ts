@@ -180,7 +180,7 @@
         }
 
         protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
-            return ss.getAttributes(ss.getInstanceType(this), attrType, true);
+            return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         }
 
         private entityType: string;
@@ -196,7 +196,7 @@
                 return (this.entityType = typeAttributes[0].value);
 
             // remove global namespace
-            var name = ss.getTypeFullName(ss.getInstanceType(this));
+            var name = Q.getTypeFullName(Q.getInstanceType(this));
             var px = name.indexOf('.');
             if (px >= 0)
                 name = name.substring(px + 1);
@@ -334,7 +334,7 @@
             return this.service;
         }
 
-        load(entityOrId: any, done: () => void, fail: (ex: ss.Exception) => void): void {
+        load(entityOrId: any, done: () => void, fail: (ex: Q.Exception) => void): void {
 
             var action = () => {
 
@@ -370,7 +370,7 @@
                 action();
             }
             catch (ex1) {
-                var ex = (ss.Exception as any).wrap(ex1);
+                var ex = (Q.Exception as any).wrap(ex1);
                 fail(ex);
             }
         }
@@ -587,7 +587,7 @@
         private getLangs(): any {
 
             var langsTuple = this.getLanguages();
-            var langs = ss.safeCast(langsTuple, Array);
+            var langs = Q.safeCast(langsTuple, Array);
             if (langs == null || langs.length === 0 ||
                 langs[0] == null || !Q.isArray(langs[0])) {
                 langs = Array.prototype.slice.call(langsTuple.map(function (x: any) {
@@ -994,7 +994,7 @@
                     var cloneEntity = this.getCloningEntity();
 
                     Serenity.Widget.create({
-                        type: ss.getInstanceType(this),
+                        type: Q.getInstanceType(this),
                         init: w => Serenity.SubDialogHelper.bubbleDataChange(
                             Serenity.SubDialogHelper.cascade(w, this.element), this, true)
                             .loadEntityAndOpenDialog(cloneEntity, null)

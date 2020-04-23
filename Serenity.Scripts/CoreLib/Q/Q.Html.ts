@@ -96,7 +96,7 @@
         }
 
         if (!($ as any).templates || !($ as any).views) {
-            throw new ss.Exception('Please make sure that jsrender.js is included in the page!');
+            throw new Q.Exception('Please make sure that jsrender.js is included in the page!');
         }
 
         data = data || {};

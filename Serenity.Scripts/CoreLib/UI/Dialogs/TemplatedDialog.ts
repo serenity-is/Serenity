@@ -26,14 +26,14 @@
         }
 
         private get isMarkedAsPanel() {
-            var panelAttr = ss.getAttributes(ss.getInstanceType(this),
+            var panelAttr = Q.getAttributes(Q.getInstanceType(this),
                 Serenity.PanelAttribute, true) as Serenity.PanelAttribute[];
             return panelAttr.length > 0 && panelAttr[panelAttr.length - 1].value !== false;
         }
 
         private get isResponsive() {
             return Q.Config.responsiveDialogs ||
-                ss.getAttributes(ss.getInstanceType(this), ResponsiveAttribute, true).length > 0;
+                Q.getAttributes(Q.getInstanceType(this), ResponsiveAttribute, true).length > 0;
         }
 
         private static getCssSize(element: JQuery, name: string): number {
@@ -105,7 +105,7 @@
             this.element.dialog(this.getDialogOptions());
             this.element.closest('.ui-dialog').on('resize', e => this.arrange());
 
-            let type = ss.getInstanceType(this);
+            let type = Q.getInstanceType(this);
 
             if (this.isResponsive) {
                 DialogExtensions.dialogResizable(this.element);
@@ -118,12 +118,12 @@
 
                 this.element.closest('.ui-dialog').addClass('flex-layout');
             }
-            else if (ss.getAttributes(type, FlexifyAttribute, true).length > 0) {
+            else if (Q.getAttributes(type, FlexifyAttribute, true).length > 0) {
                 DialogExtensions.dialogFlexify(this.element);
                 DialogExtensions.dialogResizable(this.element);
             }
 
-            if (ss.getAttributes(type, MaximizableAttribute, true).length > 0) {
+            if (Q.getAttributes(type, MaximizableAttribute, true).length > 0) {
                 DialogExtensions.dialogMaximizable(this.element);
             }
 
@@ -307,8 +307,8 @@
             opt.width = 920;
             TemplatedDialog.applyCssSizes(opt, dialogClass);
             opt.autoOpen = false;
-            let type = ss.getInstanceType(this);
-            opt.resizable = ss.getAttributes(type, Serenity.ResizableAttribute, true).length > 0;
+            let type = Q.getInstanceType(this);
+            opt.resizable = Q.getAttributes(type, Serenity.ResizableAttribute, true).length > 0;
             opt.modal = true;
             opt.position = { my: 'center', at: 'center', of: $(window.window) };
             opt.title = Q.coalesce(this.element.data('dialogtitle'), this.getDialogTitle()) || '';

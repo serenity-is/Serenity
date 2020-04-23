@@ -121,9 +121,9 @@
                 return '';
             }
 
-            var name = ss.Enum.toString(enumType, value);
-            var enumKeyAttr = ss.getAttributes(enumType, EnumKeyAttribute, false);
-            var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : ss.getTypeFullName(enumType));
+            var name = Q.Enum.toString(enumType, value);
+            var enumKeyAttr = Q.getAttributes(enumType, EnumKeyAttribute, false);
+            var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : Q.getTypeFullName(enumType));
             return EnumFormatter.getText(enumKey, name);
         }
 
@@ -139,7 +139,7 @@
             if (value == null) {
                 return '';
             }
-            return ss.Enum.toString(enumType, value);
+            return Q.Enum.toString(enumType, value);
         }
     }
 
@@ -147,14 +147,14 @@
     export class FileDownloadFormatter implements Slick.Formatter, IInitializeColumn {
 
         format(ctx: Slick.FormatterContext): string {
-            var dbFile = ss.safeCast(ctx.value, String);
+            var dbFile = Q.safeCast(ctx.value, String);
             if (Q.isEmptyOrNull(dbFile)) {
                 return '';
             }
 
             var downloadUrl = FileDownloadFormatter.dbFileUrl(dbFile);
             var originalName = (!Q.isEmptyOrNull(this.originalNameProperty) ?
-                ss.safeCast(ctx.item[this.originalNameProperty], String) : null);
+                Q.safeCast(ctx.item[this.originalNameProperty], String) : null);
 
             originalName = Q.coalesce(originalName, '');
             var text = Q.format(Q.coalesce(this.displayFormat, '{0}'),
@@ -333,15 +333,15 @@
             }
 
             knownTypes = {};
-            var types = ss.getTypes();
+            var types = Q.getTypes();
             for (var type of types) {
-                if (!ss.isAssignableFrom(Serenity.ISlickFormatter, type))
+                if (!Q.isAssignableFrom(Serenity.ISlickFormatter, type))
                     continue;
                     
-                if (ss.isGenericTypeDefinition(type))
+                if (Q.isGenericTypeDefinition(type))
                     continue;
                     
-                var fullName = ss.getTypeFullName(type).toLowerCase();
+                var fullName = Q.getTypeFullName(type).toLowerCase();
                 knownTypes[fullName] = type;
 
                 for (var k of Q.Config.rootNamespaces) {
@@ -359,13 +359,13 @@
 
         export function get(key: string): Function {
             if (Q.isEmptyOrNull(key)) 
-                throw new ss.ArgumentNullException('key');
+                throw new Q.ArgumentNullException('key');
             
             initialize();
 
             var formatterType = knownTypes[key.toLowerCase()];
             if (formatterType == null) {
-                throw new ss.Exception(Q.format(
+                throw new Q.Exception(Q.format(
                     "Can't find {0} formatter type!", key));
             }
 

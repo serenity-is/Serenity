@@ -44,7 +44,7 @@
             var self = this;
 
             this.element.addClass('s-DataGrid').html('');
-            this.element.addClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
+            this.element.addClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
             this.element.addClass('require-layout').bind('layout.' + this.uniqueName, function () {
                 self.layout();
             });
@@ -88,7 +88,7 @@
         }
 
         protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
-            return ss.getAttributes(ss.getInstanceType(this), attrType, true);
+            return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         }
 
         protected layout(): void {
@@ -383,7 +383,7 @@
             var mapped = sortBy.map(function (s) {
                 var x: Slick.ColumnSort = {};
                 if (s && Q.endsWith(s.toLowerCase(), ' desc')) {
-                    x.columnId = ss.trimEndString(s.substr(0, s.length - 5));
+                    x.columnId = Q.trimEndString(s.substr(0, s.length - 5));
                     x.sortAsc = false;
                 }
                 else {
@@ -606,7 +606,7 @@
 
                 if (columns.length > 0) {
                     columns.sort(function (x1, y) {
-                        return ss.compareValues(Math.abs(x1.sortOrder), Math.abs(y.sortOrder));
+                        return Q.compareValues(Math.abs(x1.sortOrder), Math.abs(y.sortOrder));
                     });
 
                     var list = [];
@@ -776,13 +776,13 @@
                     column.format = this.itemLink(
                         item.editLinkItemType != null ? item.editLinkItemType : null,
                         item.editLinkIdField != null ? item.editLinkIdField : null,
-                        ss.mkdel({ oldFormat: oldFormat }, function(ctx: Slick.FormatterContext) {
+                        Q.mkdel({ oldFormat: oldFormat }, function(ctx: Slick.FormatterContext) {
                             if (this.oldFormat.$ != null) {
                                 return this.oldFormat.$(ctx);
                             }
                             return Q.htmlEncode(ctx.value);
                         }),
-                        ss.mkdel({ css: css }, function(ctx1: Slick.FormatterContext) {
+                        Q.mkdel({ css: css }, function(ctx1: Slick.FormatterContext) {
                             return Q.coalesce(this.css.$, '');
                         }), false);
 
@@ -1015,7 +1015,7 @@
                 key += path.substr(1).split(String.fromCharCode(47)).slice(0, 2).join('/') + ':';
             }
 
-            key += ss.getTypeFullName(ss.getInstanceType(this));
+            key += Q.getTypeFullName(Q.getInstanceType(this));
             return key;
         }
 
@@ -1262,7 +1262,7 @@
                     }
 
                     if (flags.sortColumns !== false) {
-                        var sort = Q.indexOf(sortColumns, ss.mkdel({ column: column }, function(x: Slick.ColumnSort) {
+                        var sort = Q.indexOf(sortColumns, Q.mkdel({ column: column }, function(x: Slick.ColumnSort) {
                             return x.columnId === this.column.$.id;
                         }));
 

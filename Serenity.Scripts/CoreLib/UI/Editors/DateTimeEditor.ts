@@ -70,13 +70,13 @@
                 }
 
                 if (!Q.isEmptyOrNull(this.get_minValue()) &&
-                    ss.compareStrings(value, this.get_minValue()) < 0) {
+                    Q.compareStrings(value, this.get_minValue()) < 0) {
                     return Q.format(Q.text('Validation.MinDate'),
                         Q.formatDate(this.get_minValue(), null));
                 }
 
                 if (!Q.isEmptyOrNull(this.get_maxValue()) &&
-                    ss.compareStrings(value, this.get_maxValue()) >= 0) {
+                    Q.compareStrings(value, this.get_maxValue()) >= 0) {
                     return Q.format(Q.text('Validation.MaxDate'),
                         Q.formatDate(this.get_maxValue(), null));
                 }
@@ -127,7 +127,7 @@
                 this.time.val('00:00');
             }
 			else if (value.toLowerCase() === 'today') {
-                this.element.val(Q.formatDate(ss.today(), null));
+                this.element.val(Q.formatDate(Q.today(), null));
                 this.time.val('00:00');
             }
 			else {
@@ -241,7 +241,7 @@
 
         static roundToMinutes(date: Date, minutesStep: number) {
             date = new Date(date.getTime());
-            var m = ss.trunc(ss.round(date.getMinutes() / minutesStep) * minutesStep);
+            var m = Q.trunc(Q.round(date.getMinutes() / minutesStep) * minutesStep);
             date.setMinutes(m);
             date.setSeconds(0);
             date.setMilliseconds(0);

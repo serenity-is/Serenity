@@ -26,8 +26,8 @@
 
             input.bind('keyup.' + this.uniqueName, e => {
                 if (e.which === 32 && !this.get_readOnly()) {
-                    if (this.get_valueAsDate() != ss.today()) {
-                        this.set_valueAsDate(ss.today());
+                    if (this.get_valueAsDate() != Q.today()) {
+                        this.set_valueAsDate(Q.today());
                         this.element.trigger('change');
                     }
                 }
@@ -44,11 +44,11 @@
                     return null;
                 }
 
-                if (!Q.isEmptyOrNull(this.get_minValue()) && ss.compareStrings(value, this.get_minValue()) < 0) {
+                if (!Q.isEmptyOrNull(this.get_minValue()) && Q.compareStrings(value, this.get_minValue()) < 0) {
                     return Q.format(Q.text('Validation.MinDate'), Q.formatDate(this.get_minValue(), null));
                 }
 
-                if (!Q.isEmptyOrNull(this.get_maxValue()) && ss.compareStrings(value, this.get_maxValue()) >= 0) {
+                if (!Q.isEmptyOrNull(this.get_maxValue()) && Q.compareStrings(value, this.get_maxValue()) >= 0) {
                     return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(this.get_maxValue(), null));
                 }
 
@@ -76,7 +76,7 @@
                 this.element.val('');
             }
 			else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
-                this.element.val(Q.formatDate(ss.today(), null));
+                this.element.val(Q.formatDate(Q.today(), null));
             }
 			else {
                 this.element.val(Q.formatDate(value, null));

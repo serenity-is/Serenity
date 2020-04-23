@@ -42,7 +42,7 @@
                 for (var item of this.options.fields) {
                     var field = { $: item };
                     $('<li><a/></li>').appendTo(menu).children().attr('href', '#')
-                        .text(Q.coalesce(item.title, '')).click(ss.mkdel({
+                        .text(Q.coalesce(item.title, '')).click(Q.mkdel({
                             field: field,
                             $this: this
                         }, function (e: any) {

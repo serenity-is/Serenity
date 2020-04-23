@@ -53,7 +53,7 @@
                     e1.preventDefault();
                     var view = grid.getView();
                     if (Object.keys(this.include).length > 0) {
-                        ss.clearKeys(this.include);
+                        Q.clearKeys(this.include);
                     }
                     else {
                         var items = grid.getView().getItems();
@@ -86,7 +86,7 @@
         }
 
         clear(): void {
-            ss.clearKeys(this.include);
+            Q.clearKeys(this.include);
             this.updateSelectAll();
         }
 
@@ -188,10 +188,10 @@
                     var id = item[this.idField].toString();
 
                     if (this.include[id] == true) {
-                        ss.clearKeys(this.include);
+                        Q.clearKeys(this.include);
                     }
                     else {
-                        ss.clearKeys(this.include);
+                        Q.clearKeys(this.include);
                         this.include[id] = true;
                     }
 
@@ -209,7 +209,7 @@
         }
 
         clear(): void {
-            ss.clearKeys(this.include);
+            Q.clearKeys(this.include);
         }
 
         resetCheckedAndRefresh(): void {
@@ -559,14 +559,14 @@
 
             if (item.formatterType != null && item.formatterType.length > 0) {
 
-                var formatter = ss.cast(ss.createInstance(
+                var formatter = Q.cast(Q.createInstance(
                     Serenity.FormatterTypeRegistry.get(item.formatterType)), Serenity.ISlickFormatter);
 
                 if (item.formatterParams != null) {
                     ReflectionOptionsSetter.set(formatter, item.formatterParams);
                 }
 
-                var initializer = ss.safeCast(formatter, Serenity.IInitializeColumn);
+                var initializer = Q.safeCast(formatter, Serenity.IInitializeColumn);
                 if (initializer != null) {
                     initializer.initializeColumn(result);
                 }

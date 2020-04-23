@@ -64,13 +64,13 @@ if (typeof Promise === "undefined") {
 }
 // @ts-ignore check for global
 var globalObj = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
-var ss;
-(function (ss) {
-    ss.types = {};
+var Q;
+(function (Q) {
+    Q.types = {};
     function _makeGenericTypeName(genericType, typeArguments) {
         var result = genericType.__typeName;
         for (var i = 0; i < typeArguments.length; i++)
-            result += (i === 0 ? '[' : ',') + '[' + ss.getTypeFullName(typeArguments[i]) + ']';
+            result += (i === 0 ? '[' : ',') + '[' + Q.getTypeFullName(typeArguments[i]) + ']';
         result += ']';
         return result;
     }
@@ -81,12 +81,12 @@ var ss;
         return __genericCache[name] || genericType.apply(null, typeArguments);
     }
     ;
-    ss.isGenericTypeDefinition = function (type) {
+    Q.isGenericTypeDefinition = function (type) {
         return type.__isGenericTypeDefinition || false;
     };
-    ss.getType = function (name, target) {
+    Q.getType = function (name, target) {
         if (target == null) {
-            var type = ss.types[name];
+            var type = Q.types[name];
             if (type != null)
                 return;
         }
@@ -101,17 +101,17 @@ var ss;
             return null;
         return type;
     };
-    ss.getTypeFullName = function (type) {
+    Q.getTypeFullName = function (type) {
         return type.__typeName || type.name ||
             (type.toString().match(/^\s*function\s*([^\s(]+)/) || [])[1] || 'Object';
     };
-    ss.getTypeName = function (type) {
-        var fullName = ss.getTypeFullName(type);
+    Q.getTypeName = function (type) {
+        var fullName = Q.getTypeFullName(type);
         var bIndex = fullName.indexOf('[');
         var nsIndex = fullName.lastIndexOf('.', bIndex >= 0 ? bIndex : fullName.length);
         return nsIndex > 0 ? fullName.substr(nsIndex + 1) : fullName;
     };
-    ss.getInstanceType = function (instance) {
+    Q.getInstanceType = function (instance) {
         if (instance == null)
             throw new NullReferenceException('Cannot get type of null');
         // Have to catch as constructor cannot be looked up on native COM objects
@@ -122,29 +122,29 @@ var ss;
             return Object;
         }
     };
-    ss.isAssignableFrom = function (target, type) {
+    Q.isAssignableFrom = function (target, type) {
         return target === type ||
             (typeof (target.isAssignableFrom) === 'function' && target.isAssignableFrom(type)) ||
             type.prototype instanceof target;
     };
-    ss.isInstanceOfType = function (instance, type) {
+    Q.isInstanceOfType = function (instance, type) {
         if (instance == null)
             return false;
         if (typeof (type.isInstanceOfType) === 'function')
             return type.isInstanceOfType(instance);
-        return ss.isAssignableFrom(type, ss.getInstanceType(instance));
+        return Q.isAssignableFrom(type, Q.getInstanceType(instance));
     };
-    ss.safeCast = function (instance, type) {
-        return ss.isInstanceOfType(instance, type) ? instance : null;
+    Q.safeCast = function (instance, type) {
+        return Q.isInstanceOfType(instance, type) ? instance : null;
     };
-    ss.cast = function (instance, type) {
+    Q.cast = function (instance, type) {
         if (instance == null)
             return instance;
-        else if (ss.isInstanceOfType(instance, type))
+        else if (Q.isInstanceOfType(instance, type))
             return instance;
-        throw new InvalidCastException('Cannot cast object to type ' + ss.getTypeFullName(type));
+        throw new InvalidCastException('Cannot cast object to type ' + Q.getTypeFullName(type));
     };
-    ss.createInstance = function ss$createInstance(type) {
+    Q.createInstance = function ss$createInstance(type) {
         if (typeof (type.createInstance) === 'function')
             return type.createInstance();
         else if (type === Boolean)
@@ -158,7 +158,7 @@ var ss;
         else
             return new type();
     };
-    ss.getBaseType = function (type) {
+    Q.getBaseType = function (type) {
         if (type === Object || type.__interface) {
             return null;
         }
@@ -180,14 +180,14 @@ var ss;
             return p.constructor;
         }
     };
-    ss.getAttributes = function (type, attrType, inherit) {
+    Q.getAttributes = function (type, attrType, inherit) {
         var result = [];
         if (inherit) {
-            var b = ss.getBaseType(type);
+            var b = Q.getBaseType(type);
             if (b) {
-                var a = ss.getAttributes(b, attrType, true);
+                var a = Q.getAttributes(b, attrType, true);
                 for (var i = 0; i < a.length; i++) {
-                    var t = ss.getInstanceType(a[i]);
+                    var t = Q.getInstanceType(a[i]);
                     if (!t.__metadata || !t.__metadata.attrNoInherit)
                         result.push(a[i]);
                 }
@@ -196,11 +196,11 @@ var ss;
         if (type.__metadata && type.__metadata.attr) {
             for (var i = 0; i < type.__metadata.attr.length; i++) {
                 var a = type.__metadata.attr[i];
-                if (attrType == null || ss.isInstanceOfType(a, attrType)) {
-                    var t = ss.getInstanceType(a);
+                if (attrType == null || Q.isInstanceOfType(a, attrType)) {
+                    var t = Q.getInstanceType(a);
                     if (!t.__metadata || !t.__metadata.attrAllowMultiple) {
                         for (var j = result.length - 1; j >= 0; j--) {
-                            if (ss.isInstanceOfType(result[j], t))
+                            if (Q.isInstanceOfType(result[j], t))
                                 result.splice(j, 1);
                         }
                     }
@@ -210,12 +210,12 @@ var ss;
         }
         return result;
     };
-    ss.getMembers = function (type, memberTypes, bindingAttr, name, params) {
+    Q.getMembers = function (type, memberTypes, bindingAttr, name, params) {
         var result = [];
         if ((bindingAttr & 72) == 72 || (bindingAttr & 6) == 4) {
-            var b = ss.getBaseType(type);
+            var b = Q.getBaseType(type);
             if (b)
-                result = ss.getMembers(b, memberTypes & ~1, bindingAttr &
+                result = Q.getMembers(b, memberTypes & ~1, bindingAttr &
                     (bindingAttr & 64 ? 255 : 247) & (bindingAttr & 2 ? 251 : 255), name, params);
         }
         var f = function (m) {
@@ -254,18 +254,18 @@ var ss;
                     throw new Error('Ambiguous match');
                 else if (r.length === 1)
                     return r[0];
-                type = ss.getBaseType(type);
+                type = Q.getBaseType(type);
             }
             return null;
         }
         return result;
     };
-    ss.getTypes = function (from) {
+    Q.getTypes = function (from) {
         var result = [];
         if (!from) {
-            for (var t in ss.types) {
-                if (ss.types.hasOwnProperty(t))
-                    result.push(ss.types[t]);
+            for (var t in Q.types) {
+                if (Q.types.hasOwnProperty(t))
+                    result.push(Q.types[t]);
             }
         }
         else {
@@ -292,7 +292,7 @@ var ss;
         }
         return Exception;
     }(Error));
-    ss.Exception = Exception;
+    Q.Exception = Exception;
     var NullReferenceException = /** @class */ (function (_super) {
         __extends(NullReferenceException, _super);
         function NullReferenceException(message) {
@@ -302,7 +302,7 @@ var ss;
         }
         return NullReferenceException;
     }(Exception));
-    ss.NullReferenceException = NullReferenceException;
+    Q.NullReferenceException = NullReferenceException;
     var ArgumentNullException = /** @class */ (function (_super) {
         __extends(ArgumentNullException, _super);
         function ArgumentNullException(paramName, message) {
@@ -312,7 +312,7 @@ var ss;
         }
         return ArgumentNullException;
     }(Exception));
-    ss.ArgumentNullException = ArgumentNullException;
+    Q.ArgumentNullException = ArgumentNullException;
     var ArgumentOutOfRangeException = /** @class */ (function (_super) {
         __extends(ArgumentOutOfRangeException, _super);
         function ArgumentOutOfRangeException(paramName, message) {
@@ -323,7 +323,7 @@ var ss;
         }
         return ArgumentOutOfRangeException;
     }(Exception));
-    ss.ArgumentOutOfRangeException = ArgumentOutOfRangeException;
+    Q.ArgumentOutOfRangeException = ArgumentOutOfRangeException;
     var InvalidCastException = /** @class */ (function (_super) {
         __extends(InvalidCastException, _super);
         function InvalidCastException(message) {
@@ -333,24 +333,24 @@ var ss;
         }
         return InvalidCastException;
     }(Exception));
-    ss.InvalidCastException = InvalidCastException;
-    ss.clearKeys = function (d) {
+    Q.InvalidCastException = InvalidCastException;
+    Q.clearKeys = function (d) {
         for (var n in d) {
             if (d.hasOwnProperty(n))
                 delete d[n];
         }
     };
-    ss.compareValues = function (a, b) {
+    Q.compareValues = function (a, b) {
         if (a == null)
             throw new NullReferenceException('Object is null');
         else if (typeof (a) === 'number' || typeof (a) === 'string' || typeof (a) === 'boolean')
             return b != null ? (a < b ? -1 : (a > b ? 1 : 0)) : 1;
         else if (Object.prototype.toString.call(a) === '[object Date]')
-            return b != null ? ss.compareValues(a.valueOf(), b.valueOf()) : 1;
+            return b != null ? Q.compareValues(a.valueOf(), b.valueOf()) : 1;
         else
             return a.compareTo(b);
     };
-    ss.compareStrings = function (s1, s2, ignoreCase) {
+    Q.compareStrings = function (s1, s2, ignoreCase) {
         if (s1 == null)
             return s2 != null ? -1 : 0;
         if (s2 == null)
@@ -361,7 +361,7 @@ var ss;
         }
         return s1 == s2 ? 0 : (s1 < s2 ? -1 : 1);
     };
-    ss.lastIndexOfAnyString = function (s, chars, startIndex, count) {
+    Q.lastIndexOfAnyString = function (s, chars, startIndex, count) {
         var length = s.length;
         if (!length) {
             return -1;
@@ -380,21 +380,13 @@ var ss;
         }
         return -1;
     };
-    ss.contains = function (obj, item) {
+    Q.contains = function (obj, item) {
         if (obj.contains)
             return obj.contains(item);
         else
             return obj.indexOf(item) >= 0;
     };
-    ss.insert = function (obj, index, item) {
-        if (obj.insert)
-            obj.insert(index, item);
-        else if (Object.prototype.toString.call(obj) === '[object Array]')
-            obj.splice(index, 0, item);
-        else
-            throw new Error("Object does not support insert!");
-    };
-    ss.round = function (n, d, rounding) {
+    Q.round = function (n, d, rounding) {
         var m = Math.pow(10, d || 0);
         n *= m;
         var sign = (n > 0) | -(n < 0);
@@ -404,17 +396,17 @@ var ss;
         }
         return Math.round(n) / m;
     };
-    ss.trunc = function (n) { return n != null ? (n > 0 ? Math.floor(n) : Math.ceil(n)) : null; };
-    ss.delegateCombine = function (delegate1, delegate2) {
+    Q.trunc = function (n) { return n != null ? (n > 0 ? Math.floor(n) : Math.ceil(n)) : null; };
+    Q.delegateCombine = function (delegate1, delegate2) {
         if (!delegate1) {
             if (!delegate2._targets) {
-                return ss.mkdel(null, delegate2);
+                return Q.mkdel(null, delegate2);
             }
             return delegate2;
         }
         if (!delegate2) {
             if (!delegate1._targets) {
-                return ss.mkdel(null, delegate1);
+                return Q.mkdel(null, delegate1);
             }
             return delegate1;
         }
@@ -455,8 +447,8 @@ var ss;
             }
             return parts;
         };
-    })(Enum = ss.Enum || (ss.Enum = {}));
-    ss.arrayClone = function (arr) {
+    })(Enum = Q.Enum || (Q.Enum = {}));
+    Q.arrayClone = function (arr) {
         if (arr.length === 1) {
             return [arr[0]];
         }
@@ -473,7 +465,7 @@ var ss;
         return false;
     }
     ;
-    ss.midel = function (mi, target, typeArguments) {
+    Q.midel = function (mi, target, typeArguments) {
         if (mi.isStatic && !!target)
             throw new ArgumentNullException('Cannot specify target for static method');
         else if (!mi.isStatic && !target)
@@ -505,7 +497,7 @@ var ss;
                 method = function () { return _m2.apply(null, [this].concat(Array.prototype.slice.call(arguments))); };
             }
         }
-        return ss.mkdel(target, method);
+        return Q.mkdel(target, method);
     };
     function fieldAccess(fi, obj, val) {
         if (fi.isStatic && !!obj)
@@ -518,7 +510,7 @@ var ss;
         else
             return obj[fi.sname];
     }
-    ss.fieldAccess = fieldAccess;
+    Q.fieldAccess = fieldAccess;
     ;
     var _mkdel = function (targets) {
         var delegate = function () {
@@ -526,7 +518,7 @@ var ss;
                 return targets[1].apply(targets[0], arguments);
             }
             else {
-                var clone = ss.arrayClone(targets);
+                var clone = Q.arrayClone(targets);
                 for (var i = 0; i < clone.length; i += 2) {
                     if (delegateContains(targets, clone[i], clone[i + 1])) {
                         clone[i + 1].apply(clone[i], arguments);
@@ -538,7 +530,7 @@ var ss;
         delegate._targets = targets;
         return delegate;
     };
-    ss.mkdel = function (object, method) {
+    Q.mkdel = function (object, method) {
         if (!object) {
             return method;
         }
@@ -547,7 +539,7 @@ var ss;
         }
         return _mkdel([object, method]);
     };
-    ss.delegateRemove = function (delegate1, delegate2) {
+    Q.delegateRemove = function (delegate1, delegate2) {
         if (!delegate1 || (delegate1 === delegate2)) {
             return null;
         }
@@ -569,14 +561,14 @@ var ss;
                 if (targets.length == 2) {
                     return null;
                 }
-                var t = ss.arrayClone(targets);
+                var t = Q.arrayClone(targets);
                 t.splice(i, 2);
                 return _mkdel(t);
             }
         }
         return delegate1;
     };
-    ss.startsWithString = function (s, prefix) {
+    Q.startsWithString = function (s, prefix) {
         if (prefix == null || !prefix.length) {
             return true;
         }
@@ -585,414 +577,20 @@ var ss;
         }
         return (s.substr(0, prefix.length) == prefix);
     };
-    function _commaFormatNumber(number, decimal, comma) {
-        var decimalPart = null;
-        var decimalIndex = number.indexOf(decimal);
-        if (decimalIndex > 0) {
-            decimalPart = number.substr(decimalIndex);
-            number = number.substr(0, decimalIndex);
-        }
-        var negative = ss.startsWithString(number, '-');
-        if (negative) {
-            number = number.substr(1);
-        }
-        var groupSize = 3;
-        if (number.length < groupSize) {
-            return (negative ? '-' : '') + (decimalPart ? number + decimalPart : number);
-        }
-        var index = number.length;
-        var s = '';
-        var done = false;
-        while (!done) {
-            var length = groupSize;
-            var startIndex = index - length;
-            if (startIndex < 0) {
-                groupSize += startIndex;
-                length += startIndex;
-                startIndex = 0;
-                done = true;
-            }
-            if (!length) {
-                break;
-            }
-            var part = number.substr(startIndex, length);
-            if (s.length) {
-                s = part + comma + s;
-            }
-            else {
-                s = part;
-            }
-            index -= length;
-        }
-        if (negative) {
-            s = '-' + s;
-        }
-        return decimalPart ? s + decimalPart : s;
-    }
-    ;
-    var _formatRE = /\{\{|\}\}|\{[^\}\{]+\}/g;
-    function _formatString(format, values, fi) {
-        return format.replace(_formatRE, function (m) {
-            if (m === '{{' || m === '}}')
-                return m.charAt(0);
-            var index = parseInt(m.substr(1), 10);
-            var value = values[index + 1];
-            if (value == null) {
-                return '';
-            }
-            var type = ss.getInstanceType(value);
-            if (type == Number || type == Date) {
-                var formatSpec = null;
-                var formatIndex = m.indexOf(':');
-                if (formatIndex > 0) {
-                    formatSpec = m.substring(formatIndex + 1, m.length - 1);
-                }
-                return ss.formatObject(value, formatSpec, fi);
-            }
-            else {
-                return value.toString();
-            }
-        });
-    }
-    ;
-    ss.today = function () {
+    Q.today = function () {
         var d = new Date();
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());
     };
-    function formatString(format) {
-        var prm = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            prm[_i - 1] = arguments[_i];
-        }
-        return _formatString(format, arguments, Q.Culture);
-    }
-    ss.formatString = formatString;
-    ;
-    function formatStringInvariant(format) {
-        var prm = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            prm[_i - 1] = arguments[_i];
-        }
-        return _formatString(format, arguments, ss.InvariantFormatInfo);
-    }
-    ss.formatStringInvariant = formatStringInvariant;
-    ;
-    function netFormatNumber(num, format, fi) {
-        var _a, _b, _c, _d;
-        var s = '';
-        var precision = -1;
-        var dec = (_a = fi.decimalSeparator) !== null && _a !== void 0 ? _a : ss.InvariantFormatInfo.decimalSeparator;
-        var grp = (_b = fi.groupSeparator) !== null && _b !== void 0 ? _b : ss.InvariantFormatInfo.groupSeparator;
-        if (format.length > 1) {
-            precision = parseInt(format.substr(1), 10);
-        }
-        var fs = format.charAt(0);
-        switch (fs) {
-            case 'd':
-            case 'D':
-                s = parseInt(Math.abs(num)).toString();
-                if (precision != -1) {
-                    s = ss.padLeftString(s, precision, '0');
-                }
-                if (num < 0) {
-                    s = '-' + s;
-                }
-                break;
-            case 'x':
-            case 'X':
-                s = parseInt(Math.abs(num)).toString(16);
-                if (fs == 'X') {
-                    s = s.toUpperCase();
-                }
-                if (precision != -1) {
-                    s = ss.padLeftString(s, precision, '0');
-                }
-                break;
-            case 'e':
-            case 'E':
-                if (precision == -1) {
-                    s = num.toExponential();
-                }
-                else {
-                    s = num.toExponential(precision);
-                }
-                if (fs == 'E') {
-                    s = s.toUpperCase();
-                }
-                break;
-            case 'f':
-            case 'F':
-            case 'n':
-            case 'N':
-                if (precision == -1) {
-                    precision = fi.decimalDigits;
-                }
-                s = num.toFixed(precision).toString();
-                if (precision && (dec != '.')) {
-                    var index = s.indexOf('.');
-                    s = s.substr(0, index) + dec + s.substr(index + 1);
-                }
-                if ((fs == 'n') || (fs == 'N')) {
-                    s = _commaFormatNumber(s, dec, grp);
-                }
-                break;
-            case 'c':
-            case 'C':
-                if (precision == -1) {
-                    precision = (_c = fi.decimalDigits) !== null && _c !== void 0 ? _c : ss.InvariantFormatInfo.decimalDigits;
-                }
-                s = Math.abs(num).toFixed(precision).toString();
-                if (precision && (dec != '.')) {
-                    var index = s.indexOf('.');
-                    s = s.substr(0, index) + dec + s.substr(index + 1);
-                }
-                s = _commaFormatNumber(s, dec, grp);
-                if (num < 0) {
-                    s = ss.formatString("0", s);
-                }
-                else {
-                    s = ss.formatString("0", s);
-                }
-                break;
-            case 'p':
-            case 'P':
-                if (precision == -1) {
-                    precision = (_d = fi.decimalDigits) !== null && _d !== void 0 ? _d : ss.InvariantFormatInfo.decimalDigits;
-                }
-                s = (Math.abs(num) * 100.0).toFixed(precision).toString();
-                if (precision && (dec != '.')) {
-                    var index = s.indexOf('.');
-                    s = s.substr(0, index) + dec + s.substr(index + 1);
-                }
-                s = _commaFormatNumber(s, dec, grp);
-                if (num < 0) {
-                    s = ss.formatString("0", s);
-                }
-                else {
-                    s = ss.formatString("0", s);
-                }
-                break;
-        }
-        return s;
-    }
-    ;
-    function padLeftString(s, len, ch) {
-        if (ch === void 0) { ch = ' '; }
-        if (s["padStart"])
-            return s["padStart"](len, ch);
-        while (s.length < len)
-            s = ch + s;
-        return s;
-    }
-    ss.padLeftString = padLeftString;
-    ss.trimEndString = function (s, chars) {
+    Q.trimEndString = function (s, chars) {
         return s.replace(chars ? new RegExp('[' + String.fromCharCode.apply(null, chars) + ']+$') : /\s*$/, '');
     };
-    ss.trimStartString = function (s, chars) {
+    Q.trimStartString = function (s, chars) {
         return s.replace(chars ? new RegExp('^[' + String.fromCharCode.apply(null, chars) + ']+') : /^\s*/, '');
     };
-    ss.formatNumber = function (num, format, fi) {
-        if (format == null || (format.length == 0) || (format == 'i')) {
-            return num.toString();
-        }
-        return netFormatNumber(num, format, fi !== null && fi !== void 0 ? fi : Q.Culture);
-    };
-    var universalDateTimePattern = 'yyyy-MM-dd HH:mm:ssZ';
-    var sortableDateTimePattern = 'yyyy-MM-ddTHH:mm:ss';
-    ss.InvariantFormatInfo = {
-        dateSeparator: '/',
-        dateOrder: 'M/d/y',
-        dateFormat: 'MM/dd/yyyy',
-        dateTimeFormat: 'MM/dd/yyyy HH:mm:ss',
-        decimalSeparator: '.',
-        groupSeparator: ',',
-        decimalDigits: 2,
-        negativeSign: '-',
-        positiveSign: '+',
-        percentSymbol: '%',
-        currencySymbol: '$',
-        amDesignator: 'AM',
-        pmDesignator: 'PM',
-        timeSeparator: ':',
-        firstDayOfWeek: 0,
-        dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-        shortDayNames: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-        minimizedDayNames: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-        monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', ''],
-        shortMonthNames: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', '']
-    };
-    var _dateFormatRE = /'.*?[^\\]'|dddd|ddd|dd|d|MMMM|MMM|MM|M|yyyy|yy|y|hh|h|HH|H|mm|m|ss|s|tt|t|fff|ff|f|zzz|zz|z/g;
-    function netFormatDate(dt, format, dtf) {
-        var _a, _b, _c, _d, _e, _f, _g;
-        if (format.length == 1) {
-            switch (format) {
-                case 'd':
-                    format = (_a = dtf.dateFormat) !== null && _a !== void 0 ? _a : ss.InvariantFormatInfo.dateFormat;
-                    break;
-                case 't':
-                    format = dtf.dateTimeFormat && dtf.dateFormat ? dtf.dateTimeFormat.replace(dtf.dateFormat + " ", "") : "HH:mm";
-                    break;
-                case 'g':
-                    format = dtf.dateTimeFormat ? dtf.dateTimeFormat.replace(":ss", "") :
-                        (dtf.dateFormat ? (dtf.dateFormat + " HH:mm") : ss.InvariantFormatInfo.dateTimeFormat.replace(":ss", ""));
-                    break;
-                case 'G':
-                    format = (_b = dtf.dateTimeFormat) !== null && _b !== void 0 ? _b : ss.InvariantFormatInfo.dateTimeFormat;
-                    break;
-                case 'u':
-                    format = universalDateTimePattern;
-                    break;
-                case 'U':
-                    format = (_c = dtf.dateTimeFormat) !== null && _c !== void 0 ? _c : ss.InvariantFormatInfo.dateTimeFormat;
-                    dt = new Date(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate(), dt.getUTCHours(), dt.getUTCMinutes(), dt.getUTCSeconds(), dt.getUTCMilliseconds());
-                    break;
-                case 's':
-                    format = sortableDateTimePattern;
-                    break;
-            }
-        }
-        if (format.charAt(0) == '%') {
-            format = format.substr(1);
-        }
-        var re = _dateFormatRE;
-        var sb = [];
-        re.lastIndex = 0;
-        while (true) {
-            var index = re.lastIndex;
-            var match = re.exec(format);
-            sb.push(format.slice(index, match ? match.index : format.length));
-            if (!match) {
-                break;
-            }
-            var fs = match[0];
-            var part = fs;
-            switch (fs) {
-                case 'dddd':
-                    part = ((_d = dtf.dayNames) !== null && _d !== void 0 ? _d : ss.InvariantFormatInfo.dayNames)[dt.getDay()];
-                    break;
-                case 'ddd':
-                    part = ((_e = dtf.shortDayNames) !== null && _e !== void 0 ? _e : ss.InvariantFormatInfo.shortDayNames)[dt.getDay()];
-                    break;
-                case 'dd':
-                    part = ss.padLeftString(dt.getDate().toString(), 2, '0');
-                    break;
-                case 'd':
-                    part = dt.getDate();
-                    break;
-                case 'MMMM':
-                    part = ((_f = dtf.monthNames) !== null && _f !== void 0 ? _f : ss.InvariantFormatInfo.monthNames)[dt.getMonth()];
-                    break;
-                case 'MMM':
-                    part = ((_g = dtf.shortMonthNames) !== null && _g !== void 0 ? _g : ss.InvariantFormatInfo.shortMonthNames)[dt.getMonth()];
-                    break;
-                case 'MM':
-                    part = ss.padLeftString((dt.getMonth() + 1).toString(), 2, '0');
-                    break;
-                case 'M':
-                    part = (dt.getMonth() + 1);
-                    break;
-                case 'yyyy':
-                    part = dt.getFullYear();
-                    break;
-                case 'yy':
-                    part = ss.padLeftString((dt.getFullYear() % 100).toString(), 2, '0');
-                    break;
-                case 'y':
-                    part = (dt.getFullYear() % 100);
-                    break;
-                case 'h':
-                case 'hh':
-                    part = dt.getHours() % 12;
-                    if (!part) {
-                        part = '12';
-                    }
-                    else if (fs == 'hh') {
-                        part = ss.padLeftString(part.toString(), 2, '0');
-                    }
-                    break;
-                case 'HH':
-                    part = ss.padLeftString(dt.getHours().toString(), 2, '0');
-                    break;
-                case 'H':
-                    part = dt.getHours();
-                    break;
-                case 'mm':
-                    part = ss.padLeftString(dt.getMinutes().toString(), 2, '0');
-                    break;
-                case 'm':
-                    part = dt.getMinutes();
-                    break;
-                case 'ss':
-                    part = ss.padLeftString(dt.getSeconds().toString(), 2, '0');
-                    break;
-                case 's':
-                    part = dt.getSeconds();
-                    break;
-                case 't':
-                case 'tt':
-                    part = (dt.getHours() < 12) ? dtf.amDesignator : dtf.pmDesignator;
-                    if (fs == 't') {
-                        part = part.charAt(0);
-                    }
-                    break;
-                case 'fff':
-                    part = ss.padLeftString(dt.getMilliseconds().toString(), 3, '0');
-                    break;
-                case 'ff':
-                    part = ss.padLeftString(dt.getMilliseconds().toString(), 3).substr(0, 2);
-                    break;
-                case 'f':
-                    part = ss.padLeftString(dt.getMilliseconds().toString(), 3).charAt(0);
-                    break;
-                case 'z':
-                    part = dt.getTimezoneOffset() / 60;
-                    part = ((part >= 0) ? '-' : '+') + Math.floor(Math.abs(part));
-                    break;
-                case 'zz':
-                case 'zzz':
-                    part = dt.getTimezoneOffset() / 60;
-                    part = ((part >= 0) ? '-' : '+') +
-                        Math.floor(ss.padLeftString(Math.abs(part).toString(), 2, '0'));
-                    if (fs == 'zzz') {
-                        part += dtf.timeSeparator +
-                            Math.abs(ss.padLeftString((dt.getTimezoneOffset() % 60).toString(), 2, '0'));
-                    }
-                    break;
-                default:
-                    if (part.charAt(0) == '\'') {
-                        part = part.substr(1, part.length - 2).replace(/\\'/g, '\'');
-                    }
-                    break;
-            }
-            sb.push(part);
-        }
-        return sb.join('');
-    }
-    ;
-    ss.formatDate = function (date, format, fi) {
-        if (format == null || (format.length == 0) || (format == 'i')) {
-            return date.toString();
-        }
-        if (format == 'id') {
-            return date.toDateString();
-        }
-        if (format == 'it') {
-            return date.toTimeString();
-        }
-        return netFormatDate(date, format, fi !== null && fi !== void 0 ? fi : Q.Culture);
-    };
-    ss.formatObject = function (obj, fmt, fi) {
-        if (typeof (obj) === 'number')
-            return ss.formatNumber(obj, fmt, fi);
-        else if (Object.prototype.toString.call(obj) === '[object Date]')
-            return ss.formatDate(obj, fmt, fi);
-        else
-            return obj.format(fmt);
-    };
-    ss.isEnum = function (type) {
+    Q.isEnum = function (type) {
         return !!type.__enum;
     };
-})(ss || (ss = {}));
+})(Q || (Q = {}));
 var Q;
 (function (Q) {
     function coalesce(a, b) {
@@ -1054,8 +652,13 @@ var Q;
     /**
      * Inserts an item to the array at specified index
      */
-    function insert(array, index, item) {
-        ss.insert(array, index, item);
+    function insert(obj, index, item) {
+        if (obj.insert)
+            obj.insert(index, item);
+        else if (Object.prototype.toString.call(obj) === '[object Array]')
+            obj.splice(index, 0, item);
+        else
+            throw new Error("Object does not support insert!");
     }
     Q.insert = insert;
     /**
@@ -1162,11 +765,18 @@ var Q;
         return trimToNull(s) == null;
     }
     Q.isTrimmedEmpty = isTrimmedEmpty;
-    Q.format = ss.formatString;
-    Q.formatInvariant = ss.formatString;
-    Q.padLeft = ss.padLeftString;
+    function padLeft(s, len, ch) {
+        if (ch === void 0) { ch = ' '; }
+        if (s["padStart"])
+            return s["padStart"](len, ch);
+        s = s.toString();
+        while (s.length < len)
+            s = ch + s;
+        return s;
+    }
+    Q.padLeft = padLeft;
     function startsWith(s, search) {
-        return ss.startsWithString(s, search);
+        return Q.startsWithString(s, search);
     }
     Q.startsWith = startsWith;
     function toSingleLine(str) {
@@ -1359,127 +969,344 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
-    var Culture;
-    (function (Culture) {
-        Culture.decimalSeparator = '.';
-        Culture.dateSeparator = '/';
-        Culture.groupSeparator = ',';
-        Culture.dateOrder = 'dmy';
-        Culture.dateFormat = 'dd/MM/yyyy';
-        Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
-        var s = Q.trimToNull($('script#ScriptCulture').html());
-        if (s != null) {
-            var sc = $.parseJSON(s);
+    Q.Invariant = {
+        decimalSeparator: '.',
+        groupSeparator: ',',
+        decimalDigits: 2,
+        negativeSign: '-',
+        positiveSign: '+',
+        percentSymbol: '%',
+        currencySymbol: '$',
+        dateSeparator: '/',
+        dateOrder: 'mdy',
+        dateFormat: 'MM/dd/yyyy',
+        dateTimeFormat: 'MM/dd/yyyy HH:mm:ss',
+        amDesignator: 'AM',
+        pmDesignator: 'PM',
+        timeSeparator: ':',
+        firstDayOfWeek: 0,
+        dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        shortDayNames: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        minimizedDayNames: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+        monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', ''],
+        shortMonthNames: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', '']
+    };
+    Q.Culture = {
+        decimalSeparator: '.',
+        groupSeparator: ',',
+        dateSeparator: '/',
+        dateOrder: 'dmy',
+        dateFormat: 'dd/MM/yyyy',
+        dateTimeFormat: 'dd/MM/yyyy HH:mm:ss',
+    };
+    (function () {
+        var k;
+        for (k in Q.Invariant)
+            if (Q.Culture[k] === undefined && Q.Invariant.hasOwnProperty(k))
+                Q.Culture[k] = Q.Invariant[k];
+        if (typeof $ != "undefined" && (k = Q.trimToNull($('script#ScriptCulture').html())) != null) {
+            var sc = $.parseJSON(k);
             if (sc.DecimalSeparator != null)
-                Culture.decimalSeparator = sc.DecimalSeparator;
-            if (sc.GroupSeparator != null && sc.GroupSeparator != Culture.decimalSeparator)
-                Culture.groupSeparator = sc.GroupSeparator;
-            else if (Culture.groupSeparator == Culture.decimalSeparator)
-                Culture.groupSeparator = Culture.decimalSeparator == '.' ? ',' : '.';
-            if (sc.DateSeparator != null)
-                Culture.dateSeparator = sc.DateSeparator;
-            if (sc.DateOrder != null)
-                Culture.dateOrder = sc.DateOrder;
-            if (sc.DateFormat != null)
-                Culture.dateFormat = sc.DateFormat;
-            if (sc.DateTimeFormat != null)
-                Culture.dateTimeFormat = sc.DateTimeFormat;
+                Q.Culture.decimalSeparator = sc.DecimalSeparator;
+            if (sc.GroupSeparator != null && sc.GroupSeparator != Q.Culture.decimalSeparator)
+                Q.Culture.groupSeparator = sc.GroupSeparator;
+            else if (Q.Culture.groupSeparator == Q.Culture.decimalSeparator)
+                Q.Culture.groupSeparator = Q.Culture.decimalSeparator == '.' ? ',' : '.';
+            delete sc.groupSeparator;
+            delete sc.decimal;
+            for (k in sc) {
+                if (Q.Culture[k] === undefined && sc.hasOwnProperty(k))
+                    Q.Culture[k.charAt(0).toLowerCase() + k.substr(1)] = sc[k];
+            }
         }
-    })(Culture = Q.Culture || (Q.Culture = {}));
-    function formatNumber(n, fmt, dec, grp) {
-        var neg = '-';
-        if (isNaN(n)) {
-            return null;
+    })();
+    function insertGroupSeperator(num, dec, grp, neg) {
+        var decPart = null;
+        var decIndex = num.indexOf(dec);
+        if (decIndex > 0) {
+            decPart = num.substr(decIndex);
+            num = num.substr(0, decIndex);
         }
-        dec = dec || Culture.decimalSeparator;
-        grp = grp || Culture.groupSeparator;
-        var r = "";
-        if (fmt.indexOf(".") > -1) {
-            var dp = dec;
-            var df = fmt.substring(fmt.lastIndexOf(".") + 1);
-            n = roundNumber(n, df.length);
-            var dv = n % 1;
-            var ds = new String(dv.toFixed(df.length));
-            ds = ds.substring(ds.lastIndexOf(".") + 1);
-            for (var i = 0; i < df.length; i++) {
-                if (df.charAt(i) == '#' && ds.charAt(i) != '0') {
-                    dp += ds.charAt(i);
-                    continue;
+        var negative = Q.startsWithString(num, neg);
+        if (negative) {
+            num = num.substr(1);
+        }
+        var groupSize = 3;
+        if (num.length < groupSize) {
+            return (negative ? neg : '') + (decPart ? num + decPart : num);
+        }
+        var index = num.length;
+        var s = '';
+        var done = false;
+        while (!done) {
+            var length = groupSize;
+            var startIndex = index - length;
+            if (startIndex < 0) {
+                groupSize += startIndex;
+                length += startIndex;
+                startIndex = 0;
+                done = true;
+            }
+            if (!length)
+                break;
+            var part = num.substr(startIndex, length);
+            if (s.length)
+                s = part + grp + s;
+            else
+                s = part;
+            index -= length;
+        }
+        if (negative)
+            s = '-' + s;
+        return decPart ? s + decPart : s;
+    }
+    var _formatRE = /\{\{|\}\}|\{[^\}\{]+\}/g;
+    function _formatString(format, l, values, from) {
+        return format.replace(_formatRE, function (m) {
+            if (m === '{{' || m === '}}')
+                return m.charAt(0);
+            var index = parseInt(m.substr(1), 10);
+            var value = values[index + from];
+            if (value == null) {
+                return '';
+            }
+            var type = Q.getInstanceType(value);
+            if (type == Number || type == Date) {
+                var formatSpec = null;
+                var formatIndex = m.indexOf(':');
+                if (formatIndex > 0) {
+                    formatSpec = m.substring(formatIndex + 1, m.length - 1);
                 }
-                else if (df.charAt(i) == '#' && ds.charAt(i) == '0') {
-                    var notParsed = ds.substring(i);
-                    if (notParsed.match('[1-9]')) {
-                        dp += ds.charAt(i);
+                return _formatObject(value, formatSpec, l);
+            }
+            else {
+                return value.toString();
+            }
+        });
+    }
+    ;
+    function format(format) {
+        var prm = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            prm[_i - 1] = arguments[_i];
+        }
+        return _formatString(format, Q.Culture, arguments, 1);
+    }
+    Q.format = format;
+    function localeFormat(format, l) {
+        var prm = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            prm[_i - 2] = arguments[_i];
+        }
+        return _formatString(format, l, arguments, 2);
+    }
+    Q.localeFormat = localeFormat;
+    function _formatObject(obj, format, fmt) {
+        if (typeof (obj) === 'number')
+            return Q.formatNumber(obj, format, fmt);
+        else if (Object.prototype.toString.call(obj) === '[object Date]')
+            return Q.formatDate(obj, format, fmt);
+        else
+            return obj.format(format);
+    }
+    ;
+    function formatNumber(num, format, decOrLoc, grp) {
+        var _a, _b, _c, _d, _e, _f;
+        if (num == null)
+            return "";
+        var fmt = typeof decOrLoc !== "string" ? (decOrLoc !== null && decOrLoc !== void 0 ? decOrLoc : Q.Culture) : {
+            decimalSeparator: decOrLoc,
+            groupSeparator: grp !== null && grp !== void 0 ? grp : (decOrLoc == "," ? "." : ",")
+        };
+        if (isNaN(num)) {
+            return (_a = fmt.nanSymbol) !== null && _a !== void 0 ? _a : Q.Culture.nanSymbol;
+        }
+        if (format == null || (format.length == 0) || (format == 'i')) {
+            return num.toString();
+        }
+        var dec = (_b = fmt.decimalSeparator) !== null && _b !== void 0 ? _b : Q.Culture.decimalSeparator;
+        grp = (_c = grp !== null && grp !== void 0 ? grp : fmt.groupSeparator) !== null && _c !== void 0 ? _c : Q.Culture.groupSeparator;
+        var neg = (_d = fmt.negativeSign) !== null && _d !== void 0 ? _d : Q.Culture.negativeSign;
+        var s = '';
+        var precision = -1;
+        if (format.length > 1) {
+            precision = parseInt(format.substr(1), 10);
+        }
+        var fs = format.charAt(0);
+        switch (fs) {
+            case 'd':
+            case 'D':
+                s = parseInt(Math.abs(num)).toString();
+                if (precision != -1)
+                    s = Q.padLeft(s, precision, '0');
+                if (num < 0)
+                    s = neg + s;
+                break;
+            case 'x':
+            case 'X':
+                s = parseInt(Math.abs(num)).toString(16);
+                if (fs == 'X')
+                    s = s.toUpperCase();
+                if (precision != -1)
+                    s = Q.padLeft(s, precision, '0');
+                break;
+            case 'e':
+            case 'E':
+                if (precision == -1)
+                    s = num.toExponential();
+                else
+                    s = num.toExponential(precision);
+                if (fs == 'E')
+                    s = s.toUpperCase();
+                break;
+            case 'f':
+            case 'F':
+            case 'n':
+            case 'N':
+                if (precision == -1) {
+                    precision = (_e = fmt.decimalDigits) !== null && _e !== void 0 ? _e : Q.Culture.decimalDigits;
+                }
+                s = num.toFixed(precision).toString();
+                if (precision && (dec != '.')) {
+                    var index = s.indexOf('.');
+                    s = s.substr(0, index) + dec + s.substr(index + 1);
+                }
+                if ((fs == 'n') || (fs == 'N')) {
+                    s = insertGroupSeperator(s, dec, grp, neg);
+                }
+                break;
+            case 'c':
+            case 'C':
+            case 'p':
+            case 'P':
+                if (precision == -1) {
+                    precision = (_f = fmt.decimalDigits) !== null && _f !== void 0 ? _f : Q.Culture.decimalDigits;
+                }
+                if (fs === 'p' || fs == 'P')
+                    num *= 100;
+                s = Math.abs(num).toFixed(precision).toString();
+                if (precision && (dec != '.')) {
+                    var index = s.indexOf('.');
+                    s = s.substr(0, index) + dec + s.substr(index + 1);
+                }
+                s = insertGroupSeperator(s, dec, grp, neg);
+                s = localeFormat("0", fmt, s);
+                break;
+            default:
+                var prefix = '';
+                var mid = '';
+                var suffix = '';
+                var endPrefix = false;
+                var inQuote = false;
+                for (var i = 0; i < format.length; i++) {
+                    var c = format.charAt(i);
+                    if (c == "'") {
+                        inQuote = !inQuote;
                         continue;
                     }
-                    else
-                        break;
+                    else if (!inQuote) {
+                        if (c == '\\') {
+                            var c = (format.charAt(i + 1) || '');
+                            i++;
+                        }
+                        else if (c == '#' || c == ',' || c == '.' || c == '0') {
+                            endPrefix = true;
+                            mid += c;
+                            continue;
+                        }
+                    }
+                    endPrefix ? (suffix += c) : (prefix += c);
                 }
-                else if (df.charAt(i) == "0")
-                    dp += ds.charAt(i);
+                format = mid;
+                var r = "";
+                if (format.indexOf(".") > -1) {
+                    var dp = dec;
+                    var df = format.substring(format.lastIndexOf(".") + 1);
+                    num = roundNumber(num, df.length);
+                    var dv = num % 1;
+                    var ds = new String(dv.toFixed(df.length));
+                    ds = ds.substring(ds.lastIndexOf(".") + 1);
+                    for (var i_1 = 0; i_1 < df.length; i_1++) {
+                        if (df.charAt(i_1) == '#' && ds.charAt(i_1) != '0') {
+                            dp += ds.charAt(i_1);
+                            continue;
+                        }
+                        else if (df.charAt(i_1) == '#' && ds.charAt(i_1) == '0') {
+                            var notParsed = ds.substring(i_1);
+                            if (notParsed.match('[1-9]')) {
+                                dp += ds.charAt(i_1);
+                                continue;
+                            }
+                            else
+                                break;
+                        }
+                        else if (df.charAt(i_1) == "0")
+                            dp += ds.charAt(i_1);
+                        else
+                            dp += df.charAt(i_1);
+                    }
+                    r += dp;
+                }
                 else
-                    dp += df.charAt(i);
-            }
-            r += dp;
-        }
-        else
-            n = Math.round(n);
-        var ones = Math.floor(n);
-        if (n < 0)
-            ones = Math.ceil(n);
-        var of = "";
-        if (fmt.indexOf(".") == -1)
-            of = fmt;
-        else
-            of = fmt.substring(0, fmt.indexOf("."));
-        var op = "";
-        if (!(ones == 0 && of.substr(of.length - 1) == '#')) {
-            // find how many digits are in the group
-            var oneText = new String(Math.abs(ones));
-            var gl = 9999;
-            if (of.lastIndexOf(",") != -1)
-                gl = of.length - of.lastIndexOf(",") - 1;
-            var gc = 0;
-            for (var i = oneText.length - 1; i > -1; i--) {
-                op = oneText.charAt(i) + op;
-                gc++;
-                if (gc == gl && i != 0) {
-                    op = grp + op;
-                    gc = 0;
-                }
-            }
-            // account for any pre-data padding
-            if (of.length > op.length) {
-                var padStart = of.indexOf('0');
-                if (padStart != -1) {
-                    var padLen = of.length - padStart;
-                    // pad to left with 0's or group char
-                    var pos = of.length - op.length - 1;
-                    while (op.length < padLen) {
-                        var pc = of.charAt(pos);
-                        // replace with real group char if needed
-                        if (pc == ',')
-                            pc = grp;
-                        op = pc + op;
-                        pos--;
+                    num = Math.round(num);
+                var ones = Math.floor(num);
+                if (num < 0)
+                    ones = Math.ceil(num);
+                var of = "";
+                if (format.indexOf(".") == -1)
+                    of = format;
+                else
+                    of = format.substring(0, format.indexOf("."));
+                var op = "";
+                if (!(ones == 0 && of.substr(of.length - 1) == '#')) {
+                    // find how many digits are in the group
+                    var oneText = new String(Math.abs(ones));
+                    var gl = 9999;
+                    if (of.lastIndexOf(",") != -1)
+                        gl = of.length - of.lastIndexOf(",") - 1;
+                    var gc = 0;
+                    for (var i_2 = oneText.length - 1; i_2 > -1; i_2--) {
+                        op = oneText.charAt(i_2) + op;
+                        gc++;
+                        if (gc == gl && i_2 != 0) {
+                            op = grp + op;
+                            gc = 0;
+                        }
+                    }
+                    // account for any pre-data padding
+                    if (of.length > op.length) {
+                        var padStart = of.indexOf('0');
+                        if (padStart != -1) {
+                            var padLen = of.length - padStart;
+                            // pad to left with 0's or group char
+                            var pos = of.length - op.length - 1;
+                            while (op.length < padLen) {
+                                var pc = of.charAt(pos);
+                                // replace with real group char if needed
+                                if (pc == ',')
+                                    pc = grp;
+                                op = pc + op;
+                                pos--;
+                            }
+                        }
                     }
                 }
-            }
+                if (!op && of.indexOf('0', of.length - 1) !== -1)
+                    op = '0';
+                r = op + r;
+                if (num < 0)
+                    r = neg + r;
+                if (r.lastIndexOf(dec) == r.length - 1) {
+                    r = r.substring(0, r.length - 1);
+                }
+                return prefix + r + suffix;
         }
-        if (!op && of.indexOf('0', of.length - 1) !== -1)
-            op = '0';
-        r = op + r;
-        if (n < 0)
-            r = neg + r;
-        if (r.lastIndexOf(dec) == r.length - 1) {
-            r = r.substring(0, r.length - 1);
-        }
-        return r;
+        return s;
     }
     Q.formatNumber = formatNumber;
     function parseInteger(s) {
         s = Q.trim(s.toString());
-        var ts = Culture.groupSeparator;
+        var ts = Q.Culture.groupSeparator;
         if (s && s.length && s.indexOf(ts) > 0) {
             s = s.replace(new RegExp("(\\b\\d{1,3})\\" + ts + "(?=\\d{3}(\\D|$))", "g"), '$1');
         }
@@ -1494,13 +1321,13 @@ var Q;
         s = Q.trim(s.toString());
         if (s.length == 0)
             return null;
-        var ts = Culture.groupSeparator;
+        var ts = Q.Culture.groupSeparator;
         if (s && s.length && s.indexOf(ts) > 0) {
             s = s.replace(new RegExp("(\\b\\d{1,3})\\" + ts + "(?=\\d{3}(\\D|$))", "g"), '$1');
         }
-        if (!(new RegExp("^\\s*([-\\+])?(\\d*)\\" + Culture.decimalSeparator + "?(\\d*)\\s*$").test(s)))
+        if (!(new RegExp("^\\s*([-\\+])?(\\d*)\\" + Q.Culture.decimalSeparator + "?(\\d*)\\s*$").test(s)))
             return NaN;
-        return parseFloat(s.toString().replace(Culture.decimalSeparator, '.'));
+        return parseFloat(s.toString().replace(Q.Culture.decimalSeparator, '.'));
     }
     Q.parseDecimal = parseDecimal;
     function roundNumber(n, dec) {
@@ -1539,65 +1366,172 @@ var Q;
         return v;
     }
     Q.toId = toId;
-    function formatDate(d, format) {
-        if (!d) {
+    var _dateFormatRE = /'.*?[^\\]'|dddd|ddd|dd|d|MMMM|MMM|MM|M|yyyy|yy|y|hh|h|HH|H|mm|m|ss|s|tt|t|fff|ff|f|zzz|zz|z|\//g;
+    function formatDate(d, format, locale) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+        if (!d)
             return '';
-        }
         var date;
         if (typeof d == "string") {
-            var res = Q.parseDate(d);
+            var res = Q.parseDate(d, locale == null ? null : locale.dateOrder);
             if (!res)
                 return d;
             date = res;
         }
         else
             date = d;
-        if (format == null || format == "d") {
-            format = Culture.dateFormat;
-        }
-        else {
+        if (format == 'i')
+            return date.toString();
+        if (format == 'id')
+            return date.toDateString();
+        if (format == 'it')
+            return date.toTimeString();
+        if (locale == null)
+            locale = Q.Culture;
+        if (format == null || format == "d")
+            format = (_a = locale.dateFormat) !== null && _a !== void 0 ? _a : Q.Culture.dateFormat;
+        else if (format.length == 1) {
             switch (format) {
                 case "g":
-                    format = Culture.dateTimeFormat.replace(":ss", "");
+                    format = ((_b = locale.dateTimeFormat) !== null && _b !== void 0 ? _b : Q.Culture.dateTimeFormat).replace(":ss", "");
                     break;
                 case "G":
-                    format = Culture.dateTimeFormat;
+                    format = ((_c = locale.dateTimeFormat) !== null && _c !== void 0 ? _c : Q.Culture.dateTimeFormat);
                     break;
                 case "s":
                     format = "yyyy-MM-ddTHH:mm:ss";
                     break;
-                case "u": return Q.formatISODateTimeUTC(date);
+                case 'd': format = ((_d = locale.dateFormat) !== null && _d !== void 0 ? _d : Q.Culture.dateFormat);
+                case 't':
+                    format = (locale.dateTimeFormat && locale.dateFormat) ? locale.dateTimeFormat.replace(locale.dateFormat + " ", "") : "HH:mm";
+                    break;
+                case 'u':
+                case 'U':
+                    format = format == 'u' ? 'yyyy-MM-ddTHH:mm:ss.fffZ' : (_e = locale.dateTimeFormat) !== null && _e !== void 0 ? _e : Q.Culture.dateTimeFormat;
+                    date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.getUTCMilliseconds());
+                    break;
             }
         }
-        var pad = function (i) {
-            return Q.zeroPad(i, 2);
-        };
-        return format.replace(new RegExp('dd?|MM?|yy?y?y?|hh?|HH?|mm?|ss?|tt?|fff|zz?z?|\\/', 'g'), function (fmt) {
-            switch (fmt) {
-                case '/': return Culture.dateSeparator;
-                case 'hh': return pad(((date.getHours() < 13) ? date.getHours() : (date.getHours() - 12)));
-                case 'h': return ((date.getHours() < 13) ? date.getHours() : (date.getHours() - 12));
-                case 'HH': return pad(date.getHours());
-                case 'H': return date.getHours();
-                case 'mm': return pad(date.getMinutes());
-                case 'm': return date.getMinutes();
-                case 'ss': return pad(date.getSeconds());
-                case 's': return date.getSeconds();
-                case 'yyyy': return date.getFullYear();
-                case 'yy': return date.getFullYear().toString().substr(2, 4);
-                case 'dd': return pad(date.getDate());
-                case 'd': return date.getDate().toString();
-                case 'MM': return pad(date.getMonth() + 1);
-                case 'M': return date.getMonth() + 1;
-                case 't': return ((date.getHours() < 12) ? 'A' : 'P');
-                case 'tt': return ((date.getHours() < 12) ? 'AM' : 'PM');
-                case 'fff': return Q.zeroPad(date.getMilliseconds(), 3);
-                case 'zzz':
-                case 'zz':
-                case 'z': return '';
-                default: return fmt;
+        if (format.charAt(0) == '%') {
+            format = format.substr(1);
+        }
+        var re = _dateFormatRE;
+        var sb = [];
+        re.lastIndex = 0;
+        while (true) {
+            var index = re.lastIndex;
+            var match = re.exec(format);
+            sb.push(format.slice(index, match ? match.index : format.length));
+            if (!match) {
+                break;
             }
-        });
+            var fs = match[0];
+            var part = fs;
+            switch (fs) {
+                case '/':
+                    part = (_f = locale.dateSeparator) !== null && _f !== void 0 ? _f : Q.Culture.dateSeparator;
+                    break;
+                case 'dddd':
+                    part = ((_g = locale.dayNames) !== null && _g !== void 0 ? _g : Q.Culture.dayNames)[date.getDay()];
+                    break;
+                case 'ddd':
+                    part = ((_h = locale.shortDayNames) !== null && _h !== void 0 ? _h : Q.Culture.shortDayNames)[date.getDay()];
+                    break;
+                case 'dd':
+                    part = Q.padLeft(date.getDate().toString(), 2, '0');
+                    break;
+                case 'd':
+                    part = date.getDate();
+                    break;
+                case 'MMMM':
+                    part = ((_j = locale.monthNames) !== null && _j !== void 0 ? _j : Q.Culture.monthNames)[date.getMonth()];
+                    break;
+                case 'MMM':
+                    part = ((_k = locale.shortMonthNames) !== null && _k !== void 0 ? _k : Q.Culture.shortMonthNames)[date.getMonth()];
+                    break;
+                case 'MM':
+                    part = Q.padLeft(date.getMonth() + 1, 2, '0');
+                    break;
+                case 'M':
+                    part = (date.getMonth() + 1);
+                    break;
+                case 'yyyy':
+                    part = Q.padLeft(date.getFullYear(), 4, '0');
+                    break;
+                case 'yy':
+                    part = Q.padLeft(date.getFullYear() % 100, 2, '0');
+                    break;
+                case 'y':
+                    part = date.getFullYear() % 100;
+                    break;
+                case 'h':
+                case 'hh':
+                    part = date.getHours() % 12;
+                    if (!part) {
+                        part = '12';
+                    }
+                    else if (fs == 'hh') {
+                        part = Q.padLeft(part, 2, '0');
+                    }
+                    break;
+                case 'HH':
+                    part = Q.padLeft(date.getHours(), 2, '0');
+                    break;
+                case 'H':
+                    part = date.getHours();
+                    break;
+                case 'mm':
+                    part = Q.padLeft(date.getMinutes(), 2, '0');
+                    break;
+                case 'm':
+                    part = date.getMinutes();
+                    break;
+                case 'ss':
+                    part = Q.padLeft(date.getSeconds().toString(), 2, '0');
+                    break;
+                case 's':
+                    part = date.getSeconds();
+                    break;
+                case 't':
+                case 'tt':
+                    part = (date.getHours() < 12) ? ((_l = locale.amDesignator) !== null && _l !== void 0 ? _l : Q.Culture.amDesignator) : ((_m = locale.pmDesignator) !== null && _m !== void 0 ? _m : Q.Culture.pmDesignator);
+                    if (fs == 't') {
+                        part = part.charAt(0);
+                    }
+                    break;
+                case 'fff':
+                    part = Q.padLeft(date.getMilliseconds(), 3, '0');
+                    break;
+                case 'ff':
+                    part = Q.padLeft(date.getMilliseconds(), 3).substr(0, 2);
+                    break;
+                case 'f':
+                    part = Q.padLeft(date.getMilliseconds(), 3).charAt(0);
+                    break;
+                case 'z':
+                case 'Z':
+                    part = date.getTimezoneOffset() / 60;
+                    part = ((part >= 0) ? '-' : '+') + Math.floor(Math.abs(part));
+                    break;
+                case 'zz':
+                case 'zzz':
+                    part = date.getTimezoneOffset() / 60;
+                    part = ((part >= 0) ? '-' : '+') +
+                        Math.floor(Q.padLeft(Math.abs(part), 2, '0'));
+                    if (fs == 'zzz') {
+                        part += ((_o = locale.timeSeparator) !== null && _o !== void 0 ? _o : Q.Culture.timeSeparator) +
+                            Math.abs(Q.padLeft(date.getTimezoneOffset() % 60, 2, '0'));
+                    }
+                    break;
+                default:
+                    if (part.charAt(0) == '\'') {
+                        part = part.substr(1, part.length - 2).replace(/\\'/g, '\'');
+                    }
+                    break;
+            }
+            sb.push(part);
+        }
+        return sb.join('');
     }
     Q.formatDate = formatDate;
     function formatDayHourAndMin(n) {
@@ -1745,7 +1679,7 @@ var Q;
         if (!dArray)
             return false;
         if (dArray.length == 3) {
-            dateOrder = dateOrder || Culture.dateOrder;
+            dateOrder = dateOrder || Q.Culture.dateOrder;
             switch (dateOrder) {
                 case "dmy":
                     d = parseInt(dArray[0], 10);
@@ -2150,7 +2084,7 @@ var Q;
             return markup;
         }
         if (!$.templates || !$.views) {
-            throw new ss.Exception('Please make sure that jsrender.js is included in the page!');
+            throw new Q.Exception('Please make sure that jsrender.js is included in the page!');
         }
         data = data || {};
         var template = $.templates(markup);
@@ -3432,7 +3366,7 @@ var Serenity;
         function registerType(target, name, intf) {
             if (name != null) {
                 target.__typeName = name;
-                ss.types[name] = target;
+                Q.types[name] = target;
             }
             else if (!target.__typeName)
                 target.__register = true;
@@ -3457,7 +3391,7 @@ var Serenity;
                     registerType(target, null, nameOrIntf);
                 target.__interface = true;
                 target.isAssignableFrom = function (type) {
-                    return ss.contains(type.__interfaces || [], this);
+                    return Q.contains(type.__interfaces || [], this);
                 };
             };
         }
@@ -3942,7 +3876,7 @@ var System;
                 }
                 if (name != null) {
                     target.__typeName = name;
-                    ss.types[name] = target;
+                    Q.types[name] = target;
                 }
                 else if (!target.__typeName)
                     target.__register = true;
@@ -4168,7 +4102,7 @@ var Serenity;
                     e1.preventDefault();
                     var view = grid.getView();
                     if (Object.keys(_this.include).length > 0) {
-                        ss.clearKeys(_this.include);
+                        Q.clearKeys(_this.include);
                     }
                     else {
                         var items = grid.getView().getItems();
@@ -4196,7 +4130,7 @@ var Serenity;
             }
         };
         GridRowSelectionMixin.prototype.clear = function () {
-            ss.clearKeys(this.include);
+            Q.clearKeys(this.include);
             this.updateSelectAll();
         };
         GridRowSelectionMixin.prototype.resetCheckedAndRefresh = function () {
@@ -4278,10 +4212,10 @@ var Serenity;
                     }
                     var id = item[_this.idField].toString();
                     if (_this.include[id] == true) {
-                        ss.clearKeys(_this.include);
+                        Q.clearKeys(_this.include);
                     }
                     else {
-                        ss.clearKeys(_this.include);
+                        Q.clearKeys(_this.include);
                         _this.include[id] = true;
                     }
                     for (var i = 0; i < grid.getView().getLength(); i++) {
@@ -4295,7 +4229,7 @@ var Serenity;
                 this.options.selectable(item));
         };
         GridRadioSelectionMixin.prototype.clear = function () {
-            ss.clearKeys(this.include);
+            Q.clearKeys(this.include);
         };
         GridRadioSelectionMixin.prototype.resetCheckedAndRefresh = function () {
             this.include = {};
@@ -4600,11 +4534,11 @@ var Serenity;
                 }
             }
             if (item.formatterType != null && item.formatterType.length > 0) {
-                var formatter = ss.cast(ss.createInstance(Serenity.FormatterTypeRegistry.get(item.formatterType)), Serenity.ISlickFormatter);
+                var formatter = Q.cast(Q.createInstance(Serenity.FormatterTypeRegistry.get(item.formatterType)), Serenity.ISlickFormatter);
                 if (item.formatterParams != null) {
                     Serenity.ReflectionOptionsSetter.set(formatter, item.formatterParams);
                 }
-                var initializer = ss.safeCast(formatter, Serenity.IInitializeColumn);
+                var initializer = Q.safeCast(formatter, Serenity.IInitializeColumn);
                 if (initializer != null) {
                     initializer.initializeColumn(result);
                 }
@@ -5162,10 +5096,10 @@ var Serenity;
         }
         UploadHelper.fileNameSizeDisplay = fileNameSizeDisplay;
         function fileSizeDisplay(bytes) {
-            var byteSize = ss.round(bytes * 100 / 1024) * 0.01;
+            var byteSize = Q.round(bytes * 100 / 1024) * 0.01;
             var suffix = 'KB';
             if (byteSize >= 1024) {
-                byteSize = ss.round(byteSize * 100 / 1024) * 0.01;
+                byteSize = Q.round(byteSize * 100 / 1024) * 0.01;
                 suffix = 'MB';
             }
             var sizeParts = byteSize.toString().split(String.fromCharCode(46));
@@ -5288,10 +5222,10 @@ var Serenity;
             var _this = _super.call(this, options) || this;
             _this.element = element;
             _this.options = options || {};
-            _this.widgetName = Widget_1.getWidgetName(ss.getInstanceType(_this));
+            _this.widgetName = Widget_1.getWidgetName(Q.getInstanceType(_this));
             _this.uniqueName = _this.widgetName + (Widget_1.nextWidgetNumber++).toString();
             if (element.data(_this.widgetName)) {
-                throw new ss.Exception(Q.format("The element already has widget '{0}'!", _this.widgetName));
+                throw new Q.Exception(Q.format("The element already has widget '{0}'!", _this.widgetName));
             }
             element.bind('remove.' + _this.widgetName, function (e) {
                 if (e.bubbles || e.cancelable) {
@@ -5311,7 +5245,7 @@ var Serenity;
         }
         Widget_1 = Widget;
         Widget.prototype.destroy = function () {
-            this.element.removeClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
+            this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
             this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
             this.asyncPromise = null;
@@ -5320,9 +5254,9 @@ var Serenity;
             this.element.addClass(this.getCssClass());
         };
         Widget.prototype.getCssClass = function () {
-            var type = ss.getInstanceType(this);
-            var klass = 's-' + ss.getTypeName(type);
-            var fullClass = Q.replaceAll(ss.getTypeFullName(type), '.', '-');
+            var type = Q.getInstanceType(this);
+            var klass = 's-' + Q.getTypeName(type);
+            var fullClass = Q.replaceAll(Q.getTypeFullName(type), '.', '-');
             for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
                 var k = _a[_i];
                 if (Q.startsWith(fullClass, k + '-')) {
@@ -5340,20 +5274,20 @@ var Serenity;
             return Promise.resolve();
         };
         Widget.prototype.isAsyncWidget = function () {
-            return ss.isInstanceOfType(this, Serenity.IAsyncInit);
+            return Q.isInstanceOfType(this, Serenity.IAsyncInit);
         };
         Widget.getWidgetName = function (type) {
-            return Q.replaceAll(ss.getTypeFullName(type), '.', '_');
+            return Q.replaceAll(Q.getTypeFullName(type), '.', '_');
         };
         Widget.elementFor = function (editorType) {
-            var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
+            var elementAttr = Q.getAttributes(editorType, Serenity.ElementAttribute, true);
             var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>');
             return $(elementHtml);
         };
         ;
         Widget.create = function (params) {
             var widget;
-            if (ss.isAssignableFrom(Serenity.IDialog, params.type)) {
+            if (Q.isAssignableFrom(Serenity.IDialog, params.type)) {
                 widget = new params.type(params.options);
                 if (params.container)
                     widget.element.appendTo(params.container);
@@ -5462,7 +5396,7 @@ var Serenity;
                 return element;
             }
             if (rule == null) {
-                throw new ss.Exception('rule is null!');
+                throw new Q.Exception('rule is null!');
             }
             element.addClass('customValidate').bind('customValidate.' + eventClass, rule);
             return element;
@@ -5519,18 +5453,18 @@ var Serenity;
             return s;
         };
         TemplatedWidget.prototype.getDefaultTemplateName = function () {
-            return TemplatedWidget_1.noGeneric(ss.getTypeName(ss.getInstanceType(this)));
+            return TemplatedWidget_1.noGeneric(Q.getTypeName(Q.getInstanceType(this)));
         };
         TemplatedWidget.prototype.getTemplateName = function () {
-            var type = ss.getInstanceType(this);
-            var fullName = ss.getTypeFullName(type);
+            var type = Q.getInstanceType(this);
+            var fullName = Q.getTypeFullName(type);
             var templateNames = TemplatedWidget_1.templateNames;
             var cachedName = TemplatedWidget_1.templateNames[fullName];
             if (cachedName != null) {
                 return cachedName;
             }
             while (type && type !== Serenity.Widget) {
-                var name = TemplatedWidget_1.noGeneric(ss.getTypeFullName(type));
+                var name = TemplatedWidget_1.noGeneric(Q.getTypeFullName(type));
                 for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
                     var k = _a[_i];
                     if (Q.startsWith(name, k + '.')) {
@@ -5548,13 +5482,13 @@ var Serenity;
                     templateNames[fullName] = name;
                     return name;
                 }
-                name = TemplatedWidget_1.noGeneric(ss.getTypeName(type));
+                name = TemplatedWidget_1.noGeneric(Q.getTypeName(type));
                 if (Q.canLoadScriptData('Template.' + name) ||
                     $('script#Template_' + name).length > 0) {
                     TemplatedWidget_1.templateNames[fullName] = name;
                     return name;
                 }
-                type = ss.getBaseType(type);
+                type = Q.getBaseType(type);
             }
             templateNames[fullName] = cachedName = this.getDefaultTemplateName();
             return cachedName;
@@ -5577,7 +5511,7 @@ var Serenity;
             }
             template = Q.getTemplate(templateName);
             if (template == null) {
-                throw new Error(Q.format("Can't locate template for widget '{0}' with name '{1}'!", ss.getTypeName(ss.getInstanceType(this)), templateName));
+                throw new Error(Q.format("Can't locate template for widget '{0}' with name '{1}'!", Q.getTypeName(Q.getInstanceType(this)), templateName));
             }
             return template;
         };
@@ -5692,8 +5626,8 @@ var Serenity;
             });
             input.bind('keyup.' + _this.uniqueName, function (e) {
                 if (e.which === 32 && !_this.get_readOnly()) {
-                    if (_this.get_valueAsDate() != ss.today()) {
-                        _this.set_valueAsDate(ss.today());
+                    if (_this.get_valueAsDate() != Q.today()) {
+                        _this.set_valueAsDate(Q.today());
                         _this.element.trigger('change');
                     }
                 }
@@ -5707,10 +5641,10 @@ var Serenity;
                 if (Q.isEmptyOrNull(value)) {
                     return null;
                 }
-                if (!Q.isEmptyOrNull(_this.get_minValue()) && ss.compareStrings(value, _this.get_minValue()) < 0) {
+                if (!Q.isEmptyOrNull(_this.get_minValue()) && Q.compareStrings(value, _this.get_minValue()) < 0) {
                     return Q.format(Q.text('Validation.MinDate'), Q.formatDate(_this.get_minValue(), null));
                 }
-                if (!Q.isEmptyOrNull(_this.get_maxValue()) && ss.compareStrings(value, _this.get_maxValue()) >= 0) {
+                if (!Q.isEmptyOrNull(_this.get_maxValue()) && Q.compareStrings(value, _this.get_maxValue()) >= 0) {
                     return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(_this.get_maxValue(), null));
                 }
                 return null;
@@ -5740,7 +5674,7 @@ var Serenity;
                 this.element.val('');
             }
             else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
-                this.element.val(Q.formatDate(ss.today(), null));
+                this.element.val(Q.formatDate(Q.today(), null));
             }
             else {
                 this.element.val(Q.formatDate(value, null));
@@ -6057,11 +5991,11 @@ var Serenity;
                     return null;
                 }
                 if (!Q.isEmptyOrNull(_this.get_minValue()) &&
-                    ss.compareStrings(value, _this.get_minValue()) < 0) {
+                    Q.compareStrings(value, _this.get_minValue()) < 0) {
                     return Q.format(Q.text('Validation.MinDate'), Q.formatDate(_this.get_minValue(), null));
                 }
                 if (!Q.isEmptyOrNull(_this.get_maxValue()) &&
-                    ss.compareStrings(value, _this.get_maxValue()) >= 0) {
+                    Q.compareStrings(value, _this.get_maxValue()) >= 0) {
                     return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(_this.get_maxValue(), null));
                 }
                 return null;
@@ -6111,7 +6045,7 @@ var Serenity;
                 this.time.val('00:00');
             }
             else if (value.toLowerCase() === 'today') {
-                this.element.val(Q.formatDate(ss.today(), null));
+                this.element.val(Q.formatDate(Q.today(), null));
                 this.time.val('00:00');
             }
             else {
@@ -6200,7 +6134,7 @@ var Serenity;
         };
         DateTimeEditor.roundToMinutes = function (date, minutesStep) {
             date = new Date(date.getTime());
-            var m = ss.trunc(ss.round(date.getMinutes() / minutesStep) * minutesStep);
+            var m = Q.trunc(Q.round(date.getMinutes() / minutesStep) * minutesStep);
             date.setMinutes(m);
             date.setSeconds(0);
             date.setMilliseconds(0);
@@ -7187,7 +7121,7 @@ var Serenity;
             if (this.options.lookupKey != null) {
                 return this.options.lookupKey;
             }
-            var key = ss.getTypeFullName(ss.getInstanceType(this));
+            var key = Q.getTypeFullName(Q.getInstanceType(this));
             var idx = key.indexOf('.');
             if (idx >= 0) {
                 key = key.substring(idx + 1);
@@ -7425,7 +7359,7 @@ var Serenity;
         var knownTypes;
         function get(key) {
             if (Q.isEmptyOrNull(key)) {
-                throw new ss.ArgumentNullException('key');
+                throw new Q.ArgumentNullException('key');
             }
             initialize();
             var editorType = knownTypes[key.toLowerCase()];
@@ -7435,7 +7369,7 @@ var Serenity;
                     knownTypes[key.toLowerCase()] = type;
                     return type;
                 }
-                throw new ss.Exception(Q.format("Can't find {0} editor type!", key));
+                throw new Q.Exception(Q.format("Can't find {0} editor type!", key));
             }
             return editorType;
         }
@@ -7444,17 +7378,17 @@ var Serenity;
             if (knownTypes != null)
                 return;
             knownTypes = {};
-            for (var _i = 0, _a = ss.getTypes(); _i < _a.length; _i++) {
+            for (var _i = 0, _a = Q.getTypes(); _i < _a.length; _i++) {
                 var type = _a[_i];
                 if (!(type.prototype instanceof Serenity.Widget)) {
                     continue;
                 }
-                if (ss.isGenericTypeDefinition(type)) {
+                if (Q.isGenericTypeDefinition(type)) {
                     continue;
                 }
-                var fullName = ss.getTypeFullName(type).toLowerCase();
+                var fullName = Q.getTypeFullName(type).toLowerCase();
                 knownTypes[fullName] = type;
-                var editorAttr = ss.getAttributes(type, Serenity.EditorAttribute, false);
+                var editorAttr = Q.getAttributes(type, Serenity.EditorAttribute, false);
                 if (editorAttr != null && editorAttr.length > 0) {
                     var attrKey = editorAttr[0].key;
                     if (!Q.isEmptyOrNull(attrKey)) {
@@ -7527,22 +7461,22 @@ var Serenity;
         }
         EditorUtils.getValue = getValue;
         function saveValue(editor, item, target) {
-            var getEditValue = ss.safeCast(editor, Serenity.IGetEditValue);
+            var getEditValue = Q.safeCast(editor, Serenity.IGetEditValue);
             if (getEditValue != null) {
                 getEditValue.getEditValue(item, target);
                 return;
             }
-            var stringValue = ss.safeCast(editor, Serenity.IStringValue);
+            var stringValue = Q.safeCast(editor, Serenity.IStringValue);
             if (stringValue != null) {
                 target[item.name] = stringValue.get_value();
                 return;
             }
-            var booleanValue = ss.safeCast(editor, Serenity.IBooleanValue);
+            var booleanValue = Q.safeCast(editor, Serenity.IBooleanValue);
             if (booleanValue != null) {
                 target[item.name] = booleanValue.get_value();
                 return;
             }
-            var doubleValue = ss.safeCast(editor, Serenity.IDoubleValue);
+            var doubleValue = Q.safeCast(editor, Serenity.IDoubleValue);
             if (doubleValue != null) {
                 var value = doubleValue.get_value();
                 target[item.name] = (isNaN(value) ? null : value);
@@ -7564,21 +7498,21 @@ var Serenity;
         }
         EditorUtils.setValue = setValue;
         function loadValue(editor, item, source) {
-            var setEditValue = ss.safeCast(editor, Serenity.ISetEditValue);
+            var setEditValue = Q.safeCast(editor, Serenity.ISetEditValue);
             if (setEditValue != null) {
                 setEditValue.setEditValue(source, item);
                 return;
             }
-            var stringValue = ss.safeCast(editor, Serenity.IStringValue);
+            var stringValue = Q.safeCast(editor, Serenity.IStringValue);
             if (stringValue != null) {
                 var value = source[item.name];
                 if (value != null) {
                     value = value.toString();
                 }
-                stringValue.set_value(ss.cast(value, String));
+                stringValue.set_value(Q.cast(value, String));
                 return;
             }
-            var booleanValue = ss.safeCast(editor, Serenity.IBooleanValue);
+            var booleanValue = Q.safeCast(editor, Serenity.IBooleanValue);
             if (booleanValue != null) {
                 var value1 = source[item.name];
                 if (typeof (value1) === 'number') {
@@ -7589,20 +7523,20 @@ var Serenity;
                 }
                 return;
             }
-            var doubleValue = ss.safeCast(editor, Serenity.IDoubleValue);
+            var doubleValue = Q.safeCast(editor, Serenity.IDoubleValue);
             if (doubleValue != null) {
                 var d = source[item.name];
-                if (!!(d == null || ss.isInstanceOfType(d, String) && Q.isTrimmedEmpty(ss.cast(d, String)))) {
+                if (!!(d == null || Q.isInstanceOfType(d, String) && Q.isTrimmedEmpty(Q.cast(d, String)))) {
                     doubleValue.set_value(null);
                 }
-                else if (ss.isInstanceOfType(d, String)) {
-                    doubleValue.set_value(ss.cast(Q.parseDecimal(ss.cast(d, String)), Number));
+                else if (Q.isInstanceOfType(d, String)) {
+                    doubleValue.set_value(Q.cast(Q.parseDecimal(Q.cast(d, String)), Number));
                 }
-                else if (ss.isInstanceOfType(d, Boolean)) {
+                else if (Q.isInstanceOfType(d, Boolean)) {
                     doubleValue.set_value((!!d ? 1 : 0));
                 }
                 else {
-                    doubleValue.set_value(ss.cast(d, Number));
+                    doubleValue.set_value(Q.cast(d, Number));
                 }
                 return;
             }
@@ -7646,7 +7580,7 @@ var Serenity;
         }
         EditorUtils.setReadonly = setReadonly;
         function setReadOnly(widget, isReadOnly) {
-            var readOnly = ss.safeCast(widget, Serenity.IReadOnly);
+            var readOnly = Q.safeCast(widget, Serenity.IReadOnly);
             if (readOnly != null) {
                 readOnly.set_readOnly(isReadOnly);
             }
@@ -7656,7 +7590,7 @@ var Serenity;
         }
         EditorUtils.setReadOnly = setReadOnly;
         function setRequired(widget, isRequired) {
-            var req = ss.safeCast(widget, Serenity.IValidateRequired);
+            var req = Q.safeCast(widget, Serenity.IValidateRequired);
             if (req != null) {
                 req.set_required(isRequired);
             }
@@ -8028,15 +7962,15 @@ var Serenity;
             var enumType = this.options.enumType || Serenity.EnumTypeRegistry.get(this.options.enumKey);
             var enumKey = this.options.enumKey;
             if (enumKey == null && enumType != null) {
-                var enumKeyAttr = ss.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
+                var enumKeyAttr = Q.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
                 if (enumKeyAttr.length > 0) {
                     enumKey = enumKeyAttr[0].value;
                 }
             }
-            var values = ss.Enum.getValues(enumType);
+            var values = Q.Enum.getValues(enumType);
             for (var _i = 0, values_1 = values; _i < values_1.length; _i++) {
                 var x = values_1[_i];
-                var name = ss.Enum.toString(enumType, x);
+                var name = Q.Enum.toString(enumType, x);
                 this.addOption(parseInt(x, 10).toString(), Q.coalesce(Q.tryGetText('Enums.' + enumKey + '.' + name), name), null, false);
             }
         };
@@ -8452,7 +8386,7 @@ var Serenity;
             if (Q.isEmptyOrNull(this.options.originalNameProperty)) {
                 if (this.options.displayFileName) {
                     var s = Q.coalesce(value.Filename, '');
-                    var idx = ss.lastIndexOfAnyString(s, ['/', '\\']);
+                    var idx = Q.lastIndexOfAnyString(s, ['/', '\\']);
                     if (idx >= 0) {
                         value.OriginalName = s.substr(idx + 1);
                     }
@@ -8580,7 +8514,7 @@ var Serenity;
         };
         MultipleImageUploadEditor.prototype.setEditValue = function (source, property) {
             var val = source[property.name];
-            if (ss.isInstanceOfType(val, String)) {
+            if (Q.isInstanceOfType(val, String)) {
                 var json = Q.coalesce(Q.trimToNull(val), '[]');
                 if (Q.startsWith(json, '[') && Q.endsWith(json, ']')) {
                     this.set_value($.parseJSON(json));
@@ -8719,15 +8653,15 @@ var Serenity;
                 var enumType = _this.options.enumType || Serenity.EnumTypeRegistry.get(_this.options.enumKey);
                 var enumKey = _this.options.enumKey;
                 if (enumKey == null && enumType != null) {
-                    var enumKeyAttr = ss.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
+                    var enumKeyAttr = Q.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
                     if (enumKeyAttr.length > 0) {
                         enumKey = enumKeyAttr[0].value;
                     }
                 }
-                var values = ss.Enum.getValues(enumType);
+                var values = Q.Enum.getValues(enumType);
                 for (var _b = 0, values_2 = values; _b < values_2.length; _b++) {
                     var x = values_2[_b];
-                    var name = ss.Enum.toString(enumType, x);
+                    var name = Q.Enum.toString(enumType, x);
                     _this.addRadio(x.toString(), Q.coalesce(Q.tryGetText('Enums.' + enumKey + '.' + name), name));
                 }
             }
@@ -9091,7 +9025,7 @@ var Serenity;
             return this.element.prevAll('.select2-container');
         };
         Select2AjaxEditor.prototype.get_value = function () {
-            return ss.safeCast(this.element.select2('val'), String);
+            return Q.safeCast(this.element.select2('val'), String);
         };
         Object.defineProperty(Select2AjaxEditor.prototype, "value", {
             get: function () {
@@ -9154,7 +9088,7 @@ var Serenity;
         function FilterStore(fields) {
             this.items = [];
             if (fields == null) {
-                throw new ss.ArgumentNullException('source');
+                throw new Q.ArgumentNullException('source');
             }
             this.fields = fields.slice();
             this.get_fields().sort(function (x, y) {
@@ -9257,10 +9191,10 @@ var Serenity;
             this.changed && this.changed(this, {});
         };
         FilterStore.prototype.add_changed = function (value) {
-            this.changed = ss.delegateCombine(this.changed, value);
+            this.changed = Q.delegateCombine(this.changed, value);
         };
         FilterStore.prototype.remove_changed = function (value) {
-            this.changed = ss.delegateRemove(this.changed, value);
+            this.changed = Q.delegateRemove(this.changed, value);
         };
         FilterStore.prototype.get_activeCriteria = function () {
             return FilterStore_1.getCriteriaFor(this.items);
@@ -9361,7 +9295,7 @@ var Serenity;
                     return;
                 }
             }
-            throw new ss.Exception(Q.format("Filtering '{0}' has no editor for '{1}' operator", ss.getTypeName(ss.getInstanceType(this)), this.get_operator().key));
+            throw new Q.Exception(Q.format("Filtering '{0}' has no editor for '{1}' operator", Q.getTypeName(Q.getInstanceType(this)), this.get_operator().key));
         };
         BaseFiltering.prototype.operatorFormat = function (op) {
             return Q.coalesce(op.format, Q.coalesce(Q.tryGetText('Controls.FilterPanel.OperatorFormats.' + op.key), op.key));
@@ -9431,7 +9365,7 @@ var Serenity;
                     return result;
                 }
             }
-            throw new ss.Exception(Q.format("Filtering '{0}' has no handler for '{1}' operator", ss.getTypeName(ss.getInstanceType(this)), this.get_operator().key));
+            throw new Q.Exception(Q.format("Filtering '{0}' has no handler for '{1}' operator", Q.getTypeName(Q.getInstanceType(this)), this.get_operator().key));
         };
         BaseFiltering.prototype.loadState = function (state) {
             var input = this.get_container().find(':input').first();
@@ -9454,7 +9388,7 @@ var Serenity;
             return null;
         };
         BaseFiltering.prototype.argumentNull = function () {
-            return new ss.ArgumentNullException('value', Q.text('Controls.FilterPanel.ValueRequired'));
+            return new Q.ArgumentNullException('value', Q.text('Controls.FilterPanel.ValueRequired'));
         };
         BaseFiltering.prototype.validateEditorValue = function (value) {
             if (value.length === 0) {
@@ -9465,7 +9399,7 @@ var Serenity;
         BaseFiltering.prototype.getEditorValue = function () {
             var input = this.get_container().find(':input').not('.select2-focusser').first();
             if (input.length !== 1) {
-                throw new ss.Exception(Q.format("Couldn't find input in filter container for {0}", Q.coalesce(this.field.title, this.field.name)));
+                throw new Q.Exception(Q.format("Couldn't find input in filter container for {0}", Q.coalesce(this.field.title, this.field.name)));
             }
             var value;
             if (input.data('select2') != null) {
@@ -9891,13 +9825,13 @@ var Serenity;
             if (knownTypes != null)
                 return;
             knownTypes = {};
-            for (var _i = 0, _a = ss.getTypes(); _i < _a.length; _i++) {
+            for (var _i = 0, _a = Q.getTypes(); _i < _a.length; _i++) {
                 var type = _a[_i];
-                if (!ss.isAssignableFrom(Serenity.IFiltering, type))
+                if (!Q.isAssignableFrom(Serenity.IFiltering, type))
                     continue;
-                if (ss.isGenericTypeDefinition(type))
+                if (Q.isGenericTypeDefinition(type))
                     continue;
-                var fullName = ss.getTypeFullName(type).toLowerCase();
+                var fullName = Q.getTypeFullName(type).toLowerCase();
                 knownTypes[fullName] = type;
                 for (var _b = 0, _c = Q.Config.rootNamespaces; _b < _c.length; _b++) {
                     var k = _c[_b];
@@ -9930,11 +9864,11 @@ var Serenity;
         }
         function get(key) {
             if (Q.isEmptyOrNull(key))
-                throw new ss.ArgumentNullException('key');
+                throw new Q.ArgumentNullException('key');
             initialize();
             var formatterType = knownTypes[key.toLowerCase()];
             if (formatterType == null)
-                throw new ss.Exception(Q.format("Can't find {0} filter handler type!", key));
+                throw new Q.Exception(Q.format("Can't find {0} filter handler type!", key));
             return formatterType;
         }
         FilteringTypeRegistry.get = get;
@@ -10363,12 +10297,12 @@ var Serenity;
             var field = this.getFieldFor(row);
             if (field == null)
                 return null;
-            var filtering = ss.cast(row.data('Filtering'), Serenity.IFiltering);
+            var filtering = Q.cast(row.data('Filtering'), Serenity.IFiltering);
             if (filtering != null)
                 return filtering;
             var filteringType = Serenity.FilteringTypeRegistry.get(Q.coalesce(field.filteringType, 'String'));
             var editorDiv = row.children('div.v');
-            filtering = ss.cast(ss.createInstance(filteringType), Serenity.IFiltering);
+            filtering = Q.cast(Q.createInstance(filteringType), Serenity.IFiltering);
             Serenity.ReflectionOptionsSetter.set(filtering, field.filteringParams);
             filtering.set_container(editorDiv);
             filtering.set_field(field);
@@ -10496,7 +10430,7 @@ var Serenity;
                     var item = _a[_i];
                     var field = { $: item };
                     $('<li><a/></li>').appendTo(menu).children().attr('href', '#')
-                        .text(Q.coalesce(item.title, '')).click(ss.mkdel({
+                        .text(Q.coalesce(item.title, '')).click(Q.mkdel({
                         field: field,
                         $this: _this
                     }, function (e) {
@@ -10715,9 +10649,9 @@ var Serenity;
             if (value == null) {
                 return '';
             }
-            var name = ss.Enum.toString(enumType, value);
-            var enumKeyAttr = ss.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
-            var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : ss.getTypeFullName(enumType));
+            var name = Q.Enum.toString(enumType, value);
+            var enumKeyAttr = Q.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
+            var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : Q.getTypeFullName(enumType));
             return EnumFormatter_1.getText(enumKey, name);
         };
         EnumFormatter.getText = function (enumKey, name) {
@@ -10730,7 +10664,7 @@ var Serenity;
             if (value == null) {
                 return '';
             }
-            return ss.Enum.toString(enumType, value);
+            return Q.Enum.toString(enumType, value);
         };
         var EnumFormatter_1;
         __decorate([
@@ -10747,13 +10681,13 @@ var Serenity;
         }
         FileDownloadFormatter_1 = FileDownloadFormatter;
         FileDownloadFormatter.prototype.format = function (ctx) {
-            var dbFile = ss.safeCast(ctx.value, String);
+            var dbFile = Q.safeCast(ctx.value, String);
             if (Q.isEmptyOrNull(dbFile)) {
                 return '';
             }
             var downloadUrl = FileDownloadFormatter_1.dbFileUrl(dbFile);
             var originalName = (!Q.isEmptyOrNull(this.originalNameProperty) ?
-                ss.safeCast(ctx.item[this.originalNameProperty], String) : null);
+                Q.safeCast(ctx.item[this.originalNameProperty], String) : null);
             originalName = Q.coalesce(originalName, '');
             var text = Q.format(Q.coalesce(this.displayFormat, '{0}'), originalName, dbFile, downloadUrl);
             return "<a class='file-download-link' target='_blank' href='" +
@@ -10922,14 +10856,14 @@ var Serenity;
                 return;
             }
             knownTypes = {};
-            var types = ss.getTypes();
+            var types = Q.getTypes();
             for (var _i = 0, types_1 = types; _i < types_1.length; _i++) {
                 var type = types_1[_i];
-                if (!ss.isAssignableFrom(Serenity.ISlickFormatter, type))
+                if (!Q.isAssignableFrom(Serenity.ISlickFormatter, type))
                     continue;
-                if (ss.isGenericTypeDefinition(type))
+                if (Q.isGenericTypeDefinition(type))
                     continue;
-                var fullName = ss.getTypeFullName(type).toLowerCase();
+                var fullName = Q.getTypeFullName(type).toLowerCase();
                 knownTypes[fullName] = type;
                 for (var _a = 0, _b = Q.Config.rootNamespaces; _a < _b.length; _a++) {
                     var k = _b[_a];
@@ -10945,11 +10879,11 @@ var Serenity;
         }
         function get(key) {
             if (Q.isEmptyOrNull(key))
-                throw new ss.ArgumentNullException('key');
+                throw new Q.ArgumentNullException('key');
             initialize();
             var formatterType = knownTypes[key.toLowerCase()];
             if (formatterType == null) {
-                throw new ss.Exception(Q.format("Can't find {0} formatter type!", key));
+                throw new Q.Exception(Q.format("Can't find {0} formatter type!", key));
             }
             return formatterType;
         }
@@ -11082,12 +11016,12 @@ var Serenity;
         function tryGet(key) {
             if (knownTypes == null) {
                 knownTypes = {};
-                for (var _i = 0, _a = ss.getTypes(); _i < _a.length; _i++) {
+                for (var _i = 0, _a = Q.getTypes(); _i < _a.length; _i++) {
                     var type = _a[_i];
-                    if (ss.isEnum(type)) {
-                        var fullName = ss.getTypeFullName(type);
+                    if (Q.isEnum(type)) {
+                        var fullName = Q.getTypeFullName(type);
                         knownTypes[fullName] = type;
-                        var enumKeyAttr = ss.getAttributes(type, Serenity.EnumKeyAttribute, false);
+                        var enumKeyAttr = Q.getAttributes(type, Serenity.EnumKeyAttribute, false);
                         if (enumKeyAttr != null && enumKeyAttr.length > 0) {
                             knownTypes[enumKeyAttr[0].value] = type;
                         }
@@ -11113,7 +11047,7 @@ var Serenity;
                     "Also make sure that enum is under your project root namespace, and your namespace parts starts " +
                     "with capital letters, e.g.MyProject.Pascal.Cased namespace", key);
                 Q.notifyError(message, '', null);
-                throw new ss.Exception(message);
+                throw new Q.Exception(message);
             }
             return type;
         }
@@ -11141,19 +11075,19 @@ var Serenity;
             if (options == null) {
                 return;
             }
-            var type = ss.getInstanceType(target);
+            var type = Q.getInstanceType(target);
             if (type === Object) {
                 return;
             }
             var propByName = type.__propByName;
             var fieldByName = type.__fieldByName;
             if (propByName == null) {
-                var props = ss.getMembers(type, 16, 20);
+                var props = Q.getMembers(type, 16, 20);
                 var propList = props.filter(function (x) {
                     return !!x.setter && ((x.attr || []).filter(function (a) {
-                        return ss.isInstanceOfType(a, Serenity.OptionAttribute);
+                        return Q.isInstanceOfType(a, Serenity.OptionAttribute);
                     }).length > 0 || (x.attr || []).filter(function (a) {
-                        return ss.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
+                        return Q.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
                     }).length > 0);
                 });
                 propByName = {};
@@ -11164,12 +11098,12 @@ var Serenity;
                 type.__propByName = propByName;
             }
             if (fieldByName == null) {
-                var fields = ss.getMembers(type, 4, 20);
+                var fields = Q.getMembers(type, 4, 20);
                 var fieldList = fields.filter(function (x1) {
                     return (x1.attr || []).filter(function (a) {
-                        return ss.isInstanceOfType(a, Serenity.OptionAttribute);
+                        return Q.isInstanceOfType(a, Serenity.OptionAttribute);
                     }).length > 0 || (x1.attr || []).filter(function (a) {
-                        return ss.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
+                        return Q.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
                     }).length > 0;
                 });
                 fieldByName = {};
@@ -11186,12 +11120,12 @@ var Serenity;
                 var cc = ReflectionUtils.makeCamelCase(k2);
                 var p = propByName[cc] || propByName[k2];
                 if (p != null) {
-                    ss.midel(p.setter, target)(v);
+                    Q.midel(p.setter, target)(v);
                 }
                 else {
                     var f = fieldByName[cc] || fieldByName[k2];
                     if (f != null) {
-                        ss.fieldAccess(f, target, v);
+                        Q.fieldAccess(f, target, v);
                     }
                 }
             }
@@ -11279,25 +11213,25 @@ var Serenity;
     (function (WX) {
         function getWidget(element, type) {
             if (element == null) {
-                throw new ss.ArgumentNullException('element');
+                throw new Q.ArgumentNullException('element');
             }
             if (element.length === 0) {
-                throw new ss.Exception(Q.format("Searching for widget of type '{0}' on a non-existent element! ({1})", ss.getTypeFullName(type), element.selector));
+                throw new Q.Exception(Q.format("Searching for widget of type '{0}' on a non-existent element! ({1})", Q.getTypeFullName(type), element.selector));
             }
             var widget = element.tryGetWidget(type);
             if (widget == null) {
                 var message = Q.format("Element has no widget of type '{0}'! If you have recently changed editor " +
                     "type of a property in a form class, or changed data type in row (which also changes editor type)" +
                     " your script side Form definition might be out of date. Make sure your project builds successfully " +
-                    "and transform T4 templates", ss.getTypeFullName(type));
+                    "and transform T4 templates", Q.getTypeFullName(type));
                 Q.notifyError(message, '', null);
-                throw new ss.Exception(message);
+                throw new Q.Exception(message);
             }
             return widget;
         }
         WX.getWidget = getWidget;
         function getWidgetName(type) {
-            return Q.replaceAll(ss.getTypeFullName(type), '.', '_');
+            return Q.replaceAll(Q.getTypeFullName(type), '.', '_');
         }
         WX.getWidgetName = getWidgetName;
         function hasOriginalEvent(e) {
@@ -11339,10 +11273,10 @@ var Serenity;
     $.fn.tryGetWidget = function (widgetType) {
         var element = this;
         var widget2;
-        if (ss.isAssignableFrom(Serenity.Widget, widgetType)) {
+        if (Q.isAssignableFrom(Serenity.Widget, widgetType)) {
             var widgetName = WX.getWidgetName(widgetType);
             widget2 = element.data(widgetName);
-            if (widget2 != null && !ss.isAssignableFrom(widgetType, ss.getInstanceType(widget2))) {
+            if (widget2 != null && !Q.isAssignableFrom(widgetType, Q.getInstanceType(widget2))) {
                 widget2 = null;
             }
             if (widget2 != null) {
@@ -11356,7 +11290,7 @@ var Serenity;
         for (var _i = 0, _a = Object.keys(data); _i < _a.length; _i++) {
             var key = _a[_i];
             widget2 = data[key];
-            if (widget2 != null && ss.isAssignableFrom(widgetType, ss.getInstanceType(widget2))) {
+            if (widget2 != null && Q.isAssignableFrom(widgetType, Q.getInstanceType(widget2))) {
                 return widget2;
             }
         }
@@ -11365,19 +11299,19 @@ var Serenity;
     $.fn.getWidget = function (widgetType1) {
         var element1 = this;
         if (element1 == null) {
-            throw new ss.ArgumentNullException('element');
+            throw new Q.ArgumentNullException('element');
         }
         if (element1.length === 0) {
-            throw new ss.Exception(Q.format("Searching for widget of type '{0}' on a non-existent element! ({1})", ss.getTypeFullName(widgetType1), element1.selector));
+            throw new Q.Exception(Q.format("Searching for widget of type '{0}' on a non-existent element! ({1})", Q.getTypeFullName(widgetType1), element1.selector));
         }
         var widget3 = element1.tryGetWidget(widgetType1);
         if (widget3 == null) {
             var message = Q.format("Element has no widget of type '{0}'! If you have recently changed " +
                 "editor type of a property in a form class, or changed data type in row (which also changes " +
                 "editor type) your script side Form definition might be out of date. Make sure your project " +
-                "builds successfully and transform T4 templates", ss.getTypeFullName(widgetType1));
+                "builds successfully and transform T4 templates", Q.getTypeFullName(widgetType1));
             Q.notifyError(message, '', null);
-            throw new ss.Exception(message);
+            throw new Q.Exception(message);
         }
         return widget3;
     };
@@ -11449,7 +11383,7 @@ var Serenity;
                     }
                     var tabID = _this.uniqueName + '_Tab' + tabIndex;
                     li.children('a').attr('href', '#' + tabID)
-                        .text(_this.determineText(tab.$, ss.mkdel({
+                        .text(_this.determineText(tab.$, Q.mkdel({
                         tab: tab
                     }, function (prefix) {
                         return prefix + 'Tabs.' + this.tab.$;
@@ -11626,7 +11560,7 @@ var Serenity;
             }
             var editorType = Serenity.EditorTypeRegistry
                 .get(Q.coalesce(item.editorType, 'String'));
-            var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
+            var elementAttr = Q.getAttributes(editorType, Serenity.ElementAttribute, true);
             var elementHtml = ((elementAttr.length > 0) ?
                 elementAttr[0].value : '<input/>');
             var element = Serenity.Widget.elementFor(editorType)
@@ -11640,13 +11574,13 @@ var Serenity;
             }
             var editorParams = item.editorParams;
             var optionsType = null;
-            var optionsAttr = ss.getAttributes(editorType, Serenity.OptionsTypeAttribute, true);
+            var optionsAttr = Q.getAttributes(editorType, Serenity.OptionsTypeAttribute, true);
             if (optionsAttr != null && optionsAttr.length > 0) {
                 optionsType = optionsAttr[0].optionsType;
             }
             var editor;
             if (optionsType != null) {
-                editorParams = $.extend(ss.createInstance(optionsType), item.editorParams);
+                editorParams = $.extend(Q.createInstance(optionsType), item.editorParams);
                 editor = new editorType(element, editorParams);
             }
             else {
@@ -11654,11 +11588,11 @@ var Serenity;
                 editor = new editorType(element, editorParams);
             }
             editor.initialize();
-            if (ss.isInstanceOfType(editor, Serenity.BooleanEditor) &&
+            if (Q.isInstanceOfType(editor, Serenity.BooleanEditor) &&
                 (item.editorParams == null || !!!item.editorParams['labelFor'])) {
                 label.removeAttr('for');
             }
-            if (ss.isInstanceOfType(editor, Serenity.RadioButtonEditor) &&
+            if (Q.isInstanceOfType(editor, Serenity.RadioButtonEditor) &&
                 (item.editorParams == null || !!!item.editorParams['labelFor'])) {
                 label.removeAttr('for');
             }
@@ -11736,10 +11670,10 @@ var Serenity;
                     }
                 }
                 if (c === 0) {
-                    c = ss.compareStrings(xcategory, ycategory);
+                    c = Q.compareStrings(xcategory, ycategory);
                 }
                 if (c === 0) {
-                    c = ss.compareValues(itemIndex[x1.name], itemIndex[y.name]);
+                    c = Q.compareValues(itemIndex[x1.name], itemIndex[y.name]);
                 }
                 return c;
             });
@@ -11753,7 +11687,7 @@ var Serenity;
                     if (index > 1) {
                         $('<span/>').addClass('separator').text('|').prependTo(container);
                     }
-                    $('<a/>').addClass('category-link').text(this.determineText(category.$, ss.mkdel({ category: category }, function (prefix) {
+                    $('<a/>').addClass('category-link').text(this.determineText(category.$, Q.mkdel({ category: category }, function (prefix) {
                         return prefix + 'Categories.' + this.category.$;
                     })))
                         .attr('tabindex', '-1')
@@ -12106,7 +12040,7 @@ var Serenity;
         TemplatedDialog_1 = TemplatedDialog;
         Object.defineProperty(TemplatedDialog.prototype, "isMarkedAsPanel", {
             get: function () {
-                var panelAttr = ss.getAttributes(ss.getInstanceType(this), Serenity.PanelAttribute, true);
+                var panelAttr = Q.getAttributes(Q.getInstanceType(this), Serenity.PanelAttribute, true);
                 return panelAttr.length > 0 && panelAttr[panelAttr.length - 1].value !== false;
             },
             enumerable: true,
@@ -12115,7 +12049,7 @@ var Serenity;
         Object.defineProperty(TemplatedDialog.prototype, "isResponsive", {
             get: function () {
                 return Q.Config.responsiveDialogs ||
-                    ss.getAttributes(ss.getInstanceType(this), Serenity.ResponsiveAttribute, true).length > 0;
+                    Q.getAttributes(Q.getInstanceType(this), Serenity.ResponsiveAttribute, true).length > 0;
             },
             enumerable: true,
             configurable: true
@@ -12179,7 +12113,7 @@ var Serenity;
             this.element.removeClass('hidden');
             this.element.dialog(this.getDialogOptions());
             this.element.closest('.ui-dialog').on('resize', function (e) { return _this.arrange(); });
-            var type = ss.getInstanceType(this);
+            var type = Q.getInstanceType(this);
             if (this.isResponsive) {
                 Serenity.DialogExtensions.dialogResizable(this.element);
                 $(window).bind('resize.' + this.uniqueName, function (e) {
@@ -12189,11 +12123,11 @@ var Serenity;
                 });
                 this.element.closest('.ui-dialog').addClass('flex-layout');
             }
-            else if (ss.getAttributes(type, Serenity.FlexifyAttribute, true).length > 0) {
+            else if (Q.getAttributes(type, Serenity.FlexifyAttribute, true).length > 0) {
                 Serenity.DialogExtensions.dialogFlexify(this.element);
                 Serenity.DialogExtensions.dialogResizable(this.element);
             }
-            if (ss.getAttributes(type, Serenity.MaximizableAttribute, true).length > 0) {
+            if (Q.getAttributes(type, Serenity.MaximizableAttribute, true).length > 0) {
                 Serenity.DialogExtensions.dialogMaximizable(this.element);
             }
             var self = this;
@@ -12346,8 +12280,8 @@ var Serenity;
             opt.width = 920;
             TemplatedDialog_1.applyCssSizes(opt, dialogClass);
             opt.autoOpen = false;
-            var type = ss.getInstanceType(this);
-            opt.resizable = ss.getAttributes(type, Serenity.ResizableAttribute, true).length > 0;
+            var type = Q.getInstanceType(this);
+            opt.resizable = Q.getAttributes(type, Serenity.ResizableAttribute, true).length > 0;
             opt.modal = true;
             opt.position = { my: 'center', at: 'center', of: $(window.window) };
             opt.title = Q.coalesce(this.element.data('dialogtitle'), this.getDialogTitle()) || '';
@@ -12544,12 +12478,12 @@ var Serenity;
             }
         };
         PropertyDialog.prototype.getFormKey = function () {
-            var attributes = ss.getAttributes(ss.getInstanceType(this), Serenity.FormKeyAttribute, true);
+            var attributes = Q.getAttributes(Q.getInstanceType(this), Serenity.FormKeyAttribute, true);
             if (attributes.length >= 1) {
                 return attributes[0].value;
             }
             else {
-                var name = ss.getTypeFullName(ss.getInstanceType(this));
+                var name = Q.getTypeFullName(Q.getInstanceType(this));
                 var px = name.indexOf('.');
                 if (px >= 0) {
                     name = name.substring(px + 1);
@@ -12704,7 +12638,7 @@ var Serenity;
         QuickFilterBar.prototype.add = function (opt) {
             var _this = this;
             if (opt == null) {
-                throw new ss.ArgumentNullException('opt');
+                throw new Q.ArgumentNullException('opt');
             }
             if (opt.separator) {
                 this.addSeparator();
@@ -13000,7 +12934,7 @@ var Serenity;
             }
             else {
                 var filtering = new filteringType();
-                if (filtering && ss.isInstanceOfType(filtering, Serenity.IQuickFiltering)) {
+                if (filtering && Q.isInstanceOfType(filtering, Serenity.IQuickFiltering)) {
                     Serenity.ReflectionOptionsSetter.set(filtering, item.filteringParams);
                     filtering.set_field(item);
                     filtering.set_operator({ key: Serenity.FilterOperators.EQ });
@@ -13025,10 +12959,10 @@ var Serenity;
             this.submitHandlers && this.submitHandlers(request);
         };
         QuickFilterBar.prototype.add_submitHandlers = function (action) {
-            this.submitHandlers = ss.delegateCombine(this.submitHandlers, action);
+            this.submitHandlers = Q.delegateCombine(this.submitHandlers, action);
         };
         QuickFilterBar.prototype.remove_submitHandlers = function (action) {
-            this.submitHandlers = ss.delegateRemove(this.submitHandlers, action);
+            this.submitHandlers = Q.delegateRemove(this.submitHandlers, action);
         };
         QuickFilterBar.prototype.clear_submitHandlers = function () {
         };
@@ -13068,7 +13002,7 @@ var Serenity;
             _this.restoringSettings = 0;
             var self = _this;
             _this.element.addClass('s-DataGrid').html('');
-            _this.element.addClass('s-' + ss.getTypeName(ss.getInstanceType(_this)));
+            _this.element.addClass('s-' + Q.getTypeName(Q.getInstanceType(_this)));
             _this.element.addClass('require-layout').bind('layout.' + _this.uniqueName, function () {
                 self.layout();
             });
@@ -13102,7 +13036,7 @@ var Serenity;
             return _this;
         }
         DataGrid.prototype.attrs = function (attrType) {
-            return ss.getAttributes(ss.getInstanceType(this), attrType, true);
+            return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         };
         DataGrid.prototype.layout = function () {
             if (!this.element.is(':visible') || this.slickContainer == null)
@@ -13346,7 +13280,7 @@ var Serenity;
             var mapped = sortBy.map(function (s) {
                 var x = {};
                 if (s && Q.endsWith(s.toLowerCase(), ' desc')) {
-                    x.columnId = ss.trimEndString(s.substr(0, s.length - 5));
+                    x.columnId = Q.trimEndString(s.substr(0, s.length - 5));
                     x.sortAsc = false;
                 }
                 else {
@@ -13531,7 +13465,7 @@ var Serenity;
                 });
                 if (columns.length > 0) {
                     columns.sort(function (x1, y) {
-                        return ss.compareValues(Math.abs(x1.sortOrder), Math.abs(y.sortOrder));
+                        return Q.compareValues(Math.abs(x1.sortOrder), Math.abs(y.sortOrder));
                     });
                     var list = [];
                     for (var i = 0; i < columns.length; i++) {
@@ -13669,12 +13603,12 @@ var Serenity;
                 if (item.editLink === true) {
                     var oldFormat = { $: column.format };
                     var css = { $: (item.editLinkCssClass) != null ? item.editLinkCssClass : null };
-                    column.format = this.itemLink(item.editLinkItemType != null ? item.editLinkItemType : null, item.editLinkIdField != null ? item.editLinkIdField : null, ss.mkdel({ oldFormat: oldFormat }, function (ctx) {
+                    column.format = this.itemLink(item.editLinkItemType != null ? item.editLinkItemType : null, item.editLinkIdField != null ? item.editLinkIdField : null, Q.mkdel({ oldFormat: oldFormat }, function (ctx) {
                         if (this.oldFormat.$ != null) {
                             return this.oldFormat.$(ctx);
                         }
                         return Q.htmlEncode(ctx.value);
-                    }), ss.mkdel({ css: css }, function (ctx1) {
+                    }), Q.mkdel({ css: css }, function (ctx1) {
                         return Q.coalesce(this.css.$, '');
                     }), false);
                     if (!Q.isEmptyOrNull(item.editLinkIdField)) {
@@ -13865,7 +13799,7 @@ var Serenity;
             if (!Q.isEmptyOrNull(path)) {
                 key += path.substr(1).split(String.fromCharCode(47)).slice(0, 2).join('/') + ':';
             }
-            key += ss.getTypeFullName(ss.getInstanceType(this));
+            key += Q.getTypeFullName(Q.getInstanceType(this));
             return key;
         };
         DataGrid.prototype.gridPersistanceFlags = function () {
@@ -14086,7 +14020,7 @@ var Serenity;
                         p.width = column.$.width;
                     }
                     if (flags.sortColumns !== false) {
-                        var sort = Q.indexOf(sortColumns, ss.mkdel({ column: column }, function (x) {
+                        var sort = Q.indexOf(sortColumns, Q.mkdel({ column: column }, function (x) {
                             return x.columnId === this.column.$.id;
                         }));
                         p.sort = ((sort >= 0) ? ((sortColumns[sort].sortAsc !== false) ? (sort + 1) : (-sort - 1)) : 0);
@@ -14191,12 +14125,12 @@ var Serenity;
                 }
                 if (!!(parts.length === 2 && parts[1] === 'new')) {
                     arg.handled = true;
-                    _this.editItemOfType(ss.cast(parts[0], String), null);
+                    _this.editItemOfType(Q.cast(parts[0], String), null);
                     return;
                 }
                 if (!!(parts.length === 3 && parts[1] === 'edit')) {
                     arg.handled = true;
-                    _this.editItemOfType(ss.cast(parts[0], String), parts[2]);
+                    _this.editItemOfType(Q.cast(parts[0], String), parts[2]);
                 }
             });
             return _this;
@@ -14225,7 +14159,7 @@ var Serenity;
             if (attr.length === 1) {
                 return (this.entityType = attr[0].value);
             }
-            var name = ss.getTypeFullName(ss.getInstanceType(this));
+            var name = Q.getTypeFullName(Q.getInstanceType(this));
             var px = name.indexOf('.');
             if (px >= 0) {
                 name = name.substring(px + 1);
@@ -14305,14 +14239,14 @@ var Serenity;
         EntityGrid.prototype.editItem = function (entityOrId) {
             var _this = this;
             this.createEntityDialog(this.getItemType(), function (dlg) {
-                var dialog = ss.safeCast(dlg, Serenity['IEditDialog']);
+                var dialog = Q.safeCast(dlg, Serenity['IEditDialog']);
                 if (dialog != null) {
                     dialog.load(entityOrId, function () {
                         dialog.dialogOpen(_this.openDialogsAsPanel);
                     });
                     return;
                 }
-                throw new Error(Q.format("{0} doesn't implement IEditDialog!", ss.getTypeFullName(ss.getInstanceType(dlg))));
+                throw new Error(Q.format("{0} doesn't implement IEditDialog!", Q.getTypeFullName(Q.getInstanceType(dlg))));
             });
         };
         EntityGrid.prototype.editItemOfType = function (itemType, entityOrId) {
@@ -14322,14 +14256,14 @@ var Serenity;
                 return;
             }
             this.createEntityDialog(itemType, function (dlg) {
-                var dialog = ss.safeCast(dlg, Serenity['IEditDialog']);
+                var dialog = Q.safeCast(dlg, Serenity['IEditDialog']);
                 if (dialog != null) {
                     dialog.load(entityOrId, function () {
                         return dialog.dialogOpen(_this.openDialogsAsPanel);
                     });
                     return;
                 }
-                throw new Error(Q.format("{0} doesn't implement IEditDialog!", ss.getTypeFullName(ss.getInstanceType(dlg))));
+                throw new Error(Q.format("{0} doesn't implement IEditDialog!", Q.getTypeFullName(Q.getInstanceType(dlg))));
             });
         };
         EntityGrid.prototype.getService = function () {
@@ -14756,7 +14690,7 @@ var Serenity;
                 if (c !== 0) {
                     return c;
                 }
-                return ss.compareValues(oldIndexes[x1.id], oldIndexes[y.id]);
+                return Q.compareValues(oldIndexes[x1.id], oldIndexes[y.id]);
             });
             this.view.setItems(list, true);
         };
@@ -15161,11 +15095,11 @@ var Serenity;
                 .then(function () { return _this.loadInitialEntity(); });
         };
         PropertyPanel.prototype.getFormKey = function () {
-            var attributes = ss.getAttributes(ss.getInstanceType(this), Serenity.FormKeyAttribute, true);
+            var attributes = Q.getAttributes(Q.getInstanceType(this), Serenity.FormKeyAttribute, true);
             if (attributes.length >= 1) {
                 return attributes[0].value;
             }
-            var name = ss.getTypeFullName(ss.getInstanceType(this));
+            var name = Q.getTypeFullName(Q.getInstanceType(this));
             var px = name.indexOf('.');
             if (px >= 0) {
                 name = name.substring(px + 1);
@@ -15373,7 +15307,7 @@ var Serenity;
         EntityDialog.prototype.onDeleteSuccess = function (response) {
         };
         EntityDialog.prototype.attrs = function (attrType) {
-            return ss.getAttributes(ss.getInstanceType(this), attrType, true);
+            return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         };
         EntityDialog.prototype.getEntityType = function () {
             if (this.entityType != null)
@@ -15382,7 +15316,7 @@ var Serenity;
             if (typeAttributes.length === 1)
                 return (this.entityType = typeAttributes[0].value);
             // remove global namespace
-            var name = ss.getTypeFullName(ss.getInstanceType(this));
+            var name = Q.getTypeFullName(Q.getInstanceType(this));
             var px = name.indexOf('.');
             if (px >= 0)
                 name = name.substring(px + 1);
@@ -15503,7 +15437,7 @@ var Serenity;
                 action();
             }
             catch (ex1) {
-                var ex = ss.Exception.wrap(ex1);
+                var ex = Q.Exception.wrap(ex1);
                 fail(ex);
             }
         };
@@ -15682,7 +15616,7 @@ var Serenity;
         // for compatibility with older getLanguages methods written in Saltaralle
         EntityDialog.prototype.getLangs = function () {
             var langsTuple = this.getLanguages();
-            var langs = ss.safeCast(langsTuple, Array);
+            var langs = Q.safeCast(langsTuple, Array);
             if (langs == null || langs.length === 0 ||
                 langs[0] == null || !Q.isArray(langs[0])) {
                 langs = Array.prototype.slice.call(langsTuple.map(function (x) {
@@ -16020,7 +15954,7 @@ var Serenity;
                     }
                     var cloneEntity = _this.getCloningEntity();
                     Serenity.Widget.create({
-                        type: ss.getInstanceType(_this),
+                        type: Q.getInstanceType(_this),
                         init: function (w) { return Serenity.SubDialogHelper.bubbleDataChange(Serenity.SubDialogHelper.cascade(w, _this.element), _this, true)
                             .loadEntityAndOpenDialog(cloneEntity, null); }
                     });
@@ -18031,7 +17965,7 @@ var Q;
                 }
                 var el = $(element);
                 for (var i = 0; !!(i < handlers.length); i++) {
-                    var handler = ss.safeCast(handlers[i].handler, Function);
+                    var handler = Q.safeCast(handlers[i].handler, Function);
                     if (handler) {
                         var message = handler(el);
                         if (message != null) {
@@ -18330,16 +18264,16 @@ var Q;
         };
     })(jQuery.cleanData);
     function ssExceptionInitialization() {
-        ss.Exception.prototype.toString = function () {
+        Q.Exception.prototype.toString = function () {
             return this.get_message();
         };
     }
     ;
-    if (ss && ss.Exception)
+    if (Q && Q.Exception)
         ssExceptionInitialization();
     else {
         jQuery(function ($) {
-            if (ss && ss.Exception)
+            if (Q && Q.Exception)
                 ssExceptionInitialization();
         });
     }
@@ -18374,7 +18308,7 @@ var Q;
             },
             render: function (createElement) {
                 var editorType = Serenity.EditorTypeRegistry.get(this.type);
-                var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
+                var elementAttr = Q.getAttributes(editorType, Serenity.ElementAttribute, true);
                 var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>');
                 var domProps = {};
                 var element = $(elementHtml)[0];
@@ -18581,14 +18515,14 @@ var Serenity;
     var DialogTypeRegistry;
     (function (DialogTypeRegistry) {
         function search(typeName) {
-            var dialogType = ss.getType(typeName);
-            if (dialogType != null && ss.isAssignableFrom(Serenity.IDialog, dialogType)) {
+            var dialogType = Q.getType(typeName);
+            if (dialogType != null && Q.isAssignableFrom(Serenity.IDialog, dialogType)) {
                 return dialogType;
             }
             for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
                 var ns = _a[_i];
-                dialogType = ss.getType(ns + '.' + typeName);
-                if (dialogType != null && ss.isAssignableFrom(Serenity.IDialog, dialogType)) {
+                dialogType = Q.getType(ns + '.' + typeName);
+                if (dialogType != null && Q.isAssignableFrom(Serenity.IDialog, dialogType)) {
                     return dialogType;
                 }
             }
@@ -18621,7 +18555,7 @@ var Serenity;
                     'check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). ' +
                     "You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.";
                 Q.notifyError(message, '', null);
-                throw new ss.Exception(message);
+                throw new Q.Exception(message);
             }
             return type;
         }
@@ -18632,10 +18566,10 @@ if (globalObj != null) {
     function copyToGlobal(src, target) {
         for (var n in src) {
             if (src.hasOwnProperty(n))
-                target[n] = ss[n];
+                target[n] = Q[n];
         }
     }
-    globalObj.ss ? copyToGlobal(ss, globalObj.ss) : globalObj.ss = ss;
+    globalObj.ss ? copyToGlobal(Q, globalObj.ss) : globalObj.ss = Q;
     globalObj.Q ? copyToGlobal(Q, globalObj.Q) : globalObj.Q = Q;
     globalObj.Serenity ? copyToGlobal(Serenity, globalObj.Serenity) : globalObj.Serenity = Serenity;
 }
@@ -18701,13 +18635,13 @@ var Q;
                 obj.__interfaces = [Serenity.ISlickFormatter];
             }
             if (!obj.__class) {
-                var baseType = ss.getBaseType(obj);
+                var baseType = Q.getBaseType(obj);
                 if (baseType && baseType.__class)
                     obj.__class = true;
             }
             if (obj.__class || obj.__enum || obj.__interface) {
                 obj.__typeName = fullName;
-                ss.types[fullName] = obj;
+                Q.types[fullName] = obj;
             }
             delete obj.__register;
         });

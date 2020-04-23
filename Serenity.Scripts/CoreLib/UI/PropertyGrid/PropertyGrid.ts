@@ -60,7 +60,7 @@
                     var tabID = this.uniqueName + '_Tab' + tabIndex;
 
                     li.children('a').attr('href', '#' + tabID)
-                        .text(this.determineText(tab.$, ss.mkdel({
+                        .text(this.determineText(tab.$, Q.mkdel({
                             tab: tab
                         }, function (prefix: string) {
                             return prefix + 'Tabs.' + this.tab.$;
@@ -302,7 +302,7 @@
 
             var editorType = Serenity.EditorTypeRegistry
                 .get(Q.coalesce(item.editorType, 'String'));
-            var elementAttr = ss.getAttributes(editorType,
+            var elementAttr = Q.getAttributes(editorType,
                 Serenity.ElementAttribute, true);
             var elementHtml = ((elementAttr.length > 0) ?
                 elementAttr[0].value : '<input/>');
@@ -320,7 +320,7 @@
             }
             var editorParams = item.editorParams;
             var optionsType = null;
-            var optionsAttr = ss.getAttributes(editorType,
+            var optionsAttr = Q.getAttributes(editorType,
                 Serenity.OptionsTypeAttribute, true);
 
             if (optionsAttr != null && optionsAttr.length > 0) {
@@ -328,7 +328,7 @@
             }
             var editor;
             if (optionsType != null) {
-                editorParams = $.extend(ss.createInstance(optionsType),
+                editorParams = $.extend(Q.createInstance(optionsType),
                     item.editorParams);
 
                 editor = new (editorType as any)(element, editorParams);
@@ -340,12 +340,12 @@
 
             editor.initialize();
 
-            if (ss.isInstanceOfType(editor, BooleanEditor) &&
+            if (Q.isInstanceOfType(editor, BooleanEditor) &&
                 (item.editorParams == null || !!!item.editorParams['labelFor'])) {
                 label.removeAttr('for');
             }
 
-            if (ss.isInstanceOfType(editor, RadioButtonEditor) &&
+            if (Q.isInstanceOfType(editor, RadioButtonEditor) &&
                 (item.editorParams == null || !!!item.editorParams['labelFor'])) {
                 label.removeAttr('for');
             }
@@ -430,10 +430,10 @@
 					}
 				}
 				if (c === 0) {
-					c = ss.compareStrings(xcategory, ycategory);
+					c = Q.compareStrings(xcategory, ycategory);
 				}
 				if (c === 0) {
-					c = ss.compareValues(itemIndex[x1.name], itemIndex[y.name]);
+					c = Q.compareValues(itemIndex[x1.name], itemIndex[y.name]);
 				}
 				return c;
             });
@@ -450,7 +450,7 @@
 					}
                     $('<a/>').addClass('category-link').text(
                         this.determineText(category.$,
-                            ss.mkdel({ category: category },
+                            Q.mkdel({ category: category },
                                 function (prefix: string) {
                                     return prefix + 'Categories.' + this.category.$;
                                 })))

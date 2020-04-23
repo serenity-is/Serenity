@@ -8,7 +8,7 @@
         export function get(key: string): WidgetClass {
 
             if (Q.isEmptyOrNull(key)) {
-                throw new ss.ArgumentNullException('key');
+                throw new Q.ArgumentNullException('key');
             }
 
             initialize();
@@ -22,7 +22,7 @@
                     return type;
                 }
 
-                throw new ss.Exception(Q.format("Can't find {0} editor type!", key));
+                throw new Q.Exception(Q.format("Can't find {0} editor type!", key));
             }
             return editorType;
 
@@ -35,20 +35,20 @@
 
             knownTypes = {};
 
-            for (var type of ss.getTypes()) {
+            for (var type of Q.getTypes()) {
 
                 if (!(type.prototype instanceof Serenity.Widget)) {
                     continue;
                 }
 
-                if (ss.isGenericTypeDefinition(type)) {
+                if (Q.isGenericTypeDefinition(type)) {
                     continue;
                 }
 
-                var fullName = ss.getTypeFullName(type).toLowerCase();
+                var fullName = Q.getTypeFullName(type).toLowerCase();
                 knownTypes[fullName] = type;
 
-                var editorAttr = ss.getAttributes(type, Serenity.EditorAttribute, false);
+                var editorAttr = Q.getAttributes(type, Serenity.EditorAttribute, false);
                 if (editorAttr != null && editorAttr.length > 0) {
                     var attrKey = editorAttr[0].key;
                     if (!Q.isEmptyOrNull(attrKey)) {
@@ -138,26 +138,26 @@
 
         export function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void {
 
-            var getEditValue = ss.safeCast(editor, Serenity.IGetEditValue);
+            var getEditValue = Q.safeCast(editor, Serenity.IGetEditValue);
 
             if (getEditValue != null) {
                 getEditValue.getEditValue(item, target);
                 return;
             }
 
-            var stringValue = ss.safeCast(editor, Serenity.IStringValue);
+            var stringValue = Q.safeCast(editor, Serenity.IStringValue);
             if (stringValue != null) {
                 target[item.name] = stringValue.get_value();
                 return;
             }
 
-            var booleanValue = ss.safeCast(editor, Serenity.IBooleanValue);
+            var booleanValue = Q.safeCast(editor, Serenity.IBooleanValue);
             if (booleanValue != null) {
                 target[item.name] = booleanValue.get_value();
                 return;
             }
 
-            var doubleValue = ss.safeCast(editor, Serenity.IDoubleValue);
+            var doubleValue = Q.safeCast(editor, Serenity.IDoubleValue);
             if (doubleValue != null) {
                 var value = doubleValue.get_value();
                 target[item.name] = (isNaN(value) ? null : value);
@@ -182,23 +182,23 @@
 
         export function loadValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void {
 
-            var setEditValue = ss.safeCast(editor, Serenity.ISetEditValue);
+            var setEditValue = Q.safeCast(editor, Serenity.ISetEditValue);
             if (setEditValue != null) {
                 setEditValue.setEditValue(source, item);
                 return;
             }
 
-            var stringValue = ss.safeCast(editor, Serenity.IStringValue);
+            var stringValue = Q.safeCast(editor, Serenity.IStringValue);
             if (stringValue != null) {
                 var value = source[item.name];
                 if (value != null) {
                     value = value.toString();
                 }
-                stringValue.set_value(ss.cast(value, String));
+                stringValue.set_value(Q.cast(value, String));
                 return;
             }
 
-            var booleanValue = ss.safeCast(editor, Serenity.IBooleanValue);
+            var booleanValue = Q.safeCast(editor, Serenity.IBooleanValue);
             if (booleanValue != null) {
                 var value1 = source[item.name];
                 if (typeof (value1) === 'number') {
@@ -210,20 +210,20 @@
                 return;
             }
 
-            var doubleValue = ss.safeCast(editor, Serenity.IDoubleValue);
+            var doubleValue = Q.safeCast(editor, Serenity.IDoubleValue);
             if (doubleValue != null) {
                 var d = source[item.name];
-                if (!!(d == null || ss.isInstanceOfType(d, String) && Q.isTrimmedEmpty(ss.cast(d, String)))) {
+                if (!!(d == null || Q.isInstanceOfType(d, String) && Q.isTrimmedEmpty(Q.cast(d, String)))) {
                     doubleValue.set_value(null);
                 }
-                else if (ss.isInstanceOfType(d, String)) {
-                    doubleValue.set_value(ss.cast(Q.parseDecimal(ss.cast(d, String)), Number));
+                else if (Q.isInstanceOfType(d, String)) {
+                    doubleValue.set_value(Q.cast(Q.parseDecimal(Q.cast(d, String)), Number));
                 }
-                else if (ss.isInstanceOfType(d, Boolean)) {
+                else if (Q.isInstanceOfType(d, Boolean)) {
                     doubleValue.set_value((!!d ? 1 : 0));
                 }
                 else {
-                    doubleValue.set_value(ss.cast(d, Number));
+                    doubleValue.set_value(Q.cast(d, Number));
                 }
                 return;
             }
@@ -270,7 +270,7 @@
 
         export function setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void {
 
-            var readOnly = ss.safeCast(widget, Serenity.IReadOnly);
+            var readOnly = Q.safeCast(widget, Serenity.IReadOnly);
 
             if (readOnly != null) {
                 readOnly.set_readOnly(isReadOnly);
@@ -281,7 +281,7 @@
         }
 
         export function setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void {
-            var req = ss.safeCast(widget, IValidateRequired);
+            var req = Q.safeCast(widget, IValidateRequired);
             if (req != null) {
                 req.set_required(isRequired);
             }
@@ -706,15 +706,15 @@
             var enumKey = this.options.enumKey;
 
             if (enumKey == null && enumType != null) {
-                var enumKeyAttr = ss.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
+                var enumKeyAttr = Q.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
                 if (enumKeyAttr.length > 0) {
                     enumKey = enumKeyAttr[0].value;
                 }
             }
 
-            var values = ss.Enum.getValues(enumType);
+            var values = Q.Enum.getValues(enumType);
             for (var x of values) {
-                var name = ss.Enum.toString(enumType, x);
+                var name = Q.Enum.toString(enumType, x);
                 this.addOption(parseInt(x, 10).toString(),
                     Q.coalesce(Q.tryGetText('Enums.' + enumKey + '.' + name), name), null, false);
             }
@@ -1199,7 +1199,7 @@
 
                 if (this.options.displayFileName) {
                     var s = Q.coalesce(value.Filename, '');
-                    var idx = ss.lastIndexOfAnyString(s, ['/', '\\']);
+                    var idx = Q.lastIndexOfAnyString(s, ['/', '\\']);
                     if (idx >= 0) {
                         value.OriginalName = s.substr(idx + 1);
                     }
@@ -1349,7 +1349,7 @@
 
         setEditValue(source: any, property: PropertyItem) {
             var val = source[property.name];
-            if (ss.isInstanceOfType(val, String)) {
+            if (Q.isInstanceOfType(val, String)) {
                 var json = Q.coalesce(Q.trimToNull(val), '[]');
                 if (Q.startsWith(json, '[') && Q.endsWith(json, ']')) {
                     this.set_value($.parseJSON(json));
@@ -1484,15 +1484,15 @@
                 var enumType = this.options.enumType || Serenity.EnumTypeRegistry.get(this.options.enumKey);
                 var enumKey = this.options.enumKey;
                 if (enumKey == null && enumType != null) {
-                    var enumKeyAttr = ss.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
+                    var enumKeyAttr = Q.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
                     if (enumKeyAttr.length > 0) {
                         enumKey = enumKeyAttr[0].value;
                     }
                 }
 
-                var values = ss.Enum.getValues(enumType);
+                var values = Q.Enum.getValues(enumType);
                 for (var x of values) {
-                    var name = ss.Enum.toString(enumType, x);
+                    var name = Q.Enum.toString(enumType, x);
                     this.addRadio(x.toString(), Q.coalesce(Q.tryGetText(
                         'Enums.' + enumKey + '.' + name), name));
                 }
@@ -1901,7 +1901,7 @@
         }
 
         get_value(): string {
-            return ss.safeCast(this.element.select2('val'), String);
+            return Q.safeCast(this.element.select2('val'), String);
         }
 
         get value(): string {
