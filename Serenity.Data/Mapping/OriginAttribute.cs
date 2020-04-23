@@ -7,6 +7,11 @@ namespace Serenity.Data.Mapping
     /// </summary>
     public class OriginAttribute : Attribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OriginAttribute"/> class.
+        /// </summary>
+        /// <param name="join">The join.</param>
+        /// <param name="property">The property.</param>
         public OriginAttribute(string join, string property = null)
         {
             Check.NotNullOrEmpty(join, nameof(join));
@@ -14,7 +19,20 @@ namespace Serenity.Data.Mapping
             this.Property = property;
         }
 
+        /// <summary>
+        /// Gets the join.
+        /// </summary>
+        /// <value>
+        /// The join.
+        /// </value>
         public string Join { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the property.
+        /// </summary>
+        /// <value>
+        /// The property.
+        /// </value>
         public string Property { get; set; }
     }
 }

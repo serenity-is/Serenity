@@ -1,7 +1,6 @@
-﻿#if !COREFX
-using System;
-using System.IO;
+﻿using System;
 using System.Drawing;
+using System.IO;
 
 namespace Serenity.Web
 {
@@ -10,26 +9,6 @@ namespace Serenity.Web
     ///   </summary>
     public class ImageChecker
     {
-        /// <summary>The size of stream data being validated</summary>
-        private long dataSize;
-        /// <summary>The verified image width</summary>
-        private int width;
-        /// <summary>The verified image height</summary>
-        private int height;
-        /// <summary>The elapsed time to check whether image is valid or not</summary>
-        private double milliseconds;
-
-        /// <summary>Maximum data size limit</summary>
-        private int maxDataSize;
-        /// <summary>Maximum image width</summary>
-        private int maxWidth;
-        /// <summary>Maximum image height</summary>
-        private int maxHeight;
-        /// <summary>Minimum width</summary>
-        private int minWidth;
-        /// <summary>Minimum height</summary>
-        private int minHeight;
-
         /// <summary>
         ///   Checks if the given image if it is a valid or not. If so, controls its compliance to constraints</summary> 
         /// <param name="inputStream">
@@ -47,10 +26,10 @@ namespace Serenity.Web
             DateTime startTime = DateTime.Now;
 
             // initialize result variables
-            dataSize = 0;
-            width = 0;
-            height = 0;
-            milliseconds = -1;
+            DataSize = 0;
+            Width = 0;
+            Height = 0;
+            Milliseconds = -1;
             image = null;
             
             try
@@ -59,7 +38,7 @@ namespace Serenity.Web
                 inputStream.Seek(0, SeekOrigin.Begin);
 
                 // set file data size to input stream length
-                dataSize = inputStream.Length;
+                DataSize = inputStream.Length;
             }
             catch
             {
@@ -67,11 +46,11 @@ namespace Serenity.Web
             }
 
             // if data size equals 0 return StreamReadError
-            if (dataSize == 0)
+            if (DataSize == 0)
                 return ImageCheckResult.StreamReadError;
 
             // check file size
-            if (maxDataSize != 0 && dataSize > maxDataSize)
+            if (MaxDataSize != 0 && DataSize > MaxDataSize)
                 return ImageCheckResult.DataSizeTooHigh;
 
             // try to upload image
@@ -103,16 +82,16 @@ namespace Serenity.Web
                     return ImageCheckResult.UnsupportedFormat;
 
                 // read image size
-                width = image.Width;
-                height = image.Height;
+                Width = image.Width;
+                Height = image.Height;
 
-                var constraintResult = CheckSizeConstraints(width, height);
+                var constraintResult = CheckSizeConstraints(Width, Height);
 
                 if (constraintResult != ImageCheckResult.JPEGImage)
                     return constraintResult;
 
                 TimeSpan span = DateTime.Now.Subtract(startTime);
-                milliseconds = span.TotalMilliseconds;
+                Milliseconds = span.TotalMilliseconds;
                 
                 isImageOK = true;
 
@@ -189,71 +168,39 @@ namespace Serenity.Web
 
         /// <summary>
         ///   Gets data size of the validated image</summary>
-        public long DataSize
-        {
-            get { return dataSize; }
-        }
+        public long DataSize { get; private set; }
 
         /// <summary>
         ///   Gets width of the validated image</summary>
-        public int Width
-        {
-            get { return width; }
-        }
+        public int Width { get; private set; }
 
         /// <summary>
         ///   Gets height of the validate image</summary>
-        public int Height
-        {
-            get { return height; }
-        }
+        public int Height { get; private set; }
 
         /// <summary>
         ///   Gets the time passed during validating the image</summary>
-        public double Milliseconds
-        {
-            get { return milliseconds; }
-        }
+        public double Milliseconds { get; private set; }
 
         /// <summary>
         ///   Gets/sets maximum file size allowed</summary>
-        public int MaxDataSize
-        {
-            get { return maxDataSize; }
-            set { maxDataSize = value; }
-        }
+        public int MaxDataSize { get; set; }
 
         /// <summary>
         ///   Gets/sets maximum width allowed. 0 means any width.</summary>
-        public int MaxWidth
-        {
-            get { return maxWidth; }
-            set { maxWidth = value; }
-        }
+        public int MaxWidth { get; set; }
 
         /// <summary>
         ///   Gets/sets maximum height allowed. 0 means any height.</summary>
-        public int MaxHeight
-        {
-            get { return maxHeight; }
-            set { maxHeight = value; }
-        }
+        public int MaxHeight { get; set; }
 
         /// <summary>
         ///   Gets/sets minimum width allowed. 0 means any width.</summary>
-        public int MinWidth
-        {
-            get { return minWidth; }
-            set { minWidth = value; }
-        }
+        public int MinWidth { get; set; }
 
         /// <summary>
         ///   Gets/sets minimum height allowed. 0 means any height.</summary>
-        public int MinHeight
-        {
-            get { return minHeight; }
-            set { minHeight = value; }
-        }
+        public int MinHeight { get; set; }
 
         public string FormatErrorMessage(ImageCheckResult result)
         {
@@ -287,4 +234,3 @@ namespace Serenity.Web
         }
     }
 }
-#endif

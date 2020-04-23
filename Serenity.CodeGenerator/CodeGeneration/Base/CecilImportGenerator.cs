@@ -160,7 +160,8 @@ namespace Serenity.CodeGeneration
 
                         ScanAnnotationTypeAttributes(fromType);
 
-                        if (fromType.IsAbstract)
+                        if (fromType.IsAbstract ||
+                            CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
                             continue;
 
                         var baseClasses = CecilUtils.EnumerateBaseClasses(fromType).ToArray();
@@ -172,6 +173,7 @@ namespace Serenity.CodeGeneration
                             CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "ScriptIncludeAttribute", baseClasses) != null ||
                             CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "FormScriptAttribute", baseClasses) != null ||
                             CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "ColumnsScriptAttribute", baseClasses) != null ||
+                            CecilUtils.GetAttr(fromType, "Serenity.Extensibility", "NestedPermissionKeysAttribute", emptyTypes) != null ||
                             ((CecilUtils.Contains(baseClasses, "Microsoft.AspNetCore.Mvc", "Controller") ||
                               CecilUtils.Contains(baseClasses, "System.Web.Mvc", "Controller")) && // backwards compability
                              fromType.Namespace != null &&
@@ -536,13 +538,14 @@ namespace Serenity.CodeGeneration
             requestParam = null;
 
             if ((CecilUtils.FindAttr(method.CustomAttributes, "System.Web.Mvc", "NonActionAttribute") ??
-                 CecilUtils.FindAttr(method.CustomAttributes, "Microsoft.AspNetCore.Mvc", "NonActionAttribute")) != null)
+                 CecilUtils.FindAttr(method.CustomAttributes, "Microsoft.AspNetCore.Mvc", "NonActionAttribute") ??
+                 CecilUtils.FindAttr(method.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute")) != null)
                 return false;
 
             if (!CecilUtils.IsSubclassOf(method.DeclaringType, "System.Web.Mvc", "Controller") &&
                 !CecilUtils.IsSubclassOf(method.DeclaringType, "Microsoft.AspNetCore.Mvc", "Controller"))
                 return false;
-            
+
             if (method.IsSpecialName && (method.Name.StartsWith("set_") || method.Name.StartsWith("get_")))
                 return false;
 

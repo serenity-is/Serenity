@@ -2,6 +2,11 @@
 
 namespace Serenity.Data.Mapping
 {
+    /// <summary>
+    /// LEFT JOIN type
+    /// </summary>
+    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Serenity.Data.Mapping.ISqlJoin" />
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = true)]
     public class LeftJoinAttribute : Attribute, ISqlJoin
     {
@@ -28,11 +33,52 @@ namespace Serenity.Data.Mapping
             this.OnCriteria = onCriteria;
         }
 
+        /// <summary>
+        /// Gets the alias.
+        /// </summary>
+        /// <value>
+        /// The alias.
+        /// </value>
         public String Alias { get; private set; }
+
+        /// <summary>
+        /// Gets the table joined to.
+        /// </summary>
+        /// <value>
+        /// The table joined to.
+        /// </value>
         public String ToTable { get; private set; }
+
+        /// <summary>
+        /// Gets the ON criteria.
+        /// </summary>
+        /// <value>
+        /// The ON criteria.
+        /// </value>
         public String OnCriteria { get; private set; }
+
+        /// <summary>
+        /// Gets the property prefix.
+        /// </summary>
+        /// <value>
+        /// The property prefix.
+        /// </value>
         public String PropertyPrefix { get; set; }
+
+        /// <summary>
+        /// Gets or sets the title prefix.
+        /// </summary>
+        /// <value>
+        /// The title prefix.
+        /// </value>
         public String TitlePrefix { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of the row.
+        /// </summary>
+        /// <value>
+        /// The type of the row.
+        /// </value>
         public Type RowType { get; set; }
     }
 }

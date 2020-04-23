@@ -9,6 +9,11 @@ using DynamicParameters = Dapper.DynamicParameters;
 #endif
 namespace Serenity.Logging
 {
+    /// <summary>
+    /// A simple logger that logs to an SQL table.
+    /// </summary>
+    /// <seealso cref="Serenity.Abstractions.ILogger" />
+    /// <seealso cref="System.IDisposable" />
     public class SqlLogger : ILogger, IDisposable
     {
         private object sync = new object();
@@ -16,6 +21,9 @@ namespace Serenity.Logging
         private Queue<DynamicParameters> queue = new Queue<DynamicParameters>();
         private AutoResetEvent signal = new AutoResetEvent(false);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlLogger"/> class.
+        /// </summary>
         public SqlLogger()
         {
             var settings = Config.TryGet<LogSettings>() ?? new LogSettings();
@@ -24,11 +32,17 @@ namespace Serenity.Logging
             new Thread(Worker).Start();
         }
 
+        /// <summary>
+        /// Finalizes an instance of the <see cref="SqlLogger"/> class.
+        /// </summary>
         ~SqlLogger()
         {
             Dispose(false);
         }
 
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -45,6 +59,9 @@ namespace Serenity.Logging
                 GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Flushes this instance.
+        /// </summary>
         public void Flush()
         {
             while (true)
@@ -108,7 +125,20 @@ namespace Serenity.Logging
             }
         }
 
+        /// <summary>
+        /// Gets or sets the connection key.
+        /// </summary>
+        /// <value>
+        /// The connection key.
+        /// </value>
         public string ConnectionKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the insert command.
+        /// </summary>
+        /// <value>
+        /// The insert command.
+        /// </value>
         public string InsertCommand { get; set; }
 
         [SettingScope("Application"), SettingKey("Logging"), Ignore]
@@ -118,6 +148,13 @@ namespace Serenity.Logging
             public string InsertCommand { get; set; }
         }
 
+        /// <summary>
+        /// Writes the specified level log message.
+        /// </summary>
+        /// <param name="level">The level.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="exception">The exception.</param>
+        /// <param name="source">The source.</param>
         public void Write(LoggingLevel level, string message, Exception exception, Type source)
         {
             var connectionKey = ConnectionKey;

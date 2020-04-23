@@ -146,7 +146,7 @@ namespace Serenity.Services
 
             if (new SqlUpdate(info.logRowInstance.Table)
                     .Set(capture.ValidUntilField, now)
-                    .WhereEqual(info.mappedIdField, info.mappedIdField.AsObject(logRow))
+                    .WhereEqual(info.mappedIdField, info.mappedIdField.AsSqlValue(logRow))
                     .WhereEqual(capture.ValidUntilField, CaptureLogConsts.UntilMax)
                     .Execute(uow.Connection, ExpectedRows.Ignore) > 1)
                 throw new InvalidOperationException(String.Format("Capture log has more than one active instance for ID {0}?!", info.mappedIdField.AsObject(logRow)));

@@ -680,13 +680,14 @@ namespace Serenity.CodeGeneration {
 
     class MyCompilerHost implements ts.CompilerHost {
         files: { [fileName: string]: string } = {};
+        filesLower: { [fileName: string]: string } = {};
         options: ts.CompilerOptions  = {
             target: ts.ScriptTarget.ES5,
             moduleKind: ts.ModuleKind.None
         };
 
         fileExists = (fileName: string) => {
-            return !!(this.files[fileName]);
+            return !!(this.files[fileName] || this.filesLower[(fileName || "").toLowerCase()]);
         }
 
         getCurrentDirectory = () => "/";
@@ -696,12 +697,17 @@ namespace Serenity.CodeGeneration {
         useCaseSensitiveFileNames = () => false;
         getNewLine = () => "\r\n";
         readFile = (fileName: string) => {
-            return this.files[fileName];
+            var content = this.files[fileName];
+            if (content === undefined)
+                return this.filesLower[(fileName || "").toLowerCase()];
+            return content;
         }
         writeFile(fileName: string, data: string, writeByteOrderMark: boolean, onError?: (message: string) => void) {
         };
         getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void) {
-            const sourceText = this.files[fileName];
+            var sourceText = this.files[fileName];
+            if (sourceText === undefined)
+                sourceText = this.filesLower[(fileName || "").toLowerCase()];
             var src = sourceText !== undefined ? ts.createSourceFile(fileName, sourceText, languageVersion, true) : undefined;
             if (src != null && fileName.substr(-5).toLowerCase() == '.d.ts')
                 src.isDeclarationFile = true;
@@ -728,6 +734,7 @@ namespace Serenity.CodeGeneration {
 
     export function addSourceFile(fileName: string, body: string) {
         host.files[fileName] = body;
+        host.filesLower[(fileName || "").toLowerCase()] = body;
     }
     
     export function parseTypes(): any[] {

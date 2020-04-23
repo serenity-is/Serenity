@@ -1,16 +1,13 @@
 ﻿using System;
 using System.IO;
 using Serenity.IO;
-#if !COREFX
 using System.Drawing;
 using System.Drawing.Imaging;
-#endif
 
 namespace Serenity.Web
 {
     public class UploadProcessor
     {
-#if !COREFX
         public UploadProcessor()
         {
             ThumbBackColor = Color.Empty;
@@ -25,7 +22,6 @@ namespace Serenity.Web
         public string ThumbUrl { get; private set; }
         public int ImageWidth { get; private set; }
         public int ImageHeight { get; private set; }
-#endif
         public ImageCheckResult CheckResult { get; private set; }
         public string ErrorMessage { get; private set; }
         public long FileSize { get; private set; }
@@ -76,10 +72,8 @@ namespace Serenity.Web
 
             CheckResult = ImageCheckResult.InvalidImage;
             ErrorMessage = null;
-#if !COREFX
             ImageWidth = 0;
             ImageHeight = 0;
-#endif
             IsImage = false;
 
             var success = false;
@@ -95,19 +89,16 @@ namespace Serenity.Web
                 {
                     if (IsImageExtension(extension))
                     {
-#if COREFX
                         IsImage = true;
                         success = true;
                         FilePath = baseFileName + extension;
                         fileContent.Seek(0, SeekOrigin.Begin);
                         using (FileStream fs = new FileStream(FilePath, FileMode.Create))
                         {
-                            FileSize = fs.Length;
                             fileContent.CopyTo(fs);
+                            FileSize = fs.Length;
                         }
-#else
                         success = ProcessImageStream(fileContent, extension);
-#endif
                     }
                     else
                     {
@@ -115,8 +106,8 @@ namespace Serenity.Web
                         fileContent.Seek(0, SeekOrigin.Begin);
                         using (FileStream fs = new FileStream(FilePath, FileMode.Create))
                         {
-                            FileSize = fs.Length;
                             fileContent.CopyTo(fs);
+                            FileSize = fs.Length;
                         }
                         success = true;
                     }
@@ -133,10 +124,9 @@ namespace Serenity.Web
             {
                 if (!success)
                 {
-#if !COREFX
                     if (!ThumbFile.IsNullOrEmpty())
                         TemporaryFileHelper.TryDelete(ThumbFile);
-#endif
+
                     if (!FilePath.IsNullOrEmpty())
                         TemporaryFileHelper.TryDelete(FilePath);
                 }
@@ -147,7 +137,6 @@ namespace Serenity.Web
             return success;
         }
 
-#if !COREFX
         private bool ProcessImageStream(Stream fileContent, string extension)
         {
             Image image = null;
@@ -225,6 +214,5 @@ namespace Serenity.Web
                 }
             }
         }
-#endif
     }
 }

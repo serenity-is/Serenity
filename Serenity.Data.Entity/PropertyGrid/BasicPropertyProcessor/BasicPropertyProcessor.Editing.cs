@@ -1,7 +1,9 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data;
+using Serenity.Data.Mapping;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Serenity.PropertyGrid
 {
@@ -19,7 +21,7 @@ namespace Serenity.PropertyGrid
             {
                 item.EditorType = editorTypeAttr.EditorType;
                 editorTypeAttr.SetParams(item.EditorParams);
-                if (item.EditorType == "Lookup" && 
+                if (item.EditorType == "Lookup" &&
                     !item.EditorParams.ContainsKey("lookupKey"))
                 {
                     var distinct = source.GetAttribute<DistinctValuesEditorAttribute>();
@@ -65,6 +67,7 @@ namespace Serenity.PropertyGrid
                         }
                     }
                 }
+
             }
 
             if (source.EnumType != null)
@@ -81,52 +84,52 @@ namespace Serenity.PropertyGrid
                     ((DateTimeField)source.BasedOnField).DateTimeKind != DateTimeKind.Unspecified)
                     item.EditorParams["useUtc"] = true;
 
-				if (item.EditorType == "Decimal" &&
-					(source.BasedOnField is DoubleField ||
-					 source.BasedOnField is SingleField ||
-					 source.BasedOnField is DecimalField) &&
-					source.BasedOnField.Size > 0 &&
-					source.BasedOnField.Scale < source.BasedOnField.Size &&
-					!item.EditorParams.ContainsKey("minValue") &&
-					!item.EditorParams.ContainsKey("maxValue"))
-				{
-					string minVal = new String('0', source.BasedOnField.Size - source.BasedOnField.Scale);
-					if (source.BasedOnField.Scale > 0)
-						minVal += "." + new String('0', source.BasedOnField.Scale);
-					string maxVal = minVal.Replace('0', '9');
+                if (item.EditorType == "Decimal" &&
+                    (source.BasedOnField is DoubleField ||
+                     source.BasedOnField is SingleField ||
+                     source.BasedOnField is DecimalField) &&
+                    source.BasedOnField.Size > 0 &&
+                    source.BasedOnField.Scale < source.BasedOnField.Size &&
+                    !item.EditorParams.ContainsKey("minValue") &&
+                    !item.EditorParams.ContainsKey("maxValue"))
+                {
+                    string minVal = new String('0', source.BasedOnField.Size - source.BasedOnField.Scale);
+                    if (source.BasedOnField.Scale > 0)
+                        minVal += "." + new String('0', source.BasedOnField.Scale);
+                    string maxVal = minVal.Replace('0', '9');
 
-					if ((item.EditorParams.ContainsKey("allowNegatives") &&
-						 Convert.ToBoolean(item.EditorParams["allowNegatives"] ?? false) == true) ||
-						(!item.EditorParams.ContainsKey("allowNegatives") &&
-						DecimalEditorAttribute.AllowNegativesByDefault))
-						minVal = "-" + maxVal;
+                    if ((item.EditorParams.ContainsKey("allowNegatives") &&
+                         Convert.ToBoolean(item.EditorParams["allowNegatives"] ?? false) == true) ||
+                        (!item.EditorParams.ContainsKey("allowNegatives") &&
+                        DecimalEditorAttribute.AllowNegativesByDefault))
+                        minVal = "-" + maxVal;
 
-					item.EditorParams["minValue"] = minVal;
-					item.EditorParams["maxValue"] = maxVal;
-				}
-				else if (item.EditorType == "Integer" &&
-					(source.BasedOnField is Int32Field ||
-					 source.BasedOnField is Int16Field ||
-					 source.BasedOnField is Int64Field) &&
-					!item.EditorParams.ContainsKey("minValue") &&
-					!item.EditorParams.ContainsKey("maxValue"))
-				{
-					item.EditorParams["maxValue"] = source.BasedOnField is Int16Field ? Int16.MaxValue
-						: source.BasedOnField is Int32Field ? Int32.MaxValue :
-						source.BasedOnField is Int64Field ? Int64.MaxValue : (object)null;
+                    item.EditorParams["minValue"] = minVal;
+                    item.EditorParams["maxValue"] = maxVal;
+                }
+                else if (item.EditorType == "Integer" &&
+                    (source.BasedOnField is Int32Field ||
+                     source.BasedOnField is Int16Field ||
+                     source.BasedOnField is Int64Field) &&
+                    !item.EditorParams.ContainsKey("minValue") &&
+                    !item.EditorParams.ContainsKey("maxValue"))
+                {
+                    item.EditorParams["maxValue"] = source.BasedOnField is Int16Field ? Int16.MaxValue
+                        : source.BasedOnField is Int32Field ? Int32.MaxValue :
+                        source.BasedOnField is Int64Field ? Int64.MaxValue : (object)null;
 
-					if ((item.EditorParams.ContainsKey("allowNegatives") &&
-						 Convert.ToBoolean(item.EditorParams["allowNegatives"] ?? false) == true) ||
-						(!item.EditorParams.ContainsKey("allowNegatives") &&
-						DecimalEditorAttribute.AllowNegativesByDefault) &&
-						item.EditorParams["maxValue"] != null)
-						item.EditorParams["minValue"] = -Convert.ToInt64(item.EditorParams["maxValue"]) - 1;
-				}
-				else if (source.BasedOnField.Size > 0)
-				{
-					item.EditorParams["maxLength"] = source.BasedOnField.Size;
-					item.MaxLength = source.BasedOnField.Size;
-				}
+                    if ((item.EditorParams.ContainsKey("allowNegatives") &&
+                         Convert.ToBoolean(item.EditorParams["allowNegatives"] ?? false) == true) ||
+                        (!item.EditorParams.ContainsKey("allowNegatives") &&
+                        DecimalEditorAttribute.AllowNegativesByDefault) &&
+                        item.EditorParams["maxValue"] != null)
+                        item.EditorParams["minValue"] = -Convert.ToInt64(item.EditorParams["maxValue"]) - 1;
+                }
+                else if (source.BasedOnField.Size > 0)
+                {
+                    item.EditorParams["maxLength"] = source.BasedOnField.Size;
+                    item.MaxLength = source.BasedOnField.Size;
+                }
             }
 
             var maxLengthAttr = source.GetAttribute<MaxLengthAttribute>();
@@ -144,6 +147,56 @@ namespace Serenity.PropertyGrid
                     key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
 
                 item.EditorParams[key] = param.Value;
+            }
+
+            SetServiceLookupParams(editorTypeAttr, item.EditorParams);
+        }
+
+        private static void SetServiceLookupParams(EditorTypeAttribute editorTypeAttr, Dictionary<string, object> editorParams) 
+        {
+            if (!(editorTypeAttr is ServiceLookupEditorAttribute sle) || sle.ItemType == null)
+                return;
+
+            if (!editorParams.ContainsKey("service"))
+                editorParams["service"] = ServiceLookupEditorAttribute.AutoServiceFor(sle.ItemType);
+
+            if (sle.ItemType.IsSubclassOf(typeof(Row)) &&
+                !sle.ItemType.IsAbstract &&
+                (!editorParams.ContainsKey("idField") ||
+                    !editorParams.ContainsKey("textField") ||
+                    (!editorParams.ContainsKey("includeColumns") &&
+                    !editorParams.ContainsKey("columnSelection"))))
+            {
+                try
+                {
+                    var rowInstance = Activator.CreateInstance(sle.ItemType) as Row;
+                    if (rowInstance is IIdRow idRow &&
+                        !editorParams.ContainsKey("idField"))
+                    {
+                        var idField = ((Field)idRow.IdField);
+                        editorParams["idField"] = idField.PropertyName ?? idField.Name;
+                    }
+
+                    if (!editorParams.ContainsKey("textField"))
+                    {
+                        var nameField = RowExtensions.GetNameField(rowInstance, false);
+                        if (!ReferenceEquals(nameField, null))
+                            editorParams["textField"] = nameField.PropertyName ??
+                                nameField.Name;
+                    }
+
+                    if (!editorParams.ContainsKey("includeColumns") &&
+                        !editorParams.ContainsKey("columnSelection"))
+                    {
+                        editorParams["includeColumns"] = rowInstance.GetFields()
+                            .Where(x => x.GetAttribute<LookupIncludeAttribute>() != null)
+                            .Select(x => x.PropertyName ?? x.Name)
+                            .ToArray();
+                    }
+                }
+                catch 
+                {
+                }
             }
         }
 

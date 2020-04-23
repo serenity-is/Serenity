@@ -26,22 +26,40 @@ namespace Serenity {
     export interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
     }
 
+    export interface Select2SearchPromise {
+        abort?(): void;
+        catch?(callback: () => void): void;
+        fail?(callback: () => void): void;
+    }
+
+    export interface Select2SearchQuery {
+        searchTerm?: string;
+        idList?: string[];
+        skip?: number;
+        take?: number;
+        checkMore?: boolean;
+    }
+
+    export interface Select2SearchResult<TItem> {
+        items: TItem[];
+        more: boolean;
+    }
+
     @Serenity.Decorators.registerClass('Serenity.Select2Editor',
         [Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly])
     @Serenity.Decorators.element("<input type=\"hidden\"/>")
     export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly {
 
-        public items: Select2Item[];
-        protected itemById: Q.Dictionary<Select2Item>
-        protected pageSize: number = 100;
+        private _items: Select2Item[];
+        private _itemById: Q.Dictionary<Select2Item>;
         protected lastCreateTerm: string;
 
         constructor(hidden: JQuery, opt?: any) {
             super(hidden, opt);
 
-            this.items = [];
-            this.itemById = {};
+            this._items = [];
+            this._itemById = {};
             var emptyItemText = this.emptyItemText();
             if (emptyItemText != null) {
                 hidden.attr('placeholder', emptyItemText);
@@ -73,9 +91,68 @@ namespace Serenity {
 			super.destroy();
         }
 
+        protected hasAsyncSource(): boolean {
+            return false;
+        }
+
+        protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise {
+            results({
+                items: [],
+                more: false
+            });
+            return null;
+        }
+
+        protected getTypeDelay() {
+            return Q.coalesce(this.options['typeDelay'], 500);
+        }
+
         protected emptyItemText() {
             return Q.coalesce(this.element.attr('placeholder'),
                 Q.text('Controls.SelectEditor.EmptyItemText'));
+        }
+
+        protected getPageSize(): number {
+            return this.options['pageSize'] ?? 100;
+        }
+
+        protected getIdField() {
+            return this.options['idField'];
+        }
+
+        protected itemId(item: TItem): string {
+            var value = item[this.getIdField()];
+            if (value == null)
+                return '';
+            return value.toString();
+        }
+
+        protected getTextField() {
+            return this.options['textField'] ?? this.getIdField();
+        }
+
+        protected itemText(item: TItem): string {
+            var value = item[this.getTextField()];
+            if (value == null)
+                return '';
+            return value.toString();
+        }
+
+        protected itemDisabled(item: TItem): boolean {
+            return false;
+        }
+
+        protected mapItem(item: TItem): Select2Item {
+            return {
+                id: this.itemId(item),
+                text: this.itemText(item),
+                disabled: this.itemDisabled(item),
+                source: item
+            };
+        }
+
+        protected mapItems(items: TItem[]): Select2Item[] {
+            return items.map(this.mapItem.bind(this));
         }
 
         protected allowClear() {
@@ -90,40 +167,124 @@ namespace Serenity {
         protected getSelect2Options(): Select2Options {
             var emptyItemText = this.emptyItemText();
             var opt: Select2Options = {
-                data: this.items,
                 multiple: this.isMultiple(),
                 placeHolder: (!Q.isEmptyOrNull(emptyItemText) ? emptyItemText : null),
                 allowClear: this.allowClear(),
-                createSearchChoicePosition: 'bottom',
-                query: (query) => {
-                    var term = (Q.isEmptyOrNull(query.term) ? '' : Select2.util.stripDiacritics(
-                        Q.coalesce(query.term, '')).toUpperCase());
+                createSearchChoicePosition: 'bottom'
+            }
 
-                    var results = this.items.filter(function (item) {
-                        return term == null || Q.startsWith(Select2.util.stripDiacritics(
-                            Q.coalesce(item.text, '')).toUpperCase(), term);
+            if (this.hasAsyncSource()) {
+                var typeTimeout = 0;
+                var queryPromise: Select2SearchPromise = null;
+                opt.query = query => {
+                    var pageSize = this.getPageSize();
+                    var searchQuery: Select2SearchQuery = {
+                        searchTerm: Q.trimToNull(query.term),
+                        skip: (query.page - 1) * pageSize,
+                        take: pageSize,
+                        checkMore: true
+                    }
+
+                    queryPromise && queryPromise.abort && queryPromise.abort();
+                    queryPromise = null;
+
+                    if (typeTimeout != null)
+                        clearTimeout(typeTimeout);
+
+                    var select2 = $(this.element).data('select2');
+                    select2 && select2.search && select2.search.removeClass('select2-active');
+
+                    typeTimeout = setTimeout(() => {
+                        queryPromise && queryPromise.abort && queryPromise.abort();
+                        select2 && select2.search.addClass('select2-active');
+                        queryPromise = this.asyncSearch(searchQuery, result => {
+                            queryPromise = null;
+                            query.callback({
+                                results: this.mapItems(result.items),
+                                more: result.more
+                            });
+                        });
+                        (queryPromise && (queryPromise.catch || queryPromise.fail)).call(queryPromise, () => {
+                            queryPromise = null;
+                            select2 && select2.search && select2.search.removeClass('select2-active');
+                        });
+                    }, !query.term ? 0 : this.getTypeDelay());
+                }
+
+                var initPromise: Select2SearchPromise = null;
+                opt.initSelection = (element, callback) => {
+                    var val = element.val();
+                    if (val == null || val == '') {
+                        callback(null);
+                        return;
+                    }
+
+                    var isMultiple = this.isMultiple();
+                    var idList = isMultiple ? val.split(',') : [val]; 
+                    var searchQuery = {
+                        idList: idList
+                    }
+
+                    initPromise && initPromise.abort && initPromise.abort();
+                    initPromise = this.asyncSearch(searchQuery, result => {
+                        initPromise = null;
+                        if (isMultiple) {
+                            var items = (result.items || []).map(x => this.mapItem(x));
+                            this._itemById = this._itemById || {};
+                            for (var item of items)
+                                this._itemById[item.id] = item;
+                            if (this.isAutoComplete &&
+                                items.length != idList.length) {
+                                for (var v of idList) {
+                                    if (!Q.any(items, z => z.id == v)) {
+                                        items.push({
+                                            id: v,
+                                            text: v
+                                        });
+                                    }
+                                }
+                            }
+                            callback(items);
+                        }
+                        else if (!result.items || !result.items.length) {
+                            if (this.isAutoComplete) {
+                                callback({
+                                    id: val,
+                                    text: val
+                                });
+                            }
+                            else
+                                callback(null);
+                        }
+                        else {
+                            var item = this.mapItem(result.items[0]);
+                            this._itemById = this._itemById || {};
+                            this._itemById[item.id] = item;
+                            callback(item);
+                        }
                     });
-
-                    results.push(...this.items.filter(item1 =>
-                        term != null && !Q.startsWith(Select2.util.stripDiacritics(
-                            Q.coalesce(item1.text, '')).toUpperCase(), term) &&
-                        Select2.util.stripDiacritics(Q.coalesce(item1.text, ''))
-                            .toUpperCase().indexOf(term) >= 0));
-
+                    (initPromise && (initPromise.catch || initPromise.fail)).call(initPromise, () => {
+                        initPromise = null;
+                    });
+                }
+            }
+            else {
+                opt.data = this._items;
+                opt.query = (query) => {
+                    var items = Select2Editor.filterByText(this._items, x => x.text, query.term);
+                    var pageSize = this.getPageSize();
                     query.callback({
-                        results: results.slice((query.page - 1) * this.pageSize, query.page * this.pageSize),
-                        more: results.length >= query.page * this.pageSize
+                        results: items.slice((query.page - 1) * pageSize, query.page * pageSize),
+                        more: items.length >= query.page * pageSize
                     });
-                },
-                initSelection: (element, callback) => {
+                }
+                opt.initSelection = (element, callback) => {
                     var val = element.val();
                     var isAutoComplete = this.isAutoComplete();
                     if (this.isMultiple()) {
                         var list = [];
-                        var $t1 = val.split(',');
-                        for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-                            var z = $t1[$t2];
-                            var item2 = this.itemById[z];
+                        for (var z of val.split(',')) {
+                            var item2 = this._itemById[z];
                             if (item2 == null && isAutoComplete) {
                                 item2 = { id: z, text: z };
                                 this.addItem(item2);
@@ -135,7 +296,7 @@ namespace Serenity {
                         callback(list);
                         return;
                     }
-                    var it = this.itemById[val];
+                    var it = this._itemById[val];
                     if (it == null && isAutoComplete) {
                         it = { id: val, text: val };
                         this.addItem(it);
@@ -157,14 +318,51 @@ namespace Serenity {
             return !!(this.options as Select2EditorOptions).delimited;
         }
 
+        public get items(): Select2Item[] {
+            if (this.hasAsyncSource())
+                throw new Error("Can't read items property of an async select editor!");
+
+            return this._items || [];
+        }
+
+        public set items(value: Select2Item[]) {
+            if (this.hasAsyncSource())
+                throw new Error("Can't set items of an async select editor!");
+
+            this._items = value || [];
+            this._itemById = {};
+            for (var item of this._items)
+                this._itemById[item.id] = item;
+        }
+
+        protected get itemById(): Q.Dictionary<Select2Item> {
+            if (this.hasAsyncSource())
+                throw new Error("Can't read items property of an async select editor!");
+
+            return this._itemById;
+        }
+
+        protected set itemById(value: Q.Dictionary<Select2Item>) {
+            if (this.hasAsyncSource())
+                throw new Error("Can't set itemById of an async select editor!");
+
+            this._itemById = value || {};
+        }
+
         public clearItems() {
-            (ss as any).clear(this.items);
-            this.itemById = {};
+            if (this.hasAsyncSource())
+                throw new Error("Can't clear items of an async select editor!");
+
+            (ss as any).clear(this._items);
+            this._itemById = {};
         }
 
         public addItem(item: Select2Item) {
-            this.items.push(item);
-            this.itemById[item.id] = item;
+            if (this.hasAsyncSource())
+                throw new Error("Can't add item to an async select editor!");
+
+            this._items.push(item);
+            this._itemById[item.id] = item;
         }
 
         public addOption(key: string, text: string, source?: any, disabled?: boolean) {
@@ -246,13 +444,15 @@ namespace Serenity {
                     return null;
                 }
 
-                if (Q.any(this.get_items(), (x: Select2Item) => {
+                var isAsyncSource = false;
+
+                if (Q.any(this._items || [], (x: Select2Item) => {
                         var text = getName ? getName(x.source) : x.text;
                         return Select2.util.stripDiacritics(Q.coalesce(text, '')).toLowerCase() == s;
                 }))
                     return null;
 
-                if (!Q.any(this.get_items(), x1 => {
+                if (!Q.any(this._items || [], x1 => {
                     return Q.coalesce(Select2.util.stripDiacritics(x1.text), '').toLowerCase().indexOf(s) !== -1;
                 })) {
                     if (this.isAutoComplete()) {
@@ -313,6 +513,28 @@ namespace Serenity {
             return this.itemById;
         }
 
+        public static filterByText<TItem>(items: TItem[], getText: (item: TItem) => string, term: string): TItem[] {
+            if (term == null || term.length == 0)
+                return items;
+
+            term = Select2.util.stripDiacritics(term).toUpperCase();
+
+            var contains: TItem[] = [];
+            function filter(item: TItem): boolean {
+                var text = getText(item);
+                if (text == null || !text.length)
+                    return false;
+                text = Select2.util.stripDiacritics(text).toUpperCase();
+                if (Q.startsWith(text, term))
+                    return true;
+                if (text.indexOf(term) >= 0)
+                    contains.push(item);
+                return false;
+            }
+
+            return items.filter(filter).concat(contains);
+        }
+
         get_value() {
             var val;
             if (this.element.data('select2')) {
@@ -343,8 +565,11 @@ namespace Serenity {
                     });
                 }
 
-                this.element.select2('val', val)
-                    .triggerHandler('change', [true]);
+                var el = this.element;
+                el.select2('val', val);
+                el.data('select2-change-triggered', true);
+                el.triggerHandler('change', [true])
+                el.data('select2-change-triggered', false);
 
                 this.updateInplaceReadOnly();
             }
@@ -356,12 +581,27 @@ namespace Serenity {
 
         get selectedItem(): TItem {
             let selectedValue = this.get_value();
-            if (selectedValue && this.itemById) {
-                let item = this.itemById[selectedValue];
+            if (selectedValue && this._itemById) {
+                let item = this._itemById[selectedValue];
                 if (item)
                     return item.source;
             }
             return null;
+        }
+
+        get selectedItems(): TItem[] {
+            let selectedValues = this.values;
+            var result = [];
+            for (var value of selectedValues) {
+                if (value && this._itemById) {
+                    let item = this._itemById[value];
+                    if (item && item.source)
+                        result.push(item.source);
+                    else
+                        result.push(null);
+                }
+            }
+            return result;
         }
 
         protected get_values(): string[] {

@@ -235,7 +235,7 @@
                 }
             }
 
-            // if an error occured, display it, otherwise set current filters
+            // if an error occurred, display it, otherwise set current filters
             if (errorText != null) {
                 $('<span/>').addClass('error')
                     .attr('title', errorText).appendTo(row.children('div.v'));

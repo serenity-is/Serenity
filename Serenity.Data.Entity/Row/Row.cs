@@ -26,7 +26,7 @@ namespace Serenity.Data
             if (fields == null)
                 throw new ArgumentNullException("fields");
 
-            this.fields = fields.Init();
+            this.fields = fields.InitInstance(this);
 
             TrackAssignments = true;
         }

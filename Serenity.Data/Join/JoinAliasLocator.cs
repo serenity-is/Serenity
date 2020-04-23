@@ -4,8 +4,17 @@ using System.Text;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Locates alias references in an SQL expression
+    /// </summary>
     public class JoinAliasLocator
     {
+        /// <summary>
+        /// Locates the aliases in specified expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">expression is null</exception>
         public static HashSet<string> Locate(string expression)
         {
             if (expression == null)
@@ -21,6 +30,13 @@ namespace Serenity.Data
             return aliases;
         }
 
+        /// <summary>
+        /// Locates the aliases in a SQL expression, returning first alias in an out parameter.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="singleAlias">The single alias.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">expression is null</exception>
         public static HashSet<string> LocateOptimized(string expression, out string singleAlias)
         {
             if (expression == null)
@@ -45,6 +61,12 @@ namespace Serenity.Data
             return aliases;
         }
 
+        /// <summary>
+        /// Enumerates the aliases in an SQL expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="alias">The alias handler action.</param>
+        /// <returns></returns>
         public static bool EnumerateAliases(string expression, Action<string> alias)
         {
             bool inQuote = false;
@@ -91,6 +113,12 @@ namespace Serenity.Data
             return true;
         }
 
+        /// <summary>
+        /// Replaces the aliases in an SQL expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="replace">The replace function.</param>
+        /// <returns></returns>
         public static string ReplaceAliases(string expression, Func<string, string> replace)
         {
             bool inQuote = false;

@@ -10,10 +10,10 @@
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="CouchbaseNetClient" Version="2.7.6" />
+    <PackageReference Include="CouchbaseNetClient" Version="2.7.15" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <PackageReference Include="CouchbaseNetClient" Version="2.5.12" />

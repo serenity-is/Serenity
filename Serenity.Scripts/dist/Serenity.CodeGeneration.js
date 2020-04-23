@@ -519,12 +519,13 @@
             function MyCompilerHost() {
                 var _this = this;
                 this.files = {};
+                this.filesLower = {};
                 this.options = {
                     target: ts.ScriptTarget.ES5,
                     moduleKind: ts.ModuleKind.None
                 };
                 this.fileExists = function (fileName) {
-                    return !!(_this.files[fileName]);
+                    return !!(_this.files[fileName] || _this.filesLower[(fileName || "").toLowerCase()]);
                 };
                 this.getCurrentDirectory = function () { return "/"; };
                 this.getDirectories = function (path) { return []; };
@@ -533,7 +534,10 @@
                 this.useCaseSensitiveFileNames = function () { return false; };
                 this.getNewLine = function () { return "\r\n"; };
                 this.readFile = function (fileName) {
-                    return _this.files[fileName];
+                    var content = _this.files[fileName];
+                    if (content === undefined)
+                        return _this.filesLower[(fileName || "").toLowerCase()];
+                    return content;
                 };
             }
             MyCompilerHost.prototype.writeFile = function (fileName, data, writeByteOrderMark, onError) {
@@ -541,6 +545,8 @@
             ;
             MyCompilerHost.prototype.getSourceFile = function (fileName, languageVersion, onError) {
                 var sourceText = this.files[fileName];
+                if (sourceText === undefined)
+                    sourceText = this.filesLower[(fileName || "").toLowerCase()];
                 var src = sourceText !== undefined ? ts.createSourceFile(fileName, sourceText, languageVersion, true) : undefined;
                 if (src != null && fileName.substr(-5).toLowerCase() == '.d.ts')
                     src.isDeclarationFile = true;
@@ -562,6 +568,7 @@
         var host = new MyCompilerHost();
         function addSourceFile(fileName, body) {
             host.files[fileName] = body;
+            host.filesLower[(fileName || "").toLowerCase()] = body;
         }
         CodeGeneration.addSourceFile = addSourceFile;
         function parseTypes() {

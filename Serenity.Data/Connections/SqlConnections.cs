@@ -207,11 +207,17 @@ namespace Serenity.Data
             return null;
         }
 
-        public static void SetCommandTimeout(this IDbConnection connection, int? value)
+        /// <summary>Sets the default command timeout for given connection. 
+        /// Only works with WrappedConnection instances, which are usually
+        /// created by SqlConnections.NewXyz methods.</summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="timeout">The timeout value.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Connection is not a WrappedConnection.</exception>
+        public static void SetCommandTimeout(this IDbConnection connection, int? timeout)
         {
             var wrapped = connection as WrappedConnection;
             if (wrapped != null)
-                wrapped.CommandTimeout = value;
+                wrapped.CommandTimeout = timeout;
             else
                 throw new ArgumentOutOfRangeException(nameof(connection));
         }

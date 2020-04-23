@@ -2,9 +2,18 @@
 
 namespace Serenity.Data.Mapping
 {
+    /// <summary>
+    /// Marks the JOIN as an updatable extension.
+    /// </summary>
+    /// <seealso cref="System.Attribute" />
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class UpdatableExtensionAttribute : Attribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdatableExtensionAttribute"/> class.
+        /// </summary>
+        /// <param name="alias">The alias.</param>
+        /// <param name="rowType">Type of the row.</param>
         public UpdatableExtensionAttribute(string alias, Type rowType)
         {
             Check.NotNullOrEmpty(alias, "ExtensionRelation.alias");
@@ -14,6 +23,12 @@ namespace Serenity.Data.Mapping
             this.RowType = rowType;
         }
 
+        /// <summary>
+        /// Gets the type of the row.
+        /// </summary>
+        /// <value>
+        /// The type of the row.
+        /// </value>
         public Type RowType { get; private set; }
 
         /// <summary>

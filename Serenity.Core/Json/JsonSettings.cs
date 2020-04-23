@@ -10,36 +10,56 @@ namespace Serenity
     public static class JsonSettings
     {
         /// <summary>
-        /// The tolerant settings, ignores missing members, reference loops on deserialization
+        /// The tolerant settings, ignores missing members, reference loops on deserialization, ignores nulls
         /// </summary>
         public static JsonSerializerSettings Tolerant;
-        
+
         /// <summary>
-        /// The stricter settings, raises error on missing members / reference loops.
+        /// The tolerant settings, ignores missing members, reference loops on deserialization, includes nulls
+        /// </summary>
+        public static JsonSerializerSettings TolerantIncludeNulls;
+
+        /// <summary>
+        /// The stricter settings, raises error on missing members / reference loops, ignores nulls.
         /// </summary>
         public static JsonSerializerSettings Strict;
 
+        /// <summary>
+        /// The stricter settings, raises error on missing members / reference loops, includes nulls.
+        /// </summary>
+        public static JsonSerializerSettings StrictIncludeNulls;
+
         static JsonSettings()
         {
-            Tolerant = new JsonSerializerSettings();
-            Tolerant.DateParseHandling = DateParseHandling.DateTimeOffset;
+            Tolerant = CreateDefaults();
             Tolerant.NullValueHandling = NullValueHandling.Ignore;
-            Tolerant.MissingMemberHandling = MissingMemberHandling.Ignore;
-            Tolerant.TypeNameHandling = TypeNameHandling.None;
             Tolerant.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            Tolerant.PreserveReferencesHandling = PreserveReferencesHandling.None;
-            Tolerant.Converters.Add(new IsoDateTimeConverter());
-            Tolerant.Converters.Add(new JsonSafeInt64Converter());
 
-            Strict = new JsonSerializerSettings();
-            Strict.DateParseHandling = DateParseHandling.DateTimeOffset;
+            TolerantIncludeNulls = CreateDefaults();
+            TolerantIncludeNulls.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
+            Strict = CreateDefaults();
             Strict.NullValueHandling = NullValueHandling.Ignore;
             Strict.MissingMemberHandling = MissingMemberHandling.Error;
-            Strict.TypeNameHandling = TypeNameHandling.None;
-            Strict.ReferenceLoopHandling = ReferenceLoopHandling.Error;
-            Strict.PreserveReferencesHandling = PreserveReferencesHandling.None;
-            Strict.Converters.Add(new IsoDateTimeConverter());
-            Strict.Converters.Add(new JsonSafeInt64Converter());
+
+            StrictIncludeNulls = CreateDefaults();
+            StrictIncludeNulls.MissingMemberHandling = MissingMemberHandling.Error;
+        }
+
+        /// <summary>
+        /// Creates a JsonSerializerSettings object with common values and converters.
+        /// </summary>
+        /// <returns></returns>
+        public static JsonSerializerSettings CreateDefaults()
+        {
+            return new JsonSerializerSettings
+            {
+                DateParseHandling = DateParseHandling.DateTimeOffset,
+                Converters = {
+                    new IsoDateTimeConverter(),
+                    new JsonSafeInt64Converter()
+                }
+            };
         }
     }
 }

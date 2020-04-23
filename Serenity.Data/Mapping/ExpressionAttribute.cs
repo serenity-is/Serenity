@@ -18,7 +18,20 @@ namespace Serenity.Data.Mapping
             this.Value = value;
         }
 
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
+        /// <value>
+        /// The value.
+        /// </value>
         public string Value { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the dialect.
+        /// </summary>
+        /// <value>
+        /// The dialect.
+        /// </value>
         public string Dialect { get; set; }
     }
 }

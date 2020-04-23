@@ -197,7 +197,7 @@
             GetFromReader(query, reader, ext.IntoRows);
         }
 
-        const string FieldReadValueError = "An error occured while loading value of the field '{0}' of '{1}' from data reader. " +
+        const string FieldReadValueError = "An error occurred while loading value of the field '{0}' of '{1}' from data reader. " +
             "Please make sure the field type matches the actual data type in database.\r\n\r\nThe error message is:\r\n{2}";
 
         public static void GetFromReader(this SqlQuery query, IDataReader reader, IList<object> into)

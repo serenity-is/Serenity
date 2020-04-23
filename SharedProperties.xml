@@ -1,13 +1,13 @@
 ﻿<Project>
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <VersionPrefix>3.9.9</VersionPrefix>
+    <VersionPrefix>3.12.6</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Authors>Volkan Ceylan</Authors>
     <Copyright>Copyright (c) Volkan Ceylan</Copyright>
-    <PackageIconUrl>https://raw.github.com/volkanceylan/Serenity/master/Tools/Images/serenity-logo-128.png</PackageIconUrl>
+    <PackageIcon>serenity-logo-128.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://github.com/volkanceylan/Serenity</PackageProjectUrl>
     <PackageTags>Serenity</PackageTags>
@@ -20,5 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)SharedAssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)tools\Images\serenity-logo-128.png" Pack="true" PackagePath="" />
   </ItemGroup>
 </Project>

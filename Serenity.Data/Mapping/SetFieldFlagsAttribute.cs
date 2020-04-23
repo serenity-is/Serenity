@@ -18,7 +18,20 @@ namespace Serenity.Data.Mapping
             this.Remove = remove;
         }
 
+        /// <summary>
+        /// Gets the include flags.
+        /// </summary>
+        /// <value>
+        /// The include flags.
+        /// </value>
         public FieldFlags Add { get; private set; }
+
+        /// <summary>
+        /// Gets the exclude flags.
+        /// </summary>
+        /// <value>
+        /// The exclude flags.
+        /// </value>
         public FieldFlags Remove { get; private set; }
     }
 }

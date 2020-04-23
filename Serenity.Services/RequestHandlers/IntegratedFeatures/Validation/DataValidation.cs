@@ -25,8 +25,8 @@ namespace Serenity.Services
         public static void ValidateRequired(this Row row, Field field)
         {
             var str = field as StringField;
-            if (!ReferenceEquals(null, str) &&
-                str[row].IsTrimmedEmpty())
+            if ((!ReferenceEquals(null, str) && str[row].IsTrimmedEmpty()) ||
+                (ReferenceEquals(null, str) && field.AsObject(row) == null))
             { 
                 throw RequiredError(row, field);
             }
@@ -35,7 +35,10 @@ namespace Serenity.Services
         public static void ValidateRequired(this Row row, IEnumerable<Field> fields)
         {
             foreach (var field in fields)
-                ValidateRequired(row, field);
+            {
+                if (field.DefaultValue == null || row.IsAssigned(field))
+                    ValidateRequired(row, field);
+            }
         }
 
         public static void ValidateRequiredIfModified(this Row row, IEnumerable<Field> fields)

@@ -13,8 +13,4 @@
         ///   Object itself.</returns>
         void Where(string filter);
     }
-
-    public interface IMustRemoveT0
-    {
-    }
 }

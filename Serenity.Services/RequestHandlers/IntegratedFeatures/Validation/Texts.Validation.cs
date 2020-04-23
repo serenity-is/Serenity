@@ -21,7 +21,7 @@ namespace Serenity.Services
             public static LocalText FieldInvalidValue = "Invalid value {0} for field {1}!";
             public static LocalText FieldInvalidDateRange = "{0} field value can't be before date {1}!";
             public static LocalText RequestIsNull = "Request is null!";
-            public static LocalText UnexpectedError = "An unexpected error has occured!";
+            public static LocalText UnexpectedError = "An unexpected error has occurred!";
         }
     }
 }

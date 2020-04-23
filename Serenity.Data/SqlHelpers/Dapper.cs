@@ -117,6 +117,12 @@ namespace Serenity.Data
         }
 
         static Link<Type, Action<IDbCommand, bool>> bindByNameCache;
+
+        /// <summary>
+        /// Gets the name of the bind by.
+        /// </summary>
+        /// <param name="commandType">Type of the command.</param>
+        /// <returns></returns>
         public static Action<IDbCommand, bool> GetBindByName(Type commandType)
         {
             if (commandType == null) return null; // GIGO
@@ -434,6 +440,14 @@ namespace Serenity.Data
         }
 
         internal const string LinqBinary = "System.Data.Linq.Binary";
+
+        /// <summary>
+        /// Lookups the type of the database.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException">Member type cannot be used as a parameter value</exception>
         public static DbType LookupDbType(Type type, string name)
         {
             DbType dbType;
@@ -741,6 +755,16 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
             return Query<DapperRow>(cnn, sql, param as object, transaction, buffered, commandTimeout, commandType);
         }
 
+        /// <summary>
+        /// Return a list of dynamic objects, reader is closed after the call
+        /// </summary>
+        /// <param name="cnn">The connection.</param>
+        /// <param name="sql">The SQL.</param>
+        /// <param name="transaction">The transaction.</param>
+        /// <param name="buffered">if set to <c>true</c> [buffered].</param>
+        /// <param name="commandTimeout">The command timeout.</param>
+        /// <param name="commandType">Type of the command.</param>
+        /// <returns></returns>
         public static IEnumerable<dynamic> Query(this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
         {
             return Query<DapperRow>(cnn, sql.ToString(), sql.Params == null ? null : new DynamicParameters(sql.Params), null, buffered, commandTimeout, commandType);
@@ -823,7 +847,7 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
         /// Execute a command that returns multiple result sets, and access each in turn
         /// </summary>
         public static GridReader QueryMultiple(
-#if CSHARP30  
+#if CSHARP30
             this IDbConnection cnn, string sql, object param, IDbTransaction transaction, int? commandTimeout, CommandType? commandType
 #else
 this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null
@@ -928,7 +952,7 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
         /// <param name="commandType">Is it a stored proc or a batch?</param>
         /// <returns></returns>
         public static IEnumerable<TReturn> Query<TFirst, TSecond, TReturn>(
-#if CSHARP30  
+#if CSHARP30
             this IDbConnection cnn, string sql, Func<TFirst, TSecond, TReturn> map, object param, IDbTransaction transaction, bool buffered, string splitOn, int? commandTimeout, CommandType? commandType
 #else
 this IDbConnection cnn, string sql, Func<TFirst, TSecond, TReturn> map, dynamic param = null, IDbTransaction transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null
@@ -1515,7 +1539,7 @@ this IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TRetu
                 return GetEnumerator();
             }
 
-            #region Implementation of ICollection<KeyValuePair<string,object>>
+#region Implementation of ICollection<KeyValuePair<string,object>>
 
             void ICollection<KeyValuePair<string, object>>.Add(KeyValuePair<string, object> item)
             {
@@ -1554,9 +1578,9 @@ this IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TRetu
                 get { return false; }
             }
 
-            #endregion
+#endregion
 
-            #region Implementation of IDictionary<string,object>
+#region Implementation of IDictionary<string,object>
 
             bool IDictionary<string, object>.ContainsKey(string key)
             {
@@ -1625,7 +1649,7 @@ this IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TRetu
                 get { return this.Select(kv => kv.Value).ToArray(); }
             }
 
-            #endregion
+#endregion
         }
 #endif
         private const string MultiMapSplitExceptionMessage = "When using the multi-mapping APIs ensure you set the splitOn param if you have keys other than Id";
@@ -2745,7 +2769,7 @@ Type type, IDataReader reader, int startBound = 0, int length = -1, bool returnN
             /// <summary>
             /// Read multiple objects from a single recordset on the grid
             /// </summary>
-#if CSHARP30  
+#if CSHARP30
             public IEnumerable<TReturn> Read<TFirst, TSecond, TReturn>(Func<TFirst, TSecond, TReturn> func, string splitOn, bool buffered)
 #else
             public IEnumerable<TReturn> Read<TFirst, TSecond, TReturn>(Func<TFirst, TSecond, TReturn> func, string splitOn = "id", bool buffered = true)
@@ -2767,7 +2791,7 @@ Type type, IDataReader reader, int startBound = 0, int length = -1, bool returnN
             /// <summary>
             /// Read multiple objects from a single recordset on the grid
             /// </summary>
-#if CSHARP30  
+#if CSHARP30
             public IEnumerable<TReturn> Read<TFirst, TSecond, TThird, TReturn>(Func<TFirst, TSecond, TThird, TReturn> func, string splitOn, bool buffered)
 #else
             public IEnumerable<TReturn> Read<TFirst, TSecond, TThird, TReturn>(Func<TFirst, TSecond, TThird, TReturn> func, string splitOn = "id", bool buffered = true)
@@ -2790,7 +2814,7 @@ Type type, IDataReader reader, int startBound = 0, int length = -1, bool returnN
             /// <summary>
             /// Read multiple objects from a single record set on the grid
             /// </summary>
-#if CSHARP30  
+#if CSHARP30
             public IEnumerable<TReturn> Read<TFirst, TSecond, TThird, TFourth, TReturn>(Func<TFirst, TSecond, TThird, TFourth, TReturn> func, string splitOn, bool buffered)
 #else
             public IEnumerable<TReturn> Read<TFirst, TSecond, TThird, TFourth, TReturn>(Func<TFirst, TSecond, TThird, TFourth, TReturn> func, string splitOn = "id", bool buffered = true)

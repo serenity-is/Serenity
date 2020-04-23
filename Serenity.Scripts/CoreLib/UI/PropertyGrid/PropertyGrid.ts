@@ -14,21 +14,22 @@
 
             div.addClass('s-PropertyGrid');
             this.editors = [];
-            this.items = this.options.items || [];
+            var items = this.options.items || [];
+            this.items = [];
 
-            var useTabs = Q.any(this.items, function (x) {
+            var useTabs = Q.any(items, function (x) {
                 return !Q.isEmptyOrNull(x.tab);
             });
 
             if (useTabs) {
-                var itemsWithoutTab = this.items.filter(f => Q.isEmptyOrNull(f.tab));
+                var itemsWithoutTab = items.filter(f => Q.isEmptyOrNull(f.tab));
                 if (itemsWithoutTab.length > 0) {
                     this.createItems(this.element, itemsWithoutTab);
 
                     $("<div class='pad'></div>").appendTo(this.element);
                 }
 
-                var itemsWithTab = this.items.filter(f => !Q.isEmptyOrNull(f.tab));
+                var itemsWithTab = items.filter(f => !Q.isEmptyOrNull(f.tab));
 
                 var ul = $("<ul class='nav nav-tabs property-tabs' role='tablist'></ul>")
                     .appendTo(this.element);
@@ -78,7 +79,7 @@
                 }
             }
             else {
-                this.createItems(this.element, this.items);
+                this.createItems(this.element, items);
             }
 
             this.updateInterface();
@@ -146,6 +147,7 @@
                     fieldContainer = categoryDiv;
                 }
                 var editor = this.createField(fieldContainer, item);
+                this.items.push(item);
                 this.editors.push(editor);
             }
         }

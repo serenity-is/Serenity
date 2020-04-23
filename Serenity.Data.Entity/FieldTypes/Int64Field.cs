@@ -39,12 +39,15 @@ namespace Serenity.Data
             var value = _getValue(row);
             if (value == null)
                 writer.WriteNull();
-            else //if (EnumType == null)
-                writer.WriteValue(value.Value);
-            //else if (EnumType.IsEnum)
-            //    writer.WriteValue(Enum.GetName(EnumType, value.Value));
-            //else if (EnumType.IsSubclassOf(typeof(DataEnum)))
-            //    writer.WriteValue(DataEnum.ConvertFromInt32(EnumType, (Int32)value.Value).Key);
+            else
+            {
+                var intvalue = value.Value;
+                if (intvalue > 9007199254740992 ||
+                    intvalue < -9007199254740992)
+                    writer.WriteValue(intvalue.ToString(CultureInfo.InvariantCulture));
+                else
+                    writer.WriteValue(intvalue);
+            }
         }
 
         public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)

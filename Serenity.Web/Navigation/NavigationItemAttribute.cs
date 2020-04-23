@@ -54,9 +54,14 @@ namespace Serenity.Navigation
             if (action.IsEmptyOrNull())
                 throw new ArgumentNullException("action");
 
-            var actionMethod = controller.GetMethod(action, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            var actionMethod = controller.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                .Where(x => x.Name == action)
+                .FirstOrDefault(x => x.GetAttribute<NonActionAttribute>() == null);
+
             if (actionMethod == null)
-                throw new ArgumentOutOfRangeException("action");
+                throw new ArgumentOutOfRangeException("action",
+                    String.Format("Controller {1} doesn't have an action with name {0}!",
+                        action, controller.FullName));
 
             var routeController = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
             var routeAction = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
@@ -64,7 +69,7 @@ namespace Serenity.Navigation
             if (routeController == null && routeAction == null)
                 throw new InvalidOperationException(String.Format(
                     "Route attribute for {0} action of {1} controller is not found!",
-                        actionMethod, controller.FullName));
+                        action, controller.FullName));
 
             string url = (routeAction ?? routeController).Template ?? "";
 
@@ -72,7 +77,7 @@ namespace Serenity.Navigation
             if (routeAction != null && !url.StartsWith("~/") && !url.StartsWith("/") && routeController != null)
             {
                 var tmp = routeController.Template ?? "";
-                if (tmp.Length > 0 && tmp[tmp.Length - 1] != '/')
+                if (url.Length > 0 && tmp.Length > 0 && tmp[tmp.Length - 1] != '/')
                     tmp += "/";
 
                 url = tmp + url;

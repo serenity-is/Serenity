@@ -1,33 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-#if !COREFX
 using System.Data;
-#endif
 
 namespace Serenity.Data
 {
-    [Flags]
-    public enum DeltaOptions
-    {
-        Default = IgnoreInvalidNewId,
-        IgnoreInvalidNewId = 1
-    }
-
-    public struct OldNewPair<TItem>
-    {
-        private TItem _old;
-        private TItem _new;
-
-        public OldNewPair(TItem o, TItem n)
-        {
-            _old = o;
-            _new = n;
-        }
-
-        public TItem Old { get { return _old; } }
-        public TItem New { get { return _new; } }
-    }
-
+    /// <summary>
+    /// Helper class to find differences between to lists for updating
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
     public class DeltaLister<TItem>
     {
         private DeltaOptions _options;
@@ -37,6 +17,18 @@ namespace Serenity.Data
         private IEnumerable<TItem> _newItems;
         private Func<TItem, Int64?> _getItemId;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeltaLister{TItem}"/> class.
+        /// </summary>
+        /// <param name="oldList">The old list.</param>
+        /// <param name="newList">The new list.</param>
+        /// <param name="getItemId">The get item identifier.</param>
+        /// <param name="options">The options.</param>
+        /// <exception cref="ArgumentNullException">
+        /// oldList or newList or getItemId or oldItem or oldItemId or newItem is null.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">newItemId</exception>
+        /// <exception cref="DuplicateNameException">newItemId</exception>
         public DeltaLister(IEnumerable<TItem> oldList, IEnumerable<TItem> newList,
             Func<TItem, Int64?> getItemId, DeltaOptions options = DeltaOptions.Default)
         {
@@ -94,6 +86,12 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the items to delete.
+        /// </summary>
+        /// <value>
+        /// The items to delete.
+        /// </value>
         public IEnumerable<TItem> ItemsToDelete
         {
             get
@@ -107,6 +105,12 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the items to create.
+        /// </summary>
+        /// <value>
+        /// The items to create.
+        /// </value>
         public IEnumerable<TItem> ItemsToCreate
         {
             get
@@ -120,6 +124,12 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the items to update.
+        /// </summary>
+        /// <value>
+        /// The items to update.
+        /// </value>
         public IEnumerable<OldNewPair<TItem>> ItemsToUpdate
         {
             get

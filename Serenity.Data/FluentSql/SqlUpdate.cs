@@ -199,6 +199,11 @@
             return this;
         }
 
+        /// <summary>
+        /// Removes the t0 reference from an SQL field reference.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns></returns>
         public static string RemoveT0Reference(string expression)
         {
             var index = expression.IndexOf("T0.", StringComparison.OrdinalIgnoreCase);

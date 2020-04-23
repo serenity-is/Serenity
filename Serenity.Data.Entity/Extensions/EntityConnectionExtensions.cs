@@ -281,7 +281,7 @@ namespace Serenity.Data
 
             update.Set((Row)row, (Field)(row.IdField));
             var idField = (Field)row.IdField;
-            update.Where(idField == new ValueCriteria(idField.AsObject((Row)row)));
+            update.Where(idField == new ValueCriteria(idField.AsSqlValue((Row)row)));
 
             return update;
         }

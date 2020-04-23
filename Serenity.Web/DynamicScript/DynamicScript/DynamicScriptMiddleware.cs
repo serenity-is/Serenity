@@ -11,12 +11,15 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Linq;
 using Serenity.Services;
+#if !ASPNETCORE22
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
+#endif
 
 namespace Serenity.Web.Middleware
 {
     public class DynamicScriptMiddleware
     {
-        private RequestDelegate next;
+        private readonly RequestDelegate next;
         const string dynJSPath = "/DynJS.axd/";
 
         public DynamicScriptMiddleware(RequestDelegate next)
@@ -69,14 +72,18 @@ namespace Serenity.Web.Middleware
                 return;
             }
 
-            var mediaType = new MediaTypeHeaderValue(contentType);
-            mediaType.Encoding = System.Text.Encoding.UTF8;
+            var mediaType = new MediaTypeHeaderValue(contentType)
+            {
+                Encoding = System.Text.Encoding.UTF8
+            };
             context.Response.ContentType = mediaType.ToString();
 
             var responseHeaders = context.Response.GetTypedHeaders();
-            var cacheControl = new CacheControlHeaderValue();
-            cacheControl.MaxAge = TimeSpan.FromDays(365);
-            
+            var cacheControl = new CacheControlHeaderValue
+            {
+                MaxAge = TimeSpan.FromDays(365)
+            };
+
             // allow CDNs to cache anonymous resources
             if (!string.IsNullOrEmpty((string)context.Request.Query["v"]) &&
                 !Authorization.IsLoggedIn)
@@ -107,9 +114,8 @@ namespace Serenity.Web.Middleware
             string ifModifiedSince = context.Request.Headers["If-Modified-Since"];
             if (ifModifiedSince != null && ifModifiedSince.Length > 0)
             {
-                DateTime date;
                 if (DateTime.TryParseExact(ifModifiedSince, "R", Invariants.DateTimeFormat, DateTimeStyles.None,
-                    out date))
+                    out DateTime date))
                 {
                     if (date.Year == lastWriteTime.Year &&
                         date.Month == lastWriteTime.Month &&
@@ -147,7 +153,7 @@ namespace Serenity.Web.Middleware
             new TemplateScriptRegistrar()
                 .Initialize(new[] 
                 {
-                    System.IO.Path.Combine(contentPath, "Views/Templates"),
+                    System.IO.Path.Combine(contentPath, "Views" + System.IO.Path.DirectorySeparatorChar + "Templates"),
                     System.IO.Path.Combine(contentPath, "Modules")
                 }, watchForChanges: true);
 

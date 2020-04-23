@@ -4,20 +4,47 @@
     using System.Diagnostics;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
+    /// <summary>
+    /// Base class for queries with params like SqlQuery, SqlUpdate, SqlInsert
+    /// </summary>
+    /// <seealso cref="Serenity.Data.IQueryWithParams" />
     [DebuggerDisplay("{DebugText}")]
     public class QueryWithParams : IQueryWithParams
     {
+        /// <summary>
+        /// The dialect
+        /// </summary>
         protected ISqlDialect dialect;
+
+        /// <summary>
+        /// Is the dialect overridden
+        /// </summary>
         protected bool dialectOverridden;
+
+        /// <summary>
+        /// The parent query with param storage
+        /// </summary>
         protected QueryWithParams parent;
+
+        /// <summary>
+        /// The parameters
+        /// </summary>
         protected Dictionary parameters;
+
         private int nextAutoParam;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QueryWithParams"/> class.
+        /// </summary>
         public QueryWithParams()
         {
             dialect = SqlSettings.DefaultDialect;
         }
 
+        /// <summary>
+        /// Clones the parameters into a target query.
+        /// </summary>
+        /// <param name="target">The target.</param>
         protected void CloneParams(QueryWithParams target)
         {
             if (this.parameters != null)
@@ -32,6 +59,11 @@
             target.parameters = null;
         }
 
+        /// <summary>
+        /// Adds the parameter.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="value">The value.</param>
         public void AddParam(string name, object value)
         {
             if (parent != null)
@@ -46,6 +78,11 @@
             parameters.Add(name, value);
         }
 
+        /// <summary>
+        /// Sets the parameter.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="value">The value.</param>
         public void SetParam(string name, object value)
         {
             if (parent != null)
@@ -60,6 +97,12 @@
             parameters[name] = value;
         }
 
+        /// <summary>
+        /// Gets the parameters.
+        /// </summary>
+        /// <value>
+        /// The parameters.
+        /// </value>
         public IDictionary<string, object> Params
         {
             get 
@@ -71,6 +114,12 @@
             }
         }
 
+        /// <summary>
+        /// Gets the parameter count.
+        /// </summary>
+        /// <value>
+        /// The parameter count.
+        /// </value>
         public int ParamCount
         {
             get 
@@ -82,6 +131,10 @@
             }
         }
 
+        /// <summary>
+        /// Creates an automatically named parameter.
+        /// </summary>
+        /// <returns></returns>
         public Parameter AutoParam()
         {
             if (parent != null)
@@ -118,6 +171,12 @@
             return this.dialect;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the dialect is overridden.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if the dialect is overridden; otherwise, <c>false</c>.
+        /// </value>
         public bool IsDialectOverridden
         {
             get
@@ -126,6 +185,12 @@
             }
         }
 
+        /// <summary>
+        /// Gets the debug text.
+        /// </summary>
+        /// <value>
+        /// The debug text.
+        /// </value>
         public string DebugText
         {
             get

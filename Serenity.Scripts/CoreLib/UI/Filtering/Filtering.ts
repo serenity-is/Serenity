@@ -621,6 +621,36 @@
         }
     }
 
+    @Filtering('ServiceLookup')
+    export class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEditor> {
+
+        constructor() {
+            super(ServiceLookupEditor);
+        }
+
+        getOperators(): FilterOperator[] {
+            var ops = [{ key: Operators.EQ }, { key: Operators.NE }, { key: Operators.contains }, { key: Operators.startsWith }]
+            return this.appendNullableOperators(ops);
+        }
+
+        protected useEditor(): boolean {
+            var op = this.get_operator().key;
+            return op == Operators.EQ || op == Operators.NE;
+        }
+
+        protected useIdField(): boolean {
+            return this.useEditor();
+        }
+
+        getEditorText(): string {
+            if (this.useEditor()) {
+                return this.editor.text;
+            }
+
+            return super.getEditorText();
+        }
+    }
+
     @Filtering('String')
     export class StringFiltering extends BaseFiltering {
 

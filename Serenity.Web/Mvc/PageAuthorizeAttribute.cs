@@ -93,7 +93,7 @@ namespace Serenity.Web
         }
 
         public PageAuthorizeAttribute(Type sourceType)
-            : this(sourceType, typeof(ReadPermissionAttribute))
+            : this(sourceType, typeof(NavigationPermissionAttribute), typeof(ReadPermissionAttribute))
         {
         }
 

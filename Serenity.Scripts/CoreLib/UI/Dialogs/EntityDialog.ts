@@ -8,8 +8,8 @@
         load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
     }
 
-    @Serenity.Decorators.registerClass('Serenity.EntityDialog', [Serenity['IEditDialog']])
-    export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog {
+    @Serenity.Decorators.registerClass('Serenity.EntityDialog', [Serenity['IEditDialog'], IReadOnly])
+    export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
 
         protected entity: TItem;
         protected entityId: any;
@@ -21,6 +21,7 @@
         protected deleteButton: JQuery;
         protected undeleteButton: JQuery;
         protected cloneButton: JQuery;
+        protected editButton: JQuery;
 
         protected localizationGrid: PropertyGrid;
         protected localizationButton: JQuery;
@@ -60,6 +61,9 @@
             this.applyChangesButton = null;
             this.deleteButton = null;
             this.saveAndCloseButton = null;
+            this.editButton = null;
+            this.cloneButton = null;
+            this.toolbar = null;
 
             super.destroy();
         }
@@ -89,8 +93,10 @@
                 return Q.format(Q.text('Controls.EntityDialog.NewRecordTitle'), this.getEntitySingular());
             }
             else {
+                var titleFormat = (this.isViewMode() || this.readOnly || !this.hasSavePermission()) ?
+                    Q.text('Controls.EntityDialog.ViewRecordTitle') : Q.text('Controls.EntityDialog.EditRecordTitle');
                 var title = Q.coalesce(this.getEntityNameFieldValue(), '');
-                return Q.format(Q.text('Controls.EntityDialog.EditRecordTitle'),
+                return Q.format(titleFormat,
                     this.getEntitySingular(), (Q.isEmptyOrNull(title) ? '' : (' (' + title + ')')));
             }
         }
@@ -874,6 +880,7 @@
             this.applyChangesButton = this.toolbar.findButton('apply-changes-button');
             this.deleteButton = this.toolbar.findButton('delete-button');
             this.undeleteButton = this.toolbar.findButton('undo-delete-button');
+            this.editButton = this.toolbar.findButton('edit-button');
             this.cloneButton = this.toolbar.findButton('clone-button');
             this.localizationButton = this.toolbar.findButton('localization-button');
         }
@@ -893,7 +900,9 @@
                     this.save(response => {
                         this.dialogClose();
                     });
-                }
+                },
+                visible: () => !this.isDeleted() && !this.isViewMode(),
+                disabled: () => !this.hasSavePermission() || this.readOnly
             });
 
             list.push({
@@ -917,7 +926,9 @@
 
                         this.showSaveSuccessMessage(response1);
                     });
-                }
+                },
+                visible: () => !this.isDeleted() && !this.isViewMode(),
+                disabled: () => !this.hasSavePermission() || this.readOnly
             });
 
             list.push({
@@ -928,7 +939,9 @@
                     Q.confirm(Q.text('Controls.EntityDialog.DeleteConfirmation'), () => {
                         this.doDelete(() => this.dialogClose());
                     });
-                }
+                },
+                visible: () => this.isEditMode() && !this.isDeleted() && !this.isViewMode(),
+                disabled: () => !this.hasDeletePermission() || this.readOnly
             });
 
             list.push({
@@ -940,8 +953,28 @@
                             this.undelete(() => this.loadById(this.get_entityId()));
                         });
                     }
-                }
+                },
+                visible: () => this.isEditMode() && this.isDeleted() && !this.isViewMode(),
+                disabled: () => !this.hasDeletePermission() || this.readOnly
             });
+
+            if (this.useViewMode()) {
+                list.push({
+                    title: Q.text('Controls.EntityDialog.EditButton'),
+                    cssClass: 'edit-button',
+                    icon: 'fa-edit',
+                    onClick: () => {
+                        if (!this.isEditMode())
+                            return;
+
+                        this.editClicked = true;
+                        this.updateInterface();
+                        this.updateTitle();
+                    },
+                    visible: () => this.isViewMode(),
+                    disabled: () => !this.hasSavePermission() || this.readOnly
+                });
+            }
 
             list.push({
                 title: Q.text('Controls.EntityDialog.LocalizationButton'),
@@ -966,7 +999,9 @@
                             Serenity.SubDialogHelper.cascade(w, this.element), this, true)
                             .loadEntityAndOpenDialog(cloneEntity, null)
                     });
-                }
+                },
+                visible: () => false,
+                disabled: () => !this.hasInsertPermission() || this.readOnly
             });
 
             return list;
@@ -997,8 +1032,16 @@
 
         protected updateInterface(): void {
 
+            Serenity.EditorUtils.setContainerReadOnly(this.byId('Form'), false);
+
             var isDeleted = this.isDeleted();
             var isLocalizationMode = this.isLocalizationMode();
+            var hasSavePermission = this.hasSavePermission();
+            var viewMode = this.isViewMode();
+            var isDeleted = this.isDeleted();
+            var readOnly = this.readOnly;
+
+            this.toolbar.updateInterface();
 
             if (this.tabs != null) {
                 Serenity.TabsExtensions.setDisabled(this.tabs, 'Log', this.isNewOrDeleted());
@@ -1035,18 +1078,12 @@
             this.toolbar.findButton('localization-hidden')
                 .removeClass('localization-hidden').show();
 
-            this.deleteButton && this.deleteButton.toggle(this.isEditMode() && !isDeleted);
-            this.undeleteButton && this.undeleteButton.toggle(this.isEditMode() && isDeleted);
-
-            if (this.saveAndCloseButton) {
-                this.saveAndCloseButton.toggle(!isDeleted);
-                this.saveAndCloseButton.find('.button-inner')
-                    .text(Q.text((this.isNew() ? 'Controls.EntityDialog.SaveButton' :
+            this.saveAndCloseButton && this.saveAndCloseButton
+                    .find('.button-inner').text(Q.text((this.isNew() ? 'Controls.EntityDialog.SaveButton' :
                         'Controls.EntityDialog.UpdateButton')));
-            }
 
-            this.applyChangesButton && this.applyChangesButton.toggle(!isDeleted);
-            this.cloneButton && this.cloneButton.toggle(false);
+            if (!hasSavePermission || viewMode || readOnly)
+                Serenity.EditorUtils.setContainerReadOnly(this.byId("Form"), true);
         }
 
         protected getUndeleteOptions(callback?: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse> {
@@ -1077,6 +1114,69 @@
             var thisOptions = this.getUndeleteOptions(callback);
             var finalOptions = $.extend(baseOptions, thisOptions);
             this.undeleteHandler(finalOptions, callback);
+        }
+
+        private _readonly: boolean;
+
+        public get readOnly(): boolean {
+            return this.get_readOnly();
+        }
+
+        public set readOnly(value: boolean) {
+            this.set_readOnly(value);
+        }
+
+        public get_readOnly() {
+            return !!this._readonly;
+        }
+
+        public set_readOnly(value: boolean) {
+            if (!!this._readonly != !!value) {
+                this._readonly = !!value;
+                this.updateInterface();
+                this.updateTitle();
+            }
+        }
+
+        protected getInsertPermission(): string {
+            return null;
+        }
+
+        protected getUpdatePermission(): string {
+            return null;
+        }
+
+        protected getDeletePermission(): string {
+            return null;
+        }
+
+        protected hasDeletePermission() {
+            var deletePermission = this.getDeletePermission();
+            return deletePermission == null || Q.Authorization.hasPermission(deletePermission);
+        }
+
+        protected hasInsertPermission() {
+            var insertPermission = this.getInsertPermission();
+            return insertPermission == null || Q.Authorization.hasPermission(insertPermission);
+        }
+
+        protected hasUpdatePermission() {
+            var updatePermission = this.getUpdatePermission();
+            return updatePermission == null || Q.Authorization.hasPermission(updatePermission);
+        }
+
+        protected hasSavePermission(): boolean {
+            return this.isNew() ? this.hasInsertPermission() : this.hasUpdatePermission();
+        }
+
+        protected editClicked: boolean;
+
+        protected isViewMode() {
+            return this.useViewMode() && this.isEditMode() && !this.editClicked;
+        }
+
+        protected useViewMode() {
+            return false;
         }
     }
 }

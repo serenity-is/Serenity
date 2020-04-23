@@ -24,11 +24,20 @@
             cachedQuery = null;
         }
 
+        /// <summary>
+        /// Gets the identity column.
+        /// </summary>
+        /// <returns></returns>
         public string IdentityColumn()
         {
             return identityColumn;
         }
 
+        /// <summary>
+        /// Sets the identity column.
+        /// </summary>
+        /// <param name="value">The identity column.</param>
+        /// <returns></returns>
         public SqlInsert IdentityColumn(string value)
         {
             identityColumn = value;

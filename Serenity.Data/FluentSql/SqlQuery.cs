@@ -4,6 +4,14 @@
     using System.Collections.Generic;
     using System.Text;
 
+    /// <summary>
+    /// SQL query string builder
+    /// </summary>
+    /// <seealso cref="Serenity.Data.QueryWithParams" />
+    /// <seealso cref="Serenity.Data.IFilterableQuery" />
+    /// <seealso cref="Serenity.Data.IGetExpressionByName" />
+    /// <seealso cref="Serenity.Data.ISqlQuery" />
+    /// <seealso cref="Serenity.Data.ISqlQueryExtensible" />
     public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName, ISqlQueryExtensible
     {
         private Dictionary<string, string> aliasExpressions;
@@ -45,6 +53,11 @@
             return this;
         }
 
+        /// <summary>
+        /// Adds a FOR XML statement to the query.
+        /// </summary>
+        /// <param name="forXml">FOR XML type, usually "RAW".</param>
+        /// <returns></returns>
         public SqlQuery ForXml(string forXml)
         {
             this.forXml = forXml;

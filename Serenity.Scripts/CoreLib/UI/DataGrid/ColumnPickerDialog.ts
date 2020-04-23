@@ -28,6 +28,7 @@ namespace Serenity {
                         $(e).toggle(!txt || Select2.util.stripDiacritics(
                             $(e).text().toLowerCase()).indexOf(txt) >= 0);
                     });
+                    done && done(true);
                 }
             });
 

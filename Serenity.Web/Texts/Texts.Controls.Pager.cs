@@ -11,7 +11,7 @@ namespace Serenity.Web
                 public static LocalText PageStatus = "Showing {from} to {to} of {total} total records";
                 public static LocalText NoRowStatus = "No records";
                 public static LocalText LoadingStatus = "Please wait, loading data...";
-                public static LocalText DefaultLoadError = "An error occured while loading data!";
+                public static LocalText DefaultLoadError = "An error occurred while loading data!";
             }
         }
     }

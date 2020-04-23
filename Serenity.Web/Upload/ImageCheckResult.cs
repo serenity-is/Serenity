@@ -21,7 +21,7 @@
         ///   Unsupported format</summary>
         UnsupportedFormat,
         /// <summary>
-        ///   Error occured during reading</summary>
+        ///   Error occurred during reading</summary>
         StreamReadError,
         /// <summary>
         ///   File size too high</summary>

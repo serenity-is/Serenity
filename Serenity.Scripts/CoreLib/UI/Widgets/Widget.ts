@@ -27,10 +27,10 @@
         }
         else {
             window['React'] = {
-                Component: function () { },
-                Fragment: "x-fragment",
-                createElement: function () { return { _reactNotLoaded: true }; }
-            }
+                Component: function () { } as any,
+                Fragment: "x-fragment" as any,
+                createElement: function () { return { _reactNotLoaded: true }; } as any
+            } as any
             window['ReactDOM'] = {
                 render: function () { throw Error("To use React, it should be included before Serenity.CoreLib.js"); }
             }

@@ -5,18 +5,24 @@
         title: string;
     }
 
+    export interface GridRowSelectionMixinOptions {
+        selectable?: (item: any) => boolean;
+    }
+
     @Decorators.registerClass('Serenity.GridRowSelectionMixin')
     export class GridRowSelectionMixin {
 
         private idField: string;
         private include: Q.Dictionary<boolean>;
         private grid: IDataGrid;
+        private options: GridRowSelectionMixinOptions;
 
-        constructor(grid: IDataGrid) {
+        constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions) {
 
             this.include = {};
             this.grid = grid;
             this.idField = (grid.getView() as any).idField;
+            this.options = options || {};
 
             grid.getGrid().onClick.subscribe((e, p) => {
                 if ($(e.target).hasClass('select-item')) {
@@ -51,7 +57,7 @@
                     }
                     else {
                         var items = grid.getView().getItems();
-                        for (var x of items) {
+                        for (var x of items.filter(this.isSelectable.bind(this))) {
                             var id1 = x[this.idField];
                             this.include[id1] = true;
                         }
@@ -74,7 +80,8 @@
                 var keys = Object.keys(this.include);
                 selectAllButton.toggleClass('checked',
                     keys.length > 0 &&
-                    this.grid.getView().getItems().length === keys.length);
+                    this.grid.getView().getItems().filter(
+                        this.isSelectable.bind(this)).length <= keys.length);
             }
         }
 
@@ -122,19 +129,25 @@
             this.updateSelectAll();
         }
 
+        private isSelectable(item: any) {
+            return item && (
+                this.options.selectable == null ||
+                this.options.selectable(item));
+        }
+
         static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column {
             return {
                 name: '<span class="select-all-items check-box no-float "></span>',
                 toolTip: ' ',
                 field: '__select__',
-                width: 26,
-                minWidth: 26,
+                width: 27,
+                minWidth: 27,
                 headerCssClass: 'select-all-header',
                 sortable: false,
                 format: function (ctx) {
                     var item = ctx.item;
                     var mixin = getMixin();
-                    if (!mixin) {
+                    if (!mixin || !mixin.isSelectable(item)) {
                         return '';
                     }
                     var isChecked = mixin.include[ctx.item[mixin.idField]];
@@ -144,23 +157,34 @@
         }
     }
 
+    export interface GridRadioSelectionMixinOptions {
+        selectable?: (item: any) => boolean;
+    }
+
     @Serenity.Decorators.registerClass('Serenity.GridRadioSelectionMixin')
     export class GridRadioSelectionMixin {
 
         private idField: string;
         private include: Q.Dictionary<boolean>;
         private grid: Serenity.IDataGrid;
+        private options: GridRadioSelectionMixinOptions;
 
-        constructor(grid: Serenity.IDataGrid) {
+        constructor(grid: Serenity.IDataGrid, options?: GridRadioSelectionMixinOptions) {
 
             this.include = {};
             this.grid = grid;
             this.idField = (grid.getView() as any).idField;
+            this.options = options || {};
 
             grid.getGrid().onClick.subscribe((e, p) => {
                 if ($(e.target).hasClass('rad-select-item')) {
                     e.preventDefault();
                     var item = grid.getView().getItem(p.row);
+
+                    if (!this.isSelectable(item)) {
+                        return;
+                    }
+
                     var id = item[this.idField].toString();
 
                     if (this.include[id] == true) {
@@ -176,6 +200,12 @@
                     }
                 }
             });
+        }
+
+        private isSelectable(item: any) {
+            return item && (
+                this.options.selectable == null ||
+                this.options.selectable(item));
         }
 
         clear(): void {
@@ -230,13 +260,13 @@
                 name: '',
                 toolTip: ' ',
                 field: '__select__',
-                width: 26,
-                minWidth: 26,
+                width: 27,
+                minWidth: 27,
                 headerCssClass: '',
                 sortable: false,
                 formatter: function (row, cell, value, column, item) {
                     var mixin = getMixin();
-                    if (!mixin) {
+                    if (!mixin || !mixin.isSelectable(item)) {
                         return '';
                     }
 

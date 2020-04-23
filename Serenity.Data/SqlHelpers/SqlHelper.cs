@@ -9,38 +9,32 @@
     using System.Text;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
-    public enum ExpectedRows
-    {
-        One = 0,
-        ZeroOrOne = 1,
-        Ignore = 2,
-    }
-
     /// <summary>
-    ///   <see cref="IDataReader"/> parametresi alan ve sonuç döndürmeyen bir delegate tipi</summary>
-    /// <param name="reader">
-    ///   Callback fonksiyonuna geçirilen <see cref="IDataReader"/> tipinde nesne.</param>
-    public delegate void ReaderCallBack(IDataReader reader);
-
+    /// Contains static SQL related helper functions and extensions.
+    /// </summary>
     public static class SqlHelper
     {
+        /// <summary>
+        /// Determines whether the exception is a database exception.
+        /// </summary>
+        /// <param name="e">The exception.</param>
+        /// <returns>
+        ///   <c>true</c> if database exception; otherwise, <c>false</c>.
+        /// </returns>
         public static bool IsDatabaseException(Exception e)
         {
             return e != null && e is SqlException;
         }
 
         /// <summary>
-        ///   <see cref="SqlInsert"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
-        ///   istenirse eklenen kaydın IDENTITY alanının değerini döndürür.</summary>
-        /// <remarks>
-        ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection, true) şeklinde de 
-        ///   çalıştırılabilir.</p></remarks>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlInsert"/> nesnesi.</param>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <returns>
-        ///   Identity value of inserted record.</returns>
+        /// Executes the query and returns the generated identity value.
+        /// Only works for auto incremented fields, not GUIDs.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">query.IdentityColumn is null</exception>
+        /// <exception cref="NotImplementedException">The connection dialect doesn't support returning inserted identity.</exception>
         public static Int64? ExecuteAndGetID(this SqlInsert query, IDbConnection connection)
         {
             string queryText = query.ToString();
@@ -87,46 +81,33 @@
         }
 
         /// <summary>
-        ///   <see cref="SqlInsert"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır</summary>
-        /// <remarks>
-        ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
-        ///   çalıştırılabilir.</p></remarks>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlInsert"/> nesnesi.</param>
+        /// Executes the specified query on connection.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
         public static void Execute(this SqlInsert query, IDbConnection connection)
         {
             ExecuteNonQuery(connection, query.ToString(), query.Params);
         }
 
         /// <summary>
-        ///   <see cref="SqlInsert"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır</summary>
-        /// <remarks>
-        ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
-        ///   çalıştırılabilir.</p></remarks>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlInsert"/> nesnesi.</param>
-        /// <param name="param">Parameter dictionary</param>
+        /// Executes the query on connection with specified params.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="param">The parameters.</param>
         public static void Execute(this SqlInsert query, IDbConnection connection, Dictionary param)
         {
             ExecuteNonQuery(connection, query.ToString(), param);
         }
 
         /// <summary>
-        ///   <see cref="SqlUpdate"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
-        /// <remarks>
-        ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
-        ///   çalıştırılabilir.</p></remarks>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlUpdate"/> nesnesi.</param>
-        /// <param name="expectedRows">Expected number of rows to be updated (defaults to one)</param>
-        /// <returns>
-        ///   Etkilenen kayıt sayısı.</returns>
+        /// Executes the specified update query on connection and returns number of affected rows.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="expectedRows">The expected rows. Used to validate expected number of affected rows.</param>
+        /// <returns>Number of affected rows.</returns>
         public static int Execute(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One)
         {
             return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), query.Params));
@@ -152,82 +133,64 @@
         }
 
         /// <summary>
-        ///   <see cref="SqlDelete"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
-        /// <remarks>
-        ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
-        ///   çalıştırılabilir.</p></remarks>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlDelete"/> nesnesi.</param>
-        /// <param name="expectedRows">Expected number of rows to be deleted (defaults to one)</param>
+        /// Executes the specified delete query on connection and returns number of affected rows.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="expectedRows">The expected rows. Used to validate expected number of affected rows.</param>
         /// <returns>
-        ///   Etkilenen kayıt sayısı.</returns>
+        /// Number of affected rows.
+        /// </returns>
         public static int Execute(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One)
         {
             return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), query.Params));
         }
 
         /// <summary>
-        ///   <see cref="SqlDelete"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
-        /// <remarks>
-        ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
-        ///   çalıştırılabilir.</p></remarks>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlDelete"/> nesnesi.</param>
-        /// <param name="expectedRows">Expected number of rows to be deleted (defaults to one)</param>
-        /// <param name="param">Parameters dictionary</param>
+        /// Executes the specified delete query on connection and returns number of affected rows.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="param">The parameters.</param>
+        /// <param name="expectedRows">The expected rows. Used to validate expected number of affected rows.</param>
         /// <returns>
-        ///   Etkilenen kayıt sayısı.</returns>
+        /// Number of affected rows.
+        /// </returns>
         public static int Execute(this SqlDelete query, IDbConnection connection, Dictionary param, ExpectedRows expectedRows = ExpectedRows.One)
         {
             return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), param));
         }
 
         /// <summary>
-        ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
-        /// <remarks>
-        ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
-        ///   çalıştırılabilir.</p></remarks>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
-        /// <returns>
-        ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
+        /// Executes the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <returns>A data reader with results.</returns>
         public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection)
         {
             return ExecuteReader(connection, query.ToString(), query.Params);
         }
 
         /// <summary>
-        ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
-        /// <remarks>
-        ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
-        ///   çalıştırılabilir.</p>
-        /// </remarks>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
-        /// <param name="param">Parameter dictionary</param>
-        /// <returns>
-        ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
+        /// Executes the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="param">The parameters.</param>
+        /// <returns>A data reader with results</returns>
         public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection, Dictionary param)
         {
             return ExecuteReader(connection, query.ToString(), param);
         }
 
         /// <summary>
-        ///   İstenen bağlantıya bağlı ve verilen komutu içeren yeni bir IDbCommand nesnesi oluşturur.</summary>
-        /// <param name="connection">
-        ///   IDbCommand nesnesinin oluşturulacağı bağlantı.</param>
-        /// <param name="commandText">
-        ///   IDbCommand nesnesinin içereceği komut metni. <c>null</c> olabilir.</param>
-        /// <returns>
-        ///   Yeni IDbCommand nesnesi.</returns>
+        /// Creates a new command.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <returns>A new command with specified command text</returns>
+        /// <exception cref="ArgumentNullException">connection</exception>
         public static IDbCommand NewCommand(IDbConnection connection, string commandText)
         {
             if (connection == null)
@@ -237,15 +200,19 @@
 
             // TODO: find a workaround in new Dapper
 #if !COREFX
-            var bindByName = SqlMapper.GetBindByName(command.GetType());
-            if (bindByName != null)
-                bindByName(command, true);
+            SqlMapper.GetBindByName(command.GetType())?.Invoke(command, true);
 #endif
             commandText = FixCommandText(commandText, connection.GetDialect());
             command.CommandText = commandText;
             return command;
         }
 
+        /// <summary>
+        /// Fixes the command text for target dialect by replacing brackets ([]), and parameter prefixes (@).
+        /// </summary>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="dialect">The dialect.</param>
+        /// <returns>Fixed query.</returns>
         public static string FixCommandText(string commandText, ISqlDialect dialect)
         {
             commandText = DatabaseCaretReferences.Replace(commandText);
@@ -262,15 +229,12 @@
         }
 
         /// <summary>
-        ///   İstenen bağlantıya bağlı ve verilen komutu içeren yeni bir IDbCommand nesnesi oluşturur.</summary>
-        /// <param name="connection">
-        ///   IDbCommand nesnesinin oluşturulacağı bağlantı.</param>
-        /// <param name="commandText">
-        ///   IDbCommand nesnesinin içereceği komut metni. <c>null</c> olabilir.</param>
-        /// <param name="param">
-        ///   Parameters.</param>
-        /// <returns>
-        ///   Yeni IDbCommand nesnesi.</returns>
+        /// Creates new command.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="param">The parameters.</param>
+        /// <returns>New command with specified command text and parameters</returns>
         public static IDbCommand NewCommand(IDbConnection connection, string commandText, IDictionary<string, object> param)
         {
             var command = (DbCommand)(NewCommand(connection, commandText));
@@ -294,6 +258,11 @@
             }
         }
 
+        /// <summary>
+        /// Fixes the type of the parameter to something suitable as SQL parameter.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
         public static object FixParamType(object value)
         {
             if (value == null)
@@ -328,16 +297,13 @@
         }
 
         /// <summary>
-        ///   <see cref="DbCommand"/> nesnesine belirtilen isim ve değere sahip yeni bir parametre ekler.</summary>
-        /// <param name="command">
-        ///   Parametrenin ekleneceği <see cref="DbCommand"/> nesnesi</param>
-        /// <param name="name">
-        ///   Parametre ismi.</param>
-        /// <param name="value">
-        ///   Parametre değeri.</param>
-        /// <param name="dialect">SQL dialect</param>
-        /// <returns>
-        ///   Yeni oluşturulan <see cref="DbParameter"/> nesnesi.</returns>
+        /// Adds the parameter with value to the target command.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="dialect">The dialect.</param>
+        /// <returns>New parameter</returns>
         public static DbParameter AddParamWithValue(this DbCommand command, string name, object value, ISqlDialect dialect)
         {
             DbParameter param = command.CreateParameter();
@@ -377,8 +343,7 @@
                         param.DbType = DbType.DateTime2;
                 }
 
-                var str = value as string;
-                if (str != null && str.Length < 4000)
+                if (value is string str && str.Length < 4000)
                     param.Size = 4000;
             }
 
@@ -387,22 +352,16 @@
         }
 
         /// <summary>
-        ///   Verilen Sql exception'ının numarasının, bilinen connection pool hatalarından biri olmasını 
-        ///   denetler ve gerekirse bağlantıyı tekrar açıp kapatır.</summary>
-        /// <param name="connection">
-        ///   Hatanın oluştuğu bağlantı.</param>
-        /// <param name="exception">
-        ///   Numarası kontrol edilecek hata.</param>
-        /// <returns>
-        ///   Hata numarası 10054 ise true.</returns>
+        /// Checks for the connection pool exception.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="exception">The exception.</param>
+        /// <returns>True if exception is 10054, e.g. connection pool.</returns>
         private static bool CheckConnectionPoolException(IDbConnection connection, Exception exception)
         {
-            var ex = exception as System.Data.SqlClient.SqlException;
-
-            if (ex != null && ex.Number == 10054)
+            if (exception is SqlException ex && ex.Number == 10054)
             {
-                var wrapped = connection as WrappedConnection;
-                if (wrapped != null &&
+                if (connection is WrappedConnection wrapped && 
                     (wrapped.OpenedOnce || wrapped.CurrentTransaction != null))
                     return false;
 
@@ -416,11 +375,13 @@
         }
 
         /// <summary>
-        ///   Bağlantı üzerinde sonuç döndürmeyen (INSERT, UPDATE, DELETE gibi) bir sorguyu çalıştırır.</summary>
-        /// <param name="command">
-        ///   Çalıştırılacak komut.</param>
-        /// <returns>
-        ///   Etkilenen satır sayısı (veritabanının desteklemesine bağlı).</returns>
+        /// Executes the SQL statement, and returns affected rows.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">
+        /// command is null or command.Connection is null.
+        /// </exception>
         public static int ExecuteNonQuery(IDbCommand command)
         {
             if (command == null)
@@ -452,15 +413,12 @@
         }
 
         /// <summary>
-        ///   Bağlantı üzerinde sonuç döndürmeyen (INSERT, UPDATE, DELETE gibi) bir sorguyu çalıştırır.</summary>
-        /// <param name="connection">
-        ///   Komutun çalıştırılacağı bağlantı.</param>
-        /// <param name="commandText">
-        ///   Çalıştırılacak komut.</param>
-        /// <param name="param">
-        ///   Parameters (optional).</param>
-        /// <returns>
-        ///   Etkilenen satır sayısı (veritabanının desteklemesine bağlı).</returns>
+        /// Executes the statement
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="param">The parameters.</param>
+        /// <returns>Number of affected rows</returns>
         public static int ExecuteNonQuery(IDbConnection connection, string commandText,
             IDictionary<string, object> param)
         {
@@ -479,13 +437,11 @@
         }
 
         /// <summary>
-        ///   Bağlantı üzerinde sonuç döndürmeyen (INSERT, UPDATE, DELETE gibi) bir sorguyu çalıştırır.</summary>
-        /// <param name="connection">
-        ///   Komutun çalıştırılacağı bağlantı.</param>
-        /// <param name="commandText">
-        ///   Çalıştırılacak komut.</param>
-        /// <returns>
-        ///   Etkilenen satır sayısı (veritabanının desteklemesine bağlı).</returns>
+        /// Executes the statement.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <returns>Number of affected rows</returns>
         public static int ExecuteNonQuery(IDbConnection connection, string commandText)
         {
             using (IDbCommand command = NewCommand(connection, commandText))
@@ -503,15 +459,13 @@
         }
 
         /// <summary>
-        ///   Bağlantı üzerinde tek değer döndüren bir sorguyu çalıştırır.</summary>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı.</param>
-        /// <param name="commandText">
-        ///   Çalıştırılacak sorgu.</param>
-        /// <param name="param">
-        ///   Parameters (optional).</param>
-        /// <returns>
-        ///   Sorgunun döndürdüğü skalar değer.</returns>
+        /// Executes the statement returning a scalar value.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="param">The parameters.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">connection</exception>
         public static object ExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object> param)
         {
             if (connection == null)
@@ -552,26 +506,23 @@
         }
 
         /// <summary>
-        ///   Bağlantı üzerinde tek değer döndüren bir sorguyu çalıştırır.</summary>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı.</param>
-        /// <param name="commandText">
-        ///   Çalıştırılacak sorgu.</param>
-        /// <returns>
-        ///   Sorgunun döndürdüğü skalar değer.</returns>
+        /// Executes the statement returning a scalar value.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <returns>Scalar value</returns>
         public static object ExecuteScalar(IDbConnection connection, string commandText)
         {
             return ExecuteScalar(connection, commandText, null);
         }
 
         /// <summary>
-        ///   Bağlantı üzerinde tek değer döndüren bir <see cref="SqlQuery"/> sorgusunu çalıştırır.</summary>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı.</param>
-        /// <param name="selectQuery">
-        ///   Çalıştırılacak sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
-        /// <returns>
-        ///   Sorgunun döndürdüğü skalar değer.</returns>
+        /// Executes the statement returning a scalar value.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="selectQuery">The select query.</param>
+        /// <returns>Scalar value</returns>
+        /// <exception cref="ArgumentNullException">selectQuery is null</exception>
         public static object ExecuteScalar(IDbConnection connection, SqlQuery selectQuery)
         {
             if (selectQuery == null)
@@ -581,14 +532,15 @@
         }
 
         /// <summary>
-        ///   Bağlantı üzerinde tek değer döndüren bir <see cref="SqlQuery"/> sorgusunu çalıştırır.</summary>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı.</param>
-        /// <param name="selectQuery">
-        ///   Çalıştırılacak sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
-        /// <param name="param">Parameter dictionary</param>
+        /// Executes the statement returning a scalar value.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="selectQuery">The select query.</param>
+        /// <param name="param">The parameters.</param>
         /// <returns>
-        ///   Sorgunun döndürdüğü skalar değer.</returns>
+        /// Scalar value
+        /// </returns>
+        /// <exception cref="ArgumentNullException">selectQuery is null</exception>
         public static object ExecuteScalar(IDbConnection connection, SqlQuery selectQuery, Dictionary param)
         {
             if (selectQuery == null)
@@ -597,12 +549,16 @@
             return ExecuteScalar(connection, selectQuery.ToString(), param);
         }
 
+        /// <summary>
+        /// Logs the command.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="command">The command.</param>
         public static void LogCommand(string type, IDbCommand command)
         {
             try
             {
-                var sqlCmd = command as SqlCommand;
-                if (sqlCmd != null)
+                if (command is SqlCommand sqlCmd)
                 {
                     Log.Debug(type + "\r\n" + SqlCommandDumper.GetCommandText(sqlCmd));
                     return;
@@ -636,15 +592,13 @@
         }
 
         /// <summary>
-        ///   Sorguyu belirtilen bağlantı üzerinde çalıştırır ve bir IDataReader nesnesi döndürür.</summary>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Açık değilse otomatik olarak açılır.</param>
-        /// <param name="commandText">
-        ///   Çalıştırılacak SQL sorgusu.</param>
-        /// <param name="param">
-        ///   Parameters (optional).</param>
-        /// <returns>
-        ///   Sorgunun çalıştırılması sonucu elde edilen IDataReader nesnesi.</returns>
+        /// Executes the command returning a data reader.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="param">The parameters.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">connection is null</exception>
         public static IDataReader ExecuteReader(IDbConnection connection, string commandText,
             IDictionary<string, object> param)
         {
@@ -687,66 +641,38 @@
         }
 
         /// <summary>
-        ///   Sorguyu belirtilen bağlantı üzerinde çalıştırır ve bir IDataReader nesnesi döndürür.</summary>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Açık değilse otomatik olarak açılır.</param>
-        /// <param name="commandText">
-        ///   Çalıştırılacak SQL sorgusu.</param>
-        /// <returns>
-        ///   Sorgunun çalıştırılması sonucu elde edilen IDataReader nesnesi.</returns>
+        /// Executes the statement returning a data reader.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <returns>Data reader with results</returns>
         public static IDataReader ExecuteReader(IDbConnection connection, string commandText)
         {
             return ExecuteReader(connection, commandText, null);
         }
 
         /// <summary>
-        ///   Belli bir bağlantı string'i ve sorgu metni için Cache içinde anahtar olarak kullanılabilecek
-        ///   bir string üretir.</summary>
-        /// <remarks>
-        ///   Bu fonksiyon ExecuteReader(IDbConnection, string, TimeSpan, params) tarafından çalıştırılan
-        ///   sorguların uygulama Cache'i içerisinde önbelleklenmesi için gerekli olan anahtar string'in 
-        ///   üretilmesinde kullanılır.</remarks>
-        /// <param name="connectionString">
-        ///   Sorgunun çalıştırılacağı bağlantı string'i</param>
-        /// <param name="commandText">
-        ///   Sorgu metni, <c>null</c> olabilir.</param>
+        /// Executes the statement returning a data reader.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="query">The query.</param>
         /// <returns>
-        ///   Bağlantı string'i ve sorgu metnine göre unique bir anahtar.</returns>
-        private static string GetReaderCacheKey(string connectionString, string commandText)
-        {
-            commandText = commandText ?? String.Empty;
-
-            const string queryCacheKey = "SQL_SELECT_QUERY";
-            StringBuilder sb = new StringBuilder(queryCacheKey,
-                commandText.Length + connectionString.Length + queryCacheKey.Length + 50);
-            sb.AppendLine(connectionString);
-            sb.AppendLine(commandText);
-
-            return sb.ToString();
-        }
-
-        /// <summary>
-        ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
-        /// <returns>
-        ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
+        /// Data reader with results
+        /// </returns>
         public static IDataReader ExecuteReader(IDbConnection connection, SqlQuery query)
         {
             return ExecuteReader(connection, query.ToString(), query.Params);
         }
 
         /// <summary>
-        ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
-        /// <param name="param">Parameter dictionary</param>
+        /// Executes the statement returning a data reader.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="query">The query.</param>
+        /// <param name="param">The parameters.</param>
         /// <returns>
-        ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
+        /// Data reader with results
+        /// </returns>
         public static IDataReader ExecuteReader(IDbConnection connection, SqlQuery query, Dictionary param)
         {
             return ExecuteReader(connection, query.ToString(), param);
@@ -754,18 +680,11 @@
 
 
         /// <summary>
-        ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
-        ///   en azından 1 sonuç göndermesini kontrol eder.</summary>
-        /// <remarks>
-        ///   <p>Bu bir extension metodu olduğundan direk <c>query.Exists(connection)</c> 
-        ///   şeklinde de çalıştırılabilir.</p>
-        /// </remarks>
-        /// <param name="connection">
-        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
-        /// <param name="query">
-        ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
-        /// <returns>
-        ///   Eğer en azından bir sonuç alındıysa <c>true</c></returns>
+        /// Executes the query returning true if it has at least one result.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <returns>True if query returns one result.</returns>
         public static bool Exists(this SqlQuery query, IDbConnection connection)
         {
             using (IDataReader reader = ExecuteReader(connection, query))

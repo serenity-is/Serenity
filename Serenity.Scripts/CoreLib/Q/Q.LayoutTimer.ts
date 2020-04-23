@@ -1,11 +1,15 @@
 ﻿
 namespace Q {
 
+    interface LayoutTimerReg {
+        key: string;
+        handler: () => void;
+    }
+
     export namespace LayoutTimer {
 
         var timeout: number;
-        var regs: (() => void)[] = [];
-        var regByKey: Q.Dictionary<number> = {};
+        var regs: LayoutTimerReg[] = [];
 
         function startTimer() {
             if (timeout == null && regs.length) {
@@ -23,7 +27,7 @@ namespace Q {
         function onTimeout() {
             for (var reg of regs) {
                 try {
-                    reg();
+                    reg.handler();
                 }
                 catch (e) {
                     console.log(e);
@@ -38,13 +42,13 @@ namespace Q {
             if (handler == null)
                 throw "Layout handler can't be null!";
 
-            if (regByKey[key] !== undefined)
+            if (key != null && Q.any(regs, x => x.key === key))
                 throw "There is already a registered layout handler with key: " + key;
 
-            if (key != null)
-                regByKey[key] = regs.length;
-
-            regs.push(handler);
+            regs.push({
+                key: key,
+                handler: handler,
+            });
 
             startTimer();
 
@@ -98,27 +102,11 @@ namespace Q {
         }
 
         export function off(key: string, handler?: () => void): void {
-            if (key != null) {
-                var index = regByKey[key];
-                if (index !== undefined) {
-                    delete regByKey[key];
-                    if (handler == null || handler === regs[index]) {
-                        regs.splice(index, 1);
-                        !regs.length && this.clearTimer();
-                        return;
-                    }
-                }
-            }
-
-            if (handler != null) {
-                for (var l = regs.length - 1; l >= 0; l++) {
-                    if (regs[l] === handler) {
-                        regs.splice(l, 1);
-                        !regs.length && this.clearTimer();
-                        break;
-                    }
-                }
-            }
+            if (key != null)
+                regs = regs.filter(x => x.key !== key);
+            if (handler != null)
+                regs = regs.filter(x => x.handler === handler);
+            !regs.length && this.clearTimer();
         }
     }
 }
