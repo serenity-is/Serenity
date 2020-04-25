@@ -13,7 +13,7 @@ var __skipExtends = {
     "__typeName": true,
     "__componentFactory": true
 };
-var __extends = (this && this.__extends) || function (d, b) {
+var __extends = function (d, b) {
     for (var p in b)
         if (b.hasOwnProperty(p) && __skipExtends[p] !== true)
             d[p] = b[p];
@@ -63,7 +63,7 @@ if (typeof Promise === "undefined") {
     }
 }
 // @ts-ignore check for global
-var globalObj = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
+var globalObj = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : this));
 var Q;
 (function (Q) {
     Q.types = {};
@@ -1887,7 +1887,7 @@ var Q;
         if ($.unblockUI)
             $.unblockUI({ fadeOut: 0 });
         else
-            $(document.body).children('.blockUI blockOverlay').remove();
+            $(document.body).children('.blockUI.blockOverlay').remove();
     }
     Q.blockUndo = blockUndo;
 })(Q || (Q = {}));
@@ -2275,9 +2275,11 @@ var Q;
          * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
          */
         Config.applicationPath = '/';
-        var pathLink = $('link#ApplicationPath');
-        if (pathLink.length > 0) {
-            Config.applicationPath = pathLink.attr('href');
+        if (typeof $ !== 'undefined') {
+            var pathLink = $('link#ApplicationPath');
+            if (pathLink.length > 0) {
+                Config.applicationPath = pathLink.attr('href');
+            }
         }
         /**
          * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
@@ -2315,7 +2317,7 @@ var Q;
                 return ca[i].replace(name, '');
     }
     Q.getCookie = getCookie;
-    $.ajaxSetup({
+    typeof $ != 'undefined' && $.ajaxSetup && $.ajaxSetup({
         beforeSend: function (xhr) {
             var token = Q.getCookie('CSRF-TOKEN');
             if (token)
@@ -2974,13 +2976,6 @@ var Serenity;
     })(SummaryType = Serenity.SummaryType || (Serenity.SummaryType = {}));
     Serenity.Decorators.registerEnum(SummaryType, "Serenity.SummaryType");
 })(Serenity || (Serenity = {}));
-if (globalObj != null) {
-    function copyTo(src, target) {
-        for (var n in src)
-            if (src.hasOwnProperty(n))
-                target[n] = Q[n];
-    }
-    globalObj.Q ? copyTo(Q, globalObj.Q) : globalObj.Q = Q;
-    globalObj.Serenity ? copyTo(Serenity, globalObj.Serenity) : globalObj.Serenity = Serenity;
-}
+// @ts-ignore try to make it work in common js for tests
+typeof module !== "undefined" && (module.exports = { Q: Q, Serenity: Serenity, __extends: __extends });
 //# sourceMappingURL=Serenity.CoreLib.base.js.map

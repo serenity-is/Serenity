@@ -11,7 +11,7 @@ namespace Q {
                 return ca[i].replace(name, '');
     }
 
-    $.ajaxSetup({
+    typeof $ != 'undefined' && $.ajaxSetup && $.ajaxSetup({
         beforeSend: function (xhr) {
             var token = Q.getCookie('CSRF-TOKEN');
             if (token)

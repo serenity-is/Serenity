@@ -7,9 +7,11 @@
          */
         export let applicationPath = '/';
 
+        if (typeof $ !== 'undefined') {
         var pathLink = $('link#ApplicationPath');
-        if (pathLink.length > 0) {
-            applicationPath = pathLink.attr('href');
+            if (pathLink.length > 0) {
+                applicationPath = pathLink.attr('href');
+            }
         }
 
         /**

@@ -12,7 +12,7 @@ const __skipExtends = {
     "__componentFactory": true
 }
 
-var __extends: any = (this && this.__extends) || function (d: any, b: any) {
+var __extends: any = function (d: any, b: any) {
     for (var p in b) if (b.hasOwnProperty(p) && __skipExtends[p] !== true) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new (__ as any)());
