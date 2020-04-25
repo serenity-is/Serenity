@@ -1,5 +1,6 @@
 ﻿var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    // @ts-ignore check for Reflect
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function")
         r = Reflect.decorate(decorators, target, key, desc);
     else
@@ -52,13 +53,13 @@ var __spreadArrays = function () {
  * Represents the completion of an asynchronous operation
  */
 if (typeof Promise === "undefined") {
-    if (typeof (RSVP) !== "undefined") {
+    // @ts-ignore check for global
+    if (typeof (RSVP) !== "undefined")
         Promise = RSVP;
-    }
-    else if (typeof (jQuery) !== "undefined") {
+    else if (typeof ($) !== "undefined") {
         Promise = $.Deferred;
         Promise.resolve = function (value) {
-            return jQuery.Deferred().resolveWith(value);
+            return $.Deferred().resolveWith(value);
         };
     }
 }

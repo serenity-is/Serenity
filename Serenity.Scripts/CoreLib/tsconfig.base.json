@@ -5,7 +5,6 @@
   },
   "files": [
     "Imports/Helpers.ts",
-    "Imports/RSVP.ts",
     "Imports/Promise.ts",
     "Imports/Select2.ts",
     "Imports/jQueryStatic.ts",
