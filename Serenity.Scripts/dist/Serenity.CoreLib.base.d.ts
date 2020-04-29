@@ -135,9 +135,6 @@ interface JQueryStatic {
     extend<T>(target: T, object1?: T, ...objectN: T[]): T;
     toJSON(obj: any): string;
 }
-declare interface JQBlockUIOptions {
-    useTimeout?: boolean;
-}
 declare namespace Serenity {
     const enum ColumnSelection {
         List = 0,
@@ -480,6 +477,9 @@ declare namespace Q {
         };
         protected get_items(): TItem[];
     }
+}
+declare interface JQBlockUIOptions {
+    useTimeout?: boolean;
 }
 declare namespace Q {
     /**

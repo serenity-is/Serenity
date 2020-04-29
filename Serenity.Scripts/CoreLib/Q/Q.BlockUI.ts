@@ -1,4 +1,7 @@
-﻿
+﻿declare interface JQBlockUIOptions {
+    useTimeout?: boolean;   
+}
+
 namespace Q {
     let blockUICount: number = 0;
 

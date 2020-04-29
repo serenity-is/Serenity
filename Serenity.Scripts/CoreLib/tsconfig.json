@@ -29,11 +29,9 @@
   ],
   "files": [
     "Imports/Helpers.ts",
-    "Imports/RSVP.ts",
     "Imports/Promise.ts",
     "Imports/Select2.ts",
     "Imports/jQueryStatic.ts",
-    "Imports/JQBlockUI.ts",
     "Services/ColumnSelection.ts",
     "Services/ServiceError.ts",
     "Services/ServiceResponse.ts",
