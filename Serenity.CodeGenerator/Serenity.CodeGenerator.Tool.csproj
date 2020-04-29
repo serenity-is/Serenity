@@ -1,7 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project>
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <BaseIntermediateOutputPath>obj\Serenity.CodeGenerator.Tool\</BaseIntermediateOutputPath>
     <AssemblyName>sergen</AssemblyName>
     <OutputType>Exe</OutputType>
     <RootNamespace>Serenity.CodeGenerator</RootNamespace>
@@ -12,6 +13,7 @@
     <DefineConstants>$(DefineConstants);ASPNETCORE;COREFX</DefineConstants>
     <Deterministic>false</Deterministic>
   </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>
     <EmbeddedResource Include="..\Serenity.Scripts\dist\Serenity.CodeGeneration.js">
       <Link>Serenity.CodeGeneration.js</Link>
@@ -35,4 +37,5 @@
     <PackageReference Include="Npgsql" Version="4.1.2" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
   </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>

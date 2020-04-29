@@ -1,9 +1,9 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Configuration;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Hosting;
@@ -18,7 +18,11 @@ namespace Serenity.Web
             public bool? Enabled { get; set; }
             public bool? Minimize { get; set; }
             public bool? UseMinCSS { get; set; }
+            public string[] NoMinimize { get; set; }
+            public Dictionary<string, object> Replacements { get; set; }
         }
+
+        private static object initializationLock = new object();
 
         private bool isEnabled;
         private Dictionary<string, string> bundleKeyBySourceUrl;
@@ -31,15 +35,6 @@ namespace Serenity.Web
         [ThreadStatic]
         private static HashSet<string> recursionCheck;
 
-        public static bool IsEnabled
-        {
-            get
-            {
-                return Instance.isEnabled;
-            }
-        }
-
-        private static object initializationLock = new object();
         private static CssBundleManager instance;
 
         private static CssBundleManager Instance
@@ -65,11 +60,15 @@ namespace Serenity.Web
 
         public CssBundleManager()
         {
-            
             var settings = Config.Get<CssBundlingSettings>();
 
             var bundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
                 HostingEnvironment.MapPath("~/Content/site/CssBundles.json"));
+            bundles = bundles.Keys.ToDictionary(k => k,
+                k => (bundles[k] ?? new string[0])
+                    .Select(u => BundleUtils.DoReplacements(u, settings.Replacements))
+                    .Where(u => !string.IsNullOrEmpty(u))
+                    .ToArray());
 
             bundleIncludes = BundleUtils.ExpandBundleIncludes(bundles, "dynamic://CssBundle.", "css");
 
@@ -84,6 +83,9 @@ namespace Serenity.Web
             bundleByKey = new Dictionary<string, ConcatenatedScript>(StringComparer.OrdinalIgnoreCase);
 
             bool minimize = settings.Minimize == true;
+            var noMinimize = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (settings.NoMinimize != null)
+                noMinimize.AddRange(settings.NoMinimize);
 
             foreach (var pair in bundles)
             {
@@ -143,27 +145,23 @@ namespace Serenity.Web
                                     return String.Format(errorLines,
                                         String.Format("Dynamic script with name '{0}' is not found!", scriptName));
 
-                                if (!scriptName.StartsWith("CssBundle.", StringComparison.OrdinalIgnoreCase))
+                                if (minimize &&
+                                    !scriptName.StartsWith("Bundle.", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    if (minimize)
+                                    try
                                     {
-                                        try
-                                        {
-                                            var result = NUglify.Uglify.Css(code);
-                                            if (!result.HasErrors)
-                                                code = result.Code;
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            ex.Log();
-                                        }
+                                        var result = NUglify.Uglify.Css(code);
+                                        if (!result.HasErrors)
+                                            code = result.Code;
                                     }
-
-                                    var scriptUrl = VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + scriptName);
-                                    code = RewriteUrlsToAbsolute(scriptUrl, code);
+                                    catch (Exception ex)
+                                    {
+                                        ex.Log();
+                                    }
                                 }
 
-                                return code;
+                                var scriptUrl = VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + scriptName);
+                                return RewriteUrlsToAbsolute(scriptUrl, code);
                             }
                             finally
                             {
@@ -190,14 +188,17 @@ namespace Serenity.Web
 
                         string code = null;
 
-                        if (minimize)
+                        if (minimize &&
+                            !noMinimize.Contains(sourceFile) &&
+                            !sourceFile.EndsWith(".min.css", StringComparison.OrdinalIgnoreCase))
                         {
                             if (settings.UseMinCSS == true)
                             {
                                 var minPath = Path.ChangeExtension(sourcePath, ".min.css");
                                 if (File.Exists(minPath))
                                 {
-                                    using (StreamReader sr = new StreamReader(File.OpenRead(minPath)))
+                                    sourcePath = minPath;
+                                    using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
                                         code = sr.ReadToEnd();
                                 }
                             }
@@ -206,21 +207,20 @@ namespace Serenity.Web
                             {
                                 using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
                                     code = sr.ReadToEnd();
-                            }
 
-                            try
-                            {
-                                var result = NUglify.Uglify.Css(code);
-                                if (!result.HasErrors)
-                                    code = result.Code;
-                            }
-                            catch (Exception ex)
-                            {
-                                ex.Log();
+                                try
+                                {
+                                    var result = NUglify.Uglify.Css(code);
+                                    if (!result.HasErrors)
+                                        code = result.Code;
+                                }
+                                catch (Exception ex)
+                                {
+                                    ex.Log();
+                                }
                             }
                         }
-
-                        if (code == null)
+                        else
                         {
                             using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
                                 code = sr.ReadToEnd();
@@ -262,6 +262,14 @@ namespace Serenity.Web
             }
 
             isEnabled = true;
+        }
+
+        public static bool IsEnabled
+        {
+            get
+            {
+                return Instance.isEnabled;
+            }
         }
 
         static CssBundleManager()
@@ -310,11 +318,11 @@ namespace Serenity.Web
         {
             if (string.IsNullOrWhiteSpace(url) ||
                 (url.IndexOf("://") >= 0))
-                    return url;
+                return prefix + url + suffix;
 
             url = url.TrimStart();
             if (string.IsNullOrWhiteSpace(url) || url[0] == '/')
-                return url;
+                return prefix + url + suffix;
 
             if (url.StartsWith("data:"))
                 return prefix + url + suffix;
@@ -322,16 +330,16 @@ namespace Serenity.Web
             var question = url.IndexOf('?');
             if (question >= 0)
             {
-                return new Uri("x:" + absolutePath + url.Substring(0, question)).AbsolutePath.Substring(2)
-                    + url.Substring(question);
+                return prefix + new Uri("x:" + absolutePath + url.Substring(0, question)).AbsolutePath.Substring(2)
+                    + url.Substring(question) + suffix;
             }
-            
-            return new Uri("x:" + absolutePath + url).AbsolutePath.Substring(2);
+
+            return prefix + new Uri("x:" + absolutePath + url).AbsolutePath.Substring(2) + suffix;
         }
 
         private static string RewriteUrlsToAbsolute(string virtualPath, string content)
         {
-            if (string.IsNullOrEmpty(content) || 
+            if (string.IsNullOrEmpty(content) ||
                 string.IsNullOrEmpty(virtualPath))
                 return content;
 
@@ -348,9 +356,9 @@ namespace Serenity.Web
                 absolutePath += "/";
 
             var regex = new Regex("url\\((?<prefix>['\"]?)(?<url>[^)]+?)(?<suffix>['\"]?)\\)");
-            return regex.Replace(content, (Match match) => "url(" + 
-                UrlToAbsolute(absolutePath, match.Groups["url"].Value, 
-                    match.Groups["prefix"].Value, 
+            return regex.Replace(content, (Match match) => "url(" +
+                UrlToAbsolute(absolutePath, match.Groups["url"].Value,
+                    match.Groups["prefix"].Value,
                     match.Groups["suffix"].Value) + ")");
         }
 

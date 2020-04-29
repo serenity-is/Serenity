@@ -17377,6 +17377,9 @@ var Q;
         return $.extend({
             ignore: ":hidden",
             meta: 'v',
+            normalizer: function (value) {
+                return $.trim(value);
+            },
             errorClass: 'error',
             errorPlacement: function (error, element) {
                 var field = null;

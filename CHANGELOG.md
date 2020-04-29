@@ -1,3 +1,14 @@
+## 3.12.6 (2020-04-12)
+
+Bugfixes:
+  - fix css bundle manager removes quotes in url for data uris while adjusting relative paths in css bundle
+
+## 3.12.5 (2020-04-12)
+
+Bugfixes:
+  - fix css bundle manager ignoring usemincss setting if the included file already has .min.css extension
+  - jquery.validate has changed required logic to not trim input value by default, so whitespace was considered valid for string inputs
+  
 ## 3.12.4 (2020-03-09)
 
 Bugfixes:
