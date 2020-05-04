@@ -15,6 +15,14 @@ namespace Serenity.Services
             }
         }
 
+        public virtual bool PreferOffsetFetchOverRownum
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public bool CanUseRowNumber
         {
             get
