@@ -240,5 +240,13 @@
         /// The parameter prefix character.
         /// </value>
         char ParameterPrefix { get; }
+
+        /// <summary>
+        /// Gets the preference of using offset fetch instead of RowNum 
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if use offset fetch; otherwise rownum, <c>false</c>.
+        /// </value>
+        bool PreferOffsetFetchOverRownum { get; }
     }
 }

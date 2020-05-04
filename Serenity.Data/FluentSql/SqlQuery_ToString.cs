@@ -35,7 +35,7 @@ namespace Serenity.Data
 
             bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword;
             bool useOffset = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch;
-            if (dialect.ServerType.Equals("Oracle")) {
+            if (dialect.PreferOffsetFetchOverRownum) {
                 useOffset = (skip > 0 || take > 0) && !useSkipKeyword && dialect.CanUseOffsetFetch;
             }
             bool useRowNum = (skip > 0 || take > 0) && !useOffset && dialect.UseRowNum;

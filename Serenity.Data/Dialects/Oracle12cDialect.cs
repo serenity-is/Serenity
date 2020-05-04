@@ -13,6 +13,14 @@ namespace Serenity.Data
             }
         }
 
+        public override bool PreferOffsetFetchOverRownum
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override string OffsetFormat
         {
             get
