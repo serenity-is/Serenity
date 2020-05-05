@@ -15,7 +15,6 @@ namespace Q {
         onOpen?: () => void;
         onClose?: (result: string) => void;
         title?: string;
-        message?: string;
         htmlEncode?: boolean;
         preWrap?: boolean;
         dialogClass?: string;
@@ -90,12 +89,28 @@ namespace Q {
         return (_isBS3 = !!($.fn.modal && $.fn.modal.VERSION && $.fn.modal.VERSION.charAt(0) == '3'));
     }
 
+    const defaultTxt = {
+        AlertTitle: 'Alert',
+        InformationTitle: 'Information',
+        WarningTitle: 'Warning',
+        ConfirmationTitle: 'Confirm',
+        OkButton: 'OK',
+        YesButton: 'Yes',
+        NoButton: 'No',
+        CancelButton: 'Cancel',
+        CloseButton: 'Close'
+    };
+
+    function txt(k: string) {
+        return Q.tryGetText("Dialogs." + k) ?? defaultTxt[k];
+    }
+
     function bsModal(options: CommonDialogOptions, message: string, modalClass: string) {
-        var closeButton = `<button type="button" class="close" data-dismiss="modal" aria-label="${Q.text('Dialogs.CloseButton')}">` + 
+        var closeButton = `<button type="button" class="close" data-dismiss="modal" aria-label="${txt('CloseButton')}">` + 
             `<span aria-hidden="true">&times;</span></button>`;
         var div = $(
 `<div class="modal s-MessageModal ${modalClass}" tabindex="-1" role="dialog">
-    <div class="modal-dialog ${options.dialogClass}" role="document">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 ${(isBS3 ? closeButton : "")}<h5 class="modal-title">${options.title}</h5>${(isBS3 ? "" : closeButton)}
@@ -103,13 +118,7 @@ namespace Q {
             <div class="modal-body">
                 ${message}
             </div>
-            <div class="modal-footer">${(options.buttons || []).map(x => {
-                var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
-                var iconClass = toIconClass(x.icon);
-                if (iconClass != null)
-                    text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");
-                return `<button class="btn ${x.cssClass ? x.cssClass : ''}"${x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '' }>${text}</button>`;
-            }).join('\n')}</div>
+            <div class="modal-footer"></div>
         </div>
     </div>
 </div>`).eq(0).appendTo(document.body);
@@ -118,9 +127,29 @@ namespace Q {
             div.one('shown.bs.modal', options.onOpen);
 
         if (options.onClose)
-            div.one('hidden.bs.modal', options.onOpen);
+            div.one('hidden.bs.modal', e => options.onClose(options["result"]));
 
-        div["modal"]('open');
+        var footer = div.find('.modal-footer');
+
+        function createButton(x: DialogButton) {
+            var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
+            var iconClass = toIconClass(x.icon);
+            if (iconClass != null)
+                text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");            
+            $(`<button class="btn ${x.cssClass ? x.cssClass : ''}"${x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '' }>${text}</button>`)
+                .appendTo(footer)
+                .click(e => {
+                    options["result"] = x.result;
+                    div["modal"]("hide");
+                    x.onClick && x.onClick.call(this, e);       
+                });
+        }
+
+        if (options.buttons)
+            for (var button of options.buttons) 
+                createButton(button);
+
+        div["modal"]('show');
     }
 
     let _useBrowserDialogs: boolean;
@@ -132,7 +161,18 @@ namespace Q {
     }
 
     function useBSModal(options: CommonDialogOptions): boolean {
-        return !!((!$.ui || !$.ui.dialog) || options.modalClass);
+        return !!((!$.ui || !$.ui.dialog) || Q.Config.bootstrapModals || options.modalClass);
+    }
+
+    function messageHtml(message: string, options?: CommonDialogOptions): string {
+        var htmlEncode = options == null || options.htmlEncode == null || options.htmlEncode
+        if (htmlEncode)
+            message = Q.htmlEncode(message); 
+
+        if (options == null || (options.preWrap == null && !htmlEncode) || options.preWrap)
+            message = '<div style="white-space: pre-wrap">' + message + '</div>';
+
+        return message;
     }
 
     export function alert(message: string, options?: AlertOptions) {
@@ -146,27 +186,22 @@ namespace Q {
 
         options = Q.extend({
             htmlEncode: true,
-            okButton: text('Dialogs.OkButton'),
-            title: text('Dialogs.AlertTitle')
+            okButton: txt('OkButton'),
+            title: txt('AlertTitle')
         }, options);
 
         if (options.buttons == null) {
             options.buttons = [];
             if (options.okButton == null || options.okButton) {
                 options.buttons.push({
-                    title: typeof options.okButton == "boolean" ? text('Dialogs.OkButton') : options.okButton,
+                    title: typeof options.okButton == "boolean" ? txt('OkButton') : options.okButton,
                     cssClass: useBS ? 'btn-default' : undefined,
                     result: 'ok'
                 });
             }
         }
 
-        var message = options.message;
-        if (options.htmlEncode != null && !options.htmlEncode)
-            message = Q.htmlEncode(message); 
-
-        if (options.preWrap)
-            message = '<div style="white-space: pre-wrap">' + message + '</div>';
+         message = messageHtml(message, options);
 
         if (useBS)
             bsModal(options, message, options.modalClass ?? "s-AlertModal");
@@ -193,32 +228,32 @@ namespace Q {
 
         options = Q.extend(<ConfirmOptions>{
             htmlEncode: true,
-            yesButton: text('Dialogs.YesButton'),
-            noButton: text('Dialogs.NoButton'),
-            title: text('Dialogs.ConfirmationTitle')
+            yesButton: txt('YesButton'),
+            noButton: txt('NoButton'),
+            title: txt('ConfirmationTitle')
         }, options);
 
         if (options.buttons == null) {
             options.buttons = [];
             if (options.yesButton == null || options.yesButton) {
                 options.buttons.push({
-                    title: typeof options.yesButton == "boolean" ? text('Dialogs.YesButton') : options.yesButton,
-                    cssClass: useBS ? 'btn-success' : undefined,
+                    title: typeof options.yesButton == "boolean" ? txt('YesButton') : options.yesButton,
+                    cssClass: useBS ? 'btn-primary' : undefined,
                     result: 'yes',
                     onClick: onYes
                 });
             }
             if (options.noButton == null || options.noButton) {
                 options.buttons.push({
-                    title: typeof options.noButton == "boolean" ? text('Dialogs.NoButton') : options.noButton,
-                    cssClass: useBS ? 'btn-warning' : undefined,
+                    title: typeof options.noButton == "boolean" ? txt('NoButton') : options.noButton,
+                    cssClass: useBS ? 'btn-default' : undefined,
                     result: 'no',
                     onClick: options.onNo
                 });
             }
             if (options.cancelButton) {
                 options.buttons.push({
-                    title: typeof options.cancelButton == "boolean" ? text('Dialogs.CancelButton') : options.cancelButton,
+                    title: typeof options.cancelButton == "boolean" ? txt('CancelButton') : options.cancelButton,
                     cssClass: useBS ? 'btn-default' : undefined,
                     result: 'cancel',
                     onClick: options.onCancel
@@ -226,13 +261,7 @@ namespace Q {
             }
         }
 
-        var message = options.message;
-        if (options.htmlEncode != null && !options.htmlEncode)
-            message = Q.htmlEncode(message); 
-
-        if (options.preWrap)
-            message = '<div style="white-space: pre-wrap">' + message + '</div>';
-
+        message = messageHtml(message, options);
         if (useBS)
             bsModal(options, message, options.modalClass ?? "s-ConfirmModal");
         else
@@ -252,7 +281,7 @@ namespace Q {
 
         if (useBSModal(options as any)) {
             bsModal({
-                title: text('Dialogs.AlertTitle'),
+                title: txt('AlertTitle'),
                 modalClass: 'modal-lg',
                 onOpen: function() {
                     doc = (<HTMLIFrameElement>($(this).find('iframe').css({
@@ -275,7 +304,7 @@ namespace Q {
             modal: true,
             width: '60%',
             height: '400',
-            title: text('Dialogs.AlertTitle'),
+            title: txt('AlertTitle'),
             open: function () {
                 doc = (<HTMLIFrameElement>(e.find('iframe').css({
                     border: 'none',
@@ -303,20 +332,20 @@ namespace Q {
             return;
         }
 
-        confirm(message, onOk, Q.extend<Q.ConfirmOptions>(
-            {
-                title: text("Dialogs.InformationTitle"),
-                dialogClass: "s-MessageDialog s-InformationDialog",
-                yesButton: text("Dialogs.OkButton"),
-                noButton: false,
-            }, options));
+        confirm(message, onOk, Q.extend<Q.ConfirmOptions>({
+            title: txt("InformationTitle"),
+            dialogClass: "s-InformationDialog",
+            modalClass: "s-InformationModal",
+            yesButton: txt("OkButton"),
+            noButton: false,
+        }, options));
     }
 
     export function warning(message: string, options?: Q.AlertOptions) {
-        alert(message, Q.extend<Q.AlertOptions>(
-            {
-                title: text("Dialogs.WarningTitle"),
-                dialogClass: "s-MessageDialog s-WarningDialog"
-            }, options));
+        alert(message, Q.extend<Q.AlertOptions>({
+            title: txt("WarningTitle"),
+            dialogClass: "s-WarningDialog",
+            modalClass: "s-WarningModal"
+        }, options));
     }
 }

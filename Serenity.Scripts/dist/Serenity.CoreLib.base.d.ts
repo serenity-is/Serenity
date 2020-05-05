@@ -527,7 +527,6 @@ declare namespace Q {
         onOpen?: () => void;
         onClose?: (result: string) => void;
         title?: string;
-        message?: string;
         htmlEncode?: boolean;
         preWrap?: boolean;
         dialogClass?: string;
@@ -584,6 +583,10 @@ declare namespace Q {
          * on dialog classes manually. It's false by default for backward compability.
          */
         let responsiveDialogs: boolean;
+        /**
+         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default
+         */
+        let bootstrapModals: boolean;
         /**
          * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
          * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by

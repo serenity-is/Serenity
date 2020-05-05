@@ -26,6 +26,11 @@
         export let responsiveDialogs = false;
 
         /**
+         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default
+         */
+        export let bootstrapModals = false;
+
+        /**
          * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
          * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
          * "Serenity.MyEditor" and "MyApp.MyEditor" if you added "MyApp" to the list of root namespaces.

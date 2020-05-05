@@ -2027,21 +2027,50 @@ var Q;
         // @ts-ignore
         return (_isBS3 = !!($.fn.modal && $.fn.modal.VERSION && $.fn.modal.VERSION.charAt(0) == '3'));
     }
+    var defaultTxt = {
+        AlertTitle: 'Alert',
+        InformationTitle: 'Information',
+        WarningTitle: 'Warning',
+        ConfirmationTitle: 'Confirm',
+        OkButton: 'OK',
+        YesButton: 'Yes',
+        NoButton: 'No',
+        CancelButton: 'Cancel',
+        CloseButton: 'Close'
+    };
+    function txt(k) {
+        var _a;
+        return (_a = Q.tryGetText("Dialogs." + k)) !== null && _a !== void 0 ? _a : defaultTxt[k];
+    }
     function bsModal(options, message, modalClass) {
-        var closeButton = "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"" + Q.text('Dialogs.CloseButton') + "\">" +
+        var closeButton = "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"" + txt('CloseButton') + "\">" +
             "<span aria-hidden=\"true\">&times;</span></button>";
-        var div = $("<div class=\"modal s-MessageModal " + modalClass + "\" tabindex=\"-1\" role=\"dialog\">\n    <div class=\"modal-dialog " + options.dialogClass + "\" role=\"document\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                " + (isBS3 ? closeButton : "") + "<h5 class=\"modal-title\">" + options.title + "</h5>" + (isBS3 ? "" : closeButton) + "\n            </div>\n            <div class=\"modal-body\">\n                " + message + "\n            </div>\n            <div class=\"modal-footer\">" + (options.buttons || []).map(function (x) {
+        var div = $("<div class=\"modal s-MessageModal " + modalClass + "\" tabindex=\"-1\" role=\"dialog\">\n    <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                " + (isBS3 ? closeButton : "") + "<h5 class=\"modal-title\">" + options.title + "</h5>" + (isBS3 ? "" : closeButton) + "\n            </div>\n            <div class=\"modal-body\">\n                " + message + "\n            </div>\n            <div class=\"modal-footer\"></div>\n        </div>\n    </div>\n</div>").eq(0).appendTo(document.body);
+        if (options.onOpen)
+            div.one('shown.bs.modal', options.onOpen);
+        if (options.onClose)
+            div.one('hidden.bs.modal', function (e) { return options.onClose(options["result"]); });
+        var footer = div.find('.modal-footer');
+        function createButton(x) {
+            var _this = this;
             var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
             var iconClass = toIconClass(x.icon);
             if (iconClass != null)
                 text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");
-            return "<button class=\"btn " + (x.cssClass ? x.cssClass : '') + "\"" + (x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '') + ">" + text + "</button>";
-        }).join('\n') + "</div>\n        </div>\n    </div>\n</div>").eq(0).appendTo(document.body);
-        if (options.onOpen)
-            div.one('shown.bs.modal', options.onOpen);
-        if (options.onClose)
-            div.one('hidden.bs.modal', options.onOpen);
-        div["modal"]('open');
+            $("<button class=\"btn " + (x.cssClass ? x.cssClass : '') + "\"" + (x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '') + ">" + text + "</button>")
+                .appendTo(footer)
+                .click(function (e) {
+                options["result"] = x.result;
+                div["modal"]("hide");
+                x.onClick && x.onClick.call(_this, e);
+            });
+        }
+        if (options.buttons)
+            for (var _i = 0, _a = options.buttons; _i < _a.length; _i++) {
+                var button = _a[_i];
+                createButton(button);
+            }
+        div["modal"]('show');
     }
     var _useBrowserDialogs;
     function useBrowserDialogs() {
@@ -2051,7 +2080,15 @@ var Q;
         return _useBrowserDialogs;
     }
     function useBSModal(options) {
-        return !!((!$.ui || !$.ui.dialog) || options.modalClass);
+        return !!((!$.ui || !$.ui.dialog) || Q.Config.bootstrapModals || options.modalClass);
+    }
+    function messageHtml(message, options) {
+        var htmlEncode = options == null || options.htmlEncode == null || options.htmlEncode;
+        if (htmlEncode)
+            message = Q.htmlEncode(message);
+        if (options == null || (options.preWrap == null && !htmlEncode) || options.preWrap)
+            message = '<div style="white-space: pre-wrap">' + message + '</div>';
+        return message;
     }
     function alert(message, options) {
         var _a, _b;
@@ -2062,24 +2099,20 @@ var Q;
         var useBS = useBSModal(options);
         options = Q.extend({
             htmlEncode: true,
-            okButton: Q.text('Dialogs.OkButton'),
-            title: Q.text('Dialogs.AlertTitle')
+            okButton: txt('OkButton'),
+            title: txt('AlertTitle')
         }, options);
         if (options.buttons == null) {
             options.buttons = [];
             if (options.okButton == null || options.okButton) {
                 options.buttons.push({
-                    title: typeof options.okButton == "boolean" ? Q.text('Dialogs.OkButton') : options.okButton,
+                    title: typeof options.okButton == "boolean" ? txt('OkButton') : options.okButton,
                     cssClass: useBS ? 'btn-default' : undefined,
                     result: 'ok'
                 });
             }
         }
-        var message = options.message;
-        if (options.htmlEncode != null && !options.htmlEncode)
-            message = Q.htmlEncode(message);
-        if (options.preWrap)
-            message = '<div style="white-space: pre-wrap">' + message + '</div>';
+        message = messageHtml(message, options);
         if (useBS)
             bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-AlertModal");
         else
@@ -2096,42 +2129,38 @@ var Q;
         var useBS = useBSModal(options);
         options = Q.extend({
             htmlEncode: true,
-            yesButton: Q.text('Dialogs.YesButton'),
-            noButton: Q.text('Dialogs.NoButton'),
-            title: Q.text('Dialogs.ConfirmationTitle')
+            yesButton: txt('YesButton'),
+            noButton: txt('NoButton'),
+            title: txt('ConfirmationTitle')
         }, options);
         if (options.buttons == null) {
             options.buttons = [];
             if (options.yesButton == null || options.yesButton) {
                 options.buttons.push({
-                    title: typeof options.yesButton == "boolean" ? Q.text('Dialogs.YesButton') : options.yesButton,
-                    cssClass: useBS ? 'btn-success' : undefined,
+                    title: typeof options.yesButton == "boolean" ? txt('YesButton') : options.yesButton,
+                    cssClass: useBS ? 'btn-primary' : undefined,
                     result: 'yes',
                     onClick: onYes
                 });
             }
             if (options.noButton == null || options.noButton) {
                 options.buttons.push({
-                    title: typeof options.noButton == "boolean" ? Q.text('Dialogs.NoButton') : options.noButton,
-                    cssClass: useBS ? 'btn-warning' : undefined,
+                    title: typeof options.noButton == "boolean" ? txt('NoButton') : options.noButton,
+                    cssClass: useBS ? 'btn-default' : undefined,
                     result: 'no',
                     onClick: options.onNo
                 });
             }
             if (options.cancelButton) {
                 options.buttons.push({
-                    title: typeof options.cancelButton == "boolean" ? Q.text('Dialogs.CancelButton') : options.cancelButton,
+                    title: typeof options.cancelButton == "boolean" ? txt('CancelButton') : options.cancelButton,
                     cssClass: useBS ? 'btn-default' : undefined,
                     result: 'cancel',
                     onClick: options.onCancel
                 });
             }
         }
-        var message = options.message;
-        if (options.htmlEncode != null && !options.htmlEncode)
-            message = Q.htmlEncode(message);
-        if (options.preWrap)
-            message = '<div style="white-space: pre-wrap">' + message + '</div>';
+        message = messageHtml(message, options);
         if (useBS)
             bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-ConfirmModal");
         else
@@ -2145,7 +2174,7 @@ var Q;
         }
         if (useBSModal(options)) {
             bsModal({
-                title: Q.text('Dialogs.AlertTitle'),
+                title: txt('AlertTitle'),
                 modalClass: 'modal-lg',
                 onOpen: function () {
                     doc = ($(this).find('iframe').css({
@@ -2167,7 +2196,7 @@ var Q;
             modal: true,
             width: '60%',
             height: '400',
-            title: Q.text('Dialogs.AlertTitle'),
+            title: txt('AlertTitle'),
             open: function () {
                 doc = (e.find('iframe').css({
                     border: 'none',
@@ -2195,17 +2224,19 @@ var Q;
             return;
         }
         confirm(message, onOk, Q.extend({
-            title: Q.text("Dialogs.InformationTitle"),
-            dialogClass: "s-MessageDialog s-InformationDialog",
-            yesButton: Q.text("Dialogs.OkButton"),
+            title: txt("InformationTitle"),
+            dialogClass: "s-InformationDialog",
+            modalClass: "s-InformationModal",
+            yesButton: txt("OkButton"),
             noButton: false,
         }, options));
     }
     Q.information = information;
     function warning(message, options) {
         alert(message, Q.extend({
-            title: Q.text("Dialogs.WarningTitle"),
-            dialogClass: "s-MessageDialog s-WarningDialog"
+            title: txt("WarningTitle"),
+            dialogClass: "s-WarningDialog",
+            modalClass: "s-WarningModal"
         }, options));
     }
     Q.warning = warning;
@@ -2338,6 +2369,10 @@ var Q;
          * on dialog classes manually. It's false by default for backward compability.
          */
         Config.responsiveDialogs = false;
+        /**
+         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default
+         */
+        Config.bootstrapModals = false;
         /**
          * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
          * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
