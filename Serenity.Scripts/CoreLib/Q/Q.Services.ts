@@ -50,7 +50,7 @@ namespace Q {
         if (url && url.length && url.charAt(0) != '~' && url.charAt(0) != '/' && url.indexOf('://') < 0)
             url = resolveUrl("~/services/") + url;
 
-        options = $.extend<Q.ServiceOptions<TResponse>>({
+        options = Q.extend<Q.ServiceOptions<TResponse>>({
             dataType: 'json',
             contentType: 'application/json',
             type: 'POST',
@@ -126,7 +126,7 @@ namespace Q {
 
     export function serviceRequest<TResponse>(service: string, request?: any,
         onSuccess?: (response: TResponse) => void, options?: Q.ServiceOptions<TResponse>) {
-        return serviceCall($.extend<Q.ServiceOptions<TResponse>>({
+        return serviceCall(Q.extend<Q.ServiceOptions<TResponse>>({
             service: service,
             request: request,
             onSuccess: onSuccess

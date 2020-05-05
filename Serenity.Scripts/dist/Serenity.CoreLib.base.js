@@ -753,59 +753,23 @@ var Q;
     }
     Q.debounce = debounce;
     ;
-    // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
-    function deepClone(arg1) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
+    function extend(a, b) {
+        for (var key in b)
+            if (b.hasOwnProperty(key))
+                a[key] = b[key];
+        return a;
+    }
+    Q.extend = extend;
+    function deepClone(a) {
+        if (!a)
+            return a;
+        var v;
+        var b = Array.isArray(a) ? [] : {};
+        for (var k in a) {
+            v = a[k];
+            b[k] = (typeof v === "object") ? deepClone(v) : v;
         }
-        var options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length;
-        // Handle case when target is a string or something (possible in deep copy)
-        if (typeof target !== "object" && !$.isFunction(target)) {
-            target = {};
-        }
-        if (i === length) {
-            target = {};
-            i = 0;
-        }
-        for (; i < length; i++) {
-            // Only deal with non-null/undefined values
-            if ((options = arguments[i]) !== null) {
-                // Special operations for arrays
-                if ($.isArray(options)) {
-                    target = $.extend(true, [], options);
-                }
-                else {
-                    // Extend the base object
-                    for (name in options) {
-                        src = target[name];
-                        copy = options[name];
-                        // Prevent never-ending loop
-                        if (target === copy) {
-                            continue;
-                        }
-                        // Recurse if we're merging plain objects or arrays
-                        if (copy && ($.isPlainObject(copy) ||
-                            (copyIsArray = $.isArray(copy)))) {
-                            if (copyIsArray) {
-                                copyIsArray = false;
-                                clone = src && $.isArray(src) ? src : [];
-                            }
-                            else {
-                                clone = src && $.isPlainObject(src) ? src : {};
-                            }
-                            // Never move original objects, clone them
-                            target[name] = deepClone(clone, copy);
-                        }
-                        else if (copy !== undefined) {
-                            target[name] = copy;
-                        }
-                    }
-                }
-            }
-        }
-        // Return the modified object
-        return target;
+        return b;
     }
     Q.deepClone = deepClone;
 })(Q || (Q = {}));
@@ -1860,7 +1824,7 @@ var Q;
      * div is 2000, so a higher z-order shouldn't be used in page.
      */
     function blockUI(options) {
-        options = $.extend({
+        options = Q.extend({
             baseZ: 2000,
             message: '',
             overlayCSS: {
@@ -2005,122 +1969,200 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
-    function alert(message, options) {
-        var dialog;
-        options = $.extend({
-            htmlEncode: true,
-            okButton: Q.text('Dialogs.OkButton'),
-            title: Q.text('Dialogs.AlertTitle'),
-            onClose: null,
-            onOpen: null,
-            autoOpen: false,
-            dialogClass: 's-MessageDialog s-AlertDialog',
+    function toIconClass(icon) {
+        if (!icon)
+            return null;
+        if (Q.startsWith(icon, 'fa-'))
+            return 'fa ' + icon;
+        if (Q.startsWith(icon, 'glyphicon-'))
+            return 'glyphicon ' + icon;
+        return icon;
+    }
+    function uiDialog(options, message, dialogClass) {
+        var opt = Q.extend({
             modal: true,
+            dialogClass: 's-MessageDialog' + (dialogClass ? (' ' + dialogClass) : ''),
             width: '40%',
-            maxWidth: '450',
-            minWidth: '180',
+            maxWidth: 450,
+            minWidth: 180,
             resizable: false,
             open: function () {
                 if (options.onOpen)
                     options.onOpen.call(this);
             },
             close: function () {
-                dialog.dialog('destroy');
+                $(this).dialog('destroy');
                 if (options.onClose)
-                    options.onClose();
+                    options.onClose.call(this, options["result"]);
             }
         }, options);
-        if (options.htmlEncode)
-            message = Q.htmlEncode(message);
-        if (!options.buttons) {
-            var buttons = [];
-            buttons.push({
-                text: options.okButton,
-                click: function () {
-                    dialog.dialog('close');
-                }
+        if (options.buttons) {
+            opt.buttons = options.buttons.map(function (x) {
+                var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
+                var iconClass = toIconClass(x.icon);
+                if (iconClass != null)
+                    text = '<i class="' + iconClass + "><i> ";
+                return {
+                    text: text,
+                    click: function (e) {
+                        options["result"] = x.result;
+                        $(this).dialog('close');
+                        x.onClick && x.onClick.call(this, e);
+                    },
+                    attr: !x.cssClass ? undefined : {
+                        "class": x.cssClass
+                    }
+                };
             });
-            options.buttons = buttons;
         }
-        dialog = $('<div><div class="message"><\/div><\/div>')
-            .dialog(options)
+        return $('<div><div class="message"></div></div>')
             .children('.message')
             .html(message)
-            .parent()
-            .dialog('open');
+            .dialog(options);
+    }
+    var _isBS3;
+    function isBS3() {
+        if (_isBS3 != null)
+            return _isBS3;
+        // @ts-ignore
+        return (_isBS3 = !!($.fn.modal && $.fn.modal.VERSION && $.fn.modal.VERSION.charAt(0) == '3'));
+    }
+    function bsModal(options, message, modalClass) {
+        var closeButton = "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"" + Q.text('Dialogs.CloseButton') + "\">" +
+            "<span aria-hidden=\"true\">&times;</span></button>";
+        var div = $("<div class=\"modal s-MessageModal " + modalClass + "\" tabindex=\"-1\" role=\"dialog\">\n    <div class=\"modal-dialog " + options.dialogClass + "\" role=\"document\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                " + (isBS3 ? closeButton : "") + "<h5 class=\"modal-title\">" + options.title + "</h5>" + (isBS3 ? "" : closeButton) + "\n            </div>\n            <div class=\"modal-body\">\n                " + message + "\n            </div>\n            <div class=\"modal-footer\">" + (options.buttons || []).map(function (x) {
+            var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
+            var iconClass = toIconClass(x.icon);
+            if (iconClass != null)
+                text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");
+            return "<button class=\"btn " + (x.cssClass ? x.cssClass : '') + "\"" + (x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '') + ">" + text + "</button>";
+        }).join('\n') + "</div>\n        </div>\n    </div>\n</div>").eq(0).appendTo(document.body);
+        if (options.onOpen)
+            div.one('shown.bs.modal', options.onOpen);
+        if (options.onClose)
+            div.one('hidden.bs.modal', options.onOpen);
+        div["modal"]('open');
+    }
+    var _useBrowserDialogs;
+    function useBrowserDialogs() {
+        if (_useBrowserDialogs == null) {
+            _useBrowserDialogs = typeof $ === 'undefined' || ((!$.ui || !$.ui.dialog) && (!$.fn || !$.fn["modal"]));
+        }
+        return _useBrowserDialogs;
+    }
+    function useBSModal(options) {
+        return !!((!$.ui || !$.ui.dialog) || options.modalClass);
+    }
+    function alert(message, options) {
+        var _a, _b;
+        if (useBrowserDialogs()) {
+            window.alert(message);
+            return;
+        }
+        var useBS = useBSModal(options);
+        options = Q.extend({
+            htmlEncode: true,
+            okButton: Q.text('Dialogs.OkButton'),
+            title: Q.text('Dialogs.AlertTitle')
+        }, options);
+        if (options.buttons == null) {
+            options.buttons = [];
+            if (options.okButton == null || options.okButton) {
+                options.buttons.push({
+                    title: typeof options.okButton == "boolean" ? Q.text('Dialogs.OkButton') : options.okButton,
+                    cssClass: useBS ? 'btn-default' : undefined,
+                    result: 'ok'
+                });
+            }
+        }
+        var message = options.message;
+        if (options.htmlEncode != null && !options.htmlEncode)
+            message = Q.htmlEncode(message);
+        if (options.preWrap)
+            message = '<div style="white-space: pre-wrap">' + message + '</div>';
+        if (useBS)
+            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-AlertModal");
+        else
+            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-AlertDialog");
     }
     Q.alert = alert;
     function confirm(message, onYes, options) {
-        var dialog;
-        options = $.extend({
+        var _a, _b;
+        if (useBrowserDialogs()) {
+            if (window.confirm(message))
+                onYes && onYes();
+            return;
+        }
+        var useBS = useBSModal(options);
+        options = Q.extend({
             htmlEncode: true,
             yesButton: Q.text('Dialogs.YesButton'),
             noButton: Q.text('Dialogs.NoButton'),
-            title: Q.text('Dialogs.ConfirmationTitle'),
-            onNo: null,
-            onCancel: null,
-            onClose: null,
-            autoOpen: false,
-            modal: true,
-            dialogClass: 's-MessageDialog s-ConfirmDialog',
-            width: '40%',
-            maxWidth: '450',
-            minWidth: '180',
-            resizable: false,
-            open: function () {
-                if (options.onOpen)
-                    options.onOpen.call(this);
-            },
-            close: function () {
-                dialog.dialog('destroy');
-                if (!clicked && options.onCancel)
-                    options.onCancel();
-            },
-            overlay: {
-                opacity: 0.77,
-                background: "black"
-            }
+            title: Q.text('Dialogs.ConfirmationTitle')
         }, options);
-        if (options.htmlEncode)
-            message = Q.htmlEncode(message);
-        var clicked = false;
-        if (!options.buttons) {
-            var buttons = [];
-            buttons.push({
-                text: options.yesButton,
-                click: function () {
-                    clicked = true;
-                    dialog.dialog('close');
-                    if (onYes)
-                        onYes();
-                }
-            });
-            if (options.noButton)
-                buttons.push({
-                    text: options.noButton,
-                    click: function () {
-                        clicked = true;
-                        dialog.dialog('close');
-                        if (options.onNo)
-                            options.onNo();
-                        else if (options.onCancel)
-                            options.onCancel();
-                    }
+        if (options.buttons == null) {
+            options.buttons = [];
+            if (options.yesButton == null || options.yesButton) {
+                options.buttons.push({
+                    title: typeof options.yesButton == "boolean" ? Q.text('Dialogs.YesButton') : options.yesButton,
+                    cssClass: useBS ? 'btn-success' : undefined,
+                    result: 'yes',
+                    onClick: onYes
                 });
-            options.buttons = buttons;
+            }
+            if (options.noButton == null || options.noButton) {
+                options.buttons.push({
+                    title: typeof options.noButton == "boolean" ? Q.text('Dialogs.NoButton') : options.noButton,
+                    cssClass: useBS ? 'btn-warning' : undefined,
+                    result: 'no',
+                    onClick: options.onNo
+                });
+            }
+            if (options.cancelButton) {
+                options.buttons.push({
+                    title: typeof options.cancelButton == "boolean" ? Q.text('Dialogs.CancelButton') : options.cancelButton,
+                    cssClass: useBS ? 'btn-default' : undefined,
+                    result: 'cancel',
+                    onClick: options.onCancel
+                });
+            }
         }
-        dialog = $('<div><div class="message"><\/div><\/div>')
-            .dialog(options)
-            .children('.message')
-            .html(message)
-            .parent()
-            .dialog('open');
+        var message = options.message;
+        if (options.htmlEncode != null && !options.htmlEncode)
+            message = Q.htmlEncode(message);
+        if (options.preWrap)
+            message = '<div style="white-space: pre-wrap">' + message + '</div>';
+        if (useBS)
+            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-ConfirmModal");
+        else
+            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-ConfirmDialog");
     }
     Q.confirm = confirm;
     function iframeDialog(options) {
+        if (useBrowserDialogs()) {
+            window.alert(options.html);
+            return;
+        }
+        if (useBSModal(options)) {
+            bsModal({
+                title: Q.text('Dialogs.AlertTitle'),
+                modalClass: 'modal-lg',
+                onOpen: function () {
+                    doc = ($(this).find('iframe').css({
+                        border: 'none',
+                        width: '100%',
+                        height: '100%'
+                    })[0]).contentDocument;
+                    doc.open();
+                    doc.write(settings.html);
+                    doc.close();
+                }
+            }, '<div style="overflow: hidden"><iframe></iframe></div>', 's-IFrameModal');
+            return;
+        }
         var doc;
         var e = $('<div style="overflow: hidden"><iframe></iframe></div>');
-        var settings = $.extend({
+        var settings = Q.extend({
             autoOpen: true,
             modal: true,
             width: '60%',
@@ -2147,16 +2189,21 @@ var Q;
     }
     Q.iframeDialog = iframeDialog;
     function information(message, onOk, options) {
-        confirm(message, onOk, $.extend({
+        if (useBrowserDialogs()) {
+            window.alert(message);
+            onOk && onOk();
+            return;
+        }
+        confirm(message, onOk, Q.extend({
             title: Q.text("Dialogs.InformationTitle"),
             dialogClass: "s-MessageDialog s-InformationDialog",
             yesButton: Q.text("Dialogs.OkButton"),
-            noButton: null,
+            noButton: false,
         }, options));
     }
     Q.information = information;
     function warning(message, options) {
-        alert(message, $.extend({
+        alert(message, Q.extend({
             title: Q.text("Dialogs.WarningTitle"),
             dialogClass: "s-MessageDialog s-WarningDialog"
         }, options));
@@ -2173,7 +2220,7 @@ var Q;
         positionClass: 'toast-top-full-width'
     };
     function getToastrOptions(options) {
-        options = $.extend({}, Q.defaultNotifyOptions, options);
+        options = Q.extend(Q.extend({}, Q.defaultNotifyOptions), options);
         positionToastContainer(true);
         return options;
     }
@@ -2343,7 +2390,7 @@ var Q;
         var url = options.service;
         if (url && url.length && url.charAt(0) != '~' && url.charAt(0) != '/' && url.indexOf('://') < 0)
             url = resolveUrl("~/services/") + url;
-        options = $.extend({
+        options = Q.extend({
             dataType: 'json',
             contentType: 'application/json',
             type: 'POST',
@@ -2416,7 +2463,7 @@ var Q;
     }
     Q.serviceCall = serviceCall;
     function serviceRequest(service, request, onSuccess, options) {
-        return serviceCall($.extend({
+        return serviceCall(Q.extend({
             service: service,
             request: request,
             onSuccess: onSuccess

@@ -328,11 +328,11 @@
             }
             var editor;
             if (optionsType != null) {
-                editorParams = $.extend(new optionsType(), item.editorParams);
+                editorParams = Q.extend(new optionsType(), item.editorParams);
                 editor = new (editorType as any)(element, editorParams);
             }
             else {
-                editorParams = $.extend(new Object(), item.editorParams);
+                editorParams = Q.extend(new Object(), item.editorParams);
                 editor = new (editorType as any)(element, editorParams);
             }
 

@@ -861,7 +861,7 @@ namespace Slick {
                 groupingInfos = (groupingInfo instanceof Array) ? groupingInfo : [groupingInfo];
 
                 for (var i = 0; i < groupingInfos.length; i++) {
-                    var gi = groupingInfos[i] = $.extend(true, {}, groupingInfoDefaults, groupingInfos[i]);
+                    var gi = groupingInfos[i] = Q.extend(Q.extend<any>({}, groupingInfoDefaults), Q.deepClone(groupingInfos[i]));
                     gi.aggregators = gi.aggregators || summaryOptions.aggregators || [];
                     gi.getterIsAFn = typeof gi.getter === "function";
 
@@ -1637,7 +1637,7 @@ namespace Slick {
                 }
 
                 if (intf.params) {
-                    request = $.extend(request, intf.params);
+                    request = Q.extend(request, intf.params);
                 }
 
                 var dt = dataType;

@@ -382,7 +382,7 @@
             super(input, opt);
 
             input.addClass('decimalQ');
-			var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
+			var numericOptions = Q.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
 				vMin: Q.coalesce(this.options.minValue, this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-999999999999.99') : '0.00'),
                 vMax: Q.coalesce(this.options.maxValue, '999999999999.99')
             });
@@ -452,7 +452,7 @@
             super(input, opt);
 
             input.addClass('integerQ');
-            var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(),
+            var numericOptions = Q.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(),
                 {
 					vMin: Q.coalesce(this.options.minValue, this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-2147483647') : '0'),
                     vMax: Q.coalesce(this.options.maxValue, 2147483647),
@@ -1155,7 +1155,7 @@
             if (this.entity == null) {
                 return null;
             }
-            var copy = $.extend({}, this.entity);
+            var copy = Q.extend({}, this.entity);
             return copy;
         }
 
@@ -1169,7 +1169,7 @@
                     this.entity = null;
                 }
                 else {
-                    this.entity = $.extend({}, value);
+                    this.entity = Q.extend({}, value);
                 }
             }
             else {
@@ -1314,7 +1314,7 @@
 
         get_value(): UploadedFile[] {
             return this.entities.map(function (x) {
-                return $.extend({}, x);
+                return Q.extend({}, x);
             });
         }
 
@@ -1324,7 +1324,7 @@
 
         set_value(value: UploadedFile[]) {
             this.entities = (value || []).map(function (x) {
-                return $.extend({}, x);
+                return Q.extend({}, x);
             });
             this.populate();
             this.updateInterface();

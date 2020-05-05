@@ -30,7 +30,7 @@ namespace Q {
      * div is 2000, so a higher z-order shouldn't be used in page.
      */
     export function blockUI(options: JQBlockUIOptions) {
-        options = $.extend<JQBlockUIOptions>({
+        options = Q.extend({
             baseZ: 2000,
             message: '',
             overlayCSS: {

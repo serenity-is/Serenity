@@ -273,7 +273,7 @@
             filter.field = this.getCriteriaField();
             filter.type = Serenity.StringEditor;
             filter.title = this.getTitle(this.field);
-            filter.options = Q.deepClone({}, this.get_field().quickFilterParams);
+            filter.options = Q.deepClone(this.get_field().quickFilterParams);
         }
     }
 
@@ -331,10 +331,10 @@
         }
 
         getEditorOptions() {
-            var opt = Q.deepClone({}, this.get_field().editorParams);
+            var opt = Q.deepClone(this.get_field().editorParams);
             delete opt['cascadeFrom'];
             // currently can't support cascadeFrom in filtering
-            return Q.deepClone(opt, this.get_field().filteringParams);
+            return Q.extend(opt, this.get_field().filteringParams);
         }
 
         loadState(state: any) {
@@ -375,9 +375,7 @@
             super.initQuickFilter(filter);
 
             filter.type = this.editorType;
-            filter.options = Q.deepClone({},
-                this.getEditorOptions(),
-                this.get_field().quickFilterParams);
+            filter.options = Q.extend(Q.extend({}, Q.deepClone(this.getEditorOptions())), Q.deepClone(this.get_field().quickFilterParams));
         }
     }
 
@@ -535,7 +533,7 @@
         getEditorOptions() {
             var opt = super.getEditorOptions();
             if (this.useEditor() && this.editorType === Q.coalesce(this.get_field().editorType, 'String')) {
-                opt = $.extend(opt, this.get_field().editorParams);
+                opt = Q.extend(opt, this.get_field().editorParams);
             }
 
             return opt;

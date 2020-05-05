@@ -171,7 +171,7 @@
             };
 
             var thisOptions = this.getDeleteOptions(callback);
-            var finalOptions = $.extend(baseOptions, thisOptions);
+            var finalOptions = Q.extend(baseOptions, thisOptions);
 
             this.deleteHandler(finalOptions, callback);
         }
@@ -464,7 +464,7 @@
             };
 
             var thisOptions = this.getLoadByIdOptions(id, callback);
-            var finalOptions = $.extend(baseOptions, thisOptions);
+            var finalOptions = Q.extend(baseOptions, thisOptions);
             this.loadByIdHandler(finalOptions, callback, fail);
         }
 
@@ -513,7 +513,7 @@
                 var langs = null;
 
                 if (item1.localizable === true) {
-                    var copy = $.extend({}, item1);
+                    var copy = Q.extend({}, item1);
                     copy.oneWay = true;
                     copy.readOnly = true;
                     copy.required = false;
@@ -524,7 +524,7 @@
                         langs = this.getLangs();
 
                     for (var lang of langs) {
-                        copy = $.extend({}, item1);
+                        copy = Q.extend({}, item1);
                         copy.name = lang[0] + '$' + copy.name;
                         copy.title = lang[1];
                         copy.cssClass = [copy.cssClass, 'translation'].join(' ');
@@ -621,7 +621,7 @@
                     IncludeColumns: ['Localizations']
                 },
                 onSuccess: response => {
-                    var copy = $.extend(new Object(), this.get_entity());
+                    var copy = Q.extend(new Object(), this.get_entity());
                     if (response.Localizations) {
                         for (var language of Object.keys(response.Localizations)) {
                             var entity = response.Localizations[language];
@@ -1010,7 +1010,7 @@
         protected getCloningEntity(): TItem {
 
             var clone: TItem = new Object() as any;
-            clone = $.extend(clone, this.get_entity());
+            clone = Q.extend(clone, this.get_entity());
 
             var idField = this.getIdProperty();
             if (!Q.isEmptyOrNull(idField)) {
@@ -1112,7 +1112,7 @@
             };
 
             var thisOptions = this.getUndeleteOptions(callback);
-            var finalOptions = $.extend(baseOptions, thisOptions);
+            var finalOptions = Q.extend(baseOptions, thisOptions);
             this.undeleteHandler(finalOptions, callback);
         }
 

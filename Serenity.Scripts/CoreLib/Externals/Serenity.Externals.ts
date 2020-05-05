@@ -1,5 +1,11 @@
 ﻿declare var Vue: any;
 
+declare namespace JQueryValidation {
+    interface ValidationOptions {
+        normalizer?: (v: string) => string;
+    }
+}
+
 namespace Q {
 
     let oldShowLabel: (e: HTMLElement, message: string) => void;
@@ -160,19 +166,21 @@ namespace Q {
             this.elements().removeClass(this.settings.errorClass);
         };
         jQuery(function () {
-            $.extend($.validator.messages, {
-                email: Q.text("Validation.Email"),
-                required: Q.text("Validation.Required"),
-                minlength: Q.text("Validation.MinLength"),
-                maxlength: Q.text("Validation.MaxLength"),
-                digits: Q.text("Validation.Digits"),
-                range: Q.text("Validation.Range"),
-                xss: Q.text("Validation.Xss"),
-                dateQ: Q.text("Validation.DateInvalid"),
-                decimalQ: Q.text("Validation.Decimal"),
-                integerQ: Q.text("Validation.Integer"),
-                url: Q.text("Validation.Url")
-            });
+            if (typeof $ !== "undefined" && $.validator) {
+                Q.extend($.validator.messages, {
+                    email: Q.text("Validation.Email"),
+                    required: Q.text("Validation.Required"),
+                    minlength: Q.text("Validation.MinLength"),
+                    maxlength: Q.text("Validation.MaxLength"),
+                    digits: Q.text("Validation.Digits"),
+                    range: Q.text("Validation.Range"),
+                    xss: Q.text("Validation.Xss"),
+                    dateQ: Q.text("Validation.DateInvalid"),
+                    decimalQ: Q.text("Validation.Decimal"),
+                    integerQ: Q.text("Validation.Integer"),
+                    url: Q.text("Validation.Url")
+                });
+            }
         });
     };
 
@@ -184,7 +192,7 @@ namespace Q {
     };
 
     export function validateOptions(options: JQueryValidation.ValidationOptions) {
-        return $.extend({
+        return Q.extend({
             ignore: ":hidden",
             meta: 'v',
             normalizer: function (value: any) {

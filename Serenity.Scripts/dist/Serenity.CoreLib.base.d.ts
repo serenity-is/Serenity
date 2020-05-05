@@ -1,6 +1,5 @@
-﻿/// <reference types="jqueryui" />
+﻿/// <reference types="jquery" />
 /// <reference types="toastr" />
-/// <reference types="jquery" />
 /// <reference types="react" />
 declare var __decorate: any;
 declare const __skipExtends: {
@@ -376,7 +375,8 @@ declare namespace Q {
      * @source underscore.js
      */
     function debounce(func: Function, wait?: number, immediate?: boolean): () => any;
-    function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem;
+    function extend<T = any>(a: T, b: T): T;
+    function deepClone<T = any>(a: T): T;
 }
 declare namespace Q {
     interface NumberFormat {
@@ -514,21 +514,34 @@ declare namespace Q {
     function outerHtml(element: JQuery): string;
 }
 declare namespace Q {
-    interface CommonDialogOptions extends JQueryUI.DialogOptions {
-        onOpen?: () => void;
-        onClose?: () => void;
-        htmlEncode?: boolean;
-        dialogClass?: string;
+    interface DialogButton {
         title?: string;
+        hint?: string;
+        icon?: string;
+        onClick?: (e: JQueryEventObject) => void;
+        cssClass?: string;
+        htmlEncode?: boolean;
+        result?: string;
+    }
+    interface CommonDialogOptions {
+        onOpen?: () => void;
+        onClose?: (result: string) => void;
+        title?: string;
+        message?: string;
+        htmlEncode?: boolean;
+        preWrap?: boolean;
+        dialogClass?: string;
+        buttons?: DialogButton[];
+        modalClass?: string;
     }
     interface AlertOptions extends CommonDialogOptions {
-        okButton?: string;
+        okButton?: string | boolean;
     }
     function alert(message: string, options?: AlertOptions): void;
     interface ConfirmOptions extends CommonDialogOptions {
-        yesButton?: string;
-        noButton?: string;
-        cancelButton?: string;
+        yesButton?: string | boolean;
+        noButton?: string | boolean;
+        cancelButton?: string | boolean;
         onCancel?: () => void;
         onNo?: () => void;
     }
