@@ -257,7 +257,7 @@ var Q;
     var ArgumentOutOfRangeException = /** @class */ (function (_super) {
         __extends(ArgumentOutOfRangeException, _super);
         function ArgumentOutOfRangeException(paramName, message) {
-            var _this = _super.call(this, (message !== null && message !== void 0 ? message : 'Value is out of range.') +
+            var _this = _super.call(this, ((message !== null && message !== void 0 ? message : 'Value is out of range.')) +
                 (paramName ? ('\nParameter name: ' + paramName) : "")) || this;
             _this.name = "ArgumentNullException";
             return _this;
@@ -974,19 +974,19 @@ var Q;
         var _a, _b, _c, _d, _e, _f;
         if (num == null)
             return "";
-        var fmt = typeof decOrLoc !== "string" ? (decOrLoc !== null && decOrLoc !== void 0 ? decOrLoc : Q.Culture) : {
+        var fmt = typeof decOrLoc !== "string" ? ((decOrLoc !== null && decOrLoc !== void 0 ? decOrLoc : Q.Culture)) : {
             decimalSeparator: decOrLoc,
-            groupSeparator: grp !== null && grp !== void 0 ? grp : (decOrLoc == "," ? "." : ",")
+            groupSeparator: (grp !== null && grp !== void 0 ? grp : (decOrLoc == "," ? "." : ","))
         };
         if (isNaN(num)) {
-            return (_a = fmt.nanSymbol) !== null && _a !== void 0 ? _a : Q.Culture.nanSymbol;
+            return _a = fmt.nanSymbol, (_a !== null && _a !== void 0 ? _a : Q.Culture.nanSymbol);
         }
         if (format == null || (format.length == 0) || (format == 'i')) {
             return num.toString();
         }
-        var dec = (_b = fmt.decimalSeparator) !== null && _b !== void 0 ? _b : Q.Culture.decimalSeparator;
-        grp = (_c = grp !== null && grp !== void 0 ? grp : fmt.groupSeparator) !== null && _c !== void 0 ? _c : Q.Culture.groupSeparator;
-        var neg = (_d = fmt.negativeSign) !== null && _d !== void 0 ? _d : Q.Culture.negativeSign;
+        var dec = (_b = fmt.decimalSeparator, (_b !== null && _b !== void 0 ? _b : Q.Culture.decimalSeparator));
+        grp = (_c = (grp !== null && grp !== void 0 ? grp : fmt.groupSeparator), (_c !== null && _c !== void 0 ? _c : Q.Culture.groupSeparator));
+        var neg = (_d = fmt.negativeSign, (_d !== null && _d !== void 0 ? _d : Q.Culture.negativeSign));
         var s = '';
         var precision = -1;
         if (format.length > 1) {
@@ -1024,7 +1024,7 @@ var Q;
             case 'n':
             case 'N':
                 if (precision == -1) {
-                    precision = (_e = fmt.decimalDigits) !== null && _e !== void 0 ? _e : Q.Culture.decimalDigits;
+                    precision = (_e = fmt.decimalDigits, (_e !== null && _e !== void 0 ? _e : Q.Culture.decimalDigits));
                 }
                 s = num.toFixed(precision).toString();
                 if (precision && (dec != '.')) {
@@ -1040,7 +1040,7 @@ var Q;
             case 'p':
             case 'P':
                 if (precision == -1) {
-                    precision = (_f = fmt.decimalDigits) !== null && _f !== void 0 ? _f : Q.Culture.decimalDigits;
+                    precision = (_f = fmt.decimalDigits, (_f !== null && _f !== void 0 ? _f : Q.Culture.decimalDigits));
                 }
                 if (fs === 'p' || fs == 'P')
                     num *= 100;
@@ -1249,25 +1249,25 @@ var Q;
         if (locale == null)
             locale = Q.Culture;
         if (format == null || format == "d")
-            format = (_a = locale.dateFormat) !== null && _a !== void 0 ? _a : Q.Culture.dateFormat;
+            format = (_a = locale.dateFormat, (_a !== null && _a !== void 0 ? _a : Q.Culture.dateFormat));
         else if (format.length == 1) {
             switch (format) {
                 case "g":
-                    format = ((_b = locale.dateTimeFormat) !== null && _b !== void 0 ? _b : Q.Culture.dateTimeFormat).replace(":ss", "");
+                    format = (_b = locale.dateTimeFormat, (_b !== null && _b !== void 0 ? _b : Q.Culture.dateTimeFormat)).replace(":ss", "");
                     break;
                 case "G":
-                    format = ((_c = locale.dateTimeFormat) !== null && _c !== void 0 ? _c : Q.Culture.dateTimeFormat);
+                    format = (_c = locale.dateTimeFormat, (_c !== null && _c !== void 0 ? _c : Q.Culture.dateTimeFormat));
                     break;
                 case "s":
                     format = "yyyy-MM-ddTHH:mm:ss";
                     break;
-                case 'd': format = ((_d = locale.dateFormat) !== null && _d !== void 0 ? _d : Q.Culture.dateFormat);
+                case 'd': format = (_d = locale.dateFormat, (_d !== null && _d !== void 0 ? _d : Q.Culture.dateFormat));
                 case 't':
                     format = (locale.dateTimeFormat && locale.dateFormat) ? locale.dateTimeFormat.replace(locale.dateFormat + " ", "") : "HH:mm";
                     break;
                 case 'u':
                 case 'U':
-                    format = format == 'u' ? 'yyyy-MM-ddTHH:mm:ss.fffZ' : (_e = locale.dateTimeFormat) !== null && _e !== void 0 ? _e : Q.Culture.dateTimeFormat;
+                    format = format == 'u' ? 'yyyy-MM-ddTHH:mm:ss.fffZ' : (_e = locale.dateTimeFormat, (_e !== null && _e !== void 0 ? _e : Q.Culture.dateTimeFormat));
                     date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.getUTCMilliseconds());
                     break;
             }
@@ -1289,13 +1289,13 @@ var Q;
             var part = fs;
             switch (fs) {
                 case '/':
-                    part = (_f = locale.dateSeparator) !== null && _f !== void 0 ? _f : Q.Culture.dateSeparator;
+                    part = (_f = locale.dateSeparator, (_f !== null && _f !== void 0 ? _f : Q.Culture.dateSeparator));
                     break;
                 case 'dddd':
-                    part = ((_g = locale.dayNames) !== null && _g !== void 0 ? _g : Q.Culture.dayNames)[date.getDay()];
+                    part = (_g = locale.dayNames, (_g !== null && _g !== void 0 ? _g : Q.Culture.dayNames))[date.getDay()];
                     break;
                 case 'ddd':
-                    part = ((_h = locale.shortDayNames) !== null && _h !== void 0 ? _h : Q.Culture.shortDayNames)[date.getDay()];
+                    part = (_h = locale.shortDayNames, (_h !== null && _h !== void 0 ? _h : Q.Culture.shortDayNames))[date.getDay()];
                     break;
                 case 'dd':
                     part = Q.padLeft(date.getDate().toString(), 2, '0');
@@ -1304,10 +1304,10 @@ var Q;
                     part = date.getDate();
                     break;
                 case 'MMMM':
-                    part = ((_j = locale.monthNames) !== null && _j !== void 0 ? _j : Q.Culture.monthNames)[date.getMonth()];
+                    part = (_j = locale.monthNames, (_j !== null && _j !== void 0 ? _j : Q.Culture.monthNames))[date.getMonth()];
                     break;
                 case 'MMM':
-                    part = ((_k = locale.shortMonthNames) !== null && _k !== void 0 ? _k : Q.Culture.shortMonthNames)[date.getMonth()];
+                    part = (_k = locale.shortMonthNames, (_k !== null && _k !== void 0 ? _k : Q.Culture.shortMonthNames))[date.getMonth()];
                     break;
                 case 'MM':
                     part = Q.padLeft(date.getMonth() + 1, 2, '0');
@@ -1354,7 +1354,7 @@ var Q;
                     break;
                 case 't':
                 case 'tt':
-                    part = (date.getHours() < 12) ? ((_l = locale.amDesignator) !== null && _l !== void 0 ? _l : Q.Culture.amDesignator) : ((_m = locale.pmDesignator) !== null && _m !== void 0 ? _m : Q.Culture.pmDesignator);
+                    part = (date.getHours() < 12) ? (_l = locale.amDesignator, (_l !== null && _l !== void 0 ? _l : Q.Culture.amDesignator)) : (_m = locale.pmDesignator, (_m !== null && _m !== void 0 ? _m : Q.Culture.pmDesignator));
                     if (fs == 't') {
                         part = part.charAt(0);
                     }
@@ -1379,7 +1379,7 @@ var Q;
                     part = ((part >= 0) ? '-' : '+') +
                         Math.floor(Q.padLeft(Math.abs(part), 2, '0'));
                     if (fs == 'zzz') {
-                        part += ((_o = locale.timeSeparator) !== null && _o !== void 0 ? _o : Q.Culture.timeSeparator) +
+                        part += (_o = locale.timeSeparator, (_o !== null && _o !== void 0 ? _o : Q.Culture.timeSeparator)) +
                             Math.abs(Q.padLeft(date.getTimezoneOffset() % 60, 2, '0'));
                     }
                     break;
@@ -2037,6 +2037,7 @@ var Q;
         // @ts-ignore
         return (_isBS3 = !!($.fn.modal && $.fn.modal.Constructor && $.fn.modal.Constructor.VERSION && ($.fn.modal.Constructor.VERSION + "").charAt(0) == '3'));
     }
+    Q.isBS3 = isBS3;
     var defaultTxt = {
         AlertTitle: 'Alert',
         InformationTitle: 'Information',
@@ -2050,7 +2051,7 @@ var Q;
     };
     function txt(k) {
         var _a;
-        return (_a = Q.tryGetText("Dialogs." + k)) !== null && _a !== void 0 ? _a : defaultTxt[k];
+        return _a = Q.tryGetText("Dialogs." + k), (_a !== null && _a !== void 0 ? _a : defaultTxt[k]);
     }
     function bsModal(options, message, modalClass) {
         var closeButton = "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"" + txt('CloseButton') + "\">" +
@@ -2126,9 +2127,9 @@ var Q;
         }
         message = messageHtml(message, options);
         if (useBS)
-            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-AlertModal");
+            bsModal(options, message, (_a = options.modalClass, (_a !== null && _a !== void 0 ? _a : "s-AlertModal")));
         else
-            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-AlertDialog");
+            uiDialog(options, message, (_b = options.dialogClass, (_b !== null && _b !== void 0 ? _b : "s-AlertDialog")));
     }
     Q.alert = alert;
     function confirm(message, onYes, options) {
@@ -2174,9 +2175,9 @@ var Q;
         }
         message = messageHtml(message, options);
         if (useBS)
-            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-ConfirmModal");
+            bsModal(options, message, (_a = options.modalClass, (_a !== null && _a !== void 0 ? _a : "s-ConfirmModal")));
         else
-            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-ConfirmDialog");
+            uiDialog(options, message, (_b = options.dialogClass, (_b !== null && _b !== void 0 ? _b : "s-ConfirmDialog")));
     }
     Q.confirm = confirm;
     function iframeDialog(options) {
@@ -2820,6 +2821,118 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
+    if (typeof $ !== "undefined" && $.validator && $.validator.methods && $.validator.addMethod) {
+        $.validator.addMethod('customValidate', function (value, element) {
+            var result = this.optional(element);
+            if (element == null || !!result) {
+                return result;
+            }
+            var events = $._data(element, 'events');
+            if (!events) {
+                return true;
+            }
+            var handlers = events.customValidate;
+            if (handlers == null || handlers.length === 0) {
+                return true;
+            }
+            var el = $(element);
+            for (var i = 0; !!(i < handlers.length); i++) {
+                if ($.isFunction(handlers[i].handler)) {
+                    var message = handlers[i].handler(el);
+                    if (message != null) {
+                        el.data('customValidationMessage', message);
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }, function (o, e) {
+            return $(e).data('customValidationMessage');
+        });
+        $.validator.addMethod("dateQ", function (value, element) {
+            var o = this.optional(element);
+            if (o)
+                return o;
+            var d = Q.parseDate(value);
+            if (!d)
+                return false;
+            var z = new Date(d);
+            z.setHours(0, 0, 0, 0);
+            return z.getTime() === d.getTime();
+        });
+        $.validator.addMethod("hourAndMin", function (value, element) {
+            return this.optional(element) || !isNaN(Q.parseHourAndMin(value));
+        });
+        $.validator.addMethod("dayHourAndMin", function (value, element) {
+            return this.optional(element) || !isNaN(Q.parseDayHourAndMin(value));
+        });
+        $.validator.addMethod("decimalQ", function (value, element) {
+            return this.optional(element) || !isNaN(Q.parseDecimal(value));
+        });
+        $.validator.addMethod("integerQ", function (value, element) {
+            return this.optional(element) || !isNaN(Q.parseInteger(value));
+        });
+        var oldEmail_1 = $.validator.methods['email'];
+        $.validator.addMethod("email", function (value, element) {
+            if (!Q.Config.emailAllowOnlyAscii)
+                return oldEmail_1.call(this, value, element);
+            return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
+        });
+        function addMsg(m, k) {
+            var txt = Q.tryGetText("Validation." + k);
+            if (txt)
+                $.validator.messages[m] = txt;
+            else if (!$.validator.messages[m])
+                $.validator.messages[m] = k + "?";
+        }
+        addMsg("required", "Required");
+        addMsg("email", "Email");
+        addMsg("minlength", "MinLength");
+        addMsg("maxlength", "MaxLength");
+        addMsg("digits", "Digits");
+        addMsg("range", "Range");
+        addMsg("xss", "Xss");
+        addMsg("dateQ", "DateInvalid");
+        addMsg("decimalQ", "Decimal");
+        addMsg("integerQ", "Integer");
+        addMsg("url", "Url");
+    }
+    function setTooltip(el, val) {
+        if (Q.isBS3())
+            el.attr('data-original-title', val || '').tooltip('fixTitle');
+        else
+            el.attr('title', val || '').tooltip('_fixTitle');
+        return el;
+    }
+    var valOpt = {
+        ignore: ':hidden, .no-validate',
+        showErrors: function (errorMap, errorList) {
+            $.each(this.validElements(), function (index, element) {
+                var $element = $(element);
+                setTooltip($element
+                    .removeClass("error")
+                    .addClass("valid"), '')
+                    .tooltip('hide');
+            });
+            $.each(errorList, function (index, error) {
+                var $element = $(error.element);
+                setTooltip($element
+                    .addClass("error"), error.message);
+                if (index == 0)
+                    $element.tooltip('show');
+            });
+        },
+        normalizer: function (value) {
+            return $.trim(value);
+        }
+    };
+    function validate(form, opt) {
+        return form.validate(Q.extend(Q.extend({}, valOpt), opt));
+    }
+    Q.validate = validate;
+})(Q || (Q = {}));
+var Q;
+(function (Q) {
     var Authorization;
     (function (Authorization) {
         function hasPermission(permission) {
@@ -3050,7 +3163,6 @@ var Serenity;
             registerEnum(target, Q.coalesce(enumKey, name), name);
         }
         Decorators.registerEnumType = registerEnumType;
-        registerEnum(Serenity.SummaryType, 'Serenity.SummaryType');
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
     var EnumKeyAttribute = /** @class */ (function () {
         function EnumKeyAttribute(value) {
@@ -3062,6 +3174,7 @@ var Serenity;
         return EnumKeyAttribute;
     }());
     Serenity.EnumKeyAttribute = EnumKeyAttribute;
+    Decorators.registerEnum(Serenity.SummaryType, 'Serenity.SummaryType');
 })(Serenity || (Serenity = {}));
 var System;
 (function (System) {
@@ -4321,114 +4434,11 @@ var Q;
         });
     }
     ;
-    function registerCustomValidationMethods() {
-        if ($.validator.methods['customValidate'] == null) {
-            $.validator.addMethod('customValidate', function (value, element) {
-                var result = this.optional(element);
-                if (element == null || !!result) {
-                    return result;
-                }
-                var events = $._data(element, 'events');
-                if (!events) {
-                    return true;
-                }
-                var handlers = events.customValidate;
-                if (handlers == null || handlers.length === 0) {
-                    return true;
-                }
-                var el = $(element);
-                for (var i = 0; !!(i < handlers.length); i++) {
-                    if ($.isFunction(handlers[i].handler)) {
-                        var message = handlers[i].handler(el);
-                        if (message != null) {
-                            el.data('customValidationMessage', message);
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }, function (o, e) {
-                return $(e).data('customValidationMessage');
-            });
-        }
-    }
     function jQueryValidationInitialization() {
-        registerCustomValidationMethods();
         var p = $.validator;
         p = p.prototype;
         oldShowLabel = p.showLabel;
         p.showLabel = validateShowLabel;
-        $.validator.addMethod("dateQ", function (value, element) {
-            var o = this.optional(element);
-            if (o)
-                return o;
-            var d = Q.parseDate(value);
-            if (!d)
-                return false;
-            var z = new Date(d);
-            z.setHours(0, 0, 0, 0);
-            return z.getTime() === d.getTime();
-        });
-        $.validator.addMethod("hourAndMin", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseHourAndMin(value));
-        });
-        $.validator.addMethod("dayHourAndMin", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseDayHourAndMin(value));
-        });
-        $.validator.addMethod("decimalQ", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseDecimal(value));
-        });
-        $.validator.addMethod("integerQ", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseInteger(value));
-        });
-        var oldEmail = $.validator.methods['email'];
-        $.validator.addMethod("email", function (value, element) {
-            if (!Q.Config.emailAllowOnlyAscii)
-                return oldEmail.call(this, value, element);
-            return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
-        });
-        $.validator.addMethod("emailMultiple", function (value, element) {
-            var result = this.optional(element);
-            if (result)
-                return result;
-            if (value.indexOf(';') >= 0)
-                value = value.split(';');
-            else
-                value = value.split(',');
-            for (var i = 0; i < value.length; i++) {
-                result = $.validator.methods['email'].call(this, value[i], element);
-                if (!result)
-                    return result;
-            }
-            return result;
-        });
-        $.validator.addMethod("anyvalue", function (value, element) {
-            return true;
-        });
-        var d = $.validator.defaults;
-        d.ignoreTitle = true;
-        d.onchange = function (element) {
-            this.element(element);
-        };
-        p.oldinit = p.init;
-        p.init = function () {
-            p.oldinit.call(this);
-            function changeDelegate(event) {
-                if (this.form == null)
-                    return;
-                var validator = $.data(this.form, "validator"), eventType = "on" + event.type.replace(/^validate/, "");
-                validator && validator.settings[eventType] && validator.settings[eventType].call(validator, this);
-            }
-            function delegate(event) {
-                var el = this[0];
-                if (!$.data(el, 'changebound')) {
-                    $(el).change(changeDelegate);
-                    $.data(el, 'changebound', true);
-                }
-            }
-            $(this.currentForm)
-                .on(":text, :password, :file, select, textarea", "focusin.validate", delegate);
-        };
         p.oldfocusInvalid = p.focusInvalid;
         p.focusInvalid = function () {
             if (this.settings.abortHandler)
@@ -4449,23 +4459,6 @@ var Q;
             this.hideErrors();
             this.elements().removeClass(this.settings.errorClass);
         };
-        jQuery(function () {
-            if (typeof $ !== "undefined" && $.validator) {
-                Q.extend($.validator.messages, {
-                    email: Q.text("Validation.Email"),
-                    required: Q.text("Validation.Required"),
-                    minlength: Q.text("Validation.MinLength"),
-                    maxlength: Q.text("Validation.MaxLength"),
-                    digits: Q.text("Validation.Digits"),
-                    range: Q.text("Validation.Range"),
-                    xss: Q.text("Validation.Xss"),
-                    dateQ: Q.text("Validation.DateInvalid"),
-                    decimalQ: Q.text("Validation.Decimal"),
-                    integerQ: Q.text("Validation.Integer"),
-                    url: Q.text("Validation.Url")
-                });
-            }
-        });
     }
     ;
     function validatorAbortHandler(validator) {
@@ -4479,6 +4472,7 @@ var Q;
     function validateOptions(options) {
         return Q.extend({
             ignore: ":hidden",
+            ignoreTitle: true,
             meta: 'v',
             normalizer: function (value) {
                 return $.trim(value);
@@ -6919,7 +6913,7 @@ var Serenity;
         };
         Select2Editor.prototype.getPageSize = function () {
             var _a;
-            return (_a = this.options['pageSize']) !== null && _a !== void 0 ? _a : 100;
+            return _a = this.options['pageSize'], (_a !== null && _a !== void 0 ? _a : 100);
         };
         Select2Editor.prototype.getIdField = function () {
             return this.options['idField'];
@@ -6932,7 +6926,7 @@ var Serenity;
         };
         Select2Editor.prototype.getTextField = function () {
             var _a;
-            return (_a = this.options['textField']) !== null && _a !== void 0 ? _a : this.getIdField();
+            return _a = this.options['textField'], (_a !== null && _a !== void 0 ? _a : this.getIdField());
         };
         Select2Editor.prototype.itemText = function (item) {
             var value = item[this.getTextField()];
@@ -8046,7 +8040,7 @@ var Serenity;
             initialize();
             var editorType = knownTypes[key.toLowerCase()];
             if (editorType == null) {
-                var type = (_a = Q.getType(key)) !== null && _a !== void 0 ? _a : Q.getType(key, globalObj);
+                var type = (_a = Q.getType(key), (_a !== null && _a !== void 0 ? _a : Q.getType(key, globalObj)));
                 if (type != null) {
                     knownTypes[key.toLowerCase()] = type;
                     return type;
@@ -10163,7 +10157,7 @@ var Serenity;
             return _super.prototype.getCriteriaField.call(this);
         };
         BaseEditorFiltering.prototype.getEditorOptions = function () {
-            var opt = Q.deepClone(this.get_field().editorParams);
+            var opt = Q.deepClone(this.get_field().editorParams || {});
             delete opt['cascadeFrom'];
             // currently can't support cascadeFrom in filtering
             return Q.extend(opt, this.get_field().filteringParams);

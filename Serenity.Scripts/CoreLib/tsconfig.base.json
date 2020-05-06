@@ -27,6 +27,7 @@
     "Q/Q.Services.ts",
     "Q/Q.ScriptData.ts",
     "Q/Q.Authorization.ts",
+    "Q/Q.Validation.ts",
     "Services/Criteria.ts",
     "Services/SummaryType.ts",
     "Services/PropertyItem.ts",

@@ -99,8 +99,6 @@
         export function registerEnumType(target: any, name?: string, enumKey?: string) {
             registerEnum(target, Q.coalesce(enumKey, name), name);
         }
-
-        registerEnum(SummaryType, 'Serenity.SummaryType');
     }
     
     @Attr('EnumKey')
@@ -108,5 +106,7 @@
         constructor(public value: string) {
         }
     }
+
+    Decorators.registerEnum(SummaryType, 'Serenity.SummaryType');
 }
 

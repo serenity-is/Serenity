@@ -88,7 +88,8 @@ namespace Q {
     }
 
     let _isBS3: boolean;
-    function isBS3(): boolean {
+    
+    export function isBS3(): boolean {
         if (_isBS3 != null)
             return _isBS3;
         // @ts-ignore

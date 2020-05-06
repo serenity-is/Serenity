@@ -331,7 +331,7 @@
         }
 
         getEditorOptions() {
-            var opt = Q.deepClone(this.get_field().editorParams);
+            var opt = Q.deepClone(this.get_field().editorParams || {});
             delete opt['cascadeFrom'];
             // currently can't support cascadeFrom in filtering
             return Q.extend(opt, this.get_field().filteringParams);

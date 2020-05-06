@@ -1,13 +1,13 @@
 ﻿/// <reference types="jquery" />
 /// <reference types="toastr" />
-/// <reference types="react" />
 /// <reference types="jquery.validation" />
+/// <reference types="react" />
 /// <reference types="jqueryui" />
 declare var __decorate: any;
 declare const __skipExtends: {
-    __metadata: boolean;
-    __typeName: boolean;
-    __componentFactory: boolean;
+    "__metadata": boolean;
+    "__typeName": boolean;
+    "__componentFactory": boolean;
 };
 declare var __extends: any;
 declare var __assign: any;
@@ -544,6 +544,7 @@ declare namespace Q {
     interface AlertOptions extends CommonDialogOptions {
         okButton?: string | boolean;
     }
+    function isBS3(): boolean;
     function alert(message: string, options?: AlertOptions): void;
     interface ConfirmOptions extends CommonDialogOptions {
         yesButton?: string | boolean;
@@ -669,6 +670,14 @@ declare namespace Q {
     function getTemplate(key: string): string;
     function getTemplateAsync(key: string): PromiseLike<string>;
     function canLoadScriptData(name: string): boolean;
+}
+declare namespace JQueryValidation {
+    interface ValidationOptions {
+        normalizer?: (v: string) => string;
+    }
+}
+declare namespace Q {
+    function validate(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
 }
 declare namespace Q {
     namespace Authorization {
@@ -1032,11 +1041,6 @@ declare namespace Q.Router {
     function replaceLast(hash: string, tryBack?: boolean): void;
     function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
     function resolve(hash?: string): void;
-}
-declare namespace JQueryValidation {
-    interface ValidationOptions {
-        normalizer?: (v: string) => string;
-    }
 }
 declare namespace Q {
     function validatorAbortHandler(validator: any): void;

@@ -50,6 +50,7 @@
     "Q/Q.Config.ts",
     "Q/Q.Services.ts",
     "Q/Q.ScriptData.ts",
+    "Q/Q.Validation.ts",
     "Q/Q.Authorization.ts",
     "Services/Criteria.ts",
     "Services/SummaryType.ts",
