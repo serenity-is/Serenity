@@ -1,6 +1,5 @@
 var __extends = require("SerenityCoreLibBase").__extends;
 
-
 test('__extends skips special type system properties', function() {
     var baseObj = function() {
     }

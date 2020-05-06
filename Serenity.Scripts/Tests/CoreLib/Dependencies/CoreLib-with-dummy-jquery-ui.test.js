@@ -1,8 +1,14 @@
-var $ = require("jQuery");
-global.$ = global.jQuery = $;
-$.ui = {};
-var Q = require("SerenityCoreLib").Q;
 
 test('works when a dummy jQuery ui object exists', function() {
-    expect(Q.replaceAll('xyx', 'x', 'y')).toBe('yyy');
+    var $ = require("jQuery");
+    try {
+        global.$ = global.jQuery = $;
+        $.ui = {};
+        var Q = require("SerenityCoreLib").Q;
+        expect(Q.replaceAll('xyx', 'x', 'y')).toBe('yyy');
+    }
+    finally {
+        delete global.$;
+        delete global.jQuery;
+    }
 });

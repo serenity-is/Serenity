@@ -40,22 +40,28 @@ test('BS3 is detected when modal version starts with 3', function() {
     setupDummyJQueryForModal(function(html) {
         passedHtml = html;
     });
-    global.$.fn = {
-        modal: {
-            Constructor: {
-                VERSION: '3.3.1'
+    try {
+        global.$.fn = {
+            modal: {
+                Constructor: {
+                    VERSION: '3.3.1'
+                }
             }
         }
-    }    
 
-    Q.alert("hello");
+        Q.alert("hello");
 
-    expect(passedHtml).not.toBeNull();
+        expect(passedHtml).not.toBeNull();
 
-    var idx1 = passedHtml.indexOf('class="close"');
-    var idx2 = passedHtml.indexOf('<h5');
-    expect(idx1).toBeGreaterThan(-1);
-    expect(idx2).toBeGreaterThan(idx1);
+        var idx1 = passedHtml.indexOf('class="close"');
+        var idx2 = passedHtml.indexOf('<h5');
+        expect(idx1).toBeGreaterThan(-1);
+        expect(idx2).toBeGreaterThan(idx1);
+    }
+    finally {
+        delete global.$;
+        delete global.jQuery;
+    }
 });
 
 
@@ -67,45 +73,56 @@ test('BS4 is detected when modal version does not exist', function() {
     setupDummyJQueryForModal(function(html) {
         passedHtml = html;
     });
-    global.$.fn = {
-        modal: {
-        }
-    }        
+    try {
+        global.$.fn = {
+            modal: {
+            }
+        }        
 
-    Q.alert("hello");
+        Q.alert("hello");
 
-    expect(passedHtml).not.toBeNull();
+        expect(passedHtml).not.toBeNull();
 
-    var idx1 = passedHtml.indexOf('class="close"');
-    var idx2 = passedHtml.indexOf('<h5');
-    expect(idx1).toBeGreaterThan(-1);
-    expect(idx2).toBeGreaterThan(-1);
-    expect(idx1).toBeGreaterThan(idx2);
+        var idx1 = passedHtml.indexOf('class="close"');
+        var idx2 = passedHtml.indexOf('<h5');
+        expect(idx1).toBeGreaterThan(-1);
+        expect(idx2).toBeGreaterThan(-1);
+        expect(idx1).toBeGreaterThan(idx2);
+    }
+    finally {
+        delete global.$;
+        delete global.fn;
+    }
 });
 
 test('BS4 is detected when modal version is something other than 3', function() {
     
     var Q = require("SerenityCoreLibBase").Q;
-
     var passedHtml;
     setupDummyJQueryForModal(function(html) {
         passedHtml = html;
     });
-    global.$.fn = {
-        modal: {
-            Constructor: {
-                VERSION: '4.1.0'
+    try {
+        global.$.fn = {
+            modal: {
+                Constructor: {
+                    VERSION: '4.1.0'
+                }
             }
-        }
-    }           
+        }           
 
-    Q.alert("hello");
+        Q.alert("hello");
 
-    expect(passedHtml).not.toBeNull();
+        expect(passedHtml).not.toBeNull();
 
-    var idx1 = passedHtml.indexOf('class="close"');
-    var idx2 = passedHtml.indexOf('<h5');
-    expect(idx1).toBeGreaterThan(-1);
-    expect(idx2).toBeGreaterThan(-1);
-    expect(idx1).toBeGreaterThan(idx2);
+        var idx1 = passedHtml.indexOf('class="close"');
+        var idx2 = passedHtml.indexOf('<h5');
+        expect(idx1).toBeGreaterThan(-1);
+        expect(idx2).toBeGreaterThan(-1);
+        expect(idx1).toBeGreaterThan(idx2);
+    }
+    finally {
+        delete global.$;
+        delete global.fn;
+    }    
 });
