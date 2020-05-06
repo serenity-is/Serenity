@@ -6,7 +6,7 @@
         title?: string;
         hint?: string;
         placeholder?: string;
-        editorType?: string | React.ComponentType<any>;
+        editorType?: string;
         editorParams?: any;
         category?: string;
         collapsible?: boolean;
@@ -58,15 +58,4 @@
         quickFilterSeparator?: boolean;
         quickFilterCssClass?: string;
     }
-
-    export enum SummaryType {
-        Disabled = -1,
-        None = 0,
-        Sum = 1,
-        Avg = 2,
-        Min = 3,
-        Max = 4
-    }
-
-    Serenity.Decorators.registerEnum(SummaryType, "Serenity.SummaryType")
 }

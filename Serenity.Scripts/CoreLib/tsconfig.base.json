@@ -1,7 +1,8 @@
 ﻿{
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outFile": "../dist/Serenity.CoreLib.base.js"
+    "outFile": "../dist/Serenity.CoreLib.base.js",
+    "composite": true
   },
   "files": [
     "Imports/Helpers.ts",
@@ -9,6 +10,7 @@
     "Imports/Select2.ts",
     "Imports/jQueryStatic.ts",
     "Services/ColumnSelection.ts",
+    "Services/ISlickFormatter.ts",
     "Services/ServiceError.ts",
     "Services/ServiceResponse.ts",
     "Q/Q.TypeSystem.ts",
@@ -26,8 +28,9 @@
     "Q/Q.ScriptData.ts",
     "Q/Q.Authorization.ts",
     "Services/Criteria.ts",
-    "Decorators/Decorators.Basic.ts",
-    "UI/PropertyGrid/PropertyItem.ts",
-    "Externals/ExportNamespaces.ts"
+    "Services/SummaryType.ts",
+    "Services/PropertyItem.ts",
+    "Externals/ExportNamespaces.ts",
+    "Decorators/Decorators.Basic.ts"
   ]
 }

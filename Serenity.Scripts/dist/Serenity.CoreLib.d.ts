@@ -1,8 +1,8 @@
-﻿/// <reference types="jqueryui" />
+﻿/// <reference types="jquery" />
 /// <reference types="toastr" />
-/// <reference types="jquery" />
 /// <reference types="react" />
 /// <reference types="jquery.validation" />
+/// <reference types="jqueryui" />
 declare var __decorate: any;
 declare const __skipExtends: {
     __metadata: boolean;
@@ -146,6 +146,10 @@ declare namespace Serenity {
         details = 0,
         keyOnly = 1,
         list = 2
+    }
+}
+declare namespace Serenity {
+    class ISlickFormatter {
     }
 }
 declare namespace Serenity {
@@ -377,7 +381,8 @@ declare namespace Q {
      * @source underscore.js
      */
     function debounce(func: Function, wait?: number, immediate?: boolean): () => any;
-    function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem;
+    function extend<T = any>(a: T, b: T): T;
+    function deepClone<T = any>(a: T): T;
 }
 declare namespace Q {
     interface NumberFormat {
@@ -498,7 +503,7 @@ declare namespace Q {
     function addOption(select: JQuery, key: string, text: string): void;
     function addEmptyOption(select: JQuery): void;
     function clearOptions(select: JQuery): void;
-    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
+    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery<HTMLElement>;
     /**
      * Html attribute encodes a string (encodes quotes in addition to &, > and <)
      * @param s String to be HTML attribute encoded
@@ -515,21 +520,35 @@ declare namespace Q {
     function outerHtml(element: JQuery): string;
 }
 declare namespace Q {
-    interface CommonDialogOptions extends JQueryUI.DialogOptions {
-        onOpen?: () => void;
-        onClose?: () => void;
-        htmlEncode?: boolean;
-        dialogClass?: string;
+    interface DialogButton {
         title?: string;
+        hint?: string;
+        icon?: string;
+        onClick?: (e: JQueryEventObject) => void;
+        cssClass?: string;
+        htmlEncode?: boolean;
+        result?: string;
+    }
+    interface CommonDialogOptions {
+        onOpen?: () => void;
+        onClose?: (result: string) => void;
+        title?: string;
+        htmlEncode?: boolean;
+        preWrap?: boolean;
+        dialogClass?: string;
+        buttons?: DialogButton[];
+        modalClass?: string;
+        bootstrap?: boolean;
+        result?: string;
     }
     interface AlertOptions extends CommonDialogOptions {
-        okButton?: string;
+        okButton?: string | boolean;
     }
     function alert(message: string, options?: AlertOptions): void;
     interface ConfirmOptions extends CommonDialogOptions {
-        yesButton?: string;
-        noButton?: string;
-        cancelButton?: string;
+        yesButton?: string | boolean;
+        noButton?: string | boolean;
+        cancelButton?: string | boolean;
         onCancel?: () => void;
         onNo?: () => void;
     }
@@ -572,6 +591,10 @@ declare namespace Q {
          * on dialog classes manually. It's false by default for backward compability.
          */
         let responsiveDialogs: boolean;
+        /**
+         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default
+         */
+        let bootstrapModals: boolean;
         /**
          * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
          * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
@@ -621,24 +644,6 @@ declare namespace Serenity {
     type ServiceOptions<TResponse extends ServiceResponse> = Q.ServiceOptions<TResponse>;
 }
 declare namespace Q {
-    namespace LayoutTimer {
-        function on(key: string, handler: () => void): () => void;
-        function onSizeChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function onWidthChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function onHeightChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function off(key: string, handler?: () => void): void;
-    }
-}
-declare namespace Q {
-    function autoFullHeight(element: JQuery): void;
-    function initFullHeightGridPage(gridDiv: JQuery): void;
-    function layoutFillHeightValue(element: JQuery): number;
-    function layoutFillHeight(element: JQuery): void;
-    function setMobileDeviceMode(): void;
-    function triggerLayoutOnShow(element: JQuery): void;
-    function centerDialog(el: JQuery): void;
-}
-declare namespace Q {
     namespace ScriptData {
         function bindToChange(name: string, regClass: string, onChange: () => void): void;
         function triggerChange(name: string): void;
@@ -686,21 +691,51 @@ declare namespace Serenity {
         };
     }
 }
-declare namespace Q.Router {
-    let enabled: boolean;
-    function navigate(hash: string, tryBack?: boolean, silent?: boolean): void;
-    function replace(hash: string, tryBack?: boolean): void;
-    function replaceLast(hash: string, tryBack?: boolean): void;
-    function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
-    function resolve(hash?: string): void;
+declare namespace Serenity {
+    function Criteria(field: string): any[];
+    namespace Criteria {
+        function isEmpty(c: any[]): boolean;
+        function join(c1: any[], op: string, c2: any[]): any[];
+        function paren(c: any[]): any[];
+        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
+        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
+        const enum Operator {
+            paren = "()",
+            not = "not",
+            isNull = "is null",
+            isNotNull = "is not null",
+            exists = "exists",
+            and = "and",
+            or = "or",
+            xor = "xor",
+            eq = "=",
+            ne = "!=",
+            gt = ">",
+            ge = ">=",
+            lt = "<",
+            le = "<=",
+            in = "in",
+            notIn = "not in",
+            like = "like",
+            notLike = "not like"
+        }
+    }
+}
+declare namespace Serenity {
+    enum SummaryType {
+        Disabled = -1,
+        None = 0,
+        Sum = 1,
+        Avg = 2,
+        Min = 3,
+        Max = 4
+    }
 }
 declare namespace Serenity {
     namespace Decorators {
         function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
         function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
         function addAttribute(type: any, attr: any): void;
-    }
-    class ISlickFormatter {
     }
     namespace Decorators {
         function enumKey(value: string): (target: Function) => void;
@@ -881,33 +916,175 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    function Criteria(field: string): any[];
-    namespace Criteria {
-        function isEmpty(c: any[]): boolean;
-        function join(c1: any[], op: string, c2: any[]): any[];
-        function paren(c: any[]): any[];
-        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
-        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
-        const enum Operator {
-            paren = "()",
-            not = "not",
-            isNull = "is null",
-            isNotNull = "is not null",
-            exists = "exists",
-            and = "and",
-            or = "or",
-            xor = "xor",
-            eq = "=",
-            ne = "!=",
-            gt = ">",
-            ge = ">=",
-            lt = "<",
-            le = "<=",
-            in = "in",
-            notIn = "not in",
-            like = "like",
-            notLike = "not like"
-        }
+    interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
+        type?: new (element: JQuery, options?: TOptions) => TWidget;
+        options?: TOptions;
+        container?: JQuery;
+        element?: (e: JQuery) => void;
+        init?: (w: TWidget) => void;
+    }
+}
+declare namespace Serenity {
+    class IAsyncInit {
+    }
+}
+declare namespace Serenity {
+    class IDialog {
+    }
+    interface IDialog {
+        dialogOpen(asPanel?: boolean): void;
+    }
+}
+declare namespace Serenity {
+    interface WidgetClass<TOptions = object> {
+        new (element: JQuery, options?: TOptions): Widget<TOptions>;
+        element: JQuery;
+    }
+    interface WidgetDialogClass<TOptions = object> {
+        new (options?: TOptions): Widget<TOptions> & IDialog;
+        element: JQuery;
+    }
+    type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
+    class Widget<TOptions> extends React.Component<TOptions, any> {
+        private static nextWidgetNumber;
+        element: JQuery;
+        protected options: TOptions;
+        protected widgetName: string;
+        protected uniqueName: string;
+        protected asyncPromise: PromiseLike<void>;
+        constructor(element: JQuery, options?: TOptions);
+        destroy(): void;
+        protected addCssClass(): void;
+        protected getCssClass(): string;
+        protected initializeAsync(): PromiseLike<void>;
+        protected isAsyncWidget(): boolean;
+        static getWidgetName(type: Function): string;
+        static elementFor<TWidget>(editorType: {
+            new (...args: any[]): TWidget;
+        }): JQuery;
+        static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
+        init(action?: (widget: any) => void): this;
+        initialize(): PromiseLike<void>;
+        private static __isWidgetType;
+        props: Readonly<{
+            children?: React.ReactNode;
+        }> & Readonly<TOptions> & WidgetComponentProps<this>;
+    }
+    interface WidgetComponentProps<W extends Serenity.Widget<any>> {
+        id?: string;
+        name?: string;
+        className?: string;
+        maxLength?: number;
+        placeholder?: string;
+        setOptions?: any;
+        required?: boolean;
+        readOnly?: boolean;
+        oneWay?: boolean;
+        onChange?: (e: JQueryEventObject) => void;
+        onChangeSelect2?: (e: JQueryEventObject) => void;
+        value?: any;
+        defaultValue?: any;
+    }
+    interface Widget<TOptions> {
+        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        getGridField(): JQuery;
+        change(handler: (e: JQueryEventObject) => void): void;
+        changeSelect2(handler: (e: JQueryEventObject) => void): void;
+    }
+}
+declare namespace Serenity {
+    namespace WX {
+        function getWidget<TWidget>(element: JQuery, type: Function): any;
+        function getWidgetName(type: Function): string;
+        function hasOriginalEvent(e: any): boolean;
+        function change(widget: any, handler: any): void;
+        function changeSelect2(widget: any, handler: any): void;
+        function getGridField(widget: Serenity.Widget<any>): JQuery;
+    }
+}
+declare namespace Serenity {
+    class TemplatedWidget<TOptions> extends Widget<TOptions> {
+        protected idPrefix: string;
+        private static templateNames;
+        constructor(container: JQuery, options?: TOptions);
+        protected byId(id: string): JQuery;
+        private byID;
+        private static noGeneric;
+        private getDefaultTemplateName;
+        protected getTemplateName(): string;
+        protected getFallbackTemplate(): string;
+        protected getTemplate(): string;
+    }
+}
+declare namespace Q {
+    function autoFullHeight(element: JQuery): void;
+    function initFullHeightGridPage(gridDiv: JQuery): void;
+    function layoutFillHeightValue(element: JQuery): number;
+    function layoutFillHeight(element: JQuery): void;
+    function setMobileDeviceMode(): void;
+    function triggerLayoutOnShow(element: JQuery): void;
+    function centerDialog(el: JQuery): void;
+}
+declare namespace Q.Router {
+    let enabled: boolean;
+    function navigate(hash: string, tryBack?: boolean, silent?: boolean): void;
+    function replace(hash: string, tryBack?: boolean): void;
+    function replaceLast(hash: string, tryBack?: boolean): void;
+    function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
+    function resolve(hash?: string): void;
+}
+declare namespace JQueryValidation {
+    interface ValidationOptions {
+        normalizer?: (v: string) => string;
+    }
+}
+declare namespace Q {
+    function validatorAbortHandler(validator: any): void;
+    function validateOptions(options: JQueryValidation.ValidationOptions): JQueryValidation.ValidationOptions;
+}
+declare namespace Serenity {
+    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+        protected tabs: JQuery;
+        protected toolbar: Serenity.Toolbar;
+        protected validator: JQueryValidation.Validator;
+        constructor(options?: TOptions);
+        private get isMarkedAsPanel();
+        private get isResponsive();
+        private static getCssSize;
+        private static applyCssSizes;
+        destroy(): void;
+        protected initDialog(): void;
+        protected initToolbar(): void;
+        protected getToolbarButtons(): ToolButton[];
+        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
+        protected initValidator(): void;
+        protected resetValidation(): void;
+        protected validateForm(): boolean;
+        dialogOpen(asPanel?: boolean): void;
+        static openPanel(element: JQuery, uniqueName: string): void;
+        static closePanel(element: JQuery, e?: JQueryEventObject): void;
+        protected onDialogOpen(): void;
+        protected arrange(): void;
+        protected onDialogClose(): void;
+        protected addCssClass(): void;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogTitle(): string;
+        dialogClose(): void;
+        get dialogTitle(): string;
+        private setupPanelTitle;
+        set dialogTitle(value: string);
+        set_dialogTitle(value: string): void;
+        protected initTabs(): void;
+        protected handleResponsive(): void;
+    }
+}
+declare namespace Q {
+    namespace LayoutTimer {
+        function on(key: string, handler: () => void): () => void;
+        function onSizeChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function onWidthChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function onHeightChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function off(key: string, handler?: () => void): void;
     }
 }
 declare namespace Serenity {
@@ -1052,65 +1229,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class IAsyncInit {
-    }
-    interface WidgetClass<TOptions = object> {
-        new (element: JQuery, options?: TOptions): Widget<TOptions>;
-        element: JQuery;
-    }
-    interface WidgetDialogClass<TOptions = object> {
-        new (options?: TOptions): Widget<TOptions> & IDialog;
-        element: JQuery;
-    }
-    type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
-    class Widget<TOptions> extends React.Component<TOptions, any> {
-        private static nextWidgetNumber;
-        element: JQuery;
-        protected options: TOptions;
-        protected widgetName: string;
-        protected uniqueName: string;
-        protected asyncPromise: PromiseLike<void>;
-        constructor(element: JQuery, options?: TOptions);
-        destroy(): void;
-        protected addCssClass(): void;
-        protected getCssClass(): string;
-        protected initializeAsync(): PromiseLike<void>;
-        protected isAsyncWidget(): boolean;
-        static getWidgetName(type: Function): string;
-        static elementFor<TWidget>(editorType: {
-            new (...args: any[]): TWidget;
-        }): JQuery;
-        static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
-        init(action?: (widget: any) => void): this;
-        initialize(): PromiseLike<void>;
-        private static __isWidgetType;
-        props: Readonly<{
-            children?: React.ReactNode;
-        }> & Readonly<TOptions> & WidgetComponentProps<this>;
-    }
-    interface WidgetComponentProps<W extends Serenity.Widget<any>> {
-        id?: string;
-        name?: string;
-        className?: string;
-        maxLength?: number;
-        placeholder?: string;
-        setOptions?: any;
-        required?: boolean;
-        readOnly?: boolean;
-        oneWay?: boolean;
-        onChange?: (e: JQueryEventObject) => void;
-        onChangeSelect2?: (e: JQueryEventObject) => void;
-        value?: any;
-        defaultValue?: any;
-    }
-    interface Widget<TOptions> {
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        getGridField(): JQuery;
-        change(handler: (e: JQueryEventObject) => void): void;
-        changeSelect2(handler: (e: JQueryEventObject) => void): void;
-    }
-}
-declare namespace Serenity {
     namespace ValidationHelper {
         function asyncSubmit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
         function submit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
@@ -1120,20 +1238,6 @@ declare namespace Serenity {
         function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
         function removeValidationRule(element: JQuery, eventClass: string): JQuery;
         function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean;
-    }
-}
-declare namespace Serenity {
-    class TemplatedWidget<TOptions> extends Widget<TOptions> {
-        protected idPrefix: string;
-        private static templateNames;
-        constructor(container: JQuery, options?: TOptions);
-        protected byId(id: string): JQuery;
-        private byID;
-        private static noGeneric;
-        private getDefaultTemplateName;
-        protected getTemplateName(): string;
-        protected getFallbackTemplate(): string;
-        protected getTemplate(): string;
     }
 }
 declare namespace Serenity {
@@ -1189,7 +1293,7 @@ declare namespace Serenity {
         title?: string;
         hint?: string;
         placeholder?: string;
-        editorType?: string | React.ComponentType<any>;
+        editorType?: string;
         editorParams?: any;
         category?: string;
         collapsible?: boolean;
@@ -1240,14 +1344,6 @@ declare namespace Serenity {
         quickFilterParams?: any;
         quickFilterSeparator?: boolean;
         quickFilterCssClass?: string;
-    }
-    enum SummaryType {
-        Disabled = -1,
-        None = 0,
-        Sum = 1,
-        Avg = 2,
-        Min = 3,
-        Max = 4
     }
 }
 declare namespace Serenity {
@@ -1399,7 +1495,7 @@ declare namespace Serenity {
         };
         setEditValue(source: any, property: PropertyItem): void;
         getEditValue(property: PropertyItem, target: any): void;
-        protected get_select2Container(): JQuery;
+        protected get_select2Container(): JQuery<HTMLElement>;
         protected get_items(): Select2Item[];
         protected get_itemByKey(): Q.Dictionary<Select2Item>;
         static filterByText<TItem>(items: TItem[], getText: (item: TItem) => string, term: string): TItem[];
@@ -1906,7 +2002,7 @@ declare namespace Serenity {
         get_field(): PropertyItem;
         set_field(value: PropertyItem): void;
         private container;
-        get_container(): JQuery;
+        get_container(): JQuery<HTMLElement>;
         set_container(value: JQuery): void;
         private operator;
         get_operator(): FilterOperator;
@@ -2042,7 +2138,7 @@ declare namespace Serenity {
         protected addButtonClick(e: JQueryEventObject): void;
         protected resetButtonClick(e: JQueryEventObject): void;
         protected findEmptyRow(): JQuery;
-        protected addEmptyRow(popupField: boolean): JQuery;
+        protected addEmptyRow(popupField: boolean): JQuery<HTMLElement>;
         protected onRowFieldChange(e: JQueryEventObject): void;
         protected rowFieldChange(row: JQuery): void;
         protected removeFiltering(row: JQuery): void;
@@ -2192,7 +2288,7 @@ declare namespace Serenity {
     class PrefixedContext {
         readonly idPrefix: string;
         constructor(idPrefix: string);
-        byId(id: string): JQuery;
+        byId(id: string): JQuery<HTMLElement>;
         w<TWidget>(id: string, type: {
             new (...args: any[]): TWidget;
         }): TWidget;
@@ -2288,16 +2384,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    namespace WX {
-        function getWidget<TWidget>(element: JQuery, type: Function): any;
-        function getWidgetName(type: Function): string;
-        function hasOriginalEvent(e: any): boolean;
-        function change(widget: any, handler: any): void;
-        function changeSelect2(widget: any, handler: any): void;
-        function getGridField(widget: Serenity.Widget<any>): JQuery;
-    }
-}
-declare namespace Serenity {
     class PropertyGrid extends Widget<PropertyGridOptions> {
         private editors;
         private items;
@@ -2387,15 +2473,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
-        type?: new (element: JQuery, options?: TOptions) => TWidget;
-        options?: TOptions;
-        container?: JQuery;
-        element?: (e: JQuery) => void;
-        init?: (w: TWidget) => void;
-    }
-}
-declare namespace Serenity {
     namespace CustomValidation {
         function registerValidationMethods(): void;
     }
@@ -2414,47 +2491,6 @@ declare namespace Serenity {
         type: string;
         entityId: any;
         entity: any;
-    }
-}
-declare namespace Serenity {
-    class IDialog {
-    }
-    interface IDialog {
-        dialogOpen(asPanel?: boolean): void;
-    }
-    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
-        protected tabs: JQuery;
-        protected toolbar: Serenity.Toolbar;
-        protected validator: JQueryValidation.Validator;
-        constructor(options?: TOptions);
-        private get isMarkedAsPanel();
-        private get isResponsive();
-        private static getCssSize;
-        private static applyCssSizes;
-        destroy(): void;
-        protected initDialog(): void;
-        protected initToolbar(): void;
-        protected getToolbarButtons(): ToolButton[];
-        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected initValidator(): void;
-        protected resetValidation(): void;
-        protected validateForm(): boolean;
-        dialogOpen(asPanel?: boolean): void;
-        static openPanel(element: JQuery, uniqueName: string): void;
-        static closePanel(element: JQuery, e?: JQueryEventObject): void;
-        protected onDialogOpen(): void;
-        protected arrange(): void;
-        protected onDialogClose(): void;
-        protected addCssClass(): void;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getDialogTitle(): string;
-        dialogClose(): void;
-        get dialogTitle(): string;
-        private setupPanelTitle;
-        set dialogTitle(value: string);
-        set_dialogTitle(value: string): void;
-        protected initTabs(): void;
-        protected handleResponsive(): void;
     }
 }
 declare namespace Serenity {
@@ -3476,8 +3512,6 @@ declare namespace Slick.Aggregators {
 }
 declare var Vue: any;
 declare namespace Q {
-    function validatorAbortHandler(validator: any): void;
-    function validateOptions(options: JQueryValidation.ValidationOptions): any;
 }
 declare namespace Serenity {
     class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {

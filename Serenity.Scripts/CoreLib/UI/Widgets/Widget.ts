@@ -1,8 +1,5 @@
 ﻿namespace Serenity {
 
-    @Decorators.registerInterface('Serenity.IAsyncInit')
-    export class IAsyncInit {
-    }
 
     export interface WidgetClass<TOptions = object> {
         new(element: JQuery, options?: TOptions): Widget<TOptions>;
@@ -198,10 +195,6 @@
         getGridField(): JQuery;
         change(handler: (e: JQueryEventObject) => void): void;
         changeSelect2(handler: (e: JQueryEventObject) => void): void;
-    }
-
-    Widget.prototype.addValidationRule = function (eventClass: string, rule: (p1: JQuery) => string): JQuery {
-        return VX.addValidationRule(this.element, eventClass, rule);
     }
 }
 

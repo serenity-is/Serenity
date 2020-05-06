@@ -57,10 +57,7 @@
         }
     }
 
-    
-    @Decorators.registerInterface('Serenity.ISlickFormatter')
-    export class ISlickFormatter {
-    }
+    Serenity.Decorators.registerInterface('Serenity.ISlickFormatter')(ISlickFormatter);   
 
     function Attr(name: string) {
         return Decorators.registerClass('Serenity.' + name + 'Attribute')
@@ -102,6 +99,8 @@
         export function registerEnumType(target: any, name?: string, enumKey?: string) {
             registerEnum(target, Q.coalesce(enumKey, name), name);
         }
+
+        registerEnum(SummaryType, 'Serenity.SummaryType');
     }
     
     @Attr('EnumKey')

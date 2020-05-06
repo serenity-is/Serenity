@@ -370,7 +370,7 @@
                     filtering.set_field(item);
                     filtering.set_operator({ key: Serenity.FilterOperators.EQ });
                     (filtering as any).initQuickFilter(quick);
-                    quick.options = Q.deepClone(quick.options, item.quickFilterParams);
+                    quick.options = Q.extend(Q.deepClone(quick.options), item.quickFilterParams);
                 }
                 else {
                     return null;

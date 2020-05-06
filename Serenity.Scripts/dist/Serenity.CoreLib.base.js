@@ -63,6 +63,15 @@ if (typeof Promise === "undefined") {
         };
     }
 }
+var Serenity;
+(function (Serenity) {
+    var ISlickFormatter = /** @class */ (function () {
+        function ISlickFormatter() {
+        }
+        return ISlickFormatter;
+    }());
+    Serenity.ISlickFormatter = ISlickFormatter;
+})(Serenity || (Serenity = {}));
 // @ts-ignore check for global
 var globalObj = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : this));
 var Q;
@@ -2940,6 +2949,20 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var SummaryType;
+    (function (SummaryType) {
+        SummaryType[SummaryType["Disabled"] = -1] = "Disabled";
+        SummaryType[SummaryType["None"] = 0] = "None";
+        SummaryType[SummaryType["Sum"] = 1] = "Sum";
+        SummaryType[SummaryType["Avg"] = 2] = "Avg";
+        SummaryType[SummaryType["Min"] = 3] = "Min";
+        SummaryType[SummaryType["Max"] = 4] = "Max";
+    })(SummaryType = Serenity.SummaryType || (Serenity.SummaryType = {}));
+})(Serenity || (Serenity = {}));
+// @ts-ignore try to make it work in common js for tests
+typeof module !== "undefined" && (module.exports = { Q: Q, Serenity: Serenity, __extends: __extends });
+var Serenity;
+(function (Serenity) {
     var Decorators;
     (function (Decorators) {
         function distinct(arr) {
@@ -2990,15 +3013,7 @@ var Serenity;
         }
         Decorators.addAttribute = addAttribute;
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
-    var ISlickFormatter = /** @class */ (function () {
-        function ISlickFormatter() {
-        }
-        ISlickFormatter = __decorate([
-            Decorators.registerInterface('Serenity.ISlickFormatter')
-        ], ISlickFormatter);
-        return ISlickFormatter;
-    }());
-    Serenity.ISlickFormatter = ISlickFormatter;
+    Serenity.Decorators.registerInterface('Serenity.ISlickFormatter')(Serenity.ISlickFormatter);
     function Attr(name) {
         return Decorators.registerClass('Serenity.' + name + 'Attribute');
     }
@@ -3037,6 +3052,7 @@ var Serenity;
             registerEnum(target, Q.coalesce(enumKey, name), name);
         }
         Decorators.registerEnumType = registerEnumType;
+        registerEnum(Serenity.SummaryType, 'Serenity.SummaryType');
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
     var EnumKeyAttribute = /** @class */ (function () {
         function EnumKeyAttribute(value) {
@@ -3049,19 +3065,4 @@ var Serenity;
     }());
     Serenity.EnumKeyAttribute = EnumKeyAttribute;
 })(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var SummaryType;
-    (function (SummaryType) {
-        SummaryType[SummaryType["Disabled"] = -1] = "Disabled";
-        SummaryType[SummaryType["None"] = 0] = "None";
-        SummaryType[SummaryType["Sum"] = 1] = "Sum";
-        SummaryType[SummaryType["Avg"] = 2] = "Avg";
-        SummaryType[SummaryType["Min"] = 3] = "Min";
-        SummaryType[SummaryType["Max"] = 4] = "Max";
-    })(SummaryType = Serenity.SummaryType || (Serenity.SummaryType = {}));
-    Serenity.Decorators.registerEnum(SummaryType, "Serenity.SummaryType");
-})(Serenity || (Serenity = {}));
-// @ts-ignore try to make it work in common js for tests
-typeof module !== "undefined" && (module.exports = { Q: Q, Serenity: Serenity, __extends: __extends });
 //# sourceMappingURL=Serenity.CoreLib.base.js.map

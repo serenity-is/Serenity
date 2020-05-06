@@ -63,6 +63,15 @@ if (typeof Promise === "undefined") {
         };
     }
 }
+var Serenity;
+(function (Serenity) {
+    var ISlickFormatter = /** @class */ (function () {
+        function ISlickFormatter() {
+        }
+        return ISlickFormatter;
+    }());
+    Serenity.ISlickFormatter = ISlickFormatter;
+})(Serenity || (Serenity = {}));
 // @ts-ignore check for global
 var globalObj = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : this));
 var Q;
@@ -753,59 +762,23 @@ var Q;
     }
     Q.debounce = debounce;
     ;
-    // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
-    function deepClone(arg1) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
+    function extend(a, b) {
+        for (var key in b)
+            if (b.hasOwnProperty(key))
+                a[key] = b[key];
+        return a;
+    }
+    Q.extend = extend;
+    function deepClone(a) {
+        if (!a)
+            return a;
+        var v;
+        var b = Array.isArray(a) ? [] : {};
+        for (var k in a) {
+            v = a[k];
+            b[k] = (typeof v === "object") ? deepClone(v) : v;
         }
-        var options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length;
-        // Handle case when target is a string or something (possible in deep copy)
-        if (typeof target !== "object" && !$.isFunction(target)) {
-            target = {};
-        }
-        if (i === length) {
-            target = {};
-            i = 0;
-        }
-        for (; i < length; i++) {
-            // Only deal with non-null/undefined values
-            if ((options = arguments[i]) !== null) {
-                // Special operations for arrays
-                if ($.isArray(options)) {
-                    target = $.extend(true, [], options);
-                }
-                else {
-                    // Extend the base object
-                    for (name in options) {
-                        src = target[name];
-                        copy = options[name];
-                        // Prevent never-ending loop
-                        if (target === copy) {
-                            continue;
-                        }
-                        // Recurse if we're merging plain objects or arrays
-                        if (copy && ($.isPlainObject(copy) ||
-                            (copyIsArray = $.isArray(copy)))) {
-                            if (copyIsArray) {
-                                copyIsArray = false;
-                                clone = src && $.isArray(src) ? src : [];
-                            }
-                            else {
-                                clone = src && $.isPlainObject(src) ? src : {};
-                            }
-                            // Never move original objects, clone them
-                            target[name] = deepClone(clone, copy);
-                        }
-                        else if (copy !== undefined) {
-                            target[name] = copy;
-                        }
-                    }
-                }
-            }
-        }
-        // Return the modified object
-        return target;
+        return b;
     }
     Q.deepClone = deepClone;
 })(Q || (Q = {}));
@@ -1860,7 +1833,7 @@ var Q;
      * div is 2000, so a higher z-order shouldn't be used in page.
      */
     function blockUI(options) {
-        options = $.extend({
+        options = Q.extend({
             baseZ: 2000,
             message: '',
             overlayCSS: {
@@ -2005,127 +1978,237 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
-    function alert(message, options) {
-        var dialog;
-        options = $.extend({
-            htmlEncode: true,
-            okButton: Q.text('Dialogs.OkButton'),
-            title: Q.text('Dialogs.AlertTitle'),
-            onClose: null,
-            onOpen: null,
-            autoOpen: false,
-            dialogClass: 's-MessageDialog s-AlertDialog',
+    // if both jQuery UI and bootstrap button exists, prefer jQuery UI button as UI dialog needs them
+    if (typeof $ !== "undefined" && $.fn && $.fn.button && $.ui && $.ui.button && $.fn.button.noConflict) {
+        $.fn.btn = $.fn.button.noConflict();
+    }
+    function toIconClass(icon) {
+        if (!icon)
+            return null;
+        if (Q.startsWith(icon, 'fa-'))
+            return 'fa ' + icon;
+        if (Q.startsWith(icon, 'glyphicon-'))
+            return 'glyphicon ' + icon;
+        return icon;
+    }
+    function uiDialog(options, message, dialogClass) {
+        var opt = Q.extend({
             modal: true,
             width: '40%',
-            maxWidth: '450',
-            minWidth: '180',
+            maxWidth: 450,
+            minWidth: 180,
             resizable: false,
             open: function () {
                 if (options.onOpen)
                     options.onOpen.call(this);
             },
             close: function () {
-                dialog.dialog('destroy');
+                $(this).dialog('destroy');
                 if (options.onClose)
-                    options.onClose();
+                    options.onClose.call(this, options.result);
             }
         }, options);
-        if (options.htmlEncode)
-            message = Q.htmlEncode(message);
-        if (!options.buttons) {
-            var buttons = [];
-            buttons.push({
-                text: options.okButton,
-                click: function () {
-                    dialog.dialog('close');
-                }
+        opt.dialogClass = 's-MessageDialog' + (dialogClass ? (' ' + dialogClass) : '');
+        if (options.buttons) {
+            opt.buttons = options.buttons.map(function (x) {
+                var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
+                var iconClass = toIconClass(x.icon);
+                if (iconClass != null)
+                    text = '<i class="' + iconClass + "><i> ";
+                return {
+                    text: text,
+                    click: function (e) {
+                        options.result = x.result;
+                        $(this).dialog('close');
+                        x.onClick && x.onClick.call(this, e);
+                    },
+                    attr: !x.cssClass ? undefined : {
+                        "class": x.cssClass
+                    }
+                };
             });
-            options.buttons = buttons;
         }
-        dialog = $('<div><div class="message"><\/div><\/div>')
-            .dialog(options)
-            .children('.message')
-            .html(message)
-            .parent()
-            .dialog('open');
+        return $('<div>' + message + '</div>').dialog(opt);
+    }
+    var _isBS3;
+    function isBS3() {
+        if (_isBS3 != null)
+            return _isBS3;
+        // @ts-ignore
+        return (_isBS3 = !!($.fn.modal && $.fn.modal.Constructor && $.fn.modal.Constructor.VERSION && ($.fn.modal.Constructor.VERSION + "").charAt(0) == '3'));
+    }
+    var defaultTxt = {
+        AlertTitle: 'Alert',
+        InformationTitle: 'Information',
+        WarningTitle: 'Warning',
+        ConfirmationTitle: 'Confirm',
+        OkButton: 'OK',
+        YesButton: 'Yes',
+        NoButton: 'No',
+        CancelButton: 'Cancel',
+        CloseButton: 'Close'
+    };
+    function txt(k) {
+        var _a;
+        return (_a = Q.tryGetText("Dialogs." + k)) !== null && _a !== void 0 ? _a : defaultTxt[k];
+    }
+    function bsModal(options, message, modalClass) {
+        var closeButton = "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"" + txt('CloseButton') + "\">" +
+            "<span aria-hidden=\"true\">&times;</span></button>";
+        var div = $("<div class=\"modal s-MessageModal " + modalClass + "\" tabindex=\"-1\" role=\"dialog\">\n    <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                " + (isBS3() ? closeButton : "") + "<h5 class=\"modal-title\">" + options.title + "</h5>" + (isBS3() ? "" : closeButton) + "\n            </div>\n            <div class=\"modal-body\">\n                " + message + "\n            </div>\n            <div class=\"modal-footer\"></div>\n        </div>\n    </div>\n</div>").eq(0).appendTo(document.body);
+        if (options.onOpen)
+            div.one('shown.bs.modal', options.onOpen);
+        if (options.onClose)
+            div.one('hidden.bs.modal', function (e) { return options.onClose(options.result); });
+        var footer = div.find('.modal-footer');
+        function createButton(x) {
+            var _this = this;
+            var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
+            var iconClass = toIconClass(x.icon);
+            if (iconClass != null)
+                text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");
+            $("<button class=\"btn " + (x.cssClass ? x.cssClass : '') + "\"" + (x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '') + ">" + text + "</button>")
+                .appendTo(footer)
+                .click(function (e) {
+                options.result = x.result;
+                div.modal('hide');
+                x.onClick && x.onClick.call(_this, e);
+            });
+        }
+        if (options.buttons)
+            for (var _i = 0, _a = options.buttons; _i < _a.length; _i++) {
+                var button = _a[_i];
+                createButton(button);
+            }
+        div.modal({
+            backdrop: false,
+            show: true
+        });
+    }
+    var _useBrowserDialogs;
+    function useBrowserDialogs() {
+        if (_useBrowserDialogs == null) {
+            _useBrowserDialogs = typeof $ === 'undefined' || ((!$.ui || !$.ui.dialog) && (!$.fn || !$.fn.modal));
+        }
+        return _useBrowserDialogs;
+    }
+    function useBSModal(options) {
+        return !!((!$.ui || !$.ui.dialog) || Q.Config.bootstrapModals || (options && options.bootstrap));
+    }
+    function messageHtml(message, options) {
+        var htmlEncode = options == null || options.htmlEncode == null || options.htmlEncode;
+        if (htmlEncode)
+            message = Q.htmlEncode(message);
+        var preWrap = options == null || (options.preWrap == null && htmlEncode) || options.preWrap;
+        return '<div class="message"' + (preWrap ? ' style="white-space: pre-wrap">' : '>') + message + '</div>';
+    }
+    function alert(message, options) {
+        var _a, _b;
+        if (useBrowserDialogs()) {
+            window.alert(message);
+            return;
+        }
+        var useBS = useBSModal(options);
+        options = Q.extend({
+            htmlEncode: true,
+            okButton: txt('OkButton'),
+            title: txt('AlertTitle')
+        }, options);
+        if (options.buttons == null) {
+            options.buttons = [];
+            if (options.okButton == null || options.okButton) {
+                options.buttons.push({
+                    title: typeof options.okButton == "boolean" ? txt('OkButton') : options.okButton,
+                    cssClass: useBS ? 'btn-default' : undefined,
+                    result: 'ok'
+                });
+            }
+        }
+        message = messageHtml(message, options);
+        if (useBS)
+            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-AlertModal");
+        else
+            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-AlertDialog");
     }
     Q.alert = alert;
     function confirm(message, onYes, options) {
-        var dialog;
-        options = $.extend({
-            htmlEncode: true,
-            yesButton: Q.text('Dialogs.YesButton'),
-            noButton: Q.text('Dialogs.NoButton'),
-            title: Q.text('Dialogs.ConfirmationTitle'),
-            onNo: null,
-            onCancel: null,
-            onClose: null,
-            autoOpen: false,
-            modal: true,
-            dialogClass: 's-MessageDialog s-ConfirmDialog',
-            width: '40%',
-            maxWidth: '450',
-            minWidth: '180',
-            resizable: false,
-            open: function () {
-                if (options.onOpen)
-                    options.onOpen.call(this);
-            },
-            close: function () {
-                dialog.dialog('destroy');
-                if (!clicked && options.onCancel)
-                    options.onCancel();
-            },
-            overlay: {
-                opacity: 0.77,
-                background: "black"
-            }
-        }, options);
-        if (options.htmlEncode)
-            message = Q.htmlEncode(message);
-        var clicked = false;
-        if (!options.buttons) {
-            var buttons = [];
-            buttons.push({
-                text: options.yesButton,
-                click: function () {
-                    clicked = true;
-                    dialog.dialog('close');
-                    if (onYes)
-                        onYes();
-                }
-            });
-            if (options.noButton)
-                buttons.push({
-                    text: options.noButton,
-                    click: function () {
-                        clicked = true;
-                        dialog.dialog('close');
-                        if (options.onNo)
-                            options.onNo();
-                        else if (options.onCancel)
-                            options.onCancel();
-                    }
-                });
-            options.buttons = buttons;
+        var _a, _b;
+        if (useBrowserDialogs()) {
+            if (window.confirm(message))
+                onYes && onYes();
+            return;
         }
-        dialog = $('<div><div class="message"><\/div><\/div>')
-            .dialog(options)
-            .children('.message')
-            .html(message)
-            .parent()
-            .dialog('open');
+        var useBS = useBSModal(options);
+        options = Q.extend({
+            htmlEncode: true,
+            yesButton: txt('YesButton'),
+            noButton: txt('NoButton'),
+            title: txt('ConfirmationTitle')
+        }, options);
+        if (options.buttons == null) {
+            options.buttons = [];
+            if (options.yesButton == null || options.yesButton) {
+                options.buttons.push({
+                    title: typeof options.yesButton == "boolean" ? txt('YesButton') : options.yesButton,
+                    cssClass: useBS ? 'btn-primary' : undefined,
+                    result: 'yes',
+                    onClick: onYes
+                });
+            }
+            if (options.noButton == null || options.noButton) {
+                options.buttons.push({
+                    title: typeof options.noButton == "boolean" ? txt('NoButton') : options.noButton,
+                    cssClass: useBS ? 'btn-default' : undefined,
+                    result: 'no',
+                    onClick: options.onNo
+                });
+            }
+            if (options.cancelButton) {
+                options.buttons.push({
+                    title: typeof options.cancelButton == "boolean" ? txt('CancelButton') : options.cancelButton,
+                    cssClass: useBS ? 'btn-default' : undefined,
+                    result: 'cancel',
+                    onClick: options.onCancel
+                });
+            }
+        }
+        message = messageHtml(message, options);
+        if (useBS)
+            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-ConfirmModal");
+        else
+            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-ConfirmDialog");
     }
     Q.confirm = confirm;
     function iframeDialog(options) {
+        if (useBrowserDialogs()) {
+            window.alert(options.html);
+            return;
+        }
+        if (useBSModal(options)) {
+            bsModal({
+                title: txt('AlertTitle'),
+                modalClass: 'modal-lg',
+                onOpen: function () {
+                    doc = ($(this).find('iframe').css({
+                        border: 'none',
+                        width: '100%',
+                        height: '100%'
+                    })[0]).contentDocument;
+                    doc.open();
+                    doc.write(settings.html);
+                    doc.close();
+                }
+            }, '<div style="overflow: hidden"><iframe></iframe></div>', 's-IFrameModal');
+            return;
+        }
         var doc;
         var e = $('<div style="overflow: hidden"><iframe></iframe></div>');
-        var settings = $.extend({
+        var settings = Q.extend({
             autoOpen: true,
             modal: true,
             width: '60%',
             height: '400',
-            title: Q.text('Dialogs.AlertTitle'),
+            title: txt('AlertTitle'),
             open: function () {
                 doc = (e.find('iframe').css({
                     border: 'none',
@@ -2147,18 +2230,25 @@ var Q;
     }
     Q.iframeDialog = iframeDialog;
     function information(message, onOk, options) {
-        confirm(message, onOk, $.extend({
-            title: Q.text("Dialogs.InformationTitle"),
-            dialogClass: "s-MessageDialog s-InformationDialog",
-            yesButton: Q.text("Dialogs.OkButton"),
-            noButton: null,
+        if (useBrowserDialogs()) {
+            window.alert(message);
+            onOk && onOk();
+            return;
+        }
+        confirm(message, onOk, Q.extend({
+            title: txt("InformationTitle"),
+            dialogClass: "s-InformationDialog",
+            modalClass: "s-InformationModal",
+            yesButton: txt("OkButton"),
+            noButton: false,
         }, options));
     }
     Q.information = information;
     function warning(message, options) {
-        alert(message, $.extend({
-            title: Q.text("Dialogs.WarningTitle"),
-            dialogClass: "s-MessageDialog s-WarningDialog"
+        alert(message, Q.extend({
+            title: txt("WarningTitle"),
+            dialogClass: "s-WarningDialog",
+            modalClass: "s-WarningModal"
         }, options));
     }
     Q.warning = warning;
@@ -2173,7 +2263,7 @@ var Q;
         positionClass: 'toast-top-full-width'
     };
     function getToastrOptions(options) {
-        options = $.extend({}, Q.defaultNotifyOptions, options);
+        options = Q.extend(Q.extend({}, Q.defaultNotifyOptions), options);
         positionToastContainer(true);
         return options;
     }
@@ -2292,6 +2382,10 @@ var Q;
          */
         Config.responsiveDialogs = false;
         /**
+         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default
+         */
+        Config.bootstrapModals = false;
+        /**
          * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
          * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
          * "Serenity.MyEditor" and "MyApp.MyEditor" if you added "MyApp" to the list of root namespaces.
@@ -2343,7 +2437,7 @@ var Q;
         var url = options.service;
         if (url && url.length && url.charAt(0) != '~' && url.charAt(0) != '/' && url.indexOf('://') < 0)
             url = resolveUrl("~/services/") + url;
-        options = $.extend({
+        options = Q.extend({
             dataType: 'json',
             contentType: 'application/json',
             type: 'POST',
@@ -2416,7 +2510,7 @@ var Q;
     }
     Q.serviceCall = serviceCall;
     function serviceRequest(service, request, onSuccess, options) {
-        return serviceCall($.extend({
+        return serviceCall(Q.extend({
             service: service,
             request: request,
             onSuccess: onSuccess
@@ -2501,208 +2595,6 @@ var Q;
         return url;
     }
     Q.resolveUrl = resolveUrl;
-})(Q || (Q = {}));
-var Q;
-(function (Q) {
-    var LayoutTimer;
-    (function (LayoutTimer) {
-        var timeout;
-        var regs = [];
-        function startTimer() {
-            if (timeout == null && regs.length) {
-                timeout = window.setTimeout(onTimeout, 100);
-            }
-        }
-        function clearTimer() {
-            if (timeout != null) {
-                window.clearTimeout(timeout);
-                timeout = null;
-            }
-        }
-        function onTimeout() {
-            for (var _i = 0, regs_1 = regs; _i < regs_1.length; _i++) {
-                var reg = regs_1[_i];
-                try {
-                    reg.handler();
-                }
-                catch (e) {
-                    console.log(e);
-                }
-            }
-            clearTimer();
-            startTimer();
-        }
-        function on(key, handler) {
-            if (handler == null)
-                throw "Layout handler can't be null!";
-            if (key != null && Q.any(regs, function (x) { return x.key === key; }))
-                throw "There is already a registered layout handler with key: " + key;
-            regs.push({
-                key: key,
-                handler: handler,
-            });
-            startTimer();
-            return handler;
-        }
-        LayoutTimer.on = on;
-        function onSizeChange(key, element, handler) {
-            var oldWidth = element.offsetWidth;
-            var oldHeight = element.offsetHeight;
-            on(key, function () {
-                var offsetWidth = element.offsetWidth;
-                var offsetHeight = element.offsetHeight;
-                if (offsetWidth !== oldWidth ||
-                    offsetHeight !== oldHeight) {
-                    oldWidth = offsetWidth;
-                    oldHeight = offsetHeight;
-                    handler();
-                }
-            });
-            return handler;
-        }
-        LayoutTimer.onSizeChange = onSizeChange;
-        function onWidthChange(key, element, handler) {
-            var oldWidth = element.offsetWidth;
-            on(key, function () {
-                var offsetWidth = element.offsetWidth;
-                if (offsetWidth !== oldWidth) {
-                    oldWidth = offsetWidth;
-                    handler();
-                }
-            });
-            return handler;
-        }
-        LayoutTimer.onWidthChange = onWidthChange;
-        function onHeightChange(key, element, handler) {
-            var oldHeight = element.offsetHeight;
-            on(key, function () {
-                var offsetHeight = element.offsetHeight;
-                if (offsetHeight !== oldHeight) {
-                    oldHeight = offsetHeight;
-                    handler();
-                }
-            });
-            return handler;
-        }
-        LayoutTimer.onHeightChange = onHeightChange;
-        function off(key, handler) {
-            if (key != null)
-                regs = regs.filter(function (x) { return x.key !== key; });
-            if (handler != null)
-                regs = regs.filter(function (x) { return x.handler === handler; });
-            !regs.length && this.clearTimer();
-        }
-        LayoutTimer.off = off;
-    })(LayoutTimer = Q.LayoutTimer || (Q.LayoutTimer = {}));
-})(Q || (Q = {}));
-var Q;
-(function (Q) {
-    function autoFullHeight(element) {
-        element.css('height', '100%');
-        triggerLayoutOnShow(element);
-    }
-    Q.autoFullHeight = autoFullHeight;
-    function initFullHeightGridPage(gridDiv) {
-        $('body').addClass('full-height-page');
-        gridDiv.addClass('responsive-height');
-        var layout = function () {
-            var inPageContent = gridDiv.parent().hasClass('page-content') ||
-                gridDiv.parent().is('section.content');
-            if (inPageContent) {
-                gridDiv.css('height', '1px').css('overflow', 'hidden');
-            }
-            layoutFillHeight(gridDiv);
-            if (inPageContent) {
-                gridDiv.css('overflow', '');
-            }
-            gridDiv.triggerHandler('layout');
-        };
-        if ($('body').hasClass('has-layout-event')) {
-            $('body').bind('layout', layout);
-        }
-        else if (window.Metronic) {
-            window.Metronic.addResizeHandler(layout);
-        }
-        else {
-            $(window).resize(layout);
-        }
-        layout();
-        gridDiv.one('remove', function () {
-            $(window).off('layout', layout);
-            $('body').off('layout', layout);
-        });
-        // ugly, but to it is to make old pages work without having to add this
-        Q.Router.resolve();
-    }
-    Q.initFullHeightGridPage = initFullHeightGridPage;
-    function layoutFillHeightValue(element) {
-        var h = 0;
-        element.parent().children().not(element).each(function (i, e) {
-            var q = $(e);
-            if (q.is(':visible')) {
-                h += q.outerHeight(true);
-            }
-        });
-        h = element.parent().height() - h;
-        if (element.css('box-sizing') !== 'border-box') {
-            h = h - (element.outerHeight(true) - element.height());
-        }
-        return h;
-    }
-    Q.layoutFillHeightValue = layoutFillHeightValue;
-    function layoutFillHeight(element) {
-        var h = layoutFillHeightValue(element);
-        var n = Math.round(h) + 'px';
-        if (element.css('height') != n) {
-            element.css('height', n);
-        }
-    }
-    Q.layoutFillHeight = layoutFillHeight;
-    function setMobileDeviceMode() {
-        var isMobile = navigator.userAgent.indexOf('Mobi') >= 0 ||
-            (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
-        var body = $(document.body);
-        if (body.hasClass('mobile-device')) {
-            if (!isMobile) {
-                body.removeClass('mobile-device');
-            }
-        }
-        else if (isMobile) {
-            body.addClass('mobile-device');
-        }
-    }
-    Q.setMobileDeviceMode = setMobileDeviceMode;
-    setMobileDeviceMode();
-    $(function () {
-        if (globalObj && Q.Config.rootNamespaces) {
-            for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
-                var ns = _a[_i];
-                var obj = Q.getNested(globalObj, ns);
-                if (obj != null)
-                    Q.initializeTypes(obj, ns + ".", 3);
-            }
-        }
-        globalObj && $(globalObj).bind('resize', function () {
-            setMobileDeviceMode();
-        });
-    });
-    function triggerLayoutOnShow(element) {
-        Serenity.LazyLoadHelper.executeEverytimeWhenShown(element, function () {
-            element.triggerHandler('layout');
-        }, true);
-    }
-    Q.triggerLayoutOnShow = triggerLayoutOnShow;
-    function centerDialog(el) {
-        if (!el.hasClass("ui-dialog"))
-            el = el.closest(".ui-dialog");
-        el.position({ at: 'center center', of: window });
-        var pos = el.position();
-        if (pos.left < 0)
-            el.css("left", "0px");
-        if (pos.top < 0)
-            el.css("top", "0px");
-    }
-    Q.centerDialog = centerDialog;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
@@ -2995,227 +2887,78 @@ var Q;
         }
     });
 })(Q || (Q = {}));
-var Q;
-(function (Q) {
-    var Router;
-    (function (Router) {
-        var oldURL;
-        var resolving = 0;
-        var autoinc = 0;
-        var listenerTimeout;
-        var ignoreHash = 0;
-        var ignoreTime = 0;
-        Router.enabled = true;
-        function isEqual(url1, url2) {
-            return url1 == url2 || url1 == url2 + '#' || url2 == url1 + '#';
+var Serenity;
+(function (Serenity) {
+    function Criteria(field) {
+        return [field];
+    }
+    Serenity.Criteria = Criteria;
+    (function (Criteria) {
+        var C = Criteria;
+        function isEmpty(c) {
+            return c == null ||
+                c.length === 0 ||
+                (c.length === 1 &&
+                    typeof c[0] == "string" &&
+                    c[0].length === 0);
         }
-        function navigate(hash, tryBack, silent) {
-            if (!Router.enabled || resolving > 0)
-                return;
-            hash = hash || '';
-            hash = hash.replace(/^#/, '');
-            hash = (!hash ? "" : '#' + hash);
-            var newURL = window.location.href.replace(/#$/, '')
-                .replace(/#.*$/, '') + hash;
-            if (newURL != window.location.href) {
-                if (tryBack && oldURL != null && isEqual(oldURL, newURL)) {
-                    if (silent)
-                        ignoreChange();
-                    var prior = window.location.href;
-                    oldURL = null;
-                    window.history.back();
-                    return;
-                }
-                if (silent)
-                    ignoreChange();
-                oldURL = window.location.href;
-                window.location.hash = hash;
+        Criteria.isEmpty = isEmpty;
+        function join(c1, op, c2) {
+            if (C.isEmpty(c1))
+                return c2;
+            if (C.isEmpty(c2))
+                return c1;
+            return [c1, op, c2];
+        }
+        Criteria.join = join;
+        function paren(c) {
+            return C.isEmpty(c) ? c : ['()', c];
+        }
+        Criteria.paren = paren;
+        function and(c1, c2) {
+            var rest = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                rest[_i - 2] = arguments[_i];
             }
-        }
-        Router.navigate = navigate;
-        function replace(hash, tryBack) {
-            navigate(hash, tryBack, true);
-        }
-        Router.replace = replace;
-        function replaceLast(hash, tryBack) {
-            if (!Router.enabled)
-                return;
-            var current = window.location.hash || '';
-            if (current.charAt(0) == '#')
-                current = current.substr(1, current.length - 1);
-            var parts = current.split('/+/');
-            if (parts.length > 1) {
-                if (hash && hash.length) {
-                    parts[parts.length - 1] = hash;
-                    hash = parts.join("/+/");
-                }
-                else {
-                    parts.splice(parts.length - 1, 1);
-                    hash = parts.join("/+/");
+            var result = join(c1, 'and', c2);
+            if (rest) {
+                for (var _a = 0, rest_1 = rest; _a < rest_1.length; _a++) {
+                    var k = rest_1[_a];
+                    result = join(result, 'and', k);
                 }
             }
-            replace(hash, tryBack);
+            return result;
         }
-        Router.replaceLast = replaceLast;
-        function visibleDialogs() {
-            return $('.ui-dialog-content:visible, .ui-dialog.panel-hidden>.ui-dialog-content, .s-Panel').toArray().sort(function (a, b) {
-                return ($(a).data('qrouterorder') || 0) - ($(b).data('qrouterorder') || 0);
-            });
-        }
-        function dialogOpen(owner, element, hash) {
-            var route = [];
-            var isDialog = owner.hasClass(".ui-dialog-content") || owner.hasClass('.s-Panel');
-            var dialog = isDialog ? owner :
-                owner.closest('.ui-dialog-content, .s-Panel');
-            var value = hash();
-            var idPrefix;
-            if (dialog.length) {
-                var dialogs = visibleDialogs();
-                var index = dialogs.indexOf(dialog[0]);
-                for (var i = 0; i <= index; i++) {
-                    var q = $(dialogs[i]).data("qroute");
-                    if (q && q.length)
-                        route.push(q);
-                }
-                if (!isDialog) {
-                    idPrefix = dialog.attr("id");
-                    if (idPrefix) {
-                        idPrefix += "_";
-                        var id = owner.attr("id");
-                        if (id && Q.startsWith(id, idPrefix))
-                            value = id.substr(idPrefix.length) + '@' + value;
-                    }
+        Criteria.and = and;
+        function or(c1, c2) {
+            var rest = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                rest[_i - 2] = arguments[_i];
+            }
+            var result = join(c1, 'or', c2);
+            if (rest) {
+                for (var _a = 0, rest_2 = rest; _a < rest_2.length; _a++) {
+                    var k = rest_2[_a];
+                    result = join(result, 'or', k);
                 }
             }
-            else {
-                var id = owner.attr("id");
-                if (id && (!owner.hasClass("route-handler") ||
-                    $('.route-handler').first().attr("id") != id))
-                    value = id + "@" + value;
-            }
-            route.push(value);
-            element.data("qroute", value);
-            replace(route.join("/+/"));
-            element.bind("dialogclose.qrouter panelclose.qrouter", function (e) {
-                element.data("qroute", null);
-                element.unbind(".qrouter");
-                var prhash = element.data("qprhash");
-                var tryBack = $(e.target).closest('.s-MessageDialog').length > 0 || (e && e.originalEvent &&
-                    ((e.originalEvent.type == "keydown" && e.originalEvent.keyCode == 27) ||
-                        $(e.originalEvent.target).hasClass("ui-dialog-titlebar-close") ||
-                        $(e.originalEvent.target).hasClass("panel-titlebar-close")));
-                if (prhash != null)
-                    replace(prhash, tryBack);
-                else
-                    replaceLast('', tryBack);
-            });
+            return result;
         }
-        function dialog(owner, element, hash) {
-            if (!Router.enabled)
-                return;
-            element.on("dialogopen.qrouter panelopen.qrouter", function (e) {
-                dialogOpen(owner, element, hash);
-            });
-        }
-        Router.dialog = dialog;
-        function resolve(hash) {
-            if (!Router.enabled)
-                return;
-            resolving++;
-            try {
-                hash = Q.coalesce(Q.coalesce(hash, window.location.hash), '');
-                if (hash.charAt(0) == '#')
-                    hash = hash.substr(1, hash.length - 1);
-                var dialogs = visibleDialogs();
-                var newParts = hash.split("/+/");
-                var oldParts = dialogs.map(function (el) { return $(el).data('qroute'); });
-                var same = 0;
-                while (same < dialogs.length &&
-                    same < newParts.length &&
-                    oldParts[same] == newParts[same]) {
-                    same++;
-                }
-                for (var i = same; i < dialogs.length; i++) {
-                    var d = $(dialogs[i]);
-                    if (d.hasClass('ui-dialog-content'))
-                        d.dialog('close');
-                    else if (d.hasClass('s-Panel'))
-                        Serenity.TemplatedDialog.closePanel(d);
-                }
-                for (var i = same; i < newParts.length; i++) {
-                    var route = newParts[i];
-                    var routeParts = route.split('@');
-                    var handler;
-                    if (routeParts.length == 2) {
-                        var dialog = i > 0 ? $(dialogs[i - 1]) : $([]);
-                        if (dialog.length) {
-                            var idPrefix = dialog.attr("id");
-                            if (idPrefix) {
-                                handler = $('#' + idPrefix + "_" + routeParts[0]);
-                                if (handler.length) {
-                                    route = routeParts[1];
-                                }
-                            }
-                        }
-                        if (!handler || !handler.length) {
-                            handler = $('#' + routeParts[0]);
-                            if (handler.length) {
-                                route = routeParts[1];
-                            }
-                        }
-                    }
-                    if (!handler || !handler.length) {
-                        handler = i > 0 ? $(dialogs[i - 1]) :
-                            $('.route-handler').first();
-                    }
-                    handler.triggerHandler("handleroute", {
-                        handled: false,
-                        route: route,
-                        parts: newParts,
-                        index: i
-                    });
-                }
-            }
-            finally {
-                resolving--;
-            }
-        }
-        Router.resolve = resolve;
-        function hashChange(e, o) {
-            if (ignoreHash > 0) {
-                if (new Date().getTime() - ignoreTime > 1000) {
-                    ignoreHash = 0;
-                }
-                else {
-                    ignoreHash--;
-                    return;
-                }
-            }
-            resolve();
-        }
-        function ignoreChange() {
-            ignoreHash++;
-            ignoreTime = new Date().getTime();
-        }
-        window.addEventListener("hashchange", hashChange, false);
-        var routerOrder = 1;
-        $(document).on("dialogopen panelopen", ".ui-dialog-content, .s-Panel", function (event, ui) {
-            if (!Router.enabled)
-                return;
-            var dlg = $(event.target);
-            dlg.data("qrouterorder", routerOrder++);
-            if (dlg.data("qroute"))
-                return;
-            dlg.data("qprhash", window.location.hash);
-            var owner = $(visibleDialogs).not(dlg).last();
-            if (!owner.length)
-                owner = $('html');
-            dialogOpen(owner, dlg, function () {
-                return "!" + (++autoinc).toString(36);
-            });
-        });
-    })(Router = Q.Router || (Q.Router = {}));
-})(Q || (Q = {}));
+        Criteria.or = or;
+    })(Criteria = Serenity.Criteria || (Serenity.Criteria = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var SummaryType;
+    (function (SummaryType) {
+        SummaryType[SummaryType["Disabled"] = -1] = "Disabled";
+        SummaryType[SummaryType["None"] = 0] = "None";
+        SummaryType[SummaryType["Sum"] = 1] = "Sum";
+        SummaryType[SummaryType["Avg"] = 2] = "Avg";
+        SummaryType[SummaryType["Min"] = 3] = "Min";
+        SummaryType[SummaryType["Max"] = 4] = "Max";
+    })(SummaryType = Serenity.SummaryType || (Serenity.SummaryType = {}));
+})(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
     var Decorators;
@@ -3268,15 +3011,7 @@ var Serenity;
         }
         Decorators.addAttribute = addAttribute;
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
-    var ISlickFormatter = /** @class */ (function () {
-        function ISlickFormatter() {
-        }
-        ISlickFormatter = __decorate([
-            Decorators.registerInterface('Serenity.ISlickFormatter')
-        ], ISlickFormatter);
-        return ISlickFormatter;
-    }());
-    Serenity.ISlickFormatter = ISlickFormatter;
+    Serenity.Decorators.registerInterface('Serenity.ISlickFormatter')(Serenity.ISlickFormatter);
     function Attr(name) {
         return Decorators.registerClass('Serenity.' + name + 'Attribute');
     }
@@ -3315,6 +3050,7 @@ var Serenity;
             registerEnum(target, Q.coalesce(enumKey, name), name);
         }
         Decorators.registerEnumType = registerEnumType;
+        registerEnum(Serenity.SummaryType, 'Serenity.SummaryType');
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
     var EnumKeyAttribute = /** @class */ (function () {
         function EnumKeyAttribute(value) {
@@ -3858,64 +3594,1434 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    function Criteria(field) {
-        return [field];
-    }
-    Serenity.Criteria = Criteria;
-    (function (Criteria) {
-        var C = Criteria;
-        function isEmpty(c) {
-            return c == null ||
-                c.length === 0 ||
-                (c.length === 1 &&
-                    typeof c[0] == "string" &&
-                    c[0].length === 0);
+    var IAsyncInit = /** @class */ (function () {
+        function IAsyncInit() {
         }
-        Criteria.isEmpty = isEmpty;
-        function join(c1, op, c2) {
-            if (C.isEmpty(c1))
-                return c2;
-            if (C.isEmpty(c2))
-                return c1;
-            return [c1, op, c2];
-        }
-        Criteria.join = join;
-        function paren(c) {
-            return C.isEmpty(c) ? c : ['()', c];
-        }
-        Criteria.paren = paren;
-        function and(c1, c2) {
-            var rest = [];
-            for (var _i = 2; _i < arguments.length; _i++) {
-                rest[_i - 2] = arguments[_i];
-            }
-            var result = join(c1, 'and', c2);
-            if (rest) {
-                for (var _a = 0, rest_1 = rest; _a < rest_1.length; _a++) {
-                    var k = rest_1[_a];
-                    result = join(result, 'and', k);
-                }
-            }
-            return result;
-        }
-        Criteria.and = and;
-        function or(c1, c2) {
-            var rest = [];
-            for (var _i = 2; _i < arguments.length; _i++) {
-                rest[_i - 2] = arguments[_i];
-            }
-            var result = join(c1, 'or', c2);
-            if (rest) {
-                for (var _a = 0, rest_2 = rest; _a < rest_2.length; _a++) {
-                    var k = rest_2[_a];
-                    result = join(result, 'or', k);
-                }
-            }
-            return result;
-        }
-        Criteria.or = or;
-    })(Criteria = Serenity.Criteria || (Serenity.Criteria = {}));
+        IAsyncInit = __decorate([
+            Serenity.Decorators.registerInterface('Serenity.IAsyncInit')
+        ], IAsyncInit);
+        return IAsyncInit;
+    }());
+    Serenity.IAsyncInit = IAsyncInit;
 })(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IDialog = /** @class */ (function () {
+        function IDialog() {
+        }
+        IDialog = __decorate([
+            Serenity.Decorators.registerInterface('Serenity.IDialog')
+        ], IDialog);
+        return IDialog;
+    }());
+    Serenity.IDialog = IDialog;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    if (typeof React === "undefined") {
+        if (window['preact'] != null) {
+            window['React'] = window['ReactDOM'] = window['preact'];
+            React.Fragment = Q.coalesce(React.Fragment, "x-fragment");
+        }
+        else if (window['Nerv'] != null) {
+            window['React'] = window['ReactDOM'] = window['Nerv'];
+            React.Fragment = Q.coalesce(React.Fragment, "x-fragment");
+        }
+        else {
+            window['React'] = {
+                Component: function () { },
+                Fragment: "x-fragment",
+                createElement: function () { return { _reactNotLoaded: true }; }
+            };
+            window['ReactDOM'] = {
+                render: function () { throw Error("To use React, it should be included before Serenity.CoreLib.js"); }
+            };
+        }
+    }
+    var Widget = /** @class */ (function (_super) {
+        __extends(Widget, _super);
+        function Widget(element, options) {
+            var _this = _super.call(this, options) || this;
+            _this.element = element;
+            _this.options = options || {};
+            _this.widgetName = Widget_1.getWidgetName(Q.getInstanceType(_this));
+            _this.uniqueName = _this.widgetName + (Widget_1.nextWidgetNumber++).toString();
+            if (element.data(_this.widgetName)) {
+                throw new Q.Exception(Q.format("The element already has widget '{0}'!", _this.widgetName));
+            }
+            element.bind('remove.' + _this.widgetName, function (e) {
+                if (e.bubbles || e.cancelable) {
+                    return;
+                }
+                _this.destroy();
+            }).data(_this.widgetName, _this);
+            _this.addCssClass();
+            if (_this.isAsyncWidget()) {
+                window.setTimeout(function () {
+                    if (element && !_this.asyncPromise) {
+                        _this.asyncPromise = _this.initializeAsync();
+                    }
+                }, 0);
+            }
+            return _this;
+        }
+        Widget_1 = Widget;
+        Widget.prototype.destroy = function () {
+            this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
+            this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
+            this.element = null;
+            this.asyncPromise = null;
+        };
+        Widget.prototype.addCssClass = function () {
+            this.element.addClass(this.getCssClass());
+        };
+        Widget.prototype.getCssClass = function () {
+            var type = Q.getInstanceType(this);
+            var klass = 's-' + Q.getTypeName(type);
+            var fullClass = Q.replaceAll(Q.getTypeFullName(type), '.', '-');
+            for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
+                var k = _a[_i];
+                if (Q.startsWith(fullClass, k + '-')) {
+                    fullClass = fullClass.substr(k.length + 1);
+                    break;
+                }
+            }
+            fullClass = 's-' + fullClass;
+            if (klass === fullClass) {
+                return klass;
+            }
+            return klass + ' ' + fullClass;
+        };
+        Widget.prototype.initializeAsync = function () {
+            return Promise.resolve();
+        };
+        Widget.prototype.isAsyncWidget = function () {
+            return Q.isInstanceOfType(this, Serenity.IAsyncInit);
+        };
+        Widget.getWidgetName = function (type) {
+            return Q.replaceAll(Q.getTypeFullName(type), '.', '_');
+        };
+        Widget.elementFor = function (editorType) {
+            var elementAttr = Q.getAttributes(editorType, Serenity.ElementAttribute, true);
+            var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>');
+            return $(elementHtml);
+        };
+        ;
+        Widget.create = function (params) {
+            var widget;
+            if (Q.isAssignableFrom(Serenity.IDialog, params.type)) {
+                widget = new params.type(params.options);
+                if (params.container)
+                    widget.element.appendTo(params.container);
+                params.element && params.element(widget.element);
+            }
+            else {
+                var e = Widget_1.elementFor(params.type);
+                if (params.container)
+                    e.appendTo(params.container);
+                params.element && params.element(e);
+                widget = new params.type(e, params.options);
+            }
+            if (widget.isAsyncWidget())
+                widget.init(params.init);
+            else {
+                widget.init(null);
+                params.init && params.init(widget);
+            }
+            return widget;
+        };
+        Widget.prototype.init = function (action) {
+            var _this = this;
+            var promise = this.initialize();
+            if (action) {
+                promise.then(function () { return action(_this); });
+            }
+            return this;
+        };
+        Widget.prototype.initialize = function () {
+            if (!this.isAsyncWidget()) {
+                return Promise.resolve();
+            }
+            if (!this.asyncPromise) {
+                this.asyncPromise = this.initializeAsync();
+            }
+            return this.asyncPromise;
+        };
+        var Widget_1;
+        Widget.nextWidgetNumber = 0;
+        Widget.__isWidgetType = true;
+        Widget = Widget_1 = __decorate([
+            Serenity.Decorators.registerClass()
+        ], Widget);
+        return Widget;
+    }(React.Component));
+    Serenity.Widget = Widget;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var WX;
+    (function (WX) {
+        function getWidget(element, type) {
+            if (element == null) {
+                throw new Q.ArgumentNullException('element');
+            }
+            if (element.length === 0) {
+                throw new Q.Exception(Q.format("Searching for widget of type '{0}' on a non-existent element! ({1})", Q.getTypeFullName(type), element.selector));
+            }
+            var widget = element.tryGetWidget(type);
+            if (widget == null) {
+                var message = Q.format("Element has no widget of type '{0}'! If you have recently changed editor " +
+                    "type of a property in a form class, or changed data type in row (which also changes editor type)" +
+                    " your script side Form definition might be out of date. Make sure your project builds successfully " +
+                    "and transform T4 templates", Q.getTypeFullName(type));
+                Q.notifyError(message, '', null);
+                throw new Q.Exception(message);
+            }
+            return widget;
+        }
+        WX.getWidget = getWidget;
+        function getWidgetName(type) {
+            return Q.replaceAll(Q.getTypeFullName(type), '.', '_');
+        }
+        WX.getWidgetName = getWidgetName;
+        function hasOriginalEvent(e) {
+            return !!!(typeof (e.originalEvent) === 'undefined');
+        }
+        WX.hasOriginalEvent = hasOriginalEvent;
+        function change(widget, handler) {
+            widget.element.bind('change.' + widget.uniqueName, handler);
+        }
+        WX.change = change;
+        function changeSelect2(widget, handler) {
+            widget.element.bind('change.' + widget.uniqueName, function (e, x) {
+                if (!!(hasOriginalEvent(e) || !x)) {
+                    handler(e);
+                }
+            });
+        }
+        WX.changeSelect2 = changeSelect2;
+        function getGridField(widget) {
+            return widget.element.closest('.field');
+        }
+        WX.getGridField = getGridField;
+    })(WX = Serenity.WX || (Serenity.WX = {}));
+    Serenity.Widget.prototype['changeSelect2'] = function (handler) {
+        var widget = this;
+        widget.element.bind('change.' + widget.uniqueName, function (e, x) {
+            if (!!(WX.hasOriginalEvent(e) || !x)) {
+                handler(e);
+            }
+        });
+    };
+    Serenity.Widget.prototype['change'] = function (handler1) {
+        var widget1 = this;
+        widget1.element.bind('change.' + widget1.uniqueName, handler1);
+    };
+    Serenity.Widget.prototype['getGridField'] = function () {
+        return this.element.closest('.field');
+    };
+    if (typeof $ != "undefined") {
+        $.fn.tryGetWidget = function (widgetType) {
+            var element = this;
+            var widget2;
+            if (Q.isAssignableFrom(Serenity.Widget, widgetType)) {
+                var widgetName = WX.getWidgetName(widgetType);
+                widget2 = element.data(widgetName);
+                if (widget2 != null && !Q.isAssignableFrom(widgetType, Q.getInstanceType(widget2))) {
+                    widget2 = null;
+                }
+                if (widget2 != null) {
+                    return widget2;
+                }
+            }
+            var data = element.data();
+            if (data == null) {
+                return null;
+            }
+            for (var _i = 0, _a = Object.keys(data); _i < _a.length; _i++) {
+                var key = _a[_i];
+                widget2 = data[key];
+                if (widget2 != null && Q.isAssignableFrom(widgetType, Q.getInstanceType(widget2))) {
+                    return widget2;
+                }
+            }
+            return null;
+        };
+        $.fn.getWidget = function (widgetType1) {
+            var element1 = this;
+            if (element1 == null) {
+                throw new Q.ArgumentNullException('element');
+            }
+            if (element1.length === 0) {
+                throw new Q.Exception(Q.format("Searching for widget of type '{0}' on a non-existent element! ({1})", Q.getTypeFullName(widgetType1), element1.selector));
+            }
+            var widget3 = element1.tryGetWidget(widgetType1);
+            if (widget3 == null) {
+                var message = Q.format("Element has no widget of type '{0}'! If you have recently changed " +
+                    "editor type of a property in a form class, or changed data type in row (which also changes " +
+                    "editor type) your script side Form definition might be out of date. Make sure your project " +
+                    "builds successfully and transform T4 templates", Q.getTypeFullName(widgetType1));
+                Q.notifyError(message, '', null);
+                throw new Q.Exception(message);
+            }
+            return widget3;
+        };
+    }
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var TemplatedWidget = /** @class */ (function (_super) {
+        __extends(TemplatedWidget, _super);
+        function TemplatedWidget(container, options) {
+            var _this = _super.call(this, container, options) || this;
+            _this.idPrefix = _this.uniqueName + '_';
+            var widgetMarkup = _this.getTemplate().replace(new RegExp('~_', 'g'), _this.idPrefix);
+            // for compability with older templates based on JsRender
+            var end = 0;
+            while (true) {
+                var idx = widgetMarkup.indexOf('{{text:"', end);
+                if (idx < 0)
+                    break;
+                var end = widgetMarkup.indexOf('"}}', idx);
+                if (end < 0)
+                    break;
+                var key = widgetMarkup.substr(idx + 8, end - idx - 8);
+                var text = Q.text(key);
+                widgetMarkup = widgetMarkup.substr(0, idx) + text + widgetMarkup.substr(end + 3);
+                end = idx + text.length;
+            }
+            _this.element.html(widgetMarkup);
+            return _this;
+        }
+        TemplatedWidget_1 = TemplatedWidget;
+        TemplatedWidget.prototype.byId = function (id) {
+            return $('#' + this.idPrefix + id);
+        };
+        TemplatedWidget.prototype.byID = function (id, type) {
+            return Serenity.WX.getWidget(this.byId(id), type);
+        };
+        TemplatedWidget.noGeneric = function (s) {
+            var dollar = s.indexOf('$');
+            if (dollar >= 0) {
+                return s.substr(0, dollar);
+            }
+            return s;
+        };
+        TemplatedWidget.prototype.getDefaultTemplateName = function () {
+            return TemplatedWidget_1.noGeneric(Q.getTypeName(Q.getInstanceType(this)));
+        };
+        TemplatedWidget.prototype.getTemplateName = function () {
+            var type = Q.getInstanceType(this);
+            var fullName = Q.getTypeFullName(type);
+            var templateNames = TemplatedWidget_1.templateNames;
+            var cachedName = TemplatedWidget_1.templateNames[fullName];
+            if (cachedName != null) {
+                return cachedName;
+            }
+            while (type && type !== Serenity.Widget) {
+                var name = TemplatedWidget_1.noGeneric(Q.getTypeFullName(type));
+                for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
+                    var k = _a[_i];
+                    if (Q.startsWith(name, k + '.')) {
+                        name = name.substr(k.length + 1);
+                        break;
+                    }
+                }
+                if (Q.canLoadScriptData('Template.' + name)) {
+                    templateNames[fullName] = name;
+                    return name;
+                }
+                name = Q.replaceAll(name, '.', '_');
+                if (Q.canLoadScriptData('Template.' + name) ||
+                    $('script#Template_' + name).length > 0) {
+                    templateNames[fullName] = name;
+                    return name;
+                }
+                name = TemplatedWidget_1.noGeneric(Q.getTypeName(type));
+                if (Q.canLoadScriptData('Template.' + name) ||
+                    $('script#Template_' + name).length > 0) {
+                    TemplatedWidget_1.templateNames[fullName] = name;
+                    return name;
+                }
+                type = Q.getBaseType(type);
+            }
+            templateNames[fullName] = cachedName = this.getDefaultTemplateName();
+            return cachedName;
+        };
+        TemplatedWidget.prototype.getFallbackTemplate = function () {
+            return null;
+        };
+        TemplatedWidget.prototype.getTemplate = function () {
+            var templateName = this.getTemplateName();
+            var script = $('script#Template_' + templateName);
+            if (script.length > 0) {
+                return script.html();
+            }
+            var template;
+            if (!Q.canLoadScriptData('Template.' + templateName) &&
+                this.getDefaultTemplateName() == templateName) {
+                template = this.getFallbackTemplate();
+                if (template != null)
+                    return template;
+            }
+            template = Q.getTemplate(templateName);
+            if (template == null) {
+                throw new Error(Q.format("Can't locate template for widget '{0}' with name '{1}'!", Q.getTypeName(Q.getInstanceType(this)), templateName));
+            }
+            return template;
+        };
+        var TemplatedWidget_1;
+        TemplatedWidget.templateNames = {};
+        TemplatedWidget = TemplatedWidget_1 = __decorate([
+            Serenity.Decorators.registerClass()
+        ], TemplatedWidget);
+        return TemplatedWidget;
+    }(Serenity.Widget));
+    Serenity.TemplatedWidget = TemplatedWidget;
+})(Serenity || (Serenity = {}));
+var Q;
+(function (Q) {
+    function autoFullHeight(element) {
+        element.css('height', '100%');
+        triggerLayoutOnShow(element);
+    }
+    Q.autoFullHeight = autoFullHeight;
+    function initFullHeightGridPage(gridDiv) {
+        $('body').addClass('full-height-page');
+        gridDiv.addClass('responsive-height');
+        var layout = function () {
+            var inPageContent = gridDiv.parent().hasClass('page-content') ||
+                gridDiv.parent().is('section.content');
+            if (inPageContent) {
+                gridDiv.css('height', '1px').css('overflow', 'hidden');
+            }
+            layoutFillHeight(gridDiv);
+            if (inPageContent) {
+                gridDiv.css('overflow', '');
+            }
+            gridDiv.triggerHandler('layout');
+        };
+        if ($('body').hasClass('has-layout-event')) {
+            $('body').bind('layout', layout);
+        }
+        else if (window.Metronic) {
+            window.Metronic.addResizeHandler(layout);
+        }
+        else {
+            $(window).resize(layout);
+        }
+        layout();
+        gridDiv.one('remove', function () {
+            $(window).off('layout', layout);
+            $('body').off('layout', layout);
+        });
+        // ugly, but to it is to make old pages work without having to add this
+        Q.Router.resolve();
+    }
+    Q.initFullHeightGridPage = initFullHeightGridPage;
+    function layoutFillHeightValue(element) {
+        var h = 0;
+        element.parent().children().not(element).each(function (i, e) {
+            var q = $(e);
+            if (q.is(':visible')) {
+                h += q.outerHeight(true);
+            }
+        });
+        h = element.parent().height() - h;
+        if (element.css('box-sizing') !== 'border-box') {
+            h = h - (element.outerHeight(true) - element.height());
+        }
+        return h;
+    }
+    Q.layoutFillHeightValue = layoutFillHeightValue;
+    function layoutFillHeight(element) {
+        var h = layoutFillHeightValue(element);
+        var n = Math.round(h) + 'px';
+        if (element.css('height') != n) {
+            element.css('height', n);
+        }
+    }
+    Q.layoutFillHeight = layoutFillHeight;
+    function setMobileDeviceMode() {
+        var isMobile = navigator.userAgent.indexOf('Mobi') >= 0 ||
+            (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
+        var body = $(document.body);
+        if (body.hasClass('mobile-device')) {
+            if (!isMobile) {
+                body.removeClass('mobile-device');
+            }
+        }
+        else if (isMobile) {
+            body.addClass('mobile-device');
+        }
+    }
+    Q.setMobileDeviceMode = setMobileDeviceMode;
+    setMobileDeviceMode();
+    $(function () {
+        if (globalObj && Q.Config.rootNamespaces) {
+            for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
+                var ns = _a[_i];
+                var obj = Q.getNested(globalObj, ns);
+                if (obj != null)
+                    Q.initializeTypes(obj, ns + ".", 3);
+            }
+        }
+        globalObj && $(globalObj).bind('resize', function () {
+            setMobileDeviceMode();
+        });
+    });
+    function triggerLayoutOnShow(element) {
+        Serenity.LazyLoadHelper.executeEverytimeWhenShown(element, function () {
+            element.triggerHandler('layout');
+        }, true);
+    }
+    Q.triggerLayoutOnShow = triggerLayoutOnShow;
+    function centerDialog(el) {
+        if (!el.hasClass("ui-dialog"))
+            el = el.closest(".ui-dialog");
+        el.position({ at: 'center center', of: window });
+        var pos = el.position();
+        if (pos.left < 0)
+            el.css("left", "0px");
+        if (pos.top < 0)
+            el.css("top", "0px");
+    }
+    Q.centerDialog = centerDialog;
+})(Q || (Q = {}));
+var Q;
+(function (Q) {
+    var Router;
+    (function (Router) {
+        var oldURL;
+        var resolving = 0;
+        var autoinc = 0;
+        var listenerTimeout;
+        var ignoreHash = 0;
+        var ignoreTime = 0;
+        Router.enabled = true;
+        function isEqual(url1, url2) {
+            return url1 == url2 || url1 == url2 + '#' || url2 == url1 + '#';
+        }
+        function navigate(hash, tryBack, silent) {
+            if (!Router.enabled || resolving > 0)
+                return;
+            hash = hash || '';
+            hash = hash.replace(/^#/, '');
+            hash = (!hash ? "" : '#' + hash);
+            var newURL = window.location.href.replace(/#$/, '')
+                .replace(/#.*$/, '') + hash;
+            if (newURL != window.location.href) {
+                if (tryBack && oldURL != null && isEqual(oldURL, newURL)) {
+                    if (silent)
+                        ignoreChange();
+                    var prior = window.location.href;
+                    oldURL = null;
+                    window.history.back();
+                    return;
+                }
+                if (silent)
+                    ignoreChange();
+                oldURL = window.location.href;
+                window.location.hash = hash;
+            }
+        }
+        Router.navigate = navigate;
+        function replace(hash, tryBack) {
+            navigate(hash, tryBack, true);
+        }
+        Router.replace = replace;
+        function replaceLast(hash, tryBack) {
+            if (!Router.enabled)
+                return;
+            var current = window.location.hash || '';
+            if (current.charAt(0) == '#')
+                current = current.substr(1, current.length - 1);
+            var parts = current.split('/+/');
+            if (parts.length > 1) {
+                if (hash && hash.length) {
+                    parts[parts.length - 1] = hash;
+                    hash = parts.join("/+/");
+                }
+                else {
+                    parts.splice(parts.length - 1, 1);
+                    hash = parts.join("/+/");
+                }
+            }
+            replace(hash, tryBack);
+        }
+        Router.replaceLast = replaceLast;
+        function visibleDialogs() {
+            return $('.ui-dialog-content:visible, .ui-dialog.panel-hidden>.ui-dialog-content, .s-Panel').toArray().sort(function (a, b) {
+                return ($(a).data('qrouterorder') || 0) - ($(b).data('qrouterorder') || 0);
+            });
+        }
+        function dialogOpen(owner, element, hash) {
+            var route = [];
+            var isDialog = owner.hasClass(".ui-dialog-content") || owner.hasClass('.s-Panel');
+            var dialog = isDialog ? owner :
+                owner.closest('.ui-dialog-content, .s-Panel');
+            var value = hash();
+            var idPrefix;
+            if (dialog.length) {
+                var dialogs = visibleDialogs();
+                var index = dialogs.indexOf(dialog[0]);
+                for (var i = 0; i <= index; i++) {
+                    var q = $(dialogs[i]).data("qroute");
+                    if (q && q.length)
+                        route.push(q);
+                }
+                if (!isDialog) {
+                    idPrefix = dialog.attr("id");
+                    if (idPrefix) {
+                        idPrefix += "_";
+                        var id = owner.attr("id");
+                        if (id && Q.startsWith(id, idPrefix))
+                            value = id.substr(idPrefix.length) + '@' + value;
+                    }
+                }
+            }
+            else {
+                var id = owner.attr("id");
+                if (id && (!owner.hasClass("route-handler") ||
+                    $('.route-handler').first().attr("id") != id))
+                    value = id + "@" + value;
+            }
+            route.push(value);
+            element.data("qroute", value);
+            replace(route.join("/+/"));
+            element.bind("dialogclose.qrouter panelclose.qrouter", function (e) {
+                element.data("qroute", null);
+                element.unbind(".qrouter");
+                var prhash = element.data("qprhash");
+                var tryBack = $(e.target).closest('.s-MessageDialog').length > 0 || (e && e.originalEvent &&
+                    ((e.originalEvent.type == "keydown" && e.originalEvent.keyCode == 27) ||
+                        $(e.originalEvent.target).hasClass("ui-dialog-titlebar-close") ||
+                        $(e.originalEvent.target).hasClass("panel-titlebar-close")));
+                if (prhash != null)
+                    replace(prhash, tryBack);
+                else
+                    replaceLast('', tryBack);
+            });
+        }
+        function dialog(owner, element, hash) {
+            if (!Router.enabled)
+                return;
+            element.on("dialogopen.qrouter panelopen.qrouter", function (e) {
+                dialogOpen(owner, element, hash);
+            });
+        }
+        Router.dialog = dialog;
+        function resolve(hash) {
+            if (!Router.enabled)
+                return;
+            resolving++;
+            try {
+                hash = Q.coalesce(Q.coalesce(hash, window.location.hash), '');
+                if (hash.charAt(0) == '#')
+                    hash = hash.substr(1, hash.length - 1);
+                var dialogs = visibleDialogs();
+                var newParts = hash.split("/+/");
+                var oldParts = dialogs.map(function (el) { return $(el).data('qroute'); });
+                var same = 0;
+                while (same < dialogs.length &&
+                    same < newParts.length &&
+                    oldParts[same] == newParts[same]) {
+                    same++;
+                }
+                for (var i = same; i < dialogs.length; i++) {
+                    var d = $(dialogs[i]);
+                    if (d.hasClass('ui-dialog-content'))
+                        d.dialog('close');
+                    else if (d.hasClass('s-Panel'))
+                        Serenity.TemplatedDialog.closePanel(d);
+                }
+                for (var i = same; i < newParts.length; i++) {
+                    var route = newParts[i];
+                    var routeParts = route.split('@');
+                    var handler;
+                    if (routeParts.length == 2) {
+                        var dialog = i > 0 ? $(dialogs[i - 1]) : $([]);
+                        if (dialog.length) {
+                            var idPrefix = dialog.attr("id");
+                            if (idPrefix) {
+                                handler = $('#' + idPrefix + "_" + routeParts[0]);
+                                if (handler.length) {
+                                    route = routeParts[1];
+                                }
+                            }
+                        }
+                        if (!handler || !handler.length) {
+                            handler = $('#' + routeParts[0]);
+                            if (handler.length) {
+                                route = routeParts[1];
+                            }
+                        }
+                    }
+                    if (!handler || !handler.length) {
+                        handler = i > 0 ? $(dialogs[i - 1]) :
+                            $('.route-handler').first();
+                    }
+                    handler.triggerHandler("handleroute", {
+                        handled: false,
+                        route: route,
+                        parts: newParts,
+                        index: i
+                    });
+                }
+            }
+            finally {
+                resolving--;
+            }
+        }
+        Router.resolve = resolve;
+        function hashChange(e, o) {
+            if (ignoreHash > 0) {
+                if (new Date().getTime() - ignoreTime > 1000) {
+                    ignoreHash = 0;
+                }
+                else {
+                    ignoreHash--;
+                    return;
+                }
+            }
+            resolve();
+        }
+        function ignoreChange() {
+            ignoreHash++;
+            ignoreTime = new Date().getTime();
+        }
+        window.addEventListener("hashchange", hashChange, false);
+        var routerOrder = 1;
+        $(document).on("dialogopen panelopen", ".ui-dialog-content, .s-Panel", function (event, ui) {
+            if (!Router.enabled)
+                return;
+            var dlg = $(event.target);
+            dlg.data("qrouterorder", routerOrder++);
+            if (dlg.data("qroute"))
+                return;
+            dlg.data("qprhash", window.location.hash);
+            var owner = $(visibleDialogs).not(dlg).last();
+            if (!owner.length)
+                owner = $('html');
+            dialogOpen(owner, dlg, function () {
+                return "!" + (++autoinc).toString(36);
+            });
+        });
+    })(Router = Q.Router || (Q.Router = {}));
+})(Q || (Q = {}));
+var Q;
+(function (Q) {
+    var oldShowLabel;
+    function validateShowLabel(element, message) {
+        oldShowLabel.call(this, element, message);
+        this.errorsFor(element).each(function (i, e) {
+            if ($(element).hasClass('error'))
+                $(e).removeClass('checked');
+            $(e).attr('title', $(e).text());
+        });
+    }
+    ;
+    function registerCustomValidationMethods() {
+        if ($.validator.methods['customValidate'] == null) {
+            $.validator.addMethod('customValidate', function (value, element) {
+                var result = this.optional(element);
+                if (element == null || !!result) {
+                    return result;
+                }
+                var events = $._data(element, 'events');
+                if (!events) {
+                    return true;
+                }
+                var handlers = events.customValidate;
+                if (handlers == null || handlers.length === 0) {
+                    return true;
+                }
+                var el = $(element);
+                for (var i = 0; !!(i < handlers.length); i++) {
+                    if ($.isFunction(handlers[i].handler)) {
+                        var message = handlers[i].handler(el);
+                        if (message != null) {
+                            el.data('customValidationMessage', message);
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }, function (o, e) {
+                return $(e).data('customValidationMessage');
+            });
+        }
+    }
+    function jQueryValidationInitialization() {
+        registerCustomValidationMethods();
+        var p = $.validator;
+        p = p.prototype;
+        oldShowLabel = p.showLabel;
+        p.showLabel = validateShowLabel;
+        $.validator.addMethod("dateQ", function (value, element) {
+            var o = this.optional(element);
+            if (o)
+                return o;
+            var d = Q.parseDate(value);
+            if (!d)
+                return false;
+            var z = new Date(d);
+            z.setHours(0, 0, 0, 0);
+            return z.getTime() === d.getTime();
+        });
+        $.validator.addMethod("hourAndMin", function (value, element) {
+            return this.optional(element) || !isNaN(Q.parseHourAndMin(value));
+        });
+        $.validator.addMethod("dayHourAndMin", function (value, element) {
+            return this.optional(element) || !isNaN(Q.parseDayHourAndMin(value));
+        });
+        $.validator.addMethod("decimalQ", function (value, element) {
+            return this.optional(element) || !isNaN(Q.parseDecimal(value));
+        });
+        $.validator.addMethod("integerQ", function (value, element) {
+            return this.optional(element) || !isNaN(Q.parseInteger(value));
+        });
+        var oldEmail = $.validator.methods['email'];
+        $.validator.addMethod("email", function (value, element) {
+            if (!Q.Config.emailAllowOnlyAscii)
+                return oldEmail.call(this, value, element);
+            return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
+        });
+        $.validator.addMethod("emailMultiple", function (value, element) {
+            var result = this.optional(element);
+            if (result)
+                return result;
+            if (value.indexOf(';') >= 0)
+                value = value.split(';');
+            else
+                value = value.split(',');
+            for (var i = 0; i < value.length; i++) {
+                result = $.validator.methods['email'].call(this, value[i], element);
+                if (!result)
+                    return result;
+            }
+            return result;
+        });
+        $.validator.addMethod("anyvalue", function (value, element) {
+            return true;
+        });
+        var d = $.validator.defaults;
+        d.ignoreTitle = true;
+        d.onchange = function (element) {
+            this.element(element);
+        };
+        p.oldinit = p.init;
+        p.init = function () {
+            p.oldinit.call(this);
+            function changeDelegate(event) {
+                if (this.form == null)
+                    return;
+                var validator = $.data(this.form, "validator"), eventType = "on" + event.type.replace(/^validate/, "");
+                validator && validator.settings[eventType] && validator.settings[eventType].call(validator, this);
+            }
+            function delegate(event) {
+                var el = this[0];
+                if (!$.data(el, 'changebound')) {
+                    $(el).change(changeDelegate);
+                    $.data(el, 'changebound', true);
+                }
+            }
+            $(this.currentForm)
+                .on(":text, :password, :file, select, textarea", "focusin.validate", delegate);
+        };
+        p.oldfocusInvalid = p.focusInvalid;
+        p.focusInvalid = function () {
+            if (this.settings.abortHandler)
+                this.settings.abortHandler(this);
+            this.oldfocusInvalid.call(this);
+        };
+        p.oldstopRequest = p.focusInvalid;
+        p.stopRequest = function (element, valid) {
+            var formSubmitted = this.formSubmitted;
+            this.oldfocusInvalid.call(this, [element, valid]);
+            if (!valid && this.pendingRequest == 0 && formSubmitted && this.settings.abortHandler) {
+                this.settings.abortHandler(this);
+            }
+        };
+        p.resetAll = function () {
+            this.submitted = {};
+            this.prepareForm();
+            this.hideErrors();
+            this.elements().removeClass(this.settings.errorClass);
+        };
+        jQuery(function () {
+            if (typeof $ !== "undefined" && $.validator) {
+                Q.extend($.validator.messages, {
+                    email: Q.text("Validation.Email"),
+                    required: Q.text("Validation.Required"),
+                    minlength: Q.text("Validation.MinLength"),
+                    maxlength: Q.text("Validation.MaxLength"),
+                    digits: Q.text("Validation.Digits"),
+                    range: Q.text("Validation.Range"),
+                    xss: Q.text("Validation.Xss"),
+                    dateQ: Q.text("Validation.DateInvalid"),
+                    decimalQ: Q.text("Validation.Decimal"),
+                    integerQ: Q.text("Validation.Integer"),
+                    url: Q.text("Validation.Url")
+                });
+            }
+        });
+    }
+    ;
+    function validatorAbortHandler(validator) {
+        validator.settings.abortHandler = null;
+        validator.settings.submitHandler = function () {
+            return false;
+        };
+    }
+    Q.validatorAbortHandler = validatorAbortHandler;
+    ;
+    function validateOptions(options) {
+        return Q.extend({
+            ignore: ":hidden",
+            meta: 'v',
+            normalizer: function (value) {
+                return $.trim(value);
+            },
+            errorClass: 'error',
+            errorPlacement: function (error, element) {
+                var field = null;
+                var vx = element.attr('data-vx-id');
+                if (vx) {
+                    field = $('#' + vx);
+                    if (!field.length)
+                        field = null;
+                    else
+                        field = field[0];
+                }
+                if (field == null) {
+                    field = element.parents('div.field');
+                    if (field.length) {
+                        var inner = $('div.vx', field[0]);
+                        if (inner.length)
+                            field = inner[0];
+                    }
+                    else
+                        field = element.parent();
+                }
+                error.appendTo(field);
+            },
+            submitHandler: function () {
+                return false;
+            },
+            invalidHandler: function (event, validator) {
+                Q.notifyError(Q.text("Validation.InvalidFormMessage"));
+                $(validator.errorList.map(function (x) { return x.element; }))
+                    .closest('.category.collapsed')
+                    .children('.category-title')
+                    .each(function (i, x) {
+                    $(x).click();
+                    return true;
+                });
+                if (validator.errorList.length) {
+                    var el = validator.errorList[0].element;
+                    if (el) {
+                        var bsPane = $(el).closest('.tab-pane');
+                        if (!bsPane.hasClass("active") &&
+                            bsPane.parent().hasClass('tab-content')) {
+                            var bsPaneId = bsPane.attr('id');
+                            if (bsPaneId) {
+                                $('a[href="#' + bsPaneId + '"]').click();
+                            }
+                        }
+                        if ($.fn.tooltip) {
+                            $.fn.tooltip && $(el).tooltip({
+                                title: validator.errorList[0].message,
+                                trigger: 'manual'
+                            }).tooltip('show');
+                            window.setTimeout(function () {
+                                $(el).tooltip('destroy');
+                            }, 1500);
+                        }
+                    }
+                }
+            },
+            success: function (label) {
+                label.addClass('checked');
+            }
+        }, options);
+    }
+    Q.validateOptions = validateOptions;
+    ;
+    if ($.validator)
+        jQueryValidationInitialization();
+    else
+        $(function () {
+            $.validator && jQueryValidationInitialization();
+        });
+})(Q || (Q = {}));
+var Serenity;
+(function (Serenity) {
+    var TemplatedDialog = /** @class */ (function (_super) {
+        __extends(TemplatedDialog, _super);
+        function TemplatedDialog(options) {
+            var _this = _super.call(this, Q.newBodyDiv().addClass('s-TemplatedDialog hidden'), options) || this;
+            _this.element.attr("id", _this.uniqueName);
+            _this.initValidator();
+            _this.initTabs();
+            _this.initToolbar();
+            return _this;
+        }
+        TemplatedDialog_1 = TemplatedDialog;
+        Object.defineProperty(TemplatedDialog.prototype, "isMarkedAsPanel", {
+            get: function () {
+                var panelAttr = Q.getAttributes(Q.getInstanceType(this), Serenity.PanelAttribute, true);
+                return panelAttr.length > 0 && panelAttr[panelAttr.length - 1].value !== false;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TemplatedDialog.prototype, "isResponsive", {
+            get: function () {
+                return Q.Config.responsiveDialogs ||
+                    Q.getAttributes(Q.getInstanceType(this), Serenity.ResponsiveAttribute, true).length > 0;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TemplatedDialog.getCssSize = function (element, name) {
+            var cssSize = element.css(name);
+            if (cssSize == null) {
+                return null;
+            }
+            if (!Q.endsWith(cssSize, 'px')) {
+                return null;
+            }
+            cssSize = cssSize.substr(0, cssSize.length - 2);
+            var i = Q.parseInteger(cssSize);
+            if (i == null || isNaN(i) || i == 0)
+                return null;
+            return i;
+        };
+        TemplatedDialog.applyCssSizes = function (opt, dialogClass) {
+            var size;
+            var dialog = $('<div/>').hide().addClass(dialogClass).appendTo(document.body);
+            try {
+                var sizeHelper = $('<div/>').addClass('size').appendTo(dialog);
+                size = TemplatedDialog_1.getCssSize(sizeHelper, 'minWidth');
+                if (size != null)
+                    opt.minWidth = size;
+                size = TemplatedDialog_1.getCssSize(sizeHelper, 'width');
+                if (size != null)
+                    opt.width = size;
+                size = TemplatedDialog_1.getCssSize(sizeHelper, 'height');
+                if (size != null)
+                    opt.height = size;
+                size = TemplatedDialog_1.getCssSize(sizeHelper, 'minHeight');
+                if (size != null)
+                    opt.minHeight = size;
+            }
+            finally {
+                dialog.remove();
+            }
+        };
+        ;
+        TemplatedDialog.prototype.destroy = function () {
+            this.tabs && this.tabs.tabs('destroy');
+            this.tabs = null;
+            this.toolbar && this.toolbar.destroy();
+            this.toolbar = null;
+            this.validator && this.byId('Form').remove();
+            this.validator = null;
+            if (this.element != null &&
+                this.element.hasClass('ui-dialog-content')) {
+                this.element.dialog('destroy');
+                this.element.removeClass('ui-dialog-content');
+            }
+            $(window).unbind('.' + this.uniqueName);
+            _super.prototype.destroy.call(this);
+        };
+        TemplatedDialog.prototype.initDialog = function () {
+            var _this = this;
+            if (this.element.hasClass('ui-dialog-content'))
+                return;
+            this.element.removeClass('hidden');
+            this.element.dialog(this.getDialogOptions());
+            this.element.closest('.ui-dialog').on('resize', function (e) { return _this.arrange(); });
+            var type = Q.getInstanceType(this);
+            if (this.isResponsive) {
+                Serenity.DialogExtensions.dialogResizable(this.element);
+                $(window).bind('resize.' + this.uniqueName, function (e) {
+                    if (_this.element && _this.element.is(':visible')) {
+                        _this.handleResponsive();
+                    }
+                });
+                this.element.closest('.ui-dialog').addClass('flex-layout');
+            }
+            else if (Q.getAttributes(type, Serenity.FlexifyAttribute, true).length > 0) {
+                Serenity.DialogExtensions.dialogFlexify(this.element);
+                Serenity.DialogExtensions.dialogResizable(this.element);
+            }
+            if (Q.getAttributes(type, Serenity.MaximizableAttribute, true).length > 0) {
+                Serenity.DialogExtensions.dialogMaximizable(this.element);
+            }
+            var self = this;
+            this.element.bind('dialogopen.' + this.uniqueName, function () {
+                $(document.body).addClass('modal-dialog-open');
+                if (_this.isResponsive) {
+                    _this.handleResponsive();
+                }
+                self.onDialogOpen();
+            });
+            this.element.bind('dialogclose.' + this.uniqueName, function () {
+                $(document.body).toggleClass('modal-dialog-open', $('.ui-dialog:visible').length > 0);
+                self.onDialogClose();
+            });
+        };
+        TemplatedDialog.prototype.initToolbar = function () {
+            var toolbarDiv = this.byId('Toolbar');
+            if (toolbarDiv.length === 0) {
+                return;
+            }
+            var hotkeyContext = this.element.closest('.ui-dialog');
+            if (hotkeyContext.length === 0) {
+                hotkeyContext = this.element;
+            }
+            var opt = { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] };
+            this.toolbar = new Serenity.Toolbar(toolbarDiv, opt);
+        };
+        TemplatedDialog.prototype.getToolbarButtons = function () {
+            return [];
+        };
+        TemplatedDialog.prototype.getValidatorOptions = function () {
+            return {};
+        };
+        TemplatedDialog.prototype.initValidator = function () {
+            var form = this.byId('Form');
+            if (form.length > 0) {
+                var valOptions = this.getValidatorOptions();
+                this.validator = form.validate(Q.validateOptions(valOptions));
+            }
+        };
+        TemplatedDialog.prototype.resetValidation = function () {
+            this.validator && this.validator.resetAll();
+        };
+        TemplatedDialog.prototype.validateForm = function () {
+            return this.validator == null || !!this.validator.form();
+        };
+        TemplatedDialog.prototype.dialogOpen = function (asPanel) {
+            var _this = this;
+            asPanel = Q.coalesce(asPanel, this.isMarkedAsPanel);
+            if (asPanel) {
+                if (!this.element.hasClass('s-Panel')) {
+                    // so that panel title is created if needed
+                    this.element.on('panelopen.' + this.uniqueName, function () {
+                        _this.onDialogOpen();
+                    });
+                    this.element.on('panelclose.' + this.uniqueName, function () {
+                        _this.onDialogClose();
+                    });
+                }
+                TemplatedDialog_1.openPanel(this.element, this.uniqueName);
+                this.setupPanelTitle();
+            }
+            else {
+                if (!this.element.hasClass('ui-dialog-content'))
+                    this.initDialog();
+                this.element.dialog('open');
+            }
+        };
+        TemplatedDialog.openPanel = function (element, uniqueName) {
+            var container = $('.panels-container');
+            if (!container.length)
+                container = $('section.content');
+            element.data('paneluniquename', uniqueName);
+            if (container.length) {
+                container = container.last();
+                container.children()
+                    .not(element)
+                    .not('.panel-hidden')
+                    .addClass('panel-hidden panel-hidden-' + uniqueName);
+                if (element[0].parentElement !== container[0])
+                    element.appendTo(container);
+            }
+            $('.ui-dialog:visible, .ui-widget-overlay:visible')
+                .not(element)
+                .addClass('panel-hidden panel-hidden-' + uniqueName);
+            element
+                .removeClass('hidden')
+                .removeClass('panel-hidden')
+                .addClass('s-Panel')
+                .trigger('panelopen');
+        };
+        TemplatedDialog.closePanel = function (element, e) {
+            if (!element.hasClass('s-Panel') || element.hasClass('hidden'))
+                return;
+            var query = $.Event(e);
+            query.type = 'panelbeforeclose';
+            query.target = element[0];
+            element.trigger(query);
+            if (query.isDefaultPrevented())
+                return;
+            element.addClass('hidden');
+            var uniqueName = element.data('paneluniquename') || new Date().getTime();
+            var klass = 'panel-hidden-' + uniqueName;
+            $('.' + klass).removeClass(klass).removeClass('panel-hidden');
+            $(window).triggerHandler('resize');
+            $('.require-layout:visible').triggerHandler('layout');
+            var e = $.Event(e);
+            e.type = 'panelclose';
+            e.target = element[0];
+            element.trigger(e);
+        };
+        TemplatedDialog.prototype.onDialogOpen = function () {
+            if (!$(document.body).hasClass('mobile-device'))
+                $(':input', this.element).not('button').eq(0).focus();
+            this.arrange();
+            this.tabs && this.tabs.tabs('option', 'active', 0);
+        };
+        TemplatedDialog.prototype.arrange = function () {
+            this.element.find('.require-layout').filter(':visible').each(function (i, e) {
+                $(e).triggerHandler('layout');
+            });
+        };
+        TemplatedDialog.prototype.onDialogClose = function () {
+            var _this = this;
+            $(document).trigger('click');
+            // for tooltips etc.
+            if ($.qtip) {
+                $(document.body).children('.qtip').each(function (index, el) {
+                    $(el).qtip('hide');
+                });
+            }
+            window.setTimeout(function () {
+                var element = _this.element;
+                _this.destroy();
+                element.remove();
+                Q.positionToastContainer(false);
+            }, 0);
+        };
+        TemplatedDialog.prototype.addCssClass = function () {
+            if (this.isMarkedAsPanel) {
+                _super.prototype.addCssClass.call(this);
+                if (this.isResponsive)
+                    this.element.addClass("flex-layout");
+            }
+        };
+        TemplatedDialog.prototype.getDialogOptions = function () {
+            var opt = {};
+            var dialogClass = 's-Dialog ' + this.getCssClass();
+            opt.dialogClass = dialogClass;
+            opt.width = 920;
+            TemplatedDialog_1.applyCssSizes(opt, dialogClass);
+            opt.autoOpen = false;
+            var type = Q.getInstanceType(this);
+            opt.resizable = Q.getAttributes(type, Serenity.ResizableAttribute, true).length > 0;
+            opt.modal = true;
+            opt.position = { my: 'center', at: 'center', of: $(window.window) };
+            opt.title = Q.coalesce(this.element.data('dialogtitle'), this.getDialogTitle()) || '';
+            return opt;
+        };
+        TemplatedDialog.prototype.getDialogTitle = function () {
+            return "";
+        };
+        TemplatedDialog.prototype.dialogClose = function () {
+            if (this.element.hasClass('ui-dialog-content'))
+                this.element.dialog().dialog('close');
+            else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
+                TemplatedDialog_1.closePanel(this.element);
+            }
+        };
+        Object.defineProperty(TemplatedDialog.prototype, "dialogTitle", {
+            get: function () {
+                if (this.element.hasClass('ui-dialog-content'))
+                    return this.element.dialog('option', 'title');
+                return this.element.data('dialogtitle');
+            },
+            set: function (value) {
+                var oldTitle = this.dialogTitle;
+                this.element.data('dialogtitle', value);
+                if (this.element.hasClass('ui-dialog-content'))
+                    this.element.dialog('option', 'title', value);
+                else if (this.element.hasClass('s-Panel')) {
+                    if (oldTitle != this.dialogTitle) {
+                        this.setupPanelTitle();
+                        this.arrange();
+                    }
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TemplatedDialog.prototype.setupPanelTitle = function () {
+            var _this = this;
+            var value = Q.coalesce(this.dialogTitle, this.getDialogTitle());
+            var pt = this.element.children('.panel-titlebar');
+            if (Q.isEmptyOrNull(value)) {
+                pt.remove();
+            }
+            else {
+                if (!this.element.children('.panel-titlebar').length) {
+                    pt = $("<div class='panel-titlebar'><div class='panel-titlebar-text'></div></div>")
+                        .prependTo(this.element);
+                }
+                pt.children('.panel-titlebar-text').text(value);
+                if (this.element.hasClass('s-Panel')) {
+                    if (!pt.children('.panel-titlebar-close').length) {
+                        $('<button class="panel-titlebar-close">&nbsp;</button>')
+                            .prependTo(pt)
+                            .click(function (e) {
+                            TemplatedDialog_1.closePanel(_this.element, e);
+                        });
+                    }
+                }
+            }
+        };
+        TemplatedDialog.prototype.set_dialogTitle = function (value) {
+            this.dialogTitle = value;
+        };
+        TemplatedDialog.prototype.initTabs = function () {
+            var _this = this;
+            var tabsDiv = this.byId('Tabs');
+            if (tabsDiv.length === 0) {
+                return;
+            }
+            this.tabs = tabsDiv.tabs({});
+            this.tabs.bind('tabsactivate', function () { return _this.arrange(); });
+        };
+        TemplatedDialog.prototype.handleResponsive = function () {
+            var dlg = this.element.dialog();
+            var uiDialog = this.element.closest('.ui-dialog');
+            if ($(document.body).hasClass('mobile-device')) {
+                var data = this.element.data('responsiveData');
+                if (!data) {
+                    data = {};
+                    data.draggable = dlg.dialog('option', 'draggable');
+                    data.resizable = dlg.dialog('option', 'resizable');
+                    data.position = dlg.css('position');
+                    var pos = uiDialog.position();
+                    data.left = pos.left;
+                    data.top = pos.top;
+                    data.width = uiDialog.width();
+                    data.height = uiDialog.height();
+                    data.contentHeight = this.element.height();
+                    this.element.data('responsiveData', data);
+                    dlg.dialog('option', 'draggable', false);
+                    dlg.dialog('option', 'resizable', false);
+                }
+                uiDialog.addClass('mobile-layout');
+                uiDialog.css({ left: '0px', top: '0px', width: $(window).width() + 'px', height: $(window).height() + 'px', position: 'fixed' });
+                $(document.body).scrollTop(0);
+                Q.layoutFillHeight(this.element);
+            }
+            else {
+                var d = this.element.data('responsiveData');
+                if (d) {
+                    dlg.dialog('option', 'draggable', d.draggable);
+                    dlg.dialog('option', 'resizable', d.resizable);
+                    this.element.closest('.ui-dialog').css({ left: '0px', top: '0px', width: d.width + 'px', height: d.height + 'px', position: d.position });
+                    this.element.height(d.contentHeight);
+                    uiDialog.removeClass('mobile-layout');
+                    this.element.removeData('responsiveData');
+                }
+            }
+        };
+        var TemplatedDialog_1;
+        TemplatedDialog = TemplatedDialog_1 = __decorate([
+            Serenity.Decorators.registerClass([Serenity.IDialog])
+        ], TemplatedDialog);
+        return TemplatedDialog;
+    }(Serenity.TemplatedWidget));
+    Serenity.TemplatedDialog = TemplatedDialog;
+})(Serenity || (Serenity = {}));
+var Q;
+(function (Q) {
+    var LayoutTimer;
+    (function (LayoutTimer) {
+        var timeout;
+        var regs = [];
+        function startTimer() {
+            if (timeout == null && regs.length) {
+                timeout = window.setTimeout(onTimeout, 100);
+            }
+        }
+        function clearTimer() {
+            if (timeout != null) {
+                window.clearTimeout(timeout);
+                timeout = null;
+            }
+        }
+        function onTimeout() {
+            for (var _i = 0, regs_1 = regs; _i < regs_1.length; _i++) {
+                var reg = regs_1[_i];
+                try {
+                    reg.handler();
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            }
+            clearTimer();
+            startTimer();
+        }
+        function on(key, handler) {
+            if (handler == null)
+                throw "Layout handler can't be null!";
+            if (key != null && Q.any(regs, function (x) { return x.key === key; }))
+                throw "There is already a registered layout handler with key: " + key;
+            regs.push({
+                key: key,
+                handler: handler,
+            });
+            startTimer();
+            return handler;
+        }
+        LayoutTimer.on = on;
+        function onSizeChange(key, element, handler) {
+            var oldWidth = element.offsetWidth;
+            var oldHeight = element.offsetHeight;
+            on(key, function () {
+                var offsetWidth = element.offsetWidth;
+                var offsetHeight = element.offsetHeight;
+                if (offsetWidth !== oldWidth ||
+                    offsetHeight !== oldHeight) {
+                    oldWidth = offsetWidth;
+                    oldHeight = offsetHeight;
+                    handler();
+                }
+            });
+            return handler;
+        }
+        LayoutTimer.onSizeChange = onSizeChange;
+        function onWidthChange(key, element, handler) {
+            var oldWidth = element.offsetWidth;
+            on(key, function () {
+                var offsetWidth = element.offsetWidth;
+                if (offsetWidth !== oldWidth) {
+                    oldWidth = offsetWidth;
+                    handler();
+                }
+            });
+            return handler;
+        }
+        LayoutTimer.onWidthChange = onWidthChange;
+        function onHeightChange(key, element, handler) {
+            var oldHeight = element.offsetHeight;
+            on(key, function () {
+                var offsetHeight = element.offsetHeight;
+                if (offsetHeight !== oldHeight) {
+                    oldHeight = offsetHeight;
+                    handler();
+                }
+            });
+            return handler;
+        }
+        LayoutTimer.onHeightChange = onHeightChange;
+        function off(key, handler) {
+            if (key != null)
+                regs = regs.filter(function (x) { return x.key !== key; });
+            if (handler != null)
+                regs = regs.filter(function (x) { return x.handler === handler; });
+            !regs.length && this.clearTimer();
+        }
+        LayoutTimer.off = off;
+    })(LayoutTimer = Q.LayoutTimer || (Q.LayoutTimer = {}));
+})(Q || (Q = {}));
 var Serenity;
 (function (Serenity) {
     var GridRowSelectionMixin = /** @class */ (function () {
@@ -5036,159 +6142,6 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var IAsyncInit = /** @class */ (function () {
-        function IAsyncInit() {
-        }
-        IAsyncInit = __decorate([
-            Serenity.Decorators.registerInterface('Serenity.IAsyncInit')
-        ], IAsyncInit);
-        return IAsyncInit;
-    }());
-    Serenity.IAsyncInit = IAsyncInit;
-    if (typeof React === "undefined") {
-        if (window['preact'] != null) {
-            window['React'] = window['ReactDOM'] = window['preact'];
-            React.Fragment = Q.coalesce(React.Fragment, "x-fragment");
-        }
-        else if (window['Nerv'] != null) {
-            window['React'] = window['ReactDOM'] = window['Nerv'];
-            React.Fragment = Q.coalesce(React.Fragment, "x-fragment");
-        }
-        else {
-            window['React'] = {
-                Component: function () { },
-                Fragment: "x-fragment",
-                createElement: function () { return { _reactNotLoaded: true }; }
-            };
-            window['ReactDOM'] = {
-                render: function () { throw Error("To use React, it should be included before Serenity.CoreLib.js"); }
-            };
-        }
-    }
-    var Widget = /** @class */ (function (_super) {
-        __extends(Widget, _super);
-        function Widget(element, options) {
-            var _this = _super.call(this, options) || this;
-            _this.element = element;
-            _this.options = options || {};
-            _this.widgetName = Widget_1.getWidgetName(Q.getInstanceType(_this));
-            _this.uniqueName = _this.widgetName + (Widget_1.nextWidgetNumber++).toString();
-            if (element.data(_this.widgetName)) {
-                throw new Q.Exception(Q.format("The element already has widget '{0}'!", _this.widgetName));
-            }
-            element.bind('remove.' + _this.widgetName, function (e) {
-                if (e.bubbles || e.cancelable) {
-                    return;
-                }
-                _this.destroy();
-            }).data(_this.widgetName, _this);
-            _this.addCssClass();
-            if (_this.isAsyncWidget()) {
-                window.setTimeout(function () {
-                    if (element && !_this.asyncPromise) {
-                        _this.asyncPromise = _this.initializeAsync();
-                    }
-                }, 0);
-            }
-            return _this;
-        }
-        Widget_1 = Widget;
-        Widget.prototype.destroy = function () {
-            this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
-            this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
-            this.element = null;
-            this.asyncPromise = null;
-        };
-        Widget.prototype.addCssClass = function () {
-            this.element.addClass(this.getCssClass());
-        };
-        Widget.prototype.getCssClass = function () {
-            var type = Q.getInstanceType(this);
-            var klass = 's-' + Q.getTypeName(type);
-            var fullClass = Q.replaceAll(Q.getTypeFullName(type), '.', '-');
-            for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
-                var k = _a[_i];
-                if (Q.startsWith(fullClass, k + '-')) {
-                    fullClass = fullClass.substr(k.length + 1);
-                    break;
-                }
-            }
-            fullClass = 's-' + fullClass;
-            if (klass === fullClass) {
-                return klass;
-            }
-            return klass + ' ' + fullClass;
-        };
-        Widget.prototype.initializeAsync = function () {
-            return Promise.resolve();
-        };
-        Widget.prototype.isAsyncWidget = function () {
-            return Q.isInstanceOfType(this, Serenity.IAsyncInit);
-        };
-        Widget.getWidgetName = function (type) {
-            return Q.replaceAll(Q.getTypeFullName(type), '.', '_');
-        };
-        Widget.elementFor = function (editorType) {
-            var elementAttr = Q.getAttributes(editorType, Serenity.ElementAttribute, true);
-            var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>');
-            return $(elementHtml);
-        };
-        ;
-        Widget.create = function (params) {
-            var widget;
-            if (Q.isAssignableFrom(Serenity.IDialog, params.type)) {
-                widget = new params.type(params.options);
-                if (params.container)
-                    widget.element.appendTo(params.container);
-                params.element && params.element(widget.element);
-            }
-            else {
-                var e = Widget_1.elementFor(params.type);
-                if (params.container)
-                    e.appendTo(params.container);
-                params.element && params.element(e);
-                widget = new params.type(e, params.options);
-            }
-            if (widget.isAsyncWidget())
-                widget.init(params.init);
-            else {
-                widget.init(null);
-                params.init && params.init(widget);
-            }
-            return widget;
-        };
-        Widget.prototype.init = function (action) {
-            var _this = this;
-            var promise = this.initialize();
-            if (action) {
-                promise.then(function () { return action(_this); });
-            }
-            return this;
-        };
-        Widget.prototype.initialize = function () {
-            if (!this.isAsyncWidget()) {
-                return Promise.resolve();
-            }
-            if (!this.asyncPromise) {
-                this.asyncPromise = this.initializeAsync();
-            }
-            return this.asyncPromise;
-        };
-        var Widget_1;
-        Widget.nextWidgetNumber = 0;
-        Widget.__isWidgetType = true;
-        Widget = Widget_1 = __decorate([
-            Serenity.Decorators.registerClass()
-        ], Widget);
-        return Widget;
-    }(React.Component));
-    Serenity.Widget = Widget;
-    Widget.prototype.addValidationRule = function (eventClass, rule) {
-        return Serenity.VX.addValidationRule(this.element, eventClass, rule);
-    };
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
     var ValidationHelper;
     (function (ValidationHelper) {
         function asyncSubmit(form, validateBeforeSave, submitHandler) {
@@ -5260,118 +6213,10 @@ var Serenity;
             return validator.element(widget.element[0]);
         }
         VX.validateElement = validateElement;
+        Serenity.Widget.prototype.addValidationRule = function (eventClass, rule) {
+            return VX.addValidationRule(this.element, eventClass, rule);
+        };
     })(VX = Serenity.VX || (Serenity.VX = {}));
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var TemplatedWidget = /** @class */ (function (_super) {
-        __extends(TemplatedWidget, _super);
-        function TemplatedWidget(container, options) {
-            var _this = _super.call(this, container, options) || this;
-            _this.idPrefix = _this.uniqueName + '_';
-            var widgetMarkup = _this.getTemplate().replace(new RegExp('~_', 'g'), _this.idPrefix);
-            // for compability with older templates based on JsRender
-            var end = 0;
-            while (true) {
-                var idx = widgetMarkup.indexOf('{{text:"', end);
-                if (idx < 0)
-                    break;
-                var end = widgetMarkup.indexOf('"}}', idx);
-                if (end < 0)
-                    break;
-                var key = widgetMarkup.substr(idx + 8, end - idx - 8);
-                var text = Q.text(key);
-                widgetMarkup = widgetMarkup.substr(0, idx) + text + widgetMarkup.substr(end + 3);
-                end = idx + text.length;
-            }
-            _this.element.html(widgetMarkup);
-            return _this;
-        }
-        TemplatedWidget_1 = TemplatedWidget;
-        TemplatedWidget.prototype.byId = function (id) {
-            return $('#' + this.idPrefix + id);
-        };
-        TemplatedWidget.prototype.byID = function (id, type) {
-            return Serenity.WX.getWidget(this.byId(id), type);
-        };
-        TemplatedWidget.noGeneric = function (s) {
-            var dollar = s.indexOf('$');
-            if (dollar >= 0) {
-                return s.substr(0, dollar);
-            }
-            return s;
-        };
-        TemplatedWidget.prototype.getDefaultTemplateName = function () {
-            return TemplatedWidget_1.noGeneric(Q.getTypeName(Q.getInstanceType(this)));
-        };
-        TemplatedWidget.prototype.getTemplateName = function () {
-            var type = Q.getInstanceType(this);
-            var fullName = Q.getTypeFullName(type);
-            var templateNames = TemplatedWidget_1.templateNames;
-            var cachedName = TemplatedWidget_1.templateNames[fullName];
-            if (cachedName != null) {
-                return cachedName;
-            }
-            while (type && type !== Serenity.Widget) {
-                var name = TemplatedWidget_1.noGeneric(Q.getTypeFullName(type));
-                for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
-                    var k = _a[_i];
-                    if (Q.startsWith(name, k + '.')) {
-                        name = name.substr(k.length + 1);
-                        break;
-                    }
-                }
-                if (Q.canLoadScriptData('Template.' + name)) {
-                    templateNames[fullName] = name;
-                    return name;
-                }
-                name = Q.replaceAll(name, '.', '_');
-                if (Q.canLoadScriptData('Template.' + name) ||
-                    $('script#Template_' + name).length > 0) {
-                    templateNames[fullName] = name;
-                    return name;
-                }
-                name = TemplatedWidget_1.noGeneric(Q.getTypeName(type));
-                if (Q.canLoadScriptData('Template.' + name) ||
-                    $('script#Template_' + name).length > 0) {
-                    TemplatedWidget_1.templateNames[fullName] = name;
-                    return name;
-                }
-                type = Q.getBaseType(type);
-            }
-            templateNames[fullName] = cachedName = this.getDefaultTemplateName();
-            return cachedName;
-        };
-        TemplatedWidget.prototype.getFallbackTemplate = function () {
-            return null;
-        };
-        TemplatedWidget.prototype.getTemplate = function () {
-            var templateName = this.getTemplateName();
-            var script = $('script#Template_' + templateName);
-            if (script.length > 0) {
-                return script.html();
-            }
-            var template;
-            if (!Q.canLoadScriptData('Template.' + templateName) &&
-                this.getDefaultTemplateName() == templateName) {
-                template = this.getFallbackTemplate();
-                if (template != null)
-                    return template;
-            }
-            template = Q.getTemplate(templateName);
-            if (template == null) {
-                throw new Error(Q.format("Can't locate template for widget '{0}' with name '{1}'!", Q.getTypeName(Q.getInstanceType(this)), templateName));
-            }
-            return template;
-        };
-        var TemplatedWidget_1;
-        TemplatedWidget.templateNames = {};
-        TemplatedWidget = TemplatedWidget_1 = __decorate([
-            Serenity.Decorators.registerClass()
-        ], TemplatedWidget);
-        return TemplatedWidget;
-    }(Serenity.Widget));
-    Serenity.TemplatedWidget = TemplatedWidget;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -5444,19 +6289,6 @@ var Serenity;
         return IReadOnly;
     }());
     Serenity.IReadOnly = IReadOnly;
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var SummaryType;
-    (function (SummaryType) {
-        SummaryType[SummaryType["Disabled"] = -1] = "Disabled";
-        SummaryType[SummaryType["None"] = 0] = "None";
-        SummaryType[SummaryType["Sum"] = 1] = "Sum";
-        SummaryType[SummaryType["Avg"] = 2] = "Avg";
-        SummaryType[SummaryType["Min"] = 3] = "Min";
-        SummaryType[SummaryType["Max"] = 4] = "Max";
-    })(SummaryType = Serenity.SummaryType || (Serenity.SummaryType = {}));
-    Serenity.Decorators.registerEnum(SummaryType, "Serenity.SummaryType");
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -7531,7 +8363,7 @@ var Serenity;
         function DecimalEditor(input, opt) {
             var _this = _super.call(this, input, opt) || this;
             input.addClass('decimalQ');
-            var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
+            var numericOptions = Q.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
                 vMin: Q.coalesce(_this.options.minValue, _this.options.allowNegatives ? (_this.options.maxValue != null ? ("-" + _this.options.maxValue) : '-999999999999.99') : '0.00'),
                 vMax: Q.coalesce(_this.options.maxValue, '999999999999.99')
             });
@@ -7591,7 +8423,7 @@ var Serenity;
         function IntegerEditor(input, opt) {
             var _this = _super.call(this, input, opt) || this;
             input.addClass('integerQ');
-            var numericOptions = $.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
+            var numericOptions = Q.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
                 vMin: Q.coalesce(_this.options.minValue, _this.options.allowNegatives ? (_this.options.maxValue != null ? ("-" + _this.options.maxValue) : '-2147483647') : '0'),
                 vMax: Q.coalesce(_this.options.maxValue, 2147483647),
                 aSep: null
@@ -8195,7 +9027,7 @@ var Serenity;
             if (this.entity == null) {
                 return null;
             }
-            var copy = $.extend({}, this.entity);
+            var copy = Q.extend({}, this.entity);
             return copy;
         };
         Object.defineProperty(ImageUploadEditor.prototype, "value", {
@@ -8214,7 +9046,7 @@ var Serenity;
                     this.entity = null;
                 }
                 else {
-                    this.entity = $.extend({}, value);
+                    this.entity = Q.extend({}, value);
                 }
             }
             else {
@@ -8331,7 +9163,7 @@ var Serenity;
         };
         MultipleImageUploadEditor.prototype.get_value = function () {
             return this.entities.map(function (x) {
-                return $.extend({}, x);
+                return Q.extend({}, x);
             });
         };
         Object.defineProperty(MultipleImageUploadEditor.prototype, "value", {
@@ -8346,7 +9178,7 @@ var Serenity;
         });
         MultipleImageUploadEditor.prototype.set_value = function (value) {
             this.entities = (value || []).map(function (x) {
-                return $.extend({}, x);
+                return Q.extend({}, x);
             });
             this.populate();
             this.updateInterface();
@@ -9276,7 +10108,7 @@ var Serenity;
             filter.field = this.getCriteriaField();
             filter.type = Serenity.StringEditor;
             filter.title = this.getTitle(this.field);
-            filter.options = Q.deepClone({}, this.get_field().quickFilterParams);
+            filter.options = Q.deepClone(this.get_field().quickFilterParams);
         };
         BaseFiltering = __decorate([
             Serenity.Decorators.registerClass('Serenity.BaseFiltering', [IFiltering, IQuickFiltering])
@@ -9331,10 +10163,10 @@ var Serenity;
             return _super.prototype.getCriteriaField.call(this);
         };
         BaseEditorFiltering.prototype.getEditorOptions = function () {
-            var opt = Q.deepClone({}, this.get_field().editorParams);
+            var opt = Q.deepClone(this.get_field().editorParams);
             delete opt['cascadeFrom'];
             // currently can't support cascadeFrom in filtering
-            return Q.deepClone(opt, this.get_field().filteringParams);
+            return Q.extend(opt, this.get_field().filteringParams);
         };
         BaseEditorFiltering.prototype.loadState = function (state) {
             if (this.useEditor()) {
@@ -9364,7 +10196,7 @@ var Serenity;
         BaseEditorFiltering.prototype.initQuickFilter = function (filter) {
             _super.prototype.initQuickFilter.call(this, filter);
             filter.type = this.editorType;
-            filter.options = Q.deepClone({}, this.getEditorOptions(), this.get_field().quickFilterParams);
+            filter.options = Q.extend(Q.extend({}, Q.deepClone(this.getEditorOptions())), Q.deepClone(this.get_field().quickFilterParams));
         };
         BaseEditorFiltering = __decorate([
             Filtering('BaseEditor')
@@ -9515,7 +10347,7 @@ var Serenity;
         EditorFiltering.prototype.getEditorOptions = function () {
             var opt = _super.prototype.getEditorOptions.call(this);
             if (this.useEditor() && this.editorType === Q.coalesce(this.get_field().editorType, 'String')) {
-                opt = $.extend(opt, this.get_field().editorParams);
+                opt = Q.extend(opt, this.get_field().editorParams);
             }
             return opt;
         };
@@ -11051,115 +11883,6 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var WX;
-    (function (WX) {
-        function getWidget(element, type) {
-            if (element == null) {
-                throw new Q.ArgumentNullException('element');
-            }
-            if (element.length === 0) {
-                throw new Q.Exception(Q.format("Searching for widget of type '{0}' on a non-existent element! ({1})", Q.getTypeFullName(type), element.selector));
-            }
-            var widget = element.tryGetWidget(type);
-            if (widget == null) {
-                var message = Q.format("Element has no widget of type '{0}'! If you have recently changed editor " +
-                    "type of a property in a form class, or changed data type in row (which also changes editor type)" +
-                    " your script side Form definition might be out of date. Make sure your project builds successfully " +
-                    "and transform T4 templates", Q.getTypeFullName(type));
-                Q.notifyError(message, '', null);
-                throw new Q.Exception(message);
-            }
-            return widget;
-        }
-        WX.getWidget = getWidget;
-        function getWidgetName(type) {
-            return Q.replaceAll(Q.getTypeFullName(type), '.', '_');
-        }
-        WX.getWidgetName = getWidgetName;
-        function hasOriginalEvent(e) {
-            return !!!(typeof (e.originalEvent) === 'undefined');
-        }
-        WX.hasOriginalEvent = hasOriginalEvent;
-        function change(widget, handler) {
-            widget.element.bind('change.' + widget.uniqueName, handler);
-        }
-        WX.change = change;
-        function changeSelect2(widget, handler) {
-            widget.element.bind('change.' + widget.uniqueName, function (e, x) {
-                if (!!(hasOriginalEvent(e) || !x)) {
-                    handler(e);
-                }
-            });
-        }
-        WX.changeSelect2 = changeSelect2;
-        function getGridField(widget) {
-            return widget.element.closest('.field');
-        }
-        WX.getGridField = getGridField;
-    })(WX = Serenity.WX || (Serenity.WX = {}));
-    Serenity.Widget.prototype['changeSelect2'] = function (handler) {
-        var widget = this;
-        widget.element.bind('change.' + widget.uniqueName, function (e, x) {
-            if (!!(WX.hasOriginalEvent(e) || !x)) {
-                handler(e);
-            }
-        });
-    };
-    Serenity.Widget.prototype['change'] = function (handler1) {
-        var widget1 = this;
-        widget1.element.bind('change.' + widget1.uniqueName, handler1);
-    };
-    Serenity.Widget.prototype['getGridField'] = function () {
-        return this.element.closest('.field');
-    };
-    $.fn.tryGetWidget = function (widgetType) {
-        var element = this;
-        var widget2;
-        if (Q.isAssignableFrom(Serenity.Widget, widgetType)) {
-            var widgetName = WX.getWidgetName(widgetType);
-            widget2 = element.data(widgetName);
-            if (widget2 != null && !Q.isAssignableFrom(widgetType, Q.getInstanceType(widget2))) {
-                widget2 = null;
-            }
-            if (widget2 != null) {
-                return widget2;
-            }
-        }
-        var data = element.data();
-        if (data == null) {
-            return null;
-        }
-        for (var _i = 0, _a = Object.keys(data); _i < _a.length; _i++) {
-            var key = _a[_i];
-            widget2 = data[key];
-            if (widget2 != null && Q.isAssignableFrom(widgetType, Q.getInstanceType(widget2))) {
-                return widget2;
-            }
-        }
-        return null;
-    };
-    $.fn.getWidget = function (widgetType1) {
-        var element1 = this;
-        if (element1 == null) {
-            throw new Q.ArgumentNullException('element');
-        }
-        if (element1.length === 0) {
-            throw new Q.Exception(Q.format("Searching for widget of type '{0}' on a non-existent element! ({1})", Q.getTypeFullName(widgetType1), element1.selector));
-        }
-        var widget3 = element1.tryGetWidget(widgetType1);
-        if (widget3 == null) {
-            var message = Q.format("Element has no widget of type '{0}'! If you have recently changed " +
-                "editor type of a property in a form class, or changed data type in row (which also changes " +
-                "editor type) your script side Form definition might be out of date. Make sure your project " +
-                "builds successfully and transform T4 templates", Q.getTypeFullName(widgetType1));
-            Q.notifyError(message, '', null);
-            throw new Q.Exception(message);
-        }
-        return widget3;
-    };
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
     var PropertyGrid = /** @class */ (function (_super) {
         __extends(PropertyGrid, _super);
         function PropertyGrid(div, opt) {
@@ -11422,11 +12145,11 @@ var Serenity;
             }
             var editor;
             if (optionsType != null) {
-                editorParams = $.extend(new optionsType(), item.editorParams);
+                editorParams = Q.extend(new optionsType(), item.editorParams);
                 editor = new editorType(element, editorParams);
             }
             else {
-                editorParams = $.extend(new Object(), item.editorParams);
+                editorParams = Q.extend(new Object(), item.editorParams);
                 editor = new editorType(element, editorParams);
             }
             editor.initialize();
@@ -11857,389 +12580,6 @@ var Serenity;
         return IValidateRequired;
     }());
     Serenity.IValidateRequired = IValidateRequired;
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var IDialog = /** @class */ (function () {
-        function IDialog() {
-        }
-        IDialog = __decorate([
-            Serenity.Decorators.registerInterface('Serenity.IDialog')
-        ], IDialog);
-        return IDialog;
-    }());
-    Serenity.IDialog = IDialog;
-    var TemplatedDialog = /** @class */ (function (_super) {
-        __extends(TemplatedDialog, _super);
-        function TemplatedDialog(options) {
-            var _this = _super.call(this, Q.newBodyDiv().addClass('s-TemplatedDialog hidden'), options) || this;
-            _this.element.attr("id", _this.uniqueName);
-            _this.initValidator();
-            _this.initTabs();
-            _this.initToolbar();
-            return _this;
-        }
-        TemplatedDialog_1 = TemplatedDialog;
-        Object.defineProperty(TemplatedDialog.prototype, "isMarkedAsPanel", {
-            get: function () {
-                var panelAttr = Q.getAttributes(Q.getInstanceType(this), Serenity.PanelAttribute, true);
-                return panelAttr.length > 0 && panelAttr[panelAttr.length - 1].value !== false;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(TemplatedDialog.prototype, "isResponsive", {
-            get: function () {
-                return Q.Config.responsiveDialogs ||
-                    Q.getAttributes(Q.getInstanceType(this), Serenity.ResponsiveAttribute, true).length > 0;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        TemplatedDialog.getCssSize = function (element, name) {
-            var cssSize = element.css(name);
-            if (cssSize == null) {
-                return null;
-            }
-            if (!Q.endsWith(cssSize, 'px')) {
-                return null;
-            }
-            cssSize = cssSize.substr(0, cssSize.length - 2);
-            var i = Q.parseInteger(cssSize);
-            if (i == null || isNaN(i) || i == 0)
-                return null;
-            return i;
-        };
-        TemplatedDialog.applyCssSizes = function (opt, dialogClass) {
-            var size;
-            var dialog = $('<div/>').hide().addClass(dialogClass).appendTo(document.body);
-            try {
-                var sizeHelper = $('<div/>').addClass('size').appendTo(dialog);
-                size = TemplatedDialog_1.getCssSize(sizeHelper, 'minWidth');
-                if (size != null)
-                    opt.minWidth = size;
-                size = TemplatedDialog_1.getCssSize(sizeHelper, 'width');
-                if (size != null)
-                    opt.width = size;
-                size = TemplatedDialog_1.getCssSize(sizeHelper, 'height');
-                if (size != null)
-                    opt.height = size;
-                size = TemplatedDialog_1.getCssSize(sizeHelper, 'minHeight');
-                if (size != null)
-                    opt.minHeight = size;
-            }
-            finally {
-                dialog.remove();
-            }
-        };
-        ;
-        TemplatedDialog.prototype.destroy = function () {
-            this.tabs && this.tabs.tabs('destroy');
-            this.tabs = null;
-            this.toolbar && this.toolbar.destroy();
-            this.toolbar = null;
-            this.validator && this.byId('Form').remove();
-            this.validator = null;
-            if (this.element != null &&
-                this.element.hasClass('ui-dialog-content')) {
-                this.element.dialog('destroy');
-                this.element.removeClass('ui-dialog-content');
-            }
-            $(window).unbind('.' + this.uniqueName);
-            _super.prototype.destroy.call(this);
-        };
-        TemplatedDialog.prototype.initDialog = function () {
-            var _this = this;
-            if (this.element.hasClass('ui-dialog-content'))
-                return;
-            this.element.removeClass('hidden');
-            this.element.dialog(this.getDialogOptions());
-            this.element.closest('.ui-dialog').on('resize', function (e) { return _this.arrange(); });
-            var type = Q.getInstanceType(this);
-            if (this.isResponsive) {
-                Serenity.DialogExtensions.dialogResizable(this.element);
-                $(window).bind('resize.' + this.uniqueName, function (e) {
-                    if (_this.element && _this.element.is(':visible')) {
-                        _this.handleResponsive();
-                    }
-                });
-                this.element.closest('.ui-dialog').addClass('flex-layout');
-            }
-            else if (Q.getAttributes(type, Serenity.FlexifyAttribute, true).length > 0) {
-                Serenity.DialogExtensions.dialogFlexify(this.element);
-                Serenity.DialogExtensions.dialogResizable(this.element);
-            }
-            if (Q.getAttributes(type, Serenity.MaximizableAttribute, true).length > 0) {
-                Serenity.DialogExtensions.dialogMaximizable(this.element);
-            }
-            var self = this;
-            this.element.bind('dialogopen.' + this.uniqueName, function () {
-                $(document.body).addClass('modal-dialog-open');
-                if (_this.isResponsive) {
-                    _this.handleResponsive();
-                }
-                self.onDialogOpen();
-            });
-            this.element.bind('dialogclose.' + this.uniqueName, function () {
-                $(document.body).toggleClass('modal-dialog-open', $('.ui-dialog:visible').length > 0);
-                self.onDialogClose();
-            });
-        };
-        TemplatedDialog.prototype.initToolbar = function () {
-            var toolbarDiv = this.byId('Toolbar');
-            if (toolbarDiv.length === 0) {
-                return;
-            }
-            var hotkeyContext = this.element.closest('.ui-dialog');
-            if (hotkeyContext.length === 0) {
-                hotkeyContext = this.element;
-            }
-            var opt = { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] };
-            this.toolbar = new Serenity.Toolbar(toolbarDiv, opt);
-        };
-        TemplatedDialog.prototype.getToolbarButtons = function () {
-            return [];
-        };
-        TemplatedDialog.prototype.getValidatorOptions = function () {
-            return {};
-        };
-        TemplatedDialog.prototype.initValidator = function () {
-            var form = this.byId('Form');
-            if (form.length > 0) {
-                var valOptions = this.getValidatorOptions();
-                this.validator = form.validate(Q.validateOptions(valOptions));
-            }
-        };
-        TemplatedDialog.prototype.resetValidation = function () {
-            this.validator && this.validator.resetAll();
-        };
-        TemplatedDialog.prototype.validateForm = function () {
-            return this.validator == null || !!this.validator.form();
-        };
-        TemplatedDialog.prototype.dialogOpen = function (asPanel) {
-            var _this = this;
-            asPanel = Q.coalesce(asPanel, this.isMarkedAsPanel);
-            if (asPanel) {
-                if (!this.element.hasClass('s-Panel')) {
-                    // so that panel title is created if needed
-                    this.element.on('panelopen.' + this.uniqueName, function () {
-                        _this.onDialogOpen();
-                    });
-                    this.element.on('panelclose.' + this.uniqueName, function () {
-                        _this.onDialogClose();
-                    });
-                }
-                TemplatedDialog_1.openPanel(this.element, this.uniqueName);
-                this.setupPanelTitle();
-            }
-            else {
-                if (!this.element.hasClass('ui-dialog-content'))
-                    this.initDialog();
-                this.element.dialog('open');
-            }
-        };
-        TemplatedDialog.openPanel = function (element, uniqueName) {
-            var container = $('.panels-container');
-            if (!container.length)
-                container = $('section.content');
-            element.data('paneluniquename', uniqueName);
-            if (container.length) {
-                container = container.last();
-                container.children()
-                    .not(element)
-                    .not('.panel-hidden')
-                    .addClass('panel-hidden panel-hidden-' + uniqueName);
-                if (element[0].parentElement !== container[0])
-                    element.appendTo(container);
-            }
-            $('.ui-dialog:visible, .ui-widget-overlay:visible')
-                .not(element)
-                .addClass('panel-hidden panel-hidden-' + uniqueName);
-            element
-                .removeClass('hidden')
-                .removeClass('panel-hidden')
-                .addClass('s-Panel')
-                .trigger('panelopen');
-        };
-        TemplatedDialog.closePanel = function (element, e) {
-            if (!element.hasClass('s-Panel') || element.hasClass('hidden'))
-                return;
-            var query = $.Event(e);
-            query.type = 'panelbeforeclose';
-            query.target = element[0];
-            element.trigger(query);
-            if (query.isDefaultPrevented())
-                return;
-            element.addClass('hidden');
-            var uniqueName = element.data('paneluniquename') || new Date().getTime();
-            var klass = 'panel-hidden-' + uniqueName;
-            $('.' + klass).removeClass(klass).removeClass('panel-hidden');
-            $(window).triggerHandler('resize');
-            $('.require-layout:visible').triggerHandler('layout');
-            var e = $.Event(e);
-            e.type = 'panelclose';
-            e.target = element[0];
-            element.trigger(e);
-        };
-        TemplatedDialog.prototype.onDialogOpen = function () {
-            if (!$(document.body).hasClass('mobile-device'))
-                $(':input', this.element).not('button').eq(0).focus();
-            this.arrange();
-            this.tabs && this.tabs.tabs('option', 'active', 0);
-        };
-        TemplatedDialog.prototype.arrange = function () {
-            this.element.find('.require-layout').filter(':visible').each(function (i, e) {
-                $(e).triggerHandler('layout');
-            });
-        };
-        TemplatedDialog.prototype.onDialogClose = function () {
-            var _this = this;
-            $(document).trigger('click');
-            // for tooltips etc.
-            if ($.qtip) {
-                $(document.body).children('.qtip').each(function (index, el) {
-                    $(el).qtip('hide');
-                });
-            }
-            window.setTimeout(function () {
-                var element = _this.element;
-                _this.destroy();
-                element.remove();
-                Q.positionToastContainer(false);
-            }, 0);
-        };
-        TemplatedDialog.prototype.addCssClass = function () {
-            if (this.isMarkedAsPanel) {
-                _super.prototype.addCssClass.call(this);
-                if (this.isResponsive)
-                    this.element.addClass("flex-layout");
-            }
-        };
-        TemplatedDialog.prototype.getDialogOptions = function () {
-            var opt = {};
-            var dialogClass = 's-Dialog ' + this.getCssClass();
-            opt.dialogClass = dialogClass;
-            opt.width = 920;
-            TemplatedDialog_1.applyCssSizes(opt, dialogClass);
-            opt.autoOpen = false;
-            var type = Q.getInstanceType(this);
-            opt.resizable = Q.getAttributes(type, Serenity.ResizableAttribute, true).length > 0;
-            opt.modal = true;
-            opt.position = { my: 'center', at: 'center', of: $(window.window) };
-            opt.title = Q.coalesce(this.element.data('dialogtitle'), this.getDialogTitle()) || '';
-            return opt;
-        };
-        TemplatedDialog.prototype.getDialogTitle = function () {
-            return "";
-        };
-        TemplatedDialog.prototype.dialogClose = function () {
-            if (this.element.hasClass('ui-dialog-content'))
-                this.element.dialog().dialog('close');
-            else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
-                TemplatedDialog_1.closePanel(this.element);
-            }
-        };
-        Object.defineProperty(TemplatedDialog.prototype, "dialogTitle", {
-            get: function () {
-                if (this.element.hasClass('ui-dialog-content'))
-                    return this.element.dialog('option', 'title');
-                return this.element.data('dialogtitle');
-            },
-            set: function (value) {
-                var oldTitle = this.dialogTitle;
-                this.element.data('dialogtitle', value);
-                if (this.element.hasClass('ui-dialog-content'))
-                    this.element.dialog('option', 'title', value);
-                else if (this.element.hasClass('s-Panel')) {
-                    if (oldTitle != this.dialogTitle) {
-                        this.setupPanelTitle();
-                        this.arrange();
-                    }
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        TemplatedDialog.prototype.setupPanelTitle = function () {
-            var _this = this;
-            var value = Q.coalesce(this.dialogTitle, this.getDialogTitle());
-            var pt = this.element.children('.panel-titlebar');
-            if (Q.isEmptyOrNull(value)) {
-                pt.remove();
-            }
-            else {
-                if (!this.element.children('.panel-titlebar').length) {
-                    pt = $("<div class='panel-titlebar'><div class='panel-titlebar-text'></div></div>")
-                        .prependTo(this.element);
-                }
-                pt.children('.panel-titlebar-text').text(value);
-                if (this.element.hasClass('s-Panel')) {
-                    if (!pt.children('.panel-titlebar-close').length) {
-                        $('<button class="panel-titlebar-close">&nbsp;</button>')
-                            .prependTo(pt)
-                            .click(function (e) {
-                            TemplatedDialog_1.closePanel(_this.element, e);
-                        });
-                    }
-                }
-            }
-        };
-        TemplatedDialog.prototype.set_dialogTitle = function (value) {
-            this.dialogTitle = value;
-        };
-        TemplatedDialog.prototype.initTabs = function () {
-            var _this = this;
-            var tabsDiv = this.byId('Tabs');
-            if (tabsDiv.length === 0) {
-                return;
-            }
-            this.tabs = tabsDiv.tabs({});
-            this.tabs.bind('tabsactivate', function () { return _this.arrange(); });
-        };
-        TemplatedDialog.prototype.handleResponsive = function () {
-            var dlg = this.element.dialog();
-            var uiDialog = this.element.closest('.ui-dialog');
-            if ($(document.body).hasClass('mobile-device')) {
-                var data = this.element.data('responsiveData');
-                if (!data) {
-                    data = {};
-                    data.draggable = dlg.dialog('option', 'draggable');
-                    data.resizable = dlg.dialog('option', 'resizable');
-                    data.position = dlg.css('position');
-                    var pos = uiDialog.position();
-                    data.left = pos.left;
-                    data.top = pos.top;
-                    data.width = uiDialog.width();
-                    data.height = uiDialog.height();
-                    data.contentHeight = this.element.height();
-                    this.element.data('responsiveData', data);
-                    dlg.dialog('option', 'draggable', false);
-                    dlg.dialog('option', 'resizable', false);
-                }
-                uiDialog.addClass('mobile-layout');
-                uiDialog.css({ left: '0px', top: '0px', width: $(window).width() + 'px', height: $(window).height() + 'px', position: 'fixed' });
-                $(document.body).scrollTop(0);
-                Q.layoutFillHeight(this.element);
-            }
-            else {
-                var d = this.element.data('responsiveData');
-                if (d) {
-                    dlg.dialog('option', 'draggable', d.draggable);
-                    dlg.dialog('option', 'resizable', d.resizable);
-                    this.element.closest('.ui-dialog').css({ left: '0px', top: '0px', width: d.width + 'px', height: d.height + 'px', position: d.position });
-                    this.element.height(d.contentHeight);
-                    uiDialog.removeClass('mobile-layout');
-                    this.element.removeData('responsiveData');
-                }
-            }
-        };
-        var TemplatedDialog_1;
-        TemplatedDialog = TemplatedDialog_1 = __decorate([
-            Serenity.Decorators.registerClass([Serenity.IDialog])
-        ], TemplatedDialog);
-        return TemplatedDialog;
-    }(Serenity.TemplatedWidget));
-    Serenity.TemplatedDialog = TemplatedDialog;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -12781,7 +13121,7 @@ var Serenity;
                     filtering.set_field(item);
                     filtering.set_operator({ key: Serenity.FilterOperators.EQ });
                     filtering.initQuickFilter(quick);
-                    quick.options = Q.deepClone(quick.options, item.quickFilterParams);
+                    quick.options = Q.extend(Q.deepClone(quick.options), item.quickFilterParams);
                 }
                 else {
                     return null;
@@ -15141,7 +15481,7 @@ var Serenity;
                 }
             };
             var thisOptions = this.getDeleteOptions(callback);
-            var finalOptions = $.extend(baseOptions, thisOptions);
+            var finalOptions = Q.extend(baseOptions, thisOptions);
             this.deleteHandler(finalOptions, callback);
         };
         EntityDialog.prototype.onDeleteSuccess = function (response) {
@@ -15355,7 +15695,7 @@ var Serenity;
                 }
             };
             var thisOptions = this.getLoadByIdOptions(id, callback);
-            var finalOptions = $.extend(baseOptions, thisOptions);
+            var finalOptions = Q.extend(baseOptions, thisOptions);
             this.loadByIdHandler(finalOptions, callback, fail);
         };
         EntityDialog.prototype.loadByIdHandler = function (options, callback, fail) {
@@ -15395,7 +15735,7 @@ var Serenity;
                 var item1 = _a[_i];
                 var langs = null;
                 if (item1.localizable === true) {
-                    var copy = $.extend({}, item1);
+                    var copy = Q.extend({}, item1);
                     copy.oneWay = true;
                     copy.readOnly = true;
                     copy.required = false;
@@ -15405,7 +15745,7 @@ var Serenity;
                         langs = this.getLangs();
                     for (var _b = 0, langs_1 = langs; _b < langs_1.length; _b++) {
                         var lang = langs_1[_b];
-                        copy = $.extend({}, item1);
+                        copy = Q.extend({}, item1);
                         copy.name = lang[0] + '$' + copy.name;
                         copy.title = lang[1];
                         copy.cssClass = [copy.cssClass, 'translation'].join(' ');
@@ -15487,7 +15827,7 @@ var Serenity;
                     IncludeColumns: ['Localizations']
                 },
                 onSuccess: function (response) {
-                    var copy = $.extend(new Object(), _this.get_entity());
+                    var copy = Q.extend(new Object(), _this.get_entity());
                     if (response.Localizations) {
                         for (var _i = 0, _a = Object.keys(response.Localizations); _i < _a.length; _i++) {
                             var language = _a[_i];
@@ -15806,7 +16146,7 @@ var Serenity;
         };
         EntityDialog.prototype.getCloningEntity = function () {
             var clone = new Object();
-            clone = $.extend(clone, this.get_entity());
+            clone = Q.extend(clone, this.get_entity());
             var idField = this.getIdProperty();
             if (!Q.isEmptyOrNull(idField)) {
                 delete clone[idField];
@@ -15884,7 +16224,7 @@ var Serenity;
                     }]);
             };
             var thisOptions = this.getUndeleteOptions(callback);
-            var finalOptions = $.extend(baseOptions, thisOptions);
+            var finalOptions = Q.extend(baseOptions, thisOptions);
             this.undeleteHandler(finalOptions, callback);
         };
         Object.defineProperty(EntityDialog.prototype, "readOnly", {
@@ -16429,10 +16769,6 @@ var Serenity;
     }());
     Serenity.TreeGridMixin = TreeGridMixin;
 })(Serenity || (Serenity = {}));
-if ($.fn.button && $.fn.button.noConflict) {
-    var btn = $.fn.button.noConflict();
-    $.fn.btn = btn;
-}
 $.fn.flexHeightOnly = function (flexY) {
     if (flexY === void 0) { flexY = 1; }
     return this.flexWidthHeight(0, flexY);
@@ -16452,10 +16788,6 @@ $.fn.flexX = function (flexX) {
 $.fn.flexY = function (flexY) {
     return this.data('flex-y', flexY);
 };
-if ($.fn.button && $.fn.button.noConflict) {
-    var btn = $.fn.button.noConflict();
-    $.fn.btn = btn;
-}
 // PAGER -----
 (function ($) {
     $.widget && $.widget("ui.slickPager", {
@@ -16863,7 +17195,7 @@ var Slick;
                 groupingInfo = groupingInfo || [];
                 groupingInfos = (groupingInfo instanceof Array) ? groupingInfo : [groupingInfo];
                 for (var i = 0; i < groupingInfos.length; i++) {
-                    var gi = groupingInfos[i] = $.extend(true, {}, groupingInfoDefaults, groupingInfos[i]);
+                    var gi = groupingInfos[i] = Q.extend(Q.extend({}, groupingInfoDefaults), Q.deepClone(groupingInfos[i]));
                     gi.aggregators = gi.aggregators || summaryOptions.aggregators || [];
                     gi.getterIsAFn = typeof gi.getter === "function";
                     // pre-compile accumulator loops
@@ -17520,7 +17852,7 @@ var Slick;
                     }
                 }
                 if (intf.params) {
-                    request = $.extend(request, intf.params);
+                    request = Q.extend(request, intf.params);
                 }
                 var dt = dataType;
                 var self = this;
@@ -17778,248 +18110,6 @@ var Slick;
 })(Slick || (Slick = {}));
 var Q;
 (function (Q) {
-    var oldShowLabel;
-    function validateShowLabel(element, message) {
-        oldShowLabel.call(this, element, message);
-        this.errorsFor(element).each(function (i, e) {
-            if ($(element).hasClass('error'))
-                $(e).removeClass('checked');
-            $(e).attr('title', $(e).text());
-        });
-    }
-    ;
-    function registerCustomValidationMethods() {
-        if ($.validator.methods['customValidate'] == null) {
-            $.validator.addMethod('customValidate', function (value, element) {
-                var result = this.optional(element);
-                if (element == null || !!result) {
-                    return result;
-                }
-                var events = $._data(element, 'events');
-                if (!events) {
-                    return true;
-                }
-                var handlers = events.customValidate;
-                if (handlers == null || handlers.length === 0) {
-                    return true;
-                }
-                var el = $(element);
-                for (var i = 0; !!(i < handlers.length); i++) {
-                    var handler = Q.safeCast(handlers[i].handler, Function);
-                    if (handler) {
-                        var message = handler(el);
-                        if (message != null) {
-                            el.data('customValidationMessage', message);
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }, function (o, e) {
-                return $(e).data('customValidationMessage');
-            });
-        }
-    }
-    function jQueryValidationInitialization() {
-        registerCustomValidationMethods();
-        var p = $.validator;
-        p = p.prototype;
-        oldShowLabel = p.showLabel;
-        p.showLabel = validateShowLabel;
-        $.validator.addMethod("dateQ", function (value, element) {
-            var o = this.optional(element);
-            if (o)
-                return o;
-            var d = Q.parseDate(value);
-            if (!d)
-                return false;
-            var z = new Date(d);
-            z.setHours(0, 0, 0, 0);
-            return z.getTime() === d.getTime();
-        });
-        $.validator.addMethod("hourAndMin", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseHourAndMin(value));
-        });
-        $.validator.addMethod("dayHourAndMin", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseDayHourAndMin(value));
-        });
-        $.validator.addMethod("decimalQ", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseDecimal(value));
-        });
-        $.validator.addMethod("integerQ", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseInteger(value));
-        });
-        var oldEmail = $.validator.methods['email'];
-        $.validator.addMethod("email", function (value, element) {
-            if (!Q.Config.emailAllowOnlyAscii)
-                return oldEmail.call(this, value, element);
-            return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
-        });
-        $.validator.addMethod("emailMultiple", function (value, element) {
-            var result = this.optional(element);
-            if (result)
-                return result;
-            if (value.indexOf(';') >= 0)
-                value = value.split(';');
-            else
-                value = value.split(',');
-            for (var i = 0; i < value.length; i++) {
-                result = $.validator.methods['email'].call(this, value[i], element);
-                if (!result)
-                    return result;
-            }
-            return result;
-        });
-        $.validator.addMethod("anyvalue", function (value, element) {
-            return true;
-        });
-        var d = $.validator.defaults;
-        d.ignoreTitle = true;
-        d.onchange = function (element) {
-            this.element(element);
-        };
-        p.oldinit = p.init;
-        p.init = function () {
-            p.oldinit.call(this);
-            function changeDelegate(event) {
-                if (this.form == null)
-                    return;
-                var validator = $.data(this.form, "validator"), eventType = "on" + event.type.replace(/^validate/, "");
-                validator && validator.settings[eventType] && validator.settings[eventType].call(validator, this);
-            }
-            function delegate(event) {
-                var el = this[0];
-                if (!$.data(el, 'changebound')) {
-                    $(el).change(changeDelegate);
-                    $.data(el, 'changebound', true);
-                }
-            }
-            $(this.currentForm)
-                .on(":text, :password, :file, select, textarea", "focusin.validate", delegate);
-        };
-        p.oldfocusInvalid = p.focusInvalid;
-        p.focusInvalid = function () {
-            if (this.settings.abortHandler)
-                this.settings.abortHandler(this);
-            this.oldfocusInvalid.call(this);
-        };
-        p.oldstopRequest = p.focusInvalid;
-        p.stopRequest = function (element, valid) {
-            var formSubmitted = this.formSubmitted;
-            this.oldfocusInvalid.call(this, [element, valid]);
-            if (!valid && this.pendingRequest == 0 && formSubmitted && this.settings.abortHandler) {
-                this.settings.abortHandler(this);
-            }
-        };
-        p.resetAll = function () {
-            this.submitted = {};
-            this.prepareForm();
-            this.hideErrors();
-            this.elements().removeClass(this.settings.errorClass);
-        };
-        jQuery(function () {
-            $.extend($.validator.messages, {
-                email: Q.text("Validation.Email"),
-                required: Q.text("Validation.Required"),
-                minlength: Q.text("Validation.MinLength"),
-                maxlength: Q.text("Validation.MaxLength"),
-                digits: Q.text("Validation.Digits"),
-                range: Q.text("Validation.Range"),
-                xss: Q.text("Validation.Xss"),
-                dateQ: Q.text("Validation.DateInvalid"),
-                decimalQ: Q.text("Validation.Decimal"),
-                integerQ: Q.text("Validation.Integer"),
-                url: Q.text("Validation.Url")
-            });
-        });
-    }
-    ;
-    function validatorAbortHandler(validator) {
-        validator.settings.abortHandler = null;
-        validator.settings.submitHandler = function () {
-            return false;
-        };
-    }
-    Q.validatorAbortHandler = validatorAbortHandler;
-    ;
-    function validateOptions(options) {
-        return $.extend({
-            ignore: ":hidden",
-            meta: 'v',
-            normalizer: function (value) {
-                return $.trim(value);
-            },
-            errorClass: 'error',
-            errorPlacement: function (error, element) {
-                var field = null;
-                var vx = element.attr('data-vx-id');
-                if (vx) {
-                    field = $('#' + vx);
-                    if (!field.length)
-                        field = null;
-                    else
-                        field = field[0];
-                }
-                if (field == null) {
-                    field = element.parents('div.field');
-                    if (field.length) {
-                        var inner = $('div.vx', field[0]);
-                        if (inner.length)
-                            field = inner[0];
-                    }
-                    else
-                        field = element.parent();
-                }
-                error.appendTo(field);
-            },
-            submitHandler: function () {
-                return false;
-            },
-            invalidHandler: function (event, validator) {
-                Q.notifyError(Q.text("Validation.InvalidFormMessage"));
-                $(validator.errorList.map(function (x) { return x.element; }))
-                    .closest('.category.collapsed')
-                    .children('.category-title')
-                    .each(function (i, x) {
-                    $(x).click();
-                    return true;
-                });
-                if (validator.errorList.length) {
-                    var el = validator.errorList[0].element;
-                    if (el) {
-                        var bsPane = $(el).closest('.tab-pane');
-                        if (!bsPane.hasClass("active") &&
-                            bsPane.parent().hasClass('tab-content')) {
-                            var bsPaneId = bsPane.attr('id');
-                            if (bsPaneId) {
-                                $('a[href="#' + bsPaneId + '"]').click();
-                            }
-                        }
-                        if ($.fn.tooltip) {
-                            $.fn.tooltip && $(el).tooltip({
-                                title: validator.errorList[0].message,
-                                trigger: 'manual'
-                            }).tooltip('show');
-                            window.setTimeout(function () {
-                                $(el).tooltip('destroy');
-                            }, 1500);
-                        }
-                    }
-                }
-            },
-            success: function (label) {
-                label.addClass('checked');
-            }
-        }, options);
-    }
-    Q.validateOptions = validateOptions;
-    ;
-    if ($.validator)
-        jQueryValidationInitialization();
-    else
-        $(function () {
-            $.validator && jQueryValidationInitialization();
-        });
     function jQueryDatepickerInitialization() {
         var order = Q.Culture.dateOrder;
         var s = Q.Culture.dateSeparator;

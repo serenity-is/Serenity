@@ -68,5 +68,9 @@ namespace Serenity {
         export function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean {
             return validator.element(widget.element[0] as any);
         }
+
+        Widget.prototype.addValidationRule = function (eventClass: string, rule: (p1: JQuery) => string): JQuery {
+            return VX.addValidationRule(this.element, eventClass, rule);
+        }   
     }
 }

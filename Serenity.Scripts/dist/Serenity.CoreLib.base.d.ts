@@ -1,6 +1,5 @@
 ﻿/// <reference types="jquery" />
 /// <reference types="toastr" />
-/// <reference types="react" />
 declare var __decorate: any;
 declare const __skipExtends: {
     __metadata: boolean;
@@ -144,6 +143,10 @@ declare namespace Serenity {
         details = 0,
         keyOnly = 1,
         list = 2
+    }
+}
+declare namespace Serenity {
+    class ISlickFormatter {
     }
 }
 declare namespace Serenity {
@@ -615,8 +618,8 @@ declare namespace Q {
         onSuccess?(response: TResponse): void;
         onCleanup?(): void;
     }
-    function serviceCall<TResponse>(options: Q.ServiceOptions<TResponse>): JQuery.jqXHR<any>;
-    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: Q.ServiceOptions<TResponse>): JQuery.jqXHR<any>;
+    function serviceCall<TResponse>(options: Q.ServiceOptions<TResponse>): JQueryXHR;
+    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: Q.ServiceOptions<TResponse>): JQueryXHR;
     function setEquality(request: Serenity.ListRequest, field: string, value: any): void;
     interface PostToServiceOptions {
         url?: string;
@@ -716,21 +719,13 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    namespace Decorators {
-        function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
-        function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
-        function addAttribute(type: any, attr: any): void;
-    }
-    class ISlickFormatter {
-    }
-    namespace Decorators {
-        function enumKey(value: string): (target: Function) => void;
-        function registerEnum(target: any, enumKey?: string, name?: string): void;
-        function registerEnumType(target: any, name?: string, enumKey?: string): void;
-    }
-    class EnumKeyAttribute {
-        value: string;
-        constructor(value: string);
+    enum SummaryType {
+        Disabled = -1,
+        None = 0,
+        Sum = 1,
+        Avg = 2,
+        Min = 3,
+        Max = 4
     }
 }
 declare namespace Serenity {
@@ -740,7 +735,7 @@ declare namespace Serenity {
         title?: string;
         hint?: string;
         placeholder?: string;
-        editorType?: string | React.ComponentType<any>;
+        editorType?: string;
         editorParams?: any;
         category?: string;
         collapsible?: boolean;
@@ -792,12 +787,20 @@ declare namespace Serenity {
         quickFilterSeparator?: boolean;
         quickFilterCssClass?: string;
     }
-    enum SummaryType {
-        Disabled = -1,
-        None = 0,
-        Sum = 1,
-        Avg = 2,
-        Min = 3,
-        Max = 4
+}
+declare namespace Serenity {
+    namespace Decorators {
+        function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
+        function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
+        function addAttribute(type: any, attr: any): void;
+    }
+    namespace Decorators {
+        function enumKey(value: string): (target: Function) => void;
+        function registerEnum(target: any, enumKey?: string, name?: string): void;
+        function registerEnumType(target: any, name?: string, enumKey?: string): void;
+    }
+    class EnumKeyAttribute {
+        value: string;
+        constructor(value: string);
     }
 }
