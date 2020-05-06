@@ -532,6 +532,7 @@ declare namespace Q {
         dialogClass?: string;
         buttons?: DialogButton[];
         modalClass?: string;
+        bootstrap?: boolean;
         result?: string;
     }
     interface AlertOptions extends CommonDialogOptions {

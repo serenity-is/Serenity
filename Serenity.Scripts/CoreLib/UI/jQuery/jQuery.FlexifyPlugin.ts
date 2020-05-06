@@ -6,11 +6,6 @@
     flexY(flexY: number): JQuery;
 }
 
-if ($.fn.button && ($.fn.button as any).noConflict) {
-    let btn = ($.fn.button as any).noConflict();
-    ($.fn as any).btn = btn;
-}
-
 $.fn.flexHeightOnly = function (flexY = 1) {
     return this.flexWidthHeight(0, flexY);
 }

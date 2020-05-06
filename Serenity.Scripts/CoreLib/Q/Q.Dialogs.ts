@@ -20,11 +20,18 @@ namespace Q {
         dialogClass?: string;
         buttons?: DialogButton[];
         modalClass?: string;
+        bootstrap?: boolean;
         result?: string;
     }
 
     export interface AlertOptions extends CommonDialogOptions {
         okButton?: string | boolean;
+    }
+
+
+    // if both jQuery UI and bootstrap button exists, prefer jQuery UI button as UI dialog needs them
+    if (typeof $ !== "undefined" && $.fn && $.fn.button && $.ui && $.ui.button && ($.fn.button as any).noConflict) {
+        ($.fn as any).btn = ($.fn.button as any).noConflict();
     }
 
     function toIconClass(icon: string): string {
@@ -40,7 +47,6 @@ namespace Q {
     function uiDialog(options: CommonDialogOptions, message: string, dialogClass: string) {
         var opt = Q.extend(<JQueryUI.DialogOptions>{
             modal: true,
-            dialogClass: 's-MessageDialog' + (dialogClass ? (' ' + dialogClass): ''),
             width: '40%',
             maxWidth: 450,
             minWidth: 180,
@@ -55,6 +61,8 @@ namespace Q {
                     options.onClose.call(this, options.result);
             }
         }, options);
+
+        opt.dialogClass = 's-MessageDialog' + (dialogClass ? (' ' + dialogClass): '');
 
         if (options.buttons) {
             opt.buttons = options.buttons.map(x => {
@@ -76,10 +84,7 @@ namespace Q {
             });
         }
 
-        return $('<div><div class="message"></div></div>')
-            .children('.message')
-            .html(message)
-            .dialog(options);
+        return $('<div>' + message + '</div>').dialog(opt);
     }
 
     let _isBS3: boolean;
@@ -165,18 +170,16 @@ namespace Q {
     }
 
     function useBSModal(options: CommonDialogOptions): boolean {
-        return !!((!$.ui || !$.ui.dialog) || Q.Config.bootstrapModals || options.modalClass);
+        return !!((!$.ui || !$.ui.dialog) || Q.Config.bootstrapModals || (options && options.bootstrap));
     }
 
     function messageHtml(message: string, options?: CommonDialogOptions): string {
-        var htmlEncode = options == null || options.htmlEncode == null || options.htmlEncode
+        var htmlEncode = options == null || options.htmlEncode == null || options.htmlEncode;
         if (htmlEncode)
             message = Q.htmlEncode(message); 
 
-        if (options == null || (options.preWrap == null && !htmlEncode) || options.preWrap)
-            message = '<div style="white-space: pre-wrap">' + message + '</div>';
-
-        return message;
+        var preWrap = options == null || (options.preWrap == null && htmlEncode) || options.preWrap;
+        return '<div class="message"' + (preWrap ? ' style="white-space: pre-wrap">' : '>') + message + '</div>';
     }
 
     export function alert(message: string, options?: AlertOptions) {

@@ -1969,6 +1969,10 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
+    // if both jQuery UI and bootstrap button exists, prefer jQuery UI button as UI dialog needs them
+    if (typeof $ !== "undefined" && $.fn && $.fn.button && $.ui && $.ui.button && $.fn.button.noConflict) {
+        $.fn.btn = $.fn.button.noConflict();
+    }
     function toIconClass(icon) {
         if (!icon)
             return null;
@@ -1981,7 +1985,6 @@ var Q;
     function uiDialog(options, message, dialogClass) {
         var opt = Q.extend({
             modal: true,
-            dialogClass: 's-MessageDialog' + (dialogClass ? (' ' + dialogClass) : ''),
             width: '40%',
             maxWidth: 450,
             minWidth: 180,
@@ -1996,6 +1999,7 @@ var Q;
                     options.onClose.call(this, options.result);
             }
         }, options);
+        opt.dialogClass = 's-MessageDialog' + (dialogClass ? (' ' + dialogClass) : '');
         if (options.buttons) {
             opt.buttons = options.buttons.map(function (x) {
                 var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
@@ -2015,10 +2019,7 @@ var Q;
                 };
             });
         }
-        return $('<div><div class="message"></div></div>')
-            .children('.message')
-            .html(message)
-            .dialog(options);
+        return $('<div>' + message + '</div>').dialog(opt);
     }
     var _isBS3;
     function isBS3() {
@@ -2083,15 +2084,14 @@ var Q;
         return _useBrowserDialogs;
     }
     function useBSModal(options) {
-        return !!((!$.ui || !$.ui.dialog) || Q.Config.bootstrapModals || options.modalClass);
+        return !!((!$.ui || !$.ui.dialog) || Q.Config.bootstrapModals || (options && options.bootstrap));
     }
     function messageHtml(message, options) {
         var htmlEncode = options == null || options.htmlEncode == null || options.htmlEncode;
         if (htmlEncode)
             message = Q.htmlEncode(message);
-        if (options == null || (options.preWrap == null && !htmlEncode) || options.preWrap)
-            message = '<div style="white-space: pre-wrap">' + message + '</div>';
-        return message;
+        var preWrap = options == null || (options.preWrap == null && htmlEncode) || options.preWrap;
+        return '<div class="message"' + (preWrap ? ' style="white-space: pre-wrap">' : '>') + message + '</div>';
     }
     function alert(message, options) {
         var _a, _b;
