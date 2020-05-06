@@ -497,7 +497,7 @@ declare namespace Q {
     function addOption(select: JQuery, key: string, text: string): void;
     function addEmptyOption(select: JQuery): void;
     function clearOptions(select: JQuery): void;
-    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
+    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery<HTMLElement>;
     /**
      * Html attribute encodes a string (encodes quotes in addition to &, > and <)
      * @param s String to be HTML attribute encoded
@@ -532,6 +532,7 @@ declare namespace Q {
         dialogClass?: string;
         buttons?: DialogButton[];
         modalClass?: string;
+        result?: string;
     }
     interface AlertOptions extends CommonDialogOptions {
         okButton?: string | boolean;
@@ -613,8 +614,8 @@ declare namespace Q {
         onSuccess?(response: TResponse): void;
         onCleanup?(): void;
     }
-    function serviceCall<TResponse>(options: Q.ServiceOptions<TResponse>): JQueryXHR;
-    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: Q.ServiceOptions<TResponse>): JQueryXHR;
+    function serviceCall<TResponse>(options: Q.ServiceOptions<TResponse>): JQuery.jqXHR<any>;
+    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: Q.ServiceOptions<TResponse>): JQuery.jqXHR<any>;
     function setEquality(request: Serenity.ListRequest, field: string, value: any): void;
     interface PostToServiceOptions {
         url?: string;

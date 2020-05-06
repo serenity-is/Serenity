@@ -13,6 +13,7 @@
       "jquery.cookie",
       "jquery.validation",
       "jqueryui",
+      "bootstrap",
       "sortablejs",
       "toastr",
       "react"

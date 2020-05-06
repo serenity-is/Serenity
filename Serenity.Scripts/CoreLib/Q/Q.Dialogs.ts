@@ -20,6 +20,7 @@ namespace Q {
         dialogClass?: string;
         buttons?: DialogButton[];
         modalClass?: string;
+        result?: string;
     }
 
     export interface AlertOptions extends CommonDialogOptions {
@@ -51,7 +52,7 @@ namespace Q {
             close: function () {
                 $(this).dialog('destroy');
                 if (options.onClose)
-                    options.onClose.call(this, options["result"]);
+                    options.onClose.call(this, options.result);
             }
         }, options);
 
@@ -64,7 +65,7 @@ namespace Q {
                 return <JQueryUI.DialogButtonOptions>{
                     text: text,
                     click: function(e) {
-                        options["result"] = x.result;
+                        options.result = x.result;
                         $(this).dialog('close');
                         x.onClick && x.onClick.call(this, e);
                     },
@@ -82,11 +83,11 @@ namespace Q {
     }
 
     let _isBS3: boolean;
-    function isBS3() {
+    function isBS3(): boolean {
         if (_isBS3 != null)
             return _isBS3;
         // @ts-ignore
-        return (_isBS3 = !!($.fn.modal && $.fn.modal.VERSION && $.fn.modal.VERSION.charAt(0) == '3'));
+        return (_isBS3 = !!($.fn.modal && $.fn.modal.Constructor && $.fn.modal.Constructor.VERSION && ($.fn.modal.Constructor.VERSION + "").charAt(0) == '3'));
     }
 
     const defaultTxt = {
@@ -113,7 +114,7 @@ namespace Q {
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                ${(isBS3 ? closeButton : "")}<h5 class="modal-title">${options.title}</h5>${(isBS3 ? "" : closeButton)}
+                ${(isBS3() ? closeButton : "")}<h5 class="modal-title">${options.title}</h5>${(isBS3() ? "" : closeButton)}
             </div>
             <div class="modal-body">
                 ${message}
@@ -127,7 +128,7 @@ namespace Q {
             div.one('shown.bs.modal', options.onOpen);
 
         if (options.onClose)
-            div.one('hidden.bs.modal', e => options.onClose(options["result"]));
+            div.one('hidden.bs.modal', e => options.onClose(options.result));
 
         var footer = div.find('.modal-footer');
 
@@ -139,8 +140,8 @@ namespace Q {
             $(`<button class="btn ${x.cssClass ? x.cssClass : ''}"${x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '' }>${text}</button>`)
                 .appendTo(footer)
                 .click(e => {
-                    options["result"] = x.result;
-                    div["modal"]("hide");
+                    options.result = x.result;
+                    div.modal('hide');
                     x.onClick && x.onClick.call(this, e);       
                 });
         }
@@ -149,13 +150,16 @@ namespace Q {
             for (var button of options.buttons) 
                 createButton(button);
 
-        div["modal"]('show');
+        div.modal({
+            backdrop: false,
+            show: true
+        });
     }
 
     let _useBrowserDialogs: boolean;
     function useBrowserDialogs() {
         if (_useBrowserDialogs == null) {
-            _useBrowserDialogs = typeof $ === 'undefined' || ((!$.ui || !$.ui.dialog) && (!$.fn || !$.fn["modal"]));
+            _useBrowserDialogs = typeof $ === 'undefined' || ((!$.ui || !$.ui.dialog) && (!$.fn || !$.fn.modal));
         }
         return _useBrowserDialogs;
     }

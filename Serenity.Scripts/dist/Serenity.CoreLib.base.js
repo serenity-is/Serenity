@@ -1993,7 +1993,7 @@ var Q;
             close: function () {
                 $(this).dialog('destroy');
                 if (options.onClose)
-                    options.onClose.call(this, options["result"]);
+                    options.onClose.call(this, options.result);
             }
         }, options);
         if (options.buttons) {
@@ -2005,7 +2005,7 @@ var Q;
                 return {
                     text: text,
                     click: function (e) {
-                        options["result"] = x.result;
+                        options.result = x.result;
                         $(this).dialog('close');
                         x.onClick && x.onClick.call(this, e);
                     },
@@ -2025,7 +2025,7 @@ var Q;
         if (_isBS3 != null)
             return _isBS3;
         // @ts-ignore
-        return (_isBS3 = !!($.fn.modal && $.fn.modal.VERSION && $.fn.modal.VERSION.charAt(0) == '3'));
+        return (_isBS3 = !!($.fn.modal && $.fn.modal.Constructor && $.fn.modal.Constructor.VERSION && ($.fn.modal.Constructor.VERSION + "").charAt(0) == '3'));
     }
     var defaultTxt = {
         AlertTitle: 'Alert',
@@ -2045,11 +2045,11 @@ var Q;
     function bsModal(options, message, modalClass) {
         var closeButton = "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"" + txt('CloseButton') + "\">" +
             "<span aria-hidden=\"true\">&times;</span></button>";
-        var div = $("<div class=\"modal s-MessageModal " + modalClass + "\" tabindex=\"-1\" role=\"dialog\">\n    <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                " + (isBS3 ? closeButton : "") + "<h5 class=\"modal-title\">" + options.title + "</h5>" + (isBS3 ? "" : closeButton) + "\n            </div>\n            <div class=\"modal-body\">\n                " + message + "\n            </div>\n            <div class=\"modal-footer\"></div>\n        </div>\n    </div>\n</div>").eq(0).appendTo(document.body);
+        var div = $("<div class=\"modal s-MessageModal " + modalClass + "\" tabindex=\"-1\" role=\"dialog\">\n    <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                " + (isBS3() ? closeButton : "") + "<h5 class=\"modal-title\">" + options.title + "</h5>" + (isBS3() ? "" : closeButton) + "\n            </div>\n            <div class=\"modal-body\">\n                " + message + "\n            </div>\n            <div class=\"modal-footer\"></div>\n        </div>\n    </div>\n</div>").eq(0).appendTo(document.body);
         if (options.onOpen)
             div.one('shown.bs.modal', options.onOpen);
         if (options.onClose)
-            div.one('hidden.bs.modal', function (e) { return options.onClose(options["result"]); });
+            div.one('hidden.bs.modal', function (e) { return options.onClose(options.result); });
         var footer = div.find('.modal-footer');
         function createButton(x) {
             var _this = this;
@@ -2060,8 +2060,8 @@ var Q;
             $("<button class=\"btn " + (x.cssClass ? x.cssClass : '') + "\"" + (x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '') + ">" + text + "</button>")
                 .appendTo(footer)
                 .click(function (e) {
-                options["result"] = x.result;
-                div["modal"]("hide");
+                options.result = x.result;
+                div.modal('hide');
                 x.onClick && x.onClick.call(_this, e);
             });
         }
@@ -2070,12 +2070,15 @@ var Q;
                 var button = _a[_i];
                 createButton(button);
             }
-        div["modal"]('show');
+        div.modal({
+            backdrop: false,
+            show: true
+        });
     }
     var _useBrowserDialogs;
     function useBrowserDialogs() {
         if (_useBrowserDialogs == null) {
-            _useBrowserDialogs = typeof $ === 'undefined' || ((!$.ui || !$.ui.dialog) && (!$.fn || !$.fn["modal"]));
+            _useBrowserDialogs = typeof $ === 'undefined' || ((!$.ui || !$.ui.dialog) && (!$.fn || !$.fn.modal));
         }
         return _useBrowserDialogs;
     }
