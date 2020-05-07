@@ -501,7 +501,7 @@ namespace Serenity {
             }
         }
 
-        protected get_select2Container() {
+        protected get_select2Container(): JQuery {
             return this.element.prevAll('.select2-container');
         }
 

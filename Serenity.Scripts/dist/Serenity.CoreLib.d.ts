@@ -5,9 +5,9 @@
 /// <reference types="jqueryui" />
 declare var __decorate: any;
 declare const __skipExtends: {
-    __metadata: boolean;
-    __typeName: boolean;
-    __componentFactory: boolean;
+    "__metadata": boolean;
+    "__typeName": boolean;
+    "__componentFactory": boolean;
 };
 declare var __extends: any;
 declare var __assign: any;
@@ -504,7 +504,7 @@ declare namespace Q {
     function addOption(select: JQuery, key: string, text: string): void;
     function addEmptyOption(select: JQuery): void;
     function clearOptions(select: JQuery): void;
-    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery<HTMLElement>;
+    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
     /**
      * Html attribute encodes a string (encodes quotes in addition to &, > and <)
      * @param s String to be HTML attribute encoded
@@ -678,7 +678,7 @@ declare namespace JQueryValidation {
     }
 }
 declare namespace Q {
-    function validate(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
+    function validateTooltip(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
 }
 declare namespace Q {
     namespace Authorization {
@@ -1500,7 +1500,7 @@ declare namespace Serenity {
         };
         setEditValue(source: any, property: PropertyItem): void;
         getEditValue(property: PropertyItem, target: any): void;
-        protected get_select2Container(): JQuery<HTMLElement>;
+        protected get_select2Container(): JQuery;
         protected get_items(): Select2Item[];
         protected get_itemByKey(): Q.Dictionary<Select2Item>;
         static filterByText<TItem>(items: TItem[], getText: (item: TItem) => string, term: string): TItem[];
@@ -2007,7 +2007,7 @@ declare namespace Serenity {
         get_field(): PropertyItem;
         set_field(value: PropertyItem): void;
         private container;
-        get_container(): JQuery<HTMLElement>;
+        get_container(): JQuery;
         set_container(value: JQuery): void;
         private operator;
         get_operator(): FilterOperator;
@@ -2143,7 +2143,7 @@ declare namespace Serenity {
         protected addButtonClick(e: JQueryEventObject): void;
         protected resetButtonClick(e: JQueryEventObject): void;
         protected findEmptyRow(): JQuery;
-        protected addEmptyRow(popupField: boolean): JQuery<HTMLElement>;
+        protected addEmptyRow(popupField: boolean): JQuery;
         protected onRowFieldChange(e: JQueryEventObject): void;
         protected rowFieldChange(row: JQuery): void;
         protected removeFiltering(row: JQuery): void;
@@ -2293,7 +2293,7 @@ declare namespace Serenity {
     class PrefixedContext {
         readonly idPrefix: string;
         constructor(idPrefix: string);
-        byId(id: string): JQuery<HTMLElement>;
+        byId(id: string): JQuery;
         w<TWidget>(id: string, type: {
             new (...args: any[]): TWidget;
         }): TWidget;

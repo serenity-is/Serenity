@@ -48,7 +48,7 @@
 
         private container: JQuery;
 
-        get_container() {
+        get_container(): JQuery {
             return this.container;
         }
 

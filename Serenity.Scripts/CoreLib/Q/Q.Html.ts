@@ -12,7 +12,7 @@
         select.html('');
     }
 
-    export function findElementWithRelativeId(element: JQuery, relativeId: string) {
+    export function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery {
         let elementId = element.attr('id');
         if (isEmptyOrNull(elementId)) {
             return $('#' + relativeId);

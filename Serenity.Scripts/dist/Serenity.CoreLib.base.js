@@ -1964,7 +1964,8 @@ var Q;
     }
     Q.jsRender = jsRender;
     function log(m) {
-        window.console && window.console.log(m);
+        if (typeof console !== "undefined" && console.log)
+            console.log(m);
     }
     Q.log = log;
     function newBodyDiv() {
@@ -2995,10 +2996,10 @@ var Q;
             return $.trim(value);
         }
     };
-    function validate(form, opt) {
+    function validateTooltip(form, opt) {
         return form.validate(Q.extend(Q.extend({}, valOpt), opt));
     }
-    Q.validate = validate;
+    Q.validateTooltip = validateTooltip;
 })(Q || (Q = {}));
 var Serenity;
 (function (Serenity) {

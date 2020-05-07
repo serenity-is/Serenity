@@ -502,7 +502,7 @@ declare namespace Q {
     function addOption(select: JQuery, key: string, text: string): void;
     function addEmptyOption(select: JQuery): void;
     function clearOptions(select: JQuery): void;
-    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery<HTMLElement>;
+    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
     /**
      * Html attribute encodes a string (encodes quotes in addition to &, > and <)
      * @param s String to be HTML attribute encoded
@@ -697,7 +697,7 @@ declare namespace JQueryValidation {
     }
 }
 declare namespace Q {
-    function validate(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
+    function validateTooltip(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
 }
 declare namespace Serenity {
     function Criteria(field: string): any[];

@@ -3,7 +3,7 @@
         constructor(public readonly idPrefix: string) {
         }
 
-        byId(id: string) {
+        byId(id: string): JQuery {
             return $('#' + this.idPrefix + id);
         }
 

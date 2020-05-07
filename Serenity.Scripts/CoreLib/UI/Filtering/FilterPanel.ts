@@ -280,7 +280,7 @@
             return result;
         }
 
-        protected addEmptyRow(popupField: boolean) {
+        protected addEmptyRow(popupField: boolean): JQuery {
             var emptyRow = this.findEmptyRow();
 
             if (emptyRow != null) {
