@@ -8,10 +8,8 @@
         constructor(opt?: TOptions) {
             super(opt);
 
-            if (!this.isAsyncWidget()) {
-                this.initPropertyGrid();
-                this.loadInitialEntity();
-            }
+            this.initPropertyGrid();
+            this.loadInitialEntity();
         }
 
         destroy() {
@@ -26,22 +24,6 @@
             }
 
             super.destroy();
-        }
-
-        protected initPropertyGridAsync() {
-            return Promise.resolve().then(() => {
-                var pgDiv = this.byId('PropertyGrid');
-                if (pgDiv.length <= 0) {
-                    return Promise.resolve();
-                }
-                return this.getPropertyGridOptionsAsync().then(pgOptions => {
-                    this.propertyGrid = new Serenity.PropertyGrid(pgDiv, pgOptions);
-                    if (this.element.closest('.ui-dialog').hasClass('s-Flexify')) {
-                        this.propertyGrid.element.children('.categories').flexHeightOnly(1);
-                    }
-                    return this.propertyGrid.initialize();
-                });
-            });
         }
 
         protected getDialogOptions() {
@@ -121,27 +103,9 @@
             };
         }
 
-        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions> {
-            return this.getPropertyItemsAsync().then(propertyItems => {
-                return {
-                    idPrefix: this.idPrefix,
-                    items: propertyItems, mode: 1,
-                    useCategories: false,
-                    localTextPrefix: 'Forms.' + this.getFormKey() + '.'
-                };
-            });
-        }
-
         protected getPropertyItems(): PropertyItem[] {
             var formKey = this.getFormKey();
             return Q.getForm(formKey);
-        }
-
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]> {
-            return Promise.resolve().then(() => {
-                var formKey = this.getFormKey();
-                return Q.getFormAsync(formKey);
-            });
         }
 
         protected getSaveEntity(): TItem {
@@ -150,12 +114,6 @@
                 this.propertyGrid.save(entity);
             }
             return entity as TItem;
-        }
-
-        protected initializeAsync(): PromiseLike<void> {
-            return super.initializeAsync()
-                .then(() => this.initPropertyGridAsync())
-                .then(() => this.loadInitialEntity());
         }
 
         protected loadInitialEntity(): void {

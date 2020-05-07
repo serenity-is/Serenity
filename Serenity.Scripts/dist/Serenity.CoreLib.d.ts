@@ -585,10 +585,6 @@ declare namespace Q {
          */
         let applicationPath: string;
         /**
-         * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
-         */
-        let emailAllowOnlyAscii: boolean;
-        /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
          * on dialog classes manually. It's false by default for backward compability.
          */
@@ -956,20 +952,16 @@ declare namespace Serenity {
         protected options: TOptions;
         protected widgetName: string;
         protected uniqueName: string;
-        protected asyncPromise: PromiseLike<void>;
         constructor(element: JQuery, options?: TOptions);
         destroy(): void;
         protected addCssClass(): void;
         protected getCssClass(): string;
-        protected initializeAsync(): PromiseLike<void>;
-        protected isAsyncWidget(): boolean;
         static getWidgetName(type: Function): string;
         static elementFor<TWidget>(editorType: {
             new (...args: any[]): TWidget;
         }): JQuery;
         static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
         init(action?: (widget: any) => void): this;
-        initialize(): PromiseLike<void>;
         private static __isWidgetType;
         props: Readonly<{
             children?: React.ReactNode;
@@ -1347,6 +1339,28 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class StringEditor extends Widget<any> {
+        constructor(input: JQuery);
+        get value(): string;
+        protected get_value(): string;
+        set value(value: string);
+        protected set_value(value: string): void;
+    }
+}
+declare namespace Serenity {
+    class PasswordEditor extends StringEditor {
+        constructor(input: JQuery);
+    }
+}
+declare namespace Serenity {
+    class BooleanEditor extends Widget<any> {
+        get value(): boolean;
+        protected get_value(): boolean;
+        set value(value: boolean);
+        protected set_value(value: boolean): void;
+    }
+}
+declare namespace Serenity {
     class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
         private minValue;
         private maxValue;
@@ -1417,6 +1431,60 @@ declare namespace Serenity {
         intervalMinutes?: any;
         yearRange?: string;
         useUtc?: boolean;
+    }
+}
+declare namespace Serenity {
+    interface DecimalEditorOptions {
+        minValue?: string;
+        maxValue?: string;
+        decimals?: any;
+        padDecimals?: any;
+        allowNegatives?: boolean;
+    }
+    class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
+        constructor(input: JQuery, opt?: DecimalEditorOptions);
+        get_value(): number;
+        get value(): number;
+        set_value(value: number): void;
+        set value(v: number);
+        get_isValid(): boolean;
+        static defaultAutoNumericOptions(): any;
+    }
+}
+declare namespace Serenity {
+    interface EmailEditorOptions {
+        domain?: string;
+        readOnlyDomain?: boolean;
+    }
+    class EmailEditor extends Widget<EmailEditorOptions> {
+        constructor(input: JQuery, opt: EmailEditorOptions);
+        static registerValidationMethods(): void;
+        get_value(): string;
+        get value(): string;
+        set_value(value: string): void;
+        set value(v: string);
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+    }
+}
+declare namespace Serenity {
+    class EmailAddressEditor extends Serenity.StringEditor {
+        constructor(input: JQuery);
+    }
+}
+declare namespace Serenity {
+    interface IntegerEditorOptions {
+        minValue?: number;
+        maxValue?: number;
+        allowNegatives?: boolean;
+    }
+    class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
+        constructor(input: JQuery, opt?: IntegerEditorOptions);
+        get_value(): number;
+        get value(): number;
+        set_value(value: number): void;
+        set value(v: number);
+        get_isValid(): boolean;
     }
 }
 declare namespace Serenity {
@@ -1660,55 +1728,6 @@ declare namespace Serenity {
         function setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
         function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
     }
-    export class BooleanEditor extends Widget<any> {
-        get value(): boolean;
-        protected get_value(): boolean;
-        set value(value: boolean);
-        protected set_value(value: boolean): void;
-    }
-    export class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
-        constructor(input: JQuery, opt?: DecimalEditorOptions);
-        get_value(): number;
-        get value(): number;
-        set_value(value: number): void;
-        set value(v: number);
-        get_isValid(): boolean;
-        static defaultAutoNumericOptions(): any;
-    }
-    export interface IntegerEditorOptions {
-        minValue?: number;
-        maxValue?: number;
-        allowNegatives?: boolean;
-    }
-    export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
-        constructor(input: JQuery, opt?: IntegerEditorOptions);
-        get_value(): number;
-        get value(): number;
-        set_value(value: number): void;
-        set value(v: number);
-        get_isValid(): boolean;
-    }
-    export interface DecimalEditorOptions {
-        minValue?: string;
-        maxValue?: string;
-        decimals?: any;
-        padDecimals?: any;
-        allowNegatives?: boolean;
-    }
-    export interface EmailEditorOptions {
-        domain?: string;
-        readOnlyDomain?: boolean;
-    }
-    export class EmailEditor extends Widget<EmailEditorOptions> {
-        constructor(input: JQuery, opt: EmailEditorOptions);
-        static registerValidationMethods(): void;
-        get_value(): string;
-        get value(): string;
-        set_value(value: string): void;
-        set value(v: string);
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-    }
     export interface EnumEditorOptions extends Select2CommonOptions {
         enumKey?: string;
         enumType?: any;
@@ -1826,19 +1845,6 @@ declare namespace Serenity {
     export interface MaskedEditorOptions {
         mask?: string;
         placeholder?: string;
-    }
-    export class StringEditor extends Widget<any> {
-        constructor(input: JQuery);
-        get value(): string;
-        protected get_value(): string;
-        set value(value: string);
-        protected set_value(value: string): void;
-    }
-    export class EmailAddressEditor extends Serenity.StringEditor {
-        constructor(input: JQuery);
-    }
-    export class PasswordEditor extends StringEditor {
-        constructor(input: JQuery);
     }
     export interface RadioButtonEditorOptions {
         enumKey?: string;
@@ -2437,7 +2443,6 @@ declare namespace Serenity {
         protected _entityId: any;
         constructor(opt?: TOptions);
         destroy(): void;
-        protected initPropertyGridAsync(): PromiseLike<void>;
         protected getDialogOptions(): JQueryUI.DialogOptions;
         protected getDialogButtons(): JQueryUI.DialogButtonOptions[];
         protected okClick(): void;
@@ -2446,11 +2451,8 @@ declare namespace Serenity {
         protected initPropertyGrid(): void;
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
         protected getPropertyItems(): PropertyItem[];
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
         protected getSaveEntity(): TItem;
-        protected initializeAsync(): PromiseLike<void>;
         protected loadInitialEntity(): void;
         protected get_entity(): TItem;
         protected set_entity(value: TItem): void;
@@ -2589,7 +2591,6 @@ declare namespace Serenity {
         protected initialPopulate(): void;
         protected canFilterColumn(column: Slick.Column): boolean;
         protected initializeFilterBar(): void;
-        protected initializeAsync(): PromiseLike<void>;
         protected createSlickGrid(): Slick.Grid;
         protected setInitialSortOrder(): void;
         itemAt(row: number): TItem;
@@ -2630,11 +2631,9 @@ declare namespace Serenity {
         protected getItemType(): string;
         protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Slick.Format;
         protected getColumnsKey(): string;
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
         protected getPropertyItems(): PropertyItem[];
         protected getColumns(): Slick.Column[];
         protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Slick.Column[];
-        protected getColumnsAsync(): PromiseLike<Slick.Column[]>;
         protected getSlickOptions(): Slick.GridOptions;
         protected populateLock(): void;
         protected populateUnlock(): void;
@@ -2850,14 +2849,10 @@ declare namespace Serenity {
         constructor(container: JQuery, options?: TOptions);
         destroy(): void;
         protected initPropertyGrid(): void;
-        protected initPropertyGridAsync(): PromiseLike<void>;
         protected loadInitialEntity(): void;
-        protected initializeAsync(): PromiseLike<void>;
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
         protected getPropertyItems(): PropertyItem[];
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
         protected getSaveEntity(): TItem;
         protected get_entity(): TItem;
         protected get_entityId(): any;
@@ -2890,7 +2885,6 @@ declare namespace Serenity {
         protected localizationLastValue: any;
         static defaultLanguageList: () => string[][];
         constructor(opt?: TOptions);
-        protected initializeAsync(): PromiseLike<void>;
         destroy(): void;
         protected get_entity(): TItem;
         protected set_entity(entity: any): void;
@@ -2944,7 +2938,6 @@ declare namespace Serenity {
         loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
         protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
         protected initLocalizationGrid(): void;
-        protected initLocalizationGridAsync(): PromiseLike<void>;
         protected initLocalizationGridCommon(pgOptions: PropertyGridOptions): void;
         protected isLocalizationMode(): boolean;
         protected isLocalizationModeAndChanged(): boolean;
@@ -2956,11 +2949,8 @@ declare namespace Serenity {
         protected getLocalizationGridValue(): any;
         protected getPendingLocalizations(): any;
         protected initPropertyGrid(): void;
-        protected initPropertyGridAsync(): PromiseLike<void>;
         protected getPropertyItems(): PropertyItem[];
         protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
         protected validateBeforeSave(): boolean;
         protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse>;
         protected getSaveEntity(): TItem;

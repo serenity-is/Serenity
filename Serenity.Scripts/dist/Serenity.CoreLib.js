@@ -2375,10 +2375,6 @@ var Q;
             }
         }
         /**
-         * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
-         */
-        Config.emailAllowOnlyAscii = true;
-        /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
          * on dialog classes manually. It's false by default for backward compability.
          */
@@ -2872,12 +2868,6 @@ var Q;
         });
         $.validator.addMethod("integerQ", function (value, element) {
             return this.optional(element) || !isNaN(Q.parseInteger(value));
-        });
-        var oldEmail_1 = $.validator.methods['email'];
-        $.validator.addMethod("email", function (value, element) {
-            if (!Q.Config.emailAllowOnlyAscii)
-                return oldEmail_1.call(this, value, element);
-            return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
         });
         function addMsg(m, k) {
             var txt = Q.tryGetText("Validation." + k);
@@ -3752,13 +3742,6 @@ var Serenity;
                 _this.destroy();
             }).data(_this.widgetName, _this);
             _this.addCssClass();
-            if (_this.isAsyncWidget()) {
-                window.setTimeout(function () {
-                    if (element && !_this.asyncPromise) {
-                        _this.asyncPromise = _this.initializeAsync();
-                    }
-                }, 0);
-            }
             return _this;
         }
         Widget_1 = Widget;
@@ -3766,7 +3749,6 @@ var Serenity;
             this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
             this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
-            this.asyncPromise = null;
         };
         Widget.prototype.addCssClass = function () {
             this.element.addClass(this.getCssClass());
@@ -3787,12 +3769,6 @@ var Serenity;
                 return klass;
             }
             return klass + ' ' + fullClass;
-        };
-        Widget.prototype.initializeAsync = function () {
-            return Promise.resolve();
-        };
-        Widget.prototype.isAsyncWidget = function () {
-            return Q.isInstanceOfType(this, Serenity.IAsyncInit);
         };
         Widget.getWidgetName = function (type) {
             return Q.replaceAll(Q.getTypeFullName(type), '.', '_');
@@ -3818,30 +3794,13 @@ var Serenity;
                 params.element && params.element(e);
                 widget = new params.type(e, params.options);
             }
-            if (widget.isAsyncWidget())
-                widget.init(params.init);
-            else {
-                widget.init(null);
-                params.init && params.init(widget);
-            }
+            widget.init(null);
+            params.init && params.init(widget);
             return widget;
         };
         Widget.prototype.init = function (action) {
-            var _this = this;
-            var promise = this.initialize();
-            if (action) {
-                promise.then(function () { return action(_this); });
-            }
+            action && action(this);
             return this;
-        };
-        Widget.prototype.initialize = function () {
-            if (!this.isAsyncWidget()) {
-                return Promise.resolve();
-            }
-            if (!this.asyncPromise) {
-                this.asyncPromise = this.initializeAsync();
-            }
-            return this.asyncPromise;
         };
         var Widget_1;
         Widget.nextWidgetNumber = 0;
@@ -6265,6 +6224,84 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var StringEditor = /** @class */ (function (_super) {
+        __extends(StringEditor, _super);
+        function StringEditor(input) {
+            return _super.call(this, input) || this;
+        }
+        Object.defineProperty(StringEditor.prototype, "value", {
+            get: function () {
+                return this.element.val();
+            },
+            set: function (value) {
+                this.element.val(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        StringEditor.prototype.get_value = function () {
+            return this.value;
+        };
+        StringEditor.prototype.set_value = function (value) {
+            this.value = value;
+        };
+        StringEditor = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.StringEditor', [Serenity.IStringValue]),
+            Serenity.Decorators.element("<input type=\"text\"/>")
+        ], StringEditor);
+        return StringEditor;
+    }(Serenity.Widget));
+    Serenity.StringEditor = StringEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var PasswordEditor = /** @class */ (function (_super) {
+        __extends(PasswordEditor, _super);
+        function PasswordEditor(input) {
+            var _this = _super.call(this, input) || this;
+            input.attr('type', 'password');
+            return _this;
+        }
+        PasswordEditor = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.PasswordEditor')
+        ], PasswordEditor);
+        return PasswordEditor;
+    }(Serenity.StringEditor));
+    Serenity.PasswordEditor = PasswordEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var BooleanEditor = /** @class */ (function (_super) {
+        __extends(BooleanEditor, _super);
+        function BooleanEditor() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(BooleanEditor.prototype, "value", {
+            get: function () {
+                return this.element.is(":checked");
+            },
+            set: function (value) {
+                this.element.prop("checked", !!value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BooleanEditor.prototype.get_value = function () {
+            return this.value;
+        };
+        BooleanEditor.prototype.set_value = function (value) {
+            this.value = value;
+        };
+        BooleanEditor = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.BooleanEditor', [Serenity.IBooleanValue]),
+            Serenity.Decorators.element('<input type="checkbox"/>')
+        ], BooleanEditor);
+        return BooleanEditor;
+    }(Serenity.Widget));
+    Serenity.BooleanEditor = BooleanEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var Option = Serenity.Decorators.option;
     var DateEditor = /** @class */ (function (_super) {
         __extends(DateEditor, _super);
@@ -6838,6 +6875,288 @@ var Serenity;
         return DateTimeEditor;
     }(Serenity.Widget));
     Serenity.DateTimeEditor = DateTimeEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var DecimalEditor = /** @class */ (function (_super) {
+        __extends(DecimalEditor, _super);
+        function DecimalEditor(input, opt) {
+            var _this = _super.call(this, input, opt) || this;
+            input.addClass('decimalQ');
+            var numericOptions = Q.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
+                vMin: Q.coalesce(_this.options.minValue, _this.options.allowNegatives ? (_this.options.maxValue != null ? ("-" + _this.options.maxValue) : '-999999999999.99') : '0.00'),
+                vMax: Q.coalesce(_this.options.maxValue, '999999999999.99')
+            });
+            if (_this.options.decimals != null) {
+                numericOptions.mDec = _this.options.decimals;
+            }
+            if (_this.options.padDecimals != null) {
+                numericOptions.aPad = _this.options.padDecimals;
+            }
+            if ($.fn.autoNumeric)
+                input.autoNumeric(numericOptions);
+            return _this;
+        }
+        DecimalEditor.prototype.get_value = function () {
+            if ($.fn.autoNumeric) {
+                var val = this.element.autoNumeric('get');
+                if (!!(val == null || val === ''))
+                    return null;
+                return parseFloat(val);
+            }
+            var val = this.element.val();
+            return Q.parseDecimal(val);
+        };
+        Object.defineProperty(DecimalEditor.prototype, "value", {
+            get: function () {
+                return this.get_value();
+            },
+            set: function (v) {
+                this.set_value(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        DecimalEditor.prototype.set_value = function (value) {
+            if (value == null || value === '') {
+                this.element.val('');
+            }
+            else if ($.fn.autoNumeric) {
+                this.element.autoNumeric('set', value);
+            }
+            else
+                this.element.val(Q.formatNumber(value));
+        };
+        DecimalEditor.prototype.get_isValid = function () {
+            return !isNaN(this.get_value());
+        };
+        DecimalEditor.defaultAutoNumericOptions = function () {
+            return {
+                aDec: Q.Culture.decimalSeparator,
+                altDec: ((Q.Culture.decimalSeparator === '.') ? ',' : '.'),
+                aSep: ((Q.Culture.decimalSeparator === '.') ? ',' : '.'),
+                aPad: true
+            };
+        };
+        DecimalEditor = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.DecimalEditor', [Serenity.IDoubleValue]),
+            Serenity.Decorators.element('<input type="text"/>')
+        ], DecimalEditor);
+        return DecimalEditor;
+    }(Serenity.Widget));
+    Serenity.DecimalEditor = DecimalEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var EmailEditor = /** @class */ (function (_super) {
+        __extends(EmailEditor, _super);
+        function EmailEditor(input, opt) {
+            var _this = _super.call(this, input, opt) || this;
+            EmailEditor_1.registerValidationMethods();
+            input.addClass('emailuser');
+            var spanAt = $('<span/>').text('@').addClass('emailat').insertAfter(input);
+            var domain = $('<input type="text"/>').addClass('emaildomain').insertAfter(spanAt);
+            domain.bind('blur.' + _this.uniqueName, function () {
+                var validator = domain.closest('form').data('validator');
+                if (validator != null) {
+                    validator.element(input[0]);
+                }
+            });
+            if (!Q.isEmptyOrNull(_this.options.domain)) {
+                domain.val(_this.options.domain);
+            }
+            if (_this.options.readOnlyDomain) {
+                domain.attr('readonly', 'readonly').addClass('disabled').attr('tabindex', '-1');
+            }
+            input.bind('keypress.' + _this.uniqueName, function (e) {
+                if (e.which === 64) {
+                    e.preventDefault();
+                    if (!_this.options.readOnlyDomain) {
+                        domain.focus();
+                        domain.select();
+                    }
+                }
+            });
+            domain.bind('keypress.' + _this.uniqueName, function (e1) {
+                if (e1.which === 64) {
+                    e1.preventDefault();
+                }
+            });
+            if (!_this.options.readOnlyDomain) {
+                input.change(function (e2) { return _this.set_value(input.val()); });
+            }
+            return _this;
+        }
+        EmailEditor_1 = EmailEditor;
+        EmailEditor.registerValidationMethods = function () {
+            var _a;
+            if (!$.validator || !$.validator.methods || $.validator.methods['emailuser'] != null)
+                return;
+            $.validator.addMethod('emailuser', function (value, element) {
+                var domain = $(element).nextAll('.emaildomain');
+                if (domain.length > 0 && domain.attr('readonly') == null) {
+                    if (this.optional(element) && this.optional(domain[0])) {
+                        return true;
+                    }
+                    return $.validator.methods.email.call(value + '@' + domain.val());
+                }
+            }, (_a = Q.tryGetText("Validation.Email")) !== null && _a !== void 0 ? _a : $.validator.messages.email);
+        };
+        EmailEditor.prototype.get_value = function () {
+            var domain = this.element.nextAll('.emaildomain');
+            var value = this.element.val();
+            var domainValue = domain.val();
+            if (Q.isEmptyOrNull(value)) {
+                if (this.options.readOnlyDomain || Q.isEmptyOrNull(domainValue)) {
+                    return '';
+                }
+                return '@' + domainValue;
+            }
+            return value + '@' + domainValue;
+        };
+        Object.defineProperty(EmailEditor.prototype, "value", {
+            get: function () {
+                return this.get_value();
+            },
+            set: function (v) {
+                this.set_value(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        EmailEditor.prototype.set_value = function (value) {
+            var domain = this.element.nextAll('.emaildomain');
+            value = Q.trimToNull(value);
+            if (value == null) {
+                if (!this.options.readOnlyDomain)
+                    domain.val('');
+                this.element.val('');
+            }
+            else {
+                var parts = value.split('@');
+                if (parts.length > 1) {
+                    if (!this.options.readOnlyDomain) {
+                        domain.val(parts[1]);
+                        this.element.val(parts[0]);
+                    }
+                    else if (!Q.isEmptyOrNull(this.options.domain)) {
+                        if (parts[1] !== this.options.domain)
+                            this.element.val(value);
+                        else
+                            this.element.val(parts[0]);
+                    }
+                    else
+                        this.element.val(parts[0]);
+                }
+                else
+                    this.element.val(parts[0]);
+            }
+        };
+        EmailEditor.prototype.get_readOnly = function () {
+            var domain = this.element.nextAll('.emaildomain');
+            return !(this.element.attr('readonly') == null &&
+                (!this.options.readOnlyDomain || domain.attr('readonly') == null));
+        };
+        EmailEditor.prototype.set_readOnly = function (value) {
+            var domain = this.element.nextAll('.emaildomain');
+            if (value) {
+                this.element.attr('readonly', 'readonly').addClass('readonly');
+                if (!this.options.readOnlyDomain) {
+                    domain.attr('readonly', 'readonly').addClass('readonly');
+                }
+            }
+            else {
+                this.element.removeAttr('readonly').removeClass('readonly');
+                if (!this.options.readOnlyDomain) {
+                    domain.removeAttr('readonly').removeClass('readonly');
+                }
+            }
+        };
+        var EmailEditor_1;
+        EmailEditor = EmailEditor_1 = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.EmailEditor', [Serenity.IStringValue, Serenity.IReadOnly]),
+            Serenity.Decorators.element('<input type="text"/>')
+        ], EmailEditor);
+        return EmailEditor;
+    }(Serenity.Widget));
+    Serenity.EmailEditor = EmailEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var EmailAddressEditor = /** @class */ (function (_super) {
+        __extends(EmailAddressEditor, _super);
+        function EmailAddressEditor(input) {
+            var _this = _super.call(this, input) || this;
+            input.attr('type', 'email')
+                .addClass('email');
+            return _this;
+        }
+        EmailAddressEditor = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.EmailAddressEditor')
+        ], EmailAddressEditor);
+        return EmailAddressEditor;
+    }(Serenity.StringEditor));
+    Serenity.EmailAddressEditor = EmailAddressEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IntegerEditor = /** @class */ (function (_super) {
+        __extends(IntegerEditor, _super);
+        function IntegerEditor(input, opt) {
+            var _this = _super.call(this, input, opt) || this;
+            input.addClass('integerQ');
+            var numericOptions = Q.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
+                vMin: Q.coalesce(_this.options.minValue, _this.options.allowNegatives ? (_this.options.maxValue != null ? ("-" + _this.options.maxValue) : '-2147483647') : '0'),
+                vMax: Q.coalesce(_this.options.maxValue, 2147483647),
+                aSep: null
+            });
+            if ($.fn.autoNumeric)
+                input.autoNumeric(numericOptions);
+            return _this;
+        }
+        IntegerEditor.prototype.get_value = function () {
+            if ($.fn.autoNumeric) {
+                var val = this.element.autoNumeric('get');
+                if (!!Q.isTrimmedEmpty(val))
+                    return null;
+                else
+                    return parseInt(val, 10);
+            }
+            else {
+                var val = Q.trimToNull(this.element.val());
+                if (val == null)
+                    return null;
+                return Q.parseInteger(val);
+            }
+        };
+        Object.defineProperty(IntegerEditor.prototype, "value", {
+            get: function () {
+                return this.get_value();
+            },
+            set: function (v) {
+                this.set_value(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        IntegerEditor.prototype.set_value = function (value) {
+            if (value == null || value === '')
+                this.element.val('');
+            else if ($.fn.autoNumeric)
+                this.element.autoNumeric('set', value);
+            else
+                this.element.val(Q.formatNumber(value));
+        };
+        IntegerEditor.prototype.get_isValid = function () {
+            return !isNaN(this.get_value());
+        };
+        IntegerEditor = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.IntegerEditor', [Serenity.IDoubleValue]),
+            Serenity.Decorators.element('<input type="text"/>')
+        ], IntegerEditor);
+        return IntegerEditor;
+    }(Serenity.Widget));
+    Serenity.IntegerEditor = IntegerEditor;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -8301,305 +8620,6 @@ var Serenity;
         return Serenity.Decorators.registerEditor('Serenity.' + name + 'Editor', intf);
     }
     var Element = Serenity.Decorators.element;
-    var BooleanEditor = /** @class */ (function (_super) {
-        __extends(BooleanEditor, _super);
-        function BooleanEditor() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        Object.defineProperty(BooleanEditor.prototype, "value", {
-            get: function () {
-                return this.element.is(":checked");
-            },
-            set: function (value) {
-                this.element.prop("checked", !!value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        BooleanEditor.prototype.get_value = function () {
-            return this.value;
-        };
-        BooleanEditor.prototype.set_value = function (value) {
-            this.value = value;
-        };
-        BooleanEditor = __decorate([
-            Editor('Boolean', [Serenity.IBooleanValue]),
-            Element('<input type="checkbox"/>')
-        ], BooleanEditor);
-        return BooleanEditor;
-    }(Serenity.Widget));
-    Serenity.BooleanEditor = BooleanEditor;
-    var DecimalEditor = /** @class */ (function (_super) {
-        __extends(DecimalEditor, _super);
-        function DecimalEditor(input, opt) {
-            var _this = _super.call(this, input, opt) || this;
-            input.addClass('decimalQ');
-            var numericOptions = Q.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
-                vMin: Q.coalesce(_this.options.minValue, _this.options.allowNegatives ? (_this.options.maxValue != null ? ("-" + _this.options.maxValue) : '-999999999999.99') : '0.00'),
-                vMax: Q.coalesce(_this.options.maxValue, '999999999999.99')
-            });
-            if (_this.options.decimals != null) {
-                numericOptions.mDec = _this.options.decimals;
-            }
-            if (_this.options.padDecimals != null) {
-                numericOptions.aPad = _this.options.padDecimals;
-            }
-            input.autoNumeric(numericOptions);
-            return _this;
-        }
-        DecimalEditor.prototype.get_value = function () {
-            var val = this.element.autoNumeric('get');
-            if (!!(val == null || val === ''))
-                return null;
-            return parseFloat(val);
-        };
-        Object.defineProperty(DecimalEditor.prototype, "value", {
-            get: function () {
-                return this.get_value();
-            },
-            set: function (v) {
-                this.set_value(v);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        DecimalEditor.prototype.set_value = function (value) {
-            if (value == null || value === '') {
-                this.element.val('');
-            }
-            else {
-                this.element.autoNumeric('set', value);
-            }
-        };
-        DecimalEditor.prototype.get_isValid = function () {
-            return !isNaN(this.get_value());
-        };
-        DecimalEditor.defaultAutoNumericOptions = function () {
-            return {
-                aDec: Q.Culture.decimalSeparator,
-                altDec: ((Q.Culture.decimalSeparator === '.') ? ',' : '.'),
-                aSep: ((Q.Culture.decimalSeparator === '.') ? ',' : '.'),
-                aPad: true
-            };
-        };
-        DecimalEditor = __decorate([
-            Editor('Decimal', [Serenity.IDoubleValue]),
-            Element('<input type="text"/>')
-        ], DecimalEditor);
-        return DecimalEditor;
-    }(Serenity.Widget));
-    Serenity.DecimalEditor = DecimalEditor;
-    var IntegerEditor = /** @class */ (function (_super) {
-        __extends(IntegerEditor, _super);
-        function IntegerEditor(input, opt) {
-            var _this = _super.call(this, input, opt) || this;
-            input.addClass('integerQ');
-            var numericOptions = Q.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
-                vMin: Q.coalesce(_this.options.minValue, _this.options.allowNegatives ? (_this.options.maxValue != null ? ("-" + _this.options.maxValue) : '-2147483647') : '0'),
-                vMax: Q.coalesce(_this.options.maxValue, 2147483647),
-                aSep: null
-            });
-            input.autoNumeric(numericOptions);
-            return _this;
-        }
-        IntegerEditor.prototype.get_value = function () {
-            var val = this.element.autoNumeric('get');
-            if (!!Q.isTrimmedEmpty(val)) {
-                return null;
-            }
-            else {
-                return parseInt(val, 10);
-            }
-        };
-        Object.defineProperty(IntegerEditor.prototype, "value", {
-            get: function () {
-                return this.get_value();
-            },
-            set: function (v) {
-                this.set_value(v);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        IntegerEditor.prototype.set_value = function (value) {
-            if (value == null || value === '') {
-                this.element.val('');
-            }
-            else {
-                this.element.autoNumeric('set', value);
-            }
-        };
-        IntegerEditor.prototype.get_isValid = function () {
-            return !isNaN(this.get_value());
-        };
-        IntegerEditor = __decorate([
-            Editor('Integer', [Serenity.IDoubleValue]),
-            Element('<input type="text"/>')
-        ], IntegerEditor);
-        return IntegerEditor;
-    }(Serenity.Widget));
-    Serenity.IntegerEditor = IntegerEditor;
-    var EmailEditor = /** @class */ (function (_super) {
-        __extends(EmailEditor, _super);
-        function EmailEditor(input, opt) {
-            var _this = _super.call(this, input, opt) || this;
-            EmailEditor_1.registerValidationMethods();
-            input.addClass('emailuser');
-            var spanAt = $('<span/>').text('@').addClass('emailat').insertAfter(input);
-            var domain = $('<input type="text"/>').addClass('emaildomain').insertAfter(spanAt);
-            domain.bind('blur.' + _this.uniqueName, function () {
-                var validator = domain.closest('form').data('validator');
-                if (validator != null) {
-                    validator.element(input[0]);
-                }
-            });
-            if (!Q.isEmptyOrNull(_this.options.domain)) {
-                domain.val(_this.options.domain);
-            }
-            if (_this.options.readOnlyDomain) {
-                domain.attr('readonly', 'readonly').addClass('disabled').attr('tabindex', '-1');
-            }
-            input.bind('keypress.' + _this.uniqueName, function (e) {
-                if (e.which === 64) {
-                    e.preventDefault();
-                    if (!_this.options.readOnlyDomain) {
-                        domain.focus();
-                        domain.select();
-                    }
-                }
-            });
-            domain.bind('keypress.' + _this.uniqueName, function (e1) {
-                if (e1.which === 64) {
-                    e1.preventDefault();
-                }
-            });
-            if (!_this.options.readOnlyDomain) {
-                input.change(function (e2) { return _this.set_value(input.val()); });
-            }
-            return _this;
-        }
-        EmailEditor_1 = EmailEditor;
-        EmailEditor.registerValidationMethods = function () {
-            if ($.validator.methods['emailuser'] != null)
-                return;
-            $.validator.addMethod('emailuser', function (value, element) {
-                var domain = $(element).nextAll('.emaildomain');
-                if (domain.length > 0 && domain.attr('readonly') == null) {
-                    if (this.optional(element) && this.optional(domain[0])) {
-                        return true;
-                    }
-                    value = value + '@' + domain.val();
-                    if (Q.Config.emailAllowOnlyAscii) {
-                        return (new RegExp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}" +
-                            "[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"))
-                            .test(value);
-                    }
-                    return (new RegExp("^((([a-z]|\\d|[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|" +
-                        "[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])+(\\.([a-z]|\\d|" +
-                        "[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])+)*)|" +
-                        "((\\x22)((((\\x20|\\x09)*(\\x0d\\x0a))?(\\x20|\\x09)+)?(([\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]|" +
-                        "\\x21|[\\x23-\\x5b]|[\\x5d-\\x7e]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])|(\\\\([\\x01-\\x09\\x0b\\x0c\\x0d-\\x7f]|" +
-                        "[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF]))))*(((\\x20|\\x09)*(\\x0d\\x0a))?(\\x20|\\x09)+)?(\\x22)))@((([a-z]|\\d|" +
-                        "[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])|(([a-z]|\\d|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])" +
-                        "([a-z]|\\d|-|\\.|_|~|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])*([a-z]|\\d|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])))\\.)" +
-                        "+(([a-z]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])|(([a-z]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])([a-z]|\\d|-|\\.|_|~|" +
-                        "[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])*([a-z]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])))$", 'i')).test(value);
-                }
-                else {
-                    if (Q.Config.emailAllowOnlyAscii) {
-                        return this.optional(element) || (new RegExp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+$")).test(value);
-                    }
-                    return this.optional(element) || (new RegExp("^((([a-z]|\\d|[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])+" +
-                        "(\\.([a-z]|\\d|[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])+)*)|((\\x22)((((\\x20|\\x09)*" +
-                        "(\\x0d\\x0a))?(\\x20|\\x09)+)?(([\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]|\\x21|[\\x23-\\x5b]|[\\x5d-\\x7e]|[\\u00A0-\\uD7FF\\uF900-" +
-                        "\\uFDCF\\uFDF0-\\uFFEF])|(\\\\([\\x01-\\x09\\x0b\\x0c\\x0d-\\x7f]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF]))))*(((\\x20|\\x09)*" +
-                        "(\\x0d\\x0a))?(\\x20|\\x09)+)?(\\x22)))$", 'i')).test(value);
-                }
-            }, Q.text("Validation.Email"));
-        };
-        EmailEditor.prototype.get_value = function () {
-            var domain = this.element.nextAll('.emaildomain');
-            var value = this.element.val();
-            var domainValue = domain.val();
-            if (Q.isEmptyOrNull(value)) {
-                if (this.options.readOnlyDomain || Q.isEmptyOrNull(domainValue)) {
-                    return '';
-                }
-                return '@' + domainValue;
-            }
-            return value + '@' + domainValue;
-        };
-        Object.defineProperty(EmailEditor.prototype, "value", {
-            get: function () {
-                return this.get_value();
-            },
-            set: function (v) {
-                this.set_value(v);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        EmailEditor.prototype.set_value = function (value) {
-            var domain = this.element.nextAll('.emaildomain');
-            value = Q.trimToNull(value);
-            if (value == null) {
-                if (!this.options.readOnlyDomain) {
-                    domain.val('');
-                }
-                this.element.val('');
-            }
-            else {
-                var parts = value.split('@');
-                if (parts.length > 1) {
-                    if (!this.options.readOnlyDomain) {
-                        domain.val(parts[1]);
-                        this.element.val(parts[0]);
-                    }
-                    else if (!Q.isEmptyOrNull(this.options.domain)) {
-                        if (parts[1] !== this.options.domain) {
-                            this.element.val(value);
-                        }
-                        else {
-                            this.element.val(parts[0]);
-                        }
-                    }
-                    else {
-                        this.element.val(parts[0]);
-                    }
-                }
-                else {
-                    this.element.val(parts[0]);
-                }
-            }
-        };
-        EmailEditor.prototype.get_readOnly = function () {
-            var domain = this.element.nextAll('.emaildomain');
-            return !(this.element.attr('readonly') == null &&
-                (!this.options.readOnlyDomain || domain.attr('readonly') == null));
-        };
-        EmailEditor.prototype.set_readOnly = function (value) {
-            var domain = this.element.nextAll('.emaildomain');
-            if (value) {
-                this.element.attr('readonly', 'readonly').addClass('readonly');
-                if (!this.options.readOnlyDomain) {
-                    domain.attr('readonly', 'readonly').addClass('readonly');
-                }
-            }
-            else {
-                this.element.removeAttr('readonly').removeClass('readonly');
-                if (!this.options.readOnlyDomain) {
-                    domain.removeAttr('readonly').removeClass('readonly');
-                }
-            }
-        };
-        var EmailEditor_1;
-        EmailEditor = EmailEditor_1 = __decorate([
-            Editor('Email', [Serenity.IStringValue, Serenity.IReadOnly]),
-            Element('<input type="text"/>')
-        ], EmailEditor);
-        return EmailEditor;
-    }(Serenity.Widget));
-    Serenity.EmailEditor = EmailEditor;
     var EnumEditor = /** @class */ (function (_super) {
         __extends(EnumEditor, _super);
         function EnumEditor(hidden, opt) {
@@ -9224,61 +9244,6 @@ var Serenity;
         return MaskedEditor;
     }(Serenity.Widget));
     Serenity.MaskedEditor = MaskedEditor;
-    var StringEditor = /** @class */ (function (_super) {
-        __extends(StringEditor, _super);
-        function StringEditor(input) {
-            return _super.call(this, input) || this;
-        }
-        Object.defineProperty(StringEditor.prototype, "value", {
-            get: function () {
-                return this.element.val();
-            },
-            set: function (value) {
-                this.element.val(value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        StringEditor.prototype.get_value = function () {
-            return this.value;
-        };
-        StringEditor.prototype.set_value = function (value) {
-            this.value = value;
-        };
-        StringEditor = __decorate([
-            Editor('String', [Serenity.IStringValue]),
-            Element("<input type=\"text\"/>")
-        ], StringEditor);
-        return StringEditor;
-    }(Serenity.Widget));
-    Serenity.StringEditor = StringEditor;
-    var EmailAddressEditor = /** @class */ (function (_super) {
-        __extends(EmailAddressEditor, _super);
-        function EmailAddressEditor(input) {
-            var _this = _super.call(this, input) || this;
-            input.attr('type', 'email')
-                .addClass('email');
-            return _this;
-        }
-        EmailAddressEditor = __decorate([
-            Editor('EmailAddress')
-        ], EmailAddressEditor);
-        return EmailAddressEditor;
-    }(Serenity.StringEditor));
-    Serenity.EmailAddressEditor = EmailAddressEditor;
-    var PasswordEditor = /** @class */ (function (_super) {
-        __extends(PasswordEditor, _super);
-        function PasswordEditor(input) {
-            var _this = _super.call(this, input) || this;
-            input.attr('type', 'password');
-            return _this;
-        }
-        PasswordEditor = __decorate([
-            Editor('Password')
-        ], PasswordEditor);
-        return PasswordEditor;
-    }(StringEditor));
-    Serenity.PasswordEditor = PasswordEditor;
     var RadioButtonEditor = /** @class */ (function (_super) {
         __extends(RadioButtonEditor, _super);
         function RadioButtonEditor(input, opt) {
@@ -9552,7 +9517,7 @@ var Serenity;
             Editor('URL', [Serenity.IStringValue])
         ], URLEditor);
         return URLEditor;
-    }(StringEditor));
+    }(Serenity.StringEditor));
     Serenity.URLEditor = URLEditor;
     var Select2AjaxEditor = /** @class */ (function (_super) {
         __extends(Select2AjaxEditor, _super);
@@ -12586,10 +12551,8 @@ var Serenity;
         __extends(PropertyDialog, _super);
         function PropertyDialog(opt) {
             var _this = _super.call(this, opt) || this;
-            if (!_this.isAsyncWidget()) {
-                _this.initPropertyGrid();
-                _this.loadInitialEntity();
-            }
+            _this.initPropertyGrid();
+            _this.loadInitialEntity();
             return _this;
         }
         PropertyDialog.prototype.destroy = function () {
@@ -12602,22 +12565,6 @@ var Serenity;
                 this.validator = null;
             }
             _super.prototype.destroy.call(this);
-        };
-        PropertyDialog.prototype.initPropertyGridAsync = function () {
-            var _this = this;
-            return Promise.resolve().then(function () {
-                var pgDiv = _this.byId('PropertyGrid');
-                if (pgDiv.length <= 0) {
-                    return Promise.resolve();
-                }
-                return _this.getPropertyGridOptionsAsync().then(function (pgOptions) {
-                    _this.propertyGrid = new Serenity.PropertyGrid(pgDiv, pgOptions);
-                    if (_this.element.closest('.ui-dialog').hasClass('s-Flexify')) {
-                        _this.propertyGrid.element.children('.categories').flexHeightOnly(1);
-                    }
-                    return _this.propertyGrid.initialize();
-                });
-            });
         };
         PropertyDialog.prototype.getDialogOptions = function () {
             var opt = _super.prototype.getDialogOptions.call(this);
@@ -12687,27 +12634,9 @@ var Serenity;
                 localTextPrefix: 'Forms.' + this.getFormKey() + '.'
             };
         };
-        PropertyDialog.prototype.getPropertyGridOptionsAsync = function () {
-            var _this = this;
-            return this.getPropertyItemsAsync().then(function (propertyItems) {
-                return {
-                    idPrefix: _this.idPrefix,
-                    items: propertyItems, mode: 1,
-                    useCategories: false,
-                    localTextPrefix: 'Forms.' + _this.getFormKey() + '.'
-                };
-            });
-        };
         PropertyDialog.prototype.getPropertyItems = function () {
             var formKey = this.getFormKey();
             return Q.getForm(formKey);
-        };
-        PropertyDialog.prototype.getPropertyItemsAsync = function () {
-            var _this = this;
-            return Promise.resolve().then(function () {
-                var formKey = _this.getFormKey();
-                return Q.getFormAsync(formKey);
-            });
         };
         PropertyDialog.prototype.getSaveEntity = function () {
             var entity = new Object();
@@ -12715,12 +12644,6 @@ var Serenity;
                 this.propertyGrid.save(entity);
             }
             return entity;
-        };
-        PropertyDialog.prototype.initializeAsync = function () {
-            var _this = this;
-            return _super.prototype.initializeAsync.call(this)
-                .then(function () { return _this.initPropertyGridAsync(); })
-                .then(function () { return _this.loadInitialEntity(); });
         };
         PropertyDialog.prototype.loadInitialEntity = function () {
             this.propertyGrid && this.propertyGrid.load(new Object());
@@ -13209,11 +13132,9 @@ var Serenity;
             _this.createQuickFilters();
             _this.updateDisabledState();
             _this.updateInterface();
-            if (!_this.isAsyncWidget()) {
-                _this.initialSettings = _this.getCurrentSettings(null);
-                _this.restoreSettings(null, null);
-                window.setTimeout(function () { return _this.initialPopulate(); }, 0);
-            }
+            _this.initialSettings = _this.getCurrentSettings(null);
+            _this.restoreSettings(null, null);
+            window.setTimeout(function () { return _this.initialPopulate(); }, 0);
             return _this;
         }
         DataGrid.prototype.attrs = function (attrType) {
@@ -13410,37 +13331,12 @@ var Serenity;
                 }
             });
         };
-        DataGrid.prototype.initializeAsync = function () {
-            var _this = this;
-            return _super.prototype.initializeAsync.call(this)
-                .then(function () { return _this.getColumnsAsync(); })
-                .then(function (columns) {
-                _this.allColumns = columns;
-                _this.postProcessColumns(_this.allColumns);
-                _this.filterBar && _this.initializeFilterBar();
-                var visibleColumns = _this.allColumns.filter(function (x2) {
-                    return x2.visible !== false;
-                });
-                if (_this.slickGrid) {
-                    _this.slickGrid.setColumns(visibleColumns);
-                }
-                _this.setInitialSortOrder();
-                _this.initialSettings = _this.getCurrentSettings(null);
-                _this.restoreSettings(null, null);
-                _this.initialPopulate();
-            }, null);
-        };
         DataGrid.prototype.createSlickGrid = function () {
             var visibleColumns;
-            if (this.isAsyncWidget()) {
-                visibleColumns = [];
-            }
-            else {
-                this.allColumns = this.getColumns();
-                visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
-                    return x.visible !== false;
-                });
-            }
+            this.allColumns = this.getColumns();
+            visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
+                return x.visible !== false;
+            });
             var slickOptions = this.getSlickOptions();
             var grid = new Slick.Grid(this.slickContainer, this.view, visibleColumns, slickOptions);
             grid.registerPlugin(new Slick.AutoTooltips({
@@ -13448,9 +13344,7 @@ var Serenity;
             }));
             this.slickGrid = grid;
             this.rows = this.slickGrid;
-            if (!this.isAsyncWidget()) {
-                this.setInitialSortOrder();
-            }
+            this.setInitialSortOrder();
             return grid;
         };
         DataGrid.prototype.setInitialSortOrder = function () {
@@ -13670,10 +13564,8 @@ var Serenity;
         };
         DataGrid.prototype.createFilterBar = function () {
             var filterBarDiv = $('<div/>').appendTo(this.element);
-            var self = this;
             this.filterBar = new Serenity.FilterDisplayBar(filterBarDiv);
-            if (!this.isAsyncWidget())
-                this.initializeFilterBar();
+            this.initializeFilterBar();
         };
         DataGrid.prototype.getPagerOptions = function () {
             return {
@@ -13753,17 +13645,6 @@ var Serenity;
             }
             return null;
         };
-        DataGrid.prototype.getPropertyItemsAsync = function () {
-            var _this = this;
-            return Promise.resolve()
-                .then(function () {
-                var columnsKey = _this.getColumnsKey();
-                if (!Q.isEmptyOrNull(columnsKey)) {
-                    return Q.getColumnsAsync(columnsKey);
-                }
-                return Promise.resolve([]);
-            }, null);
-        };
         DataGrid.prototype.getPropertyItems = function () {
             var attr = this.attrs(Serenity.ColumnsKeyAttribute);
             var columnsKey = this.getColumnsKey();
@@ -13799,12 +13680,6 @@ var Serenity;
                 }
             }
             return columns;
-        };
-        DataGrid.prototype.getColumnsAsync = function () {
-            var _this = this;
-            return this.getPropertyItemsAsync().then(function (propertyItems) {
-                return _this.propertyItemsToSlickColumns(propertyItems);
-            }, null);
         };
         DataGrid.prototype.getSlickOptions = function () {
             var opt = {};
@@ -15218,10 +15093,8 @@ var Serenity;
         __extends(PropertyPanel, _super);
         function PropertyPanel(container, options) {
             var _this = _super.call(this, container, options) || this;
-            if (!_this.isAsyncWidget()) {
-                _this.initPropertyGrid();
-                _this.loadInitialEntity();
-            }
+            _this.initPropertyGrid();
+            _this.loadInitialEntity();
             return _this;
         }
         PropertyPanel.prototype.destroy = function () {
@@ -15246,32 +15119,10 @@ var Serenity;
                 this.propertyGrid.element.children('.categories').flexHeightOnly(1);
             }
         };
-        PropertyPanel.prototype.initPropertyGridAsync = function () {
-            var _this = this;
-            return Promise.resolve().then(function () {
-                var pgDiv = _this.byId('PropertyGrid');
-                if (pgDiv.length <= 0) {
-                    return Promise.resolve();
-                }
-                return _this.getPropertyGridOptionsAsync().then(function (pgOptions) {
-                    _this.propertyGrid = new Serenity.PropertyGrid(pgDiv, pgOptions);
-                    if (_this.element.closest('.ui-Panel').hasClass('s-Flexify')) {
-                        _this.propertyGrid.element.children('.categories').flexHeightOnly(1);
-                    }
-                    return _this.propertyGrid.initialize();
-                });
-            });
-        };
         PropertyPanel.prototype.loadInitialEntity = function () {
             if (this.propertyGrid) {
                 this.propertyGrid.load(new Object());
             }
-        };
-        PropertyPanel.prototype.initializeAsync = function () {
-            var _this = this;
-            return _super.prototype.initializeAsync.call(this)
-                .then(function () { return _this.initPropertyGridAsync(); })
-                .then(function () { return _this.loadInitialEntity(); });
         };
         PropertyPanel.prototype.getFormKey = function () {
             var attributes = Q.getAttributes(Q.getInstanceType(this), Serenity.FormKeyAttribute, true);
@@ -15300,28 +15151,9 @@ var Serenity;
                 localTextPrefix: 'Forms.' + this.getFormKey() + '.'
             };
         };
-        PropertyPanel.prototype.getPropertyGridOptionsAsync = function () {
-            var _this = this;
-            return this.getPropertyItemsAsync().then(function (propertyItems) {
-                return {
-                    idPrefix: _this.idPrefix,
-                    items: propertyItems,
-                    mode: 1,
-                    useCategories: false,
-                    localTextPrefix: 'Forms.' + _this.getFormKey() + '.'
-                };
-            });
-        };
         PropertyPanel.prototype.getPropertyItems = function () {
             var formKey = this.getFormKey();
             return Q.getForm(formKey);
-        };
-        PropertyPanel.prototype.getPropertyItemsAsync = function () {
-            var _this = this;
-            return Promise.resolve().then(function () {
-                var formKey = _this.getFormKey();
-                return Q.getFormAsync(formKey);
-            });
         };
         PropertyPanel.prototype.getSaveEntity = function () {
             var entity = new Object();
@@ -15367,18 +15199,10 @@ var Serenity;
         __extends(EntityDialog, _super);
         function EntityDialog(opt) {
             var _this = _super.call(this, opt) || this;
-            if (!_this.isAsyncWidget()) {
-                _this.initPropertyGrid();
-                _this.initLocalizationGrid();
-            }
+            _this.initPropertyGrid();
+            _this.initLocalizationGrid();
             return _this;
         }
-        EntityDialog.prototype.initializeAsync = function () {
-            var _this = this;
-            return _super.prototype.initializeAsync.call(this)
-                .then(function () { return _this.initPropertyGridAsync(); })
-                .then(function () { return _this.initLocalizationGridAsync(); });
-        };
         EntityDialog.prototype.destroy = function () {
             if (this.propertyGrid) {
                 this.propertyGrid.destroy();
@@ -15709,18 +15533,6 @@ var Serenity;
             var pgOptions = this.getPropertyGridOptions();
             this.initLocalizationGridCommon(pgOptions);
         };
-        EntityDialog.prototype.initLocalizationGridAsync = function () {
-            var _this = this;
-            return Promise.resolve().then(function () {
-                var pgDiv = _this.byId('PropertyGrid');
-                if (pgDiv.length <= 0) {
-                    return Promise.resolve();
-                }
-                return _this.getPropertyGridOptionsAsync().then(function (pgOptions) {
-                    _this.initLocalizationGridCommon(pgOptions);
-                });
-            });
-        };
         EntityDialog.prototype.initLocalizationGridCommon = function (pgOptions) {
             var pgDiv = this.byId('PropertyGrid');
             if (!Q.any(pgOptions.items, function (x) { return x.localizable === true; }))
@@ -15910,21 +15722,6 @@ var Serenity;
                 this.propertyGrid.element.children('.categories').flexHeightOnly(1);
             }
         };
-        EntityDialog.prototype.initPropertyGridAsync = function () {
-            var _this = this;
-            return Promise.resolve().then(function () {
-                var pgDiv = _this.byId('PropertyGrid');
-                if (pgDiv.length <= 0) {
-                    return Promise.resolve();
-                }
-                return _this.getPropertyGridOptionsAsync().then(function (pgOptions) {
-                    _this.propertyGrid = new Serenity.PropertyGrid(pgDiv, pgOptions);
-                    if (_this.element.closest('.ui-dialog').hasClass('s-Flexify'))
-                        _this.propertyGrid.element.children('.categories').flexHeightOnly(1);
-                    return _this.propertyGrid.init();
-                });
-            });
-        };
         EntityDialog.prototype.getPropertyItems = function () {
             var formKey = this.getFormKey();
             return Q.getForm(formKey);
@@ -15937,25 +15734,6 @@ var Serenity;
                 localTextPrefix: 'Forms.' + this.getFormKey() + '.',
                 useCategories: true
             };
-        };
-        EntityDialog.prototype.getPropertyGridOptionsAsync = function () {
-            var _this = this;
-            return this.getPropertyItemsAsync().then(function (propertyItems) {
-                return {
-                    idPrefix: _this.idPrefix,
-                    items: propertyItems,
-                    mode: 1,
-                    localTextPrefix: 'Forms.' + _this.getFormKey() + '.',
-                    useCategories: true
-                };
-            });
-        };
-        EntityDialog.prototype.getPropertyItemsAsync = function () {
-            var _this = this;
-            return Promise.resolve().then(function () {
-                var formKey = _this.getFormKey();
-                return Q.getFormAsync(formKey);
-            });
         };
         EntityDialog.prototype.validateBeforeSave = function () {
             return true;

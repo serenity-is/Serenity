@@ -114,11 +114,9 @@
             this.updateDisabledState();
             this.updateInterface();
 
-            if (!this.isAsyncWidget()) {
-                this.initialSettings = this.getCurrentSettings(null);
-                this.restoreSettings(null, null);
-                window.setTimeout(() => this.initialPopulate(), 0);
-            }
+            this.initialSettings = this.getCurrentSettings(null);
+            this.restoreSettings(null, null);
+            window.setTimeout(() => this.initialPopulate(), 0);
         }
 
         protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
@@ -356,41 +354,14 @@
             });
         }
 
-        protected initializeAsync(): PromiseLike<void> {
-            return super.initializeAsync()
-                .then<Slick.Column[]>(() => this.getColumnsAsync())
-                .then(columns => {
-                    this.allColumns = columns;
-                this.postProcessColumns(this.allColumns);
-                this.filterBar && this.initializeFilterBar();
-
-                var visibleColumns = this.allColumns.filter(function (x2) {
-                    return x2.visible !== false;
-                });
-
-                if (this.slickGrid) {
-                    this.slickGrid.setColumns(visibleColumns);
-                }
-                this.setInitialSortOrder();
-                this.initialSettings = this.getCurrentSettings(null);
-                this.restoreSettings(null, null);
-                this.initialPopulate();
-            }, null);
-        }
-
         protected createSlickGrid(): Slick.Grid {
 
             var visibleColumns: Slick.Column[];
 
-            if (this.isAsyncWidget()) {
-                visibleColumns = [];
-            }
-            else {
-                this.allColumns = this.getColumns();
-                visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
-                    return x.visible !== false;
-                });
-            }
+            this.allColumns = this.getColumns();
+            visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
+                return x.visible !== false;
+            });
 
             var slickOptions = this.getSlickOptions();
             var grid = new Slick.Grid(this.slickContainer, this.view as any, visibleColumns, slickOptions);
@@ -400,9 +371,8 @@
 
             this.slickGrid = grid;
             this.rows = this.slickGrid;
-            if (!this.isAsyncWidget()) {
-                this.setInitialSortOrder();
-            }
+            
+            this.setInitialSortOrder();
 
             return grid;
         }
@@ -671,10 +641,8 @@
 
         protected createFilterBar(): void {
             var filterBarDiv = $('<div/>').appendTo(this.element);
-            var self = this;
             this.filterBar = new Serenity.FilterDisplayBar(filterBarDiv);
-            if (!this.isAsyncWidget())
-                this.initializeFilterBar();
+            this.initializeFilterBar();
         }
 
         protected getPagerOptions(): Slick.PagerOptions {
@@ -772,17 +740,6 @@
             return null;
         }
 
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]> {
-            return Promise.resolve()
-                .then<PropertyItem[]>(() => {
-                    var columnsKey = this.getColumnsKey();
-                    if (!Q.isEmptyOrNull(columnsKey)) {
-                        return Q.getColumnsAsync(columnsKey);
-                    }
-                    return Promise.resolve<PropertyItem[]>([]);
-                }, null);
-        }
-
         protected getPropertyItems(): PropertyItem[] {
             var attr = this.attrs(Serenity.ColumnsKeyAttribute);
 
@@ -827,12 +784,6 @@
                 }
             }
             return columns;
-        }
-
-        protected getColumnsAsync(): PromiseLike<Slick.Column[]> {
-            return this.getPropertyItemsAsync().then(propertyItems => {
-                return this.propertyItemsToSlickColumns(propertyItems);
-            }, null);
         }
 
         protected getSlickOptions(): Slick.GridOptions {

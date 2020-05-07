@@ -41,7 +41,6 @@
         protected options: TOptions;
         protected widgetName: string;
         protected uniqueName: string;
-        protected asyncPromise: PromiseLike<void>;
 
         constructor(element: JQuery, options?: TOptions) {
             super(options);
@@ -64,21 +63,12 @@
             }).data(this.widgetName, this);
 
             this.addCssClass();
-
-            if (this.isAsyncWidget()) {
-                window.setTimeout(() => {
-                    if (element && !this.asyncPromise) {
-                        this.asyncPromise = this.initializeAsync();
-                    }
-                }, 0);
-            }
         }
 
         public destroy(): void {
             this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
             this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
-            this.asyncPromise = null;
         }
 
         protected addCssClass(): void {
@@ -103,14 +93,6 @@
             }
 
             return klass + ' ' + fullClass;
-        }
-
-        protected initializeAsync(): PromiseLike<void> {
-            return Promise.resolve();
-        }
-
-        protected isAsyncWidget(): boolean {
-            return Q.isInstanceOfType(this, Serenity.IAsyncInit);
         }
 
         public static getWidgetName(type: Function): string {
@@ -140,34 +122,15 @@
                 widget = new params.type(e, params.options);
             }
 
-            if (widget.isAsyncWidget())
-                widget.init(params.init);
-            else {
-                widget.init(null);
-                params.init && params.init(widget);
-            }
+            widget.init(null);
+            params.init && params.init(widget);
 
             return widget;
         }
 
         public init(action?: (widget: any) => void): this {
-            var promise = this.initialize();
-            if (action) {
-                promise.then(() => action(this));
-            }
+            action && action(this);
             return this;
-        }
-
-        public initialize(): PromiseLike<void> {
-            if (!this.isAsyncWidget()) {
-                return Promise.resolve();
-            }
-
-            if (!this.asyncPromise) {
-                this.asyncPromise = this.initializeAsync();
-            }
-
-            return this.asyncPromise;
         }
 
         private static __isWidgetType = true;

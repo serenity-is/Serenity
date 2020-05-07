@@ -33,16 +33,8 @@
         constructor(opt?: TOptions) {
             super(opt);
 
-            if (!this.isAsyncWidget()) {
-                this.initPropertyGrid();
-                this.initLocalizationGrid();
-            }
-        }
-
-        protected initializeAsync(): PromiseLike<void> {
-            return super.initializeAsync()
-                .then(() => this.initPropertyGridAsync())
-                .then(() => this.initLocalizationGridAsync());
+            this.initPropertyGrid();
+            this.initLocalizationGrid();
         }
 
         destroy(): void {
@@ -482,20 +474,6 @@
             this.initLocalizationGridCommon(pgOptions);
         }
 
-        protected initLocalizationGridAsync(): PromiseLike<void> {
-            return Promise.resolve().then(() => {
-
-                var pgDiv = this.byId('PropertyGrid');
-                if (pgDiv.length <= 0) {
-                    return Promise.resolve();
-                }
-
-                return this.getPropertyGridOptionsAsync().then(pgOptions => {
-                    this.initLocalizationGridCommon(pgOptions);
-                });
-            });
-        }
-
         protected initLocalizationGridCommon(pgOptions: PropertyGridOptions) {
             var pgDiv = this.byId('PropertyGrid');
 
@@ -717,26 +695,6 @@
             }
         }
 
-        protected initPropertyGridAsync(): PromiseLike<void> {
-
-            return Promise.resolve().then(() => {
-
-                var pgDiv = this.byId('PropertyGrid');
-                if (pgDiv.length <= 0) {
-                    return Promise.resolve();
-                }
-
-                return this.getPropertyGridOptionsAsync().then(pgOptions => {
-                    this.propertyGrid = new Serenity.PropertyGrid(pgDiv, pgOptions);
-
-                    if (this.element.closest('.ui-dialog').hasClass('s-Flexify'))
-                        this.propertyGrid.element.children('.categories').flexHeightOnly(1);
-
-                    return this.propertyGrid.init() as any;
-                });
-            });
-        }
-
         protected getPropertyItems() {
             var formKey = this.getFormKey();
             return Q.getForm(formKey);
@@ -750,27 +708,6 @@
                 localTextPrefix: 'Forms.' + this.getFormKey() + '.',
                 useCategories: true
             };
-        }
-
-        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions> {
-
-            return this.getPropertyItemsAsync().then(propertyItems => {
-                return <PropertyGridOptions>{
-                    idPrefix: this.idPrefix,
-                    items: propertyItems,
-                    mode: 1,
-                    localTextPrefix: 'Forms.' + this.getFormKey() + '.',
-                    useCategories: true
-                };
-            });
-
-        }
-
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]> {
-            return Promise.resolve().then(() => {
-                var formKey = this.getFormKey();
-                return Q.getFormAsync(formKey);
-            });
         }
 
         protected validateBeforeSave(): boolean {

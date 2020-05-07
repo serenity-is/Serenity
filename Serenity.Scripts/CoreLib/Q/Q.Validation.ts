@@ -67,13 +67,6 @@ namespace Q {
             return this.optional(element) || !isNaN(parseInteger(value));
         });
 
-        let oldEmail = $.validator.methods['email'];
-        $.validator.addMethod("email", function (value, element) {
-            if (!Q.Config.emailAllowOnlyAscii)
-                return oldEmail.call(this, value, element);
-            return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
-        });
-
         function addMsg(m: string, k: string) {
             var txt = Q.tryGetText("Validation." + k);
             if (txt)

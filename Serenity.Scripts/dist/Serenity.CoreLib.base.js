@@ -2375,10 +2375,6 @@ var Q;
             }
         }
         /**
-         * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
-         */
-        Config.emailAllowOnlyAscii = true;
-        /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
          * on dialog classes manually. It's false by default for backward compability.
          */
@@ -2941,12 +2937,6 @@ var Q;
         });
         $.validator.addMethod("integerQ", function (value, element) {
             return this.optional(element) || !isNaN(Q.parseInteger(value));
-        });
-        var oldEmail_1 = $.validator.methods['email'];
-        $.validator.addMethod("email", function (value, element) {
-            if (!Q.Config.emailAllowOnlyAscii)
-                return oldEmail_1.call(this, value, element);
-            return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
         });
         function addMsg(m, k) {
             var txt = Q.tryGetText("Validation." + k);

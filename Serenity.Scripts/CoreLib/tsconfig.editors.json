@@ -1,0 +1,24 @@
+﻿{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outFile": "../dist/Serenity.CoreLib.editors.js",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "tsconfig.base.json"
+    },
+    {
+      "path": "tsconfig.widget.json"
+    }
+  ],
+  "files": [
+    "UI/Editors/StringEditor.ts",
+    "UI/Editors/PasswordEditor.ts",
+    "UI/Editors/BooleanEditor.ts",
+    "UI/Editors/DecimalEditor.ts",
+    "UI/Editors/IntegerEditor.ts",
+    "UI/Editors/EmailAddressEditor.ts",
+    "UI/Editors/EmailEditor.ts",
+  ]
+}

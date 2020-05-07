@@ -1068,6 +1068,15 @@
         placeholder?: string;
     }
 
+    @Editor('Password')
+    export class PasswordEditor extends StringEditor {
+        constructor(input: JQuery) {
+            super(input);
+
+            input.attr('type', 'password');
+        }
+    }
+
     export interface RadioButtonEditorOptions {
         enumKey?: string;
         enumType?: any;
