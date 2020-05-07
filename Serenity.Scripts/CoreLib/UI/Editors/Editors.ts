@@ -351,12 +351,6 @@
     @Element('<input type="checkbox"/>')
     export class BooleanEditor extends Widget<any> {
 
-        constructor(input: JQuery) {
-            super(input);
-
-            input.removeClass("flexify");
-        }
-
         public get value(): boolean {
             return this.element.is(":checked");
         }
@@ -517,11 +511,11 @@
 
             EmailEditor.registerValidationMethods();
 
-            input.addClass('emailuser').removeClass('flexify');
+            input.addClass('emailuser');
 
             var spanAt = $('<span/>').text('@').addClass('emailat').insertAfter(input);
 
-            var domain = $('<input type="text"/>').addClass('emaildomain').addClass('flexify').insertAfter(spanAt);
+            var domain = $('<input type="text"/>').addClass('emaildomain').insertAfter(spanAt);
             domain.bind('blur.' + this.uniqueName, function () {
                 var validator = domain.closest('form').data('validator');
                 if (validator != null) {

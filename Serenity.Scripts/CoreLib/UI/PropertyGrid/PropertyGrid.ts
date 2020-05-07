@@ -308,7 +308,7 @@
                 elementAttr[0].value : '<input/>');
 
             var element = Widget.elementFor(editorType as any)
-                .addClass('editor').addClass('flexify')
+                .addClass('editor')
                 .attr('id', editorId).appendTo(fieldDiv);
 
             if (element.is(':input')) {

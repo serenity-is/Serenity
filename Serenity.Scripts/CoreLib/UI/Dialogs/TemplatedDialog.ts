@@ -110,10 +110,6 @@
 
                 this.element.closest('.ui-dialog').addClass('flex-layout');
             }
-            else if (Q.getAttributes(type, FlexifyAttribute, true).length > 0) {
-                DialogExtensions.dialogFlexify(this.element);
-                DialogExtensions.dialogResizable(this.element);
-            }
 
             if (Q.getAttributes(type, MaximizableAttribute, true).length > 0) {
                 DialogExtensions.dialogMaximizable(this.element);

@@ -812,10 +812,6 @@ declare namespace Serenity {
         value: string;
         constructor(value: string);
     }
-    class FlexifyAttribute {
-        value: boolean;
-        constructor(value?: boolean);
-    }
     class FilterableAttribute {
         value: boolean;
         constructor(value?: boolean);
@@ -914,7 +910,6 @@ declare namespace Serenity {
         function dialogType(value: any): (target: Function) => void;
         function editor(key?: string): (target: Function) => void;
         function element(value: string): (target: Function) => void;
-        function flexify(value?: boolean): (target: Function) => void;
         function filterable(value?: boolean): (target: Function) => void;
         function itemName(value: string): (target: Function) => void;
         function maximizable(value?: boolean): (target: Function) => void;
@@ -1666,7 +1661,6 @@ declare namespace Serenity {
         function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
     }
     class BooleanEditor extends Widget<any> {
-        constructor(input: JQuery);
         get value(): boolean;
         protected get_value(): boolean;
         set value(value: boolean);
@@ -2264,6 +2258,13 @@ declare namespace Serenity {
         function get(key: string): Function;
         function reset(): void;
     }
+}
+interface JQuery {
+    flexHeightOnly(flexY?: number): JQuery;
+    flexWidthOnly(flexX?: number): JQuery;
+    flexWidthHeight(flexX: number, flexY: number): JQuery;
+    flexX(flexX: number): JQuery;
+    flexY(flexY: number): JQuery;
 }
 declare namespace Serenity {
     class Flexify extends Widget<FlexifyOptions> {
@@ -3118,13 +3119,6 @@ declare namespace Serenity {
     }
 }
 interface JQuery {
-    flexHeightOnly(flexY?: number): JQuery;
-    flexWidthOnly(flexX?: number): JQuery;
-    flexWidthHeight(flexX: number, flexY: number): JQuery;
-    flexX(flexX: number): JQuery;
-    flexY(flexY: number): JQuery;
-}
-interface JQuery {
     getWidget<TWidget>(widgetType: {
         new (...args: any[]): TWidget;
     }): TWidget;
@@ -3518,6 +3512,10 @@ declare namespace Slick.Aggregators {
 declare var Vue: any;
 declare namespace Q {
 }
+declare namespace Serenity.DialogExtensions {
+    function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery;
+    function dialogMaximizable(dialog: JQuery): JQuery;
+}
 declare namespace Serenity {
     class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(hidden: JQuery, opt: LookupEditorOptions);
@@ -3538,11 +3536,6 @@ declare namespace Serenity {
         get_parentID(): string;
         set_parentID(value: string): void;
     }
-}
-declare namespace Serenity.DialogExtensions {
-    function dialogFlexify(dialog: JQuery): JQuery;
-    function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery;
-    function dialogMaximizable(dialog: JQuery): JQuery;
 }
 declare namespace Serenity.DialogTypeRegistry {
     function tryGet(key: string): WidgetDialogClass;

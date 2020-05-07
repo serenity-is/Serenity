@@ -3318,17 +3318,6 @@ var Serenity;
         return EntityTypeAttribute;
     }());
     Serenity.EntityTypeAttribute = EntityTypeAttribute;
-    var FlexifyAttribute = /** @class */ (function () {
-        function FlexifyAttribute(value) {
-            if (value === void 0) { value = true; }
-            this.value = value;
-        }
-        FlexifyAttribute = __decorate([
-            Attr('Flexify')
-        ], FlexifyAttribute);
-        return FlexifyAttribute;
-    }());
-    Serenity.FlexifyAttribute = FlexifyAttribute;
     var FilterableAttribute = /** @class */ (function () {
         function FilterableAttribute(value) {
             if (value === void 0) { value = true; }
@@ -3644,13 +3633,6 @@ var Serenity;
             };
         }
         Decorators.element = element;
-        function flexify(value) {
-            if (value === void 0) { value = true; }
-            return function (target) {
-                Decorators.addAttribute(target, new FlexifyAttribute(value));
-            };
-        }
-        Decorators.flexify = flexify;
         function filterable(value) {
             if (value === void 0) { value = true; }
             return function (target) {
@@ -4647,10 +4629,6 @@ var Serenity;
                     }
                 });
                 this.element.closest('.ui-dialog').addClass('flex-layout');
-            }
-            else if (Q.getAttributes(type, Serenity.FlexifyAttribute, true).length > 0) {
-                Serenity.DialogExtensions.dialogFlexify(this.element);
-                Serenity.DialogExtensions.dialogResizable(this.element);
             }
             if (Q.getAttributes(type, Serenity.MaximizableAttribute, true).length > 0) {
                 Serenity.DialogExtensions.dialogMaximizable(this.element);
@@ -8325,10 +8303,8 @@ var Serenity;
     var Element = Serenity.Decorators.element;
     var BooleanEditor = /** @class */ (function (_super) {
         __extends(BooleanEditor, _super);
-        function BooleanEditor(input) {
-            var _this = _super.call(this, input) || this;
-            input.removeClass("flexify");
-            return _this;
+        function BooleanEditor() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         Object.defineProperty(BooleanEditor.prototype, "value", {
             get: function () {
@@ -8468,9 +8444,9 @@ var Serenity;
         function EmailEditor(input, opt) {
             var _this = _super.call(this, input, opt) || this;
             EmailEditor_1.registerValidationMethods();
-            input.addClass('emailuser').removeClass('flexify');
+            input.addClass('emailuser');
             var spanAt = $('<span/>').text('@').addClass('emailat').insertAfter(input);
-            var domain = $('<input type="text"/>').addClass('emaildomain').addClass('flexify').insertAfter(spanAt);
+            var domain = $('<input type="text"/>').addClass('emaildomain').insertAfter(spanAt);
             domain.bind('blur.' + _this.uniqueName, function () {
                 var validator = domain.closest('form').data('validator');
                 if (validator != null) {
@@ -11564,6 +11540,25 @@ var Serenity;
         FormatterTypeRegistry.reset = reset;
     })(FormatterTypeRegistry = Serenity.FormatterTypeRegistry || (Serenity.FormatterTypeRegistry = {}));
 })(Serenity || (Serenity = {}));
+$.fn.flexHeightOnly = function (flexY) {
+    if (flexY === void 0) { flexY = 1; }
+    return this.flexWidthHeight(0, flexY);
+};
+$.fn.flexWidthOnly = function (flexX) {
+    if (flexX === void 0) { flexX = 1; }
+    return this.flexWidthHeight(flexX, 0);
+};
+$.fn.flexWidthHeight = function (flexX, flexY) {
+    if (flexX === void 0) { flexX = 1; }
+    if (flexY === void 0) { flexY = 1; }
+    return this.addClass('flexify').data('flex-x', flexX).data('flex-y', flexY);
+};
+$.fn.flexX = function (flexX) {
+    return this.data('flex-x', flexX);
+};
+$.fn.flexY = function (flexY) {
+    return this.data('flex-y', flexY);
+};
 var Serenity;
 (function (Serenity) {
     var Flexify = /** @class */ (function (_super) {
@@ -12124,7 +12119,7 @@ var Serenity;
             var elementHtml = ((elementAttr.length > 0) ?
                 elementAttr[0].value : '<input/>');
             var element = Serenity.Widget.elementFor(editorType)
-                .addClass('editor').addClass('flexify')
+                .addClass('editor')
                 .attr('id', editorId).appendTo(fieldDiv);
             if (element.is(':input')) {
                 element.attr('name', Q.coalesce(item.name, ''));
@@ -16764,25 +16759,6 @@ var Serenity;
     }());
     Serenity.TreeGridMixin = TreeGridMixin;
 })(Serenity || (Serenity = {}));
-$.fn.flexHeightOnly = function (flexY) {
-    if (flexY === void 0) { flexY = 1; }
-    return this.flexWidthHeight(0, flexY);
-};
-$.fn.flexWidthOnly = function (flexX) {
-    if (flexX === void 0) { flexX = 1; }
-    return this.flexWidthHeight(flexX, 0);
-};
-$.fn.flexWidthHeight = function (flexX, flexY) {
-    if (flexX === void 0) { flexX = 1; }
-    if (flexY === void 0) { flexY = 1; }
-    return this.addClass('flexify').data('flex-x', flexX).data('flex-y', flexY);
-};
-$.fn.flexX = function (flexX) {
-    return this.data('flex-x', flexX);
-};
-$.fn.flexY = function (flexY) {
-    return this.data('flex-y', flexY);
-};
 // PAGER -----
 (function ($) {
     $.widget && $.widget("ui.slickPager", {
@@ -18294,6 +18270,40 @@ var Q;
 })(Q || (Q = {}));
 var Serenity;
 (function (Serenity) {
+    var DialogExtensions;
+    (function (DialogExtensions) {
+        function dialogResizable(dialog, w, h, mw, mh) {
+            var dlg = dialog.dialog();
+            dlg.dialog('option', 'resizable', true);
+            if (mw != null) {
+                dlg.dialog('option', 'minWidth', mw);
+            }
+            if (w != null) {
+                dlg.dialog('option', 'width', w);
+            }
+            if (mh != null) {
+                dlg.dialog('option', 'minHeight', mh);
+            }
+            if (h != null) {
+                dlg.dialog('option', 'height', h);
+            }
+            return dialog;
+        }
+        DialogExtensions.dialogResizable = dialogResizable;
+        function dialogMaximizable(dialog) {
+            dialog.dialogExtend({
+                closable: true,
+                maximizable: true,
+                dblclick: 'maximize',
+                icons: { maximize: 'ui-icon-maximize-window' }
+            });
+            return dialog;
+        }
+        DialogExtensions.dialogMaximizable = dialogMaximizable;
+    })(DialogExtensions = Serenity.DialogExtensions || (Serenity.DialogExtensions = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var AsyncLookupEditor = /** @class */ (function (_super) {
         __extends(AsyncLookupEditor, _super);
         function AsyncLookupEditor(hidden, opt) {
@@ -18367,44 +18377,6 @@ var Serenity;
         return CascadedWidgetLink;
     }());
     Serenity.CascadedWidgetLink = CascadedWidgetLink;
-})(Serenity || (Serenity = {}));
-(function (Serenity) {
-    var DialogExtensions;
-    (function (DialogExtensions) {
-        function dialogFlexify(dialog) {
-            var flexify = new Serenity.Flexify(dialog.closest('.ui-dialog'), {});
-            return dialog;
-        }
-        DialogExtensions.dialogFlexify = dialogFlexify;
-        function dialogResizable(dialog, w, h, mw, mh) {
-            var dlg = dialog.dialog();
-            dlg.dialog('option', 'resizable', true);
-            if (mw != null) {
-                dlg.dialog('option', 'minWidth', mw);
-            }
-            if (w != null) {
-                dlg.dialog('option', 'width', w);
-            }
-            if (mh != null) {
-                dlg.dialog('option', 'minHeight', mh);
-            }
-            if (h != null) {
-                dlg.dialog('option', 'height', h);
-            }
-            return dialog;
-        }
-        DialogExtensions.dialogResizable = dialogResizable;
-        function dialogMaximizable(dialog) {
-            dialog.dialogExtend({
-                closable: true,
-                maximizable: true,
-                dblclick: 'maximize',
-                icons: { maximize: 'ui-icon-maximize-window' }
-            });
-            return dialog;
-        }
-        DialogExtensions.dialogMaximizable = dialogMaximizable;
-    })(DialogExtensions = Serenity.DialogExtensions || (Serenity.DialogExtensions = {}));
 })(Serenity || (Serenity = {}));
 (function (Serenity) {
     var DialogTypeRegistry;

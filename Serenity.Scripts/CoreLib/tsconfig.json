@@ -117,10 +117,10 @@
     "UI/Widgets/Reporting.ts",
     "UI/DataGrid/ColumnPickerDialog.ts",
     "UI/DataGrid/TreeGridMixin.ts",
-    "UI/jQuery/jQuery.FlexifyPlugin.ts",
     "UI/jQuery/jQuery.WidgetPlugin.ts",
     "Externals/Serenity.Externals.Slick.ts",
     "Externals/Serenity.Externals.ts",
+    "UI/Dialogs/DialogExtensions.ts",
     "UI/Serenity.Script.UI.ts",
     "Externals/ExportNamespaces.ts"
   ]
