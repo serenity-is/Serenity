@@ -777,11 +777,13 @@
         }
     }
 
-
     export interface HtmlContentEditorOptions {
         cols?: any;
         rows?: any;
     }
+
+    interface CKEditorConfig {
+    }    
 
     @Editor('HtmlContent', [IStringValue, IReadOnly])
     @Element('<textarea/>')

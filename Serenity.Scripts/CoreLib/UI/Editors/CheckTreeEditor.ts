@@ -1,5 +1,16 @@
 ﻿namespace Serenity {
 
+    export interface CheckTreeItem<TSource> {
+        isSelected?: boolean;
+        hideCheckBox?: boolean;
+        isAllDescendantsSelected?: boolean;
+        id?: string;
+        text?: string;
+        parentId?: string;
+        children?: CheckTreeItem<TSource>[];
+        source?: TSource;
+    }
+
     @Serenity.Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
     @Serenity.Decorators.element("<div/>")
     export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends DataGrid<TItem, TOptions>

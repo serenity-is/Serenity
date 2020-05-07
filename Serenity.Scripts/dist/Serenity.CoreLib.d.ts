@@ -1645,11 +1645,11 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    namespace EditorTypeRegistry {
+    export namespace EditorTypeRegistry {
         function get(key: string): WidgetClass;
         function reset(): void;
     }
-    namespace EditorUtils {
+    export namespace EditorUtils {
         function getDisplayText(editor: Serenity.Widget<any>): string;
         function getValue(editor: Serenity.Widget<any>): any;
         function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
@@ -1660,13 +1660,13 @@ declare namespace Serenity {
         function setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
         function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
     }
-    class BooleanEditor extends Widget<any> {
+    export class BooleanEditor extends Widget<any> {
         get value(): boolean;
         protected get_value(): boolean;
         set value(value: boolean);
         protected set_value(value: boolean): void;
     }
-    class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
+    export class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
         constructor(input: JQuery, opt?: DecimalEditorOptions);
         get_value(): number;
         get value(): number;
@@ -1675,12 +1675,12 @@ declare namespace Serenity {
         get_isValid(): boolean;
         static defaultAutoNumericOptions(): any;
     }
-    interface IntegerEditorOptions {
+    export interface IntegerEditorOptions {
         minValue?: number;
         maxValue?: number;
         allowNegatives?: boolean;
     }
-    class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
+    export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
         constructor(input: JQuery, opt?: IntegerEditorOptions);
         get_value(): number;
         get value(): number;
@@ -1688,18 +1688,18 @@ declare namespace Serenity {
         set value(v: number);
         get_isValid(): boolean;
     }
-    interface DecimalEditorOptions {
+    export interface DecimalEditorOptions {
         minValue?: string;
         maxValue?: string;
         decimals?: any;
         padDecimals?: any;
         allowNegatives?: boolean;
     }
-    interface EmailEditorOptions {
+    export interface EmailEditorOptions {
         domain?: string;
         readOnlyDomain?: boolean;
     }
-    class EmailEditor extends Widget<EmailEditorOptions> {
+    export class EmailEditor extends Widget<EmailEditorOptions> {
         constructor(input: JQuery, opt: EmailEditorOptions);
         static registerValidationMethods(): void;
         get_value(): string;
@@ -1709,16 +1709,16 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
     }
-    interface EnumEditorOptions extends Select2CommonOptions {
+    export interface EnumEditorOptions extends Select2CommonOptions {
         enumKey?: string;
         enumType?: any;
     }
-    class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
+    export class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
         constructor(hidden: JQuery, opt: EnumEditorOptions);
         protected updateItems(): void;
         protected allowClear(): any;
     }
-    interface GoogleMapOptions {
+    export interface GoogleMapOptions {
         latitude?: any;
         longitude?: any;
         zoom?: any;
@@ -1727,16 +1727,18 @@ declare namespace Serenity {
         markerLatitude?: any;
         markerLongitude?: any;
     }
-    class GoogleMap extends Widget<GoogleMapOptions> {
+    export class GoogleMap extends Widget<GoogleMapOptions> {
         private map;
         constructor(container: JQuery, opt: GoogleMapOptions);
         get_map(): any;
     }
-    interface HtmlContentEditorOptions {
+    export interface HtmlContentEditorOptions {
         cols?: any;
         rows?: any;
     }
-    class HtmlContentEditor extends Widget<HtmlContentEditorOptions> implements IStringValue, IReadOnly {
+    interface CKEditorConfig {
+    }
+    export class HtmlContentEditor extends Widget<HtmlContentEditorOptions> implements IStringValue, IReadOnly {
         private _instanceReady;
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         protected instanceReady(x: any): void;
@@ -1753,15 +1755,15 @@ declare namespace Serenity {
         static CKEditorVer: string;
         static includeCKEditor(): void;
     }
-    class HtmlNoteContentEditor extends HtmlContentEditor {
+    export class HtmlNoteContentEditor extends HtmlContentEditor {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         protected getConfig(): CKEditorConfig;
     }
-    class HtmlReportContentEditor extends HtmlContentEditor {
+    export class HtmlReportContentEditor extends HtmlContentEditor {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         protected getConfig(): CKEditorConfig;
     }
-    interface ImageUploadEditorOptions {
+    export interface ImageUploadEditorOptions {
         minWidth?: number;
         maxWidth?: number;
         minHeight?: number;
@@ -1773,7 +1775,7 @@ declare namespace Serenity {
         allowNonImage?: boolean;
         displayFileName?: boolean;
     }
-    class ImageUploadEditor extends Widget<ImageUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
+    export class ImageUploadEditor extends Widget<ImageUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
         constructor(div: JQuery, opt: ImageUploadEditorOptions);
         protected getUploadInputOptions(): UploadInputOptions;
         protected addFileButtonText(): string;
@@ -1794,7 +1796,7 @@ declare namespace Serenity {
         protected fileSymbols: JQuery;
         protected uploadInput: JQuery;
     }
-    class MultipleImageUploadEditor extends Widget<ImageUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
+    export class MultipleImageUploadEditor extends Widget<ImageUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
         private entities;
         private toolbar;
         private fileSymbols;
@@ -1814,36 +1816,36 @@ declare namespace Serenity {
         setEditValue(source: any, property: PropertyItem): void;
         jsonEncodeValue: boolean;
     }
-    class MaskedEditor extends Widget<MaskedEditorOptions> {
+    export class MaskedEditor extends Widget<MaskedEditorOptions> {
         constructor(input: JQuery, opt?: MaskedEditorOptions);
         get value(): string;
         protected get_value(): string;
         set value(value: string);
         protected set_value(value: string): void;
     }
-    interface MaskedEditorOptions {
+    export interface MaskedEditorOptions {
         mask?: string;
         placeholder?: string;
     }
-    class StringEditor extends Widget<any> {
+    export class StringEditor extends Widget<any> {
         constructor(input: JQuery);
         get value(): string;
         protected get_value(): string;
         set value(value: string);
         protected set_value(value: string): void;
     }
-    class EmailAddressEditor extends Serenity.StringEditor {
+    export class EmailAddressEditor extends Serenity.StringEditor {
         constructor(input: JQuery);
     }
-    class PasswordEditor extends StringEditor {
+    export class PasswordEditor extends StringEditor {
         constructor(input: JQuery);
     }
-    interface RadioButtonEditorOptions {
+    export interface RadioButtonEditorOptions {
         enumKey?: string;
         enumType?: any;
         lookupKey?: string;
     }
-    class RadioButtonEditor extends Widget<RadioButtonEditorOptions> implements IReadOnly {
+    export class RadioButtonEditor extends Widget<RadioButtonEditorOptions> implements IReadOnly {
         constructor(input: JQuery, opt: RadioButtonEditorOptions);
         protected addRadio(value: string, text: string): void;
         get_value(): string;
@@ -1853,33 +1855,33 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
     }
-    interface RecaptchaOptions {
+    export interface RecaptchaOptions {
         siteKey?: string;
         language?: string;
     }
-    class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
+    export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
         constructor(div: JQuery, opt: RecaptchaOptions);
         get_value(): string;
         set_value(value: string): void;
     }
-    interface TextAreaEditorOptions {
+    export interface TextAreaEditorOptions {
         cols?: number;
         rows?: number;
     }
-    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
+    export class TextAreaEditor extends Widget<TextAreaEditorOptions> {
         constructor(input: JQuery, opt?: TextAreaEditorOptions);
         get value(): string;
         protected get_value(): string;
         set value(value: string);
         protected set_value(value: string): void;
     }
-    interface TimeEditorOptions {
+    export interface TimeEditorOptions {
         noEmptyOption?: boolean;
         startHour?: any;
         endHour?: any;
         intervalMinutes?: any;
     }
-    class TimeEditor extends Widget<TimeEditorOptions> {
+    export class TimeEditor extends Widget<TimeEditorOptions> {
         private minutes;
         constructor(input: JQuery, opt?: TimeEditorOptions);
         get value(): number;
@@ -1889,10 +1891,10 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
     }
-    class URLEditor extends StringEditor {
+    export class URLEditor extends StringEditor {
         constructor(input: JQuery);
     }
-    class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
+    export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
         pageSize: number;
         constructor(hidden: JQuery, opt: TOptions);
         protected emptyItemText(): string;
@@ -1913,6 +1915,7 @@ declare namespace Serenity {
         set_value(value: string): void;
         set value(v: string);
     }
+    export {};
 }
 declare namespace Serenity {
     interface FilterOperator {
@@ -2291,6 +2294,18 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    namespace ReflectionUtils {
+        function getPropertyValue(o: any, property: string): any;
+        function setPropertyValue(o: any, property: string, value: any): void;
+        function makeCamelCase(s: string): string;
+    }
+}
+declare namespace Serenity {
+    namespace ReflectionOptionsSetter {
+        function set(target: any, options: any): void;
+    }
+}
+declare namespace Serenity {
     class PrefixedContext {
         readonly idPrefix: string;
         constructor(idPrefix: string);
@@ -2299,94 +2314,11 @@ declare namespace Serenity {
             new (...args: any[]): TWidget;
         }): TWidget;
     }
-    namespace ReflectionOptionsSetter {
-        function set(target: any, options: any): void;
-    }
-    namespace ReflectionUtils {
-        function getPropertyValue(o: any, property: string): any;
-        function setPropertyValue(o: any, property: string, value: any): void;
-        function makeCamelCase(s: string): string;
-    }
+}
+declare namespace Serenity {
     interface ScriptContext {
     }
     class ScriptContext {
-    }
-}
-declare namespace Serenity {
-    class CheckListEditor extends Widget<CheckListEditorOptions> {
-        constructor(div: JQuery, opt: CheckListEditorOptions);
-        getItems(): CheckListItem[];
-        updateItems(): void;
-    }
-    interface CheckListEditorOptions {
-        items?: CheckListItem[];
-        selectAllOptionText?: string;
-    }
-    class CheckListItem {
-        id: string;
-        text: string;
-        parentId: string;
-    }
-    interface CheckTreeItem<TSource> {
-        isSelected?: boolean;
-        hideCheckBox?: boolean;
-        isAllDescendantsSelected?: boolean;
-        id?: string;
-        text?: string;
-        parentId?: string;
-        children?: CheckTreeItem<TSource>[];
-        source?: TSource;
-    }
-    interface HtmlContentEditorOptions {
-    }
-    interface GridPersistanceFlags {
-        columnWidths?: boolean;
-        columnVisibility?: boolean;
-        sortColumns?: boolean;
-        filterItems?: boolean;
-        quickFilters?: boolean;
-        quickFilterText?: boolean;
-        quickSearch?: boolean;
-        includeDeleted?: boolean;
-    }
-    interface PersistedGridColumn {
-        id: string;
-        width?: number;
-        sort?: number;
-        visible?: boolean;
-    }
-    interface PersistedGridSettings {
-        columns?: PersistedGridColumn[];
-        filterItems?: FilterLine[];
-        quickFilters?: Q.Dictionary<any>;
-        quickFilterText?: string;
-        quickSearchField?: QuickSearchField;
-        quickSearchText?: string;
-        includeDeleted?: boolean;
-    }
-    interface SettingStorage {
-        getItem(key: string): string;
-        setItem(key: string, value: string): void;
-    }
-    interface CKEditorConfig {
-    }
-    enum CaptureOperationType {
-        Before = 0,
-        Delete = 1,
-        Insert = 2,
-        Update = 3
-    }
-    namespace CustomValidation {
-        function registerValidationMethods(): void;
-    }
-    interface DialogButton {
-        text: string;
-        click: () => void;
-    }
-    interface EditorTypeInfo {
-        type?: Function;
-        displayName?: string;
-        optionsType?: Function;
     }
 }
 declare namespace Serenity {
@@ -2571,6 +2503,35 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    interface SettingStorage {
+        getItem(key: string): string;
+        setItem(key: string, value: string): void;
+    }
+    interface PersistedGridColumn {
+        id: string;
+        width?: number;
+        sort?: number;
+        visible?: boolean;
+    }
+    interface PersistedGridSettings {
+        columns?: PersistedGridColumn[];
+        filterItems?: FilterLine[];
+        quickFilters?: Q.Dictionary<any>;
+        quickFilterText?: string;
+        quickSearchField?: QuickSearchField;
+        quickSearchText?: string;
+        includeDeleted?: boolean;
+    }
+    interface GridPersistanceFlags {
+        columnWidths?: boolean;
+        columnVisibility?: boolean;
+        sortColumns?: boolean;
+        filterItems?: boolean;
+        quickFilters?: boolean;
+        quickFilterText?: boolean;
+        quickSearch?: boolean;
+        includeDeleted?: boolean;
+    }
     interface IDataGrid {
         getElement(): JQuery;
         getGrid(): Slick.Grid;
@@ -2763,6 +2724,16 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    interface CheckTreeItem<TSource> {
+        isSelected?: boolean;
+        hideCheckBox?: boolean;
+        isAllDescendantsSelected?: boolean;
+        id?: string;
+        text?: string;
+        parentId?: string;
+        children?: CheckTreeItem<TSource>[];
+        source?: TSource;
+    }
     class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends DataGrid<TItem, TOptions> implements IGetEditValue, ISetEditValue, IReadOnly {
         private byId;
         constructor(div: JQuery, opt?: TOptions);

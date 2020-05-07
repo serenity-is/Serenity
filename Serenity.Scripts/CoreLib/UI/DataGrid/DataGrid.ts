@@ -1,4 +1,38 @@
 ﻿namespace Serenity {
+
+    export interface SettingStorage {
+        getItem(key: string): string;
+        setItem(key: string, value: string): void;
+    }
+
+    export interface PersistedGridColumn {
+        id: string;
+        width?: number;
+        sort?: number;
+        visible?: boolean;
+    }
+
+    export interface PersistedGridSettings {
+        columns?: PersistedGridColumn[];
+        filterItems?: FilterLine[];
+        quickFilters?: Q.Dictionary<any>;
+        quickFilterText?: string;
+        quickSearchField?: QuickSearchField;
+        quickSearchText?: string;
+        includeDeleted?: boolean;
+    }
+
+    export interface GridPersistanceFlags {
+        columnWidths?: boolean;
+        columnVisibility?: boolean;
+        sortColumns?: boolean;
+        filterItems?: boolean;
+        quickFilters?: boolean;
+        quickFilterText?: boolean;
+        quickSearch?: boolean;
+        includeDeleted?: boolean;
+    }
+
     export interface IDataGrid {
         getElement(): JQuery;
         getGrid(): Slick.Grid;
