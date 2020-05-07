@@ -109,7 +109,8 @@
     }
 
     export function log(m: any) {
-        (<any>window).console && (<any>window).console.log(m);
+        if (typeof console != "undefined" && console.log)
+            console.log(m);
     }
 
     export function newBodyDiv(): JQuery {
