@@ -5,9 +5,9 @@
 /// <reference types="jqueryui" />
 declare var __decorate: any;
 declare const __skipExtends: {
-    "__metadata": boolean;
-    "__typeName": boolean;
-    "__componentFactory": boolean;
+    __metadata: boolean;
+    __typeName: boolean;
+    __componentFactory: boolean;
 };
 declare var __extends: any;
 declare var __assign: any;

@@ -257,7 +257,7 @@ var Q;
     var ArgumentOutOfRangeException = /** @class */ (function (_super) {
         __extends(ArgumentOutOfRangeException, _super);
         function ArgumentOutOfRangeException(paramName, message) {
-            var _this = _super.call(this, ((message !== null && message !== void 0 ? message : 'Value is out of range.')) +
+            var _this = _super.call(this, (message !== null && message !== void 0 ? message : 'Value is out of range.') +
                 (paramName ? ('\nParameter name: ' + paramName) : "")) || this;
             _this.name = "ArgumentNullException";
             return _this;
@@ -974,19 +974,19 @@ var Q;
         var _a, _b, _c, _d, _e, _f;
         if (num == null)
             return "";
-        var fmt = typeof decOrLoc !== "string" ? ((decOrLoc !== null && decOrLoc !== void 0 ? decOrLoc : Q.Culture)) : {
+        var fmt = typeof decOrLoc !== "string" ? (decOrLoc !== null && decOrLoc !== void 0 ? decOrLoc : Q.Culture) : {
             decimalSeparator: decOrLoc,
-            groupSeparator: (grp !== null && grp !== void 0 ? grp : (decOrLoc == "," ? "." : ","))
+            groupSeparator: grp !== null && grp !== void 0 ? grp : (decOrLoc == "," ? "." : ",")
         };
         if (isNaN(num)) {
-            return _a = fmt.nanSymbol, (_a !== null && _a !== void 0 ? _a : Q.Culture.nanSymbol);
+            return (_a = fmt.nanSymbol) !== null && _a !== void 0 ? _a : Q.Culture.nanSymbol;
         }
         if (format == null || (format.length == 0) || (format == 'i')) {
             return num.toString();
         }
-        var dec = (_b = fmt.decimalSeparator, (_b !== null && _b !== void 0 ? _b : Q.Culture.decimalSeparator));
-        grp = (_c = (grp !== null && grp !== void 0 ? grp : fmt.groupSeparator), (_c !== null && _c !== void 0 ? _c : Q.Culture.groupSeparator));
-        var neg = (_d = fmt.negativeSign, (_d !== null && _d !== void 0 ? _d : Q.Culture.negativeSign));
+        var dec = (_b = fmt.decimalSeparator) !== null && _b !== void 0 ? _b : Q.Culture.decimalSeparator;
+        grp = (_c = grp !== null && grp !== void 0 ? grp : fmt.groupSeparator) !== null && _c !== void 0 ? _c : Q.Culture.groupSeparator;
+        var neg = (_d = fmt.negativeSign) !== null && _d !== void 0 ? _d : Q.Culture.negativeSign;
         var s = '';
         var precision = -1;
         if (format.length > 1) {
@@ -1024,7 +1024,7 @@ var Q;
             case 'n':
             case 'N':
                 if (precision == -1) {
-                    precision = (_e = fmt.decimalDigits, (_e !== null && _e !== void 0 ? _e : Q.Culture.decimalDigits));
+                    precision = (_e = fmt.decimalDigits) !== null && _e !== void 0 ? _e : Q.Culture.decimalDigits;
                 }
                 s = num.toFixed(precision).toString();
                 if (precision && (dec != '.')) {
@@ -1040,7 +1040,7 @@ var Q;
             case 'p':
             case 'P':
                 if (precision == -1) {
-                    precision = (_f = fmt.decimalDigits, (_f !== null && _f !== void 0 ? _f : Q.Culture.decimalDigits));
+                    precision = (_f = fmt.decimalDigits) !== null && _f !== void 0 ? _f : Q.Culture.decimalDigits;
                 }
                 if (fs === 'p' || fs == 'P')
                     num *= 100;
@@ -1249,25 +1249,25 @@ var Q;
         if (locale == null)
             locale = Q.Culture;
         if (format == null || format == "d")
-            format = (_a = locale.dateFormat, (_a !== null && _a !== void 0 ? _a : Q.Culture.dateFormat));
+            format = (_a = locale.dateFormat) !== null && _a !== void 0 ? _a : Q.Culture.dateFormat;
         else if (format.length == 1) {
             switch (format) {
                 case "g":
-                    format = (_b = locale.dateTimeFormat, (_b !== null && _b !== void 0 ? _b : Q.Culture.dateTimeFormat)).replace(":ss", "");
+                    format = ((_b = locale.dateTimeFormat) !== null && _b !== void 0 ? _b : Q.Culture.dateTimeFormat).replace(":ss", "");
                     break;
                 case "G":
-                    format = (_c = locale.dateTimeFormat, (_c !== null && _c !== void 0 ? _c : Q.Culture.dateTimeFormat));
+                    format = ((_c = locale.dateTimeFormat) !== null && _c !== void 0 ? _c : Q.Culture.dateTimeFormat);
                     break;
                 case "s":
                     format = "yyyy-MM-ddTHH:mm:ss";
                     break;
-                case 'd': format = (_d = locale.dateFormat, (_d !== null && _d !== void 0 ? _d : Q.Culture.dateFormat));
+                case 'd': format = ((_d = locale.dateFormat) !== null && _d !== void 0 ? _d : Q.Culture.dateFormat);
                 case 't':
                     format = (locale.dateTimeFormat && locale.dateFormat) ? locale.dateTimeFormat.replace(locale.dateFormat + " ", "") : "HH:mm";
                     break;
                 case 'u':
                 case 'U':
-                    format = format == 'u' ? 'yyyy-MM-ddTHH:mm:ss.fffZ' : (_e = locale.dateTimeFormat, (_e !== null && _e !== void 0 ? _e : Q.Culture.dateTimeFormat));
+                    format = format == 'u' ? 'yyyy-MM-ddTHH:mm:ss.fffZ' : (_e = locale.dateTimeFormat) !== null && _e !== void 0 ? _e : Q.Culture.dateTimeFormat;
                     date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.getUTCMilliseconds());
                     break;
             }
@@ -1289,13 +1289,13 @@ var Q;
             var part = fs;
             switch (fs) {
                 case '/':
-                    part = (_f = locale.dateSeparator, (_f !== null && _f !== void 0 ? _f : Q.Culture.dateSeparator));
+                    part = (_f = locale.dateSeparator) !== null && _f !== void 0 ? _f : Q.Culture.dateSeparator;
                     break;
                 case 'dddd':
-                    part = (_g = locale.dayNames, (_g !== null && _g !== void 0 ? _g : Q.Culture.dayNames))[date.getDay()];
+                    part = ((_g = locale.dayNames) !== null && _g !== void 0 ? _g : Q.Culture.dayNames)[date.getDay()];
                     break;
                 case 'ddd':
-                    part = (_h = locale.shortDayNames, (_h !== null && _h !== void 0 ? _h : Q.Culture.shortDayNames))[date.getDay()];
+                    part = ((_h = locale.shortDayNames) !== null && _h !== void 0 ? _h : Q.Culture.shortDayNames)[date.getDay()];
                     break;
                 case 'dd':
                     part = Q.padLeft(date.getDate().toString(), 2, '0');
@@ -1304,10 +1304,10 @@ var Q;
                     part = date.getDate();
                     break;
                 case 'MMMM':
-                    part = (_j = locale.monthNames, (_j !== null && _j !== void 0 ? _j : Q.Culture.monthNames))[date.getMonth()];
+                    part = ((_j = locale.monthNames) !== null && _j !== void 0 ? _j : Q.Culture.monthNames)[date.getMonth()];
                     break;
                 case 'MMM':
-                    part = (_k = locale.shortMonthNames, (_k !== null && _k !== void 0 ? _k : Q.Culture.shortMonthNames))[date.getMonth()];
+                    part = ((_k = locale.shortMonthNames) !== null && _k !== void 0 ? _k : Q.Culture.shortMonthNames)[date.getMonth()];
                     break;
                 case 'MM':
                     part = Q.padLeft(date.getMonth() + 1, 2, '0');
@@ -1354,7 +1354,7 @@ var Q;
                     break;
                 case 't':
                 case 'tt':
-                    part = (date.getHours() < 12) ? (_l = locale.amDesignator, (_l !== null && _l !== void 0 ? _l : Q.Culture.amDesignator)) : (_m = locale.pmDesignator, (_m !== null && _m !== void 0 ? _m : Q.Culture.pmDesignator));
+                    part = (date.getHours() < 12) ? ((_l = locale.amDesignator) !== null && _l !== void 0 ? _l : Q.Culture.amDesignator) : ((_m = locale.pmDesignator) !== null && _m !== void 0 ? _m : Q.Culture.pmDesignator);
                     if (fs == 't') {
                         part = part.charAt(0);
                     }
@@ -1379,7 +1379,7 @@ var Q;
                     part = ((part >= 0) ? '-' : '+') +
                         Math.floor(Q.padLeft(Math.abs(part), 2, '0'));
                     if (fs == 'zzz') {
-                        part += (_o = locale.timeSeparator, (_o !== null && _o !== void 0 ? _o : Q.Culture.timeSeparator)) +
+                        part += ((_o = locale.timeSeparator) !== null && _o !== void 0 ? _o : Q.Culture.timeSeparator) +
                             Math.abs(Q.padLeft(date.getTimezoneOffset() % 60, 2, '0'));
                     }
                     break;
@@ -2052,7 +2052,7 @@ var Q;
     };
     function txt(k) {
         var _a;
-        return _a = Q.tryGetText("Dialogs." + k), (_a !== null && _a !== void 0 ? _a : defaultTxt[k]);
+        return (_a = Q.tryGetText("Dialogs." + k)) !== null && _a !== void 0 ? _a : defaultTxt[k];
     }
     function bsModal(options, message, modalClass) {
         var closeButton = "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"" + txt('CloseButton') + "\">" +
@@ -2128,9 +2128,9 @@ var Q;
         }
         message = messageHtml(message, options);
         if (useBS)
-            bsModal(options, message, (_a = options.modalClass, (_a !== null && _a !== void 0 ? _a : "s-AlertModal")));
+            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-AlertModal");
         else
-            uiDialog(options, message, (_b = options.dialogClass, (_b !== null && _b !== void 0 ? _b : "s-AlertDialog")));
+            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-AlertDialog");
     }
     Q.alert = alert;
     function confirm(message, onYes, options) {
@@ -2176,9 +2176,9 @@ var Q;
         }
         message = messageHtml(message, options);
         if (useBS)
-            bsModal(options, message, (_a = options.modalClass, (_a !== null && _a !== void 0 ? _a : "s-ConfirmModal")));
+            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-ConfirmModal");
         else
-            uiDialog(options, message, (_b = options.dialogClass, (_b !== null && _b !== void 0 ? _b : "s-ConfirmDialog")));
+            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-ConfirmDialog");
     }
     Q.confirm = confirm;
     function iframeDialog(options) {
@@ -6914,7 +6914,7 @@ var Serenity;
         };
         Select2Editor.prototype.getPageSize = function () {
             var _a;
-            return _a = this.options['pageSize'], (_a !== null && _a !== void 0 ? _a : 100);
+            return (_a = this.options['pageSize']) !== null && _a !== void 0 ? _a : 100;
         };
         Select2Editor.prototype.getIdField = function () {
             return this.options['idField'];
@@ -6927,7 +6927,7 @@ var Serenity;
         };
         Select2Editor.prototype.getTextField = function () {
             var _a;
-            return _a = this.options['textField'], (_a !== null && _a !== void 0 ? _a : this.getIdField());
+            return (_a = this.options['textField']) !== null && _a !== void 0 ? _a : this.getIdField();
         };
         Select2Editor.prototype.itemText = function (item) {
             var value = item[this.getTextField()];
@@ -8041,7 +8041,7 @@ var Serenity;
             initialize();
             var editorType = knownTypes[key.toLowerCase()];
             if (editorType == null) {
-                var type = (_a = Q.getType(key), (_a !== null && _a !== void 0 ? _a : Q.getType(key, globalObj)));
+                var type = (_a = Q.getType(key)) !== null && _a !== void 0 ? _a : Q.getType(key, globalObj);
                 if (type != null) {
                     knownTypes[key.toLowerCase()] = type;
                     return type;
