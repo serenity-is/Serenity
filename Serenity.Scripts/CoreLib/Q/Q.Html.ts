@@ -109,7 +109,7 @@
     }
 
     export function log(m: any) {
-        if (typeof console != "undefined" && console.log)
+        if (typeof console !== "undefined" && console.log)
             console.log(m);
     }
 

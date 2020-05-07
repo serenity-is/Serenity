@@ -5,9 +5,9 @@
 /// <reference types="jqueryui" />
 declare var __decorate: any;
 declare const __skipExtends: {
-    "__metadata": boolean;
-    "__typeName": boolean;
-    "__componentFactory": boolean;
+    __metadata: boolean;
+    __typeName: boolean;
+    __componentFactory: boolean;
 };
 declare var __extends: any;
 declare var __assign: any;
@@ -232,7 +232,8 @@ declare namespace Serenity {
 }
 declare let globalObj: any;
 declare namespace Q {
-    interface Type extends Function {
+    interface Type {
+        prototype: any;
         name?: string;
         __typeName?: string;
         __metadata?: {
@@ -3542,7 +3543,6 @@ declare namespace Serenity.DialogExtensions {
     function dialogFlexify(dialog: JQuery): JQuery;
     function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery;
     function dialogMaximizable(dialog: JQuery): JQuery;
-    function dialogCloseOnEnter(dialog: JQuery): JQuery;
 }
 declare namespace Serenity.DialogTypeRegistry {
     function tryGet(key: string): WidgetDialogClass;

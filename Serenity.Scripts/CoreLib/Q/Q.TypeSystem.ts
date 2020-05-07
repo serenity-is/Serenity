@@ -3,7 +3,8 @@ let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window)
 
 namespace Q {
 
-    export interface Type extends Function {
+    export interface Type {
+        prototype: any;
         name?: string;
         __typeName?: string;
         __metadata?: {

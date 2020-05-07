@@ -130,7 +130,7 @@ namespace Q {
         }
     }
 
-    export function validate(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator {
+    export function validateTooltip(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator {
         return form.validate(Q.extend(Q.extend({}, valOpt), opt));
     }
 }

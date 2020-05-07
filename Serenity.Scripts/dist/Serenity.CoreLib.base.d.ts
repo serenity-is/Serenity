@@ -1,5 +1,6 @@
 ﻿/// <reference types="jquery" />
 /// <reference types="toastr" />
+/// <reference types="jquery.validation" />
 declare var __decorate: any;
 declare const __skipExtends: {
     __metadata: boolean;
@@ -229,7 +230,8 @@ declare namespace Serenity {
 }
 declare let globalObj: any;
 declare namespace Q {
-    interface Type extends Function {
+    interface Type {
+        prototype: any;
         name?: string;
         __typeName?: string;
         __metadata?: {
@@ -541,6 +543,7 @@ declare namespace Q {
     interface AlertOptions extends CommonDialogOptions {
         okButton?: string | boolean;
     }
+    function isBS3(): boolean;
     function alert(message: string, options?: AlertOptions): void;
     interface ConfirmOptions extends CommonDialogOptions {
         yesButton?: string | boolean;
@@ -687,6 +690,14 @@ declare namespace Serenity {
             [key: string]: boolean;
         };
     }
+}
+declare namespace JQueryValidation {
+    interface ValidationOptions {
+        normalizer?: (v: string) => string;
+    }
+}
+declare namespace Q {
+    function validate(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
 }
 declare namespace Serenity {
     function Criteria(field: string): any[];

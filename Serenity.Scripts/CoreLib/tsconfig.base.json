@@ -31,7 +31,7 @@
     "Services/Criteria.ts",
     "Services/SummaryType.ts",
     "Services/PropertyItem.ts",
+    "Decorators/Decorators.Basic.ts",
     "Externals/ExportNamespaces.ts",
-    "Decorators/Decorators.Basic.ts"
   ]
 }
