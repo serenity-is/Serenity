@@ -6308,13 +6308,32 @@ var Serenity;
         function DateEditor(input) {
             var _this = _super.call(this, input) || this;
             input.addClass('dateQ');
-            input.datepicker({
-                showOn: 'button',
-                beforeShow: function (inp, inst) {
-                    return !input.hasClass('readonly');
-                },
-                yearRange: Q.coalesce(_this.yearRange, '-100:+50')
-            });
+            if (input.length) {
+                if (typeof flatpickr != undefined && (DateEditor_1.useFlatpickr || !$.fn.datepicker)) {
+                    flatpickr(input[0], {
+                        clickOpens: false,
+                        dateFormat: Q.Culture.dateOrder.split('').join('-').replace('y', 'Y')
+                    });
+                }
+                else if ($.fn.datepicker) {
+                    input.datepicker({
+                        showOn: 'button',
+                        beforeShow: function (inp, inst) {
+                            return !input.hasClass('readonly');
+                        },
+                        yearRange: Q.coalesce(_this.yearRange, '-100:+50')
+                    });
+                    $('<button class="ui-datepicker-trigger"><i class="fa fa-calendar"></i></button>')
+                        .insertAfter(input)
+                        .click(function () {
+                        if (!_this.get_readOnly())
+                            input._flatpickr.open();
+                    });
+                }
+                else {
+                    input.attr('type', 'date');
+                }
+            }
             input.bind('keyup.' + _this.uniqueName, function (e) {
                 if (e.which === 32 && !_this.get_readOnly()) {
                     if (_this.get_valueAsDate() != Q.today()) {
@@ -6343,6 +6362,7 @@ var Serenity;
             _this.set_sqlMinMax(true);
             return _this;
         }
+        DateEditor_1 = DateEditor;
         DateEditor.prototype.get_value = function () {
             var value = this.element.val().trim();
             if (value != null && value.length === 0) {
@@ -6589,6 +6609,7 @@ var Serenity;
             }
         };
         ;
+        var DateEditor_1;
         DateEditor.dateInputChange = function (e) {
             if (Q.Culture.dateOrder !== 'dmy') {
                 return;
@@ -6623,7 +6644,7 @@ var Serenity;
         __decorate([
             Option()
         ], DateEditor.prototype, "get_sqlMinMax", null);
-        DateEditor = __decorate([
+        DateEditor = DateEditor_1 = __decorate([
             Serenity.Decorators.registerEditor('Serenity.DateEditor', [Serenity.IStringValue, Serenity.IReadOnly]),
             Serenity.Decorators.element('<input type="text"/>')
         ], DateEditor);

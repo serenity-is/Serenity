@@ -1,6 +1,8 @@
 ﻿namespace Serenity {
-
+    
     import Option = Serenity.Decorators.option
+
+    export let datePickerIconSvg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M14 2v-1h-3v1h-5v-1h-3v1h-3v15h17v-15h-3zM12 2h1v2h-1v-2zM4 2h1v2h-1v-2zM16 16h-15v-8.921h15v8.921zM1 6.079v-3.079h2v2h3v-2h5v2h3v-2h2v3.079h-15z" fill="#000000"></path></svg>';
 
     @Decorators.registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
     @Decorators.element('<input type="text"/>')
@@ -15,16 +17,24 @@
         constructor(input: JQuery) {
             super(input);
 
-            input.addClass('dateQ');
-            input.datepicker({
-                showOn: 'button',
-                beforeShow: (inp, inst) => {
-                    return !input.hasClass('readonly') as any;
-                },
-                yearRange: Q.coalesce(this.yearRange, '-100:+50')
-            });
+            if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$.fn.datepicker)) {
+                flatpickr(input[0], DateEditor.flatPickrOptions(input));
+            }
+            else if ($.fn.datepicker) {
+                input.datepicker({
+                    showOn: 'button',
+                    beforeShow: (inp, inst) => {
+                        return !input.hasClass('readonly') as any;
+                    },
+                    yearRange: Q.coalesce(this.yearRange, '-100:+50')
+                });
 
-            input.bind('keyup.' + this.uniqueName, e => {
+            }
+            else {
+                input.attr('type', 'date');
+            }
+
+            input.on('keyup.' + this.uniqueName, e => {
                 if (e.which === 32 && !this.get_readOnly()) {
                     if (this.get_valueAsDate() != Q.today()) {
                         this.set_valueAsDate(Q.today());
@@ -36,9 +46,9 @@
                 }
             });
 
-            input.bind('change.' + this.uniqueName, Serenity.DateEditor.dateInputChange);
+            input.on('change.' + this.uniqueName, Serenity.DateEditor.dateInputChange);
 
-            Serenity.VX.addValidationRule(input, this.uniqueName, e1 => {
+            Q.addValidationRule(input, this.uniqueName, e1 => {
                 var value = this.get_value();
                 if (Q.isEmptyOrNull(value)) {
                     return null;
@@ -56,6 +66,19 @@
             });
 
             this.set_sqlMinMax(true)
+        }
+
+        public static useFlatpickr: boolean;
+
+        public static flatPickrOptions(input: JQuery) {
+            return {
+                clickOpens: true,
+                allowInput: true,
+                dateFormat: Q.Culture.dateOrder.split('').join(Q.Culture.dateSeparator).replace('y', 'Y'),
+                onChange: function() {
+                    input.triggerHandler('change');
+                }
+            }
         }
 
         get_value(): string {
@@ -188,12 +211,12 @@
                 return;
             }
             var input = $(e.target);
-            if (!input.is(':input')) {
+            if (!input.is(':input') || input.attr("type") == "date") {
                 return;
             }
             var val = Q.coalesce(input.val(), '');
             var x = {};
-            if (val.length >= 6 && !isNaN(parseInt(val, 10))) {
+            if (val.length >= 6 && /^[0-9]*$/g.test(val)) {
                 input.val(val.substr(0, 2) + Q.Culture.dateSeparator + val.substr(2, 2) + Q.Culture.dateSeparator + val.substr(4));
             }
             val = Q.coalesce(input.val(), '');
@@ -203,6 +226,16 @@
             }
         };
 
+        static flatPickrTrigger(input: JQuery) {
+            return $('<i class="ui-datepicker-trigger" href="javascript:;">' + datePickerIconSvg + '</i>')
+                .insertAfter(input)
+                .click(() => {
+                    if (!input.hasClass('readonly'))
+                        // @ts-ignore
+                        input[0]._flatpickr.open();
+                });
+        }
+
         static dateInputKeyup(e: JQueryEventObject) {
 
             if (Q.Culture.dateOrder !== 'dmy') {
@@ -210,7 +243,8 @@
             }
 
             var input = $(e.target);
-            if (!input.is(':input')) {
+            if (!input.is(':input') || input.attr("type") == "date") {
+                // for browser date editors, format might not match culture setting
                 return;
             }
 
@@ -370,4 +404,34 @@
             }
         };
     }
+
+    function jQueryDatepickerInitialization(): boolean {
+        if (!$.datepicker || !$.datepicker.regional || !$.datepicker.regional.en)
+            return false;
+        let order = Q.Culture.dateOrder;
+        let s = Q.Culture.dateSeparator;
+        let culture = ($('html').attr('lang') || 'en').toLowerCase();
+        if (!$.datepicker.regional[culture]) {
+            culture = culture.split('-')[0];
+            if (!$.datepicker.regional[culture]) {
+                culture = 'en';
+            }
+        }
+        $.datepicker.setDefaults($.datepicker.regional['en']);
+        $.datepicker.setDefaults($.datepicker.regional[culture]);
+        $.datepicker.setDefaults({
+            dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
+                (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
+                    'dd' + s + 'mm' + s + 'yy')),
+            buttonImage: 'data:image/svg+xml,' + encodeURI(datePickerIconSvg),
+            buttonImageOnly: true,
+            showOn: 'both',
+            showButtonPanel: true,
+            changeMonth: true,
+            changeYear: true
+        });
+        return true;
+    };
+
+    typeof $ !== "undefined" && !jQueryDatepickerInitialization() && $(jQueryDatepickerInitialization);
 }

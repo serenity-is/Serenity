@@ -595,7 +595,7 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    if (typeof React === "undefined") {
+    if (typeof React === "undefined" && typeof window !== "undefined") {
         if (window['preact'] != null) {
             window['React'] = window['ReactDOM'] = window['preact'];
             React.Fragment = Q.coalesce(React.Fragment, "x-fragment");
@@ -626,7 +626,7 @@ var Serenity;
             if (element.data(_this.widgetName)) {
                 throw new Q.Exception(Q.format("The element already has widget '{0}'!", _this.widgetName));
             }
-            element.bind('remove.' + _this.widgetName, function (e) {
+            element.on('remove.' + _this.widgetName, function (e) {
                 if (e.bubbles || e.cancelable) {
                     return;
                 }
@@ -638,7 +638,7 @@ var Serenity;
         Widget_1 = Widget;
         Widget.prototype.destroy = function () {
             this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
-            this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
+            this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
         };
         Widget.prototype.addCssClass = function () {
@@ -670,6 +670,9 @@ var Serenity;
             return $(elementHtml);
         };
         ;
+        Widget.prototype.addValidationRule = function (eventClass, rule) {
+            return Q.addValidationRule(this.element, eventClass, rule);
+        };
         Widget.create = function (params) {
             var widget;
             if (Q.isAssignableFrom(Serenity.IDialog, params.type)) {

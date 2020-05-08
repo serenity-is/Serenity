@@ -1368,6 +1368,7 @@ declare namespace Serenity {
         private maxDate;
         private sqlMinMax;
         constructor(input: JQuery);
+        static useFlatpickr: boolean;
         get_value(): string;
         get value(): string;
         set_value(value: string): void;

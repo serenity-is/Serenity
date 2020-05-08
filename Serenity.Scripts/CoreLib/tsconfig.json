@@ -16,7 +16,7 @@
       "bootstrap",
       "sortablejs",
       "toastr",
-      "react"
+      "react",
     ],
     "inlineSources": true,
     "outFile": "../dist/Serenity.CoreLib.js",
@@ -29,6 +29,7 @@
     "../node_modules/@types/"
   ],
   "files": [
+    "Imports/FlatPickr.d.ts",
     "Imports/Helpers.ts",
     "Imports/Promise.ts",
     "Imports/Select2.ts",

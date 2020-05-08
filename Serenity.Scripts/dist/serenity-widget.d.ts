@@ -249,6 +249,7 @@ declare namespace Serenity {
         static elementFor<TWidget>(editorType: {
             new (...args: any[]): TWidget;
         }): JQuery;
+        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
         init(action?: (widget: any) => void): this;
         private static __isWidgetType;
@@ -272,7 +273,6 @@ declare namespace Serenity {
         defaultValue?: any;
     }
     interface Widget<TOptions> {
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         getGridField(): JQuery;
         change(handler: (e: JQueryEventObject) => void): void;
         changeSelect2(handler: (e: JQueryEventObject) => void): void;

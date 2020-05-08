@@ -13,7 +13,7 @@
 
     export type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
 
-    if (typeof React === "undefined") {
+    if (typeof React === "undefined" && typeof window !== "undefined") {
         if (window['preact'] != null) {
             window['React'] = window['ReactDOM'] = window['preact'];
             (React as any).Fragment = Q.coalesce((React as any).Fragment, "x-fragment");
@@ -55,7 +55,7 @@
                 throw new Q.Exception(Q.format("The element already has widget '{0}'!", this.widgetName));
             }
 
-            element.bind('remove.' + this.widgetName, e => {
+            element.on('remove.' + this.widgetName, e => {
                 if (e.bubbles || e.cancelable) {
                     return;
                 }
@@ -67,7 +67,7 @@
 
         public destroy(): void {
             this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
-            this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
+            this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
         }
 
@@ -104,6 +104,10 @@
             var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>');
             return $(elementHtml);
         };
+
+        public addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery {
+            return Q.addValidationRule(this.element, eventClass, rule);
+        }   
 
         public static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>) {
             let widget: TWidget;
@@ -154,7 +158,6 @@
     }
 
     export declare interface Widget<TOptions> {
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         getGridField(): JQuery;
         change(handler: (e: JQueryEventObject) => void): void;
         changeSelect2(handler: (e: JQueryEventObject) => void): void;

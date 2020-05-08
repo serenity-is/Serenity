@@ -49,28 +49,11 @@ namespace Serenity {
     }
 
     export namespace VX {
-        export function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery {
-            if(element.length === 0) {
-                return element;
-            }
-            if (rule == null) {
-                throw new Q.Exception('rule is null!');
-            }
-            element.addClass('customValidate').bind('customValidate.' + eventClass, rule as any);
-            return element;
-        }
-
-        export function removeValidationRule(element: JQuery, eventClass: string): JQuery {
-            element.unbind('customValidate.' + eventClass);
-            return element;
-        }
+        export var addValidationRule = Q.addValidationRule;
+        export var removeValidationRule = Q.removeValidationRule;
 
         export function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean {
             return validator.element(widget.element[0] as any);
         }
-
-        Widget.prototype.addValidationRule = function (eventClass: string, rule: (p1: JQuery) => string): JQuery {
-            return VX.addValidationRule(this.element, eventClass, rule);
-        }   
     }
 }

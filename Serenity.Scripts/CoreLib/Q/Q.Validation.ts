@@ -51,6 +51,15 @@ namespace Q {
             return z.getTime() === d.getTime();
         });
 
+        $.validator.addMethod("dateTimeQ", function (value, element) {
+            var o = this.optional(element);
+            if (o)
+                return o;
+
+            var d = parseDate(value);
+            return !!d;
+        });        
+
         $.validator.addMethod("hourAndMin", function (value, element) {
             return this.optional(element) || !isNaN(parseHourAndMin(value));
         });
@@ -125,5 +134,19 @@ namespace Q {
 
     export function validateTooltip(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator {
         return form.validate(Q.extend(Q.extend({}, valOpt), opt));
+    }
+
+    export function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery {
+        if (!element.length)
+            return element;
+        if (rule == null)
+            throw new Q.Exception('rule is null!');
+        element.addClass('customValidate').bind('customValidate.' + eventClass, rule as any);
+        return element;
+    }
+
+    export function removeValidationRule(element: JQuery, eventClass: string): JQuery {
+        element.unbind('customValidate.' + eventClass);
+        return element;
     }
 }
