@@ -23,5 +23,10 @@
     "UI/Editors/DateTimeEditor.ts",
     "UI/Editors/EmailAddressEditor.ts",
     "UI/Editors/EmailEditor.ts",
+    "UI/Editors/EditorUtils.ts",
+    "UI/Editors/CascadedWidgetLink.ts",
+    "UI/Editors/Select2Editor.ts",
+    "UI/Editors/LookupEditor.ts",
+    "UI/Editors/ServiceLookupEditor.ts"
   ]
 }

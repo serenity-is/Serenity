@@ -11,14 +11,20 @@
   ],
   "files": [
     "UI/Interfaces/IDialog.ts",
+    "UI/Interfaces/IEditDialog.ts",
     "UI/Interfaces/IBooleanValue.ts",
     "UI/Interfaces/IDoubleValue.ts",
     "UI/Interfaces/IStringValue.ts",
     "UI/Interfaces/IGetEditValue.ts",
     "UI/Interfaces/ISetEditValue.ts",
     "UI/Interfaces/IReadOnly.ts",
+    "UI/Interfaces/IValidateRequired.ts",    
     "UI/Widgets/CreateWidgetParams.ts",
     "Decorators/Decorators.Widget.ts",
     "UI/Widgets/Widget.ts",
+    "UI/Widgets/ReflectionUtils.ts",
+    "UI/Widgets/DialogTypeRegistry.ts",
+    "UI/Helpers/SubDialogHelper.ts",
+    "UI/Widgets/DataChangeInfo.ts"
   ]
 }

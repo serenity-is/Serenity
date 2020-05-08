@@ -68,12 +68,11 @@ namespace Serenity {
             hidden.select2(select2Options);
             hidden.attr('type', 'text');
 
-            // jquery validate to work
-            hidden.bind('change.' + this.uniqueName, <any>function (e: JQueryEventObject, x: boolean) {
-                if (!!(Serenity.WX.hasOriginalEvent(e) || !x)) {
-                    if (Serenity.ValidationHelper.getValidator(hidden) != null) {
+            // for jquery validate to work
+            hidden.on('change.' + this.uniqueName, e => {
+                if (!$(e.target).hasClass('select2-change-triggered') && 
+                    hidden.closest('form').data('validator')) {
                         hidden.valid();
-                    }
                 }
             });
 
@@ -387,22 +386,24 @@ namespace Serenity {
 
             this.get_select2Container().add(this.element).addClass('has-inplace-button');
 
-            Serenity.WX.change(this, (e1: JQueryEventObject) => {
+            this.element.change(() => {
                 var isNew = this.isMultiple() || Q.isEmptyOrNull(this.get_value());
                 inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
             });
 
-            Serenity.WX.changeSelect2(this, (e2: JQueryEventObject) => {
+            this.element.change((e) => {
+                if ($(e.target).hasClass('select2-change-triggered'))
+                    return;
                 if (this.isMultiple()) {
                     var values = this.get_values();
                     if (values.length > 0 && values[values.length - 1] == (-2147483648).toString()) {
                         this.set_values(values.slice(0, values.length - 1));
-                        this.inplaceCreateClick(e2);
+                        this.inplaceCreateClick(e);
                     }
                 }
                 else if (this.get_value() == (-2147483648).toString()) {
                     this.set_value(null);
-                    this.inplaceCreateClick(e2);
+                    this.inplaceCreateClick(e);
                 }
             });
 
@@ -568,8 +569,11 @@ namespace Serenity {
                 var el = this.element;
                 el.select2('val', val);
                 el.data('select2-change-triggered', true);
-                el.triggerHandler('change', [true])
-                el.data('select2-change-triggered', false);
+                try {
+                    el.triggerHandler('change')
+                } finally {
+                    el.data('select2-change-triggered', false);
+                }
 
                 this.updateInplaceReadOnly();
             }
@@ -669,7 +673,7 @@ namespace Serenity {
 
         set_readOnly(value: boolean) {
             if (value !== this.get_readOnly()) {
-                Serenity.EditorUtils.setReadonly(this.element, value);
+                this.element.attr("readonly", value ? "readonly" : null);
                 this.updateInplaceReadOnly();
             }
         }

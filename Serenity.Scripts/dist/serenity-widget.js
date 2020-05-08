@@ -12,6 +12,18 @@
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var IEditDialog = /** @class */ (function () {
+        function IEditDialog() {
+        }
+        IEditDialog = __decorate([
+            Serenity.Decorators.registerInterface('Serenity.IEditDialog')
+        ], IEditDialog);
+        return IEditDialog;
+    }());
+    Serenity.IEditDialog = IEditDialog;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var IBooleanValue = /** @class */ (function () {
         function IBooleanValue() {
         }
@@ -81,6 +93,18 @@ var Serenity;
         return IReadOnly;
     }());
     Serenity.IReadOnly = IReadOnly;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IValidateRequired = /** @class */ (function () {
+        function IValidateRequired() {
+        }
+        IValidateRequired = __decorate([
+            Serenity.Decorators.registerInterface('Serenity.IValidateRequired')
+        ], IValidateRequired);
+        return IValidateRequired;
+    }());
+    Serenity.IValidateRequired = IValidateRequired;
 })(Serenity || (Serenity = {}));
 var System;
 (function (System) {
@@ -705,5 +729,175 @@ var Serenity;
         return Widget;
     }(React.Component));
     Serenity.Widget = Widget;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var ReflectionUtils;
+    (function (ReflectionUtils) {
+        function getPropertyValue(o, property) {
+            var d = o;
+            var getter = d['get_' + property];
+            if (!!!(typeof (getter) === 'undefined')) {
+                return getter.apply(o);
+            }
+            var camelCase = makeCamelCase(property);
+            getter = d['get_' + camelCase];
+            if (!!!(typeof (getter) === 'undefined')) {
+                return getter.apply(o);
+            }
+            return d[camelCase];
+        }
+        ReflectionUtils.getPropertyValue = getPropertyValue;
+        function setPropertyValue(o, property, value) {
+            var d = o;
+            var setter = d['set_' + property];
+            if (!!!(typeof (setter) === 'undefined')) {
+                setter.apply(o, [value]);
+                return;
+            }
+            var camelCase = makeCamelCase(property);
+            setter = d['set_' + camelCase];
+            if (!!!(typeof (setter) === 'undefined')) {
+                setter.apply(o, [value]);
+                return;
+            }
+            d[camelCase] = value;
+        }
+        ReflectionUtils.setPropertyValue = setPropertyValue;
+        function makeCamelCase(s) {
+            if (Q.isEmptyOrNull(s)) {
+                return s;
+            }
+            if (s === 'ID') {
+                return 'id';
+            }
+            var hasNonUppercase = false;
+            var numUppercaseChars = 0;
+            for (var index = 0; index < s.length; index++) {
+                if (s.charCodeAt(index) >= 65 && s.charCodeAt(index) <= 90) {
+                    numUppercaseChars++;
+                }
+                else {
+                    hasNonUppercase = true;
+                    break;
+                }
+            }
+            if (!hasNonUppercase && s.length !== 1 || numUppercaseChars === 0) {
+                return s;
+            }
+            else if (numUppercaseChars > 1) {
+                return s.substr(0, numUppercaseChars - 1).toLowerCase() + s.substr(numUppercaseChars - 1);
+            }
+            else if (s.length === 1) {
+                return s.toLowerCase();
+            }
+            else {
+                return s.substr(0, 1).toLowerCase() + s.substr(1);
+            }
+        }
+        ReflectionUtils.makeCamelCase = makeCamelCase;
+    })(ReflectionUtils = Serenity.ReflectionUtils || (Serenity.ReflectionUtils = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var DialogTypeRegistry;
+    (function (DialogTypeRegistry) {
+        function search(typeName) {
+            var dialogType = Q.getType(typeName);
+            if (dialogType != null && Q.isAssignableFrom(Serenity.IDialog, dialogType)) {
+                return dialogType;
+            }
+            for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
+                var ns = _a[_i];
+                dialogType = Q.getType(ns + '.' + typeName);
+                if (dialogType != null && Q.isAssignableFrom(Serenity.IDialog, dialogType)) {
+                    return dialogType;
+                }
+            }
+            return null;
+        }
+        var knownTypes = {};
+        function tryGet(key) {
+            if (knownTypes[key] == null) {
+                var typeName = key;
+                var dialogType = search(typeName);
+                if (dialogType == null && !Q.endsWith(key, 'Dialog')) {
+                    typeName = key + 'Dialog';
+                    dialogType = search(typeName);
+                }
+                if (dialogType == null) {
+                    return null;
+                }
+                knownTypes[key] = dialogType;
+                return dialogType;
+            }
+            return knownTypes[key];
+        }
+        DialogTypeRegistry.tryGet = tryGet;
+        function get(key) {
+            var type = tryGet(key);
+            if (type == null) {
+                var message = key + ' dialog class is not found! Make sure there is a dialog class with this name, ' +
+                    'it is under your project root namespace, and your namespace parts start with capital letters, ' +
+                    'e.g. MyProject.Pascal.Cased namespace. If you got this error from an editor with InplaceAdd option ' +
+                    'check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). ' +
+                    "You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.";
+                Q.notifyError(message, '', null);
+                throw new Q.Exception(message);
+            }
+            return type;
+        }
+        DialogTypeRegistry.get = get;
+    })(DialogTypeRegistry = Serenity.DialogTypeRegistry || (Serenity.DialogTypeRegistry = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var SubDialogHelper;
+    (function (SubDialogHelper) {
+        function bindToDataChange(dialog, owner, dataChange, useTimeout) {
+            var widgetName = owner.widgetName;
+            dialog.element.bind('ondatachange.' + widgetName, function (e, dci) {
+                if (useTimeout) {
+                    window.setTimeout(function () {
+                        dataChange(e, dci);
+                    }, 0);
+                }
+                else {
+                    dataChange(e, dci);
+                }
+            }).bind('remove.' + widgetName, function () {
+                dialog.element.unbind('ondatachange.' + widgetName);
+            });
+            return dialog;
+        }
+        SubDialogHelper.bindToDataChange = bindToDataChange;
+        function triggerDataChange(dialog) {
+            dialog.element.triggerHandler('ondatachange');
+            return dialog;
+        }
+        SubDialogHelper.triggerDataChange = triggerDataChange;
+        function triggerDataChanged(element) {
+            element.triggerHandler('ondatachange');
+            return element;
+        }
+        SubDialogHelper.triggerDataChanged = triggerDataChanged;
+        function bubbleDataChange(dialog, owner, useTimeout) {
+            return bindToDataChange(dialog, owner, function (e, dci) {
+                owner.element.triggerHandler('ondatachange');
+            }, useTimeout);
+        }
+        SubDialogHelper.bubbleDataChange = bubbleDataChange;
+        function cascade(cascadedDialog, ofElement) {
+            cascadedDialog.element.one('dialogopen', function (e) {
+                cascadedDialog.element.dialog().dialog('option', 'position', cascadedDialogOffset(ofElement));
+            });
+            return cascadedDialog;
+        }
+        SubDialogHelper.cascade = cascade;
+        function cascadedDialogOffset(element) {
+            return { my: 'left top', at: 'left+20 top+20', of: element[0] };
+        }
+        SubDialogHelper.cascadedDialogOffset = cascadedDialogOffset;
+    })(SubDialogHelper = Serenity.SubDialogHelper || (Serenity.SubDialogHelper = {}));
 })(Serenity || (Serenity = {}));
 //# sourceMappingURL=serenity-widget.js.map

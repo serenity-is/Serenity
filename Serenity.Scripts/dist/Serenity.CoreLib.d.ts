@@ -675,6 +675,8 @@ declare namespace JQueryValidation {
 }
 declare namespace Q {
     function validateTooltip(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
+    function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
+    function removeValidationRule(element: JQuery, eventClass: string): JQuery;
 }
 declare namespace Q {
     namespace Authorization {
@@ -960,6 +962,7 @@ declare namespace Serenity {
         static elementFor<TWidget>(editorType: {
             new (...args: any[]): TWidget;
         }): JQuery;
+        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
         init(action?: (widget: any) => void): this;
         private static __isWidgetType;
@@ -983,7 +986,6 @@ declare namespace Serenity {
         defaultValue?: any;
     }
     interface Widget<TOptions> {
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         getGridField(): JQuery;
         change(handler: (e: JQueryEventObject) => void): void;
         changeSelect2(handler: (e: JQueryEventObject) => void): void;
@@ -1227,8 +1229,8 @@ declare namespace Serenity {
         function getValidator(element: JQuery): JQueryValidation.Validator;
     }
     namespace VX {
-        function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        function removeValidationRule(element: JQuery, eventClass: string): JQuery;
+        var addValidationRule: typeof Q.addValidationRule;
+        var removeValidationRule: typeof Q.removeValidationRule;
         function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean;
     }
 }
@@ -1361,6 +1363,7 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    let datePickerIconSvg: string;
     class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
         private minValue;
         private maxValue;
@@ -1369,6 +1372,12 @@ declare namespace Serenity {
         private sqlMinMax;
         constructor(input: JQuery);
         static useFlatpickr: boolean;
+        static flatPickrOptions(input: JQuery): {
+            clickOpens: boolean;
+            allowInput: boolean;
+            dateFormat: string;
+            onChange: () => void;
+        };
         get_value(): string;
         get value(): string;
         set_value(value: string): void;
@@ -1391,6 +1400,7 @@ declare namespace Serenity {
         get_sqlMinMax(): boolean;
         set_sqlMinMax(value: boolean): void;
         static dateInputChange: (e: JQueryEventObject) => void;
+        static flatPickrTrigger(input: JQuery): JQuery<HTMLElement>;
         static dateInputKeyup(e: JQueryEventObject): void;
     }
 }
@@ -1402,10 +1412,14 @@ declare namespace Serenity {
         private maxDate;
         private sqlMinMax;
         private time;
+        private lastSetValue;
+        private lastSetValueGet;
         constructor(input: JQuery, opt?: DateTimeEditorOptions);
+        getFlatpickrOptions(): any;
         get_value(): string;
         get value(): string;
         set_value(value: string): void;
+        private getDisplayFormat;
         set value(v: string);
         private get_valueAsDate;
         get valueAsDate(): Date;
@@ -1432,6 +1446,8 @@ declare namespace Serenity {
         intervalMinutes?: any;
         yearRange?: string;
         useUtc?: boolean;
+        seconds?: boolean;
+        inputOnly?: boolean;
     }
 }
 declare namespace Serenity {

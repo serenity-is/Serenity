@@ -8,6 +8,13 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class IEditDialog {
+    }
+    interface IEditDialog {
+        load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
+    }
+}
+declare namespace Serenity {
     class IBooleanValue {
     }
     interface IBooleanValue {
@@ -51,6 +58,14 @@ declare namespace Serenity {
         set_readOnly(value: boolean): void;
     }
     class IReadOnly {
+    }
+}
+declare namespace Serenity {
+    interface IValidateRequired {
+        get_required(): boolean;
+        set_required(value: boolean): void;
+    }
+    class IValidateRequired {
     }
 }
 declare namespace Serenity {
@@ -276,5 +291,33 @@ declare namespace Serenity {
         getGridField(): JQuery;
         change(handler: (e: JQueryEventObject) => void): void;
         changeSelect2(handler: (e: JQueryEventObject) => void): void;
+    }
+}
+declare namespace Serenity {
+    namespace ReflectionUtils {
+        function getPropertyValue(o: any, property: string): any;
+        function setPropertyValue(o: any, property: string, value: any): void;
+        function makeCamelCase(s: string): string;
+    }
+}
+declare namespace Serenity.DialogTypeRegistry {
+    function tryGet(key: string): WidgetDialogClass;
+    function get(key: string): WidgetDialogClass;
+}
+declare namespace Serenity {
+    namespace SubDialogHelper {
+        function bindToDataChange(dialog: any, owner: Serenity.Widget<any>, dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any;
+        function triggerDataChange(dialog: Serenity.Widget<any>): any;
+        function triggerDataChanged(element: JQuery): JQuery;
+        function bubbleDataChange(dialog: any, owner: Serenity.Widget<any>, useTimeout?: boolean): any;
+        function cascade(cascadedDialog: any, ofElement: JQuery): any;
+        function cascadedDialogOffset(element: JQuery): any;
+    }
+}
+declare namespace Serenity {
+    interface DataChangeInfo {
+        type: string;
+        entityId: any;
+        entity: any;
     }
 }

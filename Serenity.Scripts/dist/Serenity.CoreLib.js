@@ -1434,49 +1434,12 @@ var Q;
         if (!s || !s.length)
             return null;
         s = s + "";
-        if (typeof (s) != "string" || s.length === 0) {
+        if (typeof (s) != "string" || s.length === 0)
             return null;
-        }
         var res = s.match(isoRegexp);
-        if (typeof (res) == "undefined" || res === null) {
+        if (typeof (res) == "undefined" || res === null)
             return null;
-        }
-        var year, month, day, hour, min, sec, msec;
-        year = parseInt(res[1], 10);
-        if (typeof (res[2]) == "undefined" || res[2] === '') {
-            return new Date(year);
-        }
-        month = parseInt(res[2], 10) - 1;
-        day = parseInt(res[3], 10);
-        if (typeof (res[4]) == "undefined" || res[4] === '') {
-            return new Date(year, month, day);
-        }
-        hour = parseInt(res[4], 10);
-        min = parseInt(res[5], 10);
-        sec = (typeof (res[6]) != "undefined" && res[6] !== '') ? parseInt(res[6], 10) : 0;
-        if (typeof (res[7]) != "undefined" && res[7] !== '') {
-            msec = Math.round(1000.0 * parseFloat("0." + res[7]));
-        }
-        else {
-            msec = 0;
-        }
-        if ((typeof (res[8]) == "undefined" || res[8] === '') && (typeof (res[9]) == "undefined" || res[9] === '')) {
-            return new Date(year, month, day, hour, min, sec, msec);
-        }
-        var ofs;
-        if (typeof (res[9]) != "undefined" && res[9] !== '') {
-            ofs = parseInt(res[10], 10) * 3600000;
-            if (typeof (res[11]) != "undefined" && res[11] !== '') {
-                ofs += parseInt(res[11], 10) * 60000;
-            }
-            if (res[9] == "-") {
-                ofs = -ofs;
-            }
-        }
-        else {
-            ofs = 0;
-        }
-        return new Date(Date.UTC(year, month, day, hour, min, sec, msec) - ofs);
+        return new Date(s);
     }
     Q.parseISODateTime = parseISODateTime;
     function parseHourAndMin(value) {
@@ -1531,6 +1494,13 @@ var Q;
             if (res == null)
                 return false;
             return res;
+        }
+        s = Q.trim(s);
+        if (s.indexOf(' ') > 0 && s.indexOf(':') > s.indexOf(' ') + 1) {
+            var datePart = Q.parseDate(s.substr(0, s.indexOf(' ')));
+            if (datePart == null)
+                return null;
+            return Q.parseISODateTime(Q.formatDate(datePart, 'yyyy-MM-dd') + 'T' + Q.trim(s.substr(s.indexOf(' ' + 1))));
         }
         var dateVal;
         var dArray;
@@ -2857,6 +2827,13 @@ var Q;
             z.setHours(0, 0, 0, 0);
             return z.getTime() === d.getTime();
         });
+        $.validator.addMethod("dateTimeQ", function (value, element) {
+            var o = this.optional(element);
+            if (o)
+                return o;
+            var d = Q.parseDate(value);
+            return !!d;
+        });
         $.validator.addMethod("hourAndMin", function (value, element) {
             return this.optional(element) || !isNaN(Q.parseHourAndMin(value));
         });
@@ -2921,6 +2898,20 @@ var Q;
         return form.validate(Q.extend(Q.extend({}, valOpt), opt));
     }
     Q.validateTooltip = validateTooltip;
+    function addValidationRule(element, eventClass, rule) {
+        if (!element.length)
+            return element;
+        if (rule == null)
+            throw new Q.Exception('rule is null!');
+        element.addClass('customValidate').bind('customValidate.' + eventClass, rule);
+        return element;
+    }
+    Q.addValidationRule = addValidationRule;
+    function removeValidationRule(element, eventClass) {
+        element.unbind('customValidate.' + eventClass);
+        return element;
+    }
+    Q.removeValidationRule = removeValidationRule;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
@@ -3704,7 +3695,7 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    if (typeof React === "undefined") {
+    if (typeof React === "undefined" && typeof window !== "undefined") {
         if (window['preact'] != null) {
             window['React'] = window['ReactDOM'] = window['preact'];
             React.Fragment = Q.coalesce(React.Fragment, "x-fragment");
@@ -3735,7 +3726,7 @@ var Serenity;
             if (element.data(_this.widgetName)) {
                 throw new Q.Exception(Q.format("The element already has widget '{0}'!", _this.widgetName));
             }
-            element.bind('remove.' + _this.widgetName, function (e) {
+            element.on('remove.' + _this.widgetName, function (e) {
                 if (e.bubbles || e.cancelable) {
                     return;
                 }
@@ -3747,7 +3738,7 @@ var Serenity;
         Widget_1 = Widget;
         Widget.prototype.destroy = function () {
             this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
-            this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
+            this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
         };
         Widget.prototype.addCssClass = function () {
@@ -3779,6 +3770,9 @@ var Serenity;
             return $(elementHtml);
         };
         ;
+        Widget.prototype.addValidationRule = function (eventClass, rule) {
+            return Q.addValidationRule(this.element, eventClass, rule);
+        };
         Widget.create = function (params) {
             var widget;
             if (Q.isAssignableFrom(Serenity.IDialog, params.type)) {
@@ -6125,29 +6119,12 @@ var Serenity;
     })(ValidationHelper = Serenity.ValidationHelper || (Serenity.ValidationHelper = {}));
     var VX;
     (function (VX) {
-        function addValidationRule(element, eventClass, rule) {
-            if (element.length === 0) {
-                return element;
-            }
-            if (rule == null) {
-                throw new Q.Exception('rule is null!');
-            }
-            element.addClass('customValidate').bind('customValidate.' + eventClass, rule);
-            return element;
-        }
-        VX.addValidationRule = addValidationRule;
-        function removeValidationRule(element, eventClass) {
-            element.unbind('customValidate.' + eventClass);
-            return element;
-        }
-        VX.removeValidationRule = removeValidationRule;
+        VX.addValidationRule = Q.addValidationRule;
+        VX.removeValidationRule = Q.removeValidationRule;
         function validateElement(validator, widget) {
             return validator.element(widget.element[0]);
         }
         VX.validateElement = validateElement;
-        Serenity.Widget.prototype.addValidationRule = function (eventClass, rule) {
-            return VX.addValidationRule(this.element, eventClass, rule);
-        };
     })(VX = Serenity.VX || (Serenity.VX = {}));
 })(Serenity || (Serenity = {}));
 var Serenity;
@@ -6303,38 +6280,27 @@ var Serenity;
 var Serenity;
 (function (Serenity) {
     var Option = Serenity.Decorators.option;
+    Serenity.datePickerIconSvg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M14 2v-1h-3v1h-5v-1h-3v1h-3v15h17v-15h-3zM12 2h1v2h-1v-2zM4 2h1v2h-1v-2zM16 16h-15v-8.921h15v8.921zM1 6.079v-3.079h2v2h3v-2h5v2h3v-2h2v3.079h-15z" fill="#000000"></path></svg>';
     var DateEditor = /** @class */ (function (_super) {
         __extends(DateEditor, _super);
         function DateEditor(input) {
             var _this = _super.call(this, input) || this;
-            input.addClass('dateQ');
-            if (input.length) {
-                if (typeof flatpickr != undefined && (DateEditor_1.useFlatpickr || !$.fn.datepicker)) {
-                    flatpickr(input[0], {
-                        clickOpens: false,
-                        dateFormat: Q.Culture.dateOrder.split('').join('-').replace('y', 'Y')
-                    });
-                }
-                else if ($.fn.datepicker) {
-                    input.datepicker({
-                        showOn: 'button',
-                        beforeShow: function (inp, inst) {
-                            return !input.hasClass('readonly');
-                        },
-                        yearRange: Q.coalesce(_this.yearRange, '-100:+50')
-                    });
-                    $('<button class="ui-datepicker-trigger"><i class="fa fa-calendar"></i></button>')
-                        .insertAfter(input)
-                        .click(function () {
-                        if (!_this.get_readOnly())
-                            input._flatpickr.open();
-                    });
-                }
-                else {
-                    input.attr('type', 'date');
-                }
+            if (typeof flatpickr !== "undefined" && (DateEditor_1.useFlatpickr || !$.fn.datepicker)) {
+                flatpickr(input[0], DateEditor_1.flatPickrOptions(input));
             }
-            input.bind('keyup.' + _this.uniqueName, function (e) {
+            else if ($.fn.datepicker) {
+                input.datepicker({
+                    showOn: 'button',
+                    beforeShow: function (inp, inst) {
+                        return !input.hasClass('readonly');
+                    },
+                    yearRange: Q.coalesce(_this.yearRange, '-100:+50')
+                });
+            }
+            else {
+                input.attr('type', 'date');
+            }
+            input.on('keyup.' + _this.uniqueName, function (e) {
                 if (e.which === 32 && !_this.get_readOnly()) {
                     if (_this.get_valueAsDate() != Q.today()) {
                         _this.set_valueAsDate(Q.today());
@@ -6345,8 +6311,8 @@ var Serenity;
                     Serenity.DateEditor.dateInputKeyup(e);
                 }
             });
-            input.bind('change.' + _this.uniqueName, Serenity.DateEditor.dateInputChange);
-            Serenity.VX.addValidationRule(input, _this.uniqueName, function (e1) {
+            input.on('change.' + _this.uniqueName, Serenity.DateEditor.dateInputChange);
+            Q.addValidationRule(input, _this.uniqueName, function (e1) {
                 var value = _this.get_value();
                 if (Q.isEmptyOrNull(value)) {
                     return null;
@@ -6363,6 +6329,16 @@ var Serenity;
             return _this;
         }
         DateEditor_1 = DateEditor;
+        DateEditor.flatPickrOptions = function (input) {
+            return {
+                clickOpens: true,
+                allowInput: true,
+                dateFormat: Q.Culture.dateOrder.split('').join(Q.Culture.dateSeparator).replace('y', 'Y'),
+                onChange: function () {
+                    input.triggerHandler('change');
+                }
+            };
+        };
         DateEditor.prototype.get_value = function () {
             var value = this.element.val().trim();
             if (value != null && value.length === 0) {
@@ -6465,12 +6441,22 @@ var Serenity;
                 this.set_maxValue(null);
             }
         };
+        DateEditor.flatPickrTrigger = function (input) {
+            return $('<i class="ui-datepicker-trigger" href="javascript:;">' + Serenity.datePickerIconSvg + '</i>')
+                .insertAfter(input)
+                .click(function () {
+                if (!input.hasClass('readonly'))
+                    // @ts-ignore
+                    input[0]._flatpickr.open();
+            });
+        };
         DateEditor.dateInputKeyup = function (e) {
             if (Q.Culture.dateOrder !== 'dmy') {
                 return;
             }
             var input = $(e.target);
-            if (!input.is(':input')) {
+            if (!input.is(':input') || input.attr("type") == "date") {
+                // for browser date editors, format might not match culture setting
                 return;
             }
             if (input.is('[readonly]') || input.is(':disabled')) {
@@ -6615,12 +6601,12 @@ var Serenity;
                 return;
             }
             var input = $(e.target);
-            if (!input.is(':input')) {
+            if (!input.is(':input') || input.attr("type") == "date") {
                 return;
             }
             var val = Q.coalesce(input.val(), '');
             var x = {};
-            if (val.length >= 6 && !isNaN(parseInt(val, 10))) {
+            if (val.length >= 6 && /^[0-9]*$/g.test(val)) {
                 input.val(val.substr(0, 2) + Q.Culture.dateSeparator + val.substr(2, 2) + Q.Culture.dateSeparator + val.substr(4));
             }
             val = Q.coalesce(input.val(), '');
@@ -6651,6 +6637,35 @@ var Serenity;
         return DateEditor;
     }(Serenity.Widget));
     Serenity.DateEditor = DateEditor;
+    function jQueryDatepickerInitialization() {
+        if (!$.datepicker || !$.datepicker.regional || !$.datepicker.regional.en)
+            return false;
+        var order = Q.Culture.dateOrder;
+        var s = Q.Culture.dateSeparator;
+        var culture = ($('html').attr('lang') || 'en').toLowerCase();
+        if (!$.datepicker.regional[culture]) {
+            culture = culture.split('-')[0];
+            if (!$.datepicker.regional[culture]) {
+                culture = 'en';
+            }
+        }
+        $.datepicker.setDefaults($.datepicker.regional['en']);
+        $.datepicker.setDefaults($.datepicker.regional[culture]);
+        $.datepicker.setDefaults({
+            dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
+                (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
+                    'dd' + s + 'mm' + s + 'yy')),
+            buttonImage: 'data:image/svg+xml,' + encodeURI(Serenity.datePickerIconSvg),
+            buttonImageOnly: true,
+            showOn: 'both',
+            showButtonPanel: true,
+            changeMonth: true,
+            changeYear: true
+        });
+        return true;
+    }
+    ;
+    typeof $ !== "undefined" && !jQueryDatepickerInitialization() && $(jQueryDatepickerInitialization);
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -6659,86 +6674,138 @@ var Serenity;
         __extends(DateTimeEditor, _super);
         function DateTimeEditor(input, opt) {
             var _this = _super.call(this, input, opt) || this;
-            input.addClass('dateQ s-DateTimeEditor').datepicker({
-                showOn: 'button',
-                beforeShow: function () {
-                    return !input.hasClass('readonly');
-                },
-                yearRange: Q.coalesce(_this.options.yearRange, '-100:+50')
-            });
-            input.bind('keyup.' + _this.uniqueName, function (e) {
-                if (e.which === 32 && !_this.get_readOnly()) {
-                    if (_this.get_valueAsDate() !== new Date()) {
-                        _this.set_valueAsDate(new Date());
-                        _this.element.trigger('change');
+            input.addClass('s-DateTimeEditor');
+            if (_this.options.inputOnly) {
+                input.addClass('dateTimeQ');
+                // just a basic input, usually read only display
+            }
+            else if (typeof flatpickr !== "undefined" && (Serenity.DateEditor.useFlatpickr || !$.fn.datepicker || _this.options.seconds)) {
+                input.addClass('dateTimeQ');
+                flatpickr(input[0], _this.getFlatpickrOptions());
+            }
+            else if ($.fn.datepicker) {
+                input.addClass('dateQ');
+                input.datepicker({
+                    showOn: 'button',
+                    beforeShow: function () {
+                        return !input.hasClass('readonly');
+                    },
+                    yearRange: Q.coalesce(_this.options.yearRange, '-100:+50')
+                });
+                input.bind('change.' + _this.uniqueName, function (e) {
+                    _this.lastSetValue = null;
+                    Serenity.DateEditor.dateInputChange(e);
+                });
+                _this.time = $('<select/>').addClass('editor s-DateTimeEditor time');
+                var after = input.next('.ui-datepicker-trigger');
+                if (after.length > 0) {
+                    _this.time.insertAfter(after);
+                }
+                else {
+                    after = input.prev('.ui-datepicker-trigger');
+                    if (after.length > 0) {
+                        _this.time.insertBefore(after);
+                    }
+                    else {
+                        _this.time.insertAfter(input);
                     }
                 }
-                else {
-                    Serenity.DateEditor.dateInputKeyup(e);
+                _this.time.on('change', function (e3) {
+                    this.lastSetValue = null;
+                    input.triggerHandler('change');
+                });
+                var timeOpt = DateTimeEditor_1.getTimeOptions(Q.coalesce(_this.options.startHour, 0), 0, Q.coalesce(_this.options.endHour, 23), 59, Q.coalesce(_this.options.intervalMinutes, 5));
+                for (var _i = 0, timeOpt_1 = timeOpt; _i < timeOpt_1.length; _i++) {
+                    var t = timeOpt_1[_i];
+                    Q.addOption(_this.time, t, t);
                 }
-            });
-            input.bind('change.' + _this.uniqueName, Serenity.DateEditor.dateInputChange);
-            _this.time = $('<select/>').addClass('editor s-DateTimeEditor time');
-            var after = input.next('.ui-datepicker-trigger');
-            if (after.length > 0) {
-                _this.time.insertAfter(after);
-            }
-            else {
-                after = input.prev('.ui-datepicker-trigger');
-                if (after.length > 0) {
-                    _this.time.insertBefore(after);
-                }
-                else {
-                    _this.time.insertAfter(input);
-                }
-            }
-            var timeOpt = DateTimeEditor_1.getTimeOptions(Q.coalesce(_this.options.startHour, 0), 0, Q.coalesce(_this.options.endHour, 23), 59, Q.coalesce(_this.options.intervalMinutes, 5));
-            for (var _i = 0, timeOpt_1 = timeOpt; _i < timeOpt_1.length; _i++) {
-                var t = timeOpt_1[_i];
-                Q.addOption(_this.time, t, t);
-            }
-            Serenity.VX.addValidationRule(input, _this.uniqueName, function (e1) {
-                var value = _this.get_value();
-                if (Q.isEmptyOrNull(value)) {
+                Q.addValidationRule(input, _this.uniqueName, function (e1) {
+                    var value = _this.get_value();
+                    if (Q.isEmptyOrNull(value)) {
+                        return null;
+                    }
+                    if (!Q.isEmptyOrNull(_this.get_minValue()) &&
+                        Q.Invariant.stringCompare(value, _this.get_minValue()) < 0) {
+                        return Q.format(Q.text('Validation.MinDate'), Q.formatDate(_this.get_minValue(), null));
+                    }
+                    if (!Q.isEmptyOrNull(_this.get_maxValue()) &&
+                        Q.Invariant.stringCompare(value, _this.get_maxValue()) >= 0) {
+                        return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(_this.get_maxValue(), null));
+                    }
                     return null;
+                });
+            }
+            else
+                input.attr('type', 'datetime').addClass('dateTimeQ');
+            input.bind('keyup.' + _this.uniqueName, function (e) {
+                if (_this.get_readOnly())
+                    return;
+                if (_this.time) {
+                    if (e.which === 32) {
+                        if (_this.get_valueAsDate() !== new Date()) {
+                            _this.set_valueAsDate(new Date());
+                            _this.element.trigger('change');
+                        }
+                    }
+                    else {
+                        var before = _this.element.val();
+                        Serenity.DateEditor.dateInputKeyup(e);
+                        if (before != _this.element.val())
+                            _this.lastSetValue = null;
+                    }
                 }
-                if (!Q.isEmptyOrNull(_this.get_minValue()) &&
-                    Q.Invariant.stringCompare(value, _this.get_minValue()) < 0) {
-                    return Q.format(Q.text('Validation.MinDate'), Q.formatDate(_this.get_minValue(), null));
-                }
-                if (!Q.isEmptyOrNull(_this.get_maxValue()) &&
-                    Q.Invariant.stringCompare(value, _this.get_maxValue()) >= 0) {
-                    return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(_this.get_maxValue(), null));
-                }
-                return null;
             });
             _this.set_sqlMinMax(true);
-            $("<div class='inplace-button inplace-now'><b></b></div>")
-                .attr('title', 'set to now')
-                .insertAfter(_this.time).click(function (e2) {
-                if (_this.element.hasClass('readonly')) {
-                    return;
-                }
-                _this.set_valueAsDate(new Date());
-                input.triggerHandler('change');
-            });
-            _this.time.on('change', function (e3) {
-                input.triggerHandler('change');
-            });
+            if (!_this.options.inputOnly) {
+                $("<i class='inplace-button inplace-now'><b></b></div>")
+                    .attr('title', 'set to now')
+                    .insertAfter(_this.time).click(function (e2) {
+                    if (_this.element.hasClass('readonly')) {
+                        return;
+                    }
+                    _this.lastSetValue = null;
+                    _this.set_valueAsDate(new Date());
+                    input.triggerHandler('change');
+                });
+            }
             return _this;
         }
         DateTimeEditor_1 = DateTimeEditor;
+        DateTimeEditor.prototype.getFlatpickrOptions = function () {
+            var _this = this;
+            var _a;
+            return {
+                clickOpens: true,
+                allowInput: true,
+                enableTime: true,
+                time_24hr: true,
+                enableSeconds: !!this.options.seconds,
+                minuteIncrement: (_a = this.options.intervalMinutes) !== null && _a !== void 0 ? _a : 5,
+                dateFormat: Q.Culture.dateOrder.split('').join(Q.Culture.dateSeparator).replace('y', 'Y') + " H:i" + (this.options.seconds ? ":S" : ""),
+                onChange: function () {
+                    _this.lastSetValue = null;
+                    _this.element && _this.element.triggerHandler('change');
+                }
+            };
+        };
         DateTimeEditor.prototype.get_value = function () {
             var value = this.element.val().trim();
             if (value != null && value.length === 0) {
                 return null;
             }
-            var datePart = Q.formatDate(value, 'yyyy-MM-dd');
-            var timePart = this.time.val();
-            var result = datePart + 'T' + timePart + ':00.000';
-            if (this.options.useUtc) {
-                result = Q.formatISODateTimeUTC(Q.parseISODateTime(result));
+            var result;
+            if (this.time) {
+                var datePart = Q.formatDate(value, 'yyyy-MM-dd');
+                var timePart = this.time.val();
+                result = datePart + 'T' + timePart + ':00.000';
             }
+            else
+                result = Q.formatDate(Q.parseDate(this.element.val()), "yyyy-MM-ddTHH:mm:ss.fff");
+            if (this.options.useUtc)
+                result = Q.formatISODateTimeUTC(Q.parseISODateTime(result));
+            if (this.lastSetValue != null &&
+                this.lastSetValueGet == result)
+                return this.lastSetValue;
             return result;
         };
         Object.defineProperty(DateTimeEditor.prototype, "value", {
@@ -6754,18 +6821,35 @@ var Serenity;
         DateTimeEditor.prototype.set_value = function (value) {
             if (Q.isEmptyOrNull(value)) {
                 this.element.val('');
-                this.time.val('00:00');
+                this.time && this.time.val('00:00');
             }
             else if (value.toLowerCase() === 'today') {
-                this.element.val(Q.formatDate(Q.today(), null));
-                this.time.val('00:00');
+                if (this.time) {
+                    this.element.val(Q.formatDate(Q.today(), null));
+                    this.time.val('00:00');
+                }
+                else {
+                    this.element.val(this.getDisplayFormat());
+                }
             }
             else {
                 var val = ((value.toLowerCase() === 'now') ? new Date() : Q.parseISODateTime(value));
-                val = Serenity.DateTimeEditor.roundToMinutes(val, Q.coalesce(this.options.intervalMinutes, 5));
-                this.element.val(Q.formatDate(val, null));
-                this.time.val(Q.formatDate(val, 'HH:mm'));
+                if (this.time) {
+                    val = Serenity.DateTimeEditor.roundToMinutes(val, Q.coalesce(this.options.intervalMinutes, 5));
+                    this.element.val(Q.formatDate(val, null));
+                    this.time.val(Q.formatDate(val, 'HH:mm'));
+                }
+                else
+                    this.element.val(Q.formatDate(val, this.getDisplayFormat()));
             }
+            this.lastSetValue = null;
+            if (!Q.isEmptyOrNull(value)) {
+                this.lastSetValueGet = this.get_value();
+                this.lastSetValue = value;
+            }
+        };
+        DateTimeEditor.prototype.getDisplayFormat = function () {
+            return (this.options.seconds ? Q.Culture.dateTimeFormat : Q.Culture.dateTimeFormat.replace(':ss', ''));
         };
         DateTimeEditor.prototype.get_valueAsDate = function () {
             if (Q.isEmptyOrNull(this.get_value())) {
@@ -6787,7 +6871,7 @@ var Serenity;
             if (value == null) {
                 this.set_value(null);
             }
-            this.set_value(Q.formatDate(value, 'yyyy-MM-ddTHH:mm'));
+            this.set_value(Q.formatDate(value, 'yyyy-MM-ddTHH:mm' + (this.options.seconds ? ':ss' : '')));
         };
         DateTimeEditor.prototype.get_minValue = function () {
             return this.minValue;
@@ -6841,7 +6925,7 @@ var Serenity;
                     this.element.nextAll('.ui-datepicker-trigger').css('opacity', '1');
                     this.element.nextAll('.inplace-now').css('opacity', '1');
                 }
-                Serenity.EditorUtils.setReadonly(this.time, value);
+                this.time && this.time.attr('readonly', value ? "readonly" : null);
             }
         };
         DateTimeEditor.roundToMinutes = function (date, minutesStep) {
@@ -17889,37 +17973,6 @@ var Slick;
 })(Slick || (Slick = {}));
 var Q;
 (function (Q) {
-    function jQueryDatepickerInitialization() {
-        var order = Q.Culture.dateOrder;
-        var s = Q.Culture.dateSeparator;
-        var culture = ($('html').attr('lang') || 'en').toLowerCase();
-        if (!$.datepicker.regional[culture]) {
-            culture = culture.split('-')[0];
-            if (!$.datepicker.regional[culture]) {
-                culture = 'en';
-            }
-        }
-        $.datepicker.setDefaults($.datepicker.regional['en']);
-        $.datepicker.setDefaults($.datepicker.regional[culture]);
-        $.datepicker.setDefaults({
-            dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
-                (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
-                    'dd' + s + 'mm' + s + 'yy')),
-            buttonImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuNvyMY98AAAHNSURBVEhLtZU/S8NAGIf7FfpJHDoX136ADp3s4qDgUpeCDlJEEIcubk7ZFJ06OBRcdJAOdhCx6CAWodJFrP8KFexrnhcv3sVLVYyBp/fLXe75hbSkGRFxaLVaEgSBMMbXkpi0Rz8eVlbkrlhUdnM56XQ6Opq57/DtwRkVMCFMhJzn89JoNHQ0c9/h26NOU3BdKMh4eVneFhflcGpK1rNZHTn/CfE9uHA6BSyMFhZkODsrt2E7I+c/Ib4Hl1NwOT0dXcgx2N6Wh+FQx16vp/O/ARdO3FrAs2PhcWZGm3l+9sj8b8Cl34ddwMKgVEoFXE5BUK9zkurx4fwseBuPUyWxYKfZTCQIf+txtvb2HLwFm7WaTg5fX1V0cnWlxPPR2ZmC2GSkB+22QsaBC6dTwMLzaPTnAhy4vhSwcP/yEl1s2D8+ngjFNjhwJRZwt9wB2Jm79WVuws4TC3qDgUrJYGekvozUzjjITsFGtarNpsBw2u0654ghnhEbcODCmVjAewjsjMyXkdo5seDm6Uku+n2VcgHYGakvI7UzDlxOwWql4hT4QOoDqY0pwBkVLM3NRQVpgAtnVFApl3UyTXBGBWvhX9x8+JpNE5xRwf8hmXe+7B9dZrOuOwAAAABJRU5ErkJggg==',
-            buttonImageOnly: true,
-            showOn: 'both',
-            showButtonPanel: true,
-            changeMonth: true,
-            changeYear: true
-        });
-    }
-    ;
-    if ($.datepicker && $.datepicker.regional && $.datepicker.regional.en)
-        jQueryDatepickerInitialization();
-    else
-        $(function () {
-            $.datepicker && $.datepicker.regional && $.datepicker.regional.en && jQueryDatepickerInitialization();
-        });
     function jQueryUIInitialization() {
         $.ui.dialog.prototype._allowInteraction = function (event) {
             if ($(event.target).closest(".ui-dialog").length) {
