@@ -1,4 +1,4 @@
-var Q = require("SerenityCoreLibBase").Q;
+var Q = require("serenity-core").Q;
 
 test('format number with "." as decimal separator', function() {
     var backupDec = Q.Culture.decimalSeparator;

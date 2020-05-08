@@ -25,10 +25,13 @@
     </Message>
     <Exec Command="cmd /c &quot;$(NpmPath)npm&quot; install" />
   </Target>
-  <Target Name="MinimizeCoreLib" AfterTargets="AfterBuild" Inputs="dist\Serenity.CoreLib.js" Outputs="dist\Serenity.CoreLib.min.js">
+  <Target Name="MinimizeCoreLib" AfterTargets="AfterBuild" Inputs="dist\Serenity.CoreLib.*.js" Outputs="dist\Serenity.CoreLib.*.min.js">
     <Message Text="Minimizing Serenity.CoreLib.js..." Importance="high">
     </Message>
     <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)dist\Serenity.CoreLib.js&quot; -o &quot;$(ProjectDir)dist\Serenity.CoreLib.min.js&quot; --comments --mangle" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)dist\Serenity.CoreLib.base.js&quot; -o &quot;$(ProjectDir)dist\Serenity.CoreLib.base.min.js&quot; --comments --mangle" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)dist\Serenity.CoreLib.widget.js&quot; -o &quot;$(ProjectDir)dist\Serenity.CoreLib.widget.min.js&quot; --comments --mangle" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)dist\Serenity.CoreLib.editors.js&quot; -o &quot;$(ProjectDir)dist\Serenity.CoreLib.editors.min.js&quot; --comments --mangle" />
   </Target>
   <Target Name="MinimizeCodeGeneration" AfterTargets="AfterBuild" Inputs="dist\Serenity.CodeGeneration.js" Outputs="dist\Serenity.CodeGeneration.min.js">
     <Message Text="Minimizing Serenity.CodeGeneration.js..." Importance="high">

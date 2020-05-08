@@ -1,7 +1,7 @@
 ﻿{
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outFile": "../dist/Serenity.CoreLib.base.js",
+    "outFile": "../dist/serenity-core.js",
     "composite": true
   },
   "files": [

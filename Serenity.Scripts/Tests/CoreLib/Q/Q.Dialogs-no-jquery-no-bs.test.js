@@ -1,4 +1,4 @@
-Q = require("SerenityCoreLibBase").Q;
+Q = require("serenity-core").Q;
 
 test('Q.alert uses window.alert when no BS/jQuery UI loaded', function() {
     var alertCount = 0;

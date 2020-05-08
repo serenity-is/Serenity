@@ -358,4 +358,4 @@ var Serenity;
     }(Serenity.Widget));
     Serenity.EmailEditor = EmailEditor;
 })(Serenity || (Serenity = {}));
-//# sourceMappingURL=Serenity.CoreLib.editors.js.map
+//# sourceMappingURL=serenity-editors.js.map

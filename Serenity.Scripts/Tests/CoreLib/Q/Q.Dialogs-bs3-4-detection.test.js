@@ -34,7 +34,7 @@ function setupDummyJQueryForModal(callback) {
 
 test('BS3 is detected when modal version starts with 3', function() {
 
-    var Q = require("SerenityCoreLibBase").Q;
+    var Q = require("serenity-core").Q;
 
     var passedHtml;
     setupDummyJQueryForModal(function(html) {
@@ -67,7 +67,7 @@ test('BS3 is detected when modal version starts with 3', function() {
 
 test('BS4 is detected when modal version does not exist', function() {
     
-    var Q = require("SerenityCoreLibBase").Q;
+    var Q = require("serenity-core").Q;
 
     var passedHtml;
     setupDummyJQueryForModal(function(html) {
@@ -97,7 +97,7 @@ test('BS4 is detected when modal version does not exist', function() {
 
 test('BS4 is detected when modal version is something other than 3', function() {
     
-    var Q = require("SerenityCoreLibBase").Q;
+    var Q = require("serenity-core").Q;
     var passedHtml;
     setupDummyJQueryForModal(function(html) {
         passedHtml = html;

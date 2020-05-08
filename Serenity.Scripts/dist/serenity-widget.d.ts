@@ -8,6 +8,52 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class IBooleanValue {
+    }
+    interface IBooleanValue {
+        get_value(): boolean;
+        set_value(value: boolean): void;
+    }
+}
+declare namespace Serenity {
+    class IDoubleValue {
+    }
+    interface IDoubleValue {
+        get_value(): any;
+        set_value(value: any): void;
+    }
+}
+declare namespace Serenity {
+    class IStringValue {
+    }
+    interface IStringValue {
+        get_value(): string;
+        set_value(value: string): void;
+    }
+}
+declare namespace Serenity {
+    class IGetEditValue {
+    }
+    interface IGetEditValue {
+        getEditValue(property: PropertyItem, target: any): void;
+    }
+}
+declare namespace Serenity {
+    class ISetEditValue {
+    }
+    interface ISetEditValue {
+        setEditValue(source: any, property: PropertyItem): void;
+    }
+}
+declare namespace Serenity {
+    interface IReadOnly {
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+    }
+    class IReadOnly {
+    }
+}
+declare namespace Serenity {
     interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
         type?: new (element: JQuery, options?: TOptions) => TWidget;
         options?: TOptions;
@@ -230,51 +276,5 @@ declare namespace Serenity {
         getGridField(): JQuery;
         change(handler: (e: JQueryEventObject) => void): void;
         changeSelect2(handler: (e: JQueryEventObject) => void): void;
-    }
-}
-declare namespace Serenity {
-    class IBooleanValue {
-    }
-    interface IBooleanValue {
-        get_value(): boolean;
-        set_value(value: boolean): void;
-    }
-}
-declare namespace Serenity {
-    class IDoubleValue {
-    }
-    interface IDoubleValue {
-        get_value(): any;
-        set_value(value: any): void;
-    }
-}
-declare namespace Serenity {
-    class IStringValue {
-    }
-    interface IStringValue {
-        get_value(): string;
-        set_value(value: string): void;
-    }
-}
-declare namespace Serenity {
-    class IGetEditValue {
-    }
-    interface IGetEditValue {
-        getEditValue(property: PropertyItem, target: any): void;
-    }
-}
-declare namespace Serenity {
-    class ISetEditValue {
-    }
-    interface ISetEditValue {
-        setEditValue(source: any, property: PropertyItem): void;
-    }
-}
-declare namespace Serenity {
-    interface IReadOnly {
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-    }
-    class IReadOnly {
     }
 }

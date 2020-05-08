@@ -10,6 +10,78 @@
     }());
     Serenity.IDialog = IDialog;
 })(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IBooleanValue = /** @class */ (function () {
+        function IBooleanValue() {
+        }
+        IBooleanValue = __decorate([
+            Serenity.Decorators.registerInterface()
+        ], IBooleanValue);
+        return IBooleanValue;
+    }());
+    Serenity.IBooleanValue = IBooleanValue;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IDoubleValue = /** @class */ (function () {
+        function IDoubleValue() {
+        }
+        IDoubleValue = __decorate([
+            Serenity.Decorators.registerInterface()
+        ], IDoubleValue);
+        return IDoubleValue;
+    }());
+    Serenity.IDoubleValue = IDoubleValue;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IStringValue = /** @class */ (function () {
+        function IStringValue() {
+        }
+        IStringValue = __decorate([
+            Serenity.Decorators.registerInterface()
+        ], IStringValue);
+        return IStringValue;
+    }());
+    Serenity.IStringValue = IStringValue;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IGetEditValue = /** @class */ (function () {
+        function IGetEditValue() {
+        }
+        IGetEditValue = __decorate([
+            Serenity.Decorators.registerInterface()
+        ], IGetEditValue);
+        return IGetEditValue;
+    }());
+    Serenity.IGetEditValue = IGetEditValue;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var ISetEditValue = /** @class */ (function () {
+        function ISetEditValue() {
+        }
+        ISetEditValue = __decorate([
+            Serenity.Decorators.registerInterface()
+        ], ISetEditValue);
+        return ISetEditValue;
+    }());
+    Serenity.ISetEditValue = ISetEditValue;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IReadOnly = /** @class */ (function () {
+        function IReadOnly() {
+        }
+        IReadOnly = __decorate([
+            Serenity.Decorators.registerInterface('Serenity.IReadOnly')
+        ], IReadOnly);
+        return IReadOnly;
+    }());
+    Serenity.IReadOnly = IReadOnly;
+})(Serenity || (Serenity = {}));
 var System;
 (function (System) {
     var ComponentModel;
@@ -631,76 +703,4 @@ var Serenity;
     }(React.Component));
     Serenity.Widget = Widget;
 })(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var IBooleanValue = /** @class */ (function () {
-        function IBooleanValue() {
-        }
-        IBooleanValue = __decorate([
-            Serenity.Decorators.registerInterface()
-        ], IBooleanValue);
-        return IBooleanValue;
-    }());
-    Serenity.IBooleanValue = IBooleanValue;
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var IDoubleValue = /** @class */ (function () {
-        function IDoubleValue() {
-        }
-        IDoubleValue = __decorate([
-            Serenity.Decorators.registerInterface()
-        ], IDoubleValue);
-        return IDoubleValue;
-    }());
-    Serenity.IDoubleValue = IDoubleValue;
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var IStringValue = /** @class */ (function () {
-        function IStringValue() {
-        }
-        IStringValue = __decorate([
-            Serenity.Decorators.registerInterface()
-        ], IStringValue);
-        return IStringValue;
-    }());
-    Serenity.IStringValue = IStringValue;
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var IGetEditValue = /** @class */ (function () {
-        function IGetEditValue() {
-        }
-        IGetEditValue = __decorate([
-            Serenity.Decorators.registerInterface()
-        ], IGetEditValue);
-        return IGetEditValue;
-    }());
-    Serenity.IGetEditValue = IGetEditValue;
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var ISetEditValue = /** @class */ (function () {
-        function ISetEditValue() {
-        }
-        ISetEditValue = __decorate([
-            Serenity.Decorators.registerInterface()
-        ], ISetEditValue);
-        return ISetEditValue;
-    }());
-    Serenity.ISetEditValue = ISetEditValue;
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var IReadOnly = /** @class */ (function () {
-        function IReadOnly() {
-        }
-        IReadOnly = __decorate([
-            Serenity.Decorators.registerInterface('Serenity.IReadOnly')
-        ], IReadOnly);
-        return IReadOnly;
-    }());
-    Serenity.IReadOnly = IReadOnly;
-})(Serenity || (Serenity = {}));
-//# sourceMappingURL=Serenity.CoreLib.widget.js.map
+//# sourceMappingURL=serenity-widget.js.map

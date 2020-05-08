@@ -1,12 +1,12 @@
 ﻿{
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outFile": "../dist/Serenity.CoreLib.editors.js",
+    "outFile": "../dist/serenity-editors.js",
     "composite": true
   },
   "references": [
     {
-      "path": "tsconfig.base.json"
+      "path": "tsconfig.core.json"
     },
     {
       "path": "tsconfig.widget.json"

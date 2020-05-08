@@ -1,24 +1,24 @@
 ﻿{
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outFile": "../dist/Serenity.CoreLib.widget.js",
+    "outFile": "../dist/serenity-widget.js",
     "composite": true
   },
   "references": [
     {
-      "path": "./tsconfig.base.json"
+      "path": "./tsconfig.core.json"
     }
   ],
   "files": [
-    "UI/Widgets/IDialog.ts",
+    "UI/Interfaces/IDialog.ts",
+    "UI/Interfaces/IBooleanValue.ts",
+    "UI/Interfaces/IDoubleValue.ts",
+    "UI/Interfaces/IStringValue.ts",
+    "UI/Interfaces/IGetEditValue.ts",
+    "UI/Interfaces/ISetEditValue.ts",
+    "UI/Interfaces/IReadOnly.ts",
     "UI/Widgets/CreateWidgetParams.ts",
     "Decorators/Decorators.Widget.ts",
     "UI/Widgets/Widget.ts",
-    "UI/Editors/IBooleanValue.ts",
-    "UI/Editors/IDoubleValue.ts",
-    "UI/Editors/IStringValue.ts",
-    "UI/Editors/IGetEditValue.ts",
-    "UI/Editors/ISetEditValue.ts",
-    "UI/Editors/IReadOnly.ts"
   ]
 }

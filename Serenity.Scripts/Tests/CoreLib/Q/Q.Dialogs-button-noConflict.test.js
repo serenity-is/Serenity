@@ -27,7 +27,7 @@ test('noConflict is not called if no jQuery ui button widget', function() {
                 noConflictCalled = true;
             }
         }
-        var Q = require("SerenityCoreLibBase").Q;
+        var Q = require("serenity-core").Q;
         expect(noConflictCalled).toBe(false);
     }
     finally {
@@ -45,7 +45,7 @@ test('noConflict skipped if button does not have noConflict method', function() 
         };
         global.$.fn.button = {
         }
-        var Q = require("SerenityCoreLibBase").Q;
+        var Q = require("serenity-core").Q;
     }
     finally {
         delete global.$;
@@ -70,7 +70,7 @@ test('noConflict called if jQuery ui button widget exists and $.fn.button has no
         global.$.ui = {
             button: uiButton
         };
-        var Q = require("SerenityCoreLibBase").Q;
+        var Q = require("serenity-core").Q;
         expect(noConflictCalled).toBe(true);
         expect($.fn.button).toBe(uiButton);
         expect($.fn.btn).toBe(bsButton);

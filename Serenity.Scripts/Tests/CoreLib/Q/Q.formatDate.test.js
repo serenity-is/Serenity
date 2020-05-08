@@ -1,4 +1,4 @@
-Q = require("SerenityCoreLibBase").Q;
+Q = require("serenity-core").Q;
 
 test('FormatDateWorks', function() {
     var backupDec = Q.Culture.dateSeparator;
