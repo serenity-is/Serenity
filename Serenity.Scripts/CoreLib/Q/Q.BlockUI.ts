@@ -1,4 +1,7 @@
-﻿
+﻿declare interface JQBlockUIOptions {
+    useTimeout?: boolean;   
+}
+
 namespace Q {
     let blockUICount: number = 0;
 
@@ -8,7 +11,13 @@ namespace Q {
             return;
         }
 
-        $.blockUI(opt);
+        if ($.blockUI) {
+            $.blockUI && $.blockUI(opt);
+        }
+        else {
+            $('<div class="blockUI blockOverlay" style="z-index: 2000; border: none; margin: 0px; padding: 0px; width: 100%; height: 100%; top: 0px; left: 0px; opacity: 0; cursor: wait; position: fixed;"></div>')
+                .appendTo(document.body);
+        }
         blockUICount++;
     }
 
@@ -21,7 +30,7 @@ namespace Q {
      * div is 2000, so a higher z-order shouldn't be used in page.
      */
     export function blockUI(options: JQBlockUIOptions) {
-        options = $.extend<JQBlockUIOptions>({
+        options = Q.extend({
             baseZ: 2000,
             message: '',
             overlayCSS: {
@@ -48,6 +57,9 @@ namespace Q {
         }
 
         blockUICount--;
-        $.unblockUI({ fadeOut: 0 });
+        if ($.unblockUI)
+            $.unblockUI({ fadeOut: 0 });
+        else 
+            $(document.body).children('.blockUI.blockOverlay').remove();
     }
 }

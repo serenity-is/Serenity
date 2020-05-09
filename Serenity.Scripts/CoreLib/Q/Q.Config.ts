@@ -7,21 +7,23 @@
          */
         export let applicationPath = '/';
 
-        var pathLink = $('link#ApplicationPath');
-        if (pathLink.length > 0) {
-            applicationPath = pathLink.attr('href');
+        if (typeof document !== 'undefined') {
+            var pathLink = document.querySelector('link#ApplicationPath') as HTMLLinkElement;
+            if (pathLink != null) {
+                applicationPath = pathLink.href;
+            }
         }
-
-        /**
-         * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
-         */
-        export let emailAllowOnlyAscii = true;
 
         /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
          * on dialog classes manually. It's false by default for backward compability.
          */
         export let responsiveDialogs = false;
+
+        /**
+         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default for message dialogs
+         */
+        export let bootstrapMessages = false;
 
         /**
          * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type

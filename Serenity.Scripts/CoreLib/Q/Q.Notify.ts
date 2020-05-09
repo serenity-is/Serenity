@@ -9,7 +9,7 @@ namespace Q {
     }
 
     function getToastrOptions(options: ToastrOptions) {
-        options = $.extend<ToastrOptions>({}, defaultNotifyOptions, options);
+        options = Q.extend(Q.extend({}, defaultNotifyOptions), options);
         positionToastContainer(true);
         return options;
     }

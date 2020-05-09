@@ -7,7 +7,9 @@
     "emitBOM": true,
     "sourceMap": true,
     "outFile": "../dist/Serenity.CodeGeneration.js",
-    "target": "ES3"
+    "target": "ES3",
+    "types": [
+    ]
   },
   "files": [
     "typeScriptServices.d.ts",

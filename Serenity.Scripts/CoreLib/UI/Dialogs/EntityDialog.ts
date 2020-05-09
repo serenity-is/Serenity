@@ -1,12 +1,5 @@
 ﻿namespace Serenity {
 
-    @Decorators.registerInterface('Serenity.IEditDialog')
-    export class IEditDialog {
-    }
-
-    export interface IEditDialog {
-        load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
-    }
 
     @Serenity.Decorators.registerClass('Serenity.EntityDialog', [Serenity['IEditDialog'], IReadOnly])
     export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
@@ -33,16 +26,8 @@
         constructor(opt?: TOptions) {
             super(opt);
 
-            if (!this.isAsyncWidget()) {
-                this.initPropertyGrid();
-                this.initLocalizationGrid();
-            }
-        }
-
-        protected initializeAsync(): PromiseLike<void> {
-            return super.initializeAsync()
-                .then(() => this.initPropertyGridAsync())
-                .then(() => this.initLocalizationGridAsync());
+            this.initPropertyGrid();
+            this.initLocalizationGrid();
         }
 
         destroy(): void {
@@ -171,7 +156,7 @@
             };
 
             var thisOptions = this.getDeleteOptions(callback);
-            var finalOptions = $.extend(baseOptions, thisOptions);
+            var finalOptions = Q.extend(baseOptions, thisOptions);
 
             this.deleteHandler(finalOptions, callback);
         }
@@ -180,7 +165,7 @@
         }
 
         protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
-            return (ss as any).getAttributes((ss as any).getInstanceType(this), attrType, true);
+            return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         }
 
         private entityType: string;
@@ -196,7 +181,7 @@
                 return (this.entityType = typeAttributes[0].value);
 
             // remove global namespace
-            var name = (ss as any).getTypeFullName((ss as any).getInstanceType(this));
+            var name = Q.getTypeFullName(Q.getInstanceType(this));
             var px = name.indexOf('.');
             if (px >= 0)
                 name = name.substring(px + 1);
@@ -334,7 +319,7 @@
             return this.service;
         }
 
-        load(entityOrId: any, done: () => void, fail: (ex: ss.Exception) => void): void {
+        load(entityOrId: any, done: () => void, fail: (ex: Q.Exception) => void): void {
 
             var action = () => {
 
@@ -370,7 +355,7 @@
                 action();
             }
             catch (ex1) {
-                var ex = (ss.Exception as any).wrap(ex1);
+                var ex = (Q.Exception as any).wrap(ex1);
                 fail(ex);
             }
         }
@@ -464,7 +449,7 @@
             };
 
             var thisOptions = this.getLoadByIdOptions(id, callback);
-            var finalOptions = $.extend(baseOptions, thisOptions);
+            var finalOptions = Q.extend(baseOptions, thisOptions);
             this.loadByIdHandler(finalOptions, callback, fail);
         }
 
@@ -480,20 +465,6 @@
             }
             var pgOptions = this.getPropertyGridOptions();
             this.initLocalizationGridCommon(pgOptions);
-        }
-
-        protected initLocalizationGridAsync(): PromiseLike<void> {
-            return Promise.resolve().then(() => {
-
-                var pgDiv = this.byId('PropertyGrid');
-                if (pgDiv.length <= 0) {
-                    return Promise.resolve();
-                }
-
-                return this.getPropertyGridOptionsAsync().then(pgOptions => {
-                    this.initLocalizationGridCommon(pgOptions);
-                });
-            });
         }
 
         protected initLocalizationGridCommon(pgOptions: PropertyGridOptions) {
@@ -513,7 +484,7 @@
                 var langs = null;
 
                 if (item1.localizable === true) {
-                    var copy = $.extend({}, item1);
+                    var copy = Q.extend({}, item1);
                     copy.oneWay = true;
                     copy.readOnly = true;
                     copy.required = false;
@@ -524,7 +495,7 @@
                         langs = this.getLangs();
 
                     for (var lang of langs) {
-                        copy = $.extend({}, item1);
+                        copy = Q.extend({}, item1);
                         copy.name = lang[0] + '$' + copy.name;
                         copy.title = lang[1];
                         copy.cssClass = [copy.cssClass, 'translation'].join(' ');
@@ -587,7 +558,7 @@
         private getLangs(): any {
 
             var langsTuple = this.getLanguages();
-            var langs = (ss as any).safeCast(langsTuple, Array);
+            var langs = Q.safeCast(langsTuple, Array);
             if (langs == null || langs.length === 0 ||
                 langs[0] == null || !Q.isArray(langs[0])) {
                 langs = Array.prototype.slice.call(langsTuple.map(function (x: any) {
@@ -621,7 +592,7 @@
                     IncludeColumns: ['Localizations']
                 },
                 onSuccess: response => {
-                    var copy = $.extend(new Object(), this.get_entity());
+                    var copy = Q.extend(new Object(), this.get_entity());
                     if (response.Localizations) {
                         for (var language of Object.keys(response.Localizations)) {
                             var entity = response.Localizations[language];
@@ -717,26 +688,6 @@
             }
         }
 
-        protected initPropertyGridAsync(): PromiseLike<void> {
-
-            return Promise.resolve().then(() => {
-
-                var pgDiv = this.byId('PropertyGrid');
-                if (pgDiv.length <= 0) {
-                    return Promise.resolve();
-                }
-
-                return this.getPropertyGridOptionsAsync().then(pgOptions => {
-                    this.propertyGrid = new Serenity.PropertyGrid(pgDiv, pgOptions);
-
-                    if (this.element.closest('.ui-dialog').hasClass('s-Flexify'))
-                        this.propertyGrid.element.children('.categories').flexHeightOnly(1);
-
-                    return this.propertyGrid.init() as any;
-                });
-            });
-        }
-
         protected getPropertyItems() {
             var formKey = this.getFormKey();
             return Q.getForm(formKey);
@@ -750,27 +701,6 @@
                 localTextPrefix: 'Forms.' + this.getFormKey() + '.',
                 useCategories: true
             };
-        }
-
-        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions> {
-
-            return this.getPropertyItemsAsync().then(propertyItems => {
-                return <PropertyGridOptions>{
-                    idPrefix: this.idPrefix,
-                    items: propertyItems,
-                    mode: 1,
-                    localTextPrefix: 'Forms.' + this.getFormKey() + '.',
-                    useCategories: true
-                };
-            });
-
-        }
-
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]> {
-            return Promise.resolve().then(() => {
-                var formKey = this.getFormKey();
-                return Q.getFormAsync(formKey);
-            });
         }
 
         protected validateBeforeSave(): boolean {
@@ -994,7 +924,7 @@
                     var cloneEntity = this.getCloningEntity();
 
                     Serenity.Widget.create({
-                        type: (ss as any).getInstanceType(this),
+                        type: Q.getInstanceType(this),
                         init: w => Serenity.SubDialogHelper.bubbleDataChange(
                             Serenity.SubDialogHelper.cascade(w, this.element), this, true)
                             .loadEntityAndOpenDialog(cloneEntity, null)
@@ -1010,7 +940,7 @@
         protected getCloningEntity(): TItem {
 
             var clone: TItem = new Object() as any;
-            clone = $.extend(clone, this.get_entity());
+            clone = Q.extend(clone, this.get_entity());
 
             var idField = this.getIdProperty();
             if (!Q.isEmptyOrNull(idField)) {
@@ -1112,7 +1042,7 @@
             };
 
             var thisOptions = this.getUndeleteOptions(callback);
-            var finalOptions = $.extend(baseOptions, thisOptions);
+            var finalOptions = Q.extend(baseOptions, thisOptions);
             this.undeleteHandler(finalOptions, callback);
         }
 

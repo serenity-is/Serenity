@@ -30,7 +30,7 @@
         public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
 
             if (opt == null) {
-                throw new (ss as any).ArgumentNullException('opt');
+                throw new Q.ArgumentNullException('opt');
             }
 
             if (opt.separator) {
@@ -114,7 +114,7 @@
                 }
             };
 
-            Serenity.WX.changeSelect2(widget, (e1: JQueryEventObject) => {
+            widget.changeSelect2(e1 => {
                 // use timeout give cascaded dropdowns a chance to update / clear themselves
                 window.setTimeout(() => this.onChange && this.onChange(e1), 0);
             });
@@ -331,60 +331,6 @@
             };
         }
 
-        public static propertyItemToQuickFilter(item: PropertyItem) {
-            var quick: any = {};
-
-            var name = item.name;
-            var title = Q.tryGetText(item.title);
-            if (title == null) {
-                title = item.title;
-                if (title == null) {
-                    title = name;
-                }
-            }
-
-            var filteringType = Serenity.FilteringTypeRegistry.get(Q.coalesce(item.filteringType, 'String'));
-            if (filteringType === Serenity.DateFiltering) {
-                quick = QuickFilterBar.dateRange(name, title);
-            }
-            else if (filteringType === Serenity.DateTimeFiltering) {
-                quick = QuickFilterBar.dateTimeRange(name, title);
-            }
-            else if (filteringType === Serenity.BooleanFiltering) {
-                var q = item.quickFilterParams || {};
-                var f = item.filteringParams || {};
-                var trueText = q['trueText'];
-                if (trueText == null) {
-                    trueText = f['trueText'];
-                }
-                var falseText = q['falseText'];
-                if (falseText == null) {
-                    falseText = f['falseText'];
-                }
-                quick = QuickFilterBar.boolean(name, title, trueText, falseText);
-            }
-            else {
-                var filtering = new (filteringType as any)() as IFiltering;
-                if (filtering && (ss as any).isInstanceOfType(filtering, Serenity.IQuickFiltering)) {
-                    Serenity.ReflectionOptionsSetter.set(filtering, item.filteringParams);
-                    filtering.set_field(item);
-                    filtering.set_operator({ key: Serenity.FilterOperators.EQ });
-                    (filtering as any).initQuickFilter(quick);
-                    quick.options = Q.deepClone(quick.options, item.quickFilterParams);
-                }
-                else {
-                    return null;
-                }
-            }
-
-            if (!!item.quickFilterSeparator) {
-                quick.separator = true;
-            }
-
-            quick.cssClass = item.quickFilterCssClass;
-            return quick;
-        }
-
         public onChange: (e: JQueryEventObject) => void;
 
         private submitHandlers: any;
@@ -399,11 +345,11 @@
         }
 
         protected add_submitHandlers(action: (request: Serenity.ListRequest) => void): void {
-            this.submitHandlers = (ss as any).delegateCombine(this.submitHandlers, action);
+            this.submitHandlers = Q.delegateCombine(this.submitHandlers, action);
         }
 
         protected remove_submitHandlers(action: (request: Serenity.ListRequest) => void): void {
-            this.submitHandlers = (ss as any).delegateRemove(this.submitHandlers, action);
+            this.submitHandlers = Q.delegateRemove(this.submitHandlers, action);
         }
 
         protected clear_submitHandlers() {

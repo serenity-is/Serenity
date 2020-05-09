@@ -54,7 +54,7 @@ namespace Serenity {
                     grid.refresh();
                 };
 
-                Q.Router.dialog(grid.element, picker.element, () => "columns");
+                Q["Router"] && Q["Router"].dialog && Q["Router"].dialog(grid.element, picker.element, () => "columns");
                 picker.dialogOpen();
             }
 
@@ -198,7 +198,7 @@ namespace Serenity {
                 }
             }
 
-            let hiddenColumns = hidden.sort((a, b) => Q.turkishLocaleCompare(this.getTitle(a), this.getTitle(b)));
+            let hiddenColumns = hidden.sort((a, b) => Q.Culture.stringCompare(this.getTitle(a), this.getTitle(b)));
 
             for (let id of this.visibleColumns) {
                 var c = this.colById[id];

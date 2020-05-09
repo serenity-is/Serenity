@@ -192,47 +192,36 @@
             var errorText = null;
             var row = null;
             for (var i = 0; i < this.rowsDiv.children().length; i++) {
-                try {
-                    row = this.rowsDiv.children().eq(i);
-                    var filtering = this.getFilteringFor(row);
-                    if (filtering == null) {
-                        continue;
-                    }
-
-                    var field = this.getFieldFor(row);
-                    var op = row.children('div.o').find('input.op-select')
-                        .getWidget(FilterOperatorSelect).value;
-
-                    if (op == null || op.length === 0) 
-                        throw new (ss as any).ArgumentOutOfRangeException('operator',
-                            Q.text('Controls.FilterPanel.InvalidOperator'));
-
-                    var line: FilterLine = {};
-                    line.field = field.name;
-                    line.operator = op;
-                    line.isOr = row.children('div.l')
-                        .children('a.andor').hasClass('or');
-                    line.leftParen = row.children('div.l')
-                        .children('a.leftparen').hasClass('active');
-                    line.rightParen = row.children('div.l')
-                        .children('a.rightparen').hasClass('active');
-                    filtering.set_operator({ key: op });
-                    var criteria = filtering.getCriteria();
-                    line.criteria = criteria.criteria;
-                    line.state = filtering.saveState();
-                    line.displayText = criteria.displayText;
-                    filterLines.push(line);
+                row = this.rowsDiv.children().eq(i);
+                var filtering = this.getFilteringFor(row);
+                if (filtering == null) {
+                    continue;
                 }
-                catch (ex) {
-                    ex = (ss.Exception as any).wrap(ex);
-                    if ((ss as any).isInstanceOfType(ex, (ss as any).ArgumentException)) {
-                        errorText = ex.get_message();
-                        break;
-                    }
-                    else {
-                        throw ex;
-                    }
+
+                var field = this.getFieldFor(row);
+                var op = row.children('div.o').find('input.op-select')
+                    .getWidget(FilterOperatorSelect).value;
+
+                if (op == null || op.length === 0) {
+                    errorText = Q.text('Controls.FilterPanel.InvalidOperator');
+                    break;
                 }
+
+                var line: FilterLine = {};
+                line.field = field.name;
+                line.operator = op;
+                line.isOr = row.children('div.l')
+                    .children('a.andor').hasClass('or');
+                line.leftParen = row.children('div.l')
+                    .children('a.leftparen').hasClass('active');
+                line.rightParen = row.children('div.l')
+                    .children('a.rightparen').hasClass('active');
+                filtering.set_operator({ key: op });
+                var criteria = filtering.getCriteria();
+                line.criteria = criteria.criteria;
+                line.state = filtering.saveState();
+                line.displayText = criteria.displayText;
+                filterLines.push(line);
             }
 
             // if an error occurred, display it, otherwise set current filters
@@ -243,8 +232,9 @@
                 return;
             }
 
-            (ss as any).clear(this.get_store().get_items());
-            (ss as any).arrayAddRange(this.get_store().get_items(), filterLines);
+            var items = this.get_store().get_items();
+            items.length = 0;
+            items.push.apply(items, filterLines);
             this.get_store().raiseChanged();
         }
 
@@ -258,7 +248,7 @@
 
             if (this.get_updateStoreOnReset()) {
                 if (this.get_store().get_items().length > 0) {
-                    (ss as any).clear(this.get_store().get_items());
+                    this.get_store().get_items().length = 0;
                     this.get_store().raiseChanged();
                 }
             }
@@ -290,7 +280,7 @@
             return result;
         }
 
-        protected addEmptyRow(popupField: boolean) {
+        protected addEmptyRow(popupField: boolean): JQuery {
             var emptyRow = this.findEmptyRow();
 
             if (emptyRow != null) {
@@ -415,7 +405,7 @@
             if (field == null)
                 return null;
 
-            var filtering = (ss as any).cast(row.data('Filtering'), IFiltering);
+            var filtering = Q.cast(row.data('Filtering'), IFiltering);
 
             if (filtering != null)
                 return filtering;
@@ -424,7 +414,7 @@
                 Q.coalesce(field.filteringType, 'String'));
 
             var editorDiv = row.children('div.v');
-            filtering = (ss as any).cast((ss as any).createInstance(filteringType), IFiltering);
+            filtering = new (filteringType as any)() as IFiltering;
             ReflectionOptionsSetter.set(filtering, field.filteringParams);
             filtering.set_container(editorDiv);
             filtering.set_field(field);

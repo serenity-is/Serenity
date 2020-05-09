@@ -12,7 +12,7 @@
         select.html('');
     }
 
-    export function findElementWithRelativeId(element: JQuery, relativeId: string) {
+    export function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery {
         let elementId = element.attr('id');
         if (isEmptyOrNull(elementId)) {
             return $('#' + relativeId);
@@ -96,7 +96,7 @@
         }
 
         if (!($ as any).templates || !($ as any).views) {
-            throw new ss.Exception('Please make sure that jsrender.js is included in the page!');
+            throw new Q.Exception('Please make sure that jsrender.js is included in the page!');
         }
 
         data = data || {};
@@ -109,7 +109,8 @@
     }
 
     export function log(m: any) {
-        (<any>window).console && (<any>window).console.log(m);
+        if (typeof console !== "undefined" && console.log)
+            console.log(m);
     }
 
     export function newBodyDiv(): JQuery {

@@ -8,7 +8,7 @@
             this.items = [];
 
             if (fields == null) {
-                throw new (ss as any).ArgumentNullException('source');
+                throw new Q.ArgumentNullException('source');
             }
 
             this.fields = fields.slice();
@@ -28,7 +28,7 @@
                         titleY = y.name;
                 }
 
-                return Q.turkishLocaleCompare(titleX, titleY);
+                return Q.Culture.stringCompare(titleX, titleY);
             });
 
             this.fieldByName = {};
@@ -152,15 +152,15 @@
 
         raiseChanged(): void {
             this.displayText = null;
-            this.changed && this.changed(this, (ss as any).EventArgs.Empty);
+            this.changed && this.changed(this, {});
         }
 
         add_changed(value: (e: JQueryEventObject, a: any) => void): void {
-            this.changed = (ss as any).delegateCombine(this.changed, value);
+            this.changed = Q.delegateCombine(this.changed, value);
         }
 
         remove_changed(value: (e: JQueryEventObject, a: any) => void): void {
-            this.changed = (ss as any).delegateRemove(this.changed, value);
+            this.changed = Q.delegateRemove(this.changed, value);
         }
 
         get_activeCriteria(): any[] {
