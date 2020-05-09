@@ -55,15 +55,12 @@
         Decorators.addAttribute = addAttribute;
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
     Serenity.Decorators.registerInterface('Serenity.ISlickFormatter')(Serenity.ISlickFormatter);
-    function Attr(name) {
-        return Decorators.registerClass('Serenity.' + name + 'Attribute');
-    }
     var EnumKeyAttribute = /** @class */ (function () {
         function EnumKeyAttribute(value) {
             this.value = value;
         }
         EnumKeyAttribute = __decorate([
-            Attr('EnumKey')
+            Serenity.Decorators.registerClass('Serenity.EnumKeyAttribute')
         ], EnumKeyAttribute);
         return EnumKeyAttribute;
     }());
@@ -104,7 +101,7 @@
         }
         Decorators.registerEnumType = registerEnumType;
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
-    Decorators.registerEnum(Serenity.SummaryType, 'Serenity.SummaryType');
+    Serenity.Decorators.registerEnum(Serenity.SummaryType, 'Serenity.SummaryType');
 })(Serenity || (Serenity = {}));
 var System;
 (function (System) {
@@ -124,7 +121,7 @@ var System;
 })(System || (System = {}));
 (function (Serenity) {
     function Attr(name) {
-        return Decorators.registerClass('Serenity.' + name + 'Attribute');
+        return Serenity.Decorators.registerClass('Serenity.' + name + 'Attribute');
     }
     var CategoryAttribute = /** @class */ (function () {
         function CategoryAttribute(category) {
@@ -203,7 +200,7 @@ var System;
         EditorTypeAttributeBase.prototype.setParams = function (editorParams) {
         };
         EditorTypeAttributeBase = __decorate([
-            Decorators.registerClass('Serenity.EditorTypeAttributeBase')
+            Serenity.Decorators.registerClass('Serenity.EditorTypeAttributeBase')
         ], EditorTypeAttributeBase);
         return EditorTypeAttributeBase;
     }());
@@ -1071,6 +1068,8 @@ var Serenity;
             widget.init(null);
             params.init && params.init(widget);
             return widget;
+        };
+        Widget.prototype.initialize = function () {
         };
         Widget.prototype.init = function (action) {
             action && action(this);

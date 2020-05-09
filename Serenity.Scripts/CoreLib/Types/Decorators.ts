@@ -63,11 +63,7 @@
 
     Serenity.Decorators.registerInterface('Serenity.ISlickFormatter')(ISlickFormatter);   
 
-    function Attr(name: string) {
-        return Decorators.registerClass('Serenity.' + name + 'Attribute')
-    }
-        
-    @Attr('EnumKey')
+    @Serenity.Decorators.registerClass('Serenity.EnumKeyAttribute')
     export class EnumKeyAttribute {
         constructor(public value: string) {
         }
@@ -111,7 +107,7 @@
         }
     }
 
-    Decorators.registerEnum(SummaryType, 'Serenity.SummaryType');
+    Serenity.Decorators.registerEnum(SummaryType, 'Serenity.SummaryType');
 }
 
 namespace System.ComponentModel {
@@ -126,7 +122,7 @@ namespace System.ComponentModel {
 namespace Serenity {
 
     function Attr(name: string) {
-        return Decorators.registerClass('Serenity.' + name + 'Attribute')
+        return Serenity.Decorators.registerClass('Serenity.' + name + 'Attribute')
     }
 
     @Attr('Category')
@@ -172,7 +168,7 @@ namespace Serenity {
         }
     }
 
-    @Decorators.registerClass('Serenity.EditorTypeAttributeBase')
+    @Serenity.Decorators.registerClass('Serenity.EditorTypeAttributeBase')
     export class EditorTypeAttributeBase {
         constructor(public editorType: string) {
         }

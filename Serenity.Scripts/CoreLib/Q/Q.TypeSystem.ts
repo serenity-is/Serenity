@@ -254,7 +254,7 @@ namespace Q {
     export namespace Enum {
         export let toString = (enumType: any, value: number): string => {
             var values = enumType.prototype;
-            if (value === 0 || !enumType.__metadata && !enumType.__metadata.enumFlags) {
+            if (value === 0 || !enumType.__metadata || !enumType.__metadata.enumFlags) {
                 for (var i in values) {
                     if (values[i] === value) {
                         return i;

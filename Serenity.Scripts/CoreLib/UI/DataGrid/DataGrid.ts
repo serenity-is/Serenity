@@ -709,7 +709,7 @@
 
         protected createPager(): void {
             var pagerDiv = $('<div></div>').appendTo(this.element);
-            pagerDiv.slickPager(this.getPagerOptions());
+            new SlickPager(pagerDiv, this.getPagerOptions());
         }
 
         protected getViewOptions() {

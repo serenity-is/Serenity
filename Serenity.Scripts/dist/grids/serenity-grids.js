@@ -3,7 +3,7 @@
     var SlickPager = /** @class */ (function (_super) {
         __extends(SlickPager, _super);
         function SlickPager(div, o) {
-            var _this = _super.call(this, Q.extend({
+            var _this = _super.call(this, div, Q.extend({
                 showRowsPerPage: true,
                 rowsPerPageOptions: [20, 100, 500, 2000]
             }, o)) || this;
@@ -1760,7 +1760,7 @@ var Serenity;
         };
         DataGrid.prototype.createPager = function () {
             var pagerDiv = $('<div></div>').appendTo(this.element);
-            pagerDiv.slickPager(this.getPagerOptions());
+            new Serenity.SlickPager(pagerDiv, this.getPagerOptions());
         };
         DataGrid.prototype.getViewOptions = function () {
             var _this = this;

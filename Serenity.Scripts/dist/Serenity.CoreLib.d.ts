@@ -1144,6 +1144,7 @@ declare namespace Serenity {
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         getGridField(): JQuery;
         static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
+        initialize(): void;
         init(action?: (widget: any) => void): this;
         private static __isWidgetType;
         props: Readonly<{

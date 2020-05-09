@@ -4,7 +4,7 @@ namespace Serenity {
     export class SlickPager extends Widget<Slick.PagerOptions> {
 
         constructor(div: JQuery, o: Slick.PagerOptions) {
-            super(Q.extend({
+            super(div, Q.extend({
                 showRowsPerPage: true,
                 rowsPerPageOptions: [20, 100, 500, 2000]
             } as any, o));

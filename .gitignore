@@ -62,3 +62,6 @@ Serenity.TypeScript.CoreLib/Serenity.CoreLib.min.js
 /Serenity.Scripts/dist/Serenity.CoreLib.widget.js.map
 /Serenity.Scripts/dist/Serenity.CoreLib.editors.js.map
 /Serenity.Scripts/dist/*.map
+/Serenity.Scripts/dist/**/*.min.js
+/Serenity.Scripts/dist/**/*.map
+/Serenity.Scripts/dist/**/*.tsbuildinfo

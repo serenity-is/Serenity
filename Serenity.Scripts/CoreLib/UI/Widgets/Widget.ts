@@ -147,6 +147,9 @@
             return widget;
         }
 
+        public initialize(): void {
+        }
+
         public init(action?: (widget: any) => void): this {
             action && action(this);
             return this;
