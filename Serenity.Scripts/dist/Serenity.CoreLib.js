@@ -1969,7 +1969,7 @@ var Q;
             return 'glyphicon ' + icon;
         return icon;
     }
-    function uiDialog(options, message, dialogClass) {
+    function uiDialogMessage(options, message, dialogClass) {
         var opt = Q.extend({
             modal: true,
             width: '40%',
@@ -1989,21 +1989,13 @@ var Q;
         opt.dialogClass = 's-MessageDialog' + (dialogClass ? (' ' + dialogClass) : '');
         if (options.buttons) {
             opt.buttons = options.buttons.map(function (x) {
-                var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
-                var iconClass = toIconClass(x.icon);
-                if (iconClass != null)
-                    text = '<i class="' + iconClass + "><i> ";
-                return {
-                    text: text,
-                    click: function (e) {
-                        options.result = x.result;
-                        $(this).dialog('close');
-                        x.onClick && x.onClick.call(this, e);
-                    },
-                    attr: !x.cssClass ? undefined : {
-                        "class": x.cssClass
-                    }
+                var btn = dialogButtonToUI(x);
+                btn.click = function (e) {
+                    options.result = x.result;
+                    $(this).dialog('close');
+                    x.click && x.click.call(this, e);
                 };
+                return btn;
             });
         }
         return $('<div>' + message + '</div>').dialog(opt);
@@ -2031,10 +2023,37 @@ var Q;
         var _a;
         return (_a = Q.tryGetText("Dialogs." + k)) !== null && _a !== void 0 ? _a : defaultTxt[k];
     }
-    function bsModal(options, message, modalClass) {
+    function bsModalMarkup(title, body, modalClass) {
         var closeButton = "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"" + txt('CloseButton') + "\">" +
             "<span aria-hidden=\"true\">&times;</span></button>";
-        var div = $("<div class=\"modal s-MessageModal " + modalClass + "\" tabindex=\"-1\" role=\"dialog\">\n    <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                " + (isBS3() ? closeButton : "") + "<h5 class=\"modal-title\">" + options.title + "</h5>" + (isBS3() ? "" : closeButton) + "\n            </div>\n            <div class=\"modal-body\">\n                " + message + "\n            </div>\n            <div class=\"modal-footer\"></div>\n        </div>\n    </div>\n</div>").eq(0).appendTo(document.body);
+        return ("<div class=\"modal " + modalClass + "\" tabindex=\"-1\" role=\"dialog\">\n    <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                " + (isBS3() ? closeButton : "") + "<h5 class=\"modal-title\">" + title + "</h5>" + (isBS3() ? "" : closeButton) + "\n            </div>\n            <div class=\"modal-body\">" + body + "</div>\n            <div class=\"modal-footer\"></div>\n        </div>\n    </div>\n</div>");
+    }
+    Q.bsModalMarkup = bsModalMarkup;
+    function dialogButtonToBS(x) {
+        var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.text) : x.text;
+        var iconClass = toIconClass(x.icon);
+        if (iconClass != null)
+            text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");
+        return "<button class=\"btn " + (x.cssClass ? x.cssClass : '') + "\"" + (x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '') + ">" + text + "</button>";
+    }
+    Q.dialogButtonToBS = dialogButtonToBS;
+    function dialogButtonToUI(x) {
+        var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.text) : x.text;
+        var iconClass = toIconClass(x.icon);
+        if (iconClass != null)
+            text = '<i class="' + iconClass + "><i> ";
+        return {
+            text: text,
+            attr: !x.cssClass ? undefined : {
+                "class": x.cssClass
+            },
+            click: x.click
+        };
+    }
+    Q.dialogButtonToUI = dialogButtonToUI;
+    function bsModalMessage(options, message, modalClass) {
+        var markup = bsModalMarkup(options.title, message, "s-MessageModal" + (modalClass ? (" " + modalClass) : ""));
+        var div = $(markup).eq(0).appendTo(document.body);
         if (options.onOpen)
             div.one('shown.bs.modal', options.onOpen);
         if (options.onClose)
@@ -2042,16 +2061,12 @@ var Q;
         var footer = div.find('.modal-footer');
         function createButton(x) {
             var _this = this;
-            var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
-            var iconClass = toIconClass(x.icon);
-            if (iconClass != null)
-                text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");
-            $("<button class=\"btn " + (x.cssClass ? x.cssClass : '') + "\"" + (x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '') + ">" + text + "</button>")
+            return $(dialogButtonToBS(x))
                 .appendTo(footer)
                 .click(function (e) {
                 options.result = x.result;
                 div.modal('hide');
-                x.onClick && x.onClick.call(_this, e);
+                x.click && x.click.call(_this, e);
             });
         }
         if (options.buttons)
@@ -2097,7 +2112,7 @@ var Q;
             options.buttons = [];
             if (options.okButton == null || options.okButton) {
                 options.buttons.push({
-                    title: typeof options.okButton == "boolean" ? txt('OkButton') : options.okButton,
+                    text: typeof options.okButton == "boolean" ? txt('OkButton') : options.okButton,
                     cssClass: useBS ? 'btn-default' : undefined,
                     result: 'ok'
                 });
@@ -2105,9 +2120,9 @@ var Q;
         }
         message = messageHtml(message, options);
         if (useBS)
-            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-AlertModal");
+            bsModalMessage(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-AlertModal");
         else
-            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-AlertDialog");
+            uiDialogMessage(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-AlertDialog");
     }
     Q.alert = alert;
     function confirm(message, onYes, options) {
@@ -2128,34 +2143,34 @@ var Q;
             options.buttons = [];
             if (options.yesButton == null || options.yesButton) {
                 options.buttons.push({
-                    title: typeof options.yesButton == "boolean" ? txt('YesButton') : options.yesButton,
+                    text: typeof options.yesButton == "boolean" ? txt('YesButton') : options.yesButton,
                     cssClass: useBS ? 'btn-primary' : undefined,
                     result: 'yes',
-                    onClick: onYes
+                    click: onYes
                 });
             }
             if (options.noButton == null || options.noButton) {
                 options.buttons.push({
-                    title: typeof options.noButton == "boolean" ? txt('NoButton') : options.noButton,
+                    text: typeof options.noButton == "boolean" ? txt('NoButton') : options.noButton,
                     cssClass: useBS ? 'btn-default' : undefined,
                     result: 'no',
-                    onClick: options.onNo
+                    click: options.onNo
                 });
             }
             if (options.cancelButton) {
                 options.buttons.push({
-                    title: typeof options.cancelButton == "boolean" ? txt('CancelButton') : options.cancelButton,
+                    text: typeof options.cancelButton == "boolean" ? txt('CancelButton') : options.cancelButton,
                     cssClass: useBS ? 'btn-default' : undefined,
                     result: 'cancel',
-                    onClick: options.onCancel
+                    click: options.onCancel
                 });
             }
         }
         message = messageHtml(message, options);
         if (useBS)
-            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-ConfirmModal");
+            bsModalMessage(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-ConfirmModal");
         else
-            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-ConfirmDialog");
+            uiDialogMessage(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-ConfirmDialog");
     }
     Q.confirm = confirm;
     function iframeDialog(options) {
@@ -2164,7 +2179,7 @@ var Q;
             return;
         }
         if (useBSModal(options)) {
-            bsModal({
+            bsModalMessage({
                 title: txt('AlertTitle'),
                 modalClass: 'modal-lg',
                 onOpen: function () {
@@ -2266,7 +2281,7 @@ var Q;
         if (typeof toastr === 'undefined') {
             return;
         }
-        var dialog = $(window.document.body).children('.ui-dialog:visible').last();
+        var dialog = $(window.document.body).children('.ui-dialog:visible, .modal.in, .modal.show').last();
         var container = toastr.getContainer(null, create);
         if (container.length === 0) {
             return;
@@ -2353,7 +2368,7 @@ var Q;
         }
         /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
-         * on dialog classes manually. It's false by default for backward compability.
+         * on dialog classes manually. It's false by default for backward compatibility.
          */
         Config.responsiveDialogs = false;
         /**
@@ -4174,9 +4189,11 @@ var Serenity;
         }
         Widget_1 = Widget;
         Widget.prototype.destroy = function () {
-            this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
-            this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
-            this.element = null;
+            if (this.element) {
+                this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
+                this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
+                this.element = null;
+            }
         };
         Widget.prototype.addCssClass = function () {
             this.element.addClass(this.getCssClass());
@@ -4459,9 +4476,10 @@ var Serenity;
                     dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
                 }
                 if (dialog.length > 0) {
-                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass, function () {
+                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, function () {
                         dialog.unbind('dialogopen.' + eventClass);
                         dialog.unbind('panelopen.' + eventClass);
+                        dialog.unbind('shown.bs.modal.' + eventClass);
                         if (element.is(':visible') && !executed) {
                             executed = true;
                             element.unbind('shown.' + eventClass);
@@ -4505,7 +4523,7 @@ var Serenity;
             }
             var dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
             if (dialog.length > 0) {
-                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass, check);
+                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, check);
             }
             element.bind('shown.' + eventClass, check);
         }
@@ -10298,6 +10316,12 @@ var Serenity;
                 this.element.dialog('destroy');
                 this.element.removeClass('ui-dialog-content');
             }
+            else if (this.element != null &&
+                this.element.hasClass('modal-body')) {
+                var modal = this.element.closest('.modal').data('bs.modal', null);
+                this.element && this.element.removeClass('modal-body');
+                window.setTimeout(function () { return modal.remove(); }, 0);
+            }
             $(window).unbind('.' + this.uniqueName);
             _super.prototype.destroy.call(this);
         };
@@ -10334,6 +10358,50 @@ var Serenity;
                 self.onDialogClose();
             });
         };
+        TemplatedDialog.prototype.getModalOptions = function () {
+            return {
+                backdrop: false,
+                keyboard: false,
+                size: 'lg',
+                modalClass: this.getCssClass()
+            };
+        };
+        TemplatedDialog.prototype.initModal = function () {
+            var _this = this;
+            if (this.element.hasClass('modal-body'))
+                return;
+            var title = Q.coalesce(this.element.data('dialogtitle'), this.getDialogTitle()) || '';
+            var opt = this.getModalOptions();
+            opt["show"] = false;
+            var modalClass = "s-Modal";
+            if (opt.modalClass)
+                modalClass += ' ' + opt.modalClass;
+            var markup = Q.bsModalMarkup(title, '', modalClass);
+            var modal = $(markup).eq(0).appendTo(document.body).addClass('flex-layout');
+            modal.one('shown.bs.modal.' + this.uniqueName, function () {
+                _this.element.triggerHandler('shown.bs.modal');
+                _this.onDialogOpen();
+            });
+            modal.one('hidden.bs.modal.' + this.uniqueName, function () {
+                $(document.body).toggleClass('modal-open', $('.modal.show').length + $('.modal.in').length > 0);
+                _this.onDialogClose();
+            });
+            if (opt.size)
+                modal.find('.modal-dialog').addClass('modal-' + opt.size);
+            var footer = modal.find('.modal-footer');
+            var buttons = this.getDialogButtons();
+            if (buttons != null) {
+                for (var _i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
+                    var x = buttons_1[_i];
+                    $(Q.dialogButtonToBS(x)).appendTo(footer).click(x.click);
+                }
+            }
+            else
+                footer.hide();
+            modal.modal(opt);
+            modal.find('.modal-body').replaceWith(this.element.removeClass('hidden').addClass('modal-body'));
+            $(window).on('resize.' + this.uniqueName, this.arrange.bind(this));
+        };
         TemplatedDialog.prototype.initToolbar = function () {
             var toolbarDiv = this.byId('Toolbar');
             if (toolbarDiv.length === 0) {
@@ -10341,7 +10409,9 @@ var Serenity;
             }
             var hotkeyContext = this.element.closest('.ui-dialog');
             if (hotkeyContext.length === 0) {
-                hotkeyContext = this.element;
+                hotkeyContext = this.element.closest('.modal');
+                if (hotkeyContext.length == 0)
+                    hotkeyContext = this.element;
             }
             var opt = { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] };
             this.toolbar = new Serenity.Toolbar(toolbarDiv, opt);
@@ -10381,11 +10451,17 @@ var Serenity;
                 TemplatedDialog_1.openPanel(this.element, this.uniqueName);
                 this.setupPanelTitle();
             }
+            else if (this.useBSModal()) {
+                this.initModal();
+                this.element.closest('.modal').modal('show');
+            }
             else {
-                if (!this.element.hasClass('ui-dialog-content'))
-                    this.initDialog();
+                this.initDialog();
                 this.element.dialog('open');
             }
+        };
+        TemplatedDialog.prototype.useBSModal = function () {
+            return !!((!$.ui || !$.ui.dialog) || TemplatedDialog_1.bootstrapModal);
         };
         TemplatedDialog.openPanel = function (element, uniqueName) {
             var container = $('.panels-container');
@@ -10401,7 +10477,7 @@ var Serenity;
                 if (element[0].parentElement !== container[0])
                     element.appendTo(container);
             }
-            $('.ui-dialog:visible, .ui-widget-overlay:visible')
+            $('.ui-dialog:visible, .ui-widget-overlay:visible, .modal.show, .modal.in')
                 .not(element)
                 .addClass('panel-hidden panel-hidden-' + uniqueName);
             element
@@ -10464,10 +10540,16 @@ var Serenity;
                     this.element.addClass("flex-layout");
             }
         };
+        TemplatedDialog.prototype.getDialogButtons = function () {
+            return undefined;
+        };
         TemplatedDialog.prototype.getDialogOptions = function () {
             var opt = {};
             var dialogClass = 's-Dialog ' + this.getCssClass();
             opt.dialogClass = dialogClass;
+            var buttons = this.getDialogButtons();
+            if (buttons != null)
+                opt.buttons = buttons.map(Q.dialogButtonToUI);
             opt.width = 920;
             TemplatedDialog_1.applyCssSizes(opt, dialogClass);
             opt.autoOpen = false;
@@ -10484,6 +10566,8 @@ var Serenity;
         TemplatedDialog.prototype.dialogClose = function () {
             if (this.element.hasClass('ui-dialog-content'))
                 this.element.dialog().dialog('close');
+            else if (this.element.hasClass('modal-body'))
+                this.element.closest('.modal').modal('hide');
             else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
                 TemplatedDialog_1.closePanel(this.element);
             }
@@ -10492,6 +10576,8 @@ var Serenity;
             get: function () {
                 if (this.element.hasClass('ui-dialog-content'))
                     return this.element.dialog('option', 'title');
+                else if (this.element.hasClass('modal-body'))
+                    return this.element.closest('.modal').find('.modal-header').children('h5').text();
                 return this.element.data('dialogtitle');
             },
             set: function (value) {
@@ -10499,6 +10585,9 @@ var Serenity;
                 this.element.data('dialogtitle', value);
                 if (this.element.hasClass('ui-dialog-content'))
                     this.element.dialog('option', 'title', value);
+                else if (this.element.hasClass('modal-body')) {
+                    this.element.closest('.modal').find('.modal-header').children('h5').text(value !== null && value !== void 0 ? value : '');
+                }
                 else if (this.element.hasClass('s-Panel')) {
                     if (oldTitle != this.dialogTitle) {
                         this.setupPanelTitle();
@@ -10613,7 +10702,6 @@ var Serenity;
         };
         PropertyDialog.prototype.getDialogOptions = function () {
             var opt = _super.prototype.getDialogOptions.call(this);
-            opt.buttons = this.getDialogButtons();
             opt.width = 400;
             return opt;
         };
@@ -12899,6 +12987,7 @@ var Serenity;
             _this.filterPanel.set_showInitialLine(true);
             _this.filterPanel.set_showSearchButton(false);
             _this.filterPanel.set_updateStoreOnReset(false);
+            _this.dialogTitle = Q.text('Controls.FilterPanel.DialogTitle');
             return _this;
         }
         FilterDialog.prototype.get_filterPanel = function () {
@@ -12907,10 +12996,9 @@ var Serenity;
         FilterDialog.prototype.getTemplate = function () {
             return '<div id="~_FilterPanel"/>';
         };
-        FilterDialog.prototype.getDialogOptions = function () {
+        FilterDialog.prototype.getDialogButtons = function () {
             var _this = this;
-            var opt = _super.prototype.getDialogOptions.call(this);
-            opt.buttons = [
+            return [
                 {
                     text: Q.text('Dialogs.OkButton'),
                     click: function () {
@@ -12927,8 +13015,6 @@ var Serenity;
                     click: function () { return _this.dialogClose(); }
                 }
             ];
-            opt.title = Q.text('Controls.FilterPanel.DialogTitle');
-            return opt;
         };
         FilterDialog = __decorate([
             Serenity.Decorators.registerClass('Serenity.FilterDialog')
@@ -16517,6 +16603,7 @@ var Serenity;
             });
             _this.ulVisible = _this.byId("VisibleCols");
             _this.ulHidden = _this.byId("HiddenCols");
+            _this.dialogTitle = Q.text("Controls.ColumnPickerDialog.Title");
             return _this;
         }
         ColumnPickerDialog.createToolButton = function (grid) {
@@ -16550,12 +16637,9 @@ var Serenity;
                 onClick: onClick
             };
         };
-        ColumnPickerDialog.prototype.getDialogOptions = function () {
+        ColumnPickerDialog.prototype.getDialogButtons = function () {
             var _this = this;
-            var opt = _super.prototype.getDialogOptions.call(this);
-            opt.title = Q.text("Controls.ColumnPickerDialog.Title");
-            opt.width = 600;
-            opt.buttons = [
+            return [
                 {
                     text: Q.text("Controls.ColumnPickerDialog.RestoreDefaults"),
                     click: function () {
@@ -16615,6 +16699,10 @@ var Serenity;
                     }
                 }
             ];
+        };
+        ColumnPickerDialog.prototype.getDialogOptions = function () {
+            var opt = _super.prototype.getDialogOptions.call(this);
+            opt.width = 600;
             return opt;
         };
         ColumnPickerDialog.prototype.getTitle = function (col) {

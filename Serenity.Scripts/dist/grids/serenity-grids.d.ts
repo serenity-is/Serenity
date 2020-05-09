@@ -346,6 +346,10 @@ declare namespace Serenity {
         done: () => void;
         constructor();
         static createToolButton(grid: DataGrid<any, any>): ToolButton;
+        protected getDialogButtons(): {
+            text: string;
+            click: () => void;
+        }[];
         protected getDialogOptions(): JQueryUI.DialogOptions;
         private getTitle;
         private allowHide;

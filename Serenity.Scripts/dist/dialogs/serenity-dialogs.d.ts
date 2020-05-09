@@ -34,6 +34,8 @@ declare namespace Serenity {
         private static applyCssSizes;
         destroy(): void;
         protected initDialog(): void;
+        protected getModalOptions(): ModalOptions;
+        protected initModal(): void;
         protected initToolbar(): void;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
@@ -41,12 +43,15 @@ declare namespace Serenity {
         protected resetValidation(): void;
         protected validateForm(): boolean;
         dialogOpen(asPanel?: boolean): void;
+        private useBSModal;
+        static bootstrapModal: boolean;
         static openPanel(element: JQuery, uniqueName: string): void;
         static closePanel(element: JQuery, e?: JQueryEventObject): void;
         protected onDialogOpen(): void;
         protected arrange(): void;
         protected onDialogClose(): void;
         protected addCssClass(): void;
+        protected getDialogButtons(): Q.DialogButton[];
         protected getDialogOptions(): JQueryUI.DialogOptions;
         protected getDialogTitle(): string;
         dialogClose(): void;
@@ -57,6 +62,12 @@ declare namespace Serenity {
         protected initTabs(): void;
         protected handleResponsive(): void;
     }
+    interface ModalOptions {
+        backdrop?: boolean | 'static';
+        keyboard?: boolean;
+        size?: 'lg' | 'sm';
+        modalClass?: string;
+    }
 }
 declare namespace Serenity {
     type DialogButton = JQueryUI.DialogButtonOptions;
@@ -66,7 +77,10 @@ declare namespace Serenity {
         constructor(opt?: TOptions);
         destroy(): void;
         protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getDialogButtons(): JQueryUI.DialogButtonOptions[];
+        protected getDialogButtons(): {
+            text: string;
+            click: () => void;
+        }[];
         protected okClick(): void;
         protected okClickValidated(): void;
         protected cancelClick(): void;

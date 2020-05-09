@@ -35,7 +35,7 @@ namespace Q {
             return;
         }
 
-        var dialog = $(window.document.body).children('.ui-dialog:visible').last();
+        var dialog = $(window.document.body).children('.ui-dialog:visible, .modal.in, .modal.show').last();
         var container = toastr.getContainer(null, create);
         if (container.length === 0) {
             return;

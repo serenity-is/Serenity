@@ -1,4 +1,5 @@
 ﻿/// <reference types="jquery" />
+/// <reference types="jqueryui" />
 /// <reference types="toastr" />
 /// <reference types="jquery.validation" />
 declare var __decorate: any;
@@ -527,10 +528,10 @@ declare namespace Q {
 }
 declare namespace Q {
     interface DialogButton {
-        title?: string;
+        text?: string;
         hint?: string;
         icon?: string;
-        onClick?: (e: JQueryEventObject) => void;
+        click?: (e: JQueryEventObject) => void;
         cssClass?: string;
         htmlEncode?: boolean;
         result?: string;
@@ -551,6 +552,9 @@ declare namespace Q {
         okButton?: string | boolean;
     }
     function isBS3(): boolean;
+    function bsModalMarkup(title: string, body: string, modalClass?: string): string;
+    function dialogButtonToBS(x: DialogButton): string;
+    function dialogButtonToUI(x: DialogButton): JQueryUI.DialogButtonOptions;
     function alert(message: string, options?: AlertOptions): void;
     interface ConfirmOptions extends CommonDialogOptions {
         yesButton?: string | boolean;
@@ -591,7 +595,7 @@ declare namespace Q {
         let applicationPath: string;
         /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
-         * on dialog classes manually. It's false by default for backward compability.
+         * on dialog classes manually. It's false by default for backward compatibility.
          */
         let responsiveDialogs: boolean;
         /**

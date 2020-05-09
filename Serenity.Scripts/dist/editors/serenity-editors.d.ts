@@ -449,13 +449,13 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    export interface HtmlContentEditorOptions {
+    interface HtmlContentEditorOptions {
         cols?: any;
         rows?: any;
     }
     interface CKEditorConfig {
     }
-    export class HtmlContentEditor extends Widget<HtmlContentEditorOptions> implements IStringValue, IReadOnly {
+    class HtmlContentEditor extends Widget<HtmlContentEditorOptions> implements IStringValue, IReadOnly {
         private _instanceReady;
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         protected instanceReady(x: any): void;
@@ -472,15 +472,14 @@ declare namespace Serenity {
         static CKEditorVer: string;
         static includeCKEditor(): void;
     }
-    export class HtmlNoteContentEditor extends HtmlContentEditor {
+    class HtmlNoteContentEditor extends HtmlContentEditor {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         protected getConfig(): CKEditorConfig;
     }
-    export class HtmlReportContentEditor extends HtmlContentEditor {
+    class HtmlReportContentEditor extends HtmlContentEditor {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         protected getConfig(): CKEditorConfig;
     }
-    export {};
 }
 declare namespace Serenity {
     interface FileUploadEditorOptions extends FileUploadConstraints {

@@ -1,8 +1,8 @@
 ﻿/// <reference types="jquery" />
+/// <reference types="jqueryui" />
 /// <reference types="toastr" />
 /// <reference types="jquery.validation" />
 /// <reference types="react" />
-/// <reference types="jqueryui" />
 declare var __decorate: any;
 declare const __skipExtends: {
     __metadata: boolean;
@@ -529,10 +529,10 @@ declare namespace Q {
 }
 declare namespace Q {
     interface DialogButton {
-        title?: string;
+        text?: string;
         hint?: string;
         icon?: string;
-        onClick?: (e: JQueryEventObject) => void;
+        click?: (e: JQueryEventObject) => void;
         cssClass?: string;
         htmlEncode?: boolean;
         result?: string;
@@ -553,6 +553,9 @@ declare namespace Q {
         okButton?: string | boolean;
     }
     function isBS3(): boolean;
+    function bsModalMarkup(title: string, body: string, modalClass?: string): string;
+    function dialogButtonToBS(x: DialogButton): string;
+    function dialogButtonToUI(x: DialogButton): JQueryUI.DialogButtonOptions;
     function alert(message: string, options?: AlertOptions): void;
     interface ConfirmOptions extends CommonDialogOptions {
         yesButton?: string | boolean;
@@ -593,7 +596,7 @@ declare namespace Q {
         let applicationPath: string;
         /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
-         * on dialog classes manually. It's false by default for backward compability.
+         * on dialog classes manually. It's false by default for backward compatibility.
          */
         let responsiveDialogs: boolean;
         /**
@@ -1891,13 +1894,13 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    export interface HtmlContentEditorOptions {
+    interface HtmlContentEditorOptions {
         cols?: any;
         rows?: any;
     }
     interface CKEditorConfig {
     }
-    export class HtmlContentEditor extends Widget<HtmlContentEditorOptions> implements IStringValue, IReadOnly {
+    class HtmlContentEditor extends Widget<HtmlContentEditorOptions> implements IStringValue, IReadOnly {
         private _instanceReady;
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         protected instanceReady(x: any): void;
@@ -1914,15 +1917,14 @@ declare namespace Serenity {
         static CKEditorVer: string;
         static includeCKEditor(): void;
     }
-    export class HtmlNoteContentEditor extends HtmlContentEditor {
+    class HtmlNoteContentEditor extends HtmlContentEditor {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         protected getConfig(): CKEditorConfig;
     }
-    export class HtmlReportContentEditor extends HtmlContentEditor {
+    class HtmlReportContentEditor extends HtmlContentEditor {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         protected getConfig(): CKEditorConfig;
     }
-    export {};
 }
 declare namespace Serenity {
     interface FileUploadEditorOptions extends FileUploadConstraints {
@@ -2093,6 +2095,8 @@ declare namespace Serenity {
         private static applyCssSizes;
         destroy(): void;
         protected initDialog(): void;
+        protected getModalOptions(): ModalOptions;
+        protected initModal(): void;
         protected initToolbar(): void;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
@@ -2100,12 +2104,15 @@ declare namespace Serenity {
         protected resetValidation(): void;
         protected validateForm(): boolean;
         dialogOpen(asPanel?: boolean): void;
+        private useBSModal;
+        static bootstrapModal: boolean;
         static openPanel(element: JQuery, uniqueName: string): void;
         static closePanel(element: JQuery, e?: JQueryEventObject): void;
         protected onDialogOpen(): void;
         protected arrange(): void;
         protected onDialogClose(): void;
         protected addCssClass(): void;
+        protected getDialogButtons(): Q.DialogButton[];
         protected getDialogOptions(): JQueryUI.DialogOptions;
         protected getDialogTitle(): string;
         dialogClose(): void;
@@ -2116,6 +2123,12 @@ declare namespace Serenity {
         protected initTabs(): void;
         protected handleResponsive(): void;
     }
+    interface ModalOptions {
+        backdrop?: boolean | 'static';
+        keyboard?: boolean;
+        size?: 'lg' | 'sm';
+        modalClass?: string;
+    }
 }
 declare namespace Serenity {
     type DialogButton = JQueryUI.DialogButtonOptions;
@@ -2125,7 +2138,10 @@ declare namespace Serenity {
         constructor(opt?: TOptions);
         destroy(): void;
         protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getDialogButtons(): JQueryUI.DialogButtonOptions[];
+        protected getDialogButtons(): {
+            text: string;
+            click: () => void;
+        }[];
         protected okClick(): void;
         protected okClickValidated(): void;
         protected cancelClick(): void;
@@ -2499,7 +2515,10 @@ declare namespace Serenity {
         constructor();
         get_filterPanel(): FilterPanel;
         protected getTemplate(): string;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogButtons(): {
+            text: string;
+            click: () => void;
+        }[];
     }
 }
 declare namespace Serenity {
@@ -3265,6 +3284,10 @@ declare namespace Serenity {
         done: () => void;
         constructor();
         static createToolButton(grid: DataGrid<any, any>): ToolButton;
+        protected getDialogButtons(): {
+            text: string;
+            click: () => void;
+        }[];
         protected getDialogOptions(): JQueryUI.DialogOptions;
         private getTitle;
         private allowHide;

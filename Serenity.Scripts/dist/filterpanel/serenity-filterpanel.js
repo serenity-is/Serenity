@@ -1312,6 +1312,7 @@ var Serenity;
             _this.filterPanel.set_showInitialLine(true);
             _this.filterPanel.set_showSearchButton(false);
             _this.filterPanel.set_updateStoreOnReset(false);
+            _this.dialogTitle = Q.text('Controls.FilterPanel.DialogTitle');
             return _this;
         }
         FilterDialog.prototype.get_filterPanel = function () {
@@ -1320,10 +1321,9 @@ var Serenity;
         FilterDialog.prototype.getTemplate = function () {
             return '<div id="~_FilterPanel"/>';
         };
-        FilterDialog.prototype.getDialogOptions = function () {
+        FilterDialog.prototype.getDialogButtons = function () {
             var _this = this;
-            var opt = _super.prototype.getDialogOptions.call(this);
-            opt.buttons = [
+            return [
                 {
                     text: Q.text('Dialogs.OkButton'),
                     click: function () {
@@ -1340,8 +1340,6 @@ var Serenity;
                     click: function () { return _this.dialogClose(); }
                 }
             ];
-            opt.title = Q.text('Controls.FilterPanel.DialogTitle');
-            return opt;
         };
         FilterDialog = __decorate([
             Serenity.Decorators.registerClass('Serenity.FilterDialog')

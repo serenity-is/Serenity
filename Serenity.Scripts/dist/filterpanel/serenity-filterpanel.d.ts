@@ -1,5 +1,4 @@
 ﻿/// <reference types="jquery" />
-/// <reference types="jqueryui" />
 declare namespace Serenity {
     interface FilterOperator {
         key?: string;
@@ -238,7 +237,10 @@ declare namespace Serenity {
         constructor();
         get_filterPanel(): FilterPanel;
         protected getTemplate(): string;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogButtons(): {
+            text: string;
+            click: () => void;
+        }[];
     }
 }
 declare namespace Serenity {

@@ -30,12 +30,11 @@
 
         protected getDialogOptions() {
             var opt = super.getDialogOptions();
-            opt.buttons = this.getDialogButtons();
             opt.width = 400;
             return opt;
         }
 
-        protected getDialogButtons(): JQueryUI.DialogButtonOptions[] {
+        protected getDialogButtons() {
             return [{
                 text: Q.text('Dialogs.OkButton'),
                 click: () => this.okClick()

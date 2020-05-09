@@ -84,6 +84,13 @@
                 this.element.dialog('destroy');
                 this.element.removeClass('ui-dialog-content');
             }
+            else if (this.element != null &&
+                this.element.hasClass('modal-body')) {
+                var modal = this.element.closest('.modal').data('bs.modal', null);
+                this.element && this.element.removeClass('modal-body');
+                window.setTimeout(() => modal.remove(), 0);
+            }
+            
             $(window).unbind('.' + this.uniqueName);
             super.destroy();
         }
@@ -132,6 +139,56 @@
             });
         }
 
+        protected getModalOptions(): ModalOptions {
+            return {
+                backdrop: false,
+                keyboard: false,
+                size: 'lg',
+                modalClass: this.getCssClass()
+            }
+        }
+
+        protected initModal(): void {
+            if (this.element.hasClass('modal-body'))
+                return;
+            
+            var title = Q.coalesce(this.element.data('dialogtitle'), this.getDialogTitle()) || '';
+            var opt = this.getModalOptions();
+            opt["show"] = false;
+            var modalClass = "s-Modal";
+            
+            if (opt.modalClass)
+                modalClass += ' ' + opt.modalClass;
+
+            var markup = Q.bsModalMarkup(title, '', modalClass);
+            var modal = $(markup).eq(0).appendTo(document.body).addClass('flex-layout');
+            modal.one('shown.bs.modal.' + this.uniqueName, () => {
+                this.element.triggerHandler('shown.bs.modal');
+                this.onDialogOpen();
+            });
+
+            modal.one('hidden.bs.modal.' + this.uniqueName, () => {
+                $(document.body).toggleClass('modal-open', $('.modal.show').length + $('.modal.in').length > 0);
+                this.onDialogClose();
+            });
+            if (opt.size)
+                modal.find('.modal-dialog').addClass('modal-' + opt.size);
+
+            var footer = modal.find('.modal-footer');
+            var buttons = this.getDialogButtons();
+            if (buttons != null) {
+                for (var x of buttons) {
+                    $(Q.dialogButtonToBS(x)).appendTo(footer).click(x.click);
+                }
+            }
+            else
+                footer.hide();
+
+            modal.modal(opt);
+            modal.find('.modal-body').replaceWith(this.element.removeClass('hidden').addClass('modal-body'));
+            $(window).on('resize.' + this.uniqueName, this.arrange.bind(this));
+        }
+
         protected initToolbar(): void {
             var toolbarDiv = this.byId('Toolbar');
             if (toolbarDiv.length === 0) {
@@ -140,7 +197,9 @@
 
             var hotkeyContext = this.element.closest('.ui-dialog');
             if (hotkeyContext.length === 0) {
-                hotkeyContext = this.element;
+                hotkeyContext = this.element.closest('.modal');
+                if (hotkeyContext.length == 0)
+                    hotkeyContext = this.element;
             }
 
             var opt = { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] };
@@ -187,13 +246,21 @@
                 TemplatedDialog.openPanel(this.element, this.uniqueName);
                 this.setupPanelTitle();
             }
+            else if (this.useBSModal()) {
+                this.initModal();
+                this.element.closest('.modal').modal('show');
+            }
             else {
-                if (!this.element.hasClass('ui-dialog-content'))
-                    this.initDialog();
-
+                this.initDialog();
                 this.element.dialog('open');
             }
         }
+
+        private useBSModal() {
+            return !!((!$.ui || !$.ui.dialog) || TemplatedDialog.bootstrapModal);
+        }
+
+        public static bootstrapModal: boolean;
 
         public static openPanel(element: JQuery, uniqueName: string) {
             var container = $('.panels-container');
@@ -213,7 +280,7 @@
                     element.appendTo(container);
             }
 
-            $('.ui-dialog:visible, .ui-widget-overlay:visible')
+            $('.ui-dialog:visible, .ui-widget-overlay:visible, .modal.show, .modal.in')
                 .not(element)
                 .addClass('panel-hidden panel-hidden-' + uniqueName);
 
@@ -288,10 +355,17 @@
             }
         }
 
+        protected getDialogButtons(): Q.DialogButton[] {
+            return undefined;
+        }
+
         protected getDialogOptions(): JQueryUI.DialogOptions {
             var opt: JQueryUI.DialogOptions = {};
             var dialogClass = 's-Dialog ' + this.getCssClass();
             opt.dialogClass = dialogClass;
+            var buttons = this.getDialogButtons();
+            if (buttons != null)
+                opt.buttons = buttons.map(Q.dialogButtonToUI);
             opt.width = 920;
             TemplatedDialog.applyCssSizes(opt, dialogClass);
             opt.autoOpen = false;
@@ -310,6 +384,8 @@
         public dialogClose(): void {
             if (this.element.hasClass('ui-dialog-content'))
                 this.element.dialog().dialog('close');
+            else if (this.element.hasClass('modal-body'))
+                this.element.closest('.modal').modal('hide');
             else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
                 TemplatedDialog.closePanel(this.element);
             }
@@ -318,6 +394,8 @@
         public get dialogTitle(): string {
             if (this.element.hasClass('ui-dialog-content'))
                 return this.element.dialog('option', 'title');
+            else if (this.element.hasClass('modal-body'))
+                return this.element.closest('.modal').find('.modal-header').children('h5').text();
 
             return this.element.data('dialogtitle');
         }
@@ -354,6 +432,9 @@
 
             if (this.element.hasClass('ui-dialog-content'))
                 this.element.dialog('option', 'title', value);
+            else if (this.element.hasClass('modal-body')) {
+                this.element.closest('.modal').find('.modal-header').children('h5').text(value ?? '');
+            }
             else if (this.element.hasClass('s-Panel')) {
                 if (oldTitle != this.dialogTitle) {
                     this.setupPanelTitle();
@@ -413,5 +494,12 @@
                 }
             }
         }
+    }
+
+    export interface ModalOptions {
+        backdrop?: boolean | 'static',
+        keyboard?: boolean,
+        size?: 'lg' | 'sm',
+        modalClass?: string;
     }
 }

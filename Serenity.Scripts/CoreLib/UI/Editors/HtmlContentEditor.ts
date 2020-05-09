@@ -5,7 +5,7 @@
         rows?: any;
     }
 
-    interface CKEditorConfig {
+    export interface CKEditorConfig {
     }    
 
     @Decorators.registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])

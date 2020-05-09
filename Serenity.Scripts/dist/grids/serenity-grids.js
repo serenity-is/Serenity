@@ -2360,6 +2360,7 @@ var Serenity;
             });
             _this.ulVisible = _this.byId("VisibleCols");
             _this.ulHidden = _this.byId("HiddenCols");
+            _this.dialogTitle = Q.text("Controls.ColumnPickerDialog.Title");
             return _this;
         }
         ColumnPickerDialog.createToolButton = function (grid) {
@@ -2393,12 +2394,9 @@ var Serenity;
                 onClick: onClick
             };
         };
-        ColumnPickerDialog.prototype.getDialogOptions = function () {
+        ColumnPickerDialog.prototype.getDialogButtons = function () {
             var _this = this;
-            var opt = _super.prototype.getDialogOptions.call(this);
-            opt.title = Q.text("Controls.ColumnPickerDialog.Title");
-            opt.width = 600;
-            opt.buttons = [
+            return [
                 {
                     text: Q.text("Controls.ColumnPickerDialog.RestoreDefaults"),
                     click: function () {
@@ -2458,6 +2456,10 @@ var Serenity;
                     }
                 }
             ];
+        };
+        ColumnPickerDialog.prototype.getDialogOptions = function () {
+            var opt = _super.prototype.getDialogOptions.call(this);
+            opt.width = 600;
             return opt;
         };
         ColumnPickerDialog.prototype.getTitle = function (col) {

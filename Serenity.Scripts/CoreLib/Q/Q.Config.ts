@@ -16,7 +16,7 @@
 
         /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
-         * on dialog classes manually. It's false by default for backward compability.
+         * on dialog classes manually. It's false by default for backward compatibility.
          */
         export let responsiveDialogs = false;
 

@@ -34,6 +34,7 @@ namespace Serenity {
 
             this.ulVisible = this.byId("VisibleCols");
             this.ulHidden = this.byId("HiddenCols");
+            this.dialogTitle = Q.text("Controls.ColumnPickerDialog.Title");
         }
 
         public static createToolButton(grid: DataGrid<any, any>): ToolButton {
@@ -71,11 +72,8 @@ namespace Serenity {
             }
         }
 
-        protected getDialogOptions() {
-            var opt = super.getDialogOptions();
-            opt.title = Q.text("Controls.ColumnPickerDialog.Title");
-            opt.width = 600;
-            opt.buttons = [
+        protected getDialogButtons() {
+            return [
                 {
                     text: Q.text("Controls.ColumnPickerDialog.RestoreDefaults"),
                     click: () => {
@@ -140,7 +138,11 @@ namespace Serenity {
                     }
                 }
             ];
+        }
 
+        protected getDialogOptions() {
+            var opt = super.getDialogOptions();
+            opt.width = 600;
             return opt;
         }
 

@@ -1000,9 +1000,11 @@ var Serenity;
         }
         Widget_1 = Widget;
         Widget.prototype.destroy = function () {
-            this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
-            this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
-            this.element = null;
+            if (this.element) {
+                this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
+                this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
+                this.element = null;
+            }
         };
         Widget.prototype.addCssClass = function () {
             this.element.addClass(this.getCssClass());
@@ -1902,9 +1904,10 @@ var Serenity;
                     dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
                 }
                 if (dialog.length > 0) {
-                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass, function () {
+                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, function () {
                         dialog.unbind('dialogopen.' + eventClass);
                         dialog.unbind('panelopen.' + eventClass);
+                        dialog.unbind('shown.bs.modal.' + eventClass);
                         if (element.is(':visible') && !executed) {
                             executed = true;
                             element.unbind('shown.' + eventClass);
@@ -1948,7 +1951,7 @@ var Serenity;
             }
             var dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
             if (dialog.length > 0) {
-                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass, check);
+                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, check);
             }
             element.bind('shown.' + eventClass, check);
         }

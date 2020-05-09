@@ -66,9 +66,11 @@
         }
 
         public destroy(): void {
-            this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
-            this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
-            this.element = null;
+            if (this.element) {
+                this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
+                this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
+                this.element = null;
+            }
         }
 
         protected addCssClass(): void {

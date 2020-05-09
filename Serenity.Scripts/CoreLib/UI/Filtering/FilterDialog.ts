@@ -12,6 +12,8 @@
             this.filterPanel.set_showInitialLine(true);
             this.filterPanel.set_showSearchButton(false);
             this.filterPanel.set_updateStoreOnReset(false);
+
+            this.dialogTitle = Q.text('Controls.FilterPanel.DialogTitle');
         }
 
         get_filterPanel(): FilterPanel {
@@ -22,10 +24,8 @@
             return '<div id="~_FilterPanel"/>';
         }
 
-        protected getDialogOptions() {
-            var opt = super.getDialogOptions();
-
-            opt.buttons = [
+        protected getDialogButtons() {
+            return [
                 {
                     text: Q.text('Dialogs.OkButton'),
                     click: () => {
@@ -43,10 +43,6 @@
                     click: () => this.dialogClose()
                 }
             ];
-
-            opt.title = Q.text('Controls.FilterPanel.DialogTitle');
-
-            return opt;
         }
     }
 

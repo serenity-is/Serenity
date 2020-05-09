@@ -1969,7 +1969,7 @@ var Q;
             return 'glyphicon ' + icon;
         return icon;
     }
-    function uiDialog(options, message, dialogClass) {
+    function uiDialogMessage(options, message, dialogClass) {
         var opt = Q.extend({
             modal: true,
             width: '40%',
@@ -1989,21 +1989,13 @@ var Q;
         opt.dialogClass = 's-MessageDialog' + (dialogClass ? (' ' + dialogClass) : '');
         if (options.buttons) {
             opt.buttons = options.buttons.map(function (x) {
-                var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
-                var iconClass = toIconClass(x.icon);
-                if (iconClass != null)
-                    text = '<i class="' + iconClass + "><i> ";
-                return {
-                    text: text,
-                    click: function (e) {
-                        options.result = x.result;
-                        $(this).dialog('close');
-                        x.onClick && x.onClick.call(this, e);
-                    },
-                    attr: !x.cssClass ? undefined : {
-                        "class": x.cssClass
-                    }
+                var btn = dialogButtonToUI(x);
+                btn.click = function (e) {
+                    options.result = x.result;
+                    $(this).dialog('close');
+                    x.click && x.click.call(this, e);
                 };
+                return btn;
             });
         }
         return $('<div>' + message + '</div>').dialog(opt);
@@ -2031,10 +2023,37 @@ var Q;
         var _a;
         return (_a = Q.tryGetText("Dialogs." + k)) !== null && _a !== void 0 ? _a : defaultTxt[k];
     }
-    function bsModal(options, message, modalClass) {
+    function bsModalMarkup(title, body, modalClass) {
         var closeButton = "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"" + txt('CloseButton') + "\">" +
             "<span aria-hidden=\"true\">&times;</span></button>";
-        var div = $("<div class=\"modal s-MessageModal " + modalClass + "\" tabindex=\"-1\" role=\"dialog\">\n    <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                " + (isBS3() ? closeButton : "") + "<h5 class=\"modal-title\">" + options.title + "</h5>" + (isBS3() ? "" : closeButton) + "\n            </div>\n            <div class=\"modal-body\">\n                " + message + "\n            </div>\n            <div class=\"modal-footer\"></div>\n        </div>\n    </div>\n</div>").eq(0).appendTo(document.body);
+        return ("<div class=\"modal " + modalClass + "\" tabindex=\"-1\" role=\"dialog\">\n    <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                " + (isBS3() ? closeButton : "") + "<h5 class=\"modal-title\">" + title + "</h5>" + (isBS3() ? "" : closeButton) + "\n            </div>\n            <div class=\"modal-body\">" + body + "</div>\n            <div class=\"modal-footer\"></div>\n        </div>\n    </div>\n</div>");
+    }
+    Q.bsModalMarkup = bsModalMarkup;
+    function dialogButtonToBS(x) {
+        var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.text) : x.text;
+        var iconClass = toIconClass(x.icon);
+        if (iconClass != null)
+            text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");
+        return "<button class=\"btn " + (x.cssClass ? x.cssClass : '') + "\"" + (x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '') + ">" + text + "</button>";
+    }
+    Q.dialogButtonToBS = dialogButtonToBS;
+    function dialogButtonToUI(x) {
+        var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.text) : x.text;
+        var iconClass = toIconClass(x.icon);
+        if (iconClass != null)
+            text = '<i class="' + iconClass + "><i> ";
+        return {
+            text: text,
+            attr: !x.cssClass ? undefined : {
+                "class": x.cssClass
+            },
+            click: x.click
+        };
+    }
+    Q.dialogButtonToUI = dialogButtonToUI;
+    function bsModalMessage(options, message, modalClass) {
+        var markup = bsModalMarkup(options.title, message, "s-MessageModal" + (modalClass ? (" " + modalClass) : ""));
+        var div = $(markup).eq(0).appendTo(document.body);
         if (options.onOpen)
             div.one('shown.bs.modal', options.onOpen);
         if (options.onClose)
@@ -2042,16 +2061,12 @@ var Q;
         var footer = div.find('.modal-footer');
         function createButton(x) {
             var _this = this;
-            var text = x.htmlEncode == null || x.htmlEncode ? Q.htmlEncode(x.title) : x.title;
-            var iconClass = toIconClass(x.icon);
-            if (iconClass != null)
-                text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");
-            $("<button class=\"btn " + (x.cssClass ? x.cssClass : '') + "\"" + (x.hint ? (' title="' + Q.attrEncode(x.hint) + '"') : '') + ">" + text + "</button>")
+            return $(dialogButtonToBS(x))
                 .appendTo(footer)
                 .click(function (e) {
                 options.result = x.result;
                 div.modal('hide');
-                x.onClick && x.onClick.call(_this, e);
+                x.click && x.click.call(_this, e);
             });
         }
         if (options.buttons)
@@ -2097,7 +2112,7 @@ var Q;
             options.buttons = [];
             if (options.okButton == null || options.okButton) {
                 options.buttons.push({
-                    title: typeof options.okButton == "boolean" ? txt('OkButton') : options.okButton,
+                    text: typeof options.okButton == "boolean" ? txt('OkButton') : options.okButton,
                     cssClass: useBS ? 'btn-default' : undefined,
                     result: 'ok'
                 });
@@ -2105,9 +2120,9 @@ var Q;
         }
         message = messageHtml(message, options);
         if (useBS)
-            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-AlertModal");
+            bsModalMessage(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-AlertModal");
         else
-            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-AlertDialog");
+            uiDialogMessage(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-AlertDialog");
     }
     Q.alert = alert;
     function confirm(message, onYes, options) {
@@ -2128,34 +2143,34 @@ var Q;
             options.buttons = [];
             if (options.yesButton == null || options.yesButton) {
                 options.buttons.push({
-                    title: typeof options.yesButton == "boolean" ? txt('YesButton') : options.yesButton,
+                    text: typeof options.yesButton == "boolean" ? txt('YesButton') : options.yesButton,
                     cssClass: useBS ? 'btn-primary' : undefined,
                     result: 'yes',
-                    onClick: onYes
+                    click: onYes
                 });
             }
             if (options.noButton == null || options.noButton) {
                 options.buttons.push({
-                    title: typeof options.noButton == "boolean" ? txt('NoButton') : options.noButton,
+                    text: typeof options.noButton == "boolean" ? txt('NoButton') : options.noButton,
                     cssClass: useBS ? 'btn-default' : undefined,
                     result: 'no',
-                    onClick: options.onNo
+                    click: options.onNo
                 });
             }
             if (options.cancelButton) {
                 options.buttons.push({
-                    title: typeof options.cancelButton == "boolean" ? txt('CancelButton') : options.cancelButton,
+                    text: typeof options.cancelButton == "boolean" ? txt('CancelButton') : options.cancelButton,
                     cssClass: useBS ? 'btn-default' : undefined,
                     result: 'cancel',
-                    onClick: options.onCancel
+                    click: options.onCancel
                 });
             }
         }
         message = messageHtml(message, options);
         if (useBS)
-            bsModal(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-ConfirmModal");
+            bsModalMessage(options, message, (_a = options.modalClass) !== null && _a !== void 0 ? _a : "s-ConfirmModal");
         else
-            uiDialog(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-ConfirmDialog");
+            uiDialogMessage(options, message, (_b = options.dialogClass) !== null && _b !== void 0 ? _b : "s-ConfirmDialog");
     }
     Q.confirm = confirm;
     function iframeDialog(options) {
@@ -2164,7 +2179,7 @@ var Q;
             return;
         }
         if (useBSModal(options)) {
-            bsModal({
+            bsModalMessage({
                 title: txt('AlertTitle'),
                 modalClass: 'modal-lg',
                 onOpen: function () {
@@ -2266,7 +2281,7 @@ var Q;
         if (typeof toastr === 'undefined') {
             return;
         }
-        var dialog = $(window.document.body).children('.ui-dialog:visible').last();
+        var dialog = $(window.document.body).children('.ui-dialog:visible, .modal.in, .modal.show').last();
         var container = toastr.getContainer(null, create);
         if (container.length === 0) {
             return;
@@ -2353,7 +2368,7 @@ var Q;
         }
         /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
-         * on dialog classes manually. It's false by default for backward compability.
+         * on dialog classes manually. It's false by default for backward compatibility.
          */
         Config.responsiveDialogs = false;
         /**

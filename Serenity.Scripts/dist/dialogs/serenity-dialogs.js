@@ -440,6 +440,12 @@ var Serenity;
                 this.element.dialog('destroy');
                 this.element.removeClass('ui-dialog-content');
             }
+            else if (this.element != null &&
+                this.element.hasClass('modal-body')) {
+                var modal = this.element.closest('.modal').data('bs.modal', null);
+                this.element && this.element.removeClass('modal-body');
+                window.setTimeout(function () { return modal.remove(); }, 0);
+            }
             $(window).unbind('.' + this.uniqueName);
             _super.prototype.destroy.call(this);
         };
@@ -476,6 +482,50 @@ var Serenity;
                 self.onDialogClose();
             });
         };
+        TemplatedDialog.prototype.getModalOptions = function () {
+            return {
+                backdrop: false,
+                keyboard: false,
+                size: 'lg',
+                modalClass: this.getCssClass()
+            };
+        };
+        TemplatedDialog.prototype.initModal = function () {
+            var _this = this;
+            if (this.element.hasClass('modal-body'))
+                return;
+            var title = Q.coalesce(this.element.data('dialogtitle'), this.getDialogTitle()) || '';
+            var opt = this.getModalOptions();
+            opt["show"] = false;
+            var modalClass = "s-Modal";
+            if (opt.modalClass)
+                modalClass += ' ' + opt.modalClass;
+            var markup = Q.bsModalMarkup(title, '', modalClass);
+            var modal = $(markup).eq(0).appendTo(document.body).addClass('flex-layout');
+            modal.one('shown.bs.modal.' + this.uniqueName, function () {
+                _this.element.triggerHandler('shown.bs.modal');
+                _this.onDialogOpen();
+            });
+            modal.one('hidden.bs.modal.' + this.uniqueName, function () {
+                $(document.body).toggleClass('modal-open', $('.modal.show').length + $('.modal.in').length > 0);
+                _this.onDialogClose();
+            });
+            if (opt.size)
+                modal.find('.modal-dialog').addClass('modal-' + opt.size);
+            var footer = modal.find('.modal-footer');
+            var buttons = this.getDialogButtons();
+            if (buttons != null) {
+                for (var _i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
+                    var x = buttons_1[_i];
+                    $(Q.dialogButtonToBS(x)).appendTo(footer).click(x.click);
+                }
+            }
+            else
+                footer.hide();
+            modal.modal(opt);
+            modal.find('.modal-body').replaceWith(this.element.removeClass('hidden').addClass('modal-body'));
+            $(window).on('resize.' + this.uniqueName, this.arrange.bind(this));
+        };
         TemplatedDialog.prototype.initToolbar = function () {
             var toolbarDiv = this.byId('Toolbar');
             if (toolbarDiv.length === 0) {
@@ -483,7 +533,9 @@ var Serenity;
             }
             var hotkeyContext = this.element.closest('.ui-dialog');
             if (hotkeyContext.length === 0) {
-                hotkeyContext = this.element;
+                hotkeyContext = this.element.closest('.modal');
+                if (hotkeyContext.length == 0)
+                    hotkeyContext = this.element;
             }
             var opt = { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] };
             this.toolbar = new Serenity.Toolbar(toolbarDiv, opt);
@@ -523,11 +575,17 @@ var Serenity;
                 TemplatedDialog_1.openPanel(this.element, this.uniqueName);
                 this.setupPanelTitle();
             }
+            else if (this.useBSModal()) {
+                this.initModal();
+                this.element.closest('.modal').modal('show');
+            }
             else {
-                if (!this.element.hasClass('ui-dialog-content'))
-                    this.initDialog();
+                this.initDialog();
                 this.element.dialog('open');
             }
+        };
+        TemplatedDialog.prototype.useBSModal = function () {
+            return !!((!$.ui || !$.ui.dialog) || TemplatedDialog_1.bootstrapModal);
         };
         TemplatedDialog.openPanel = function (element, uniqueName) {
             var container = $('.panels-container');
@@ -543,7 +601,7 @@ var Serenity;
                 if (element[0].parentElement !== container[0])
                     element.appendTo(container);
             }
-            $('.ui-dialog:visible, .ui-widget-overlay:visible')
+            $('.ui-dialog:visible, .ui-widget-overlay:visible, .modal.show, .modal.in')
                 .not(element)
                 .addClass('panel-hidden panel-hidden-' + uniqueName);
             element
@@ -606,10 +664,16 @@ var Serenity;
                     this.element.addClass("flex-layout");
             }
         };
+        TemplatedDialog.prototype.getDialogButtons = function () {
+            return undefined;
+        };
         TemplatedDialog.prototype.getDialogOptions = function () {
             var opt = {};
             var dialogClass = 's-Dialog ' + this.getCssClass();
             opt.dialogClass = dialogClass;
+            var buttons = this.getDialogButtons();
+            if (buttons != null)
+                opt.buttons = buttons.map(Q.dialogButtonToUI);
             opt.width = 920;
             TemplatedDialog_1.applyCssSizes(opt, dialogClass);
             opt.autoOpen = false;
@@ -626,6 +690,8 @@ var Serenity;
         TemplatedDialog.prototype.dialogClose = function () {
             if (this.element.hasClass('ui-dialog-content'))
                 this.element.dialog().dialog('close');
+            else if (this.element.hasClass('modal-body'))
+                this.element.closest('.modal').modal('hide');
             else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
                 TemplatedDialog_1.closePanel(this.element);
             }
@@ -634,6 +700,8 @@ var Serenity;
             get: function () {
                 if (this.element.hasClass('ui-dialog-content'))
                     return this.element.dialog('option', 'title');
+                else if (this.element.hasClass('modal-body'))
+                    return this.element.closest('.modal').find('.modal-header').children('h5').text();
                 return this.element.data('dialogtitle');
             },
             set: function (value) {
@@ -641,6 +709,9 @@ var Serenity;
                 this.element.data('dialogtitle', value);
                 if (this.element.hasClass('ui-dialog-content'))
                     this.element.dialog('option', 'title', value);
+                else if (this.element.hasClass('modal-body')) {
+                    this.element.closest('.modal').find('.modal-header').children('h5').text(value !== null && value !== void 0 ? value : '');
+                }
                 else if (this.element.hasClass('s-Panel')) {
                     if (oldTitle != this.dialogTitle) {
                         this.setupPanelTitle();
@@ -755,7 +826,6 @@ var Serenity;
         };
         PropertyDialog.prototype.getDialogOptions = function () {
             var opt = _super.prototype.getDialogOptions.call(this);
-            opt.buttons = this.getDialogButtons();
             opt.width = 400;
             return opt;
         };
