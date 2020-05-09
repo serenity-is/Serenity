@@ -54,7 +54,7 @@ namespace Serenity {
                     grid.refresh();
                 };
 
-                Q.Router.dialog(grid.element, picker.element, () => "columns");
+                Q["Router"] && Q["Router"].dialog && Q["Router"].dialog(grid.element, picker.element, () => "columns");
                 picker.dialogOpen();
             }
 

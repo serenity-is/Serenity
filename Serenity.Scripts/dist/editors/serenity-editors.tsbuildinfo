@@ -1,0 +1,53 @@
+{
+  "bundle": {
+    "commonSourceDirectory": "../../CoreLib",
+    "sourceFiles": [
+      "../../CoreLib/UI/Editors/StringEditor.ts",
+      "../../CoreLib/UI/Editors/PasswordEditor.ts",
+      "../../CoreLib/UI/Editors/TextAreaEditor.ts",
+      "../../CoreLib/UI/Editors/BooleanEditor.ts",
+      "../../CoreLib/UI/Editors/DecimalEditor.ts",
+      "../../CoreLib/UI/Editors/IntegerEditor.ts",
+      "../../CoreLib/UI/Editors/DateEditor.ts",
+      "../../CoreLib/UI/Editors/DateTimeEditor.ts",
+      "../../CoreLib/UI/Editors/TimeEditor.ts",
+      "../../CoreLib/UI/Editors/EmailAddressEditor.ts",
+      "../../CoreLib/UI/Editors/EmailEditor.ts",
+      "../../CoreLib/UI/Editors/URLEditor.ts",
+      "../../CoreLib/UI/Editors/RadioButtonEditor.ts",
+      "../../CoreLib/UI/Editors/Select2Editor.ts",
+      "../../CoreLib/UI/Editors/SelectEditor.ts",
+      "../../CoreLib/UI/Editors/DateYearEditor.ts",
+      "../../CoreLib/UI/Editors/EnumEditor.ts",
+      "../../CoreLib/UI/Editors/LookupEditor.ts",
+      "../../CoreLib/UI/Editors/ServiceLookupEditor.ts",
+      "../../CoreLib/UI/Editors/HtmlContentEditor.ts",
+      "../../CoreLib/UI/Editors/UploadEditors.ts"
+    ],
+    "js": {
+      "sections": [
+        {
+          "pos": 0,
+          "end": 134712,
+          "kind": "text"
+        }
+      ]
+    },
+    "dts": {
+      "sections": [
+        {
+          "pos": 0,
+          "end": 32,
+          "kind": "type",
+          "data": "jquery"
+        },
+        {
+          "pos": 34,
+          "end": 21185,
+          "kind": "text"
+        }
+      ]
+    }
+  },
+  "version": "3.8.3"
+}

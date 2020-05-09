@@ -44,7 +44,7 @@
         });
 
         // ugly, but to it is to make old pages work without having to add this
-        Q.Router.resolve();
+        Q["Router"] && Q["Router"].resolve && Q["Router"].resolve();
     }
 
     export function layoutFillHeightValue(element: JQuery) {

@@ -49,6 +49,10 @@ interface PromiseConstructor {
     resolve(): PromiseLike<void>;
 }
 declare var Promise: PromiseConstructor;
+interface JQueryStatic {
+    extend<T>(target: T, object1?: T, ...objectN: T[]): T;
+    toJSON(obj: any): string;
+}
 declare namespace Select2 {
     namespace util {
         function stripDiacritics(input: string): string;
@@ -60,6 +64,12 @@ interface Select2QueryOptions {
     page?: number;
     context?: any;
     callback?: (p1: Select2Result) => void;
+}
+interface Select2Item {
+    id: string;
+    text: string;
+    source?: any;
+    disabled?: boolean;
 }
 interface Select2Result {
     results: any;
@@ -131,10 +141,6 @@ interface JQuery {
     select2(cmd: 'val'): any;
     select2(cmd: 'val', value: string | string[]): JQuery;
     select2(cmd: 'data'): Select2Data;
-}
-interface JQueryStatic {
-    extend<T>(target: T, object1?: T, ...objectN: T[]): T;
-    toJSON(obj: any): string;
 }
 declare namespace Serenity {
     const enum ColumnSelection {
@@ -383,7 +389,7 @@ declare namespace Q {
      */
     function debounce(func: Function, wait?: number, immediate?: boolean): () => any;
     function extend<T = any>(a: T, b: T): T;
-    function deepClone<T = any>(a: T): T;
+    function deepClone<T = any>(a: T, a2?: any, a3?: any): T;
 }
 declare namespace Q {
     interface NumberFormat {
@@ -419,6 +425,7 @@ declare namespace Q {
     function compareStringFactory(order: string): ((a: string, b: string) => number);
     let Culture: Locale;
     function turkishLocaleToUpper(a: string): string;
+    let turkishLocaleCompare: (a: string, b: string) => number;
     function format(format: string, ...prm: any[]): string;
     function localeFormat(format: string, l: Locale, ...prm: any[]): string;
     let round: (n: number, d?: number, rounding?: boolean) => number;
@@ -590,9 +597,9 @@ declare namespace Q {
          */
         let responsiveDialogs: boolean;
         /**
-         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default
+         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default for message dialogs
          */
-        let bootstrapModals: boolean;
+        let bootstrapMessages: boolean;
         /**
          * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
          * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
@@ -699,6 +706,15 @@ declare namespace Serenity {
         };
     }
 }
+declare namespace Q {
+    namespace LayoutTimer {
+        function on(key: string, handler: () => void): () => void;
+        function onSizeChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function onWidthChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function onHeightChange(key: string, element: HTMLElement, handler: () => void): () => void;
+        function off(key: string, handler?: () => void): void;
+    }
+}
 declare namespace Serenity {
     function Criteria(field: string): any[];
     namespace Criteria {
@@ -740,19 +756,80 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    type Constructor<T> = new (...args: any[]) => T;
+    interface PropertyItem {
+        name?: string;
+        title?: string;
+        hint?: string;
+        placeholder?: string;
+        editorType?: string;
+        editorParams?: any;
+        category?: string;
+        collapsible?: boolean;
+        collapsed?: boolean;
+        tab?: string;
+        cssClass?: string;
+        headerCssClass?: string;
+        formCssClass?: string;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        insertPermission?: string;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        updatePermission?: string;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        readPermission?: string;
+        oneWay?: boolean;
+        defaultValue?: any;
+        localizable?: boolean;
+        visible?: boolean;
+        allowHide?: boolean;
+        formatterType?: string;
+        formatterParams?: any;
+        displayFormat?: string;
+        alignment?: string;
+        width?: number;
+        widthSet?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        labelWidth?: string;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        groupOrder?: number;
+        summaryType?: SummaryType;
+        editLink?: boolean;
+        editLinkItemType?: string;
+        editLinkIdField?: string;
+        editLinkCssClass?: string;
+        filteringType?: string;
+        filteringParams?: any;
+        filteringIdField?: string;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
+        quickFilterCssClass?: string;
+    }
+}
+declare namespace Serenity {
     namespace Decorators {
         function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
         function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
+        function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
         function addAttribute(type: any, attr: any): void;
+    }
+    class EnumKeyAttribute {
+        value: string;
+        constructor(value: string);
     }
     namespace Decorators {
         function enumKey(value: string): (target: Function) => void;
         function registerEnum(target: any, enumKey?: string, name?: string): void;
         function registerEnumType(target: any, name?: string, enumKey?: string): void;
-    }
-    class EnumKeyAttribute {
-        value: string;
-        constructor(value: string);
     }
 }
 declare namespace System.ComponentModel {
@@ -762,9 +839,6 @@ declare namespace System.ComponentModel {
     }
 }
 declare namespace Serenity {
-    namespace Decorators {
-        function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
-    }
     class CategoryAttribute {
         category: string;
         constructor(category: string);
@@ -919,16 +993,13 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
-        type?: new (element: JQuery, options?: TOptions) => TWidget;
-        options?: TOptions;
-        container?: JQuery;
-        element?: (e: JQuery) => void;
-        init?: (w: TWidget) => void;
-    }
-}
-declare namespace Serenity {
-    class IAsyncInit {
+    class PrefixedContext {
+        readonly idPrefix: string;
+        constructor(idPrefix: string);
+        byId(id: string): JQuery;
+        w<TWidget>(id: string, type: {
+            new (...args: any[]): TWidget;
+        }): TWidget;
     }
 }
 declare namespace Serenity {
@@ -936,6 +1007,114 @@ declare namespace Serenity {
     }
     interface IDialog {
         dialogOpen(asPanel?: boolean): void;
+    }
+}
+declare namespace Serenity {
+    class IEditDialog {
+    }
+    interface IEditDialog {
+        load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
+    }
+}
+declare namespace Serenity {
+    class IBooleanValue {
+    }
+    interface IBooleanValue {
+        get_value(): boolean;
+        set_value(value: boolean): void;
+    }
+}
+declare namespace Serenity {
+    class IDoubleValue {
+    }
+    interface IDoubleValue {
+        get_value(): any;
+        set_value(value: any): void;
+    }
+}
+declare namespace Serenity {
+    class IStringValue {
+    }
+    interface IStringValue {
+        get_value(): string;
+        set_value(value: string): void;
+    }
+}
+declare namespace Serenity {
+    class IGetEditValue {
+    }
+    interface IGetEditValue {
+        getEditValue(property: PropertyItem, target: any): void;
+    }
+}
+declare namespace Serenity {
+    class ISetEditValue {
+    }
+    interface ISetEditValue {
+        setEditValue(source: any, property: PropertyItem): void;
+    }
+}
+declare namespace Serenity {
+    interface IReadOnly {
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+    }
+    class IReadOnly {
+    }
+}
+declare namespace Serenity {
+    interface IValidateRequired {
+        get_required(): boolean;
+        set_required(value: boolean): void;
+    }
+    class IValidateRequired {
+    }
+}
+declare namespace Serenity {
+    interface DataChangeInfo {
+        type: string;
+        entityId: any;
+        entity: any;
+    }
+}
+declare namespace Serenity {
+    enum CaptureOperationType {
+        Before = 0,
+        Delete = 1,
+        Insert = 2,
+        Update = 3
+    }
+}
+declare namespace Serenity {
+    namespace ReflectionUtils {
+        function getPropertyValue(o: any, property: string): any;
+        function setPropertyValue(o: any, property: string, value: any): void;
+        function makeCamelCase(s: string): string;
+    }
+}
+declare namespace Serenity.DialogTypeRegistry {
+    function tryGet(key: string): WidgetDialogClass;
+    function get(key: string): WidgetDialogClass;
+}
+declare namespace Serenity {
+    namespace EditorTypeRegistry {
+        function get(key: string): WidgetClass;
+        function reset(): void;
+    }
+}
+declare namespace Serenity {
+    namespace EnumTypeRegistry {
+        function tryGet(key: string): Function;
+        function get(key: string): Function;
+    }
+}
+declare namespace Serenity {
+    interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
+        type?: new (element: JQuery, options?: TOptions) => TWidget;
+        options?: TOptions;
+        container?: JQuery;
+        element?: (e: JQuery) => void;
+        init?: (w: TWidget) => void;
     }
 }
 declare namespace Serenity {
@@ -963,6 +1142,7 @@ declare namespace Serenity {
             new (...args: any[]): TWidget;
         }): JQuery;
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        getGridField(): JQuery;
         static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
         init(action?: (widget: any) => void): this;
         private static __isWidgetType;
@@ -986,20 +1166,17 @@ declare namespace Serenity {
         defaultValue?: any;
     }
     interface Widget<TOptions> {
-        getGridField(): JQuery;
         change(handler: (e: JQueryEventObject) => void): void;
         changeSelect2(handler: (e: JQueryEventObject) => void): void;
     }
 }
-declare namespace Serenity {
-    namespace WX {
-        function getWidget<TWidget>(element: JQuery, type: Function): any;
-        function getWidgetName(type: Function): string;
-        function hasOriginalEvent(e: any): boolean;
-        function change(widget: any, handler: any): void;
-        function changeSelect2(widget: any, handler: any): void;
-        function getGridField(widget: Serenity.Widget<any>): JQuery;
-    }
+interface JQuery {
+    getWidget<TWidget>(widgetType: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
+    tryGetWidget<TWidget>(widgetType: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
 }
 declare namespace Serenity {
     class TemplatedWidget<TOptions> extends Widget<TOptions> {
@@ -1013,156 +1190,6 @@ declare namespace Serenity {
         protected getTemplateName(): string;
         protected getFallbackTemplate(): string;
         protected getTemplate(): string;
-    }
-}
-declare namespace Q {
-    function autoFullHeight(element: JQuery): void;
-    function initFullHeightGridPage(gridDiv: JQuery): void;
-    function layoutFillHeightValue(element: JQuery): number;
-    function layoutFillHeight(element: JQuery): void;
-    function setMobileDeviceMode(): void;
-    function triggerLayoutOnShow(element: JQuery): void;
-    function centerDialog(el: JQuery): void;
-}
-declare namespace Q.Router {
-    let enabled: boolean;
-    function navigate(hash: string, tryBack?: boolean, silent?: boolean): void;
-    function replace(hash: string, tryBack?: boolean): void;
-    function replaceLast(hash: string, tryBack?: boolean): void;
-    function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
-    function resolve(hash?: string): void;
-}
-declare namespace Q {
-    function validatorAbortHandler(validator: any): void;
-    function validateOptions(options: JQueryValidation.ValidationOptions): JQueryValidation.ValidationOptions;
-}
-declare namespace Serenity {
-    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
-        protected tabs: JQuery;
-        protected toolbar: Serenity.Toolbar;
-        protected validator: JQueryValidation.Validator;
-        constructor(options?: TOptions);
-        private get isMarkedAsPanel();
-        private get isResponsive();
-        private static getCssSize;
-        private static applyCssSizes;
-        destroy(): void;
-        protected initDialog(): void;
-        protected initToolbar(): void;
-        protected getToolbarButtons(): ToolButton[];
-        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected initValidator(): void;
-        protected resetValidation(): void;
-        protected validateForm(): boolean;
-        dialogOpen(asPanel?: boolean): void;
-        static openPanel(element: JQuery, uniqueName: string): void;
-        static closePanel(element: JQuery, e?: JQueryEventObject): void;
-        protected onDialogOpen(): void;
-        protected arrange(): void;
-        protected onDialogClose(): void;
-        protected addCssClass(): void;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getDialogTitle(): string;
-        dialogClose(): void;
-        get dialogTitle(): string;
-        private setupPanelTitle;
-        set dialogTitle(value: string);
-        set_dialogTitle(value: string): void;
-        protected initTabs(): void;
-        protected handleResponsive(): void;
-    }
-}
-declare namespace Q {
-    namespace LayoutTimer {
-        function on(key: string, handler: () => void): () => void;
-        function onSizeChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function onWidthChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function onHeightChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function off(key: string, handler?: () => void): void;
-    }
-}
-declare namespace Serenity {
-    interface QuickSearchField {
-        name: string;
-        title: string;
-    }
-    interface GridRowSelectionMixinOptions {
-        selectable?: (item: any) => boolean;
-    }
-    class GridRowSelectionMixin {
-        private idField;
-        private include;
-        private grid;
-        private options;
-        constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions);
-        updateSelectAll(): void;
-        clear(): void;
-        resetCheckedAndRefresh(): void;
-        selectKeys(keys: string[]): void;
-        getSelectedKeys(): string[];
-        getSelectedAsInt32(): number[];
-        getSelectedAsInt64(): number[];
-        setSelectedKeys(keys: string[]): void;
-        private isSelectable;
-        static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column;
-    }
-    interface GridRadioSelectionMixinOptions {
-        selectable?: (item: any) => boolean;
-    }
-    class GridRadioSelectionMixin {
-        private idField;
-        private include;
-        private grid;
-        private options;
-        constructor(grid: Serenity.IDataGrid, options?: GridRadioSelectionMixinOptions);
-        private isSelectable;
-        clear(): void;
-        resetCheckedAndRefresh(): void;
-        getSelectedKey(): string;
-        getSelectedAsInt32(): number;
-        getSelectedAsInt64(): number;
-        setSelectedKey(key: string): void;
-        static createSelectColumn(getMixin: () => Serenity.GridRadioSelectionMixin): Slick.Column;
-    }
-    namespace GridSelectAllButtonHelper {
-        function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void;
-        function define(getGrid: () => IDataGrid, getId: (p1: any) => any, getSelected: (p1: any) => boolean, setSelected: (p1: any, p2: boolean) => void, text?: string, onClick?: () => void): ToolButton;
-    }
-    namespace GridUtils {
-        function addToggleButton(toolDiv: JQuery, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
-        function addIncludeDeletedToggle(toolDiv: JQuery, view: Slick.RemoteView<any>, hint?: string, initial?: boolean): void;
-        function addQuickSearchInput(toolDiv: JQuery, view: Slick.RemoteView<any>, fields?: QuickSearchField[]): void;
-        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): void;
-        function makeOrderable(grid: Slick.Grid, handleMove: (p1: any, p2: number) => void): void;
-        function makeOrderableWithUpdateRequest(grid: DataGrid<any, any>, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
-    }
-    namespace PropertyItemSlickConverter {
-        function toSlickColumns(items: PropertyItem[]): Slick.Column[];
-        function toSlickColumn(item: PropertyItem): Slick.Column;
-    }
-    namespace SlickFormatting {
-        function getEnumText(enumKey: string, name: string): string;
-        function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any, formatter: Slick.Format): Slick.Format;
-        function date(format?: string): Slick.Format;
-        function dateTime(format?: string): Slick.Format;
-        function checkBox(): Slick.Format;
-        function number(format: string): Slick.Format;
-        function getItemType(link: JQuery): string;
-        function getItemId(link: JQuery): string;
-        function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
-        function itemLink(itemType: string, idField: string, getText: Slick.Format, cssClass?: Slick.Format, encode?: boolean): Slick.Format;
-    }
-    namespace SlickHelper {
-        function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any;
-        function convertToFormatter(format: Slick.Format): Slick.ColumnFormatter;
-    }
-    namespace SlickTreeHelper {
-        function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
-        function filterById<TItem>(item: TItem, view: Slick.RemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
-        function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
-        function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
-        function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
-        function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void;
     }
 }
 declare namespace Serenity {
@@ -1182,18 +1209,9 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    namespace TabsExtensions {
-        function setDisabled(tabs: JQuery, tabKey: string, isDisabled: boolean): void;
-        function toggle(tabs: JQuery, tabKey: string, visible: boolean): void;
-        function activeTabKey(tabs: JQuery): string;
-        function indexByKey(tabs: JQuery): any;
-        function selectTab(tabs: JQuery, tabKey: string): void;
-    }
-}
-declare namespace Serenity {
     namespace UploadHelper {
         function addUploadInput(options: UploadInputOptions): JQuery;
-        function checkImageConstraints(file: UploadResponse, opt: ImageUploadEditorOptions): boolean;
+        function checkImageConstraints(file: UploadResponse, opt: FileUploadConstraints): boolean;
         function fileNameSizeDisplay(name: string, bytes: number): string;
         function fileSizeDisplay(bytes: number): string;
         function hasImageExtension(filename: string): boolean;
@@ -1221,6 +1239,93 @@ declare namespace Serenity {
         Width: number;
         Height: number;
     }
+    interface FileUploadConstraints {
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+        minSize?: number;
+        maxSize?: number;
+        allowNonImage?: boolean;
+        originalNameProperty?: string;
+    }
+}
+declare namespace Serenity {
+    interface ToolButton {
+        title?: string;
+        hint?: string;
+        cssClass?: string;
+        icon?: string;
+        onClick?: any;
+        htmlEncode?: any;
+        hotkey?: string;
+        hotkeyAllowDefault?: boolean;
+        hotkeyContext?: any;
+        separator?: (false | true | 'left' | 'right' | 'both');
+        visible?: boolean | (() => boolean);
+        disabled?: boolean | (() => boolean);
+    }
+    interface PopupMenuButtonOptions {
+        menu?: JQuery;
+        onPopup?: () => void;
+        positionMy?: string;
+        positionAt?: string;
+    }
+    class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
+        constructor(div: JQuery, opt: PopupMenuButtonOptions);
+        destroy(): void;
+    }
+    interface PopupToolButtonOptions extends PopupMenuButtonOptions {
+    }
+    class PopupToolButton extends PopupMenuButton {
+        constructor(div: JQuery, opt: PopupToolButtonOptions);
+    }
+    interface ToolbarOptions {
+        buttons?: ToolButton[];
+        hotkeyContext?: any;
+    }
+    class Toolbar extends Widget<ToolbarOptions> {
+        constructor(div: JQuery, options: ToolbarOptions);
+        destroy(): void;
+        protected mouseTrap: any;
+        protected createButton(container: JQuery, b: ToolButton): void;
+        findButton(className: string): JQuery;
+        updateInterface(): void;
+    }
+}
+declare namespace Serenity {
+    namespace EditorUtils {
+        function getDisplayText(editor: Serenity.Widget<any>): string;
+        function getValue(editor: Serenity.Widget<any>): any;
+        function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
+        function setValue(editor: Serenity.Widget<any>, value: any): void;
+        function loadValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
+        function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
+        function setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void;
+        function setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
+        function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
+    }
+}
+declare namespace Serenity {
+    class CascadedWidgetLink<TParent extends Widget<any>> {
+        private parentType;
+        private widget;
+        private parentChange;
+        constructor(parentType: {
+            new (...args: any[]): TParent;
+        }, widget: Serenity.Widget<any>, parentChange: (p1: TParent) => void);
+        private _parentID;
+        bind(): TParent;
+        unbind(): TParent;
+        get_parentID(): string;
+        set_parentID(value: string): void;
+    }
+}
+declare namespace Serenity {
+}
+declare namespace Q {
+    function validatorAbortHandler(validator: any): void;
+    function validateOptions(options: JQueryValidation.ValidationOptions): JQueryValidation.ValidationOptions;
 }
 declare namespace Serenity {
     namespace ValidationHelper {
@@ -1235,110 +1340,105 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class IBooleanValue {
-    }
-    interface IBooleanValue {
-        get_value(): boolean;
-        set_value(value: boolean): void;
-    }
-}
-declare namespace Serenity {
-    class IDoubleValue {
-    }
-    interface IDoubleValue {
-        get_value(): any;
-        set_value(value: any): void;
-    }
-}
-declare namespace Serenity {
-    class IGetEditValue {
-    }
-    interface IGetEditValue {
-        getEditValue(property: PropertyItem, target: any): void;
+    class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
+        constructor(container: JQuery, options?: TOptions);
+        destroy(): void;
+        protected tabs: JQuery;
+        protected toolbar: Serenity.Toolbar;
+        protected validator: JQueryValidation.Validator;
+        protected isPanel: boolean;
+        protected responsive: boolean;
+        protected arrange(): void;
+        protected getToolbarButtons(): ToolButton[];
+        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
+        protected initTabs(): void;
+        protected initToolbar(): void;
+        protected initValidator(): void;
+        protected resetValidation(): void;
+        protected validateForm(): boolean;
     }
 }
 declare namespace Serenity {
-    class ISetEditValue {
-    }
-    interface ISetEditValue {
-        setEditValue(source: any, property: PropertyItem): void;
-    }
-}
-declare namespace Serenity {
-    class IStringValue {
-    }
-    interface IStringValue {
-        get_value(): string;
-        set_value(value: string): void;
+    namespace TabsExtensions {
+        function setDisabled(tabs: JQuery, tabKey: string, isDisabled: boolean): void;
+        function toggle(tabs: JQuery, tabKey: string, visible: boolean): void;
+        function activeTabKey(tabs: JQuery): string;
+        function indexByKey(tabs: JQuery): any;
+        function selectTab(tabs: JQuery, tabKey: string): void;
     }
 }
 declare namespace Serenity {
-    interface IReadOnly {
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-    }
-    class IReadOnly {
+    namespace ReflectionOptionsSetter {
+        function set(target: any, options: any): void;
     }
 }
 declare namespace Serenity {
-    type Constructor<T> = new (...args: any[]) => T;
-    interface PropertyItem {
-        name?: string;
-        title?: string;
-        hint?: string;
-        placeholder?: string;
-        editorType?: string;
-        editorParams?: any;
-        category?: string;
-        collapsible?: boolean;
-        collapsed?: boolean;
-        tab?: string;
-        cssClass?: string;
-        headerCssClass?: string;
-        formCssClass?: string;
-        maxLength?: number;
-        required?: boolean;
-        insertable?: boolean;
-        insertPermission?: string;
-        hideOnInsert?: boolean;
-        updatable?: boolean;
-        updatePermission?: string;
-        hideOnUpdate?: boolean;
-        readOnly?: boolean;
-        readPermission?: string;
-        oneWay?: boolean;
-        defaultValue?: any;
-        localizable?: boolean;
-        visible?: boolean;
-        allowHide?: boolean;
-        formatterType?: string;
-        formatterParams?: any;
-        displayFormat?: string;
-        alignment?: string;
-        width?: number;
-        widthSet?: boolean;
-        minWidth?: number;
-        maxWidth?: number;
-        labelWidth?: string;
-        resizable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        groupOrder?: number;
-        summaryType?: SummaryType;
-        editLink?: boolean;
-        editLinkItemType?: string;
-        editLinkIdField?: string;
-        editLinkCssClass?: string;
-        filteringType?: string;
-        filteringParams?: any;
-        filteringIdField?: string;
-        notFilterable?: boolean;
-        filterOnly?: boolean;
-        quickFilter?: boolean;
-        quickFilterParams?: any;
-        quickFilterSeparator?: boolean;
-        quickFilterCssClass?: string;
+    class PropertyGrid extends Widget<PropertyGridOptions> {
+        private editors;
+        private items;
+        constructor(div: JQuery, opt: PropertyGridOptions);
+        destroy(): void;
+        private createItems;
+        private createCategoryDiv;
+        private categoryLinkClick;
+        private determineText;
+        private createField;
+        private getCategoryOrder;
+        private createCategoryLinks;
+        get_editors(): Widget<any>[];
+        get_items(): PropertyItem[];
+        get_idPrefix(): string;
+        get_mode(): PropertyGridMode;
+        set_mode(value: PropertyGridMode): void;
+        static loadEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
+        static saveEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
+        private static setReadOnly;
+        private static setReadonly;
+        private static setRequired;
+        private static setMaxLength;
+        load(source: any): void;
+        save(target?: any): any;
+        get value(): any;
+        set value(val: any);
+        private canModifyItem;
+        updateInterface(): void;
+        enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
     }
+    const enum PropertyGridMode {
+        insert = 1,
+        update = 2
+    }
+    interface PropertyGridOptions {
+        idPrefix?: string;
+        items?: PropertyItem[];
+        useCategories?: boolean;
+        categoryOrder?: string;
+        defaultCategory?: string;
+        localTextPrefix?: string;
+        mode?: PropertyGridMode;
+    }
+}
+declare namespace Serenity {
+    class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
+        private _entity;
+        private _entityId;
+        constructor(container: JQuery, options?: TOptions);
+        destroy(): void;
+        protected initPropertyGrid(): void;
+        protected loadInitialEntity(): void;
+        protected getFormKey(): string;
+        protected getPropertyGridOptions(): PropertyGridOptions;
+        protected getPropertyItems(): PropertyItem[];
+        protected getSaveEntity(): TItem;
+        protected get_entity(): TItem;
+        protected get_entityId(): any;
+        protected set_entity(value: TItem): void;
+        protected set_entityId(value: any): void;
+        protected validateBeforeSave(): boolean;
+        protected propertyGrid: Serenity.PropertyGrid;
+    }
+}
+declare namespace Serenity {
 }
 declare namespace Serenity {
     class StringEditor extends Widget<any> {
@@ -1355,11 +1455,57 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    interface TextAreaEditorOptions {
+        cols?: number;
+        rows?: number;
+    }
+    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
+        constructor(input: JQuery, opt?: TextAreaEditorOptions);
+        get value(): string;
+        protected get_value(): string;
+        set value(value: string);
+        protected set_value(value: string): void;
+    }
+}
+declare namespace Serenity {
     class BooleanEditor extends Widget<any> {
         get value(): boolean;
         protected get_value(): boolean;
         set value(value: boolean);
         protected set_value(value: boolean): void;
+    }
+}
+declare namespace Serenity {
+    interface DecimalEditorOptions {
+        minValue?: string;
+        maxValue?: string;
+        decimals?: any;
+        padDecimals?: any;
+        allowNegatives?: boolean;
+    }
+    class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
+        constructor(input: JQuery, opt?: DecimalEditorOptions);
+        get_value(): number;
+        get value(): number;
+        set_value(value: number): void;
+        set value(v: number);
+        get_isValid(): boolean;
+        static defaultAutoNumericOptions(): any;
+    }
+}
+declare namespace Serenity {
+    interface IntegerEditorOptions {
+        minValue?: number;
+        maxValue?: number;
+        allowNegatives?: boolean;
+    }
+    class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
+        constructor(input: JQuery, opt?: IntegerEditorOptions);
+        get_value(): number;
+        get value(): number;
+        set_value(value: number): void;
+        set value(v: number);
+        get_isValid(): boolean;
     }
 }
 declare namespace Serenity {
@@ -1400,7 +1546,7 @@ declare namespace Serenity {
         get_sqlMinMax(): boolean;
         set_sqlMinMax(value: boolean): void;
         static dateInputChange: (e: JQueryEventObject) => void;
-        static flatPickrTrigger(input: JQuery): JQuery<HTMLElement>;
+        static flatPickrTrigger(input: JQuery): JQuery;
         static dateInputKeyup(e: JQueryEventObject): void;
     }
 }
@@ -1451,21 +1597,26 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    interface DecimalEditorOptions {
-        minValue?: string;
-        maxValue?: string;
-        decimals?: any;
-        padDecimals?: any;
-        allowNegatives?: boolean;
+    interface TimeEditorOptions {
+        noEmptyOption?: boolean;
+        startHour?: any;
+        endHour?: any;
+        intervalMinutes?: any;
     }
-    class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
-        constructor(input: JQuery, opt?: DecimalEditorOptions);
-        get_value(): number;
+    class TimeEditor extends Widget<TimeEditorOptions> {
+        private minutes;
+        constructor(input: JQuery, opt?: TimeEditorOptions);
         get value(): number;
-        set_value(value: number): void;
-        set value(v: number);
-        get_isValid(): boolean;
-        static defaultAutoNumericOptions(): any;
+        protected get_value(): number;
+        set value(value: number);
+        protected set_value(value: number): void;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+    }
+}
+declare namespace Serenity {
+    class EmailAddressEditor extends Serenity.StringEditor {
+        constructor(input: JQuery);
     }
 }
 declare namespace Serenity {
@@ -1485,23 +1636,25 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class EmailAddressEditor extends Serenity.StringEditor {
+    class URLEditor extends StringEditor {
         constructor(input: JQuery);
     }
 }
 declare namespace Serenity {
-    interface IntegerEditorOptions {
-        minValue?: number;
-        maxValue?: number;
-        allowNegatives?: boolean;
+    interface RadioButtonEditorOptions {
+        enumKey?: string;
+        enumType?: any;
+        lookupKey?: string;
     }
-    class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
-        constructor(input: JQuery, opt?: IntegerEditorOptions);
-        get_value(): number;
-        get value(): number;
-        set_value(value: number): void;
-        set value(v: number);
-        get_isValid(): boolean;
+    class RadioButtonEditor extends Widget<RadioButtonEditorOptions> implements IReadOnly {
+        constructor(input: JQuery, opt: RadioButtonEditorOptions);
+        protected addRadio(value: string, text: string): void;
+        get_value(): string;
+        get value(): string;
+        set_value(value: string): void;
+        set value(v: string);
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
     }
 }
 declare namespace Serenity {
@@ -1637,12 +1790,8 @@ declare namespace Serenity {
         protected inplaceCreateClick(e: JQueryEventObject): void;
         openDialogAsPanel: boolean;
     }
-    interface Select2Item {
-        id: string;
-        text: string;
-        source?: any;
-        disabled?: boolean;
-    }
+}
+declare namespace Serenity {
     class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
         constructor(hidden: JQuery, opt?: SelectEditorOptions);
         getItems(): any[];
@@ -1663,6 +1812,17 @@ declare namespace Serenity {
         minYear?: string;
         maxYear?: string;
         descending?: boolean;
+    }
+}
+declare namespace Serenity {
+    interface EnumEditorOptions extends Select2CommonOptions {
+        enumKey?: string;
+        enumType?: any;
+    }
+    class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
+        constructor(hidden: JQuery, opt: EnumEditorOptions);
+        protected updateItems(): void;
+        protected allowClear(): any;
     }
 }
 declare namespace Serenity {
@@ -1730,44 +1890,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    export namespace EditorTypeRegistry {
-        function get(key: string): WidgetClass;
-        function reset(): void;
-    }
-    export namespace EditorUtils {
-        function getDisplayText(editor: Serenity.Widget<any>): string;
-        function getValue(editor: Serenity.Widget<any>): any;
-        function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
-        function setValue(editor: Serenity.Widget<any>, value: any): void;
-        function loadValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
-        function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
-        function setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void;
-        function setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
-        function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
-    }
-    export interface EnumEditorOptions extends Select2CommonOptions {
-        enumKey?: string;
-        enumType?: any;
-    }
-    export class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
-        constructor(hidden: JQuery, opt: EnumEditorOptions);
-        protected updateItems(): void;
-        protected allowClear(): any;
-    }
-    export interface GoogleMapOptions {
-        latitude?: any;
-        longitude?: any;
-        zoom?: any;
-        mapTypeId?: any;
-        markerTitle?: string;
-        markerLatitude?: any;
-        markerLongitude?: any;
-    }
-    export class GoogleMap extends Widget<GoogleMapOptions> {
-        private map;
-        constructor(container: JQuery, opt: GoogleMapOptions);
-        get_map(): any;
-    }
     export interface HtmlContentEditorOptions {
         cols?: any;
         rows?: any;
@@ -1799,20 +1921,17 @@ declare namespace Serenity {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         protected getConfig(): CKEditorConfig;
     }
-    export interface ImageUploadEditorOptions {
-        minWidth?: number;
-        maxWidth?: number;
-        minHeight?: number;
-        maxHeight?: number;
-        minSize?: number;
-        maxSize?: number;
-        originalNameProperty?: string;
-        urlPrefix?: string;
-        allowNonImage?: boolean;
+    export {};
+}
+declare namespace Serenity {
+    interface FileUploadEditorOptions extends FileUploadConstraints {
         displayFileName?: boolean;
+        urlPrefix?: string;
     }
-    export class ImageUploadEditor extends Widget<ImageUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
-        constructor(div: JQuery, opt: ImageUploadEditorOptions);
+    interface ImageUploadEditorOptions extends FileUploadEditorOptions {
+    }
+    class FileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
+        constructor(div: JQuery, opt: FileUploadEditorOptions);
         protected getUploadInputOptions(): UploadInputOptions;
         protected addFileButtonText(): string;
         protected getToolButtons(): ToolButton[];
@@ -1832,7 +1951,10 @@ declare namespace Serenity {
         protected fileSymbols: JQuery;
         protected uploadInput: JQuery;
     }
-    export class MultipleImageUploadEditor extends Widget<ImageUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
+    class ImageUploadEditor extends FileUploadEditor {
+        constructor(div: JQuery, opt: ImageUploadEditorOptions);
+    }
+    class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
         private entities;
         private toolbar;
         private fileSymbols;
@@ -1852,93 +1974,291 @@ declare namespace Serenity {
         setEditValue(source: any, property: PropertyItem): void;
         jsonEncodeValue: boolean;
     }
-    export class MaskedEditor extends Widget<MaskedEditorOptions> {
-        constructor(input: JQuery, opt?: MaskedEditorOptions);
-        get value(): string;
-        protected get_value(): string;
-        set value(value: string);
-        protected set_value(value: string): void;
+    class MultipleImageUploadEditor extends MultipleFileUploadEditor {
+        constructor(div: JQuery, opt: ImageUploadEditorOptions);
     }
-    export interface MaskedEditorOptions {
-        mask?: string;
-        placeholder?: string;
+}
+declare namespace Serenity {
+    interface QuickFilterArgs<TWidget> {
+        field?: string;
+        widget?: TWidget;
+        request?: ListRequest;
+        equalityFilter?: any;
+        value?: any;
+        active?: boolean;
+        handled?: boolean;
     }
-    export interface RadioButtonEditorOptions {
-        enumKey?: string;
-        enumType?: any;
-        lookupKey?: string;
+    interface QuickFilter<TWidget extends Widget<TOptions>, TOptions> {
+        field?: string;
+        type?: new (element: JQuery, options: TOptions) => TWidget;
+        handler?: (h: QuickFilterArgs<TWidget>) => void;
+        title?: string;
+        options?: TOptions;
+        element?: (e: JQuery) => void;
+        init?: (w: TWidget) => void;
+        separator?: boolean;
+        cssClass?: string;
+        loadState?: (w: TWidget, state: any) => void;
+        saveState?: (w: TWidget) => any;
+        displayText?: (w: TWidget, label: string) => string;
     }
-    export class RadioButtonEditor extends Widget<RadioButtonEditorOptions> implements IReadOnly {
-        constructor(input: JQuery, opt: RadioButtonEditorOptions);
-        protected addRadio(value: string, text: string): void;
-        get_value(): string;
-        get value(): string;
-        set_value(value: string): void;
-        set value(v: string);
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
+}
+declare namespace Serenity {
+    interface QuickFilterBarOptions {
+        filters: QuickFilter<Widget<any>, any>[];
+        getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
+        idPrefix?: string;
     }
-    export interface RecaptchaOptions {
-        siteKey?: string;
-        language?: string;
+    class QuickFilterBar extends Widget<QuickFilterBarOptions> {
+        constructor(container: JQuery, options?: QuickFilterBarOptions);
+        addSeparator(): void;
+        add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
+        addDateRange(field: string, title?: string): Serenity.DateEditor;
+        static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
+        addDateTimeRange(field: string, title?: string): DateTimeEditor;
+        static dateTimeRange(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
+        addBoolean(field: string, title?: string, yes?: string, no?: string): SelectEditor;
+        static boolean(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
+        onChange: (e: JQueryEventObject) => void;
+        private submitHandlers;
+        destroy(): void;
+        onSubmit(request: Serenity.ListRequest): void;
+        protected add_submitHandlers(action: (request: Serenity.ListRequest) => void): void;
+        protected remove_submitHandlers(action: (request: Serenity.ListRequest) => void): void;
+        protected clear_submitHandlers(): void;
+        find<TWidget>(type: {
+            new (...args: any[]): TWidget;
+        }, field: string): TWidget;
+        tryFind<TWidget>(type: {
+            new (...args: any[]): TWidget;
+        }, field: string): TWidget;
     }
-    export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
-        constructor(div: JQuery, opt: RecaptchaOptions);
-        get_value(): string;
-        set_value(value: string): void;
+}
+declare namespace Serenity {
+    interface QuickSearchField {
+        name: string;
+        title: string;
     }
-    export interface TextAreaEditorOptions {
-        cols?: number;
-        rows?: number;
+    interface QuickSearchInputOptions {
+        typeDelay?: number;
+        loadingParentClass?: string;
+        filteredParentClass?: string;
+        onSearch?: (p1: string, p2: string, p3: (p1: boolean) => void) => void;
+        fields?: QuickSearchField[];
     }
-    export class TextAreaEditor extends Widget<TextAreaEditorOptions> {
-        constructor(input: JQuery, opt?: TextAreaEditorOptions);
-        get value(): string;
-        protected get_value(): string;
-        set value(value: string);
-        protected set_value(value: string): void;
+    class QuickSearchInput extends Widget<QuickSearchInputOptions> {
+        private lastValue;
+        private field;
+        private fieldChanged;
+        private timer;
+        constructor(input: JQuery, opt: QuickSearchInputOptions);
+        protected checkIfValueChanged(): void;
+        get_field(): QuickSearchField;
+        set_field(value: QuickSearchField): void;
+        protected updateInputPlaceHolder(): void;
+        protected searchNow(value: string): void;
     }
-    export interface TimeEditorOptions {
-        noEmptyOption?: boolean;
-        startHour?: any;
-        endHour?: any;
-        intervalMinutes?: any;
+}
+declare namespace Q.Router {
+    let enabled: boolean;
+    function navigate(hash: string, tryBack?: boolean, silent?: boolean): void;
+    function replace(hash: string, tryBack?: boolean): void;
+    function replaceLast(hash: string, tryBack?: boolean): void;
+    function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
+    function resolve(hash?: string): void;
+}
+declare namespace Q {
+    function autoFullHeight(element: JQuery): void;
+    function initFullHeightGridPage(gridDiv: JQuery): void;
+    function layoutFillHeightValue(element: JQuery): number;
+    function layoutFillHeight(element: JQuery): void;
+    function setMobileDeviceMode(): void;
+    function triggerLayoutOnShow(element: JQuery): void;
+    function centerDialog(el: JQuery): void;
+}
+declare namespace Serenity.DialogExtensions {
+    function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery;
+    function dialogMaximizable(dialog: JQuery): JQuery;
+}
+declare namespace Serenity {
+    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+        protected tabs: JQuery;
+        protected toolbar: Serenity.Toolbar;
+        protected validator: JQueryValidation.Validator;
+        constructor(options?: TOptions);
+        private get isMarkedAsPanel();
+        private get isResponsive();
+        private static getCssSize;
+        private static applyCssSizes;
+        destroy(): void;
+        protected initDialog(): void;
+        protected initToolbar(): void;
+        protected getToolbarButtons(): ToolButton[];
+        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
+        protected initValidator(): void;
+        protected resetValidation(): void;
+        protected validateForm(): boolean;
+        dialogOpen(asPanel?: boolean): void;
+        static openPanel(element: JQuery, uniqueName: string): void;
+        static closePanel(element: JQuery, e?: JQueryEventObject): void;
+        protected onDialogOpen(): void;
+        protected arrange(): void;
+        protected onDialogClose(): void;
+        protected addCssClass(): void;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogTitle(): string;
+        dialogClose(): void;
+        get dialogTitle(): string;
+        private setupPanelTitle;
+        set dialogTitle(value: string);
+        set_dialogTitle(value: string): void;
+        protected initTabs(): void;
+        protected handleResponsive(): void;
     }
-    export class TimeEditor extends Widget<TimeEditorOptions> {
-        private minutes;
-        constructor(input: JQuery, opt?: TimeEditorOptions);
-        get value(): number;
-        protected get_value(): number;
-        set value(value: number);
-        protected set_value(value: number): void;
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
+}
+declare namespace Serenity {
+    type DialogButton = JQueryUI.DialogButtonOptions;
+    class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        protected _entity: TItem;
+        protected _entityId: any;
+        constructor(opt?: TOptions);
+        destroy(): void;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogButtons(): JQueryUI.DialogButtonOptions[];
+        protected okClick(): void;
+        protected okClickValidated(): void;
+        protected cancelClick(): void;
+        protected initPropertyGrid(): void;
+        protected getFormKey(): string;
+        protected getPropertyGridOptions(): PropertyGridOptions;
+        protected getPropertyItems(): PropertyItem[];
+        protected getSaveEntity(): TItem;
+        protected loadInitialEntity(): void;
+        protected get_entity(): TItem;
+        protected set_entity(value: TItem): void;
+        protected get_entityId(): any;
+        protected set_entityId(value: any): void;
+        protected validateBeforeSave(): boolean;
+        protected updateTitle(): void;
+        protected propertyGrid: Serenity.PropertyGrid;
     }
-    export class URLEditor extends StringEditor {
-        constructor(input: JQuery);
-    }
-    export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
-        pageSize: number;
-        constructor(hidden: JQuery, opt: TOptions);
-        protected emptyItemText(): string;
+}
+declare namespace Serenity {
+    class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
+        protected entity: TItem;
+        protected entityId: any;
+        protected propertyGrid: PropertyGrid;
+        protected toolbar: Toolbar;
+        protected saveAndCloseButton: JQuery;
+        protected applyChangesButton: JQuery;
+        protected deleteButton: JQuery;
+        protected undeleteButton: JQuery;
+        protected cloneButton: JQuery;
+        protected editButton: JQuery;
+        protected localizationGrid: PropertyGrid;
+        protected localizationButton: JQuery;
+        protected localizationPendingValue: any;
+        protected localizationLastValue: any;
+        static defaultLanguageList: () => string[][];
+        constructor(opt?: TOptions);
+        destroy(): void;
+        protected get_entity(): TItem;
+        protected set_entity(entity: any): void;
+        protected get_entityId(): any;
+        protected set_entityId(value: any): void;
+        protected getEntityNameFieldValue(): any;
+        protected getEntityTitle(): string;
+        protected updateTitle(): void;
+        protected isCloneMode(): boolean;
+        protected isEditMode(): boolean;
+        protected isDeleted(): boolean;
+        protected isNew(): boolean;
+        protected isNewOrDeleted(): boolean;
+        protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse>;
+        protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
+        protected doDelete(callback: (response: DeleteResponse) => void): void;
+        protected onDeleteSuccess(response: DeleteResponse): void;
+        protected attrs<TAttr>(attrType: {
+            new (...args: any[]): TAttr;
+        }): TAttr[];
+        private entityType;
+        protected getEntityType(): string;
+        private formKey;
+        protected getFormKey(): string;
+        private localTextDbPrefix;
+        protected getLocalTextDbPrefix(): string;
+        protected getLocalTextPrefix(): string;
+        private entitySingular;
+        protected getEntitySingular(): string;
+        private nameProperty;
+        protected getNameProperty(): string;
+        private idProperty;
+        protected getIdProperty(): string;
+        protected isActiveProperty: string;
+        protected getIsActiveProperty(): string;
+        protected getIsDeletedProperty(): string;
+        protected service: string;
         protected getService(): string;
-        protected query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void;
-        protected executeQuery(options: ServiceOptions<ListResponse<any>>): void;
-        protected queryByKey(key: string, callback: (p1: any) => void): void;
-        protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void;
-        protected getItemKey(item: any): string;
-        protected getItemText(item: any): string;
-        protected getTypeDelay(): number;
-        protected getSelect2Options(): Select2Options;
-        protected addInplaceCreate(title: string): void;
-        protected inplaceCreateClick(e: any): void;
-        protected get_select2Container(): JQuery;
-        get_value(): string;
-        get value(): string;
-        set_value(value: string): void;
-        set value(v: string);
+        load(entityOrId: any, done: () => void, fail: (ex: Q.Exception) => void): void;
+        loadNewAndOpenDialog(asPanel?: boolean): void;
+        loadEntityAndOpenDialog(entity: TItem, asPanel?: boolean): void;
+        protected loadResponse(data: any): void;
+        protected loadEntity(entity: TItem): void;
+        protected beforeLoadEntity(entity: TItem): void;
+        protected afterLoadEntity(): void;
+        loadByIdAndOpenDialog(entityId: any, asPanel?: boolean): void;
+        protected onLoadingData(data: RetrieveResponse<TItem>): void;
+        protected getLoadByIdOptions(id: any, callback: (response: RetrieveResponse<TItem>) => void): ServiceOptions<RetrieveResponse<TItem>>;
+        protected getLoadByIdRequest(id: any): RetrieveRequest;
+        protected reloadById(): void;
+        loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
+        protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
+        protected initLocalizationGrid(): void;
+        protected initLocalizationGridCommon(pgOptions: PropertyGridOptions): void;
+        protected isLocalizationMode(): boolean;
+        protected isLocalizationModeAndChanged(): boolean;
+        protected localizationButtonClick(): void;
+        protected getLanguages(): any[];
+        private getLangs;
+        protected loadLocalization(): void;
+        protected setLocalizationGridCurrentValues(): void;
+        protected getLocalizationGridValue(): any;
+        protected getPendingLocalizations(): any;
+        protected initPropertyGrid(): void;
+        protected getPropertyItems(): PropertyItem[];
+        protected getPropertyGridOptions(): PropertyGridOptions;
+        protected validateBeforeSave(): boolean;
+        protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse>;
+        protected getSaveEntity(): TItem;
+        protected getSaveRequest(): SaveRequest<TItem>;
+        protected onSaveSuccess(response: SaveResponse): void;
+        protected save_submitHandler(callback: (response: SaveResponse) => void): void;
+        protected save(callback?: (response: SaveResponse) => void): void | boolean;
+        protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
+        protected initToolbar(): void;
+        protected showSaveSuccessMessage(response: SaveResponse): void;
+        protected getToolbarButtons(): ToolButton[];
+        protected getCloningEntity(): TItem;
+        protected updateInterface(): void;
+        protected getUndeleteOptions(callback?: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse>;
+        protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void;
+        protected undelete(callback?: (response: UndeleteResponse) => void): void;
+        private _readonly;
+        get readOnly(): boolean;
+        set readOnly(value: boolean);
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+        protected getInsertPermission(): string;
+        protected getUpdatePermission(): string;
+        protected getDeletePermission(): string;
+        protected hasDeletePermission(): boolean;
+        protected hasInsertPermission(): boolean;
+        protected hasUpdatePermission(): boolean;
+        protected hasSavePermission(): boolean;
+        protected editClicked: boolean;
+        protected isViewMode(): boolean;
+        protected useViewMode(): boolean;
     }
-    export {};
 }
 declare namespace Serenity {
     interface FilterOperator {
@@ -2134,13 +2454,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class FilterDisplayBar extends FilterWidgetBase<any> {
-        constructor(div: JQuery);
-        protected filterStoreChanged(): void;
-        protected getTemplate(): string;
-    }
-}
-declare namespace Serenity {
     class FilterPanel extends FilterWidgetBase<any> {
         private rowsDiv;
         constructor(div: JQuery);
@@ -2180,49 +2493,526 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    interface QuickFilterArgs<TWidget> {
-        field?: string;
-        widget?: TWidget;
-        request?: ListRequest;
-        equalityFilter?: any;
-        value?: any;
-        active?: boolean;
-        handled?: boolean;
-    }
-    interface QuickFilter<TWidget extends Widget<TOptions>, TOptions> {
-        field?: string;
-        type?: new (element: JQuery, options: TOptions) => TWidget;
-        handler?: (h: QuickFilterArgs<TWidget>) => void;
-        title?: string;
-        options?: TOptions;
-        element?: (e: JQuery) => void;
-        init?: (w: TWidget) => void;
-        separator?: boolean;
-        cssClass?: string;
-        loadState?: (w: TWidget, state: any) => void;
-        saveState?: (w: TWidget) => any;
-        displayText?: (w: TWidget, label: string) => string;
+    class FilterDialog extends TemplatedDialog<any> {
+        private filterPanel;
+        constructor();
+        get_filterPanel(): FilterPanel;
+        protected getTemplate(): string;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
     }
 }
 declare namespace Serenity {
-    interface QuickSearchInputOptions {
-        typeDelay?: number;
-        loadingParentClass?: string;
-        filteredParentClass?: string;
-        onSearch?: (p1: string, p2: string, p3: (p1: boolean) => void) => void;
-        fields?: QuickSearchField[];
+    class FilterDisplayBar extends FilterWidgetBase<any> {
+        constructor(div: JQuery);
+        protected filterStoreChanged(): void;
+        protected getTemplate(): string;
     }
-    class QuickSearchInput extends Widget<QuickSearchInputOptions> {
-        private lastValue;
-        private field;
-        private fieldChanged;
-        private timer;
-        constructor(input: JQuery, opt: QuickSearchInputOptions);
-        protected checkIfValueChanged(): void;
-        get_field(): QuickSearchField;
-        set_field(value: QuickSearchField): void;
-        protected updateInputPlaceHolder(): void;
-        protected searchNow(value: string): void;
+}
+declare namespace Slick {
+    type Handler<TArgs> = (e: JQueryEventObject, args: TArgs) => void;
+    interface IEventData {
+        isPropagationStopped(): boolean;
+        isImmediatePropagationStopped(): boolean;
+    }
+    class EventData {
+        constructor();
+        isPropagationStopped(): boolean;
+        isImmediatePropagationStopped(): boolean;
+    }
+    class Event<TArgs = any> {
+        subscribe(handler: Handler<TArgs>): void;
+        unsubscribe(handler: Handler<TArgs>): void;
+        notify(args?: TArgs, e?: IEventData, scope?: any): void;
+        clear(): void;
+    }
+    class EventHandler<TArgs = any> {
+        subscribe<TArgs>(event: Event<TArgs>, handler: Handler<TArgs>): EventHandler<TArgs>;
+        unsubscribe<TArgs>(event: Event<TArgs>, handler: Handler<TArgs>): EventHandler<TArgs>;
+        unsubscribeAll(): EventHandler<TArgs>;
+    }
+}
+declare namespace Slick.Data {
+    class GroupItemMetadataProvider implements Slick.GroupItemMetadataProvider {
+        constructor();
+        getGroupRowMetadata(item: any): any;
+        getTotalsRowMetadata(item: any): any;
+    }
+}
+declare namespace Slick {
+    interface GroupItemMetadataProvider {
+        getGroupRowMetadata(item: any): any;
+        getTotalsRowMetadata(item: any): any;
+    }
+    class Group<TEntity> {
+        isGroup: boolean;
+        level: number;
+        count: number;
+        value: any;
+        title: string;
+        collapsed: boolean;
+        totals: any;
+        rows: any;
+        groups: Group<TEntity>[];
+        groupingKey: string;
+    }
+    class GroupTotals<TEntity> {
+        isGroupTotals: boolean;
+        group: Group<TEntity>;
+        initialized: boolean;
+        sum: any;
+        avg: any;
+        min: any;
+        max: any;
+    }
+    interface GroupInfo<TItem> {
+        getter?: any;
+        formatter?: (p1: Slick.Group<TItem>) => string;
+        comparer?: (a: Slick.Group<TItem>, b: Slick.Group<TItem>) => number;
+        aggregators?: any[];
+        aggregateCollapsed?: boolean;
+        lazyTotalsCalculation?: boolean;
+    }
+}
+declare namespace Slick {
+    interface FormatterContext {
+        row?: number;
+        cell?: number;
+        value?: any;
+        column?: any;
+        item?: any;
+    }
+    interface Formatter {
+        format(ctx: FormatterContext): string;
+    }
+    type Format = (ctx: Slick.FormatterContext) => string;
+    type AsyncPostRender = (cellNode: any, row: number, item: any, column: Slick.Column, clean?: boolean) => void;
+    type ColumnFormatter = (row: number, cell: number, value: any, column: Slick.Column, item: any) => string;
+}
+declare namespace Slick {
+    interface Column {
+        asyncPostRender?: Slick.AsyncPostRender;
+        behavior?: any;
+        cannotTriggerInsert?: boolean;
+        cssClass?: string;
+        defaultSortAsc?: boolean;
+        editor?: Function;
+        field: string;
+        focusable?: boolean;
+        formatter?: Slick.ColumnFormatter;
+        headerCssClass?: string;
+        id?: string;
+        maxWidth?: any;
+        minWidth?: number;
+        name?: string;
+        rerenderOnResize?: boolean;
+        resizable?: boolean;
+        selectable?: boolean;
+        sortable?: boolean;
+        toolTip?: string;
+        width?: number;
+        format?: (ctx: Slick.FormatterContext) => string;
+        referencedFields?: string[];
+        sourceItem?: Serenity.PropertyItem;
+        sortOrder?: number;
+        groupTotalsFormatter?: (p1?: GroupTotals<any>, p2?: Column) => string;
+        visible?: boolean;
+    }
+}
+declare namespace Slick {
+    interface GridOptions {
+        asyncEditorLoading?: boolean;
+        asyncEditorLoadDelay?: number;
+        asyncPostRenderDelay?: number;
+        asyncPostRenderCleanupDelay?: number;
+        autoEdit?: boolean;
+        autoHeight?: boolean;
+        cellFlashingCssClass?: string;
+        cellHighlightCssClass?: string;
+        dataItemColumnValueExtractor?: () => void;
+        groupingPanel?: boolean;
+        groupingPanelHeight?: number;
+        setGroupingPanelVisibility?: (value: boolean) => void;
+        defaultColumnWidth?: number;
+        defaultFormatter?: () => void;
+        editable?: boolean;
+        editCommandHandler?: () => void;
+        editorFactory?: () => void;
+        editorLock?: any;
+        enableAddRow?: boolean;
+        enableAsyncPostRender?: boolean;
+        enableAsyncPostRenderCleanup?: boolean;
+        enableCellRangeSelection?: boolean;
+        enableCellNavigation?: boolean;
+        enableColumnReorder?: boolean;
+        enableRowReordering?: boolean;
+        enableTextSelectionOnCells?: boolean;
+        explicitInitialization?: boolean;
+        forceFitColumns?: boolean;
+        forceSyncScrolling?: boolean;
+        formatterFactory?: () => void;
+        fullWidthRows?: boolean;
+        frozenColumn?: number;
+        frozenRow?: number;
+        frozenBottom?: boolean;
+        headerRowHeight?: number;
+        leaveSpaceForNewRows?: boolean;
+        minBuffer?: number;
+        multiColumnSort?: boolean;
+        multiSelect?: boolean;
+        renderAllCells?: boolean;
+        rowHeight?: number;
+        selectedCellCssClass?: string;
+        showHeaderRow?: boolean;
+        showFooterRow?: boolean;
+        syncColumnCellResize?: boolean;
+        topPanelHeight?: number;
+    }
+}
+declare namespace Slick {
+    class Grid {
+        constructor(container: JQuery, data: any, columns: Column[], options: GridOptions);
+    }
+    interface ColumnSort {
+        columnId?: string;
+        sortAsc?: boolean;
+    }
+    interface RowCell {
+        row: number;
+        cell: number;
+    }
+    interface PositionInfo {
+        bottom: number;
+        height: number;
+        left: number;
+        right: number;
+        top: number;
+        visible: boolean;
+        width: number;
+    }
+    interface RangeInfo {
+        top?: number;
+        bottom?: number;
+        leftPx?: number;
+        rightPx?: number;
+    }
+    class RowSelectionModel {
+    }
+    interface Grid {
+        init(): void;
+        destroy(): void;
+        getData(): any[];
+        getDataItem(index: number): any;
+        setData(data: any[], scrollToTop: boolean): void;
+        getDataLength(): number;
+        getOptions(): GridOptions;
+        setOptions(options: GridOptions): void;
+        getSelectedRows(): any;
+        getSelectionModel(): any;
+        setSelectionModel(model: any): any;
+        setSelectedRows(rows: any): void;
+        autoSizeColumns(): void;
+        getColumnIndex(id: string): number;
+        getColumns(): Column[];
+        getUID(): string;
+        setColumns(columns: Column[]): void;
+        setSortColumn(columnId: string, ascending: boolean): void;
+        setSortColumns(cols: ColumnSort[]): void;
+        updateColumnHeader(columnId: string, title: string, toolTip: string): void;
+        addCellCssStyles(key: string, hash: any): void;
+        canCellBeActive(row: number, col: number): boolean;
+        canCellBeSelected(row: number, col: number): boolean;
+        editActiveCell(editor: Function): void;
+        flashCell(row: number, cell: number, speed: number): void;
+        getActiveCell(): RowCell;
+        getActiveCellNode(): any;
+        getActiveCellPosition(): PositionInfo;
+        getCellCssStyles(key: string): any;
+        getCellEditor(): any;
+        getCellFromEvent(e: any): RowCell;
+        getCellFromPoint(x: number, y: number): RowCell;
+        getCellNode(row: number, cell: number): any;
+        getCellNodeBox(row: number, cell: number): PositionInfo;
+        goToCell(row: number, cell: number, forceEdit: boolean): void;
+        navigateDown(): void;
+        navigateLeft(): void;
+        navigateNext(): void;
+        navigatePrev(): void;
+        navigateRight(): void;
+        navigateUp(): void;
+        removeCellCssStyles(key: string): void;
+        resetActiveCell(): void;
+        registerPlugin(plugin: any): void;
+        setActiveCell(row: number, cell: number): void;
+        setCellCssStyles(key: string, hash: any): void;
+        getCanvasNode(): any;
+        getGridPosition(): PositionInfo;
+        getRenderedRange(viewportTop: number, viewportLeft: number): RangeInfo;
+        getViewport(viewportTop: number, viewportLeft: number): RangeInfo;
+        getViewport(): RangeInfo;
+        invalidate(): void;
+        invalidateAllRows(): void;
+        invalidateRow(row: number): void;
+        invalidateRows(rows: any): void;
+        render(): void;
+        resizeCanvas(): void;
+        scrollCellIntoView(row: number, cell: number): void;
+        scrollRowIntoView(row: number, doPaging: boolean): void;
+        scrollRowToTop(row: number): void;
+        updateCell(row: number, cell: number): void;
+        updateRow(row: number): void;
+        updateRowCount(): void;
+        updateColumnHeader(columnId: string, title?: string, toolTip?: string): void;
+        getGroupingPanel(): HTMLDivElement;
+        getHeaderRow(): any;
+        getEditorLock(): any;
+        getHeaderRowColumn(columnId: string): any;
+        getSortColumns(): any;
+        getTopPanel(): any;
+        setHeaderRowVisibility(visible: boolean): void;
+        onScroll?: Event;
+        onSort?: Event;
+        onHeaderContextMenu?: Event;
+        onHeaderClick?: Event;
+        onMouseEnter?: Event;
+        onMouseLeave?: Event;
+        onClick?: Event;
+        onDblClick?: Event;
+        onContextMenu?: Event;
+        onKeyDown?: Event;
+        onAddNewRow?: Event;
+        onValidationError?: Event;
+        onViewportChanged?: Event;
+        onColumnsReordered?: Event;
+        onColumnsResized?: Event;
+        onCellChange?: Event;
+        onBeforeEditCell?: Event;
+        onBeforeCellEditorDestroy?: Event;
+        onHeaderCellRendered?: Event;
+        onBeforeHeaderCellDestroy?: Event;
+        onBeforeDestroy?: Event;
+        onActiveCellChanged?: Event;
+        onActiveCellPositionChanged?: Event;
+        onDragInit?: Event;
+        onDragStart?: Event;
+        onDrag?: Event;
+        onDragEnd?: Event;
+        onSelectedRowsChanged?: Event;
+        onCellCssStylesChanged?: Event;
+    }
+}
+declare namespace Slick.Aggregators {
+    function Avg(field: string): void;
+    function WeightedAvg(field: string, weightedField: string): void;
+    function Min(field: string): void;
+    function Max(field: string): void;
+    function Sum(field: string): void;
+}
+declare namespace Slick {
+    interface RemoteViewOptions {
+        autoLoad?: boolean;
+        idField?: string;
+        contentType?: string;
+        dataType?: string;
+        filter?: any;
+        params?: any;
+        onSubmit?: CancellableViewCallback<any>;
+        url?: string;
+        sortBy?: any;
+        rowsPerPage?: number;
+        seekToPage?: number;
+        onProcessData?: RemoteViewProcessCallback<any>;
+        method?: string;
+        inlineFilters?: boolean;
+        groupItemMetadataProvider?: Slick.GroupItemMetadataProvider;
+        onAjaxCall?: Slick.RemoteViewAjaxCallback<any>;
+        getItemMetadata?: (p1?: any, p2?: number) => any;
+        errorMsg?: string;
+    }
+    class RemoteView<TEntity> {
+        constructor(options: RemoteViewOptions);
+    }
+}
+declare namespace Slick {
+    type CancellableViewCallback<TEntity> = (view: Slick.RemoteView<TEntity>) => boolean | void;
+    type RemoteViewAjaxCallback<TEntity> = (view: Slick.RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
+    type RemoteViewFilter<TEntity> = (item: TEntity, view: Slick.RemoteView<TEntity>) => boolean;
+    type RemoteViewProcessCallback<TEntity> = (data: Serenity.ListResponse<TEntity>, view: Slick.RemoteView<TEntity>) => Serenity.ListResponse<TEntity>;
+    interface SummaryOptions {
+        aggregators: any[];
+    }
+    interface PagingOptions {
+        rowsPerPage?: number;
+        page?: number;
+    }
+    interface PagingInfo {
+        rowsPerPage: number;
+        page: number;
+        totalCount: number;
+        loading: boolean;
+        error: string;
+        dataView: RemoteView<any>;
+    }
+    interface RemoteView<TEntity> {
+        constructor(options: RemoteViewOptions): void;
+        onSubmit: Slick.CancellableViewCallback<TEntity>;
+        onDataChanged: Slick.Event;
+        onDataLoaded: Slick.Event;
+        onPagingInfoChanged: Slick.Event;
+        getPagingInfo(): PagingInfo;
+        onAjaxCall: Slick.RemoteViewAjaxCallback<TEntity>;
+        onProcessData: Slick.RemoteViewProcessCallback<TEntity>;
+        addData(data: Serenity.ListResponse<TEntity>): void;
+        beginUpdate(): void;
+        endUpdate(): void;
+        deleteItem(id: any): void;
+        getItems(): TEntity[];
+        setFilter(filter: RemoteViewFilter<TEntity>): void;
+        setItems(items: any[], fullReset: boolean): void;
+        getItemById(id: any): TEntity;
+        getRowById(id: any): number;
+        updateItem(id: any, item: TEntity): void;
+        addItem(item: TEntity): void;
+        getIdxById(id: any): any;
+        getItemByIdx(index: number): any;
+        setGrouping(groupInfo: Slick.GroupInfo<TEntity>[]): void;
+        collapseAllGroups(level: number): void;
+        expandAllGroups(level: number): void;
+        expandGroup(keys: any[]): void;
+        collapseGroup(keys: any[]): void;
+        setSummaryOptions(options: Slick.SummaryOptions): void;
+        setPagingOptions(options: PagingOptions): void;
+        refresh(): void;
+        populate(): void;
+        populateLock(): void;
+        populateUnlock(): void;
+        getItem(row: number): any;
+        getLength(): number;
+        rowsPerPage: number;
+        errormsg: string;
+        params: any;
+        sortBy: string[];
+        url: string;
+        method: string;
+        idField: string;
+        seekToPage?: number;
+        loading: boolean;
+    }
+}
+declare namespace Slick {
+    class AutoTooltips {
+        constructor(options: Slick.AutoTooltipsOptions);
+    }
+    interface AutoTooltipsOptions {
+        enableForHeaderCells?: boolean;
+        enableForCells?: boolean;
+        maxToolTipLength?: number;
+    }
+}
+declare namespace Slick {
+    class RowMoveManager {
+        constructor(options: Slick.RowMoveManagerOptions);
+        onBeforeMoveRows: Slick.Event;
+        onMoveRows: Slick.Event;
+    }
+    interface RowMoveManagerOptions {
+        cancelEditOnDrag: boolean;
+    }
+}
+declare namespace Serenity {
+    class SlickPager extends Widget<Slick.PagerOptions> {
+        constructor(div: JQuery, o: Slick.PagerOptions);
+        _changePage(ctype: string): boolean;
+        _updatePager(): void;
+    }
+}
+declare namespace Slick {
+    interface PagerOptions {
+        view?: Slick.RemoteView<any>;
+        showRowsPerPage?: boolean;
+        rowsPerPage?: number;
+        rowsPerPageOptions?: number[];
+        onChangePage?: (newPage: number) => void;
+        onRowsPerPageChange?: (n: number) => void;
+    }
+}
+declare namespace Serenity {
+    interface GridRowSelectionMixinOptions {
+        selectable?: (item: any) => boolean;
+    }
+    class GridRowSelectionMixin {
+        private idField;
+        private include;
+        private grid;
+        private options;
+        constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions);
+        updateSelectAll(): void;
+        clear(): void;
+        resetCheckedAndRefresh(): void;
+        selectKeys(keys: string[]): void;
+        getSelectedKeys(): string[];
+        getSelectedAsInt32(): number[];
+        getSelectedAsInt64(): number[];
+        setSelectedKeys(keys: string[]): void;
+        private isSelectable;
+        static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column;
+    }
+    interface GridRadioSelectionMixinOptions {
+        selectable?: (item: any) => boolean;
+    }
+    class GridRadioSelectionMixin {
+        private idField;
+        private include;
+        private grid;
+        private options;
+        constructor(grid: Serenity.IDataGrid, options?: GridRadioSelectionMixinOptions);
+        private isSelectable;
+        clear(): void;
+        resetCheckedAndRefresh(): void;
+        getSelectedKey(): string;
+        getSelectedAsInt32(): number;
+        getSelectedAsInt64(): number;
+        setSelectedKey(key: string): void;
+        static createSelectColumn(getMixin: () => Serenity.GridRadioSelectionMixin): Slick.Column;
+    }
+    namespace GridSelectAllButtonHelper {
+        function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void;
+        function define(getGrid: () => IDataGrid, getId: (p1: any) => any, getSelected: (p1: any) => boolean, setSelected: (p1: any, p2: boolean) => void, text?: string, onClick?: () => void): ToolButton;
+    }
+    namespace GridUtils {
+        function addToggleButton(toolDiv: JQuery, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
+        function addIncludeDeletedToggle(toolDiv: JQuery, view: Slick.RemoteView<any>, hint?: string, initial?: boolean): void;
+        function addQuickSearchInput(toolDiv: JQuery, view: Slick.RemoteView<any>, fields?: QuickSearchField[]): void;
+        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): void;
+        function makeOrderable(grid: Slick.Grid, handleMove: (p1: any, p2: number) => void): void;
+        function makeOrderableWithUpdateRequest(grid: DataGrid<any, any>, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
+    }
+    namespace PropertyItemSlickConverter {
+        function toSlickColumns(items: PropertyItem[]): Slick.Column[];
+        function toSlickColumn(item: PropertyItem): Slick.Column;
+    }
+    namespace SlickFormatting {
+        function getEnumText(enumKey: string, name: string): string;
+        function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any, formatter: Slick.Format): Slick.Format;
+        function date(format?: string): Slick.Format;
+        function dateTime(format?: string): Slick.Format;
+        function checkBox(): Slick.Format;
+        function number(format: string): Slick.Format;
+        function getItemType(link: JQuery): string;
+        function getItemId(link: JQuery): string;
+        function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
+        function itemLink(itemType: string, idField: string, getText: Slick.Format, cssClass?: Slick.Format, encode?: boolean): Slick.Format;
+    }
+    namespace SlickHelper {
+        function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any;
+        function convertToFormatter(format: Slick.Format): Slick.ColumnFormatter;
+    }
+    namespace SlickTreeHelper {
+        function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
+        function filterById<TItem>(item: TItem, view: Slick.RemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
+        function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
+        function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
+        function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
+        function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void;
     }
 }
 declare namespace Serenity {
@@ -2283,242 +3073,6 @@ declare namespace Serenity {
     namespace FormatterTypeRegistry {
         function get(key: string): Function;
         function reset(): void;
-    }
-}
-interface JQuery {
-    flexHeightOnly(flexY?: number): JQuery;
-    flexWidthOnly(flexX?: number): JQuery;
-    flexWidthHeight(flexX: number, flexY: number): JQuery;
-    flexX(flexX: number): JQuery;
-    flexY(flexY: number): JQuery;
-}
-declare namespace Serenity {
-    class Flexify extends Widget<FlexifyOptions> {
-        private xDifference;
-        private yDifference;
-        constructor(container: JQuery, options: FlexifyOptions);
-        storeInitialSize(): void;
-        private getXFactor;
-        private getYFactor;
-        private resizeElements;
-        private resizeElement;
-    }
-    interface FlexifyOptions {
-        getXFactor?: (p1: JQuery) => any;
-        getYFactor?: (p1: JQuery) => any;
-        designWidth?: any;
-        designHeight?: any;
-    }
-}
-declare namespace Serenity {
-    namespace EnumTypeRegistry {
-        function tryGet(key: string): Function;
-        function get(key: string): Function;
-    }
-}
-declare namespace Serenity {
-    namespace ReflectionUtils {
-        function getPropertyValue(o: any, property: string): any;
-        function setPropertyValue(o: any, property: string, value: any): void;
-        function makeCamelCase(s: string): string;
-    }
-}
-declare namespace Serenity {
-    namespace ReflectionOptionsSetter {
-        function set(target: any, options: any): void;
-    }
-}
-declare namespace Serenity {
-    class PrefixedContext {
-        readonly idPrefix: string;
-        constructor(idPrefix: string);
-        byId(id: string): JQuery;
-        w<TWidget>(id: string, type: {
-            new (...args: any[]): TWidget;
-        }): TWidget;
-    }
-}
-declare namespace Serenity {
-    interface ScriptContext {
-    }
-    class ScriptContext {
-    }
-}
-declare namespace Serenity {
-    class PropertyGrid extends Widget<PropertyGridOptions> {
-        private editors;
-        private items;
-        constructor(div: JQuery, opt: PropertyGridOptions);
-        destroy(): void;
-        private createItems;
-        private createCategoryDiv;
-        private categoryLinkClick;
-        private determineText;
-        private createField;
-        private getCategoryOrder;
-        private createCategoryLinks;
-        get_editors(): Widget<any>[];
-        get_items(): PropertyItem[];
-        get_idPrefix(): string;
-        get_mode(): PropertyGridMode;
-        set_mode(value: PropertyGridMode): void;
-        static loadEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
-        static saveEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
-        private static setReadOnly;
-        private static setReadonly;
-        private static setRequired;
-        private static setMaxLength;
-        load(source: any): void;
-        save(target?: any): any;
-        get value(): any;
-        set value(val: any);
-        private canModifyItem;
-        updateInterface(): void;
-        enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
-    }
-    const enum PropertyGridMode {
-        insert = 1,
-        update = 2
-    }
-    interface PropertyGridOptions {
-        idPrefix?: string;
-        items?: PropertyItem[];
-        useCategories?: boolean;
-        categoryOrder?: string;
-        defaultCategory?: string;
-        localTextPrefix?: string;
-        mode?: PropertyGridMode;
-    }
-}
-declare namespace Serenity {
-    interface ToolButton {
-        title?: string;
-        hint?: string;
-        cssClass?: string;
-        icon?: string;
-        onClick?: any;
-        htmlEncode?: any;
-        hotkey?: string;
-        hotkeyAllowDefault?: boolean;
-        hotkeyContext?: any;
-        separator?: (false | true | 'left' | 'right' | 'both');
-        visible?: boolean | (() => boolean);
-        disabled?: boolean | (() => boolean);
-    }
-    interface PopupMenuButtonOptions {
-        menu?: JQuery;
-        onPopup?: () => void;
-        positionMy?: string;
-        positionAt?: string;
-    }
-    class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
-        constructor(div: JQuery, opt: PopupMenuButtonOptions);
-        destroy(): void;
-    }
-    interface PopupToolButtonOptions extends PopupMenuButtonOptions {
-    }
-    class PopupToolButton extends PopupMenuButton {
-        constructor(div: JQuery, opt: PopupToolButtonOptions);
-    }
-    interface ToolbarOptions {
-        buttons?: ToolButton[];
-        hotkeyContext?: any;
-    }
-    class Toolbar extends Widget<ToolbarOptions> {
-        constructor(div: JQuery, options: ToolbarOptions);
-        destroy(): void;
-        protected mouseTrap: any;
-        protected createButton(container: JQuery, b: ToolButton): void;
-        findButton(className: string): JQuery;
-        updateInterface(): void;
-    }
-}
-declare namespace Serenity {
-    namespace CustomValidation {
-        function registerValidationMethods(): void;
-    }
-    type CustomValidationRule = (element: JQuery) => string;
-}
-declare namespace Serenity {
-    interface IValidateRequired {
-        get_required(): boolean;
-        set_required(value: boolean): void;
-    }
-    class IValidateRequired {
-    }
-}
-declare namespace Serenity {
-    interface DataChangeInfo {
-        type: string;
-        entityId: any;
-        entity: any;
-    }
-}
-declare namespace Serenity {
-    class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
-        protected _entity: TItem;
-        protected _entityId: any;
-        constructor(opt?: TOptions);
-        destroy(): void;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getDialogButtons(): JQueryUI.DialogButtonOptions[];
-        protected okClick(): void;
-        protected okClickValidated(): void;
-        protected cancelClick(): void;
-        protected initPropertyGrid(): void;
-        protected getFormKey(): string;
-        protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyItems(): PropertyItem[];
-        protected getSaveEntity(): TItem;
-        protected loadInitialEntity(): void;
-        protected get_entity(): TItem;
-        protected set_entity(value: TItem): void;
-        protected get_entityId(): any;
-        protected set_entityId(value: any): void;
-        protected validateBeforeSave(): boolean;
-        protected updateTitle(): void;
-        protected propertyGrid: Serenity.PropertyGrid;
-    }
-}
-declare namespace Serenity {
-    class FilterDialog extends TemplatedDialog<any> {
-        private filterPanel;
-        constructor();
-        get_filterPanel(): FilterPanel;
-        protected getTemplate(): string;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-    }
-}
-declare namespace Serenity {
-    interface QuickFilterBarOptions {
-        filters: QuickFilter<Widget<any>, any>[];
-        getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
-        idPrefix?: string;
-    }
-    class QuickFilterBar extends Widget<QuickFilterBarOptions> {
-        constructor(container: JQuery, options?: QuickFilterBarOptions);
-        addSeparator(): void;
-        add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
-        addDateRange(field: string, title?: string): Serenity.DateEditor;
-        static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
-        addDateTimeRange(field: string, title?: string): DateTimeEditor;
-        static dateTimeRange(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
-        addBoolean(field: string, title?: string, yes?: string, no?: string): SelectEditor;
-        static boolean(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
-        static propertyItemToQuickFilter(item: PropertyItem): any;
-        onChange: (e: JQueryEventObject) => void;
-        private submitHandlers;
-        destroy(): void;
-        onSubmit(request: Serenity.ListRequest): void;
-        protected add_submitHandlers(action: (request: Serenity.ListRequest) => void): void;
-        protected remove_submitHandlers(action: (request: Serenity.ListRequest) => void): void;
-        protected clear_submitHandlers(): void;
-        find<TWidget>(type: {
-            new (...args: any[]): TWidget;
-        }, field: string): TWidget;
-        tryFind<TWidget>(type: {
-            new (...args: any[]): TWidget;
-        }, field: string): TWidget;
     }
 }
 declare namespace Serenity {
@@ -2592,6 +3146,7 @@ declare namespace Serenity {
         protected ensureQuickFilterBar(): QuickFilterBar;
         protected createQuickFilters(filters?: QuickFilter<Widget<any>, any>[]): void;
         protected getQuickFilters(): QuickFilter<Widget<any>, any>[];
+        static propertyItemToQuickFilter(item: PropertyItem): any;
         protected findQuickFilter<TWidget>(type: {
             new (...args: any[]): TWidget;
         }, field: string): TWidget;
@@ -2699,6 +3254,27 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class ColumnPickerDialog extends Serenity.TemplatedDialog<any> {
+        private ulVisible;
+        private ulHidden;
+        private colById;
+        allColumns: Slick.Column[];
+        visibleColumns: string[];
+        defaultColumns: string[];
+        done: () => void;
+        constructor();
+        static createToolButton(grid: DataGrid<any, any>): ToolButton;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        private getTitle;
+        private allowHide;
+        private createLI;
+        private updateListStates;
+        protected setupColumns(): void;
+        protected onDialogOpen(): void;
+        protected getTemplate(): string;
+    }
+}
+declare namespace Serenity {
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         constructor(container: JQuery, options?: TOptions);
         protected usePager(): boolean;
@@ -2737,6 +3313,37 @@ declare namespace Serenity {
         protected getDialogType(): {
             new (...args: any[]): Widget<any>;
         };
+    }
+}
+declare namespace Serenity {
+    /**
+     * A mixin that can be applied to a DataGrid for tree functionality
+     */
+    class TreeGridMixin<TItem> {
+        private options;
+        private dataGrid;
+        private getId;
+        constructor(options: TreeGridMixinOptions<TItem>);
+        /**
+         * Expands / collapses all rows in a grid automatically
+         */
+        toggleAll(): void;
+        collapseAll(): void;
+        expandAll(): void;
+        /**
+         * Reorders a set of items so that parents comes before their children.
+         * This method is required for proper tree ordering, as it is not so easy to perform with SQL.
+         * @param items list of items to be ordered
+         * @param getId a delegate to get ID of a record (must return same ID with grid identity field)
+         * @param getParentId a delegate to get parent ID of a record
+         */
+        static applyTreeOrdering<TItem>(items: TItem[], getId: (item: TItem) => any, getParentId: (item: TItem) => any): TItem[];
+    }
+    interface TreeGridMixinOptions<TItem> {
+        grid: Serenity.DataGrid<TItem, any>;
+        getParentId: (item: TItem) => any;
+        toggleField: string;
+        initialCollapse?: () => boolean;
     }
 }
 declare namespace Serenity {
@@ -2841,167 +3448,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
-        constructor(container: JQuery, options?: TOptions);
-        destroy(): void;
-        protected tabs: JQuery;
-        protected toolbar: Serenity.Toolbar;
-        protected validator: JQueryValidation.Validator;
-        protected isPanel: boolean;
-        protected responsive: boolean;
-        protected arrange(): void;
-        protected getToolbarButtons(): ToolButton[];
-        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected initTabs(): void;
-        protected initToolbar(): void;
-        protected initValidator(): void;
-        protected resetValidation(): void;
-        protected validateForm(): boolean;
-    }
-}
-declare namespace Serenity {
-    class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
-        private _entity;
-        private _entityId;
-        constructor(container: JQuery, options?: TOptions);
-        destroy(): void;
-        protected initPropertyGrid(): void;
-        protected loadInitialEntity(): void;
-        protected getFormKey(): string;
-        protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyItems(): PropertyItem[];
-        protected getSaveEntity(): TItem;
-        protected get_entity(): TItem;
-        protected get_entityId(): any;
-        protected set_entity(value: TItem): void;
-        protected set_entityId(value: any): void;
-        protected validateBeforeSave(): boolean;
-        protected propertyGrid: Serenity.PropertyGrid;
-    }
-}
-declare namespace Serenity {
-    class IEditDialog {
-    }
-    interface IEditDialog {
-        load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
-    }
-    class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
-        protected entity: TItem;
-        protected entityId: any;
-        protected propertyGrid: PropertyGrid;
-        protected toolbar: Toolbar;
-        protected saveAndCloseButton: JQuery;
-        protected applyChangesButton: JQuery;
-        protected deleteButton: JQuery;
-        protected undeleteButton: JQuery;
-        protected cloneButton: JQuery;
-        protected editButton: JQuery;
-        protected localizationGrid: PropertyGrid;
-        protected localizationButton: JQuery;
-        protected localizationPendingValue: any;
-        protected localizationLastValue: any;
-        static defaultLanguageList: () => string[][];
-        constructor(opt?: TOptions);
-        destroy(): void;
-        protected get_entity(): TItem;
-        protected set_entity(entity: any): void;
-        protected get_entityId(): any;
-        protected set_entityId(value: any): void;
-        protected getEntityNameFieldValue(): any;
-        protected getEntityTitle(): string;
-        protected updateTitle(): void;
-        protected isCloneMode(): boolean;
-        protected isEditMode(): boolean;
-        protected isDeleted(): boolean;
-        protected isNew(): boolean;
-        protected isNewOrDeleted(): boolean;
-        protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse>;
-        protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
-        protected doDelete(callback: (response: DeleteResponse) => void): void;
-        protected onDeleteSuccess(response: DeleteResponse): void;
-        protected attrs<TAttr>(attrType: {
-            new (...args: any[]): TAttr;
-        }): TAttr[];
-        private entityType;
-        protected getEntityType(): string;
-        private formKey;
-        protected getFormKey(): string;
-        private localTextDbPrefix;
-        protected getLocalTextDbPrefix(): string;
-        protected getLocalTextPrefix(): string;
-        private entitySingular;
-        protected getEntitySingular(): string;
-        private nameProperty;
-        protected getNameProperty(): string;
-        private idProperty;
-        protected getIdProperty(): string;
-        protected isActiveProperty: string;
-        protected getIsActiveProperty(): string;
-        protected getIsDeletedProperty(): string;
-        protected service: string;
-        protected getService(): string;
-        load(entityOrId: any, done: () => void, fail: (ex: Q.Exception) => void): void;
-        loadNewAndOpenDialog(asPanel?: boolean): void;
-        loadEntityAndOpenDialog(entity: TItem, asPanel?: boolean): void;
-        protected loadResponse(data: any): void;
-        protected loadEntity(entity: TItem): void;
-        protected beforeLoadEntity(entity: TItem): void;
-        protected afterLoadEntity(): void;
-        loadByIdAndOpenDialog(entityId: any, asPanel?: boolean): void;
-        protected onLoadingData(data: RetrieveResponse<TItem>): void;
-        protected getLoadByIdOptions(id: any, callback: (response: RetrieveResponse<TItem>) => void): ServiceOptions<RetrieveResponse<TItem>>;
-        protected getLoadByIdRequest(id: any): RetrieveRequest;
-        protected reloadById(): void;
-        loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
-        protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
-        protected initLocalizationGrid(): void;
-        protected initLocalizationGridCommon(pgOptions: PropertyGridOptions): void;
-        protected isLocalizationMode(): boolean;
-        protected isLocalizationModeAndChanged(): boolean;
-        protected localizationButtonClick(): void;
-        protected getLanguages(): any[];
-        private getLangs;
-        protected loadLocalization(): void;
-        protected setLocalizationGridCurrentValues(): void;
-        protected getLocalizationGridValue(): any;
-        protected getPendingLocalizations(): any;
-        protected initPropertyGrid(): void;
-        protected getPropertyItems(): PropertyItem[];
-        protected getPropertyGridOptions(): PropertyGridOptions;
-        protected validateBeforeSave(): boolean;
-        protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse>;
-        protected getSaveEntity(): TItem;
-        protected getSaveRequest(): SaveRequest<TItem>;
-        protected onSaveSuccess(response: SaveResponse): void;
-        protected save_submitHandler(callback: (response: SaveResponse) => void): void;
-        protected save(callback?: (response: SaveResponse) => void): void | boolean;
-        protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
-        protected initToolbar(): void;
-        protected showSaveSuccessMessage(response: SaveResponse): void;
-        protected getToolbarButtons(): ToolButton[];
-        protected getCloningEntity(): TItem;
-        protected updateInterface(): void;
-        protected getUndeleteOptions(callback?: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse>;
-        protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void;
-        protected undelete(callback?: (response: UndeleteResponse) => void): void;
-        private _readonly;
-        get readOnly(): boolean;
-        set readOnly(value: boolean);
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-        protected getInsertPermission(): string;
-        protected getUpdatePermission(): string;
-        protected getDeletePermission(): string;
-        protected hasDeletePermission(): boolean;
-        protected hasInsertPermission(): boolean;
-        protected hasUpdatePermission(): boolean;
-        protected hasSavePermission(): boolean;
-        protected editClicked: boolean;
-        protected isViewMode(): boolean;
-        protected useViewMode(): boolean;
-    }
-}
-declare namespace Serenity {
     namespace Reporting {
         interface ReportDialogOptions {
             reportKey?: string;
@@ -3045,477 +3491,92 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class ColumnPickerDialog extends Serenity.TemplatedDialog<any> {
-        private ulVisible;
-        private ulHidden;
-        private colById;
-        allColumns: Slick.Column[];
-        visibleColumns: string[];
-        defaultColumns: string[];
-        done: () => void;
-        constructor();
-        static createToolButton(grid: DataGrid<any, any>): ToolButton;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        private getTitle;
-        private allowHide;
-        private createLI;
-        private updateListStates;
-        protected setupColumns(): void;
-        protected onDialogOpen(): void;
-        protected getTemplate(): string;
-    }
-}
-declare namespace Serenity {
-    /**
-     * A mixin that can be applied to a DataGrid for tree functionality
-     */
-    class TreeGridMixin<TItem> {
-        private options;
-        private dataGrid;
-        private getId;
-        constructor(options: TreeGridMixinOptions<TItem>);
-        /**
-         * Expands / collapses all rows in a grid automatically
-         */
-        toggleAll(): void;
-        collapseAll(): void;
-        expandAll(): void;
-        /**
-         * Reorders a set of items so that parents comes before their children.
-         * This method is required for proper tree ordering, as it is not so easy to perform with SQL.
-         * @param items list of items to be ordered
-         * @param getId a delegate to get ID of a record (must return same ID with grid identity field)
-         * @param getParentId a delegate to get parent ID of a record
-         */
-        static applyTreeOrdering<TItem>(items: TItem[], getId: (item: TItem) => any, getParentId: (item: TItem) => any): TItem[];
-    }
-    interface TreeGridMixinOptions<TItem> {
-        grid: Serenity.DataGrid<TItem, any>;
-        getParentId: (item: TItem) => any;
-        toggleField: string;
-        initialCollapse?: () => boolean;
-    }
-}
-interface JQuery {
-    getWidget<TWidget>(widgetType: {
-        new (...args: any[]): TWidget;
-    }): TWidget;
-    tryGetWidget<TWidget>(widgetType: {
-        new (...args: any[]): TWidget;
-    }): TWidget;
-}
-interface JQuery {
-    slickPager(options: Slick.PagerOptions): JQuery;
-}
-declare namespace Slick.Data {
-    class GroupItemMetadataProvider {
-        constructor();
-    }
-}
-declare namespace Slick {
-    interface PagerOptions {
-        view?: Slick.RemoteView<any>;
-        showRowsPerPage?: boolean;
-        rowsPerPage?: number;
-        rowsPerPageOptions?: number[];
-        onChangePage?: (newPage: number) => void;
-    }
-    interface FormatterContext {
-        row?: number;
-        cell?: number;
-        value?: any;
-        column?: any;
-        item?: any;
-    }
-    interface Formatter {
-        format(ctx: FormatterContext): string;
-    }
-    type Format = (ctx: Slick.FormatterContext) => string;
-    interface IEventData {
-        isPropagationStopped(): boolean;
-        isImmediatePropagationStopped(): boolean;
-    }
-    class Event<TArgs = any> {
-        subscribe(handler: Handler<TArgs>): void;
-        unsubscribe(handler: Handler<TArgs>): void;
-        notify(args?: TArgs, e?: IEventData, scope?: any): void;
-        clear(): void;
-    }
-    interface PositionInfo {
-        bottom: number;
-        height: number;
-        left: number;
-        right: number;
-        top: number;
-        visible: boolean;
-        width: number;
-    }
-    interface SlickRangeInfo {
-        top: number;
-        bottom: number;
-        leftPx: number;
-        rightPx: number;
-    }
-    class EventData {
-        constructor();
-        isPropagationStopped(): boolean;
-        isImmediatePropagationStopped(): boolean;
-    }
-    type AsyncPostRender = (cellNode: any, row: number, item: any, column: Slick.Column, clean?: boolean) => void;
-    type CancellableViewCallback<TEntity> = (view: Slick.RemoteView<TEntity>) => boolean;
-    type ColumnFormatter = (row: number, cell: number, value: any, column: Slick.Column, item: any) => string;
-    type RemoteViewAjaxCallback<TEntity> = (view: Slick.RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean;
-    type RemoteViewFilter<TEntity> = (item: TEntity, view: Slick.RemoteView<TEntity>) => boolean;
-    type RemoteViewProcessCallback<TEntity> = (data: Serenity.ListResponse<TEntity>, view: Slick.RemoteView<TEntity>) => Serenity.ListResponse<TEntity>;
-    type Handler<TArgs> = (e: JQueryEventObject, args: TArgs) => void;
-    class EventHandler<TArgs = any> {
-        subscribe<TArgs>(event: Event<TArgs>, handler: Handler<TArgs>): EventHandler<TArgs>;
-        unsubscribe<TArgs>(event: Event<TArgs>, handler: Handler<TArgs>): EventHandler<TArgs>;
-        unsubscribeAll(): EventHandler<TArgs>;
-    }
-    interface Column {
-        asyncPostRender?: Slick.AsyncPostRender;
-        behavior?: any;
-        cannotTriggerInsert?: boolean;
-        cssClass?: string;
-        defaultSortAsc?: boolean;
-        editor?: Function;
-        field: string;
-        focusable?: boolean;
-        formatter?: Slick.ColumnFormatter;
-        headerCssClass?: string;
-        id?: string;
-        maxWidth?: any;
-        minWidth?: number;
-        name?: string;
-        rerenderOnResize?: boolean;
-        resizable?: boolean;
-        selectable?: boolean;
-        sortable?: boolean;
-        toolTip?: string;
-        width?: number;
-        format?: (ctx: Slick.FormatterContext) => string;
-        referencedFields?: string[];
-        sourceItem?: Serenity.PropertyItem;
-        sortOrder?: number;
-        groupTotalsFormatter?: (p1?: GroupTotals<any>, p2?: Column) => string;
-        visible?: boolean;
-    }
-    class RowMoveManager {
-        constructor(options: Slick.RowMoveManagerOptions);
-        onBeforeMoveRows: Slick.Event;
-        onMoveRows: Slick.Event;
-    }
-    class RowSelectionModel {
-    }
-    class AutoTooltips {
-        constructor(options: Slick.AutoTooltipsOptions);
-    }
-    interface AutoTooltipsOptions {
-        enableForHeaderCells?: boolean;
-        enableForCells?: boolean;
-        maxToolTipLength?: number;
-    }
-    interface GroupInfo<TItem> {
-        getter?: any;
-        formatter?: (p1: Slick.Group<TItem>) => string;
-        comparer?: (a: Slick.Group<TItem>, b: Slick.Group<TItem>) => number;
-        aggregators?: any[];
-        aggregateCollapsed?: boolean;
-        lazyTotalsCalculation?: boolean;
-    }
-    interface RowCell {
-        row: number;
-        cell: number;
-    }
-    interface RowMoveManagerOptions {
-        cancelEditOnDrag: boolean;
-    }
-    interface SummaryOptions {
-        aggregators: any[];
-    }
-    class Group<TEntity> {
-        isGroup: boolean;
-        level: number;
-        count: number;
-        value: any;
-        title: string;
-        collapsed: boolean;
-        totals: any;
-        rows: any;
-        groups: Group<TEntity>[];
-        groupingKey: string;
-    }
-    class GroupTotals<TEntity> {
-        isGroupTotals: boolean;
-        group: Group<TEntity>;
-        initialized: boolean;
-        sum: any;
-        avg: any;
-        min: any;
-        max: any;
-    }
-    interface GridOptions {
-        asyncEditorLoading?: boolean;
-        asyncEditorLoadDelay?: number;
-        asyncPostRenderDelay?: number;
-        asyncPostRenderCleanupDelay?: number;
-        autoEdit?: boolean;
-        autoHeight?: boolean;
-        cellFlashingCssClass?: string;
-        cellHighlightCssClass?: string;
-        dataItemColumnValueExtractor?: () => void;
-        groupingPanel?: boolean;
-        groupingPanelHeight?: number;
-        setGroupingPanelVisibility?: (value: boolean) => void;
-        defaultColumnWidth?: number;
-        defaultFormatter?: () => void;
-        editable?: boolean;
-        editCommandHandler?: () => void;
-        editorFactory?: () => void;
-        editorLock?: any;
-        enableAddRow?: boolean;
-        enableAsyncPostRender?: boolean;
-        enableAsyncPostRenderCleanup?: boolean;
-        enableCellRangeSelection?: boolean;
-        enableCellNavigation?: boolean;
-        enableColumnReorder?: boolean;
-        enableRowReordering?: boolean;
-        enableTextSelectionOnCells?: boolean;
-        explicitInitialization?: boolean;
-        forceFitColumns?: boolean;
-        forceSyncScrolling?: boolean;
-        formatterFactory?: () => void;
-        fullWidthRows?: boolean;
-        frozenColumn?: number;
-        frozenRow?: number;
-        frozenBottom?: boolean;
-        headerRowHeight?: number;
-        leaveSpaceForNewRows?: boolean;
-        minBuffer?: number;
-        multiColumnSort?: boolean;
-        multiSelect?: boolean;
-        renderAllCells?: boolean;
-        rowHeight?: number;
-        selectedCellCssClass?: string;
-        showHeaderRow?: boolean;
-        showFooterRow?: boolean;
-        syncColumnCellResize?: boolean;
-        topPanelHeight?: number;
-    }
-    interface RemoteView<TEntity> {
-        constructor(options: RemoteViewOptions): void;
-        onSubmit: Slick.CancellableViewCallback<TEntity>;
-        onDataChanged: Slick.Event;
-        onDataLoaded: Slick.Event;
-        onAjaxCall: Slick.RemoteViewAjaxCallback<TEntity>;
-        onProcessData: Slick.RemoteViewProcessCallback<TEntity>;
-        addData(data: Serenity.ListResponse<TEntity>): void;
-        beginUpdate(): void;
-        endUpdate(): void;
-        deleteItem(id: any): void;
-        getItems(): TEntity[];
-        setFilter(filter: RemoteViewFilter<TEntity>): void;
-        setItems(items: any[], fullReset: boolean): void;
-        getItemById(id: any): TEntity;
-        getRowById(id: any): number;
-        updateItem(id: any, item: TEntity): void;
-        addItem(item: TEntity): void;
-        getIdxById(id: any): any;
-        getItemByIdx(index: number): any;
-        setGrouping(groupInfo: Slick.GroupInfo<TEntity>[]): void;
-        collapseAllGroups(level: number): void;
-        expandAllGroups(level: number): void;
-        expandGroup(keys: any[]): void;
-        collapseGroup(keys: any[]): void;
-        setSummaryOptions(options: Slick.SummaryOptions): void;
-        refresh(): void;
-        populate(): void;
-        populateLock(): void;
-        populateUnlock(): void;
-        getItem(row: number): any;
-        getLength(): number;
-        params: any;
-        sortBy: string[];
-        url: string;
-        seekToPage?: number;
-    }
-    interface RemoteViewOptions {
-        autoLoad?: boolean;
-        idField?: string;
-        contentType?: string;
-        dataType?: string;
-        filter?: any;
-        params?: any;
-        onSubmit?: Slick.Event;
-        url?: string;
-        sortBy?: any;
-        rowsPerPage?: number;
-        seekToPage?: number;
-        onProcessData?: Slick.Event;
-        method?: string;
-        getItemMetadata?: (p1?: any, p2?: number) => any;
-        errorMsg?: string;
-    }
-    interface ColumnSort {
-        columnId?: string;
-        sortAsc?: boolean;
-    }
-    interface RangeInfo {
-        top?: number;
-        bottom?: number;
-        leftPx?: number;
-        rightPx?: number;
-    }
-    class Grid {
-        constructor(container: JQuery, data: any, columns: Column[], options: GridOptions);
-    }
-    interface Grid {
-        init(): void;
-        destroy(): void;
-        getData(): any[];
-        getDataItem(index: number): any;
-        setData(data: any[], scrollToTop: boolean): void;
-        getDataLength(): number;
-        getOptions(): GridOptions;
-        setOptions(options: GridOptions): void;
-        getSelectedRows(): any;
-        getSelectionModel(): any;
-        setSelectionModel(model: any): any;
-        setSelectedRows(rows: any): void;
-        autoSizeColumns(): void;
-        getColumnIndex(id: string): number;
-        getColumns(): Column[];
-        getUID(): string;
-        setColumns(columns: Column[]): void;
-        setSortColumn(columnId: string, ascending: boolean): void;
-        setSortColumns(cols: Slick.ColumnSort[]): void;
-        updateColumnHeader(columnId: string, title: string, toolTip: string): void;
-        addCellCssStyles(key: string, hash: any): void;
-        canCellBeActive(row: number, col: number): boolean;
-        canCellBeSelected(row: number, col: number): boolean;
-        editActiveCell(editor: Function): void;
-        flashCell(row: number, cell: number, speed: number): void;
-        getActiveCell(): Slick.RowCell;
-        getActiveCellNode(): any;
-        getActiveCellPosition(): Slick.PositionInfo;
-        getCellCssStyles(key: string): any;
-        getCellEditor(): any;
-        getCellFromEvent(e: any): Slick.RowCell;
-        getCellFromPoint(x: number, y: number): Slick.RowCell;
-        getCellNode(row: number, cell: number): any;
-        getCellNodeBox(row: number, cell: number): Slick.PositionInfo;
-        goToCell(row: number, cell: number, forceEdit: boolean): void;
-        navigateDown(): void;
-        navigateLeft(): void;
-        navigateNext(): void;
-        navigatePrev(): void;
-        navigateRight(): void;
-        navigateUp(): void;
-        removeCellCssStyles(key: string): void;
-        resetActiveCell(): void;
-        registerPlugin(plugin: any): void;
-        setActiveCell(row: number, cell: number): void;
-        setCellCssStyles(key: string, hash: any): void;
-        getCanvasNode(): any;
-        getGridPosition(): Slick.PositionInfo;
-        getRenderedRange(viewportTop: number, viewportLeft: number): Slick.RangeInfo;
-        getViewport(viewportTop: number, viewportLeft: number): Slick.RangeInfo;
-        getViewport(): Slick.RangeInfo;
-        invalidate(): void;
-        invalidateAllRows(): void;
-        invalidateRow(row: number): void;
-        invalidateRows(rows: any): void;
-        render(): void;
-        resizeCanvas(): void;
-        scrollCellIntoView(row: number, cell: number): void;
-        scrollRowIntoView(row: number, doPaging: boolean): void;
-        scrollRowToTop(row: number): void;
-        updateCell(row: number, cell: number): void;
-        updateRow(row: number): void;
-        updateRowCount(): void;
-        updateColumnHeader(columnId: string, title?: string, toolTip?: string): void;
-        getGroupingPanel(): HTMLDivElement;
-        getHeaderRow(): any;
-        getEditorLock(): any;
-        getHeaderRowColumn(columnId: string): any;
-        getSortColumns(): any;
-        getTopPanel(): any;
-        setHeaderRowVisibility(visible: boolean): void;
-        onScroll?: Slick.Event;
-        onSort?: Slick.Event;
-        onHeaderContextMenu?: Slick.Event;
-        onHeaderClick?: Slick.Event;
-        onMouseEnter?: Slick.Event;
-        onMouseLeave?: Slick.Event;
-        onClick?: Slick.Event;
-        onDblClick?: Slick.Event;
-        onContextMenu?: Slick.Event;
-        onKeyDown?: Slick.Event;
-        onAddNewRow?: Slick.Event;
-        onValidationError?: Slick.Event;
-        onViewportChanged?: Slick.Event;
-        onColumnsReordered?: Slick.Event;
-        onColumnsResized?: Slick.Event;
-        onCellChange?: Slick.Event;
-        onBeforeEditCell?: Slick.Event;
-        onBeforeCellEditorDestroy?: Slick.Event;
-        onHeaderCellRendered?: Slick.Event;
-        onBeforeHeaderCellDestroy?: Slick.Event;
-        onBeforeDestroy?: Slick.Event;
-        onActiveCellChanged?: Slick.Event;
-        onActiveCellPositionChanged?: Slick.Event;
-        onDragInit?: Slick.Event;
-        onDragStart?: Slick.Event;
-        onDrag?: Slick.Event;
-        onDragEnd?: Slick.Event;
-        onSelectedRowsChanged?: Slick.Event;
-        onCellCssStylesChanged?: Slick.Event;
-    }
-}
-declare namespace Slick.Data {
-}
-declare namespace Slick {
-    class RemoteView<TEntity> {
-        constructor(options: any);
-    }
-}
-declare namespace Slick.Aggregators {
-    function Avg(field: string): void;
-    function WeightedAvg(field: string, weightedField: string): void;
-    function Min(field: string): void;
-    function Max(field: string): void;
-    function Sum(field: string): void;
-}
-declare var Vue: any;
-declare namespace Q {
-}
-declare namespace Serenity.DialogExtensions {
-    function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery;
-    function dialogMaximizable(dialog: JQuery): JQuery;
-}
-declare namespace Serenity {
     class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(hidden: JQuery, opt: LookupEditorOptions);
         getLookupKey(): any;
     }
 }
 declare namespace Serenity {
-    class CascadedWidgetLink<TParent extends Widget<any>> {
-        private parentType;
-        private widget;
-        private parentChange;
-        constructor(parentType: {
-            new (...args: any[]): TParent;
-        }, widget: Serenity.Widget<any>, parentChange: (p1: TParent) => void);
-        private _parentID;
-        bind(): TParent;
-        unbind(): TParent;
-        get_parentID(): string;
-        set_parentID(value: string): void;
+    interface ScriptContext {
+    }
+    class ScriptContext {
     }
 }
-declare namespace Serenity.DialogTypeRegistry {
-    function tryGet(key: string): WidgetDialogClass;
-    function get(key: string): WidgetDialogClass;
+declare namespace Serenity {
+    class IAsyncInit {
+    }
+}
+declare namespace Serenity {
+    namespace WX {
+        function getWidget<TWidget>(element: JQuery, type: any): TWidget;
+        var getWidgetName: typeof Widget.getWidgetName;
+        function hasOriginalEvent(e: any): boolean;
+        function change(widget: any, handler: any): void;
+        function changeSelect2(widget: any, handler: any): void;
+        function getGridField(widget: Serenity.Widget<any>): JQuery;
+    }
+}
+interface JQuery {
+    flexHeightOnly(flexY?: number): JQuery;
+    flexWidthOnly(flexX?: number): JQuery;
+    flexWidthHeight(flexX: number, flexY: number): JQuery;
+    flexX(flexX: number): JQuery;
+    flexY(flexY: number): JQuery;
+}
+declare namespace Serenity {
+    class Flexify extends Widget<FlexifyOptions> {
+        private xDifference;
+        private yDifference;
+        constructor(container: JQuery, options: FlexifyOptions);
+        storeInitialSize(): void;
+        private getXFactor;
+        private getYFactor;
+        private resizeElements;
+        private resizeElement;
+    }
+    interface FlexifyOptions {
+        getXFactor?: (p1: JQuery) => any;
+        getYFactor?: (p1: JQuery) => any;
+        designWidth?: any;
+        designHeight?: any;
+    }
+}
+declare namespace Serenity {
+    interface GoogleMapOptions {
+        latitude?: any;
+        longitude?: any;
+        zoom?: any;
+        mapTypeId?: any;
+        markerTitle?: string;
+        markerLatitude?: any;
+        markerLongitude?: any;
+    }
+    class GoogleMap extends Widget<GoogleMapOptions> {
+        private map;
+        constructor(container: JQuery, opt: GoogleMapOptions);
+        get_map(): any;
+    }
+}
+declare namespace Serenity {
+    class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
+        pageSize: number;
+        constructor(hidden: JQuery, opt: TOptions);
+        protected emptyItemText(): string;
+        protected getService(): string;
+        protected query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void;
+        protected executeQuery(options: ServiceOptions<ListResponse<any>>): void;
+        protected queryByKey(key: string, callback: (p1: any) => void): void;
+        protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void;
+        protected getItemKey(item: any): string;
+        protected getItemText(item: any): string;
+        protected getTypeDelay(): number;
+        protected getSelect2Options(): Select2Options;
+        protected addInplaceCreate(title: string): void;
+        protected inplaceCreateClick(e: any): void;
+        protected get_select2Container(): JQuery;
+        get_value(): string;
+        get value(): string;
+        set_value(value: string): void;
+        set value(v: string);
+    }
 }

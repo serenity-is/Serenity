@@ -120,11 +120,15 @@ namespace Q {
         }
     })();
 
+    // for backwards compatibility
     export function turkishLocaleToUpper(a: string): string {
         if (!a)
             return a;
         return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
     }
+
+    // for backwards compatibility
+    export let turkishLocaleCompare = Q.Culture.stringCompare;
 
     function insertGroupSeperator(num: string, dec: string, grp: string, neg: string) {
         var decPart = null;
@@ -790,8 +794,8 @@ namespace Q {
         s = Q.trim(s);
         if (s.indexOf(' ') > 0 && s.indexOf(':') > s.indexOf(' ') + 1) {
             var datePart = Q.parseDate(s.substr(0, s.indexOf(' ')));
-            if (datePart == null)
-                return null;
+            if (!datePart)
+                return false;
             return Q.parseISODateTime(Q.formatDate(datePart, 'yyyy-MM-dd') + 'T' + Q.trim(s.substr(s.indexOf(' ' + 1))));
         }
 

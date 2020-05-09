@@ -321,7 +321,12 @@ namespace Q {
         return a;
     }
 
-    export function deepClone<T = any>(a: T): T {
+    export function deepClone<T = any>(a: T, a2?: any, a3?: any): T {
+        // for backward compatibility
+        if (a2 != null || a3 != null) {
+            return Q.extend(Q.extend(Q.deepClone(a || {}), Q.deepClone(a2 || {})), Q.deepClone(a3 || {}));
+        }
+
         if (!a)
             return a;
       

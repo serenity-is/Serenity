@@ -1,5 +1,7 @@
 ﻿namespace Serenity {
 
+    export type DialogButton = JQueryUI.DialogButtonOptions;
+
     @Decorators.registerClass('Serenity.PropertyDialog')
     export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
         protected _entity: TItem;

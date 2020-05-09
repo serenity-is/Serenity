@@ -45,7 +45,7 @@
         }
 
         export function checkImageConstraints(file: UploadResponse,
-            opt: ImageUploadEditorOptions): boolean {
+            opt: FileUploadConstraints): boolean {
 
             if (!file.IsImage && !opt.allowNonImage) {
                 Q.alert(Q.text('Controls.ImageUpload.NotAnImageFile'));
@@ -203,5 +203,16 @@
         IsImage: boolean;
         Width: number;
         Height: number;
+    }
+
+    export interface FileUploadConstraints {
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+        minSize?: number;
+        maxSize?: number;
+        allowNonImage?: boolean;
+        originalNameProperty?: string;
     }
 }

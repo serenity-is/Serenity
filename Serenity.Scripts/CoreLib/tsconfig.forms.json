@@ -1,0 +1,24 @@
+﻿{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outFile": "../dist/forms/serenity-forms.js",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "./tsconfig.core.json"
+    },
+    {
+      "path": "./tsconfig.widget.json"
+    }
+  ],
+  "files": [
+    "UI/Helpers/ValidationHelper.ts",
+    "UI/Widgets/TemplatedPanel.ts",
+    "UI/Helpers/TabsExtensions.ts",
+    "UI/Widgets/ReflectionOptionsSetter.ts",
+    "UI/Widgets/PropertyGrid.ts",
+    "UI/Widgets/PropertyPanel.ts",
+    "Imports/VueIntegration.ts"
+  ]
+}

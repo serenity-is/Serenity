@@ -226,7 +226,7 @@
             }
         };
 
-        static flatPickrTrigger(input: JQuery) {
+        static flatPickrTrigger(input: JQuery): JQuery {
             return $('<i class="ui-datepicker-trigger" href="javascript:;">' + datePickerIconSvg + '</i>')
                 .insertAfter(input)
                 .click(() => {

@@ -1,5 +1,10 @@
 ﻿namespace Serenity {
 
+    export interface QuickSearchField {
+        name: string;
+        title: string;
+    }
+    
     export interface QuickSearchInputOptions {
         typeDelay?: number;
         loadingParentClass?: string;

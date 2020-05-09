@@ -171,7 +171,7 @@ namespace Q {
     }
 
     function useBSModal(options: CommonDialogOptions): boolean {
-        return !!((!$.ui || !$.ui.dialog) || Q.Config.bootstrapModals || (options && options.bootstrap));
+        return !!((!$.ui || !$.ui.dialog) || Q.Config.bootstrapMessages || (options && options.bootstrap));
     }
 
     function messageHtml(message: string, options?: CommonDialogOptions): string {

@@ -1,9 +1,6 @@
 ﻿namespace Serenity {
 
-    export interface QuickSearchField {
-        name: string;
-        title: string;
-    }
+    
 
     export interface GridRowSelectionMixinOptions {
         selectable?: (item: any) => boolean;

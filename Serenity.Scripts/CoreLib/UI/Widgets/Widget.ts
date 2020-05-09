@@ -109,6 +109,21 @@
             return Q.addValidationRule(this.element, eventClass, rule);
         }   
 
+        public getGridField(): JQuery {
+            return this.element.closest('.field');
+        } 
+
+        public change(handler: (e: JQueryEventObject) => void) {
+            this.element.on('change.' + this.uniqueName, handler);
+        };
+
+        public changeSelect2(handler: (e: JQueryEventObject) => void) {
+            this.element.on('change.' + this.uniqueName, function(e) {
+                if (!$(e.target).hasClass('select2-change-triggered'))
+                    handler(e);
+            });
+        };
+
         public static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>) {
             let widget: TWidget;
 
@@ -141,6 +156,58 @@
         props: Readonly<{ children?: React.ReactNode }> & Readonly<TOptions> & WidgetComponentProps<this>;
     }
 
+    if (typeof $ !== "undefined" && $.fn) {
+        $.fn.tryGetWidget = function (this: JQuery, type: any) {
+            var element = this;
+            var w;
+            if (Q.isAssignableFrom(Serenity.Widget, type)) {
+                var widgetName = Widget.getWidgetName(type);
+                w = element.data(widgetName);
+                if (w != null && !Q.isAssignableFrom(type, Q.getInstanceType(w))) {
+                    w = null;
+                }
+                if (w != null) {
+                    return w;
+                }
+            }
+
+            var data = element.data();
+            if (data == null) {
+                return null;
+            }
+
+            for (var key of Object.keys(data)) {
+                w = data[key];
+                if (w != null && Q.isAssignableFrom(type, Q.getInstanceType(w))) {
+                    return w;
+                }
+            }
+
+            return null;
+        };
+
+        $.fn.getWidget = function (this: JQuery, type: any) {
+            if (this == null) {
+                throw new Q.ArgumentNullException('element');
+            }
+            if (this.length === 0) {
+                throw new Q.Exception(Q.format("Searching for widget of type '{0}' on a non-existent element! ({1})",
+                    Q.getTypeFullName(type), this.selector));
+            }
+
+            var w = this.tryGetWidget(type);
+            if (w == null) {
+                var message = Q.format("Element has no widget of type '{0}'! If you have recently changed " +
+                    "editor type of a property in a form class, or changed data type in row (which also changes " +
+                    "editor type) your script side Form definition might be out of date. Make sure your project " +
+                    "builds successfully and transform T4 templates", Q.getTypeFullName(type));
+                Q.notifyError(message, '', null);
+                throw new Q.Exception(message);
+            }
+            return w;
+        };
+    }
+
     export interface WidgetComponentProps<W extends Serenity.Widget<any>> {
         id?: string;
         name?: string;
@@ -158,9 +225,13 @@
     }
 
     export declare interface Widget<TOptions> {
-        getGridField(): JQuery;
         change(handler: (e: JQueryEventObject) => void): void;
         changeSelect2(handler: (e: JQueryEventObject) => void): void;
     }
+}
+
+interface JQuery {
+    getWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
+    tryGetWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
 }
 

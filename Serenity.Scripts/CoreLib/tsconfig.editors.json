@@ -1,7 +1,7 @@
 ﻿{
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outFile": "../dist/serenity-editors.js",
+    "outFile": "../dist/editors/serenity-editors.js",
     "composite": true
   },
   "references": [
@@ -16,17 +16,24 @@
     "Imports/FlatPickr.d.ts",
     "UI/Editors/StringEditor.ts",
     "UI/Editors/PasswordEditor.ts",
+    "UI/Editors/TextAreaEditor.ts",
     "UI/Editors/BooleanEditor.ts",
     "UI/Editors/DecimalEditor.ts",
     "UI/Editors/IntegerEditor.ts",
     "UI/Editors/DateEditor.ts",
     "UI/Editors/DateTimeEditor.ts",
+    "UI/Editors/TimeEditor.ts",
     "UI/Editors/EmailAddressEditor.ts",
     "UI/Editors/EmailEditor.ts",
-    "UI/Editors/EditorUtils.ts",
-    "UI/Editors/CascadedWidgetLink.ts",
+    "UI/Editors/URLEditor.ts",
+    "UI/Editors/RadioButtonEditor.ts",
     "UI/Editors/Select2Editor.ts",
+    "UI/Editors/SelectEditor.ts",
+    "UI/Editors/DateYearEditor.ts",
+    "UI/Editors/EnumEditor.ts",
     "UI/Editors/LookupEditor.ts",
-    "UI/Editors/ServiceLookupEditor.ts"
+    "UI/Editors/ServiceLookupEditor.ts",
+    "UI/Editors/HtmlContentEditor.ts",
+    "UI/Editors/UploadEditors.ts"
   ]
 }

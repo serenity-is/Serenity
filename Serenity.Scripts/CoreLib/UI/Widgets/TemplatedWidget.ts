@@ -13,7 +13,7 @@
 
             var widgetMarkup = this.getTemplate().replace(new RegExp('~_', 'g'), this.idPrefix);
 
-            // for compability with older templates based on JsRender
+            // for compatibility with older templates based on JsRender
             var end = 0;
             while (true) {
                 var idx = widgetMarkup.indexOf('{{text:"', end);
@@ -36,7 +36,7 @@
         }
 
         private byID<TWidget>(id: string, type: { new (...args: any[]): TWidget }) {
-            return Serenity.WX.getWidget(this.byId(id), type);
+            return this.byId(id).getWidget(type);
         }
 
         private static noGeneric(s: string): string {

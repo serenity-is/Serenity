@@ -201,8 +201,62 @@
                     x.sourceItem.quickFilter === true &&
                     (x.sourceItem.readPermission == null ||
                         Q.Authorization.hasPermission(x.sourceItem.readPermission));
-            }).map(x => QuickFilterBar.propertyItemToQuickFilter(x.sourceItem))
+            }).map(x => DataGrid.propertyItemToQuickFilter(x.sourceItem))
                 .filter(x => x != null);
+        }
+
+        public static propertyItemToQuickFilter(item: PropertyItem) {
+            var quick: any = {};
+
+            var name = item.name;
+            var title = Q.tryGetText(item.title);
+            if (title == null) {
+                title = item.title;
+                if (title == null) {
+                    title = name;
+                }
+            }
+
+            var filteringType = Serenity.FilteringTypeRegistry.get(Q.coalesce(item.filteringType, 'String'));
+            if (filteringType === Serenity.DateFiltering) {
+                quick = QuickFilterBar.dateRange(name, title);
+            }
+            else if (filteringType === Serenity.DateTimeFiltering) {
+                quick = QuickFilterBar.dateTimeRange(name, title);
+            }
+            else if (filteringType === Serenity.BooleanFiltering) {
+                var q = item.quickFilterParams || {};
+                var f = item.filteringParams || {};
+                var trueText = q['trueText'];
+                if (trueText == null) {
+                    trueText = f['trueText'];
+                }
+                var falseText = q['falseText'];
+                if (falseText == null) {
+                    falseText = f['falseText'];
+                }
+                quick = QuickFilterBar.boolean(name, title, trueText, falseText);
+            }
+            else {
+                var filtering = new (filteringType as any)() as IFiltering;
+                if (filtering && Q.isInstanceOfType(filtering, Serenity.IQuickFiltering)) {
+                    Serenity.ReflectionOptionsSetter.set(filtering, item.filteringParams);
+                    filtering.set_field(item);
+                    filtering.set_operator({ key: Serenity.FilterOperators.EQ });
+                    (filtering as any).initQuickFilter(quick);
+                    quick.options = Q.extend(Q.deepClone(quick.options), item.quickFilterParams);
+                }
+                else {
+                    return null;
+                }
+            }
+
+            if (!!item.quickFilterSeparator) {
+                quick.separator = true;
+            }
+
+            quick.cssClass = item.quickFilterCssClass;
+            return quick;
         }
 
         protected findQuickFilter<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {

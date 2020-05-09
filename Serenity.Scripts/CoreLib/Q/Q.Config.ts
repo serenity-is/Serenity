@@ -7,10 +7,10 @@
          */
         export let applicationPath = '/';
 
-        if (typeof $ !== 'undefined') {
-        var pathLink = $('link#ApplicationPath');
-            if (pathLink.length > 0) {
-                applicationPath = pathLink.attr('href');
+        if (typeof document !== 'undefined') {
+            var pathLink = document.querySelector('link#ApplicationPath') as HTMLLinkElement;
+            if (pathLink != null) {
+                applicationPath = pathLink.href;
             }
         }
 
@@ -21,9 +21,9 @@
         export let responsiveDialogs = false;
 
         /**
-         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default
+         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default for message dialogs
          */
-        export let bootstrapModals = false;
+        export let bootstrapMessages = false;
 
         /**
          * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
