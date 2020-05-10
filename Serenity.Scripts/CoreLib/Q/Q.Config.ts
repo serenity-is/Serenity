@@ -15,6 +15,11 @@
         }
 
         /**
+         * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
+         */
+        export let emailAllowOnlyAscii = true;
+
+        /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
          * on dialog classes manually. It's false by default for backward compatibility.
          */

@@ -88,12 +88,17 @@ var Q;
     }
     Q.getNested = getNested;
     Q.getType = function (name, target) {
-        if (target == null)
-            return Q.types[name];
-        target = getNested(target, name);
-        if (typeof target !== 'function')
+        var type;
+        if (target == null) {
+            type = Q.types[name];
+            if (type != null || globalObj == null)
+                return type;
+            target = globalObj;
+        }
+        type = getNested(target, name);
+        if (typeof type !== 'function')
             return null;
-        return target;
+        return type;
     };
     Q.getTypeFullName = function (type) {
         return type.__typeName || type.name ||
@@ -2367,6 +2372,10 @@ var Q;
             }
         }
         /**
+         * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
+         */
+        Config.emailAllowOnlyAscii = true;
+        /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
          * on dialog classes manually. It's false by default for backward compatibility.
          */
@@ -2868,6 +2877,24 @@ var Q;
         $.validator.addMethod("integerQ", function (value, element) {
             return this.optional(element) || !isNaN(Q.parseInteger(value));
         });
+        var oldEmail_1 = $.validator.methods['email'];
+        var emailRegex_1 = null;
+        $.validator.addMethod("email", function (value, element) {
+            if (Q.Config.emailAllowOnlyAscii)
+                return oldEmail_1.call(this, value, element);
+            if (emailRegex_1 == null)
+                emailRegex_1 = new RegExp("^((([a-z]|\\d|[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|" +
+                    "[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])+(\\.([a-z]|\\d|" +
+                    "[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])+)*)|" +
+                    "((\\x22)((((\\x20|\\x09)*(\\x0d\\x0a))?(\\x20|\\x09)+)?(([\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]|" +
+                    "\\x21|[\\x23-\\x5b]|[\\x5d-\\x7e]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])|(\\\\([\\x01-\\x09\\x0b\\x0c\\x0d-\\x7f]|" +
+                    "[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF]))))*(((\\x20|\\x09)*(\\x0d\\x0a))?(\\x20|\\x09)+)?(\\x22)))@((([a-z]|\\d|" +
+                    "[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])|(([a-z]|\\d|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])" +
+                    "([a-z]|\\d|-|\\.|_|~|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])*([a-z]|\\d|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])))\\.)" +
+                    "+(([a-z]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])|(([a-z]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])([a-z]|\\d|-|\\.|_|~|" +
+                    "[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])*([a-z]|[\\u00A0-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF])))$", "i");
+            return emailRegex_1.test(value);
+        });
         function addMsg(m, k) {
             var txt = Q.tryGetText("Validation." + k);
             if (txt)
@@ -3190,6 +3217,8 @@ var Serenity;
             }
             else if (!target.__typeName)
                 target.__register = true;
+            else
+                Q.types[target.__typeName] = target;
             if (intf)
                 target.__interfaces = merge(target.__interfaces, intf);
         }
@@ -7468,7 +7497,10 @@ var Serenity;
                     if (this.optional(element) && this.optional(domain[0])) {
                         return true;
                     }
-                    return $.validator.methods.email.call(value + '@' + domain.val());
+                    return $.validator.methods.email.call(this, value + '@' + domain.val(), element);
+                }
+                else {
+                    return $.validator.methods.email.call(this, value + '@dummy.com', element);
                 }
             }, (_a = Q.tryGetText("Validation.Email")) !== null && _a !== void 0 ? _a : $.validator.messages.email);
         };

@@ -595,6 +595,10 @@ declare namespace Q {
          */
         let applicationPath: string;
         /**
+         * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
+         */
+        let emailAllowOnlyAscii: boolean;
+        /**
          * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
          * on dialog classes manually. It's false by default for backward compatibility.
          */

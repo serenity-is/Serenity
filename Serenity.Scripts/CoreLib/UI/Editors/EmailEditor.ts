@@ -68,7 +68,10 @@
                         return true;
                     }
 
-                    return $.validator.methods.email.call(value + '@' + domain.val());
+                    return $.validator.methods.email.call(this, value + '@' + domain.val(), element);
+                }
+                else {
+                    return $.validator.methods.email.call(this, value + '@dummy.com', element);
                 }
             }, Q.tryGetText("Validation.Email") ?? $.validator.messages.email);
         }

@@ -222,9 +222,9 @@ var Serenity;
                 assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("SomeModule.SomeDialog"), "should find dialog class with module name only");
                 assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("SomeModule.Some"), "should find dialog class without specifying Dialog suffix");
                 assert.equal(DummyRoot.SomeModule.SomeDialogWithoutDialogSuffix, Serenity.DialogTypeRegistry.get("SomeModule.SomeDialogWithoutDialogSuffix"), "should find dialog class that doesn't have Dialog suffix");
-                assert.throws(function () { return Serenity.DialogTypeRegistry.get("SomeDialog"); }, "SomeDialog dialog class is not found! Make sure there is a dialog class with this name, it is under your project root namespace, and your namespace parts start with capital letters, e.g. MyProject.Pascal.Cased namespace. If you got this error from an editor with InplaceAdd option check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.", "shouldn't find dialog class without module name");
-                assert.throws(function () { return Serenity.DialogTypeRegistry.get("Some"); }, "Some dialog class is not found! Make sure there is a dialog class with this name, it is under your project root namespace, and your namespace parts start with capital letters, e.g. MyProject.Pascal.Cased namespace. If you got this error from an editor with InplaceAdd option check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.", "shouldn't find dialog class without module name and suffix");
-                assert.throws(function () { return Serenity.DialogTypeRegistry.get("SomeDialogWithoutDialogSuffix"); }, "SomeDialogWithoutDialogSuffix dialog class is not found! Make sure there is a dialog class with this name, it is under your project root namespace, and your namespace parts start with capital letters, e.g. MyProject.Pascal.Cased namespace. If you got this error from an editor with InplaceAdd option check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.", "shouldn't find dialog class that doesn't have dialog suffix without module");
+                assert.throws(function () { return Serenity.DialogTypeRegistry.get("SomeDialog"); }, function (err) { return err.toString().indexOf("SomeDialog dialog class is not found") >= 0; }, "shouldn't find dialog class without module name");
+                assert.throws(function () { return Serenity.DialogTypeRegistry.get("Some"); }, function (err) { return err.toString().indexOf("Some dialog class is not found") >= 0; }, "shouldn't find dialog class without module name and suffix");
+                assert.throws(function () { return Serenity.DialogTypeRegistry.get("SomeDialogWithoutDialogSuffix"); }, function (err) { return err.toString().indexOf("SomeDialogWithoutDialogSuffix dialog class is not found") >= 0; }, "shouldn't find dialog class that doesn't have dialog suffix without module");
             }
             finally {
                 Q.Config.rootNamespaces = Q.Config.rootNamespaces.filter(function (x) { return x != "DummyRoot"; });
@@ -240,7 +240,7 @@ var Serenity;
         QUnit.module('Widget');
         QUnit.test('GetWidget tests', function () {
             var input = $('<input />');
-            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'! If you have recently changed editor type of a property in a form class, or changed data type in row (which also changes editor type) your script side Form definition might be out of date. Make sure your project builds successfully and transform T4 templates", 'should throw before widget creation');
+            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, function (err) { return err.toString().indexOf("Element has no widget of type") >= 0; }, 'should throw before widget creation');
             var stringEditor = new Serenity.StringEditor(input);
             assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
             var secondaryWidget = new Serenity.DecimalEditor(input);
@@ -249,7 +249,7 @@ var Serenity;
             assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
             assert.strictEqual(input.getWidget(Serenity.Widget), stringEditor, 'can return stringeditor using base class');
             stringEditor.destroy();
-            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'! If you have recently changed editor type of a property in a form class, or changed data type in row (which also changes editor type) your script side Form definition might be out of date. Make sure your project builds successfully and transform T4 templates", 'should throw after string editor is destroyed');
+            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, function (err) { return err.toString().indexOf("Element has no widget of type") >= 0; }, 'should throw after string editor is destroyed');
         });
     })(Test = Serenity.Test || (Serenity.Test = {}));
 })(Serenity || (Serenity = {}));

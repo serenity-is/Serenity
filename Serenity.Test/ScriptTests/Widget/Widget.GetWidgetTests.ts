@@ -4,8 +4,7 @@ namespace Serenity.Test {
 
     QUnit.test('GetWidget tests', function () {
         var input = $('<input />');
-        assert.throws(function () { input.getWidget(Serenity.StringEditor) },
-            "Element has no widget of type 'Serenity.StringEditor'! If you have recently changed editor type of a property in a form class, or changed data type in row (which also changes editor type) your script side Form definition might be out of date. Make sure your project builds successfully and transform T4 templates",
+        assert.throws(function () { input.getWidget(Serenity.StringEditor) }, err => err.toString().indexOf("Element has no widget of type") >= 0,
             'should throw before widget creation');
 
         var stringEditor = new StringEditor(input);
@@ -24,8 +23,7 @@ namespace Serenity.Test {
             'can return stringeditor using base class');
 
         (<any>stringEditor).destroy();
-        assert.throws(function () { input.getWidget(Serenity.StringEditor) },
-            "Element has no widget of type 'Serenity.StringEditor'! If you have recently changed editor type of a property in a form class, or changed data type in row (which also changes editor type) your script side Form definition might be out of date. Make sure your project builds successfully and transform T4 templates",
+        assert.throws(function () { input.getWidget(Serenity.StringEditor) }, err => err.toString().indexOf("Element has no widget of type") >= 0,
             'should throw after string editor is destroyed');
     });
 }

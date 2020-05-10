@@ -1093,7 +1093,10 @@ var Serenity;
                     if (this.optional(element) && this.optional(domain[0])) {
                         return true;
                     }
-                    return $.validator.methods.email.call(value + '@' + domain.val());
+                    return $.validator.methods.email.call(this, value + '@' + domain.val(), element);
+                }
+                else {
+                    return $.validator.methods.email.call(this, value + '@dummy.com', element);
                 }
             }, (_a = Q.tryGetText("Validation.Email")) !== null && _a !== void 0 ? _a : $.validator.messages.email);
         };

@@ -17,6 +17,8 @@
             }
             else if (!target.__typeName)
                 target.__register = true;
+            else
+                Q.types[target.__typeName] = target;
             if (intf)
                 target.__interfaces = merge(target.__interfaces, intf);
         }

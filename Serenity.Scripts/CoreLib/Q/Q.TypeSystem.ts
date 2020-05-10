@@ -28,14 +28,20 @@ namespace Q {
     }
 
     export let getType = (name: string, target?: any): Type => {
-        if (target == null)
-            return types[name];
+        var type: any;
+        if (target == null) {
+            type = types[name];
+            if (type != null || globalObj == null)
+                return type;
 
-        target = getNested(target, name)
-        if (typeof target !== 'function')
+            target = globalObj;
+        }
+
+        type = getNested(target, name)
+        if (typeof type !== 'function')
             return null;
 
-        return target;
+        return type;
     }
 
     export let getTypeFullName = (type: Type): string => {
