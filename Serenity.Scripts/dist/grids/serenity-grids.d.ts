@@ -218,6 +218,7 @@ declare namespace Serenity {
         static defaultRowHeight: number;
         static defaultHeaderHeight: number;
         static defaultPersistanceStorage: SettingStorage;
+        private layoutTimer;
         constructor(container: JQuery, options?: TOptions);
         protected attrs<TAttr>(attrType: {
             new (...args: any[]): TAttr;

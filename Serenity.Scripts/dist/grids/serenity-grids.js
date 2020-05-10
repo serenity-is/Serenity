@@ -1241,9 +1241,12 @@ var Serenity;
             var self = _this;
             _this.element.addClass('s-DataGrid').html('');
             _this.element.addClass('s-' + Q.getTypeName(Q.getInstanceType(_this)));
-            _this.element.addClass('require-layout').bind('layout.' + _this.uniqueName, function () {
+            var layout = function () {
                 self.layout();
-            });
+                Q.LayoutTimer.store(this.layoutTimer);
+            };
+            _this.element.addClass('require-layout').on('layout.' + _this.uniqueName, layout);
+            _this.layoutTimer = Q.LayoutTimer.onSizeChange(function () { return _this.element && _this.element[0]; }, Q.debounce(layout, 50));
             _this.setTitle(_this.getInitialTitle());
             var buttons = _this.getButtons();
             if (buttons != null) {
@@ -1276,7 +1279,7 @@ var Serenity;
             return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         };
         DataGrid.prototype.layout = function () {
-            if (!this.element.is(':visible') || this.slickContainer == null)
+            if (!this.element || !this.element.is(':visible') || this.slickContainer == null)
                 return;
             var responsiveHeight = this.element.hasClass('responsive-height');
             var madeAutoHeight = this.slickGrid != null && this.slickGrid.getOptions().autoHeight;
@@ -1416,6 +1419,9 @@ var Serenity;
             Serenity.GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields());
         };
         DataGrid.prototype.destroy = function () {
+            if (this.layoutTimer) {
+                this.layoutTimer = Q.LayoutTimer.off(this.layoutTimer);
+            }
             if (this.quickFiltersBar) {
                 this.quickFiltersBar.destroy();
                 this.quickFiltersBar = null;

@@ -3036,9 +3036,11 @@ var Q;
     var LayoutTimer;
     (function (LayoutTimer) {
         var timeout;
-        var regs = [];
+        var nextKey = 0;
+        var regCount = 0;
+        var regs = {};
         function startTimer() {
-            if (timeout == null && regs.length) {
+            if (timeout == null && regCount > 0) {
                 timeout = window.setTimeout(onTimeout, 100);
             }
         }
@@ -3049,10 +3051,33 @@ var Q;
             }
         }
         function onTimeout() {
-            for (var _i = 0, regs_1 = regs; _i < regs_1.length; _i++) {
-                var reg = regs_1[_i];
+            for (var key in regs) {
+                var reg = regs[key];
                 try {
-                    reg.handler();
+                    var el = reg.element();
+                    if (!el)
+                        continue;
+                    var w = el.offsetWidth;
+                    var h = el.offsetHeight;
+                    try {
+                        if ((reg.width && reg.storedWidth !== w) ||
+                            (reg.height && reg.storedHeight !== h) ||
+                            (!reg.width && !reg.height && (!w !== !reg.storedWidth || !h !== !reg.storedHeight))) {
+                            if (w > 0 && h > 0) {
+                                try {
+                                    reg.handler();
+                                }
+                                finally {
+                                    w = el.offsetWidth;
+                                    h = el.offsetHeight;
+                                }
+                            }
+                        }
+                    }
+                    finally {
+                        reg.storedWidth = w;
+                        reg.storedHeight = h;
+                    }
                 }
                 catch (e) {
                     console.log(e);
@@ -3061,65 +3086,65 @@ var Q;
             clearTimer();
             startTimer();
         }
-        function on(key, handler) {
+        function store(key) {
+            var reg = regs[key];
+            if (!reg)
+                return;
+            var el = reg.element();
+            if (!el)
+                return;
+            reg.storedWidth = el.offsetWidth;
+            reg.storedHeight = el.offsetHeight;
+        }
+        LayoutTimer.store = store;
+        function trigger(key) {
+            var reg = regs[key];
+            if (!reg)
+                return;
+            store(key);
+            if (reg.storedWidth >= 0 &&
+                reg.storedHeight >= 0) {
+                reg.handler();
+            }
+            store(key);
+        }
+        LayoutTimer.trigger = trigger;
+        function onSizeChange(element, handler, width, height) {
             if (handler == null)
                 throw "Layout handler can't be null!";
-            if (key != null && Q.any(regs, function (x) { return x.key === key; }))
-                throw "There is already a registered layout handler with key: " + key;
-            regs.push({
-                key: key,
+            regs[++nextKey] = {
+                element: element,
                 handler: handler,
-            });
+                width: width !== false,
+                height: height !== false
+            };
+            regCount++;
+            store(nextKey);
             startTimer();
-            return handler;
-        }
-        LayoutTimer.on = on;
-        function onSizeChange(key, element, handler) {
-            var oldWidth = element.offsetWidth;
-            var oldHeight = element.offsetHeight;
-            on(key, function () {
-                var offsetWidth = element.offsetWidth;
-                var offsetHeight = element.offsetHeight;
-                if (offsetWidth !== oldWidth ||
-                    offsetHeight !== oldHeight) {
-                    oldWidth = offsetWidth;
-                    oldHeight = offsetHeight;
-                    handler();
-                }
-            });
-            return handler;
+            return nextKey;
         }
         LayoutTimer.onSizeChange = onSizeChange;
-        function onWidthChange(key, element, handler) {
-            var oldWidth = element.offsetWidth;
-            on(key, function () {
-                var offsetWidth = element.offsetWidth;
-                if (offsetWidth !== oldWidth) {
-                    oldWidth = offsetWidth;
-                    handler();
-                }
-            });
-            return handler;
+        function onWidthChange(element, handler) {
+            return onSizeChange(element, handler, true, false);
         }
         LayoutTimer.onWidthChange = onWidthChange;
-        function onHeightChange(key, element, handler) {
-            var oldHeight = element.offsetHeight;
-            on(key, function () {
-                var offsetHeight = element.offsetHeight;
-                if (offsetHeight !== oldHeight) {
-                    oldHeight = offsetHeight;
-                    handler();
-                }
-            });
-            return handler;
+        function onHeightChange(element, handler) {
+            return onSizeChange(element, handler, false, true);
         }
         LayoutTimer.onHeightChange = onHeightChange;
-        function off(key, handler) {
-            if (key != null)
-                regs = regs.filter(function (x) { return x.key !== key; });
-            if (handler != null)
-                regs = regs.filter(function (x) { return x.handler === handler; });
-            !regs.length && this.clearTimer();
+        function onShown(element, handler) {
+            return onSizeChange(element, handler, false, false);
+        }
+        LayoutTimer.onShown = onShown;
+        function off(key) {
+            var reg = regs[key];
+            if (!reg)
+                return 0;
+            delete regs[key];
+            regCount--;
+            if (regCount <= 0)
+                clearTimer();
+            return 0;
         }
         LayoutTimer.off = off;
     })(LayoutTimer = Q.LayoutTimer || (Q.LayoutTimer = {}));
@@ -4468,93 +4493,29 @@ var Serenity;
     (function (LazyLoadHelper) {
         var autoIncrement = 0;
         function executeOnceWhenShown(element, callback) {
-            autoIncrement++;
-            var eventClass = 'ExecuteOnceWhenShown' + autoIncrement;
-            var executed = false;
-            if (element.is(':visible')) {
+            var el = element && element[0];
+            if (!el)
+                return;
+            if (el.offsetWidth > 0 && el.offsetHeight > 0) {
                 callback();
+                return;
             }
-            else {
-                var uiTabs = element.closest('.ui-tabs');
-                if (uiTabs.length > 0) {
-                    uiTabs.bind('tabsactivate.' + eventClass, function (e) {
-                        if (element.is(':visible')) {
-                            uiTabs.unbind('tabsactivate.' + eventClass);
-                            if (!executed) {
-                                executed = true;
-                                element.unbind('shown.' + eventClass);
-                                callback();
-                            }
-                        }
-                    });
-                }
-                var bsTabs = element.closest('.nav-tabs');
-                if (bsTabs.length > 0) {
-                    bsTabs.one('shown.bs.tab', function (e) {
-                        if (!executed && element.is(':visible')) {
-                            executed = true;
-                            callback();
-                        }
-                    });
-                }
-                var dialog;
-                if (element.hasClass('ui-dialog')) {
-                    dialog = element.children('.ui-dialog-content');
-                }
-                else {
-                    dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
-                }
-                if (dialog.length > 0) {
-                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, function () {
-                        dialog.unbind('dialogopen.' + eventClass);
-                        dialog.unbind('panelopen.' + eventClass);
-                        dialog.unbind('shown.bs.modal.' + eventClass);
-                        if (element.is(':visible') && !executed) {
-                            executed = true;
-                            element.unbind('shown.' + eventClass);
-                            callback();
-                        }
-                    });
-                }
-                element.bind('shown.' + eventClass, function () {
-                    if (element.is(':visible')) {
-                        element.unbind('shown.' + eventClass);
-                        if (!executed) {
-                            executed = true;
-                            callback();
-                        }
-                    }
-                });
-            }
+            var timer = Q.LayoutTimer.onShown(function () { return el; }, function () {
+                Q.LayoutTimer.off(timer);
+                callback();
+            });
         }
         LazyLoadHelper.executeOnceWhenShown = executeOnceWhenShown;
         function executeEverytimeWhenShown(element, callback, callNowIfVisible) {
-            autoIncrement++;
-            var eventClass = 'ExecuteEverytimeWhenShown' + autoIncrement;
-            var wasVisible = element.is(':visible');
-            if (wasVisible && callNowIfVisible) {
+            var el = element && element[0];
+            if (!el)
+                return;
+            if (callNowIfVisible && el.offsetWidth > 0 && el.offsetHeight > 0) {
                 callback();
             }
-            var check = function (e) {
-                if (element.is(':visible')) {
-                    if (!wasVisible) {
-                        wasVisible = true;
-                        callback();
-                    }
-                }
-                else {
-                    wasVisible = false;
-                }
-            };
-            var uiTabs = element.closest('.ui-tabs');
-            if (uiTabs.length > 0) {
-                uiTabs.bind('tabsactivate.' + eventClass, check);
-            }
-            var dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
-            if (dialog.length > 0) {
-                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, check);
-            }
-            element.bind('shown.' + eventClass, check);
+            Q.LayoutTimer.onShown(function () { return el; }, function () {
+                callback();
+            });
         }
         LazyLoadHelper.executeEverytimeWhenShown = executeEverytimeWhenShown;
     })(LazyLoadHelper = Serenity.LazyLoadHelper || (Serenity.LazyLoadHelper = {}));
@@ -15516,9 +15477,12 @@ var Serenity;
             var self = _this;
             _this.element.addClass('s-DataGrid').html('');
             _this.element.addClass('s-' + Q.getTypeName(Q.getInstanceType(_this)));
-            _this.element.addClass('require-layout').bind('layout.' + _this.uniqueName, function () {
+            var layout = function () {
                 self.layout();
-            });
+                Q.LayoutTimer.store(this.layoutTimer);
+            };
+            _this.element.addClass('require-layout').on('layout.' + _this.uniqueName, layout);
+            _this.layoutTimer = Q.LayoutTimer.onSizeChange(function () { return _this.element && _this.element[0]; }, Q.debounce(layout, 50));
             _this.setTitle(_this.getInitialTitle());
             var buttons = _this.getButtons();
             if (buttons != null) {
@@ -15551,7 +15515,7 @@ var Serenity;
             return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         };
         DataGrid.prototype.layout = function () {
-            if (!this.element.is(':visible') || this.slickContainer == null)
+            if (!this.element || !this.element.is(':visible') || this.slickContainer == null)
                 return;
             var responsiveHeight = this.element.hasClass('responsive-height');
             var madeAutoHeight = this.slickGrid != null && this.slickGrid.getOptions().autoHeight;
@@ -15691,6 +15655,9 @@ var Serenity;
             Serenity.GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields());
         };
         DataGrid.prototype.destroy = function () {
+            if (this.layoutTimer) {
+                this.layoutTimer = Q.LayoutTimer.off(this.layoutTimer);
+            }
             if (this.quickFiltersBar) {
                 this.quickFiltersBar.destroy();
                 this.quickFiltersBar = null;
