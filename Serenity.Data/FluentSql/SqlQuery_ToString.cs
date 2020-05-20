@@ -318,6 +318,12 @@ namespace Serenity.Data
                 sb.Append(forXml);
             }
 
+            if (!string.IsNullOrEmpty(forJson))
+            {
+                sb.Append(" FOR JSON ");
+                sb.Append(forJson);
+            }
+
             if (countRecords)
             {
                 if (!dialect.MultipleResultsets)
