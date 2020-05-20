@@ -24,6 +24,19 @@ namespace Serenity.Data
             return "SUM(" + field + ")";
         }
 
+        /// <summary>
+        /// Creates a SUM() expression
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        public static string Sum(IField field)
+        {
+            if (field == null)
+                throw new ArgumentNullException("field");
+
+            return "SUM(" + field.Expression + ")";
+        }
 
         /// <summary>
         /// Creates a COUNT() expression
@@ -36,6 +49,19 @@ namespace Serenity.Data
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
             return "COUNT(" + field + ")";
+        }
+
+        /// <summary>
+        /// Creates a COUNT() expression
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        public static string Count(IField field)
+        {
+            if (field == null)
+                throw new ArgumentNullException("field");
+            return "COUNT(" + field.Expression + ")";
         }
 
         /// <summary>
@@ -139,6 +165,20 @@ namespace Serenity.Data
             return "MIN(" + field + ")";
         }
 
+        /// <summary>
+        /// Creates a MIN() expression
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        public static string Min(IField field)
+        {
+            if (field == null)
+                throw new ArgumentNullException("field");
+
+            return "MIN(" + field.Expression + ")";
+        }
+
 
         /// <summary>
         /// Creates a MIN() expression.
@@ -167,6 +207,20 @@ namespace Serenity.Data
                 throw new ArgumentNullException("field");
 
             return "MAX(" + field + ")";
+        }
+
+        /// <summary>
+        /// Creates a MAX() expression.
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        public static string Max(IField field)
+        {
+            if (field == null)
+                throw new ArgumentNullException("field");
+
+            return "MAX(" + field.Expression + ")";
         }
 
         /// <summary>
@@ -211,6 +265,20 @@ namespace Serenity.Data
                 throw new ArgumentNullException("field");
 
             return "AVG(" + field + ")";
+        }
+
+        /// <summary>
+        /// Creates a AVG expression.
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        public static string Avg(IField field)
+        {
+            if (field == null)
+                throw new ArgumentNullException("field");
+
+            return "AVG(" + field.Expression + ")";
         }
 
         /// <summary>
