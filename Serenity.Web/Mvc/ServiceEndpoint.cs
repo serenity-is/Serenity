@@ -67,6 +67,7 @@ namespace Serenity.Services
                 this.connection = SqlConnections.NewByKey(connectionKey.Value);
                 context.ActionArguments[cnnParam.Name] = connection;
                 base.OnActionExecuting(context);
+                return;
             }
 
             base.OnActionExecuting(context);
