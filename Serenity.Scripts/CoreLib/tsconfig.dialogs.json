@@ -1,0 +1,26 @@
+﻿{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outFile": "../dist/dialogs/serenity-dialogs.js",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "./tsconfig.core.json"
+    },
+    {
+      "path": "./tsconfig.widget.json"
+    },
+    {
+      "path": "./tsconfig.forms.json"
+    }
+  ],
+  "files": [
+    "Q/Q.Router.ts",
+    "Q/Q.Layout.ts",
+    "UI/Dialogs/DialogExtensions.ts",
+    "UI/Dialogs/TemplatedDialog.ts",
+    "UI/Dialogs/PropertyDialog.ts",
+    "UI/Dialogs/EntityDialog.ts"
+  ]
+}

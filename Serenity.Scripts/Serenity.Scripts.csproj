@@ -4,36 +4,40 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Remove="node_modules\" />
-  </ItemGroup>
-
+ 
   <ItemGroup>
     <None Remove="CodeGeneration\tsconfig.json" />
-    <None Remove="CoreLib\tsconfig.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="CodeGeneration\tsconfig.json" />
-    <Content Include="CoreLib\tsconfig.json" />
+    <None Remove="CoreLib\**\tsconfig*.json" />
+    <Content Include="CoreLib\**\tsconfig*.json" />
+    <None Remove="node_modules\**" />
+    <Compile Remove="node_modules\**" />
+    <EmbeddedResource Remove="node_modules\**" />
+    <TypeScriptCompile Remove="node_modules\**" />
+    <ToTypescript Include="CoreLib\tsconfig.*.json"></ToTypescript>
+    <ToMinimize Include="dist\**\*.js"></ToMinimize>
+    <ToMinimize Remove="**\*.min.js"></ToMinimize>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="3.7.4">
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="3.8.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
   <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\@types\jquery\index.d.ts')">
     <Message Text="Installing NPM packages..." Importance="high">
     </Message>
     <Exec Command="cmd /c &quot;$(NpmPath)npm&quot; install" />
   </Target>
-  <Target Name="MinimizeCoreLib" AfterTargets="AfterBuild" Inputs="dist\Serenity.CoreLib.js" Outputs="dist\Serenity.CoreLib.min.js">
-    <Message Text="Minimizing Serenity.CoreLib.js..." Importance="high">
-    </Message>
-    <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)dist\Serenity.CoreLib.js&quot; -o &quot;$(ProjectDir)dist\Serenity.CoreLib.min.js&quot; --comments --mangle" />
+  <Target Name="CompileTSC" AfterTargets="AfterBuild">
+    <Message Text="Executing TypeScript compiler for %(ToTypescript.Identity)..." Importance="high"></Message>
+    <Exec Command="&quot;$(NodePath)\node&quot; &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -b &quot;$(ProjectDir)%(ToTypescript.Identity)&quot;" ContinueOnError="true" />
+  </Target>
+  <Target Name="MinimizeCoreLib" AfterTargets="AfterBuild" Inputs="dist\Serenity.CoreLib.*.js" Outputs="dist\Serenity.CoreLib.*.min.js">
+    <Message Text="Minimizing %(ToMinimize.Identity)..." Importance="high"></Message>
+    <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)%(ToMinimize.Identity)&quot; -o &quot;$(ProjectDir)dist\%(ToMinimize.RecursiveDir)%(ToMinimize.FileName).min.js&quot; --comments --mangle" />
   </Target>
   <Target Name="MinimizeCodeGeneration" AfterTargets="AfterBuild" Inputs="dist\Serenity.CodeGeneration.js" Outputs="dist\Serenity.CodeGeneration.min.js">
     <Message Text="Minimizing Serenity.CodeGeneration.js..." Importance="high">

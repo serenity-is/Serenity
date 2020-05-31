@@ -178,74 +178,46 @@
 				form.parent().remove();
 			}));
 			test('EmailValidationMethodWorks', ss.mkdel(this, function() {
-				var oldAscii = Q.Config.emailAllowOnlyAscii;
-				try {
-					var form = $Serenity_Test_EmailEditorTests.$createValidatedForm();
-					var validator = form.validate();
-					var input = $("<input type='text'/>").attr('name', 'dummy').appendTo(form);
-					var jq = $;
-					var $t1 = [false, true];
-					for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-						var onlyAscii = $t1[$t2];
-						Q.Config.emailAllowOnlyAscii = onlyAscii;
-						ok(!!jq.validator.methods.email.call(validator, 'x@y.com', input.val('x@y.com')[0]));
-						ok(!!jq.validator.methods.email.call(validator, 'some.user@somedomain.com', input.val('some.user@somedomain.com')[0]));
-						ok(!!jq.validator.methods.email.call(validator, 'some_user@some.domain.com.tr', input.val('some_user@some.domain.com.tr')[0]));
-						ok(!!!jq.validator.methods.email.call(validator, 'abcdef', input.val('abcdef')[0]));
-						ok(!!!jq.validator.methods.email.call(validator, 'xyz@', input.val('xyz@')[0]));
-						ok(!!!jq.validator.methods.email.call(validator, '@xyz', input.val('@xyz')[0]));
-						ok(!!!jq.validator.methods.email.call(validator, '@xyz.com', input.val('@xyz.com')[0]));
-						if (onlyAscii) {
-							deepEqual(false, jq.validator.methods.email.call(validator, 'êığş@ädomaın.com', input.val('êığş@ädomaın.com')[0]));
-						}
-					}
-					form.parent().remove();
-				}
-				finally {
-					Q.Config.emailAllowOnlyAscii = oldAscii;
-				}
+				var form = $Serenity_Test_EmailEditorTests.$createValidatedForm();
+				var validator = form.validate();
+				var input = $("<input type='text'/>").attr('name', 'dummy').appendTo(form);
+				var jq = $;
+				ok(!!jq.validator.methods.email.call(validator, 'x@y.com', input.val('x@y.com')[0]));
+				ok(!!jq.validator.methods.email.call(validator, 'some.user@somedomain.com', input.val('some.user@somedomain.com')[0]));
+				ok(!!jq.validator.methods.email.call(validator, 'some_user@some.domain.com.tr', input.val('some_user@some.domain.com.tr')[0]));
+				ok(!!!jq.validator.methods.email.call(validator, 'abcdef', input.val('abcdef')[0]));
+				ok(!!!jq.validator.methods.email.call(validator, 'xyz@', input.val('xyz@')[0]));
+				ok(!!!jq.validator.methods.email.call(validator, '@xyz', input.val('@xyz')[0]));
+				ok(!!!jq.validator.methods.email.call(validator, '@xyz.com', input.val('@xyz.com')[0]));
 			}));
 			test('EmailUserValidationMethodWorks', ss.mkdel(this, function() {
-				var oldAscii = Q.Config.emailAllowOnlyAscii;
-				try {
-					var form = $Serenity_Test_EmailEditorTests.$createValidatedForm();
-					var validator = form.validate();
-					var user = $("<input type='text' class='emailuser'/>").appendTo(form);
-					var domain = $("<input type='text' class='emaildomain'/>").appendTo(form);
-					var jq = $;
-					Serenity.EmailEditor.registerValidationMethods();
-					var $t1 = [false, true];
-					for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-						var domainReadOnly = $t1[$t2];
-						var $t3 = [false, true];
-						for (var $t4 = 0; $t4 < $t3.length; $t4++) {
-							var onlyAscii = $t3[$t4];
-							var title = (domainReadOnly ? 'domainreadonly_' : '');
-							title += (onlyAscii ? 'ascii_' : 'unicode_');
-							if (domainReadOnly) {
-								domain.attr('readonly', 'readonly');
-							}
-							else {
-								domain.removeAttr('readonly');
-							}
-							domain.val((onlyAscii ? 'ascii.domain.com' : 'unıcõde.domaîn.com'));
-							Q.Config.emailAllowOnlyAscii = onlyAscii;
-							ok(!!jq.validator.methods.emailuser.call(validator, 'x', user.val('x')[0]), title + '1');
-							ok(!!jq.validator.methods.emailuser.call(validator, 'some.user', user.val('some.user')[0]), title + '2');
-							domain.val('');
-							ok(!!!jq.validator.methods.emailuser.call(validator, ' ', user.val(' ')[0]), title + '3');
-							domain.val((onlyAscii ? 'ascii.domain.co.uk' : 'unıcõde.domaîn.co.uk'));
-							ok(!!jq.validator.methods.emailuser.call(validator, 'some_user', user.val('some_user')[0]), title + '4');
-							ok(!!!jq.validator.methods.emailuser.call(validator, 'xyz@', user.val('xyz@')[0]), title + '5');
-							ok(!!!jq.validator.methods.emailuser.call(validator, '@xyz', user.val('@xyz')[0]), title + '6');
-							ok(!!!jq.validator.methods.emailuser.call(validator, '@@', user.val('@@')[0]), title + '7');
-							deepEqual(!onlyAscii, jq.validator.methods.emailuser.call(validator, 'êığş', user.val('êığş')[0]), title + '8');
-						}
+				var form = $Serenity_Test_EmailEditorTests.$createValidatedForm();
+				var validator = form.validate();
+				var user = $("<input type='text' class='emailuser'/>").appendTo(form);
+				var domain = $("<input type='text' class='emaildomain'/>").appendTo(form);
+				var jq = $;
+				Serenity.EmailEditor.registerValidationMethods();
+				var $t1 = [false, true];
+				for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+					var domainReadOnly = $t1[$t2];
+					var title = (domainReadOnly ? 'domainreadonly_' : '');
+					if (domainReadOnly) {
+						domain.attr('readonly', 'readonly');
 					}
+					else {
+						domain.removeAttr('readonly');
+					}
+					domain.val('unıcõde.domaîn.com');
+					ok(!!jq.validator.methods.emailuser.call(validator, 'x', user.val('x')[0]), title + '1');
+					ok(!!jq.validator.methods.emailuser.call(validator, 'some.user', user.val('some.user')[0]), title + '2');
+					domain.val('');
+					ok(!!!jq.validator.methods.emailuser.call(validator, ' ', user.val(' ')[0]), title + '3');
+					domain.val('unıcõde.domaîn.co.uk');
+					ok(!!jq.validator.methods.emailuser.call(validator, 'some_user', user.val('some_user')[0]), title + '4');
+					ok(!!!jq.validator.methods.emailuser.call(validator, 'xyz@', user.val('xyz@')[0]), title + '5');
+					ok(!!!jq.validator.methods.emailuser.call(validator, '@xyz', user.val('@xyz')[0]), title + '6');
+					ok(!!!jq.validator.methods.emailuser.call(validator, '@@', user.val('@@')[0]), title + '7');
 					form.parent().remove();
-				}
-				finally {
-					Q.Config.emailAllowOnlyAscii = oldAscii;
 				}
 			}));
 			test('EmailEditorUserOnlyValidationWorks', ss.mkdel(this, function() {
@@ -507,83 +479,7 @@
 	});
 	ss.initClass($Serenity_Test_QDateTests, $asm, {
 		runTests: function() {
-			test('FormatDateWorks', ss.mkdel(this, function() {
-				var backupDec = Q.Culture.dateSeparator;
-				var backupDateFormat = Q.Culture.dateFormat;
-				var backupDateTimeFormat = Q.Culture.dateTimeFormat;
-				try {
-					Q.Culture.dateSeparator = '/';
-					Q.Culture.dateFormat = 'dd/MM/yyyy';
-					Q.Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
-					var date = new Date(2029, 0, 2, 3, 4, 5, 6);
-					// 02.01.2029 03:04:05.006
-					deepEqual(Q.formatDate(date, 'dd/MM/yyyy'), '02/01/2029', "'/': dd/MM/yyy");
-					deepEqual(Q.formatDate(date, 'd/M/yy'), '2/1/29', "'/': d/M/yy");
-					deepEqual(Q.formatDate(date, 'd.M.yyyy'), '2.1.2029', "'/': d.M.yyy");
-					deepEqual(Q.formatDate(date, 'yyyyMMdd'), '20290102', "'/': yyyyMMdd");
-					deepEqual(Q.formatDate(date, 'hh:mm tt'), '03:04 AM', "'/': hh:mm tt");
-					deepEqual(Q.formatDate(date, 'yyyy-MM-ddTHH:mm:ss.fff'), '2029-01-02T03:04:05.006', "'/': yyyy-MM-ddTHH:mm:ss.fff");
-					deepEqual(Q.formatDate(date, 'd'), '02/01/2029', "'/': d");
-					deepEqual(Q.formatDate(date, 'g'), '02/01/2029 03:04', "'/': g");
-					deepEqual(Q.formatDate(date, 'G'), '02/01/2029 03:04:05', "'/': G");
-					deepEqual(Q.formatDate(date, 's'), '2029-01-02T03:04:05', "'/': s");
-					deepEqual(Q.formatDate(date, 'u'), Q.formatISODateTimeUTC(date), "'/': u");
-					Q.Culture.dateSeparator = '.';
-					deepEqual(Q.formatDate(date, 'dd/MM/yyyy'), '02.01.2029', "'.': dd/MM/yyy");
-					deepEqual(Q.formatDate(date, 'd/M/yy'), '2.1.29', "'.': d/M/yy");
-					deepEqual(Q.formatDate(date, 'd-M-yyyy'), '2-1-2029', "'.': d-M-yyy");
-					deepEqual(Q.formatDate(date, 'yyyy-MM-ddTHH:mm:ss.fff'), '2029-01-02T03:04:05.006', "'.': yyyy-MM-ddTHH:mm:ss.fff");
-					deepEqual(Q.formatDate(date, 'g'), '02.01.2029 03:04', "'.': g");
-					deepEqual(Q.formatDate(date, 'G'), '02.01.2029 03:04:05', "'.': G");
-					deepEqual(Q.formatDate(date, 's'), '2029-01-02T03:04:05', "'.': s");
-					deepEqual(Q.formatDate(date, 'u'), Q.formatISODateTimeUTC(date), "'.': u");
-				}
-				finally {
-					Q.Culture.decimalSeparator = backupDec;
-					Q.Culture.dateFormat = backupDateFormat;
-					Q.Culture.dateTimeFormat = backupDateTimeFormat;
-				}
-			}));
-			test('FormatDateWorksWithISOString', ss.mkdel(this, function() {
-				var backupDec = Q.Culture.dateSeparator;
-				var backupDateFormat = Q.Culture.dateFormat;
-				var backupDateTimeFormat = Q.Culture.dateTimeFormat;
-				try {
-					Q.Culture.dateSeparator = '/';
-					Q.Culture.dateFormat = 'dd/MM/yyyy';
-					Q.Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
-					deepEqual(Q.formatDate('2029-01-02', null), '02/01/2029', "'/': date only, empty format");
-					deepEqual(Q.formatDate('2029-01-02T16:35:24', null), '02/01/2029', "'/': date with time, empty format");
-					deepEqual(Q.formatDate('2029-01-02T16:35:24', 'g'), '02/01/2029 16:35', "'/': date with time, g format");
-					Q.Culture.dateSeparator = '.';
-					deepEqual(Q.formatDate('2029-01-02', null), '02.01.2029', "'.': date only, empty format");
-					deepEqual(Q.formatDate('2029-01-02T16:35:24', null), '02.01.2029', "'.': date with time, empty format");
-					deepEqual(Q.formatDate('2029-01-02T16:35:24', 'g'), '02.01.2029 16:35', "'.': date with time, g format");
-				}
-				finally {
-					Q.Culture.decimalSeparator = backupDec;
-					Q.Culture.dateFormat = backupDateFormat;
-					Q.Culture.dateTimeFormat = backupDateTimeFormat;
-				}
-			}));
-			test('FormatDateWorksWithDateString', ss.mkdel(this, function() {
-				var backupDec = Q.Culture.dateSeparator;
-				var backupDateFormat = Q.Culture.dateFormat;
-				var backupDateTimeFormat = Q.Culture.dateTimeFormat;
-				try {
-					Q.Culture.dateSeparator = '/';
-					Q.Culture.dateFormat = 'dd/MM/yyyy';
-					Q.Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
-					deepEqual(Q.formatDate('2/1/2029', null), '02/01/2029', "'/': date only, empty format");
-					Q.Culture.dateSeparator = '.';
-					deepEqual(Q.formatDate('2/1/2029', null), '02.01.2029', "'.': date only, empty format");
-				}
-				finally {
-					Q.Culture.decimalSeparator = backupDec;
-					Q.Culture.dateFormat = backupDateFormat;
-					Q.Culture.dateTimeFormat = backupDateTimeFormat;
-				}
-			}));
+			
 		}
 	});
 	ss.initClass($Serenity_Test_QDialogTests, $asm, {
@@ -665,42 +561,6 @@
 				deepEqual(Q.htmlEncode('if (a < b && c > d) x = 5 & 3 else y = (u <> w)'), 'if (a &lt; b &amp;&amp; c &gt; d) x = 5 &amp; 3 else y = (u &lt;&gt; w)');
 				var q = window.window['Q'];
 				deepEqual(q.htmlEncode('<script&>'), '&lt;script&amp;&gt;', 'check direct script access');
-			}));
-		}
-	});
-	ss.initClass($Serenity_Test_QMethodTests, $asm, {
-		runTests: function() {
-			test('ToJSONWorks', ss.mkdel(this, function() {
-				deepEqual($.toJSON(12345), '12345', 'Number');
-				deepEqual($.toJSON('abcd"\'e'), '"abcd\\"\'e"', 'String');
-				var date = new Date(2013, 12, 27, 16, 19, 35, 345);
-				deepEqual($.toJSON(date), '"' + Q.formatISODateTimeUTC(date) + '"', 'Date/Time');
-				deepEqual($.toJSON(12345.678), '12345.678', 'Double');
-				var o = { num: 5, str: 'abc', date: date };
-				var json = $.toJSON(o);
-				ok(typeof(json) === 'string', 'Ensure serialized object is string');
-				var deserialized = $.parseJSON(json);
-				o.date = Q.formatISODateTimeUTC(date);
-				deepEqual(deserialized, o, 'Compare original object and deserialization');
-			}));
-			test('IsTrueWorks', ss.mkdel(this, function() {
-				deepEqual(!!1, true, '1 is true');
-				deepEqual(!!0, false, '0 is false');
-				deepEqual(!!null, false, 'null is false');
-				deepEqual(!!undefined, false, 'undefined is false');
-				deepEqual(!!'0', true, "'0' is true");
-				deepEqual(!!'1', true, "'1' is true");
-				deepEqual(!!'-1', true, "'-1' is true");
-				deepEqual(!!'xysa', true, 'any other value is true');
-			}));
-			test('IsFalseWorks', ss.mkdel(this, function() {
-				deepEqual(!1, false, '1 is false');
-				deepEqual(!0, true, '0 is true');
-				deepEqual(!null, true, 'null is true');
-				deepEqual(!undefined, true, 'undefined is true');
-				deepEqual(!'0', false, "'0' is false");
-				deepEqual(!'-1', false, '-1 is false');
-				deepEqual(!'xysa', false, 'any other value is false');
 			}));
 		}
 	});

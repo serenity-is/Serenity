@@ -13,7 +13,7 @@
 
             var widgetMarkup = this.getTemplate().replace(new RegExp('~_', 'g'), this.idPrefix);
 
-            // for compability with older templates based on JsRender
+            // for compatibility with older templates based on JsRender
             var end = 0;
             while (true) {
                 var idx = widgetMarkup.indexOf('{{text:"', end);
@@ -36,7 +36,7 @@
         }
 
         private byID<TWidget>(id: string, type: { new (...args: any[]): TWidget }) {
-            return Serenity.WX.getWidget(this.byId(id), type);
+            return this.byId(id).getWidget(type);
         }
 
         private static noGeneric(s: string): string {
@@ -48,14 +48,14 @@
         }
 
         private getDefaultTemplateName(): string {
-            return TemplatedWidget.noGeneric((ss as any).getTypeName(
-                (ss as any).getInstanceType(this)));
+            return TemplatedWidget.noGeneric(Q.getTypeName(
+                Q.getInstanceType(this)));
         }
 
         protected getTemplateName(): string {
 
-            var type = (ss as any).getInstanceType(this);
-            var fullName = (ss as any).getTypeFullName(type);
+            var type = Q.getInstanceType(this);
+            var fullName = Q.getTypeFullName(type);
 
             var templateNames = TemplatedWidget.templateNames;
 
@@ -65,7 +65,7 @@
             }
             
             while (type && type !== Serenity.Widget) {
-                var name = TemplatedWidget.noGeneric((ss as any).getTypeFullName(type));
+                var name = TemplatedWidget.noGeneric(Q.getTypeFullName(type));
 
                 for (let k of Q.Config.rootNamespaces) {
                     if (Q.startsWith(name, k + '.')) {
@@ -86,14 +86,14 @@
                     return name;
                 }
 
-                name = TemplatedWidget.noGeneric((ss as any).getTypeName(type));
+                name = TemplatedWidget.noGeneric(Q.getTypeName(type));
                 if (Q.canLoadScriptData('Template.' + name) ||
                     $('script#Template_' + name).length > 0) {
                     TemplatedWidget.templateNames[fullName] = name;
                     return name;
                 }
 
-                type = (ss as any).getBaseType(type);
+                type = Q.getBaseType(type);
             }
 
             templateNames[fullName] = cachedName = this.getDefaultTemplateName();
@@ -125,7 +125,7 @@
             if (template == null) {
                 throw new Error(Q.format(
                     "Can't locate template for widget '{0}' with name '{1}'!",
-                    (ss as any).getTypeName((ss as any).getInstanceType(this)), templateName));
+                    Q.getTypeName(Q.getInstanceType(this)), templateName));
             }
 
             return template;

@@ -42,13 +42,12 @@ interface PromiseConstructor {
 declare var Promise: PromiseConstructor;
 
 if (typeof Promise === "undefined") {
-    if (typeof (RSVP) !== "undefined") {
-        Promise = RSVP as any;
-    }
-    else if (typeof (jQuery) !== "undefined") {
+    // @ts-ignore check for global
+    if (typeof (RSVP) !== "undefined") Promise = RSVP as any;
+    else if (typeof ($) !== "undefined") {
         Promise = $.Deferred as any;
         (Promise as any).resolve = function (value?: any) {
-            return jQuery.Deferred().resolveWith(value);
+            return $.Deferred().resolveWith(value);
         }
     }
 }

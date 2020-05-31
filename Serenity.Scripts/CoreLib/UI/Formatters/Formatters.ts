@@ -121,22 +121,9 @@
                 return '';
             }
 
-            var name;
-            try {
-                name = (ss as any).Enum.toString(enumType, value);
-            }
-            catch (e) {
-                e = (ss.Exception as any).wrap(e);
-                if ((ss as any).isInstanceOfType(e, (ss as any).ArgumentException)) {
-                    name = value.toString();
-                }
-                else {
-                    throw e;
-                }
-            }
-
-            var enumKeyAttr = (ss as any).getAttributes(enumType, EnumKeyAttribute, false);
-            var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : (ss as any).getTypeFullName(enumType));
+            var name = Q.Enum.toString(enumType, value);
+            var enumKeyAttr = Q.getAttributes(enumType, EnumKeyAttribute, false);
+            var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : Q.getTypeFullName(enumType));
             return EnumFormatter.getText(enumKey, name);
         }
 
@@ -152,7 +139,7 @@
             if (value == null) {
                 return '';
             }
-            return (ss as any).Enum.toString(enumType, value);
+            return Q.Enum.toString(enumType, value);
         }
     }
 
@@ -160,14 +147,14 @@
     export class FileDownloadFormatter implements Slick.Formatter, IInitializeColumn {
 
         format(ctx: Slick.FormatterContext): string {
-            var dbFile = (ss as any).safeCast(ctx.value, String);
+            var dbFile = Q.safeCast(ctx.value, String);
             if (Q.isEmptyOrNull(dbFile)) {
                 return '';
             }
 
             var downloadUrl = FileDownloadFormatter.dbFileUrl(dbFile);
             var originalName = (!Q.isEmptyOrNull(this.originalNameProperty) ?
-                (ss as any).safeCast(ctx.item[this.originalNameProperty], String) : null);
+                Q.safeCast(ctx.item[this.originalNameProperty], String) : null);
 
             originalName = Q.coalesce(originalName, '');
             var text = Q.format(Q.coalesce(this.displayFormat, '{0}'),
@@ -346,25 +333,19 @@
             }
 
             knownTypes = {};
-            var assemblies = (ss as any).getAssemblies();
-            for (var assembly of assemblies) {
-                var types = (ss as any).getAssemblyTypes(assembly);
-                for (var type of types) {
-                    if (!(ss as any).isAssignableFrom(Serenity.ISlickFormatter, type))
-                        continue;
+            var types = Q.getTypes();
+            for (var type of types) {
+                if (!Q.isAssignableFrom(Serenity.ISlickFormatter, type))
+                    continue;
                     
-                    if ((ss as any).isGenericTypeDefinition(type))
-                        continue;
-                    
-                    var fullName = (ss as any).getTypeFullName(type).toLowerCase();
-                    knownTypes[fullName] = type;
+                var fullName = Q.getTypeFullName(type).toLowerCase();
+                knownTypes[fullName] = type;
 
-                    for (var k of Q.Config.rootNamespaces) {
-                        if (Q.startsWith(fullName, k.toLowerCase() + '.')) {
-                            var kx = fullName.substr(k.length + 1).toLowerCase();
-                            if (knownTypes[kx] == null) {
-                                knownTypes[kx] = type;
-                            }
+                for (var k of Q.Config.rootNamespaces) {
+                    if (Q.startsWith(fullName, k.toLowerCase() + '.')) {
+                        var kx = fullName.substr(k.length + 1).toLowerCase();
+                        if (knownTypes[kx] == null) {
+                            knownTypes[kx] = type;
                         }
                     }
                 }
@@ -375,13 +356,13 @@
 
         export function get(key: string): Function {
             if (Q.isEmptyOrNull(key)) 
-                throw new (ss as any).ArgumentNullException('key');
+                throw new Q.ArgumentNullException('key');
             
             initialize();
 
             var formatterType = knownTypes[key.toLowerCase()];
             if (formatterType == null) {
-                throw new ss.Exception(Q.format(
+                throw new Q.Exception(Q.format(
                     "Can't find {0} formatter type!", key));
             }
 

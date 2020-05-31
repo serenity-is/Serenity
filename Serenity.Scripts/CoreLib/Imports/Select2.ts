@@ -12,6 +12,13 @@ interface Select2QueryOptions {
     callback?: (p1: Select2Result) => void;
 }
 
+interface Select2Item {
+    id: string;
+    text: string;
+    source?: any;
+    disabled?: boolean;
+}
+
 interface Select2Result {
     results: any;
     more: boolean;

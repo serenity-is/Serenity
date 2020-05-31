@@ -1,8 +1,5 @@
 ﻿namespace Serenity {
 
-    @Decorators.registerInterface('Serenity.IAsyncInit')
-    export class IAsyncInit {
-    }
 
     export interface WidgetClass<TOptions = object> {
         new(element: JQuery, options?: TOptions): Widget<TOptions>;
@@ -16,7 +13,7 @@
 
     export type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
 
-    if (typeof React === "undefined") {
+    if (typeof React === "undefined" && typeof window !== "undefined") {
         if (window['preact'] != null) {
             window['React'] = window['ReactDOM'] = window['preact'];
             (React as any).Fragment = Q.coalesce((React as any).Fragment, "x-fragment");
@@ -44,7 +41,6 @@
         protected options: TOptions;
         protected widgetName: string;
         protected uniqueName: string;
-        protected asyncPromise: PromiseLike<void>;
 
         constructor(element: JQuery, options?: TOptions) {
             super(options);
@@ -52,14 +48,14 @@
             this.element = element;
             this.options = options || ({} as TOptions);
 
-            this.widgetName = Widget.getWidgetName((ss as any).getInstanceType(this));
+            this.widgetName = Widget.getWidgetName(Q.getInstanceType(this));
             this.uniqueName = this.widgetName + (Widget.nextWidgetNumber++).toString();
 
             if (element.data(this.widgetName)) {
-                throw new ss.Exception(Q.format("The element already has widget '{0}'!", this.widgetName));
+                throw new Q.Exception(Q.format("The element already has widget '{0}'!", this.widgetName));
             }
 
-            element.bind('remove.' + this.widgetName, e => {
+            element.on('remove.' + this.widgetName, e => {
                 if (e.bubbles || e.cancelable) {
                     return;
                 }
@@ -67,21 +63,14 @@
             }).data(this.widgetName, this);
 
             this.addCssClass();
-
-            if (this.isAsyncWidget()) {
-                window.setTimeout(() => {
-                    if (element && !this.asyncPromise) {
-                        this.asyncPromise = this.initializeAsync();
-                    }
-                }, 0);
-            }
         }
 
         public destroy(): void {
-            this.element.removeClass('s-' + (ss as any).getTypeName((ss as any).getInstanceType(this)));
-            this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
-            this.element = null;
-            this.asyncPromise = null;
+            if (this.element) {
+                this.element.removeClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
+                this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
+                this.element = null;
+            }
         }
 
         protected addCssClass(): void {
@@ -89,9 +78,9 @@
         }
 
         protected getCssClass(): string {
-            var type = (ss as any).getInstanceType(this);
-            var klass = 's-' + (ss as any).getTypeName(type);
-            var fullClass = Q.replaceAll((ss as any).getTypeFullName(type), '.', '-');
+            var type = Q.getInstanceType(this);
+            var klass = 's-' + Q.getTypeName(type);
+            var fullClass = Q.replaceAll(Q.getTypeFullName(type), '.', '-');
 
             for (let k of Q.Config.rootNamespaces) {
                 if (Q.startsWith(fullClass, k + '-')) {
@@ -108,28 +97,39 @@
             return klass + ' ' + fullClass;
         }
 
-        protected initializeAsync(): PromiseLike<void> {
-            return Promise.resolve();
-        }
-
-        protected isAsyncWidget(): boolean {
-            return (ss as any).isInstanceOfType(this, Serenity.IAsyncInit);
-        }
-
         public static getWidgetName(type: Function): string {
-            return Q.replaceAll((ss as any).getTypeFullName(type), '.', '_');
+            return Q.replaceAll(Q.getTypeFullName(type), '.', '_');
         }
 
         public static elementFor<TWidget>(editorType: { new (...args: any[]): TWidget }): JQuery {
-            var elementAttr = (ss as any).getAttributes(editorType, Serenity.ElementAttribute, true);
+            var elementAttr = Q.getAttributes(editorType, Serenity.ElementAttribute, true);
             var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>');
             return $(elementHtml);
+        };
+
+        public addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery {
+            return Q.addValidationRule(this.element, eventClass, rule);
+        }   
+
+        public getGridField(): JQuery {
+            return this.element.closest('.field');
+        } 
+
+        public change(handler: (e: JQueryEventObject) => void) {
+            this.element.on('change.' + this.uniqueName, handler);
+        };
+
+        public changeSelect2(handler: (e: JQueryEventObject) => void) {
+            this.element.on('change.' + this.uniqueName, function(e) {
+                if (!$(e.target).hasClass('select2-change-triggered'))
+                    handler(e);
+            });
         };
 
         public static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>) {
             let widget: TWidget;
 
-            if ((ss as any).isAssignableFrom(Serenity.IDialog, params.type)) {
+            if (Q.isAssignableFrom(Serenity.IDialog, params.type)) {
                 widget = new (params.type as any)(params.options);
                 if (params.container)
                     widget.element.appendTo(params.container);
@@ -143,38 +143,74 @@
                 widget = new params.type(e, params.options);
             }
 
-            if (widget.isAsyncWidget())
-                widget.init(params.init);
-            else {
-                widget.init(null);
-                params.init && params.init(widget);
-            }
+            widget.init(null);
+            params.init && params.init(widget);
 
             return widget;
         }
 
-        public init(action?: (widget: any) => void): this {
-            var promise = this.initialize();
-            if (action) {
-                promise.then(() => action(this));
-            }
-            return this;
+        public initialize(): void {
         }
 
-        public initialize(): PromiseLike<void> {
-            if (!this.isAsyncWidget()) {
-                return Promise.resolve();
-            }
-
-            if (!this.asyncPromise) {
-                this.asyncPromise = this.initializeAsync();
-            }
-
-            return this.asyncPromise;
+        public init(action?: (widget: any) => void): this {
+            action && action(this);
+            return this;
         }
 
         private static __isWidgetType = true;
         props: Readonly<{ children?: React.ReactNode }> & Readonly<TOptions> & WidgetComponentProps<this>;
+    }
+
+    if (typeof $ !== "undefined" && $.fn) {
+        $.fn.tryGetWidget = function (this: JQuery, type: any) {
+            var element = this;
+            var w;
+            if (Q.isAssignableFrom(Serenity.Widget, type)) {
+                var widgetName = Widget.getWidgetName(type);
+                w = element.data(widgetName);
+                if (w != null && !Q.isAssignableFrom(type, Q.getInstanceType(w))) {
+                    w = null;
+                }
+                if (w != null) {
+                    return w;
+                }
+            }
+
+            var data = element.data();
+            if (data == null) {
+                return null;
+            }
+
+            for (var key of Object.keys(data)) {
+                w = data[key];
+                if (w != null && Q.isAssignableFrom(type, Q.getInstanceType(w))) {
+                    return w;
+                }
+            }
+
+            return null;
+        };
+
+        $.fn.getWidget = function (this: JQuery, type: any) {
+            if (this == null) {
+                throw new Q.ArgumentNullException('element');
+            }
+            if (this.length === 0) {
+                throw new Q.Exception(Q.format("Searching for widget of type '{0}' on a non-existent element! ({1})",
+                    Q.getTypeFullName(type), this.selector));
+            }
+
+            var w = this.tryGetWidget(type);
+            if (w == null) {
+                var message = Q.format("Element has no widget of type '{0}'! If you have recently changed " +
+                    "editor type of a property in a form class, or changed data type in row (which also changes " +
+                    "editor type) your script side Form definition might be out of date. Make sure your project " +
+                    "builds successfully and transform T4 templates", Q.getTypeFullName(type));
+                Q.notifyError(message, '', null);
+                throw new Q.Exception(message);
+            }
+            return w;
+        };
     }
 
     export interface WidgetComponentProps<W extends Serenity.Widget<any>> {
@@ -194,13 +230,13 @@
     }
 
     export declare interface Widget<TOptions> {
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        getGridField(): JQuery;
         change(handler: (e: JQueryEventObject) => void): void;
         changeSelect2(handler: (e: JQueryEventObject) => void): void;
     }
-
-    Widget.prototype.addValidationRule = function (eventClass: string, rule: (p1: JQuery) => string): JQuery {
-        return VX.addValidationRule(this.element, eventClass, rule);
-    }
 }
+
+interface JQuery {
+    getWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
+    tryGetWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
+}
+

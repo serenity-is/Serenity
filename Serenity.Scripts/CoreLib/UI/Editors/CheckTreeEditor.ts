@@ -1,5 +1,16 @@
 ﻿namespace Serenity {
 
+    export interface CheckTreeItem<TSource> {
+        isSelected?: boolean;
+        hideCheckBox?: boolean;
+        isAllDescendantsSelected?: boolean;
+        id?: string;
+        text?: string;
+        parentId?: string;
+        children?: CheckTreeItem<TSource>[];
+        source?: TSource;
+    }
+
     @Serenity.Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
     @Serenity.Decorators.element("<div/>")
     export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends DataGrid<TItem, TOptions>
@@ -353,11 +364,11 @@
                 if (y.isSelected && !x1.isSelected) {
                     return 1;
                 }
-                var c = Q.turkishLocaleCompare(x1.text, y.text);
+                var c = Q.Culture.stringCompare(x1.text, y.text);
                 if (c !== 0) {
                     return c;
                 }
-                return (ss as any).compare(oldIndexes[x1.id], oldIndexes[y.id]);
+                return oldIndexes[x1.id] < oldIndexes[y.id] ? -1 : (oldIndexes[x1.id] > oldIndexes[y.id] ? 1 : 0);
             });
 
             this.view.setItems(list, true);

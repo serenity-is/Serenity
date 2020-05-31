@@ -1,4 +1,38 @@
 ﻿namespace Serenity {
+
+    export interface SettingStorage {
+        getItem(key: string): string;
+        setItem(key: string, value: string): void;
+    }
+
+    export interface PersistedGridColumn {
+        id: string;
+        width?: number;
+        sort?: number;
+        visible?: boolean;
+    }
+
+    export interface PersistedGridSettings {
+        columns?: PersistedGridColumn[];
+        filterItems?: FilterLine[];
+        quickFilters?: Q.Dictionary<any>;
+        quickFilterText?: string;
+        quickSearchField?: QuickSearchField;
+        quickSearchText?: string;
+        includeDeleted?: boolean;
+    }
+
+    export interface GridPersistanceFlags {
+        columnWidths?: boolean;
+        columnVisibility?: boolean;
+        sortColumns?: boolean;
+        filterItems?: boolean;
+        quickFilters?: boolean;
+        quickFilterText?: boolean;
+        quickSearch?: boolean;
+        includeDeleted?: boolean;
+    }
+
     export interface IDataGrid {
         getElement(): JQuery;
         getGrid(): Slick.Grid;
@@ -44,7 +78,7 @@
             var self = this;
 
             this.element.addClass('s-DataGrid').html('');
-            this.element.addClass('s-' + (ss as any).getTypeName((ss as any).getInstanceType(this)));
+            this.element.addClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
             this.element.addClass('require-layout').bind('layout.' + this.uniqueName, function () {
                 self.layout();
             });
@@ -80,15 +114,13 @@
             this.updateDisabledState();
             this.updateInterface();
 
-            if (!this.isAsyncWidget()) {
-                this.initialSettings = this.getCurrentSettings(null);
-                this.restoreSettings(null, null);
-                window.setTimeout(() => this.initialPopulate(), 0);
-            }
+            this.initialSettings = this.getCurrentSettings(null);
+            this.restoreSettings(null, null);
+            window.setTimeout(() => this.initialPopulate(), 0);
         }
 
         protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
-            return (ss as any).getAttributes((ss as any).getInstanceType(this), attrType, true);
+            return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         }
 
         protected layout(): void {
@@ -169,8 +201,62 @@
                     x.sourceItem.quickFilter === true &&
                     (x.sourceItem.readPermission == null ||
                         Q.Authorization.hasPermission(x.sourceItem.readPermission));
-            }).map(x => QuickFilterBar.propertyItemToQuickFilter(x.sourceItem))
+            }).map(x => DataGrid.propertyItemToQuickFilter(x.sourceItem))
                 .filter(x => x != null);
+        }
+
+        public static propertyItemToQuickFilter(item: PropertyItem) {
+            var quick: any = {};
+
+            var name = item.name;
+            var title = Q.tryGetText(item.title);
+            if (title == null) {
+                title = item.title;
+                if (title == null) {
+                    title = name;
+                }
+            }
+
+            var filteringType = Serenity.FilteringTypeRegistry.get(Q.coalesce(item.filteringType, 'String'));
+            if (filteringType === Serenity.DateFiltering) {
+                quick = QuickFilterBar.dateRange(name, title);
+            }
+            else if (filteringType === Serenity.DateTimeFiltering) {
+                quick = QuickFilterBar.dateTimeRange(name, title);
+            }
+            else if (filteringType === Serenity.BooleanFiltering) {
+                var q = item.quickFilterParams || {};
+                var f = item.filteringParams || {};
+                var trueText = q['trueText'];
+                if (trueText == null) {
+                    trueText = f['trueText'];
+                }
+                var falseText = q['falseText'];
+                if (falseText == null) {
+                    falseText = f['falseText'];
+                }
+                quick = QuickFilterBar.boolean(name, title, trueText, falseText);
+            }
+            else {
+                var filtering = new (filteringType as any)() as IFiltering;
+                if (filtering && Q.isInstanceOfType(filtering, Serenity.IQuickFiltering)) {
+                    Serenity.ReflectionOptionsSetter.set(filtering, item.filteringParams);
+                    filtering.set_field(item);
+                    filtering.set_operator({ key: Serenity.FilterOperators.EQ });
+                    (filtering as any).initQuickFilter(quick);
+                    quick.options = Q.extend(Q.deepClone(quick.options), item.quickFilterParams);
+                }
+                else {
+                    return null;
+                }
+            }
+
+            if (!!item.quickFilterSeparator) {
+                quick.separator = true;
+            }
+
+            quick.cssClass = item.quickFilterCssClass;
+            return quick;
         }
 
         protected findQuickFilter<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
@@ -322,41 +408,14 @@
             });
         }
 
-        protected initializeAsync(): PromiseLike<void> {
-            return super.initializeAsync()
-                .then<Slick.Column[]>(() => this.getColumnsAsync())
-                .then(columns => {
-                    this.allColumns = columns;
-                this.postProcessColumns(this.allColumns);
-                this.filterBar && this.initializeFilterBar();
-
-                var visibleColumns = this.allColumns.filter(function (x2) {
-                    return x2.visible !== false;
-                });
-
-                if (this.slickGrid) {
-                    this.slickGrid.setColumns(visibleColumns);
-                }
-                this.setInitialSortOrder();
-                this.initialSettings = this.getCurrentSettings(null);
-                this.restoreSettings(null, null);
-                this.initialPopulate();
-            }, null);
-        }
-
         protected createSlickGrid(): Slick.Grid {
 
             var visibleColumns: Slick.Column[];
 
-            if (this.isAsyncWidget()) {
-                visibleColumns = [];
-            }
-            else {
-                this.allColumns = this.getColumns();
-                visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
-                    return x.visible !== false;
-                });
-            }
+            this.allColumns = this.getColumns();
+            visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
+                return x.visible !== false;
+            });
 
             var slickOptions = this.getSlickOptions();
             var grid = new Slick.Grid(this.slickContainer, this.view as any, visibleColumns, slickOptions);
@@ -366,9 +425,8 @@
 
             this.slickGrid = grid;
             this.rows = this.slickGrid;
-            if (!this.isAsyncWidget()) {
-                this.setInitialSortOrder();
-            }
+            
+            this.setInitialSortOrder();
 
             return grid;
         }
@@ -383,7 +441,7 @@
             var mapped = sortBy.map(function (s) {
                 var x: Slick.ColumnSort = {};
                 if (s && Q.endsWith(s.toLowerCase(), ' desc')) {
-                    x.columnId = (ss as any).trimEndString(s.substr(0, s.length - 5));
+                    x.columnId = Q.trimEnd(s.substr(0, s.length - 5));
                     x.sortAsc = false;
                 }
                 else {
@@ -473,7 +531,7 @@
         }
 
         protected editItem(entityOrId: any): void {
-            throw new (ss as any).NotImplementedException();
+            throw new Error("Not Implemented!");
         }
 
         protected editItemOfType(itemType: string, entityOrId: any): void {
@@ -482,7 +540,7 @@
                 return;
             }
 
-            throw new (ss as any).NotImplementedException();
+            throw new Error("Not Implemented!");
         }
 
         protected onClick(e: JQueryEventObject, row: number, cell: number): void {
@@ -606,7 +664,7 @@
 
                 if (columns.length > 0) {
                     columns.sort(function (x1, y) {
-                        return (ss as any).compare(Math.abs(x1.sortOrder), Math.abs(y.sortOrder));
+                        return x1.sortOrder < y.sortOrder ? -1 : (x1.sortOrder > y.sortOrder ? 1 : 0);
                     });
 
                     var list = [];
@@ -637,10 +695,8 @@
 
         protected createFilterBar(): void {
             var filterBarDiv = $('<div/>').appendTo(this.element);
-            var self = this;
             this.filterBar = new Serenity.FilterDisplayBar(filterBarDiv);
-            if (!this.isAsyncWidget())
-                this.initializeFilterBar();
+            this.initializeFilterBar();
         }
 
         protected getPagerOptions(): Slick.PagerOptions {
@@ -653,7 +709,7 @@
 
         protected createPager(): void {
             var pagerDiv = $('<div></div>').appendTo(this.element);
-            pagerDiv.slickPager(this.getPagerOptions());
+            new SlickPager(pagerDiv, this.getPagerOptions());
         }
 
         protected getViewOptions() {
@@ -738,17 +794,6 @@
             return null;
         }
 
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]> {
-            return Promise.resolve()
-                .then<PropertyItem[]>(() => {
-                    var columnsKey = this.getColumnsKey();
-                    if (!Q.isEmptyOrNull(columnsKey)) {
-                        return Q.getColumnsAsync(columnsKey);
-                    }
-                    return Promise.resolve<PropertyItem[]>([]);
-                }, null);
-        }
-
         protected getPropertyItems(): PropertyItem[] {
             var attr = this.attrs(Serenity.ColumnsKeyAttribute);
 
@@ -776,15 +821,15 @@
                     column.format = this.itemLink(
                         item.editLinkItemType != null ? item.editLinkItemType : null,
                         item.editLinkIdField != null ? item.editLinkIdField : null,
-                        (ss as any).mkdel({ oldFormat: oldFormat }, function(ctx: Slick.FormatterContext) {
+                        function(ctx: Slick.FormatterContext) {
                             if (this.oldFormat.$ != null) {
                                 return this.oldFormat.$(ctx);
                             }
                             return Q.htmlEncode(ctx.value);
-                        }),
-                        (ss as any).mkdel({ css: css }, function(ctx1: Slick.FormatterContext) {
+                        }.bind({ oldFormat: oldFormat }),
+                        function(ctx1: Slick.FormatterContext) {
                             return Q.coalesce(this.css.$, '');
-                        }), false);
+                        }.bind({ css: css }), false);
 
                     if (!Q.isEmptyOrNull(item.editLinkIdField)) {
                         column.referencedFields = column.referencedFields || [];
@@ -793,12 +838,6 @@
                 }
             }
             return columns;
-        }
-
-        protected getColumnsAsync(): PromiseLike<Slick.Column[]> {
-            return this.getPropertyItemsAsync().then(propertyItems => {
-                return this.propertyItemsToSlickColumns(propertyItems);
-            }, null);
         }
 
         protected getSlickOptions(): Slick.GridOptions {
@@ -1015,7 +1054,7 @@
                 key += path.substr(1).split(String.fromCharCode(47)).slice(0, 2).join('/') + ':';
             }
 
-            key += (ss as any).getTypeFullName((ss as any).getInstanceType(this));
+            key += Q.getTypeFullName(Q.getInstanceType(this));
             return key;
         }
 
@@ -1155,8 +1194,9 @@
                     flags.filterItems !== false &&
                     this.filterBar != null &&
                     this.filterBar.get_store() != null) {
-                    (ss as any).clear(this.filterBar.get_store().get_items());
-                    (ss as any).arrayAddRange(this.filterBar.get_store().get_items(), settings.filterItems);
+                    var items = this.filterBar.get_store().get_items();
+                    items.length = 0;
+                    items.push.apply(items, settings.filterItems);
                     this.filterBar.get_store().raiseChanged();
                 }
 
@@ -1245,26 +1285,22 @@
             var settings: PersistedGridSettings = {};
             if (flags.columnVisibility !== false || flags.columnWidths !== false || flags.sortColumns !== false) {
                 settings.columns = [];
-                var sortColumns = this.slickGrid.getSortColumns();
-                var $t1 = this.slickGrid.getColumns();
-                for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-                    var column = { $: $t1[$t2] };
+                var sortColumns = this.slickGrid.getSortColumns() as any[];
+                var columns = this.slickGrid.getColumns();
+                for (var column of columns) {
                     var p: PersistedGridColumn = {
-                        id: column.$.id
+                        id: column.id
                     };
 
                     if (flags.columnVisibility !== false) {
                         p.visible = true;
                     }
                     if (flags.columnWidths !== false) {
-                        p.width = column.$.width;
+                        p.width = column.width;
                     }
 
                     if (flags.sortColumns !== false) {
-                        var sort = Q.indexOf(sortColumns, (ss as any).mkdel({ column: column }, function(x: Slick.ColumnSort) {
-                            return x.columnId === this.column.$.id;
-                        }));
-
+                        var sort = Q.indexOf(sortColumns, x => x.columnId == column.id);
                         p.sort = ((sort >= 0) ? ((sortColumns[sort].sortAsc !== false) ? (sort + 1) : (-sort - 1)) : 0);
                     }
                     settings.columns.push(p);

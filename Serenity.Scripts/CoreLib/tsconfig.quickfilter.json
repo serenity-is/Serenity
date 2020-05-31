@@ -1,0 +1,23 @@
+﻿{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outFile": "../dist/quickfilter/serenity-quickfilter.js",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "./tsconfig.core.json" 
+    },
+    {
+      "path": "./tsconfig.widget.json"
+    },
+    {
+      "path": "./tsconfig.editors.json"
+    }
+  ],
+  "files": [
+    "UI/Filtering/QuickFilter.ts",
+    "UI/Filtering/QuickFilterBar.ts",
+    "UI/Filtering/QuickSearchInput.ts",
+  ]
+}

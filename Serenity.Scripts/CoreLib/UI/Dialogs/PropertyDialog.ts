@@ -1,5 +1,7 @@
 ﻿namespace Serenity {
 
+    export type DialogButton = JQueryUI.DialogButtonOptions;
+
     @Decorators.registerClass('Serenity.PropertyDialog')
     export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
         protected _entity: TItem;
@@ -8,10 +10,8 @@
         constructor(opt?: TOptions) {
             super(opt);
 
-            if (!this.isAsyncWidget()) {
-                this.initPropertyGrid();
-                this.loadInitialEntity();
-            }
+            this.initPropertyGrid();
+            this.loadInitialEntity();
         }
 
         destroy() {
@@ -28,30 +28,13 @@
             super.destroy();
         }
 
-        protected initPropertyGridAsync() {
-            return Promise.resolve().then(() => {
-                var pgDiv = this.byId('PropertyGrid');
-                if (pgDiv.length <= 0) {
-                    return Promise.resolve();
-                }
-                return this.getPropertyGridOptionsAsync().then(pgOptions => {
-                    this.propertyGrid = new Serenity.PropertyGrid(pgDiv, pgOptions);
-                    if (this.element.closest('.ui-dialog').hasClass('s-Flexify')) {
-                        this.propertyGrid.element.children('.categories').flexHeightOnly(1);
-                    }
-                    return this.propertyGrid.initialize();
-                });
-            });
-        }
-
         protected getDialogOptions() {
             var opt = super.getDialogOptions();
-            opt.buttons = this.getDialogButtons();
             opt.width = 400;
             return opt;
         }
 
-        protected getDialogButtons(): JQueryUI.DialogButtonOptions[] {
+        protected getDialogButtons() {
             return [{
                 text: Q.text('Dialogs.OkButton'),
                 click: () => this.okClick()
@@ -90,13 +73,13 @@
         }
 
         protected getFormKey(): string {
-            var attributes = (ss as any).getAttributes(
-                (ss as any).getInstanceType(this), Serenity.FormKeyAttribute, true);
+            var attributes = Q.getAttributes(
+                Q.getInstanceType(this), Serenity.FormKeyAttribute, true);
             if (attributes.length >= 1) {
                 return attributes[0].value;
             }
             else {
-                var name = (ss as any).getTypeFullName((ss as any).getInstanceType(this));
+                var name = Q.getTypeFullName(Q.getInstanceType(this));
                 var px = name.indexOf('.');
                 if (px >= 0) {
                     name = name.substring(px + 1);
@@ -121,27 +104,9 @@
             };
         }
 
-        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions> {
-            return this.getPropertyItemsAsync().then(propertyItems => {
-                return {
-                    idPrefix: this.idPrefix,
-                    items: propertyItems, mode: 1,
-                    useCategories: false,
-                    localTextPrefix: 'Forms.' + this.getFormKey() + '.'
-                };
-            });
-        }
-
         protected getPropertyItems(): PropertyItem[] {
             var formKey = this.getFormKey();
             return Q.getForm(formKey);
-        }
-
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]> {
-            return Promise.resolve().then(() => {
-                var formKey = this.getFormKey();
-                return Q.getFormAsync(formKey);
-            });
         }
 
         protected getSaveEntity(): TItem {
@@ -150,12 +115,6 @@
                 this.propertyGrid.save(entity);
             }
             return entity as TItem;
-        }
-
-        protected initializeAsync(): PromiseLike<void> {
-            return super.initializeAsync()
-                .then(() => this.initPropertyGridAsync())
-                .then(() => this.loadInitialEntity());
         }
 
         protected loadInitialEntity(): void {

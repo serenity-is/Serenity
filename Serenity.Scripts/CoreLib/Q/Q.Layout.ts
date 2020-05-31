@@ -44,7 +44,7 @@
         });
 
         // ugly, but to it is to make old pages work without having to add this
-        Q.Router.resolve();
+        Q["Router"] && Q["Router"].resolve && Q["Router"].resolve();
     }
 
     export function layoutFillHeightValue(element: JQuery) {
@@ -72,7 +72,7 @@
 
     export function setMobileDeviceMode() {
         let isMobile = navigator.userAgent.indexOf('Mobi') >= 0 ||
-            window.matchMedia('(max-width: 767px)').matches;
+            (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
 
         let body = $(document.body);
         if (body.hasClass('mobile-device')) {
@@ -84,6 +84,21 @@
             body.addClass('mobile-device');
         }
     }
+
+    setMobileDeviceMode();
+    $(function() {
+        if (globalObj && Q.Config.rootNamespaces) {
+            for (var ns of Q.Config.rootNamespaces) {
+                var obj = getNested(globalObj, ns);
+                if (obj != null)
+                    initializeTypes(obj, ns + ".", 3);
+            }
+        }
+
+        globalObj && $(globalObj).bind('resize', function () {
+            setMobileDeviceMode();
+        });
+    });
 
     export function triggerLayoutOnShow(element: JQuery) {
         Serenity.LazyLoadHelper.executeEverytimeWhenShown(element, function () {

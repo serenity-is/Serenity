@@ -1,6 +1,11 @@
 ﻿(function() {
 	'use strict';
 	var $asm = {};
+	var old = ss.initClass;
+	ss.initClass = function (ctor, asm, members, baseType, interfaces) {
+		old(ctor, asm, members, baseType, interfaces);
+		Serenity.Decorators.registerClass()(ctor);
+    }
 	global.EditorTypeRegistryTestNamespace = global.EditorTypeRegistryTestNamespace || {};
 	global.FormatterTypeRegistryTestNamespace = global.FormatterTypeRegistryTestNamespace || {};
 	global.Serenity = global.Serenity || {};
@@ -149,8 +154,8 @@
 				strictEqual($EditorTypeRegistryTestNamespace_DummyEditor, Serenity.EditorTypeRegistry.get('EditorTypeRegistryTestNamespace.DummyEditor'), 'with namespace and suffix');
 				throws(function() {
 					Serenity.EditorTypeRegistry.get('DummyEditor');
-				}, function() {
-					return ss.isInstanceOfType(arguments[0], ss.Exception);
+				}, function(err) {
+						return err.toString().indexOf('Can\'t find Dummy') >= 0;
 				}, "can't find if no root namespace");
 				Q.Config.rootNamespaces.push('EditorTypeRegistryTestNamespace');
 				try {
@@ -273,8 +278,8 @@
 				strictEqual($FormatterTypeRegistryTestNamespace_DummyFormatter, Serenity.FormatterTypeRegistry.get('FormatterTypeRegistryTestNamespace.DummyFormatter'), 'with namespace and suffix');
 				throws(function() {
 					Serenity.FormatterTypeRegistry.get('DummyFormatter');
-				}, function() {
-					return ss.isInstanceOfType(arguments[0], ss.Exception);
+				}, function (err) {
+					return err.toString().indexOf('Can\'t find') >= 0;
 				}, "can't find if no root namespace");
 				Q.Config.rootNamespaces.push('FormatterTypeRegistryTestNamespace');
 				try {
@@ -602,9 +607,9 @@
 				var dlg = $('div.s-ConfirmDialog.ui-dialog:visible');
 				ok(dlg.length > 0, 'Check confirmation dialog exists and visible.');
 				ok(dlg.find(":contains('Test ABCDEFGHJKL'):visible").length > 0, 'Check that message is displayed');
-				var yesButton = $(".ui-dialog-buttonset button:contains('" + Q.text('Dialogs.YesButton') + "')");
+				var yesButton = $(".ui-dialog-buttonset button:contains('Yes')");
 				ok(yesButton.length === 1, 'Check that dialog has Yes button');
-				var noButton = $(".ui-dialog-buttonset button:contains('" + Q.text('Dialogs.NoButton') + "')");
+				var noButton = $(".ui-dialog-buttonset button:contains('No')");
 				ok(noButton.length === 1, 'Check that dialog has No button');
 				$('.ui-dialog-titlebar-close:visible').click();
 				ok($('div.s-ConfirmDialog.ui-dialog:visible').length === 0, 'Check confirmation dialog is closed.');
@@ -615,7 +620,7 @@
 				Q.confirm('Test', function() {
 					confirmed = true;
 				});
-				$(".ui-dialog-buttonset button:contains('" + Q.text('Dialogs.YesButton') + "')").click();
+				$(".ui-dialog-buttonset button:contains('Yes')").click();
 				ok(confirmed, 'Ensure yes button click called success delegate');
 			}));
 			test('ConfirmDialogNoClickDoesntCallSuccess', ss.mkdel(this, function() {
@@ -707,10 +712,11 @@
 	ss.initClass($Serenity_Test_QNumberTests, $asm, {
 		runTests: function() {
 			test('FormatNumberWorks', ss.mkdel(this, function() {
-				deepEqual(Q.formatNumber(1, '1'), '1');
+				deepEqual(Q.formatNumber(1, '0'), '1');
 				var backupDec = Q.Culture.decimalSeparator;
 				try {
 					Q.Culture.decimalSeparator = ',';
+					Q.Culture.groupSeparator = '.';
 					deepEqual(Q.formatNumber(1, '0.00'), '1,00');
 					deepEqual(Q.formatNumber(1, '0.0000'), '1,0000');
 					deepEqual(Q.formatNumber(1234, '#,##0'), '1.234');
@@ -718,6 +724,7 @@
 					deepEqual(Q.formatNumber(1234.5678, '#,##0.##'), '1.234,57');
 					deepEqual(Q.formatNumber(1234.5, '#,##0.00'), '1.234,50');
 					Q.Culture.decimalSeparator = '.';
+					Q.Culture.groupSeparator = ',';
 					deepEqual(Q.formatNumber(1234, '#,##0'), '1,234');
 					deepEqual(Q.formatNumber(1234.5, '#,##0.##'), '1,234.5');
 					deepEqual(Q.formatNumber(1234.5678, '#,##0.##'), '1,234.57');

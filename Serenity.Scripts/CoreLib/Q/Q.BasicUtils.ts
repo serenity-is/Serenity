@@ -4,11 +4,11 @@ namespace Q {
     export type Grouping<TItem> = { [key: string]: TItem[] };
 
     export function coalesce(a: any, b: any): any {
-        return (ss as any).coalesce(a, b);
+        return a != null ? a : b;
     }
 
     export function isValue(a: any): boolean {
-        return (ss as any).isValue(a);
+        return a != null;
     }
 
     /**
@@ -60,15 +60,20 @@ namespace Q {
     /**
      * Inserts an item to the array at specified index
      */
-    export function insert<TItem>(array: TItem[], index: number, item: TItem): void {
-        (ss as any).insert(array, index, item);
+    export function insert(obj: any, index: number, item: any): void {
+        if (obj.insert)
+            obj.insert(index, item);
+        else if (Object.prototype.toString.call(obj) === '[object Array]')
+            obj.splice(index, 0, item);
+        else
+            throw new Error("Object does not support insert!");
     }
 
     /**
      * Determines if the object is an array
      */
     export function isArray(obj: any): boolean {
-        return (ss as any).isArray(obj);
+        return Object.prototype.toString.call(obj) === '[object Array]';
     }
 
     /**
@@ -166,8 +171,12 @@ namespace Q {
                 return x;
     }
 
-    export function endsWith(s: string, search: string): boolean {
-        return (ss as any).endsWithString(s, search);
+    export function endsWith(s: string, suffix: string): boolean {
+        if (suffix == null || !suffix.length)
+            return true;
+        if (suffix.length > s.length)
+            return false;
+        return (s.substr(s.length - suffix.length) == suffix);
     }
 
     export function isEmptyOrNull(s: string) {
@@ -178,87 +187,63 @@ namespace Q {
         return trimToNull(s) == null;
     }
 
-    export function format(msg: string, ...prm: any[]): string {
-        return (ss as any).formatString(msg, ...prm);
-    }
-
-    export function padLeft(s: string, len: number, ch: string = ' ') {
+    export function padLeft(s: string | number, len: number, ch: string = ' ') {
+        if (s["padStart"])
+            return s["padStart"](len, ch);
+        s = s.toString();
         while (s.length < len)
-            s = "0" + s;
+            s = ch + s;
         return s;
     }
 
-    export function startsWith(s: string, search: string): boolean {
-        return (ss as any).startsWithString(s, search);
+    export function startsWith(s: string, prefix: string): boolean {
+        if (prefix == null || !prefix.length)
+            return true;
+        if (prefix.length > s.length)
+            return false;
+        return (s.substr(0, prefix.length) == prefix);
     }
 
     export function toSingleLine(str: string) {
         return Q.replaceAll(Q.replaceAll(trimToEmpty(str), '\r\n', ' '), '\n', ' ').trim();
     }
 
+    export let today = (): Date => {
+        var d = new Date();
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
+    export var trimEnd = function(s: string) {
+        return s.replace(/\s*$/, '');
+    };
+
+    export var trimStart = function(s: string) {
+        return s.replace(/^\s*/, '');
+    };
+
     export function trim(s: string) {
-        return (s == null ? '' : s).replace(new RegExp('^\\s+|\\s+$', 'g'), '');
+        if (s == null)
+            return '';
+        return s.replace(new RegExp('^\\s+|\\s+$', 'g'), '');
     }
 
     export function trimToEmpty(s: string) {
-        if (s == null || s.length === 0) {
+        if (s == null || s.length === 0)
             return '';
-        }
 
         return trim(s);
     }
 
     export function trimToNull(s: string) {
-        if (s == null || s.length === 0) {
-            return null;
-        }
-
         s = trim(s);
-        if (s.length === 0) {
+        if (s.length === 0)
             return null;
-        }
-        else {
-            return s;
-        }
-    }
-
-    let turkishOrder: {};
-
-    export function turkishLocaleCompare(a: string, b: string): number {
-        let alphabet = "AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz";
-        a = a || "";
-        b = b || "";
-        if (a == b)
-            return 0;
-        if (!turkishOrder) {
-            turkishOrder = {};
-            for (let z = 0; z < alphabet.length; z++) {
-                turkishOrder[alphabet.charAt(z)] = z + 1;
-            }
-        }
-        for (let i = 0, _len = Math.min(a.length, b.length); i < _len; i++) {
-            let x = a.charAt(i), y = b.charAt(i);
-            if (x === y)
-                continue;
-            let ix = turkishOrder[x], iy = turkishOrder[y];
-            if (ix != null && iy != null)
-                return ix < iy ? -1 : 1;
-            let c = x.localeCompare(y);
-            if (c == 0)
-                continue;
-            return c;
-        }
-        return a.localeCompare(b);
-    }
-
-    export function turkishLocaleToUpper(a: string): string {
-        if (!a)
-            return a;
-        return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
+        return s;
     }
 
     export function replaceAll(s: string, f: string, r: string): string {
-        return (ss as any).replaceAllString(s, f, r);
+        s = s || '';
+        return s.split(f).join(r);
     }
 
     export function zeroPad(n: number, digits: number): string {
@@ -329,63 +314,29 @@ namespace Q {
         return debounced;
     };
 
-    // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
-    export function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem {
-        let options: any,
-            name: string,
-            src: any,
-            copy: any,
-            copyIsArray: boolean,
-            clone: any,
-            target = arguments[0] || {},
-            i = 1,
-            length = arguments.length;
+    export function extend<T = any>(a: T, b: T): T {
+        for (var key in b)
+            if (b.hasOwnProperty(key))
+                a[key] = b[key];
+        return a;
+    }
 
-        // Handle case when target is a string or something (possible in deep copy)
-        if (typeof target !== "object" && !$.isFunction(target)) {
-            target = {};
+    export function deepClone<T = any>(a: T, a2?: any, a3?: any): T {
+        // for backward compatibility
+        if (a2 != null || a3 != null) {
+            return Q.extend(Q.extend(Q.deepClone(a || {}), Q.deepClone(a2 || {})), Q.deepClone(a3 || {}));
         }
-        if (i === length) {
-            target = {};
-            i = 0;
+
+        if (!a)
+            return a;
+      
+        let v;
+        let b: T = Array.isArray(a) ? [] : {} as any;
+        for (const k in a) {
+            v = a[k];
+            b[k] = (typeof v === "object") ? deepClone(v) : v;
         }
-        for (; i < length; i++) {
-            // Only deal with non-null/undefined values
-            if ((options = arguments[i]) !== null) {
-                // Special operations for arrays
-                if ($.isArray(options)) {
-                    target = $.extend(true, [], options);
-                }
-                else {
-                    // Extend the base object
-                    for (name in options) {
-                        src = target[name];
-                        copy = options[name];
-                        // Prevent never-ending loop
-                        if (target === copy) {
-                            continue;
-                        }
-                        // Recurse if we're merging plain objects or arrays
-                        if (copy && ($.isPlainObject(copy) ||
-                            (copyIsArray = $.isArray(copy)))) {
-                            if (copyIsArray) {
-                                copyIsArray = false;
-                                clone = src && $.isArray(src) ? src : [];
-                            }
-                            else {
-                                clone = src && $.isPlainObject(src) ? src : {};
-                            }
-                            // Never move original objects, clone them
-                            target[name] = deepClone(clone, copy);
-                        }
-                        else if (copy !== undefined) {
-                            target[name] = copy;
-                        }
-                    }
-                }
-            }
-        }
-        // Return the modified object
-        return target;
+      
+        return b;
     }
 }

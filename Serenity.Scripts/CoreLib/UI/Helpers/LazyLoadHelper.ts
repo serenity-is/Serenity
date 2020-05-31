@@ -40,9 +40,10 @@
                     dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
                 }
                 if (dialog.length > 0) {
-                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass, function () {
+                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, function () {
                         dialog.unbind('dialogopen.' + eventClass);
                         dialog.unbind('panelopen.' + eventClass);
+                        dialog.unbind('shown.bs.modal.' + eventClass);
                         if (element.is(':visible') && !executed) {
                             executed = true;
                             element.unbind('shown.' + eventClass);
@@ -90,7 +91,7 @@
 
             var dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
             if (dialog.length > 0) {
-                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass, check);
+                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, check);
             }
 
             element.bind('shown.' + eventClass, check);

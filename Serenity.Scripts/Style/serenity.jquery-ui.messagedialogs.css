@@ -1,0 +1,65 @@
+.s-MessageDialog {
+  min-width: 310px;
+}
+
+.s-MessageDialog .message {
+  padding: 24px 6px 6px 86px;
+  min-height: 80px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.s-MessageDialog .ui-dialog-content {
+  position: relative;
+  padding: 0;
+}
+
+.s-MessageDialog .ui-dialog-content:before {
+  padding: 0px 0px 0px 15px;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 50px;
+  position: absolute;
+}
+
+.s-MessageDialog .ui-dialog-buttonpane {
+   border-top: 1px solid #ccc;
+   padding: 0;
+}
+
+.s-AlertDialog .ui-dialog-content:before {
+  content: "\f06a";
+  color: #dd4b39;
+}
+
+.s-AlertDialog .ui-dialog-titlebar {
+   background: #dd4b39;    
+}
+
+.s-WarningDialog .ui-dialog-content:before {
+  content: "\f071";
+  color: #f39c12;
+}
+
+.s-WarningDialog .ui-dialog-titlebar {
+  background: #f39c12;
+}
+
+.s-ConfirmDialog .ui-dialog-content:before {
+  content: "\f059";
+  color: #1f7dce;
+}
+
+.s-ConfirmDialog .ui-dialog-titlebar {
+  background: #1f7dce;
+}
+
+.s-InformationDialog .ui-dialog-content:before {
+  content: "\f05a";
+  color: #00a65a;
+}
+
+.s-InformationDialog .ui-dialog-titlebar {
+  background: #00a65a;
+}

@@ -1,0 +1,30 @@
+.s-MessageModal .modal-header {
+  color: #fff;
+}
+
+.s-MessageModal .close {
+  color: #fff;
+  text-shadow: 0 1px 0 #000;
+  opacity: .7;
+}
+
+.s-MessageModal .close:focus, .s-MessageModal .close:hover {
+  color: #fff;
+  opacity: 1;
+}
+
+.s-AlertModal .modal-header {
+  background-color: #dd4b39;
+}
+
+.s-ConfirmModal .modal-header {
+  background: #1f7dce;
+}
+
+.s-InformationModal .modal-header {
+  background: #00a65a;
+}
+
+.s-WarningModal .modal-header {
+  background: #f39c12;
+}

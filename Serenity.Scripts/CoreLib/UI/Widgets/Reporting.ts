@@ -126,9 +126,7 @@
                     liList.show().removeClass('expanded');
                     return;
                 }
-                var parts = (ss as any).netSplit(text, [44, 32].map(function (i) {
-                    return String.fromCharCode(i);
-                }), null, 1);
+                var parts = text.replace(',', ' ').split(' ');
                 for (var i = 0; i < parts.length; i++) {
                     parts[i] = Q.trimToNull(Select2.util.stripDiacritics(parts[i]).toUpperCase());
                 }

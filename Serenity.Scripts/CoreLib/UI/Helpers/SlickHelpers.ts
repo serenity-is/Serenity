@@ -1,9 +1,6 @@
 ﻿namespace Serenity {
 
-    export interface QuickSearchField {
-        name: string;
-        title: string;
-    }
+    
 
     export interface GridRowSelectionMixinOptions {
         selectable?: (item: any) => boolean;
@@ -53,7 +50,7 @@
                     e1.preventDefault();
                     var view = grid.getView();
                     if (Object.keys(this.include).length > 0) {
-                        (ss as any).clearKeys(this.include);
+                        Q.clearKeys(this.include);
                     }
                     else {
                         var items = grid.getView().getItems();
@@ -86,7 +83,7 @@
         }
 
         clear(): void {
-            (ss as any).clearKeys(this.include);
+            Q.clearKeys(this.include);
             this.updateSelectAll();
         }
 
@@ -188,10 +185,10 @@
                     var id = item[this.idField].toString();
 
                     if (this.include[id] == true) {
-                        (ss as any).clearKeys(this.include);
+                        Q.clearKeys(this.include);
                     }
                     else {
-                        (ss as any).clearKeys(this.include);
+                        Q.clearKeys(this.include);
                         this.include[id] = true;
                     }
 
@@ -209,7 +206,7 @@
         }
 
         clear(): void {
-            (ss as any).clearKeys(this.include);
+            Q.clearKeys(this.include);
         }
 
         resetCheckedAndRefresh(): void {
@@ -559,14 +556,14 @@
 
             if (item.formatterType != null && item.formatterType.length > 0) {
 
-                var formatter = (ss as any).cast((ss as any).createInstance(
-                    Serenity.FormatterTypeRegistry.get(item.formatterType)), Serenity.ISlickFormatter);
+                var formatterType = FormatterTypeRegistry.get(item.formatterType) as any;
+                var formatter = new formatterType() as Slick.Formatter;
 
                 if (item.formatterParams != null) {
                     ReflectionOptionsSetter.set(formatter, item.formatterParams);
                 }
 
-                var initializer = (ss as any).safeCast(formatter, Serenity.IInitializeColumn);
+                var initializer = Q.safeCast(formatter, Serenity.IInitializeColumn);
                 if (initializer != null) {
                     initializer.initializeColumn(result);
                 }
@@ -726,7 +723,7 @@
                 }
                 parent = getParent(parent);
                 if (loop++ > 1000) {
-                    throw new (ss as any).InvalidOperationException(
+                    throw new Error(
                         'Possible infinite loop, check parents has no circular reference!');
                 }
             }

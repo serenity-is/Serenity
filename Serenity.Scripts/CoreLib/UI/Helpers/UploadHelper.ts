@@ -45,7 +45,7 @@
         }
 
         export function checkImageConstraints(file: UploadResponse,
-            opt: ImageUploadEditorOptions): boolean {
+            opt: FileUploadConstraints): boolean {
 
             if (!file.IsImage && !opt.allowNonImage) {
                 Q.alert(Q.text('Controls.ImageUpload.NotAnImageFile'));
@@ -88,10 +88,10 @@
         }
 
         export function fileSizeDisplay(bytes: number): string {
-            var byteSize = (ss as any).round(bytes * 100 / 1024) * 0.01;
+            var byteSize = Q.round(bytes * 100 / 1024) * 0.01;
             var suffix = 'KB';
             if (byteSize >= 1024) {
-                byteSize = (ss as any).round(byteSize * 100 / 1024) * 0.01;
+                byteSize = Q.round(byteSize * 100 / 1024) * 0.01;
                 suffix = 'MB';
             }
             var sizeParts = byteSize.toString().split(String.fromCharCode(46));
@@ -203,5 +203,16 @@
         IsImage: boolean;
         Width: number;
         Height: number;
+    }
+
+    export interface FileUploadConstraints {
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+        minSize?: number;
+        maxSize?: number;
+        allowNonImage?: boolean;
+        originalNameProperty?: string;
     }
 }

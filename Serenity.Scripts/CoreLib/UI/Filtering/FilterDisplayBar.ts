@@ -27,7 +27,7 @@
 
             this.element.find('.reset').click(e1 => {
                 e1.preventDefault();
-                (ss as any).clear(this.get_store().get_items());
+                this.get_store().get_items().length = 0;
                 this.get_store().raiseChanged();
             });
         }
