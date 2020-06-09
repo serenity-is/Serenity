@@ -159,10 +159,15 @@ namespace Serenity.Data
         {
             var value = _getValue(row);
             if (value.HasValue)
-                writer.WriteValue(value.Value.ToString(
-                    (DateTimeKind == System.DateTimeKind.Unspecified ? 
-                        DateHelper.ISODateTimeFormatLocal : 
+            {
+                var dt = value.Value;
+                if (DateTimeKind == DateTimeKind.Local)
+                    dt = dt.ToUniversalTime();
+                writer.WriteValue(dt.ToString(
+                    (DateTimeKind == System.DateTimeKind.Unspecified ?
+                        DateHelper.ISODateTimeFormatLocal :
                         DateHelper.ISODateTimeFormatUTC), CultureInfo.InvariantCulture));
+            }
             else
                 writer.WriteNull();
         }
