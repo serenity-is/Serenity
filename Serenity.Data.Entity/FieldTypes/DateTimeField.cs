@@ -53,7 +53,10 @@ namespace Serenity.Data
                 _setValue(row, null);
             else
             {
-                var datetime = reader.GetDateTime(index);
+                var value = reader.GetValue(index);
+                DateTime datetime = value is DateTimeOffset ?
+                    ((DateTimeOffset)value).DateTime :
+                        (value is DateTime ? (DateTime)value : Convert.ToDateTime(value));
                 if (DateTimeKind != System.DateTimeKind.Unspecified)
                     datetime = DateTime.SpecifyKind(datetime, DateTimeKind);
                 _setValue(row, datetime);
