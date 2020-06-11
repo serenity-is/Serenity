@@ -3,7 +3,7 @@ using System.Data;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Globalization;
-#if COREFX
+#if !NET45
 using Newtonsoft.Json.Linq;
 #endif
 
@@ -25,7 +25,7 @@ namespace Serenity.Data
 
         public override object ConvertValue(object source, IFormatProvider provider)
         {
-#if COREFX
+#if !NET45
             if (source is JValue)
                 source = ((JValue)source).Value;
 #endif

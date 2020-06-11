@@ -1,4 +1,4 @@
-﻿#if ASPNETCORE
+﻿#if !ASPNETMVC
 using Newtonsoft.Json;
 using System;
 using System.Text;

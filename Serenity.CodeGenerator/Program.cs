@@ -112,7 +112,7 @@ namespace Serenity.CodeGenerator
         private static void WriteHelp()
         {
             Console.WriteLine("Serenity Code Generator " +
-#if COREFX
+#if !NET45
                 System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
 #else
                 typeof(Program).GetType().Assembly.GetName().Version.ToString());

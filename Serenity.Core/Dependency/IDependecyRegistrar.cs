@@ -1,4 +1,4 @@
-﻿#if !COREFX
+﻿#if NET45
 namespace Serenity
 {
     /// <summary>

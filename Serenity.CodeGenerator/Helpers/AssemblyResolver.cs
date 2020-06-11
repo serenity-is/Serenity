@@ -1,4 +1,4 @@
-﻿#if COREFX
+﻿#if !NET45
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.DependencyModel.Resolution;
 using System;

@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-#if COREFX
+#if !NET45
 using System;
 #endif
 
@@ -18,7 +18,7 @@ namespace Serenity
             DateOrder = DateHelper.DateOrderString(order);
             DateFormat = DateHelper.DefaultDateFormat(order);
             DateTimeFormat = DateHelper.DefaultDateTimeFormat(order);
-#if COREFX
+#if !NET45
             DateSeparator = DateTime.MaxValue.ToString("yy/MM/dd", culture.DateTimeFormat)[2].ToString();
 #else
             DateSeparator = culture.DateTimeFormat.DateSeparator;

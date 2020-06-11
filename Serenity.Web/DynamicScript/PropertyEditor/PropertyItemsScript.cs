@@ -1,7 +1,7 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Web.PropertyEditor;
 using System;
-#if COREFX
+#if !NET45
 using System.Reflection;
 #endif
 

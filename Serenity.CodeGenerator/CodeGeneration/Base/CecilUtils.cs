@@ -104,7 +104,7 @@ namespace Serenity.Reflection
                 return x;
             }).ToList();
 
-#if COREFX
+#if !NET45
             var resolver = ICSharpCode.Decompiler.UniversalAssemblyResolver
                 .LoadMainModule(assemblyLocations.First(), inMemory: true).AssemblyResolver
                     as ICSharpCode.Decompiler.UniversalAssemblyResolver;

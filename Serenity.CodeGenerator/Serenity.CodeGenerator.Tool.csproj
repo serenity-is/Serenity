@@ -10,7 +10,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackAsTool>true</PackAsTool>
     <PackageId>sergen</PackageId>
-    <DefineConstants>$(DefineConstants);ASPNETCORE;COREFX</DefineConstants>
     <Deterministic>false</Deterministic>
   </PropertyGroup>
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
@@ -22,6 +21,8 @@
       <Link>typeScriptServices.js</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\*.scriban" />
+    <Compile Remove="obj\**\*" />
+    <None Remove="obj\**\*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj" />

@@ -1,6 +1,6 @@
 ﻿using System;
 using Serenity.Abstractions;
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
@@ -58,7 +58,7 @@ namespace Serenity
             if (username == null)
                 throw new ArgumentNullException(username);
 
-#if ASPNETCORE
+#if !ASPNETMVC
             var principal = new GenericPrincipal(new GenericIdentity(username), EmptyStringArray);
             var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
             httpContext.SignInAsync("Cookies", principal).Wait();
@@ -75,7 +75,7 @@ namespace Serenity
         ///   Logs out to logged user.</summary>
         public static void LogOut()
         {
-#if ASPNETCORE
+#if !ASPNETMVC
             var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
             httpContext.SignOutAsync("Cookies").Wait();
 #else
@@ -91,7 +91,7 @@ namespace Serenity
 #endif
         }
 
-#if !ASPNETCORE
+#if ASPNETMVC
         public static void EnsurePermission(string permission)
         {
             if (!Authorization.HasPermission(permission))
@@ -125,7 +125,7 @@ namespace Serenity
         {
             get
             {
-#if ASPNETCORE
+#if !ASPNETMVC
                 var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
                 return httpContext?.User?.Identity?.Name;
 #else

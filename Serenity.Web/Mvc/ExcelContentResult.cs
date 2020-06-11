@@ -1,5 +1,5 @@
 ﻿using System;
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.AspNetCore.Mvc;
 #else
 using System.Web.Mvc;

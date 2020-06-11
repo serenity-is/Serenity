@@ -20,7 +20,7 @@
         /// <returns>Resolved service of type TService, or null if none.</returns>
         TService TryResolve<TService>() where TService : class;
 
-#if !COREFX
+#if NET45
         /// <summary>
         /// Resolves the service type from registered dependencies with given name.
         /// </summary>

@@ -199,7 +199,7 @@
             IDbCommand command = connection.CreateCommand();
 
             // TODO: find a workaround in new Dapper
-#if !COREFX
+#if NET45
             SqlMapper.GetBindByName(command.GetType())?.Invoke(command, true);
 #endif
             commandText = FixCommandText(commandText, connection.GetDialect());
@@ -327,7 +327,7 @@
 
                 if (value != null && value != DBNull.Value)
                 {
-#if COREFX
+#if !NET45
 #pragma warning disable CS0618
                     var mappedType = Dapper.SqlMapper.GetDbType(value);
 #pragma warning restore CS0618

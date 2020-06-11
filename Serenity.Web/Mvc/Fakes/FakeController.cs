@@ -1,4 +1,4 @@
-﻿#if !ASPNETCORE
+﻿#if ASPNETMVC
 using System.Web.Mvc;
 
 namespace Serenity.Web.MvcFakes

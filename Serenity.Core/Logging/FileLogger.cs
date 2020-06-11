@@ -72,7 +72,7 @@ namespace Serenity.Logging
                 {
                     file = value;
 
-#if COREFX
+#if !NET45
                     string baseDirectory = AppContext.BaseDirectory;
 #else
                     string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -238,7 +238,7 @@ namespace Serenity.Logging
                             {
                                 stream.Dispose();
                             }
-#if COREFX
+#if !NET45
                             catch
                             {
                             }
@@ -266,7 +266,7 @@ namespace Serenity.Logging
                         flushTimeout > TimeSpan.Zero && (DateTimeProvider.Now - lastFlush) >= flushTimeout)
                         InternalFlush();
                 }
-#if COREFX
+#if !NET45
                 catch
                 {
                 }

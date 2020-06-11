@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-#if !COREFX
+#if NET45
 using System.IO;
 #endif
 using System.Linq;
@@ -65,7 +65,7 @@ namespace Serenity.Extensibility
                 assembly.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity"));
         }
 
-#if !COREFX
+#if NET45
         /// <summary>
         /// Enumerates the directory for assemblies.
         /// </summary>
@@ -119,7 +119,7 @@ namespace Serenity.Extensibility
                 }
             }
 
-#if !COREFX
+#if NET45
             var asmPath = Path.GetDirectoryName(typeof(ExtensibilityHelper).Assembly.Location);
             EnumerateDirectory(assemblies, asmPath);
 #endif

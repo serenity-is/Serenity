@@ -7,7 +7,7 @@ namespace Serenity.Web
     using System;
     using System.IO;
     using System.Net;
-#if COREFX
+#if !NET45
     using System.Threading.Tasks;
 #endif
     public static class RecaptchaValidation
@@ -33,7 +33,7 @@ namespace Serenity.Web
 
             var webRequest = (HttpWebRequest)WebRequest.Create(verifyUri);
             webRequest.ContentType = "application/x-www-form-urlencoded";
-#if COREFX
+#if !NET45
             webRequest.Headers["Content-Length"] = postDataBuffer.Length.ToString();
 #else
             var proxy = WebRequest.GetSystemWebProxy();
@@ -42,7 +42,7 @@ namespace Serenity.Web
 #endif
 
             webRequest.Method = "POST";
-#if COREFX
+#if !NET45
             using (var requestStream = Task.Run(() => webRequest.GetRequestStreamAsync()).Result)
                 requestStream.Write(postDataBuffer, 0, postDataBuffer.Length);
 

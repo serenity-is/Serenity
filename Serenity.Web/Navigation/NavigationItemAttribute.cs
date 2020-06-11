@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.AspNetCore.Mvc;
 #else
 using System.Web.Mvc;
@@ -73,7 +73,7 @@ namespace Serenity.Navigation
 
             string url = (routeAction ?? routeController).Template ?? "";
 
-#if ASPNETCORE
+#if !ASPNETMVC
             if (routeAction != null && !url.StartsWith("~/") && !url.StartsWith("/") && routeController != null)
             {
                 var tmp = routeController.Template ?? "";

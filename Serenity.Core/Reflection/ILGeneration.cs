@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-#if !COREFX
+#if NET45
 using System.Reflection.Emit;
 #endif
 
@@ -18,7 +18,7 @@ namespace Serenity.Reflection
         /// <returns></returns>
         public static Func<object, object> GenerateGetter(FieldInfo fieldInfo)
         {
-#if COREFX
+#if !NET45
             return x => fieldInfo.GetValue(x);
 #else
             // create a method without a name, object as result type and one parameter of type object
@@ -46,7 +46,7 @@ namespace Serenity.Reflection
         /// <returns></returns>
         public static Action<object, object> GenerateSetter(FieldInfo fieldInfo)
         {
-#if COREFX
+#if !NET45
             return (x, v) => fieldInfo.SetValue(x, v);
 #else
             var method = new DynamicMethod(string.Empty, null, new[] { typeof(object), typeof(object) }, fieldInfo.DeclaringType, true);

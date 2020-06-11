@@ -1,7 +1,7 @@
 ﻿using Serenity.Data;
 using System;
 using System.Data;
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
@@ -20,7 +20,7 @@ namespace Serenity.Services
         {
             exception.Log();
 
-#if ASPNETCORE
+#if !ASPNETMVC
             var context = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
 #if ASPNETCORE22
             bool showDetails = context != null && context.RequestServices.GetService<IHostingEnvironment>().IsDevelopment();
@@ -72,7 +72,7 @@ namespace Serenity.Services
                 response = exception.ConvertToResponse<TResponse>();
                 controller.HttpContext.Response.Clear();
                 controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
-#if !ASPNETCORE
+#if ASPNETMVC
                 controller.HttpContext.Response.TrySkipIisCustomErrors = true;
 #endif
             }
@@ -94,7 +94,7 @@ namespace Serenity.Services
                 response = exception.ConvertToResponse<TResponse>();
                 controller.HttpContext.Response.Clear();
                 controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
-#if !ASPNETCORE
+#if ASPNETMVC
                 controller.HttpContext.Response.TrySkipIisCustomErrors = true;
 #endif
             }
@@ -121,7 +121,7 @@ namespace Serenity.Services
                 response = exception.ConvertToResponse<TResponse>();
                 controller.HttpContext.Response.Clear();
                 controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
-#if !ASPNETCORE
+#if ASPNETMVC
                 controller.HttpContext.Response.TrySkipIisCustomErrors = true;
 #endif
 

@@ -51,7 +51,7 @@ namespace Serenity.Data
 
             var temp = new Dictionary<TableAndGroup, CacheItem>();
 
-#if COREFX
+#if !NET45
             var rows = Dependency.Resolve<ICustomFieldListService>().List(schema).ToList();
 #else
             var rows = Dependency.Resolve<ICustomFieldListService>(schema).List(schema).ToList();

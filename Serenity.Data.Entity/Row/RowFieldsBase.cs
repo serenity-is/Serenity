@@ -23,7 +23,7 @@ namespace Serenity.Data
         internal Dictionary<string, Join> joins;
         internal string localTextPrefix;
         internal PropertyChangedEventArgs[] propertyChangedEventArgs;
-#if !COREFX
+#if NET45
         internal PropertyDescriptorCollection propertyDescriptors;
 #endif
         internal Func<Row> rowFactory;
@@ -501,7 +501,7 @@ namespace Serenity.Data
                 foreach (var attr in rowCustomAttributes.OfType<OuterApplyAttribute>())
                     new OuterApply(this.joins, attr.InnerQuery, attr.Alias);
 
-#if !COREFX
+#if NET45
                 var propertyDescriptorArray = new PropertyDescriptor[this.Count];
                 for (int i = 0; i < this.Count; i++)
                 {

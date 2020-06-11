@@ -1,4 +1,4 @@
-﻿#if !COREFX
+﻿#if NET45
 // --------------------------------------------------------------------------------------------------
 // © Copyright 2011 by Matthew Dennis.
 // Released under the Microsoft Public License (Ms-PL) http://www.opensource.org/licenses/ms-pl.html

@@ -63,7 +63,7 @@ namespace Serenity.Localization
         /// </summary>
         /// <param name="path">Path containing JSON files</param>
         /// <param name="registry">Registry</param>
-#if COREFX
+#if !NET45
         public static void AddJsonTexts(this ILocalTextRegistry registry, string path)
 #else
         public static void AddFromFilesInFolder(string path, ILocalTextRegistry registry = null)

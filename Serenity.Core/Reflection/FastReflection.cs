@@ -1,5 +1,5 @@
 ﻿using System;
-#if COREFX
+#if !NET45
 using System.Reflection;
 #else
 using System.Reflection.Emit;
@@ -31,7 +31,7 @@ namespace Serenity.Reflection
         /// <exception cref="MissingMethodException">No constructor</exception>
         public static Func<TReturn> DelegateForConstructor<TReturn>(Type type)
         {
-#if COREFX
+#if !NET45
             var constructor = type.GetTypeInfo().GetConstructor(Type.EmptyTypes);
             if (constructor == null)
                 throw new ArgumentOutOfRangeException("type");

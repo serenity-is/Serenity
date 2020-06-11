@@ -1,4 +1,4 @@
-﻿#if COREFX
+﻿#if !NET45
 using System;
 using System.Collections.Generic;
 using System.Data.Common;

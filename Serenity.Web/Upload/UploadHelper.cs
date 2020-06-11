@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using Serenity.IO;
 using System.Web.Hosting;
-#if !ASPNETCORE
+#if ASPNETMVC
 using System.Web;
 #endif
 
@@ -168,7 +168,7 @@ namespace Serenity.Web
                 string pre2 = @"~/";
                 if (path.StartsWith(pre1) || path.StartsWith(pre2))
                 {
-#if COREFX
+#if !NET45
                     path = Path.Combine(Path.GetDirectoryName(HostingEnvironment.MapPath(pre2)), ToPath(path.Substring(pre2.Length)));
 #else
                     path = Path.Combine(HostingEnvironment.MapPath(pre2), ToPath(path.Substring(pre2.Length)));
@@ -291,7 +291,7 @@ namespace Serenity.Web
                 fileName.StartsWith("\\") ||
                 fileName.EndsWith("/") ||
                 fileName.EndsWith("\\"))
-#if ASPNETCORE
+#if !ASPNETMVC
                 throw new ArgumentOutOfRangeException("fileName");
 #else
                 throw new HttpException(0x194, "Invalid_Request");
@@ -403,7 +403,7 @@ namespace Serenity.Web
             else
                 mimeType = "application/unknown";
 
-#if !COREFX
+#if NET45
             try
             {
                 Microsoft.Win32.RegistryKey regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext);

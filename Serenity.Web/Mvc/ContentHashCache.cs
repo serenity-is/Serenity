@@ -8,7 +8,7 @@ using Serenity.ComponentModel;
 using System.Collections.Generic;
 using Serenity.IO;
 using System.Collections.Concurrent;
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.AspNetCore.WebUtilities;
 #endif
 
@@ -57,7 +57,7 @@ namespace Serenity.Web
         {
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 120000))
             { 
-#if ASPNETCORE
+#if !ASPNETMVC
                 var md5 = MD5.Create();
                 byte[] hash = md5.ComputeHash(fs);
                 return WebEncoders.Base64UrlEncode(hash);
@@ -84,7 +84,7 @@ namespace Serenity.Web
             if (!cdnEnabled)
                 return contentPath;
 
-#if ASPNETCORE
+#if !ASPNETMVC
             var contextAccessor = Dependency.TryResolve<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
             bool isSecureConnection = contextAccessor != null && contextAccessor.HttpContext != null &&
                 contextAccessor.HttpContext.Request.IsHttps;
@@ -149,7 +149,7 @@ namespace Serenity.Web
             if (!cdnFilter.IsMatch(cdnMatch.Replace('/', Path.DirectorySeparatorChar)))
                 return contentUrl;
 
-#if ASPNETCORE
+#if !ASPNETMVC
             var contextAccessor = Dependency.TryResolve<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
             bool isSecureConnection = contextAccessor != null && contextAccessor.HttpContext != null &&
                 contextAccessor.HttpContext.Request.IsHttps;

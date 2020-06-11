@@ -413,7 +413,7 @@ namespace Serenity.CodeGeneration
                 GeneratorUtils.GetAttribute(controller, "Microsoft.AspNetCore.Mvc.RouteAttribute");
             string url = route == null ? ("Services/HasNoRoute/" + controller.Name) : (route.GetType().GetProperty("Template").GetValue(route) as string ?? "");
 
-#if ASPNETCORE
+#if !ASPNETMVC
             url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
             url = url.Replace("/[action]", "");
 #else

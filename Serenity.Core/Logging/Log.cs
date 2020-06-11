@@ -325,7 +325,7 @@ namespace Serenity
             {
                 logger.Write(level, message, exception, source);
             }
-#if COREFX
+#if !NET45
             catch
             {
             }

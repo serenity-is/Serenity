@@ -1,4 +1,4 @@
-﻿#if !COREFX
+﻿#if NET45
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -83,7 +83,7 @@ namespace Serenity.Data
         {
             get
             {
-#if !COREFX
+#if NET45
                 if (typeof(IList).IsAssignableFrom(this.PropertyType))
                 {
                     Attribute[] array = new Attribute[base.Attributes.Count + 1];

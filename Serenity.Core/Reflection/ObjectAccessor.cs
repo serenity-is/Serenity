@@ -1,4 +1,4 @@
-﻿#if !COREFX
+﻿#if NET45
 using System;
 //#if !NO_DYNAMIC
 //using System.Dynamic;

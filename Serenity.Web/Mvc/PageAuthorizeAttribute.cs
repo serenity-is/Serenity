@@ -1,7 +1,7 @@
 ﻿using Serenity.Data;
 using System;
 using System.Linq;
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 #else
@@ -12,7 +12,7 @@ using System.Web.Security;
 
 namespace Serenity.Web
 {
-#if ASPNETCORE
+#if !ASPNETMVC
     public class PageAuthorizeAttribute : TypeFilterAttribute
     {
         public PageAuthorizeAttribute()
@@ -113,7 +113,7 @@ namespace Serenity.Web
         {
         }
 
-#if !ASPNETCORE
+#if ASPNETMVC
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
             if (!base.AuthorizeCore(httpContext))

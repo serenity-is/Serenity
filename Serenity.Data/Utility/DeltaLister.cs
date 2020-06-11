@@ -76,7 +76,7 @@ namespace Serenity.Data
                     }
 
                     if (_newById.Contains(id.Value))
-#if COREFX
+#if !NET45
                         throw new ArgumentException("newItemId");
 #else
                         throw new DuplicateNameException("newItemId");

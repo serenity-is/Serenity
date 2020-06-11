@@ -228,7 +228,7 @@ namespace Serenity.Data
             if (typeOriginal.IsGenericType
                 && typeOriginal.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-#if COREFX
+#if !NET45
                 return (value as dynamic).GetValueOrDefault();
 #else
                 // generic value, unboxing needed

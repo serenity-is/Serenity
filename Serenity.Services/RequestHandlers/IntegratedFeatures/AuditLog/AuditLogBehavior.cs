@@ -1,7 +1,7 @@
 ﻿using Serenity.Data;
 using System.Collections.Generic;
 using System.Reflection;
-#if COREFX
+#if !NET45
 using System;
 #endif
 

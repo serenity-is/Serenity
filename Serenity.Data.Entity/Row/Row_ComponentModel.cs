@@ -176,7 +176,7 @@ namespace Serenity.Data
             }
         }
 
-#if !COREFX
+#if NET45
         string IDataErrorInfo.Error
         {
             get

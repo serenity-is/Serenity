@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Text;
-#if ASPNETCORE
+#if !ASPNETMVC
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 #else
@@ -24,7 +24,7 @@ namespace Serenity.Services
             this.SerializerSettings = JsonSettings.Strict;
         }
 
-#if ASPNETCORE
+#if !ASPNETMVC
         public override void ExecuteResult(ActionContext context)
 #else
         public override void ExecuteResult(ControllerContext context)
@@ -37,14 +37,14 @@ namespace Serenity.Services
             response.ContentType = !string.IsNullOrEmpty(ContentType) ? ContentType : "application/json";
 
             if (ContentEncoding != null)
-#if ASPNETCORE
+#if !ASPNETMVC
                 response.Headers["Content-Encoding"] = this.ContentEncoding.WebName;
 #else
                 response.ContentEncoding = this.ContentEncoding;
 #endif
             if (Data != null)
             {
-#if ASPNETCORE
+#if !ASPNETMVC
                 JsonTextWriter writer = new JsonTextWriter(new StreamWriter(response.Body)) { Formatting = this.Formatting };
 #else
                 JsonTextWriter writer = new JsonTextWriter(response.Output) { Formatting = this.Formatting };

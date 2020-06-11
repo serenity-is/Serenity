@@ -1,4 +1,4 @@
-﻿#if ASPNETCORE
+﻿#if !ASPNETMVC
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using Serenity;

@@ -168,7 +168,7 @@ namespace Serenity.CodeGenerator
                 providerName = confConnection.ProviderName.TrimToNull();
             providerName = providerName ?? "System.Data.SqlClient";
 
-#if COREFX
+#if !NET45
             DbProviderFactories.RegisterFactory("System.Data.SqlClient", SqlClientFactory.Instance);
             DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite", Microsoft.Data.Sqlite.SqliteFactory.Instance);
             DbProviderFactories.RegisterFactory("Npgsql", Npgsql.NpgsqlFactory.Instance);
