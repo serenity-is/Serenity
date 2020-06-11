@@ -72,6 +72,8 @@
         public static defaultHeaderHeight: number;
         public static defaultPersistanceStorage: SettingStorage;
 
+        private layoutTimer: number; 
+
         constructor(container: JQuery, options?: TOptions) {
             super(container, options);
 
@@ -79,9 +81,13 @@
 
             this.element.addClass('s-DataGrid').html('');
             this.element.addClass('s-' + Q.getTypeName(Q.getInstanceType(this)));
-            this.element.addClass('require-layout').bind('layout.' + this.uniqueName, function () {
+
+            var layout = function() {
                 self.layout();
-            });
+                Q.LayoutTimer.store(this.layoutTimer);
+            }
+            this.element.addClass('require-layout').on('layout.' + this.uniqueName, layout);
+            this.layoutTimer = Q.LayoutTimer.onSizeChange(() => this.element && this.element[0], Q.debounce(layout, 50));
 
             this.setTitle(this.getInitialTitle());
 
@@ -124,7 +130,7 @@
         }
 
         protected layout(): void {
-            if (!this.element.is(':visible') || this.slickContainer == null)
+            if (!this.element || !this.element.is(':visible') || this.slickContainer == null)
                 return;
 
             var responsiveHeight = this.element.hasClass('responsive-height');
@@ -293,6 +299,9 @@
         }
 
         public destroy() {
+            if (this.layoutTimer) {
+                this.layoutTimer = Q.LayoutTimer.off(this.layoutTimer);
+            }
             if (this.quickFiltersBar) {
                 this.quickFiltersBar.destroy();
                 this.quickFiltersBar = null;

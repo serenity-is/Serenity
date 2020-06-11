@@ -2,17 +2,23 @@
 namespace Q {
 
     interface LayoutTimerReg {
-        key: string;
         handler: () => void;
+        element: () => HTMLElement;
+        width: boolean;
+        height: boolean;
+        storedWidth?: number;
+        storedHeight?: number;
     }
 
     export namespace LayoutTimer {
 
         var timeout: number;
-        var regs: LayoutTimerReg[] = [];
+        var nextKey: number = 0;
+        var regCount: number = 0;
+        var regs: { [key: number]: LayoutTimerReg; } = {};
 
         function startTimer() {
-            if (timeout == null && regs.length) {
+            if (timeout == null && regCount > 0) {
                 timeout = window.setTimeout(onTimeout, 100);
             }
         }
@@ -25,88 +31,108 @@ namespace Q {
         }
 
         function onTimeout() {
-            for (var reg of regs) {
+            for (var key in regs) {
+                var reg = regs[key];
                 try {
-                    reg.handler();
+                    var el = reg.element();
+                    if (!el)
+                        continue;
+
+                    var w = el.offsetWidth;
+                    var h = el.offsetHeight;
+                    try {
+
+                        if ((reg.width && reg.storedWidth !== w) ||
+                            (reg.height && reg.storedHeight !== h) ||
+                            (!reg.width && !reg.height && (!w !== !reg.storedWidth || !h !== !reg.storedHeight))) {
+                                if (w > 0 && h > 0) {
+                                    try {
+                                        reg.handler();
+                                    }
+                                    finally {
+                                        w = el.offsetWidth;
+                                        h = el.offsetHeight;
+                                    }
+                                }
+                        }
+                    }
+                    finally {
+                        reg.storedWidth = w;
+                        reg.storedHeight = h;
+                    }
                 }
                 catch (e) {
                     console.log(e);
                 }
             }
-
             clearTimer();
             startTimer();
         }
 
-        export function on(key: string, handler: () => void): () => void {
+        export function store(key: number) {
+            var reg = regs[key];
+            if (!reg)
+                return;
+
+            var el = reg.element();
+            if (!el)
+                return;
+
+            reg.storedWidth = el.offsetWidth;
+            reg.storedHeight = el.offsetHeight;
+        }
+
+        export function trigger(key: number) {
+            var reg = regs[key];
+            if (!reg)
+                return;
+            store(key);
+            if (reg.storedWidth >= 0 &&
+                reg.storedHeight >= 0) {
+                reg.handler();
+            }
+            store(key);
+        }
+
+        export function onSizeChange(element: () => HTMLElement, handler: () => void, width?: boolean, height?: boolean): number {
             if (handler == null)
                 throw "Layout handler can't be null!";
 
-            if (key != null && Q.any(regs, x => x.key === key))
-                throw "There is already a registered layout handler with key: " + key;
-
-            regs.push({
-                key: key,
+            regs[++nextKey] = {
+                element: element,
                 handler: handler,
-            });
-
+                width: width !== false,
+                height: height !== false
+            }
+            regCount++;
+            store(nextKey)
             startTimer();
-
-            return handler;
+            return nextKey;
         }
 
-        export function onSizeChange(key: string, element: HTMLElement, handler: () => void): () => void {
-            var oldWidth = element.offsetWidth;
-            var oldHeight = element.offsetHeight;
-
-            on(key, () => {
-                var offsetWidth = element.offsetWidth;
-                var offsetHeight = element.offsetHeight;
-                if (offsetWidth !== oldWidth ||
-                    offsetHeight !== oldHeight) {
-                    oldWidth = offsetWidth;
-                    oldHeight = offsetHeight;
-                    handler();
-                }
-            });
-
-            return handler;
+        export function onWidthChange(element: () => HTMLElement, handler: () => void) {
+            return onSizeChange(element, handler, true, false);
         }
 
-        export function onWidthChange(key: string, element: HTMLElement, handler: () => void): () => void {
-            var oldWidth = element.offsetWidth;
-
-            on(key, () => {
-                var offsetWidth = element.offsetWidth;
-                if (offsetWidth !== oldWidth) {
-                    oldWidth = offsetWidth;
-                    handler();
-                }
-            });
-
-            return handler;
+        export function onHeightChange(element: () => HTMLElement, handler: () => void) {
+            return onSizeChange(element, handler, false, true);
         }
 
-        export function onHeightChange(key: string, element: HTMLElement, handler: () => void): () => void {
-            var oldHeight = element.offsetHeight;
-
-            on(key, () => {
-                var offsetHeight = element.offsetHeight;
-                if (offsetHeight !== oldHeight) {
-                    oldHeight = offsetHeight;
-                    handler();
-                }
-            });
-
-            return handler;
+        export function onShown(element: () => HTMLElement, handler: () => void) {
+            return onSizeChange(element, handler, false, false);
         }
 
-        export function off(key: string, handler?: () => void): void {
-            if (key != null)
-                regs = regs.filter(x => x.key !== key);
-            if (handler != null)
-                regs = regs.filter(x => x.handler === handler);
-            !regs.length && this.clearTimer();
+        export function off(key: number): number {
+            var reg = regs[key];
+            if (!reg) 
+                return 0;
+                
+            delete regs[key];
+            regCount--;
+            if (regCount <= 0)
+                clearTimer();
+
+            return 0;
         }
     }
 }

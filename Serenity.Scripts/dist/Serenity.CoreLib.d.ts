@@ -715,11 +715,13 @@ declare namespace Serenity {
 }
 declare namespace Q {
     namespace LayoutTimer {
-        function on(key: string, handler: () => void): () => void;
-        function onSizeChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function onWidthChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function onHeightChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function off(key: string, handler?: () => void): void;
+        function store(key: number): void;
+        function trigger(key: number): void;
+        function onSizeChange(element: () => HTMLElement, handler: () => void, width?: boolean, height?: boolean): number;
+        function onWidthChange(element: () => HTMLElement, handler: () => void): number;
+        function onHeightChange(element: () => HTMLElement, handler: () => void): number;
+        function onShown(element: () => HTMLElement, handler: () => void): number;
+        function off(key: number): number;
     }
 }
 declare namespace Serenity {
@@ -3160,6 +3162,7 @@ declare namespace Serenity {
         static defaultRowHeight: number;
         static defaultHeaderHeight: number;
         static defaultPersistanceStorage: SettingStorage;
+        private layoutTimer;
         constructor(container: JQuery, options?: TOptions);
         protected attrs<TAttr>(attrType: {
             new (...args: any[]): TAttr;

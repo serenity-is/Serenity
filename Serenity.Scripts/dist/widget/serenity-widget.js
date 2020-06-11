@@ -1869,93 +1869,29 @@ var Serenity;
     (function (LazyLoadHelper) {
         var autoIncrement = 0;
         function executeOnceWhenShown(element, callback) {
-            autoIncrement++;
-            var eventClass = 'ExecuteOnceWhenShown' + autoIncrement;
-            var executed = false;
-            if (element.is(':visible')) {
+            var el = element && element[0];
+            if (!el)
+                return;
+            if (el.offsetWidth > 0 && el.offsetHeight > 0) {
                 callback();
+                return;
             }
-            else {
-                var uiTabs = element.closest('.ui-tabs');
-                if (uiTabs.length > 0) {
-                    uiTabs.bind('tabsactivate.' + eventClass, function (e) {
-                        if (element.is(':visible')) {
-                            uiTabs.unbind('tabsactivate.' + eventClass);
-                            if (!executed) {
-                                executed = true;
-                                element.unbind('shown.' + eventClass);
-                                callback();
-                            }
-                        }
-                    });
-                }
-                var bsTabs = element.closest('.nav-tabs');
-                if (bsTabs.length > 0) {
-                    bsTabs.one('shown.bs.tab', function (e) {
-                        if (!executed && element.is(':visible')) {
-                            executed = true;
-                            callback();
-                        }
-                    });
-                }
-                var dialog;
-                if (element.hasClass('ui-dialog')) {
-                    dialog = element.children('.ui-dialog-content');
-                }
-                else {
-                    dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
-                }
-                if (dialog.length > 0) {
-                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, function () {
-                        dialog.unbind('dialogopen.' + eventClass);
-                        dialog.unbind('panelopen.' + eventClass);
-                        dialog.unbind('shown.bs.modal.' + eventClass);
-                        if (element.is(':visible') && !executed) {
-                            executed = true;
-                            element.unbind('shown.' + eventClass);
-                            callback();
-                        }
-                    });
-                }
-                element.bind('shown.' + eventClass, function () {
-                    if (element.is(':visible')) {
-                        element.unbind('shown.' + eventClass);
-                        if (!executed) {
-                            executed = true;
-                            callback();
-                        }
-                    }
-                });
-            }
+            var timer = Q.LayoutTimer.onShown(function () { return el; }, function () {
+                Q.LayoutTimer.off(timer);
+                callback();
+            });
         }
         LazyLoadHelper.executeOnceWhenShown = executeOnceWhenShown;
         function executeEverytimeWhenShown(element, callback, callNowIfVisible) {
-            autoIncrement++;
-            var eventClass = 'ExecuteEverytimeWhenShown' + autoIncrement;
-            var wasVisible = element.is(':visible');
-            if (wasVisible && callNowIfVisible) {
+            var el = element && element[0];
+            if (!el)
+                return;
+            if (callNowIfVisible && el.offsetWidth > 0 && el.offsetHeight > 0) {
                 callback();
             }
-            var check = function (e) {
-                if (element.is(':visible')) {
-                    if (!wasVisible) {
-                        wasVisible = true;
-                        callback();
-                    }
-                }
-                else {
-                    wasVisible = false;
-                }
-            };
-            var uiTabs = element.closest('.ui-tabs');
-            if (uiTabs.length > 0) {
-                uiTabs.bind('tabsactivate.' + eventClass, check);
-            }
-            var dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
-            if (dialog.length > 0) {
-                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, check);
-            }
-            element.bind('shown.' + eventClass, check);
+            Q.LayoutTimer.onShown(function () { return el; }, function () {
+                callback();
+            });
         }
         LazyLoadHelper.executeEverytimeWhenShown = executeEverytimeWhenShown;
     })(LazyLoadHelper = Serenity.LazyLoadHelper || (Serenity.LazyLoadHelper = {}));
