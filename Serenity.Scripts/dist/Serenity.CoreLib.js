@@ -18139,12 +18139,14 @@ var Serenity;
         __extends(GoogleMap, _super);
         function GoogleMap(container, opt) {
             var _this = _super.call(this, container, opt) || this;
+            // @ts-ignore
             var center = new google.maps.LatLng(Q.coalesce(_this.options.latitude, 0), Q.coalesce(_this.options.longitude, 0));
             var mapOpt = new Object();
             mapOpt.center = center;
             mapOpt.mapTypeId = Q.coalesce(_this.options.mapTypeId, 'roadmap');
             mapOpt.zoom = Q.coalesce(_this.options.zoom, 15);
             mapOpt.zoomControl = true;
+            // @ts-ignore
             _this.map = new google.maps.Map(container[0], mapOpt);
             if (_this.options.markerTitle != null) {
                 var markerOpt = new Object();
@@ -18156,13 +18158,16 @@ var Serenity;
                 if (lon == null) {
                     lon = Q.coalesce(_this.options.longitude, 0);
                 }
+                // @ts-ignore
                 markerOpt.position = new google.maps.LatLng(lat, lon);
                 markerOpt.map = _this.map;
                 markerOpt.title = _this.options.markerTitle;
                 markerOpt.animation = 2;
+                // @ts-ignore
                 new google.maps.Marker(markerOpt);
             }
             Serenity.LazyLoadHelper.executeOnceWhenShown(container, function () {
+                // @ts-ignore
                 google.maps.event.trigger(_this.map, 'resize', []);
                 _this.map.setCenter(center);
                 // in case it wasn't visible (e.g. in dialog)
