@@ -15,6 +15,7 @@ namespace Serenity.Data
         public FieldReadPermissionAttribute(object permission)
             : base(permission)
         {
+            ApplyToLookups = true;
         }
 
         /// <summary>
@@ -39,6 +40,7 @@ namespace Serenity.Data
         public FieldReadPermissionAttribute(object module, object submodule, object permission)
             : base(module, submodule, permission)
         {
+            ApplyToLookups = true;
         }
 
         /// <summary>
