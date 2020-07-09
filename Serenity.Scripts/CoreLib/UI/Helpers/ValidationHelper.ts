@@ -51,14 +51,10 @@ namespace Q {
     };
 
     export function validateOptions(options: JQueryValidation.ValidationOptions) {
-        return Q.extend({
-            ignore: ":hidden",
-            ignoreTitle: true,
+        var opt = Q.baseValidateOptions();
+        delete opt.showErrors;
+        return Q.extend(Q.extend(opt, {
             meta: 'v',
-            normalizer: function (value: any) {
-                return $.trim(value);
-            },
-            errorClass: 'error',
             errorPlacement: function (error: any, element: any) {
                 let field: any = null;
                 let vx = element.attr('data-vx-id');
@@ -109,13 +105,19 @@ namespace Q {
                         }
 
                         if ($.fn.tooltip) {
-                            $.fn.tooltip && ($(el) as any).tooltip({
+                            var $el = $(el);
+                            if ($el.hasClass('select2-offscreen') &&
+                                el.id) {
+                                $el = $('#s2id_' + el.id);
+                            }
+
+                            $.fn.tooltip && ($el as any).tooltip({
                                 title: validator.errorList[0].message,
                                 trigger: 'manual'
                             }).tooltip('show');
 
                             window.setTimeout(function () {
-                                $(el).tooltip('destroy');
+                                $el.tooltip('destroy');
                             }, 1500);
                         }
                     }
@@ -124,7 +126,7 @@ namespace Q {
             success: function (label: JQuery) {
                 label.addClass('checked');
             }
-        }, options);
+        }), options);
     };
 
     if ($.validator)

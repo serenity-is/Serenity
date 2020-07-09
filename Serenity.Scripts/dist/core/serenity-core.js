@@ -2921,32 +2921,67 @@ var Q;
             el.attr('title', val || '').tooltip('_fixTitle');
         return el;
     }
-    var valOpt = {
-        ignore: ':hidden, .no-validate',
-        showErrors: function (errorMap, errorList) {
-            $.each(this.validElements(), function (index, element) {
-                var $element = $(element);
-                setTooltip($element
-                    .removeClass("error")
-                    .addClass("valid"), '')
-                    .tooltip('hide');
-            });
-            $.each(errorList, function (index, error) {
-                var $element = $(error.element);
-                setTooltip($element
-                    .addClass("error"), error.message);
-                if (index == 0)
-                    $element.tooltip('show');
-            });
-        },
-        normalizer: function (value) {
-            return $.trim(value);
-        }
-    };
-    function validateTooltip(form, opt) {
-        return form.validate(Q.extend(Q.extend({}, valOpt), opt));
+    function baseValidateOptions() {
+        return {
+            errorClass: 'error',
+            ignore: ':hidden, .no-validate',
+            ignoreTitle: true,
+            normalizer: function (value) {
+                return $.trim(value);
+            },
+            highlight: function (element, errorClass, validClass) {
+                if (element.type === "radio") {
+                    this.findByName(element.name).addClass(errorClass).removeClass(validClass);
+                }
+                else {
+                    var $el = $(element);
+                    $el.addClass(errorClass).removeClass(validClass);
+                    if ($el.hasClass('select2-offscreen') &&
+                        element.id) {
+                        $('#s2id_' + element.id).addClass(errorClass).removeClass(validClass);
+                    }
+                }
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                if (element.type === "radio") {
+                    this.findByName(element.name).removeClass(errorClass).addClass(validClass);
+                }
+                else {
+                    var $el = $(element);
+                    $el.removeClass(errorClass).addClass(validClass);
+                    if ($el.hasClass('select2-offscreen') &&
+                        element.id) {
+                        $('#s2id_' + element.id).addClass(errorClass).removeClass(validClass);
+                    }
+                }
+            },
+            showErrors: function (errorMap, errorList) {
+                $.each(this.validElements(), function (index, element) {
+                    var $element = $(element);
+                    setTooltip($element
+                        .removeClass("error")
+                        .addClass("valid"), '')
+                        .tooltip('hide');
+                });
+                $.each(errorList, function (index, error) {
+                    var $el = $(error.element);
+                    if ($el.hasClass('select2-offscreen') &&
+                        error.element.id) {
+                        $el = $('#s2id_' + error.element);
+                    }
+                    setTooltip($el
+                        .addClass("error"), error.message);
+                    if (index == 0)
+                        $el.tooltip('show');
+                });
+            }
+        };
     }
-    Q.validateTooltip = validateTooltip;
+    Q.baseValidateOptions = baseValidateOptions;
+    function validateForm(form, opt) {
+        return form.validate(Q.extend(Q.baseValidateOptions(), opt));
+    }
+    Q.validateForm = validateForm;
     function addValidationRule(element, eventClass, rule) {
         if (!element.length)
             return element;
