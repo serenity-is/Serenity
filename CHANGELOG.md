@@ -1,3 +1,9 @@
+## 3.13.5 (2020-07-09)
+
+Features:
+  - added FieldInsertPermissionAttribute, FieldUpdatePermissionAttribute, FieldModifyPermissionAttribute which works similar to FieldReadPermissionAttribute to set relevant permission on all fields, which can be overridden field level on particular fields
+  - add ability to clear local text registry through a new IRemoveAll interface. required for runtime translation reloading in .NET Core as it is not possible to register a new ILocalTextRegistry unlike .NET framework
+
 ## 3.13.4 (2020-06-12)
 
 Features:
