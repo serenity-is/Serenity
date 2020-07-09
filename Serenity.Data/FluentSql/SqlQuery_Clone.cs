@@ -27,6 +27,7 @@
             clone.into = new List<object>(into);
             clone.intoIndex = intoIndex;
             clone.forXml = forXml;
+            clone.forJson = forJson;
             clone.unionQuery = unionQuery;
             clone.unionType = unionType;
 

@@ -24,6 +24,7 @@
         private StringBuilder groupBy;
         private List<string> orderBy;
         private string forXml;
+        private string forJson;
         private int skip;
         private int take;
         private StringBuilder where;
@@ -61,6 +62,17 @@
         public SqlQuery ForXml(string forXml)
         {
             this.forXml = forXml;
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a FOR JSON statement to the query.
+        /// </summary>
+        /// <param name="forJson">FOR JSON type, usually "auto".</param>
+        /// <returns></returns>
+        public SqlQuery ForJson(string forJson = "AUTO")
+        {
+            this.forJson = forJson;
             return this;
         }
 
@@ -526,6 +538,7 @@
             this.groupBy = null;
             this.orderBy = null;
             this.forXml = null;
+            this.forJson = null;
             this.skip = 0;
             this.take = 0;
             this.where = null;
