@@ -1,4 +1,5 @@
 ﻿using Serenity.Abstractions;
+using System;
 using System.Text.RegularExpressions;
 
 namespace Serenity.Localization
@@ -6,7 +7,7 @@ namespace Serenity.Localization
     /// <summary>
     /// Adds key fallback to any ILocalTextRegistry implementation
     /// </summary>
-    public class FallbackLocalTextRegistry : ILocalTextRegistry
+    public class FallbackLocalTextRegistry : ILocalTextRegistry, IRemoveAll
     {
         private ILocalTextRegistry localTextRegistry;
 
@@ -111,6 +112,19 @@ namespace Serenity.Localization
         public static string BreakUpString(string value)
         {
             return Regex.Replace(value, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1", RegexOptions.Compiled).Trim();
+        }
+
+        /// <summary>
+        /// Removes all cached items from target object.
+        /// </summary>
+        /// <exception cref="NotImplementedException">If underlying local text registry does 
+        /// not implement IRemoveAll interface</exception>
+        public void RemoveAll()
+        {
+            var removeAll = localTextRegistry as IRemoveAll;
+            if (removeAll == null)
+                throw new NotImplementedException();
+            removeAll.RemoveAll();
         }
     }
 }
