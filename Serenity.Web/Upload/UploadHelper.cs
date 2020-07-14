@@ -38,6 +38,7 @@ namespace Serenity.Web
 
         public static string DbFilePath(string dbFileName)
         {
+            CheckFileNameSecurity(dbFileName);
             return Path.Combine(RootPath, ToPath(dbFileName));
         }
 
