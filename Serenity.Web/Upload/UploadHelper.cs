@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using Serenity.IO;
 using System.Web.Hosting;
+using System.Linq;
 #if ASPNETMVC
 using System.Web;
 #endif
@@ -282,21 +283,36 @@ namespace Serenity.Web
             }
         }
 
+        static readonly char[] invalidChars = Path.GetInvalidFileNameChars()
+            .Where(x => x != '/' && x != '\\').ToArray();
+
+        public static bool IsSecureRelativeFile(string fileName)
+        {
+            var trim = fileName.TrimToNull();
+
+            return !(trim == null ||
+                trim == "." ||
+                trim == ".." ||
+                fileName.IndexOf("../") >= 0 ||
+                fileName.IndexOf("..\\") >= 0 ||
+                fileName.IndexOf(':') >= 0 ||
+                trim.StartsWith("/") ||
+                trim.StartsWith("\\") ||
+                trim.EndsWith("/") ||
+                trim.EndsWith("\\") ||
+                Path.IsPathRooted(fileName) ||
+                fileName.IndexOfAny(invalidChars) >= 0 ||
+                !Path.Combine("a/", fileName).StartsWith("a/"));
+        }
+
         public static void CheckFileNameSecurity(string fileName)
         {
-            if (fileName == null ||
-                fileName.Length == 0 ||
-                fileName.IndexOf("..") >= 0 ||
-                fileName.StartsWith("/") ||
-                fileName.StartsWith("\\") ||
-                fileName.EndsWith("/") ||
-                fileName.EndsWith("\\"))
+            if (!IsSecureRelativeFile(fileName))
 #if !ASPNETMVC
                 throw new ArgumentOutOfRangeException("fileName");
 #else
                 throw new HttpException(0x194, "Invalid_Request");
 #endif
-
         }
 
         public static string GetThumbFileName(string fileName, string thumbSuffix = "_t.jpg")

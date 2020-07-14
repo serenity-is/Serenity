@@ -77,6 +77,7 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
     </Reference>
@@ -187,6 +188,7 @@
     <Compile Include="Testing\TestSqlHelperTests.cs" />
     <Compile Include="Testing\TestRow.cs" />
     <Compile Include="Testing\DbScriptTests.cs" />
+    <Compile Include="Web\UploadHelper_CheckFileNameSecurityTests.cs" />
     <Compile Include="Web\NavigationHelperTests.cs" />
     <Compile Include="Web\NavigationItemTests.cs" />
   </ItemGroup>
