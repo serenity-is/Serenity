@@ -602,7 +602,7 @@ namespace Serenity.ComponentModel
         /// </summary>
         public bool ShouldSerializeFormatterParams()
         {
-            return EditorParams != null && FormatterParams.Count > 0;
+            return FormatterParams != null && FormatterParams.Count > 0;
         }
 
         /// <summary>
