@@ -9146,6 +9146,90 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    // http://digitalbush.com/projects/masked-input-plugin/
+    var MaskedEditor = /** @class */ (function (_super) {
+        __extends(MaskedEditor, _super);
+        function MaskedEditor(input, opt) {
+            var _this = _super.call(this, input, opt) || this;
+            input.mask(_this.options.mask || '', {
+                placeholder: Q.coalesce(_this.options.placeholder, '_')
+            });
+            return _this;
+        }
+        Object.defineProperty(MaskedEditor.prototype, "value", {
+            get: function () {
+                this.element.triggerHandler("blur.mask");
+                return this.element.val();
+            },
+            set: function (value) {
+                this.element.val(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        MaskedEditor.prototype.get_value = function () {
+            return this.value;
+        };
+        MaskedEditor.prototype.set_value = function (value) {
+            this.value = value;
+        };
+        MaskedEditor = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.MaskedEditor', [Serenity.IStringValue]),
+            Serenity.Decorators.element("<input type=\"text\"/>")
+        ], MaskedEditor);
+        return MaskedEditor;
+    }(Serenity.Widget));
+    Serenity.MaskedEditor = MaskedEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Recaptcha = /** @class */ (function (_super) {
+        __extends(Recaptcha, _super);
+        function Recaptcha(div, opt) {
+            var _this = _super.call(this, div, opt) || this;
+            _this.element.addClass('g-recaptcha').attr('data-sitekey', _this.options.siteKey);
+            if (!!(window['grecaptcha'] == null && $('script#RecaptchaInclude').length === 0)) {
+                var src = 'https://www.google.com/recaptcha/api.js';
+                var lng = _this.options.language;
+                if (lng == null) {
+                    lng = Q.coalesce($('html').attr('lang'), '');
+                }
+                src += '?hl=' + lng;
+                $('<script/>').attr('id', 'RecaptchaInclude').attr('src', src).appendTo(document.body);
+            }
+            var valInput = $('<input />').insertBefore(_this.element)
+                .attr('id', _this.uniqueName + '_validate').val('x');
+            var gro = {};
+            gro['visibility'] = 'hidden';
+            gro['width'] = '0px';
+            gro['height'] = '0px';
+            gro['padding'] = '0px';
+            var input = valInput.css(gro);
+            var self = _this;
+            Serenity.VX.addValidationRule(input, _this.uniqueName, function (e) {
+                if (Q.isEmptyOrNull(_this.get_value())) {
+                    return Q.text('Validation.Required');
+                }
+                return null;
+            });
+            return _this;
+        }
+        Recaptcha.prototype.get_value = function () {
+            return this.element.find('.g-recaptcha-response').val();
+        };
+        Recaptcha.prototype.set_value = function (value) {
+            // ignore
+        };
+        Recaptcha = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.Recaptcha', [Serenity.IStringValue]),
+            Serenity.Decorators.element("<div/>")
+        ], Recaptcha);
+        return Recaptcha;
+    }(Serenity.Widget));
+    Serenity.Recaptcha = Recaptcha;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var FileUploadEditor = /** @class */ (function (_super) {
         __extends(FileUploadEditor, _super);
         function FileUploadEditor(div, opt) {

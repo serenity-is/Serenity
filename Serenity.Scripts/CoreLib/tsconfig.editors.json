@@ -34,6 +34,8 @@
     "UI/Editors/LookupEditor.ts",
     "UI/Editors/ServiceLookupEditor.ts",
     "UI/Editors/HtmlContentEditor.ts",
+    "UI/Editors/MaskedEditor.ts",
+    "UI/Editors/Recaptcha.ts",
     "UI/Editors/UploadEditors.ts"
   ]
 }

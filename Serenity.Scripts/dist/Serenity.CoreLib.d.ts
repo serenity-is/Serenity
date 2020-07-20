@@ -1934,6 +1934,30 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class MaskedEditor extends Widget<MaskedEditorOptions> {
+        constructor(input: JQuery, opt?: MaskedEditorOptions);
+        get value(): string;
+        protected get_value(): string;
+        set value(value: string);
+        protected set_value(value: string): void;
+    }
+    interface MaskedEditorOptions {
+        mask?: string;
+        placeholder?: string;
+    }
+}
+declare namespace Serenity {
+    interface RecaptchaOptions {
+        siteKey?: string;
+        language?: string;
+    }
+    class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
+        constructor(div: JQuery, opt: RecaptchaOptions);
+        get_value(): string;
+        set_value(value: string): void;
+    }
+}
+declare namespace Serenity {
     interface FileUploadEditorOptions extends FileUploadConstraints {
         displayFileName?: boolean;
         urlPrefix?: string;
