@@ -9206,7 +9206,7 @@ var Serenity;
             gro['padding'] = '0px';
             var input = valInput.css(gro);
             var self = _this;
-            Serenity.VX.addValidationRule(input, _this.uniqueName, function (e) {
+            Q.addValidationRule(input, _this.uniqueName, function (e) {
                 if (Q.isEmptyOrNull(_this.get_value())) {
                     return Q.text('Validation.Required');
                 }

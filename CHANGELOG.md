@@ -1,3 +1,8 @@
+## 3.13.6 (2020-07-20)
+
+Bugfixes:
+  - include recaptcha and maskededitor in corelib again
+
 ## 3.13.5 (2020-07-09)
 
 Features:
