@@ -21,6 +21,7 @@
     <file src="..\Serenity.Scripts\dist\Serenity.CoreLib*.js" target="content/Scripts/serenity" />
     <file src="..\Serenity.Scripts\dist\Serenity.CoreLib*.map" target="content/Scripts/serenity" />
     <file src="..\Serenity.Scripts\dist\Serenity.CoreLib*.ts" target="content/Scripts/serenity" />
+    <file src="..\Serenity.Scripts\dist\Serenity.CoreLib.d.ts" target="content/Scripts/typings/serenity" />	
     <file src="..\Serenity.Scripts\legacy\Serenity.Script.UI.js" target="content/Scripts/serenity" />
     <file src="..\Serenity.Scripts\legacy\Serenity.Script.UI.js" target="content/Scripts/serenity/Serenity.Script.UI.min.js" />
     <file src="..\Serenity.Scripts\dist\core\serenity-*.js" target="content/Scripts/serenity/core" />
