@@ -1,3 +1,8 @@
+## 3.13.7 (2020-07-21)
+
+Bugfixes:
+  - also include Serenity.CoreLib.d.ts under Scripts/typings/serenity/ as older projects still use that one in tsconfig.json (if you have it there, change path to Scripts/serenity/Serenity.CoreLib.d.ts
+
 ## 3.13.6 (2020-07-20)
 
 Bugfixes:
