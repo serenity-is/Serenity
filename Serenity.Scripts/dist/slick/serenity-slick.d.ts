@@ -308,6 +308,7 @@ declare namespace Slick {
         params?: any;
         onSubmit?: CancellableViewCallback<any>;
         url?: string;
+        localSort?: boolean;
         sortBy?: any;
         rowsPerPage?: number;
         seekToPage?: number;
@@ -350,6 +351,8 @@ declare namespace Slick {
         onDataLoaded: Slick.Event;
         onPagingInfoChanged: Slick.Event;
         getPagingInfo(): PagingInfo;
+        onGroupExpanded: Slick.Event;
+        onGroupCollapsed: Slick.Event;
         onAjaxCall: Slick.RemoteViewAjaxCallback<TEntity>;
         onProcessData: Slick.RemoteViewProcessCallback<TEntity>;
         addData(data: Serenity.ListResponse<TEntity>): void;
@@ -358,7 +361,8 @@ declare namespace Slick {
         deleteItem(id: any): void;
         getItems(): TEntity[];
         setFilter(filter: RemoteViewFilter<TEntity>): void;
-        setItems(items: any[], fullReset: boolean): void;
+        setItems(items: any[], newIdProperty?: boolean | string): void;
+        getIdPropertyName(): string;
         getItemById(id: any): TEntity;
         getRowById(id: any): number;
         updateItem(id: any, item: TEntity): void;
@@ -381,6 +385,10 @@ declare namespace Slick {
         rowsPerPage: number;
         errormsg: string;
         params: any;
+        getLocalSort(): boolean;
+        setLocalSort(value: boolean): boolean;
+        sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
+        reSort(): void;
         sortBy: string[];
         url: string;
         method: string;

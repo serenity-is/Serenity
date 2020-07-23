@@ -1599,7 +1599,12 @@ var Serenity;
                 finally {
                     self.view.populateUnlock();
                 }
-                self.view.populate();
+                if (self.view.getLocalSort && self.view.getLocalSort()) {
+                    self.view.sort();
+                }
+                else {
+                    self.view.populate();
+                }
                 _this.persistSettings(null);
             };
             this.slickGrid.onSort.subscribe(this.slickGridOnSort);

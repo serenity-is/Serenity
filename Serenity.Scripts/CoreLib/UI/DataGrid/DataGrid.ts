@@ -510,7 +510,13 @@
                 finally {
                     self.view.populateUnlock();
                 }
-                self.view.populate();
+
+                if (self.view.getLocalSort && self.view.getLocalSort()) {
+                    self.view.sort();
+                }
+                else {
+                    self.view.populate();
+                }
                 this.persistSettings(null);
             };
 
