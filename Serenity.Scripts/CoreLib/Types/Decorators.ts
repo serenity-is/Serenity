@@ -198,12 +198,6 @@ namespace Serenity {
         }
     }
 
-    @Attr('Flexify')
-    export class FlexifyAttribute {
-        constructor(public value = true) {
-        }
-    }
-
     @Attr('Filterable')
     export class FilterableAttribute {
         constructor(public value = true) {
@@ -423,12 +417,6 @@ namespace Serenity {
         export function filterable(value = true) {
             return function (target: Function) {
                 addAttribute(target, new FilterableAttribute(value));
-            }
-        }
-
-        export function flexify(value = true) {
-            return function (target: Function) {
-                addAttribute(target, new FlexifyAttribute(value));
             }
         }
 

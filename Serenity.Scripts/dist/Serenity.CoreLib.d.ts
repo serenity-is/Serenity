@@ -894,10 +894,6 @@ declare namespace Serenity {
         value: string;
         constructor(value: string);
     }
-    class FlexifyAttribute {
-        value: boolean;
-        constructor(value?: boolean);
-    }
     class FilterableAttribute {
         value: boolean;
         constructor(value?: boolean);
@@ -997,7 +993,6 @@ declare namespace Serenity {
         function editor(key?: string): (target: Function) => void;
         function element(value: string): (target: Function) => void;
         function filterable(value?: boolean): (target: Function) => void;
-        function flexify(value?: boolean): (target: Function) => void;
         function itemName(value: string): (target: Function) => void;
         function maximizable(value?: boolean): (target: Function) => void;
         function optionsType(value: Function): (target: Function) => void;
@@ -3593,6 +3588,10 @@ interface JQuery {
     flexY(flexY: number): JQuery;
 }
 declare namespace Serenity {
+    class FlexifyAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
     class Flexify extends Widget<FlexifyOptions> {
         private xDifference;
         private yDifference;
@@ -3609,6 +3608,9 @@ declare namespace Serenity {
         designWidth?: any;
         designHeight?: any;
     }
+}
+declare namespace Serenity.Decorators {
+    function flexify(value?: boolean): (target: Function) => void;
 }
 declare namespace Serenity {
     interface GoogleMapOptions {

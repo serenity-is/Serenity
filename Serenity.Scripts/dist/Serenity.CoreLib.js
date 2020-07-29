@@ -3498,17 +3498,6 @@ var System;
         return EntityTypeAttribute;
     }());
     Serenity.EntityTypeAttribute = EntityTypeAttribute;
-    var FlexifyAttribute = /** @class */ (function () {
-        function FlexifyAttribute(value) {
-            if (value === void 0) { value = true; }
-            this.value = value;
-        }
-        FlexifyAttribute = __decorate([
-            Attr('Flexify')
-        ], FlexifyAttribute);
-        return FlexifyAttribute;
-    }());
-    Serenity.FlexifyAttribute = FlexifyAttribute;
     var FilterableAttribute = /** @class */ (function () {
         function FilterableAttribute(value) {
             if (value === void 0) { value = true; }
@@ -3832,13 +3821,6 @@ var System;
             };
         }
         Decorators.filterable = filterable;
-        function flexify(value) {
-            if (value === void 0) { value = true; }
-            return function (target) {
-                Decorators.addAttribute(target, new FlexifyAttribute(value));
-            };
-        }
-        Decorators.flexify = flexify;
         function itemName(value) {
             return function (target) {
                 Decorators.addAttribute(target, new ItemNameAttribute(value));
@@ -18343,6 +18325,17 @@ $.fn.flexY = function (flexY) {
 };
 var Serenity;
 (function (Serenity) {
+    var FlexifyAttribute = /** @class */ (function () {
+        function FlexifyAttribute(value) {
+            if (value === void 0) { value = true; }
+            this.value = value;
+        }
+        FlexifyAttribute = __decorate([
+            Serenity.Decorators.registerClass('Serenity.FlexifyAttribute')
+        ], FlexifyAttribute);
+        return FlexifyAttribute;
+    }());
+    Serenity.FlexifyAttribute = FlexifyAttribute;
     var Flexify = /** @class */ (function (_super) {
         __extends(Flexify, _super);
         function Flexify(container, options) {
@@ -18454,6 +18447,18 @@ var Serenity;
         return Flexify;
     }(Serenity.Widget));
     Serenity.Flexify = Flexify;
+})(Serenity || (Serenity = {}));
+(function (Serenity) {
+    var Decorators;
+    (function (Decorators) {
+        function flexify(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                Decorators.addAttribute(target, new Serenity.FlexifyAttribute(value));
+            };
+        }
+        Decorators.flexify = flexify;
+    })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {

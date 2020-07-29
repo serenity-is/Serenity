@@ -27,6 +27,13 @@ $.fn.flexY = function (flexY: number): JQuery {
 }
 
 namespace Serenity {
+
+    @Serenity.Decorators.registerClass('Serenity.FlexifyAttribute')
+    export class FlexifyAttribute {
+        constructor(public value = true) {
+        }
+    }
+
     export class Flexify extends Widget<FlexifyOptions> {
         private xDifference = 0;
         private yDifference = 0;
@@ -161,5 +168,14 @@ namespace Serenity {
         getYFactor?: (p1: JQuery) => any;
         designWidth?: any;
         designHeight?: any;
+    }
+}
+
+namespace Serenity.Decorators {
+
+    export function flexify(value = true) {
+        return function (target: Function) {
+            addAttribute(target, new FlexifyAttribute(value));
+        }
     }
 }
