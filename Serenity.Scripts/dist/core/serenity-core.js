@@ -2951,26 +2951,35 @@ var Q;
                     $el.removeClass(errorClass).addClass(validClass);
                     if ($el.hasClass('select2-offscreen') &&
                         element.id) {
-                        $('#s2id_' + element.id).addClass(errorClass).removeClass(validClass);
+                        $('#s2id_' + element.id).removeClass(errorClass).addClass(validClass);
                     }
                 }
             },
             showErrors: function (errorMap, errorList) {
+                var _this = this;
                 $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-                    setTooltip($element
-                        .removeClass("error")
-                        .addClass("valid"), '')
+                    var $el = $(element);
+                    $el.removeClass(_this.settings.errorClass).addClass(_this.settings.validClass);
+                    if ($el.hasClass('select2-offscreen') &&
+                        $el.id) {
+                        $el = $('#s2id_' + element.id)
+                            .removeClass(_this.settings.errorClass)
+                            .addClass(_this.settings.validClass);
+                        if (!$el.length)
+                            $el = $(element);
+                    }
+                    setTooltip($el, '')
                         .tooltip('hide');
                 });
                 $.each(errorList, function (index, error) {
-                    var $el = $(error.element);
+                    var $el = $(error.element).addClass(_this.settings.errorClass);
                     if ($el.hasClass('select2-offscreen') &&
                         error.element.id) {
-                        $el = $('#s2id_' + error.element);
+                        $el = $('#s2id_' + error.element.id).addClass(_this.settings.errorClass);
+                        if (!$el.length)
+                            $el = $(error.element);
                     }
-                    setTooltip($el
-                        .addClass("error"), error.message);
+                    setTooltip($el, error.message);
                     if (index == 0)
                         $el.tooltip('show');
                 });
