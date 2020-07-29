@@ -10455,6 +10455,11 @@ var Serenity;
                 });
                 this.element.closest('.ui-dialog').addClass('flex-layout');
             }
+            else if (Serenity["FlexifyAttribute"] && Serenity.DialogExtensions["dialogFlexify"] &&
+                Q.getAttributes(type, Serenity["FlexifyAttribute"], true).length > 0) {
+                Serenity.DialogExtensions["dialogFlexify"](this.element);
+                Serenity.DialogExtensions.dialogResizable(this.element);
+            }
             if (Q.getAttributes(type, Serenity.MaximizableAttribute, true).length > 0) {
                 Serenity.DialogExtensions.dialogMaximizable(this.element);
             }
@@ -18459,6 +18464,16 @@ var Serenity;
         }
         Decorators.flexify = flexify;
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
+})(Serenity || (Serenity = {}));
+(function (Serenity) {
+    var DialogExtensions;
+    (function (DialogExtensions) {
+        function dialogFlexify(dialog) {
+            new Serenity.Flexify(dialog.closest('.ui-dialog'), {});
+            return dialog;
+        }
+        DialogExtensions.dialogFlexify = dialogFlexify;
+    })(DialogExtensions = Serenity.DialogExtensions || (Serenity.DialogExtensions = {}));
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {

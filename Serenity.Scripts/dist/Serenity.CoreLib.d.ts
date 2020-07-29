@@ -3612,6 +3612,9 @@ declare namespace Serenity {
 declare namespace Serenity.Decorators {
     function flexify(value?: boolean): (target: Function) => void;
 }
+declare namespace Serenity.DialogExtensions {
+    function dialogFlexify(dialog: JQuery): JQuery;
+}
 declare namespace Serenity {
     interface GoogleMapOptions {
         latitude?: any;

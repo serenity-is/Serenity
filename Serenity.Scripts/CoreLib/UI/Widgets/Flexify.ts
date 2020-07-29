@@ -179,3 +179,11 @@ namespace Serenity.Decorators {
         }
     }
 }
+
+namespace Serenity.DialogExtensions {
+
+    export function dialogFlexify(dialog: JQuery): JQuery {
+        new Serenity.Flexify(dialog.closest('.ui-dialog'), {});
+        return dialog;
+    }
+}
