@@ -3498,6 +3498,17 @@ var System;
         return EntityTypeAttribute;
     }());
     Serenity.EntityTypeAttribute = EntityTypeAttribute;
+    var FlexifyAttribute = /** @class */ (function () {
+        function FlexifyAttribute(value) {
+            if (value === void 0) { value = true; }
+            this.value = value;
+        }
+        FlexifyAttribute = __decorate([
+            Attr('Flexify')
+        ], FlexifyAttribute);
+        return FlexifyAttribute;
+    }());
+    Serenity.FlexifyAttribute = FlexifyAttribute;
     var FilterableAttribute = /** @class */ (function () {
         function FilterableAttribute(value) {
             if (value === void 0) { value = true; }
@@ -3821,6 +3832,13 @@ var System;
             };
         }
         Decorators.filterable = filterable;
+        function flexify(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                Decorators.addAttribute(target, new FlexifyAttribute(value));
+            };
+        }
+        Decorators.flexify = flexify;
         function itemName(value) {
             return function (target) {
                 Decorators.addAttribute(target, new ItemNameAttribute(value));

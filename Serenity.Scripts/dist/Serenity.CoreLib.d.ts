@@ -894,6 +894,10 @@ declare namespace Serenity {
         value: string;
         constructor(value: string);
     }
+    class FlexifyAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
     class FilterableAttribute {
         value: boolean;
         constructor(value?: boolean);
@@ -993,6 +997,7 @@ declare namespace Serenity {
         function editor(key?: string): (target: Function) => void;
         function element(value: string): (target: Function) => void;
         function filterable(value?: boolean): (target: Function) => void;
+        function flexify(value?: boolean): (target: Function) => void;
         function itemName(value: string): (target: Function) => void;
         function maximizable(value?: boolean): (target: Function) => void;
         function optionsType(value: Function): (target: Function) => void;
