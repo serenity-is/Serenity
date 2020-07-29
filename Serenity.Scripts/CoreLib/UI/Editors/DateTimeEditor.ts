@@ -203,7 +203,7 @@
             }
 
             this.lastSetValue = null;
-            if (!Q.isEmptyOrNull(value)) {
+            if (!Q.isEmptyOrNull(value) && value.toLowerCase() != 'today' && value.toLowerCase() != 'now') {
                 this.lastSetValueGet = this.get_value();
                 this.lastSetValue = value;
             }
