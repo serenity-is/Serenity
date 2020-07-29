@@ -71,6 +71,14 @@ interface Select2Item {
     source?: any;
     disabled?: boolean;
 }
+declare namespace Serenity {
+    interface Select2Item {
+        id: string;
+        text: string;
+        source?: any;
+        disabled?: boolean;
+    }
+}
 interface Select2Result {
     results: any;
     more: boolean;
