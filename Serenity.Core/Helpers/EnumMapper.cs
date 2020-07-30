@@ -120,6 +120,9 @@ namespace Serenity
         /// <returns>Enum name.</returns>
         public static string GetName(this Enum value)
         {
+            if (value == null)
+                return String.Empty;
+
             return System.Enum.GetName(value.GetType(), value);
         }
 
@@ -130,6 +133,9 @@ namespace Serenity
         /// <returns></returns>
         public static string GetText(this Enum value)
         {
+            if (value == null)
+                return String.Empty;
+
             return FormatEnum(value.GetType(), value);
         }
 
