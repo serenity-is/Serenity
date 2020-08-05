@@ -7032,7 +7032,7 @@ var Serenity;
             dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
                 (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
                     'dd' + s + 'mm' + s + 'yy')),
-            buttonImage: 'data:image/svg+xml,' + encodeURI(Serenity.datePickerIconSvg),
+            buttonImage: 'data:image/svg+xml,' + encodeURIComponent(Serenity.datePickerIconSvg),
             buttonImageOnly: true,
             showOn: 'both',
             showButtonPanel: true,
