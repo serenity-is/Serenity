@@ -128,6 +128,7 @@
     <Compile Include="Core\Logging\FileLoggerTests.cs" />
     <Compile Include="Core\Authorization\LogicOperatorPermissionServiceTests.cs" />
     <Compile Include="Data\DateTimeFieldKindTests.cs" />
+    <Compile Include="Data\RowMappingTests.OuterApplyRow.cs" />
     <Compile Include="Data\RowMappingTests.NamePropertyRow.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidLoadsDetailsOnRetrieve.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidDetailRow.cs" />

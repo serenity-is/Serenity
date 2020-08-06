@@ -360,5 +360,32 @@ namespace Serenity.Test.Data
                 TestSqlHelper.Normalize(
                     query.DebugText));
         }
+
+        [Fact]
+        public void DoesAutomaticJoinForOuterApplyReferencedJoinsBeforeOuterApplyItself()
+        {
+            var fld = RowMappingTests.OuterApplyRow.Fields;
+
+            var query = new SqlQuery()
+                .From(fld)
+                .Select(fld.ID)
+                .Select(fld.OuterColumnId)
+                .Select(fld.OuterColumnName)
+                .Select(fld.LeftJoinedColumn);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+@"SELECT 
+T0.ID AS [ID],
+outerTable.column_id AS [OuterColumnId],
+outerTable.column_name AS [OuterColumnName],
+jLeftJoinedTable.left_joined_column AS [LeftJoinedColumn] 
+FROM MainTable T0 
+LEFT JOIN left_joined_table jLeftJoinedTable ON (jLeftJoinedTable.id = T0.left_joined_id) 
+OUTER APPLY (SELECT DISTINCT [outer_table].[column_id], [outer_table].[column_name] FROM [schema].[some_other_table] AS [outer_table]
+	        WHERE jLeftJoinedTable.outer_table_related_id = outer_table.id) outerTable"),
+                TestSqlHelper.Normalize(
+                    query.DebugText));
+        }
     }
 }
