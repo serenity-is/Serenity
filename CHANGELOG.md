@@ -1,3 +1,18 @@
+## 3.14.0 (2020-08-06)
+
+Features:
+  - ability to enable local sorting on remote view, might be useful for in memory grid editors, override getViewOptions to enable and set localSort to true
+  - bring back flexify decorator for backward compatibility (please don't use it)
+  
+Bugfixes:
+  - datepicker icon not displayed in Serene due to url encoding problem
+  - set datepicker img width default to 16px by css as it is now a svg
+  - checked null in GetName() and GetText() Enum extention methods (#4252)
+  - restore Select2Item interface under Serenity namespace
+  - fix issue with validation error highlighting of select2 editors
+  - don't return last set value in date time picker, if the value was now or today. should resolve issues with validation on create.
+
+
 ## 3.13.7 (2020-07-21)
 
 Bugfixes:
