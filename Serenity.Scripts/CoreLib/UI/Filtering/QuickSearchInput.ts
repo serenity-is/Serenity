@@ -82,7 +82,7 @@
                 return;
             }
 
-            var value = Q.trim(Q.coalesce(this.element.val(), ''));
+            var value = this.get_value();
             if (value == this.lastValue && (!this.fieldChanged || Q.isEmptyOrNull(value))) {
                 this.fieldChanged = false;
                 return;
@@ -100,6 +100,10 @@
             }, Q.coalesce(this.options.typeDelay, 500));
 
             this.lastValue = value;
+        }
+
+        get_value() {
+            return Q.trim(Q.coalesce(this.element.val(), ''));
         }
 
         get_field(): QuickSearchField {
@@ -123,6 +127,19 @@
 			else {
                 qsf.text('');
             }
+        }
+
+        public restoreState(value: string, field: QuickSearchField) {
+            this.fieldChanged = false;
+            this.field = field;
+            var value = Q.trim(Q.coalesce(value, ''));
+            this.element.val(value);
+            this.lastValue = value;
+            if (!!this.timer) {
+                window.clearTimeout(this.timer);
+                this.timer = null;
+            }
+            this.updateInputPlaceHolder();
         }
 
         protected searchNow(value: string) {

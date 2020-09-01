@@ -9936,7 +9936,7 @@ var Serenity;
             if (this.element.hasClass('ignore-change')) {
                 return;
             }
-            var value = Q.trim(Q.coalesce(this.element.val(), ''));
+            var value = this.get_value();
             if (value == this.lastValue && (!this.fieldChanged || Q.isEmptyOrNull(value))) {
                 this.fieldChanged = false;
                 return;
@@ -9950,6 +9950,9 @@ var Serenity;
                 self.searchNow(value);
             }, Q.coalesce(this.options.typeDelay, 500));
             this.lastValue = value;
+        };
+        QuickSearchInput.prototype.get_value = function () {
+            return Q.trim(Q.coalesce(this.element.val(), ''));
         };
         QuickSearchInput.prototype.get_field = function () {
             return this.field;
@@ -9970,6 +9973,18 @@ var Serenity;
             else {
                 qsf.text('');
             }
+        };
+        QuickSearchInput.prototype.restoreState = function (value, field) {
+            this.fieldChanged = false;
+            this.field = field;
+            var value = Q.trim(Q.coalesce(value, ''));
+            this.element.val(value);
+            this.lastValue = value;
+            if (!!this.timer) {
+                window.clearTimeout(this.timer);
+                this.timer = null;
+            }
+            this.updateInputPlaceHolder();
         };
         QuickSearchInput.prototype.searchNow = function (value) {
             var _this = this;
@@ -14992,31 +15007,34 @@ var Serenity;
             });
         }
         GridUtils.addIncludeDeletedToggle = addIncludeDeletedToggle;
-        function addQuickSearchInput(toolDiv, view, fields) {
+        function addQuickSearchInput(toolDiv, view, fields, onChange) {
             var oldSubmit = view.onSubmit;
-            var searchText = '';
-            var searchField = '';
+            var input;
             view.onSubmit = function (v) {
-                if (searchText != null && searchText.length > 0) {
-                    v.params.ContainsText = searchText;
-                }
-                else {
-                    delete v.params['ContainsText'];
-                }
-                if (searchField != null && searchField.length > 0) {
-                    v.params.ContainsField = searchField;
-                }
-                else {
-                    delete v.params['ContainsField'];
+                var _a;
+                if (input) {
+                    var searchText = input.get_value();
+                    if (searchText && searchText.length > 0) {
+                        v.params.ContainsText = searchText;
+                    }
+                    else {
+                        delete v.params['ContainsText'];
+                    }
+                    var searchField = (_a = input.get_field()) === null || _a === void 0 ? void 0 : _a.name;
+                    if (searchField != null && searchField.length > 0) {
+                        v.params.ContainsField = searchField;
+                    }
+                    else {
+                        delete v.params['ContainsField'];
+                    }
                 }
                 if (oldSubmit != null)
                     return oldSubmit(v);
                 return true;
             };
             var lastDoneEvent = null;
-            addQuickSearchInputCustom(toolDiv, function (field, query, done) {
-                searchText = query;
-                searchField = field;
+            input = addQuickSearchInputCustom(toolDiv, function (field, query, done) {
+                onChange && onChange();
                 view.seekToPage = 1;
                 lastDoneEvent = done;
                 view.populate();
@@ -15035,7 +15053,7 @@ var Serenity;
             if (fields != null && fields.length > 0) {
                 div.addClass('has-quick-search-fields');
             }
-            new Serenity.QuickSearchInput(div.children(), {
+            return new Serenity.QuickSearchInput(div.children(), {
                 fields: fields,
                 onSearch: onSearch
             });
@@ -15965,7 +15983,8 @@ var Serenity;
             return null;
         };
         DataGrid.prototype.createQuickSearchInput = function () {
-            Serenity.GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields());
+            var _this = this;
+            Serenity.GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields(), function () { return _this.persistSettings(null); });
         };
         DataGrid.prototype.destroy = function () {
             if (this.layoutTimer) {
@@ -16758,32 +16777,11 @@ var Serenity;
                         }
                     });
                 }
-                if (flags.quickSearch === true && (settings.quickSearchField != null || settings.quickSearchText != null)) {
+                if (flags.quickSearch === true && (settings.quickSearchField !== undefined || settings.quickSearchText !== undefined)) {
                     var qsInput = this.toolbar.element.find('.s-QuickSearchInput').first();
                     if (qsInput.length > 0) {
                         var qsWidget = qsInput.tryGetWidget(Serenity.QuickSearchInput);
-                        if (qsWidget != null) {
-                            this.view.populateLock();
-                            try {
-                                qsWidget.element.addClass('ignore-change');
-                                try {
-                                    if (settings.quickSearchField != null) {
-                                        qsWidget.set_field(settings.quickSearchField);
-                                    }
-                                    if (settings.quickSearchText != null &&
-                                        Q.trimToNull(settings.quickSearchText) !== Q.trimToNull(qsWidget.element.val())) {
-                                        qsWidget.element.val(settings.quickSearchText);
-                                    }
-                                }
-                                finally {
-                                    qsWidget.element.removeClass('ignore-change');
-                                    qsWidget.element.triggerHandler('execute-search');
-                                }
-                            }
-                            finally {
-                                this.view.populateUnlock();
-                            }
-                        }
+                        qsWidget && qsWidget.restoreState(settings.quickSearchText, settings.quickSearchField);
                     }
                 }
             }
