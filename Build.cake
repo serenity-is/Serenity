@@ -99,7 +99,7 @@ Action<string> minimizeJs = filename => {
 
 Action runSourceLink = () => {
 
-    MSBuild(@".\Serenity.Web\Serenity.Web.Net45.csproj", s => {
+    MSBuild(@".\Serenity.Web.Net45\Serenity.Web.Net45.csproj", s => {
         s.SetConfiguration(configuration);
 		s.ToolPath = msBuildPath;
         s.WithProperty("SourceLinkCreate", "true");

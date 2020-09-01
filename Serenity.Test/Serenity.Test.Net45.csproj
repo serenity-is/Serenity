@@ -218,7 +218,7 @@
       <Project>{e5fd07ef-84b5-48c4-8640-46cdc9219ae8}</Project>
       <Name>Serenity.Testing.Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Web\Serenity.Web.Net45.csproj">
+    <ProjectReference Include="..\Serenity.Web.Net45\Serenity.Web.Net45.csproj">
       <Project>{8632943d-2a88-4c83-8451-69d62f059efc}</Project>
       <Name>Serenity.Web.Net45</Name>
     </ProjectReference>
