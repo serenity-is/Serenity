@@ -15,7 +15,7 @@
     <tags>${tags}</tags>
   </metadata>
   <files>
-    <file src="bin\${configuration}\serenity.css" target="content/Content/serenity" />
+    <file src="..\Serenity.Web.Net45\bin\${configuration}\serenity.css" target="content/Content/serenity" />
 	<file src="..\Serenity.Scripts\Style\*.css" target="content/Content/serenity" />
     <file src="Scripts\Serenity\texts\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content/Scripts/serenity/texts" />
     <file src="..\Serenity.Scripts\dist\Serenity.CoreLib*.js" target="content/Scripts/serenity" />
