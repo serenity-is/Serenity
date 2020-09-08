@@ -1451,7 +1451,7 @@ var Q;
         var res = s.match(isoRegexp);
         if (typeof (res) == "undefined" || res === null)
             return null;
-        return new Date(s);
+        return new Date(s + (s.length == 10 ? "T00:00:00" : ""));
     }
     Q.parseISODateTime = parseISODateTime;
     function parseHourAndMin(value) {
