@@ -1,3 +1,9 @@
+## 3.14.1 (2020-09-09)
+
+Bugfixes:
+  - fix setting a date editor date to today in UTC minus time zone resulting in one day before
+  - make sure quick search text and field is persisted after user change if quickSearch persistance flag is true
+
 ## 3.14.0 (2020-08-06)
 
 Features:
