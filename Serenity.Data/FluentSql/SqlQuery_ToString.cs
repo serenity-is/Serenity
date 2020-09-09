@@ -242,31 +242,14 @@ namespace Serenity.Data
                 if (columns.Count > 0)
                     sb.Append(", ");
 
-                if (useRowNum)
-                {
-                    if (orderBy != null)
-                    {
-                        sb.Append("ROW_NUMBER() OVER (ORDER BY ");
-                        for (int i = 0; i < orderBy.Count; i++)
-                        {
-                            if (i > 0)
-                                sb.Append(", ");
-
-                            sb.Append(orderBy[i]);
-                        }
-
-                        sb.Append(") AS numberingofrow");
-                    }
-                    else
-                    {
-                        sb.Append("ROWNUM AS numberingofrow");
-                    }
-                }
+                if (useRowNum && orderBy == null)
+                    sb.Append("ROWNUM AS __rownum__");
                 else
                 {
                     sb.Append("ROW_NUMBER() OVER (ORDER BY ");
 
                     if (orderBy != null)
+                    {
                         for (int i = 0; i < orderBy.Count; i++)
                         {
                             if (i > 0)
@@ -274,14 +257,15 @@ namespace Serenity.Data
 
                             sb.Append(orderBy[i]);
                         }
+                    }
 
-                    sb.Append(") AS __num__");
+                    sb.Append(") AS ");
+                    sb.Append(useRowNum ? "__rownum__" : "__num__");
                 }
-
             }
 
             // write remaining parts of the select query
-            AppendFromWhereOrderByGroupByHaving(sb, extraWhere, !useRowNumber);
+            AppendFromWhereOrderByGroupByHaving(sb, extraWhere, true);
 
             if (useRowNumber)
             {
@@ -291,7 +275,7 @@ namespace Serenity.Data
 
             if (useRowNum)
             {
-                sb.Append(") WHERE numberingofrow > " + skip);
+                sb.Append(") WHERE __rownum__ > " + skip);
                 if (take > 0)
                     sb.Append(" AND ROWNUM <= " + take);
             }
