@@ -6,6 +6,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using WebDriverManager;
+using WebDriverManager.DriverConfigs.Impl;
 
 namespace Serenity.Testing
 {
@@ -71,9 +73,10 @@ namespace Serenity.Testing
 
             private SeleniumDriverManager()
             {
-                var options = new FirefoxOptions();
+                new DriverManager().SetUpDriver(new ChromeConfig());
+                var options = new ChromeOptions();
                 options.AddArgument("-headless");
-                driver = new FirefoxDriver(options);
+                driver = new ChromeDriver(options);
                 driver.Manage().Window.Size = new System.Drawing.Size(1366, 768);
             }
 
@@ -93,6 +96,7 @@ namespace Serenity.Testing
 
                 if (driver != null)
                 {
+                    driver.Quit();
                     driver.Dispose();
                     driver = null;
                 }
