@@ -456,8 +456,12 @@ namespace Serenity.CodeGeneration
 
             if (type.IsGenericInstance)
             {
-                ns = ShortenNamespace(type, codeNamespace);
+                if (type.Namespace == "System.Collections.Generic") {
+                    HandleMemberType(type, codeNamespace, sb);
+                    return;
+                }
 
+                ns = ShortenNamespace(type, codeNamespace);
                 if (!string.IsNullOrEmpty(ns))
                 {
                     sb.Append(ns);
@@ -478,10 +482,16 @@ namespace Serenity.CodeGeneration
                     if (i++ > 0)
                         sb.Append(", ");
 
-                    HandleMemberType(argument, codeNamespace);
+                    HandleMemberType(argument, codeNamespace, sb);
                 }
 
                 sb.Append(">");
+                return;
+            }
+
+            if (type.Namespace == "System")
+            {
+                HandleMemberType(type, codeNamespace, sb);
                 return;
             }
 
