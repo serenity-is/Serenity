@@ -725,7 +725,7 @@ var Serenity;
             _this.set_sqlMinMax(true);
             if (!_this.options.inputOnly) {
                 $("<i class='inplace-button inplace-now'><b></b></div>")
-                    .attr('title', 'set to now')
+                    .attr('title', _this.getInplaceNowText())
                     .insertAfter(_this.time).click(function (e2) {
                     if (_this.element.hasClass('readonly')) {
                         return;
@@ -814,6 +814,9 @@ var Serenity;
                 this.lastSetValueGet = this.get_value();
                 this.lastSetValue = value;
             }
+        };
+        DateTimeEditor.prototype.getInplaceNowText = function () {
+            return Q.coalesce(Q.tryGetText('Controls.DateTimeEditor.SetToNow'), 'set to now');
         };
         DateTimeEditor.prototype.getDisplayFormat = function () {
             return (this.options.seconds ? Q.Culture.dateTimeFormat : Q.Culture.dateTimeFormat.replace(':ss', ''));

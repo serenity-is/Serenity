@@ -1584,6 +1584,7 @@ declare namespace Serenity {
         get_value(): string;
         get value(): string;
         set_value(value: string): void;
+        private getInplaceNowText;
         private getDisplayFormat;
         set value(v: string);
         private get_valueAsDate;
