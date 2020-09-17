@@ -260,6 +260,7 @@
     <Compile Include="..\Serenity.Web\Texts\Texts.Controls.FilterPanel.cs" />
     <Compile Include="..\Serenity.Web\Texts\Texts.Controls.Pager.cs" />
     <Compile Include="..\Serenity.Web\Texts\Texts.Controls.SelectEditor.cs" />
+    <Compile Include="..\Serenity.Web\Texts\Texts.Controls.DateTimeEditor.cs" />
     <Compile Include="..\Serenity.Web\Texts\Texts.Controls.PropertyGrid.cs" />
     <Compile Include="..\Serenity.Web\Texts\Texts.Controls.QuickSearch.cs" />
     <Compile Include="..\Serenity.Web\Texts\Texts.cs" />

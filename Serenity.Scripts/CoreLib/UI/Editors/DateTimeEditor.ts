@@ -120,7 +120,7 @@
 
             if (!this.options.inputOnly) {
                 $("<i class='inplace-button inplace-now'><b></b></div>")
-                    .attr('title', 'set to now')
+                    .attr('title', this.getInplaceNowText())
                     .insertAfter(this.time).click(e2 => {
                         if (this.element.hasClass('readonly')) {
                             return;
@@ -207,6 +207,10 @@
                 this.lastSetValueGet = this.get_value();
                 this.lastSetValue = value;
             }
+        }
+
+        private getInplaceNowText(): string {
+            return Q.coalesce(Q.tryGetText('Controls.DateTimeEditor.SetToNow'), 'set to now');
         }
 
         private getDisplayFormat(): string {

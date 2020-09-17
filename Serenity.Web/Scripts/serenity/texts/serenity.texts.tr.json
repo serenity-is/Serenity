@@ -7,6 +7,7 @@
     "Controls.ColumnPickerDialog.ShowHint": "Göster",
     "Controls.ColumnPickerDialog.Title": "Kolon Seçici",
     "Controls.ColumnPickerDialog.VisibleColumns": "Görünür Kolonlar",
+    "Controls.DateTimeEditor.SetToNow": "şimdiye ayarla",
     "Controls.EntityDialog.ApplyChangesButton": "Değişiklikleri Uygula",
     "Controls.EntityDialog.CloneButton": "Klonla",
     "Controls.EntityDialog.DeleteButton": "Sil",
