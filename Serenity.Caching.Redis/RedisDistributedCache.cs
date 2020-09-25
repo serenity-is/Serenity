@@ -21,6 +21,7 @@ namespace Serenity.Caching
 
         public TValue Get<TValue>(string key)
         {
+            key = this.keyPrefix + key;
             var value = cache.StringGet(key);
 
             if (value.IsNull)
