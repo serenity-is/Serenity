@@ -10,7 +10,7 @@
         if (typeof document !== 'undefined') {
             var pathLink = document.querySelector('link#ApplicationPath') as HTMLLinkElement;
             if (pathLink != null) {
-                applicationPath = pathLink.href;
+                applicationPath = pathLink.getAttribute('href');
             }
         }
 
