@@ -1246,10 +1246,12 @@ var Serenity;
             _this.element.addClass('s-' + Q.getTypeName(Q.getInstanceType(_this)));
             var layout = function () {
                 self.layout();
-                Q.LayoutTimer.store(this.layoutTimer);
+                if (self.layoutTimer != null)
+                    Q.LayoutTimer.store(self.layoutTimer);
             };
             _this.element.addClass('require-layout').on('layout.' + _this.uniqueName, layout);
-            _this.layoutTimer = Q.LayoutTimer.onSizeChange(function () { return _this.element && _this.element[0]; }, Q.debounce(layout, 50));
+            if (_this.useLayoutTimer())
+                _this.layoutTimer = Q.LayoutTimer.onSizeChange(function () { return _this.element && _this.element[0]; }, Q.debounce(layout, 50));
             _this.setTitle(_this.getInitialTitle());
             var buttons = _this.getButtons();
             if (buttons != null) {
@@ -1278,6 +1280,9 @@ var Serenity;
             return _this;
         }
         DataGrid_1 = DataGrid;
+        DataGrid.prototype.useLayoutTimer = function () {
+            return true;
+        };
         DataGrid.prototype.attrs = function (attrType) {
             return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         };

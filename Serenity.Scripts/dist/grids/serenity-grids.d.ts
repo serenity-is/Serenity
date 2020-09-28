@@ -220,6 +220,7 @@ declare namespace Serenity {
         static defaultPersistanceStorage: SettingStorage;
         private layoutTimer;
         constructor(container: JQuery, options?: TOptions);
+        protected useLayoutTimer(): boolean;
         protected attrs<TAttr>(attrType: {
             new (...args: any[]): TAttr;
         }): TAttr[];
