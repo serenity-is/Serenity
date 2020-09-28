@@ -307,14 +307,14 @@
                     this.element.addClass('readonly').attr('readonly', 'readonly');
                     this.element.nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
                     this.element.nextAll('.inplace-now').css('opacity', '0.1');
-
                 }
                 else {
                     this.element.removeClass('readonly').removeAttr('readonly');
                     this.element.nextAll('.ui-datepicker-trigger').css('opacity', '1');
                     this.element.nextAll('.inplace-now').css('opacity', '1');
                 }
-                this.time && this.time.attr('readonly', value ? "readonly" : null)
+
+                this.time && Serenity.EditorUtils.setReadonly(this.time, value);
             }
         }
 
