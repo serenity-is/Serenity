@@ -84,10 +84,13 @@
 
             var layout = function() {
                 self.layout();
-                Q.LayoutTimer.store(this.layoutTimer);
+                if (self.layoutTimer != null)
+                    Q.LayoutTimer.store(self.layoutTimer);
             }
             this.element.addClass('require-layout').on('layout.' + this.uniqueName, layout);
-            this.layoutTimer = Q.LayoutTimer.onSizeChange(() => this.element && this.element[0], Q.debounce(layout, 50));
+
+            if (this.useLayoutTimer())
+                this.layoutTimer = Q.LayoutTimer.onSizeChange(() => this.element && this.element[0], Q.debounce(layout, 50));
 
             this.setTitle(this.getInitialTitle());
 
@@ -123,6 +126,10 @@
             this.initialSettings = this.getCurrentSettings(null);
             this.restoreSettings(null, null);
             window.setTimeout(() => this.initialPopulate(), 0);
+        }
+
+        protected useLayoutTimer() {
+            return true;
         }
 
         protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {

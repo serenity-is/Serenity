@@ -6154,7 +6154,7 @@ var Serenity;
                     val = Object.create(null);
                 this.load(val);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         PropertyGrid.prototype.canModifyItem = function (item) {
@@ -6422,7 +6422,7 @@ var Serenity;
             set: function (value) {
                 this.element.val(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         StringEditor.prototype.get_value = function () {
@@ -6476,7 +6476,7 @@ var Serenity;
             set: function (value) {
                 this.element.val(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         TextAreaEditor.prototype.get_value = function () {
@@ -6507,7 +6507,7 @@ var Serenity;
             set: function (value) {
                 this.element.prop("checked", !!value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         BooleanEditor.prototype.get_value = function () {
@@ -6562,7 +6562,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         DecimalEditor.prototype.set_value = function (value) {
@@ -6632,7 +6632,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         IntegerEditor.prototype.set_value = function (value) {
@@ -6730,7 +6730,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         DateEditor.prototype.set_value = function (value) {
@@ -6757,7 +6757,7 @@ var Serenity;
             set: function (v) {
                 this.set_valueAsDate(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         DateEditor.prototype.set_valueAsDate = function (value) {
@@ -7192,7 +7192,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         DateTimeEditor.prototype.set_value = function (value) {
@@ -7244,7 +7244,7 @@ var Serenity;
             set: function (value) {
                 this.set_valueAsDate(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         DateTimeEditor.prototype.set_valueAsDate = function (value) {
@@ -7406,7 +7406,7 @@ var Serenity;
                     this.minutes.val(value % 60);
                 }
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         TimeEditor.prototype.get_value = function () {
@@ -7532,7 +7532,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         EmailEditor.prototype.set_value = function (value) {
@@ -7680,7 +7680,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         RadioButtonEditor.prototype.set_value = function (value) {
@@ -7977,7 +7977,7 @@ var Serenity;
                     this._itemById[item.id] = item;
                 }
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(Select2Editor.prototype, "itemById", {
@@ -7991,7 +7991,7 @@ var Serenity;
                     throw new Error("Can't set itemById of an async select editor!");
                 this._itemById = value || {};
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.clearItems = function () {
@@ -8173,7 +8173,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.set_value = function (value) {
@@ -8208,7 +8208,7 @@ var Serenity;
                 }
                 return null;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(Select2Editor.prototype, "selectedItems", {
@@ -8227,7 +8227,7 @@ var Serenity;
                 }
                 return result;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.get_values = function () {
@@ -8251,7 +8251,7 @@ var Serenity;
             set: function (value) {
                 this.set_values(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.set_values = function (value) {
@@ -8268,7 +8268,7 @@ var Serenity;
             get: function () {
                 return this.get_text();
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.get_readOnly = function () {
@@ -8281,7 +8281,7 @@ var Serenity;
             set: function (value) {
                 this.set_readOnly(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.updateInplaceReadOnly = function () {
@@ -8327,7 +8327,7 @@ var Serenity;
             set: function (value) {
                 this.set_cascadeFrom(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.set_cascadeFrom = function (value) {
@@ -8346,7 +8346,7 @@ var Serenity;
             set: function (value) {
                 this.set_cascadeField(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.set_cascadeField = function (value) {
@@ -8362,7 +8362,7 @@ var Serenity;
             set: function (value) {
                 this.set_cascadeValue(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.set_cascadeValue = function (value) {
@@ -8382,7 +8382,7 @@ var Serenity;
             set: function (value) {
                 this.set_filterField(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.set_filterField = function (value) {
@@ -8398,7 +8398,7 @@ var Serenity;
             set: function (value) {
                 this.set_filterValue(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2Editor.prototype.set_filterValue = function (value) {
@@ -9062,7 +9062,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         HtmlContentEditor.prototype.set_value = function (value) {
@@ -9176,7 +9176,7 @@ var Serenity;
             set: function (value) {
                 this.element.val(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         MaskedEditor.prototype.get_value = function () {
@@ -9353,7 +9353,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         FileUploadEditor.prototype.set_value = function (value) {
@@ -9504,7 +9504,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         MultipleFileUploadEditor.prototype.set_value = function (value) {
@@ -10396,7 +10396,7 @@ var Serenity;
                 var panelAttr = Q.getAttributes(Q.getInstanceType(this), Serenity.PanelAttribute, true);
                 return panelAttr.length > 0 && panelAttr[panelAttr.length - 1].value !== false;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(TemplatedDialog.prototype, "isResponsive", {
@@ -10404,7 +10404,7 @@ var Serenity;
                 return Q.Config.responsiveDialogs ||
                     Q.getAttributes(Q.getInstanceType(this), Serenity.ResponsiveAttribute, true).length > 0;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         TemplatedDialog.getCssSize = function (element, name) {
@@ -10740,7 +10740,7 @@ var Serenity;
                     }
                 }
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         TemplatedDialog.prototype.setupPanelTitle = function () {
@@ -11768,7 +11768,7 @@ var Serenity;
             set: function (value) {
                 this.set_readOnly(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         EntityDialog.prototype.get_readOnly = function () {
@@ -15813,10 +15813,12 @@ var Serenity;
             _this.element.addClass('s-' + Q.getTypeName(Q.getInstanceType(_this)));
             var layout = function () {
                 self.layout();
-                Q.LayoutTimer.store(this.layoutTimer);
+                if (self.layoutTimer != null)
+                    Q.LayoutTimer.store(self.layoutTimer);
             };
             _this.element.addClass('require-layout').on('layout.' + _this.uniqueName, layout);
-            _this.layoutTimer = Q.LayoutTimer.onSizeChange(function () { return _this.element && _this.element[0]; }, Q.debounce(layout, 50));
+            if (_this.useLayoutTimer())
+                _this.layoutTimer = Q.LayoutTimer.onSizeChange(function () { return _this.element && _this.element[0]; }, Q.debounce(layout, 50));
             _this.setTitle(_this.getInitialTitle());
             var buttons = _this.getButtons();
             if (buttons != null) {
@@ -15845,6 +15847,9 @@ var Serenity;
             return _this;
         }
         DataGrid_1 = DataGrid;
+        DataGrid.prototype.useLayoutTimer = function () {
+            return true;
+        };
         DataGrid.prototype.attrs = function (attrType) {
             return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         };
@@ -16502,7 +16507,7 @@ var Serenity;
             set: function (value) {
                 this.set_readOnly(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         DataGrid.prototype.get_readOnly = function () {
@@ -17753,7 +17758,8 @@ var Serenity;
             var self = this;
             var columns = [];
             columns.push({
-                field: 'text', name: 'Kayıt', width: 80, format: Serenity.SlickFormatting.treeToggle(function () {
+                field: 'text', name: 'Kayıt', width: 80,
+                format: Serenity.SlickFormatting.treeToggle(function () {
                     return self.view;
                 }, function (x) {
                     return x.id;
@@ -17842,7 +17848,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         CheckTreeEditor.prototype.set_value = function (value) {
@@ -17974,7 +17980,7 @@ var Serenity;
             set: function (value) {
                 this.set_cascadeFrom(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         CheckLookupEditor.prototype.getCascadeFromValue = function (parent) {
@@ -18012,7 +18018,7 @@ var Serenity;
             set: function (value) {
                 this.set_cascadeField(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         CheckLookupEditor.prototype.set_cascadeField = function (value) {
@@ -18028,7 +18034,7 @@ var Serenity;
             set: function (value) {
                 this.set_cascadeValue(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         CheckLookupEditor.prototype.set_cascadeValue = function (value) {
@@ -18048,7 +18054,7 @@ var Serenity;
             set: function (value) {
                 this.set_filterField(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         CheckLookupEditor.prototype.set_filterField = function (value) {
@@ -18064,7 +18070,7 @@ var Serenity;
             set: function (value) {
                 this.set_filterValue(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         CheckLookupEditor.prototype.set_filterValue = function (value) {
@@ -18146,22 +18152,26 @@ var Serenity;
                 var _this = this;
                 var buttons = [];
                 buttons.push({
-                    title: 'Önizleme', cssClass: 'print-preview-button', onClick: function () {
+                    title: 'Önizleme', cssClass: 'print-preview-button',
+                    onClick: function () {
                         _this.executeReport('_blank', null);
                     }
                 });
                 buttons.push({
-                    title: 'PDF', cssClass: 'export-pdf-button', onClick: function () {
+                    title: 'PDF', cssClass: 'export-pdf-button',
+                    onClick: function () {
                         _this.executeReport('', 'Pdf');
                     }
                 });
                 buttons.push({
-                    title: 'Excel', cssClass: 'export-xlsx-button', onClick: function () {
+                    title: 'Excel', cssClass: 'export-xlsx-button',
+                    onClick: function () {
                         _this.executeReport('', 'Xlsx');
                     }
                 });
                 buttons.push({
-                    title: 'Word', cssClass: 'export-docx-button', onClick: function () {
+                    title: 'Word', cssClass: 'export-docx-button',
+                    onClick: function () {
                         _this.executeReport('', 'Docx');
                     }
                 });
@@ -18624,7 +18634,8 @@ var Serenity;
                             query.callback({
                                 results: response.Entities.slice(0, _this.pageSize).map(function (x) {
                                     return { id: _this.getItemKey(x), text: _this.getItemText(x), source: x };
-                                }), more: response.Entities.length >= _this.pageSize
+                                }),
+                                more: response.Entities.length >= _this.pageSize
                             });
                         });
                     }, _this.getTypeDelay());
@@ -18669,7 +18680,7 @@ var Serenity;
             set: function (v) {
                 this.set_value(v);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Select2AjaxEditor.prototype.set_value = function (value) {
