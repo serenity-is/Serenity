@@ -13,10 +13,26 @@ namespace Serenity.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="TwoLevelCachedAttribute"/> class.
         /// </summary>
+        public TwoLevelCachedAttribute()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TwoLevelCachedAttribute"/> class.
+        /// </summary>
         /// <param name="generationKeys">The generation keys.</param>
         public TwoLevelCachedAttribute(params string[] generationKeys)
         {
             this.GenerationKeys = generationKeys;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TwoLevelCachedAttribute"/> class.
+        /// </summary>
+        /// <param name="linkedRows">Types of linked rows</param>
+        public TwoLevelCachedAttribute(params Type[] linkedRows)
+        {
+            this.LinkedRows = linkedRows;
         }
 
         /// <summary>
@@ -25,6 +41,14 @@ namespace Serenity.Data
         /// <value>
         /// The generation keys.
         /// </value>
-        public string[] GenerationKeys { get; private set; }
+        public string[] GenerationKeys { get; set; }
+
+        /// <summary>
+        /// Gets the types of the linked rows.
+        /// </summary>
+        /// <value>
+        /// The linked row types.
+        /// </value>
+        public Type[] LinkedRows { get; set; }
     }
 }

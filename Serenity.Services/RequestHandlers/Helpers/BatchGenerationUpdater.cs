@@ -1,6 +1,7 @@
 ﻿using Serenity.Data;
 using System;
 using System.Collections;
+using System.Reflection;
 
 namespace Serenity.Services
 {
@@ -50,6 +51,30 @@ namespace Serenity.Services
             var updater = GetUpdater(generationKey);
             uow.OnCommit -= updater.Update;
             uow.OnCommit += updater.Update;
+        }
+
+        public static void OnCommit(IUnitOfWork uow, Row row)
+        {
+            var generationKey = row.GetFields().GenerationKey;
+            OnCommit(uow, generationKey);
+
+            var attr = row.GetType().GetCustomAttribute<TwoLevelCachedAttribute>(false);
+            if (attr?.GenerationKeys?.Length > 0)
+            {
+                foreach (var key in attr.GenerationKeys)
+                {
+                    OnCommit(uow, key);
+                }
+            }
+
+            if (attr?.LinkedRows?.Length > 0)
+            {
+                foreach (var rowType in attr.LinkedRows)
+                {
+                    var rowInstance = (Row)Activator.CreateInstance(rowType);
+                    OnCommit(uow, rowInstance.GetFields().GenerationKey);
+                }
+            }
         }
     }
 }
