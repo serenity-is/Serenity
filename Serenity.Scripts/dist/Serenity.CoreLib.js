@@ -1451,7 +1451,7 @@ var Q;
         var res = s.match(isoRegexp);
         if (typeof (res) == "undefined" || res === null)
             return null;
-        return new Date(s);
+        return new Date(s + (s.length == 10 ? "T00:00:00" : ""));
     }
     Q.parseISODateTime = parseISODateTime;
     function parseHourAndMin(value) {
@@ -2368,7 +2368,7 @@ var Q;
         if (typeof document !== 'undefined') {
             var pathLink = document.querySelector('link#ApplicationPath');
             if (pathLink != null) {
-                Config.applicationPath = pathLink.href;
+                Config.applicationPath = pathLink.getAttribute('href');
             }
         }
         /**
@@ -2921,32 +2921,76 @@ var Q;
             el.attr('title', val || '').tooltip('_fixTitle');
         return el;
     }
-    var valOpt = {
-        ignore: ':hidden, .no-validate',
-        showErrors: function (errorMap, errorList) {
-            $.each(this.validElements(), function (index, element) {
-                var $element = $(element);
-                setTooltip($element
-                    .removeClass("error")
-                    .addClass("valid"), '')
-                    .tooltip('hide');
-            });
-            $.each(errorList, function (index, error) {
-                var $element = $(error.element);
-                setTooltip($element
-                    .addClass("error"), error.message);
-                if (index == 0)
-                    $element.tooltip('show');
-            });
-        },
-        normalizer: function (value) {
-            return $.trim(value);
-        }
-    };
-    function validateTooltip(form, opt) {
-        return form.validate(Q.extend(Q.extend({}, valOpt), opt));
+    function baseValidateOptions() {
+        return {
+            errorClass: 'error',
+            ignore: ':hidden, .no-validate',
+            ignoreTitle: true,
+            normalizer: function (value) {
+                return $.trim(value);
+            },
+            highlight: function (element, errorClass, validClass) {
+                if (element.type === "radio") {
+                    this.findByName(element.name).addClass(errorClass).removeClass(validClass);
+                }
+                else {
+                    var $el = $(element);
+                    $el.addClass(errorClass).removeClass(validClass);
+                    if ($el.hasClass('select2-offscreen') &&
+                        element.id) {
+                        $('#s2id_' + element.id).addClass(errorClass).removeClass(validClass);
+                    }
+                }
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                if (element.type === "radio") {
+                    this.findByName(element.name).removeClass(errorClass).addClass(validClass);
+                }
+                else {
+                    var $el = $(element);
+                    $el.removeClass(errorClass).addClass(validClass);
+                    if ($el.hasClass('select2-offscreen') &&
+                        element.id) {
+                        $('#s2id_' + element.id).removeClass(errorClass).addClass(validClass);
+                    }
+                }
+            },
+            showErrors: function (errorMap, errorList) {
+                var _this = this;
+                $.each(this.validElements(), function (index, element) {
+                    var $el = $(element);
+                    $el.removeClass(_this.settings.errorClass).addClass(_this.settings.validClass);
+                    if ($el.hasClass('select2-offscreen') &&
+                        $el.id) {
+                        $el = $('#s2id_' + element.id)
+                            .removeClass(_this.settings.errorClass)
+                            .addClass(_this.settings.validClass);
+                        if (!$el.length)
+                            $el = $(element);
+                    }
+                    setTooltip($el, '')
+                        .tooltip('hide');
+                });
+                $.each(errorList, function (index, error) {
+                    var $el = $(error.element).addClass(_this.settings.errorClass);
+                    if ($el.hasClass('select2-offscreen') &&
+                        error.element.id) {
+                        $el = $('#s2id_' + error.element.id).addClass(_this.settings.errorClass);
+                        if (!$el.length)
+                            $el = $(error.element);
+                    }
+                    setTooltip($el, error.message);
+                    if (index == 0)
+                        $el.tooltip('show');
+                });
+            }
+        };
     }
-    Q.validateTooltip = validateTooltip;
+    Q.baseValidateOptions = baseValidateOptions;
+    function validateForm(form, opt) {
+        return form.validate(Q.extend(Q.baseValidateOptions(), opt));
+    }
+    Q.validateForm = validateForm;
     function addValidationRule(element, eventClass, rule) {
         if (!element.length)
             return element;
@@ -3036,9 +3080,11 @@ var Q;
     var LayoutTimer;
     (function (LayoutTimer) {
         var timeout;
-        var regs = [];
+        var nextKey = 0;
+        var regCount = 0;
+        var regs = {};
         function startTimer() {
-            if (timeout == null && regs.length) {
+            if (timeout == null && regCount > 0) {
                 timeout = window.setTimeout(onTimeout, 100);
             }
         }
@@ -3049,10 +3095,33 @@ var Q;
             }
         }
         function onTimeout() {
-            for (var _i = 0, regs_1 = regs; _i < regs_1.length; _i++) {
-                var reg = regs_1[_i];
+            for (var key in regs) {
+                var reg = regs[key];
                 try {
-                    reg.handler();
+                    var el = reg.element();
+                    if (!el)
+                        continue;
+                    var w = el.offsetWidth;
+                    var h = el.offsetHeight;
+                    try {
+                        if ((reg.width && reg.storedWidth !== w) ||
+                            (reg.height && reg.storedHeight !== h) ||
+                            (!reg.width && !reg.height && (!w !== !reg.storedWidth || !h !== !reg.storedHeight))) {
+                            if (w > 0 && h > 0) {
+                                try {
+                                    reg.handler();
+                                }
+                                finally {
+                                    w = el.offsetWidth;
+                                    h = el.offsetHeight;
+                                }
+                            }
+                        }
+                    }
+                    finally {
+                        reg.storedWidth = w;
+                        reg.storedHeight = h;
+                    }
                 }
                 catch (e) {
                     console.log(e);
@@ -3061,65 +3130,65 @@ var Q;
             clearTimer();
             startTimer();
         }
-        function on(key, handler) {
+        function store(key) {
+            var reg = regs[key];
+            if (!reg)
+                return;
+            var el = reg.element();
+            if (!el)
+                return;
+            reg.storedWidth = el.offsetWidth;
+            reg.storedHeight = el.offsetHeight;
+        }
+        LayoutTimer.store = store;
+        function trigger(key) {
+            var reg = regs[key];
+            if (!reg)
+                return;
+            store(key);
+            if (reg.storedWidth >= 0 &&
+                reg.storedHeight >= 0) {
+                reg.handler();
+            }
+            store(key);
+        }
+        LayoutTimer.trigger = trigger;
+        function onSizeChange(element, handler, width, height) {
             if (handler == null)
                 throw "Layout handler can't be null!";
-            if (key != null && Q.any(regs, function (x) { return x.key === key; }))
-                throw "There is already a registered layout handler with key: " + key;
-            regs.push({
-                key: key,
+            regs[++nextKey] = {
+                element: element,
                 handler: handler,
-            });
+                width: width !== false,
+                height: height !== false
+            };
+            regCount++;
+            store(nextKey);
             startTimer();
-            return handler;
-        }
-        LayoutTimer.on = on;
-        function onSizeChange(key, element, handler) {
-            var oldWidth = element.offsetWidth;
-            var oldHeight = element.offsetHeight;
-            on(key, function () {
-                var offsetWidth = element.offsetWidth;
-                var offsetHeight = element.offsetHeight;
-                if (offsetWidth !== oldWidth ||
-                    offsetHeight !== oldHeight) {
-                    oldWidth = offsetWidth;
-                    oldHeight = offsetHeight;
-                    handler();
-                }
-            });
-            return handler;
+            return nextKey;
         }
         LayoutTimer.onSizeChange = onSizeChange;
-        function onWidthChange(key, element, handler) {
-            var oldWidth = element.offsetWidth;
-            on(key, function () {
-                var offsetWidth = element.offsetWidth;
-                if (offsetWidth !== oldWidth) {
-                    oldWidth = offsetWidth;
-                    handler();
-                }
-            });
-            return handler;
+        function onWidthChange(element, handler) {
+            return onSizeChange(element, handler, true, false);
         }
         LayoutTimer.onWidthChange = onWidthChange;
-        function onHeightChange(key, element, handler) {
-            var oldHeight = element.offsetHeight;
-            on(key, function () {
-                var offsetHeight = element.offsetHeight;
-                if (offsetHeight !== oldHeight) {
-                    oldHeight = offsetHeight;
-                    handler();
-                }
-            });
-            return handler;
+        function onHeightChange(element, handler) {
+            return onSizeChange(element, handler, false, true);
         }
         LayoutTimer.onHeightChange = onHeightChange;
-        function off(key, handler) {
-            if (key != null)
-                regs = regs.filter(function (x) { return x.key !== key; });
-            if (handler != null)
-                regs = regs.filter(function (x) { return x.handler === handler; });
-            !regs.length && this.clearTimer();
+        function onShown(element, handler) {
+            return onSizeChange(element, handler, false, false);
+        }
+        LayoutTimer.onShown = onShown;
+        function off(key) {
+            var reg = regs[key];
+            if (!reg)
+                return 0;
+            delete regs[key];
+            regCount--;
+            if (regCount <= 0)
+                clearTimer();
+            return 0;
         }
         LayoutTimer.off = off;
     })(LayoutTimer = Q.LayoutTimer || (Q.LayoutTimer = {}));
@@ -4468,93 +4537,29 @@ var Serenity;
     (function (LazyLoadHelper) {
         var autoIncrement = 0;
         function executeOnceWhenShown(element, callback) {
-            autoIncrement++;
-            var eventClass = 'ExecuteOnceWhenShown' + autoIncrement;
-            var executed = false;
-            if (element.is(':visible')) {
+            var el = element && element[0];
+            if (!el)
+                return;
+            if (el.offsetWidth > 0 && el.offsetHeight > 0) {
                 callback();
+                return;
             }
-            else {
-                var uiTabs = element.closest('.ui-tabs');
-                if (uiTabs.length > 0) {
-                    uiTabs.bind('tabsactivate.' + eventClass, function (e) {
-                        if (element.is(':visible')) {
-                            uiTabs.unbind('tabsactivate.' + eventClass);
-                            if (!executed) {
-                                executed = true;
-                                element.unbind('shown.' + eventClass);
-                                callback();
-                            }
-                        }
-                    });
-                }
-                var bsTabs = element.closest('.nav-tabs');
-                if (bsTabs.length > 0) {
-                    bsTabs.one('shown.bs.tab', function (e) {
-                        if (!executed && element.is(':visible')) {
-                            executed = true;
-                            callback();
-                        }
-                    });
-                }
-                var dialog;
-                if (element.hasClass('ui-dialog')) {
-                    dialog = element.children('.ui-dialog-content');
-                }
-                else {
-                    dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
-                }
-                if (dialog.length > 0) {
-                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, function () {
-                        dialog.unbind('dialogopen.' + eventClass);
-                        dialog.unbind('panelopen.' + eventClass);
-                        dialog.unbind('shown.bs.modal.' + eventClass);
-                        if (element.is(':visible') && !executed) {
-                            executed = true;
-                            element.unbind('shown.' + eventClass);
-                            callback();
-                        }
-                    });
-                }
-                element.bind('shown.' + eventClass, function () {
-                    if (element.is(':visible')) {
-                        element.unbind('shown.' + eventClass);
-                        if (!executed) {
-                            executed = true;
-                            callback();
-                        }
-                    }
-                });
-            }
+            var timer = Q.LayoutTimer.onShown(function () { return el; }, function () {
+                Q.LayoutTimer.off(timer);
+                callback();
+            });
         }
         LazyLoadHelper.executeOnceWhenShown = executeOnceWhenShown;
         function executeEverytimeWhenShown(element, callback, callNowIfVisible) {
-            autoIncrement++;
-            var eventClass = 'ExecuteEverytimeWhenShown' + autoIncrement;
-            var wasVisible = element.is(':visible');
-            if (wasVisible && callNowIfVisible) {
+            var el = element && element[0];
+            if (!el)
+                return;
+            if (callNowIfVisible && el.offsetWidth > 0 && el.offsetHeight > 0) {
                 callback();
             }
-            var check = function (e) {
-                if (element.is(':visible')) {
-                    if (!wasVisible) {
-                        wasVisible = true;
-                        callback();
-                    }
-                }
-                else {
-                    wasVisible = false;
-                }
-            };
-            var uiTabs = element.closest('.ui-tabs');
-            if (uiTabs.length > 0) {
-                uiTabs.bind('tabsactivate.' + eventClass, check);
-            }
-            var dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
-            if (dialog.length > 0) {
-                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass + ' shown.bs.modal.' + eventClass, check);
-            }
-            element.bind('shown.' + eventClass, check);
+            Q.LayoutTimer.onShown(function () { return el; }, function () {
+                callback();
+            });
         }
         LazyLoadHelper.executeEverytimeWhenShown = executeEverytimeWhenShown;
     })(LazyLoadHelper = Serenity.LazyLoadHelper || (Serenity.LazyLoadHelper = {}));
@@ -5325,14 +5330,10 @@ var Q;
     Q.validatorAbortHandler = validatorAbortHandler;
     ;
     function validateOptions(options) {
-        return Q.extend({
-            ignore: ":hidden",
-            ignoreTitle: true,
+        var opt = Q.baseValidateOptions();
+        delete opt.showErrors;
+        return Q.extend(Q.extend(opt, {
             meta: 'v',
-            normalizer: function (value) {
-                return $.trim(value);
-            },
-            errorClass: 'error',
             errorPlacement: function (error, element) {
                 var field = null;
                 var vx = element.attr('data-vx-id');
@@ -5379,12 +5380,17 @@ var Q;
                             }
                         }
                         if ($.fn.tooltip) {
-                            $.fn.tooltip && $(el).tooltip({
+                            var $el = $(el);
+                            if ($el.hasClass('select2-offscreen') &&
+                                el.id) {
+                                $el = $('#s2id_' + el.id);
+                            }
+                            $.fn.tooltip && $el.tooltip({
                                 title: validator.errorList[0].message,
                                 trigger: 'manual'
                             }).tooltip('show');
                             window.setTimeout(function () {
-                                $(el).tooltip('destroy');
+                                $el.tooltip('destroy');
                             }, 1500);
                         }
                     }
@@ -5393,7 +5399,7 @@ var Q;
             success: function (label) {
                 label.addClass('checked');
             }
-        }, options);
+        }), options);
     }
     Q.validateOptions = validateOptions;
     ;
@@ -7026,7 +7032,7 @@ var Serenity;
             dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
                 (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
                     'dd' + s + 'mm' + s + 'yy')),
-            buttonImage: 'data:image/svg+xml,' + encodeURI(Serenity.datePickerIconSvg),
+            buttonImage: 'data:image/svg+xml,' + encodeURIComponent(Serenity.datePickerIconSvg),
             buttonImageOnly: true,
             showOn: 'both',
             showButtonPanel: true,
@@ -7129,7 +7135,7 @@ var Serenity;
             _this.set_sqlMinMax(true);
             if (!_this.options.inputOnly) {
                 $("<i class='inplace-button inplace-now'><b></b></div>")
-                    .attr('title', 'set to now')
+                    .attr('title', _this.getInplaceNowText())
                     .insertAfter(_this.time).click(function (e2) {
                     if (_this.element.hasClass('readonly')) {
                         return;
@@ -7214,10 +7220,13 @@ var Serenity;
                     this.element.val(Q.formatDate(val, this.getDisplayFormat()));
             }
             this.lastSetValue = null;
-            if (!Q.isEmptyOrNull(value)) {
+            if (!Q.isEmptyOrNull(value) && value.toLowerCase() != 'today' && value.toLowerCase() != 'now') {
                 this.lastSetValueGet = this.get_value();
                 this.lastSetValue = value;
             }
+        };
+        DateTimeEditor.prototype.getInplaceNowText = function () {
+            return Q.coalesce(Q.tryGetText('Controls.DateTimeEditor.SetToNow'), 'set to now');
         };
         DateTimeEditor.prototype.getDisplayFormat = function () {
             return (this.options.seconds ? Q.Culture.dateTimeFormat : Q.Culture.dateTimeFormat.replace(':ss', ''));
@@ -7296,7 +7305,7 @@ var Serenity;
                     this.element.nextAll('.ui-datepicker-trigger').css('opacity', '1');
                     this.element.nextAll('.inplace-now').css('opacity', '1');
                 }
-                this.time && this.time.attr('readonly', value ? "readonly" : null);
+                this.time && Serenity.EditorUtils.setReadonly(this.time, value);
             }
         };
         DateTimeEditor.roundToMinutes = function (date, minutesStep) {
@@ -9149,6 +9158,90 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    // http://digitalbush.com/projects/masked-input-plugin/
+    var MaskedEditor = /** @class */ (function (_super) {
+        __extends(MaskedEditor, _super);
+        function MaskedEditor(input, opt) {
+            var _this = _super.call(this, input, opt) || this;
+            input.mask(_this.options.mask || '', {
+                placeholder: Q.coalesce(_this.options.placeholder, '_')
+            });
+            return _this;
+        }
+        Object.defineProperty(MaskedEditor.prototype, "value", {
+            get: function () {
+                this.element.triggerHandler("blur.mask");
+                return this.element.val();
+            },
+            set: function (value) {
+                this.element.val(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        MaskedEditor.prototype.get_value = function () {
+            return this.value;
+        };
+        MaskedEditor.prototype.set_value = function (value) {
+            this.value = value;
+        };
+        MaskedEditor = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.MaskedEditor', [Serenity.IStringValue]),
+            Serenity.Decorators.element("<input type=\"text\"/>")
+        ], MaskedEditor);
+        return MaskedEditor;
+    }(Serenity.Widget));
+    Serenity.MaskedEditor = MaskedEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Recaptcha = /** @class */ (function (_super) {
+        __extends(Recaptcha, _super);
+        function Recaptcha(div, opt) {
+            var _this = _super.call(this, div, opt) || this;
+            _this.element.addClass('g-recaptcha').attr('data-sitekey', _this.options.siteKey);
+            if (!!(window['grecaptcha'] == null && $('script#RecaptchaInclude').length === 0)) {
+                var src = 'https://www.google.com/recaptcha/api.js';
+                var lng = _this.options.language;
+                if (lng == null) {
+                    lng = Q.coalesce($('html').attr('lang'), '');
+                }
+                src += '?hl=' + lng;
+                $('<script/>').attr('id', 'RecaptchaInclude').attr('src', src).appendTo(document.body);
+            }
+            var valInput = $('<input />').insertBefore(_this.element)
+                .attr('id', _this.uniqueName + '_validate').val('x');
+            var gro = {};
+            gro['visibility'] = 'hidden';
+            gro['width'] = '0px';
+            gro['height'] = '0px';
+            gro['padding'] = '0px';
+            var input = valInput.css(gro);
+            var self = _this;
+            Q.addValidationRule(input, _this.uniqueName, function (e) {
+                if (Q.isEmptyOrNull(_this.get_value())) {
+                    return Q.text('Validation.Required');
+                }
+                return null;
+            });
+            return _this;
+        }
+        Recaptcha.prototype.get_value = function () {
+            return this.element.find('.g-recaptcha-response').val();
+        };
+        Recaptcha.prototype.set_value = function (value) {
+            // ignore
+        };
+        Recaptcha = __decorate([
+            Serenity.Decorators.registerEditor('Serenity.Recaptcha', [Serenity.IStringValue]),
+            Serenity.Decorators.element("<div/>")
+        ], Recaptcha);
+        return Recaptcha;
+    }(Serenity.Widget));
+    Serenity.Recaptcha = Recaptcha;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var FileUploadEditor = /** @class */ (function (_super) {
         __extends(FileUploadEditor, _super);
         function FileUploadEditor(div, opt) {
@@ -9846,7 +9939,7 @@ var Serenity;
             if (this.element.hasClass('ignore-change')) {
                 return;
             }
-            var value = Q.trim(Q.coalesce(this.element.val(), ''));
+            var value = this.get_value();
             if (value == this.lastValue && (!this.fieldChanged || Q.isEmptyOrNull(value))) {
                 this.fieldChanged = false;
                 return;
@@ -9860,6 +9953,9 @@ var Serenity;
                 self.searchNow(value);
             }, Q.coalesce(this.options.typeDelay, 500));
             this.lastValue = value;
+        };
+        QuickSearchInput.prototype.get_value = function () {
+            return Q.trim(Q.coalesce(this.element.val(), ''));
         };
         QuickSearchInput.prototype.get_field = function () {
             return this.field;
@@ -9880,6 +9976,18 @@ var Serenity;
             else {
                 qsf.text('');
             }
+        };
+        QuickSearchInput.prototype.restoreState = function (value, field) {
+            this.fieldChanged = false;
+            this.field = field;
+            var value = Q.trim(Q.coalesce(value, ''));
+            this.element.val(value);
+            this.lastValue = value;
+            if (!!this.timer) {
+                window.clearTimeout(this.timer);
+                this.timer = null;
+            }
+            this.updateInputPlaceHolder();
         };
         QuickSearchInput.prototype.searchNow = function (value) {
             var _this = this;
@@ -10373,6 +10481,11 @@ var Serenity;
                     }
                 });
                 this.element.closest('.ui-dialog').addClass('flex-layout');
+            }
+            else if (Serenity["FlexifyAttribute"] && Serenity.DialogExtensions["dialogFlexify"] &&
+                Q.getAttributes(type, Serenity["FlexifyAttribute"], true).length > 0) {
+                Serenity.DialogExtensions["dialogFlexify"](this.element);
+                Serenity.DialogExtensions.dialogResizable(this.element);
             }
             if (Q.getAttributes(type, Serenity.MaximizableAttribute, true).length > 0) {
                 Serenity.DialogExtensions.dialogMaximizable(this.element);
@@ -13224,6 +13337,7 @@ var Slick;
 (function (Slick) {
     var RemoteView = /** @class */ (function () {
         function RemoteView(options) {
+            var _a;
             var self = this;
             var defaults = {
                 groupItemMetadataProvider: null,
@@ -13255,6 +13369,7 @@ var Slick;
                         (a.value > b.value ? 1 : -1));
                 },
                 predefinedValues: [],
+                aggregators: [],
                 aggregateEmpty: false,
                 aggregateCollapsed: false,
                 aggregateChildGroups: false,
@@ -13269,9 +13384,15 @@ var Slick;
             var groupingDelimiter = ':|:';
             var page = 1;
             var totalRows = 0;
+            var onDataChanged = new Slick.Event();
+            var onDataLoading = new Slick.Event();
+            var onDataLoaded = new Slick.Event();
+            var onGroupExpanded = new Slick.Event();
+            var onGroupCollapsed = new Slick.Event();
+            var onPagingInfoChanged = new Slick.Event();
             var onRowCountChanged = new Slick.Event();
             var onRowsChanged = new Slick.Event();
-            var onPagingInfoChanged = new Slick.Event();
+            var onRowsOrCountChanged = new Slick.Event();
             var loading = false;
             var errorMessage = null;
             var populateLocks = 0;
@@ -13279,10 +13400,7 @@ var Slick;
             var contentType;
             var dataType;
             var totalCount = null;
-            var onDataChanged = new Slick.Event();
-            var onDataLoading = new Slick.Event();
-            var onDataLoaded = new Slick.Event();
-            var onClearData = new Slick.Event();
+            var localSort = (_a = options === null || options === void 0 ? void 0 : options.localSort) !== null && _a !== void 0 ? _a : false;
             var intf;
             function beginUpdate() {
                 suspend++;
@@ -13332,8 +13450,16 @@ var Slick;
             function getItems() {
                 return items;
             }
-            function setItems(data) {
+            function getIdPropertyName() {
+                return idProperty;
+            }
+            function setItems(data, newIdProperty) {
+                if (newIdProperty != null && typeof newIdProperty == "string")
+                    idProperty = newIdProperty;
                 items = filteredItems = data;
+                if (localSort) {
+                    items.sort(getSortComparer());
+                }
                 idxById = {};
                 rowsById = null;
                 summaryOptions.totals = {};
@@ -13382,20 +13508,61 @@ var Slick;
                     dataView: self
                 };
             }
+            function getSortComparer() {
+                if (sortComparer != null)
+                    return sortComparer;
+                var cols = [];
+                var asc = [];
+                var sorts = intf.sortBy || [];
+                for (var _i = 0, sorts_1 = sorts; _i < sorts_1.length; _i++) {
+                    var s = sorts_1[_i];
+                    if (s == null)
+                        continue;
+                    if (s.length > 5 && s.toLowerCase().substr(s.length - 5).toLowerCase() == ' desc') {
+                        asc.push(false);
+                        cols.push(s.substr(0, s.length - 5));
+                    }
+                    else {
+                        asc.push(true);
+                        cols.push(s);
+                    }
+                }
+                return function (a, b) {
+                    for (var i = 0, l = cols.length; i < l; i++) {
+                        var field = cols[i];
+                        var sign = asc[i] ? 1 : -1;
+                        var value1 = a[field], value2 = b[field];
+                        var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+                        if (result != 0) {
+                            return result;
+                        }
+                    }
+                    return 0;
+                };
+            }
             function sort(comparer, ascending) {
                 sortAsc = ascending;
-                sortComparer = comparer;
                 fastSortField = null;
                 if (ascending === false) {
                     items.reverse();
                 }
-                items.sort(comparer);
+                sortComparer = comparer;
+                items.sort(getSortComparer());
                 if (ascending === false) {
                     items.reverse();
                 }
                 idxById = {};
                 updateIdxById();
                 refresh();
+            }
+            function getLocalSort() {
+                return localSort;
+            }
+            function setLocalSort(value) {
+                if (localSort != value) {
+                    localSort = value;
+                    sort();
+                }
             }
             /***
              * Provides a workaround for the extremely slow sorting in IE.
@@ -13425,12 +13592,16 @@ var Slick;
                 refresh();
             }
             function reSort() {
-                if (sortComparer) {
-                    sort(sortComparer, sortAsc);
-                }
-                else if (fastSortField) {
+                if (fastSortField)
                     fastSort(fastSortField, sortAsc);
-                }
+                else
+                    sort(sortComparer, sortAsc);
+            }
+            function getFilteredItems() {
+                return filteredItems;
+            }
+            function getFilter() {
+                return filter;
             }
             function setFilter(filterFn) {
                 filter = filterFn;
@@ -13506,12 +13677,27 @@ var Slick;
                     }
                 }
             }
+            function getRowByItem(item) {
+                ensureRowsByIdCache();
+                return rowsById[item[idProperty]];
+            }
             function getRowById(id) {
                 ensureRowsByIdCache();
                 return rowsById[id];
             }
             function getItemById(id) {
                 return items[idxById[id]];
+            }
+            function mapItemsToRows(itemArray) {
+                var rows = [];
+                ensureRowsByIdCache();
+                for (var i = 0, l = itemArray.length; i < l; i++) {
+                    var row = rowsById[itemArray[i][idProperty]];
+                    if (row != null) {
+                        rows[rows.length] = row;
+                    }
+                }
+                return rows;
             }
             function mapIdsToRows(idArray) {
                 var rows = [];
@@ -13534,8 +13720,24 @@ var Slick;
                 return ids;
             }
             function updateItem(id, item) {
-                if (idxById[id] === undefined || id !== item[idProperty]) {
-                    throw "Invalid or non-matching id";
+                if (idxById[id] === undefined) {
+                    throw new Error("Invalid id");
+                }
+                if (id !== item[idProperty]) {
+                    // make sure the new id is unique:
+                    var newId = item[idProperty];
+                    if (newId == null) {
+                        throw new Error("Cannot update item to associate with a null id");
+                    }
+                    if (idxById[newId] !== undefined) {
+                        throw new Error("Cannot update item to associate with a non-unique id");
+                    }
+                    idxById[newId] = idxById[id];
+                    delete idxById[id];
+                    if (updated && updated[id]) {
+                        delete updated[id];
+                    }
+                    id = newId;
                 }
                 items[idxById[id]] = item;
                 if (!updated) {
@@ -13563,6 +13765,38 @@ var Slick;
                 items.splice(idx, 1);
                 updateIdxById(idx);
                 refresh();
+            }
+            function sortedAddItem(item) {
+                insertItem(sortedIndex(item), item);
+            }
+            function sortedUpdateItem(id, item) {
+                if (idxById[id] === undefined || id !== item[idProperty]) {
+                    throw new Error("Invalid or non-matching id " + idxById[id]);
+                }
+                var comparer = getSortComparer();
+                var oldItem = getItemById(id);
+                if (comparer(oldItem, item) !== 0) {
+                    // item affects sorting -> must use sorted add
+                    deleteItem(id);
+                    sortedAddItem(item);
+                }
+                else { // update does not affect sorting -> regular update works fine
+                    updateItem(id, item);
+                }
+            }
+            function sortedIndex(searchItem) {
+                var low = 0, high = items.length;
+                var comparer = getSortComparer();
+                while (low < high) {
+                    var mid = low + high >>> 1;
+                    if (comparer(items[mid], searchItem) === -1) {
+                        low = mid + 1;
+                    }
+                    else {
+                        high = mid;
+                    }
+                }
+                return low;
             }
             function getRows() {
                 return rows;
@@ -13606,11 +13840,23 @@ var Slick;
                     for (var i = 0; i < groupingInfos.length; i++) {
                         toggledGroupsByLevel[i] = {};
                         groupingInfos[i].collapsed = collapse;
+                        if (collapse === true) {
+                            onGroupCollapsed.notify({ level: i, groupingKey: null });
+                        }
+                        else {
+                            onGroupExpanded.notify({ level: i, groupingKey: null });
+                        }
                     }
                 }
                 else {
                     toggledGroupsByLevel[level] = {};
                     groupingInfos[level].collapsed = collapse;
+                    if (collapse === true) {
+                        onGroupCollapsed.notify({ level: level, groupingKey: null });
+                    }
+                    else {
+                        onGroupExpanded.notify({ level: level, groupingKey: null });
+                    }
                 }
                 refresh();
             }
@@ -13638,6 +13884,10 @@ var Slick;
             function expandCollapseGroup(args, collapse) {
                 var opts = resolveLevelAndGroupingKey(args);
                 toggledGroupsByLevel[opts.level][opts.groupingKey] = groupingInfos[opts.level].collapsed ^ collapse;
+                if (collapse)
+                    onGroupCollapsed.notify({ level: opts.level, groupingKey: opts.groupingKey });
+                else
+                    onGroupExpanded.notify({ level: opts.level, groupingKey: opts.groupingKey });
                 refresh();
             }
             /**
@@ -13698,6 +13948,9 @@ var Slick;
                         group = groups[i];
                         group.groups = extractGroups(group.rows, group);
                     }
+                }
+                if (groups.length) {
+                    addTotals(groups, level);
                 }
                 groups.sort(groupingInfos[level].comparer);
                 return groups;
@@ -13851,8 +14104,28 @@ var Slick;
                 tpl = tpl.replace(/\$item\$/gi, filterInfo.params[0]);
                 tpl = tpl.replace(/\$args\$/gi, filterInfo.params[1]);
                 var fn = new Function("_items,_args,_cache", tpl);
-                fn.displayName = fn.name = "compiledFilterWithCaching";
+                var fnName = "compiledFilterWithCaching";
+                fn.displayName = fnName;
+                fn.name = setFunctionName(fn, fnName);
                 return fn;
+            }
+            /**
+             * In ES5 we could set the function name on the fly but in ES6 this is forbidden and we need to set it through differently
+             * We can use Object.defineProperty and set it the property to writable, see MDN for reference
+             * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+             * @param {string} fn
+             * @param {string} fnName
+             */
+            function setFunctionName(fn, fnName) {
+                try {
+                    Object.defineProperty(fn, 'name', {
+                        writable: true,
+                        value: fnName
+                    });
+                }
+                catch (err) {
+                    fn.name = fnName;
+                }
             }
             function uncompiledFilter(items, args) {
                 var retval = [], idx = 0;
@@ -13946,7 +14219,6 @@ var Slick;
                 if (groupingInfos.length) {
                     groups = extractGroups(newRows);
                     if (groups.length) {
-                        addTotals(groups);
                         newRows = flattenGroupedRows(groups);
                     }
                 }
@@ -13972,6 +14244,12 @@ var Slick;
                 }
                 if (diff.length > 0) {
                     onRowsChanged.notify({ rows: diff, dataView: self }, null, self);
+                }
+                if (countBefore !== rows.length || diff.length > 0) {
+                    onRowsOrCountChanged.notify({
+                        rowsDiff: diff, previousRowCount: countBefore, currentRowCount: rows.length,
+                        rowCountChanged: countBefore !== rows.length, rowsChanged: diff.length > 0, dataView: self
+                    }, null, self);
                 }
             }
             /***
@@ -14067,7 +14345,7 @@ var Slick;
                         inHandler = false;
                     }
                 }
-                grid.onCellCssStylesChanged.subscribe(function (e, args) {
+                var subFunc = function (e, args) {
                     if (inHandler) {
                         return;
                     }
@@ -14077,9 +14355,13 @@ var Slick;
                     if (args.hash) {
                         storeCellCssStyles(args.hash);
                     }
-                });
-                this.onRowsChanged.subscribe(update);
-                this.onRowCountChanged.subscribe(update);
+                    else {
+                        grid.onCellCssStylesChanged.unsubscribe(subFunc);
+                        onRowsOrCountChanged.unsubscribe(update);
+                    }
+                };
+                grid.onCellCssStylesChanged.subscribe(subFunc);
+                onRowsOrCountChanged.subscribe(update);
             }
             function addData(data) {
                 if (intf.onProcessData && data)
@@ -14092,7 +14374,6 @@ var Slick;
                     onPagingInfoChanged.notify(getPagingInfo());
                     return false;
                 }
-                var theData = data;
                 data.TotalCount = data.TotalCount || 0;
                 data.Entities = data.Entities || [];
                 if (!data.Skip || (!intf.rowsPerPage && !data.Take))
@@ -14139,7 +14420,6 @@ var Slick;
                     request = Q.extend(request, intf.params);
                 }
                 var dt = dataType;
-                var self = this;
                 var ajaxOptions = {
                     cache: false,
                     type: intf.method,
@@ -14204,13 +14484,18 @@ var Slick;
                 "endUpdate": endUpdate,
                 "setPagingOptions": setPagingOptions,
                 "getPagingInfo": getPagingInfo,
+                "getIdPropertyName": getIdPropertyName,
                 "getRows": getRows,
                 "getItems": getItems,
                 "setItems": setItems,
+                "getFilter": getFilter,
+                "getFilteredItems": getFilteredItems,
                 "setFilter": setFilter,
                 "sort": sort,
                 "fastSort": fastSort,
                 "reSort": reSort,
+                "getLocalSort": getLocalSort,
+                "setLocalSort": setLocalSort,
                 "setSummaryOptions": setSummaryOptions,
                 "getGrandTotals": getGrandTotals,
                 "setGrouping": setGrouping,
@@ -14221,9 +14506,11 @@ var Slick;
                 "expandGroup": expandGroup,
                 "getGroups": getGroups,
                 "getIdxById": getIdxById,
+                "getRowByItem": getRowByItem,
                 "getRowById": getRowById,
                 "getItemById": getItemById,
                 "getItemByIdx": getItemByIdx,
+                "mapItemsToRows": mapItemsToRows,
                 "mapRowsToIds": mapRowsToIds,
                 "mapIdsToRows": mapIdsToRows,
                 "setRefreshHints": setRefreshHints,
@@ -14233,6 +14520,8 @@ var Slick;
                 "insertItem": insertItem,
                 "addItem": addItem,
                 "deleteItem": deleteItem,
+                "sortedAddItem": sortedAddItem,
+                "sortedUpdateItem": sortedUpdateItem,
                 "syncGridSelection": syncGridSelection,
                 "syncGridCellCssStyles": syncGridCellCssStyles,
                 "getLength": getLength,
@@ -14240,7 +14529,10 @@ var Slick;
                 "getItemMetadata": getItemMetadata,
                 "onRowCountChanged": onRowCountChanged,
                 "onRowsChanged": onRowsChanged,
+                "onRowsOrCountChanged": onRowsOrCountChanged,
                 "onPagingInfoChanged": onPagingInfoChanged,
+                "onGroupExpanded": onGroupExpanded,
+                "onGroupCollapsed": onGroupCollapsed,
                 "addData": addData,
                 "populate": populate,
                 "populateLock": populateLock,
@@ -14718,31 +15010,34 @@ var Serenity;
             });
         }
         GridUtils.addIncludeDeletedToggle = addIncludeDeletedToggle;
-        function addQuickSearchInput(toolDiv, view, fields) {
+        function addQuickSearchInput(toolDiv, view, fields, onChange) {
             var oldSubmit = view.onSubmit;
-            var searchText = '';
-            var searchField = '';
+            var input;
             view.onSubmit = function (v) {
-                if (searchText != null && searchText.length > 0) {
-                    v.params.ContainsText = searchText;
-                }
-                else {
-                    delete v.params['ContainsText'];
-                }
-                if (searchField != null && searchField.length > 0) {
-                    v.params.ContainsField = searchField;
-                }
-                else {
-                    delete v.params['ContainsField'];
+                var _a;
+                if (input) {
+                    var searchText = input.get_value();
+                    if (searchText && searchText.length > 0) {
+                        v.params.ContainsText = searchText;
+                    }
+                    else {
+                        delete v.params['ContainsText'];
+                    }
+                    var searchField = (_a = input.get_field()) === null || _a === void 0 ? void 0 : _a.name;
+                    if (searchField != null && searchField.length > 0) {
+                        v.params.ContainsField = searchField;
+                    }
+                    else {
+                        delete v.params['ContainsField'];
+                    }
                 }
                 if (oldSubmit != null)
                     return oldSubmit(v);
                 return true;
             };
             var lastDoneEvent = null;
-            addQuickSearchInputCustom(toolDiv, function (field, query, done) {
-                searchText = query;
-                searchField = field;
+            input = addQuickSearchInputCustom(toolDiv, function (field, query, done) {
+                onChange && onChange();
                 view.seekToPage = 1;
                 lastDoneEvent = done;
                 view.populate();
@@ -14761,7 +15056,7 @@ var Serenity;
             if (fields != null && fields.length > 0) {
                 div.addClass('has-quick-search-fields');
             }
-            new Serenity.QuickSearchInput(div.children(), {
+            return new Serenity.QuickSearchInput(div.children(), {
                 fields: fields,
                 onSearch: onSearch
             });
@@ -15516,9 +15811,14 @@ var Serenity;
             var self = _this;
             _this.element.addClass('s-DataGrid').html('');
             _this.element.addClass('s-' + Q.getTypeName(Q.getInstanceType(_this)));
-            _this.element.addClass('require-layout').bind('layout.' + _this.uniqueName, function () {
+            var layout = function () {
                 self.layout();
-            });
+                if (self.layoutTimer != null)
+                    Q.LayoutTimer.store(self.layoutTimer);
+            };
+            _this.element.addClass('require-layout').on('layout.' + _this.uniqueName, layout);
+            if (_this.useLayoutTimer())
+                _this.layoutTimer = Q.LayoutTimer.onSizeChange(function () { return _this.element && _this.element[0]; }, Q.debounce(layout, 50));
             _this.setTitle(_this.getInitialTitle());
             var buttons = _this.getButtons();
             if (buttons != null) {
@@ -15547,11 +15847,14 @@ var Serenity;
             return _this;
         }
         DataGrid_1 = DataGrid;
+        DataGrid.prototype.useLayoutTimer = function () {
+            return true;
+        };
         DataGrid.prototype.attrs = function (attrType) {
             return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         };
         DataGrid.prototype.layout = function () {
-            if (!this.element.is(':visible') || this.slickContainer == null)
+            if (!this.element || !this.element.is(':visible') || this.slickContainer == null)
                 return;
             var responsiveHeight = this.element.hasClass('responsive-height');
             var madeAutoHeight = this.slickGrid != null && this.slickGrid.getOptions().autoHeight;
@@ -15688,9 +15991,13 @@ var Serenity;
             return null;
         };
         DataGrid.prototype.createQuickSearchInput = function () {
-            Serenity.GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields());
+            var _this = this;
+            Serenity.GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields(), function () { return _this.persistSettings(null); });
         };
         DataGrid.prototype.destroy = function () {
+            if (this.layoutTimer) {
+                this.layoutTimer = Q.LayoutTimer.off(this.layoutTimer);
+            }
             if (this.quickFiltersBar) {
                 this.quickFiltersBar.destroy();
                 this.quickFiltersBar = null;
@@ -15868,7 +16175,12 @@ var Serenity;
                 finally {
                     self.view.populateUnlock();
                 }
-                self.view.populate();
+                if (self.view.getLocalSort && self.view.getLocalSort()) {
+                    self.view.sort();
+                }
+                else {
+                    self.view.populate();
+                }
                 _this.persistSettings(null);
             };
             this.slickGrid.onSort.subscribe(this.slickGridOnSort);
@@ -16473,32 +16785,11 @@ var Serenity;
                         }
                     });
                 }
-                if (flags.quickSearch === true && (settings.quickSearchField != null || settings.quickSearchText != null)) {
+                if (flags.quickSearch === true && (settings.quickSearchField !== undefined || settings.quickSearchText !== undefined)) {
                     var qsInput = this.toolbar.element.find('.s-QuickSearchInput').first();
                     if (qsInput.length > 0) {
                         var qsWidget = qsInput.tryGetWidget(Serenity.QuickSearchInput);
-                        if (qsWidget != null) {
-                            this.view.populateLock();
-                            try {
-                                qsWidget.element.addClass('ignore-change');
-                                try {
-                                    if (settings.quickSearchField != null) {
-                                        qsWidget.set_field(settings.quickSearchField);
-                                    }
-                                    if (settings.quickSearchText != null &&
-                                        Q.trimToNull(settings.quickSearchText) !== Q.trimToNull(qsWidget.element.val())) {
-                                        qsWidget.element.val(settings.quickSearchText);
-                                    }
-                                }
-                                finally {
-                                    qsWidget.element.removeClass('ignore-change');
-                                    qsWidget.element.triggerHandler('execute-search');
-                                }
-                            }
-                            finally {
-                                this.view.populateUnlock();
-                            }
-                        }
+                        qsWidget && qsWidget.restoreState(settings.quickSearchText, settings.quickSearchField);
                     }
                 }
             }
@@ -18054,6 +18345,17 @@ $.fn.flexY = function (flexY) {
 };
 var Serenity;
 (function (Serenity) {
+    var FlexifyAttribute = /** @class */ (function () {
+        function FlexifyAttribute(value) {
+            if (value === void 0) { value = true; }
+            this.value = value;
+        }
+        FlexifyAttribute = __decorate([
+            Serenity.Decorators.registerClass('Serenity.FlexifyAttribute')
+        ], FlexifyAttribute);
+        return FlexifyAttribute;
+    }());
+    Serenity.FlexifyAttribute = FlexifyAttribute;
     var Flexify = /** @class */ (function (_super) {
         __extends(Flexify, _super);
         function Flexify(container, options) {
@@ -18166,18 +18468,42 @@ var Serenity;
     }(Serenity.Widget));
     Serenity.Flexify = Flexify;
 })(Serenity || (Serenity = {}));
+(function (Serenity) {
+    var Decorators;
+    (function (Decorators) {
+        function flexify(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                Decorators.addAttribute(target, new Serenity.FlexifyAttribute(value));
+            };
+        }
+        Decorators.flexify = flexify;
+    })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
+})(Serenity || (Serenity = {}));
+(function (Serenity) {
+    var DialogExtensions;
+    (function (DialogExtensions) {
+        function dialogFlexify(dialog) {
+            new Serenity.Flexify(dialog.closest('.ui-dialog'), {});
+            return dialog;
+        }
+        DialogExtensions.dialogFlexify = dialogFlexify;
+    })(DialogExtensions = Serenity.DialogExtensions || (Serenity.DialogExtensions = {}));
+})(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
     var GoogleMap = /** @class */ (function (_super) {
         __extends(GoogleMap, _super);
         function GoogleMap(container, opt) {
             var _this = _super.call(this, container, opt) || this;
+            // @ts-ignore
             var center = new google.maps.LatLng(Q.coalesce(_this.options.latitude, 0), Q.coalesce(_this.options.longitude, 0));
             var mapOpt = new Object();
             mapOpt.center = center;
             mapOpt.mapTypeId = Q.coalesce(_this.options.mapTypeId, 'roadmap');
             mapOpt.zoom = Q.coalesce(_this.options.zoom, 15);
             mapOpt.zoomControl = true;
+            // @ts-ignore
             _this.map = new google.maps.Map(container[0], mapOpt);
             if (_this.options.markerTitle != null) {
                 var markerOpt = new Object();
@@ -18189,13 +18515,16 @@ var Serenity;
                 if (lon == null) {
                     lon = Q.coalesce(_this.options.longitude, 0);
                 }
+                // @ts-ignore
                 markerOpt.position = new google.maps.LatLng(lat, lon);
                 markerOpt.map = _this.map;
                 markerOpt.title = _this.options.markerTitle;
                 markerOpt.animation = 2;
+                // @ts-ignore
                 new google.maps.Marker(markerOpt);
             }
             Serenity.LazyLoadHelper.executeOnceWhenShown(container, function () {
+                // @ts-ignore
                 google.maps.event.trigger(_this.map, 'resize', []);
                 _this.map.setCenter(center);
                 // in case it wasn't visible (e.g. in dialog)

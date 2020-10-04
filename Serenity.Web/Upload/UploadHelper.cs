@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using Serenity.IO;
 using System.Web.Hosting;
-#if !ASPNETCORE
+using System.Linq;
+#if ASPNETMVC
 using System.Web;
 #endif
 
@@ -37,6 +38,7 @@ namespace Serenity.Web
 
         public static string DbFilePath(string dbFileName)
         {
+            CheckFileNameSecurity(dbFileName);
             return Path.Combine(RootPath, ToPath(dbFileName));
         }
 
@@ -168,7 +170,7 @@ namespace Serenity.Web
                 string pre2 = @"~/";
                 if (path.StartsWith(pre1) || path.StartsWith(pre2))
                 {
-#if COREFX
+#if !NET45
                     path = Path.Combine(Path.GetDirectoryName(HostingEnvironment.MapPath(pre2)), ToPath(path.Substring(pre2.Length)));
 #else
                     path = Path.Combine(HostingEnvironment.MapPath(pre2), ToPath(path.Substring(pre2.Length)));
@@ -282,21 +284,36 @@ namespace Serenity.Web
             }
         }
 
+        static readonly char[] invalidChars = Path.GetInvalidFileNameChars()
+            .Where(x => x != '/' && x != '\\').ToArray();
+
+        public static bool IsSecureRelativeFile(string fileName)
+        {
+            var trim = fileName.TrimToNull();
+
+            return !(trim == null ||
+                trim == "." ||
+                trim == ".." ||
+                fileName.IndexOf("../") >= 0 ||
+                fileName.IndexOf("..\\") >= 0 ||
+                fileName.IndexOf(':') >= 0 ||
+                trim.StartsWith("/") ||
+                trim.StartsWith("\\") ||
+                trim.EndsWith("/") ||
+                trim.EndsWith("\\") ||
+                Path.IsPathRooted(fileName) ||
+                fileName.IndexOfAny(invalidChars) >= 0 ||
+                !Path.Combine("a/", fileName).StartsWith("a/"));
+        }
+
         public static void CheckFileNameSecurity(string fileName)
         {
-            if (fileName == null ||
-                fileName.Length == 0 ||
-                fileName.IndexOf("..") >= 0 ||
-                fileName.StartsWith("/") ||
-                fileName.StartsWith("\\") ||
-                fileName.EndsWith("/") ||
-                fileName.EndsWith("\\"))
-#if ASPNETCORE
+            if (!IsSecureRelativeFile(fileName))
+#if !ASPNETMVC
                 throw new ArgumentOutOfRangeException("fileName");
 #else
                 throw new HttpException(0x194, "Invalid_Request");
 #endif
-
         }
 
         public static string GetThumbFileName(string fileName, string thumbSuffix = "_t.jpg")
@@ -403,7 +420,7 @@ namespace Serenity.Web
             else
                 mimeType = "application/unknown";
 
-#if !COREFX
+#if NET45
             try
             {
                 Microsoft.Win32.RegistryKey regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext);

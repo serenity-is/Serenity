@@ -121,7 +121,7 @@ namespace Serenity.CodeGenerator
             var backup = CreateDirectoryOrBackupFile(file);
             CodeFileHelper.CheckoutAndWrite(file, code, true);
             CodeFileHelper.MergeChanges(backup, file);
-#if !ASPNETCORE
+#if ASPNETMVC
             ProjectFileHelper.AddFileToProject(this.csproj, 
                 file.Substring(Path.GetDirectoryName(csproj).Length + 1).Replace('/', '\\'), dependentUpon);
 #endif
@@ -129,7 +129,7 @@ namespace Serenity.CodeGenerator
 
         private void GenerateStyle()
         {
-#if ASPNETCORE
+#if !ASPNETMVC
             string contentSite = "wwwroot/Content/site".Replace('/', Path.DirectorySeparatorChar);
 #else
             string contentSite = "Content/site".Replace('/', Path.DirectorySeparatorChar);

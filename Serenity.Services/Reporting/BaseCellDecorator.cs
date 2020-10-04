@@ -1,4 +1,4 @@
-﻿#if COREFX
+﻿#if !NET45
 using Color = System.String;
 #else
 using System.Drawing;

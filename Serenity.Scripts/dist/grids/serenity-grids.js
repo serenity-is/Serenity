@@ -443,31 +443,34 @@ var Serenity;
             });
         }
         GridUtils.addIncludeDeletedToggle = addIncludeDeletedToggle;
-        function addQuickSearchInput(toolDiv, view, fields) {
+        function addQuickSearchInput(toolDiv, view, fields, onChange) {
             var oldSubmit = view.onSubmit;
-            var searchText = '';
-            var searchField = '';
+            var input;
             view.onSubmit = function (v) {
-                if (searchText != null && searchText.length > 0) {
-                    v.params.ContainsText = searchText;
-                }
-                else {
-                    delete v.params['ContainsText'];
-                }
-                if (searchField != null && searchField.length > 0) {
-                    v.params.ContainsField = searchField;
-                }
-                else {
-                    delete v.params['ContainsField'];
+                var _a;
+                if (input) {
+                    var searchText = input.get_value();
+                    if (searchText && searchText.length > 0) {
+                        v.params.ContainsText = searchText;
+                    }
+                    else {
+                        delete v.params['ContainsText'];
+                    }
+                    var searchField = (_a = input.get_field()) === null || _a === void 0 ? void 0 : _a.name;
+                    if (searchField != null && searchField.length > 0) {
+                        v.params.ContainsField = searchField;
+                    }
+                    else {
+                        delete v.params['ContainsField'];
+                    }
                 }
                 if (oldSubmit != null)
                     return oldSubmit(v);
                 return true;
             };
             var lastDoneEvent = null;
-            addQuickSearchInputCustom(toolDiv, function (field, query, done) {
-                searchText = query;
-                searchField = field;
+            input = addQuickSearchInputCustom(toolDiv, function (field, query, done) {
+                onChange && onChange();
                 view.seekToPage = 1;
                 lastDoneEvent = done;
                 view.populate();
@@ -486,7 +489,7 @@ var Serenity;
             if (fields != null && fields.length > 0) {
                 div.addClass('has-quick-search-fields');
             }
-            new Serenity.QuickSearchInput(div.children(), {
+            return new Serenity.QuickSearchInput(div.children(), {
                 fields: fields,
                 onSearch: onSearch
             });
@@ -1241,9 +1244,14 @@ var Serenity;
             var self = _this;
             _this.element.addClass('s-DataGrid').html('');
             _this.element.addClass('s-' + Q.getTypeName(Q.getInstanceType(_this)));
-            _this.element.addClass('require-layout').bind('layout.' + _this.uniqueName, function () {
+            var layout = function () {
                 self.layout();
-            });
+                if (self.layoutTimer != null)
+                    Q.LayoutTimer.store(self.layoutTimer);
+            };
+            _this.element.addClass('require-layout').on('layout.' + _this.uniqueName, layout);
+            if (_this.useLayoutTimer())
+                _this.layoutTimer = Q.LayoutTimer.onSizeChange(function () { return _this.element && _this.element[0]; }, Q.debounce(layout, 50));
             _this.setTitle(_this.getInitialTitle());
             var buttons = _this.getButtons();
             if (buttons != null) {
@@ -1272,11 +1280,14 @@ var Serenity;
             return _this;
         }
         DataGrid_1 = DataGrid;
+        DataGrid.prototype.useLayoutTimer = function () {
+            return true;
+        };
         DataGrid.prototype.attrs = function (attrType) {
             return Q.getAttributes(Q.getInstanceType(this), attrType, true);
         };
         DataGrid.prototype.layout = function () {
-            if (!this.element.is(':visible') || this.slickContainer == null)
+            if (!this.element || !this.element.is(':visible') || this.slickContainer == null)
                 return;
             var responsiveHeight = this.element.hasClass('responsive-height');
             var madeAutoHeight = this.slickGrid != null && this.slickGrid.getOptions().autoHeight;
@@ -1413,9 +1424,13 @@ var Serenity;
             return null;
         };
         DataGrid.prototype.createQuickSearchInput = function () {
-            Serenity.GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields());
+            var _this = this;
+            Serenity.GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields(), function () { return _this.persistSettings(null); });
         };
         DataGrid.prototype.destroy = function () {
+            if (this.layoutTimer) {
+                this.layoutTimer = Q.LayoutTimer.off(this.layoutTimer);
+            }
             if (this.quickFiltersBar) {
                 this.quickFiltersBar.destroy();
                 this.quickFiltersBar = null;
@@ -1593,7 +1608,12 @@ var Serenity;
                 finally {
                     self.view.populateUnlock();
                 }
-                self.view.populate();
+                if (self.view.getLocalSort && self.view.getLocalSort()) {
+                    self.view.sort();
+                }
+                else {
+                    self.view.populate();
+                }
                 _this.persistSettings(null);
             };
             this.slickGrid.onSort.subscribe(this.slickGridOnSort);
@@ -2198,32 +2218,11 @@ var Serenity;
                         }
                     });
                 }
-                if (flags.quickSearch === true && (settings.quickSearchField != null || settings.quickSearchText != null)) {
+                if (flags.quickSearch === true && (settings.quickSearchField !== undefined || settings.quickSearchText !== undefined)) {
                     var qsInput = this.toolbar.element.find('.s-QuickSearchInput').first();
                     if (qsInput.length > 0) {
                         var qsWidget = qsInput.tryGetWidget(Serenity.QuickSearchInput);
-                        if (qsWidget != null) {
-                            this.view.populateLock();
-                            try {
-                                qsWidget.element.addClass('ignore-change');
-                                try {
-                                    if (settings.quickSearchField != null) {
-                                        qsWidget.set_field(settings.quickSearchField);
-                                    }
-                                    if (settings.quickSearchText != null &&
-                                        Q.trimToNull(settings.quickSearchText) !== Q.trimToNull(qsWidget.element.val())) {
-                                        qsWidget.element.val(settings.quickSearchText);
-                                    }
-                                }
-                                finally {
-                                    qsWidget.element.removeClass('ignore-change');
-                                    qsWidget.element.triggerHandler('execute-search');
-                                }
-                            }
-                            finally {
-                                this.view.populateUnlock();
-                            }
-                        }
+                        qsWidget && qsWidget.restoreState(settings.quickSearchText, settings.quickSearchField);
                     }
                 }
             }

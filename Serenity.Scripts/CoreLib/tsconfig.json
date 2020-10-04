@@ -35,7 +35,7 @@
     "Imports/FlatPickr.d.ts", // serenity-core
     "Imports/Select2.ts", // serenity-core
     "Services/ColumnSelection.ts", // serenity-core
-    "Services/ISlickFormatter.ts",// serenity-core
+    "Services/ISlickFormatter.ts", // serenity-core
     "Services/ServiceError.ts", // serenity-core
     "Services/ServiceResponse.ts", // serenity-core
     "Q/Q.TypeSystem.ts", // serenity-core
@@ -112,6 +112,8 @@
     "UI/Editors/LookupEditor.ts", // serenity-editors
     "UI/Editors/ServiceLookupEditor.ts", // serenity-editors
     "UI/Editors/HtmlContentEditor.ts", // serenity-editors
+    "UI/Editors/MaskedEditor.ts", // serenity-editors
+    "UI/Editors/Recaptcha.ts", // serenity-editors
     "UI/Editors/UploadEditors.ts", // serenity-editors
     "UI/Filtering/QuickFilter.ts", // serenity-quickfilter
     "UI/Filtering/QuickFilterBar.ts", // serenity-quickfilter
@@ -121,7 +123,7 @@
     "UI/Dialogs/DialogExtensions.ts", // serenity-dialogs
     "UI/Dialogs/TemplatedDialog.ts", // serenity-dialogs
     "UI/Dialogs/PropertyDialog.ts", // serenity-dialogs
-    "UI/Dialogs/EntityDialog.ts",  // serenity-dialogs
+    "UI/Dialogs/EntityDialog.ts", // serenity-dialogs
     "UI/Filtering/FilterOperator.ts", // serenity-filterpanel
     "UI/Filtering/FilterLine.ts", // serenity-filterpanel
     "UI/Filtering/FilterStore.ts", // serenity-filterpanel

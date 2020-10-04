@@ -3,7 +3,7 @@ using Serenity.Data.Mapping;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-#if COREFX
+#if !NET45
 using System;
 #endif
 

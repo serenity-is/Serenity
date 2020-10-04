@@ -733,7 +733,7 @@ namespace Q {
         if (typeof (res) == "undefined" || res === null)
             return null;
 
-        return new Date(s);
+        return new Date(s + (s.length == 10 ? "T00:00:00" : ""));
     }
 
     export function parseHourAndMin(value: string) {

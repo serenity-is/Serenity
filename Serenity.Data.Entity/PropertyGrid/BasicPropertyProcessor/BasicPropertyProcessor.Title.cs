@@ -1,7 +1,7 @@
 ﻿using Serenity.ComponentModel;
 using System.ComponentModel;
 using System.Reflection;
-#if COREFX
+#if !NET45
 using System;
 #endif
 

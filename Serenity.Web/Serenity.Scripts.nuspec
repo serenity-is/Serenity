@@ -15,13 +15,41 @@
     <tags>${tags}</tags>
   </metadata>
   <files>
-    <file src="bin\${configuration}\serenity.css" target="content/Content/serenity" />
+    <file src="..\Serenity.Web.Net45\bin\${configuration}\serenity.css" target="content/Content/serenity" />
+	<file src="..\Serenity.Scripts\Style\*.css" target="content/Content/serenity" />
     <file src="Scripts\Serenity\texts\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content/Scripts/serenity/texts" />
     <file src="..\Serenity.Scripts\dist\Serenity.CoreLib*.js" target="content/Scripts/serenity" />
     <file src="..\Serenity.Scripts\dist\Serenity.CoreLib*.map" target="content/Scripts/serenity" />
     <file src="..\Serenity.Scripts\dist\Serenity.CoreLib*.ts" target="content/Scripts/serenity" />
-    <file src="..\Serenity.Scripts\dist\Serenity.CoreLib.d.ts" target="content/Scripts/typings/serenity" />
+    <file src="..\Serenity.Scripts\dist\Serenity.CoreLib.d.ts" target="content/Scripts/typings/serenity" />	
     <file src="..\Serenity.Scripts\legacy\Serenity.Script.UI.js" target="content/Scripts/serenity" />
     <file src="..\Serenity.Scripts\legacy\Serenity.Script.UI.js" target="content/Scripts/serenity/Serenity.Script.UI.min.js" />
+    <file src="..\Serenity.Scripts\dist\core\serenity-*.js" target="content/Scripts/serenity/core" />
+    <file src="..\Serenity.Scripts\dist\core\serenity-*.map" target="content/Scripts/serenity/core" />
+    <file src="..\Serenity.Scripts\dist\core\serenity-*.ts" target="content/Scripts/serenity/core" />
+    <file src="..\Serenity.Scripts\dist\dialogs\serenity-*.js" target="content/Scripts/serenity/dialogs" />
+    <file src="..\Serenity.Scripts\dist\dialogs\serenity-*.map" target="content/Scripts/serenity/dialogs" />
+    <file src="..\Serenity.Scripts\dist\dialogs\serenity-*.ts" target="content/Scripts/serenity/dialogs" />
+    <file src="..\Serenity.Scripts\dist\editors\serenity-*.js" target="content/Scripts/serenity/editors" />
+    <file src="..\Serenity.Scripts\dist\editors\serenity-*.map" target="content/Scripts/serenity/editors" />
+    <file src="..\Serenity.Scripts\dist\editors\serenity-*.ts" target="content/Scripts/serenity/editors" />
+    <file src="..\Serenity.Scripts\dist\filterpanel\serenity-*.js" target="content/Scripts/serenity/filterpanel" />
+    <file src="..\Serenity.Scripts\dist\filterpanel\serenity-*.map" target="content/Scripts/serenity/filterpanel" />
+    <file src="..\Serenity.Scripts\dist\filterpanel\serenity-*.ts" target="content/Scripts/serenity/filterpanel" />
+    <file src="..\Serenity.Scripts\dist\forms\serenity-*.js" target="content/Scripts/serenity/forms" />
+    <file src="..\Serenity.Scripts\dist\forms\serenity-*.map" target="content/Scripts/serenity/forms" />
+    <file src="..\Serenity.Scripts\dist\forms\serenity-*.ts" target="content/Scripts/serenity/forms" />
+    <file src="..\Serenity.Scripts\dist\grids\serenity-*.js" target="content/Scripts/serenity/grids" />
+    <file src="..\Serenity.Scripts\dist\grids\serenity-*.map" target="content/Scripts/serenity/grids" />
+    <file src="..\Serenity.Scripts\dist\grids\serenity-*.ts" target="content/Scripts/serenity/grids" />
+    <file src="..\Serenity.Scripts\dist\quickfilter\serenity-*.js" target="content/Scripts/serenity/quickfilter" />
+    <file src="..\Serenity.Scripts\dist\quickfilter\serenity-*.map" target="content/Scripts/serenity/quickfilter" />
+    <file src="..\Serenity.Scripts\dist\quickfilter\serenity-*.ts" target="content/Scripts/serenity/quickfilter" />
+    <file src="..\Serenity.Scripts\dist\slick\serenity-*.js" target="content/Scripts/serenity/slick" />
+    <file src="..\Serenity.Scripts\dist\slick\serenity-*.map" target="content/Scripts/serenity/slick" />
+    <file src="..\Serenity.Scripts\dist\slick\serenity-*.ts" target="content/Scripts/serenity/slick" />
+    <file src="..\Serenity.Scripts\dist\widget\serenity-*.js" target="content/Scripts/serenity/widget" />
+    <file src="..\Serenity.Scripts\dist\widget\serenity-*.map" target="content/Scripts/serenity/widget" />
+    <file src="..\Serenity.Scripts\dist\widget\serenity-*.ts" target="content/Scripts/serenity/widget" />
   </files>
 </package>

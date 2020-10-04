@@ -1,10 +1,13 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using WebDriverManager;
+using WebDriverManager.DriverConfigs.Impl;
 
 namespace Serenity.Testing
 {
@@ -70,10 +73,9 @@ namespace Serenity.Testing
 
             private SeleniumDriverManager()
             {
+                new DriverManager().SetUpDriver(new ChromeConfig());
                 var options = new ChromeOptions();
-                options.AddArguments("--proxy-server='direct://'");
-                options.AddArgument("--proxy-bypass-list=*");
-                options.AddArgument("--headless");
+                options.AddArgument("-headless");
                 driver = new ChromeDriver(options);
                 driver.Manage().Window.Size = new System.Drawing.Size(1366, 768);
             }
@@ -94,6 +96,7 @@ namespace Serenity.Testing
 
                 if (driver != null)
                 {
+                    driver.Quit();
                     driver.Dispose();
                     driver = null;
                 }

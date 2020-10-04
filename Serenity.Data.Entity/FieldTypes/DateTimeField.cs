@@ -3,7 +3,7 @@ using System.Data;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Globalization;
-#if COREFX
+#if !NET45
 using Newtonsoft.Json.Linq;
 #endif
 
@@ -25,7 +25,7 @@ namespace Serenity.Data
 
         public override object ConvertValue(object source, IFormatProvider provider)
         {
-#if COREFX
+#if !NET45
             if (source is JValue)
                 source = ((JValue)source).Value;
 #endif
@@ -53,7 +53,10 @@ namespace Serenity.Data
                 _setValue(row, null);
             else
             {
-                var datetime = reader.GetDateTime(index);
+                var value = reader.GetValue(index);
+                DateTime datetime = value is DateTimeOffset ?
+                    ((DateTimeOffset)value).DateTime :
+                        (value is DateTime ? (DateTime)value : Convert.ToDateTime(value));
                 if (DateTimeKind != System.DateTimeKind.Unspecified)
                     datetime = DateTime.SpecifyKind(datetime, DateTimeKind);
                 _setValue(row, datetime);
@@ -156,10 +159,15 @@ namespace Serenity.Data
         {
             var value = _getValue(row);
             if (value.HasValue)
-                writer.WriteValue(value.Value.ToString(
-                    (DateTimeKind == System.DateTimeKind.Unspecified ? 
-                        DateHelper.ISODateTimeFormatLocal : 
+            {
+                var dt = value.Value;
+                if (DateTimeKind == DateTimeKind.Local)
+                    dt = dt.ToUniversalTime();
+                writer.WriteValue(dt.ToString(
+                    (DateTimeKind == System.DateTimeKind.Unspecified ?
+                        DateHelper.ISODateTimeFormatLocal :
                         DateHelper.ISODateTimeFormatUTC), CultureInfo.InvariantCulture));
+            }
             else
                 writer.WriteNull();
         }

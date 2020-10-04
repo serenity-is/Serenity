@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Serenity.Test</RootNamespace>
     <AssemblyName>Serenity.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -53,8 +53,14 @@
     <Reference Include="AdvancedStringBuilder, Version=0.1.0.0, Culture=neutral, PublicKeyToken=e818a2fc08933ddb, processorArchitecture=MSIL">
       <HintPath>..\..\packages\AdvancedStringBuilder.0.1.0\lib\net45\AdvancedStringBuilder.dll</HintPath>
     </Reference>
+    <Reference Include="AngleSharp, Version=0.14.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AngleSharp.0.14.0\lib\net461\AngleSharp.dll</HintPath>
+    </Reference>
     <Reference Include="FakeItEasy, Version=5.0.0.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\FakeItEasy.5.5.0\lib\net45\FakeItEasy.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=1.2.0.246, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\SharpZipLib.1.2.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -77,6 +83,13 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.4.5.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encoding.CodePages, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Text.Encoding.CodePages.4.5.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
     </Reference>
@@ -99,6 +112,9 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WebDriver, Version=3.141.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Selenium.WebDriver.3.141.0\lib\net45\WebDriver.dll</HintPath>
+    </Reference>
+    <Reference Include="WebDriverManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\WebDriverManager.2.9.3\lib\netstandard2.0\WebDriverManager.dll</HintPath>
     </Reference>
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.3\lib\net35\xunit.abstractions.dll</HintPath>
@@ -127,6 +143,7 @@
     <Compile Include="Core\Logging\FileLoggerTests.cs" />
     <Compile Include="Core\Authorization\LogicOperatorPermissionServiceTests.cs" />
     <Compile Include="Data\DateTimeFieldKindTests.cs" />
+    <Compile Include="Data\RowMappingTests.OuterApplyRow.cs" />
     <Compile Include="Data\RowMappingTests.NamePropertyRow.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidLoadsDetailsOnRetrieve.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidDetailRow.cs" />
@@ -187,6 +204,7 @@
     <Compile Include="Testing\TestSqlHelperTests.cs" />
     <Compile Include="Testing\TestRow.cs" />
     <Compile Include="Testing\DbScriptTests.cs" />
+    <Compile Include="Web\UploadHelper_CheckFileNameSecurityTests.cs" />
     <Compile Include="Web\NavigationHelperTests.cs" />
     <Compile Include="Web\NavigationItemTests.cs" />
   </ItemGroup>
@@ -215,7 +233,7 @@
       <Project>{e5fd07ef-84b5-48c4-8640-46cdc9219ae8}</Project>
       <Name>Serenity.Testing.Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Web\Serenity.Web.Net45.csproj">
+    <ProjectReference Include="..\Serenity.Web.Net45\Serenity.Web.Net45.csproj">
       <Project>{8632943d-2a88-4c83-8451-69d62f059efc}</Project>
       <Name>Serenity.Web.Net45</Name>
     </ProjectReference>
@@ -417,8 +435,6 @@
     <Error Condition="!Exists('..\..\packages\xunit.core.2.4.1\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.core.2.4.1\build\xunit.core.props'))" />
     <Error Condition="!Exists('..\..\packages\xunit.core.2.4.1\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.core.2.4.1\build\xunit.core.targets'))" />
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props'))" />
-    <Error Condition="!Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.81.0.4044.6900\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Selenium.WebDriver.ChromeDriver.81.0.4044.6900\build\Selenium.WebDriver.ChromeDriver.targets'))" />
   </Target>
   <Import Project="..\..\packages\xunit.core.2.4.1\build\xunit.core.targets" Condition="Exists('..\..\packages\xunit.core.2.4.1\build\xunit.core.targets')" />
-  <Import Project="..\..\packages\Selenium.WebDriver.ChromeDriver.81.0.4044.6900\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.81.0.4044.6900\build\Selenium.WebDriver.ChromeDriver.targets')" />
 </Project>

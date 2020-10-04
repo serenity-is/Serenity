@@ -126,35 +126,76 @@ namespace Q {
         return el;
     }
 
-    const valOpt: JQueryValidation.ValidationOptions = {
-        ignore: ':hidden, .no-validate',
-        showErrors: function (errorMap, errorList) {
-            $.each(this.validElements(), function (index, element) {
-                var $element = $(element);
+    export function baseValidateOptions(): JQueryValidation.ValidationOptions {
+        return {
+            errorClass: 'error',
+            ignore: ':hidden, .no-validate',
+            ignoreTitle: true,
+            normalizer: function (value: any) {
+                return $.trim(value);
+            },
+            highlight: function (element: HTMLElement, errorClass: string, validClass: string) {
+                if ((element as any).type === "radio") {
+                    this.findByName((element as any).name).addClass(errorClass).removeClass(validClass);
+                } else {
+                    var $el = $(element);
+                    $el.addClass(errorClass).removeClass(validClass);
+                    if ($el.hasClass('select2-offscreen') &&
+                        element.id) {
+                        $('#s2id_' + element.id).addClass(errorClass).removeClass(validClass);
+                    }
+                }
+            },
+            unhighlight: function (element: HTMLElement, errorClass: string, validClass: string) {
+                if ((element as any).type === "radio") {
+                    this.findByName((element as any).name).removeClass(errorClass).addClass(validClass);
+                } else {
+                    var $el = $(element);
+                    $el.removeClass(errorClass).addClass(validClass);
+                    if ($el.hasClass('select2-offscreen') &&
+                        element.id) {
+                        $('#s2id_' + element.id).removeClass(errorClass).addClass(validClass);
+                    }
+                }
+            },
+            showErrors: function (errorMap, errorList) {
+                var _this = this;
+                $.each(this.validElements(), function (index, element) {
+                    var $el = $(element);
+                    $el.removeClass(_this.settings.errorClass).addClass(_this.settings.validClass);
+                    if ($el.hasClass('select2-offscreen') &&
+                        $el.id) {
+                        $el = $('#s2id_' + element.id)
+                            .removeClass(_this.settings.errorClass)
+                            .addClass(_this.settings.validClass);
+                        if (!$el.length)
+                            $el = $(element);
+                    }
 
-                setTooltip($element
-                    .removeClass("error")
-                    .addClass("valid"), '')
-                    .tooltip('hide');
-            });
+                    setTooltip($el, '')
+                        .tooltip('hide');
+                });
 
-            $.each(errorList, function (index: number, error) {
-                var $element = $(error.element);
+                $.each(errorList, function (index: number, error) {
+                    var $el = $(error.element).addClass(_this.settings.errorClass);
 
-                setTooltip($element
-                    .addClass("error"), error.message);
+                    if ($el.hasClass('select2-offscreen') &&
+                        error.element.id) {
+                        $el = $('#s2id_' + error.element.id).addClass(_this.settings.errorClass);
+                        if (!$el.length)
+                            $el = $(error.element);
+                    }
+                    setTooltip($el, error.message);
 
-                if (index == 0)
-                    $element.tooltip('show');
-            });
-        },
-        normalizer: function (value) {
-            return $.trim(value);
+                    if (index == 0)
+                        $el.tooltip('show');
+                });
+            }
         }
     }
 
-    export function validateTooltip(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator {
-        return form.validate(Q.extend(Q.extend({}, valOpt), opt));
+    export function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator {
+        return form.validate(Q.extend(Q.baseValidateOptions(), opt));
     }
 
     export function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery {

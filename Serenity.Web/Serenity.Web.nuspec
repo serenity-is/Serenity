@@ -55,8 +55,8 @@
   <files>
     <file src="bin\${configuration}\netcoreapp3.1\Serenity.Web.dll" target="lib/netcoreapp3.1" />
     <file src="bin\${configuration}\netcoreapp3.1\Serenity.Web.pdb" target="lib/netcoreapp3.1" />
-    <file src="bin\${configuration}\Serenity.Web.dll" target="lib/net45" />
-	  <file src="bin\${configuration}\Mono.Cecil.dll" target="lib/net45" />
-    <file src="bin\${configuration}\Serenity.Web.pdb" target="lib/net45" />
+    <file src="..\Serenity.Web.Net45\bin\${configuration}\Serenity.Web.dll" target="lib/net45" />
+	<file src="..\Serenity.Web.Net45\bin\${configuration}\Mono.Cecil.dll" target="lib/net45" />
+    <file src="..\Serenity.Web.Net45\bin\${configuration}\Serenity.Web.pdb" target="lib/net45" />
   </files>
 </package>

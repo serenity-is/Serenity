@@ -1,4 +1,4 @@
-﻿#if !ASPNETCORE
+﻿#if ASPNETMVC
 using System.Linq;
 using System.Security.Principal;
 

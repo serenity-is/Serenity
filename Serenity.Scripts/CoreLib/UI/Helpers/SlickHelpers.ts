@@ -370,23 +370,26 @@
         }
 
         export function addQuickSearchInput(toolDiv: JQuery,
-            view: Slick.RemoteView<any>, fields?: QuickSearchField[]): void {
+            view: Slick.RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void {
 
             var oldSubmit = view.onSubmit;
-            var searchText = '';
-            var searchField = '';
+            var input: QuickSearchInput;
             view.onSubmit = function (v) {
-                if (searchText != null && searchText.length > 0) {
-                    v.params.ContainsText = searchText;
-                }
-                else {
-                    delete v.params['ContainsText'];
-                }
-                if (searchField != null && searchField.length > 0) {
-                    v.params.ContainsField = searchField;
-                }
-                else {
-                    delete v.params['ContainsField'];
+                if (input) {
+                    var searchText = input.get_value();
+                    if (searchText && searchText.length > 0) {
+                        v.params.ContainsText = searchText;
+                    }
+                    else {
+                        delete v.params['ContainsText'];
+                    }
+                    var searchField = input.get_field()?.name;
+                    if (searchField != null && searchField.length > 0) {
+                        v.params.ContainsField = searchField;
+                    }
+                    else {
+                        delete v.params['ContainsField'];
+                    }
                 }
 
                 if (oldSubmit != null) 
@@ -396,9 +399,8 @@
             };
 
             var lastDoneEvent: any = null;
-            addQuickSearchInputCustom(toolDiv, (field, query, done) => {
-                searchText = query;
-                searchField = field;
+            input = addQuickSearchInputCustom(toolDiv, (field, query, done) => {
+                onChange && onChange();
                 view.seekToPage = 1;
                 lastDoneEvent = done;
                 view.populate();
@@ -414,7 +416,7 @@
 
         export function addQuickSearchInputCustom(container: JQuery,
             onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void,
-            fields?: QuickSearchField[]) {
+            fields?: QuickSearchField[]): QuickSearchInput {
 
             var div = $('<div><input type="text"/></div>')
                 .addClass('s-QuickSearchBar').prependTo(container);
@@ -423,7 +425,7 @@
                 div.addClass('has-quick-search-fields');
             }
 
-            new QuickSearchInput(div.children(), {
+            return new QuickSearchInput(div.children(), {
                 fields: fields,
                 onSearch: onSearch as any
             });

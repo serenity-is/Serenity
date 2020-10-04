@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.AspNetCore.WebUtilities;
 #else
 using System.Web;
@@ -70,7 +70,7 @@ namespace Serenity.Web
 
             private static string GetMD5HashString(byte[] bytes)
             {
-#if ASPNETCORE
+#if !ASPNETMVC
                 var md5 = MD5.Create();
                 byte[] result = md5.ComputeHash(bytes);
                 return WebEncoders.Base64UrlEncode(result);

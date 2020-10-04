@@ -1,7 +1,7 @@
 ﻿using System;
 using Serenity.Reflection;
 using System.Linq;
-#if COREFX
+#if !NET45
 using System.Reflection;
 #endif
 using Mono.Cecil;

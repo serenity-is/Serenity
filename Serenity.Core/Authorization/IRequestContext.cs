@@ -1,4 +1,4 @@
-﻿#if COREFX
+﻿#if !NET45
 using IDictionary = System.Collections.Generic.IDictionary<object, object>;
 #else
 using System.Collections;

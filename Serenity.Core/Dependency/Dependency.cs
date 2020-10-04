@@ -24,7 +24,7 @@
             return Resolver.Resolve<TService>();
         }
 
-#if !COREFX
+#if NET45
         /// <summary>
         /// Maps TService service to its registered provider for specified scope.
         /// Use this method when an interface can be handled by different providers
@@ -53,7 +53,7 @@
             return resolver == null ? null : Resolver.TryResolve<TService>();
         }
 
-#if !COREFX
+#if NET45
         /// <summary>
         /// Maps TService service to its registered provider for specified scope.
         /// Returns null if registration for TService doesn't exist or 

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
 using System.Net;
-#if COREFX
+#if !NET45
 using System.Threading.Tasks;
 #endif
 
@@ -35,7 +35,7 @@ namespace Serenity.Services
             var rb = System.Text.Encoding.UTF8.GetBytes(r);
             //wr.ContentLength = rb.Length; bunu yapma hata alınca çakılıyor! redirect lerle ilgili bug malesef!
             wr.CookieContainer = cookies;
-#if COREFX
+#if !NET45
             wr.ContinueTimeout = 10 * 60 * 1000;
             using (var requestStream = Task.Run(() => wr.GetRequestStreamAsync()).Result)
                 requestStream.Write(rb, 0, rb.Length);

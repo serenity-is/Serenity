@@ -1,4 +1,4 @@
-﻿#if !ASPNETCORE
+﻿#if ASPNETMVC
 using System;
 using System.Web.Mvc;
 

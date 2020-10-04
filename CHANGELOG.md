@@ -1,3 +1,57 @@
+## 3.14.1 (2020-09-09)
+
+Bugfixes:
+  - fix setting a date editor date to today in UTC minus time zone resulting in one day before
+  - make sure quick search text and field is persisted after user change if quickSearch persistance flag is true
+
+## 3.14.0 (2020-08-06)
+
+Features:
+  - ability to enable local sorting on remote view, might be useful for in memory grid editors, override getViewOptions to enable and set localSort to true
+  - bring back flexify decorator for backward compatibility (please don't use it)
+  
+Bugfixes:
+  - datepicker icon not displayed in Serene due to url encoding problem
+  - set datepicker img width default to 16px by css as it is now a svg
+  - checked null in GetName() and GetText() Enum extention methods (#4252)
+  - restore Select2Item interface under Serenity namespace
+  - fix issue with validation error highlighting of select2 editors
+  - don't return last set value in date time picker, if the value was now or today. should resolve issues with validation on create.
+
+
+## 3.13.7 (2020-07-21)
+
+Bugfixes:
+  - also include Serenity.CoreLib.d.ts under Scripts/typings/serenity/ as older projects still use that one in tsconfig.json (if you have it there, change path to Scripts/serenity/Serenity.CoreLib.d.ts
+
+## 3.13.6 (2020-07-20)
+
+Bugfixes:
+  - include recaptcha and maskededitor in corelib again
+
+## 3.13.5 (2020-07-09)
+
+Features:
+  - added FieldInsertPermissionAttribute, FieldUpdatePermissionAttribute, FieldModifyPermissionAttribute which works similar to FieldReadPermissionAttribute to set relevant permission on all fields, which can be overridden field level on particular fields
+  - add ability to clear local text registry through a new IRemoveAll interface. required for runtime translation reloading in .NET Core as it is not possible to register a new ILocalTextRegistry unlike .NET framework
+
+## 3.13.4 (2020-06-12)
+
+Features:
+  - added option to use bootstrap modal for dialogs instead of jQuery UI.
+  - Q.alert, Q.confirm etc works without jQuery UI and it can use Bootstrap if available. it fallbacks to browser native dialogs if both is not loaded, though options will only be limited to the message.
+  - Q.blockUI can work without blockUI plugin, but just for full screen blocking
+  - serenity corelib itself can be loaded without loading external scripts like jQuery, jQuery UI, toastr etc. but functionality will be limited. useful for testing and frontend pages.
+  - removed dependency on saltaralle mscorlib.js. no longer have to include it, unless you have some code that uses "ss." namespace in your project. most of them can be converted to "Q." alternatives. search for (ss as any) or (ss.) in your code before removing.
+  - introduced splitted parts of Serenity.CoreLib.js so that only required libs can be loaded when needed. useful for frontend apps. the list of libs: serenity-core.js (contains Q and core types / functions), serenity-widget.js (contains base widget type, ui related typings, toolbar etc. depends on core), serenity-forms.js (contains validation, templated panel, property grid, property panel, depends on core and widget), serenity-editors.js (contains most editor types, depends on core and widget), serenity-slick.js (contains remoteview and other slickgrid related types, depends on core), serenity-dialogs.js (contains templated dialog, property dialog and entity dialog, depends on core, widget and forms), serenity-quickfilter.js (contains quick search and quick filter bar, depends on core, widget and editors), serenity-filterpanel.js (contains filter panel and dialog, depends on core, widget, editors, quickfilter, forms and dialogs), serenity-grids.js (contains data and entity grid, depends on core, slick, widget, forms, editors, dialogs, quickfilter and filterpanel).
+  - optional flatpickr support for date/time editors. enabled with DateEditor.useFlatpickr = true or used automatically when flatpickr is loaded in page and jQuery UI datepicker itself not.
+  - a new layout watcher that can call layout for elements when their width / height / or visibility change by using a timer. used to resolve slickgrid layout issues.
+  - replace COREFX ifdefs with NET45 as .NET CORE and ASP.NET CORE is now the default. this will open way to use other IDEs like Visual Studio Code for .NET CORE projects. OmniSharp extension VSCODE does not work well with #IFs and project references.
+  
+Bugfixes:
+  - make sure DateTimeField does not fail on read if the data reader returns a DateTimeOffset
+  - if date/time kind is local, should convert the value to universal time before formatting, as .net format function does not do this conversion automatically
+  
 ## 3.12.6 (2020-04-12)
 
 Bugfixes:

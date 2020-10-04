@@ -20,7 +20,7 @@ namespace Serenity.Localization
         /// <summary>
         /// Adds translations from static nested local text classes marked with NestedLocalTextAttribute.
         /// </summary>
-#if COREFX
+#if !NET45
         public static void AddNestedTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies = null)
 #else
         public static void Initialize(IEnumerable<Assembly> assemblies, ILocalTextRegistry registry = null)

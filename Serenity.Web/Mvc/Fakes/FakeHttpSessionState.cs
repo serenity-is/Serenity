@@ -1,4 +1,4 @@
-﻿#if !ASPNETCORE
+﻿#if ASPNETMVC
 using System.Collections;
 using System.Collections.Specialized;
 using System.Web;

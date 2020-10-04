@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Configuration", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Scripts", "Serenity.Scripts\Serenity.Scripts.csproj", "{2ACB06BE-7058-4E19-A0B1-0171D15870E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Web.Net45", "Serenity.Web\Serenity.Web.Net45.csproj", "{8632943D-2A88-4C83-8451-69D62F059EFC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Web.Net45", "Serenity.Web.Net45\Serenity.Web.Net45.csproj", "{8632943D-2A88-4C83-8451-69D62F059EFC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Testing.Net45", "Serenity.Testing\Serenity.Testing.Net45.csproj", "{E5FD07EF-84B5-48C4-8640-46CDC9219AE8}"
 EndProject

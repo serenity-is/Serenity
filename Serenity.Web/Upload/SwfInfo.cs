@@ -188,7 +188,7 @@ namespace Serenity.Web
                 // Must get all 4 values in the RECT
                 for (int i = 0; i < 4; i++)
                 {
-#if COREFX
+#if !NET45
                     for (int j = 0; j < cval.Length; j++)
 #else
                     for (int j = 0; j < cval.Count; j++)
@@ -220,7 +220,7 @@ namespace Serenity.Web
                     int c = 1;
                     int val = 0;
 
-#if COREFX
+#if !NET45
                     for (int j = cval.Length - 1; j >= 0; j--)
 #else
                     for (int j = cval.Count - 1; j >= 0; j--)

@@ -1,5 +1,5 @@
 ﻿using System;
-#if COREFX
+#if !NET45
 using System.Security.Cryptography;
 #endif
 
@@ -13,7 +13,7 @@ namespace Serenity.Web.Providers
                 throw new ArgumentNullException();
 
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(s);
-#if COREFX
+#if !NET45
             var sha512 = SHA512.Create();
 #else
             var sha512 = System.Security.Cryptography.SHA512Managed.Create();

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-#if ASPNETCORE
+#if !ASPNETMVC
 using System.Net;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -38,7 +38,7 @@ namespace Serenity.Web
                 included.Add(css);
 
                 return new HtmlString(String.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
-#if ASPNETCORE
+#if !ASPNETMVC
                     WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(css))));
 #else
                     HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(css))));
@@ -84,7 +84,7 @@ namespace Serenity.Web
                     {
                         cssList.Add(cssUrl);
                         sb.AppendLine(String.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
-#if ASPNETCORE
+#if !ASPNETMVC
                             WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(cssUrl))));
 #else
                             HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(cssUrl))));
@@ -116,7 +116,7 @@ namespace Serenity.Web
                 scripts.Add(script);
 
                 return new HtmlString(String.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
-#if ASPNETCORE
+#if !ASPNETMVC
                     WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(script))));
 #else
                     HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(script))));
@@ -162,7 +162,7 @@ namespace Serenity.Web
                     {
                         scripts.Add(scriptUrl);
                         sb.AppendLine(String.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
-#if ASPNETCORE
+#if !ASPNETMVC
                             WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(scriptUrl))));
 #else
                             HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(scriptUrl))));

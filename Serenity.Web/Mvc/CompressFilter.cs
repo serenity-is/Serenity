@@ -1,4 +1,4 @@
-﻿#if !ASPNETCORE
+﻿#if ASPNETMVC
 using System.Web;
 using System.Web.Mvc;
 using System.IO.Compression;

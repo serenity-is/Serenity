@@ -70,6 +70,14 @@ interface Select2Item {
     source?: any;
     disabled?: boolean;
 }
+declare namespace Serenity {
+    interface Select2Item {
+        id: string;
+        text: string;
+        source?: any;
+        disabled?: boolean;
+    }
+}
 interface Select2Result {
     results: any;
     more: boolean;
@@ -687,7 +695,8 @@ declare namespace JQueryValidation {
     }
 }
 declare namespace Q {
-    function validateTooltip(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
+    function baseValidateOptions(): JQueryValidation.ValidationOptions;
+    function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
     function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
     function removeValidationRule(element: JQuery, eventClass: string): JQuery;
 }
@@ -714,11 +723,13 @@ declare namespace Serenity {
 }
 declare namespace Q {
     namespace LayoutTimer {
-        function on(key: string, handler: () => void): () => void;
-        function onSizeChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function onWidthChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function onHeightChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function off(key: string, handler?: () => void): void;
+        function store(key: number): void;
+        function trigger(key: number): void;
+        function onSizeChange(element: () => HTMLElement, handler: () => void, width?: boolean, height?: boolean): number;
+        function onWidthChange(element: () => HTMLElement, handler: () => void): number;
+        function onHeightChange(element: () => HTMLElement, handler: () => void): number;
+        function onShown(element: () => HTMLElement, handler: () => void): number;
+        function off(key: number): number;
     }
 }
 declare namespace Serenity {

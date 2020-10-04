@@ -6,7 +6,7 @@
     /// <summary>
     ///   An object that is used to create criterias by employing operator overloading 
     ///   features of C# language, instead of using string based criterias.</summary>
-#if !COREFX
+#if NET45
     [Serializable]
 #endif
     public class Criteria : BaseCriteria
@@ -41,11 +41,11 @@
         ///   field name, but it can also be a criteria text pre-generated.</summary>
         /// <remarks>
         ///   Usually used like: <c>new Criteria("fieldname") >= 5</c>.</remarks>
-        /// <param name="text">
+        /// <param name="expression">
         ///   A field name or criteria condition (can be null)</param>
-        public Criteria(string text)
+        public Criteria(string expression)
         {
-            this.expression = text;
+            this.expression = expression;
         }
 
         /// <summary>

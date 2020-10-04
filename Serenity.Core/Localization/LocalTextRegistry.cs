@@ -10,13 +10,15 @@ namespace Serenity.Localization
     /// <summary>
     /// Default ILocalTextRegistry implementation.
     /// </summary>
+    /// <seealso cref="ILocalTextRegistry" />
+    /// <seealso cref="IRemoveAll" />
     /// <remarks>
     /// This implementation also supports a "pending approval" mode. If your site needs some moderator
     /// approval before translations are published, you may put your site to this mode when
     /// some moderator is using the site by registering an ILocalTextContext provider. Thus,
     /// moderators can see unapproved texts while they are logged in to the site.
     /// </remarks>
-    public class LocalTextRegistry : ILocalTextRegistry
+    public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
     {
         private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = 
             new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
@@ -278,6 +280,16 @@ namespace Serenity.Localization
             foreach (var k in (pending ? pendingTexts : approvedTexts).Keys)
                 result.Add(k.Item2);
             return result;
+        }
+
+        /// <summary>
+        /// Removes all cached texts
+        /// </summary>
+        public void RemoveAll()
+        {
+            approvedTexts.Clear();
+            pendingTexts.Clear();
+            languageFallbacks.Clear();
         }
 
         private class ItemKeyComparer : IEqualityComparer<Tuple<string, string>>

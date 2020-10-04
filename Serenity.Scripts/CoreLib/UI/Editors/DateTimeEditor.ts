@@ -120,7 +120,7 @@
 
             if (!this.options.inputOnly) {
                 $("<i class='inplace-button inplace-now'><b></b></div>")
-                    .attr('title', 'set to now')
+                    .attr('title', this.getInplaceNowText())
                     .insertAfter(this.time).click(e2 => {
                         if (this.element.hasClass('readonly')) {
                             return;
@@ -203,10 +203,14 @@
             }
 
             this.lastSetValue = null;
-            if (!Q.isEmptyOrNull(value)) {
+            if (!Q.isEmptyOrNull(value) && value.toLowerCase() != 'today' && value.toLowerCase() != 'now') {
                 this.lastSetValueGet = this.get_value();
                 this.lastSetValue = value;
             }
+        }
+
+        private getInplaceNowText(): string {
+            return Q.coalesce(Q.tryGetText('Controls.DateTimeEditor.SetToNow'), 'set to now');
         }
 
         private getDisplayFormat(): string {
@@ -303,14 +307,14 @@
                     this.element.addClass('readonly').attr('readonly', 'readonly');
                     this.element.nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
                     this.element.nextAll('.inplace-now').css('opacity', '0.1');
-
                 }
                 else {
                     this.element.removeClass('readonly').removeAttr('readonly');
                     this.element.nextAll('.ui-datepicker-trigger').css('opacity', '1');
                     this.element.nextAll('.inplace-now').css('opacity', '1');
                 }
-                this.time && this.time.attr('readonly', value ? "readonly" : null)
+
+                this.time && Serenity.EditorUtils.setReadonly(this.time, value);
             }
         }
 

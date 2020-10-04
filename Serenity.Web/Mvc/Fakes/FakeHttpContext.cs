@@ -1,4 +1,4 @@
-﻿#if !ASPNETCORE
+﻿#if ASPNETMVC
 using System.Collections.Specialized;
 using System.Security.Principal;
 using System.Web;

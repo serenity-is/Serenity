@@ -46,14 +46,10 @@
     Q.validatorAbortHandler = validatorAbortHandler;
     ;
     function validateOptions(options) {
-        return Q.extend({
-            ignore: ":hidden",
-            ignoreTitle: true,
+        var opt = Q.baseValidateOptions();
+        delete opt.showErrors;
+        return Q.extend(Q.extend(opt, {
             meta: 'v',
-            normalizer: function (value) {
-                return $.trim(value);
-            },
-            errorClass: 'error',
             errorPlacement: function (error, element) {
                 var field = null;
                 var vx = element.attr('data-vx-id');
@@ -100,12 +96,17 @@
                             }
                         }
                         if ($.fn.tooltip) {
-                            $.fn.tooltip && $(el).tooltip({
+                            var $el = $(el);
+                            if ($el.hasClass('select2-offscreen') &&
+                                el.id) {
+                                $el = $('#s2id_' + el.id);
+                            }
+                            $.fn.tooltip && $el.tooltip({
                                 title: validator.errorList[0].message,
                                 trigger: 'manual'
                             }).tooltip('show');
                             window.setTimeout(function () {
-                                $(el).tooltip('destroy');
+                                $el.tooltip('destroy');
                             }, 1500);
                         }
                     }
@@ -114,7 +115,7 @@
             success: function (label) {
                 label.addClass('checked');
             }
-        }, options);
+        }), options);
     }
     Q.validateOptions = validateOptions;
     ;

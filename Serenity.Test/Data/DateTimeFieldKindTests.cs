@@ -103,6 +103,7 @@ namespace Serenity.Test.Data
             var reader = A.Fake<IDataReader>();
             A.CallTo(() => reader.IsDBNull(0)).Returns(false);
             A.CallTo(() => reader.GetDateTime(0)).ReturnsLazily(() => testDate);
+            A.CallTo(() => reader.GetValue(0)).ReturnsLazily(() => testDate);
 
             testDate = DateTime.Today;
             var dateOnlyRow = new DateTimeTestRow();
@@ -140,6 +141,7 @@ namespace Serenity.Test.Data
             var reader = A.Fake<IDataReader>();
             A.CallTo(() => reader.IsDBNull(0)).Returns(false);
             A.CallTo(() => reader.GetDateTime(0)).ReturnsLazily(() => testDate);
+            A.CallTo(() => reader.GetValue(0)).ReturnsLazily(() => testDate);
 
             testDate = DateTime.Today;
             var dateOnlyRow = new DateTimeTestRow();
@@ -177,6 +179,7 @@ namespace Serenity.Test.Data
             var reader = A.Fake<IDataReader>();
             A.CallTo(() => reader.IsDBNull(0)).Returns(false);
             A.CallTo(() => reader.GetDateTime(0)).ReturnsLazily(() => testDate);
+            A.CallTo(() => reader.GetValue(0)).ReturnsLazily(() => testDate);
 
             testDate = DateTime.Today;
             var dateOnlyRow = new DateTimeTestRow();
@@ -214,6 +217,7 @@ namespace Serenity.Test.Data
             var reader = A.Fake<IDataReader>();
             A.CallTo(() => reader.IsDBNull(0)).Returns(false);
             A.CallTo(() => reader.GetDateTime(0)).ReturnsLazily(() => testDate);
+            A.CallTo(() => reader.GetValue(0)).ReturnsLazily(() => testDate);
 
             testDate = DateTime.Today;
             var dateOnlyRow = new DateTimeTestRow();

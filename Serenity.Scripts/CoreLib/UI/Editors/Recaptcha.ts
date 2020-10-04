@@ -34,7 +34,7 @@
             var input = valInput.css(gro);
             var self = this;
 
-            VX.addValidationRule(input, this.uniqueName, e => {
+            Q.addValidationRule(input, this.uniqueName, e => {
                 if (Q.isEmptyOrNull(this.get_value())) {
                     return Q.text('Validation.Required');
                 }

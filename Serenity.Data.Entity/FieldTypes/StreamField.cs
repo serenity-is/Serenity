@@ -30,7 +30,7 @@ namespace Serenity.Data
             else
             {
                 byte[] a;
-#if COREFX
+#if !NET45
                 if (reader.GetType().Name == "SqliteDataReader")
                 {
                     a = (byte[])reader.GetValue(index);
@@ -42,7 +42,7 @@ namespace Serenity.Data
                     a = new byte[available];
                     if (a.Length > 0)
                         reader.GetBytes(index, (long)0, a, 0, a.Length);
-#if COREFX
+#if !NET45
                 }
 #endif
 

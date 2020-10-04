@@ -8,6 +8,7 @@
         params?: any;
         onSubmit?: CancellableViewCallback<any>;
         url?: string;
+        localSort?: boolean;
         sortBy?: any;
         rowsPerPage?: number;
         seekToPage?: number;
@@ -58,6 +59,7 @@
                     );
                 },
                 predefinedValues: <any[]>[],
+                aggregators: <any[]>[],
                 aggregateEmpty: false,
                 aggregateCollapsed: false,
                 aggregateChildGroups: false,
@@ -74,9 +76,15 @@
             var page = 1;
             var totalRows = 0;
 
+            var onDataChanged = new Event();
+            var onDataLoading = new Event();
+            var onDataLoaded = new Event();
+            var onGroupExpanded = new Slick.Event();
+            var onGroupCollapsed = new Slick.Event();
+            var onPagingInfoChanged = new Event();
             var onRowCountChanged = new Event();
             var onRowsChanged = new Event();
-            var onPagingInfoChanged = new Event();
+            var onRowsOrCountChanged = new Event();
 
             var loading: any = false;
             var errorMessage: string = null;
@@ -85,10 +93,8 @@
             var contentType: string;
             var dataType: string;
             var totalCount: number = null;
-            var onDataChanged = new Event();
-            var onDataLoading = new Event();
-            var onDataLoaded = new Event();
-            var onClearData = new Event();
+            var localSort: boolean = options?.localSort ?? false;
+
             var intf: this;
 
             function beginUpdate() {
@@ -149,8 +155,19 @@
                 return items;
             }
 
-            function setItems(data: any[]) {
+            function getIdPropertyName() {
+                return idProperty;
+            }
+
+            function setItems(data: any[], newIdProperty?: string | boolean) {
+                if (newIdProperty != null && typeof newIdProperty == "string")
+                    idProperty = newIdProperty;
+
                 items = filteredItems = data;
+                if (localSort) {
+                    items.sort(getSortComparer());
+                }
+
                 idxById = {};
                 rowsById = null;
                 summaryOptions.totals = {};
@@ -209,20 +226,66 @@
                 };
             }
 
-            function sort(comparer: any, ascending: boolean) {
+            function getSortComparer() {
+                if (sortComparer != null)
+                    return sortComparer;
+
+                var cols: string[] = [];
+                var asc: boolean[] = [];
+                var sorts = intf.sortBy || [];
+                for (var s of sorts) {
+                    if (s == null)
+                        continue;
+                    if (s.length > 5 && s.toLowerCase().substr(s.length - 5).toLowerCase() == ' desc') {
+                        asc.push(false);
+                        cols.push(s.substr(0, s.length - 5));
+                    }
+                    else {
+                        asc.push(true);
+                        cols.push(s);
+                    }
+                }
+                return function (a: any, b: any) {
+                    for (var i = 0, l = cols.length; i < l; i++) {
+                        var field = cols[i];
+                        var sign = asc[i] ? 1 : -1;
+                        var value1 = a[field], value2 = b[field];
+                        var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+                        if (result != 0) {
+                            return result;
+                        }
+                    }
+                    return 0;
+                }
+            }
+
+            function sort(comparer?: (a: any, b: any) => number, ascending?: boolean) {
                 sortAsc = ascending;
-                sortComparer = comparer;
                 fastSortField = null;
                 if (ascending === false) {
                     items.reverse();
                 }
-                items.sort(comparer);
+
+                sortComparer = comparer;
+                items.sort(getSortComparer());
+
                 if (ascending === false) {
                     items.reverse();
                 }
                 idxById = {};
                 updateIdxById();
                 refresh();
+            }
+
+            function getLocalSort(): boolean {
+                return localSort;
+            }
+
+            function setLocalSort(value: boolean) {
+                if (localSort != value) {
+                    localSort = value;
+                    sort();
+                }
             }
 
             /***
@@ -254,11 +317,18 @@
             }
 
             function reSort() {
-                if (sortComparer) {
-                    sort(sortComparer, sortAsc);
-                } else if (fastSortField) {
+                if (fastSortField)
                     fastSort(fastSortField, sortAsc);
-                }
+                else
+                    sort(sortComparer, sortAsc);
+            }
+
+            function getFilteredItems() {
+                return filteredItems;
+            }
+
+            function getFilter() {
+                return filter;
             }
 
             function setFilter(filterFn: any) {
@@ -351,6 +421,11 @@
                 }
             }
 
+            function getRowByItem(item: any) {
+                ensureRowsByIdCache();
+                return rowsById[item[idProperty]];
+            }
+
             function getRowById(id: any) {
                 ensureRowsByIdCache();
                 return rowsById[id];
@@ -358,6 +433,18 @@
 
             function getItemById(id: any) {
                 return items[idxById[id]];
+            }
+
+            function mapItemsToRows(itemArray: any[]) {
+                var rows = [];
+                ensureRowsByIdCache();
+                for (var i = 0, l = itemArray.length; i < l; i++) {
+                    var row = rowsById[itemArray[i][idProperty]];
+                    if (row != null) {
+                        rows[rows.length] = row;
+                    }
+                }
+                return rows;
             }
 
             function mapIdsToRows(idArray: any[]) {
@@ -383,10 +470,30 @@
             }
 
             function updateItem(id: any, item: any) {
-                if (idxById[id] === undefined || id !== item[idProperty]) {
-                    throw "Invalid or non-matching id";
+                if (idxById[id] === undefined) {
+                    throw new Error("Invalid id");
+                }
+
+                if (id !== item[idProperty]) {
+                    // make sure the new id is unique:
+                    var newId = item[idProperty];
+                    if (newId == null) {
+                        throw new Error("Cannot update item to associate with a null id");
+                    }
+                    if (idxById[newId] !== undefined) {
+                        throw new Error("Cannot update item to associate with a non-unique id");
+                    }
+                    idxById[newId] = idxById[id];
+                    delete idxById[id];
+
+                    if (updated && updated[id]) {
+                        delete updated[id];
+                    }
+
+                    id = newId;
                 }
                 items[idxById[id]] = item;
+
                 if (!updated) {
                     updated = {};
                 }
@@ -415,6 +522,41 @@
                 items.splice(idx, 1);
                 updateIdxById(idx);
                 refresh();
+            }
+
+            function sortedAddItem(item: any) {
+                insertItem(sortedIndex(item), item);
+            }
+
+            function sortedUpdateItem(id: any, item: any) {
+                if (idxById[id] === undefined || id !== item[idProperty]) {
+                    throw new Error("Invalid or non-matching id " + idxById[id]);
+                }
+                var comparer = getSortComparer();
+                var oldItem = getItemById(id);
+                if (comparer(oldItem, item) !== 0) {
+                    // item affects sorting -> must use sorted add
+                    deleteItem(id);
+                    sortedAddItem(item);
+                }
+                else { // update does not affect sorting -> regular update works fine
+                    updateItem(id, item);
+                }
+            }
+
+            function sortedIndex(searchItem: any) {
+                var low = 0, high = items.length;
+                var comparer = getSortComparer();
+                while (low < high) {
+                    var mid = low + high >>> 1;
+                    if (comparer(items[mid], searchItem) === -1) {
+                        low = mid + 1;
+                    }
+                    else {
+                        high = mid;
+                    }
+                }
+                return low;
             }
 
             function getRows() {
@@ -468,10 +610,22 @@
                     for (var i = 0; i < groupingInfos.length; i++) {
                         toggledGroupsByLevel[i] = {};
                         groupingInfos[i].collapsed = collapse;
+
+                        if (collapse === true) {
+                            onGroupCollapsed.notify({ level: i, groupingKey: null });
+                        } else {
+                            onGroupExpanded.notify({ level: i, groupingKey: null });
+                        }
                     }
                 } else {
                     toggledGroupsByLevel[level] = {};
                     groupingInfos[level].collapsed = collapse;
+
+                    if (collapse === true) {
+                        onGroupCollapsed.notify({ level: level, groupingKey: null });
+                    } else {
+                        onGroupExpanded.notify({ level: level, groupingKey: null });
+                    }
                 }
                 refresh();
             }
@@ -502,6 +656,11 @@
             function expandCollapseGroup(args: any, collapse: any) {
                 var opts = resolveLevelAndGroupingKey(args);
                 toggledGroupsByLevel[opts.level][opts.groupingKey] = groupingInfos[opts.level].collapsed ^ collapse;
+                if (collapse)
+                    onGroupCollapsed.notify({ level: opts.level, groupingKey: opts.groupingKey });
+                else
+                    onGroupExpanded.notify({ level: opts.level, groupingKey: opts.groupingKey });
+
                 refresh();
             }
 
@@ -573,6 +732,10 @@
                         group = groups[i];
                         group.groups = extractGroups(group.rows, group);
                     }
+                }
+
+                if (groups.length) {
+                    addTotals(groups, level);
                 }
 
                 groups.sort(groupingInfos[level].comparer);
@@ -755,8 +918,28 @@
                 tpl = tpl.replace(/\$args\$/gi, filterInfo.params[1]);
 
                 var fn: any = new Function("_items,_args,_cache", tpl);
-                fn.displayName = fn.name = "compiledFilterWithCaching";
+                var fnName = "compiledFilterWithCaching";
+                fn.displayName = fnName;
+                fn.name = setFunctionName(fn, fnName);
                 return fn;
+            }
+
+            /**
+             * In ES5 we could set the function name on the fly but in ES6 this is forbidden and we need to set it through differently
+             * We can use Object.defineProperty and set it the property to writable, see MDN for reference
+             * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+             * @param {string} fn
+             * @param {string} fnName
+             */
+            function setFunctionName(fn: Function, fnName: string) {
+                try {
+                    Object.defineProperty(fn, 'name', {
+                        writable: true,
+                        value: fnName
+                    });
+                } catch (err) {
+                    (fn as any).name = fnName;
+                }
             }
 
             function uncompiledFilter(items: any[], args: any) {
@@ -867,7 +1050,6 @@
                 if (groupingInfos.length) {
                     groups = extractGroups(newRows);
                     if (groups.length) {
-                        addTotals(groups);
                         newRows = flattenGroupedRows(groups);
                     }
                 }
@@ -901,6 +1083,12 @@
                 }
                 if (diff.length > 0) {
                     onRowsChanged.notify({ rows: diff, dataView: self }, null, self);
+                }
+                if (countBefore !== rows.length || diff.length > 0) {
+                    onRowsOrCountChanged.notify({
+                        rowsDiff: diff, previousRowCount: countBefore, currentRowCount: rows.length,
+                        rowCountChanged: countBefore !== rows.length, rowsChanged: diff.length > 0, dataView: self
+                    }, null, self);
                 }
             }
 
@@ -1006,16 +1194,20 @@
                     }
                 }
 
-                grid.onCellCssStylesChanged.subscribe(function (e, args) {
+                var subFunc = function (e: any, args: any) {
                     if (inHandler) { return; }
                     if (key != args.key) { return; }
                     if (args.hash) {
                         storeCellCssStyles(args.hash);
                     }
-                });
+                    else {
+                        grid.onCellCssStylesChanged.unsubscribe(subFunc);
+                        onRowsOrCountChanged.unsubscribe(update);
+                    }
+                };
 
-                this.onRowsChanged.subscribe(update);
-                this.onRowCountChanged.subscribe(update);
+                grid.onCellCssStylesChanged.subscribe(subFunc);
+                onRowsOrCountChanged.subscribe(update);
             }
 
             function addData(data: any) {
@@ -1033,7 +1225,6 @@
                     return false;
                 }
 
-                var theData = data;
                 data.TotalCount = data.TotalCount || 0;
                 data.Entities = data.Entities || [];
 
@@ -1098,7 +1289,6 @@
 
                 var dt = dataType;
 
-                var self = this;
                 var ajaxOptions = {
                     cache: false,
                     type: intf.method,
@@ -1171,13 +1361,18 @@
                 "endUpdate": endUpdate,
                 "setPagingOptions": setPagingOptions,
                 "getPagingInfo": getPagingInfo,
+                "getIdPropertyName": getIdPropertyName,
                 "getRows": getRows,
                 "getItems": getItems,
                 "setItems": setItems,
+                "getFilter": getFilter,
+                "getFilteredItems": getFilteredItems,
                 "setFilter": setFilter,
                 "sort": sort,
                 "fastSort": fastSort,
                 "reSort": reSort,
+                "getLocalSort": getLocalSort,
+                "setLocalSort": setLocalSort,
                 "setSummaryOptions": setSummaryOptions,
                 "getGrandTotals": getGrandTotals,
                 "setGrouping": setGrouping,
@@ -1188,9 +1383,11 @@
                 "expandGroup": expandGroup,
                 "getGroups": getGroups,
                 "getIdxById": getIdxById,
+                "getRowByItem": getRowByItem,
                 "getRowById": getRowById,
                 "getItemById": getItemById,
                 "getItemByIdx": getItemByIdx,
+                "mapItemsToRows": mapItemsToRows,
                 "mapRowsToIds": mapRowsToIds,
                 "mapIdsToRows": mapIdsToRows,
                 "setRefreshHints": setRefreshHints,
@@ -1200,6 +1397,8 @@
                 "insertItem": insertItem,
                 "addItem": addItem,
                 "deleteItem": deleteItem,
+                "sortedAddItem": sortedAddItem,
+                "sortedUpdateItem": sortedUpdateItem,
                 "syncGridSelection": syncGridSelection,
                 "syncGridCellCssStyles": syncGridCellCssStyles,
 
@@ -1209,7 +1408,10 @@
 
                 "onRowCountChanged": onRowCountChanged,
                 "onRowsChanged": onRowsChanged,
+                "onRowsOrCountChanged": onRowsOrCountChanged,
                 "onPagingInfoChanged": onPagingInfoChanged,
+                "onGroupExpanded": onGroupExpanded,
+                "onGroupCollapsed": onGroupCollapsed,
 
                 "addData": addData,
                 "populate": populate,
@@ -1278,6 +1480,8 @@ declare namespace Slick {
         onDataLoaded: Slick.Event;
         onPagingInfoChanged: Slick.Event;
         getPagingInfo(): PagingInfo;
+        onGroupExpanded: Slick.Event,
+        onGroupCollapsed: Slick.Event,
         onAjaxCall: Slick.RemoteViewAjaxCallback<TEntity>;
         onProcessData: Slick.RemoteViewProcessCallback<TEntity>;
         addData(data: Serenity.ListResponse<TEntity>): void;
@@ -1286,7 +1490,8 @@ declare namespace Slick {
         deleteItem(id: any): void;
         getItems(): TEntity[];
         setFilter(filter: RemoteViewFilter<TEntity>): void;
-        setItems(items: any[], fullReset: boolean): void;
+        setItems(items: any[], newIdProperty?: boolean | string): void;
+        getIdPropertyName(): string;
         getItemById(id: any): TEntity;
         getRowById(id: any): number;
         updateItem(id: any, item: TEntity): void;
@@ -1309,6 +1514,10 @@ declare namespace Slick {
         rowsPerPage: number;
         errormsg: string;
         params: any;
+        getLocalSort(): boolean;
+        setLocalSort(value: boolean): boolean;
+        sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
+        reSort(): void;
         sortBy: string[];
         url: string;
         method: string;

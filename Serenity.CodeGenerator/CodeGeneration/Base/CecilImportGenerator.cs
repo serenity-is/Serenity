@@ -588,7 +588,7 @@ namespace Serenity.CodeGeneration
             string url = route == null || route.ConstructorArguments.Count == 0 || !(route.ConstructorArguments[0].Value is string) ? 
                 ("Services/HasNoRoute/" + controller.Name) : (route.ConstructorArguments[0].Value as string ?? "");
 
-#if ASPNETCORE
+#if !ASPNETMVC
             url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
             url = url.Replace("/[action]", "");
 #else

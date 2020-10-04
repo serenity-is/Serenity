@@ -23,7 +23,7 @@ namespace Serenity.Data
         internal Dictionary<string, Join> joins;
         internal string localTextPrefix;
         internal PropertyChangedEventArgs[] propertyChangedEventArgs;
-#if !COREFX
+#if NET45
         internal PropertyDescriptorCollection propertyDescriptors;
 #endif
         internal Func<Row> rowFactory;
@@ -226,7 +226,15 @@ namespace Serenity.Data
                 GetRowFieldsAndProperties(out rowFields, out rowProperties);
 
                 var expressionSelector = new DialectExpressionSelector(connectionKey);
-                var rowCustomAttributes = this.rowType.GetCustomAttributes().ToList();
+                var rowCustomAttributes = rowType.GetCustomAttributes().ToList();
+
+                var fieldsReadPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
+                if (fieldsReadPerm != null && fieldsReadPerm.ApplyToLookups)
+                    fieldsReadPerm = null; // ignore as need to specially handle in initialize
+
+                PermissionAttributeBase fieldsModifyPerm = rowType.GetCustomAttribute<FieldModifyPermissionAttribute>();
+                PermissionAttributeBase fieldsInsertPerm = rowType.GetCustomAttribute<FieldInsertPermissionAttribute>();
+                PermissionAttributeBase fieldsUpdatePerm = rowType.GetCustomAttribute<FieldUpdatePermissionAttribute>();
 
                 foreach (var fieldInfo in this.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
                 {
@@ -250,9 +258,10 @@ namespace Serenity.Data
                         DefaultValueAttribute defaultValue = null;
                         TextualFieldAttribute textualField = null;
                         DateTimeKindAttribute dateTimeKind = null;
-                        PermissionAttributeBase readPermission = null;
-                        PermissionAttributeBase insertPermission = null;
-                        PermissionAttributeBase updatePermission = null;
+                        
+                        PermissionAttributeBase readPermission;
+                        PermissionAttributeBase insertPermission;
+                        PermissionAttributeBase updatePermission;
 
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
@@ -281,11 +290,11 @@ namespace Serenity.Data
                             defaultValue = property.GetAttribute<DefaultValueAttribute>();
                             textualField = property.GetAttribute<TextualFieldAttribute>();
                             dateTimeKind = property.GetAttribute<DateTimeKindAttribute>();
-                            readPermission = property.GetAttribute<ReadPermissionAttribute>();
-                            insertPermission = property.GetAttribute<InsertPermissionAttribute>() ??
-                                property.GetAttribute<ModifyPermissionAttribute>() ?? readPermission;
-                            updatePermission = property.GetAttribute<UpdatePermissionAttribute>() ??
-                                property.GetAttribute<ModifyPermissionAttribute>() ?? readPermission;
+                            readPermission = property.GetAttribute<ReadPermissionAttribute>() ?? (PermissionAttributeBase)fieldsReadPerm;
+                            insertPermission = property.GetAttribute<InsertPermissionAttribute>() ?? fieldsInsertPerm ??
+                                property.GetAttribute<ModifyPermissionAttribute>() ?? fieldsModifyPerm ?? readPermission ?? fieldsReadPerm;
+                            updatePermission = property.GetAttribute<UpdatePermissionAttribute>() ?? fieldsUpdatePerm ??
+                                property.GetAttribute<ModifyPermissionAttribute>() ?? fieldsModifyPerm ?? readPermission ?? fieldsReadPerm;
 
                             if (origin != null)
                             {
@@ -328,6 +337,12 @@ namespace Serenity.Data
                                 addFlags |= attr.Add;
                                 removeFlags |= attr.Remove;
                             }
+                        }
+                        else
+                        {
+                            readPermission = fieldsReadPerm;
+                            insertPermission = fieldsInsertPerm ?? fieldsModifyPerm ?? fieldsReadPerm;
+                            updatePermission = fieldsUpdatePerm ?? fieldsUpdatePerm ?? fieldsReadPerm;
                         }
 
                         if (ReferenceEquals(null, field))
@@ -501,7 +516,7 @@ namespace Serenity.Data
                 foreach (var attr in rowCustomAttributes.OfType<OuterApplyAttribute>())
                     new OuterApply(this.joins, attr.InnerQuery, attr.Alias);
 
-#if !COREFX
+#if NET45
                 var propertyDescriptorArray = new PropertyDescriptor[this.Count];
                 for (int i = 0; i < this.Count; i++)
                 {
@@ -832,35 +847,28 @@ namespace Serenity.Data
             if (initializedInstance)
                 return this;
 
-            var attr = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
-            if (attr != null && attr.Permission != null)
+            var readPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
+            if (readPerm != null && readPerm.Permission != null && !readPerm.ApplyToLookups)
             {
-                var permission = attr.Permission;
-                if (attr.ApplyToLookups)
+                var idField = (row as IIdRow)?.IdField as Field;
+                var nameField = row.GetNameField();
+                var permission = readPerm.Permission;
+                foreach (var field in this)
                 {
-                    foreach (var field in this)
+                    if (field.ReadPermission == null &&
+                        !ReferenceEquals(idField, field) &&
+                        !ReferenceEquals(nameField, field) &&
+                        field.GetAttribute<LookupIncludeAttribute>() == null)
                     {
-                        if (field.ReadPermission == null)
-                            field.ReadPermission = permission;
-                    }
-                }
-                else
-                {
-                    var idField = (row as IIdRow).IdField as Field;
-                    var nameField = row.GetNameField();
-                    foreach (var field in this)
-                    {
-                        if (field.ReadPermission == null &&
-                            !ReferenceEquals(idField, field) &&
-                            !ReferenceEquals(nameField, field) &&
-                            field.GetAttribute<LookupIncludeAttribute>() == null)
-                        {
-                            field.ReadPermission = permission;
-                        }
+                        field.ReadPermission = permission;
+                        if (field.InsertPermission == null)
+                            field.InsertPermission = permission;
+                        if (field.UpdatePermission == null)
+                            field.UpdatePermission = permission;
                     }
                 }
             }
-
+            
             initializedInstance = true;
             return this;
         }

@@ -1,12 +1,12 @@
 ﻿using Serenity.Abstractions;
-#if COREFX
+#if !NET45
 using IDictionary = System.Collections.Generic.IDictionary<object, object>;
 #else
 using System.Collections;
 using System.Collections.Generic;
 using System;
 #endif
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.AspNetCore.Http;
 #else
 using System.Web;
@@ -20,9 +20,9 @@ namespace Serenity.Web
         {
             get 
             {
-#if ASPNETCORE
+#if !ASPNETMVC
                 var context = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
-#if COREFX
+#if !NET45
                 if (context != null)
                     return context.Items;
 #else
@@ -38,8 +38,8 @@ namespace Serenity.Web
             }
         }
 
-#if ASPNETCORE
-#if !COREFX
+#if !ASPNETMVC
+#if NET45
         private class GenericDictionaryWrapper : IDictionary
         {
             private readonly IDictionary<object, object> dictionary;

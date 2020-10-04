@@ -1,4 +1,4 @@
-﻿#if !COREFX
+﻿#if NET45
 using Serenity.Abstractions;
 using Serenity.Caching;
 using Serenity.Configuration;
@@ -9,7 +9,7 @@ using Serenity.Services;
 using System.Reflection;
 using System.Web.Hosting;
 using Serenity.Reflection;
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.Extensions.Caching.Memory;
 #else
 using System.Linq;
@@ -22,7 +22,7 @@ namespace Serenity.Web
     {
         public static void Run()
         {
-#if !COREFX
+#if NET45
             InitializeServiceLocator();
 #endif
             InitializeSelfAssemblies();
@@ -36,7 +36,7 @@ namespace Serenity.Web
             InitializeRequestBehaviors();
         }
 
-#if !COREFX
+#if NET45
         public static void InitializeServiceLocator()
         {
             if (!Dependency.HasResolver)
@@ -57,7 +57,7 @@ namespace Serenity.Web
 
         public static void InitializeSelfAssemblies()
         {
-#if !ASPNETCORE
+#if ASPNETMVC
             var selfAssemblies = BuildManager.GetReferencedAssemblies()
                 .Cast<Assembly>()
                 .Where(x =>
@@ -73,7 +73,7 @@ namespace Serenity.Web
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
             if (Dependency.TryResolve<ILocalCache>() == null)
-#if ASPNETCORE
+#if !ASPNETMVC
                 registrar.RegisterInstance<ILocalCache>(new Serenity.Caching.MemoryLocalCache(Dependency.Resolve<IMemoryCache>()));
 #else
                 registrar.RegisterInstance<ILocalCache>(new HttpRuntimeCache());
@@ -114,7 +114,7 @@ namespace Serenity.Web
                 registrar.RegisterInstance<IConfigurationManager>(new WebConfigurationWrapper());
 
             if (Dependency.TryResolve<IConfigurationRepository>() == null)
-#if COREFX
+#if !NET45
                 registrar.RegisterInstance<IConfigurationRepository>(new AppSettingsJsonConfigRepository());
 #else
                 registrar.RegisterInstance<IConfigurationRepository>("Application", new AppSettingsJsonConfigRepository());
@@ -168,8 +168,8 @@ namespace Serenity.Web
 }
 #endif
 
-#if ASPNETCORE
-#if !COREFX
+#if !ASPNETMVC
+#if NET45
 namespace Serenity.Caching
 {
     using Serenity.Abstractions;

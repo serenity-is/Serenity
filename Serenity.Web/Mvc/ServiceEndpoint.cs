@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Serenity.Data;
 using System.Data;
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 #else
@@ -14,13 +14,13 @@ using System.Web.Mvc;
 
 namespace Serenity.Services
 {
-#if ASPNETCORE
+#if !ASPNETMVC
     [HandleServiceException]
 #endif
     public abstract class ServiceEndpoint : Controller
     {
 
-#if ASPNETCORE
+#if !ASPNETMVC
         private IDbConnection connection;
         private UnitOfWork unitOfWork;
 
@@ -67,6 +67,7 @@ namespace Serenity.Services
                 this.connection = SqlConnections.NewByKey(connectionKey.Value);
                 context.ActionArguments[cnnParam.Name] = connection;
                 base.OnActionExecuting(context);
+                return;
             }
 
             base.OnActionExecuting(context);

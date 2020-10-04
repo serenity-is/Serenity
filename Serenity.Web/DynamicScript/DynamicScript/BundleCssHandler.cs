@@ -1,4 +1,4 @@
-﻿#if !ASPNETCORE
+﻿#if ASPNETMVC
 using Serenity.Web;
 using Serenity.Web.HttpHandlers;
 using System;

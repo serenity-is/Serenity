@@ -1,4 +1,4 @@
-﻿#if ASPNETCORE
+﻿#if !ASPNETMVC
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Serenity.Data;

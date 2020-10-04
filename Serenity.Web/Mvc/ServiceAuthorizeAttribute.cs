@@ -1,7 +1,7 @@
 ﻿using Serenity.Data;
 using System;
 using System.Linq;
-#if ASPNETCORE
+#if !ASPNETMVC
 using Microsoft.AspNetCore.Mvc.Filters;
 #else
 using System.Web;
@@ -10,7 +10,7 @@ using System.Web.Mvc;
 
 namespace Serenity.Services
 {
-#if ASPNETCORE
+#if !ASPNETMVC
     public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
     {
         public void OnResourceExecuted(ResourceExecutedContext context)
@@ -115,7 +115,7 @@ namespace Serenity.Services
 
         public string Permission { get; private set; }
 
-#if !ASPNETCORE
+#if ASPNETMVC
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
             if (!base.AuthorizeCore(httpContext))

@@ -25,7 +25,7 @@ namespace Serenity.Reporting
 
         public byte[] Execute()
         {
-#if ASPNETCORE
+#if !ASPNETMVC
             var exePath = UtilityExePath ?? Path.Combine(HostingEnvironment.MapPath("~/"), "../App_Data/Reporting/wkhtmltopdf.exe".Replace('/', Path.DirectorySeparatorChar));
 #else
             var exePath = UtilityExePath ?? HostingEnvironment.MapPath("~/App_Data/Reporting/wkhtmltopdf.exe");

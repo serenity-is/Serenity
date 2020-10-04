@@ -466,6 +466,11 @@ var Serenity;
                 });
                 this.element.closest('.ui-dialog').addClass('flex-layout');
             }
+            else if (Serenity["FlexifyAttribute"] && Serenity.DialogExtensions["dialogFlexify"] &&
+                Q.getAttributes(type, Serenity["FlexifyAttribute"], true).length > 0) {
+                Serenity.DialogExtensions["dialogFlexify"](this.element);
+                Serenity.DialogExtensions.dialogResizable(this.element);
+            }
             if (Q.getAttributes(type, Serenity.MaximizableAttribute, true).length > 0) {
                 Serenity.DialogExtensions.dialogMaximizable(this.element);
             }

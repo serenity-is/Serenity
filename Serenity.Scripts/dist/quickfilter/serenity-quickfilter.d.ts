@@ -74,9 +74,11 @@ declare namespace Serenity {
         private timer;
         constructor(input: JQuery, opt: QuickSearchInputOptions);
         protected checkIfValueChanged(): void;
+        get_value(): string;
         get_field(): QuickSearchField;
         set_field(value: QuickSearchField): void;
         protected updateInputPlaceHolder(): void;
+        restoreState(value: string, field: QuickSearchField): void;
         protected searchNow(value: string): void;
     }
 }

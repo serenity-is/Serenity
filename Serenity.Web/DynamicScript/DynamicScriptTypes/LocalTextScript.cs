@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-#if COREFX
+#if !NET45
 using Microsoft.Extensions.Configuration;
 #else
 using System.Configuration;

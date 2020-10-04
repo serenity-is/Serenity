@@ -9,7 +9,7 @@ namespace Serenity.Configuration
     {
         public object AppSetting(string key, Type settingType)
         {
-#if !ASPNETCORE
+#if ASPNETMVC
             var setting = System.Configuration.ConfigurationManager.AppSettings[key];
             if (settingType == typeof(string))
                 return setting;
@@ -34,7 +34,7 @@ namespace Serenity.Configuration
 
         public Tuple<string, string> ConnectionString(string key)
         {
-#if !ASPNETCORE
+#if ASPNETMVC
             var cs = System.Configuration.ConfigurationManager.ConnectionStrings[key];
             if (cs == null)
                 return null;

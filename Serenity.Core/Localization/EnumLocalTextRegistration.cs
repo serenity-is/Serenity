@@ -25,7 +25,7 @@ namespace Serenity.Localization
         /// <param name="assemblies">Assemblies to search for enumeration classes in</param>
         /// <param name="languageID">Language ID texts will be added (default is invariant language)</param>
         /// <param name="registry">Registry</param>
-#if COREFX
+#if !NET45
         public static void AddEnumTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies = null,
             string languageID = LocalText.InvariantLanguageID)
 #else

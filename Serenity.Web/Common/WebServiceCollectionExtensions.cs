@@ -1,4 +1,4 @@
-﻿#if ASPNETCORE
+﻿#if !ASPNETMVC
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +18,7 @@ namespace Serenity.Extensions.DependencyInjection
             services.TryAddSingleton<IConfigurationManager, WebConfigurationWrapper>();
         }
 
-#if !COREFX
+#if NET45
         public static void AddCaching(this IServiceCollection services)
         {
             services.AddMemoryCache();

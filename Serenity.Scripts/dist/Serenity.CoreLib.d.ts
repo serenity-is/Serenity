@@ -71,6 +71,14 @@ interface Select2Item {
     source?: any;
     disabled?: boolean;
 }
+declare namespace Serenity {
+    interface Select2Item {
+        id: string;
+        text: string;
+        source?: any;
+        disabled?: boolean;
+    }
+}
 interface Select2Result {
     results: any;
     more: boolean;
@@ -688,7 +696,8 @@ declare namespace JQueryValidation {
     }
 }
 declare namespace Q {
-    function validateTooltip(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
+    function baseValidateOptions(): JQueryValidation.ValidationOptions;
+    function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
     function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
     function removeValidationRule(element: JQuery, eventClass: string): JQuery;
 }
@@ -715,11 +724,13 @@ declare namespace Serenity {
 }
 declare namespace Q {
     namespace LayoutTimer {
-        function on(key: string, handler: () => void): () => void;
-        function onSizeChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function onWidthChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function onHeightChange(key: string, element: HTMLElement, handler: () => void): () => void;
-        function off(key: string, handler?: () => void): void;
+        function store(key: number): void;
+        function trigger(key: number): void;
+        function onSizeChange(element: () => HTMLElement, handler: () => void, width?: boolean, height?: boolean): number;
+        function onWidthChange(element: () => HTMLElement, handler: () => void): number;
+        function onHeightChange(element: () => HTMLElement, handler: () => void): number;
+        function onShown(element: () => HTMLElement, handler: () => void): number;
+        function off(key: number): number;
     }
 }
 declare namespace Serenity {
@@ -1573,6 +1584,7 @@ declare namespace Serenity {
         get_value(): string;
         get value(): string;
         set_value(value: string): void;
+        private getInplaceNowText;
         private getDisplayFormat;
         set value(v: string);
         private get_valueAsDate;
@@ -1931,6 +1943,30 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class MaskedEditor extends Widget<MaskedEditorOptions> {
+        constructor(input: JQuery, opt?: MaskedEditorOptions);
+        get value(): string;
+        protected get_value(): string;
+        set value(value: string);
+        protected set_value(value: string): void;
+    }
+    interface MaskedEditorOptions {
+        mask?: string;
+        placeholder?: string;
+    }
+}
+declare namespace Serenity {
+    interface RecaptchaOptions {
+        siteKey?: string;
+        language?: string;
+    }
+    class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
+        constructor(div: JQuery, opt: RecaptchaOptions);
+        get_value(): string;
+        set_value(value: string): void;
+    }
+}
+declare namespace Serenity {
     interface FileUploadEditorOptions extends FileUploadConstraints {
         displayFileName?: boolean;
         urlPrefix?: string;
@@ -2060,9 +2096,11 @@ declare namespace Serenity {
         private timer;
         constructor(input: JQuery, opt: QuickSearchInputOptions);
         protected checkIfValueChanged(): void;
+        get_value(): string;
         get_field(): QuickSearchField;
         set_field(value: QuickSearchField): void;
         protected updateInputPlaceHolder(): void;
+        restoreState(value: string, field: QuickSearchField): void;
         protected searchNow(value: string): void;
     }
 }
@@ -2841,6 +2879,7 @@ declare namespace Slick {
         params?: any;
         onSubmit?: CancellableViewCallback<any>;
         url?: string;
+        localSort?: boolean;
         sortBy?: any;
         rowsPerPage?: number;
         seekToPage?: number;
@@ -2883,6 +2922,8 @@ declare namespace Slick {
         onDataLoaded: Slick.Event;
         onPagingInfoChanged: Slick.Event;
         getPagingInfo(): PagingInfo;
+        onGroupExpanded: Slick.Event;
+        onGroupCollapsed: Slick.Event;
         onAjaxCall: Slick.RemoteViewAjaxCallback<TEntity>;
         onProcessData: Slick.RemoteViewProcessCallback<TEntity>;
         addData(data: Serenity.ListResponse<TEntity>): void;
@@ -2891,7 +2932,8 @@ declare namespace Slick {
         deleteItem(id: any): void;
         getItems(): TEntity[];
         setFilter(filter: RemoteViewFilter<TEntity>): void;
-        setItems(items: any[], fullReset: boolean): void;
+        setItems(items: any[], newIdProperty?: boolean | string): void;
+        getIdPropertyName(): string;
         getItemById(id: any): TEntity;
         getRowById(id: any): number;
         updateItem(id: any, item: TEntity): void;
@@ -2914,6 +2956,10 @@ declare namespace Slick {
         rowsPerPage: number;
         errormsg: string;
         params: any;
+        getLocalSort(): boolean;
+        setLocalSort(value: boolean): boolean;
+        sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
+        reSort(): void;
         sortBy: string[];
         url: string;
         method: string;
@@ -3005,8 +3051,8 @@ declare namespace Serenity {
     namespace GridUtils {
         function addToggleButton(toolDiv: JQuery, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
         function addIncludeDeletedToggle(toolDiv: JQuery, view: Slick.RemoteView<any>, hint?: string, initial?: boolean): void;
-        function addQuickSearchInput(toolDiv: JQuery, view: Slick.RemoteView<any>, fields?: QuickSearchField[]): void;
-        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): void;
+        function addQuickSearchInput(toolDiv: JQuery, view: Slick.RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void;
+        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
         function makeOrderable(grid: Slick.Grid, handleMove: (p1: any, p2: number) => void): void;
         function makeOrderableWithUpdateRequest(grid: DataGrid<any, any>, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
     }
@@ -3160,7 +3206,9 @@ declare namespace Serenity {
         static defaultRowHeight: number;
         static defaultHeaderHeight: number;
         static defaultPersistanceStorage: SettingStorage;
+        private layoutTimer;
         constructor(container: JQuery, options?: TOptions);
+        protected useLayoutTimer(): boolean;
         protected attrs<TAttr>(attrType: {
             new (...args: any[]): TAttr;
         }): TAttr[];
@@ -3552,6 +3600,10 @@ interface JQuery {
     flexY(flexY: number): JQuery;
 }
 declare namespace Serenity {
+    class FlexifyAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
     class Flexify extends Widget<FlexifyOptions> {
         private xDifference;
         private yDifference;
@@ -3568,6 +3620,12 @@ declare namespace Serenity {
         designWidth?: any;
         designHeight?: any;
     }
+}
+declare namespace Serenity.Decorators {
+    function flexify(value?: boolean): (target: Function) => void;
+}
+declare namespace Serenity.DialogExtensions {
+    function dialogFlexify(dialog: JQuery): JQuery;
 }
 declare namespace Serenity {
     interface GoogleMapOptions {

@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.0" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-    <DefineConstants>$(DefineConstants);COREFX;ASPNETCORE</DefineConstants>
+    <DefineConstants>$(DefineConstants)</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.2" />
@@ -32,7 +32,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.4" />
   </ItemGroup>  
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);COREFX;ASPNETCORE;ASPNETCORE22</DefineConstants>
+    <DefineConstants>$(DefineConstants);ASPNETCORE22</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461'">
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
@@ -51,7 +51,10 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <DefineConstants>$(DefineConstants);ASPNETCORE;ASPNETCORE22</DefineConstants>
+    <DefineConstants>$(DefineConstants);NET45;ASPNETCORE22</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <DefineConstants>$(DefineConstants);NET45;ASPNETMVC</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
