@@ -4,7 +4,7 @@ Serenity Application Platform
 <img src="https://github.com/volkanceylan/Serenity/blob/master/Tools/Images/serenity-logo-128.png" />
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3b9118bb630f4ee593757b8d59d0322f)](https://www.codacy.com/app/Serenity/Serenity?utm_source=github.com&utm_medium=referral&utm_content=volkanceylan/Serenity&utm_campaign=badger)
-[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Core/)   [![Serenity Slack Status](https://serenityslackinvitation.herokuapp.com/badge.svg?2)](https://serenityslackinvitation.herokuapp.com/)
+[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Core/)
 
 ## What is Serenity Platform
 
@@ -26,7 +26,7 @@ See [Serenity Developer Guide](https://serenity.is/docs/) at https://serenity.is
 - http://serenity.is/blog/
 
 **Serenity Slack Chat:**
-For join https://serenityslackinvitation.herokuapp.com
+For join https://join.slack.com/t/serenityplatform/shared_invite/zt-hz32q186-zqbk2QKj4UFLO3mJCtHNHQ
 - http://serenityplatform.slack.com/
 
 ## Quick Start with Serene
