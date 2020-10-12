@@ -31,11 +31,11 @@ For join https://join.slack.com/t/serenityplatform/shared_invite/zt-hz32q186-zqb
 
 ## Quick Start with Serene
 
-The easiest and fastest way to get your hands dirty on Serenity is by using a sample application template (Serene) from Visual Studio Gallery at https://visualstudiogallery.msdn.microsoft.com/559ec6fc-feef-4077-b6d5-5a99408a6681
+The easiest and fastest way to get your hands dirty on Serenity is by using a sample application template (Serene) from Visual Studio Gallery at https://marketplace.visualstudio.com/items?itemName=VolkanCeylan.SereneSerenityApplicationTemplate
 
-You can also install it directly from Visual Studio, by entering File -> New -> Project -> Online and searching for *SERENE*.
+You can also install it directly from Visual Studio, from Extensions => Manage Extensions => Online and searching for *SERENE*.
 
-Serene source code is available in its own repository at https://github.com/volkanceylan/serene.
+Serene source code is available in its own repository at https://github.com/serenity-is/serene.
 
 ## Installation
  
@@ -44,8 +44,6 @@ See [Installation Guide](INSTALL.md) for prerequisites and setup information
 ## Online Serene Demo
 
 http://serenity.is/demo/
-
-http://serenedemo.azurewebsites.net/ [alternative one from @samdubey]
 
 ## Contribute / Spread the Word
 
@@ -67,7 +65,7 @@ Visit [this blog post](http://serenity.is/blog/2017/08/08/what-is-in-premium) fo
 
 Paid support options are available from the author and a team of Serenity professionals. [Contact us](mailto:volkanceylan@gmail.com) for details.
 
-## Video Tutorials (thanks a lot to @samdubey and @sayuga for these contributions)
+## Video Tutorials (thanks a lot to for these contributions)
 
 **Starting Point Videos (by @sayuga):**
 
