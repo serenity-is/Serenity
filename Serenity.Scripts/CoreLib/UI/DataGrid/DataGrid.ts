@@ -1190,7 +1190,11 @@
                         });
 
                         sortColumns.sort(function (a, b) {
-                            return a.sort - b.sort;
+                            // sort holds two informations:
+                            // absoulte value: order of sorting
+                            // sign: positive = ascending, negativ = descending
+                            // so we have to compare absolute values here
+                            return Math.abs(a.sort) - Math.abs(b.sort);
                         });
 
                         for (var $t5 = 0; $t5 < sortColumns.length; $t5++) {
