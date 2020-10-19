@@ -1,3 +1,16 @@
+## 3.14.2 (2020-09-19)
+
+Features:
+  - option to disable layout timer in datagrid
+
+Bugfixes:
+  - row number over order by does not gurantee order and might mess paging in some rare cases on SQL 2005/2008
+  - missing localization for "set to now" in date time editor
+  - datetime editor time part is not readonly when editor itself is readonly
+  - keyprefix not used properly for get in RedisDistributedCache
+  - fix infinite resizing on some cases in datagrid due to layout timer
+  - reading pathLink.href directly results in full address like localhost:6543/ instead of just /, so use getAttribute to fix Q.Config.AppPath
+
 ## 3.14.1 (2020-09-09)
 
 Bugfixes:
