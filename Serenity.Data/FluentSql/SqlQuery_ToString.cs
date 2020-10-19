@@ -12,8 +12,32 @@ namespace Serenity.Data
         ///   Formatted SELECT statement</returns>
         public override string ToString()
         {
-            if (dialect is ISqlQueryToString dialectWithToString) 
-                return dialectWithToString.SqlQueryToString(this);
+            if (dialect is ISqlQueryToString dialectWithToString)
+            {
+                var queryElements = new SqlQueryElements
+                {
+                    AliasExpressions = aliasExpressions,
+                    AliasWithJoins = aliasWithJoins,
+                    Columns = columns,
+                    CountRecords = countRecords,
+                    Distinct = distinct,
+                    ForJson = forJson,
+                    ForXml = forXml,
+                    From = from,
+                    GroupBy = groupBy,
+                    Having = having,
+                    Into = into,
+                    IntoIndex = intoIndex,
+                    OrderBy = orderBy,
+                    Skip = skip,
+                    Take = take,
+                    UnionQuery = unionQuery,
+                    UnionType = unionType,
+                    Where = where
+                };
+
+                return dialectWithToString.SqlQueryToString(this, queryElements);
+            }
 
             var sb = new StringBuilder();
 

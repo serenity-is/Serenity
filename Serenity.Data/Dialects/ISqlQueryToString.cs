@@ -8,7 +8,7 @@
         /// <summary>
         /// The method which will call inside SqlQuery.ToString() method
         /// </summary>
-        string SqlQueryToString(SqlQuery sqlQuery);
+        string SqlQueryToString(SqlQuery sqlQuery, SqlQueryElements queryElements);
 
     }
 }
