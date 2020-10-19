@@ -28,6 +28,7 @@
         public List<object> Into { get; set; } = new List<object>();
         public SqlQuery UnionQuery { get; set; }
         public SqlUnionType UnionType { get; set; }
+        public QueryWithParams Parent { get; set; }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
     }

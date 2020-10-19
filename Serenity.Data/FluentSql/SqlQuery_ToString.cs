@@ -33,7 +33,8 @@ namespace Serenity.Data
                     Take = take,
                     UnionQuery = unionQuery,
                     UnionType = unionType,
-                    Where = where
+                    Where = where,
+                    Parent = parent
                 };
 
                 return dialectWithToString.SqlQueryToString(this, queryElements);
