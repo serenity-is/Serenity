@@ -8,9 +8,6 @@
         /// <summary>
         /// The method which will call inside SqlQuery.ToString() method
         /// </summary>
-        /// <value>
-        ///   <c>true</c> if the server supports OFFSET FETCH; otherwise, <c>false</c>.
-        /// </value>
         string SqlQueryToString(SqlQuery sqlQuery);
 
     }
