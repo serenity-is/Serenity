@@ -12,6 +12,9 @@ namespace Serenity.Data
         ///   Formatted SELECT statement</returns>
         public override string ToString()
         {
+            if (dialect is ISqlQueryToString dialectWithToString) 
+                return dialectWithToString.SqlQueryToString(this);
+
             var sb = new StringBuilder();
 
             if (unionQuery != null)
