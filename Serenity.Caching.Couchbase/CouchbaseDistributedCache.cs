@@ -1,4 +1,3 @@
-﻿
 namespace Serenity
 {
     using ComponentModel;
@@ -31,7 +30,7 @@ namespace Serenity
             {
                 var config = new ClientConfiguration();
                 config.Servers.Add(new Uri(this.configuration.ServerAddress));
-                Cluster = Cluster ?? new Cluster();
+                Cluster = Cluster ?? new Cluster(config);
             }
 
             this.cacheClient = Cluster.OpenBucket(this.configuration.BucketName, this.configuration.BucketPass);
