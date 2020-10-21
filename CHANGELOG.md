@@ -1,4 +1,9 @@
-## 3.14.2 (2020-09-19)
+## 3.14.3 (2020-10-21)
+
+Bugfixes:
+  - prefix `__rownum__` alias with x as Oracle does not seem to like it
+
+## 3.14.2 (2020-10-19)
 
 Features:
   - option to disable layout timer in datagrid
