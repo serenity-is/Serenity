@@ -792,7 +792,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT * FROM ( SELECT c, ROWNUM AS __rownum__ FROM t) WHERE __rownum__ > 50 AND ROWNUM <= 20"),
+                    "SELECT * FROM ( SELECT c, ROWNUM AS x__rownum__ FROM t) WHERE x__rownum__ > 50 AND ROWNUM <= 20"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
@@ -810,7 +810,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT * FROM ( SELECT c, ROW_NUMBER() OVER (ORDER BY x) AS __rownum__ FROM t ORDER BY x) WHERE __rownum__ > 50 AND ROWNUM <= 20"),
+                    "SELECT * FROM ( SELECT c, ROW_NUMBER() OVER (ORDER BY x) AS x__rownum__ FROM t ORDER BY x) WHERE x__rownum__ > 50 AND ROWNUM <= 20"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
@@ -826,7 +826,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT * FROM ( SELECT c, ROWNUM AS __rownum__ FROM t) WHERE __rownum__ > 0 AND ROWNUM <= 10"),
+                    "SELECT * FROM ( SELECT c, ROWNUM AS x__rownum__ FROM t) WHERE x__rownum__ > 0 AND ROWNUM <= 10"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
