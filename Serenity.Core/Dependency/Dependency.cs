@@ -1,7 +1,7 @@
 ﻿namespace Serenity
 {
     using System;
-    
+
     /// <summary>
     /// Service locator for Serenity. It requires setting an IoC container 
     /// that implements IDependencyResolver interface through SetResolver 
@@ -9,6 +9,8 @@
     /// </summary>
     public static class Dependency
     {
+        internal const string UseDI = "Use .NET Dependency Injection";
+
         private static IDependencyResolver resolver;
 
         /// <summary>
@@ -19,6 +21,9 @@
         /// No provider is registered for TService</exception>
         /// <exception cref="System.InvalidProgramException">
         /// No dependency resolver is configured using SetResolver</exception>
+#if !NET45
+        [Obsolete("Use .NET Dependency Injection")]
+#endif
         public static TService Resolve<TService>() where TService : class
         {
             return Resolver.Resolve<TService>();
@@ -36,6 +41,9 @@
         /// No provider is registered for TService</exception>
         /// <exception cref="System.InvalidProgramException">
         /// No dependency resolver is configured using SetResolver</exception>
+#if !NET45
+    [Obsolete("Use .NET Dependency Injection")]
+#endif
         public static TService Resolve<TService>(string name) where TService : class
         {
             return Resolver.Resolve<TService>(name);
@@ -48,6 +56,9 @@
         /// no dependency resolver is configured using SetResolver.
         /// </summary>
         /// <typeparam name="TService">Service type</typeparam>
+#if !NET45
+        [Obsolete("Use .NET Dependency Injection")]
+#endif
         public static TService TryResolve<TService>() where TService : class
         {
             return resolver == null ? null : Resolver.TryResolve<TService>();
@@ -63,6 +74,9 @@
         /// </summary>
         /// <typeparam name="TService">Service type</typeparam>
         /// <param name="name">Scope name</param>
+#if !NET45
+    [Obsolete("Use .NET Dependency Injection")]
+#endif
         public static TService TryResolve<TService>(string name) where TService : class
         {
             return resolver == null ? null : Resolver.TryResolve<TService>(name);
@@ -73,6 +87,9 @@
         /// Sets current dependency resolver and returns previous one if exists.
         /// </summary>
         /// <param name="value">Dependency resolver</param>
+#if !NET45
+        [Obsolete("Use .NET Dependency Injection")]
+#endif
         public static IDependencyResolver SetResolver(IDependencyResolver value)
         {
             var old = resolver;
@@ -85,6 +102,9 @@
         /// Use this property to check if there is a current resolver as Resolver 
         /// property raises an exception if not.
         /// </summary>
+#if !NET45
+        [Obsolete("Use .NET Dependency Injection")]
+#endif
         public static bool HasResolver
         {
             get { return resolver != null; }
@@ -95,6 +115,9 @@
         /// </summary>
         /// <exception cref="System.InvalidProgramException">
         /// No dependency resolver is configured using SetResolver</exception>
+#if !NET45
+        [Obsolete("Use .NET Dependency Injection")]
+#endif
         public static IDependencyResolver Resolver
         {
             get

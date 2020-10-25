@@ -23,12 +23,14 @@ namespace Serenity.Localization
         public static void AddFromNestedDictionary(IDictionary<string, JToken> nested, string prefix, string languageID, ILocalTextRegistry registry = null)
         {
             if (nested == null)
-                throw new ArgumentNullException("nested");
+                throw new ArgumentNullException(nameof(nested));
+
+            if (registry == null)
+                throw new ArgumentNullException(nameof(registry));
 
             var target = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             ProcessNestedDictionary(nested, prefix, target);
 
-            registry = registry ?? Dependency.Resolve<ILocalTextRegistry>();
             foreach (var pair in target)
                 registry.Add(languageID, pair.Key, pair.Value);
         }

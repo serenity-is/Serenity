@@ -2,6 +2,7 @@
 namespace Serenity
 {
     using Serenity.Abstractions;
+    using Serenity.Localization;
     using System;
     using System.Globalization;
 
@@ -21,8 +22,6 @@ namespace Serenity
         /// </summary>
         public static readonly LocalText Empty;
 
-        private string key;
-
         static LocalText()
         {
             Empty = new LocalText("");
@@ -34,33 +33,36 @@ namespace Serenity
         /// <param name="key">Local text key</param>
         public LocalText(string key)
         {
-            this.key = key;
+            Key = key;
         }
 
         /// <summary>
         /// Gets the local text key
         /// </summary>
-        public string Key
-        {
-            get { return key; }
-        }
+        public string Key { get; private set; }
 
         /// <summary>
         /// Returns localized representation which corresponds to the local text key or the key itself if none 
         /// found in local text registry.
-        /// </summary>
+        /// </summary>   
+        [Obsolete("Use ILocalTextSource through DI")]
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
         public override string ToString()
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
         {
-            return Get(key);
+            return Get(Key);
         }
 
         /// <summary>
         /// Implicit conversion to String that returns localized representation which corresponds to the local 
         /// text key or the key itself if none found in local text registry.
         /// </summary>
+#if !NET45
+        [Obsolete("Use ILocalTextSource through DI")]
+#endif        
         public static implicit operator string(LocalText localText)
         {
-            return localText == null ? null : Get(localText.key);
+            return localText == null ? null : Get(localText.Key);
         }
 
         /// <summary>
@@ -69,13 +71,16 @@ namespace Serenity
         /// <param name="key">Local text key</param>
         public static implicit operator LocalText(string key)
         {
-            return String.IsNullOrEmpty(key) ? Empty : new LocalText(key);
+            return string.IsNullOrEmpty(key) ? Empty : new LocalText(key);
         }
 
         /// <summary>
         /// Returns localized representation which corresponds to the local text key or the key itself if none 
         /// found in local text registry.
         /// </summary>
+#if !NET45
+        [Obsolete("Use ILocalTextSource through DI")]
+#endif
         public static string Get(string key)
         {
             return TryGet(key) ?? key;
@@ -85,13 +90,17 @@ namespace Serenity
         /// Returns localized representation which corresponds to the local text key or NULL if none found 
         /// in local text registry.
         /// </summary>
+#if !NET45
+        [Obsolete("Use ILocalTextSource through DI")]
+#endif
         public static string TryGet(string key)
         {
             if (string.IsNullOrEmpty(key))
                 return null;
 
-            var provider = Dependency.TryResolve<ILocalTextRegistry>();
-            return provider == null ? null : provider.TryGet(CultureInfo.CurrentUICulture.Name, key);
+            var provider = Dependency.TryResolve<ILocalTextSource>();
+            return provider?.TryGet(CultureInfo.CurrentUICulture.Name, key, 
+                Dependency.TryResolve<ILocalTextContext>()?.IsApprovalMode == true);
         }
     }
 }

@@ -1,11 +1,15 @@
 ﻿using Serenity.Abstractions;
 using Serenity.Services;
+using System;
 
 namespace Serenity
 {
     /// <summary>
     /// Provides a common access point for authorization related services
     /// </summary>
+#if !NET45
+    [Obsolete(Dependency.UseDI)]
+#endif
     public static class Authorization
     {
         /// <summary>
@@ -52,7 +56,7 @@ namespace Serenity
             get
             {
                 var user = UserDefinition;
-                return user == null ? null : user.Id;
+                return user?.Id;
             }
         }
 

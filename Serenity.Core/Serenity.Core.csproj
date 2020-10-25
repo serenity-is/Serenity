@@ -2,15 +2,14 @@
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
     <AssemblyName>Serenity.Core</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>    
     <Title>Serenity Platform - Core Library</Title>
     <Description>Contains abstractions and implementations for some basic Serenity features like authorization, caching, localization, dependency resolution, reflection...</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net45' ">
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">

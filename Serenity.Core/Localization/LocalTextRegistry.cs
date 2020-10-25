@@ -58,26 +58,14 @@ namespace Serenity.Localization
         }
 
         /// <summary>
-        /// Returns localized representation which corresponds to the local text key or the key itself if none 
-        /// found in local text registry.
-        /// </summary>
-        public string TryGet(string languageID, string key)
-        {
-            Check.NotNull(languageID, "languageID");
-            var context = Dependency.TryResolve<ILocalTextContext>();
-
-            return TryGet(languageID, key, context != null && context.IsApprovalMode);
-        }
-
-        /// <summary>
         /// Converts the local text key to its representation in requested language. Looks up text
         /// in requested language, its Fallbacks and invariant language in order. If not found in any,
         /// null is returned. See SetLanguageFallback for information about language fallbacks.
         /// </summary>
         /// <param name="languageID">Language ID.</param>
         /// <param name="textKey">Local text key (can be null).</param>
-        /// <param name="isApprovalMode">If pending approval texts to be used, true.</param>
-        public string TryGet(string languageID, string textKey, bool isApprovalMode)
+        /// <param name="pending">If pending approval texts to be used, true.</param>
+        public string TryGet(string languageID, string textKey, bool pending)
         {
             Check.NotNull(languageID, "languageID");
 
@@ -86,7 +74,7 @@ namespace Serenity.Localization
 
             string s;
 
-            if (isApprovalMode)
+            if (pending)
             {
                 // first search in pending texts
                 if (pendingTexts.TryGetValue(k, out s))

@@ -1,4 +1,4 @@
-﻿
+﻿#if NET45
 namespace Serenity.Abstractions
 {
     using System;
@@ -35,3 +35,4 @@ namespace Serenity.Abstractions
         void RemoveAll();
     }
 }
+#endif

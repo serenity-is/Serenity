@@ -3,16 +3,8 @@
     /// <summary>
     /// Abstraction for local text registry which stores translations for local text keys. 
     /// </summary>
-    public interface ILocalTextRegistry
+    public interface ILocalTextRegistry : ILocalTextSource
     {
-        /// <summary>
-        /// Returns localized representation which corresponds to the local text key or the key itself if none 
-        /// found in the registry.
-        /// </summary>
-        /// <param name="key">Local text key (e.g. Enums.Month.June)</param>
-        /// <param name="languageID">Language identifier</param>
-        /// <returns></returns>
-        string TryGet(string languageID, string key);
         /// <summary>
         /// Adds a local text entry to the registry
         /// </summary>

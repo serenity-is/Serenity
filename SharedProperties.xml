@@ -12,6 +12,9 @@
     <PackageProjectUrl>http://github.com/volkanceylan/Serenity</PackageProjectUrl>
     <PackageTags>Serenity</PackageTags>
   </PropertyGroup>
+  <PropertyGroup>
+	<NewtonsoftJsonVersion>12.0.3</NewtonsoftJsonVersion>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <DefineConstants>$(DefineConstants);NET45</DefineConstants>
   </PropertyGroup>

@@ -1,5 +1,6 @@
 ﻿#if !NET45
 
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serenity.Abstractions;
@@ -23,8 +24,8 @@ namespace Serenity.Extensions.DependencyInjection
         public static void AddCaching(this IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.TryAddSingleton<ILocalCache, MemoryLocalCache>();
             services.TryAddSingleton<IDistributedCache, DistributedCacheEmulator>();
+            services.TryAddSingleton<ITwoLevelCache, TwoLevelCache>();
         }
 
         /// <summary>

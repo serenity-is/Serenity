@@ -1,25 +1,24 @@
 ﻿using Serenity.Abstractions;
-using System;
 using System.Text.RegularExpressions;
 
 namespace Serenity.Localization
 {
     /// <summary>
-    /// Adds key fallback to any ILocalTextRegistry implementation
+    /// Adds key fallback to any ILocalTextSource implementation
     /// </summary>
-    public class FallbackLocalTextRegistry : ILocalTextRegistry, IRemoveAll
+    public class FallbackLocalTextSource : ILocalTextSource
     {
-        private ILocalTextRegistry localTextRegistry;
+        private readonly ILocalTextSource source;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FallbackLocalTextRegistry"/> class.
+        /// Initializes a new instance of the <see cref="FallbackLocalTextSource"/> class.
         /// </summary>
-        /// <param name="localTextRegistry">The local text registry.</param>
-        public FallbackLocalTextRegistry(ILocalTextRegistry localTextRegistry)
+        /// <param name="source">The local text source.</param>
+        public FallbackLocalTextSource(ILocalTextSource source)
         {
-            Check.NotNull(localTextRegistry, "localTextRegistry");
+            Check.NotNull(source, nameof(source));
 
-            this.localTextRegistry = localTextRegistry;
+            this.source = source;
         }
 
         /// <summary>
@@ -28,10 +27,11 @@ namespace Serenity.Localization
         /// </summary>
         /// <param name="key">Local text key (e.g. Enums.Month.June)</param>
         /// <param name="languageID">Language identifier</param>
+        /// <param name="pending">If pending approval text should be used</param>
         /// <returns></returns>
-        public string TryGet(string languageID, string key)
+        public string TryGet(string languageID, string key, bool pending)
         {
-            string text = localTextRegistry.TryGet(languageID, key);
+            string text = source.TryGet(languageID, key, pending);
 
             if (!string.IsNullOrEmpty(text) || string.IsNullOrEmpty(key))
                 return text;
@@ -43,7 +43,7 @@ namespace Serenity.Localization
                 {
                     key = key.Substring(0, key.Length - suffix.Length);
 
-                    text = localTextRegistry.TryGet(languageID, key);
+                    text = source.TryGet(languageID, key, pending);
                     if (!string.IsNullOrEmpty(text))
                         return text;
 
@@ -54,7 +54,7 @@ namespace Serenity.Localization
             key = TryGetKeyFallback(key);
             if (!string.IsNullOrEmpty(key))
             {
-                text = localTextRegistry.TryGet(languageID, key);
+                text = source.TryGet(languageID, key, pending);
                 if (!string.IsNullOrEmpty(text))
                     return text;
 
@@ -62,17 +62,6 @@ namespace Serenity.Localization
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Adds a local text entry to the registry
-        /// </summary>
-        /// <param name="languageID">Language ID (e.g. en-US, tr-TR)</param>
-        /// <param name="key">Local text key</param>
-        /// <param name="text">Translated text</param>
-        public void Add(string languageID, string key, string text)
-        {
-            localTextRegistry.Add(languageID, key, text);
         }
 
         /// <summary>
@@ -112,19 +101,6 @@ namespace Serenity.Localization
         public static string BreakUpString(string value)
         {
             return Regex.Replace(value, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1", RegexOptions.Compiled).Trim();
-        }
-
-        /// <summary>
-        /// Removes all cached items from target object.
-        /// </summary>
-        /// <exception cref="NotImplementedException">If underlying local text registry does 
-        /// not implement IRemoveAll interface</exception>
-        public void RemoveAll()
-        {
-            var removeAll = localTextRegistry as IRemoveAll;
-            if (removeAll == null)
-                throw new NotImplementedException();
-            removeAll.RemoveAll();
         }
     }
 }

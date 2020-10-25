@@ -1,12 +1,43 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using System;
+#if !NET45
+    using ILocalCache = Microsoft.Extensions.Caching.Memory.IMemoryCache;
+#endif
 
 namespace Serenity
 {
     /// <summary>
     /// Contains helper functions to use local and distributed cache in sync with optional cache invalidation.
     /// </summary>
-    public static class TwoLevelCache
+    public class TwoLevelCache : ITwoLevelCache
     {
+        /// <summary>
+        /// Creates a new TwoLevelCache instance
+        /// </summary>
+        /// <param name="memoryCache">Memory cache</param>
+        /// <param name="distributedCache">Distributed cache</param>
+        public TwoLevelCache(ILocalCache memoryCache, IDistributedCache distributedCache)
+        {
+            if (memoryCache == null)
+                throw new ArgumentNullException(nameof(memoryCache));
+
+            if (distributedCache == null)
+                throw new ArgumentNullException(nameof(distributedCache));
+
+            Memory = memoryCache;
+            Distributed = distributedCache;
+        }
+
+        /// <summary>
+        /// Gets memory cache
+        /// </summary>
+        public ILocalCache Memory { get; private set; }
+
+        /// <summary>
+        /// Gets distributed cache
+        /// </summary>
+        public IDistributedCache Distributed { get; private set; }
+
         /// <summary>
         /// Expiration timeout for cache generation keys
         /// </summary>
@@ -16,13 +47,6 @@ namespace Serenity
         /// Suffix for cache generation keys
         /// </summary>
         public const string GenerationSuffix = "$Generation$";
-
-        private static readonly Random GenerationRandomizer;
-
-        static TwoLevelCache()
-        {
-            GenerationRandomizer = new Random(GetSeed());
-        }
 
         /// <summary>
         /// Tries to read a value from local cache. If it is not found there, tries the distributed cache. 
@@ -45,12 +69,15 @@ namespace Serenity
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
         /// or distributed cache, or all found items are expired.</param>
-        public static TItem Get<TItem>(string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration, 
+#if !NET45
+        [Obsolete(Dependency.UseDI)]
+#endif
+        public static TItem Get<TItem>(string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration,
             string groupKey, Func<TItem> loader)
             where TItem : class
         {
-            return GetInternal<TItem, TItem>(cacheKey, localExpiration, remoteExpiration, 
-                groupKey, loader, x => x, x => x);
+            return TwoLevelCacheExtensions.Get(Legacy, cacheKey, localExpiration, remoteExpiration,
+                groupKey, loader);
         }
 
         /// <summary>
@@ -73,11 +100,13 @@ namespace Serenity
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
         /// or distributed cache, or all found items are expired.</param>
+#if !NET45
+        [Obsolete(Dependency.UseDI)]
+#endif
         public static TItem Get<TItem>(string cacheKey, TimeSpan expiration, string groupKey, Func<TItem> loader)
             where TItem : class
         {
-            return GetInternal<TItem, TItem>(cacheKey, expiration, expiration, 
-                groupKey, loader, x => x, x => x);
+            return TwoLevelCacheExtensions.Get(Legacy, cacheKey, expiration, groupKey, loader);
         }
 
         /// <summary>
@@ -105,20 +134,17 @@ namespace Serenity
         /// <param name="serialize">A function used to serialize items before cached.</param>
         /// <param name="deserialize">A function used to deserialize items before cached.</param>
         /// <typeparam name="TSerialized">Serilized type</typeparam>
-        public static TItem GetWithCustomSerializer<TItem, TSerialized>(string cacheKey, TimeSpan localExpiration, 
-            TimeSpan remoteExpiration, string groupKey, Func<TItem> loader, 
+#if !NET45
+        [Obsolete(Dependency.UseDI)]
+#endif
+        public static TItem GetWithCustomSerializer<TItem, TSerialized>(string cacheKey, TimeSpan localExpiration,
+        TimeSpan remoteExpiration, string groupKey, Func<TItem> loader,
             Func<TItem, TSerialized> serialize, Func<TSerialized, TItem> deserialize)
             where TItem : class
             where TSerialized : class
         {
-            if (serialize == null)
-                throw new ArgumentNullException("serialize");
-
-            if (deserialize == null)
-                throw new ArgumentNullException("deserialize");
-
-            return GetInternal<TItem, TSerialized>(cacheKey, localExpiration, remoteExpiration, 
-                groupKey, loader, serialize, deserialize);
+            return TwoLevelCacheExtensions.GetWithCustomSerializer(Legacy, cacheKey, localExpiration, remoteExpiration,
+                   groupKey, loader, serialize, deserialize);
         }
 
         /// <summary>
@@ -142,176 +168,12 @@ namespace Serenity
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
         /// or distributed cache, or all found items are expired.</param>
-        public static TItem GetLocalStoreOnly<TItem>(string cacheKey, TimeSpan localExpiration, 
+        public static TItem GetLocalStoreOnly<TItem>(string cacheKey, TimeSpan localExpiration,
             string groupKey, Func<TItem> loader)
             where TItem : class
         {
-            return GetInternal<TItem, TItem>(cacheKey, localExpiration, TimeSpan.FromSeconds(0), 
-                groupKey, loader, null, null);
+            return TwoLevelCacheExtensions.GetLocalStoreOnly<TItem>(Legacy, cacheKey, localExpiration, groupKey, loader);
         }
-
-        private static TItem GetInternal<TItem, TSerialized>(string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration, 
-            string groupKey, Func<TItem> loader, Func<TItem, TSerialized> serialize, Func<TSerialized, TItem> deserialize)
-            where TItem : class
-            where TSerialized : class
-        {
-            ulong? groupGeneration = null;
-            ulong? groupGenerationCache = null;
-
-            string itemGenerationKey = cacheKey + GenerationSuffix;
-
-            var localCache = LocalCache.Provider;
-            var distributedCache = DistributedCache.Provider;
-
-            // retrieves distributed cache group generation number lazily
-            Func<ulong> getGroupGenerationValue = delegate()
-            {
-                if (groupGeneration != null)
-                    return groupGeneration.Value;
-
-                groupGeneration = distributedCache.Get<ulong?>(groupKey);
-                if (groupGeneration == null || groupGeneration == 0)
-                {
-                    groupGeneration = RandomGeneration();
-                    distributedCache.Set(groupKey, groupGeneration.Value);
-                }
-
-                groupGenerationCache = groupGeneration.Value;
-                // add to local cache, use 5 seconds from there
-                LocalCache.Add(groupKey, groupGenerationCache, GenerationCacheExpiration);
-
-                return groupGeneration.Value;
-            };
-
-            // retrieves local cache group generation number lazily
-            Func<ulong> getGroupGenerationCacheValue = delegate()
-            {
-                if (groupGenerationCache != null)
-                    return groupGenerationCache.Value;
-
-                // check cached local value of group key 
-                // it expires in 5 seconds and read from server again
-                groupGenerationCache = localCache.Get<object>(groupKey) as ulong?;
-
-                // if its in local cache, return it
-                if (groupGenerationCache != null)
-                    return groupGenerationCache.Value;
-
-                return getGroupGenerationValue();
-            };
-
-            
-
-            // first check local cache, if item exists and not expired (group version = item version) return it
-            var cachedObj = localCache.Get<object>(cacheKey);
-            if (cachedObj != null)
-            {
-                // check local cache, if exists, compare version with group one
-                var itemGenerationCache = localCache.Get<object>(itemGenerationKey) as ulong?;
-                if (itemGenerationCache != null &&
-                    itemGenerationCache == getGroupGenerationCacheValue())
-                {
-                    // local cached item is not expired yet
-
-                    if (cachedObj == DBNull.Value)
-                        return null;
-
-                    return (TItem)cachedObj;
-                }
-
-                // local cached item is expired, remove all information
-                if (itemGenerationCache != null)
-                    localCache.Remove(itemGenerationKey);
-
-                localCache.Remove(cacheKey);
-
-                cachedObj = null;
-            }
-
-            // if serializer is null, than this is a local store only item
-            if (serialize != null)
-            {
-                // no item in local cache or expired, now check distributed cache
-                var itemGeneration = distributedCache.Get<ulong?>(itemGenerationKey);
-
-                // if item has version number in distributed cache and this is equal to group version
-                if (itemGeneration != null &&
-                    itemGeneration.Value == getGroupGenerationValue())
-                {
-                    // get item from distributed cache
-                    var serialized = distributedCache.Get<TSerialized>(cacheKey);
-                    // if item exists in distributed cache
-                    if (serialized != null)
-                    {
-                        cachedObj = deserialize(serialized);
-                        LocalCache.Add(cacheKey, (object)cachedObj ?? DBNull.Value, localExpiration);
-                        LocalCache.Add(itemGenerationKey, getGroupGenerationValue(), localExpiration);
-                        return (TItem)cachedObj;
-                    }
-                }
-            }
-
-            // couldn't find valid item in local or distributed cache, produce value by calling loader
-            var item = loader();
-
-            // add item and its version to cache
-            LocalCache.Add(cacheKey, (object)item ?? DBNull.Value, localExpiration);
-            LocalCache.Add(itemGenerationKey, getGroupGenerationValue(), localExpiration);
-
-            if (serialize != null)
-            {
-                var serializedItem = serialize(item);
-
-                // add item and generation to distributed cache
-                if (remoteExpiration == TimeSpan.Zero)
-                {
-                    distributedCache.Set(cacheKey, serializedItem);
-                    distributedCache.Set(itemGenerationKey, getGroupGenerationValue());
-                }
-                else
-                {
-                    distributedCache.Set(cacheKey, serializedItem, remoteExpiration);
-                    distributedCache.Set(itemGenerationKey, getGroupGenerationValue(), remoteExpiration);
-                }
-            }
-
-            return item;
-        }
-
-        /// <summary>
-        /// Generates a seed for Random object.
-        /// </summary>
-        /// <returns>Random 32 bit seed</returns>
-        private static int GetSeed()
-        {
-            byte[] raw = Guid.NewGuid().ToByteArray();
-            int i1 = BitConverter.ToInt32(raw, 0);
-            int i2 = BitConverter.ToInt32(raw, 4);
-            int i3 = BitConverter.ToInt32(raw, 8);
-            int i4 = BitConverter.ToInt32(raw, 12);
-            long val = i1 + i2 + i3 + i4;
-            while (val > int.MaxValue)
-                val -= int.MaxValue;
-            return (int)val;
-        }
-
-        /// <summary>
-        /// Generates a 64 bit random generation number (version key)
-        /// </summary>
-        /// <returns>Random 64 bit number</returns>
-        private static ulong RandomGeneration()
-        {
-            var buffer = new byte[sizeof(ulong)];
-            GenerationRandomizer.NextBytes(buffer);
-            var value = BitConverter.ToUInt64(buffer, 0);
-
-            // random değer 0 olmasın
-            if (value == 0)
-                return ulong.MaxValue;
-
-            return value;
-        }
-
 
         /// <summary>
         /// Changes a group generation value, so that all items that depend on it are expired.
@@ -323,31 +185,38 @@ namespace Serenity
             ExpireGroupItems(groupKey);
         }
 
+        private class LegacyTwoLevelCache : ITwoLevelCache
+        {
+            [Obsolete("Using for backward compatibility")]
+            public ILocalCache Memory => LocalCache.Provider;
+            [Obsolete("Using for backward compatibility")]
+            public IDistributedCache Distributed => DistributedCache.Provider;
+        }
+
+        private static readonly ITwoLevelCache Legacy = new LegacyTwoLevelCache();
+
         /// <summary>
         /// Changes a group generation value, so that all items that depend on it are expired.
         /// </summary>
         /// <param name="groupKey">Group key</param>
+#if !NET45
+        [Obsolete(Dependency.UseDI)]
+#endif
         public static void ExpireGroupItems(string groupKey)
         {
-            LocalCache.Provider.Remove(groupKey);
-            DistributedCache.Set<object>(groupKey, null);
+            Legacy.ExpireGroupItems(groupKey);
         }
 
         /// <summary>
         /// Removes a key from local, distributed caches, and removes their generation version information.
         /// </summary>
         /// <param name="cacheKey">Cache key</param>
+#if !NET45
+        [Obsolete(Dependency.UseDI)]
+#endif
         public static void Remove(string cacheKey)
         {
-            string itemGenerationKey = cacheKey + GenerationSuffix;
-
-            var localCache = LocalCache.Provider;
-            var distributedCache = DistributedCache.Provider;
-
-            localCache.Remove(cacheKey);
-            localCache.Remove(itemGenerationKey);
-            distributedCache.Set<object>(cacheKey, null);
-            distributedCache.Set<object>(itemGenerationKey, null);
+            Legacy.Remove(cacheKey);
         }
     }
 }
