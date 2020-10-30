@@ -197,7 +197,7 @@
 
             $('<script/>').attr('type', 'text/javascript')
                 .attr('id', 'CKEditorScript')
-                .attr('src', Q.resolveUrl('~/Scripts/CKEditor/ckeditor.js?v=' +
+                .attr('src', Q.resolveUrl('~/Scripts/ckeditor/ckeditor.js?v=' +
                     HtmlContentEditor.CKEditorVer))
                 .appendTo(window.document.head);
         };
