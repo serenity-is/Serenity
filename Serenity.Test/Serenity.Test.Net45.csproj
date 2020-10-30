@@ -137,6 +137,9 @@
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowLocalTextPrefix.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowLookupKey.cs" />
     <Compile Include="Core\Authorization\PermissionExpressionParserTests.cs" />
+    <Compile Include="Core\Caching\BatchGenerationUpdaterTest\BatchGenerationUpdaterTests.cs" />
+    <Compile Include="Core\Caching\BatchGenerationUpdaterTest\CacheLinkedTestRow.cs" />
+    <Compile Include="Core\Caching\BatchGenerationUpdaterTest\CacheTestRow.cs" />
     <Compile Include="Core\ComponentModel\PropertyGrid\FormWidthAttributeTests.cs" />
     <Compile Include="Core\IO\GlobFilterTests.cs" />
     <Compile Include="Core\Json\JsonSettingsTests.cs" />
