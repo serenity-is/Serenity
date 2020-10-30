@@ -931,7 +931,7 @@
                     });
                 },
                 visible: () => false,
-                disabled: () => !this.hasInsertPermission() || this.readOnly
+                disabled: () => !this.hasInsertPermission()
             });
 
             return list;
