@@ -9317,6 +9317,7 @@ var Serenity;
             else {
                 Serenity.UploadHelper.populateFileSymbols(this.fileSymbols, [this.entity], displayOriginalName, this.options.urlPrefix);
             }
+            this.element.find('input.select2-offscreen').val(Q.trimToNull((this.get_value() || {}).Filename));
         };
         FileUploadEditor.prototype.updateInterface = function () {
             var addButton = this.toolbar.findButton('add-file-button');
@@ -9331,13 +9332,32 @@ var Serenity;
         FileUploadEditor.prototype.set_readOnly = function (value) {
             if (this.get_readOnly() !== value) {
                 if (value) {
-                    this.uploadInput.attr('disabled', 'disabled').fileupload('disable');
+                    this.uploadInput.attr('disabled', 'disabled');
+                    try {
+                        this.uploadInput.fileupload('disable');
+                    }
+                    catch (_a) {
+                    }
                 }
                 else {
-                    this.uploadInput.removeAttr('disabled').fileupload('enable');
+                    this.uploadInput.removeAttr('disabled');
+                    try {
+                        this.uploadInput.fileupload('enable');
+                    }
+                    catch (_b) {
+                    }
                 }
                 this.updateInterface();
             }
+        };
+        FileUploadEditor.prototype.get_required = function () {
+            return this.element.find('input.select2-offscreen').hasClass('required');
+        };
+        FileUploadEditor.prototype.set_required = function (value) {
+            var input = this.element.find('input.select2-offscreen');
+            if (value && !input.length)
+                input = $('<input type="text" class="select2-offscreen" name="' + this.uniqueName + '_Validator"/>').appendTo(this.element);
+            input.toggleClass('required', !!value);
         };
         FileUploadEditor.prototype.get_value = function () {
             if (this.entity == null) {
@@ -9357,6 +9377,21 @@ var Serenity;
             configurable: true
         });
         FileUploadEditor.prototype.set_value = function (value) {
+            var stringValue = value;
+            if (typeof stringValue === "string") {
+                var stringValue = Q.trimToNull(stringValue);
+                if (value != null) {
+                    var idx = stringValue.indexOf('/');
+                    if (idx < 0)
+                        idx = stringValue.indexOf('\\');
+                    value = {
+                        Filename: value,
+                        OriginalName: stringValue.substring(idx + 1)
+                    };
+                }
+            }
+            else if (Q.isTrimmedEmpty(value.Filename))
+                value = null;
             if (value != null) {
                 if (value.Filename == null) {
                     this.entity = null;

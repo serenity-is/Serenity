@@ -11,7 +11,7 @@
     @Serenity.Decorators.registerEditor('Serenity.FileUploadEditor', [IReadOnly])
     @Serenity.Decorators.element('<div/>')
     export class FileUploadEditor extends Widget<FileUploadEditorOptions>
-        implements IReadOnly, IGetEditValue, ISetEditValue {
+        implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
         constructor(div: JQuery, opt: FileUploadEditorOptions) {
             super(div, opt);
@@ -100,6 +100,8 @@
                     this.fileSymbols, [this.entity], displayOriginalName,
                     this.options.urlPrefix);
             }
+
+            this.element.find('input.select2-offscreen').val(Q.trimToNull((this.get_value() || {}).Filename))
         }
 
         protected updateInterface(): void {
@@ -117,13 +119,33 @@
         set_readOnly(value: boolean): void {
             if (this.get_readOnly() !== value) {
                 if (value) {
-                    (this.uploadInput.attr('disabled', 'disabled') as any).fileupload('disable');
+                    this.uploadInput.attr('disabled', 'disabled');
+                    try {
+                        this.uploadInput.fileupload('disable');
+                    }
+                    catch {
+                    }
                 }
                 else {
-                    (this.uploadInput.removeAttr('disabled') as any).fileupload('enable');
+                    this.uploadInput.removeAttr('disabled');
+                    try {
+                        this.uploadInput.fileupload('enable');
+                    } catch {
+                    }
                 }
                 this.updateInterface();
             }
+        }
+
+        get_required(): boolean {
+            return this.element.find('input.select2-offscreen').hasClass('required');
+        }
+
+        set_required(value: boolean): void {
+            var input = this.element.find('input.select2-offscreen');
+            if (value && !input.length)
+                input = $('<input type="text" class="select2-offscreen" name="' + this.uniqueName + '_Validator"/>').appendTo(this.element);
+            input.toggleClass('required', !!value);
         }
 
         get_value(): UploadedFile {
@@ -139,6 +161,22 @@
         }
 
         set_value(value: UploadedFile): void {
+            var stringValue = value as string;
+            if (typeof stringValue === "string") {
+                var stringValue = Q.trimToNull(stringValue);
+                if (value != null) {
+                    var idx = stringValue.indexOf('/');
+                    if (idx < 0)
+                        idx = stringValue.indexOf('\\');
+                    value = <Serenity.UploadedFile>{
+                        Filename: value,
+                        OriginalName: stringValue.substring(idx + 1)
+                    }
+                }
+            }
+            else if (Q.isTrimmedEmpty(value.Filename))
+                value = null;
+
             if (value != null) {
                 if (value.Filename == null) {
                     this.entity = null;

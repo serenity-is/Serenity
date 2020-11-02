@@ -1973,7 +1973,7 @@ declare namespace Serenity {
     }
     interface ImageUploadEditorOptions extends FileUploadEditorOptions {
     }
-    class FileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
+    class FileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
         constructor(div: JQuery, opt: FileUploadEditorOptions);
         protected getUploadInputOptions(): UploadInputOptions;
         protected addFileButtonText(): string;
@@ -1982,6 +1982,8 @@ declare namespace Serenity {
         protected updateInterface(): void;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
+        get_required(): boolean;
+        set_required(value: boolean): void;
         get_value(): UploadedFile;
         get value(): UploadedFile;
         set_value(value: UploadedFile): void;
