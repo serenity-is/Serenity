@@ -2936,8 +2936,11 @@ var Q;
                 else {
                     var $el = $(element);
                     $el.addClass(errorClass).removeClass(validClass);
-                    if ($el.hasClass('select2-offscreen') &&
-                        element.id) {
+                    var data = $el.data();
+                    if (data && data.vxHighlight) {
+                        $('#' + data.vxHighlight).addClass(errorClass).removeClass(validClass);
+                    }
+                    else if ($el.hasClass('select2-offscreen') && element.id) {
                         $('#s2id_' + element.id).addClass(errorClass).removeClass(validClass);
                     }
                 }
@@ -2949,8 +2952,11 @@ var Q;
                 else {
                     var $el = $(element);
                     $el.removeClass(errorClass).addClass(validClass);
-                    if ($el.hasClass('select2-offscreen') &&
-                        element.id) {
+                    var data = $el.data();
+                    if (data && data.vxHighlight) {
+                        $('#' + data.vxHighlight).removeClass(errorClass).addClass(validClass);
+                    }
+                    else if ($el.hasClass('select2-offscreen') && element.id) {
                         $('#s2id_' + element.id).removeClass(errorClass).addClass(validClass);
                     }
                 }
@@ -2960,25 +2966,34 @@ var Q;
                 $.each(this.validElements(), function (index, element) {
                     var $el = $(element);
                     $el.removeClass(_this.settings.errorClass).addClass(_this.settings.validClass);
-                    if ($el.hasClass('select2-offscreen') &&
-                        $el.id) {
+                    var data = $el.data();
+                    if (data && data.vxHighlight) {
+                        $('#' + data.vxHighlight)
+                            .removeClass(_this.settings.errorClass)
+                            .addClass(_this.settings.validClass);
+                    }
+                    else if ($el.hasClass('select2-offscreen') && $el.id) {
                         $el = $('#s2id_' + element.id)
                             .removeClass(_this.settings.errorClass)
                             .addClass(_this.settings.validClass);
-                        if (!$el.length)
-                            $el = $(element);
                     }
+                    if (!$el.length)
+                        $el = $(element);
                     setTooltip($el, '')
                         .tooltip('hide');
                 });
                 $.each(errorList, function (index, error) {
                     var $el = $(error.element).addClass(_this.settings.errorClass);
-                    if ($el.hasClass('select2-offscreen') &&
+                    var data = $el.data();
+                    if (data && data.vxHighlight) {
+                        $el = $('#' + data.vxHighlight).addClass(_this.settings.errorClass);
+                    }
+                    else if ($el.hasClass('select2-offscreen') &&
                         error.element.id) {
                         $el = $('#s2id_' + error.element.id).addClass(_this.settings.errorClass);
-                        if (!$el.length)
-                            $el = $(error.element);
                     }
+                    if (!$el.length)
+                        $el = $(error.element);
                     setTooltip($el, error.message);
                     if (index == 0)
                         $el.tooltip('show');

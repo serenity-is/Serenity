@@ -106,8 +106,13 @@ namespace Q {
 
                         if ($.fn.tooltip) {
                             var $el = $(el);
-                            if ($el.hasClass('select2-offscreen') &&
-                                el.id) {
+
+                            var data = $el.data();
+                            if (data && data.vxHighlight) {
+                                $el = $('#' + data.vxHighlight);
+                            }
+
+                            if ($el.hasClass('select2-offscreen') && el.id) {
                                 $el = $('#s2id_' + el.id);
                             }
 

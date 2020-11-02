@@ -2851,6 +2851,9 @@ var Serenity;
             _this.uploadInput = Serenity.UploadHelper.addUploadInput(uio);
             _this.fileSymbols = $('<ul/>').appendTo(_this.element);
             _this.updateInterface();
+            if (!_this.element.attr('id')) {
+                _this.element.attr('id', _this.uniqueName);
+            }
             return _this;
         }
         FileUploadEditor.prototype.getUploadInputOptions = function () {
@@ -2871,6 +2874,8 @@ var Serenity;
                     _this.entity = newEntity;
                     _this.populate();
                     _this.updateInterface();
+                    _this.hiddenInput.trigger('keyup');
+                    _this.hiddenInput.trigger('focusout');
                 }
             };
         };
@@ -2894,6 +2899,8 @@ var Serenity;
                         _this.entity = null;
                         _this.populate();
                         _this.updateInterface();
+                        _this.hiddenInput.trigger('keyup');
+                        _this.hiddenInput.trigger('focusout');
                     }
                 }
             ];
@@ -2907,7 +2914,7 @@ var Serenity;
             else {
                 Serenity.UploadHelper.populateFileSymbols(this.fileSymbols, [this.entity], displayOriginalName, this.options.urlPrefix);
             }
-            this.element.find('input.select2-offscreen').val(Q.trimToNull((this.get_value() || {}).Filename));
+            this.hiddenInput.val(Q.trimToNull((this.get_value() || {}).Filename));
         };
         FileUploadEditor.prototype.updateInterface = function () {
             var addButton = this.toolbar.findButton('add-file-button');
@@ -2941,13 +2948,13 @@ var Serenity;
             }
         };
         FileUploadEditor.prototype.get_required = function () {
-            return this.element.find('input.select2-offscreen').hasClass('required');
+            return this.hiddenInput.hasClass('required');
         };
         FileUploadEditor.prototype.set_required = function (value) {
-            var input = this.element.find('input.select2-offscreen');
-            if (value && !input.length)
-                input = $('<input type="text" class="select2-offscreen" name="' + this.uniqueName + '_Validator"/>').appendTo(this.element);
-            input.toggleClass('required', !!value);
+            if (value && (!this.hiddenInput || !this.hiddenInput.length)) {
+                this.hiddenInput = $('<input type="text" class="s-offscreen" name="' + this.uniqueName + '_Validator" data-vx-highlight="' + this.element.attr('id') + '"/>').appendTo(this.element);
+            }
+            this.hiddenInput.toggleClass('required', !!value);
         };
         FileUploadEditor.prototype.get_value = function () {
             if (this.entity == null) {
@@ -2994,6 +3001,8 @@ var Serenity;
                 this.entity = null;
             }
             this.populate();
+            this.hiddenInput.trigger('keyup');
+            this.hiddenInput.trigger('change');
             this.updateInterface();
         };
         FileUploadEditor.prototype.getEditValue = function (property, target) {
@@ -3021,7 +3030,7 @@ var Serenity;
             this.set_value(value);
         };
         FileUploadEditor = __decorate([
-            Serenity.Decorators.registerEditor('Serenity.FileUploadEditor', [Serenity.IReadOnly]),
+            Serenity.Decorators.registerEditor('Serenity.FileUploadEditor', [Serenity.IReadOnly, Serenity.IGetEditValue, Serenity.ISetEditValue, Serenity.IValidateRequired]),
             Serenity.Decorators.element('<div/>')
         ], FileUploadEditor);
         return FileUploadEditor;
@@ -3067,11 +3076,16 @@ var Serenity;
                     var newEntity = { OriginalName: name, Filename: response.TemporaryFile };
                     self.entities.push(newEntity);
                     self.populate();
+                    _this.hiddenInput.trigger('keyup');
+                    _this.hiddenInput.trigger('focusout');
                     self.updateInterface();
                 }
             });
             _this.fileSymbols = $('<ul/>').appendTo(_this.element);
             _this.updateInterface();
+            if (!_this.element.attr('id')) {
+                _this.element.attr('id', _this.uniqueName);
+            }
             return _this;
         }
         MultipleFileUploadEditor.prototype.addFileButtonText = function () {
@@ -3095,8 +3109,11 @@ var Serenity;
                     ev.preventDefault();
                     _this.entities.splice(x, 1);
                     _this.populate();
+                    _this.hiddenInput.trigger('keyup');
+                    _this.hiddenInput.trigger('focusout');
                 });
             });
+            this.hiddenInput.val(Q.trimToNull((this.get_value()[0] || {}).Filename));
         };
         MultipleFileUploadEditor.prototype.updateInterface = function () {
             var addButton = this.toolbar.findButton('add-file-button');
@@ -3109,13 +3126,32 @@ var Serenity;
         MultipleFileUploadEditor.prototype.set_readOnly = function (value) {
             if (this.get_readOnly() !== value) {
                 if (value) {
-                    this.uploadInput.attr('disabled', 'disabled').fileupload('disable');
+                    this.uploadInput.attr('disabled', 'disabled');
+                    try {
+                        this.uploadInput.fileupload('disable');
+                    }
+                    catch (_a) {
+                    }
                 }
                 else {
-                    this.uploadInput.removeAttr('disabled').fileupload('enable');
+                    this.uploadInput.removeAttr('disabled');
+                    try {
+                        this.uploadInput.fileupload('enable');
+                    }
+                    catch (_b) {
+                    }
                 }
                 this.updateInterface();
             }
+        };
+        MultipleFileUploadEditor.prototype.get_required = function () {
+            return this.hiddenInput.hasClass('required');
+        };
+        MultipleFileUploadEditor.prototype.set_required = function (value) {
+            if (value && (!this.hiddenInput || !this.hiddenInput.length)) {
+                this.hiddenInput = $('<input type="text" class="s-offscreen" name="' + this.uniqueName + '_Validator" data-vx-highlight="' + this.element.attr('id') + '"/>').appendTo(this.element);
+            }
+            this.hiddenInput && this.hiddenInput.toggleClass('required', !!value);
         };
         MultipleFileUploadEditor.prototype.get_value = function () {
             return this.entities.map(function (x) {
@@ -3169,7 +3205,7 @@ var Serenity;
             Serenity.Decorators.option()
         ], MultipleFileUploadEditor.prototype, "jsonEncodeValue", void 0);
         MultipleFileUploadEditor = __decorate([
-            Serenity.Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [Serenity.IReadOnly]),
+            Serenity.Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [Serenity.IReadOnly, Serenity.IGetEditValue, Serenity.ISetEditValue, Serenity.IValidateRequired]),
             Serenity.Decorators.element('<div/>')
         ], MultipleFileUploadEditor);
         return MultipleFileUploadEditor;
