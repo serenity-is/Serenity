@@ -5,6 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+#if !NET45
+using Microsoft.Extensions.Internal;
+using DateTime = System.DateTimeOffset;
+#endif
 
 namespace Serenity.Logging
 {
@@ -23,15 +27,33 @@ namespace Serenity.Logging
         private object sync = new object();
         private StreamWriter stream;
 
+#if NET45
         /// <summary>
         /// Initializes a new instance of the <see cref="FileLogger"/> class.
         /// </summary>
         /// <param name="log">The log.</param>
         public FileLogger(LogSettings log = null)
         {
+#else
+        private ISystemClock clock;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileLogger"/> class.
+        /// </summary>
+        /// <param name="clock">The system clock</param>
+        /// <param name="log">The log.</param>
+        public FileLogger(ISystemClock clock, LogSettings log = null)
+        {
+            if (clock == null)
+                throw new ArgumentNullException(nameof(clock));
+#endif
             queue = new Queue<string>();
+#if NET45
             lastFlush = DateTimeProvider.Now;
-            
+#else
+            lastFlush = clock.UtcNow;
+#endif
+
             var settings = log ?? Config.TryGet<LogSettings>() ?? new LogSettings();
             File = string.IsNullOrEmpty(settings.File) ? null : settings.File;
             FlushTimeout = TimeSpan.FromSeconds(settings.FlushTimeout);
@@ -150,7 +172,11 @@ namespace Serenity.Logging
                 }
             }
 
+#if NET45
             lastFlush = DateTimeProvider.Now;
+#else
+            lastFlush = clock.UtcNow;
+#endif
         }
 
         /// <summary>
@@ -207,7 +233,12 @@ namespace Serenity.Logging
                     else
                         sb.Append("[?]");
 
+#if NET45
                     sb.Append(DateTimeProvider.Now.ToString(DateHelper.ISODateTimeFormatLocal));
+#else
+                    sb.Append(clock.UtcNow.ToLocalTime().ToString(DateHelper.ISODateTimeFormatLocal));
+
+#endif
                     sb.Append(' ');
 
                     if (source != null)
@@ -222,7 +253,11 @@ namespace Serenity.Logging
                     if (exception != null)
                         sb.AppendLine(exception.ToString());
 
+#if NET45
                     var currentDate = DateTimeProvider.Now.Date;
+#else
+                    var currentDate = clock.UtcNow.ToLocalTime().Date;
+#endif
                     if (stream == null || writerDate != currentDate)
                     {
                         writerDate = currentDate;
@@ -262,8 +297,13 @@ namespace Serenity.Logging
 
                     queue.Enqueue(sb.ToString());
 
+#if NET45
                     if (flushTimeout <= TimeSpan.Zero ||
                         flushTimeout > TimeSpan.Zero && (DateTimeProvider.Now - lastFlush) >= flushTimeout)
+#else
+                    if (flushTimeout <= TimeSpan.Zero ||
+                        flushTimeout > TimeSpan.Zero && (clock.UtcNow - lastFlush) >= flushTimeout)
+#endif
                         InternalFlush();
                 }
 #if !NET45

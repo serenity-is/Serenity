@@ -1,7 +1,7 @@
 ﻿using Serenity.Abstractions;
 using System;
 #if !NET45
-    using ILocalCache = Microsoft.Extensions.Caching.Memory.IMemoryCache;
+using ILocalCache = Microsoft.Extensions.Caching.Memory.IMemoryCache;
 #endif
 
 namespace Serenity
@@ -48,6 +48,7 @@ namespace Serenity
         /// </summary>
         public const string GenerationSuffix = "$Generation$";
 
+#if !NET
         /// <summary>
         /// Tries to read a value from local cache. If it is not found there, tries the distributed cache. 
         /// If neither contains the specified key, produces value by calling a loader function and adds the
@@ -218,5 +219,6 @@ namespace Serenity
         {
             Legacy.Remove(cacheKey);
         }
+#endif
     }
 }

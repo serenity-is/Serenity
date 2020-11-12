@@ -1,6 +1,10 @@
 ﻿using Serenity.Abstractions;
 using System;
 using System.Collections.Generic;
+#if !NET45
+using Microsoft.Extensions.Internal;
+using DateTime = System.DateTimeOffset;
+#endif
 
 namespace Serenity.Caching
 {
@@ -9,6 +13,20 @@ namespace Serenity.Caching
     /// </summary>
     public class DistributedCacheEmulator : IDistributedCache
     {
+
+#if !NET45
+        private readonly ISystemClock clock;
+
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        /// <param name="clock">Clock source for testing purposes</param>
+        public DistributedCacheEmulator(ISystemClock clock)
+        {
+            this.clock = clock ?? throw new ArgumentNullException(nameof(clock));
+        }
+#endif
+
         /// <summary>
         /// The synchronization lock
         /// </summary>
@@ -33,18 +51,18 @@ namespace Serenity.Caching
         /// <returns>Increased amount, or 1 if it didn't exist before</returns>
         public long Increment(string key, int amount = 1)
         {
-            lock (this.sync)
+            lock (sync)
             {
                 object value;
-                if (!this.dictionary.TryGetValue(key, out value))
+                if (!dictionary.TryGetValue(key, out value))
                 {
-                    this.dictionary[key] = (long)amount;
+                    dictionary[key] = (long)amount;
                     return (long)amount;
                 }
                 else
                 {
                     var l = Convert.ToInt64(value) + amount;
-                    this.dictionary[key] = l;
+                    dictionary[key] = l;
                     return l;
                 }
             }
@@ -59,20 +77,24 @@ namespace Serenity.Caching
         /// <remarks>It may raise an exception if the value is not of type TValue.</remarks>
         public TValue Get<TValue>(string key)
         {
-            lock (this.sync)
+            lock (sync)
             {
                 object value;
-                if (!this.dictionary.TryGetValue(key, out value))
+                if (!dictionary.TryGetValue(key, out value))
                     return default(TValue);
 
+#if NET45
                 var now = DateTimeProvider.Current.Now;
+#else
+                var now = clock.UtcNow;
+#endif
 
                 DateTime expires;
-                if (this.expiration.TryGetValue(key, out expires) &&
+                if (expiration.TryGetValue(key, out expires) &&
                     expires <= now)
                 {
-                    this.dictionary.Remove(key);
-                    this.expiration.Remove(key);
+                    dictionary.Remove(key);
+                    expiration.Remove(key);
                     return default(TValue);
                 }
 
@@ -88,10 +110,10 @@ namespace Serenity.Caching
         /// <param name="value">Value</param>
         public void Set<TValue>(string key, TValue value)
         {
-            lock (this.sync)
+            lock (sync)
             {
-                this.dictionary[key] = value;
-                this.expiration.Remove(key);
+                dictionary[key] = value;
+                expiration.Remove(key);
             }
         }
 
@@ -105,10 +127,14 @@ namespace Serenity.Caching
         public void Set<TValue>(string key, TValue value, TimeSpan expiration)
         {
             // need a better implementation for expirations
-            lock (this.sync)
+            lock (sync)
             {
                 this.dictionary[key] = value;
+#if NET45
                 this.expiration[key] = DateTimeProvider.Now.Add(expiration);
+#else
+                this.expiration[key] = clock.UtcNow.Add(expiration);
+#endif
             }
         }
 
@@ -117,10 +143,10 @@ namespace Serenity.Caching
         /// </summary>
         public void Reset()
         {
-            lock (this.sync)
+            lock (sync)
             {
-                this.dictionary.Clear();
-                this.expiration.Clear();
+                dictionary.Clear();
+                expiration.Clear();
             }
         }
     }

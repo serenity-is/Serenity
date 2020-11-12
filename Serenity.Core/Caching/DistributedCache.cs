@@ -1,4 +1,5 @@
-﻿namespace Serenity
+﻿#if !NET
+namespace Serenity
 {
     using Serenity.Abstractions;
     using System;
@@ -94,3 +95,4 @@
         }
     }
 }
+#endif

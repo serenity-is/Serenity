@@ -1,10 +1,13 @@
 ﻿namespace Serenity.Configuration
 {
-    using Serenity;
     using Serenity.Abstractions;
     using Serenity.ComponentModel;
     using System;
     using System.Reflection;
+#if !NET45
+    using Microsoft.Extensions.Caching.Memory;
+    using Microsoft.Extensions.Configuration;
+#endif
 
     /// <summary>
     /// Implementation of IConfigRepository which reads its settings
@@ -14,6 +17,19 @@
     /// <seealso cref="Serenity.Abstractions.IConfigurationRepository" />
     public class AppSettingsJsonConfigRepository : IConfigurationRepository
     {
+#if !NET45
+        private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        /// <param name="configuration">Configuration</param>
+        public AppSettingsJsonConfigRepository(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+#endif
+
         /// <summary>
         /// Saves configuration for the specified setting type.
         /// Not implemented for this provider.
@@ -37,6 +53,7 @@
             var keyAttr = settingType.GetCustomAttribute<SettingKeyAttribute>();
             var key = keyAttr == null ? settingType.Name : keyAttr.Value;
 
+#if NET45
             return LocalCache.Get("ApplicationSetting:" + settingType.FullName, TimeSpan.Zero, delegate ()
             {
                 var configuration = Dependency.TryResolve<IConfigurationManager>();
@@ -46,6 +63,11 @@
                 return configuration.AppSetting(key, settingType) ?? 
                     Activator.CreateInstance(settingType);
             });
+#else
+            var instance = Activator.CreateInstance(settingType);
+            configuration.GetSection("AppSettings").GetSection("key").Bind(instance);
+            return instance;
+#endif
         }
     }
 }

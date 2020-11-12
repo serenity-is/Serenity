@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NET45
+using System;
 
 namespace Serenity.Abstractions
 {
@@ -60,3 +61,4 @@ namespace Serenity.Abstractions
         }
     }
 }
+#endif

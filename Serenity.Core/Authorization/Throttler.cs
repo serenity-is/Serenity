@@ -1,4 +1,7 @@
 ﻿using System;
+#if !NET45
+using Microsoft.Extensions.Caching.Memory;
+#endif
 
 namespace Serenity
 {
@@ -7,6 +10,7 @@ namespace Serenity
     /// </summary>
     public class Throttler
     {
+#if NET45
         /// <summary>
         /// Creates a new throttler
         /// </summary>
@@ -14,12 +18,28 @@ namespace Serenity
         /// <param name="duration">Check period</param>
         /// <param name="limit">How many times are allowed</param>
         public Throttler(string key, TimeSpan duration, int limit)
+#else
+        private IMemoryCache cache;
+
+        /// <summary>
+        /// Creates a new throttler
+        /// </summary>
+        /// <param name="cache">Cache</param>
+        /// <param name="key">Cache key for throttler. Include the resource name, e.g. username, you are throttling</param>
+        /// <param name="duration">Check period</param>
+        /// <param name="limit">How many times are allowed</param>
+        public Throttler(IMemoryCache cache, string key, TimeSpan duration, int limit)
+#endif
         {
+#if !NET45
+            this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
+#endif
             Key = key;
             Duration = duration;
             Limit = limit;
             CacheKey = "Throttling:" + key + ":" + duration.Ticks.ToInvariant();
         }
+
 
         /// <summary>
         /// Cache key
@@ -49,15 +69,23 @@ namespace Serenity
         /// <returns>True if under throttle limit, false otherwise</returns>
         public bool Check()
         {
+#if NET45
             var hit = LocalCache.TryGet<HitInfo>(this.CacheKey);
+#else
+            var hit = cache.TryGet<HitInfo>(this.CacheKey);
+#endif
             if (hit == null)
             {
                 hit = new HitInfo { Counter = 1 };
-                LocalCache.Add(this.CacheKey, hit, this.Duration);
+#if NET45
+                LocalCache.Add(CacheKey, hit, this.Duration);
+#else
+                cache.Add(CacheKey, hit, Duration);
+#endif
             }
             else
             {
-                if (hit.Counter++ >= this.Limit)
+                if (hit.Counter++ >= Limit)
                     return false;
             }
 
@@ -69,7 +97,11 @@ namespace Serenity
         /// </summary>
         public void Reset()
         {
+#if NET45
             LocalCache.Remove(CacheKey);
+#else
+            cache.Remove(CacheKey);
+#endif
         }
     }
 }
