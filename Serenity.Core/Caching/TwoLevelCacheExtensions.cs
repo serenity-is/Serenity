@@ -256,8 +256,6 @@ namespace Serenity
                     localCache.Remove(itemGenerationKey);
 
                 localCache.Remove(cacheKey);
-
-                cachedObj = null;
             }
 
             // if serializer is null, than this is a local store only item
