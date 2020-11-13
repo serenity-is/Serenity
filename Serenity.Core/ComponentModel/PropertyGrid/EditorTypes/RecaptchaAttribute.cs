@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NET
+using System;
 
 namespace Serenity.ComponentModel
 {
@@ -6,6 +7,9 @@ namespace Serenity.ComponentModel
     /// Indicates that the target property should use a "Recaptcha" (Google).
     /// </summary>
     /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+#if !NET45
+    [Obsolete("Dependends on static configuration")]
+#endif
     public partial class RecaptchaAttribute : CustomEditorAttribute
     {
         /// <summary>
@@ -32,3 +36,4 @@ namespace Serenity.ComponentModel
         }
     }
 }
+#endif

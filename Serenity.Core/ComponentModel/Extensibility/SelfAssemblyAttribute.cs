@@ -1,5 +1,6 @@
 ﻿using System;
 
+#if !NET
 namespace Serenity
 {
     /// <summary>
@@ -11,3 +12,4 @@ namespace Serenity
     {
     }
 }
+#endif

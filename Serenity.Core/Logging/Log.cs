@@ -1,4 +1,5 @@
-﻿using Serenity.Abstractions;
+﻿#if !NET
+using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using Serenity.Logging;
 using System;
@@ -8,6 +9,9 @@ namespace Serenity
     /// <summary>
     /// Static class with log helper functions
     /// </summary>
+#if !NET45
+    [Obsolete("Use .NET Core Logging")]
+#endif
     public static class Log
     {
         private static LoggingLevel minimumLevel;
@@ -229,6 +233,7 @@ namespace Serenity
             get { return minimumLevel <= LoggingLevel.Debug; }
         }
 
+#if !NET
         /// <summary>
         /// Gets a value indicating whether debug level logging is enabled.
         /// </summary>
@@ -240,6 +245,7 @@ namespace Serenity
         {
             get { return minimumLevel <= LoggingLevel.Debug; }
         }
+#endif
 
         /// <summary>
         /// Logs a debug level message.
@@ -356,3 +362,4 @@ namespace Serenity
         }
     }
 }
+#endif

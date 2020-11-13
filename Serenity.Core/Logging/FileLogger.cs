@@ -1,4 +1,5 @@
-﻿using Serenity.Abstractions;
+﻿#if !NET
+using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
@@ -35,17 +36,19 @@ namespace Serenity.Logging
         public FileLogger(LogSettings log = null)
         {
 #else
+        private IExceptionLogger exceptionLogger;
         private ISystemClock clock;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileLogger"/> class.
         /// </summary>
         /// <param name="clock">The system clock</param>
-        /// <param name="log">The log.</param>
-        public FileLogger(ISystemClock clock, LogSettings log = null)
+        /// <param name="logSettings">The log settings.</param>
+        /// <param name="exceptionLogger">Exception logger</param>
+        public FileLogger(ISystemClock clock, LogSettings logSettings = null, IExceptionLogger exceptionLogger = null)
         {
-            if (clock == null)
-                throw new ArgumentNullException(nameof(clock));
+            this.clock = clock ?? throw new ArgumentNullException(nameof(clock));
+            this.exceptionLogger = exceptionLogger;
 #endif
             queue = new Queue<string>();
 #if NET45
@@ -54,7 +57,11 @@ namespace Serenity.Logging
             lastFlush = clock.UtcNow;
 #endif
 
+#if NET45
             var settings = log ?? Config.TryGet<LogSettings>() ?? new LogSettings();
+#else
+            var settings = logSettings ?? throw new ArgumentNullException(nameof(logSettings));
+#endif
             File = string.IsNullOrEmpty(settings.File) ? null : settings.File;
             FlushTimeout = TimeSpan.FromSeconds(settings.FlushTimeout);
         }
@@ -168,7 +175,11 @@ namespace Serenity.Logging
                     if (queue != null)
                         queue.Clear();
 
+#if NET45
                     ex.Log();
+#else
+                    ex.Log(exceptionLogger);
+#endif
                 }
             }
 
@@ -204,7 +215,11 @@ namespace Serenity.Logging
                 catch (Exception ex)
                 {
                     stream = null;
+#if NET45
                     ex.Log();
+#else
+                    ex.Log(exceptionLogger);
+#endif
                 }
             }
 
@@ -322,3 +337,4 @@ namespace Serenity.Logging
         }
     }
 }
+#endif

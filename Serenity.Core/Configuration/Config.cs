@@ -1,4 +1,4 @@
-﻿
+﻿#if !NET
 namespace Serenity
 {
     using Abstractions;
@@ -24,6 +24,9 @@ namespace Serenity
         /// <param name="settingType">Setting type.</param>
         /// <exception cref="System.Collections.Generic.KeyNotFoundException">
         /// IConfigurationRepository for setting scope is not set.</exception>
+#if !NET45
+        [Obsolete("Use .NET Core Configuration / Options System")]
+#endif
         public static object Get(Type settingType)
         {
             var scope = GetSettingScope(settingType);
@@ -41,6 +44,9 @@ namespace Serenity
         /// If IConfigurationRepository for setting scope is not set returns null.
         /// </summary>
         /// <param name="settingType">Setting type.</param>
+#if !NET45
+        [Obsolete("Use .NET Core Configuration / Options System")]
+#endif
         public static object TryGet(Type settingType)
         {
             var scope = GetSettingScope(settingType);
@@ -59,6 +65,9 @@ namespace Serenity
         /// <typeparam name="TSettings">Setting type</typeparam>
         /// <exception cref="System.Collections.Generic.KeyNotFoundException">
         /// IConfigurationRepository for setting scope is not set.</exception>
+#if !NET45
+        [Obsolete("Use .NET Core Configuration / Options System")]
+#endif
         public static TSettings Get<TSettings>()
             where TSettings: class, new()
         {
@@ -71,6 +80,9 @@ namespace Serenity
         /// If IConfigurationRepository for setting scope is not set returns null.
         /// </summary>
         /// <typeparam name="TSettings">Setting type.</typeparam>
+#if !NET45
+        [Obsolete("Use .NET Core Configuration / Options System")]
+#endif
         public static TSettings TryGet<TSettings>()
             where TSettings : class, new()
         {
@@ -78,3 +90,4 @@ namespace Serenity
         }
     }
 }
+#endif

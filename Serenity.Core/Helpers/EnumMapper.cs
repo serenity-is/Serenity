@@ -5,6 +5,7 @@ using System.Reflection;
 using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using System.Collections.Concurrent;
+using Serenity.Localization;
 
 namespace Serenity
 {
@@ -89,7 +90,7 @@ namespace Serenity
             if (item.stringToValue.TryGetValue(key, out obj))
                 return (TEnum)obj;
 
-            throw new ArgumentOutOfRangeException(String.Format("Can't parse {0} enum value {1}!", 
+            throw new ArgumentOutOfRangeException(string.Format("Can't parse {0} enum value {1}!", 
                 typeof(TEnum).FullName, key));
         }
 
@@ -121,22 +122,41 @@ namespace Serenity
         public static string GetName(this Enum value)
         {
             if (value == null)
-                return String.Empty;
+                return string.Empty;
 
-            return System.Enum.GetName(value.GetType(), value);
+            return Enum.GetName(value.GetType(), value);
         }
 
+#if !NET
         /// <summary>
         /// Gets the display text of the enum value.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns></returns>
+#if !NET45
+        [Obsolete(Dependency.UseDI)]
+#endif
         public static string GetText(this Enum value)
         {
             if (value == null)
-                return String.Empty;
+                return string.Empty;
 
             return FormatEnum(value.GetType(), value);
+        }
+#endif
+
+        /// <summary>
+        /// Gets the display text of the enum value.
+        /// </summary>
+        /// <param name="context">Local text context</param>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
+        public static string GetText(this Enum value, ILocalTextContext context)
+        {
+            if (value == null)
+                return string.Empty;
+
+            return FormatEnum(context, value.GetType(), value);
         }
 
         /// <summary>
@@ -150,13 +170,30 @@ namespace Serenity
             return enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
         }
 
+#if !NET
         /// <summary>
         /// Formats the enum.
         /// </summary>
         /// <param name="enumType">Type of the enum.</param>
         /// <param name="value">The value.</param>
         /// <returns></returns>
+#if !NET45
+        [Obsolete("Use overload with ILocalTextSource")]
+#endif
         public static string FormatEnum(Type enumType, object value)
+        {
+            return FormatEnum(Dependency.TryResolve<ILocalTextContext>(), enumType, value);
+        }
+#endif
+
+        /// <summary>
+        /// Formats the enum.
+        /// </summary>
+        /// <param name="context">Local text context</param>
+        /// <param name="enumType">Type of the enum.</param>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
+        public static string FormatEnum(this ILocalTextContext context, Type enumType, object value)
         {
             if (value == null)
                 return String.Empty;
@@ -168,7 +205,7 @@ namespace Serenity
                 var enumName = System.Enum.GetName(enumType, value);
                 var enumKey = GetEnumTypeKey(enumType);
                 var key = "Enums." + enumKey + "." + enumName;
-                var text = LocalText.TryGet(key);
+                var text = context?.TryGet(key);
                 if (text == null)
                 {
                     var memInfo = enumType.GetMember(enumName);
@@ -178,7 +215,13 @@ namespace Serenity
                         if (attribute != null)
                         {
                             text = attribute.Description;
+#if !NET
+#if NET45
                             Dependency.Resolve<ILocalTextRegistry>().Add(LocalText.InvariantLanguageID, key, text);
+#else
+                            (context?.Source as ILocalTextRegistry).Add(LocalText.InvariantLanguageID, key, text);
+#endif
+#endif
                         }
                     }
                 }

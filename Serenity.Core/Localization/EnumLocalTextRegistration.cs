@@ -38,7 +38,11 @@ namespace Serenity.Localization
             if (assemblies == null)
                 throw new ArgumentNullException("assemblies");
 
+#if NET45
             var provider = registry ?? Dependency.Resolve<ILocalTextRegistry>();
+#else
+            var provider = registry ?? throw new ArgumentNullException(nameof(registry));
+#endif
 
             foreach (var assembly in assemblies)
             {

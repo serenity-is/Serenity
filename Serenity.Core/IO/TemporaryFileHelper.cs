@@ -85,8 +85,10 @@ namespace Serenity.IO
                     {
                         try
                         {
+#if NET45
                             if (Log.IsDebugEnabled)
                                 Log.Debug("Deleting Expired Temporary File : " + fiOld.Name);
+#endif
                             fiOld.Delete();
                         }
                         catch
@@ -119,8 +121,10 @@ namespace Serenity.IO
                         if (!checkFileName.Equals(files[i].Name, StringComparison.OrdinalIgnoreCase))
                             try
                             {
+#if NET45
                                 if (Log.IsDebugEnabled)
                                     Log.Debug("MaxFiles Passed, Deleting Temporary File : " + files[i].Name);
+#endif
                                 files[i].Delete();
                             }
                             catch

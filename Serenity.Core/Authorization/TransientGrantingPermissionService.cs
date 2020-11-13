@@ -17,24 +17,33 @@ namespace Serenity.Web
     public class TransientGrantingPermissionService : IPermissionService, ITransientGrantor
     {
         private IPermissionService permissionService;
+        private IRequestContext requestContext;
         private ThreadLocal<Stack<HashSet<string>>> grantingStack = new ThreadLocal<Stack<HashSet<string>>>();
 
         /// <summary>
         /// Creates a new TransientGrantingPermissionService wrapping passed service
         /// </summary>
         /// <param name="permissionService">Permission service to wrap with transient granting ability</param>
-        public TransientGrantingPermissionService(IPermissionService permissionService)
+        /// <param name="requestContext">Request context</param>
+        public TransientGrantingPermissionService(IPermissionService permissionService, IRequestContext requestContext = null)
         {
-            Check.NotNull(permissionService, "permissionService");
-
-            this.permissionService = permissionService;
+            this.permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
+#if NET45
+            this.requestContext = requestContext;
+#else
+            this.requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
+#endif
         }
 
         private Stack<HashSet<string>> GetGrantingStack(bool createIfNull)
         {
             Stack<HashSet<string>> stack;
 
-            var requestItems = Dependency.Resolve<IRequestContext>().Items;
+#if NET45
+            var requestItems = (requestContext ?? Dependency.Resolve<IRequestContext>()).Items;
+#else
+            var requestItems = requestContext.Items;
+#endif
             if (requestItems != null)
             {
                 stack = requestItems["GrantingStack"] as Stack<HashSet<string>>;

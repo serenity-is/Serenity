@@ -1,4 +1,5 @@
-﻿namespace Serenity
+﻿#if !NET
+namespace Serenity
 {
     using System;
 
@@ -134,3 +135,4 @@
         }
     }
 }
+#endif

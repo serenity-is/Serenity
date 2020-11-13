@@ -44,7 +44,14 @@ namespace Serenity.Localization
 
         private static void Initialize(ILocalTextRegistry registry, Type type, string languageID, string prefix)
         {
+#if NET45
             var provider = registry ?? Dependency.Resolve<ILocalTextRegistry>();
+#else
+            if (registry == null)
+                throw new ArgumentNullException(nameof(registry));
+
+            var provider = registry;
+#endif
             foreach (var member in type.GetMembers(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
                 var fi = member as FieldInfo;

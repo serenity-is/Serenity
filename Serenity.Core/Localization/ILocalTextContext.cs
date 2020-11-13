@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using Serenity.Abstractions;
+using System.Globalization;
 
 namespace Serenity.Localization
 {
@@ -16,5 +17,10 @@ namespace Serenity.Localization
         /// Returns the UI culture that local texts should be translated to
         /// </summary>
         CultureInfo UICulture { get; }
+
+        /// <summary>
+        /// Returns the UI culture that local texts should be translated to
+        /// </summary>
+        ILocalTextSource Source { get; }
     }
 }

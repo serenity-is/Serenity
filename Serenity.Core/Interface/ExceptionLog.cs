@@ -1,41 +1,47 @@
-﻿using System;
-using Serenity.Abstractions;
+﻿using Serenity.Abstractions;
+using System;
 
 namespace Serenity
 {
     /// <summary>
-    /// An exception that should not be logged.
-    /// </summary>
-    public interface INotLoggedException
-    {
-        /// <summary>
-        /// Gets a value indicating whether to not log exception.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if not logged exception; otherwise, <c>false</c>.
-        /// </value>
-        bool NotLoggedException { get; }
-    }
-
-    /// <summary>
     ///   Centralized logger for exceptions.</summary>
     public static class ExceptionLog
     {
+#if !NET
         /// <summary>
         ///   Logs an exception. Nothing logged if exception logger delegate is not set.</summary>
         /// <param name="e"></param>
+#if !NET45
+        [Obsolete("Use overload with IExceptionLogger")]
+#endif
         public static void Log(this Exception e)
         {
             try
             {
-                var exceptionLogger = Dependency.TryResolve<IExceptionLogger>();
-                if (exceptionLogger != null)
+                if ((e as INotLoggedException)?.NotLoggedException != true)
                 {
-                    var no = e as INotLoggedException;
-                    if (no == null ||
-                        !no.NotLoggedException)
-                        exceptionLogger.Log(e);
+                    var logger = Dependency.TryResolve<IExceptionLogger>();
+                    if (logger != null)
+                        logger.Log(e);
                 }
+            }
+            catch
+            {
+            }
+        }
+#endif
+
+        /// <summary>
+        /// Logs an exception. Nothing logged if exception logger is null or exception
+        /// is of type INotLoggedException.</summary>
+        /// <param name="e">Exception</param>
+        /// <param name="logger">Exception logger</param>
+        public static void Log(this Exception e, IExceptionLogger logger)
+        {
+            try
+            {
+                if (logger != null && (e as INotLoggedException)?.NotLoggedException != true)
+                    logger.Log(e);
             }
             catch
             {

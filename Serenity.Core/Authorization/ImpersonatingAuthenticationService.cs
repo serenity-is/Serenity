@@ -11,6 +11,7 @@ namespace Serenity.Web
     public class ImpersonatingAuthorizationService : IAuthorizationService, IImpersonator
     {
         private IAuthorizationService authorizationService;
+        private IRequestContext requestContext;
         private ThreadLocal<Stack<string>> impersonationStack = new ThreadLocal<Stack<string>>();
 
         /// <summary>
@@ -18,18 +19,26 @@ namespace Serenity.Web
         /// that wraps passed authorization service and adds impersonation support.
         /// </summary>
         /// <param name="authorizationService">The authorization service to wrap with impersonation support.</param>
-        public ImpersonatingAuthorizationService(IAuthorizationService authorizationService)
+        /// <param name="requestContext">Request context</param>
+        public ImpersonatingAuthorizationService(IAuthorizationService authorizationService, IRequestContext requestContext = null)
         {
-            Check.NotNull(authorizationService, "authorizationService");
-
-            this.authorizationService = authorizationService;
+            this.authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+#if NET45
+            this.requestContext = requestContext;
+#else
+            this.requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
+#endif
         }
 
         private Stack<string> GetImpersonationStack(bool createIfNull)
         {
             Stack<string> stack;
 
-            var requestItems = Dependency.Resolve<IRequestContext>().Items;
+#if NET45
+            var requestItems = (requestContext ?? Dependency.Resolve<IRequestContext>()).Items;
+#else
+            var requestItems = requestContext.Items;
+#endif
 
             if (requestItems != null)
             {
@@ -54,7 +63,7 @@ namespace Serenity.Web
         {
             get
             {
-                return !string.IsNullOrEmpty(this.Username);
+                return !string.IsNullOrEmpty(Username);
             }
         }
 

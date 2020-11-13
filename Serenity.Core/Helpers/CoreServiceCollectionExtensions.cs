@@ -28,6 +28,7 @@ namespace Serenity.Extensions.DependencyInjection
             services.TryAddSingleton<ITwoLevelCache, TwoLevelCache>();
         }
 
+#if !NET
         /// <summary>
         /// Adds the simple file logging.
         /// </summary>
@@ -36,6 +37,7 @@ namespace Serenity.Extensions.DependencyInjection
         {
             services.TryAddSingleton<ILogger, FileLogger>();
         }
+#endif
 
         /// <summary>
         /// Adds the local text registry.
