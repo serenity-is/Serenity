@@ -1,4 +1,6 @@
 ﻿
+using System.Security.Claims;
+
 namespace Serenity.Abstractions
 {
     /// <summary>
@@ -9,8 +11,9 @@ namespace Serenity.Abstractions
         /// <summary>
         /// Temporarily impersonates as a user
         /// </summary>
-        /// <param name="username">Username to impersonate as</param>
-        void Impersonate(string username);
+        /// <param name="user">User to impersonate as</param>
+        void Impersonate(ClaimsPrincipal user);
+
         /// <summary>
         /// Undoes impersonation
         /// </summary>

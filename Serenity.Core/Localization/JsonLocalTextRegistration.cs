@@ -50,9 +50,9 @@ namespace Serenity.Localization
             {
                 var actual = prefix + k.Key;
                 var o = k.Value;
-                if (o is IDictionary<string, JToken>)
-                    ProcessNestedDictionary((IDictionary<string, JToken>)o, actual + ".", target);
-                else if (o != null && (!(o is JValue) || ((JValue)o).Value != null))
+                if (o is IDictionary<string, JToken> dictionary)
+                    ProcessNestedDictionary(dictionary, actual + ".", target);
+                else if (o != null && (!(o is JValue value) || value.Value != null))
                 {
                     target[actual] = o.ToString();
                 }
@@ -65,11 +65,7 @@ namespace Serenity.Localization
         /// </summary>
         /// <param name="path">Path containing JSON files</param>
         /// <param name="registry">Registry</param>
-#if !NET45
         public static void AddJsonTexts(this ILocalTextRegistry registry, string path)
-#else
-        public static void AddFromFilesInFolder(string path, ILocalTextRegistry registry = null)
-#endif
         {
             if (path == null)
                 throw new ArgumentNullException("path");

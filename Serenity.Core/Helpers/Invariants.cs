@@ -94,8 +94,7 @@ namespace Serenity
         /// <seealso cref="Int64.Parse(string)"/>
         public static Int64? TryParseID(this string str)
         {
-            Int64 id;
-            if (Int64.TryParse(str, out id))
+            if (long.TryParse(str, out long id))
                 return id;
             else
                 return null;
@@ -113,8 +112,7 @@ namespace Serenity
         /// <seealso cref="Int64.Parse(string)"/>
         public static Int32? TryParseID32(this string str)
         {
-            Int32 id;
-            if (Int32.TryParse(str, out id))
+            if (int.TryParse(str, out int id))
                 return id;
             else
                 return null;

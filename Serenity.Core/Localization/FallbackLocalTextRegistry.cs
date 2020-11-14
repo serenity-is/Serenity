@@ -1,4 +1,5 @@
 ﻿using Serenity.Abstractions;
+using System;
 using System.Text.RegularExpressions;
 
 namespace Serenity.Localization
@@ -6,19 +7,17 @@ namespace Serenity.Localization
     /// <summary>
     /// Adds key fallback to any ILocalTextSource implementation
     /// </summary>
-    public class FallbackLocalTextSource : ILocalTextSource
+    public class FallbackLocalTextSource : ILocalTextRegistry
     {
-        private readonly ILocalTextSource source;
+        private readonly ILocalTextRegistry source;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FallbackLocalTextSource"/> class.
         /// </summary>
         /// <param name="source">The local text source.</param>
-        public FallbackLocalTextSource(ILocalTextSource source)
+        public FallbackLocalTextSource(ILocalTextRegistry source)
         {
-            Check.NotNull(source, nameof(source));
-
-            this.source = source;
+            this.source = source ?? throw new ArgumentNullException(nameof(source));
         }
 
         /// <summary>
@@ -101,6 +100,17 @@ namespace Serenity.Localization
         public static string BreakUpString(string value)
         {
             return Regex.Replace(value, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1", RegexOptions.Compiled).Trim();
+        }
+
+        /// <summary>
+        /// Adds a local text entry to the registry
+        /// </summary>
+        /// <param name="languageID">Language ID (e.g. en-US, tr-TR)</param>
+        /// <param name="key">Local text key</param>
+        /// <param name="text">Translated text</param>
+        public void Add(string languageID, string key, string text)
+        {
+            source.Add(languageID, key, text);
         }
     }
 }

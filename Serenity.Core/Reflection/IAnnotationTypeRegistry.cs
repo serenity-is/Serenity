@@ -16,13 +16,6 @@ namespace Serenity.Reflection
         IEnumerable<Type> GetAnnotationTypesFor(Type type);
 
         /// <summary>
-        /// Gets the annotated type information for given type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns>Annotated type information</returns>
-        IAnnotatedType GetAnnotatedType(Type type);
-
-        /// <summary>
         /// Resets this instance.
         /// </summary>
         void Reset();

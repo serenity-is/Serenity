@@ -14,7 +14,7 @@ namespace Serenity.Data
         /// <param name="permission">The permission.</param>
         public PermissionAttributeBase(object permission)
         {
-            this.Permission = permission == null ? null : permission.ToString();
+            Permission = permission?.ToString();
         }
 
         /// <summary>

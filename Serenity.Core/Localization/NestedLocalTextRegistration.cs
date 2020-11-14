@@ -20,11 +20,7 @@ namespace Serenity.Localization
         /// <summary>
         /// Adds translations from static nested local text classes marked with NestedLocalTextAttribute.
         /// </summary>
-#if !NET45
         public static void AddNestedTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies = null)
-#else
-        public static void Initialize(IEnumerable<Assembly> assemblies, ILocalTextRegistry registry = null)
-#endif
         {
             assemblies = assemblies ?? ExtensibilityHelper.SelfAssemblies;
 
@@ -44,25 +40,19 @@ namespace Serenity.Localization
 
         private static void Initialize(ILocalTextRegistry registry, Type type, string languageID, string prefix)
         {
-#if NET45
-            var provider = registry ?? Dependency.Resolve<ILocalTextRegistry>();
-#else
             if (registry == null)
                 throw new ArgumentNullException(nameof(registry));
 
             var provider = registry;
-#endif
             foreach (var member in type.GetMembers(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
                 var fi = member as FieldInfo;
                 if (fi != null &&
                     fi.FieldType == typeof(LocalText))
                 {
-                    var value = fi.GetValue(null) as LocalText;
-                    if (value != null)
+                    if (fi.GetValue(null) is LocalText value)
                     {
-                        var initialized = value as InitializedLocalText;
-                        if (initialized != null)
+                        if (value is InitializedLocalText initialized)
                         {
                             provider.Add(languageID, initialized.Key, initialized.InitialText);
                         }

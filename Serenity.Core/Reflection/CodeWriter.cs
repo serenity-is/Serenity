@@ -8,8 +8,8 @@ namespace Serenity.Reflection
     /// </summary>
     public class CodeWriter
     {
-        private StringBuilder sb;
-        private string space;
+        private readonly StringBuilder sb;
+        private readonly string space;
         private string indent;
 
         /// <summary>

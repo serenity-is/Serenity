@@ -1,7 +1,7 @@
 ﻿
 namespace Serenity
 {
-    using Serenity.Localization;
+    using Serenity.Abstractions;
     using System;
 
     /// <summary>
@@ -49,57 +49,22 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Returns localized representation which corresponds to the local text key or the key itself if none 
-        /// found in local text registry.
+        /// Returns the local text key, use overload with ILocalText to get translation.
         /// </summary>   
         [Obsolete("Use ILocalTextContext through DI")]
 #pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
         public override string ToString()
 #pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
         {
-#if NET
             return Key;
-#else
-            return Get(Key);
-#endif
-        }
-
-#if !NET
-        /// <summary>
-        /// Implicit conversion to String that returns localized representation which corresponds to the local 
-        /// text key or the key itself if none found in local text registry.
-        /// </summary>
-#if !NET45
-        [Obsolete("Use ILocalTextContext through DI")]
-#endif
-        public static implicit operator string(LocalText localText)
-        {
-            return localText == null ? null : Get(localText.Key);
         }
 
         /// <summary>
-        /// Returns localized representation which corresponds to the local text key or the key itself if none 
-        /// found in local text registry.
-        /// </summary>
-#if !NET45
-        [Obsolete("Use ILocalTextContext through DI")]
-#endif
-        public static string Get(string key)
+        /// Returns the translation for current context
+        /// </summary>   
+        public string ToString(ITextLocalizer localizer)
         {
-            return Dependency.TryResolve<ILocalTextContext>()?.TryGet(key) ?? key;
+            return localizer?.TryGet(Key) ?? Key;
         }
-
-        /// <summary>
-        /// Returns localized representation which corresponds to the local text key or NULL if none found 
-        /// in local text registry.
-        /// </summary>
-#if !NET45
-        [Obsolete("Use ILocalTextContext through DI")]
-#endif
-        public static string TryGet(string key)
-        {
-            return Dependency.TryResolve<ILocalTextContext>()?.TryGet(key);
-        }
-#endif
     }
 }

@@ -1,6 +1,4 @@
-﻿#if !NET45
-    using ILocalCache = Microsoft.Extensions.Caching.Memory.IMemoryCache;
-#endif
+﻿using Microsoft.Extensions.Caching.Memory;
 
 namespace Serenity.Abstractions
 {
@@ -12,7 +10,7 @@ namespace Serenity.Abstractions
         /// <summary>
         /// Gets the memory cache
         /// </summary>
-        ILocalCache Memory { get; }
+        IMemoryCache Memory { get; }
 
         /// <summary>
         /// Gets the distributed cache

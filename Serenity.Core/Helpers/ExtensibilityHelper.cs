@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-#if NET45
-using System.IO;
-#endif
 using System.Linq;
 using System.Reflection;
 
@@ -35,10 +32,7 @@ namespace Serenity.Extensibility
             }
             set 
             {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-
-                selfAssemblies = value; 
+                selfAssemblies = value ?? throw new ArgumentNullException("value"); 
             }
         }
 
@@ -64,31 +58,6 @@ namespace Serenity.Extensibility
             return assembly.FullName.Contains("Serenity") ||
                 assembly.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity"));
         }
-
-#if NET45
-        /// <summary>
-        /// Enumerates the directory for assemblies.
-        /// </summary>
-        /// <param name="assemblies">The dictionary to add loaded assemblies to.</param>
-        /// <param name="path">The path.</param>
-        private static void EnumerateDirectory(Dictionary<string, Assembly> assemblies, string path)
-        {
-            foreach (var filename in Directory.GetFiles(path, "*.dll"))
-            try
-            {
-                if (assemblies.ContainsKey(Path.GetFileNameWithoutExtension(Path.GetFileName(filename))))
-                    continue;
-
-                var asm = Assembly.LoadFrom(filename);
-                var name = asm.GetName().Name;
-                if (!assemblies.ContainsKey(name) && ReferencesSerenity(asm))
-                    assemblies.Add(name, asm);
-            }
-            catch (Exception)
-            {
-            }
-        }
-#endif
 
         private static Assembly[] DetermineSelfAssemblies()
         {
@@ -118,11 +87,6 @@ namespace Serenity.Extensibility
                     }
                 }
             }
-
-#if NET45
-            var asmPath = Path.GetDirectoryName(typeof(ExtensibilityHelper).Assembly.Location);
-            EnumerateDirectory(assemblies, asmPath);
-#endif
 
             return Reflection.AssemblySorter.Sort(assemblies.Values).ToArray();
         }

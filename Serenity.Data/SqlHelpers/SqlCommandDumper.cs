@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Data;
+#if NET45
 using System.Data.SqlClient;
+#else
+using Microsoft.Data.SqlClient;
+#endif
 using System.Text;
 
 namespace Serenity.Data

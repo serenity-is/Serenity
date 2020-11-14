@@ -1,8 +1,6 @@
 ﻿using Serenity.Abstractions;
 using System;
-#if !NET45
 using Microsoft.Extensions.Caching.Memory;
-#endif
 
 namespace Serenity
 {
@@ -198,7 +196,7 @@ namespace Serenity
             var distributedCache = cache.Distributed;
 
             // retrieves distributed cache group generation number lazily
-            Func<ulong> getGroupGenerationValue = delegate ()
+            ulong getGroupGenerationValue()
             {
                 if (groupGeneration != null)
                     return groupGeneration.Value;
@@ -215,10 +213,10 @@ namespace Serenity
                 localCache.Add(groupKey, groupGenerationCache, TwoLevelCache.GenerationCacheExpiration);
 
                 return groupGeneration.Value;
-            };
+            }
 
             // retrieves local cache group generation number lazily
-            Func<ulong> getGroupGenerationCacheValue = delegate ()
+            ulong getGroupGenerationCacheValue()
             {
                 if (groupGenerationCache != null)
                     return groupGenerationCache.Value;
@@ -232,7 +230,7 @@ namespace Serenity
                     return groupGenerationCache.Value;
 
                 return getGroupGenerationValue();
-            };
+            }
 
             // first check local cache, if item exists and not expired (group version = item version) return it
             var cachedObj = localCache.Get<object>(cacheKey);

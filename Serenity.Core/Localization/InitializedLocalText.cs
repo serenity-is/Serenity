@@ -8,7 +8,7 @@ namespace Serenity.Localization
     /// </summary>
     public class InitializedLocalText : LocalText
     {
-        private string initialText;
+        private readonly string initialText;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InitializedLocalText"/> class.

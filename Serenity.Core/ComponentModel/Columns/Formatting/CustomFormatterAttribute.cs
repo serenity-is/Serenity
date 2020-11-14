@@ -49,12 +49,11 @@ namespace Serenity.ComponentModel
         /// <returns>Option value</returns>
         protected TType GetOption<TType>(string key)
         {
-            if (this.options == null)
-                return default(TType);
+            if (options == null)
+                return default;
 
-            object obj;
-            if (!this.options.TryGetValue(key, out obj) || obj == null)
-                return default(TType);
+            if (!options.TryGetValue(key, out object obj) || obj == null)
+                return default;
 
             return (TType)obj;
         }

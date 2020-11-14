@@ -12,22 +12,22 @@ namespace Serenity.IO
     /// </summary>
     public class GlobFilter
     {
-        private GlobFilter excludeFilter;
-        private HashSet<string> extensions;
-        private List<string> startsWith;
-        private List<string> endsWith;
-        private List<string> contains;
-        private HashSet<string> exactMatch;
-        private List<Tuple<string, bool, string>> startsWithAndEndsWith;
-        private List<Tuple<string, bool, string>> containsAndEndsWith;
+        private readonly GlobFilter excludeFilter;
+        private readonly HashSet<string> extensions;
+        private readonly List<string> startsWith;
+        private readonly List<string> endsWith;
+        private readonly List<string> contains;
+        private readonly HashSet<string> exactMatch;
+        private readonly List<Tuple<string, bool, string>> startsWithAndEndsWith;
+        private readonly List<Tuple<string, bool, string>> containsAndEndsWith;
 
-        private bool isActive;
-        private List<Func<string, bool>> matchers;
+        private readonly bool isActive;
+        private readonly List<Func<string, bool>> matchers;
 
-        private char[] DotAsteriskSlashBackQue = new char[] { '.', '*', '/', '\\', '?' };
-        private char[] AsteriskSlashBackQue = new char[] { '*', '/', '\\', '?' };
-        private char[] AsteriskQue = new char[] { '*', '?' };
-        private char[] FolderSeps = new char[] { '\\', '/' };
+        private readonly char[] DotAsteriskSlashBackQue = new char[] { '.', '*', '/', '\\', '?' };
+        private readonly char[] AsteriskSlashBackQue = new char[] { '*', '/', '\\', '?' };
+        private readonly char[] AsteriskQue = new char[] { '*', '?' };
+        private readonly char[] FolderSeps = new char[] { '\\', '/' };
 
         /// <summary>
         /// Creates a new GlobFilter, containing both include and exclude patterns.
@@ -417,7 +417,7 @@ namespace Serenity.IO
 
             if (glob.EndsWith("/") ||
                 glob.EndsWith("\\"))
-                glob = glob + "**/*";
+                glob += "**/*";
 
             return glob;
         }

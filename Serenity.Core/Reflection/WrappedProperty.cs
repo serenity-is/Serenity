@@ -9,7 +9,7 @@ namespace Serenity.Reflection
     /// </summary>
     public class WrappedProperty : IPropertyInfo
     {
-        private PropertyInfo property;
+        private readonly PropertyInfo property;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WrappedProperty"/> class.

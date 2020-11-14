@@ -31,10 +31,7 @@ namespace Serenity.ComponentModel
         public ServiceLookupEditorAttribute(Type itemType)
             : base("ServiceLookup")
         {
-            if (itemType == null)
-                throw new ArgumentNullException("itemType");
-
-            ItemType = itemType;
+            ItemType = itemType ?? throw new ArgumentNullException("itemType");
         }
 
         /// <summary>

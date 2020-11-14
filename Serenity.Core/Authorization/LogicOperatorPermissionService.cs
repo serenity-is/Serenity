@@ -19,8 +19,9 @@ namespace Serenity.Web
     public partial class LogicOperatorPermissionService : IPermissionService
     {
         private static readonly char[] chars = new Char[] { '|', '&', '!', '(', ')' };
-        private IPermissionService permissionService;
-        private ConcurrentDictionary<string, string[]> cache = new ConcurrentDictionary<string, string[]>();
+        private readonly IPermissionService permissionService;
+        private readonly ConcurrentDictionary<string, string[]> cache = 
+            new ConcurrentDictionary<string, string[]>();
 
         /// <summary>
         /// Creates a new LogicOperatorPermissionService wrapping passed IPermissionService
@@ -28,9 +29,8 @@ namespace Serenity.Web
         /// <param name="permissionService">Permission service to wrap with AND/OR functionality</param>
         public LogicOperatorPermissionService(IPermissionService permissionService)
         {
-            Check.NotNull(permissionService, "permissionService");
-
-            this.permissionService = permissionService;
+            this.permissionService = permissionService ?? 
+                throw new ArgumentNullException(nameof(permissionService));
         }
 
         /// <summary>
@@ -44,8 +44,7 @@ namespace Serenity.Web
                 permission.IndexOfAny(chars) < 0)
                 return permissionService.HasPermission(permission);
 
-            string[] rpnTokens;
-            if (!cache.TryGetValue(permission, out rpnTokens))
+            if (!cache.TryGetValue(permission, out string[] rpnTokens))
             {
                 var tokens = PermissionExpressionParser.Tokenize(permission);
                 cache[permission] = rpnTokens = PermissionExpressionParser.ShuntingYard(tokens).ToArray();

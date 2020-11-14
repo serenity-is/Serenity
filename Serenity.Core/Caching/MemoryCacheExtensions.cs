@@ -1,5 +1,4 @@
-﻿#if !NET45
-namespace Serenity
+﻿namespace Serenity
 {
     using Microsoft.Extensions.Caching.Memory;
     using System;
@@ -7,7 +6,7 @@ namespace Serenity
     /// <summary>
     /// Contains extensions methods to work with IMemoryCache provider.
     /// </summary>
-    public static class LocalCacheExtensions
+    public static class MemoryCacheExtensions
     {
         /// <summary>
         /// Adds a value to cache with a given key
@@ -102,4 +101,3 @@ namespace Serenity
         }
     }
 }
-#endif

@@ -18,7 +18,7 @@ namespace Serenity
         public static string ISODateTimeFormatLocal =
             "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff";
 
-        private static string[] _isoDateTimeFormats = {
+        private static readonly string[] _isoDateTimeFormats = {
            "yyyy'-'MM'-'dd",
            "yyyy'-'MM'-'dd'T'HH':'mm",
            "yyyy'-'MM'-'dd'T'HH':'mmK",
@@ -74,19 +74,19 @@ namespace Serenity
             return DateElementOrder.DayMonthYear;
         }
 
-        private static string[] _dateOrderString = new string[] {
+        private static readonly string[] _dateOrderString = new string[] {
            "dmy",
            "mdy",
            "ymd"
        };
 
-        private static string[] _defaultDateFormat = new string[] {
+        private static readonly string[] _defaultDateFormat = new string[] {
            "dd/MM/yyyy",
            "MM/dd/yyyy",
            "yyyy/MM/dd"
        };
 
-        private static string[] _defaultDateTimeFormat = new string[] {
+        private static readonly string[] _defaultDateTimeFormat = new string[] {
            "dd/MM/yyyy HH:mm:ss",
            "MM/dd/yyyy HH:mm:ss",
            "yyyy/MM/dd HH:mm:ss"

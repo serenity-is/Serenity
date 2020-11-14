@@ -85,10 +85,6 @@ namespace Serenity.IO
                     {
                         try
                         {
-#if NET45
-                            if (Log.IsDebugEnabled)
-                                Log.Debug("Deleting Expired Temporary File : " + fiOld.Name);
-#endif
                             fiOld.Delete();
                         }
                         catch
@@ -121,10 +117,6 @@ namespace Serenity.IO
                         if (!checkFileName.Equals(files[i].Name, StringComparison.OrdinalIgnoreCase))
                             try
                             {
-#if NET45
-                                if (Log.IsDebugEnabled)
-                                    Log.Debug("MaxFiles Passed, Deleting Temporary File : " + files[i].Name);
-#endif
                                 files[i].Delete();
                             }
                             catch
@@ -160,7 +152,7 @@ namespace Serenity.IO
         {
             if (File.Exists(filePath))
                 File.Delete(filePath);
-            filePath = filePath + ".delete";
+            filePath += ".delete";
             if (File.Exists(filePath))
                 try
                 {
@@ -225,11 +217,10 @@ namespace Serenity.IO
                         string readLine;
                         using (var sr = new StreamReader(File.OpenRead(name)))
                              readLine = sr.ReadToEnd();
-                        long fileTime;
                         string actualFile = name.Substring(0, name.Length - 7);
                         if (File.Exists(actualFile))
                         {
-                            if (long.TryParse(readLine, out fileTime))
+                            if (long.TryParse(readLine, out long fileTime))
                             {
                                 if (fileTime == File.GetLastWriteTimeUtc(actualFile).ToFileTimeUtc())
                                     TryDelete(actualFile);
@@ -253,7 +244,7 @@ namespace Serenity.IO
             public bool RemoveFolder;
         }
 
-        private static List<TempFile> _tempFiles = new List<TempFile>();
+        private static readonly List<TempFile> _tempFiles = new List<TempFile>();
 
         /// <summary>
         /// Clears the temporary files.
@@ -295,10 +286,12 @@ namespace Serenity.IO
         /// <param name="removeFolder">if set to <c>true</c> [remove folder].</param>
         public static void RegisterTempFile(string filename, DateTime? expiry, bool removeFolder)
         {
-            TempFile tf = new TempFile();
-            tf.Filename = filename;
-            tf.Expiry = expiry;
-            tf.RemoveFolder = removeFolder;
+            TempFile tf = new TempFile
+            {
+                Filename = filename,
+                Expiry = expiry,
+                RemoveFolder = removeFolder
+            };
             lock (_tempFiles)
             {
                 _tempFiles.Add(tf);

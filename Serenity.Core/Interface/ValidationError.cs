@@ -24,7 +24,7 @@ namespace Serenity.Services
         /// </summary>
         /// <param name="message">The error message that explains the reason for the exception.</param>
         /// <param name="innerException">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
-        public ValidationError(string message, Exception innerException) { }
+        public ValidationError(string message, Exception innerException) : base(message, innerException) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationError"/> class.
@@ -56,7 +56,7 @@ namespace Serenity.Services
         /// <param name="errorMessageFormat">The error message format.</param>
         /// <param name="formatArgs">The format arguments.</param>
         public ValidationError(string errorCode, string arguments, string errorMessageFormat, params object[] formatArgs)
-            : base(String.Format(errorMessageFormat, formatArgs))
+            : base(string.Format(errorMessageFormat, formatArgs))
         {
             ErrorCode = errorCode;
             Arguments = arguments;

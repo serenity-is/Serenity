@@ -25,8 +25,7 @@ namespace Serenity.ComponentModel
         /// <param name="key">The key.</param>
         public DataScriptAttribute(string key)
         {
-            Check.NotNull(key, "key");
-            this.Key = key;
+            Key = key ?? throw new ArgumentNullException(nameof(key));
         }
 
         /// <summary>

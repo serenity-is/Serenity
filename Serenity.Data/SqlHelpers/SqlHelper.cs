@@ -4,28 +4,21 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
+#if NET45
     using System.Data.SqlClient;
+#else
+    using Microsoft.Data.SqlClient;
+#endif
     using System.IO;
     using System.Text;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Contains static SQL related helper functions and extensions.
     /// </summary>
     public static class SqlHelper
     {
-        /// <summary>
-        /// Determines whether the exception is a database exception.
-        /// </summary>
-        /// <param name="e">The exception.</param>
-        /// <returns>
-        ///   <c>true</c> if database exception; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsDatabaseException(Exception e)
-        {
-            return e != null && e is SqlException;
-        }
-
         /// <summary>
         /// Executes the query and returns the generated identity value.
         /// Only works for auto incremented fields, not GUIDs.
@@ -365,7 +358,7 @@
                     (wrapped.OpenedOnce || wrapped.CurrentTransaction != null))
                     return false;
 
-                System.Data.SqlClient.SqlConnection.ClearAllPools();
+                SqlConnection.ClearAllPools();
                 connection.Close();
                 connection.Open();
                 return true;
@@ -397,7 +390,7 @@
                 {
                     return command.ExecuteNonQuery();
                 }
-                catch (System.Data.SqlClient.SqlException ex)
+                catch (SqlException ex)
                 {
                     if (CheckConnectionPoolException(command.Connection, ex))
                         return command.ExecuteNonQuery();
@@ -419,8 +412,11 @@
         /// <param name="commandText">The command text.</param>
         /// <param name="param">The parameters.</param>
         /// <returns>Number of affected rows</returns>
-        public static int ExecuteNonQuery(IDbConnection connection, string commandText,
-            IDictionary<string, object> param)
+        public static int ExecuteNonQuery(IDbConnection connection, string commandText, IDictionary<string, object> param
+#if !NET45
+
+#endif
+        )
         {
             using (IDbCommand command = NewCommand(connection, commandText, param))
             {
@@ -489,7 +485,7 @@
 
                         return result;
                     }
-                    catch (System.Data.SqlClient.SqlException ex)
+                    catch (SqlException ex)
                     {
                         if (CheckConnectionPoolException(connection, ex))
                             return command.ExecuteScalar();
@@ -549,18 +545,36 @@
             return ExecuteScalar(connection, selectQuery.ToString(), param);
         }
 
+#if NET45
         /// <summary>
         /// Logs the command.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="command">The command.</param>
         public static void LogCommand(string type, IDbCommand command)
+#else
+        /// <summary>
+        /// Logs the command.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="command">The command.</param>
+        /// <param name="logger">Logger</param>
+        public static void LogCommand(string type, IDbCommand command, ILogger<Internal.SqlHelperLogs> logger)
+#endif
         {
+#if !NET45
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger));
+#endif
             try
             {
                 if (command is SqlCommand sqlCmd)
                 {
+#if NET45
                     Log.Debug(type + "\r\n" + SqlCommandDumper.GetCommandText(sqlCmd));
+#else
+                    logger.LogDebug("{0}{1}{2}", Environment.NewLine, SqlCommandDumper.GetCommandText(sqlCmd));
+#endif
                     return;
                 }
 
@@ -583,11 +597,19 @@
                     }
                 }
 
+#if NET45
                 Log.Debug(sb.ToString());
+#else
+                logger.LogDebug(sb.ToString());
+#endif
             }
             catch (Exception ex)
             {
-                Log.Debug("Error logging command: " + ex.ToString());
+#if NET45
+                Log.Debug(ex.ToString());
+#else
+                logger.LogDebug("Error logging command: " + ex.ToString());
+#endif
             }
         }
 
@@ -609,28 +631,25 @@
 
             try
             {
-                //using (new Tracer(commandText))
+                IDbCommand command = NewCommand(connection, commandText, param);
+                try
                 {
-                    IDbCommand command = NewCommand(connection, commandText, param);
-                    try
-                    {
-                        if (Log.IsDebugEnabled)
-                            LogCommand("ExecuteReader", command);
+                    if (Log.IsDebugEnabled)
+                        LogCommand("ExecuteReader", command);
 
-                        var result = command.ExecuteReader();
+                    var result = command.ExecuteReader();
 
-                        if (Log.IsDebugEnabled)
-                            Log.Debug("END - ExecuteReader");
+                    if (Log.IsDebugEnabled)
+                        Log.Debug("END - ExecuteReader");
 
-                        return result;
-                    }
-                    catch (System.Data.SqlClient.SqlException ex)
-                    {
-                        if (CheckConnectionPoolException(connection, ex))
-                            return command.ExecuteReader();
-                        else
-                            throw;
-                    }
+                    return result;
+                }
+                catch (SqlException ex)
+                {
+                    if (CheckConnectionPoolException(connection, ex))
+                        return command.ExecuteReader();
+                    else
+                        throw;
                 }
             }
             catch (Exception ex)

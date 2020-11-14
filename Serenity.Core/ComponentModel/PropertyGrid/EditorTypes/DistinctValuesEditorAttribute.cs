@@ -30,14 +30,8 @@ namespace Serenity.ComponentModel
         public DistinctValuesEditorAttribute(Type rowType, string propertyName)
             : base("Lookup")
         {
-            if (rowType == null)
-                throw new ArgumentNullException("rowType");
-
-            if (propertyName == null)
-                throw new ArgumentNullException("propertyName");
-
-            this.RowType = rowType;
-            this.PropertyName = propertyName;
+            RowType = rowType ?? throw new ArgumentNullException("rowType");
+            PropertyName = propertyName ?? throw new ArgumentNullException("propertyName");
         }
 
         /// <summary>

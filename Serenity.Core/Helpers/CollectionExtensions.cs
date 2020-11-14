@@ -41,9 +41,8 @@ namespace Serenity
         /// <returns>Value for specified key, or default value if not found.</returns>
         public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
         {
-            TValue value;
-            if (!dict.TryGetValue(key, out value))
-                return default(TValue);
+            if (!dict.TryGetValue(key, out TValue value))
+                return default;
 
             return value;
         }
@@ -61,8 +60,7 @@ namespace Serenity
         /// </returns>
         public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue defaultValue)
         {
-            TValue value;
-            if (!dict.TryGetValue(key, out value))
+            if (!dict.TryGetValue(key, out TValue value))
                 return defaultValue;
 
             return value;

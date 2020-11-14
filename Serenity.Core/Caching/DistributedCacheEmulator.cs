@@ -1,10 +1,7 @@
-﻿using Serenity.Abstractions;
+﻿using Microsoft.Extensions.Internal;
+using Serenity.Abstractions;
 using System;
 using System.Collections.Generic;
-#if !NET45
-using Microsoft.Extensions.Internal;
-using DateTime = System.DateTimeOffset;
-#endif
 
 namespace Serenity.Caching
 {
@@ -13,8 +10,6 @@ namespace Serenity.Caching
     /// </summary>
     public class DistributedCacheEmulator : IDistributedCache
     {
-
-#if !NET45
         private readonly ISystemClock clock;
 
         /// <summary>
@@ -25,22 +20,22 @@ namespace Serenity.Caching
         {
             this.clock = clock ?? throw new ArgumentNullException(nameof(clock));
         }
-#endif
 
         /// <summary>
         /// The synchronization lock
         /// </summary>
-        private object sync = new object();
+        private readonly object sync = new object();
 
         /// <summary>
         /// The dictionary that contains cached items
         /// </summary>
-        private Dictionary<string, object> dictionary = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, object> dictionary = 
+            new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// The dictionary that contains expiration dates for keys that added with an expiration
         /// </summary>
-        private Dictionary<string, DateTime> expiration = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, DateTimeOffset> expiration = new Dictionary<string, DateTimeOffset>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Increments value with specified key and returns the new value.
@@ -53,8 +48,7 @@ namespace Serenity.Caching
         {
             lock (sync)
             {
-                object value;
-                if (!dictionary.TryGetValue(key, out value))
+                if (!dictionary.TryGetValue(key, out object value))
                 {
                     dictionary[key] = (long)amount;
                     return (long)amount;
@@ -79,23 +73,17 @@ namespace Serenity.Caching
         {
             lock (sync)
             {
-                object value;
-                if (!dictionary.TryGetValue(key, out value))
-                    return default(TValue);
+                if (!dictionary.TryGetValue(key, out object value))
+                    return default;
 
-#if NET45
-                var now = DateTimeProvider.Current.Now;
-#else
                 var now = clock.UtcNow;
-#endif
 
-                DateTime expires;
-                if (expiration.TryGetValue(key, out expires) &&
+                if (expiration.TryGetValue(key, out DateTimeOffset expires) &&
                     expires <= now)
                 {
                     dictionary.Remove(key);
                     expiration.Remove(key);
-                    return default(TValue);
+                    return default;
                 }
 
                 return (TValue)value;
@@ -129,12 +117,8 @@ namespace Serenity.Caching
             // need a better implementation for expirations
             lock (sync)
             {
-                this.dictionary[key] = value;
-#if NET45
-                this.expiration[key] = DateTimeProvider.Now.Add(expiration);
-#else
+                dictionary[key] = value;
                 this.expiration[key] = clock.UtcNow.Add(expiration);
-#endif
             }
         }
 

@@ -50,8 +50,7 @@ namespace Serenity.Localization
                 if (member.FieldType != typeof(String))
                     continue;
 
-                var key = member.GetValue(null) as string;
-                if (key == null)
+                if (!(member.GetValue(null) is string key))
                     continue;
 
                 DescriptionAttribute descr;

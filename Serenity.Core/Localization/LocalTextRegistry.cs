@@ -37,8 +37,12 @@ namespace Serenity.Localization
         /// <param name="text">Translated text</param>
         public void Add(string languageID, string key, string text)
         {
-            Check.NotNull(languageID, "languageID");
-            Check.NotNull(key, "key");
+            if (languageID == null)
+                throw new ArgumentNullException(nameof(languageID));
+
+            if (key == null)
+                throw new ArgumentNullException(nameof(languageID));
+            
             approvedTexts[new ItemKey(languageID, key)] = text;
         }
 
@@ -52,8 +56,12 @@ namespace Serenity.Localization
         /// <param name="text">Translated text</param>
         public void AddPending(string languageID, string key, string text)
         {
-            Check.NotNull(languageID, "languageID");
-            Check.NotNull(key, "key");
+            if (languageID == null)
+                throw new ArgumentNullException(nameof(languageID));
+
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+
             pendingTexts[new ItemKey(languageID, key)] = text;
         }
 
@@ -67,7 +75,11 @@ namespace Serenity.Localization
         /// <param name="pending">If pending approval texts to be used, true.</param>
         public string TryGet(string languageID, string textKey, bool pending)
         {
-            Check.NotNull(languageID, "languageID");
+            if (languageID == null)
+                throw new ArgumentNullException(nameof(languageID));
+
+            if (textKey == null)
+                throw new ArgumentNullException(nameof(textKey));
 
             // create a key to lookup by language and text key pair
             var k = new ItemKey(languageID, textKey);
@@ -178,16 +190,15 @@ namespace Serenity.Localization
         /// <param name="languageFallbackID">language fallback identifier. (e.g. en)</param>
         public void SetLanguageFallback(string languageID, string languageFallbackID)
         {
-            Check.NotNull(languageID, "languageID");
-            Check.NotNull(languageFallbackID, "languageFallbackID");
+            if (languageID == null)
+                throw new ArgumentNullException(nameof(languageID));
 
-            languageFallbacks[languageID] = languageFallbackID;
+            languageFallbacks[languageID] = languageFallbackID ?? throw new ArgumentNullException(nameof(languageFallbackID));
         }
 
         private string TryGetLanguageFallback(string languageID)
         {
-            string fallback;
-            if (languageFallbacks.TryGetValue(languageID, out fallback))
+            if (languageFallbacks.TryGetValue(languageID, out string fallback))
                 return fallback;
 
             if (languageID == LocalText.InvariantLanguageID)
@@ -212,7 +223,8 @@ namespace Serenity.Localization
         ///   A dictionary of all texts in the language.</returns>
         public Dictionary<string, string> GetAllAvailableTextsInLanguage(string languageID, bool pending)
         {
-            Check.NotNull(languageID, "languageID");
+            if (languageID == null)
+                throw new ArgumentNullException(nameof(languageID));
 
             var texts = new Dictionary<string, string>();
             string text;

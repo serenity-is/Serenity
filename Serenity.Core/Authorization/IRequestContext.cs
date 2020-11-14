@@ -1,8 +1,4 @@
-﻿#if !NET45
-using IDictionary = System.Collections.Generic.IDictionary<object, object>;
-#else
-using System.Collections;
-#endif
+﻿using System.Collections.Generic;
 
 namespace Serenity.Abstractions
 {
@@ -15,6 +11,6 @@ namespace Serenity.Abstractions
         /// <summary>
         /// A dictionary that can be used as a request context specific storage
         /// </summary>
-        IDictionary Items { get; }
+        IDictionary<object, object> Items { get; }
     }
 }
