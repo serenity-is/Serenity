@@ -10,7 +10,7 @@ namespace Serenity.Extensibility
     /// key generation.
     /// </summary>
     /// <seealso cref="System.Attribute" />
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class NestedLocalTextsAttribute : Attribute
     {
         /// <summary>

@@ -356,7 +356,7 @@ namespace Serenity.ComponentModel
         /// The width set.
         /// </value>
         [JsonProperty("widthSet")]
-		public bool? WidthSet { get; set; }
+        public bool? WidthSet { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum width of a column.

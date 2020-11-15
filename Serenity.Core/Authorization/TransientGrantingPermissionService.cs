@@ -36,7 +36,7 @@ namespace Serenity.Web
             Stack<HashSet<string>> stack;
 
             var requestItems = requestContext.Items;
-    
+
             if (requestItems != null)
             {
                 stack = requestItems["GrantingStack"] as Stack<HashSet<string>>;
@@ -59,7 +59,7 @@ namespace Serenity.Web
         /// <param name="permission">Permission to check</param>
         /// <returns>True if user has the permission</returns>
         public bool HasPermission(string permission)
-        { 
+        {
             var grantingStack = GetGrantingStack(false);
 
             if (grantingStack != null && grantingStack.Count > 0)

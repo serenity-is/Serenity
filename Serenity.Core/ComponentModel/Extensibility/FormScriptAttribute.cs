@@ -9,7 +9,7 @@ namespace Serenity.ComponentModel
     /// accessed from client side using Q.getForm("Key")
     /// </summary>
     /// <seealso cref="System.Attribute" />
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class FormScriptAttribute : Attribute
     {
         /// <summary>

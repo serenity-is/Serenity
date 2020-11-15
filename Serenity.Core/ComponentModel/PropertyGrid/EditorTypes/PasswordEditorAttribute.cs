@@ -1,8 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Reflection;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Indicates that the target property should use a "Password" editor.

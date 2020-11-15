@@ -101,7 +101,7 @@ namespace Serenity.Data.Schema
                     SELECT COLUMN_NAME FROM information_schema.COLUMNS 
                     WHERE TABLE_SCHEMA = Database()
                     AND table_name = @tbl
-                    AND EXTRA = 'auto_increment'", 
+                    AND EXTRA = 'auto_increment'",
                 new
                 {
                     tbl = table

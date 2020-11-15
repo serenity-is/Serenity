@@ -1,8 +1,8 @@
-﻿using System;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Collections;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Serenity.Data
 {
@@ -53,7 +53,7 @@ namespace Serenity.Data
                     return;
                 }
 
-                serializer.Serialize(writer, value );
+                serializer.Serialize(writer, value);
                 return;
             }
 
@@ -200,7 +200,7 @@ namespace Serenity.Data
 
             throw new JsonSerializationException(string.Format("Can't deserialize {0} as Criteria item", array[0].ToString()));
         }
-        
+
         /// <summary>
         ///   Determines whether this instance can convert the specified object type.</summary>
         /// <param name="objectType">

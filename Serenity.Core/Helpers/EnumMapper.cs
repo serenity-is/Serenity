@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
-using Serenity.Abstractions;
-using Serenity.ComponentModel;
-using System.Collections.Concurrent;
-using Serenity.Localization;
 
 namespace Serenity
 {
@@ -28,7 +27,7 @@ namespace Serenity
 
             public EnumTypeItem()
             {
-                stringToValue = new Dictionary<string,object>(StringComparer.OrdinalIgnoreCase);
+                stringToValue = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
                 valueToString = new Dictionary<int, string>();
             }
         }
@@ -87,7 +86,7 @@ namespace Serenity
             if (item.stringToValue.TryGetValue(key, out object obj))
                 return (TEnum)obj;
 
-            throw new ArgumentOutOfRangeException(string.Format("Can't parse {0} enum value {1}!", 
+            throw new ArgumentOutOfRangeException(string.Format("Can't parse {0} enum value {1}!",
                 typeof(TEnum).FullName, key));
         }
 

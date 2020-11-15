@@ -71,9 +71,9 @@ namespace Serenity
         {
             if (str.IsNullOrEmpty())
                 return null;
-            
+
             str = str.Trim();
-            
+
             if (str.Length == 0)
                 return null;
             return str;
@@ -116,7 +116,7 @@ namespace Serenity
         ///   If two strings are same trimmed, true</returns>
         public static bool IsTrimmedSame(this string string1, string string2)
         {
-            if ((string1 == null || string1.Length == 0) && 
+            if ((string1 == null || string1.Length == 0) &&
                 (string2 == null || string2.Length == 0))
                 return true;
             else
@@ -146,7 +146,7 @@ namespace Serenity
 
             if (maxLength > 3)
                 maxLength -= 3;
-            else 
+            else
                 return "...";
 
             return str.Substring(0, maxLength) + "...";
@@ -380,10 +380,10 @@ namespace Serenity
         {
             if (a.IsNullOrEmpty() && b.IsNullOrEmpty())
                 return "";
-            
+
             if (a.IsNullOrEmpty())
                 return b ?? "";
-            
+
             if (b.IsNullOrEmpty())
                 return a ?? "";
 

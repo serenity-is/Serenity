@@ -29,7 +29,7 @@ namespace Serenity.Data
             {
                 var name = param[i].Key;
                 if (!name.StartsWith("@"))
-                    param[i] = new KeyValuePair<string,object>("@" + name, param[i].Value);
+                    param[i] = new KeyValuePair<string, object>("@" + name, param[i].Value);
             }
 
             param.Sort((x, y) => y.Key.Length.CompareTo(x.Key.Length));

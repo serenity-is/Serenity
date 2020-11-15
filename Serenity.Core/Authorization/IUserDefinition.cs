@@ -28,6 +28,6 @@ namespace Serenity
         /// <summary>
         /// Is user active (1 = active, 0 = disabled, -1 = deleted)
         /// </summary>
-        Int16 IsActive { get;  }
+        Int16 IsActive { get; }
     }
 }

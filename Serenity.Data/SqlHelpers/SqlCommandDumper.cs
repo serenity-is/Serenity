@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Data;
-#if NET45
-using System.Data.SqlClient;
-#else
 using Microsoft.Data.SqlClient;
-#endif
 using System.Text;
 
 namespace Serenity.Data
@@ -26,7 +22,7 @@ namespace Serenity.Data
             // params
             for (int i = 0; i < sqc.Parameters.Count; i++)
                 LogParameterToSqlBatch(sqc.Parameters[i], sbCommandText);
-            
+
             sbCommandText.AppendLine("");
 
             // command
@@ -150,8 +146,6 @@ namespace Serenity.Data
                     if (value is string
                         || value is char
                         || value is char[])
-                        //|| value is System.Xml.Linq.XElement
-                        //|| value is System.Xml.Linq.XDocument)
                     {
                         sbCommandText.Append('\'');
                         sbCommandText.Append(value.ToString().Replace("'", "''"));
@@ -232,16 +226,7 @@ namespace Serenity.Data
             if (typeOriginal.IsGenericType
                 && typeOriginal.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-#if !NET45
                 return (value as dynamic).GetValueOrDefault();
-#else
-                // generic value, unboxing needed
-                return typeOriginal.InvokeMember("GetValueOrDefault",
-                    System.Reflection.BindingFlags.Public |
-                    System.Reflection.BindingFlags.Instance |
-                    System.Reflection.BindingFlags.InvokeMethod,
-                    null, value, null);
-#endif
             }
             else
             {
@@ -272,9 +257,6 @@ namespace Serenity.Data
                         sbCommandText.Append("(");
                         sbCommandText.Append(param.Size == 0 ? 1 : param.Size);
                         sbCommandText.Append(")");
-                        //sbCommandText.Append("(MAX /* Specified as ");
-                        //sbCommandText.Append(param.Size);
-                        //sbCommandText.Append(" */)");
                     }
                     break;
                 // fixed length

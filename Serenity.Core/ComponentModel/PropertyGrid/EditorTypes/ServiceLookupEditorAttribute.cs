@@ -73,7 +73,7 @@ namespace Serenity.ComponentModel
             else if (name.EndsWith("Lookup"))
                 name = name[0..^6];
 
-            return (string.IsNullOrEmpty(module) ? name  :
+            return (string.IsNullOrEmpty(module) ? name :
                 module + "/" + name) + "/List";
         }
     }

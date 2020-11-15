@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Set form field width class to null, e.g. full width

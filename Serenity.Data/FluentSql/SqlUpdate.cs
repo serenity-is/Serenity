@@ -1,10 +1,10 @@
 ﻿namespace Serenity.Data
 {
     using System;
-    using System.Text;
     using System.Collections.Generic;
-    using Dictionary = System.Collections.Generic.Dictionary<string, object>;
     using System.Globalization;
+    using System.Text;
+    using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
     /// <summary>
     ///   Generates queries of the form <c>UPDATE tablename SET field1 = value1, field2 = value2 ... fieldN = valueN WHERE [filter]</c>.</summary>
@@ -271,7 +271,7 @@
         {
             return Format(_tableName, _where.ToString(), _nameValuePairs);
         }
-        
+
         /// <summary>
         ///   Formats an SQL UPDATE statement.</summary>
         /// <param name="tableName">

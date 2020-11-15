@@ -20,10 +20,10 @@ namespace Serenity.Localization
     /// </remarks>
     public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
     {
-        private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = 
+        private readonly ConcurrentDictionary<ItemKey, string> approvedTexts =
             new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
 
-        private readonly ConcurrentDictionary<ItemKey, string> pendingTexts = 
+        private readonly ConcurrentDictionary<ItemKey, string> pendingTexts =
             new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
 
         private readonly ConcurrentDictionary<string, string> languageFallbacks =
@@ -42,7 +42,7 @@ namespace Serenity.Localization
 
             if (key == null)
                 throw new ArgumentNullException(nameof(languageID));
-            
+
             approvedTexts[new ItemKey(languageID, key)] = text;
         }
 
@@ -139,7 +139,7 @@ namespace Serenity.Localization
                         // not in pending nor approved, or circular reference, return key itself
                         return null;
                     }
-                    
+
                     // check for possible circular Fallbacks
                     if (circularCheck1++ >= 10)
                         return null;

@@ -52,7 +52,7 @@ namespace Serenity.Data
                     }
                     else if (c == '.')
                     {
-                        if (startIdent >= 0 && 
+                        if (startIdent >= 0 &&
                             startIdent < index &&
                             index - startIdent == 2 &&
                             expression[startIdent + 1] == '0' &&

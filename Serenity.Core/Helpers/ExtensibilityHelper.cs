@@ -30,9 +30,9 @@ namespace Serenity.Extensibility
 
                 return selfAssemblies;
             }
-            set 
+            set
             {
-                selfAssemblies = value ?? throw new ArgumentNullException("value"); 
+                selfAssemblies = value ?? throw new ArgumentNullException("value");
             }
         }
 
@@ -54,7 +54,7 @@ namespace Serenity.Extensibility
         }
 
         private static bool ReferencesSerenity(Assembly assembly)
-        { 
+        {
             return assembly.FullName.Contains("Serenity") ||
                 assembly.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity"));
         }

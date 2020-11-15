@@ -38,5 +38,5 @@ namespace Serenity.Data
         {
             return "OUTER APPLY";
         }
-     }
+    }
 }

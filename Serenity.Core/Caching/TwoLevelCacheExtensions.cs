@@ -1,6 +1,6 @@
-﻿using Serenity.Abstractions;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Serenity.Abstractions;
 using System;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Serenity
 {
@@ -180,9 +180,9 @@ namespace Serenity
                 groupKey, loader, null, null);
         }
 
-        private static TItem GetInternal<TItem, TSerialized>(ITwoLevelCache cache, string cacheKey, 
+        private static TItem GetInternal<TItem, TSerialized>(ITwoLevelCache cache, string cacheKey,
             TimeSpan localExpiration, TimeSpan remoteExpiration,
-            string groupKey, Func<TItem> loader, 
+            string groupKey, Func<TItem> loader,
             Func<TItem, TSerialized> serialize, Func<TSerialized, TItem> deserialize)
             where TItem : class
             where TSerialized : class

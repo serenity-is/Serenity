@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 
 namespace Serenity.Data
@@ -59,7 +58,7 @@ namespace Serenity.Data
                 return (ISqlDialect)Activator.CreateInstance(dialectType);
             }
 
-            return dialectByProviderName.TryGetValue(entry.ProviderName, out ISqlDialect dialect) ? 
+            return dialectByProviderName.TryGetValue(entry.ProviderName, out ISqlDialect dialect) ?
                 dialect : SqlSettings.DefaultDialect;
         }
 

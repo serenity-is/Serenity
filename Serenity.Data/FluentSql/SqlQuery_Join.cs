@@ -24,7 +24,7 @@
                 sb.Append(" ON ");
                 if (!(join.OnCriteria is BinaryCriteria))
                     sb.Append('(');
-                
+
                 if (modifySelf)
                     sb.Append(join.OnCriteria.ToString(this));
                 else

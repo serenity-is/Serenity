@@ -26,7 +26,7 @@ namespace Serenity.Data
         /// Gets the dialect.
         /// </summary>
         public ISqlDialect Dialect { get; private set; }
-        
+
         /// <summary>
         /// Gets the connection key.
         /// </summary>

@@ -161,7 +161,7 @@
 
             cachedQuery = Format(tableName, nameValuePairs);
 
-            return cachedQuery;           
+            return cachedQuery;
         }
 
         /// <summary>

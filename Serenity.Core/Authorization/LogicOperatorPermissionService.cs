@@ -20,7 +20,7 @@ namespace Serenity.Web
     {
         private static readonly char[] chars = new Char[] { '|', '&', '!', '(', ')' };
         private readonly IPermissionService permissionService;
-        private readonly ConcurrentDictionary<string, string[]> cache = 
+        private readonly ConcurrentDictionary<string, string[]> cache =
             new ConcurrentDictionary<string, string[]>();
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Serenity.Web
         /// <param name="permissionService">Permission service to wrap with AND/OR functionality</param>
         public LogicOperatorPermissionService(IPermissionService permissionService)
         {
-            this.permissionService = permissionService ?? 
+            this.permissionService = permissionService ??
                 throw new ArgumentNullException(nameof(permissionService));
         }
 

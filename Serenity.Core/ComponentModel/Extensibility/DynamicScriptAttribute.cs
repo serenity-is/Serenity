@@ -7,7 +7,7 @@ namespace Serenity.ComponentModel
     /// Dynamic scripts contain dynamic data, but they are not parameterized.
     /// </summary>
     /// <seealso cref="System.Attribute" />
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public abstract class DynamicScriptAttribute : Attribute
     {
         /// <summary>

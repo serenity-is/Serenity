@@ -18,7 +18,7 @@ namespace Serenity.Data.Mapping
         {
             if (string.IsNullOrEmpty(alias))
                 throw new ArgumentNullException(nameof(alias));
-            
+
             Alias = alias;
             RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
         }

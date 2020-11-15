@@ -39,5 +39,5 @@ namespace Serenity.Data
         {
             return "RIGHT JOIN";
         }
-     }
+    }
 }

@@ -1,5 +1,5 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Serenity.Data
 {
@@ -21,7 +21,7 @@ namespace Serenity.Data
             object existingValue, JsonSerializer serializer)
         {
             var value = (BaseCriteria)base.ReadJson(reader, objectType, existingValue, serializer);
-            
+
             if (value is null)
                 return value;
 

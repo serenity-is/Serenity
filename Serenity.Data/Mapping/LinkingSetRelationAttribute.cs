@@ -78,7 +78,7 @@ namespace Serenity.Data.Mapping
         ///   <c>true</c> if should handle equality filter; otherwise, <c>false</c>.
         /// </value>
         public bool HandleEqualityFilter { get; set; }
-        
+
         /// <summary>
         /// Forces deletion of linking row records even if master record uses soft delete.
         /// If false (default) this doesn't delete linking records, as master record might be undeleted.

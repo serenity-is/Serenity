@@ -9,7 +9,7 @@ namespace Serenity.ComponentModel
     /// client side using Q.getRemoteData("Key") function.
     /// </summary>
     /// <seealso cref="Serenity.ComponentModel.DynamicScriptAttribute" />
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
     public class DataScriptAttribute : Attribute
     {
         /// <summary>

@@ -33,7 +33,7 @@ namespace Serenity.Data
             var attr = sourceType.GetCustomAttribute<ConnectionKeyAttribute>(true);
             if (attr == null)
                 throw new ArgumentOutOfRangeException("sourceType",
-                    "ConnectionKeyAttribute is created with source type " + sourceType.Name + 
+                    "ConnectionKeyAttribute is created with source type " + sourceType.Name +
                     ", but that class has no ConnectionKey attribute");
 
             this.Value = attr.Value;

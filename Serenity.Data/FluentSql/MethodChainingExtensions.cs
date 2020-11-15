@@ -15,7 +15,7 @@ namespace Serenity
         /// <returns>
         /// The query itself.</returns>
         public static TChain With<TChain>(this TChain chain, Action<TChain> action)
-            where TChain: IChainable
+            where TChain : IChainable
         {
             if (action == null)
                 throw new ArgumentNullException("action");
@@ -55,7 +55,7 @@ namespace Serenity
         /// <param name="param2">An object that will be passed to action as third parameter</param>
         /// <returns>
         /// The query itself.</returns>
-        public static TChain With<TChain, TParam1, TParam2>(this TChain chain, 
+        public static TChain With<TChain, TParam1, TParam2>(this TChain chain,
             TParam1 param1, TParam2 param2, Action<TChain, TParam1, TParam2> action)
         {
             if (action == null)
@@ -102,7 +102,7 @@ namespace Serenity
         /// <returns>
         /// The query itself.</returns>
         public static TChain With<TChain, TParam1, TParam2, TParam3, TParam4>(this TChain chain,
-            TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4, 
+            TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4,
             Action<TChain, TParam1, TParam2, TParam3, TParam4> action)
             where TChain : IChainable
         {

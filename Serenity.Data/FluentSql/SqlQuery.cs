@@ -654,7 +654,7 @@
         int ISqlQueryExtensible.GetSelectIntoIndex(IField field)
         {
             return this.columns.FindIndex(
-                delegate(Column s) { return s.IntoField == field; });
+                delegate (Column s) { return s.IntoField == field; });
         }
 
         void ISqlQueryExtensible.IntoRowSelection(object row)

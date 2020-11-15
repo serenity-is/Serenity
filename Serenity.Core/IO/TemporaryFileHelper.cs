@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using Serenity.Data;
+using System;
 using System.Collections.Generic;
-using Serenity.Data;
+using System.IO;
 using System.Linq;
 
 namespace Serenity.IO
@@ -107,7 +107,7 @@ namespace Serenity.IO
                     if (maxFilesInDirectory != 0)
                     {
                         Array.Sort<FileInfo>(files,
-                            delegate(FileInfo x, FileInfo y)
+                            delegate (FileInfo x, FileInfo y)
                             { return x.CreationTime < y.CreationTime ? -1 : 1; });
                     }
 
@@ -138,7 +138,7 @@ namespace Serenity.IO
                 {
                     Delete(filePath);
                 }
-                catch 
+                catch
                 {
 
                 }
@@ -196,7 +196,7 @@ namespace Serenity.IO
                     using var sw = new StreamWriter(File.OpenWrite(deleteFile));
                     sw.Write(fileTime);
                 }
-                catch 
+                catch
                 {
                 }
             }
@@ -216,7 +216,7 @@ namespace Serenity.IO
                     {
                         string readLine;
                         using (var sr = new StreamReader(File.OpenRead(name)))
-                             readLine = sr.ReadToEnd();
+                            readLine = sr.ReadToEnd();
                         string actualFile = name[0..^7];
                         if (File.Exists(actualFile))
                         {
@@ -265,13 +265,13 @@ namespace Serenity.IO
                         {
                             _tempFiles.RemoveAt(i);
                             if (tf.RemoveFolder)
-                            try
-                            {
-                                Directory.Delete(Path.GetDirectoryName(tf.Filename));
-                            }
-                            catch
-                            {
-                            }
+                                try
+                                {
+                                    Directory.Delete(Path.GetDirectoryName(tf.Filename));
+                                }
+                                catch
+                                {
+                                }
                         }
                     }
                 }

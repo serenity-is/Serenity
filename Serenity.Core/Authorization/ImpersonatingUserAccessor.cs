@@ -52,7 +52,7 @@ namespace Serenity.Web
         /// Return current user
         /// </summary>
         public ClaimsPrincipal User
-        { 
+        {
             get
             {
                 var impersonationStack = GetImpersonationStack(false);
@@ -72,7 +72,7 @@ namespace Serenity.Web
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-            
+
             var impersonationStack = GetImpersonationStack(true);
             impersonationStack.Push(user);
         }

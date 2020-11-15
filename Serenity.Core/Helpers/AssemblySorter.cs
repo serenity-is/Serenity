@@ -53,7 +53,7 @@ namespace Serenity.Reflection
         /// <param name="dependencies">The dependencies.</param>
         /// <param name="throwOnCycle">if set to <c>true</c> throw on circular link.</param>
         /// <returns></returns>
-        public static IEnumerable<T> TSort<T>(IEnumerable<T> source, 
+        public static IEnumerable<T> TSort<T>(IEnumerable<T> source,
             Func<T, IEnumerable<T>> dependencies, bool throwOnCycle = false)
         {
             var sorted = new List<T>();
@@ -65,7 +65,7 @@ namespace Serenity.Reflection
             return sorted;
         }
 
-        private static void Visit<T>(T item, HashSet<T> visited, List<T> sorted, 
+        private static void Visit<T>(T item, HashSet<T> visited, List<T> sorted,
             Func<T, IEnumerable<T>> dependencies, bool throwOnCycle)
         {
             if (!visited.Contains(item))

@@ -34,7 +34,7 @@ namespace Serenity
         /// Expiration timeout for cache generation keys
         /// </summary>
         public static readonly TimeSpan GenerationCacheExpiration = TimeSpan.FromSeconds(5);
-        
+
         /// <summary>
         /// Suffix for cache generation keys
         /// </summary>

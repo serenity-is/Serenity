@@ -1,5 +1,4 @@
-﻿#if !NET45
-using Dapper;
+﻿using Dapper;
 using System.Collections.Generic;
 using System.Data;
 
@@ -148,4 +147,3 @@ namespace Serenity.Data
         }
     }
 }
-#endif

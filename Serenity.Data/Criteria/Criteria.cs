@@ -6,9 +6,6 @@
     /// <summary>
     ///   An object that is used to create criterias by employing operator overloading 
     ///   features of C# language, instead of using string based criterias.</summary>
-#if NET45
-    [Serializable]
-#endif
     public class Criteria : BaseCriteria
     {
         /// <summary>
@@ -27,7 +24,7 @@
         /// The true criteria instance (1 = 1)
         /// </summary>
         public static readonly BaseCriteria True = new Criteria("1=1");
-        
+
         private readonly string expression;
 
         /// <summary>
@@ -191,7 +188,7 @@
         ///   Gets if criteria is empty.</summary>
         public override bool IsEmpty
         {
-            get 
+            get
             {
                 return String.IsNullOrEmpty(expression);
             }

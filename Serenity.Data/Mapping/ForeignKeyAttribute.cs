@@ -49,7 +49,7 @@ namespace Serenity.Data.Mapping
 
                 if (identityOrPrimaryKey.Length == 0)
                     throw new ArgumentOutOfRangeException(nameof(rowType),
-                        string.Format("Type '{0}' is specified for a ForeignKey attribute " + 
+                        string.Format("Type '{0}' is specified for a ForeignKey attribute " +
                             "but it has no property with [Identity] or [PrimaryKey] attribute",
                             rowType.FullName));
 
@@ -60,7 +60,7 @@ namespace Serenity.Data.Mapping
 
                     if (identity.Count() != 1)
                         throw new ArgumentOutOfRangeException(nameof(rowType),
-                            string.Format("Type '{0}' is specified for a ForeignKey attribute " + 
+                            string.Format("Type '{0}' is specified for a ForeignKey attribute " +
                             "but it has multiple [Identity] or [PrimaryKey] attributes",
                             rowType.FullName));
 

@@ -2,7 +2,7 @@
 
 namespace Serenity.Abstractions
 {
-   /// <summary>
+    /// <summary>
     /// An abstraction for a combination of in memory and distributed cache.
     /// </summary>
     public interface ITwoLevelCache

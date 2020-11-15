@@ -1,8 +1,8 @@
 ﻿using Serenity.Data;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System;
 
 namespace Serenity.Data.Schema
 {

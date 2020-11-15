@@ -44,9 +44,9 @@ namespace Serenity.Data.Schema
                 WHERE
                     rfr.rdb$relation_name = @tbl
                 ORDER BY 
-                    rfr.rdb$field_position",  new
+                    rfr.rdb$field_position", new
             {
-                tbl = table   
+                tbl = table
             }).Select(src =>
             {
                 var fi = new FieldInfo

@@ -7,7 +7,7 @@ namespace Serenity.Extensibility
     /// subclasses that also contains permission keys.
     /// </summary>
     /// <seealso cref="System.Attribute" />
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class NestedPermissionKeysAttribute : Attribute
     {
         /// <summary>

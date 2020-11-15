@@ -29,7 +29,7 @@ namespace Serenity.Caching
         /// <summary>
         /// The dictionary that contains cached items
         /// </summary>
-        private readonly Dictionary<string, object> dictionary = 
+        private readonly Dictionary<string, object> dictionary =
             new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>

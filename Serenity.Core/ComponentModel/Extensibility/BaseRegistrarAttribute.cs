@@ -7,7 +7,7 @@ namespace Serenity.Extensibility
     /// of a type at app start.
     /// </summary>
     /// <seealso cref="System.Attribute" />
-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple=true)]
+    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public abstract class BaseRegistrarAttribute : Attribute
     {
         /// <summary>

@@ -448,7 +448,7 @@
         /// <returns>
         /// Number of affected rows.
         /// </returns>
-        public static int Execute(this SqlDelete query, IDbConnection connection, Dictionary param, 
+        public static int Execute(this SqlDelete query, IDbConnection connection, Dictionary param,
             ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
         {
             return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), param, logger));

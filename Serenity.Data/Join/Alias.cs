@@ -25,7 +25,7 @@ namespace Serenity.Data
         /// Static t3 alias
         /// </summary>
         public static readonly Alias T3 = new Alias(3);
-        
+
         /// <summary>
         /// Static t4 alias
         /// </summary>
@@ -168,7 +168,7 @@ namespace Serenity.Data
                 if (field == null)
                     throw new ArgumentNullException("field");
 
-                return this.aliasDot + field.Name; 
+                return this.aliasDot + field.Name;
             }
         }
 

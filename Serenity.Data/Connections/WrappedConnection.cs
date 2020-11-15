@@ -177,7 +177,7 @@ namespace Serenity.Data
 
                 var transaction = currentTransaction?.ActualTransaction;
                 if (transaction != null && transaction.Connection == null)
-                    throw new System.Exception("Active transaction for connection is in invalid state! " + 
+                    throw new System.Exception("Active transaction for connection is in invalid state! " +
                         "Connection was probably closed unexpectedly!");
 
                 command.Transaction = transaction;

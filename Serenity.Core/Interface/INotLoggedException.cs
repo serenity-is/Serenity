@@ -1,7 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// An exception that should not be logged.

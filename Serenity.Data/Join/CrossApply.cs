@@ -37,5 +37,5 @@ namespace Serenity.Data
         {
             return "CROSS APPLY";
         }
-     }
+    }
 }

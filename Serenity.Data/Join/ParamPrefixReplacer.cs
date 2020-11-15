@@ -23,7 +23,7 @@ namespace Serenity.Data
             for (var i = 0; i < expression.Length; i++)
             {
                 var c = expression[i];
-                
+
                 if (inQuote)
                 {
                     sb.Append(c);

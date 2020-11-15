@@ -40,5 +40,5 @@ namespace Serenity.Data
         {
             return "INNER JOIN";
         }
-     }
+    }
 }

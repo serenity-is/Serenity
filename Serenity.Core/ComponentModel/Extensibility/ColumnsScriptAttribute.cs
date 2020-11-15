@@ -9,7 +9,7 @@ namespace Serenity.ComponentModel
     /// accessed from client side using Q.getColumns("Key")
     /// </summary>
     /// <seealso cref="System.Attribute" />
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class ColumnsScriptAttribute : Attribute
     {
         /// <summary>

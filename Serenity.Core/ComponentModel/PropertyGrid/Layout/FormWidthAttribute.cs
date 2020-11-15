@@ -84,10 +84,10 @@ namespace Serenity.ComponentModel
         private void Set(string prefix, int cols)
         {
             var parts = (this.Value ?? "").Split(' ');
-            var index = Array.FindIndex(parts, x => 
-                x.Length > prefix.Length && 
+            var index = Array.FindIndex(parts, x =>
+                x.Length > prefix.Length &&
                 x.StartsWith(prefix) &&
-                x[prefix.Length] >= '0' && 
+                x[prefix.Length] >= '0' &&
                 x[prefix.Length] <= '9');
 
             if (index < 0)
@@ -114,7 +114,7 @@ namespace Serenity.ComponentModel
         private int? Get(string prefix)
         {
             var klass = (this.Value ?? "").Split(' ')
-                .FirstOrDefault(x => 
+                .FirstOrDefault(x =>
                     x.Length > prefix.Length &&
                     x.StartsWith(prefix) &&
                     x[prefix.Length] >= '0' &&

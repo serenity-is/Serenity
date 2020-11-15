@@ -105,12 +105,12 @@
         /// </value>
         public IDictionary<string, object> Params
         {
-            get 
+            get
             {
                 if (parent != null)
                     return parent.Params;
 
-                return parameters; 
+                return parameters;
             }
         }
 
@@ -122,12 +122,12 @@
         /// </value>
         public int ParamCount
         {
-            get 
+            get
             {
                 if (parent != null)
                     return parent.ParamCount;
 
-                return parameters == null ? 0 : parameters.Count; 
+                return parameters == null ? 0 : parameters.Count;
             }
         }
 
@@ -149,7 +149,7 @@
         /// <returns>
         /// A new query that shares parameters.</returns>
         public TQuery CreateSubQuery<TQuery>()
-            where TQuery: QueryWithParams, new()
+            where TQuery : QueryWithParams, new()
         {
             var subQuery = new TQuery
             {

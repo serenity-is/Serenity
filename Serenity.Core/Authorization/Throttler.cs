@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
+using System;
 
 namespace Serenity
 {
@@ -20,7 +20,7 @@ namespace Serenity
         public Throttler(IMemoryCache cache, string key, TimeSpan duration, int limit)
         {
             this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
-     
+
             Key = key;
             Duration = duration;
             Limit = limit;
@@ -56,7 +56,7 @@ namespace Serenity
         public bool Check()
         {
             var hit = cache.TryGet<HitInfo>(this.CacheKey);
-    
+
             if (hit == null)
             {
                 hit = new HitInfo { Counter = 1 };

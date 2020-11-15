@@ -71,10 +71,10 @@ namespace Serenity.Data
         {
             if (!value.HasValue)
                 return Null;
-            
+
             if (value.Value.Date == value.Value)
                 return value.Value.ToString((dialect ?? SqlSettings.DefaultDialect).DateFormat, Invariants.DateTimeFormat);
-            
+
             return value.Value.ToString((dialect ?? SqlSettings.DefaultDialect).DateTimeFormat, Invariants.DateTimeFormat);
         }
 
