@@ -7,23 +7,20 @@ namespace Serenity.PropertyGrid
 {
     public class PropertyInfoSource : IPropertySource
     {
-        public PropertyInfoSource(PropertyInfo property, Row basedOnRow)
+        public PropertyInfoSource(PropertyInfo property, IRow basedOnRow)
         {
-            if (property == null)
-                throw new ArgumentNullException("property");
-
-            Property = property;
+            Property = property ?? throw new ArgumentNullException("property");
             BasedOnRow = basedOnRow;
 
             if (basedOnRow != null)
             {
-                BasedOnField = basedOnRow.FindFieldByPropertyName(property.Name);
+                BasedOnField = basedOnRow.Fields.FindFieldByPropertyName(property.Name);
                     
-                if (ReferenceEquals(null, BasedOnField))
+                if (BasedOnField is null)
                 {
                     // only use field found by field name if it has no property
-                    var byFieldName = basedOnRow.FindField(property.Name);
-                    if (!ReferenceEquals(byFieldName, null) &&
+                    var byFieldName = basedOnRow.Fields.FindField(property.Name);
+                    if (byFieldName is object &&
                         string.IsNullOrEmpty(byFieldName.PropertyName))
                         BasedOnField = byFieldName;
                 }
@@ -35,7 +32,7 @@ namespace Serenity.PropertyGrid
             if (ValueType.IsEnum)
                 EnumType = ValueType;
             else if (
-                !ReferenceEquals(null, BasedOnField)
+                BasedOnField is object
                 && BasedOnField is IEnumTypeField)
             {
                 EnumType = (BasedOnField as IEnumTypeField).EnumType;
@@ -57,7 +54,7 @@ namespace Serenity.PropertyGrid
             var attrList = new List<TAttribute>();
             attrList.AddRange(Property.GetCustomAttributes<TAttribute>());
 
-            if (!ReferenceEquals(null, BasedOnField) &&
+            if (BasedOnField is object &&
                 BasedOnField.CustomAttributes != null)
             {
                 foreach (var a in BasedOnField.CustomAttributes)
@@ -71,7 +68,7 @@ namespace Serenity.PropertyGrid
         public PropertyInfo Property { get; private set; }
         public Type ValueType { get; private set; }
         public Type EnumType { get; private set; }
-        public Row BasedOnRow { get; private set; }
+        public IRow BasedOnRow { get; private set; }
         public Field BasedOnField { get; private set; }
     }
 }

@@ -2,22 +2,11 @@
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
     <AssemblyName>Serenity.Data.Entity</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <Title>Serenity Platform - Data Entity Library</Title>
     <Description>Contains entity classes, fields and related functions...</Description>        
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Data" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 </Project>

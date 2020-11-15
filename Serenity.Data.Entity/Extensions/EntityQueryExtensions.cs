@@ -15,13 +15,13 @@ namespace Serenity.Data
         ///   or an exception is raised.</param>
         /// <returns>
         ///   Object itself.</returns>
-        public static T WhereEqual<T>(this T self, Row row) where T : IFilterableQuery
+        public static T WhereEqual<T>(this T self, IRow row) where T : IFilterableQuery
         {
             if (row == null)
                 throw new ArgumentNullException("row");
             if (!row.TrackAssignments)
                 throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
-            foreach (var field in row.GetFields())
+            foreach (var field in row.Fields)
                 if (row.IsAssigned(field))
                     self.Where(new Criteria(field) == self.AddParam(field.AsSqlValue(row)));
 
@@ -34,7 +34,7 @@ namespace Serenity.Data
         ///   The row with modified field values. Must be in TrackAssignments mode, or an exception is raised.</param>
         /// <returns>
         ///   Object itself.</returns>
-        public static T Set<T>(this T self, Row row, IField exclude = null) where T : ISetFieldByStatement
+        public static T Set<T>(this T self, IRow row, IField exclude = null) where T : ISetFieldByStatement
         {
             if (row == null)
                 throw new ArgumentNullException("row");
@@ -42,7 +42,7 @@ namespace Serenity.Data
             if (!row.TrackAssignments)
                 throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
 
-            foreach (var field in row.GetFields())
+            foreach (var field in row.Fields)
                 if (!ReferenceEquals(field, exclude) && row.IsAssigned(field))
                     self.Set((IField)field, field.AsSqlValue(row));
 
@@ -57,7 +57,7 @@ namespace Serenity.Data
         ///   Row with fields to be selected (required).</param>
         /// <param name="exclude">
         ///   Fields to be excluded (optional).</param>
-        public static SqlQuery SelectTableFields(this SqlQuery query, Row row, params Field[] exclude)
+        public static SqlQuery SelectTableFields(this SqlQuery query, IRow row, params Field[] exclude)
         {
             if (query == null)
                 throw new ArgumentNullException("query");
@@ -68,9 +68,9 @@ namespace Serenity.Data
             HashSet<Field> excludeFields =
                 (exclude != null && exclude.Length > 0) ? new HashSet<Field>(exclude) : null;
 
-            var fields = row.GetFields();
+            var fields = row.Fields;
 
-            for (int i = 0; i < row.FieldCount; i++)
+            for (int i = 0; i < row.Fields.Count; i++)
             {
                 Field field = fields[i];
                 if (EntityFieldExtensions.IsTableField(field))
@@ -92,7 +92,7 @@ namespace Serenity.Data
         ///   Row with fields to be selected (required).</param>
         /// <param name="exclude">
         ///   Fields to be excluded (optional).</param>
-        public static SqlQuery SelectForeignFields(this SqlQuery query, Row row, params Field[] exclude)
+        public static SqlQuery SelectForeignFields(this SqlQuery query, IRow row, params Field[] exclude)
         {
             if (query == null)
                 throw new ArgumentNullException("query");
@@ -103,9 +103,9 @@ namespace Serenity.Data
             HashSet<Field> excludeFields =
                 (exclude != null && exclude.Length > 0) ? new HashSet<Field>(exclude) : null;
 
-            var fields = row.GetFields();
+            var fields = row.Fields;
 
-            for (int i = 0; i < row.FieldCount; i++)
+            for (int i = 0; i < fields.Count; i++)
             {
                 Field field = fields[i];
                 if (!EntityFieldExtensions.IsTableField(field) &&
@@ -135,7 +135,7 @@ namespace Serenity.Data
 
             var ext = (ISqlQueryExtensible)query;
 
-            foreach (var field in ((Row)ext.FirstIntoRow).GetFields())
+            foreach (var field in ((IRow)ext.FirstIntoRow).Fields)
             {
                 if (!EntityFieldExtensions.IsTableField(field) &&
                     (field.Flags & FieldFlags.NotMapped) != FieldFlags.NotMapped)
@@ -160,7 +160,7 @@ namespace Serenity.Data
 
             var ext = (ISqlQueryExtensible)query;
 
-            return SelectTableFields(query, (Row)ext.FirstIntoRow, exclude);
+            return SelectTableFields(query, (IRow)ext.FirstIntoRow, exclude);
         }
 
         /// <summary>

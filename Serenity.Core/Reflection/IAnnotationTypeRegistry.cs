@@ -14,10 +14,5 @@ namespace Serenity.Reflection
         /// <param name="type">The type.</param>
         /// <returns></returns>
         IEnumerable<Type> GetAnnotationTypesFor(Type type);
-
-        /// <summary>
-        /// Resets this instance.
-        /// </summary>
-        void Reset();
     }
 }

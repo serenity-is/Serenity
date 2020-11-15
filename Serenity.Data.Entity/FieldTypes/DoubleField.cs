@@ -9,18 +9,18 @@ namespace Serenity.Data
     public sealed class DoubleField : GenericValueField<Double>
     {
         public DoubleField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<Row, Double?> getValue = null, Action<Row, Double?> setValue = null)
+            Func<IRow, Double?> getValue = null, Action<IRow, Double?> setValue = null)
             : base(collection, FieldType.Double, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static DoubleField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<Row, Double?> getValue, Action<Row, Double?> setValue)
+            Func<IRow, Double?> getValue, Action<IRow, Double?> setValue)
         {
             return new DoubleField(collection, name, caption, size, flags, getValue, setValue);
         }
 
-        public override void GetFromReader(IDataReader reader, int index, Row row)
+        public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -33,16 +33,15 @@ namespace Serenity.Data
             else
                 _setValue(row, Convert.ToDouble(value, CultureInfo.InvariantCulture));
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        public override void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer)
+        public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             writer.WriteValue(_getValue(row));
         }
 
-        public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
+        public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -69,8 +68,7 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
     }
 }

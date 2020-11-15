@@ -20,10 +20,8 @@ namespace Serenity.Localization
         /// <summary>
         /// Gets permission keys and adds texts if any from static nested permission key classes marked with NestedPermissionKeys attribute.
         /// </summary>
-        public static HashSet<string> AddNestedPermissions(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies = null)
+        public static HashSet<string> AddNestedPermissions(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies)
         {
-            assemblies ??= ExtensibilityHelper.SelfAssemblies;
-
             if (assemblies == null)
                 throw new ArgumentNullException("assemblies");
 

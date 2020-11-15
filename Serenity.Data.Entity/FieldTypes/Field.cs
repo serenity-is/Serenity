@@ -93,19 +93,14 @@ namespace Serenity.Data
             }
         }
 
-        public string Title
+        public string AutoTextKey
         {
             get
             {
-                if (ReferenceEquals(null, caption))
-                {
-                    if (autoTextKey == null)
-                        autoTextKey = "Db." + this.Fields.LocalTextPrefix + "." + (propertyName ?? name);
+                if (autoTextKey == null)
+                    autoTextKey = "Db." + this.Fields.LocalTextPrefix + "." + (propertyName ?? name);
 
-                    return LocalText.TryGet(autoTextKey) ?? (propertyName ?? name);
-                }
-                else
-                    return caption.ToString();
+                return autoTextKey;
             }
         }
 
@@ -149,7 +144,7 @@ namespace Serenity.Data
             throw new JsonSerializationException("Unexpected token when deserializing row: " + reader.TokenType);
         }
 
-        public void CopyNoAssignment(Row source, Row target)
+        public void CopyNoAssignment(IRow source, IRow target)
         {
             Copy(source, target);
             target.ClearAssignment(this);
@@ -173,7 +168,7 @@ namespace Serenity.Data
                     {
                         if (expression != null && 
                             expression.StartsWith("T0.", StringComparison.OrdinalIgnoreCase) &&
-                            SqlSyntax.IsValidQuotedIdentifier(expression.Substring(3)))
+                            SqlSyntax.IsValidQuotedIdentifier(expression[3..]))
                         {
                             if (flags.HasFlag(FieldFlags.Calculated))
                                 flags -= FieldFlags.Calculated;
@@ -199,7 +194,7 @@ namespace Serenity.Data
                                     flags = (FieldFlags)(flags ^ FieldFlags.Foreign) | FieldFlags.Calculated;
                                 else
                                 {
-                                    flags = flags | FieldFlags.Foreign;
+                                    flags |= FieldFlags.Foreign;
 
                                     var split = expression.Split('.');
                                     if (split.Length == 2 &&
@@ -210,14 +205,14 @@ namespace Serenity.Data
                                         origin = split[1];
                                     }
                                     else
-                                        flags = flags | FieldFlags.Calculated;
+                                        flags |= FieldFlags.Calculated;
                                 }
                             }
                             else
                                 flags = flags | FieldFlags.Calculated | FieldFlags.Foreign;
                         }
                         else if (!SqlSyntax.IsValidQuotedIdentifier(value))
-                            flags = flags | FieldFlags.Calculated;
+                            flags |= FieldFlags.Calculated;
                     }
                     else
                     {
@@ -245,8 +240,7 @@ namespace Serenity.Data
                 if (join == null &&
                     joinAlias != null)
                 {
-                    Join theJoin;
-                    if (fields.Joins.TryGetValue(joinAlias, out theJoin))
+                    if (fields.Joins.TryGetValue(joinAlias, out Join theJoin))
                         join = theJoin;
                 }
 
@@ -322,9 +316,9 @@ namespace Serenity.Data
             {
                 foreignJoin = Name;
                 if (foreignJoin.EndsWith("Id", StringComparison.Ordinal))
-                    foreignJoin = foreignJoin.Substring(0, foreignJoin.Length - 2);
+                    foreignJoin = foreignJoin[0..^2];
                 else if (foreignJoin.EndsWith("_ID", StringComparison.OrdinalIgnoreCase))
-                    foreignJoin = foreignJoin.Substring(0, foreignJoin.Length - 3);
+                    foreignJoin = foreignJoin[0..^3];
 
                 foreignJoin = "j" + foreignJoin;
             }
@@ -348,21 +342,18 @@ namespace Serenity.Data
         {
         }
 
-        protected void CheckUnassignedRead(Row row)
+        protected void CheckUnassignedRead(IRow row)
         {
             if (row == null)
                 throw new ArgumentNullException("row");
 
-            if (!row.tracking)
-                return;
-
-            if (!row.trackWithChecks)
+            if (!row.TrackWithChecks)
                 return;
 
             if (row.IsAssigned(this))
                 return;
 
-            if (!this.GetIsNull(row))
+            if (!GetIsNull(row))
                 return;
 
             throw new InvalidOperationException(String.Format(
@@ -370,23 +361,23 @@ namespace Serenity.Data
                     this.Name, row.GetType().Name));
         }
 
-        public abstract void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer);
-        public abstract void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer);
-        public abstract void Copy(Row source, Row target);
-        public abstract void GetFromReader(IDataReader reader, int index, Row row);
+        public abstract void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer);
+        public abstract void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer);
+        public abstract void Copy(IRow source, IRow target);
+        public abstract void GetFromReader(IDataReader reader, int index, IRow row);
         public abstract Type ValueType { get; }
         public abstract object ConvertValue(object source, IFormatProvider provider);
-        public abstract int IndexCompare(Row row1, Row row2);
-        public abstract object AsObject(Row row);
-        public abstract void AsObject(Row row, object value);
-        protected abstract bool GetIsNull(Row row);
+        public abstract int IndexCompare(IRow row1, IRow row2);
+        public abstract object AsObject(IRow row);
+        public abstract void AsObject(IRow row, object value);
+        protected abstract bool GetIsNull(IRow row);
 
-        public virtual object AsSqlValue(Row row)
+        public virtual object AsSqlValue(IRow row)
         {
             return AsObject(row);
         }
 
-        public bool IsNull(Row row)
+        public bool IsNull(IRow row)
         {
             CheckUnassignedRead(row);
             return GetIsNull(row);
@@ -396,7 +387,7 @@ namespace Serenity.Data
         {
             get
             {
-                if (!Object.ReferenceEquals(criteria, null))
+                if (criteria is object)
                     return criteria;
 
                 criteria = new Criteria(this);

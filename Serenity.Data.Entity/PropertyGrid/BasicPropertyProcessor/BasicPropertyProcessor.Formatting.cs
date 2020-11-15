@@ -29,7 +29,7 @@ namespace Serenity.PropertyGrid
                     else
                         item.FormatterType = "Date";
                 }
-                else if (valueType == typeof(Boolean))
+                else if (valueType == typeof(bool))
                     item.FormatterType = "Checkbox";
                 else if (valueType == typeof(Decimal) ||
                     valueType == typeof(Double) ||

@@ -5,9 +5,9 @@ namespace Serenity.Services
 {
     public class RowValidationContext : IValidationContext
     {
-        private Row row;
+        private IRow row;
 
-        public RowValidationContext(IDbConnection connection, Row row)
+        public RowValidationContext(IDbConnection connection, IRow row)
         {
             this.row = row;
             this.Connection = connection;
@@ -15,7 +15,7 @@ namespace Serenity.Services
 
         public object GetFieldValue(string fieldName)
         {
-            var field = row.FindFieldByPropertyName(fieldName) ?? row.FindField(fieldName);
+            var field = row.Fields.FindFieldByPropertyName(fieldName) ?? row.Fields.FindField(fieldName);
             if (ReferenceEquals(null, field))
                 return null;
 

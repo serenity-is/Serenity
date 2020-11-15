@@ -9,19 +9,19 @@ namespace Serenity.Data
     public sealed class TimeSpanField : GenericValueField<TimeSpan>
     {
         public TimeSpanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<Row, TimeSpan?> getValue = null, Action<Row, TimeSpan?> setValue = null)
+            Func<IRow, TimeSpan?> getValue = null, Action<IRow, TimeSpan?> setValue = null)
             : base(collection, FieldType.Time, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static TimeSpanField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<Row, TimeSpan?> getValue, Action<Row, TimeSpan?> setValue)
+            Func<IRow, TimeSpan?> getValue, Action<IRow, TimeSpan?> setValue)
         {
             return new TimeSpanField(collection, name, caption, size, flags, getValue, setValue);
         }
 
 #if !SILVERLIGHT
-        public override void GetFromReader(IDataReader reader, int index, Row row)
+        public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -42,12 +42,11 @@ namespace Serenity.Data
                 _setValue(row, timeSpan);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 #endif
 
-        public new TimeSpan? this[Row row]
+        public new TimeSpan? this[IRow row]
         {
             get
             {
@@ -60,29 +59,27 @@ namespace Serenity.Data
                     _setValue(row, value.Value);
                 else
                     _setValue(row, null);
-                if (row.tracking)
-                    row.FieldAssignedValue(this);
+                row.FieldAssignedValue(this);
             }
         }
 
-        public override object AsObject(Row row)
+        public override object AsObject(IRow row)
         {
             CheckUnassignedRead(row);
             return _getValue(row);
         }
 
-        public override void AsObject(Row row, object value)
+        public override void AsObject(IRow row,object value)
         {
             if (value == null)
                 _setValue(row, null);
             else
                 _setValue(row, (TimeSpan)value);
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        public override void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer)
+        public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             var value = _getValue(row);
             if (value.HasValue)
@@ -91,7 +88,7 @@ namespace Serenity.Data
                 writer.WriteNull();
         }
 
-        public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
+        public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -127,8 +124,7 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
     }
 }

@@ -9,18 +9,18 @@ namespace Serenity.Data
     public class Int32Field : GenericValueField<Int32>, IIdField
     {
         public Int32Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<Row, Int32?> getValue = null, Action<Row, Int32?> setValue = null)
+            Func<IRow, Int32?> getValue = null, Action<IRow, Int32?> setValue = null)
             : base(collection, FieldType.Int32, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static Int32Field Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<Row, Int32?> getValue, Action<Row, Int32?> setValue)
+            Func<IRow, Int32?> getValue, Action<IRow, Int32?> setValue)
         {
             return new Int32Field(collection, name, caption, size, flags, getValue, setValue);
         }
 
-        public override void GetFromReader(IDataReader reader, int index, Row row)
+        public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -33,11 +33,10 @@ namespace Serenity.Data
             else
                 _setValue(row, Convert.ToInt32(value, CultureInfo.InvariantCulture));
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        public override void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer)
+        public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             var value = _getValue(row);
             if (value == null)
@@ -80,7 +79,7 @@ namespace Serenity.Data
                 throw new InvalidProgramException(String.Format("{0} is not a valid enum type!", enumType.Name));
         }
 
-        public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
+        public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -115,11 +114,10 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        Int64? IIdField.this[Row row]
+        Int64? IIdField.this[IRow row]
         {
             get
             {
@@ -136,8 +134,7 @@ namespace Serenity.Data
                 else
                     _setValue(row, null);
                 
-                if (row.tracking)
-                    row.FieldAssignedValue(this);
+                row.FieldAssignedValue(this);
             }
         }
 

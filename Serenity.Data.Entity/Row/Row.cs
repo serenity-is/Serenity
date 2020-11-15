@@ -7,36 +7,35 @@ using System.ComponentModel;
 namespace Serenity.Data
 {
     [JsonConverter(typeof(JsonRowConverter))]
-    public abstract partial class Row : IEntityWithJoins, 
-        INotifyPropertyChanged, IEditableObject
-#if NET45
-        , IDataErrorInfo
-#endif
+    public abstract partial class Row<TFields> : IRow, IRow<TFields>, INotifyPropertyChanged, IEditableObject
+        where TFields: RowFieldsBase
     {
-        internal RowFieldsBase fields;
+        protected readonly TFields fields;
         internal bool[] assignedFields;
         internal Hashtable dictionaryData;
-        internal bool ignoreConstraints;
         internal object[] indexedData;
         internal bool tracking;
         internal bool trackWithChecks;
 
-        protected Row(RowFieldsBase fields)
+        protected Row(TFields fields = null)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
 
-            this.fields = fields.InitInstance(this);
+            fields.InitInstance(this);
 
             TrackAssignments = true;
         }
 
-        public void CloneInto(Row clone, 
+        public TFields Fields => fields;
+        RowFieldsBase IRow.Fields => fields;
+
+        public void CloneInto(Row<TFields> clone, 
             bool cloneHandlers)
         {
-            clone.ignoreConstraints = ignoreConstraints;
+            clone.IgnoreConstraints = IgnoreConstraints;
 
-            foreach (var field in GetFields())
+            foreach (var field in fields)
                 field.Copy(this, clone);
 
             clone.tracking = tracking;
@@ -56,7 +55,7 @@ namespace Serenity.Data
             clone.originalValues = originalValues;
 
             if (dictionaryData != null)
-                clone.dictionaryData = (Hashtable)this.dictionaryData.Clone();
+                clone.dictionaryData = (Hashtable)dictionaryData.Clone();
             else
                 clone.dictionaryData = null;
 
@@ -76,33 +75,56 @@ namespace Serenity.Data
 
             if (cloneHandlers)
             {
-                clone.postHandler = this.postHandler;
-                clone.propertyChanged = this.propertyChanged;
+                clone.postHandler = postHandler;
+                clone.propertyChanged = propertyChanged;
 
-                if (this.validationErrors != null)
-                    clone.validationErrors = new Dictionary<string, string>(this.validationErrors);
+                if (validationErrors != null)
+                    clone.validationErrors = new Dictionary<string, string>(validationErrors);
                 else
                     clone.validationErrors = null;
             }
         }
 
-        public Row CloneRow()
+        public virtual Row<TFields> CloneRow()
         {
             var clone = CreateNew();
             CloneInto(clone, true);
             return clone;
         }
 
-        public virtual Row CreateNew()
+        public virtual Row<TFields> CreateNew()
         {
             if (fields.rowFactory == null)
                 throw new NotImplementedException();
 
-            return fields.rowFactory();
+            return (Row<TFields>)fields.rowFactory();
         }
 
-        internal void FieldAssignedValue(Field field)
+        IRow<TFields> IRow<TFields>.CreateNew()
         {
+            return CreateNew();
+        }
+
+        IRow<TFields> IRow<TFields>.CloneRow()
+        {
+            return CloneRow();
+        }
+
+        IRow IRow.CloneRow()
+        {
+            return CloneRow();
+        }
+
+        IRow IRow.CreateNew()
+        {
+            return CreateNew();
+        }
+
+        void IRow.FieldAssignedValue(Field field)
+        {
+            if (!tracking)
+                return;
+
             if (assignedFields == null)
                 assignedFields = new bool[fields.Count];
 
@@ -131,11 +153,6 @@ namespace Serenity.Data
             return fields.FindFieldByPropertyName(propertyName);
         }
 
-        public RowFieldsBase GetFields()
-        {
-            return fields;
-        }
-
         public int FieldCount
         {
             get { return fields.Count; }
@@ -149,16 +166,9 @@ namespace Serenity.Data
             }
         }
 
-        public bool IgnoreConstraints
-        {
-            get { return ignoreConstraints; }
-            set { ignoreConstraints = value; }
-        }
+        public bool IgnoreConstraints { get; set; }
 
-        public string Table
-        {
-            get { return fields.TableName; }
-        }
+        public string Table => fields.TableName;
 
         public bool TrackAssignments
         {
@@ -173,7 +183,7 @@ namespace Serenity.Data
                     if (value)
                     {
                         if (propertyChanged != null)
-                            previousValues = this.CloneRow();
+                            previousValues = CloneRow();
 
                         tracking = value;
                     }
@@ -208,9 +218,9 @@ namespace Serenity.Data
         private Field FindFieldEnsure(string fieldName)
         {
             var field = FindField(fieldName);
-            if (ReferenceEquals(null, field))
-                throw new ArgumentOutOfRangeException("fieldName", String.Format(
-                    "{0} has no field with name '{1}'.", this.GetType().Name, fieldName));
+            if (field is null)
+                throw new ArgumentOutOfRangeException("fieldName", string.Format(
+                    "{0} has no field with name '{1}'.", GetType().Name, fieldName));
             return field;
         }
 
@@ -221,7 +231,7 @@ namespace Serenity.Data
                 var field = FindFieldByPropertyName(fieldName) ??
                     FindField(fieldName);
 
-                if (ReferenceEquals(null, field))
+                if (field is null)
                 {
                     if (dictionaryData != null)
                         return dictionaryData[fieldName];
@@ -254,6 +264,14 @@ namespace Serenity.Data
             }
         }
 
+        public IEnumerable GetDictionaryDataKeys()
+        {
+            if (dictionaryData == null)
+                return Array.Empty<object>();
+
+            return dictionaryData.Keys;
+        }
+
         public object GetDictionaryData(object key)
         {
             if (dictionaryData != null)
@@ -262,8 +280,15 @@ namespace Serenity.Data
             return null;
         }
 
+        object IRow.GetIndexedData(int index)
+        {
+            if (indexedData != null)
+                return indexedData[index];
 
-        internal void SetIndexedData(int index, object value)
+            return null;
+        }
+
+        void IRow.SetIndexedData(int index, object value)
         {
             if (value == null)
             {
@@ -275,18 +300,10 @@ namespace Serenity.Data
             else
             {
                 if (indexedData == null)
-                    indexedData = new object[this.FieldCount];
+                    indexedData = new object[FieldCount];
 
                 indexedData[index] = value;
             }
-        }
-
-        internal object GetIndexedData(int index)
-        {
-            if (indexedData != null)
-                return indexedData[index];
-
-            return null;
         }
 
         public bool IsAssigned(Field field)

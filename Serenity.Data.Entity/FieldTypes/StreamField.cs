@@ -9,18 +9,18 @@ namespace Serenity.Data
     public class StreamField : GenericClassField<Stream>
     {
         public StreamField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-            Func<Row, Stream> getValue = null, Action<Row, Stream> setValue = null)
+            Func<IRow, Stream> getValue = null, Action<IRow, Stream> setValue = null)
             : base(collection, FieldType.Stream, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static StreamField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<Row, Stream> getValue, Action<Row, Stream> setValue)
+            Func<IRow, Stream> getValue, Action<IRow, Stream> setValue)
         {
             return new StreamField(collection, name, caption, size, flags, getValue, setValue);
         }
 
-        public override void GetFromReader(IDataReader reader, int index, Row row)
+        public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -30,30 +30,26 @@ namespace Serenity.Data
             else
             {
                 byte[] a;
-#if !NET45
+
                 if (reader.GetType().Name == "SqliteDataReader")
                 {
                     a = (byte[])reader.GetValue(index);
                 }
                 else
                 {
-#endif
                     long available = reader.GetBytes(index, (long)0, null, 0, 0);
                     a = new byte[available];
                     if (a.Length > 0)
                         reader.GetBytes(index, (long)0, a, 0, a.Length);
-#if !NET45
                 }
-#endif
 
                 _setValue(row, new MemoryStream(a));
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        public override int IndexCompare(Row row1, Row row2)
+        public override int IndexCompare(IRow row1, IRow row2)
         {
             throw new NotImplementedException();
         }
@@ -75,7 +71,7 @@ namespace Serenity.Data
             } while (read != 0);
         }
 
-        public override void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer)
+        public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             var value = _getValue(row);
             if (value == null ||
@@ -89,7 +85,7 @@ namespace Serenity.Data
             }
         }
 
-        public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
+        public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -110,8 +106,7 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
     }
 }

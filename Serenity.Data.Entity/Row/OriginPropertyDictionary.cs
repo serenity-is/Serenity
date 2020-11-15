@@ -66,7 +66,7 @@ namespace Serenity.Data
 
                     if (joinProperty.Item1.EndsWith("ID") ||
                         joinProperty.Item1.EndsWith("Id"))
-                        return joinProperty.Item1.Substring(0, joinProperty.Item1.Length - 2);
+                        return joinProperty.Item1[0..^2];
                 }
 
                 ISqlJoin join;
@@ -103,8 +103,7 @@ namespace Serenity.Data
 
         public static OriginPropertyDictionary GetPropertyDictionary(Type rowType)
         {
-            OriginPropertyDictionary dictionary;
-            if (!cache.TryGetValue(rowType, out dictionary))
+            if (!cache.TryGetValue(rowType, out OriginPropertyDictionary dictionary))
             {
                 dictionary = new OriginPropertyDictionary(rowType);
                 cache[rowType] = dictionary;
@@ -119,9 +118,11 @@ namespace Serenity.Data
             var d = originPropertyByName;
             if (d == null)
             {
-                d = new Dictionary<string, Tuple<PropertyInfo, Type>>();
-                d[name] = pi = new Tuple<PropertyInfo, Type>(GetOriginProperty(propertyByName[name], 
-                    origins[name], out originType), originType);
+                d = new Dictionary<string, Tuple<PropertyInfo, Type>>
+                {
+                    [name] = pi = new Tuple<PropertyInfo, Type>(GetOriginProperty(propertyByName[name],
+                    origins[name], out originType), originType)
+                };
                 originPropertyByName = d;
             }
             else if (!d.TryGetValue(name, out pi))
@@ -139,10 +140,8 @@ namespace Serenity.Data
             out Type originRowType)
         {
             var joinAlias = origin.Join;
-            Tuple<string, ForeignKeyAttribute, ISqlJoin> joinProperty;
 
-            ISqlJoin rowJoin;
-            if (joinPropertyByAlias.TryGetValue(joinAlias, out joinProperty))
+            if (joinPropertyByAlias.TryGetValue(joinAlias, out Tuple<string, ForeignKeyAttribute, ISqlJoin> joinProperty))
             {
                 var joinPropertyName = joinProperty.Item1;
                 var fk = joinProperty.Item2;
@@ -158,7 +157,7 @@ namespace Serenity.Data
                             property.Name, rowType.Name, joinPropertyName));
                 }
             }
-            else if (rowJoinByAlias.TryGetValue(joinAlias, out rowJoin))
+            else if (rowJoinByAlias.TryGetValue(joinAlias, out ISqlJoin rowJoin))
             {
                 originRowType = rowJoin.RowType;
                 if (originRowType == null)
@@ -191,7 +190,7 @@ namespace Serenity.Data
                     property.Name.StartsWith(prefix) &&
                     property.Name.Length > prefix.Length &&
                     originDictionary.propertyByName.TryGetValue(
-                        property.Name.Substring(prefix.Length), out originProperty))
+                        property.Name[prefix.Length..], out originProperty))
                 {
                     originPropertyName = originProperty.Name;
                 }
@@ -253,7 +252,7 @@ namespace Serenity.Data
             }
         }
 
-        public TAttr OriginAttribute<TAttr>(string propertyName, OriginAttribute origin, int recursion = 0)
+        public TAttr OriginAttribute<TAttr>(string propertyName, int recursion = 0)
             where TAttr: Attribute
         {
             if (recursion++ > 1000)
@@ -270,7 +269,7 @@ namespace Serenity.Data
             if (originOrigin != null)
             {
                 var originDictionary = GetPropertyDictionary(org.Item2);
-                return originDictionary.OriginAttribute<TAttr>(originProperty.Name, originOrigin);
+                return originDictionary.OriginAttribute<TAttr>(originProperty.Name, recursion + 1);
             }
 
             return null;
@@ -305,13 +304,13 @@ namespace Serenity.Data
                 prefix = join.TitlePrefix.Length > 0 ? join.TitlePrefix + " " : "";
             }
 
-            Func<string, string> addPrefix = s =>
+            string addPrefix(string s)
             {
                 if (string.IsNullOrEmpty(prefix) || s == prefix || s.StartsWith(prefix + " "))
                     return s;
 
                 return prefix + " " + s;
-            };
+            }
 
             var org = GetOriginProperty(propertyName);
             var originProperty = org.Item1;
@@ -336,7 +335,8 @@ namespace Serenity.Data
             if (string.IsNullOrWhiteSpace(expression))
                 return expression;
 
-            Check.NotNullOrWhiteSpace(alias, "alias");
+            if (string.IsNullOrWhiteSpace(alias))
+                throw new ArgumentNullException(nameof(alias));
 
             var aliasPrefix = alias + "_";
 
@@ -344,25 +344,23 @@ namespace Serenity.Data
 
             Func<string, string> mapAlias = null;
 
-            Func<string, string> mapExpression = x =>
+            string mapExpression(string x)
             {
                 if (x == null)
                     return null;
 
                 return JoinAliasLocator.ReplaceAliases(x, mapAlias);
-            };
+            }
 
             mapAlias = x =>
             {
                 if (x == "t0" || x == "T0")
                     return alias;
 
-                ISqlJoin sqlJoin;
-                if (mappedJoins.TryGetValue(x, out sqlJoin))
+                if (mappedJoins.TryGetValue(x, out ISqlJoin sqlJoin))
                     return sqlJoin.Alias;
 
-                Tuple<string, ForeignKeyAttribute, ISqlJoin> propJoin;
-                if (joinPropertyByAlias.TryGetValue(x, out propJoin))
+                if (joinPropertyByAlias.TryGetValue(x, out Tuple<string, ForeignKeyAttribute, ISqlJoin> propJoin))
                 {
                     var propertyInfo = propertyByName[propJoin.Item1];
                     string leftExpression;
@@ -384,7 +382,7 @@ namespace Serenity.Data
                                 leftExpression = alias + "." + SqlSyntax.AutoBracket(propertyInfo.Name);
                         }
                     }
-                    
+
                     ISqlJoin srcJoin = propJoin.Item3;
                     var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(propJoin.Item2.Field);
 
@@ -407,8 +405,7 @@ namespace Serenity.Data
                     var newAlias = aliasPrefix + x;
                     var rowType = sqlJoin.RowType;
 
-                    var lja = sqlJoin as LeftJoinAttribute;
-                    if (lja != null)
+                    if (sqlJoin is LeftJoinAttribute lja)
                         sqlJoin = new LeftJoinAttribute(lja.Alias, lja.ToTable, mappedCriteria);
                     else
                     {

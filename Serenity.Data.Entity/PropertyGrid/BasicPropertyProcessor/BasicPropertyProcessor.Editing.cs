@@ -32,10 +32,10 @@ namespace Serenity.PropertyGrid
                         {
                             if (!distinct.RowType.IsInterface &&
                                 !distinct.RowType.IsAbstract &&
-                                distinct.RowType.IsSubclassOf(typeof(Row)))
+                                typeof(IRow).IsAssignableFrom(distinct.RowType))
                             {
-                                prefix = ((Row)Activator.CreateInstance(distinct.RowType))
-                                    .GetFields().LocalTextPrefix;
+                                prefix = ((IRow)Activator.CreateInstance(distinct.RowType))
+                                    .Fields.LocalTextPrefix;
                             }
                         }
                         else
@@ -43,7 +43,7 @@ namespace Serenity.PropertyGrid
                             var isRow = source.Property != null &&
                                 source.Property.ReflectedType != null &&
                                 !source.Property.ReflectedType.IsAbstract &&
-                                source.Property.ReflectedType.IsSubclassOf(typeof(Row));
+                                typeof(IRow).IsAssignableFrom(source.Property.ReflectedType);
 
                             if (!isRow)
                             {
@@ -51,8 +51,8 @@ namespace Serenity.PropertyGrid
                                     prefix = source.BasedOnField.Fields.LocalTextPrefix;
                             }
                             else
-                                prefix = ((Row)Activator.CreateInstance(source.Property.ReflectedType))
-                                    .GetFields().LocalTextPrefix;
+                                prefix = ((IRow)Activator.CreateInstance(source.Property.ReflectedType))
+                                    .Fields.LocalTextPrefix;
                         }
 
                         if (prefix != null)
@@ -160,7 +160,7 @@ namespace Serenity.PropertyGrid
             if (!editorParams.ContainsKey("service"))
                 editorParams["service"] = ServiceLookupEditorAttribute.AutoServiceFor(sle.ItemType);
 
-            if (sle.ItemType.IsSubclassOf(typeof(Row)) &&
+            if (typeof(IRow).IsAssignableFrom(sle.ItemType) &&
                 !sle.ItemType.IsAbstract &&
                 (!editorParams.ContainsKey("idField") ||
                     !editorParams.ContainsKey("textField") ||
@@ -169,7 +169,7 @@ namespace Serenity.PropertyGrid
             {
                 try
                 {
-                    var rowInstance = Activator.CreateInstance(sle.ItemType) as Row;
+                    var rowInstance = Activator.CreateInstance(sle.ItemType) as IRow;
                     if (rowInstance is IIdRow idRow &&
                         !editorParams.ContainsKey("idField"))
                     {
@@ -188,7 +188,7 @@ namespace Serenity.PropertyGrid
                     if (!editorParams.ContainsKey("includeColumns") &&
                         !editorParams.ContainsKey("columnSelection"))
                     {
-                        editorParams["includeColumns"] = rowInstance.GetFields()
+                        editorParams["includeColumns"] = rowInstance.Fields
                             .Where(x => x.GetAttribute<LookupIncludeAttribute>() != null)
                             .Select(x => x.PropertyName ?? x.Name)
                             .ToArray();
@@ -219,7 +219,7 @@ namespace Serenity.PropertyGrid
 			}
 			else if (valueType == typeof(DateTime))
 				return "Date";
-			else if (valueType == typeof(Boolean))
+			else if (valueType == typeof(bool))
 				return "Boolean";
 			else if (valueType == typeof(Decimal) || valueType == typeof(Double) || valueType == typeof(Single))
 			{

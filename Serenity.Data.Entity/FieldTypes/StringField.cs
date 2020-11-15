@@ -9,18 +9,18 @@ namespace Serenity.Data
     public class StringField : GenericClassField<String>, IIdField
     {
         public StringField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-            Func<Row, String> getValue = null, Action<Row, String> setValue = null)
+            Func<IRow, String> getValue = null, Action<IRow, String> setValue = null)
             : base(collection, FieldType.String, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static StringField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<Row, String> getValue, Action<Row, String> setValue)
+            Func<IRow, String> getValue, Action<IRow, String> setValue)
         {
             return new StringField(collection, name, caption, size, flags, getValue, setValue);
         }
 
-        public override void GetFromReader(IDataReader reader, int index, Row row)
+        public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -30,11 +30,10 @@ namespace Serenity.Data
             else
                 _setValue(row, reader.GetString(index));
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        public override int IndexCompare(Row row1, Row row2)
+        public override int IndexCompare(IRow row1, IRow row2)
         {
             var value1 = _getValue(row1);
             var value2 = _getValue(row2);
@@ -54,12 +53,12 @@ namespace Serenity.Data
                 return value1.CompareTo(value2);
         }
 
-        public override void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer)
+        public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             writer.WriteValue(_getValue(row));
         }
 
-        public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
+        public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -82,8 +81,7 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
         bool IIdField.IsIntegerType
@@ -94,7 +92,7 @@ namespace Serenity.Data
             }
         }
 
-        long? IIdField.this[Row row]
+        long? IIdField.this[IRow row]
         {
             get
             {

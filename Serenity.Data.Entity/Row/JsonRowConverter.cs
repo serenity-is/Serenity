@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Serenity.Data
 {
@@ -8,7 +7,7 @@ namespace Serenity.Data
     ///   Serialize/deserialize a row</summary>
     public class JsonRowConverter : JsonConverter
     {
-        public static Func<Row, string, bool> ShouldSerializeExtension;
+        public static Func<IRow, string, bool> ShouldSerializeExtension;
 
         /// <summary>
         ///   Writes the JSON representation of the object.</summary>
@@ -20,21 +19,20 @@ namespace Serenity.Data
         ///   The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            ToJson(writer, (Row)value, serializer);
+            ToJson(writer, (IRow)value, serializer);
         }
 
-        private void ToJson(JsonWriter writer, Row row, JsonSerializer serializer)
+        private void ToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             writer.WriteStartObject();
 
             if (row.TrackAssignments)
             {
-                var modified = row.assignedFields;
-                if (modified != null)
+                if (row.IsAnyFieldChanged)
                 {
-                    var fields = row.fields;
-                    for (var i = 0; i < fields.Count; i++)
-                        if (modified[i])
+                    var fields = row.Fields;
+                    for (var i = 0; i < row.Fields.Count; i++)
+                        if (row.IsAssigned(row.Fields[i]))
                         {
                             var f = fields[i];
                             if (!f.IsNull(row) || serializer.NullValueHandling == NullValueHandling.Include)
@@ -47,7 +45,7 @@ namespace Serenity.Data
             }
             else
             {
-                var fields = row.fields;
+                var fields = row.Fields;
                 foreach (var f in fields)  
                     if (!f.IsNull(row) || serializer.NullValueHandling == NullValueHandling.Include)
                     {
@@ -56,15 +54,14 @@ namespace Serenity.Data
                     }
             }
 
-            if (ShouldSerializeExtension != null &&
-                row.dictionaryData != null)
+            if (ShouldSerializeExtension != null)
             {
-                foreach (string key in row.dictionaryData.Keys)
+                foreach (string key in row.GetDictionaryDataKeys())
                 {
                     if (ShouldSerializeExtension(row, key))
                     {
                         writer.WritePropertyName(key);
-                        writer.WriteValue(row.dictionaryData[key]);
+                        writer.WriteValue(row.GetDictionaryData(key));
                     }
                 }
             }
@@ -88,16 +85,15 @@ namespace Serenity.Data
             if (reader.TokenType == JsonToken.Null)
                 return null;
 
-            var row = (Row)(Activator.CreateInstance(objectType));
+            var row = (IRow)(Activator.CreateInstance(objectType));
             if (row == null)
-                throw new JsonSerializationException(String.Format("No row of type {0} could be created.", objectType.Name));
+                throw new JsonSerializationException(string.Format("No row of type {0} could be created.", objectType.Name));
 
             row.TrackAssignments = true;
 
             if (!reader.Read())
                 throw new JsonSerializationException("Unexpected end when deserializing object.");
 
-            int initialDepth = reader.Depth;
             do
             {
                 switch (reader.TokenType)
@@ -108,23 +104,22 @@ namespace Serenity.Data
                         if (!reader.Read())
                             throw new JsonSerializationException("Unexpected end when deserializing object.");
 
-                        var field = row.FindField(fieldName);
-                        if (ReferenceEquals(null, field))
-                            field = row.FindFieldByPropertyName(fieldName);
+                        var field = row.Fields.FindField(fieldName);
+                        if (field is null)
+                            field = row.Fields.FindFieldByPropertyName(fieldName);
                         
-                        if (ReferenceEquals(null, field) &&
+                        if (field is null &&
                             serializer.MissingMemberHandling == MissingMemberHandling.Error)
-                            throw new JsonSerializationException(String.Format("Could not find field '{0}' on row of type '{1}'", fieldName, objectType.Name));
+                            throw new JsonSerializationException(string.Format("Could not find field '{0}' on row of type '{1}'", fieldName, objectType.Name));
 
                         while (reader.TokenType == JsonToken.Comment)
                             reader.Read();
 
-                        if (ReferenceEquals(null, field))
+                        if (field is null)
                             reader.Skip();
                         else
                             field.ValueFromJson(reader, row, serializer);
                         
-
                         break;
 
                     case JsonToken.EndObject:
@@ -147,7 +142,7 @@ namespace Serenity.Data
         ///   True if this instance can convert the specified object type; otherwise, false.</returns>
         public override bool CanConvert(Type objectType)
         {
-            return objectType.IsSubclassOf(typeof(Row));
+            return typeof(IRow).IsAssignableFrom(objectType);
         }
 
         /// <summary>

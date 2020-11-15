@@ -1,76 +1,26 @@
-﻿using System.Collections.Generic;
-using System;
-using Serenity.Extensibility;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Serenity.Data
 {
     public static class RowRegistry
     {
-        public const string DefaultConnectionKey = "Default";
-
-        private static ILookup<string, Row> emptyRegistry = new List<Row>().ToLookup(x => (string)null);
-        internal static IDictionary<string, ILookup<string, Row>> registry;
-
-        static RowRegistry()
+        public static IEnumerable<Type> EnumerateRowTypes(IEnumerable<Assembly> assemblies, string connectionKey = null)
         {
-            SchemaChangeSource.Observers += (connectionKey, table) => {
-                registry = null;
-            };
+            if (assemblies == null)
+                throw new ArgumentNullException(nameof(assemblies));
+
+            return assemblies.SelectMany(x => x.GetTypes())
+                .Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(IRow)) && 
+                    (connectionKey == null || string.Compare(type.GetCustomAttribute<ConnectionKeyAttribute>()?.Value,
+                        connectionKey, StringComparison.OrdinalIgnoreCase) == 0));
         }
 
-        public static ILookup<string, Row> ByConnectionKey(string connectionKey)
+        public static IEnumerable<IRow> EnumerateRowInstances(IEnumerable<Assembly> assemblies, string connectionKey = null)
         {
-            var registry = EnsureRegistry();
-            ILookup<string, Row> connectionRegistry;
-            if (!registry.TryGetValue(connectionKey, out connectionRegistry))
-                return emptyRegistry;
-
-            return connectionRegistry;
-        }
-
-        public static IEnumerable<Row> EnumerateRows()
-        {
-            var registry = EnsureRegistry();
-
-            foreach (var reg in registry.Values)
-                foreach (var rows in reg)
-                    foreach (var row in rows)
-                        yield return row;
-        }
-
-        private static Row GetInstance(Type rowType)
-        {
-            return (Row)Activator.CreateInstance(rowType);
-        }
-
-        private static IDictionary<string, ILookup<string, Row>> EnsureRegistry()
-        {
-            var reg = registry;
-            if (reg == null)
-            {
-                registry = reg = Initialize();
-                return reg;
-            }
-
-            return reg;
-        }
-
-        private static IDictionary<string, ILookup<string, Row>> Initialize()
-        {
-            var rows = new List<Row>();
-            
-            foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
-                foreach (var type in assembly.GetTypes())
-                    if (!type.IsAbstract &&
-                        type.IsSubclassOf(typeof(Row)))
-                    {
-                        var instance = GetInstance(type);
-                        rows.Add(instance);
-                    }
-
-            return rows.GroupBy(x => x.GetFields().ConnectionKey, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(x => x.Key, x => x.ToLookup(z => z.Table, StringComparer.OrdinalIgnoreCase), StringComparer.OrdinalIgnoreCase);
+            return EnumerateRowTypes(assemblies, connectionKey).Select(type => (IRow)Activator.CreateInstance(type));
         }
     }
 }

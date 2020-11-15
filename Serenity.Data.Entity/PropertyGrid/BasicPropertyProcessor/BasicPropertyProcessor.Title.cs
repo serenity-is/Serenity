@@ -1,9 +1,6 @@
 ﻿using Serenity.ComponentModel;
 using System.ComponentModel;
 using System.Reflection;
-#if !NET45
-using System;
-#endif
 
 namespace Serenity.PropertyGrid
 {
@@ -22,10 +19,10 @@ namespace Serenity.PropertyGrid
             {
                 var basedOnField = source.BasedOnField;
 
-                if (!ReferenceEquals(null, basedOnField))
+                if (basedOnField is object)
                 {
-                    item.Title = !object.ReferenceEquals(null, basedOnField.Caption) ?
-                        basedOnField.Caption.Key : basedOnField.Title;
+                    item.Title = basedOnField.Caption is object ?
+                        basedOnField.Caption.Key : basedOnField.AutoTextKey;
                 }
                 else
                     item.Title = item.Name;

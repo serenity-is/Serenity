@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Serenity.Data
 {
     /// <summary>
@@ -26,5 +28,12 @@ namespace Serenity.Data
         /// The default dialect
         /// </summary>
         public static ISqlDialect DefaultDialect = new SqlServer2012Dialect();
+
+        /// <summary>
+        /// A delegate that will be used to determine dialect for connection key 
+        /// for contexts where dependency injection is not possible.
+        /// If this delegate is null or returns null, the default dialect will be used
+        /// </summary>
+        public static Func<string, ISqlDialect> DialectByConnectionKey { get; set; }
     }
 }

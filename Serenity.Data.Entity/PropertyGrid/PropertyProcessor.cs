@@ -25,7 +25,7 @@ namespace Serenity.PropertyGrid
         }
 
         public Type Type { get; set; }
-        public Row BasedOnRow { get; set; }
+        public IRow BasedOnRow { get; set; }
         public List<PropertyItem> Items { get; set; }
     }
 }

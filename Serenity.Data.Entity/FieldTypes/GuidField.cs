@@ -2,27 +2,25 @@
 using System.Data;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-#if !NET45
 using Newtonsoft.Json.Linq;
-#endif
 
 namespace Serenity.Data
 {
     public sealed class GuidField : GenericValueField<Guid>, IIdField
     {
         public GuidField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<Row, Guid?> getValue = null, Action<Row, Guid?> setValue = null)
+            Func<IRow, Guid?> getValue = null, Action<IRow, Guid?> setValue = null)
             : base(collection, FieldType.Guid, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static GuidField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<Row, Guid?> getValue, Action<Row, Guid?> setValue)
+            Func<IRow, Guid?> getValue, Action<IRow, Guid?> setValue)
         {
             return new GuidField(collection, name, caption, size, flags, getValue, setValue);
         }
 
-        public override void GetFromReader(IDataReader reader, int index, Row row)
+        public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -32,16 +30,15 @@ namespace Serenity.Data
             else
                 _setValue(row, reader.GetGuid(index));
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, Row row, JsonSerializer serializer)
+        public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             writer.WriteValue(_getValue(row));
         }
 
-        public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
+        public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -63,30 +60,26 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
         public override object ConvertValue(object source, IFormatProvider provider)
         {
-#if !NET45
-            if (source is JValue)
-                source = ((JValue)source).Value;
-#endif
+            if (source is JValue jValue)
+                source = jValue.Value;
 
             if (source == null)
                 return null;
 
-            if (source is Guid)
-                return (Guid)source;
+            if (source is Guid guid)
+                return guid;
 
-            var value = source as string;
-            if (value != null)
+            if (source is string str)
             {
-                if (value == "")
+                if (str == "")
                     return null;
 
-                return new Guid(value);
+                return new Guid(str);
             }
 
             if (source is byte[])
@@ -103,7 +96,7 @@ namespace Serenity.Data
             }
         }
 
-        long? IIdField.this[Row row]
+        long? IIdField.this[IRow row]
         {
             get
             {

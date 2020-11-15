@@ -13,7 +13,8 @@ namespace Serenity.Data
         public static TFields As<TFields>(this TFields fields, string alias)
             where TFields : RowFieldsBase, new()
         {
-            Check.NotNullOrWhiteSpace(alias, "alias");
+            if (string.IsNullOrWhiteSpace(alias))
+                throw new ArgumentNullException(nameof(alias));
 
             if ((alias == "t0" || alias == "T0") &&
                 (fields.alias == "t0" || fields.alias == "T0"))
@@ -26,8 +27,7 @@ namespace Serenity.Data
 
             var key = new Tuple<Type, string>(typeof(TFields), alias);
 
-            RowFieldsBase cached;
-            if (cache.TryGetValue(key, out cached))
+            if (cache.TryGetValue(key, out RowFieldsBase cached))
                 return (TFields)cached;
 
             var result = new TFields();
@@ -37,7 +37,7 @@ namespace Serenity.Data
 
             var joinByKey = new HashSet<string>(result.joins.Keys, StringComparer.OrdinalIgnoreCase);
 
-            Func<string, string> mapAlias = x =>
+            string mapAlias(string x)
             {
                 if (x == "t0" || x == "T0")
                     return alias;
@@ -46,15 +46,15 @@ namespace Serenity.Data
                     return x;
 
                 return aliasPrefix + x;
-            };
+            }
 
-            Func<string, string> mapExpression = x =>
+            string mapExpression(string x)
             {
                 if (x == null)
                     return null;
 
                 return JoinAliasLocator.ReplaceAliases(x, mapAlias);
-            };
+            }
 
             foreach (var field in result)
             {
@@ -77,15 +77,14 @@ namespace Serenity.Data
             foreach (var join in oldJoins)
             {
                 BaseCriteria onCriteria;
-                var bc = join.Value.OnCriteria as BinaryCriteria;
-                if (!ReferenceEquals(null, bc))
+                if (join.Value.OnCriteria is BinaryCriteria bc)
                     onCriteria = new BinaryCriteria(
                         new Criteria(mapExpression(bc.LeftOperand.ToString())),
                         bc.Operator,
                         new Criteria(mapExpression(bc.RightOperand.ToString())));
                 else
                 {
-                    if (ReferenceEquals(null, join.Value.OnCriteria))
+                    if (join.Value.OnCriteria is null)
                         onCriteria = null;
                     else
                         onCriteria = new Criteria(mapExpression(join.Value.OnCriteria.ToString()));
@@ -107,7 +106,7 @@ namespace Serenity.Data
 
         private class ReplacedJoin : Join
         {
-            private string keyword;
+            private readonly string keyword;
 
             public ReplacedJoin(IDictionary<string, Join> joins, 
                 string toTable, string alias, ICriteria onCriteria, string keyword)

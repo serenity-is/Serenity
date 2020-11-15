@@ -13,6 +13,8 @@ namespace Serenity.Data
 {
     public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     {
+        public static IRowFieldsSource RowFieldsSource { get; set; }
+
         internal Dictionary<string, Field> byName;
         internal Dictionary<string, Field> byPropertyName;
         internal Dictionary<Type, Field[]> byAttribute;
@@ -23,10 +25,7 @@ namespace Serenity.Data
         internal Dictionary<string, Join> joins;
         internal string localTextPrefix;
         internal PropertyChangedEventArgs[] propertyChangedEventArgs;
-#if NET45
-        internal PropertyDescriptorCollection propertyDescriptors;
-#endif
-        internal Func<Row> rowFactory;
+        internal Func<IRow> rowFactory;
         internal Type rowType;
         internal string moduleIdentifier;
         internal string connectionKey;
@@ -42,13 +41,13 @@ namespace Serenity.Data
         protected RowFieldsBase(string tableName = null, string fieldPrefix = "")
         {
             this.tableName = tableName;
-            this.alias = "T0";
-            this.aliasDot = "T0.";
+            alias = "T0";
+            aliasDot = "T0.";
             this.fieldPrefix = fieldPrefix;
-            this.byName = new Dictionary<string, Field>(StringComparer.OrdinalIgnoreCase);
-            this.byPropertyName = new Dictionary<string, Field>(StringComparer.OrdinalIgnoreCase);
-            this.joins = new Dictionary<string, Join>(StringComparer.OrdinalIgnoreCase);
-            this.initializeLock = new object();
+            byName = new Dictionary<string, Field>(StringComparer.OrdinalIgnoreCase);
+            byPropertyName = new Dictionary<string, Field>(StringComparer.OrdinalIgnoreCase);
+            joins = new Dictionary<string, Join>(StringComparer.OrdinalIgnoreCase);
+            initializeLock = new object();
 
             DetermineRowType();
             DetermineTableName();
@@ -60,35 +59,33 @@ namespace Serenity.Data
 
         private void DetermineRowType()
         {
-            var fieldsType = this.GetType();
+            var fieldsType = GetType();
             if (!fieldsType.IsNested)
-                throw new InvalidProgramException(String.Format(
+                throw new InvalidProgramException(string.Format(
                     "RowFields type {0} must be a nested type!", fieldsType.Name));
 
-            this.rowType = fieldsType.DeclaringType;
-            if (!this.rowType.IsSubclassOf(typeof(Row)))
-                throw new InvalidProgramException(String.Format(
-                    "RowFields {0}'s declaring row type {0} must be a subclass of Row!", fieldsType.Name, this.rowType.Name));
+            rowType = fieldsType.DeclaringType;
+            if (!typeof(IRow).IsAssignableFrom(rowType))
+                throw new InvalidProgramException(string.Format(
+                    "RowFields {0}'s declaring row type {0} must be a subclass of Row!", fieldsType.Name, rowType.Name));
 
-            var constructor = this.rowType.GetConstructor(Type.EmptyTypes);
+            var constructor = rowType.GetConstructors().FirstOrDefault(x => x.GetParameters().Length == 1 &&
+                x.GetParameters()[0].GetType().IsSubclassOf(typeof(RowFieldsBase)));
+
             if (constructor != null)
-            {
-                var method = new DynamicMethod("", typeof(Row), Type.EmptyTypes);
-                var il = method.GetILGenerator();
-                il.Emit(OpCodes.Newobj, constructor);
-                il.Emit(OpCodes.Ret);
-                this.rowFactory = (Func<Row>)method.CreateDelegate(typeof(Func<>).MakeGenericType(typeof(Row)));
-            }
+                rowFactory = () => (IRow)Activator.CreateInstance(rowType, this);
+            else
+                rowFactory = () => (IRow)Activator.CreateInstance(rowType);
         }
 
         private void DetermineTableName()
         {
-            var attr = this.rowType.GetCustomAttribute<TableNameAttribute>();
+            var attr = rowType.GetCustomAttribute<TableNameAttribute>();
 
             if (tableName != null)
             {
-                if (attr != null && String.Compare(tableName, attr.Name, StringComparison.OrdinalIgnoreCase) != 0)
-                    throw new InvalidProgramException(String.Format(
+                if (attr != null && string.Compare(tableName, attr.Name, StringComparison.OrdinalIgnoreCase) != 0)
+                    throw new InvalidProgramException(string.Format(
                         "Tablename in row type {0} can't be overridden by attribute!",
                             rowType.Name));
 
@@ -103,7 +100,7 @@ namespace Serenity.Data
 
             var name = rowType.Name;
             if (name.EndsWith("Row"))
-                name = name.Substring(0, name.Length - 3);
+                name = name[0..^3];
 
             tableName = name;
         }
@@ -125,17 +122,17 @@ namespace Serenity.Data
             if (idx2 < 0)
             {
                 schema = tableName.Substring(0, idx1);
-                return tableName.Substring(idx1 + 1);
+                return tableName[(idx1 + 1)..];
             }
 
             database = tableName.Substring(0, idx1);
             schema = tableName.Substring(idx1 + 1, idx2 - idx1 - 1);
-            return tableName.Substring(idx2 + 1);
+            return tableName[(idx2 + 1)..];
         }
 
         private void DetermineDatabaseAndSchema()
         {
-            this.tableOnly = ParseDatabaseAndSchema(this.tableName, out this.database, out this.schema);
+            tableOnly = ParseDatabaseAndSchema(tableName, out database, out schema);
         }
 
 
@@ -143,28 +140,28 @@ namespace Serenity.Data
         {
             var connectionKeyAttr = rowType.GetCustomAttribute<ConnectionKeyAttribute>();
             if (connectionKeyAttr != null)
-                this.connectionKey = connectionKeyAttr.Value;
+                connectionKey = connectionKeyAttr.Value;
             else
-                this.connectionKey = "Default";
+                connectionKey = "Default";
         }
 
         private void DetermineModuleIdentifier()
         {
             var moduleAttr = rowType.GetCustomAttribute<ModuleAttribute>();
             if (moduleAttr != null)
-                this.moduleIdentifier = moduleAttr.Value;
+                moduleIdentifier = moduleAttr.Value;
             else
             {
                 var ns = rowType.Namespace ?? "";
 
                 if (ns.EndsWith(".Entities"))
-                    ns = ns.Substring(0, ns.Length - 9);
+                    ns = ns[0..^9];
 
                 var idx = ns.IndexOf(".");
                 if (idx >= 0)
-                    ns = ns.Substring(idx + 1);
+                    ns = ns[(idx + 1)..];
 
-                this.moduleIdentifier = ns;
+                moduleIdentifier = ns;
             }
         }
 
@@ -176,19 +173,19 @@ namespace Serenity.Data
             var localTextPrefixAttr = rowType.GetCustomAttribute<LocalTextPrefixAttribute>();
             if (localTextPrefixAttr != null)
             {
-                this.localTextPrefix = localTextPrefixAttr.Value;
+                localTextPrefix = localTextPrefixAttr.Value;
                 return;
             }
 
-            this.localTextPrefix = this.RowIdentifier;
+            localTextPrefix = RowIdentifier;
         }
 
         private void GetRowFieldsAndProperties(
+            IAnnotationTypeRegistry annotationTypes,
             out Dictionary<string, FieldInfo> rowFields,
             out Dictionary<string, IPropertyInfo> rowProperties)
         {
-            var annotationTypes = Dependency.TryResolve<IAnnotationTypeRegistry>();
-            var annotationType = annotationTypes != null ? annotationTypes.GetAnnotatedType(rowType) : null;
+            var annotationType = annotationTypes?.GetAnnotatedType(rowType);
             rowFields = new Dictionary<string, FieldInfo>(StringComparer.OrdinalIgnoreCase);
             rowProperties = new Dictionary<string, IPropertyInfo>(StringComparer.Ordinal);
 
@@ -214,16 +211,14 @@ namespace Serenity.Data
         {
         }
 
-        public void Initialize()
+        public void Initialize(IAnnotationTypeRegistry annotationTypes)
         {
             if (isInitialized)
                 return;
 
-            lock (this.initializeLock)
+            lock (initializeLock)
             {
-                Dictionary<string, FieldInfo> rowFields;
-                Dictionary<string, IPropertyInfo> rowProperties;
-                GetRowFieldsAndProperties(out rowFields, out rowProperties);
+                GetRowFieldsAndProperties(annotationTypes, out Dictionary<string, FieldInfo> rowFields, out Dictionary<string, IPropertyInfo> rowProperties);
 
                 var expressionSelector = new DialectExpressionSelector(connectionKey);
                 var rowCustomAttributes = rowType.GetCustomAttributes().ToList();
@@ -236,14 +231,13 @@ namespace Serenity.Data
                 PermissionAttributeBase fieldsInsertPerm = rowType.GetCustomAttribute<FieldInsertPermissionAttribute>();
                 PermissionAttributeBase fieldsUpdatePerm = rowType.GetCustomAttribute<FieldUpdatePermissionAttribute>();
 
-                foreach (var fieldInfo in this.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
+                foreach (var fieldInfo in GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
                 {
                     if (fieldInfo.FieldType.IsSubclassOf(typeof(Field)))
                     {
                         var field = (Field)fieldInfo.GetValue(this);
 
-                        IPropertyInfo property;
-                        if (!rowProperties.TryGetValue(fieldInfo.Name, out property))
+                        if (!rowProperties.TryGetValue(fieldInfo.Name, out IPropertyInfo property))
                             property = null;
 
                         ColumnAttribute column = null;
@@ -298,7 +292,7 @@ namespace Serenity.Data
 
                             if (origin != null)
                             {
-                                propertyDictionary = propertyDictionary ?? OriginPropertyDictionary.GetPropertyDictionary(this.rowType);
+                                propertyDictionary ??= OriginPropertyDictionary.GetPropertyDictionary(rowType);
                                 try
                                 {
                                     if (!expressions.Any() && expression == null)
@@ -309,14 +303,14 @@ namespace Serenity.Data
                                         display = new DisplayNameAttribute(propertyDictionary.OriginDisplayName(property.Name, origin));
 
                                     if (size == null)
-                                        size = propertyDictionary.OriginAttribute<SizeAttribute>(property.Name, origin);
+                                        size = propertyDictionary.OriginAttribute<SizeAttribute>(property.Name);
 
                                     if (scale == null)
-                                        scale = propertyDictionary.OriginAttribute<ScaleAttribute>(property.Name, origin);
+                                        scale = propertyDictionary.OriginAttribute<ScaleAttribute>(property.Name);
                                 }
                                 catch (DivideByZeroException)
                                 {
-                                    throw new InvalidProgramException(String.Format(
+                                    throw new InvalidProgramException(string.Format(
                                         "Infinite recursion detected while determining origins " +
                                         "for property '{0}' on row type '{1}'",
                                         property.Name, rowType.FullName));
@@ -345,11 +339,11 @@ namespace Serenity.Data
                             updatePermission = fieldsUpdatePerm ?? fieldsUpdatePerm ?? fieldsReadPerm;
                         }
 
-                        if (ReferenceEquals(null, field))
+                        if (field is null)
                         {
                             if (property == null)
                             {
-                                throw new InvalidProgramException(String.Format(
+                                throw new InvalidProgramException(string.Format(
                                     "Field {0} in type {1} is null and has no corresponding property in entity!",
                                         fieldInfo.Name, rowType.Name));
                             }
@@ -368,8 +362,7 @@ namespace Serenity.Data
                             prm[5] = null;
                             prm[6] = null;
 
-                            FieldInfo storage;
-                            if (rowFields.TryGetValue("_" + property.Name, out storage) ||
+                            if (rowFields.TryGetValue("_" + property.Name, out FieldInfo storage) ||
                                 rowFields.TryGetValue("m_" + property.Name, out storage) ||
                                 rowFields.TryGetValue(property.Name, out storage))
                             {
@@ -383,7 +376,7 @@ namespace Serenity.Data
                         else
                         {
                             if (size != null)
-                                throw new InvalidProgramException(String.Format(
+                                throw new InvalidProgramException(string.Format(
                                     "Field size '{0}' in type {1} can't be overridden by Size attribute!",
                                         fieldInfo.Name, rowType.FullName));
 
@@ -393,8 +386,8 @@ namespace Serenity.Data
                             if ((int)addFlags != 0 || (int)removeFlags != 0)
                                 field.Flags = (field.Flags ^ removeFlags) | addFlags;
 
-                            if (column != null && String.Compare(column.Name, field.Name, StringComparison.OrdinalIgnoreCase) != 0)
-                                throw new InvalidProgramException(String.Format(
+                            if (column != null && string.Compare(column.Name, field.Name, StringComparison.OrdinalIgnoreCase) != 0)
+                                throw new InvalidProgramException(string.Format(
                                     "Field name '{0}' in type {1} can't be overridden by Column name attribute!",
                                         fieldInfo.Name, rowType.FullName));
                         }
@@ -426,24 +419,24 @@ namespace Serenity.Data
                         }
 
                         if ((leftJoin != null || innerJoin != null) && field.ForeignTable.IsEmptyOrNull())
-                            throw new InvalidProgramException(String.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
+                            throw new InvalidProgramException(string.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
                                 "but its foreign table is undefined. Make sure it has a valid [ForeignKey] attribute!",
                                     fieldInfo.Name, rowType.FullName));
 
                         if ((leftJoin != null || innerJoin != null) && field.ForeignField.IsEmptyOrNull())
-                            throw new InvalidProgramException(String.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
+                            throw new InvalidProgramException(string.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
                                 "but its foreign field is undefined. Make sure it has a valid [ForeignKey] attribute!",
                                     fieldInfo.Name, rowType.FullName));
 
                         if (leftJoin != null)
                         {
-                            field.ForeignJoinAlias = new LeftJoin(this.joins, field.ForeignTable, leftJoin.Alias,
+                            field.ForeignJoinAlias = new LeftJoin(joins, field.ForeignTable, leftJoin.Alias,
                                 new Criteria(leftJoin.Alias, field.ForeignField) == new Criteria(field));
                         }
 
                         if (innerJoin != null)
                         {
-                            field.ForeignJoinAlias = new InnerJoin(this.joins, field.ForeignTable, innerJoin.Alias,
+                            field.ForeignJoinAlias = new InnerJoin(joins, field.ForeignTable, innerJoin.Alias,
                                 new Criteria(innerJoin.Alias, field.ForeignField) == new Criteria(field));
                         }
 
@@ -452,9 +445,9 @@ namespace Serenity.Data
                             field.textualField = textualField.Value;
                         }
 
-                        if (dateTimeKind != null && field is DateTimeField)
+                        if (dateTimeKind != null && field is DateTimeField dtf)
                         {
-                            ((DateTimeField)field).DateTimeKind = dateTimeKind.Value;
+                            dtf.DateTimeKind = dateTimeKind.Value;
                         }
 
                         if (readPermission != null)
@@ -491,16 +484,16 @@ namespace Serenity.Data
 
                             foreach (var attr in property.GetAttributes<LeftJoinAttribute>())
                                 if (attr.ToTable != null && attr.OnCriteria != null)
-                                    new LeftJoin(this.joins, attr.ToTable, attr.Alias,
+                                    new LeftJoin(joins, attr.ToTable, attr.Alias,
                                         new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
 
                             foreach (var attr in property.GetAttributes<InnerJoinAttribute>())
                                 if (attr.ToTable != null && attr.OnCriteria != null)
-                                    new InnerJoin(this.joins, attr.ToTable, attr.Alias,
+                                    new InnerJoin(joins, attr.ToTable, attr.Alias,
                                         new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
 
                             field.PropertyName = property.Name;
-                            this.byPropertyName[field.PropertyName] = field;
+                            byPropertyName[field.PropertyName] = field;
 
                             field.customAttributes = property.GetAttributes<Attribute>().ToArray();
                         }
@@ -508,24 +501,13 @@ namespace Serenity.Data
                 }
 
                 foreach (var attr in rowCustomAttributes.OfType<LeftJoinAttribute>())
-                    new LeftJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
+                    new LeftJoin(joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
                 foreach (var attr in rowCustomAttributes.OfType<InnerJoinAttribute>())
-                    new InnerJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
+                    new InnerJoin(joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
                 foreach (var attr in rowCustomAttributes.OfType<OuterApplyAttribute>())
-                    new OuterApply(this.joins, attr.InnerQuery, attr.Alias);
-
-#if NET45
-                var propertyDescriptorArray = new PropertyDescriptor[this.Count];
-                for (int i = 0; i < this.Count; i++)
-                {
-                    var field = this[i];
-                    propertyDescriptorArray[i] = new FieldDescriptor(field);
-                }
-
-                this.propertyDescriptors = new PropertyDescriptorCollection(propertyDescriptorArray);
-#endif
+                    new OuterApply(joins, attr.InnerQuery, attr.Alias);
 
                 InferTextualFields();
                 AfterInitialize();
@@ -534,7 +516,7 @@ namespace Serenity.Data
             isInitialized = true;
         }
 
-        private Field[] EmptyFields = new Field[0];
+        private readonly Field[] EmptyFields = new Field[0];
 
         public Field[] GetFieldsByAttribute<TAttr>()
             where TAttr : Attribute
@@ -546,9 +528,8 @@ namespace Serenity.Data
         {
             var byAttribute = this.byAttribute;
 
-            Field[] fieldList;
             if (byAttribute != null &&
-                byAttribute.TryGetValue(attrType, out fieldList))
+                byAttribute.TryGetValue(attrType, out Field[] fieldList))
                 return fieldList;
 
             List<Field> newList = new List<Field>();
@@ -572,13 +553,17 @@ namespace Serenity.Data
 
             if (byAttribute == null)
             {
-                byAttribute = new Dictionary<Type, Field[]>();
-                byAttribute.Add(attrType, fieldList);
+                byAttribute = new Dictionary<Type, Field[]>
+                {
+                    { attrType, fieldList }
+                };
             }
             else
             {
-                byAttribute = new Dictionary<Type, Field[]>(byAttribute);
-                byAttribute[attrType] = fieldList; 
+                byAttribute = new Dictionary<Type, Field[]>(byAttribute)
+                {
+                    [attrType] = fieldList
+                };
             }
 
             this.byAttribute = byAttribute;
@@ -594,9 +579,9 @@ namespace Serenity.Data
         private static Delegate CreateFieldGetMethod(FieldInfo fieldInfo)
         {
             Type[] arguments = new Type[1];
-            arguments[0] = typeof(Row);
+            arguments[0] = typeof(IRow);
 
-            var getter = new DynamicMethod(String.Concat("_Get", fieldInfo.Name, "_"),
+            var getter = new DynamicMethod(string.Concat("_Get", fieldInfo.Name, "_"),
                 fieldInfo.FieldType, arguments, fieldInfo.DeclaringType);
 
             ILGenerator generator = getter.GetILGenerator();
@@ -604,16 +589,16 @@ namespace Serenity.Data
             generator.Emit(OpCodes.Castclass, fieldInfo.DeclaringType);
             generator.Emit(OpCodes.Ldfld, fieldInfo);
             generator.Emit(OpCodes.Ret);
-            return getter.CreateDelegate(typeof(Func<,>).MakeGenericType(typeof(Row), fieldInfo.FieldType));
+            return getter.CreateDelegate(typeof(Func<,>).MakeGenericType(typeof(IRow), fieldInfo.FieldType));
         }
 
         private static Delegate CreateFieldSetMethod(FieldInfo fieldInfo)
         {
             Type[] arguments = new Type[2];
-            arguments[0] = typeof(Row);
+            arguments[0] = typeof(IRow);
             arguments[1] = fieldInfo.FieldType;
 
-            var getter = new DynamicMethod(String.Concat("_Set", fieldInfo.Name, "_"),
+            var getter = new DynamicMethod(string.Concat("_Set", fieldInfo.Name, "_"),
                 null, arguments, fieldInfo.DeclaringType);
 
             ILGenerator generator = getter.GetILGenerator();
@@ -622,7 +607,7 @@ namespace Serenity.Data
             generator.Emit(OpCodes.Ldarg_1);
             generator.Emit(OpCodes.Stfld, fieldInfo);
             generator.Emit(OpCodes.Ret);
-            return getter.CreateDelegate(typeof(Action<,>).MakeGenericType(typeof(Row), fieldInfo.FieldType));
+            return getter.CreateDelegate(typeof(Action<,>).MakeGenericType(typeof(IRow), fieldInfo.FieldType));
         }
 
         private void InferTextualFields()
@@ -632,15 +617,15 @@ namespace Serenity.Data
                 if (!field.ForeignTable.IsNullOrEmpty() &&
                     field.TextualField == null)
                 {
-                    foreach (var join in this.joins.Values)
+                    foreach (var join in joins.Values)
                     {
-                        if (String.Compare(field.ForeignTable, join.Table) == 0 &&
+                        if (string.Compare(field.ForeignTable, join.Table) == 0 &&
                             (join is LeftJoin || join is InnerJoin) &&
-                            !Object.ReferenceEquals(null, join.OnCriteria) &&
+                            join.OnCriteria is object &&
                             join.OnCriteria.ToStringIgnoreParams().IndexOf(field.Expression, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             foreach (var f in this)
-                                if (String.Compare(f.JoinAlias, join.Name, StringComparison.OrdinalIgnoreCase) == 0 &&
+                                if (string.Compare(f.JoinAlias, join.Name, StringComparison.OrdinalIgnoreCase) == 0 &&
                                     f is StringField)
                                 {
                                     field.TextualField = f.Name;
@@ -698,7 +683,7 @@ namespace Serenity.Data
             {
                 var name = rowType.Name;
                 if (name.EndsWith("Row"))
-                    name = name.Substring(0, name.Length - 3);
+                    name = name[0..^3];
 
                 return string.IsNullOrEmpty(moduleIdentifier) ? name : moduleIdentifier + "." + name;
             }
@@ -759,7 +744,7 @@ namespace Serenity.Data
                     }
 
                     sortOrders = list.OrderBy(x => Math.Abs(x.Item2))
-                        .Select(x => new Tuple<Field, bool>(x.Item1, x.Item2 < 0 ? true : false))
+                        .Select(x => new Tuple<Field, bool>(x.Item1, x.Item2 < 0))
                         .ToArray();
                 }
 
@@ -772,12 +757,12 @@ namespace Serenity.Data
             if (isInitialized)
                 throw new InvalidOperationException("field collection can't be modified!");
 
-            if (ReferenceEquals(null, item))
+            if (item is null)
                 throw new ArgumentNullException("item");
 
             if (byName.ContainsKey(item.Name))
                 throw new ArgumentOutOfRangeException("item",
-                    String.Format("field list already contains a field with name '{0}'", item.Name));
+                    string.Format("field list already contains a field with name '{0}'", item.Name));
 
             if (item.Fields != null)
                 item.Fields.Remove(item);
@@ -809,12 +794,12 @@ namespace Serenity.Data
             if (isInitialized)
                 throw new InvalidOperationException("field collection can't be modified!");
 
-            if (ReferenceEquals(null, item))
+            if (item is null)
                 throw new ArgumentNullException("item");
 
             if (byName.ContainsKey(item.Name))
                 throw new ArgumentOutOfRangeException("item",
-                    String.Format("field list already contains a field with name '{0}'", item.Name));
+                    string.Format("field list already contains a field with name '{0}'", item.Name));
 
             var old = base[index];
 
@@ -831,8 +816,7 @@ namespace Serenity.Data
 
         public Field FindField(string fieldName)
         {
-            Field field;
-            if (byName.TryGetValue(fieldName, out field))
+            if (byName.TryGetValue(fieldName, out Field field))
                 return field;
             else
                 return null;
@@ -840,12 +824,12 @@ namespace Serenity.Data
 
         private bool initializedInstance;
 
-        internal RowFieldsBase InitInstance(Row row)
+        internal void InitInstance(IRow row)
         {
-            this.Initialize();
+            Initialize();
 
             if (initializedInstance)
-                return this;
+                return;
 
             var readPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
             if (readPerm != null && readPerm.Permission != null && !readPerm.ApplyToLookups)
@@ -870,13 +854,11 @@ namespace Serenity.Data
             }
             
             initializedInstance = true;
-            return this;
         }
 
         public Field FindFieldByPropertyName(string propertyName)
         {
-            Field field;
-            if (byPropertyName.TryGetValue(propertyName, out field))
+            if (byPropertyName.TryGetValue(propertyName, out Field field))
                 return field;
             else
                 return null;

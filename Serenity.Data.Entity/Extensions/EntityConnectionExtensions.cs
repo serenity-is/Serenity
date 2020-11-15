@@ -8,17 +8,17 @@ namespace Serenity.Data
     public static class EntityConnectionExtensions
     {
         public static TRow ById<TRow>(this IDbConnection connection, object id)
-            where TRow: Row, IIdRow, new()
+            where TRow: class, IRow, IIdRow, new()
         {
             var row = TryById<TRow>(connection, id);
             if (row == null)
-                throw new ValidationError("RecordNotFound", String.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
+                throw new ValidationError("RecordNotFound", string.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
 
             return row;
         }
 
         public static TRow TryById<TRow>(this IDbConnection connection, object id)
-            where TRow: Row, IIdRow, new()
+            where TRow: class, IRow, IIdRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             if (new SqlQuery().From(row)
@@ -31,7 +31,7 @@ namespace Serenity.Data
         }
 
         public static TRow ById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
-            where TRow : Row, IIdRow, new()
+            where TRow : class, IRow, IIdRow, new()
         {
             var row = TryById<TRow>(connection, id, editQuery);
             if (row == null)
@@ -41,7 +41,7 @@ namespace Serenity.Data
         }
 
         public static TRow TryById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
-            where TRow: Row, IIdRow, new()
+            where TRow: class, IRow, IIdRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             var query = new SqlQuery().From(row)
@@ -56,7 +56,7 @@ namespace Serenity.Data
         }
 
         public static TRow Single<TRow>(this IDbConnection connection, ICriteria where)
-            where TRow : Row, new()
+            where TRow: class, IRow, new()
         {
             var row = TrySingle<TRow>(connection, where);
             
@@ -67,7 +67,7 @@ namespace Serenity.Data
         }
 
         public static TRow TrySingle<TRow>(this IDbConnection connection, ICriteria where)
-            where TRow : Row, new()
+            where TRow : class, IRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             if (new SqlQuery().From(row)
@@ -80,7 +80,7 @@ namespace Serenity.Data
         }
 
         public static TRow Single<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
-            where TRow : Row, new()
+            where TRow : class, IRow, new()
         {
             var row = TrySingle<TRow>(connection, editQuery);
 
@@ -91,7 +91,7 @@ namespace Serenity.Data
         }
 
         public static TRow TrySingle<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
-            where TRow : Row, new()
+            where TRow : class, IRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             var query = new SqlQuery().From(row);
@@ -105,7 +105,7 @@ namespace Serenity.Data
         }
 
         public static TRow First<TRow>(this IDbConnection connection, ICriteria where)
-            where TRow : Row, new()
+            where TRow : class, IRow, new()
         {
             var row = TryFirst<TRow>(connection, where);
 
@@ -116,7 +116,7 @@ namespace Serenity.Data
         }
 
         public static TRow TryFirst<TRow>(this IDbConnection connection, ICriteria where)
-            where TRow : Row, new()
+            where TRow : class, IRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             if (new SqlQuery().From(row)
@@ -129,7 +129,7 @@ namespace Serenity.Data
         }
 
         public static TRow First<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
-            where TRow : Row, new()
+            where TRow : class, IRow, new()
         {
             var row = TryFirst<TRow>(connection, editQuery);
 
@@ -140,7 +140,7 @@ namespace Serenity.Data
         }
 
         public static TRow TryFirst<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
-            where TRow : Row, new()
+            where TRow: class, IRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             var query = new SqlQuery().From(row);
@@ -154,13 +154,13 @@ namespace Serenity.Data
         }
 
         public static int Count<TRow>(this IDbConnection connection)
-            where TRow : Row, new()
+            where TRow: class, IRow, new()
         {
             return connection.Count<TRow>((Criteria)null);
         }
 
         public static int Count<TRow>(this IDbConnection connection, ICriteria where)
-            where TRow : Row, new()
+            where TRow: class, IRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
 
@@ -171,7 +171,7 @@ namespace Serenity.Data
         }
 
         public static bool ExistsById<TRow>(this IDbConnection connection, object id)
-            where TRow : Row, IIdRow, new()
+            where TRow: class, IRow, IIdRow, new()
         {
             var row = new TRow();
             return new SqlQuery()
@@ -182,7 +182,7 @@ namespace Serenity.Data
         }
 
         public static bool Exists<TRow>(this IDbConnection connection, ICriteria where)
-            where TRow : Row, new()
+            where TRow: class, IRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             return new SqlQuery().From(row)
@@ -192,13 +192,13 @@ namespace Serenity.Data
         }
 
         public static List<TRow> List<TRow>(this IDbConnection connection)
-            where TRow : Row, new()
+            where TRow: class, IRow, new()
         {
             return connection.List<TRow>((Criteria)null);
         }
 
         public static List<TRow> List<TRow>(this IDbConnection connection, ICriteria where)
-            where TRow : Row, new()
+            where TRow: class, IRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             return new SqlQuery().From(row)
@@ -208,7 +208,7 @@ namespace Serenity.Data
         }
 
         public static List<TRow> List<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
-            where TRow : Row, new()
+            where TRow : class, IRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             var query = new SqlQuery().From(row);
@@ -219,13 +219,13 @@ namespace Serenity.Data
         }
 
         public static void Insert<TRow>(this IDbConnection connection, TRow row)
-            where TRow: Row
+            where TRow: class, IRow
         {
             ToSqlInsert(row).Execute(connection);
         }
 
-        public static Int64? InsertAndGetID<TRow>(this IDbConnection connection, TRow row)
-            where TRow : Row
+        public static long? InsertAndGetID<TRow>(this IDbConnection connection, TRow row)
+            where TRow : IRow
         {
             return ToSqlInsert(row).ExecuteAndGetID(connection);
         }
@@ -234,7 +234,7 @@ namespace Serenity.Data
             where TRow: IIdRow
         {
             var idField = (Field)row.IdField;
-            var r = (Row)(object)row;
+            var r = (IRow)(object)row;
 
             if (idField.IsNull(r))
                 throw new InvalidOperationException("ID field of row has null value!");
@@ -244,7 +244,7 @@ namespace Serenity.Data
         }
 
         public static int DeleteById<TRow>(this IDbConnection connection, object id, ExpectedRows expectedRows = ExpectedRows.One)
-            where TRow: Row, IIdRow, new()
+            where TRow: class, IRow, IIdRow, new()
         {
             var row = new TRow();
             return new SqlDelete(row.Table)
@@ -252,7 +252,7 @@ namespace Serenity.Data
                 .Execute(connection, expectedRows);
         }
 
-        public static SqlInsert ToSqlInsert(this Row row)
+        public static SqlInsert ToSqlInsert(this IRow row)
         {
             if (row == null)
                 throw new ArgumentNullException("row");
@@ -261,8 +261,7 @@ namespace Serenity.Data
             
             insert.Set(row);
 
-            var idRow = row as IIdRow;
-            if (idRow != null)
+            if (row as IIdRow != null)
                 insert.IdentityColumn(((Field)(((IIdRow)row).IdField)).Name);
 
             return insert;
@@ -279,9 +278,9 @@ namespace Serenity.Data
 
             var update = new SqlUpdate(row.Table);
 
-            update.Set((Row)row, (Field)(row.IdField));
+            update.Set((IRow)row, (Field)(row.IdField));
             var idField = (Field)row.IdField;
-            update.Where(idField == new ValueCriteria(idField.AsSqlValue((Row)row)));
+            update.Where(idField == new ValueCriteria(idField.AsSqlValue((IRow)row)));
 
             return update;
         }

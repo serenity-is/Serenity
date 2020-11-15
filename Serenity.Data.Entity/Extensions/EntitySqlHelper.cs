@@ -9,98 +9,86 @@
     {
         public static bool GetFirst(this SqlQuery query, IDbConnection connection)
         {
-            using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
+            using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
+            if (reader.Read())
             {
-                if (reader.Read())
-                {
-                    query.GetFromReader(reader);
-                    return true;
-                }
-                else
-                    return false;
+                query.GetFromReader(reader);
+                return true;
             }
+            else
+                return false;
         }
 
         public static bool GetFirst(this SqlQuery query, IDbConnection connection, IEntity row, Dictionary param)
         {
-            using (IDataReader reader = SqlHelper.ExecuteReader(connection, query, param))
+            using IDataReader reader = SqlHelper.ExecuteReader(connection, query, param);
+            if (reader.Read())
             {
-                if (reader.Read())
-                {
-                    query.GetFromReader(reader, new IEntity[] { row });
-                    return true;
-                }
-                else
-                    return false;
+                query.GetFromReader(reader, new IEntity[] { row });
+                return true;
             }
+            else
+                return false;
         }
 
         public static bool GetSingle(this SqlQuery query, IDbConnection connection)
         {
-            using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
+            using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
+            if (reader.Read())
             {
+                query.GetFromReader(reader);
+
                 if (reader.Read())
-                {
-                    query.GetFromReader(reader);
+                    throw new InvalidOperationException("Query returned more than one result!");
 
-                    if (reader.Read())
-                        throw new InvalidOperationException("Query returned more than one result!");
-
-                    return true;
-                }
-                else
-                    return false;
+                return true;
             }
+            else
+                return false;
         }
 
-        public static bool GetSingle(this SqlQuery query, IDbConnection connection, Row row, Dictionary param)
+        public static bool GetSingle(this SqlQuery query, IDbConnection connection, IRow row, Dictionary param)
         {
-            using (IDataReader reader = SqlHelper.ExecuteReader(connection, query, param))
+            using IDataReader reader = SqlHelper.ExecuteReader(connection, query, param);
+            if (reader.Read())
             {
+                query.GetFromReader(reader, new IRow[] { row });
+
                 if (reader.Read())
-                {
-                    query.GetFromReader(reader, new Row[] { row });
+                    throw new InvalidOperationException("Query returned more than one result!");
 
-                    if (reader.Read())
-                        throw new InvalidOperationException("Query returned more than one result!");
-
-                    return true;
-                }
-                else
-                    return false;
+                return true;
             }
+            else
+                return false;
         }
 
         public static bool ForFirst(this SqlQuery query, IDbConnection connection,
             Action callBack)
         {
-            using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
+            using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
+            if (reader.Read())
             {
-                if (reader.Read())
-                {
-                    query.GetFromReader(reader);
-                    callBack();
-                    return true;
-                }
-                else
-                    return false;
+                query.GetFromReader(reader);
+                callBack();
+                return true;
             }
+            else
+                return false;
         }
 
         public static bool ForFirst(this SqlQuery query, IDbConnection connection,
             ReaderCallBack callBack)
         {
-            using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
+            using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
+            if (reader.Read())
             {
-                if (reader.Read())
-                {
-                    query.GetFromReader(reader);
-                    callBack(reader);
-                    return true;
-                }
-                else
-                    return false;
+                query.GetFromReader(reader);
+                callBack(reader);
+                return true;
             }
+            else
+                return false;
         }
 
         public static int ForEach(this SqlQuery query, IDbConnection connection,
@@ -110,17 +98,15 @@
 
             if (connection.GetDialect().MultipleResultsets)
             {
-                using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
+                using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
+                while (reader.Read())
                 {
-                    while (reader.Read())
-                    {
-                        query.GetFromReader(reader);
-                        callBack();
-                    }
-
-                    if (query.CountRecords && reader.NextResult() && reader.Read())
-                        return Convert.ToInt32(reader.GetValue(0));
+                    query.GetFromReader(reader);
+                    callBack();
                 }
+
+                if (query.CountRecords && reader.NextResult() && reader.Read())
+                    return Convert.ToInt32(reader.GetValue(0));
             }
             else
             {
@@ -128,13 +114,11 @@
                 if (queries.Length > 1)
                     count = Convert.ToInt32(SqlHelper.ExecuteScalar(connection, queries[1], query.Params));
 
-                using (IDataReader reader = SqlHelper.ExecuteReader(connection, queries[0], query.Params))
+                using IDataReader reader = SqlHelper.ExecuteReader(connection, queries[0], query.Params);
+                while (reader.Read())
                 {
-                    while (reader.Read())
-                    {
-                        query.GetFromReader(reader);
-                        callBack();
-                    }
+                    query.GetFromReader(reader);
+                    callBack();
                 }
             }
 
@@ -148,17 +132,15 @@
 
             if (connection.GetDialect().MultipleResultsets)
             {
-                using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
+                using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
+                while (reader.Read())
                 {
-                    while (reader.Read())
-                    {
-                        query.GetFromReader(reader);
-                        callBack(reader);
-                    }
-
-                    if (query.CountRecords && reader.NextResult() && reader.Read())
-                        return Convert.ToInt32(reader.GetValue(0));
+                    query.GetFromReader(reader);
+                    callBack(reader);
                 }
+
+                if (query.CountRecords && reader.NextResult() && reader.Read())
+                    return Convert.ToInt32(reader.GetValue(0));
             }
             else
             {
@@ -166,13 +148,11 @@
                 if (queries.Length > 1)
                     count = Convert.ToInt32(SqlHelper.ExecuteScalar(connection, queries[1], query.Params));
 
-                using (IDataReader reader = SqlHelper.ExecuteReader(connection, queries[0], query.Params))
+                using IDataReader reader = SqlHelper.ExecuteReader(connection, queries[0], query.Params);
+                while (reader.Read())
                 {
-                    while (reader.Read())
-                    {
-                        query.GetFromReader(reader);
-                        callBack(reader);
-                    }
+                    query.GetFromReader(reader);
+                    callBack(reader);
                 }
             }
 
@@ -180,7 +160,7 @@
         }
 
         public static List<TRow> List<TRow>(this SqlQuery query,
-            IDbConnection connection, TRow loaderRow = null) where TRow : Row
+            IDbConnection connection, TRow loaderRow = null) where TRow : class, IRow
         {
             var list = new List<TRow>();
             ForEach(query, connection, delegate ()
@@ -212,15 +192,12 @@
                 if (info.IntoRowIndex < 0 || info.IntoRowIndex >= into.Count)
                     continue;
 
-                var row = into[info.IntoRowIndex] as Row;
-                if (row == null)
+                if (!(into[info.IntoRowIndex] is IRow row))
                     continue;
 
-                var field = info.IntoField as Field;
-
-                if (!ReferenceEquals(null, field) &&
-                    (field.Fields == row.fields ||
-                     field.Fields.GetType() == row.fields.GetType()))
+                if (info.IntoField is Field field &&
+                    (field.Fields == row.Fields ||
+                     field.Fields.GetType() == row.Fields.GetType()))
                 {
                     try
                     {
@@ -235,9 +212,9 @@
                 }
 
                 var name = reader.GetName(index);
-                field = row.FindField(name) ?? row.FindFieldByPropertyName(name);
+                field = row.Fields.FindField(name) ?? row.Fields.FindFieldByPropertyName(name);
 
-                if (!ReferenceEquals(null, field))
+                if (field is object)
                 {
                     try
                     {

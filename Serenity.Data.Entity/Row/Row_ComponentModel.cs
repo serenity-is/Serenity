@@ -4,13 +4,13 @@ using System.ComponentModel;
 
 namespace Serenity.Data
 {
-    public abstract partial class Row
+    public abstract partial class Row<TFields>
     {
         internal int insidePostHandler;
-        internal Row originalValues;
-        internal Row previousValues;
+        internal Row<TFields> originalValues;
+        internal Row<TFields> previousValues;
         internal PropertyChangedEventHandler propertyChanged;
-        internal Action<Row> postHandler;
+        internal Action<Row<TFields>> postHandler;
         private Dictionary<String, String> validationErrors;
 
         internal void RaisePropertyChanged(Field field)
@@ -27,13 +27,13 @@ namespace Serenity.Data
                 fields.propertyChangedEventArgs = args;
             }
 
-            if (ReferenceEquals(null, field))
+            if (field is null)
                 propertyChanged(this, fields.propertyChangedEventArgs[fields.Count]);
             else
                 propertyChanged(this, fields.propertyChangedEventArgs[field.Index]);
         }
 
-        public Action<Row> PostHandler
+        public Action<Row<TFields>> PostHandler
         {
             get { return postHandler; }
             set { postHandler = value; }
@@ -121,12 +121,12 @@ namespace Serenity.Data
             get { return originalValues != null; }
         }
 
-        public Row OriginalValues
+        public Row<TFields> OriginalValues
         {
             get { return originalValues ?? this; }
         }
 
-        public Row PreviousValues
+        public Row<TFields> PreviousValues
         {
             get { return previousValues ?? this; }
         }
@@ -175,36 +175,5 @@ namespace Serenity.Data
                     validationErrors.Count > 0;
             }
         }
-
-#if NET45
-        string IDataErrorInfo.Error
-        {
-            get
-            {
-                string error;
-                if (validationErrors != null &&
-                    validationErrors.TryGetValue(String.Empty, out error))
-                    return error;
-                return String.Empty;
-            }
-        }
-
-        string IDataErrorInfo.this[string columnName]
-        {
-            get
-            {
-                string error;
-                if (validationErrors != null &&
-                    validationErrors.TryGetValue(columnName ?? String.Empty, out error))
-                    return error;
-                return String.Empty;
-            }
-        }
-
-        public PropertyDescriptorCollection GetPropertyDescriptors()
-        {
-            return fields.propertyDescriptors;
-        }
-#endif
     }
 }

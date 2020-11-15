@@ -3,37 +3,33 @@ namespace Serenity.Localization
 {
     using Serenity.Abstractions;
     using Serenity.Data;
-#if !NET45
     using System;
     using System.Collections.Generic;
-#endif
     using System.ComponentModel;
     using System.Reflection;
 
     public static class EntityLocalTexts
     {
-#if !NET45
-        public static void AddRowTexts(this ILocalTextRegistry registry,
+        public static void AddRowTexts(this ILocalTextRegistry registry, IEnumerable<IRow> rowInstances,
             string languageID = LocalText.InvariantLanguageID)
-#else
-        public static void Initialize(string languageID = LocalText.InvariantLanguageID, ILocalTextRegistry registry = null)
-#endif
         {
-            var provider = registry ?? Dependency.Resolve<ILocalTextRegistry>();
+            var provider = registry ?? throw new ArgumentNullException(nameof(registry));
 
-            foreach (var row in RowRegistry.EnumerateRows())
+            if (rowInstances == null)
+                throw new ArgumentNullException(nameof(rowInstances));
+
+            foreach (var row in rowInstances)
             {
-                var fields = row.GetFields();
+                var fields = row.Fields;
                 var prefix = fields.LocalTextPrefix;
 
-                foreach (var field in row.GetFields())
+                foreach (var field in row.Fields)
                 {
                     LocalText lt = field.Caption;
                     if (lt != null &&
                         !lt.Key.IsEmptyOrNull())
                     {
-                        var initialized = lt as InitializedLocalText;
-                        if (initialized != null)
+                        if (lt is InitializedLocalText initialized)
                         {
                             provider.Add(languageID, initialized.Key, initialized.InitialText);
                         }

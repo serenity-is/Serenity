@@ -1,7 +1,6 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Data.Mapping;
-using Serenity.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,18 +8,33 @@ using System.Reflection;
 
 namespace Serenity.PropertyGrid
 {
-    public partial class PropertyItemHelper
+    public partial class PropertyItemRegistry : IPropertyItemRegistry
     {
-        public static List<PropertyItem> GetPropertyItemsFor(Type type)
+        private readonly IEnumerable<Func<IPropertyProcessor>> processorFactories;
+
+        public PropertyItemRegistry(IEnumerable<Func<IPropertyProcessor>> processorFactories)
+        {
+            this.processorFactories = processorFactories ?? throw new ArgumentNullException(nameof(processorFactories));
+        }
+
+        public static IEnumerable<Type> FindProcessorTypes(IEnumerable<Assembly> assemblies)
+        {
+            if (assemblies == null)
+                throw new ArgumentNullException(nameof(assemblies));
+
+            return assemblies.SelectMany(x => x.GetTypes())
+                .Where(type => !type.IsInterface && typeof(IPropertyProcessor).IsAssignableFrom(type));
+        }
+
+        public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException("type");
 
             var list = new List<PropertyItem>();
 
-            bool checkNames;
-            var basedOnRow = GetBasedOnRow(type, out checkNames);
-            var processors = ProcessorTypes.Select(x => (IPropertyProcessor)Activator.CreateInstance(x))
+            var basedOnRow = GetBasedOnRow(type, out bool checkNames);
+            var processors = processorFactories.Select(x => x())
                 .OrderBy(x => x.Priority).ToList();
 
             foreach (var processor in processors)
@@ -42,9 +56,9 @@ namespace Serenity.PropertyGrid
                     property.GetCustomAttribute<NotMappedAttribute>() == null &&
                     property.GetCustomAttribute<IgnoreNameAttribute>() == null)
                 {
-                    if (ReferenceEquals(null, source.BasedOnField))
+                    if (source.BasedOnField is null)
                     {
-                        throw new Exception(String.Format(
+                        throw new Exception(string.Format(
                             "{0} has a [BasedOnRow(typeof({2}), CheckNames = true)] attribute but its '{1}' property " +
                             "doesn't have a matching field with same property / field name in the row.\n\n" +
                             "Please check if property is named correctly.\n\n" +
@@ -58,19 +72,21 @@ namespace Serenity.PropertyGrid
                         (source.BasedOnField.PropertyName.IsEmptyOrNull() &&
                          source.BasedOnField.Name != property.Name))
                     {
-                        throw new Exception(String.Format(
+                        throw new Exception(string.Format(
                                 "{0} has a [BasedOnRow(typeof({3}), CheckNames = true)] attribute but its '{1}' property " +
                                 "doesn't match the property/field name '{2}' in the row.\n\n" +
                                 "Property names must match case sensitively. Please change property name to '{2}'.\n\n" +
                                 "To remove this validation you may set CheckNames to false on [BasedOnRow] attribute.\n\n" +
                                 "To disable check for this specific property add a [IgnoreName] attribute to the property itself.",
-                                type.FullName, property.Name, source.BasedOnField.PropertyName.TrimToNull() ?? 
+                                type.FullName, property.Name, source.BasedOnField.PropertyName.TrimToNull() ??
                                     source.BasedOnField.Name, basedOnRow.GetType().FullName));
                     }
                 }
 
-                PropertyItem pi = new PropertyItem();
-                pi.Name = property.Name;
+                PropertyItem pi = new PropertyItem
+                {
+                    Name = property.Name
+                };
 
                 foreach (var processor in processors)
                     processor.Process(source, pi);
@@ -84,7 +100,7 @@ namespace Serenity.PropertyGrid
             return list;
         }
 
-        private static Row GetBasedOnRow(Type type, out bool checkPropertyNames)
+        private static IRow GetBasedOnRow(Type type, out bool checkPropertyNames)
         {
             checkPropertyNames = false;
             var basedOnRowAttr = type.GetCustomAttribute<BasedOnRowAttribute>();
@@ -92,30 +108,13 @@ namespace Serenity.PropertyGrid
                 return null;
 
             var basedOnRowType = basedOnRowAttr.RowType;
-            if (!basedOnRowType.IsSubclassOf(typeof(Row)))
-                throw new InvalidOperationException(String.Format(
-                    "BasedOnRowAttribute value ({0}) must be set to a subclass of {1}!", 
-                        type.FullName, typeof(Row).FullName));
+            if (!typeof(IRow).IsAssignableFrom(basedOnRowType))
+                throw new InvalidOperationException(string.Format(
+                    "BasedOnRowAttribute value ({0}) must be set to a subclass of {1}!",
+                        type.FullName, typeof(IRow).FullName));
 
             checkPropertyNames = basedOnRowAttr.CheckNames;
-            return (Row)Activator.CreateInstance(basedOnRowType);
-        }
-
-        private static Type[] processorTypes;
-
-        private static Type[] ProcessorTypes
-        {
-            get
-            {
-                if (processorTypes != null)
-                    return processorTypes;
-
-                processorTypes = ExtensibilityHelper.GetTypesWithInterface(
-                        typeof(IPropertyProcessor))
-                    .Where(x => !x.IsAbstract).ToArray();
-
-                return processorTypes;
-            }
+            return (IRow)Activator.CreateInstance(basedOnRowType);
         }
     }
 }

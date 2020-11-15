@@ -1,6 +1,4 @@
-﻿#if !NET45
-using Newtonsoft.Json.Linq;
-#endif
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -8,25 +6,24 @@ namespace Serenity.Data
 {
     public abstract class GenericClassField<TValue> : Field where TValue : class
     {
-        protected internal Func<Row, TValue> _getValue;
-        protected internal Action<Row, TValue> _setValue;
+        protected internal Func<IRow, TValue> _getValue;
+        protected internal Action<IRow, TValue> _setValue;
 
         internal GenericClassField(ICollection<Field> collection, FieldType type, string name, LocalText caption, int size, FieldFlags flags,
-            Func<Row, TValue> getValue = null, Action<Row, TValue> setValue = null)
+            Func<IRow, TValue> getValue = null, Action<IRow, TValue> setValue = null)
             : base(collection, type, name, caption, size, flags)
         {
             _getValue = getValue ?? (r => (TValue)(r.GetIndexedData(this.index)));
             _setValue = setValue ?? ((r, v) => r.SetIndexedData(this.index, v));
         }
 
-        public override void Copy(Row source, Row target)
+        public override void Copy(IRow source, IRow target)
         {
-            _setValue((Row)(target), _getValue((Row)(source)));
-            if (target.tracking)
-                target.FieldAssignedValue(this);
+            _setValue(target, _getValue(source));
+            target.FieldAssignedValue(this);
         }
 
-        public TValue this[Row row]
+        public TValue this[IRow row]
         {
             get
             {
@@ -36,44 +33,39 @@ namespace Serenity.Data
             set
             {
                 _setValue(row, value);
-                if (row.tracking)
-                    row.FieldAssignedValue(this);
+                row.FieldAssignedValue(this);
             }
         }
 
         public override object ConvertValue(object source, IFormatProvider provider)
         {
-#if !NET45
-            if (source is JValue)
-                source = ((JValue)source).Value;
-#endif
+            if (source is JValue jValue)
+                source = jValue.Value;
 
             if (source == null)
                 return null;
             else
             {
-                if (source is TValue)
-                    return (TValue)source;
+                if (source is TValue value)
+                    return value;
 
                 return Convert.ChangeType(source, typeof(TValue), provider);
             }
         }
 
-        public override object AsObject(Row row)
+        public override object AsObject(IRow row)
         {
             CheckUnassignedRead(row);
             return _getValue(row);
         }
 
-        public override void AsObject(Row row, object value)
+        public override void AsObject(IRow row,object value)
         {
             _setValue(row, (TValue)value);
-
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        protected override bool GetIsNull(Row row)
+        protected override bool GetIsNull(IRow row)
         {
             return _getValue(row) == null;
         }

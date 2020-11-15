@@ -1,7 +1,6 @@
 ﻿
 namespace Serenity.Localization
 {
-    using Extensibility;
     using Serenity.Abstractions;
     using System;
     using System.Collections.Generic;
@@ -25,11 +24,9 @@ namespace Serenity.Localization
         /// <param name="assemblies">Assemblies to search for enumeration classes in</param>
         /// <param name="languageID">Language ID texts will be added (default is invariant language)</param>
         /// <param name="registry">Registry</param>
-        public static void AddEnumTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies = null,
+        public static void AddEnumTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies,
             string languageID = LocalText.InvariantLanguageID)
         {
-            assemblies ??= ExtensibilityHelper.SelfAssemblies;
-
             if (assemblies == null)
                 throw new ArgumentNullException("assemblies");
 

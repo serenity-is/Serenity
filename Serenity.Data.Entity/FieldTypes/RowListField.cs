@@ -5,10 +5,10 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     [NotMapped]
-    public class RowListField<TForeign> : CustomClassField<List<TForeign>> where TForeign: Row
+    public class RowListField<TForeign> : CustomClassField<List<TForeign>> where TForeign: class, IRow
     {
         public RowListField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped, 
-            Func<Row, List<TForeign>> getValue = null, Action<Row, List<TForeign>> setValue = null)
+            Func<IRow, List<TForeign>> getValue = null, Action<IRow, List<TForeign>> setValue = null)
             : base(collection, name, caption, size, flags, getValue, setValue)
         {
         }
@@ -31,7 +31,7 @@ namespace Serenity.Data
                 if (v2 == null)
                     return 1;
 
-                foreach (var f in v1.GetFields())
+                foreach (var f in v1.Fields)
                 {
                     var c = f.IndexCompare(v1, v2);
                     if (c != 0)

@@ -6,7 +6,7 @@ namespace Serenity.Data
 {
     public class DialectExpressionSelector
     {
-        private string connectionKey;
+        private readonly string connectionKey;
         private string dialectServerType;
         private string dialectTypeName;
 
@@ -17,7 +17,7 @@ namespace Serenity.Data
 
         public DialectExpressionSelector(ISqlDialect dialect)
         {
-            dialect = dialect ?? SqlSettings.DefaultDialect;
+            dialect ??= SqlSettings.DefaultDialect;
             dialectServerType = dialect.ServerType;
             dialectTypeName = dialect.GetType().Name;
         }
@@ -38,13 +38,9 @@ namespace Serenity.Data
                 ISqlDialect dialect = null;
 
                 if (!string.IsNullOrEmpty(connectionKey))
-                {
-                    var csi = SqlConnections.TryGetConnectionString(connectionKey);
-                    if (csi != null)
-                        dialect = csi.Dialect;
-                }
+                    dialect = SqlConnections.GetDialect(connectionKey);
 
-                dialect = dialect ?? SqlSettings.DefaultDialect;
+                dialect ??= SqlSettings.DefaultDialect;
                 dialectServerType = dialect.ServerType;
                 dialectTypeName = dialect.GetType().Name;
             }
@@ -87,8 +83,7 @@ namespace Serenity.Data
                 if (string.IsNullOrEmpty(d))
                     return 0;
 
-                int w;
-                if (weight != null && weight.TryGetValue(x, out w))
+                if (weight != null && weight.TryGetValue(x, out int w))
                     return w;
 
                 return d.Length;

@@ -6,21 +6,21 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
-    public sealed class BooleanField : GenericValueField<Boolean>
+    public sealed class BooleanField : GenericValueField<bool>
     {
         public BooleanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<Row, Boolean?> getValue = null, Action<Row, Boolean?> setValue = null)
+            Func<IRow, bool?> getValue = null, Action<IRow, bool?> setValue = null)
             : base(collection, FieldType.Boolean, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static BooleanField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags, 
-            Func<Row, Boolean?> getValue, Action<Row, Boolean?> setValue)
+            Func<IRow, bool?> getValue, Action<IRow, bool?> setValue)
         {
             return new BooleanField(collection, name, caption, size, flags, getValue, setValue);
         }
 
-        public override void GetFromReader(IDataReader reader, int index, Row row)
+        public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -30,16 +30,15 @@ namespace Serenity.Data
             else
                 _setValue(row, Convert.ToBoolean(reader.GetValue(index)));
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, Row row, JsonSerializer serializer)
+        public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             writer.WriteValue(_getValue(row));
         }
 
-        public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
+        public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -51,7 +50,7 @@ namespace Serenity.Data
                     _setValue(row, null);
                     break;
                 case JsonToken.Boolean:
-                    _setValue(row, (Boolean)reader.Value);
+                    _setValue(row, (bool)reader.Value);
                     break;
                 case JsonToken.Integer:
                 case JsonToken.Float:
@@ -68,8 +67,7 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
     }
 }

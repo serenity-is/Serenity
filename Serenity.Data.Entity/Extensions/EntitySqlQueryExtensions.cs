@@ -16,23 +16,17 @@ namespace Serenity.Data
             if (entity == null)
                 throw new ArgumentNullException("row");
 
-            var row = entity as Row;
-            if (row != null)
+            if (entity as IRow != null)
             {
-                var fields = row.GetFields();
+                var fields = (entity as IRow).Fields;
                 query.From(fields);
                 if (!query.IsDialectOverridden && !string.IsNullOrEmpty(fields.connectionKey))
-                {
-                    var cs = SqlConnections.TryGetConnectionString(fields.connectionKey);
-                    if (cs != null)
-                        query.Dialect(cs.Dialect);
-                }
+                    query.Dialect(SqlConnections.GetDialect(fields.connectionKey));
             }
             else
             {
-                var alias = entity as IAlias;
-                if (alias != null && (alias.Name == "t0" || alias.Name == "T0") && alias.Table == entity.Table)
-                    query.From(alias);
+                if (entity as IAlias != null && ((entity as IAlias).Name == "t0" || (entity as IAlias).Name == "T0") && (entity as IAlias).Table == entity.Table)
+                    query.From(entity as IAlias);
                 else
                     query.From(entity.Table, Alias.T0);
             }

@@ -9,18 +9,18 @@ namespace Serenity.Data
     public sealed class DecimalField : GenericValueField<Decimal>
     {
         public DecimalField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<Row, Decimal?> getValue = null, Action<Row, Decimal?> setValue = null)
+            Func<IRow, Decimal?> getValue = null, Action<IRow, Decimal?> setValue = null)
             : base(collection, FieldType.Decimal, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static DecimalField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<Row, Decimal?> getValue, Action<Row, Decimal?> setValue)
+            Func<IRow, Decimal?> getValue, Action<IRow, Decimal?> setValue)
         {
             return new DecimalField(collection, name, caption, size, flags, getValue, setValue);
         }
 
-        public override void GetFromReader(IDataReader reader, int index, Row row)
+        public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -33,16 +33,15 @@ namespace Serenity.Data
             else
                 _setValue(row, Convert.ToDecimal(value, CultureInfo.InvariantCulture));
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        public override void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer)
+        public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             writer.WriteValue(_getValue(row));
         }
 
-        public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
+        public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -69,8 +68,7 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
     }
 }

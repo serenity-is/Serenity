@@ -3,48 +3,44 @@ using System.Data;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Globalization;
-#if !NET45
 using Newtonsoft.Json.Linq;
-#endif
 
 namespace Serenity.Data
 {
     public sealed class DateTimeField : GenericValueField<DateTime>
     {
         public DateTimeField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<Row, DateTime?> getValue = null, Action<Row, DateTime?> setValue = null)
+            Func<IRow, DateTime?> getValue = null, Action<IRow, DateTime?> setValue = null)
             : base(collection, FieldType.DateTime, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static DateTimeField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<Row, DateTime?> getValue, Action<Row, DateTime?> setValue)
+            Func<IRow, DateTime?> getValue, Action<IRow, DateTime?> setValue)
         {
             return new DateTimeField(collection, name, caption, size, flags, getValue, setValue);
         }
 
         public override object ConvertValue(object source, IFormatProvider provider)
         {
-#if !NET45
-            if (source is JValue)
-                source = ((JValue)source).Value;
-#endif
+            if (source is JValue jValue)
+                source = jValue.Value;
+
             if (source == null)
                 return null;
             else
             {
-                if (source is DateTime)
-                    return (DateTime)source;
+                if (source is DateTime dt)
+                    return dt;
 
-                if (source is DateTimeOffset)
-                    return ((DateTimeOffset)source).DateTime;
+                if (source is DateTimeOffset dto)
+                    return dto.DateTime;
 
                 return Convert.ChangeType(source, typeof(DateTime), provider);
             }
         }
 
-#if !SILVERLIGHT
-        public override void GetFromReader(IDataReader reader, int index, Row row)
+        public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -54,18 +50,15 @@ namespace Serenity.Data
             else
             {
                 var value = reader.GetValue(index);
-                DateTime datetime = value is DateTimeOffset ?
-                    ((DateTimeOffset)value).DateTime :
-                        (value is DateTime ? (DateTime)value : Convert.ToDateTime(value));
+                DateTime datetime = value is DateTimeOffset dto ?
+                    dto.DateTime : (value is DateTime dt ? dt : Convert.ToDateTime(value));
                 if (DateTimeKind != System.DateTimeKind.Unspecified)
                     datetime = DateTime.SpecifyKind(datetime, DateTimeKind);
                 _setValue(row, datetime);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
-#endif
 
         private DateTimeKind? dateTimeKind;
 
@@ -120,7 +113,7 @@ namespace Serenity.Data
             return ToDateTimeKind(value, this.dateTimeKind);
         }
 
-        public new DateTime? this[Row row]
+        public new DateTime? this[IRow row]
         {
             get
             {
@@ -133,29 +126,27 @@ namespace Serenity.Data
                     _setValue(row, ToDateTimeKind(value.Value));
                 else
                     _setValue(row, value);
-                if (row.tracking)
-                    row.FieldAssignedValue(this);
+                row.FieldAssignedValue(this);
             }
         }
 
-        public override object AsObject(Row row)
+        public override object AsObject(IRow row)
         {
             CheckUnassignedRead(row);
             return _getValue(row);
         }
 
-        public override void AsObject(Row row, object value)
+        public override void AsObject(IRow row,object value)
         {
             if (value == null)
                 _setValue(row, null);
             else
                 _setValue(row, ToDateTimeKind((DateTime)value));
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
-        public override void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer)
+        public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             var value = _getValue(row);
             if (value.HasValue)
@@ -172,7 +163,7 @@ namespace Serenity.Data
                 writer.WriteNull();
         }
 
-        public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
+        public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -186,11 +177,11 @@ namespace Serenity.Data
                 case JsonToken.Date:
                     var obj = reader.Value;
                     DateTime value;
-                    if (obj is DateTime)
-                        value = (DateTime)obj;
-                    else if (obj is DateTimeOffset)
+                    if (obj is DateTime dt)
+                        value = dt;
+                    else if (obj is DateTimeOffset dto)
                     {
-                        _setValue(row, ToDateTimeKind((DateTimeOffset)obj));
+                        _setValue(row, ToDateTimeKind(dto));
                         break;
                     }
                     else
@@ -209,8 +200,7 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
     }
 }

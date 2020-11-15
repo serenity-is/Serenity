@@ -1,5 +1,4 @@
 ﻿using Serenity.ComponentModel;
-using Serenity.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,39 +12,28 @@ namespace Serenity.Reflection
     /// <seealso cref="Serenity.Reflection.IAnnotationTypeRegistry" />
     public class AnnotationTypeRegistry : IAnnotationTypeRegistry
     {
-        private Type[] annotationTypes;
+        private readonly IEnumerable<Type> annotationTypes;
+
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        /// <param name="annotationTypes">Types with AnnotationType attributes</param>
+        public AnnotationTypeRegistry(IEnumerable<Type> annotationTypes)
+        {
+            this.annotationTypes = annotationTypes ?? throw new ArgumentNullException(nameof(annotationTypes));
+        }
 
         /// <summary>
         /// Gets the annotation types.
         /// </summary>
         /// <returns></returns>
-        protected IEnumerable<Type> GetAnnotationTypes()
+        public static IEnumerable<Type> FindAnnotationTypes(IEnumerable<Assembly> assemblies)
         {
-            var annotationTypes = this.annotationTypes;
-            if (annotationTypes != null)
-                return annotationTypes;
+            if (assemblies == null)
+                throw new ArgumentNullException(nameof(assemblies));
 
-            var list = new List<Type>();
-
-            foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
-            {
-                foreach (var type in assembly.GetTypes())
-                {
-                    if (type.GetCustomAttribute<AnnotationTypeAttribute>() != null)
-                        list.Add(type);
-                }
-            }
-
-            this.annotationTypes = annotationTypes = list.ToArray();
-            return annotationTypes;
-        }
-
-        /// <summary>
-        /// Resets this instance.
-        /// </summary>
-        public void Reset()
-        {
-            this.annotationTypes = null;
+            return assemblies.SelectMany(assembly => assembly.GetTypes())
+                .Where(type => type.GetCustomAttribute<AnnotationTypeAttribute>() != null);
         }
 
         /// <summary>
@@ -57,7 +45,7 @@ namespace Serenity.Reflection
         {
             var list = new List<Type>();
 
-            foreach (var annotationType in GetAnnotationTypes())
+            foreach (var annotationType in annotationTypes)
             {
                 var annotationMatch = false;
 

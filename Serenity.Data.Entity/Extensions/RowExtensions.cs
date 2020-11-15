@@ -5,18 +5,18 @@ namespace Serenity.Data
 {
     public static class RowExtensions
     {
-        public static TRow Clone<TRow>(this TRow row) where TRow : Row
+        public static TRow Clone<TRow>(this TRow row) where TRow : IRow
         {
             return (TRow)(row.CloneRow());
         }
 
         public static TRow ApplyDefaultValues<TRow>(this TRow row, bool unassignedOnly = false)
-            where TRow: Row
+            where TRow: IRow
         {
             if (row == null)
                 throw new ArgumentNullException("row");
 
-            foreach (var field in row.GetFields())
+            foreach (var field in row.Fields)
             {
                 if (unassignedOnly && row.IsAssigned(field))
                     continue;
@@ -36,13 +36,12 @@ namespace Serenity.Data
             return rowFields;
         }
 
-        public static Field GetNameField(this Row row, bool force = false)
+        public static Field GetNameField(this IRow row, bool force = false)
         {
-            var nameRow = row as INameRow;
-            if (nameRow != null)
-                return nameRow.NameField;
+            if (row as INameRow != null)
+                return (row as INameRow).NameField;
 
-            var nameProperty = row.GetFields().GetFieldsByAttribute<NamePropertyAttribute>();
+            var nameProperty = row.Fields.GetFieldsByAttribute<NamePropertyAttribute>();
             if (nameProperty.Length > 0)
             {
                 if (nameProperty.Length > 1)

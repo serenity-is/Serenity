@@ -7,7 +7,7 @@ namespace Serenity.Data
         where TEnum: struct, IComparable, IFormattable, IConvertible
     {
         public EnumField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<Row, Int32?> getValue = null, Action<Row, Int32?> setValue = null)
+            Func<IRow, Int32?> getValue = null, Action<IRow, Int32?> setValue = null)
             : base(collection, name, caption, size, flags, getValue, setValue)
         {
             if (!typeof(TEnum).IsEnum)
@@ -19,7 +19,7 @@ namespace Serenity.Data
             this.EnumType = typeof(TEnum);
         }
 
-        public new TEnum? this[Row row]
+        public new TEnum? this[IRow row]
         {
             get
             {
@@ -34,8 +34,7 @@ namespace Serenity.Data
             {
                 Int32? v = value == null ? (Int32?)null : Convert.ToInt32(value);
                 _setValue(row, v);
-                if (row.tracking)
-                    row.FieldAssignedValue(this);
+                row.FieldAssignedValue(this);
             }
         }
     }

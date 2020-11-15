@@ -5,25 +5,24 @@ namespace Serenity.Data
 {
     public abstract class GenericField<TValue> : Field
     {
-        protected internal Func<Row, TValue> _getValue;
-        protected internal Action<Row, TValue> _setValue;
+        protected internal Func<IRow, TValue> _getValue;
+        protected internal Action<IRow, TValue> _setValue;
 
         public GenericField(ICollection<Field> collection, FieldType type, string name, string caption, int size, FieldFlags flags,
-            Func<Row, TValue> getValue, Action<Row, TValue> setValue)
+            Func<IRow, TValue> getValue, Action<IRow, TValue> setValue)
             : base(collection, type, name, caption, size, flags)
         {
             _getValue = getValue;
             _setValue = setValue;
         }
 
-        public override void Copy(Row source, Row target)
+        public override void Copy(IRow source, IRow target)
         {
-            _setValue((Row)(target), _getValue((Row)(source)));
-            if (target.tracking)
-                target.FieldAssignedValue(this);
+            _setValue(target, _getValue(source));
+            target.FieldAssignedValue(this);
         }
 
-        public TValue this[Row row]
+        public TValue this[IRow row]
         {
             get
             {
@@ -33,8 +32,7 @@ namespace Serenity.Data
             set
             {
                 _setValue(row, value);
-                if (row.tracking)
-                    row.FieldAssignedValue(this);
+                row.FieldAssignedValue(this);
             }
         }
     }

@@ -11,6 +11,11 @@ namespace Serenity.Data
     public static class SqlConnections
     {
         /// <summary>
+        /// Default connection key, this is an optional name
+        /// </summary>
+        public const string DefaultConnectionKey = "Default";
+
+        /// <summary>
         /// Creates a new connection for specified class, determining 
         /// the connection key by checking its [ConnectionKey] attribute.
         /// </summary>
@@ -93,6 +98,21 @@ namespace Serenity.Data
                 return SqlSettings.DefaultDialect;
 
             return wrapped.Dialect ?? SqlSettings.DefaultDialect;
+        }
+
+        /// <summary>
+        /// Gets the dialect for given connection key. Should only be used where accessing 
+        /// connection strings through DI is not available or feasible.
+        /// </summary>
+        /// <param name="connectionKey">Connection key.</param>
+        /// <returns>The sql dialect.</returns>
+        public static ISqlDialect GetDialect(string connectionKey)
+        {
+            var byConnectionKey = SqlSettings.DialectByConnectionKey;
+            if (byConnectionKey != null)
+                return byConnectionKey(connectionKey) ?? SqlSettings.DefaultDialect;
+
+            return SqlSettings.DefaultDialect;
         }
 
         private static readonly string[] databaseNameKeys = new string[]

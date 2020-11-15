@@ -9,18 +9,18 @@ namespace Serenity.Data
         where TValue: class
     {
         public JsonField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-            Func<Row, TValue> getValue = null, Action<Row, TValue> setValue = null)
+            Func<IRow, TValue> getValue = null, Action<IRow, TValue> setValue = null)
             : base(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static JsonField<TValue> Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<Row, TValue> getValue, Action<Row, TValue> setValue)
+            Func<IRow, TValue> getValue, Action<IRow, TValue> setValue)
         {
             return new JsonField<TValue>(collection, name, caption, size, flags, getValue, setValue);
         }
 
-        public override void GetFromReader(IDataReader reader, int index, Row row)
+        public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -30,13 +30,12 @@ namespace Serenity.Data
             else
                 _setValue(row, JsonConvert.DeserializeObject<TValue>(reader.GetString(index), Settings ?? JsonSettings.Strict));
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
 
         public JsonSerializerSettings Settings { get; set; }
 
-        public override object AsSqlValue(Row row)
+        public override object AsSqlValue(IRow row)
         {
             var value = AsObject(row);
             if (value == null)
@@ -45,7 +44,7 @@ namespace Serenity.Data
             return JsonConvert.SerializeObject(value, Settings ?? JsonSettings.Strict);
         }
 
-        public override int IndexCompare(Row row1, Row row2)
+        public override int IndexCompare(IRow row1, IRow row2)
         {
             var value1 = _getValue(row1);
             var value2 = _getValue(row2);
@@ -65,12 +64,12 @@ namespace Serenity.Data
                 return value1.ToJson().CompareTo(value2.ToJson());
         }
 
-        public override void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer)
+        public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             serializer.Serialize(writer, _getValue(row));
         }
 
-        public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
+        public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)
                 throw new ArgumentNullException("reader");
@@ -92,8 +91,7 @@ namespace Serenity.Data
                     break;
             }
 
-            if (row.tracking)
-                row.FieldAssignedValue(this);
+            row.FieldAssignedValue(this);
         }
     }
 }

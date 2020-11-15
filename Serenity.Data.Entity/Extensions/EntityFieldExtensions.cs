@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-#if !NET45
-using System.Reflection;
-#endif
 
 namespace Serenity.Data
 {
@@ -23,12 +19,8 @@ namespace Serenity.Data
         ///   True if field seems to be an actual table field.</returns>
         public static bool IsTableField(this Field field)
         {
-            if (ReferenceEquals(field, null))
-                throw new ArgumentNullException("meta");
-
-            return (field.Flags & NonTableFieldFlags) == (FieldFlags)0;
+            return field is null ? throw new ArgumentNullException(nameof(field)) : (field.Flags & NonTableFieldFlags) == 0;
         }
-
 
         /// <summary>
         ///   Gets a dictionary of table fields (e.g. not a foreign or calculated field) in a row.</summary>
@@ -36,9 +28,9 @@ namespace Serenity.Data
         ///   The row to return dictionary of table fields</param>
         /// <returns>
         ///   A dictionary of table fields in which field objects are keys.</returns>
-        public static IEnumerable<Field> EnumerateTableFields(this Row row)
+        public static IEnumerable<Field> EnumerateTableFields(this IRow row)
         {
-            var fields = row.GetFields();
+            var fields = row.Fields;
             for (int i = 0; i < fields.Count; i++)
             {
                 Field field = fields[i];
@@ -53,10 +45,10 @@ namespace Serenity.Data
         ///   The row to return dictionary of table fields</param>
         /// <returns>
         ///   A dictionary of table fields in which field objects are keys.</returns>
-        public static HashSet<Field> GetTableFields(this Row row)
+        public static HashSet<Field> GetTableFields(this IRow row)
         {
             HashSet<Field> tableFields = new HashSet<Field>();
-            var fields = row.GetFields();
+            var fields = row.Fields;
 
             for (int i = 0; i < fields.Count; i++)
             {
@@ -68,20 +60,18 @@ namespace Serenity.Data
         }
 
 
-        public static void AutoTrim(this Field field, Row row)
+        public static void AutoTrim(this Field field, IRow row)
         {
-            var stringField = field as StringField;
-            if (!ReferenceEquals(null, stringField) &&
+            if (field as StringField is object &&
                 (field.Flags & FieldFlags.Trim) == FieldFlags.Trim)
             {
-                string value = stringField[row];
+                string value = (field as StringField)[row];
 
                 if ((field.Flags & FieldFlags.TrimToEmpty) == FieldFlags.TrimToEmpty)
                     value = value.TrimToEmpty();
                 else // TrimToNull
                     value = value.TrimToNull();
-
-                stringField[row] = value;
+                (field as StringField)[row] = value;
             }
         }
 
@@ -101,15 +91,10 @@ namespace Serenity.Data
             return field;
         }
 
-        public static IDbConnection NewConnection(RowFieldsBase fields)
-        {
-            return SqlConnections.NewByKey(fields.connectionKey);
-        }
-
         public static TAttribute GetAttribute<TAttribute>(this Field field)
             where TAttribute: Attribute
         {
-            if (Object.ReferenceEquals(null, field))
+            if (field is null)
                 return null;
 
             if (field.CustomAttributes != null)
@@ -126,7 +111,7 @@ namespace Serenity.Data
         public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this Field field)
             where TAttribute : Attribute
         {
-            if (Object.ReferenceEquals(null, field))
+            if (field is null)
                 yield break;
 
             if (field.CustomAttributes != null)
