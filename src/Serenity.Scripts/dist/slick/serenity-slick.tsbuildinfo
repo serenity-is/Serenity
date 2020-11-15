@@ -1,0 +1,42 @@
+{
+  "bundle": {
+    "commonSourceDirectory": "../../CoreLib",
+    "sourceFiles": [
+      "../../CoreLib/SlickGrid/Event.ts",
+      "../../CoreLib/SlickGrid/Grouping.ts",
+      "../../CoreLib/SlickGrid/Formatter.ts",
+      "../../CoreLib/SlickGrid/Column.ts",
+      "../../CoreLib/SlickGrid/GridOptions.ts",
+      "../../CoreLib/SlickGrid/Grid.ts",
+      "../../CoreLib/SlickGrid/Aggregators.ts",
+      "../../CoreLib/SlickGrid/RemoteView.ts",
+      "../../CoreLib/SlickGrid/Autotooltips.ts",
+      "../../CoreLib/SlickGrid/RowMoveManager.ts"
+    ],
+    "js": {
+      "sections": [
+        {
+          "pos": 0,
+          "end": 60538,
+          "kind": "text"
+        }
+      ]
+    },
+    "dts": {
+      "sections": [
+        {
+          "pos": 0,
+          "end": 32,
+          "kind": "type",
+          "data": "jquery"
+        },
+        {
+          "pos": 34,
+          "end": 15016,
+          "kind": "text"
+        }
+      ]
+    }
+  },
+  "version": "3.8.3"
+}

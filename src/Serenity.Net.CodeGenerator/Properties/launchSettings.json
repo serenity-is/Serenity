@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Serenity.CodeGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "t",
+      "workingDirectory": "C:\\Sandbox\\StartSharp\\StartSharp\\StartSharp.Core"
+    }
+  }
+}

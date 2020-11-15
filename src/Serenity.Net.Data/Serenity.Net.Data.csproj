@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\SharedProperties.xml" />
+  <PropertyGroup>
+    <AssemblyName>Serenity.Net.Data</AssemblyName>
+    <Title>Serenity Platform - Data Library</Title>
+    <Description>Contains helper classes for SQL data connections, fluent SQL builders, criteria, join definitions, data mapping, validation...</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Net.Core\Serenity.Net.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.35" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
+  </ItemGroup>
+</Project>

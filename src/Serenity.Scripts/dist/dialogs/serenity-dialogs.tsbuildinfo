@@ -1,0 +1,50 @@
+{
+  "bundle": {
+    "commonSourceDirectory": "../../CoreLib",
+    "sourceFiles": [
+      "../../CoreLib/Q/Q.Router.ts",
+      "../../CoreLib/Q/Q.Layout.ts",
+      "../../CoreLib/UI/Dialogs/DialogExtensions.ts",
+      "../../CoreLib/UI/Dialogs/TemplatedDialog.ts",
+      "../../CoreLib/UI/Dialogs/PropertyDialog.ts",
+      "../../CoreLib/UI/Dialogs/EntityDialog.ts"
+    ],
+    "js": {
+      "sections": [
+        {
+          "pos": 0,
+          "end": 80365,
+          "kind": "text"
+        }
+      ]
+    },
+    "dts": {
+      "sections": [
+        {
+          "pos": 0,
+          "end": 43,
+          "kind": "type",
+          "data": "jquery.validation"
+        },
+        {
+          "pos": 45,
+          "end": 77,
+          "kind": "type",
+          "data": "jquery"
+        },
+        {
+          "pos": 79,
+          "end": 113,
+          "kind": "type",
+          "data": "jqueryui"
+        },
+        {
+          "pos": 115,
+          "end": 10592,
+          "kind": "text"
+        }
+      ]
+    }
+  },
+  "version": "3.8.3"
+}

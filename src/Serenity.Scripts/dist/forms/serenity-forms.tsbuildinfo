@@ -1,0 +1,39 @@
+{
+  "bundle": {
+    "commonSourceDirectory": "../../CoreLib",
+    "sourceFiles": [
+      "../../CoreLib/UI/Helpers/ValidationHelper.ts",
+      "../../CoreLib/UI/Widgets/TemplatedPanel.ts",
+      "../../CoreLib/UI/Helpers/TabsExtensions.ts",
+      "../../CoreLib/UI/Widgets/ReflectionOptionsSetter.ts",
+      "../../CoreLib/UI/Widgets/PropertyGrid.ts",
+      "../../CoreLib/UI/Widgets/PropertyPanel.ts",
+      "../../CoreLib/Imports/VueIntegration.ts"
+    ],
+    "js": {
+      "sections": [
+        {
+          "pos": 0,
+          "end": 47740,
+          "kind": "text"
+        }
+      ]
+    },
+    "dts": {
+      "sections": [
+        {
+          "pos": 0,
+          "end": 43,
+          "kind": "type",
+          "data": "jquery.validation"
+        },
+        {
+          "pos": 45,
+          "end": 4767,
+          "kind": "text"
+        }
+      ]
+    }
+  },
+  "version": "3.8.3"
+}

@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\SharedProperties.xml" />
+  <PropertyGroup>
+    <AssemblyName>Serenity.Net.Data.Entity</AssemblyName>
+    <Title>Serenity Platform - Data Entity Library</Title>
+    <Description>Contains entity classes, fields and related functions...</Description>        
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Net.Core\Serenity.Net.Core.csproj" />
+    <ProjectReference Include="..\Serenity.Net.Data\Serenity.Net.Data.csproj" />
+  </ItemGroup>
+</Project>
