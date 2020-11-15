@@ -31,7 +31,7 @@ namespace Serenity.Data
                 return (TFields)cached;
 
             var result = new TFields();
-            result.Initialize(annotatedType: fields.annotatedType);
+            result.Initialize(annotations: fields.annotations);
 
             var aliasPrefix = alias + "_";
 

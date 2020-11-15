@@ -21,13 +21,19 @@ namespace Serenity.Data
         {
             if (fields == null)
             {
-                var fieldsSource = RowFieldsBase.RowFieldsSource;
-                if (fieldsSource == null)
+                var fieldsFactory = RowFieldsFactory.Current;
+                if (fieldsFactory == null)
                     throw new ArgumentNullException("fields", $"{this.GetType().FullName} constructor is called " +
-                        $"without providing a fields object. Please set RowFieldsBase.RowFieldsSource!");
+                        $"without providing a fields object. Please set RowFieldsFactory.Current!");
 
-                fields = (TFields)fieldsSource.GetFields(typeof(TFields));
+                fields = (TFields)fieldsFactory.GetFields(typeof(TFields));
             }
+
+            if (!fields.isInitialized)
+                throw new ArgumentOutOfRangeException("fields", $"{this.GetType().FullName} constructor is called " +
+                    $"with a fields object that is not initialized. Please call .Init() method on it before using!");
+
+            this.fields = fields;
 
             fields.InitInstance(this);
 

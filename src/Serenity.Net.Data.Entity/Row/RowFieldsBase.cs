@@ -13,8 +13,6 @@ namespace Serenity.Data
 {
     public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     {
-        public static IRowFieldsSource RowFieldsSource { get; set; }
-
         internal Dictionary<string, Field> byName;
         internal Dictionary<string, Field> byPropertyName;
         internal Dictionary<Type, Field[]> byAttribute;
@@ -27,7 +25,7 @@ namespace Serenity.Data
         internal PropertyChangedEventArgs[] propertyChangedEventArgs;
         internal Func<IRow> rowFactory;
         internal Type rowType;
-        internal IAnnotatedType annotatedType;
+        internal IAnnotatedType annotations;
         internal string moduleIdentifier;
         internal string connectionKey;
         internal string generationKey;
@@ -182,7 +180,6 @@ namespace Serenity.Data
         }
 
         private void GetRowFieldsAndProperties(
-            IAnnotatedType annotatedType,
             out Dictionary<string, FieldInfo> rowFields,
             out Dictionary<string, IPropertyInfo> rowProperties)
         {
@@ -200,8 +197,8 @@ namespace Serenity.Data
                     var pi = member as PropertyInfo;
                     if (pi != null)
                     {
-                        rowProperties[pi.Name] = annotatedType != null ? 
-                            annotatedType.GetAnnotatedProperty(pi) : new WrappedProperty(pi);
+                        rowProperties[pi.Name] = annotations != null ? 
+                            annotations.GetAnnotatedProperty(pi) : new WrappedProperty(pi);
                     }
                 }
             }
@@ -211,15 +208,15 @@ namespace Serenity.Data
         {
         }
 
-        public void Initialize(IAnnotatedType annotatedType)
+        public void Initialize(IAnnotatedType annotations)
         {
             if (isInitialized)
                 return;
 
             lock (initializeLock)
             {
-                this.annotatedType = annotatedType;
-                GetRowFieldsAndProperties(annotatedType, out Dictionary<string, FieldInfo> rowFields, out Dictionary<string, IPropertyInfo> rowProperties);
+                this.annotations = annotations;
+                GetRowFieldsAndProperties(out Dictionary<string, FieldInfo> rowFields, out Dictionary<string, IPropertyInfo> rowProperties);
 
                 var expressionSelector = new DialectExpressionSelector(connectionKey);
                 var rowCustomAttributes = rowType.GetCustomAttributes().ToList();

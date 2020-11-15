@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serenity.Reflection;
+using System;
 using System.Globalization;
 
 namespace Serenity.Data
@@ -51,6 +52,13 @@ namespace Serenity.Data
                     row.GetType().FullName));
 
             return null;
+        }
+
+        public static TFields Init<TFields>(this TFields fields, IAnnotatedType annotations)
+            where TFields: RowFieldsBase
+        {
+            fields.Initialize(annotations);
+            return fields;
         }
     }
 }

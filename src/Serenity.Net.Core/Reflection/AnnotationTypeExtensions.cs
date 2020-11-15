@@ -13,11 +13,10 @@ namespace Serenity.Reflection
         /// Gets the annotated type information for given type.
         /// </summary>
         /// <param name="annotationTypes">Annotation types</param>
-        /// <param name="type">The type.</param>
         /// <returns>
         /// Annotated type information
         /// </returns>
-        public static IAnnotatedType GetAnnotatedType(this IEnumerable<Type> annotationTypes, Type type)
+        public static IAnnotatedType GetAnnotatedType(this IEnumerable<Type> annotationTypes)
         {
             return new AnnotatedType(annotationTypes);
         }

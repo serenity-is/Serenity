@@ -2,7 +2,7 @@
 
 namespace Serenity.Data
 {
-    public interface IRowFieldsSource
+    public interface IRowFieldsFactory
     {
         RowFieldsBase GetFields(Type type);
     }
