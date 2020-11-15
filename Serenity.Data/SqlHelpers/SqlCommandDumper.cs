@@ -176,20 +176,20 @@ namespace Serenity.Data
                     {
                         sbCommandText.Append(value.ToString());
                     }
-                    else if (value is DateTime)
+                    else if (value is DateTime dt)
                     {
-                        sbCommandText.Append(((DateTime)value).ToSql(SqlServer2012Dialect.Instance));
+                        sbCommandText.Append(dt.ToSql(SqlServer2012Dialect.Instance));
                     }
-                    else if (value is DateTimeOffset)
+                    else if (value is DateTimeOffset dto)
                     {
                         sbCommandText.Append('\'');
-                        sbCommandText.Append(((DateTimeOffset)value).ToString("o"));
+                        sbCommandText.Append(dto.ToString("o"));
                         sbCommandText.Append('\'');
                     }
-                    else if (value is Guid)
+                    else if (value is Guid guid)
                     {
                         sbCommandText.Append('\'');
-                        sbCommandText.Append(((Guid)value).ToString());
+                        sbCommandText.Append(guid.ToString());
                         sbCommandText.Append('\'');
                     }
                     else if (value is byte[] data)

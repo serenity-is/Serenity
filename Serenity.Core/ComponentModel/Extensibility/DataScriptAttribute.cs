@@ -73,11 +73,11 @@ namespace Serenity.ComponentModel
                 module = type.Namespace ?? "";
 
                 if (module.EndsWith(".Lookups") || module.EndsWith(".Scripts"))
-                    module = module.Substring(0, module.Length - 8);
+                    module = module[0..^8];
 
                 var idx = module.IndexOf(".");
                 if (idx >= 0)
-                    module = module.Substring(idx + 1);
+                    module = module[(idx + 1)..];
             }
 
             var name = type.Name;

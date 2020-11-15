@@ -7,9 +7,9 @@ namespace Serenity.Data
     ///   Corresponds to an SQL JOIN (INNER, OUTER, CROSS etc.)</summary>
     public abstract class Join : Alias
     {
-        private IDictionary<string, Join> joins;
-        private ICriteria onCriteria;
-        private HashSet<string> referencedAliases;
+        private readonly IDictionary<string, Join> joins;
+        private readonly ICriteria onCriteria;
+        private readonly HashSet<string> referencedAliases;
 
         /// <summary>
         /// Gets the keyword.
@@ -31,7 +31,7 @@ namespace Serenity.Data
             this.joins = joins;
             this.onCriteria = onCriteria;
 
-            if (!ReferenceEquals(this.onCriteria, null))
+            if (this.onCriteria is object)
             {
                 var aliases = JoinAliasLocator.Locate(this.onCriteria.ToStringIgnoreParams());
                 if (aliases != null && aliases.Count > 0)
@@ -53,7 +53,7 @@ namespace Serenity.Data
             if (joins != null)
             {
                 if (joins.ContainsKey(this.Name))
-                    throw new ArgumentException(String.Format(
+                    throw new ArgumentException(string.Format(
                         "There is already a join with alias '{0}'", this.Name));
 
                 joins.Add(this.Name, this);

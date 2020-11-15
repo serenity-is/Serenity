@@ -22,7 +22,7 @@ namespace Serenity.Data
         {
             var value = (BaseCriteria)base.ReadJson(reader, objectType, existingValue, serializer);
             
-            if (Object.ReferenceEquals(null, value))
+            if (value is null)
                 return value;
 
             new SafeCriteriaValidator().Validate(value);

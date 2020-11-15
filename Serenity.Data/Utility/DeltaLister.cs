@@ -10,12 +10,12 @@ namespace Serenity.Data
     /// <typeparam name="TItem">The type of the item.</typeparam>
     public class DeltaLister<TItem>
     {
-        private DeltaOptions _options;
-        private Dictionary<Int64, TItem> _oldById;
-        private HashSet<Int64> _newById;
-        private IEnumerable<TItem> _oldItems;
-        private IEnumerable<TItem> _newItems;
-        private Func<TItem, Int64?> _getItemId;
+        private readonly DeltaOptions _options;
+        private readonly Dictionary<long, TItem> _oldById;
+        private readonly HashSet<long> _newById;
+        private readonly IEnumerable<TItem> _oldItems;
+        private readonly IEnumerable<TItem> _newItems;
+        private readonly Func<TItem, long?> _getItemId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeltaLister{TItem}"/> class.
@@ -32,19 +32,10 @@ namespace Serenity.Data
         public DeltaLister(IEnumerable<TItem> oldList, IEnumerable<TItem> newList,
             Func<TItem, Int64?> getItemId, DeltaOptions options = DeltaOptions.Default)
         {
-            if (oldList == null)
-                throw new ArgumentNullException("oldList");
-
-            if (newList == null)
-                throw new ArgumentNullException("newList");
-
-            if (getItemId == null)
-                throw new ArgumentNullException("getItemId");
-
             _options = options;
-            _oldItems = oldList;
-            _newItems = newList;
-            _getItemId = getItemId;
+            _oldItems = oldList ?? throw new ArgumentNullException("oldList");
+            _newItems = newList ?? throw new ArgumentNullException("newList");
+            _getItemId = getItemId ?? throw new ArgumentNullException("getItemId");
 
             _oldById = new Dictionary<Int64, TItem>();
             _newById = new HashSet<Int64>();
@@ -137,8 +128,7 @@ namespace Serenity.Data
                 foreach (var item in _newItems)
                 {
                     var id = _getItemId(item);
-                    TItem old;
-                    if (id != null && _oldById.TryGetValue(id.Value, out old))
+                    if (id != null && _oldById.TryGetValue(id.Value, out TItem old))
                         yield return new OldNewPair<TItem>(old, item);
                 }
             }

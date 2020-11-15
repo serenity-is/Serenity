@@ -16,20 +16,21 @@
         /// </remarks>
         public SqlQuery Clone()
         {
-            var clone = new SqlQuery();
-
-            clone.dialect = dialect;
-            clone.dialectOverridden = dialectOverridden;
-            clone.skip = skip;
-            clone.take = take;
-            clone.countRecords = countRecords;
-            clone.distinct = distinct;
-            clone.into = new List<object>(into);
-            clone.intoIndex = intoIndex;
-            clone.forXml = forXml;
-            clone.forJson = forJson;
-            clone.unionQuery = unionQuery;
-            clone.unionType = unionType;
+            var clone = new SqlQuery
+            {
+                dialect = dialect,
+                dialectOverridden = dialectOverridden,
+                skip = skip,
+                take = take,
+                countRecords = countRecords,
+                distinct = distinct,
+                into = new List<object>(into),
+                intoIndex = intoIndex,
+                forXml = forXml,
+                forJson = forJson,
+                unionQuery = unionQuery,
+                unionType = unionType
+            };
 
             Column s;
             for (int i = 0; i < columns.Count; i++)

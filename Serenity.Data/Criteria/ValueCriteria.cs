@@ -10,7 +10,7 @@
     /// <seealso cref="Serenity.Data.BaseCriteria" />
     public class ValueCriteria : BaseCriteria
     {
-        private object value;
+        private readonly object value;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValueCriteria"/> class.
@@ -42,8 +42,7 @@
         /// <param name="query">The target query to add params to.</param>
         public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
-            var enumerable = value as IEnumerable;
-            if (enumerable != null && !(value is string))
+            if (value is IEnumerable enumerable && !(value is string))
             {
                 var c = 0;
                 foreach (var k in enumerable)

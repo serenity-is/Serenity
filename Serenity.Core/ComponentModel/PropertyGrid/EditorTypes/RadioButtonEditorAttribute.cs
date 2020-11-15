@@ -35,7 +35,7 @@ namespace Serenity.ComponentModel
             var lk = enumOrLookupType.GetCustomAttribute<LookupScriptAttribute>(false);
             if (lk == null)
             {
-                throw new ArgumentException(String.Format(
+                throw new ArgumentException(string.Format(
                     "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
                     "be used with a RadioButtonEditor!",
                     enumOrLookupType.FullName), "lookupType");

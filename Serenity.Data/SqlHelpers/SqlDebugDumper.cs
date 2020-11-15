@@ -40,7 +40,7 @@ namespace Serenity.Data
 
             var text = DatabaseCaretReferences.Replace(sb.ToString());
 
-            dialect = dialect ?? SqlSettings.DefaultDialect;
+            dialect ??= SqlSettings.DefaultDialect;
             var openBracket = dialect.OpenQuote;
             if (openBracket != '[')
                 text = BracketLocator.ReplaceBrackets(text, dialect);
@@ -57,45 +57,42 @@ namespace Serenity.Data
             if (value == null || value == DBNull.Value)
                 return "NULL";
 
-            var str = value as string;
-            if (str != null)
+            if (value is string str)
                 return str.ToSql(dialect);
 
             if (value is char || value is char[])
                 return value.ToString().ToSql(dialect);
 
-            if (value is bool)
-                return ((bool)value) ? "1" : "0";
+            if (value is bool b)
+                return b ? "1" : "0";
 
-            if (value is DateTime)
+            if (value is DateTime date)
             {
-                var date = (DateTime)value;
                 if (date.Date == date)
                     return date.ToSqlDate(dialect);
                 else
-                    return ((DateTime)value).ToSql(dialect);
+                    return date.ToSql(dialect);
             }
 
-            if (value is DateTimeOffset)
-                return "'" + ((DateTimeOffset)value).ToString("o") + "'";
+            if (value is DateTimeOffset dto)
+                return "'" + dto.ToString("o") + "'";
 
-            if (value is Guid)
-                return "'" + ((Guid)value).ToString() + "'";
+            if (value is Guid guid)
+                return "'" + guid.ToString() + "'";
 
-            if (value is MemoryStream)
-                value = ((MemoryStream)value).ToArray();
+            if (value is MemoryStream ms)
+                value = ms.ToArray();
 
-            if (value is byte[])
+            if (value is byte[] data)
             {
-                var data = (byte[])value;
                 StringBuilder sb = new StringBuilder("0x");
                 for (int i = 0; i < data.Length; i++)
                     sb.Append(data[i].ToString("h2"));
                 return sb.ToString();
             }
 
-            if (value is IFormattable)
-                return ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
+            if (value is IFormattable formattable)
+                return formattable.ToString(null, CultureInfo.InvariantCulture);
 
             return value.ToString();
         }

@@ -40,10 +40,10 @@ namespace Serenity
             {
                 return fileName;
             }
-            else if (url.Length > 0 && url[url.Length - 1] == '/')
+            else if (url.Length > 0 && url[^1] == '/')
             {
                 if (fileName.Length > 0 && fileName[0] == '/')
-                    return url + fileName.Substring(1);
+                    return url + fileName[1..];
                 else
                     return url + fileName;
             }

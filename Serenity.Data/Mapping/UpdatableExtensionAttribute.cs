@@ -16,11 +16,11 @@ namespace Serenity.Data.Mapping
         /// <param name="rowType">Type of the row.</param>
         public UpdatableExtensionAttribute(string alias, Type rowType)
         {
-            Check.NotNullOrEmpty(alias, "ExtensionRelation.alias");
-            Check.NotNull(rowType, "ExtensionRelation.rowType");
-
-            this.Alias = alias;
-            this.RowType = rowType;
+            if (string.IsNullOrEmpty(alias))
+                throw new ArgumentNullException(nameof(alias));
+            
+            Alias = alias;
+            RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
         }
 
         /// <summary>

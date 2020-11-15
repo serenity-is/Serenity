@@ -76,14 +76,14 @@ namespace Serenity.IO
 
                 // exact match
                 if (s[0] == sep &&
-                    s[s.Length - 1] != '/' &&
-                    s[s.Length - 1] != '\\' &&
+                    s[^1] != '/' &&
+                    s[^1] != '\\' &&
                     s.IndexOfAny(AsteriskQue, 1) < 0)
                 {
                     if (exactMatch == null)
                         exactMatch = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                    exactMatch.Add(s.Substring(1));
+                    exactMatch.Add(s[1..]);
                     continue;
                 }
 
@@ -94,7 +94,7 @@ namespace Serenity.IO
                     if (extensions == null)
                         extensions = new HashSet<string>();
 
-                    extensions.Add(s.Substring(1));
+                    extensions.Add(s[1..]);
                     continue;
                 }
 
@@ -105,7 +105,7 @@ namespace Serenity.IO
                     if (endsWith == null)
                         endsWith = new List<string>();
 
-                    endsWith.Add(s.Substring(1));
+                    endsWith.Add(s[1..]);
                     continue;
                 }
 
@@ -120,7 +120,7 @@ namespace Serenity.IO
                         startsWithAndEndsWith = new List<Tuple<string, bool, string>>();
 
                     startsWithAndEndsWith.Add(new Tuple<string, bool, string>(
-                        s.Substring(1, starDotIndex - 1), false, s.Substring(starDotIndex + 1)));
+                        s[1..starDotIndex], false, s[(starDotIndex + 1)..]));
 
                     continue;
                 }
@@ -133,12 +133,12 @@ namespace Serenity.IO
                     if (startsWithAndEndsWith == null)
                         startsWithAndEndsWith = new List<Tuple<string, bool, string>>();
 
-                    startsWithAndEndsWith.Add(new Tuple<string, bool, string>(null, false, s.Substring(starDotIndex + 1)));
+                    startsWithAndEndsWith.Add(new Tuple<string, bool, string>(null, false, s[(starDotIndex + 1)..]));
                     continue;
                 }
 
                 // directory filter at any depth (.git/)
-                if (s[s.Length - 1] == sep &&
+                if (s[^1] == sep &&
                     s[0] != sep &&
                     s.IndexOfAny(AsteriskQue, 1) < 0)
                 {
@@ -155,14 +155,14 @@ namespace Serenity.IO
                 }
 
                 // directory filter at root (/Imports/)
-                if (s[s.Length - 1] == sep &&
+                if (s[^1] == sep &&
                     s[0] == sep &&
                     s.IndexOfAny(AsteriskQue) < 0)
                 {
                     if (startsWith == null)
                         startsWith = new List<string>();
 
-                    startsWith.Add(s.Substring(1));
+                    startsWith.Add(s[1..]);
                     continue;
                 }
 
@@ -181,7 +181,7 @@ namespace Serenity.IO
                     if (s[0] == sep)
                     {
                         startsWithAndEndsWith.Add(new Tuple<string, bool, string>(
-                            s.Substring(1, starDotIndex - 4), true, s.Substring(starDotIndex + 1)));
+                            s.Substring(1, starDotIndex - 4), true, s[(starDotIndex + 1)..]));
                     }
                     else
                     {
@@ -189,10 +189,10 @@ namespace Serenity.IO
                             containsAndEndsWith = new List<Tuple<string, bool, string>>();
 
                         startsWithAndEndsWith.Add(new Tuple<string, bool, string>(
-                            s.Substring(0, starDotIndex - 3), true, s.Substring(starDotIndex + 1)));
+                            s.Substring(0, starDotIndex - 3), true, s[(starDotIndex + 1)..]));
 
                         containsAndEndsWith.Add(new Tuple<string, bool, string>(
-                            sep.ToString() + s.Substring(0, starDotIndex - 3), true, s.Substring(starDotIndex + 1)));
+                            sep.ToString() + s.Substring(0, starDotIndex - 3), true, s[(starDotIndex + 1)..]));
                     }
 
                     continue;
@@ -205,16 +205,16 @@ namespace Serenity.IO
 
                     if (s[0] == sep)
                     {
-                        exactMatch.Add(s.Substring(0));
+                        exactMatch.Add(s[..]);
                     }
                     else
                     {
-                        exactMatch.Add(s.Substring(0));
+                        exactMatch.Add(s[..]);
 
                         if (endsWith == null)
                             endsWith = new List<string>();
 
-                        endsWith.Add(sep + s.Substring(0));
+                        endsWith.Add(sep + s[..]);
                     }
 
                     continue;
@@ -225,7 +225,7 @@ namespace Serenity.IO
                     if (endsWith == null)
                         endsWith = new List<string>();
 
-                    endsWith.Add(s.Substring(1));
+                    endsWith.Add(s[1..]);
                     continue;
                 }
 
@@ -237,7 +237,7 @@ namespace Serenity.IO
                     if (startsWithAndEndsWith == null)
                         startsWithAndEndsWith = new List<Tuple<string, bool, string>>();
 
-                    startsWithAndEndsWith.Add(new Tuple<string, bool, string>(null, false, s.Substring(2)));
+                    startsWithAndEndsWith.Add(new Tuple<string, bool, string>(null, false, s[2..]));
                     continue;
                 }
 
@@ -411,7 +411,7 @@ namespace Serenity.IO
 
             if (glob.StartsWith("/") ||
                 glob.StartsWith("\\"))
-                glob = glob.Substring(1);
+                glob = glob[1..];
             else if (glob.IndexOf("**") < 0)
                 glob = "**/" + glob;
 

@@ -49,8 +49,10 @@ namespace Serenity.Data.Schema
                 tbl = table   
             }).Select(src =>
             {
-                var fi = new FieldInfo();
-                fi.FieldName = ((string)src.FIELD_NAME).TrimToNull();
+                var fi = new FieldInfo
+                {
+                    FieldName = ((string)src.FIELD_NAME).TrimToNull()
+                };
                 var fieldType = src.FIELD_TYPE == null ? 0 : Convert.ToInt32(src.FIELD_TYPE, CultureInfo.InvariantCulture);
                 var fieldSubType = src.FIELD_SUB_TYPE == null ? 0 : Convert.ToInt32(src.FIELD_SUB_TYPE, CultureInfo.InvariantCulture);
                 var numericScale = src.NUMERIC_SCALE == null ? 0 : Convert.ToInt32(src.NUMERIC_SCALE, CultureInfo.InvariantCulture);
@@ -130,7 +132,7 @@ namespace Serenity.Data.Schema
                 {
                     genprefix = "GEN_" + table + "_%"
                 })
-                .Select(x => x.Substring(("GEN_" + table + "_").Length))
+                .Select(x => x[("GEN_" + table + "_").Length..])
                 .FirstOrDefault()
                 .TrimToNull();
 

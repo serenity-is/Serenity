@@ -23,7 +23,7 @@ namespace Serenity.Data
             HashSet<string> aliases = null;
             EnumerateAliases(expression, s =>
             {
-                aliases = aliases ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                aliases ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 aliases.Add(s);
             });
 
@@ -101,7 +101,7 @@ namespace Serenity.Data
                     {
                         if (startIdent >= 0 && startIdent < i)
                         {
-                            alias(expression.Substring(startIdent, i - startIdent));
+                            alias(expression[startIdent..i]);
                         }
                         startIdent = -1;
                     }
@@ -155,7 +155,7 @@ namespace Serenity.Data
                     {
                         if (startIdent >= 0 && startIdent < i)
                         {
-                            var alias = expression.Substring(startIdent, i - startIdent);
+                            var alias = expression[startIdent..i];
                             var replaced = replace(alias);
                             if (alias != replaced)
                             {

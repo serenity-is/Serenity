@@ -76,7 +76,7 @@ namespace Serenity.Data
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            return String.Format("COUNT(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
+            return string.Format("COUNT(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
         }
 
         /// <summary>
@@ -130,14 +130,12 @@ namespace Serenity.Data
                     sb.Append(", ");
 
                 var value = values[i];
-                if (value is ICriteria)
-                    ((ICriteria)value).ToString(sb, query);
-                else if (value is IQueryWithParams)
-                    sb.Append(((IQueryWithParams) value).ToString());
-                else if (value is IField)
-                {
-                    sb.Append(((IField)value).Expression);
-                }
+                if (value is ICriteria crit)
+                    crit.ToString(sb, query);
+                else if (value is IQueryWithParams qprm)
+                    sb.Append(qprm.ToString());
+                else if (value is IField fld)
+                    sb.Append(fld.Expression);
                 else
                 {
                     var param = query.AutoParam();
@@ -192,7 +190,7 @@ namespace Serenity.Data
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            return String.Format("MIN(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
+            return string.Format("MIN(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
         }
 
         /// <summary>
@@ -235,7 +233,7 @@ namespace Serenity.Data
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            return String.Format("MAX(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
+            return string.Format("MAX(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
         }
 
         /// <summary>
@@ -250,7 +248,7 @@ namespace Serenity.Data
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            return String.Format("SUM(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
+            return string.Format("SUM(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
         }
 
         /// <summary>
@@ -293,7 +291,7 @@ namespace Serenity.Data
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            return String.Format("AVG(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
+            return string.Format("AVG(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
         }
 
         /// <summary>
@@ -313,7 +311,7 @@ namespace Serenity.Data
             if (string.IsNullOrEmpty(field))
                 throw new ArgumentNullException("field");
 
-            return String.Format(" Convert({0},{1}) ", type, field);
+            return string.Format(" Convert({0},{1}) ", type, field);
         }
 
         /// <summary>
@@ -387,8 +385,8 @@ namespace Serenity.Data
         /// </summary>
         public class CaseBuilder
         {
-            private List<ICriteria> when;
-            private List<object> then;
+            private readonly List<ICriteria> when;
+            private readonly List<object> then;
             private object elseValue;
 
             /// <summary>
@@ -443,7 +441,7 @@ namespace Serenity.Data
             /// <exception cref="System.InvalidOperationException">Internal else value is not null</exception>
             public CaseBuilder Else(object elseValue)
             {
-                if (!ReferenceEquals(null, this.elseValue))
+                if (this.elseValue is object)
                     throw new InvalidOperationException();
 
                 this.elseValue = elseValue ?? DBNull.Value;
@@ -480,12 +478,12 @@ namespace Serenity.Data
                     when[i].ToString(sb, query);
                     sb.Append(" THEN ");
                     var value = then[i];
-                    if (value is ICriteria)
-                        ((ICriteria)value).ToString(sb, query);
-                    else if (value is IQueryWithParams)
-                        sb.Append(((IQueryWithParams) value).ToString());
-                    else if (value is IField)
-                        sb.Append(((IField) value).Expression);
+                    if (value is ICriteria crit)
+                        crit.ToString(sb, query);
+                    else if (value is IQueryWithParams qprm)
+                        sb.Append(qprm.ToString());
+                    else if (value is IField fld)
+                        sb.Append(fld.Expression);
                     else
                     {
                         var param = query.AutoParam();
@@ -494,16 +492,16 @@ namespace Serenity.Data
                     }
                 }
 
-                if (!Object.ReferenceEquals(null, elseValue))
+                if (elseValue is object)
                 {
                     sb.Append(" ELSE ");
 
-                    if (elseValue is ICriteria)
-                        ((ICriteria)elseValue).ToString(sb, query);
-                    else if (elseValue is IQueryWithParams)
-                        sb.Append(((IQueryWithParams)elseValue).ToString());
-                    else if (elseValue is IField)
-                        sb.Append(((IField)elseValue).Expression);
+                    if (elseValue is ICriteria crit)
+                        crit.ToString(sb, query);
+                    else if (elseValue is IQueryWithParams qprm)
+                        sb.Append(qprm.ToString());
+                    else if (elseValue is IField fld)
+                        sb.Append(fld.Expression);
                     else
                     {
                         var param = query.AutoParam();

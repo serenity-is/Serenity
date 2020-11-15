@@ -58,7 +58,7 @@ namespace Serenity.Data
         public static IEnumerable<dynamic> Query(this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
         {
             cnn.EnsureOpen();
-            return Dapper.SqlMapper.Query(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), sql.Params == null ? null : new DynamicParameters(sql.Params), null, buffered, commandTimeout, commandType);
+            return Dapper.SqlMapper.Query(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), sql.Params == null ? null : new DynamicParameters(sql.Params), transaction, buffered, commandTimeout, commandType);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Serenity.Data
         public static IEnumerable<TValue> Query<TValue>(this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
         {
             cnn.EnsureOpen();
-            return Dapper.SqlMapper.Query<TValue>(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), sql.Params == null ? null : new DynamicParameters(sql.Params), null, buffered, commandTimeout, commandType);
+            return Dapper.SqlMapper.Query<TValue>(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), sql.Params == null ? null : new DynamicParameters(sql.Params), transaction, buffered, commandTimeout, commandType);
         }
 
         /// <summary>

@@ -1,9 +1,9 @@
 ﻿
 namespace Serenity.Localization
 {
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using Serenity.Abstractions;
-    using Serenity.Configuration;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -78,12 +78,12 @@ namespace Serenity.Localization
 
             foreach (var file in files)
             {
-                var texts = JsonConfigHelper.LoadConfig<Dictionary<string, JToken>>(file);
+                var texts = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(File.ReadAllText(file).TrimToNull() ?? "{}");
                 var langID = Path.GetFileNameWithoutExtension(Path.GetFileName(file));
 
                 var idx = langID.LastIndexOf(".");
                 if (idx >= 0)
-                    langID = langID.Substring(idx + 1);
+                    langID = langID[(idx + 1)..];
 
                 if (langID.ToLowerInvariant() == "invariant")
                     langID = "";

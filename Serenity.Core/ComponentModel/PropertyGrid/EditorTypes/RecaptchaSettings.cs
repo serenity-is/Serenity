@@ -1,10 +1,11 @@
-﻿namespace Serenity.ComponentModel
+﻿using Microsoft.Extensions.Options;
+
+namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Settings for Recaptcha integration
     /// </summary>
-    [SettingKey("Recaptcha"), SettingScope("Application")]
-    public class RecaptchaSettings
+    public class RecaptchaSettings : IOptions<RecaptchaSettings>
     {
         /// <summary>
         /// Gets or sets the site key.
@@ -21,5 +22,10 @@
         /// The secret key.
         /// </value>
         public string SecretKey { get; set; }
+
+        /// <summary>
+        /// Returns this
+        /// </summary>
+        public RecaptchaSettings Value => this;
     }
 }

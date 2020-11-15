@@ -96,8 +96,8 @@ namespace Serenity.Data.Schema
                     AND COLUMNPROPERTY(object_id(TABLE_SCHEMA + '.' + TABLE_NAME), COLUMN_NAME, 'IsIdentity') = 1",
                 new
                 {
-                    schema = schema,
-                    table = table
+                    schema,
+                    table
                 });
         }
 
@@ -121,8 +121,8 @@ namespace Serenity.Data.Schema
                     "ORDER BY ku.ORDINAL_POSITION",
                 new
                 {
-                    schema = schema,
-                    table = table
+                    schema,
+                    table
                 });
         }
 

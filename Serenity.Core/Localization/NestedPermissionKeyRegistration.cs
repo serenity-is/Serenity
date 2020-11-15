@@ -22,7 +22,7 @@ namespace Serenity.Localization
         /// </summary>
         public static HashSet<string> AddNestedPermissions(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies = null)
         {
-            assemblies = assemblies ?? ExtensibilityHelper.SelfAssemblies;
+            assemblies ??= ExtensibilityHelper.SelfAssemblies;
 
             if (assemblies == null)
                 throw new ArgumentNullException("assemblies");

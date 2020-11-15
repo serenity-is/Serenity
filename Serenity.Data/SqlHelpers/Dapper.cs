@@ -2249,7 +2249,7 @@ Type type, IDataReader reader, int startBound = 0, int length = -1, bool returnN
                     if (ctor == null)
                     {
                         string proposedTypes = "(" + String.Join(", ", types.Select((t, i) => t.FullName + " " + names[i]).ToArray()) + ")";
-                        throw new InvalidOperationException(String.Format("A parameterless default constructor or one matching signature {0} is required for {1} materialization", proposedTypes, type.FullName));
+                        throw new InvalidOperationException(string.Format("A parameterless default constructor or one matching signature {0} is required for {1} materialization", proposedTypes, type.FullName));
                     }
 
                     if (ctor.GetParameters().Length == 0)

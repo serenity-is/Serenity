@@ -8,7 +8,7 @@ namespace Serenity.Data
     /// <seealso cref="System.Data.IDbConnection" />
     public class WrappedConnection : IDbConnection
     {
-        private IDbConnection actualConnection;
+        private readonly IDbConnection actualConnection;
         private bool openedOnce;
         private WrappedTransaction currentTransaction;
         private ISqlDialect dialect;
@@ -175,7 +175,7 @@ namespace Serenity.Data
                 else if (SqlSettings.DefaultCommandTimeout.HasValue)
                     command.CommandTimeout = SqlSettings.DefaultCommandTimeout.Value;
 
-                var transaction = this.currentTransaction != null ? this.currentTransaction.ActualTransaction : null;
+                var transaction = currentTransaction?.ActualTransaction;
                 if (transaction != null && transaction.Connection == null)
                     throw new System.Exception("Active transaction for connection is in invalid state! " + 
                         "Connection was probably closed unexpectedly!");

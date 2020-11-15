@@ -190,11 +190,8 @@
         /// </summary>
         public SqlUpdate Dialect(ISqlDialect dialect)
         {
-            if (dialect == null)
-                throw new ArgumentNullException("dialect");
-
-            this.dialect = dialect;
-            this.dialectOverridden = true;
+            this.dialect = dialect ?? throw new ArgumentNullException("dialect");
+            dialectOverridden = true;
 
             return this;
         }
@@ -209,7 +206,7 @@
             var index = expression.IndexOf("T0.", StringComparison.OrdinalIgnoreCase);
             if (index == 0)
             {
-                string rest = expression.Substring(3);
+                string rest = expression[3..];
                 if (SqlSyntax.IsValidQuotedIdentifier(rest))
                     return rest;
             }

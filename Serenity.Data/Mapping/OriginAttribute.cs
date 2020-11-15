@@ -14,9 +14,8 @@ namespace Serenity.Data.Mapping
         /// <param name="property">The property.</param>
         public OriginAttribute(string join, string property = null)
         {
-            Check.NotNullOrEmpty(join, nameof(join));
-            this.Join = join;
-            this.Property = property;
+            Join = join ?? throw new ArgumentNullException(nameof(join));
+            Property = property;
         }
 
         /// <summary>

@@ -78,17 +78,17 @@ namespace Serenity
         /// <returns>Serialized JSON string</returns>
         public static string StringifyIndented(object value, int indentation = 4, bool includeNulls = false)
         {
-            using (var sw = new StringWriter())
-            using (var jw = new JsonTextWriter(sw))
+            using var sw = new StringWriter();
+            using var jw = new JsonTextWriter(sw)
             {
-                jw.Formatting = Formatting.Indented;
-                jw.IndentChar = ' ';
-                jw.Indentation = indentation;
+                Formatting = Formatting.Indented,
+                IndentChar = ' ',
+                Indentation = indentation
+            };
 
-                var serializer = JsonSerializer.Create(includeNulls ? JsonSettings.StrictIncludeNulls : JsonSettings.Strict);
-                serializer.Serialize(jw, value);
-                return sw.ToString();
-            }
+            var serializer = JsonSerializer.Create(includeNulls ? JsonSettings.StrictIncludeNulls : JsonSettings.Strict);
+            serializer.Serialize(jw, value);
+            return sw.ToString();
         }
 
         /// <summary>

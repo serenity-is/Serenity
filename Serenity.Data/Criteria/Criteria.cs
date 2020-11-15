@@ -28,7 +28,7 @@
         /// </summary>
         public static readonly BaseCriteria True = new Criteria("1=1");
         
-        private string expression;
+        private readonly string expression;
 
         /// <summary>
         ///   Creates an empty criteria</summary>

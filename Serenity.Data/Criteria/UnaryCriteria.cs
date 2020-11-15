@@ -9,8 +9,8 @@
     /// <seealso cref="Serenity.Data.BaseCriteria" />
     public class UnaryCriteria : BaseCriteria
     {
-        private CriteriaOperator op;
-        private BaseCriteria operand;
+        private readonly CriteriaOperator op;
+        private readonly BaseCriteria operand;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnaryCriteria"/> class.
@@ -21,7 +21,7 @@
         /// <exception cref="ArgumentOutOfRangeException">operator</exception>
         public UnaryCriteria(CriteriaOperator op, BaseCriteria operand)
         {
-            if (Object.ReferenceEquals(operand, null))
+            if (operand is null)
                 throw new ArgumentNullException("operand");
 
             if (op < CriteriaOperator.Paren || op > CriteriaOperator.Exists)

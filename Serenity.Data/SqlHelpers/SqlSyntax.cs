@@ -11,7 +11,7 @@ namespace Serenity.Data
         private static string[] _indexParam;
         private static string[] _tableAlias;
         private static string[] _tableAliasDot;
-        private static CultureInfo _invariant = CultureInfo.InvariantCulture;
+        private static readonly CultureInfo _invariant = CultureInfo.InvariantCulture;
 
         /// <summary>
         ///   Returns an indexed parameter name like @p123.</summary>
@@ -115,7 +115,7 @@ namespace Serenity.Data
             if (!IsQuoted(s))
                 return IsValidIdentifier(s);
 
-            if (s[1] == ' ' || s[s.Length - 2] == ' ')
+            if (s[1] == ' ' || s[^2] == ' ')
                 return false;
 
             Char c;
@@ -144,11 +144,11 @@ namespace Serenity.Data
                 return false;
 
             if ((s[0] == '[' &&
-                 s[s.Length - 1] == ']') ||
+                 s[^1] == ']') ||
                 (s[0] == '"' &&
-                 s[s.Length - 1] == '"') ||
+                 s[^1] == '"') ||
                 (s[0] == '`' &&
-                 s[s.Length - 1] == '`'))
+                 s[^1] == '`'))
             {
                 return true;
             }
@@ -201,7 +201,7 @@ namespace Serenity.Data
             if (!IsQuoted(s))
                 return s;
 
-            return s.Substring(1, s.Length - 2);
+            return s[1..^1];
         }
     }
 }

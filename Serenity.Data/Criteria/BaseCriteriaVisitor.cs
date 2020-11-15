@@ -22,25 +22,25 @@
         /// <exception cref="Exception">Criteria type is unkown.</exception>
         protected virtual BaseCriteria Visit(BaseCriteria criteria)
         {
-            if (Object.ReferenceEquals(null, criteria))
+            if (criteria is null)
                 return null;
 
-            if (criteria is Criteria)
-                return VisitCriteria((Criteria)criteria);
+            if (criteria is Criteria crit)
+                return VisitCriteria(crit);
 
-            if (criteria is BinaryCriteria)
-                return VisitBinary((BinaryCriteria)criteria);
+            if (criteria is BinaryCriteria binary)
+                return VisitBinary(binary);
 
-            if (criteria is UnaryCriteria)
-                return VisitUnary((UnaryCriteria)criteria);
+            if (criteria is UnaryCriteria unary)
+                return VisitUnary(unary);
 
-            if (criteria is ValueCriteria)
-                return VisitValue((ValueCriteria)criteria);
+            if (criteria is ValueCriteria value)
+                return VisitValue(value);
 
-            if (criteria is ParamCriteria)
-                return VisitParam((ParamCriteria)criteria);
+            if (criteria is ParamCriteria prm)
+                return VisitParam(prm);
 
-            throw new Exception(String.Format("Unhandled criteria type: '{0}'", criteria.GetType().Name));
+            throw new InvalidProgramException(string.Format("Unhandled criteria type: '{0}'", criteria.GetType().Name));
         }
 
         /// <summary>

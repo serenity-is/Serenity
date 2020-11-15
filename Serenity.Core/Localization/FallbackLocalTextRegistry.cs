@@ -74,11 +74,11 @@ namespace Serenity.Localization
             var lastDot = key.LastIndexOf('.');
             if (lastDot > 0 && lastDot < key.Length - 1)
             {
-                key = key.Substring(lastDot + 1);
+                key = key[(lastDot + 1)..];
 
                 // Remove Id
                 if (key.Length > 2 && key.EndsWith("Id"))
-                    key = key.Substring(0, key.Length - 2);
+                    key = key[0..^2];
 
                 return key;
             }
@@ -86,7 +86,7 @@ namespace Serenity.Localization
             // Get last part of the key after the last forward slash
             var lastSlash = key.LastIndexOf('/');
             if (lastSlash > 0 && lastSlash < key.Length - 1)
-                return key.Substring(lastSlash + 1);
+                return key[(lastSlash + 1)..];
 
             return null;
         }

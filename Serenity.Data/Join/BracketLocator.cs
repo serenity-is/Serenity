@@ -119,18 +119,17 @@ namespace Serenity.Data
 
                     if (end < expression.Length - 1 &&
                         (expression[end + 1] == '_' ||
-                         Char.IsLetterOrDigit(expression[end + 1])))
+                         char.IsLetterOrDigit(expression[end + 1])))
                     {
                         sb.Append(c);
                         continue;
                     }
 
-                    long l;
                     var sub = expression.SafeSubstring(i + 1, end - i - 1);
                     if (sub.Length == 0 ||
                         sub.IndexOf('\'') >= 0 ||
                         sub.IndexOf('[') >= 0 ||
-                        Int64.TryParse(sub, out l))
+                        long.TryParse(sub, out _))
                     {
                         sb.Append(c);
                         continue;

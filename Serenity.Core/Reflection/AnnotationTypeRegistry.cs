@@ -91,8 +91,8 @@ namespace Serenity.Reflection
                                 ns.EndsWith(".*", StringComparison.OrdinalIgnoreCase) &&
                                 type.Namespace != null)
                             {
-                                if (type.Namespace == ns.Substring(0, ns.Length - 2) ||
-                                    type.Namespace.StartsWith(ns.Substring(0, ns.Length - 1), StringComparison.OrdinalIgnoreCase))
+                                if (type.Namespace == ns[0..^2] ||
+                                    type.Namespace.StartsWith(ns[0..^1], StringComparison.OrdinalIgnoreCase))
                                 {
                                     namespaceMatch = true;
                                     break;

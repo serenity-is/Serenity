@@ -18,7 +18,7 @@
                 sb.Append(join.Name);
             }
 
-            if (!ReferenceEquals(null, join.OnCriteria) &&
+            if (join.OnCriteria is object &&
                 !join.OnCriteria.IsEmpty)
             {
                 sb.Append(" ON ");
@@ -50,15 +50,14 @@
             var sb = new StringBuilder();
             JoinToString(join, sb, modifySelf: false);
             string expression = sb.ToString();
-            string existingExpression;
 
             if (!string.IsNullOrEmpty(join.Name) &&
-                aliasExpressions != null && aliasExpressions.TryGetValue(join.Name, out existingExpression))
+                aliasExpressions != null && aliasExpressions.TryGetValue(join.Name, out string existingExpression))
             {
                 if (expression == existingExpression)
                     return this;
 
-                throw new InvalidOperationException(String.Format("Query already has a join '{0}' with expression '{1}'. " +
+                throw new InvalidOperationException(string.Format("Query already has a join '{0}' with expression '{1}'. " +
                     "Attempted join expression is '{2}'", join.Name, existingExpression, expression));
             }
 
@@ -71,9 +70,8 @@
             {
                 AliasExpressions[join.Name] = expression;
 
-                var haveJoins = join as IHaveJoins;
-                if (haveJoins != null)
-                    AliasWithJoins[join.Name] = haveJoins;
+                if (join as IHaveJoins != null)
+                    AliasWithJoins[join.Name] = join as IHaveJoins;
             }
 
             return this;
@@ -101,8 +99,7 @@
 
             Join(join);
 
-            var haveJoins = alias as IHaveJoins;
-            if (haveJoins != null)
+            if (alias is IHaveJoins haveJoins)
                 AliasWithJoins[alias.Name] = haveJoins;
 
             return this;
@@ -129,9 +126,8 @@
 
             Join(join);
 
-            var haveJoins = alias as IHaveJoins;
-            if (haveJoins != null)
-                AliasWithJoins[alias.Name] = haveJoins;
+            if (alias as IHaveJoins != null)
+                AliasWithJoins[alias.Name] = alias as IHaveJoins;
 
             return this;
         }
@@ -160,8 +156,7 @@
 
             Join(join);
 
-            var haveJoins = alias as IHaveJoins;
-            if (haveJoins != null)
+            if (alias is IHaveJoins haveJoins)
                 AliasWithJoins[alias.Name] = haveJoins;
 
             return this;
@@ -190,9 +185,8 @@
 
             Join(join);
 
-            var haveJoins = alias as IHaveJoins;
-            if (haveJoins != null)
-                AliasWithJoins[alias.Name] = haveJoins;
+            if (alias as IHaveJoins != null)
+                AliasWithJoins[alias.Name] = alias as IHaveJoins;
 
             return this;
         }
@@ -220,8 +214,7 @@
 
             Join(join);
 
-            var haveJoins = alias as IHaveJoins;
-            if (haveJoins != null)
+            if (alias is IHaveJoins haveJoins)
                 AliasWithJoins[alias.Name] = haveJoins;
 
             return this;
@@ -229,16 +222,14 @@
 
         void EnsureJoin(string joinAlias)
         {
-            Join join;
             if (aliasWithJoins == null)
                 return;
 
             foreach (var haveJoin in aliasWithJoins)
             {
-                var alias = haveJoin.Value as IAlias;
-                if (alias != null && haveJoin.Key == alias.Name)
+                if (haveJoin.Value is IAlias alias && haveJoin.Key == alias.Name)
                 {
-                    if (haveJoin.Value.Joins.TryGetValue(joinAlias, out join))
+                    if (haveJoin.Value.Joins.TryGetValue(joinAlias, out Join join))
                     {
                         EnsureJoin(join);
                         break;
@@ -258,8 +249,7 @@
             if (string.IsNullOrEmpty(expression))
                 return this;
 
-            string referencedJoin;
-            var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out referencedJoin);
+            var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out string referencedJoin);
 
             if (referencedJoin != null)
                 EnsureJoin(referencedJoin);
@@ -282,8 +272,6 @@
             if (join == null)
                 throw new ArgumentNullException("join");
 
-            var ext = (ISqlQueryExtensible)this;
-
             var joinAlias = join.Name;
             if (aliasExpressions != null && aliasExpressions.ContainsKey(joinAlias))
                 return this;
@@ -292,11 +280,10 @@
                 join.ReferencedAliases != null)
                 foreach (var alias in join.ReferencedAliases)
                 {
-                    if (String.Compare(alias, joinAlias, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Compare(alias, joinAlias, StringComparison.OrdinalIgnoreCase) == 0)
                         continue;
 
-                    Join other;
-                    if (join.Joins.TryGetValue(alias, out other))
+                    if (join.Joins.TryGetValue(alias, out Join other))
                         EnsureJoin(other);
                 }
 

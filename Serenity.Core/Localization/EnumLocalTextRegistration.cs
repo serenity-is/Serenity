@@ -28,7 +28,7 @@ namespace Serenity.Localization
         public static void AddEnumTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies = null,
             string languageID = LocalText.InvariantLanguageID)
         {
-            assemblies = assemblies ?? ExtensibilityHelper.SelfAssemblies;
+            assemblies ??= ExtensibilityHelper.SelfAssemblies;
 
             if (assemblies == null)
                 throw new ArgumentNullException("assemblies");

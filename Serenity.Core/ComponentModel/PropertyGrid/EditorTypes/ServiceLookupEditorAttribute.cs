@@ -56,22 +56,22 @@ namespace Serenity.ComponentModel
                 module = type.Namespace ?? "";
 
                 if (module.EndsWith(".Entities"))
-                    module = module.Substring(0, module.Length - 9);
+                    module = module[0..^9];
                 else if (module.EndsWith(".Scripts"))
-                    module = module.Substring(0, module.Length - 8);
+                    module = module[0..^8];
                 else if (module.EndsWith(".Lookups"))
-                    module = module.Substring(0, module.Length - 8);
+                    module = module[0..^8];
 
                 var idx = module.IndexOf(".");
                 if (idx >= 0)
-                    module = module.Substring(idx + 1);
+                    module = module[(idx + 1)..];
             }
 
             var name = type.Name;
             if (name.EndsWith("Row"))
-                name = name.Substring(0, name.Length - 3);
+                name = name[0..^3];
             else if (name.EndsWith("Lookup"))
-                name = name.Substring(0, name.Length - 6);
+                name = name[0..^6];
 
             return (string.IsNullOrEmpty(module) ? name  :
                 module + "/" + name) + "/List";

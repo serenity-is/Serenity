@@ -334,23 +334,16 @@ namespace Serenity.Data
         /// <exception cref="System.NotImplementedException"></exception>
         public string UnionKeyword(SqlUnionType unionType)
         {
-            switch (unionType)
+            return unionType switch
             {
-                case SqlUnionType.Union:
-                    return "UNION";
-                case SqlUnionType.UnionAll:
-                    return "UNION ALL";
-                case SqlUnionType.Intersect:
-                    return "INTERSECT";
-                case SqlUnionType.IntersectAll:
-                    return "INTERSECT ALL";
-                case SqlUnionType.Except:
-                    return "EXCEPT";
-                case SqlUnionType.ExceptAll:
-                    return "EXCEPT ALL";
-                default:
-                    throw new NotImplementedException();
-            }
+                SqlUnionType.Union => "UNION",
+                SqlUnionType.UnionAll => "UNION ALL",
+                SqlUnionType.Intersect => "INTERSECT",
+                SqlUnionType.IntersectAll => "INTERSECT ALL",
+                SqlUnionType.Except => "EXCEPT",
+                SqlUnionType.ExceptAll => "EXCEPT ALL",
+                _ => throw new NotImplementedException(),
+            };
         }
 
         /// <summary>

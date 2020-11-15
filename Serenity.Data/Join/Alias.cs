@@ -56,9 +56,9 @@ namespace Serenity.Data
         /// </summary>
         public static readonly Alias T9 = new Alias(9);
 
-        private string alias;
-        private string aliasDot;
-        private string table;
+        private readonly string alias;
+        private readonly string aliasDot;
+        private readonly string table;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Alias"/> class.
@@ -67,7 +67,7 @@ namespace Serenity.Data
         public Alias(int alias)
         {
             this.alias = alias.TableAlias();
-            this.aliasDot = alias.TableAliasDot();
+            aliasDot = alias.TableAliasDot();
         }
 
         /// <summary>

@@ -31,7 +31,7 @@
 
             if (!SqlSyntax.IsValidIdentifier(criteria.Expression))
                 throw new ValidationError("InvalidCriteriaField",
-                    String.Format("{0} is not a valid field name!", criteria.Expression));
+                    string.Format("{0} is not a valid field name!", criteria.Expression));
 
             return base.VisitCriteria(criteria);
         }

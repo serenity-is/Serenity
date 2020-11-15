@@ -9,9 +9,9 @@
     /// <seealso cref="Serenity.Data.BaseCriteria" />
     public class BinaryCriteria : BaseCriteria
     {
-        private BaseCriteria left;
-        private BaseCriteria right;
-        private CriteriaOperator op;
+        private readonly BaseCriteria left;
+        private readonly BaseCriteria right;
+        private readonly CriteriaOperator op;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryCriteria"/> class.
@@ -25,10 +25,10 @@
         /// <exception cref="ArgumentOutOfRangeException">Operator is not a binary one.</exception>
         public BinaryCriteria(BaseCriteria left, CriteriaOperator op, BaseCriteria right)
         {
-            if (ReferenceEquals(left, null))
+            if (left is null)
                 throw new ArgumentNullException("left");
 
-            if (ReferenceEquals(right, null))
+            if (right is null)
                 throw new ArgumentNullException("right");
 
             if (op < CriteriaOperator.AND || op > CriteriaOperator.NotLike)
@@ -47,25 +47,24 @@
         /// <param name="query">The target query.</param>
         public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
-            if (this.op == CriteriaOperator.Like ||
-                this.op == CriteriaOperator.NotLike)
+            if (op == CriteriaOperator.Like ||
+                op == CriteriaOperator.NotLike)
             {
-                var valueCriteria = this.right as ValueCriteria;
                 if (query.Dialect.IsLikeCaseSensitive &&
-                    !ReferenceEquals(null, valueCriteria) &&
+                    right is ValueCriteria valueCriteria &&
                     valueCriteria.Value is string)
                 {
                     sb.Append("UPPER(");
-                    this.left.ToString(sb, query);
-                    sb.Append(this.op == CriteriaOperator.Like ? ") LIKE UPPER(" : ") NOT LIKE UPPER(");
-                    this.right.ToString(sb, query);
+                    left.ToString(sb, query);
+                    sb.Append(op == CriteriaOperator.Like ? ") LIKE UPPER(" : ") NOT LIKE UPPER(");
+                    right.ToString(sb, query);
                     sb.Append(")");
                 }
                 else
                 {
-                    this.left.ToString(sb, query);
-                    sb.Append(this.op == CriteriaOperator.Like ? " LIKE " : " NOT LIKE ");
-                    this.right.ToString(sb, query);
+                    left.ToString(sb, query);
+                    sb.Append(op == CriteriaOperator.Like ? " LIKE " : " NOT LIKE ");
+                    right.ToString(sb, query);
                 }
             }
             else

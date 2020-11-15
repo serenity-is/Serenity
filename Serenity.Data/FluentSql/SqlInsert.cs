@@ -144,11 +144,8 @@
         /// </summary>
         public SqlInsert Dialect(ISqlDialect dialect)
         {
-            if (dialect == null)
-                throw new ArgumentNullException("dialect");
-
-            this.dialect = dialect;
-            this.dialectOverridden = true;
+            this.dialect = dialect ?? throw new ArgumentNullException("dialect");
+            dialectOverridden = true;
 
             return this;
         }

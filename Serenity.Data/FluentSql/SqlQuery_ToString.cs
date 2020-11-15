@@ -291,9 +291,9 @@ namespace Serenity.Data
             if (useOffset)
             {
                 if (take == 0)
-                    sb.Append(String.Format(dialect.OffsetFormat, skip, take));
+                    sb.Append(string.Format(dialect.OffsetFormat, skip, take));
                 else
-                    sb.Append(String.Format(dialect.OffsetFetchFormat, skip, take));
+                    sb.Append(string.Format(dialect.OffsetFetchFormat, skip, take));
             }
 
             if (!string.IsNullOrEmpty(forXml))

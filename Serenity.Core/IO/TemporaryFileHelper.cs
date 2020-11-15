@@ -59,7 +59,7 @@ namespace Serenity.IO
         public static void PurgeDirectory(string directoryToClean,
             TimeSpan autoExpireTime, int maxFilesInDirectory, string checkFileName)
         {
-            checkFileName = checkFileName ?? String.Empty;
+            checkFileName ??= String.Empty;
             if (checkFileName.Length > 0)
             {
                 checkFileName = System.IO.Path.GetFileName(checkFileName).Trim();
@@ -193,8 +193,8 @@ namespace Serenity.IO
                 {
                     string deleteFile = filePath + ".delete";
                     long fileTime = File.GetLastWriteTimeUtc(filePath).ToFileTimeUtc();
-                    using (var sw = new StreamWriter(File.OpenWrite(deleteFile)))
-                        sw.Write(fileTime);                
+                    using var sw = new StreamWriter(File.OpenWrite(deleteFile));
+                    sw.Write(fileTime);
                 }
                 catch 
                 {
@@ -217,7 +217,7 @@ namespace Serenity.IO
                         string readLine;
                         using (var sr = new StreamReader(File.OpenRead(name)))
                              readLine = sr.ReadToEnd();
-                        string actualFile = name.Substring(0, name.Length - 7);
+                        string actualFile = name[0..^7];
                         if (File.Exists(actualFile))
                         {
                             if (long.TryParse(readLine, out long fileTime))

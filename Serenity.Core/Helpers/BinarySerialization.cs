@@ -36,11 +36,9 @@ namespace Serenity.Data
         /// <param name="deserialize">Deserialization delegate</param>
         public static TValue Deserialize<TValue>(byte[] input, Func<BinaryReader, TValue> deserialize)
         {
-            using (var ms = new MemoryStream(input))
-            using (var sw = new BinaryReader(ms, Encoding.UTF8))
-            {
-                return deserialize(sw);
-            }
+            using var ms = new MemoryStream(input);
+            using var sw = new BinaryReader(ms, Encoding.UTF8);
+            return deserialize(sw);
         }
     }
 }

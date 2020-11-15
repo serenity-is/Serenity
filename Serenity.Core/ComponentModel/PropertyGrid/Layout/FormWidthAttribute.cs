@@ -123,7 +123,7 @@ namespace Serenity.ComponentModel
             if (klass == null)
                 return null;
 
-            if (!int.TryParse(klass.Substring(prefix.Length), out int cols))
+            if (!int.TryParse(klass[prefix.Length..], out int cols))
                 return null;
 
             return cols;

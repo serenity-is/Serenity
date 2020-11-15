@@ -118,9 +118,8 @@
 
             AliasExpressions.Add(alias.Name, table + " " + alias.Name);
 
-            var haveJoins = alias as IHaveJoins;
-            if (haveJoins != null)
-                AliasWithJoins[alias.Name] = haveJoins;
+            if (alias as IHaveJoins != null)
+                AliasWithJoins[alias.Name] = alias as IHaveJoins;
 
             return this;
         }
@@ -305,7 +304,7 @@
             orderBy.RemoveAll(x => String.Compare((x ?? "").Trim(), search, StringComparison.OrdinalIgnoreCase) == 0);
 
             if (search.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
-                search = search.Substring(0, search.Length - 5).Trim();
+                search = search[0..^5].Trim();
             else
                 search += " DESC";
 
@@ -598,11 +597,8 @@
         /// </summary>
         public SqlQuery Dialect(ISqlDialect dialect)
         {
-            if (dialect == null)
-                throw new ArgumentNullException("dialect");
-
-            this.dialect = dialect;
-            this.dialectOverridden = true;
+            this.dialect = dialect ?? throw new ArgumentNullException("dialect");
+            dialectOverridden = true;
 
             return this;
         }

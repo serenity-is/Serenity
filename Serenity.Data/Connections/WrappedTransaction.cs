@@ -9,7 +9,7 @@ namespace Serenity.Data
     public class WrappedTransaction : IDbTransaction
     {
         private WrappedConnection wrappedConnection;
-        private IDbTransaction actualTransaction;
+        private readonly IDbTransaction actualTransaction;
 
         /// <summary>
         ///   Creates a new WrappedTransaction instance.</summary>

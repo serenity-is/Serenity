@@ -284,7 +284,7 @@ namespace Serenity
                 return String.Empty;
 
             if (startIndex + maxLength > len)
-                return value.Substring(startIndex);
+                return value[startIndex..];
 
             return value.Substring(startIndex, maxLength);
         }

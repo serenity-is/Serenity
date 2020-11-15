@@ -17,7 +17,7 @@ namespace Serenity.Data
         ///   Query itself.</returns>
         public static T Where<T>(this T self, ICriteria filter) where T : IFilterableQuery
         {
-            if (!ReferenceEquals(null, filter) && !filter.IsEmpty)
+            if (filter is object && !filter.IsEmpty)
             {
                 var statement = filter.ToString(self);
                 self.Where(statement);

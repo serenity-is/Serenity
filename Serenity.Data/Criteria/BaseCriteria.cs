@@ -15,8 +15,8 @@
     [JsonConverter(typeof(JsonCriteriaConverter))]
     public abstract class BaseCriteria : ICriteria
     {
-        private static NoParamsChecker noParamsChecker = new NoParamsChecker();
-        private static IgnoreParams ignoreParams = new IgnoreParams();
+        private static readonly NoParamsChecker noParamsChecker = new NoParamsChecker();
+        private static readonly IgnoreParams ignoreParams = new IgnoreParams();
 
         /// <summary>
         /// Gets a value indicating whether this criteria instance is empty.
@@ -157,7 +157,7 @@
         /// <exception cref="ArgumentNullException">statement is null or empty</exception>
         public BaseCriteria In(BaseCriteria statement)
         {
-            if (Object.ReferenceEquals(null, statement) || statement.IsEmpty)
+            if (statement is null || statement.IsEmpty)
                 throw new ArgumentNullException("statement");
 
             return new BinaryCriteria(this, CriteriaOperator.In, statement);
@@ -181,7 +181,7 @@
         /// <exception cref="ArgumentNullException">statement is null</exception>
         public BaseCriteria In(ISqlQuery statement)
         {
-            if (Object.ReferenceEquals(null, statement))
+            if (statement is null)
                 throw new ArgumentNullException("statement");
 
             return new BinaryCriteria(this, CriteriaOperator.In, new Criteria(statement));
@@ -229,7 +229,7 @@
         /// <exception cref="ArgumentNullException">statement is null or empty</exception>
         public BaseCriteria NotIn(BaseCriteria statement)
         {
-            if (Object.ReferenceEquals(null, statement) || statement.IsEmpty)
+            if (statement is null || statement.IsEmpty)
                 throw new ArgumentNullException("statement");
 
             return new BinaryCriteria(this, CriteriaOperator.NotIn, statement);
@@ -243,7 +243,7 @@
         /// <exception cref="ArgumentNullException">statement is null</exception>
         public BaseCriteria NotIn(ISqlQuery statement)
         {
-            if (Object.ReferenceEquals(null, statement))
+            if (statement is null)
                 throw new ArgumentNullException("statement");
 
             return new BinaryCriteria(this, CriteriaOperator.NotIn, new Criteria(statement));
@@ -1043,10 +1043,10 @@
 
         private static BaseCriteria JoinIf(BaseCriteria criteria1, BaseCriteria criteria2, CriteriaOperator op)
         {
-            if (ReferenceEquals(null, criteria1) || criteria1.IsEmpty)
+            if (criteria1 is null || criteria1.IsEmpty)
                 return criteria2;
 
-            if (ReferenceEquals(null, criteria2) || criteria2.IsEmpty)
+            if (criteria2 is null || criteria2.IsEmpty)
                 return criteria1;
 
             return new BinaryCriteria(criteria1, op, criteria2);
@@ -1109,7 +1109,9 @@
         /// Must return FALSE from this for short circuit OR (||) to return 
         /// a new binary criteria merging left and right operands in any case
         /// </summary>
+#pragma warning disable IDE0060 // Remove unused parameter
         public static bool operator false(BaseCriteria statement)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             return false;
         }
@@ -1119,7 +1121,9 @@
         /// a new binary criteria merging left and right operands in any case
         /// https://msdn.microsoft.com/en-us/library/aa691312
         /// </summary>
+#pragma warning disable IDE0060 // Remove unused parameter
         public static bool operator true(BaseCriteria statement)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             return false;
         }

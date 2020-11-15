@@ -17,14 +17,10 @@ namespace Serenity.Data.Mapping
         /// <param name="itemKey">Name of the field in linking row that will hold item values in list</param>
         public LinkingSetRelationAttribute(Type rowType, string thisKey, string itemKey)
         {
-            Check.NotNull(rowType, "LinkingSetRelationAttribute.RowType");
-            Check.NotNullOrEmpty(thisKey, "LinkingSetRelationAttribute.ThisKey");
-            Check.NotNullOrEmpty(itemKey, "LinkingSetRelationAttribute.ItemKey");
-
-            this.RowType = rowType;
-            this.ThisKey = thisKey;
-            this.ItemKey = itemKey;
-            this.HandleEqualityFilter = true;
+            RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
+            ThisKey = thisKey ?? throw new ArgumentNullException(nameof(thisKey));
+            ItemKey = itemKey ?? throw new ArgumentNullException(nameof(itemKey));
+            HandleEqualityFilter = true;
         }
 
         /// <summary>

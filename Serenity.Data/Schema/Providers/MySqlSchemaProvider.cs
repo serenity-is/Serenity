@@ -32,9 +32,11 @@ namespace Serenity.Data.Schema
                 .OrderBy(x => Convert.ToInt32(x.ORDINAL_POSITION))
                 .Select(src =>
                 {
-                    var fi = new FieldInfo();
-                    fi.FieldName = src.Field;
-                    fi.IsNullable = ((string)src.Null) != "NO";
+                    var fi = new FieldInfo
+                    {
+                        FieldName = src.Field,
+                        IsNullable = ((string)src.Null) != "NO"
+                    };
                     var dataType = (string)src.Type;
                     var dx = dataType.IndexOf('(');
                     if (dx >= 0)

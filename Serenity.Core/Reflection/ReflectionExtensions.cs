@@ -24,7 +24,7 @@ namespace Serenity
                 return null;
 
             if (attrs.Count() >  1)
-                throw new InvalidOperationException(String.Format("{0} has more than 1 of {1} attribute", member.Name, typeof(TAttribute).Name));
+                throw new InvalidOperationException(string.Format("{0} has more than 1 of {1} attribute", member.Name, typeof(TAttribute).Name));
 
             return (TAttribute)attrs.First();
         }

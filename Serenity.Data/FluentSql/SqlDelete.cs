@@ -12,10 +12,7 @@
 
         private void Initialize(string tableName)
         {
-            if (tableName == null)
-                throw new ArgumentNullException("tableName");
-
-            _tableName = tableName;
+            _tableName = tableName ?? throw new ArgumentNullException("tableName");
             _where = new StringBuilder();
         }
 

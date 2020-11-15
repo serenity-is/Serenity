@@ -6,8 +6,8 @@
     /// <typeparam name="TItem">The type of the item.</typeparam>
     public struct OldNewPair<TItem>
     {
-        private TItem _old;
-        private TItem _new;
+        private readonly TItem _old;
+        private readonly TItem _new;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OldNewPair{TItem}"/> struct.

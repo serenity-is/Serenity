@@ -10,7 +10,7 @@ namespace Serenity.Data
     /// <seealso cref="Serenity.Data.IUnitOfWork" />
     public class UnitOfWork : IDisposable, IUnitOfWork
     {
-        private IDbConnection _connection;
+        private readonly IDbConnection _connection;
         private IDbTransaction _transaction;
         private Action _commit;
         private Action _rollback;
@@ -22,10 +22,7 @@ namespace Serenity.Data
         /// <exception cref="System.ArgumentNullException">connection</exception>
         public UnitOfWork(IDbConnection connection)
         {
-            if (connection == null)
-                throw new ArgumentNullException("connection");
-
-            _connection = connection;
+            _connection = connection ?? throw new ArgumentNullException("connection");
             connection.EnsureOpen();
             _transaction = connection.BeginTransaction();
         }

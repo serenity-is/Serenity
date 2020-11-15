@@ -16,9 +16,9 @@ namespace Serenity.Data.Mapping
         /// <param name="isExplicit">if set to <c>true</c> [is explicit].</param>
         public QuickSearchAttribute(SearchType searchType = SearchType.Auto, int numericOnly = -1, bool isExplicit = false)
         {
-            this.SearchType = searchType;
-            this.NumericOnly = numericOnly < 0 ? (bool?)null : (numericOnly > 0 ? true : false);
-            this.IsExplicit = isExplicit;
+            SearchType = searchType;
+            NumericOnly = numericOnly < 0 ? (bool?)null : (numericOnly > 0);
+            IsExplicit = isExplicit;
         }
 
         /// <summary>

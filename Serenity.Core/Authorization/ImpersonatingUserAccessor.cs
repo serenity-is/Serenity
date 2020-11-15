@@ -9,19 +9,19 @@ namespace Serenity.Web
     /// <summary>
     /// Adds impersonation support to any IUserContext implementation
     /// </summary>
-    public class ImpersonatingUserContext : IUserContext, IImpersonator
+    public class ImpersonatingUserAccessor : IUserAccessor, IImpersonator
     {
-        private readonly IUserContext userContext;
+        private readonly IUserAccessor userContext;
         private readonly IRequestContext requestContext;
         private readonly ThreadLocal<Stack<ClaimsPrincipal>> impersonationStack = new ThreadLocal<Stack<ClaimsPrincipal>>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ImpersonatingUserContext"/> class
+        /// Initializes a new instance of the <see cref="ImpersonatingUserAccessor"/> class
         /// that wraps passed authorization service and adds impersonation support.
         /// </summary>
         /// <param name="userContext">The user accessor service to wrap with impersonation support.</param>
         /// <param name="requestContext">Request context</param>
-        public ImpersonatingUserContext(IUserContext userContext, IRequestContext requestContext)
+        public ImpersonatingUserAccessor(IUserAccessor userContext, IRequestContext requestContext)
         {
             this.userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
             this.requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));

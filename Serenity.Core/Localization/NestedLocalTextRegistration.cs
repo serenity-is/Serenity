@@ -22,7 +22,7 @@ namespace Serenity.Localization
         /// </summary>
         public static void AddNestedTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies = null)
         {
-            assemblies = assemblies ?? ExtensibilityHelper.SelfAssemblies;
+            assemblies ??= ExtensibilityHelper.SelfAssemblies;
 
             if (assemblies == null)
                 throw new ArgumentNullException("assemblies");
@@ -69,7 +69,7 @@ namespace Serenity.Localization
             {
                 var name = nested.Name;
                 if (name.EndsWith("_"))
-                    name = name.Substring(0, name.Length - 1);
+                    name = name[0..^1];
 
                 Initialize(registry, nested, languageID, prefix + name + ".");
             }

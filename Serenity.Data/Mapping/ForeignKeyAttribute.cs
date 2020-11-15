@@ -18,11 +18,8 @@ namespace Serenity.Data.Mapping
         /// <param name="field">Matching column in primary key table</param>
         public ForeignKeyAttribute(string table, string field)
         {
-            Check.NotNull(table, nameof(table));
-            Check.NotNull(field, nameof(field));
-
-            this.Field = field;
-            this.Table = table;
+            Field = field ?? throw new ArgumentNullException(nameof(field));
+            Table = table ?? throw new ArgumentNullException(nameof(table));
         }
 
         /// <summary>
@@ -34,13 +31,12 @@ namespace Serenity.Data.Mapping
         /// (implementing IIdRow won't help)</param>
         public ForeignKeyAttribute(Type rowType, string field = null)
         {
-            Check.NotNull(rowType, nameof(rowType));
-            this.RowType = rowType;
+            this.RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
 
             var attr = rowType.GetCustomAttribute<TableNameAttribute>(true);
             if (attr == null || string.IsNullOrEmpty(attr.Name))
                 throw new ArgumentOutOfRangeException(nameof(rowType),
-                    String.Format("Type '{0}' is specified for a ForeignKey attribute " +
+                    string.Format("Type '{0}' is specified for a ForeignKey attribute " +
                         "but it has no [TableName] attribute", rowType.FullName));
 
             this.Table = attr.Name;
@@ -53,7 +49,7 @@ namespace Serenity.Data.Mapping
 
                 if (identityOrPrimaryKey.Length == 0)
                     throw new ArgumentOutOfRangeException(nameof(rowType),
-                        String.Format("Type '{0}' is specified for a ForeignKey attribute " + 
+                        string.Format("Type '{0}' is specified for a ForeignKey attribute " + 
                             "but it has no property with [Identity] or [PrimaryKey] attribute",
                             rowType.FullName));
 
@@ -64,7 +60,7 @@ namespace Serenity.Data.Mapping
 
                     if (identity.Count() != 1)
                         throw new ArgumentOutOfRangeException(nameof(rowType),
-                            String.Format("Type '{0}' is specified for a ForeignKey attribute " + 
+                            string.Format("Type '{0}' is specified for a ForeignKey attribute " + 
                             "but it has multiple [Identity] or [PrimaryKey] attributes",
                             rowType.FullName));
 

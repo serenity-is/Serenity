@@ -37,7 +37,7 @@ namespace Serenity.Data
                 }
 
                 if (idx < contents.Length - 1)
-                    return contents.Substring(idx + 1);
+                    return contents[(idx + 1)..];
 
                 return contents;
             });

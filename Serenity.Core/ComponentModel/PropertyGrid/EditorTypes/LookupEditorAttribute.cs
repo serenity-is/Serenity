@@ -33,7 +33,7 @@ namespace Serenity.ComponentModel
             var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false);
             if (attr == null)
             {
-                throw new ArgumentException(String.Format(
+                throw new ArgumentException(string.Format(
                     "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
                     "be used with a LookupEditor!",
                     lookupType.FullName), "lookupType");

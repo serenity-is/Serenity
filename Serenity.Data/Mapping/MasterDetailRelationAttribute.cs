@@ -16,11 +16,9 @@ namespace Serenity.Data.Mapping
         /// <param name="foreignKey">The foreign key.</param>
         public MasterDetailRelationAttribute(string foreignKey)
         {
-            Check.NotNullOrEmpty(foreignKey, "MasterDetailRelation.ForeignKey");
-
-            this.ForeignKey = foreignKey;
-            this.CheckChangesOnUpdate = true;
-            this.ColumnSelection = ColumnSelection.List;
+            ForeignKey = foreignKey ?? throw new ArgumentNullException(nameof(foreignKey));
+            CheckChangesOnUpdate = true;
+            ColumnSelection = ColumnSelection.List;
         }
 
         /// <summary>
