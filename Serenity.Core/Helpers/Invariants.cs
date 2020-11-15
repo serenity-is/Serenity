@@ -67,7 +67,7 @@ namespace Serenity
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>Converted string.</returns>
-        public static string ToInvariant(this Double value)
+        public static string ToInvariant(this double value)
         {
             return value.ToString(NumberFormat);
         }
@@ -77,15 +77,15 @@ namespace Serenity
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>Converted string.</returns>
-        public static string ToInvariant(this Decimal value)
+        public static string ToInvariant(this decimal value)
         {
             return value.ToString(NumberFormat);
         }
 
         /// <summary>
-        ///   <p>Tries to converts an ID's string representation to its numerical ID value (Int64).</p>
-        ///   <p>Unlike <see cref="Int64.Parse(string)"/>, <c>null</c>, empty string and all other
-        ///   invalid strings results in <see cref="System.Int64"/> value (not an exception).</p></summary>
+        ///   <p>Tries to converts an ID's string representation to its numerical ID value (<see cref="long"/>).</p>
+        ///   <p>Unlike <see cref="long.Parse(string)"/>, <c>null</c>, empty string and all other
+        ///   invalid strings results in <see cref="long"/> value (not an exception).</p></summary>
         /// <param name="str">
         ///   String representation of an ID.</param>
         /// <returns>
@@ -102,14 +102,14 @@ namespace Serenity
 
         /// <summary>
         ///   <p>Tries to converts an ID's string representation to its numerical ID value (Int64).</p>
-        ///   <p>Unlike <see cref="Int64.Parse(string)"/>, <c>null</c>, empty string and all other
-        ///   invalid strings results in <see cref="System.Int64"/> value (not an exception).</p></summary>
+        ///   <p>Unlike <see cref="long.Parse(string)"/>, <c>null</c>, empty string and all other
+        ///   invalid strings results in <see cref="long"/> value (not an exception).</p></summary>
         /// <param name="str">
         ///   String representation of an ID.</param>
         /// <returns>
         ///   Numerical ID value or Null.Int64 if null, empty, or invalid string.</returns>
         /// <seealso cref="TryParseID(string)"/>
-        /// <seealso cref="Int64.Parse(string)"/>
+        /// <seealso cref="long.Parse(string)"/>
         public static int? TryParseID32(this string str)
         {
             if (int.TryParse(str, out int id))

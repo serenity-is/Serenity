@@ -6,11 +6,11 @@ using System.Text;
 namespace Serenity
 {
     /// <summary>
-    ///   This static class contains some helper functions that operate on <see cref="String"/> objects.</summary>
+    ///   This static class contains some helper functions that operate on <see cref="string"/> objects.</summary>
     public static partial class StringHelper
     {
         /// <summary>
-        ///   <p>Returns true if <see cref="String"/> is <c>null</c> or empty (zero length)</p></summary>
+        ///   <p>Returns true if <see cref="string"/> is <c>null</c> or empty (zero length)</p></summary>
         /// <remarks>
         ///   <p>This function might be useful if an empty string is assumed to be <c>null</c>.</p>
         ///   <p>This is an extension method, so it can be called directly as <c>str.IsNullOrEmpty()</c>.</p></remarks>
@@ -24,7 +24,7 @@ namespace Serenity
         }
 
         /// <summary>
-        ///   <p>Returns true if <see cref="String"/> is <c>null</c> or empty (zero length)</p></summary>
+        ///   <p>Returns true if <see cref="string"/> is <c>null</c> or empty (zero length)</p></summary>
         /// <remarks>
         ///   <p>This function might be useful if an empty string is assumed to be <c>null</c>.</p>
         ///   <p>This is an extension method, so it can be called directly as <c>str.IsNullOrEmpty()</c>.</p></remarks>
@@ -38,11 +38,11 @@ namespace Serenity
         }
 
         /// <summary>
-        ///   Checks if a string <see cref="String"/> is <c>null</c>, empty or just contains whitespace
+        ///   Checks if a string <see cref="string"/> is <c>null</c>, empty or just contains whitespace
         ///   characters.</summary>
         /// <remarks>
         ///   <p><b>Warning:</b> "\n" (line end), "\t" (tab) and some other are also considered as whitespace). 
-        ///   To see a list see <see cref="String.Trim()" /> function.</p>
+        ///   To see a list see <see cref="string.Trim()" /> function.</p>
         ///   <p>This is an extension method, so it can be called directly as <c>str.IsTrimmedEmpty()</c>.</p></remarks>
         /// <param name="str">
         ///   String.</param>
@@ -54,14 +54,14 @@ namespace Serenity
         }
 
         /// <summary>
-        ///   <p>Removes whitespace characters in the left or right of the <see cref="String"/> string,
+        ///   <p>Removes whitespace characters in the left or right of the <see cref="string"/> string,
         ///   and if resulting string is empty or null, returns null.</p></summary>
         /// <remarks>
         ///   <p>Generally, when a user entered string is going to be saved to database, if user entered an
         ///   empty string, <c>null</c> or a string of whitespaces, it is stored as <c>null</c>, otherwise
         ///   it is expected to remove whitespace at start and end only.</p>
         ///   <p><b>Warning:</b> "\n" (line end), "\t" (tab) and some other are also considered as whitespace). 
-        ///   To see a list see <see cref="String.Trim()" /> function.</p>
+        ///   To see a list see <see cref="string.Trim()" /> function.</p>
         ///   <p>This is an extension method, so it can be called directly as <c>str.TrimToNull()</c>.</p></remarks>
         /// <param name="str">
         ///   String to be trimmed.</param>
@@ -80,14 +80,14 @@ namespace Serenity
         }
 
         /// <summary>
-        ///   <p>Removes whitespace characters in the left or right of the <see cref="String"/> string,
+        ///   <p>Removes whitespace characters in the left or right of the <see cref="string"/> string,
         ///   and if resulting string is empty or null, returns empty.</p></summary>
         /// <remarks>
         ///   <p>Generally, when a user entered string is going to be saved to database, if user entered an
         ///   empty string, <c>null</c> or a string of whitespaces, it is stored as empty string, otherwise
         ///   it is expected to remove whitespace at start and end only.</p>
         ///   <p><b>Warning:</b> "\n" (line end), "\t" (tab) and some other are also considered as whitespace). 
-        ///   To see a list see <see cref="String.Trim()" /> function.</p>
+        ///   To see a list see <see cref="string.Trim()" /> function.</p>
         ///   <p>This is an extension method, so it can be called directly as <c>str.TrimToEmpty()</c>.</p></remarks>
         /// <param name="str">
         ///   String to be trimmed.</param>
@@ -105,7 +105,7 @@ namespace Serenity
         /// <remarks>
         ///   <p><c>null</c> is considered to be empty.</p>
         ///   <p><b>Warning:</b> "\n" (line end), "\t" (tab) and some other are also considered as whitespace). 
-        ///   To see a list see <see cref="String.Trim()" /> function.</p>
+        ///   To see a list see <see cref="string.Trim()" /> function.</p>
         ///   <p>This function can be used to compare a string entered by user to the value in the database
         ///   for equality.</p></remarks>
         /// <param name="string1">
@@ -169,7 +169,7 @@ namespace Serenity
         /// <returns>Single quoted string.</returns>
         public static string ToSingleQuoted(this string str)
         {
-            if (String.IsNullOrEmpty(str))
+            if (string.IsNullOrEmpty(str))
                 return emptySingleQuote;
 
             StringBuilder sb = new StringBuilder();
@@ -190,7 +190,7 @@ namespace Serenity
         ///   True to use double quotes</param>
         public static void QuoteString(string s, StringBuilder sb, bool doubleQuote)
         {
-            if (String.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(s))
             {
                 if (doubleQuote)
                     sb.Append(emptyDoubleQuote);
@@ -295,7 +295,7 @@ namespace Serenity
         /// <param name="s">The string.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">s is null</exception>
-        public static String SanitizeFilename(string s)
+        public static string SanitizeFilename(string s)
         {
             if (s == null)
                 throw new ArgumentNullException("s");
@@ -313,14 +313,14 @@ namespace Serenity
         /// </summary>
         /// <param name="s">The string.</param>
         /// <returns>String with diacritics replaced.</returns>
-        public static String RemoveDiacritics(string s)
+        public static string RemoveDiacritics(string s)
         {
             var normalizedString = s.Normalize(NormalizationForm.FormKD);
             var stringBuilder = new StringBuilder();
 
             for (int i = 0; i < normalizedString.Length; i++)
             {
-                Char c = normalizedString[i];
+                char c = normalizedString[i];
                 if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
                 {
                     if (c == 'ı')

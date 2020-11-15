@@ -96,7 +96,7 @@ namespace Serenity
         /// <param name="enumType">Type of the enum.</param>
         /// <param name="value">The value.</param>
         /// <returns>
-        /// A <see cref="System.String" /> that represents enum value.
+        /// A <see cref="string" /> that represents enum value.
         /// This is the identifier of the enum value or a numeric value.
         /// </returns>
         public static string ToString(Type enumType, object value)

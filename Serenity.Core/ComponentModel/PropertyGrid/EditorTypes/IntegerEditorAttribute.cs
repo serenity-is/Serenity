@@ -48,9 +48,9 @@ namespace Serenity.ComponentModel
         /// <value>
         ///   <c>true</c> if [allow negatives]; otherwise, <c>false</c>.
         /// </value>
-        public Boolean AllowNegatives
+        public bool AllowNegatives
         {
-            get { return GetOption<Boolean>("allowNegatives"); }
+            get { return GetOption<bool>("allowNegatives"); }
             set { SetOption("allowNegatives", value); }
         }
 

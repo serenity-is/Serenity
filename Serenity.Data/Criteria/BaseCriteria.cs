@@ -1161,7 +1161,7 @@
         /// </summary>
         /// <param name="query">The target query to add params to.</param>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        /// A <see cref="string" /> that represents this instance.
         /// </returns>
         public string ToString(IQueryWithParams query)
         {
@@ -1175,7 +1175,7 @@
         /// criteria contains parameters.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        /// A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
