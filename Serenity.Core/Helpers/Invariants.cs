@@ -27,7 +27,7 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Determines whether type of the value is an integer type (Int16, Int32, Int64).
+        /// Determines whether type of the value is an integer type (<see cref="short"/>, <see cref="int"/>, <see cref="long"/>).
         /// Avoid using this function as it is obsolete.
         /// </summary>
         /// <param name="value">The value.</param>
@@ -37,9 +37,9 @@ namespace Serenity
         public static bool IsIntegerType(object value)
         {
             return value != null &&
-                (value is Int32 ||
-                 value is Int64 ||
-                 value is Int16);
+                (value is int ||
+                 value is long ||
+                 value is short);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Serenity
         /// <returns></returns>
         public static string ToInvariant(this int value)
         {
-            return value.ToString(Invariants.NumberFormat);
+            return value.ToString(NumberFormat);
         }
 
         /// <summary>
@@ -57,9 +57,9 @@ namespace Serenity
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>Converted string.</returns>
-        public static string ToInvariant(this Int64 value)
+        public static string ToInvariant(this long value)
         {
-            return value.ToString(Invariants.NumberFormat);
+            return value.ToString(NumberFormat);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Serenity
         /// <returns>Converted string.</returns>
         public static string ToInvariant(this Double value)
         {
-            return value.ToString(Invariants.NumberFormat);
+            return value.ToString(NumberFormat);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Serenity
         /// <returns>Converted string.</returns>
         public static string ToInvariant(this Decimal value)
         {
-            return value.ToString(Invariants.NumberFormat);
+            return value.ToString(NumberFormat);
         }
 
         /// <summary>
@@ -91,8 +91,8 @@ namespace Serenity
         /// <returns>
         ///   Numerical ID value or Null.Int64 if null, empty, or invalid string.</returns>
         /// <seealso cref="TryParseID(string)"/>
-        /// <seealso cref="Int64.Parse(string)"/>
-        public static Int64? TryParseID(this string str)
+        /// <seealso cref="long.Parse(string)"/>
+        public static long? TryParseID(this string str)
         {
             if (long.TryParse(str, out long id))
                 return id;
@@ -110,7 +110,7 @@ namespace Serenity
         ///   Numerical ID value or Null.Int64 if null, empty, or invalid string.</returns>
         /// <seealso cref="TryParseID(string)"/>
         /// <seealso cref="Int64.Parse(string)"/>
-        public static Int32? TryParseID32(this string str)
+        public static int? TryParseID32(this string str)
         {
             if (int.TryParse(str, out int id))
                 return id;
@@ -123,12 +123,12 @@ namespace Serenity
         /// <param name="id">
         ///   ID value.</param>
         /// <returns>
-        ///   If <paramref name="id"/> has <see cref="System.Int64"/> value, <c>String.Empty</c>, 
+        ///   If <paramref name="id"/> has <see cref="long"/> value, <c><see cref="string.Empty"/></c>, 
         ///   otherwise its string representation</returns>
-        public static string IDString(this Int64? id)
+        public static string IDString(this long? id)
         {
             if (id == null)
-                return String.Empty;
+                return string.Empty;
             else
                 return id.ToString();
         }

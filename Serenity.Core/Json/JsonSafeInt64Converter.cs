@@ -55,7 +55,7 @@ namespace Serenity.Data
         ///   True if this instance can convert the specified object type; otherwise, false.</returns>
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(Int64) || objectType == typeof(Int64?);
+            return objectType == typeof(long) || objectType == typeof(long?);
         }
 
         /// <summary>

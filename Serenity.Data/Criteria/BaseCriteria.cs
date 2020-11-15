@@ -10,7 +10,7 @@
     /// <summary>
     /// Base criteria object type
     /// </summary>
-    /// <seealso cref="Serenity.ICriteria" />
+    /// <seealso cref="ICriteria" />
     [DebuggerDisplay("{ToStringIgnoreParams()}")]
     [JsonConverter(typeof(JsonCriteriaConverter))]
     public abstract class BaseCriteria : ICriteria
@@ -308,7 +308,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator ==(BaseCriteria criteria1, Int64 value)
+        public static BaseCriteria operator ==(BaseCriteria criteria1, long value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
@@ -334,7 +334,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator ==(BaseCriteria criteria1, Double value)
+        public static BaseCriteria operator ==(BaseCriteria criteria1, double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
@@ -347,7 +347,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator ==(BaseCriteria criteria1, Decimal value)
+        public static BaseCriteria operator ==(BaseCriteria criteria1, decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
@@ -438,7 +438,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator !=(BaseCriteria criteria1, Int64 value)
+        public static BaseCriteria operator !=(BaseCriteria criteria1, long value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
@@ -464,7 +464,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator !=(BaseCriteria criteria1, Double value)
+        public static BaseCriteria operator !=(BaseCriteria criteria1, double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
@@ -477,7 +477,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator !=(BaseCriteria criteria1, Decimal value)
+        public static BaseCriteria operator !=(BaseCriteria criteria1, decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
@@ -555,7 +555,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator >(BaseCriteria criteria1, Int32 value)
+        public static BaseCriteria operator >(BaseCriteria criteria1, int value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
@@ -568,7 +568,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator >(BaseCriteria criteria1, Int64 value)
+        public static BaseCriteria operator >(BaseCriteria criteria1, long value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
@@ -594,7 +594,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator >(BaseCriteria criteria1, Double value)
+        public static BaseCriteria operator >(BaseCriteria criteria1, double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
@@ -607,7 +607,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator >(BaseCriteria criteria1, Decimal value)
+        public static BaseCriteria operator >(BaseCriteria criteria1, decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
@@ -685,7 +685,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator >=(BaseCriteria criteria1, Int32 value)
+        public static BaseCriteria operator >=(BaseCriteria criteria1, int value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
@@ -698,7 +698,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator >=(BaseCriteria criteria1, Int64 value)
+        public static BaseCriteria operator >=(BaseCriteria criteria1, long value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
@@ -724,7 +724,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator >=(BaseCriteria criteria1, Double value)
+        public static BaseCriteria operator >=(BaseCriteria criteria1, double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
@@ -737,7 +737,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator >=(BaseCriteria criteria1, Decimal value)
+        public static BaseCriteria operator >=(BaseCriteria criteria1, decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
@@ -815,7 +815,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator <(BaseCriteria criteria1, Int32 value)
+        public static BaseCriteria operator <(BaseCriteria criteria1, int value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
@@ -828,7 +828,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator <(BaseCriteria criteria1, Int64 value)
+        public static BaseCriteria operator <(BaseCriteria criteria1, long value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
@@ -854,7 +854,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator <(BaseCriteria criteria1, Double value)
+        public static BaseCriteria operator <(BaseCriteria criteria1, double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
@@ -867,7 +867,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator <(BaseCriteria criteria1, Decimal value)
+        public static BaseCriteria operator <(BaseCriteria criteria1, decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
@@ -945,7 +945,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator <=(BaseCriteria criteria1, Int32 value)
+        public static BaseCriteria operator <=(BaseCriteria criteria1, int value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
@@ -958,7 +958,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator <=(BaseCriteria criteria1, Int64 value)
+        public static BaseCriteria operator <=(BaseCriteria criteria1, long value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
@@ -984,7 +984,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator <=(BaseCriteria criteria1, Double value)
+        public static BaseCriteria operator <=(BaseCriteria criteria1, double value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
@@ -997,7 +997,7 @@
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static BaseCriteria operator <=(BaseCriteria criteria1, Decimal value)
+        public static BaseCriteria operator <=(BaseCriteria criteria1, decimal value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }

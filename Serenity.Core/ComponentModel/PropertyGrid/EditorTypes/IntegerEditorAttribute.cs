@@ -24,9 +24,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The maximum value.
         /// </value>
-        public Int64 MaxValue
+        public long MaxValue
         {
-            get { return GetOption<Int64>("maxValue"); }
+            get { return GetOption<long>("maxValue"); }
             set { SetOption("maxValue", value); }
         }
 
@@ -36,9 +36,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The minimum value.
         /// </value>
-        public Int64 MinValue
+        public long MinValue
         {
-            get { return GetOption<Int64>("minValue"); }
+            get { return GetOption<long>("minValue"); }
             set { SetOption("minValue", value); }
         }
 

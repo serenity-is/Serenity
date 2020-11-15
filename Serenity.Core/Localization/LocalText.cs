@@ -16,7 +16,7 @@ namespace Serenity
         public const string InvariantLanguageID = "";
 
         /// <summary>
-        /// An empty local text instance like String.Empty
+        /// An empty local text instance like string.Empty
         /// </summary>
         public static readonly LocalText Empty;
 

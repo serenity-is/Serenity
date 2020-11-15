@@ -59,7 +59,7 @@ namespace Serenity.IO
         public static void PurgeDirectory(string directoryToClean,
             TimeSpan autoExpireTime, int maxFilesInDirectory, string checkFileName)
         {
-            checkFileName ??= String.Empty;
+            checkFileName ??= string.Empty;
             if (checkFileName.Length > 0)
             {
                 checkFileName = System.IO.Path.GetFileName(checkFileName).Trim();

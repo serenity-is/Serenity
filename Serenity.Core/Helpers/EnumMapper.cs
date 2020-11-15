@@ -157,7 +157,7 @@ namespace Serenity
         public static string FormatEnum(this ITextLocalizer localizer, Type enumType, object value)
         {
             if (value == null)
-                return String.Empty;
+                return string.Empty;
 
             if (enumType != null &&
                 enumType.IsEnum &&

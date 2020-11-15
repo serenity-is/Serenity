@@ -96,7 +96,7 @@ namespace Serenity
         public static string TrimToEmpty(this string str)
         {
             if (str.IsNullOrEmpty())
-                return String.Empty;
+                return string.Empty;
             return str.Trim();
         }
 
@@ -138,7 +138,7 @@ namespace Serenity
         public static string ThreeDots(this string str, int maxLength)
         {
             if (str == null)
-                return String.Empty;
+                return string.Empty;
 
             if (maxLength == 0 ||
                 str.Length <= maxLength)
@@ -277,11 +277,11 @@ namespace Serenity
         public static string SafeSubstring(this string value, int startIndex, int maxLength)
         {
             if (value.IsNullOrEmpty())
-                return String.Empty;
+                return string.Empty;
 
             var len = value.Length;
             if (startIndex >= len || maxLength <= 0)
-                return String.Empty;
+                return string.Empty;
 
             if (startIndex + maxLength > len)
                 return value[startIndex..];
