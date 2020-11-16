@@ -12,7 +12,7 @@ namespace Serenity.Web
     public class ImpersonatingUserAccessor : IUserAccessor, IImpersonator
     {
         private readonly IUserAccessor userContext;
-        private readonly IRequestContext requestContext;
+        private readonly IRequestItemsAccessor requestContext;
         private readonly ThreadLocal<Stack<ClaimsPrincipal>> impersonationStack = new ThreadLocal<Stack<ClaimsPrincipal>>();
 
         /// <summary>
@@ -20,11 +20,11 @@ namespace Serenity.Web
         /// that wraps passed authorization service and adds impersonation support.
         /// </summary>
         /// <param name="userContext">The user accessor service to wrap with impersonation support.</param>
-        /// <param name="requestContext">Request context</param>
-        public ImpersonatingUserAccessor(IUserAccessor userContext, IRequestContext requestContext)
+        /// <param name="itemsAccessor">Request items accessor</param>
+        public ImpersonatingUserAccessor(IUserAccessor userContext, IRequestItemsAccessor itemsAccessor)
         {
             this.userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
-            this.requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
+            this.requestContext = itemsAccessor ?? throw new ArgumentNullException(nameof(itemsAccessor));
         }
 
         private Stack<ClaimsPrincipal> GetImpersonationStack(bool createIfNull)

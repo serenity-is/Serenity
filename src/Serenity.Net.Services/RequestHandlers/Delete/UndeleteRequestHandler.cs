@@ -20,7 +20,7 @@ namespace Serenity.Services
         //protected static CaptureLogHandler<TRow> captureLogHandler;
         protected Lazy<IDeleteBehavior[]> behaviors;
 
-        public UndeleteRequestHandler(IRequestHandlerContext context)
+        public UndeleteRequestHandler(IRequestContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
@@ -198,7 +198,7 @@ namespace Serenity.Services
             return Response;
         }
 
-        public IRequestHandlerContext Context { get; private set; }
+        public IRequestContext Context { get; private set; }
         public ITextLocalizer Localizer => Context.Localizer;
         public IPermissionService Permissions => Context.Permissions;
         public ClaimsPrincipal User => Context.User;
@@ -207,7 +207,7 @@ namespace Serenity.Services
     public class UndeleteRequestHandler<TRow> : UndeleteRequestHandler<TRow, UndeleteResponse>
         where TRow : class, IRow, IIdRow, new()
     {
-        public UndeleteRequestHandler(IRequestHandlerContext context)
+        public UndeleteRequestHandler(IRequestContext context)
             : base(context)
         {
         }

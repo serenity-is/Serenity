@@ -25,7 +25,7 @@
         protected HashSet<string> ignoredEqualityFilters;
         protected Lazy<IListBehavior[]> behaviors;
 
-        public ListRequestHandler(IRequestHandlerContext context)
+        public ListRequestHandler(IRequestContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
             StateBag = new Dictionary<string, object>();
@@ -34,7 +34,8 @@
 
         protected virtual IEnumerable<IListBehavior> GetBehaviors()
         {
-            return Context.GetBehaviors<IListBehavior>(typeof(TRow), GetType());
+            return Context.Behaviors.Resolve<TRow, IListBehavior>(
+                GetType().GetCustomAttributes<AddBehaviorAttribute>().Select(x => x.Value).ToArray());
         }
 
         protected virtual SortBy[] GetNativeSort()
@@ -615,7 +616,7 @@
             ignoredEqualityFilters.Add(field);
         }
 
-        public IRequestHandlerContext Context { get; private set; }
+        public IRequestContext Context { get; private set; }
         public ITextLocalizer Localizer => Context.Localizer;
         public IPermissionService Permissions => Context.Permissions;
         public ClaimsPrincipal User => Context.User;
@@ -634,7 +635,7 @@
     public class ListRequestHandler<TRow> : ListRequestHandler<TRow, ListRequest, ListResponse<TRow>>
         where TRow : class, IRow, new()
     {
-        public ListRequestHandler(IRequestHandlerContext context)
+        public ListRequestHandler(IRequestContext context)
             : base(context)
         {
         }
@@ -644,7 +645,7 @@
         where TRow : class, IRow, new()
         where TListRequest: ListRequest
     {
-        public ListRequestHandler(IRequestHandlerContext context)
+        public ListRequestHandler(IRequestContext context)
             : base(context)
         {
         }

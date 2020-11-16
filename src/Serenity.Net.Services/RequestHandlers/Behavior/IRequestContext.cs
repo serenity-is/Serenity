@@ -1,0 +1,14 @@
+﻿using Serenity.Abstractions;
+using System.Security.Claims;
+
+namespace Serenity.Services
+{
+    public interface IRequestContext
+    {
+        IBehaviorProvider Behaviors { get; }
+        ITwoLevelCache Cache { get; }
+        ClaimsPrincipal User { get; }
+        ITextLocalizer Localizer { get; }
+        IPermissionService Permissions { get; }
+    }
+}

@@ -1,4 +1,5 @@
 ﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace Serenity.Services
         private bool displayOrderFix;
         protected Lazy<ISaveBehavior[]> behaviors;
 
-        public SaveRequestHandler(IRequestHandlerContext context)
+        public SaveRequestHandler(IRequestContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
             StateBag = new Dictionary<string, object>();
@@ -27,7 +28,8 @@ namespace Serenity.Services
 
         protected virtual IEnumerable<ISaveBehavior> GetBehaviors()
         {
-            return Context.GetBehaviors<ISaveBehavior>(typeof(TRow), GetType());
+            return Context.Behaviors.Resolve<TRow, ISaveBehavior>(
+                GetType().GetCustomAttributes<AddBehaviorAttribute>().Select(x => x.Value).ToArray());
         }
 
         protected virtual void AfterSave()
@@ -490,7 +492,7 @@ namespace Serenity.Services
             return Process(uow, (TSaveRequest)request, type);
         }
 
-        public IRequestHandlerContext Context { get; private set; }
+        public IRequestContext Context { get; private set; }
         public ITextLocalizer Localizer => Context.Localizer;
         public IPermissionService Permissions => Context.Permissions;
         public ClaimsPrincipal User => Context.User;
@@ -525,7 +527,7 @@ namespace Serenity.Services
     public class SaveRequestHandler<TRow> : SaveRequestHandler<TRow, SaveRequest<TRow>, SaveResponse>
         where TRow : class, IRow, IIdRow, new()
     {
-        public SaveRequestHandler(IRequestHandlerContext context)
+        public SaveRequestHandler(IRequestContext context)
             : base(context)
         {
         }

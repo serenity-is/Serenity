@@ -19,6 +19,14 @@ namespace Serenity
         }
 
         /// <summary>
+        /// Returns true if user is logged in (authenticated).
+        /// </summary>
+        public static bool IsLoggedIn(this ClaimsPrincipal user)
+        {
+            return user?.Identity?.IsAuthenticated == true;
+        }
+
+        /// <summary>
         /// Checks if current user has given permission and throws a validation error with 
         /// "AccessDenied" error code if not.
         /// </summary>

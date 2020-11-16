@@ -1,4 +1,5 @@
 ﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace Serenity.Services
         protected TDeleteRequest Request;
         protected Lazy<IDeleteBehavior[]> behaviors;
 
-        public DeleteRequestHandler(IRequestHandlerContext context)
+        public DeleteRequestHandler(IRequestContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
             StateBag = new Dictionary<string, object>();
@@ -29,7 +30,8 @@ namespace Serenity.Services
 
         protected virtual IEnumerable<IDeleteBehavior> GetBehaviors()
         {
-            return Context.GetBehaviors<IDeleteBehavior>(typeof(TRow), GetType());
+            return Context.Behaviors.Resolve<TRow, IDeleteBehavior>(
+                GetType().GetCustomAttributes<AddBehaviorAttribute>().Select(x => x.Value).ToArray());
         }
 
         public IDbConnection Connection
@@ -239,7 +241,7 @@ namespace Serenity.Services
             return Process(uow, (TDeleteRequest)request);
         }
 
-        public IRequestHandlerContext Context { get; private set; }
+        public IRequestContext Context { get; private set; }
         public ITextLocalizer Localizer => Context.Localizer;
         public IPermissionService Permissions => Context.Permissions;
         public ClaimsPrincipal User => Context.User;
@@ -254,7 +256,7 @@ namespace Serenity.Services
     public class DeleteRequestHandler<TRow> : DeleteRequestHandler<TRow, DeleteRequest, DeleteResponse>
         where TRow : class, IRow, IIdRow, new()
     {
-        public DeleteRequestHandler(IRequestHandlerContext context)
+        public DeleteRequestHandler(IRequestContext context)
             : base(context)
         {
         }

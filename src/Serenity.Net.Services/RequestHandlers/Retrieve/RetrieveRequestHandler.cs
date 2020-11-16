@@ -1,6 +1,7 @@
 ﻿namespace Serenity.Services
 {
     using Serenity.Abstractions;
+    using Serenity.ComponentModel;
     using Serenity.Data;
     using System;
     using System.Collections.Generic;
@@ -21,7 +22,7 @@
 
         protected Lazy<IRetrieveBehavior[]> behaviors;
 
-        public RetrieveRequestHandler(IRequestHandlerContext context)
+        public RetrieveRequestHandler(IRequestContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
             StateBag = new Dictionary<string, object>();
@@ -30,7 +31,8 @@
 
         protected virtual IEnumerable<IRetrieveBehavior> GetBehaviors()
         {
-            return Context.GetBehaviors<IRetrieveBehavior>(typeof(TRow), GetType());
+            return Context.Behaviors.Resolve<TRow, IRetrieveBehavior>(
+                GetType().GetCustomAttributes<AddBehaviorAttribute>().Select(x => x.Value).ToArray());
         }
 
         protected virtual bool AllowSelectField(Field field)
@@ -231,7 +233,7 @@
             return Response;
         }
 
-        public IRequestHandlerContext Context { get; private set; }
+        public IRequestContext Context { get; private set; }
         public ITextLocalizer Localizer => Context.Localizer;
         public IPermissionService Permissions => Context.Permissions;
         public ClaimsPrincipal User => Context.User;
@@ -255,7 +257,7 @@
     public class RetrieveRequestHandler<TRow> : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>
         where TRow : class, IRow, new()
     {
-        public RetrieveRequestHandler(IRequestHandlerContext context)
+        public RetrieveRequestHandler(IRequestContext context)
             : base(context)
         {
         }

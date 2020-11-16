@@ -17,7 +17,7 @@ namespace Serenity.Web
     public class TransientGrantingPermissionService : IPermissionService, ITransientGrantor
     {
         private readonly IPermissionService permissionService;
-        private readonly IRequestContext requestContext;
+        private readonly IRequestItemsAccessor requestContext;
         private readonly ThreadLocal<Stack<HashSet<string>>> grantingStack = new ThreadLocal<Stack<HashSet<string>>>();
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace Serenity.Web
         /// </summary>
         /// <param name="permissionService">Permission service to wrap with transient granting ability</param>
         /// <param name="requestContext">Request context</param>
-        public TransientGrantingPermissionService(IPermissionService permissionService, IRequestContext requestContext = null)
+        public TransientGrantingPermissionService(IPermissionService permissionService, IRequestItemsAccessor requestContext = null)
         {
             this.permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
             this.requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
