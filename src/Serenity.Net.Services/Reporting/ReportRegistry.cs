@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
 using Serenity.Extensibility;
 using System;
 using System.Collections.Generic;
@@ -7,10 +8,20 @@ using System.Reflection;
 
 namespace Serenity.Reporting
 {
-    public static class ReportRegistry
+    public class ReportRegistry
     {
-        private static Dictionary<string, Report> reportByKey;
-        private static Dictionary<string, List<Report>> reportsByCategory;
+        private Dictionary<string, Report> reportByKey;
+        private Dictionary<string, List<Report>> reportsByCategory;
+        private readonly IEnumerable<Type> types;
+        private readonly IPermissionService permissions;
+        private readonly ITextLocalizer localizer;
+
+        public ReportRegistry(IEnumerable<Type> types, IPermissionService permissions, ITextLocalizer localizer)
+        {
+            this.types = types ?? throw new ArgumentNullException(nameof(types));
+            this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
+            this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
+        }
 
         public static string GetReportKey(Type type)
         {
@@ -30,9 +41,9 @@ namespace Serenity.Reporting
             return String.Empty;
         }
 
-        public static string GetReportCategoryTitle(string key)
+        public static string GetReportCategoryTitle(string key, ITextLocalizer localizer)
         {
-            var title = LocalText.TryGet("Report.Category." + key.Replace("/", "."));
+            var title = localizer?.TryGet("Report.Category." + key.Replace("/", "."));
             if (title == null)
             {
                 key = key ?? "";
@@ -45,7 +56,7 @@ namespace Serenity.Reporting
             return title;
         }
 
-        private static void EnsureTypes()
+        private void EnsureTypes()
         {
             if (reportsByCategory != null)
                 return;
@@ -53,35 +64,34 @@ namespace Serenity.Reporting
             var reportByKeyNew = new Dictionary<string, Report>();
             var reportsByCategoryNew = new Dictionary<string, List<Report>>();
 
-            foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
-                foreach (var type in assembly.GetTypes())
+            foreach (var type in types)
+            {
+                var attr = type.GetCustomAttribute<ReportAttribute>(false);
+                if (attr != null)
                 {
-                    var attr = type.GetCustomAttribute<ReportAttribute>(false);
-                    if (attr != null)
+                    var report = new Report(type, localizer);
+                    var key = report.Key.TrimToNull() ?? type.FullName;
+
+                    reportByKeyNew[key] = report;
+
+                    var category = report.Category.Key;
+                    List<Report> reports;
+
+                    if (!reportsByCategoryNew.TryGetValue(category, out reports))
                     {
-                        var report = new Report(type);
-                        var key = report.Key.TrimToNull() ?? type.FullName;
-
-                        reportByKeyNew[key] = report;
-
-                        var category = report.Category.Key;
-                        List<Report> reports;
-
-                        if (!reportsByCategoryNew.TryGetValue(category, out reports))
-                        {
-                            reports = new List<Report>();
-                            reportsByCategoryNew[category] = reports;
-                        }
-
-                        reports.Add(report);
+                        reports = new List<Report>();
+                        reportsByCategoryNew[category] = reports;
                     }
+
+                    reports.Add(report);
                 }
+            }
 
             reportsByCategory = reportsByCategoryNew;
             reportByKey = reportByKeyNew;
         }
 
-        public static bool HasAvailableReportsInCategory(string categoryKey)
+        public bool HasAvailableReportsInCategory(string categoryKey)
         {
             EnsureTypes();
 
@@ -90,13 +100,13 @@ namespace Serenity.Reporting
                 return false;
 
             foreach (var report in reports)
-                if (report.Permission == null || Authorization.HasPermission(report.Permission))
+                if (report.Permission == null || permissions.HasPermission(report.Permission))
                     return true;
 
             return false;
         }
 
-        public static IEnumerable<Report> GetAvailableReportsInCategory(string categoryKey)
+        public IEnumerable<Report> GetAvailableReportsInCategory(string categoryKey)
         {
             EnsureTypes();
 
@@ -108,7 +118,7 @@ namespace Serenity.Reporting
                     (k.Key + "/").StartsWith((categoryKey ?? ""), StringComparison.OrdinalIgnoreCase))
                 {
                     foreach (var report in k.Value)
-                        if (report.Permission == null || Authorization.HasPermission(report.Permission))
+                        if (report.Permission == null || permissions.HasPermission(report.Permission))
                         {
                             list.Add(report);
                         }
@@ -119,7 +129,7 @@ namespace Serenity.Reporting
             return list;
         }
 
-        public static Report GetReport(string reportKey, bool validatePermission = true)
+        public Report GetReport(string reportKey, bool validatePermission = true)
         {
             EnsureTypes();
 
@@ -130,7 +140,7 @@ namespace Serenity.Reporting
             if (reportByKey.TryGetValue(reportKey, out report))
             {
                 if (validatePermission && report.Permission != null)
-                    Authorization.ValidatePermission(report.Permission);
+                    permissions.ValidatePermission(report.Permission, localizer);
 
                 return report;
             }
@@ -146,7 +156,7 @@ namespace Serenity.Reporting
             public string Title { get; private set; }
             public Category Category { get; private set; }
 
-            public Report(Type type)
+            public Report(Type type, ITextLocalizer localizer)
             {
                 if (type == null)
                     throw new ArgumentNullException("type");
@@ -160,7 +170,7 @@ namespace Serenity.Reporting
                     this.Title = ((DisplayNameAttribute)attr[0]).DisplayName;
 
                 var category = GetReportCategory(type);
-                this.Category = new ReportRegistry.Category(category, GetReportCategoryTitle(category));
+                this.Category = new ReportRegistry.Category(category, GetReportCategoryTitle(category, localizer));
 
                 attr = type.GetCustomAttributes(typeof(RequiredPermissionAttribute), false);
                 if (attr.Length > 0)

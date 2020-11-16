@@ -1,39 +1,35 @@
-﻿using Serenity.Data;
+﻿using Serenity.Abstractions;
+using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace Serenity.Services
 {
     public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDeleteRequestHandler, IDeleteRequestProcessor
-        where TRow : Row, IIdRow, new()
+        where TRow : class, IRow, IIdRow, new()
         where TDeleteRequest: DeleteRequest
         where TDeleteResponse : DeleteResponse, new()
     {
         protected TRow Row;
         protected TDeleteResponse Response;
         protected TDeleteRequest Request;
-        protected static IEnumerable<IDeleteBehavior> cachedBehaviors;
-        protected IEnumerable<IDeleteBehavior> behaviors;
+        protected Lazy<IDeleteBehavior[]> behaviors;
 
-        public DeleteRequestHandler()
+        public DeleteRequestHandler(IRequestHandlerContext context)
         {
-            this.StateBag = new Dictionary<string, object>();
-            this.behaviors = GetBehaviors();
+            Context = context ?? throw new ArgumentNullException(nameof(context));
+            StateBag = new Dictionary<string, object>();
+            behaviors = new Lazy<IDeleteBehavior[]>(() => GetBehaviors().ToArray());
         }
 
         protected virtual IEnumerable<IDeleteBehavior> GetBehaviors()
         {
-            if (cachedBehaviors == null)
-            {
-                cachedBehaviors = RowDeleteBehaviors<TRow>.Default.Concat(
-                    this.GetType().GetCustomAttributes().OfType<IDeleteBehavior>()).ToList();
-            }
-
-            return cachedBehaviors;
+            return Context.GetBehaviors<IDeleteBehavior>(typeof(TRow), GetType());
         }
 
         public IDbConnection Connection
@@ -43,7 +39,7 @@ namespace Serenity.Services
 
         protected virtual void OnBeforeDelete()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnBeforeDelete(this);
         }
 
@@ -61,13 +57,13 @@ namespace Serenity.Services
                 DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter, -1, 1, false);
             }
 
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnAfterDelete(this);
         }
 
         protected virtual void ValidateRequest()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnValidateRequest(this);
         }
 
@@ -75,7 +71,7 @@ namespace Serenity.Services
         {
             query.SelectTableFields();
 
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnPrepareQuery(this, query);
         }
 
@@ -92,7 +88,7 @@ namespace Serenity.Services
             PrepareQuery(query);
 
             if (!query.GetFirst(Connection))
-                throw DataValidation.EntityNotFoundError(Row, Request.EntityId);
+                throw DataValidation.EntityNotFoundError(Row, Request.EntityId, Localizer);
         }
 
         protected virtual void ExecuteDelete()
@@ -108,7 +104,7 @@ namespace Serenity.Services
                 if (new SqlDelete(Row.Table)
                         .WhereEqual(idField, id)
                         .Execute(Connection) != 1)
-                    throw DataValidation.EntityNotFoundError(Row, id);
+                    throw DataValidation.EntityNotFoundError(Row, id, Localizer);
             }
             else
             {
@@ -133,28 +129,28 @@ namespace Serenity.Services
                     {
                         update.Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
                                         deleteLogRow.DeleteDateField.DateTimeKind))
-                              .Set((Field)deleteLogRow.DeleteUserIdField, Authorization.UserId.TryParseID());
+                              .Set((Field)deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID());
                     }
                     else if (updateLogRow != null)
                     {
                         update.Set(updateLogRow.UpdateDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
                                         updateLogRow.UpdateDateField.DateTimeKind))
-                              .Set((Field)updateLogRow.UpdateUserIdField, Authorization.UserId.TryParseID());
+                              .Set((Field)updateLogRow.UpdateUserIdField, User?.GetIdentifier().TryParseID());
                     }
 
                     if (update.Execute(Connection) != 1)
-                        throw DataValidation.EntityNotFoundError(Row, id);
+                        throw DataValidation.EntityNotFoundError(Row, id, Localizer);
                 }
                 else //if (deleteLogRow != null)
                 {
                     if (new SqlUpdate(Row.Table)
                             .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
                                         deleteLogRow.DeleteDateField.DateTimeKind))
-                            .Set((Field)deleteLogRow.DeleteUserIdField, Authorization.UserId.TryParseID())
+                            .Set((Field)deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
                             .WhereEqual(idField, id)
                             .Where(new Criteria((Field)deleteLogRow.DeleteUserIdField).IsNull())
                             .Execute(Connection) != 1)
-                        throw DataValidation.EntityNotFoundError(Row, id);
+                        throw DataValidation.EntityNotFoundError(Row, id, Localizer);
                 }
             }
 
@@ -163,22 +159,22 @@ namespace Serenity.Services
 
         protected virtual void InvalidateCacheOnCommit()
         {
-            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Row.GetFields().GenerationKey);
+            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, Row.GetFields().GenerationKey);
             var attr = typeof(TRow).GetCustomAttribute<TwoLevelCachedAttribute>(false);
             if (attr != null)
                 foreach (var key in attr.GenerationKeys)
-                    BatchGenerationUpdater.OnCommit(this.UnitOfWork, key);
+                    BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, key);
         }
 
         protected virtual void DoAudit()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnAudit(this);
         }
 
         protected virtual void OnReturn()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnReturn(this);
         }
 
@@ -189,7 +185,7 @@ namespace Serenity.Services
                 typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
             if (attr != null)
-                Authorization.ValidatePermission(attr.Permission ?? "?");
+                Permissions.ValidatePermission(attr.Permission ?? "?", Localizer);
         }
 
         public TDeleteResponse Process(IUnitOfWork unitOfWork, TDeleteRequest request)
@@ -204,7 +200,7 @@ namespace Serenity.Services
             Response = new TDeleteResponse();
 
             if (request.EntityId == null)
-                throw DataValidation.RequiredError("EntityId");
+                throw DataValidation.RequiredError(nameof(request.EntityId), Localizer);
 
             Row = new TRow();
 
@@ -243,16 +239,25 @@ namespace Serenity.Services
             return Process(uow, (TDeleteRequest)request);
         }
 
-        public IUnitOfWork UnitOfWork { get; protected set; }  
+        public IRequestHandlerContext Context { get; private set; }
+        public ITextLocalizer Localizer => Context.Localizer;
+        public IPermissionService Permissions => Context.Permissions;
+        public ClaimsPrincipal User => Context.User;
+
+        public IUnitOfWork UnitOfWork { get; protected set; }
         DeleteRequest IDeleteRequestHandler.Request { get { return this.Request; } }
         DeleteResponse IDeleteRequestHandler.Response { get { return this.Response; } }
-        Row IDeleteRequestHandler.Row { get { return this.Row; } }
+        IRow IDeleteRequestHandler.Row { get { return this.Row; } }
         public IDictionary<string, object> StateBag { get; private set; }
     }
 
     public class DeleteRequestHandler<TRow> : DeleteRequestHandler<TRow, DeleteRequest, DeleteResponse>
-        where TRow : Row, IIdRow, new()
+        where TRow : class, IRow, IIdRow, new()
     {
+        public DeleteRequestHandler(IRequestHandlerContext context)
+            : base(context)
+        {
+        }
     }
 
     public interface IDeleteRequestProcessor

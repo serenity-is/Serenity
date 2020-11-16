@@ -1,15 +1,12 @@
-﻿using Serenity;
+﻿#if TODO
+using Serenity;
 using Serenity.Data;
 using Serenity.Data.Mapping;
-using Serenity.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-#if !NET45
-using System.Reflection;
-#endif
 
 namespace Serenity.Services
 {
@@ -20,7 +17,7 @@ namespace Serenity.Services
 
         private MasterDetailRelationAttribute attr;
         private Func<IList> rowListFactory;
-        private Func<Row> rowFactory;
+        private Func<IRow> rowFactory;
         private Type rowType;
         private Field foreignKeyField;
         private BaseCriteria foreignKeyCriteria;
@@ -31,7 +28,7 @@ namespace Serenity.Services
         private BaseCriteria queryCriteria;
         private HashSet<string> includeColumns;
 
-        public bool ActivateFor(Row row)
+        public bool ActivateFor(IRow row)
         {
             if (ReferenceEquals(null, Target))
                 return false;
@@ -45,22 +42,22 @@ namespace Serenity.Services
                 rowListType.GetGenericTypeDefinition() != typeof(List<>))
             {
                 throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
-                    "but its property type is not a generic List (e.g. List<Row>)!",
+                    "but its property type is not a generic List (e.g. List<IRow>)!",
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
             }
 
             rowType = rowListType.GetGenericArguments()[0];
             if (rowType.IsAbstract ||
-                !typeof(Row).IsAssignableFrom(rowType))
+                !typeof(IRow).IsAssignableFrom(rowType))
             {
                 throw new ArgumentException(String.Format(
                     "Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
-                    "but its property type is not a generic list of rows (e.g. List<Row>)!",
+                    "but its property type is not a generic list of rows (e.g. List<IRow>)!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
             }
 
-            rowListFactory = FastReflection.DelegateForConstructor<IList>(rowListType);
-            rowFactory = FastReflection.DelegateForConstructor<Row>(rowType);
+            rowListFactory = () => (IList)Activator.CreateInstance(rowListType);
+            rowFactory = () => (IRow)Activator.CreateInstance(rowType);
 
             if (attr.MasterKeyField != null)
             {
@@ -174,7 +171,7 @@ namespace Serenity.Services
             listRequest.ColumnSelection = this.attr.ColumnSelection;
             listRequest.IncludeColumns = this.includeColumns;
 
-            var enumerator = handler.Response.Entities.Cast<Row>();
+            var enumerator = handler.Response.Entities.Cast<IRow>();
             while (true)
             {
                 var part = enumerator.Take(1000);
@@ -189,7 +186,7 @@ namespace Serenity.Services
                 IListResponse response = listHandler.Process(
                     handler.Connection, listRequest);
 
-                var lookup = response.Entities.Cast<Row>()
+                var lookup = response.Entities.Cast<IRow>()
                     .ToLookup(x => foreignKeyField.AsObject(x).ToString());
 
                 foreach (var row in part)
@@ -204,7 +201,7 @@ namespace Serenity.Services
             }
         }
 
-        private void SaveDetail(IUnitOfWork uow, Row detail, object masterId, object detailId)
+        private void SaveDetail(IUnitOfWork uow, IRow detail, object masterId, object detailId)
         {
             detail = detail.Clone();
 
@@ -246,7 +243,7 @@ namespace Serenity.Services
 
             if (oldList.Count == 0)
             {
-                foreach (Row entity in newList)
+                foreach (IRow entity in newList)
                     SaveDetail(uow, entity, masterId, null);
 
                 return;
@@ -256,18 +253,18 @@ namespace Serenity.Services
 
             if (newList.Count == 0)
             {
-                foreach (Row entity in oldList)
+                foreach (IRow entity in oldList)
                     DeleteDetail(uow, rowIdField.AsObject(entity));
 
                 return;
             }
 
             var oldById = new Dictionary<string, Row>(oldList.Count);
-            foreach (Row item in oldList)
+            foreach (IRow item in oldList)
                 oldById[AsString(rowIdField.AsObject(item))] = item;
 
             var newById = new Dictionary<string, Row>(newList.Count);
-            foreach (Row item in newList)
+            foreach (IRow item in newList)
             {
                 var idStr = AsString(rowIdField.AsObject(item));
 
@@ -275,7 +272,7 @@ namespace Serenity.Services
                     newById[idStr] = item;
             }
 
-            foreach (Row item in oldList)
+            foreach (IRow item in oldList)
             {
                 var id = rowIdField.AsObject(item);
                 var idStr = AsString(id);
@@ -283,12 +280,12 @@ namespace Serenity.Services
                     DeleteDetail(uow, id);
             }
 
-            foreach (Row item in newList)
+            foreach (IRow item in newList)
             {
                 var id = rowIdField.AsObject(item);
                 var idStr = AsString(id);
 
-                Row old;
+                IRow old;
                 if (string.IsNullOrEmpty(idStr) || !oldById.TryGetValue(idStr, out old))
                     continue;
 
@@ -313,7 +310,7 @@ namespace Serenity.Services
                 SaveDetail(uow, item, masterId, id);
             }
 
-            foreach (Row item in newList)
+            foreach (IRow item in newList)
             {
                 var id = rowIdField.AsObject(item);
                 var idStr = AsString(id);
@@ -332,13 +329,13 @@ namespace Serenity.Services
 
             if (handler.IsCreate)
             {
-                foreach (Row entity in newList)
+                foreach (IRow entity in newList)
                     SaveDetail(handler.UnitOfWork, entity, masterId, null);
 
                 return;
             }
 
-            var oldList = new List<Row>();
+            var oldList = new List<IRow>();
 
             if (!attr.CheckChangesOnUpdate)
             {
@@ -368,7 +365,7 @@ namespace Serenity.Services
                 listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria;
 
                 var entities = listHandler.Process(handler.Connection, listRequest).Entities;
-                foreach (Row entity in entities)
+                foreach (IRow entity in entities)
                     oldList.Add(entity);
             }
 
@@ -405,3 +402,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

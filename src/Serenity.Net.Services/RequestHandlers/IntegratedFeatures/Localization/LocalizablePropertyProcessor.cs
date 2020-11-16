@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿#if TODO
+using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.ComponentModel;
@@ -46,3 +47,4 @@ namespace Serenity.PropertyGrid
         }
     }
 }
+#endif

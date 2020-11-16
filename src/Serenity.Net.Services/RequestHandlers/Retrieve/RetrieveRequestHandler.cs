@@ -1,5 +1,6 @@
 ﻿namespace Serenity.Services
 {
+    using Serenity.Abstractions;
     using Serenity.Data;
     using System;
     using System.Collections.Generic;
@@ -7,9 +8,10 @@
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
+    using System.Security.Claims;
 
     public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestHandler, IRetrieveRequestProcessor
-        where TRow: Row, new()
+        where TRow: class, IRow, new()
         where TRetrieveRequest: RetrieveRequest
         where TRetrieveResponse: RetrieveResponse<TRow>, new()
     {
@@ -17,24 +19,18 @@
         protected TRetrieveResponse Response;
         protected TRetrieveRequest Request;
 
-        protected static IEnumerable<IRetrieveBehavior> cachedBehaviors;
-        protected IEnumerable<IRetrieveBehavior> behaviors;
+        protected Lazy<IRetrieveBehavior[]> behaviors;
 
-        public RetrieveRequestHandler()
+        public RetrieveRequestHandler(IRequestHandlerContext context)
         {
-            this.StateBag = new Dictionary<string, object>();
-            this.behaviors = GetBehaviors();
+            Context = context ?? throw new ArgumentNullException(nameof(context));
+            StateBag = new Dictionary<string, object>();
+            behaviors = new Lazy<IRetrieveBehavior[]>(() => GetBehaviors().ToArray());
         }
 
         protected virtual IEnumerable<IRetrieveBehavior> GetBehaviors()
         {
-            if (cachedBehaviors == null)
-            {
-                cachedBehaviors = RowRetrieveBehaviors<TRow>.Default.Concat(
-                    this.GetType().GetCustomAttributes().OfType<IRetrieveBehavior>()).ToList();
-            }
-
-            return cachedBehaviors;
+            return Context.GetBehaviors<IRetrieveBehavior>(typeof(TRow), GetType());
         }
 
         protected virtual bool AllowSelectField(Field field)
@@ -43,7 +39,7 @@
                 return false;
 
             if (field.ReadPermission != null &&
-                !Authorization.HasPermission(field.ReadPermission))
+                !Permissions.HasPermission(field.ReadPermission))
                 return false;
 
             return true;
@@ -132,7 +128,7 @@
 
         protected virtual void OnReturn()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnReturn(this);
         }
 
@@ -140,19 +136,19 @@
         {
             SelectFields(query);
 
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnPrepareQuery(this, query);
         }
 
         protected virtual void OnBeforeExecuteQuery()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnBeforeExecuteQuery(this);
         }
 
         protected virtual void OnAfterExecuteQuery()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnAfterExecuteQuery(this);
         }
 
@@ -173,14 +169,14 @@
         {
             var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
             if (readAttr != null)
-                Authorization.ValidatePermission(readAttr.Permission ?? "?");
+                Permissions.ValidatePermission(readAttr.Permission ?? "?", Localizer);
         }
 
         protected virtual void ValidateRequest()
         {
             ValidatePermissions();
 
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnValidateRequest(this);
         }
 
@@ -205,9 +201,11 @@
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            request.CheckNotNull();
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
             if (request.EntityId == null)
-                throw DataValidation.RequiredError("entityId");
+                throw DataValidation.RequiredError("entityId", Localizer);
 
             Connection = connection;
             Request = request;
@@ -225,7 +223,7 @@
             if (Query.GetFirst(Connection))
                 Response.Entity = Row;
             else
-                throw DataValidation.EntityNotFoundError(Row, request.EntityId);
+                throw DataValidation.EntityNotFoundError(Row, request.EntityId, Localizer);
 
             OnAfterExecuteQuery();
 
@@ -233,8 +231,13 @@
             return Response;
         }
 
+        public IRequestHandlerContext Context { get; private set; }
+        public ITextLocalizer Localizer => Context.Localizer;
+        public IPermissionService Permissions => Context.Permissions;
+        public ClaimsPrincipal User => Context.User;
+
         public IDbConnection Connection { get; private set; }
-        Row IRetrieveRequestHandler.Row { get { return this.Row; } }
+        IRow IRetrieveRequestHandler.Row { get { return this.Row; } }
         public SqlQuery Query { get; private set; }
         RetrieveRequest IRetrieveRequestHandler.Request { get { return this.Request; } }
         IRetrieveResponse IRetrieveRequestHandler.Response { get { return this.Response; } }
@@ -250,8 +253,12 @@
     }
 
     public class RetrieveRequestHandler<TRow> : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>
-        where TRow : Row, new()
+        where TRow : class, IRow, new()
     {
+        public RetrieveRequestHandler(IRequestHandlerContext context)
+            : base(context)
+        {
+        }
     }
 
     public interface IRetrieveRequestProcessor

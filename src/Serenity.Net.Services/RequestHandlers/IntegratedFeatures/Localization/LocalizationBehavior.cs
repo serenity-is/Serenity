@@ -1,5 +1,5 @@
-﻿using Serenity.Data;
-using Serenity.Reflection;
+﻿#if TODO
+using Serenity.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,18 +14,18 @@ namespace Serenity.Services
     {
         private LocalizationRowAttribute attr;
         private int rowPrefixLength;
-        private Func<Row> rowFactory;
+        private Func<IRow> rowFactory;
         private Type localRowType;
-        private Func<Row> localRowFactory;
+        private Func<IRow> localRowFactory;
         private int localRowPrefixLength;
         private Field foreignKeyField;
         private Field localRowIdField;
         private Field cultureIdField;
-        private Row localRowInstance;
+        private IRow localRowInstance;
         private BaseCriteria foreignKeyCriteria;
         private Func<IDictionary> dictionaryFactory;
 
-        public bool ActivateFor(Row row)
+        public bool ActivateFor(IRow row)
         {
             attr = row.GetType().GetCustomAttribute<LocalizationRowAttribute>();
             if (attr == null)
@@ -56,8 +56,8 @@ namespace Serenity.Services
                         row.GetType().FullName));
             }
 
-            rowFactory = FastReflection.DelegateForConstructor<Row>(row.GetType());
-            localRowFactory = FastReflection.DelegateForConstructor<Row>(localRowType);
+            rowFactory = FastReflection.DelegateForConstructor<IRow>(row.GetType());
+            localRowFactory = FastReflection.DelegateForConstructor<IRow>(localRowType);
 
             var localRow = localRowFactory();
             localRowInstance = localRow;
@@ -190,7 +190,7 @@ namespace Serenity.Services
             }
 
             var dictionary = dictionaryFactory();
-            foreach (Row localRow in response.Entities)
+            foreach (IRow localRow in response.Entities)
             {
                 row = rowFactory();
                 row.TrackAssignments = true;
@@ -214,7 +214,7 @@ namespace Serenity.Services
             handler.Response.Localizations = dictionary;
         }
 
-        private void SaveLocalRow(IUnitOfWork uow, Row localRow, object masterId, object localRowId)
+        private void SaveLocalRow(IUnitOfWork uow, IRow localRow, object masterId, object localRowId)
         {
             localRow = localRow.Clone();
 
@@ -319,3 +319,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

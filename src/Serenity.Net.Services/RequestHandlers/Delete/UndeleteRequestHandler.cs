@@ -1,13 +1,15 @@
-﻿using Serenity.Data;
+﻿using Serenity.Abstractions;
+using Serenity.Data;
 using System;
 using System.Data;
 using System.Globalization;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace Serenity.Services
 {
     public class UndeleteRequestHandler<TRow, TUndeleteResponse>
-        where TRow : Row, IIdRow, new()
+        where TRow : class, IRow, IIdRow, new()
         where TUndeleteResponse : UndeleteResponse, new()
     {
         protected IUnitOfWork UnitOfWork;
@@ -15,36 +17,17 @@ namespace Serenity.Services
         protected TUndeleteResponse Response;
         protected UndeleteRequest Request;
         private static bool loggingInitialized;
-        protected static CaptureLogHandler<TRow> captureLogHandler;
-        protected static bool hasAuditLogAttribute;
+        //protected static CaptureLogHandler<TRow> captureLogHandler;
+        protected Lazy<IDeleteBehavior[]> behaviors;
+
+        public UndeleteRequestHandler(IRequestHandlerContext context)
+        {
+            Context = context ?? throw new ArgumentNullException(nameof(context));
+        }
 
         protected IDbConnection Connection
         {
             get { return UnitOfWork.Connection; }
-        }
-
-        protected virtual AuditUndeleteRequest GetAuditRequest()
-        {
-            //EntityType entityType;
-            //if (SiteSchema.Instance.TableToType.TryGetValue(Row.Table, out entityType))
-            {
-                var auditRequest = new AuditUndeleteRequest(Row.Table, Row.IdField[Row].Value);
-
-                var parentIdRow = Row as IParentIdRow;
-                if (parentIdRow != null)
-                {
-                    var parentIdField = (Field)parentIdRow.ParentIdField;
-                    //EntityType parentEntityType;
-                    if (!parentIdField.ForeignTable.IsNullOrEmpty())// &&
-                        //SiteSchema.Instance.TableToType.TryGetValue(parentIdField.ForeignTable, out parentEntityType))
-                    {
-                        auditRequest.ParentTypeId = parentIdField.ForeignTable;
-                        auditRequest.ParentId = parentIdRow.ParentIdField[Row];
-                    }
-                }
-
-                return auditRequest;
-            }
         }
 
         protected virtual void OnBeforeUndelete()
@@ -71,39 +54,28 @@ namespace Serenity.Services
         {
         }
 
-        protected virtual void DoGenericAudit()
-        {
-            var auditRequest = GetAuditRequest();
-            if (auditRequest != null)
-                AuditLogService.AuditUndelete(Connection, Row.GetFields().ConnectionKey, auditRequest);
-        }
-
         protected virtual void DoCaptureLog()
         {
             var newRow = Row.Clone();
             if (newRow is IIsActiveRow)
                 ((IIsActiveRow)newRow).IsActiveField[newRow] = 1;
-            captureLogHandler.Log(this.UnitOfWork, this.Row, newRow, Authorization.UserId);
+            //captureLogHandler.Log(UnitOfWork, Row, newRow, 
+            //    User.GetIdentifier());
         }
 
         protected virtual void DoAudit()
         {
             if (!loggingInitialized)
             {
-                var logTableAttr = typeof(TRow).GetCustomAttribute<CaptureLogAttribute>();
-                if (logTableAttr != null)
-                    captureLogHandler = new CaptureLogHandler<TRow>();
-
-                hasAuditLogAttribute = Row.IdField.IsIntegerType &&
-                    typeof(TRow).GetCustomAttribute<AuditLogAttribute>(false) != null;
+                //var logTableAttr = typeof(TRow).GetCustomAttribute<CaptureLogAttribute>();
+                //if (logTableAttr != null)
+                //    captureLogHandler = new CaptureLogHandler<TRow>();
 
                 loggingInitialized = true;
             }
 
-            if (captureLogHandler != null)
-                DoCaptureLog();
-            else if (hasAuditLogAttribute)
-                DoGenericAudit();
+            //if (captureLogHandler != null)
+            //    DoCaptureLog();
         }
 
         protected virtual void PrepareQuery(SqlQuery query)
@@ -124,7 +96,7 @@ namespace Serenity.Services
             PrepareQuery(query);
 
             if (!query.GetFirst(Connection))
-                throw DataValidation.EntityNotFoundError(Row, id);
+                throw DataValidation.EntityNotFoundError(Row, id, Localizer);
         }
 
         protected virtual void OnReturn()
@@ -137,16 +109,16 @@ namespace Serenity.Services
                 typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(false);
 
             if (attr != null)
-                Authorization.ValidatePermission(attr.Permission ?? "?");
+                Permissions.ValidatePermission(attr.Permission ?? "?", Localizer);
         }
 
         protected virtual void InvalidateCacheOnCommit()
         {
-            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Row.GetFields().GenerationKey);
+            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, Row.GetFields().GenerationKey);
             var attr = typeof(TRow).GetCustomAttribute<TwoLevelCachedAttribute>(false);
             if (attr != null)
                 foreach (var key in attr.GenerationKeys)
-                    BatchGenerationUpdater.OnCommit(this.UnitOfWork, key);
+                    BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, key);
         }
 
         public TUndeleteResponse Process(IUnitOfWork unitOfWork, UndeleteRequest request)
@@ -162,7 +134,7 @@ namespace Serenity.Services
             Response = new TUndeleteResponse();
 
             if (request.EntityId == null)
-                throw DataValidation.RequiredError("EntityId");
+                throw DataValidation.RequiredError("EntityId", Localizer);
 
             Row = new TRow();
 
@@ -212,7 +184,7 @@ namespace Serenity.Services
                 }
 
                 if (update.Execute(Connection) != 1)
-                    throw DataValidation.EntityNotFoundError(Row, id);
+                    throw DataValidation.EntityNotFoundError(Row, id, Localizer);
 
                 InvalidateCacheOnCommit();
 
@@ -225,10 +197,19 @@ namespace Serenity.Services
 
             return Response;
         }
+
+        public IRequestHandlerContext Context { get; private set; }
+        public ITextLocalizer Localizer => Context.Localizer;
+        public IPermissionService Permissions => Context.Permissions;
+        public ClaimsPrincipal User => Context.User;
     }
 
     public class UndeleteRequestHandler<TRow> : UndeleteRequestHandler<TRow, UndeleteResponse>
-        where TRow : Row, IIdRow, new()
+        where TRow : class, IRow, IIdRow, new()
     {
+        public UndeleteRequestHandler(IRequestHandlerContext context)
+            : base(context)
+        {
+        }
     }
 }

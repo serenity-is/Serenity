@@ -5,7 +5,7 @@ namespace Serenity.Services
 {
     public class DisplayOrderFilterHelper
     {
-        public static BaseCriteria GetDisplayOrderFilterFor(Row row)
+        public static BaseCriteria GetDisplayOrderFilterFor(IRow row)
         {
             var flt = Criteria.Empty;
             var parentIdRow = row as IParentIdRow;

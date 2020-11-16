@@ -1,4 +1,5 @@
-﻿using Serenity.Data;
+﻿#if TODO
+using Serenity.Data;
 using Serenity.Data.Mapping;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Serenity.Services
         private UniqueConstraintAttribute[] attrList;
         private IEnumerable<Field>[] attrFields;
 
-        public bool ActivateFor(Row row)
+        public bool ActivateFor(IRow row)
         {
             var attr = row.GetType().GetCustomAttributes<UniqueConstraintAttribute>()
                 .Where(x => x.CheckBeforeSave);
@@ -58,3 +59,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

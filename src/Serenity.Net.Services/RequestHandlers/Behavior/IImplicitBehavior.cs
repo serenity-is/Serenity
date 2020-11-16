@@ -9,6 +9,6 @@ namespace Serenity.Services
     /// </summary>
     public interface IImplicitBehavior
     {
-        bool ActivateFor(Row row);
+        bool ActivateFor(IRow row);
     }
 }

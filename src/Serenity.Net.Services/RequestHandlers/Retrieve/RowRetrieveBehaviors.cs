@@ -1,4 +1,5 @@
-﻿using Serenity.Data;
+﻿#if TODO
+using Serenity.Data;
 
 namespace Serenity.Services
 {
@@ -8,7 +9,8 @@ namespace Serenity.Services
     /// </summary>
     /// <typeparam name="TRow">Type of row</typeparam>
     public class RowRetrieveBehaviors<TRow> : RowBehaviors<TRow, IRetrieveBehavior>
-        where TRow: Row, new()
+        where TRow: class, IRow, new()
     {
     }
 }
+#endif

@@ -1,6 +1,7 @@
 ﻿namespace Serenity.Services
 {
     using ComponentModel;
+    using Serenity.Abstractions;
     using Serenity.Data;
     using Serenity.Data.Mapping;
     using System;
@@ -10,9 +11,10 @@
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
+    using System.Security.Claims;
 
     public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestHandler, IListRequestProcessor
-        where TRow: Row, new()
+        where TRow: class, IRow, new()
         where TListRequest: ListRequest
         where TListResponse: ListResponse<TRow>, new()
     {
@@ -20,25 +22,19 @@
         protected TListRequest Request;
         protected TListResponse Response;
 
-        protected static IEnumerable<IListBehavior> cachedBehaviors;
-        protected IEnumerable<IListBehavior> behaviors;
         protected HashSet<string> ignoredEqualityFilters;
+        protected Lazy<IListBehavior[]> behaviors;
 
-        public ListRequestHandler()
+        public ListRequestHandler(IRequestHandlerContext context)
         {
-            this.StateBag = new Dictionary<string, object>();
-            this.behaviors = GetBehaviors();
+            Context = context ?? throw new ArgumentNullException(nameof(context));
+            StateBag = new Dictionary<string, object>();
+            behaviors = new Lazy<IListBehavior[]>(() => GetBehaviors().ToArray());
         }
 
         protected virtual IEnumerable<IListBehavior> GetBehaviors()
         {
-            if (cachedBehaviors == null)
-            {
-                cachedBehaviors = RowListBehaviors<TRow>.Default.Concat(
-                    this.GetType().GetCustomAttributes().OfType<IListBehavior>()).ToList();
-            }
-
-            return cachedBehaviors;
+            return Context.GetBehaviors<IListBehavior>(typeof(TRow), GetType());
         }
 
         protected virtual SortBy[] GetNativeSort()
@@ -48,7 +44,7 @@
                 return sortOrders.Select(x => new SortBy(x.Item1.PropertyName ?? x.Item1.Name, x.Item2)).ToArray();
 
             var nameField = Row.GetNameField();
-            if (!ReferenceEquals(null, nameField))
+            if (nameField is object)
                 return new SortBy[] { new SortBy(nameField.Name, false) };
 
             return null;
@@ -60,7 +56,7 @@
                 return false;
 
             if (field.ReadPermission != null &&
-                !Authorization.HasPermission(field.ReadPermission))
+                !Permissions.HasPermission(field.ReadPermission))
                 return false;
 
             return true;
@@ -164,7 +160,7 @@
         {
             SelectFields(query);
 
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnPrepareQuery(this, query);
         }
 
@@ -196,7 +192,7 @@
                 if (!fields.Any())
                 {
                     var nameField = Row.GetNameField();
-                    if (!ReferenceEquals(null, nameField))
+                    if (nameField is object)
                         return new Field[] { nameField };
                 }
 
@@ -204,7 +200,7 @@
             }
 
             var field = Row.FindField(containsField) ?? Row.FindFieldByPropertyName(containsField);
-            if (ReferenceEquals(null, field) ||
+            if (field is null ||
                 ((field.MinSelectLevel == SelectLevel.Never) && 
                     (field.CustomAttributes == null || 
                      !field.CustomAttributes.OfType<QuickSearchAttribute>().Any())))
@@ -241,7 +237,7 @@
                 case SearchType.Equals:
                     if (field is Int32Field)
                     {
-                        if (id == null || id < Int32.MinValue || id > Int32.MaxValue)
+                        if (id == null || id < int.MinValue || id > int.MaxValue)
                         {
                             orFalse = true;
                             return;
@@ -251,17 +247,17 @@
                     }
                     else if (field is Int16Field)
                     {
-                        if (id == null || id < Int16.MinValue || id > Int16.MaxValue)
+                        if (id == null || id < short.MinValue || id > short.MaxValue)
                         {
                             orFalse = true;
                             return;
                         }
 
-                        criteria |= new Criteria(field) == (Int16)id;
+                        criteria |= new Criteria(field) == (short)id;
                     }
                     else if (field is Int64Field)
                     {
-                        if (id == null || id < Int64.MinValue || id > Int64.MaxValue)
+                        if (id == null || id < long.MinValue || id > long.MaxValue)
                         {
                             orFalse = true;
                             return;
@@ -327,19 +323,19 @@
 
         protected virtual void OnBeforeExecuteQuery()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnBeforeExecuteQuery(this);
         }
 
         protected virtual void OnAfterExecuteQuery()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnAfterExecuteQuery(this);
         }
 
         protected virtual void OnReturn()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnReturn(this);
         }
 
@@ -356,7 +352,7 @@
 
         protected virtual BaseCriteria ReplaceFieldExpressions(BaseCriteria criteria)
         {
-            return new CriteriaFieldExpressionReplacer(this.Row)
+            return new CriteriaFieldExpressionReplacer(this.Row, Permissions)
                 .Process(criteria);
         }
 
@@ -444,7 +440,7 @@
             ApplyCriteria(query);
             ApplyIncludeDeletedFilter(query);
 
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnApplyFilters(this, query);
         }
 
@@ -452,14 +448,14 @@
         {
             var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
             if (readAttr != null)
-                Authorization.ValidatePermission(readAttr.Permission ?? "?");
+                Permissions.ValidatePermission(readAttr.Permission ?? "?", Localizer);
         }
 
         protected virtual void ValidateRequest()
         {
             ValidatePermissions();
 
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnValidateRequest(this);
         }
 
@@ -619,9 +615,14 @@
             ignoredEqualityFilters.Add(field);
         }
 
+        public IRequestHandlerContext Context { get; private set; }
+        public ITextLocalizer Localizer => Context.Localizer;
+        public IPermissionService Permissions => Context.Permissions;
+        public ClaimsPrincipal User => Context.User;
+
         public Field[] DistinctFields { get; private set; }
         public IDbConnection Connection { get; private set; }
-        Row IListRequestHandler.Row { get { return this.Row; } }
+        IRow IListRequestHandler.Row { get { return this.Row; } }
         public SqlQuery Query { get; private set; }
         ListRequest IListRequestHandler.Request { get { return this.Request; } }
         IListResponse IListRequestHandler.Response { get { return this.Response; } }
@@ -631,14 +632,22 @@
     }
 
     public class ListRequestHandler<TRow> : ListRequestHandler<TRow, ListRequest, ListResponse<TRow>>
-        where TRow : Row, new()
+        where TRow : class, IRow, new()
     {
+        public ListRequestHandler(IRequestHandlerContext context)
+            : base(context)
+        {
+        }
     }
 
     public class ListRequestHandler<TRow, TListRequest> : ListRequestHandler<TRow, TListRequest, ListResponse<TRow>>
-        where TRow : Row, new()
+        where TRow : class, IRow, new()
         where TListRequest: ListRequest
     {
+        public ListRequestHandler(IRequestHandlerContext context)
+            : base(context)
+        {
+        }
     }
 
     public interface IListRequestProcessor

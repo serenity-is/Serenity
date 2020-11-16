@@ -1,4 +1,5 @@
-﻿using Serenity.Data;
+﻿#if TODO
+using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -12,7 +13,7 @@ namespace Serenity.Services
     /// <typeparam name="TRow">Type of row</typeparam>
     public abstract class RowBehaviors<TRow, TBehavior>
         where TBehavior: class
-        where TRow: Row, new()
+        where TRow: class, IRow, new()
     {
         static IEnumerable<TBehavior> behaviors;
 
@@ -101,3 +102,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

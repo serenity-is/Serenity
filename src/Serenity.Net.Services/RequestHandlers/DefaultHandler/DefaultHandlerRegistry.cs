@@ -1,4 +1,5 @@
-﻿using Serenity.Extensibility;
+﻿#if TODO
+using Serenity.Extensibility;
 using System;
 using System.Collections.Generic;
 
@@ -36,3 +37,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

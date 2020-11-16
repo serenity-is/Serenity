@@ -30,6 +30,26 @@ namespace Serenity.Data
             return row;
         }
 
+        public static Field FindField(this IRow row, string name)
+        {
+            return row.Fields.FindField(name);
+        }
+
+        public static Field FindFieldByPropertyName(this IRow row, string name)
+        {
+            return row.Fields.FindFieldByPropertyName(name);
+        }
+
+        public static RowFieldsBase GetFields(this IRow row)
+        {
+            return row.Fields;
+        }
+
+        public static TFields GetFields<TFields>(this IRow<TFields> row)
+        {
+            return row.Fields;
+        }
+
         public static Field GetNameField(this IRow row, bool force = false)
         {
             if (row as INameRow != null)

@@ -10,7 +10,8 @@ namespace Serenity.Reporting
 {
     public static class ReportColumnConverter
     {
-        private static ReportColumn FromMember(MemberInfo member, Type dataType, Field baseField)
+        private static ReportColumn FromMember(MemberInfo member, Type dataType, 
+            Field baseField, ITextLocalizer localizer)
         {
             if (member == null)
                 throw new ArgumentNullException("member");
@@ -46,7 +47,7 @@ namespace Serenity.Reporting
             if (!ReferenceEquals(null, baseField))
             {
                 if (result.Title == null)
-                    result.Title = baseField.Title;
+                    result.Title = baseField.GetTitle(localizer);
 
                 if (result.Width == null && baseField is StringField && baseField.Size != 0)
                     result.Width = baseField.Size;
@@ -57,24 +58,24 @@ namespace Serenity.Reporting
             return result;
         }
 
-        public static ReportColumn FromFieldInfo(FieldInfo field, Field baseField = null)
+        public static ReportColumn FromFieldInfo(FieldInfo field, ITextLocalizer localizer, Field baseField = null)
         {
-            return FromMember(field, field.FieldType, baseField);
+            return FromMember(field, field.FieldType, baseField, localizer);
         }
 
-        public static ReportColumn FromPropertyInfo(PropertyInfo property, Field baseField = null)
+        public static ReportColumn FromPropertyInfo(PropertyInfo property, ITextLocalizer localizer, Field baseField = null)
         {
-            return FromMember(property, property.PropertyType, baseField);
+            return FromMember(property, property.PropertyType, baseField, localizer);
         }
 
-        public static List<ReportColumn> ObjectTypeToList(Type objectType)
+        public static List<ReportColumn> ObjectTypeToList(Type objectType, ITextLocalizer localizer)
         {
             var list = new List<ReportColumn>();
 
-            Row basedOnRow = null;
+            IRow basedOnRow = null;
             var basedOnRowAttr = objectType.GetCustomAttribute<BasedOnRowAttribute>();
             if (basedOnRowAttr != null)
-                basedOnRow = Activator.CreateInstance(basedOnRowAttr.RowType) as Row;
+                basedOnRow = Activator.CreateInstance(basedOnRowAttr.RowType) as IRow;
 
             foreach (MemberInfo member in objectType.GetMembers(BindingFlags.Instance | BindingFlags.Public))
             {
@@ -100,9 +101,9 @@ namespace Serenity.Reporting
 
                 ReportColumn column;
                 if (fieldInfo != null)
-                    column = FromFieldInfo(fieldInfo, baseField);
+                    column = FromFieldInfo(fieldInfo, localizer, baseField);
                 else
-                    column = FromPropertyInfo(propertyInfo, baseField);
+                    column = FromPropertyInfo(propertyInfo, localizer, baseField);
 
                 var cellDecorator = member.GetCustomAttribute<CellDecoratorAttribute>();
                 if (cellDecorator != null)
@@ -117,11 +118,11 @@ namespace Serenity.Reporting
             return list;
         }
 
-        public static ReportColumn FromField(Field field)
+        public static ReportColumn FromField(Field field, ITextLocalizer localizer)
         {
             var column = new ReportColumn();
             column.Name = field.Name;
-            column.Title = field.Title;
+            column.Title = field.GetTitle(localizer);
 
             if (field is StringField)
                 if (field.Size != 0)
@@ -130,13 +131,13 @@ namespace Serenity.Reporting
             return column;
         }
 
-        public static List<ReportColumn> EntityTypeToList(Row instance)
+        public static List<ReportColumn> EntityTypeToList(IRow instance, ITextLocalizer localizer)
         {
             var list = new List<ReportColumn>();
 
             foreach (var field in instance.GetFields())
             {
-                list.Add(FromField(field));
+                list.Add(FromField(field, localizer));
             }
 
             return list;

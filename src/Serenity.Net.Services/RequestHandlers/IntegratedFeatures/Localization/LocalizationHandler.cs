@@ -1,4 +1,5 @@
-﻿using Serenity.Services;
+﻿#if TODO
+using Serenity.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,7 +13,7 @@ namespace Serenity.Data
     }
 
     public class LocalizationRowHandler<TRow> : ILocalizationRowHandler
-        where TRow: Row, IIdRow, new()
+        where TRow: class, IRow, IIdRow, new()
     {
         private static string schemaName;
         private static StaticInfo info;
@@ -20,20 +21,11 @@ namespace Serenity.Data
         private class StaticInfo
         {
             public TRow rowInstance;
-            public Row localRowInstance;
+            public IRow localRowInstance;
             public ILocalizationRow localRowInterface;
             public int rowFieldPrefixLength;
             public int localRowFieldPrefixLength;
             public IIdField mappedIdField;
-        }
-
-        static LocalizationRowHandler()
-        {
-            SchemaChangeSource.Observers += (schema, table) =>
-            {
-                if (schema == schemaName)
-                    info = null;
-            };
         }
 
         static StaticInfo EnsureInfo()
@@ -46,7 +38,7 @@ namespace Serenity.Data
             if (localAttr == null || localAttr.LocalizationRow == null)
                 throw new InvalidOperationException(String.Format("{0} row type has no localization row type defined!", typeof(TRow).Name));
 
-            var localInstance = (Row)Activator.CreateInstance(localAttr.LocalizationRow);
+            var localInstance = (IRow)Activator.CreateInstance(localAttr.LocalizationRow);
 
             var localRow = localInstance as ILocalizationRow;
             if (localRow == null)
@@ -61,7 +53,7 @@ namespace Serenity.Data
             newInfo.rowInstance = new TRow();
             newInfo.rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(newInfo.rowInstance.EnumerateTableFields(), x => x.Name);
             newInfo.localRowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(localInstance.EnumerateTableFields(), x => x.Name);
-            newInfo.mappedIdField = (IIdField)((Row)localInstance).FindField(localAttr.MappedIdField ?? ((Field)new TRow().IdField).Name);
+            newInfo.mappedIdField = (IIdField)((IRow)localInstance).FindField(localAttr.MappedIdField ?? ((Field)new TRow().IdField).Name);
             if (newInfo.mappedIdField == null)
                 throw new InvalidOperationException(String.Format("Can't locate localization table mapped ID field for {0}!",
                     localInstance.Table));
@@ -131,8 +123,8 @@ namespace Serenity.Data
             return null;
         }
 
-        public void Update<TLocalRow>(IUnitOfWork uow, TRow row, object cultureId)
-            where TLocalRow: Row, IIdRow, new()
+        public void Update<TLocalRow>(IUnitOfWork uow, TRow row, object cultureId, ITextLocalizer localizer)
+            where TLocalRow: class, IRow, IIdRow, new()
         {
             Update(uow, row, cultureId,
                 (r) => new SaveRequestHandler<TLocalRow>().Process(uow,
@@ -148,11 +140,11 @@ namespace Serenity.Data
                 (id) => new DeleteRequestHandler<TLocalRow>().Process(uow, new DeleteRequest
                     {
                         EntityId = id
-                    }));
+                    }), localizer);
         }
         
         public void Update(IUnitOfWork uow, TRow row, object cultureId,
-            Action<Row> create, Action<Row> update, Action<Int64> delete)
+            Action<IRow> create, Action<IRow> update, Action<Int64> delete, ITextLocalizer localizer)
         {
             var info = EnsureInfo();
 
@@ -184,7 +176,8 @@ namespace Serenity.Data
 
                 var match = GetLocalizationMatch(field);
                 if (ReferenceEquals(null, match))
-                    throw new ValidationError("CantLocalize", field.Name, String.Format("{0} alanı yerelleştirilemez!", field.Title));
+                    throw new ValidationError("CantLocalize", field.Name, String.Format("{0} can't be localized!", 
+                        field.GetTitle(localizer)));
 
                 var value = field.AsObject(row);
                 match.AsObject(localRow, value);
@@ -210,7 +203,7 @@ namespace Serenity.Data
             }
         }
 
-        private Row GetOldLocalizationRow(IDbConnection connection, Int64 recordId, object cultureId)
+        private IRow GetOldLocalizationRow(IDbConnection connection, Int64 recordId, object cultureId)
         {
             var info = EnsureInfo();
 
@@ -226,7 +219,7 @@ namespace Serenity.Data
             return null;
         }
 
-        private List<Row> GetOldLocalizationRows(IDbConnection connection, Int64 recordId)
+        private List<IRow> GetOldLocalizationRows(IDbConnection connection, Int64 recordId)
         {
             var info = EnsureInfo();
 
@@ -240,7 +233,8 @@ namespace Serenity.Data
 
         public RetrieveLocalizationResponse<TRow> Retrieve(IDbConnection connection, RetrieveLocalizationRequest request)
         {
-            request.CheckNotNull();
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
 
             if (request.EntityId == null)
                 throw new ArgumentNullException("entityId");
@@ -293,3 +287,4 @@ namespace Serenity.Data
         }
     }
 }
+#endif

@@ -405,9 +405,22 @@ namespace Serenity.Data
             get { return propertyName ?? name; }
         }
 
+        public string GetTitle(ITextLocalizer localizer)
+        {
+            if (caption is null)
+            {
+                if (autoTextKey == null)
+                    autoTextKey = "Db." + this.Fields.LocalTextPrefix + "." + (propertyName ?? name);
+
+                return localizer?.TryGet(autoTextKey) ?? propertyName ?? name;
+            }
+                
+            return caption.ToString(localizer);
+        }
+
         public override string ToString()
         {
-            return this.Expression;
+            return Expression;
         }
     }
 }

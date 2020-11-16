@@ -7,7 +7,7 @@ namespace Serenity.Services
 {
     public static class DataValidation
     {
-        public static void AutoTrim(Row row, StringField stringField)
+        public static void AutoTrim(IRow row, StringField stringField)
         {
             if ((stringField.Flags & FieldFlags.Trim) == FieldFlags.Trim)
             {
@@ -22,170 +22,187 @@ namespace Serenity.Services
             }
         }
 
-        public static void ValidateRequired(this Row row, Field field)
+        public static void ValidateRequired(this IRow row, Field field, ITextLocalizer localizer)
         {
             var str = field as StringField;
             if ((!ReferenceEquals(null, str) && str[row].IsTrimmedEmpty()) ||
                 (ReferenceEquals(null, str) && field.AsObject(row) == null))
             { 
-                throw RequiredError(row, field);
+                throw RequiredError(row, field, localizer);
             }
         }
 
-        public static void ValidateRequired(this Row row, IEnumerable<Field> fields)
+        public static void ValidateRequired(this IRow row, IEnumerable<Field> fields, ITextLocalizer localizer)
         {
             foreach (var field in fields)
             {
                 if (field.DefaultValue == null || row.IsAssigned(field))
-                    ValidateRequired(row, field);
+                    ValidateRequired(row, field, localizer);
             }
         }
 
-        public static void ValidateRequiredIfModified(this Row row, IEnumerable<Field> fields)
+        public static void ValidateRequiredIfModified(this IRow row, IEnumerable<Field> fields, ITextLocalizer localizer)
         {
             foreach (var field in fields)
                 if (row.IsAssigned(field))
-                    ValidateRequired(row, field);
+                    ValidateRequired(row, field, localizer);
         }
 
-        public static void EnsureUniversalTime(this Row row, DateTimeField field)
+        public static void EnsureUniversalTime(this IRow row, DateTimeField field)
         {
             if (!field.IsNull(row))
                 field[row] = field[row].Value.ToUniversalTime();
         }
 
-        public static void ValidateEnum(this Row row, Field field, Type enumType)
+        public static void ValidateEnum(this IRow row, Field field, Type enumType, ITextLocalizer localizer)
         {
             if (!Enum.IsDefined(enumType, field.AsObject(row)))
-                throw InvalidValueError(row, field);
+                throw InvalidValueError(row, field, localizer);
         }
 
-        public static void ValidateEnum<T>(this Row row, GenericValueField<T> field) where T: struct, IComparable<T>
+        public static void ValidateEnum<T>(this IRow row, GenericValueField<T> field, 
+            ITextLocalizer localizer) where T: struct, IComparable<T>
         {
             if (!Enum.IsDefined(field.EnumType, field.AsObject(row)))
-                throw InvalidValueError(row, field);
+                throw InvalidValueError(row, field, localizer);
         }
 
-        public static void ValidateEnum<T>(T value)
+        public static void ValidateEnum<T>(T value, ITextLocalizer localizer)
         {
             if (!Enum.IsDefined(typeof(T), value))
-                throw ArgumentOutOfRange(typeof(T).Name);
+                throw ArgumentOutOfRange(typeof(T).Name, localizer);
         }
 
-        public static void ValidateDateRange(this Row row, DateTimeField start, DateTimeField finish)
+        public static void ValidateDateRange(this IRow row, DateTimeField start, DateTimeField finish, 
+            ITextLocalizer localizer)
         {
             if (!start.IsNull(row) &&
                 !finish.IsNull(row) &&
                 start[row].Value > finish[row].Value)
             {
-                throw InvalidDateRangeError(row, start, finish);
+                throw InvalidDateRangeError(row, start, finish, localizer);
             }
         }
 
-        public static ValidationError RequiredError(Row row, Field field)
+        public static ValidationError RequiredError(IRow row, Field field, ITextLocalizer localizer)
         {
-            return RequiredError(field.Name, field.Title);
+            return RequiredError(field.Name, localizer, field.GetTitle(localizer));
         }
 
-        public static ValidationError RequiredError(string name, string title = null)
+        public static ValidationError RequiredError(string name, ITextLocalizer localizer, string title = null)
         {
-            return new ValidationError("Required", name, Texts.Validation.FieldIsRequired, title ?? name);
+            return new ValidationError("Required", name, 
+                Texts.Validation.FieldIsRequired.ToString(localizer), 
+                title ?? name);
         }
 
-        public static ValidationError InvalidIdError(Row row, IIdField field)
+        public static ValidationError InvalidIdError(IRow row, IIdField field, ITextLocalizer localizer)
         {
             var fld = (Field)field;
-            return new ValidationError("InvalidId", fld.Name, Texts.Validation.FieldInvalidValue, fld.Title, ((Field)field).AsObject(row));
+            return new ValidationError("InvalidId", fld.Name, 
+                Texts.Validation.FieldInvalidValue.ToString(localizer), 
+                fld.GetTitle(localizer), ((Field)field).AsObject(row));
         }
 
-        public static ValidationError InvalidIdError(Field field, Int64 value)
+        public static ValidationError InvalidIdError(Field field, long value, ITextLocalizer localizer)
         {
             var fld = (Field)field;
-            return new ValidationError("InvalidId", field.Name, Texts.Validation.FieldInvalidValue, field.Title, value);
+            return new ValidationError("InvalidId", field.Name, 
+                Texts.Validation.FieldInvalidValue.ToString(localizer), 
+                field.GetTitle(localizer), value);
         }
 
-        public static ValidationError InvalidDateRangeError(Row row, DateTimeField start, DateTimeField finish)
+        public static ValidationError InvalidDateRangeError(IRow row, 
+            DateTimeField start, DateTimeField finish, ITextLocalizer localizer)
         {
-            return new ValidationError("InvalidDateRange", start.Name + "," + finish.Name, Texts.Validation.FieldInvalidDateRange, start.Title, finish.Title);
+            return new ValidationError("InvalidDateRange", start.Name + "," + finish.Name, 
+                Texts.Validation.FieldInvalidDateRange.ToString(localizer), 
+                start.GetTitle(localizer), finish.GetTitle(localizer));
         }
 
-        public static ValidationError ReadOnlyError(Row row, Field field)
+        public static ValidationError ReadOnlyError(Field field, ITextLocalizer localizer)
         {
-            return new ValidationError("ReadOnly", field.Name, Texts.Validation.FieldIsReadOnly, field.Title);
+            return new ValidationError("ReadOnly", field.Name, Texts.Validation.FieldIsReadOnly.ToString(localizer), 
+                field.GetTitle(localizer));
         }
 
-        public static ValidationError InvalidValueError(Field field, object value)
+        public static ValidationError InvalidValueError(Field field, object value, ITextLocalizer localizer)
         {
-            return new ValidationError("InvalidValue", field.Name, Texts.Validation.FieldInvalidValue,
-                Convert.ToString(value, CultureInfo.CurrentCulture), field.Title);
+            return new ValidationError("InvalidValue", field.Name, 
+                Texts.Validation.FieldInvalidValue.ToString(localizer),
+                Convert.ToString(value, CultureInfo.CurrentCulture), field.GetTitle(localizer));
         }
 
-        public static ValidationError InvalidValueError(Row row, Field field)
+        public static ValidationError InvalidValueError(IRow row, Field field, ITextLocalizer localizer)
         {
-            return new ValidationError("InvalidValue", field.Name, Texts.Validation.FieldInvalidValue,
-                Convert.ToString(field.AsObject(row), CultureInfo.CurrentCulture), field.Title);
+            return new ValidationError("InvalidValue", field.Name, 
+                Texts.Validation.FieldInvalidValue.ToString(localizer),
+                Convert.ToString(field.AsObject(row), CultureInfo.CurrentCulture), field.GetTitle(localizer));
         }
 
-        public static ValidationError EntityNotFoundError(Row row, object id)
+        public static ValidationError EntityNotFoundError(IRow row, object id, ITextLocalizer localizer)
         {
-            return new ValidationError("EntityNotFound", null, Texts.Validation.EntityNotFound,
-                Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table));
+            return new ValidationError("EntityNotFound", null, Texts.Validation.EntityNotFound.ToString(localizer),
+                Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table, localizer));
         }
 
-        public static ValidationError EntityReadAccessError(Row row, object id)
+        public static ValidationError EntityReadAccessError(IRow row, object id, ITextLocalizer localizer)
         {
-            return new ValidationError("EntityReadAccessError", null, Texts.Validation.EntityReadAccessViolation,
-                Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table));
+            return new ValidationError("EntityReadAccessError", null, 
+                Texts.Validation.EntityReadAccessViolation.ToString(localizer),
+                Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table, localizer));
         }
 
-        public static ValidationError EntityWriteAccessError(Row row, Int64 id)
+        public static ValidationError EntityWriteAccessError(IRow row, long id, ITextLocalizer localizer)
         {
-            return new ValidationError("EntityWriteAccessError", null, Texts.Validation.EntityWriteAccessViolation,
-                Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table));
+            return new ValidationError("EntityWriteAccessError", null, 
+                Texts.Validation.EntityWriteAccessViolation.ToString(localizer),
+                Convert.ToString(id, CultureInfo.CurrentCulture), 
+                GetEntitySingular(row.Table, localizer));
         }
 
-        public static ValidationError RelatedRecordExist(string foreignTable)
+        public static ValidationError RelatedRecordExist(string foreignTable, ITextLocalizer localizer)
         {
-            return new ValidationError("RelatedRecordExist", null, Texts.Validation.EntityForeignKeyViolation,
-                GetEntitySingular(foreignTable));
+            return new ValidationError("RelatedRecordExist", null, 
+                Texts.Validation.EntityForeignKeyViolation.ToString(localizer),
+                GetEntitySingular(foreignTable, localizer));
         }
 
-        public static ValidationError ParentRecordDeleted(string foreignTable)
+        public static ValidationError ParentRecordDeleted(string foreignTable, ITextLocalizer localizer)
         {
-            return new ValidationError("ParentRecordDeleted", null, Texts.Validation.EntityHasDeletedParent,
-                GetEntitySingular(foreignTable));
+            return new ValidationError("ParentRecordDeleted", null, 
+                Texts.Validation.EntityHasDeletedParent.ToString(localizer),
+                GetEntitySingular(foreignTable, localizer));
         }
 
-        public static ValidationError RecordNotActive(Row row)
+        public static ValidationError RecordNotActive(IRow row, ITextLocalizer localizer)
         {
-            return new ValidationError("RecordNotActive", null, Texts.Validation.EntityIsNotActive,
-                GetEntitySingular(row.Table));
+            return new ValidationError("RecordNotActive", null, 
+                Texts.Validation.EntityIsNotActive.ToString(localizer),
+                GetEntitySingular(row.Table, localizer));
         }
 
-        public static ValidationError UnexpectedError()
+        public static ValidationError UnexpectedError(ITextLocalizer localizer)
         {
-            return new ValidationError("UnexpectedError", null, Texts.Validation.UnexpectedError);
+            return new ValidationError("UnexpectedError", null, 
+                Texts.Validation.UnexpectedError.ToString(localizer));
         }
 
-        public static string GetEntitySingular(string table)
+        public static string GetEntitySingular(string table, ITextLocalizer localizer)
         {
-            return LocalText.TryGet("Db." + table + ".EntitySingular") ?? table;
+            return localizer?.TryGet("Db." + table + ".EntitySingular") ?? table;
         }
 
-        public static ValidationError ArgumentNull(string argument)
+        public static ValidationError ArgumentNull(string argument, ITextLocalizer localizer)
         {
-            return new ValidationError("ArgumentNull", argument, Texts.Validation.ArgumentIsNull, argument);
+            return new ValidationError("ArgumentNull", argument, 
+                Texts.Validation.ArgumentIsNull.ToString(localizer), argument);
         }
 
-        public static ValidationError ArgumentOutOfRange(string argument)
+        public static ValidationError ArgumentOutOfRange(string argument, ITextLocalizer localizer)
         {
-            return new ValidationError("ArgumentOutOfRange", argument, Texts.Validation.ArgumentOutOfRange, argument);
-        }
-
-        public static void CheckNotNull(this ServiceRequest request)
-        {
-            if (request == null)
-                throw new ValidationError(Texts.Validation.RequestIsNull);
+            return new ValidationError("ArgumentOutOfRange", argument, 
+                Texts.Validation.ArgumentOutOfRange.ToString(localizer), argument);
         }
     }
 }

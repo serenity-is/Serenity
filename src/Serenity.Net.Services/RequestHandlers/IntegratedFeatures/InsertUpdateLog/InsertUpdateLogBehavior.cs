@@ -1,4 +1,5 @@
-﻿using Serenity.Data;
+﻿#if TODO
+using Serenity.Data;
 using System;
 using System.Globalization;
 
@@ -6,7 +7,7 @@ namespace Serenity.Services
 {
     public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
     {
-        public bool ActivateFor(Row row)
+        public bool ActivateFor(IRow row)
         {
             return row is IUpdateLogRow || row is IInsertLogRow;
         }
@@ -48,3 +49,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

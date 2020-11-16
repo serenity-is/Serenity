@@ -12,7 +12,7 @@ namespace Serenity.Services
         /// <summary>
         /// Loader row
         /// </summary>
-        Row Row { get; }
+        IRow Row { get; }
 
         /// <summary>
         /// Retrieve request

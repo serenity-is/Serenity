@@ -1,50 +1,46 @@
-﻿using Serenity.Data;
+﻿using Serenity.Abstractions;
+using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace Serenity.Services
 {
     public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveRequestHandler, ISaveRequestProcessor
-        where TRow : Row, IIdRow, new()
+        where TRow : class, IRow, IIdRow, new()
         where TSaveResponse : SaveResponse, new()
         where TSaveRequest : SaveRequest<TRow>, new()
     {
         private bool displayOrderFix;
-        protected static IEnumerable<ISaveBehavior> cachedBehaviors;
-        protected IEnumerable<ISaveBehavior> behaviors;
+        protected Lazy<ISaveBehavior[]> behaviors;
 
-        public SaveRequestHandler()
+        public SaveRequestHandler(IRequestHandlerContext context)
         {
-            this.StateBag = new Dictionary<string, object>();
-            this.behaviors = GetBehaviors();
+            Context = context ?? throw new ArgumentNullException(nameof(context));
+            StateBag = new Dictionary<string, object>();
+            behaviors = new Lazy<ISaveBehavior[]>(() => GetBehaviors().ToArray());
         }
 
         protected virtual IEnumerable<ISaveBehavior> GetBehaviors()
         {
-            if (cachedBehaviors == null)
-            {
-                cachedBehaviors = RowSaveBehaviors<TRow>.Default.Concat(
-                    this.GetType().GetCustomAttributes().OfType<ISaveBehavior>()).ToList();
-            }
-
-            return cachedBehaviors;
+            return Context.GetBehaviors<ISaveBehavior>(typeof(TRow), GetType());
         }
 
         protected virtual void AfterSave()
         {
             HandleDisplayOrder(afterSave: true);
 
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnAfterSave(this);
         }
 
         protected virtual void BeforeSave()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnBeforeSave(this);
         }
 
@@ -59,7 +55,7 @@ namespace Serenity.Services
 
         protected virtual void PerformAuditing()
         {
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnAudit(this);
         }
 
@@ -120,8 +116,10 @@ namespace Serenity.Services
             foreach (var field in Row.GetFields())
                 if (field.Flags.HasFlag(flag))
                 {
-                    if ((IsCreate && (field.InsertPermission == null || Authorization.HasPermission(field.InsertPermission))) ||
-                        (IsUpdate && (field.UpdatePermission == null || Authorization.HasPermission(field.UpdatePermission))))
+                    if ((IsCreate && (field.InsertPermission == null || 
+                            Permissions.HasPermission(field.InsertPermission))) ||
+                        (IsUpdate && (field.UpdatePermission == null || 
+                            Permissions.HasPermission(field.UpdatePermission))))
                         editable.Add(field);
                 }
         }
@@ -189,7 +187,7 @@ namespace Serenity.Services
                 if ((field.Flags & FieldFlags.Reflective) != FieldFlags.Reflective)
                 {
                     if (!isNonTableField)
-                        throw DataValidation.ReadOnlyError(Row, field);
+                        throw DataValidation.ReadOnlyError(field, Localizer);
 
                     field.CopyNoAssignment(Old, Row);
                     Row.ClearAssignment(field);
@@ -201,7 +199,7 @@ namespace Serenity.Services
                     (field.Flags & FieldFlags.Reflective) != FieldFlags.Reflective)
                 {
                     if (!isNonTableField)
-                        throw DataValidation.ReadOnlyError(Row, field);
+                        throw DataValidation.ReadOnlyError(field, Localizer);
 
                     field.AsObject(Row, null);
                     Row.ClearAssignment(field);
@@ -221,13 +219,13 @@ namespace Serenity.Services
                     idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
                     : idField.AsObject(Row);
 
-                throw DataValidation.EntityNotFoundError(Row, id);
+                throw DataValidation.EntityNotFoundError(Row, id, Localizer);
             }
         }
 
         protected virtual void OnReturn()
         {
-            foreach (var behavior in this.behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnReturn(this);
         }
 
@@ -244,7 +242,7 @@ namespace Serenity.Services
                 .SelectTableFields()
                 .WhereEqual(idField, id);
 
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnPrepareQuery(this, query);
 
             return query;
@@ -330,7 +328,7 @@ namespace Serenity.Services
                 SetDefaultValues();
             }
 
-            foreach (var behaviour in this.behaviors)
+            foreach (var behaviour in behaviors.Value)
                 behaviour.OnSetInternalFields(this);
         }
 
@@ -384,9 +382,9 @@ namespace Serenity.Services
             GetRequiredFields(required: requiredFields, editable: editableFields);
 
             if (IsUpdate)
-                Row.ValidateRequiredIfModified(requiredFields);
+                Row.ValidateRequiredIfModified(requiredFields, Localizer);
             else
-                Row.ValidateRequired(requiredFields);
+                Row.ValidateRequired(requiredFields, Localizer);
         }
 
         protected virtual void ValidateRequest()
@@ -401,7 +399,7 @@ namespace Serenity.Services
 
             ValidateFieldValues();
 
-            foreach (var behavior in this.behaviors)
+            foreach (var behavior in behaviors.Value)
                 behavior.OnValidateRequest(this);
         }
 
@@ -440,19 +438,19 @@ namespace Serenity.Services
             var isActiveRow = Old as IIsActiveRow;
             if (isActiveRow != null &&
                 isActiveRow.IsActiveField[Old] < 0)
-                throw DataValidation.RecordNotActive(Old);
+                throw DataValidation.RecordNotActive(Old, Localizer);
 
             var isDeletedRow = Old as IIsDeletedRow;
             if (isDeletedRow != null &&
                 isDeletedRow.IsDeletedField[Old] == true)
-                throw DataValidation.RecordNotActive(Old);
+                throw DataValidation.RecordNotActive(Old, Localizer);
         }
 
         protected virtual void ValidateAndClearIdField()
         {
             var idField = (Field)(Row.IdField);
             if (Row.IsAssigned(idField))
-                Row.ValidateRequired(idField);
+                Row.ValidateRequired(idField, Localizer);
 
             if ((idField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
                 Row.ClearAssignment(idField);
@@ -475,22 +473,27 @@ namespace Serenity.Services
                 typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
             if (attr != null)
-                Authorization.ValidatePermission(attr.Permission ?? "?");
+                Permissions.ValidatePermission(attr.Permission ?? "?", Localizer);
         }
 
         protected virtual void InvalidateCacheOnCommit()
         {
-            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Row.GetFields().GenerationKey);
+            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, Row.GetFields().GenerationKey);
             var attr = typeof(TRow).GetCustomAttribute<TwoLevelCachedAttribute>(false);
             if (attr != null)
                 foreach (var key in attr.GenerationKeys)
-                    BatchGenerationUpdater.OnCommit(this.UnitOfWork, key);
+                    BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, key);
         }
 
         SaveResponse ISaveRequestProcessor.Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type)
         {
             return Process(uow, (TSaveRequest)request, type);
         }
+
+        public IRequestHandlerContext Context { get; private set; }
+        public ITextLocalizer Localizer => Context.Localizer;
+        public IPermissionService Permissions => Context.Permissions;
+        public ClaimsPrincipal User => Context.User;
 
         public IDbConnection Connection { get { return UnitOfWork.Connection; } }
 
@@ -512,16 +515,20 @@ namespace Serenity.Services
 
         SaveResponse ISaveRequestHandler.Response { get { return this.Response; } }
 
-        Row ISaveRequestHandler.Old { get { return this.Old; } }
+        IRow ISaveRequestHandler.Old { get { return this.Old; } }
 
-        Row ISaveRequestHandler.Row { get { return this.Row; } }
+        IRow ISaveRequestHandler.Row { get { return this.Row; } }
 
         public IDictionary<string, object> StateBag { get; private set; }
     }
 
     public class SaveRequestHandler<TRow> : SaveRequestHandler<TRow, SaveRequest<TRow>, SaveResponse>
-        where TRow : Row, IIdRow, new()
+        where TRow : class, IRow, IIdRow, new()
     {
+        public SaveRequestHandler(IRequestHandlerContext context)
+            : base(context)
+        {
+        }
     }
 
     public interface ISaveRequestProcessor

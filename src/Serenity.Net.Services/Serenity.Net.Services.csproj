@@ -1,25 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
-    <AssemblyName>Serenity.Services</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <AssemblyName>Serenity.Net.Services</AssemblyName>
     <Title>Serenity Platform - Services Library</Title>
     <Description>Contains classes for CRUD service / repository implementations...</Description>            
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
-    <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj" />
-    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj" />
+    <ProjectReference Include="..\Serenity.Net.Data.Entity\Serenity.Net.Data.Entity.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Data" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="System.Drawing.Common" Version="$(FrameworkPackageVersion)" />
   </ItemGroup>
 </Project>

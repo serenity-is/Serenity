@@ -1,4 +1,5 @@
-﻿using Serenity.Data;
+﻿#if TODO
+using Serenity.Data;
 using Serenity.Data.Mapping;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Serenity.Services
 
         private UniqueAttribute attr;
 
-        public bool ActivateFor(Row row)
+        public bool ActivateFor(IRow row)
         {
             if (ReferenceEquals(null, Target))
                 return false;
@@ -72,3 +73,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

@@ -1,5 +1,6 @@
 ﻿namespace Serenity.Data
 {
+    using Serenity.Abstractions;
     using Serenity.Services;
     using System;
     using System.Collections;
@@ -8,12 +9,15 @@
 
     public class CriteriaFieldExpressionReplacer : SafeCriteriaValidator
     {
-        public CriteriaFieldExpressionReplacer(Row row)
+        private readonly IPermissionService permissions;
+
+        public CriteriaFieldExpressionReplacer(IRow row, IPermissionService permissions)
         {
-            this.Row = row;
+            Row = row;
+            this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
         }
 
-        protected Row Row { get; private set; }
+        protected IRow Row { get; private set; }
 
         public BaseCriteria Process(BaseCriteria criteria)
         {
@@ -30,7 +34,7 @@
                 return false;
 
             if (field.ReadPermission != null &&
-                !Authorization.HasPermission(field.ReadPermission))
+                !permissions.HasPermission(field.ReadPermission))
                 return false;
 
             return true;

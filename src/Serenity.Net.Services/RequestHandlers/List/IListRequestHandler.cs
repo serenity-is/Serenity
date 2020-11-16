@@ -9,10 +9,12 @@ namespace Serenity.Services
     /// </summary>
     public interface IListRequestHandler
     {
+        IRequestHandlerContext Context { get; }
+
         /// <summary>
         /// Loader row
         /// </summary>
-        Row Row { get; }
+        IRow Row { get; }
 
         /// <summary>
         /// List request

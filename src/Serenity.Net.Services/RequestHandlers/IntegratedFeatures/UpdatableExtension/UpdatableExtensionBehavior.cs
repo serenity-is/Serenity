@@ -1,4 +1,5 @@
-﻿using Serenity.Data;
+﻿#if TODO
+using Serenity.Data;
 using Serenity.Data.Mapping;
 using Serenity.Reflection;
 using System;
@@ -15,7 +16,7 @@ namespace Serenity.Services
         private class RelationInfo
         {
             public UpdatableExtensionAttribute Attr;
-            public Func<Row> RowFactory;
+            public Func<IRow> RowFactory;
             public Field ThisKeyField;
             public Field OtherKeyField;
             public Field FilterField;
@@ -27,7 +28,7 @@ namespace Serenity.Services
 
         private List<RelationInfo> infoList;
 
-        public bool ActivateFor(Row row)
+        public bool ActivateFor(IRow row)
         {
             var attrs = row.GetType().GetCustomAttributes<UpdatableExtensionAttribute>();
 
@@ -44,7 +45,7 @@ namespace Serenity.Services
 
                 var rowType = attr.RowType;
                 if (rowType.IsAbstract ||
-                    !typeof(Row).IsAssignableFrom(rowType))
+                    !typeof(IRow).IsAssignableFrom(rowType))
                 {
                     throw new ArgumentException(String.Format(
                         "Row type '{1}' has an ExtensionRelation attribute " +
@@ -53,7 +54,7 @@ namespace Serenity.Services
                             row.GetType().FullName));
                 }
 
-                info.RowFactory = FastReflection.DelegateForConstructor<Row>(rowType);
+                info.RowFactory = FastReflection.DelegateForConstructor<IRow>(rowType);
 
                 var thisKey = attr.ThisKey;
                 if (string.IsNullOrEmpty(thisKey))
@@ -253,10 +254,10 @@ namespace Serenity.Services
             if (existing.Count == 0)
                 return null;
 
-            return ((Field)((IIdRow)existing[0]).IdField).AsObject((Row)existing[0]);
+            return ((Field)((IIdRow)existing[0]).IdField).AsObject((IRow)existing[0]);
         }
 
-        private bool CheckPresenceValue(RelationInfo info, Row row)
+        private bool CheckPresenceValue(RelationInfo info, IRow row)
         {
             if (!ReferenceEquals(null, info.PresenceField))
             {
@@ -343,3 +344,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

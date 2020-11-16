@@ -1,4 +1,4 @@
-﻿namespace Serenity.Abstractions
+﻿namespace Serenity
 {
     /// <summary>
     /// Text localizer for current context language / pending state.

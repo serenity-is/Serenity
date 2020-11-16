@@ -1,15 +1,12 @@
-﻿using Serenity;
+﻿#if TODO
+using Serenity;
 using Serenity.Data;
 using Serenity.Data.Mapping;
-using Serenity.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-#if !NET45
-using System.Reflection;
-#endif
 
 namespace Serenity.Services
 {
@@ -20,7 +17,7 @@ namespace Serenity.Services
 
         private LinkingSetRelationAttribute attr;
         private Func<IList> listFactory;
-        private Func<Row> rowFactory;
+        private Func<IRow> rowFactory;
         private Type rowType;
         private Field thisKeyField;
         private Criteria thisKeyCriteria;
@@ -30,7 +27,7 @@ namespace Serenity.Services
         private BaseCriteria filterCriteria;
         private BaseCriteria queryCriteria;
 
-        public bool ActivateFor(Row row)
+        public bool ActivateFor(IRow row)
         {
             if (ReferenceEquals(null, Target))
                 return false;
@@ -75,7 +72,7 @@ namespace Serenity.Services
             }
 
             listFactory = FastReflection.DelegateForConstructor<IList>(listType);
-            rowFactory = FastReflection.DelegateForConstructor<Row>(rowType);
+            rowFactory = FastReflection.DelegateForConstructor<IRow>(rowType);
 
             var detailRow = rowFactory();
 
@@ -202,7 +199,7 @@ namespace Serenity.Services
             IListResponse response = listHandler.Process(handler.Connection, listRequest);
 
             var list = listFactory();
-            foreach (Row item in response.Entities)
+            foreach (IRow item in response.Entities)
                 list.Add(itemKeyField.AsObject(item));
 
             Target.AsObject(handler.Row, list);
@@ -227,7 +224,7 @@ namespace Serenity.Services
                 thisKeyField.PropertyName ?? thisKeyField.Name
             };
 
-            var enumerator = handler.Response.Entities.Cast<Row>();
+            var enumerator = handler.Response.Entities.Cast<IRow>();
             while (true)
             {
                 var part = enumerator.Take(1000);
@@ -242,7 +239,7 @@ namespace Serenity.Services
                 IListResponse response = listHandler.Process(
                     handler.Connection, listRequest);
 
-                var lookup = response.Entities.Cast<Row>()
+                var lookup = response.Entities.Cast<IRow>()
                     .ToLookup(x => thisKeyField.AsObject(x).ToString());
 
                 foreach (var row in part)
@@ -279,7 +276,7 @@ namespace Serenity.Services
             deleteHandler.Process(uow, deleteRequest);
         }
 
-        private void DetailListSave(IUnitOfWork uow, object masterId, IList<Row> oldRows, 
+        private void DetailListSave(IUnitOfWork uow, object masterId, IList<IRow> oldRows, 
             IList<object> newItemKeys)
         {
             if (oldRows.Count == 0)
@@ -297,14 +294,14 @@ namespace Serenity.Services
 
             if (newItemKeys.Count == 0)
             {
-                foreach (Row entity in oldRows)
+                foreach (IRow entity in oldRows)
                     DeleteDetail(uow, rowIdField.AsObject(entity));
 
                 return;
             }
 
             var oldByItemKey = new Dictionary<string, Row>(oldRows.Count);
-            foreach (Row item in oldRows)
+            foreach (IRow item in oldRows)
             {
                 var itemKey = itemKeyField.AsObject(item);
                 if (itemKey != null)
@@ -317,13 +314,13 @@ namespace Serenity.Services
                         oldRows.Select(x => itemKeyField.AsObject(x))) &&
                     newItemKeys.Any(x => !oldByItemKey.ContainsKey(x.ToString())))
                 {
-                    foreach (Row item in oldRows)
+                    foreach (IRow item in oldRows)
                     {
                         var id = rowIdField.AsObject(item);
                         DeleteDetail(uow, id);
                     }
 
-                    oldRows = new List<Row>();
+                    oldRows = new List<IRow>();
                     oldByItemKey = new Dictionary<string, Row>();
                 }
             }
@@ -335,7 +332,7 @@ namespace Serenity.Services
                     newByItemKey.Add(item.ToString());
             }
 
-            foreach (Row item in oldRows)
+            foreach (IRow item in oldRows)
             {
                 var itemKey = itemKeyField.AsObject(item);
                 var id = rowIdField.AsObject(item);
@@ -370,7 +367,7 @@ namespace Serenity.Services
                 return;
             }
 
-            var oldRows = new List<Row>();
+            var oldRows = new List<IRow>();
 
             var row = rowFactory();
             var rowIdField = (Field)((row as IIdRow).IdField);
@@ -425,3 +422,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

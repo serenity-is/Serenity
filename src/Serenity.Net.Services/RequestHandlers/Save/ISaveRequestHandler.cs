@@ -12,12 +12,12 @@ namespace Serenity.Services
         /// <summary>
         /// Old row, if any, otherwise null
         /// </summary>
-        Row Old { get; }
+        IRow Old { get; }
 
         /// <summary>
         /// New row
         /// </summary>
-        Row Row { get; }
+        IRow Row { get; }
 
         /// <summary>
         /// Is this an INSERT operation?

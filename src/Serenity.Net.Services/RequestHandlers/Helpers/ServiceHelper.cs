@@ -6,65 +6,13 @@ namespace Serenity.Services
 {
     public static class ServiceHelper
     {
-    //    public static void ValidateRequestSupport(this ListRequest request, ListRequestSupport support)
-    //    {
-    //        DataValidation.CheckNotNull(request);
-
-    //        if (request.Take < 0 ||
-    //            request.Skip < 0)
-    //            throw new ValidationError("Liste isteklerinde Take ve Skip parametreleri 0'dan büyük olmalıdır!");
-
-    //        if ((support & ListRequestSupport.Paging) != ListRequestSupport.Paging &&
-    //            (request.Take > 0 || request.Skip > 0))
-    //        {
-    //            throw new ValidationError("Bu liste servisi sayfalamayı desteklemiyor!");
-    //        }
-
-    //        if ((support & ListRequestSupport.Sorting) != ListRequestSupport.Sorting &&
-    //            !request.Sort.IsEmptyOrNull())
-    //        {
-    //            throw new ValidationError("Bu liste servisi sıralamayı desteklemiyor!");
-    //        }
-
-    //        if ((support & ListRequestSupport.ContainsText) != ListRequestSupport.ContainsText &&
-    //            !request.ContainsText.IsNullOrEmpty())
-    //        {
-    //            throw new ValidationError("Bu liste servisi metin aramasını desteklemiyor!");
-    //        }
-
-    //        if ((support & ListRequestSupport.IncludeDeleted) != ListRequestSupport.IncludeDeleted &&
-    //            request.IncludeDeleted)
-    //        {
-    //            throw new ValidationError("Bu liste servisi silinmiş kayıtları göstermeyi desteklemiyor!");
-    //        }
-
-    //        /*if ((support & ListRequestSupport.FilterLines) != ListRequestSupport.FilterLines &&
-    //            !request.FilterLines.IsEmptyOrNull())
-    //        {
-    //            throw new ValidationError("Bu liste servisi filtre satırlarını desteklemiyor!");
-    //        }
-
-    //        if ((support & ListRequestSupport.Filter) != ListRequestSupport.Filter &&
-    //            request.Filter != null)
-    //        {
-    //            throw new ValidationError("Bu liste servisi filtre desteklemiyor!");
-    //        }*/
-    //    }
-
-    //    public static void CheckRelatedOnDelete(IDbConnection connection, string tableName, Action<SqlQuery> filter)
-    //    {
-    //        var query = new SqlQuery().Select("1").From(tableName, Alias.T0);
-    //        filter(query);
-    //        if (query.Take(1).Exists(connection))
-    //            throw DataValidation.RelatedRecordExist(tableName);
-    //    }
-
-        public static void CheckParentNotDeleted(IDbConnection connection, string tableName, Action<SqlQuery> filter)
+        public static void CheckParentNotDeleted(IDbConnection connection, string tableName,
+            Action<SqlQuery> filter, ITextLocalizer localizer)
         {
             var query = new SqlQuery().Dialect(connection.GetDialect()).Select("1").From(tableName, Alias.T0);
             filter(query);
             if (query.Take(1).Exists(connection))
-                throw DataValidation.ParentRecordDeleted(tableName);
+                throw DataValidation.ParentRecordDeleted(tableName, localizer);
         }
 
         public static void SetSkipTakeTotal<T>(this ListResponse<T> response, SqlQuery query)
@@ -77,16 +25,13 @@ namespace Serenity.Services
 
         public static bool IsUniqueIndexException(IDbConnection connection,
             Exception exception, string indexName,
-            Row oldRow, Row newRow, params Field[] indexFields)
+            IRow oldRow, IRow newRow, params Field[] indexFields)
         {
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
             if (exception == null)
                 throw new ArgumentNullException("exception");
-
-            if (!SqlHelper.IsDatabaseException(exception))
-                return false;
 
             if (indexFields == null ||
                 indexFields.Length == 0)
@@ -123,26 +68,6 @@ namespace Serenity.Services
                 return false;
 
             return idField.IndexCompare(row, newRow) != 0;
-        }
-
-        public static void HandleUniqueKodException(IDbConnection connection,
-            Exception exception, string indexName,
-            Row oldRow, Row newRow, params Field[] indexFields)
-        {
-            if (IsUniqueIndexException(connection, exception, indexName, oldRow, newRow, indexFields))
-            {
-                var fieldNames = indexFields[0].Name;
-                var fieldTitles = indexFields[0].Title;
-                for (var i = 1; i < indexFields.Length; i++)
-                {
-                    fieldNames += ", " + indexFields[i].Name;
-                    fieldTitles += ", " + indexFields[i].Title;
-                }
-
-                throw new ValidationError("UniqueViolation", fieldNames,
-                    String.Format("Aynı \"{0}\" değerine sahip başka bir kayıt daha var!",
-                        fieldTitles));
-            }
         }
     }
 }

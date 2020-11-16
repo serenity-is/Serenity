@@ -1,4 +1,5 @@
-﻿using Serenity.Data;
+﻿#if TODO
+using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,7 +13,7 @@ namespace Serenity.Services
     }
 
     public class CaptureLogHandler<TRow> : ICaptureLogHandler
-        where TRow: Row, IIdRow, new() 
+        where TRow: class, IRow, IIdRow, new() 
     {
         private static string logConnectionKey;
         private static StaticInfo info;
@@ -20,20 +21,11 @@ namespace Serenity.Services
         private class StaticInfo
         {
             public TRow rowInstance;
-            public Row logRowInstance;
+            public IRow logRowInstance;
             public ICaptureLogRow captureLogInstance;
             public int rowFieldPrefixLength;
             public int logFieldPrefixLength;
             public Field mappedIdField;
-        }
-
-        static CaptureLogHandler()
-        {
-            SchemaChangeSource.Observers += (connectionKey, table) =>
-            {
-                if (connectionKey == logConnectionKey)
-                    info = null;
-            };
         }
 
         static StaticInfo EnsureInfo()
@@ -46,7 +38,7 @@ namespace Serenity.Services
             if (captureLogAttr == null || captureLogAttr.LogRow == null)
                 throw new InvalidOperationException(String.Format("{0} row type has no capture log attribute defined!", typeof(TRow).Name));
 
-            var logRowInstance = (Row)Activator.CreateInstance(captureLogAttr.LogRow);
+            var logRowInstance = (IRow)Activator.CreateInstance(captureLogAttr.LogRow);
 
             var captureLogRow = logRowInstance as ICaptureLogRow;
             if (captureLogRow == null)
@@ -62,10 +54,10 @@ namespace Serenity.Services
             newInfo.rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(newInfo.rowInstance.EnumerateTableFields(), x => x.Name);
             newInfo.logFieldPrefixLength = PrefixHelper.DeterminePrefixLength(logRowInstance.EnumerateTableFields(), x => x.Name);
             var mappedIdField = captureLogAttr.MappedIdField ?? ((Field)newInfo.rowInstance.IdField).Name;
-            newInfo.mappedIdField = ((Row)captureLogRow).FindField(mappedIdField) as Field;
+            newInfo.mappedIdField = ((IRow)captureLogRow).FindField(mappedIdField) as Field;
             if (ReferenceEquals(null, newInfo.mappedIdField))
                 throw new InvalidOperationException(String.Format("Can't locate capture log table mapped ID field for {0}!",
-                    ((Row)captureLogRow).Table));
+                    ((IRow)captureLogRow).Table));
 
             info = newInfo;
             return newInfo;
@@ -103,7 +95,7 @@ namespace Serenity.Services
             }
         }
 
-        private static void CopyCapturedFields(Row source, Row target)
+        private static void CopyCapturedFields(IRow source, IRow target)
         {
             var info = EnsureInfo();
             foreach (var tuple in EnumerateCapturedFields())
@@ -168,9 +160,10 @@ namespace Serenity.Services
             }
         }
 
-        void ICaptureLogHandler.Log(IUnitOfWork uow, Row old, Row row, object userId)
+        void ICaptureLogHandler.Log(IUnitOfWork uow, IRow old, IRow row, object userId)
         {
             Log(uow, (TRow)old, (TRow)row, userId);
         }
     }
 }
+#endif

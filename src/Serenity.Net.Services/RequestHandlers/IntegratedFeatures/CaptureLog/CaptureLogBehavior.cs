@@ -1,4 +1,5 @@
-﻿using Serenity.Data;
+﻿#if TODO
+using Serenity.Data;
 using System;
 using System.Reflection;
 
@@ -8,7 +9,7 @@ namespace Serenity.Services
     {
         private ICaptureLogHandler captureLogHandler;
 
-        public bool ActivateFor(Row row)
+        public bool ActivateFor(IRow row)
         {
             if (row.GetType().GetCustomAttribute<CaptureLogAttribute>() == null)
                 return false;
@@ -27,7 +28,7 @@ namespace Serenity.Services
             if (handler.Row == null || captureLogHandler == null)
                 return;
 
-            Row newRow = null;
+            IRow newRow = null;
 
             // if row is not actually deleted, but set to deleted by a flag, log it as if it is an update operation
             if (handler.Row is IIsActiveDeletedRow)
@@ -88,3 +89,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

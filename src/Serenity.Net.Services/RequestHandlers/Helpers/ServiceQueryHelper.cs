@@ -24,7 +24,7 @@ namespace Serenity.Services
                     var row = ext.FirstIntoRow;
                     if (row != null)
                     {
-                        var field = ((Row)ext.FirstIntoRow).FindFieldByPropertyName(sort);
+                        var field = ((IRow)ext.FirstIntoRow).FindFieldByPropertyName(sort);
                         if (!ReferenceEquals(null, field))
                         {
                             expr = ((IGetExpressionByName)query).GetExpression(field.Name);
@@ -110,7 +110,7 @@ namespace Serenity.Services
             return null;
         }
 
-        public static BaseCriteria GetNotDeletedCriteria(Row row)
+        public static BaseCriteria GetNotDeletedCriteria(IRow row)
         {
             var isActiveDeletedRow = row as IIsActiveDeletedRow;
             if (isActiveDeletedRow != null)
@@ -139,7 +139,7 @@ namespace Serenity.Services
             return null;
         }
 
-        public static bool UseSoftDelete(Row row)
+        public static bool UseSoftDelete(IRow row)
         {
             return row is IIsActiveDeletedRow ||
                 row is IIsDeletedRow ||
