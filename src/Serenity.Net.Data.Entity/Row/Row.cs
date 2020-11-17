@@ -21,12 +21,8 @@ namespace Serenity.Data
         {
             if (fields == null)
             {
-                var fieldsFactory = RowFieldsFactory.Current;
-                if (fieldsFactory == null)
-                    throw new ArgumentNullException("fields", $"{this.GetType().FullName} constructor is called " +
-                        $"without providing a fields object. Please set RowFieldsFactory.Current!");
-
-                fields = (TFields)fieldsFactory.GetFields(typeof(TFields));
+                var fieldsProvider = RowFieldsProvider.Current;
+                fields = (TFields)fieldsProvider.Resolve(typeof(TFields));
             }
 
             if (!fields.isInitialized)
@@ -35,7 +31,7 @@ namespace Serenity.Data
 
             this.fields = fields;
 
-            fields.InitInstance(this);
+            fields.RowCreated(this);
 
             TrackAssignments = true;
         }

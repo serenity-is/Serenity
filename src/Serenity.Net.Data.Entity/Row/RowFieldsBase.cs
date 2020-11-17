@@ -820,11 +820,11 @@ namespace Serenity.Data
                 return null;
         }
 
-        private bool initializedInstance;
+        private bool calledRowCreated;
 
-        internal void InitInstance(IRow row)
+        internal void RowCreated(IRow row)
         {
-            if (initializedInstance)
+            if (calledRowCreated)
                 return;
 
             var readPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
@@ -849,7 +849,7 @@ namespace Serenity.Data
                 }
             }
             
-            initializedInstance = true;
+            calledRowCreated = true;
         }
 
         public Field FindFieldByPropertyName(string propertyName)

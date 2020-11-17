@@ -7,15 +7,6 @@ namespace Serenity.Net.Data.Entity.Tests
     public class RowCreationTests
     {
         [Fact]
-        public void Raises_Exception_If_Fields_Is_Null_And_Fields_Factory_Not_Set()
-        {
-            RowFieldsFactory.Scoped(() =>
-            {
-                Assert.Throws<ArgumentNullException>(() => new ComplexRow());
-            }, null);
-        }
-
-        [Fact]
         public void Raises_Exception_For_Unitialized_Fields()
         {
             var fields = new ComplexRow.RowFields();
@@ -31,14 +22,14 @@ namespace Serenity.Net.Data.Entity.Tests
         }
 
         [Fact]
-        public void Can_Create_Row_With_Initialized_Fields_Even_When_RowFieldsFactory_Is_Null()
+        public void Can_Create_Row_With_Initialized_Fields_With_DefaultScope()
         {
-            RowFieldsFactory.Scoped(() =>
+            RowFieldsProvider.TestScope(() =>
             {
                 var fields = new ComplexRow.RowFields().Init(annotations: null);
                 var row = new ComplexRow(fields);
                 row.BasicExpression = "test";
-            }, null);
+            }, new DefaultRowFieldsProvider());
         }
 
         [Fact]
