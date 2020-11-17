@@ -31,8 +31,7 @@
 
         protected virtual IEnumerable<IRetrieveBehavior> GetBehaviors()
         {
-            return Context.Behaviors.Resolve<TRow, IRetrieveBehavior>(
-                GetType().GetCustomAttributes<AddBehaviorAttribute>().Select(x => x.Value).ToArray());
+            return Context.Behaviors.Resolve<TRow, IRetrieveBehavior>(GetType());
         }
 
         protected virtual bool AllowSelectField(Field field)

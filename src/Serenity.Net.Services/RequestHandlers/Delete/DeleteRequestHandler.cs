@@ -30,8 +30,7 @@ namespace Serenity.Services
 
         protected virtual IEnumerable<IDeleteBehavior> GetBehaviors()
         {
-            return Context.Behaviors.Resolve<TRow, IDeleteBehavior>(
-                GetType().GetCustomAttributes<AddBehaviorAttribute>().Select(x => x.Value).ToArray());
+            return Context.Behaviors.Resolve<TRow, IDeleteBehavior>(GetType());
         }
 
         public IDbConnection Connection

@@ -34,8 +34,7 @@
 
         protected virtual IEnumerable<IListBehavior> GetBehaviors()
         {
-            return Context.Behaviors.Resolve<TRow, IListBehavior>(
-                GetType().GetCustomAttributes<AddBehaviorAttribute>().Select(x => x.Value).ToArray());
+            return Context.Behaviors.Resolve<TRow, IListBehavior>(GetType());
         }
 
         protected virtual SortBy[] GetNativeSort()

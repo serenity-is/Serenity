@@ -8,6 +8,6 @@ namespace Serenity.Services
     /// </summary>
     public interface IBehaviorProvider
     {
-        IEnumerable Resolve(Type forType, Type behaviorType, Type[] explicitBehaviors);
+        IEnumerable Resolve(Type handlerType, Type rowType, Type behaviorType);
     }
 }

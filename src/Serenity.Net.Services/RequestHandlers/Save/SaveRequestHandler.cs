@@ -28,8 +28,7 @@ namespace Serenity.Services
 
         protected virtual IEnumerable<ISaveBehavior> GetBehaviors()
         {
-            return Context.Behaviors.Resolve<TRow, ISaveBehavior>(
-                GetType().GetCustomAttributes<AddBehaviorAttribute>().Select(x => x.Value).ToArray());
+            return Context.Behaviors.Resolve<TRow, ISaveBehavior>(GetType());
         }
 
         protected virtual void AfterSave()
