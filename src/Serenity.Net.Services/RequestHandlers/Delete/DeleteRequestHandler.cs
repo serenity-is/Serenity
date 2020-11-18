@@ -1,5 +1,4 @@
 ﻿using Serenity.Abstractions;
-using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,8 @@ using System.Security.Claims;
 
 namespace Serenity.Services
 {
-    public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDeleteRequestHandler, IDeleteRequestProcessor
+    public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDeleteRequestProcessor,
+        IRequestHandler<TRow, TDeleteRequest, TDeleteResponse>
         where TRow : class, IRow, IIdRow, new()
         where TDeleteRequest: DeleteRequest
         where TDeleteResponse : DeleteResponse, new()
@@ -51,11 +51,10 @@ namespace Serenity.Services
 
         protected virtual void OnAfterDelete()
         {
-            var displayOrderRow = Row as IDisplayOrderRow;
-            if (displayOrderRow != null)
+            if (Row as IDisplayOrderRow != null)
             {
                 var filter = GetDisplayOrderFilter();
-                DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter, -1, 1, false);
+                DisplayOrderHelper.ReorderValues(Connection, Row as IDisplayOrderRow, filter, -1, 1, false);
             }
 
             foreach (var behavior in behaviors.Value)
@@ -78,7 +77,7 @@ namespace Serenity.Services
 
         protected virtual void LoadEntity()
         {
-            var idField = (Field)Row.IdField;
+            var idField = Row.IdField;
             var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
             var query = new SqlQuery()
@@ -112,7 +111,6 @@ namespace Serenity.Services
                 if (isDeletedRow != null || isActiveDeletedRow != null)
                 {
                     
-                    var updateLogRow = Row as IUpdateLogRow;
                     var update = new SqlUpdate(Row.Table)
                         .WhereEqual(idField, id)
                         .Where(ServiceQueryHelper.GetNotDeletedCriteria(Row));
@@ -130,13 +128,13 @@ namespace Serenity.Services
                     {
                         update.Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
                                         deleteLogRow.DeleteDateField.DateTimeKind))
-                              .Set((Field)deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID());
+                              .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID());
                     }
-                    else if (updateLogRow != null)
+                    else if (Row is IUpdateLogRow updateLogRow)
                     {
                         update.Set(updateLogRow.UpdateDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
                                         updateLogRow.UpdateDateField.DateTimeKind))
-                              .Set((Field)updateLogRow.UpdateUserIdField, User?.GetIdentifier().TryParseID());
+                              .Set(updateLogRow.UpdateUserIdField, User?.GetIdentifier().TryParseID());
                     }
 
                     if (update.Execute(Connection) != 1)
@@ -147,9 +145,9 @@ namespace Serenity.Services
                     if (new SqlUpdate(Row.Table)
                             .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
                                         deleteLogRow.DeleteDateField.DateTimeKind))
-                            .Set((Field)deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
+                            .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
                             .WhereEqual(idField, id)
-                            .Where(new Criteria((Field)deleteLogRow.DeleteUserIdField).IsNull())
+                            .Where(new Criteria(deleteLogRow.DeleteUserIdField).IsNull())
                             .Execute(Connection) != 1)
                         throw DataValidation.EntityNotFoundError(Row, id, Localizer);
                 }
@@ -181,7 +179,7 @@ namespace Serenity.Services
 
         protected virtual void ValidatePermissions()
         {
-            var attr = (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??
+            var attr = typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??
                 (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
                 typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
@@ -192,11 +190,7 @@ namespace Serenity.Services
         public TDeleteResponse Process(IUnitOfWork unitOfWork, TDeleteRequest request)
         {
             StateBag.Clear();
-
-            if (unitOfWork == null)
-                throw new ArgumentNullException("unitOfWork");
-
-            UnitOfWork = unitOfWork;
+            UnitOfWork = unitOfWork ?? throw new ArgumentNullException("unitOfWork");
             Request = request;
             Response = new TDeleteResponse();
 
@@ -204,8 +198,6 @@ namespace Serenity.Services
                 throw DataValidation.RequiredError(nameof(request.EntityId), Localizer);
 
             Row = new TRow();
-
-            var idField = (Field)Row.IdField;
 
             LoadEntity();
             ValidatePermissions();
@@ -217,7 +209,7 @@ namespace Serenity.Services
 
             if ((isDeletedRow != null && isDeletedRow.IsDeletedField[Row] == true) ||
                 (isActiveDeletedRow != null && isActiveDeletedRow.IsActiveField[Row] < 0) ||
-                (deleteLogRow != null && !((Field)deleteLogRow.DeleteUserIdField).IsNull(Row)))
+                (deleteLogRow != null && !deleteLogRow.DeleteUserIdField.IsNull(Row)))
                 Response.WasAlreadyDeleted = true;
             else
             {
@@ -246,9 +238,9 @@ namespace Serenity.Services
         public ClaimsPrincipal User => Context.User;
 
         public IUnitOfWork UnitOfWork { get; protected set; }
-        DeleteRequest IDeleteRequestHandler.Request { get { return this.Request; } }
-        DeleteResponse IDeleteRequestHandler.Response { get { return this.Response; } }
-        IRow IDeleteRequestHandler.Row { get { return this.Row; } }
+        IRow IDeleteRequestHandler.Row => Row;
+        DeleteRequest IDeleteRequestHandler.Request => Request;
+        DeleteResponse IDeleteRequestHandler.Response => Response;
         public IDictionary<string, object> StateBag { get; private set; }
     }
 
@@ -261,7 +253,7 @@ namespace Serenity.Services
         }
     }
 
-    public interface IDeleteRequestProcessor
+    public interface IDeleteRequestProcessor : IDeleteRequestHandler
     {
         DeleteResponse Process(IUnitOfWork uow, DeleteRequest request);
     }

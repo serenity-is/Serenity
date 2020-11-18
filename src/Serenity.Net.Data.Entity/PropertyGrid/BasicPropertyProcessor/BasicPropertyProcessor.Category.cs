@@ -11,7 +11,7 @@ namespace Serenity.PropertyGrid
             if (attr != null)
                 item.Category = attr.Category;
             else if (Items != null && Items.Count > 0)
-                item.Category = Items[Items.Count - 1].Category;
+                item.Category = Items[^1].Category;
         }
     }
 }

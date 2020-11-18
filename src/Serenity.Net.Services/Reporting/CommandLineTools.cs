@@ -6,9 +6,9 @@
 
     public class CommandLineTools
     {
-        private static Regex invalidChar = new Regex("[\x00\x0a\x0d]", RegexOptions.Compiled); //  these can not be escaped
-        private static Regex needsQuotes = new Regex(@"\s|""", RegexOptions.Compiled); // contains whitespace or two quote characters
-        private static Regex escapeQuote = new Regex(@"(\\*)(""|$)", RegexOptions.Compiled); // one or more '\' followed with a quote or end of string
+        private static readonly Regex invalidChar = new Regex("[\x00\x0a\x0d]", RegexOptions.Compiled); //  these can not be escaped
+        private static readonly Regex needsQuotes = new Regex(@"\s|""", RegexOptions.Compiled); // contains whitespace or two quote characters
+        private static readonly Regex escapeQuote = new Regex(@"(\\*)(""|$)", RegexOptions.Compiled); // one or more '\' followed with a quote or end of string
 
         /// <summary>
         /// Quotes all arguments that contain whitespace, or begin with a quote and returns a single
@@ -33,7 +33,7 @@
                 if (i > 0)
                     arguments.Append(' ');
 
-                if (args[i] == String.Empty)
+                if (args[i] == string.Empty)
                 {
                     arguments.Append("\"\"");
                 }

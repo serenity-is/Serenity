@@ -2,19 +2,19 @@
 {
     public interface IUpdateLogRow
     {
-        IIdField UpdateUserIdField { get; }
+        Field UpdateUserIdField { get; }
         DateTimeField UpdateDateField { get; }
     }
 
     public interface IInsertLogRow
     {
-        IIdField InsertUserIdField { get; }
+        Field InsertUserIdField { get; }
         DateTimeField InsertDateField { get; }
     }
 
     public interface IDeleteLogRow
     {
-        IIdField DeleteUserIdField { get; }
+        Field DeleteUserIdField { get; }
         DateTimeField DeleteDateField { get; }
     }
 

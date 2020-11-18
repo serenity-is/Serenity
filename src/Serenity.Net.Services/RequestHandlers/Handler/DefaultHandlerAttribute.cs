@@ -10,5 +10,11 @@ namespace Serenity.Services
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class DefaultHandlerAttribute : Attribute
     {
+        public DefaultHandlerAttribute(bool isDefault = true)
+        {
+            Value = isDefault;
+        }
+
+        public bool Value { get; }
     }
 }

@@ -7,7 +7,7 @@ namespace Serenity.Services
     /// <summary>
     /// Represents a DeleteRequestHandler. Is used with DeleteBehavior objects.
     /// </summary>
-    public interface IDeleteRequestHandler
+    public interface IDeleteRequestHandler : IRequestHandler
     {
         /// <summary>
         /// New row
@@ -38,5 +38,10 @@ namespace Serenity.Services
         /// Current transaction
         /// </summary>
         IUnitOfWork UnitOfWork { get; }
+
+        /// <summary>
+        /// Current request context
+        /// </summary>
+        IRequestContext Context { get; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Serenity.Abstractions;
-using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,8 @@ using System.Security.Claims;
 
 namespace Serenity.Services
 {
-    public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveRequestHandler, ISaveRequestProcessor
+    public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveRequestProcessor,
+        IRequestHandler<TRow, TSaveRequest, TSaveResponse>
         where TRow : class, IRow, IIdRow, new()
         where TSaveResponse : SaveResponse, new()
         where TSaveRequest : SaveRequest<TRow>, new()
@@ -86,18 +86,18 @@ namespace Serenity.Services
             }
             else if (IsCreate)
             {
-                var idField = Row.IdField as Field;
-                if (!ReferenceEquals(null, idField) &&
+                var idField = Row.IdField;
+                if (idField is object &&
                     idField.Flags.HasFlag(FieldFlags.AutoIncrement))
                 {
                     var entityId = Connection.InsertAndGetID(Row);
                     Response.EntityId = entityId;
-                    Row.IdField[Row] = entityId;
+                    Row.IdField.AsObject(Row, entityId);
                 }
                 else
                 {
                     Connection.Insert(Row);
-                    if (!ReferenceEquals(null, idField))
+                    if (idField is object)
                         Response.EntityId = ((Field)idField).AsObject(Row);
                 }
 
@@ -140,8 +140,7 @@ namespace Serenity.Services
 
         protected virtual void HandleDisplayOrder(bool afterSave)
         {
-            var displayOrderRow = Row as IDisplayOrderRow;
-            if (displayOrderRow == null)
+            if (!(Row is IDisplayOrderRow displayOrderRow))
                 return;
 
             if (IsCreate && !afterSave)
@@ -253,11 +252,7 @@ namespace Serenity.Services
             SaveRequestType requestType = SaveRequestType.Auto)
         {
             StateBag.Clear();
-
-            if (unitOfWork == null)
-                throw new ArgumentNullException("unitOfWork");
-
-            UnitOfWork = unitOfWork;
+            UnitOfWork = unitOfWork ?? throw new ArgumentNullException("unitOfWork");
 
             Request = request;
             Response = new TSaveResponse();
@@ -268,7 +263,7 @@ namespace Serenity.Services
 
             if (requestType == SaveRequestType.Auto)
             {
-                if (((Field)Row.IdField).IsNull(Row))
+                if (Row.IdField.IsNull(Row))
                     requestType = SaveRequestType.Create;
                 else
                     requestType = SaveRequestType.Update;
@@ -314,8 +309,7 @@ namespace Serenity.Services
                 SetDefaultValue(field);
             }
 
-            var isActiveRow = Row as IIsActiveRow;
-            if (isActiveRow != null &&
+            if (Row is IIsActiveRow isActiveRow &&
                 !Row.IsAssigned(isActiveRow.IsActiveField))
                 isActiveRow.IsActiveField[Row] = 1;
         }
@@ -337,12 +331,12 @@ namespace Serenity.Services
         {
             foreach (var field in Row.GetFields())
                 if (!Row.IsAssigned(field) &&
-                    (field is StringField &&
+                    field is StringField str &&
                     (field.Flags & FieldFlags.Insertable) == FieldFlags.Insertable &
                     (field.Flags & FieldFlags.NotNull) == FieldFlags.NotNull &
-                    (field.Flags & FieldFlags.TrimToEmpty) == FieldFlags.TrimToEmpty))
+                    (field.Flags & FieldFlags.TrimToEmpty) == FieldFlags.TrimToEmpty)
                 {
-                    ((StringField)field)[Row] = "";
+                    str[Row] = "";
                 }
         }
 
@@ -357,12 +351,8 @@ namespace Serenity.Services
                     continue;
                 }
 
-                var stringField = field as StringField;
-                if (!ReferenceEquals(null, stringField) &&
-                    Row.IsAssigned(field))
-                {
+                if (field is StringField stringField && Row.IsAssigned(field))
                     DataValidation.AutoTrim(Row, stringField);
-                }
 
                 if (!editable.Contains(field))
                     HandleNonEditable(field);
@@ -406,7 +396,7 @@ namespace Serenity.Services
 
         protected virtual void ValidateFieldValues()
         {
-            var context = new RowValidationContext(this.Connection, this.Row);
+            var context = new RowValidationContext(Connection, Row);
 
             foreach (var field in Row.GetFields())
             {
@@ -436,13 +426,11 @@ namespace Serenity.Services
 
         protected virtual void ValidateIsActive()
         {
-            var isActiveRow = Old as IIsActiveRow;
-            if (isActiveRow != null &&
+            if (Old is IIsActiveRow isActiveRow &&
                 isActiveRow.IsActiveField[Old] < 0)
                 throw DataValidation.RecordNotActive(Old, Localizer);
 
-            var isDeletedRow = Old as IIsDeletedRow;
-            if (isDeletedRow != null &&
+            if (Old is IIsDeletedRow isDeletedRow &&
                 isDeletedRow.IsDeletedField[Old] == true)
                 throw DataValidation.RecordNotActive(Old, Localizer);
         }
@@ -470,7 +458,7 @@ namespace Serenity.Services
                 attr = typeof(TRow).GetCustomAttribute<InsertPermissionAttribute>(true);
             }
 
-            attr = attr ?? (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
+            attr ??= (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
                 typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
             if (attr != null)
@@ -517,7 +505,6 @@ namespace Serenity.Services
         SaveResponse ISaveRequestHandler.Response { get { return this.Response; } }
 
         IRow ISaveRequestHandler.Old { get { return this.Old; } }
-
         IRow ISaveRequestHandler.Row { get { return this.Row; } }
 
         public IDictionary<string, object> StateBag { get; private set; }
@@ -532,7 +519,7 @@ namespace Serenity.Services
         }
     }
 
-    public interface ISaveRequestProcessor
+    public interface ISaveRequestProcessor : ISaveRequestHandler
     {
         SaveResponse Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type);
     }

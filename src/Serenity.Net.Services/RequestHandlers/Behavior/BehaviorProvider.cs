@@ -36,16 +36,14 @@ namespace Serenity.Services
 
             foreach (var type in implicitBehaviors.GetTypes())
             {
-                var behavior = behaviorFactory.Create(type);
+                var behavior = behaviorFactory.CreateInstance(type);
                 if (behavior == null)
                     continue;
 
-                var implicitBehavior = behavior as IImplicitBehavior;
-                if (implicitBehavior == null)
+                if (!(behavior is IImplicitBehavior implicitBehavior))
                     continue;
 
-                var fieldBehavior = behavior as IFieldBehavior;
-                if (fieldBehavior == null)
+                if (!(behavior is IFieldBehavior fieldBehavior))
                 {
                     if (implicitBehavior.ActivateFor(row))
                         list.Add(behavior);
@@ -55,12 +53,12 @@ namespace Serenity.Services
 
                 foreach (var field in row.GetFields())
                 {
-                    fieldBehavior.Target = field;
+                    (behavior as IFieldBehavior).Target = field;
                     if (implicitBehavior.ActivateFor(row))
                     {
                         list.Add(behavior);
 
-                        behavior = behaviorFactory.Create(behaviorType);
+                        behavior = behaviorFactory.CreateInstance(behaviorType);
                         implicitBehavior = behavior as IImplicitBehavior;
                         fieldBehavior = behavior as IFieldBehavior;
                     }
@@ -70,7 +68,7 @@ namespace Serenity.Services
             foreach (var attr in row.GetType().GetCustomAttributes<AddBehaviorAttribute>())
             {
                 if (behaviorType.IsAssignableFrom(attr.Value))
-                    list.Add(behaviorFactory.Create(attr.Value));
+                    list.Add(behaviorFactory.CreateInstance(attr.Value));
             }
 
             foreach (var field in row.GetFields())
@@ -83,7 +81,7 @@ namespace Serenity.Services
                     if (behaviorType.IsAssignableFrom(attr.Value) &&
                         typeof(IFieldBehavior).IsAssignableFrom(attr.Value))
                     {
-                        var fieldBehavior = (IFieldBehavior)behaviorFactory.Create(attr.Value);
+                        var fieldBehavior = (IFieldBehavior)behaviorFactory.CreateInstance(attr.Value);
                         fieldBehavior.Target = field;
                         list.Add(fieldBehavior);
                     }

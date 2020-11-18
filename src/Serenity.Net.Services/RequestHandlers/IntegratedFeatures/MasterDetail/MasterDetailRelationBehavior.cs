@@ -41,7 +41,7 @@ namespace Serenity.Services
             if (!rowListType.IsGenericType ||
                 rowListType.GetGenericTypeDefinition() != typeof(List<>))
             {
-                throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
+                throw new ArgumentException(string.Format("Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
                     "but its property type is not a generic List (e.g. List<IRow>)!",
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
             }
@@ -50,7 +50,7 @@ namespace Serenity.Services
             if (rowType.IsAbstract ||
                 !typeof(IRow).IsAssignableFrom(rowType))
             {
-                throw new ArgumentException(String.Format(
+                throw new ArgumentException(string.Format(
                     "Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
                     "but its property type is not a generic list of rows (e.g. List<IRow>)!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
@@ -65,7 +65,7 @@ namespace Serenity.Services
                 masterKeyField = row.FindFieldByPropertyName(attr.MasterKeyField) ??
                     row.FindField(attr.MasterKeyField);
                 if (ReferenceEquals(masterKeyField, null))
-                    throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                    throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified for a master detail relation in field '{2}'.",
                         attr.MasterKeyField, row.GetType().FullName,
                         Target.PropertyName ?? Target.Name));
@@ -81,7 +81,7 @@ namespace Serenity.Services
                 detailRow.FindField(attr.ForeignKey);
 
             if (ReferenceEquals(foreignKeyField, null))
-                throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a master detail relation in field '{2}' of row type '{3}'.",
                     attr.ForeignKey, detailRow.GetType().FullName,
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
@@ -92,7 +92,7 @@ namespace Serenity.Services
             {
                 this.filterField = detailRow.FindFieldByPropertyName(attr.FilterField) ?? detailRow.FindField(attr.FilterField);
                 if (ReferenceEquals(null, this.filterField))
-                    throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                    throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified for a master detail relation as FilterField in field '{2}' of row type '{3}'.",
                         attr.FilterField, detailRow.GetType().FullName,
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));

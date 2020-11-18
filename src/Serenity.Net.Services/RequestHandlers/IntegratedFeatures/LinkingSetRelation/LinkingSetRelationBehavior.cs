@@ -38,7 +38,7 @@ namespace Serenity.Services
 
             if (!(row is IIdRow))
             {
-                throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
+                throw new ArgumentException(string.Format("Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
                     "but it doesn't implement IIdRow!",
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
             }
@@ -48,7 +48,7 @@ namespace Serenity.Services
             if (!listType.IsGenericType ||
                 listType.GetGenericTypeDefinition() != typeof(List<>))
             {
-                throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
+                throw new ArgumentException(string.Format("Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
                     "but its property type is not a generic List (e.g. List<int>)!",
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
             }
@@ -57,7 +57,7 @@ namespace Serenity.Services
             if (rowType.IsAbstract ||
                 !typeof(Row).IsAssignableFrom(rowType))
             {
-                throw new ArgumentException(String.Format(
+                throw new ArgumentException(string.Format(
                     "Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
                     "but specified row type is not valid row class!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
@@ -65,7 +65,7 @@ namespace Serenity.Services
 
             if (!typeof(IIdRow).IsAssignableFrom(rowType))
             {
-                throw new ArgumentException(String.Format(
+                throw new ArgumentException(string.Format(
                     "Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
                     "but specified row type doesn't implement IIdRow!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
@@ -80,7 +80,7 @@ namespace Serenity.Services
                 detailRow.FindField(attr.ThisKey);
 
             if (ReferenceEquals(thisKeyField, null))
-                throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a linking set relation in field '{2}' of row type '{3}'.",
                     attr.ThisKey, detailRow.GetType().FullName,
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
@@ -91,7 +91,7 @@ namespace Serenity.Services
                 detailRow.FindField(attr.ItemKey);
 
             if (ReferenceEquals(itemKeyField, null))
-                throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a linking set relation in field '{2}' of row type '{3}'.",
                     attr.ItemKey, detailRow.GetType().FullName,
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
@@ -100,7 +100,7 @@ namespace Serenity.Services
             {
                 this.filterField = detailRow.FindFieldByPropertyName(attr.FilterField) ?? detailRow.FindField(attr.FilterField);
                 if (ReferenceEquals(null, this.filterField))
-                    throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                    throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified for a linking set relation as FilterField in field '{2}' of row type '{3}'.",
                         attr.FilterField, detailRow.GetType().FullName,
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));

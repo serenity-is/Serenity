@@ -35,7 +35,7 @@ namespace Serenity.Data
         {
             var row = TryById<TRow>(connection, id, editQuery);
             if (row == null)
-                throw new ValidationError("RecordNotFound", String.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
+                throw new ValidationError("RecordNotFound", string.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
 
             return row;
         }

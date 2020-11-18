@@ -6,16 +6,16 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
-    public class StringField : GenericClassField<String>, IIdField
+    public class StringField : GenericClassField<string>
     {
         public StringField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-            Func<IRow, String> getValue = null, Action<IRow, String> setValue = null)
+            Func<IRow, string> getValue = null, Action<IRow, string> setValue = null)
             : base(collection, FieldType.String, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static StringField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<IRow, String> getValue, Action<IRow, String> setValue)
+            Func<IRow, string> getValue, Action<IRow, string> setValue)
         {
             return new StringField(collection, name, caption, size, flags, getValue, setValue);
         }
@@ -82,27 +82,6 @@ namespace Serenity.Data
             }
 
             row.FieldAssignedValue(this);
-        }
-
-        bool IIdField.IsIntegerType
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        long? IIdField.this[IRow row]
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

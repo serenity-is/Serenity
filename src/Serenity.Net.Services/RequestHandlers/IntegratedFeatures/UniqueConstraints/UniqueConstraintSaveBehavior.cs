@@ -39,7 +39,7 @@ namespace Serenity.Services
                         var field = handler.Row.FindFieldByPropertyName(x) ?? handler.Row.FindField(x);
                         if (ReferenceEquals(null, field))
                         {
-                            throw new InvalidOperationException(String.Format(
+                            throw new InvalidOperationException(string.Format(
                                 "Can't find field '{0}' of unique constraint in row type '{1}'",
                                     x, handler.Row.GetType().FullName));
                         }

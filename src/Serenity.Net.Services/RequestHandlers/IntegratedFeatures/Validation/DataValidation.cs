@@ -25,10 +25,10 @@ namespace Serenity.Services
         public static void ValidateRequired(this IRow row, Field field, ITextLocalizer localizer)
         {
             var str = field as StringField;
-            if ((!ReferenceEquals(null, str) && str[row].IsTrimmedEmpty()) ||
-                (ReferenceEquals(null, str) && field.AsObject(row) == null))
+            if ((str is object && str[row].IsTrimmedEmpty()) ||
+                (str is null && field.AsObject(row) == null))
             { 
-                throw RequiredError(row, field, localizer);
+                throw RequiredError(field, localizer);
             }
         }
 
@@ -80,11 +80,11 @@ namespace Serenity.Services
                 !finish.IsNull(row) &&
                 start[row].Value > finish[row].Value)
             {
-                throw InvalidDateRangeError(row, start, finish, localizer);
+                throw InvalidDateRangeError(start, finish, localizer);
             }
         }
 
-        public static ValidationError RequiredError(IRow row, Field field, ITextLocalizer localizer)
+        public static ValidationError RequiredError(Field field, ITextLocalizer localizer)
         {
             return RequiredError(field.Name, localizer, field.GetTitle(localizer));
         }
@@ -96,7 +96,7 @@ namespace Serenity.Services
                 title ?? name);
         }
 
-        public static ValidationError InvalidIdError(IRow row, IIdField field, ITextLocalizer localizer)
+        public static ValidationError InvalidIdError(IRow row, Field field, ITextLocalizer localizer)
         {
             var fld = (Field)field;
             return new ValidationError("InvalidId", fld.Name, 
@@ -106,14 +106,12 @@ namespace Serenity.Services
 
         public static ValidationError InvalidIdError(Field field, long value, ITextLocalizer localizer)
         {
-            var fld = (Field)field;
             return new ValidationError("InvalidId", field.Name, 
                 Texts.Validation.FieldInvalidValue.ToString(localizer), 
                 field.GetTitle(localizer), value);
         }
 
-        public static ValidationError InvalidDateRangeError(IRow row, 
-            DateTimeField start, DateTimeField finish, ITextLocalizer localizer)
+        public static ValidationError InvalidDateRangeError(DateTimeField start, DateTimeField finish, ITextLocalizer localizer)
         {
             return new ValidationError("InvalidDateRange", start.Name + "," + finish.Name, 
                 Texts.Validation.FieldInvalidDateRange.ToString(localizer), 

@@ -33,7 +33,7 @@ namespace Serenity.PropertyGrid
 
         private static string AutoDetermineIdField(Field basedOnField)
         {
-            if (ReferenceEquals(null, basedOnField))
+            if (basedOnField is null)
                 return null;
 
             Field idField;
@@ -54,7 +54,7 @@ namespace Serenity.PropertyGrid
                     x.ForeignJoinAlias.Name == joinName);
             }
 
-            return ReferenceEquals(null, idField) ? null : (idField.PropertyName ?? idField.Name);
+            return idField is null ? null : (idField.PropertyName ?? idField.Name);
         }
     }
 }

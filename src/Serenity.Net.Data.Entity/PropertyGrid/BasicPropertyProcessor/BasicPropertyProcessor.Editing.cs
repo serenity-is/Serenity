@@ -47,7 +47,7 @@ namespace Serenity.PropertyGrid
 
                             if (!isRow)
                             {
-                                if (!ReferenceEquals(null, source.BasedOnField))
+                                if (source.BasedOnField is object)
                                     prefix = source.BasedOnField.Fields.LocalTextPrefix;
                             }
                             else
@@ -58,7 +58,7 @@ namespace Serenity.PropertyGrid
                         if (prefix != null)
                         {
                             var propertyName = distinct.PropertyName.IsEmptyOrNull() ?
-                                    (!ReferenceEquals(null, source.BasedOnField) ?
+                                    (source.BasedOnField is object ?
                                         (source.BasedOnField.PropertyName ?? source.BasedOnField.Name) :
                                     item.Name) : distinct.PropertyName;
 
@@ -77,11 +77,11 @@ namespace Serenity.PropertyGrid
             if (dtka != null && dtka.Value != DateTimeKind.Unspecified)
                 item.EditorParams["useUtc"] = true;
 
-            if (!ReferenceEquals(null, source.BasedOnField))
+            if (source.BasedOnField is object)
             {
                 if (dtka == null &&
-                    source.BasedOnField is DateTimeField &&
-                    ((DateTimeField)source.BasedOnField).DateTimeKind != DateTimeKind.Unspecified)
+                    source.BasedOnField is DateTimeField dtf &&
+                    dtf.DateTimeKind != DateTimeKind.Unspecified)
                     item.EditorParams["useUtc"] = true;
 
                 if (item.EditorType == "Decimal" &&
@@ -93,9 +93,9 @@ namespace Serenity.PropertyGrid
                     !item.EditorParams.ContainsKey("minValue") &&
                     !item.EditorParams.ContainsKey("maxValue"))
                 {
-                    string minVal = new String('0', source.BasedOnField.Size - source.BasedOnField.Scale);
+                    string minVal = new string('0', source.BasedOnField.Size - source.BasedOnField.Scale);
                     if (source.BasedOnField.Scale > 0)
-                        minVal += "." + new String('0', source.BasedOnField.Scale);
+                        minVal += "." + new string('0', source.BasedOnField.Scale);
                     string maxVal = minVal.Replace('0', '9');
 
                     if ((item.EditorParams.ContainsKey("allowNegatives") &&
@@ -114,9 +114,9 @@ namespace Serenity.PropertyGrid
                     !item.EditorParams.ContainsKey("minValue") &&
                     !item.EditorParams.ContainsKey("maxValue"))
                 {
-                    item.EditorParams["maxValue"] = source.BasedOnField is Int16Field ? Int16.MaxValue
-                        : source.BasedOnField is Int32Field ? Int32.MaxValue :
-                        source.BasedOnField is Int64Field ? Int64.MaxValue : (object)null;
+                    item.EditorParams["maxValue"] = source.BasedOnField is Int16Field ? short.MaxValue
+                        : source.BasedOnField is Int32Field ? int.MaxValue :
+                        source.BasedOnField is Int64Field ? long.MaxValue : (object)null;
 
                     if ((item.EditorParams.ContainsKey("allowNegatives") &&
                          Convert.ToBoolean(item.EditorParams["allowNegatives"] ?? false) == true) ||
@@ -144,7 +144,7 @@ namespace Serenity.PropertyGrid
                 var key = param.Key;
                 if (key != null &&
                     key.Length >= 1)
-                    key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
+                    key = key.Substring(0, 1).ToLowerInvariant() + key[1..];
 
                 item.EditorParams[key] = param.Value;
             }
@@ -179,8 +179,8 @@ namespace Serenity.PropertyGrid
 
                     if (!editorParams.ContainsKey("textField"))
                     {
-                        var nameField = RowExtensions.GetNameField(rowInstance, false);
-                        if (!ReferenceEquals(nameField, null))
+                        var nameField = rowInstance.NameField;
+                        if (nameField is object)
                             editorParams["textField"] = nameField.PropertyName ??
                                 nameField.Name;
                     }
@@ -206,14 +206,14 @@ namespace Serenity.PropertyGrid
 				return "Enum";
 			else if (valueType == typeof(string))
 				return "String";
-			else if (valueType == typeof(Int32) ||
-				valueType == typeof(Int16))
+            else if (valueType == typeof(int) ||
+				valueType == typeof(short))
 			{
 				if (IntegerEditorAttribute.AllowNegativesByDefault)
 					editorParams["allowNegatives"] = true;
 
-				if (valueType == typeof(Int16))
-					editorParams["maxValue"] = Int16.MaxValue;
+				if (valueType == typeof(short))
+					editorParams["maxValue"] = short.MaxValue;
 
 				return "Integer";
 			}
@@ -221,7 +221,7 @@ namespace Serenity.PropertyGrid
 				return "Date";
 			else if (valueType == typeof(bool))
 				return "Boolean";
-			else if (valueType == typeof(Decimal) || valueType == typeof(Double) || valueType == typeof(Single))
+			else if (valueType == typeof(decimal) || valueType == typeof(double) || valueType == typeof(float))
 			{
 				if (DecimalEditorAttribute.AllowNegativesByDefault)
 					editorParams["allowNegatives"] = true;

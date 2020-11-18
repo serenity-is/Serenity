@@ -1,31 +1,27 @@
-﻿#if TODO
-using Serenity.Data;
+﻿using Serenity.Data;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 
 namespace Serenity.Services
 {
     public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior
     {
-        private ICaptureLogHandler captureLogHandler;
+        private CaptureLogAttribute captureLogAttr;
 
         public bool ActivateFor(IRow row)
         {
-            if (row.GetType().GetCustomAttribute<CaptureLogAttribute>() == null)
-                return false;
-
             if (!(row is IIdRow))
                 return false;
 
-            captureLogHandler = (ICaptureLogHandler)Activator.CreateInstance(
-                typeof(CaptureLogHandler<>).MakeGenericType(row.GetType()));
-
-            return true;
+            captureLogAttr = row.GetType().GetCustomAttribute<CaptureLogAttribute>();
+            return captureLogAttr != null;
         }
 
         public override void OnAudit(IDeleteRequestHandler handler)
         {
-            if (handler.Row == null || captureLogHandler == null)
+            if (handler.Row == null)
                 return;
 
             IRow newRow = null;
@@ -42,34 +38,31 @@ namespace Serenity.Services
                 ((IIsDeletedRow)newRow).IsDeletedField[newRow] = true;
             }
 
-            captureLogHandler.Log(handler.UnitOfWork, handler.Row, newRow, Authorization.UserId);
+            Log(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetIdentifier());
         }
 
         public override void OnAudit(ISaveRequestHandler handler)
         {
-            if (handler.Row == null || captureLogHandler == null)
+            if (handler.Row == null)
                 return;
 
             if (handler.IsCreate)
             {
-                captureLogHandler.Log(handler.UnitOfWork, 
-                    null, handler.Row, Authorization.UserId);
+                Log(handler.UnitOfWork,  null, handler.Row, handler.Context.User?.GetIdentifier());
 
                 return;
             }
 
-            var insertLogRow = handler.Row as IInsertLogRow;
-            var updateLogRow = handler.Row as IUpdateLogRow;
 
             bool anyChanged = false;
             foreach (var field in handler.Row.GetTableFields())
             {
-                if (insertLogRow != null &&
+                if (handler.Row is IInsertLogRow insertLogRow &&
                     (ReferenceEquals(insertLogRow.InsertDateField, field) ||
                      ReferenceEquals(insertLogRow.InsertUserIdField, field)))
                     continue;
 
-                if (updateLogRow != null && 
+                if (handler.Row is IUpdateLogRow updateLogRow && 
                     (ReferenceEquals(updateLogRow.UpdateDateField, field) ||
                      ReferenceEquals(updateLogRow.UpdateUserIdField, field)))
                 {
@@ -84,9 +77,112 @@ namespace Serenity.Services
             }
 
             if (anyChanged)
-                captureLogHandler.Log(handler.UnitOfWork, 
-                    handler.Old, handler.Row, Authorization.UserId);
+                Log(handler.UnitOfWork, handler.Old, handler.Row, handler.Context.User?.GetIdentifier());
+        }
+
+        public void Log(IUnitOfWork uow, IRow old, IRow row, object userId)
+        {
+            if (old == null && row == null)
+                throw new ArgumentNullException("old");
+
+            var now = DateTime.Now;
+            var rowInstance = row ?? old;
+            var rowType = rowInstance.GetType();
+            var logRow = (Activator.CreateInstance(captureLogAttr.LogRow) as ICaptureLogRow) ?? 
+                throw new InvalidOperationException($"Capture log table {captureLogAttr.LogRow.FullName} " +
+                    $"for {rowType.FullName} doesn't implement ICaptureLogRow interface!");
+
+            var logConnectionKey = logRow.Fields.ConnectionKey;
+
+            var rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(rowInstance.EnumerateTableFields(), x => x.Name);
+            var logFieldPrefixLength = PrefixHelper.DeterminePrefixLength(logRow.EnumerateTableFields(), x => x.Name);
+            var mappedIdFieldName = captureLogAttr.MappedIdField ?? rowInstance.IdField.Name;
+            var mappedIdField = logRow.FindField(mappedIdFieldName);
+            if (mappedIdField is null)
+                throw new InvalidOperationException($"Can't locate capture log table " +
+                    $"mapped ID field for {logRow.Table}!");
+
+            logRow.TrackAssignments = true;
+            logRow.ChangingUserIdField.AsObject(logRow, userId == null ? null :
+            logRow.ChangingUserIdField.ConvertValue(userId, CultureInfo.InvariantCulture));
+
+            var operationType = old == null ? CaptureOperationType.Insert :
+                (row == null ? CaptureOperationType.Delete : CaptureOperationType.Before);
+
+            logRow.OperationTypeField[logRow] = operationType;
+            logRow.ValidFromField[logRow] = now;
+
+            IEnumerable<Tuple<Field, Field>> enumerateCapturedFields()
+            {
+                foreach (var logField in logRow.Fields)
+                {
+                    if (!logField.IsTableField())
+                        continue;
+
+                    if (ReferenceEquals(logRow.ChangingUserIdField, logField) ||
+                        ReferenceEquals(logRow.ValidFromField, logField) ||
+                        ReferenceEquals(logRow.ValidUntilField, logField) ||
+                        ReferenceEquals(logRow.OperationTypeField, logField) ||
+                        ReferenceEquals(logRow.IdField, logField))
+                        continue;
+
+                    if (ReferenceEquals(logField, mappedIdField))
+                        yield return new Tuple<Field, Field>(logField, rowInstance.IdField);
+                    else
+                    {
+                        var name = logField.Name[logFieldPrefixLength..];
+                        name = rowInstance.IdField.Name.Substring(0, rowFieldPrefixLength) + name;
+                        var match = rowInstance.FindField(name);
+                        if (match is null)
+                            throw new InvalidOperationException($"Can't find match in the row for log table field {name}!");
+
+                        yield return new Tuple<Field, Field>(logField, match);
+                    }
+                }
+            }
+
+            void copyCapturedFields(IRow source, IRow target)
+            {
+                foreach (var tuple in enumerateCapturedFields())
+                {
+                    var value = tuple.Item2.AsObject(source);
+                    tuple.Item1.AsObject(target, value);
+                }
+            }
+
+            if (operationType == CaptureOperationType.Insert)
+            {
+                logRow.ValidUntilField[logRow] = CaptureLogConsts.UntilMax;
+                copyCapturedFields(row, logRow);
+            }
+            else
+            {
+                logRow.ValidUntilField[logRow] = now;
+                copyCapturedFields(old, logRow);
+            }
+
+            if (new SqlUpdate(logRow.Table)
+                    .Set(logRow.ValidUntilField, now)
+                    .WhereEqual(mappedIdField, mappedIdField.AsSqlValue(logRow))
+                    .WhereEqual(logRow.ValidUntilField, CaptureLogConsts.UntilMax)
+                    .Execute(uow.Connection, ExpectedRows.Ignore) > 1)
+                throw new InvalidOperationException($"Capture log has more than one active instance " +
+                    $"for ID {mappedIdField.AsObject(logRow)}?!");
+
+            uow.Connection.Insert(logRow);
+
+            if (operationType == CaptureOperationType.Before)
+            {
+                logRow = (ICaptureLogRow)logRow.CreateNew();
+                logRow.TrackAssignments = true;
+                logRow.ChangingUserIdField.AsObject(logRow, userId == null ? null :
+                    logRow.ChangingUserIdField.ConvertValue(userId, Invariants.NumberFormat));
+                logRow.OperationTypeField[logRow] = CaptureOperationType.Update;
+                logRow.ValidFromField[logRow] = now;
+                logRow.ValidUntilField[logRow] = CaptureLogConsts.UntilMax;
+                copyCapturedFields(row, logRow);
+                uow.Connection.Insert(logRow);
+            }
         }
     }
 }
-#endif

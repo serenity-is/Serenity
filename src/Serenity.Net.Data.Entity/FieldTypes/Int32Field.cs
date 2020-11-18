@@ -6,16 +6,16 @@ using Newtonsoft.Json;
 
 namespace Serenity.Data
 {
-    public class Int32Field : GenericValueField<Int32>, IIdField
+    public class Int32Field : GenericValueField<int>
     {
         public Int32Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<IRow, Int32?> getValue = null, Action<IRow, Int32?> setValue = null)
+            Func<IRow, int?> getValue = null, Action<IRow, int?> setValue = null)
             : base(collection, FieldType.Int32, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static Int32Field Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<IRow, Int32?> getValue, Action<IRow, Int32?> setValue)
+            Func<IRow, int?> getValue, Action<IRow, int?> setValue)
         {
             return new Int32Field(collection, name, caption, size, flags, getValue, setValue);
         }
@@ -28,8 +28,8 @@ namespace Serenity.Data
             var value = reader.GetValue(index);
             if (value is DBNull)
                 _setValue(row, null);
-            else if (value is Int32)
-                _setValue(row, (Int32)value);
+            else if (value is int val)
+                _setValue(row, val);
             else
                 _setValue(row, Convert.ToInt32(value, CultureInfo.InvariantCulture));
 
@@ -45,30 +45,29 @@ namespace Serenity.Data
                 writer.WriteValue(value.Value);
         }
 
-        internal static Int64 ConvertEnumFromInt(Type enumType, Int64 v)
+        internal static long ConvertEnumFromInt(Type enumType, long v)
         {
             if (enumType.IsEnum)
             {
                 var val = Enum.Parse(enumType, v.ToString());
                 if (!Enum.IsDefined(enumType, val))
-                    throw new InvalidCastException(String.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
+                    throw new InvalidCastException(string.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
 
                 return v;
             }
             else
-                throw new InvalidProgramException(String.Format("{0} is not a valid enum type!", enumType.Name));
+                throw new InvalidProgramException(string.Format("{0} is not a valid enum type!", enumType.Name));
         }
 
-        internal static Int64 ConvertEnumFromString(Type enumType, string s)
+        internal static long ConvertEnumFromString(Type enumType, string s)
         {
             if (enumType.IsEnum)
             {
-                Int64 v;
-                if (Int64.TryParse(s, out v))
+                if (long.TryParse(s, out long v))
                 {
                     var val = Enum.Parse(enumType, s);
                     if (!Enum.IsDefined(enumType, val))
-                        throw new InvalidCastException(String.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
+                        throw new InvalidCastException(string.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
 
                     return v;
                 }
@@ -76,7 +75,7 @@ namespace Serenity.Data
                     return Convert.ToInt64(Enum.Parse(enumType, s), CultureInfo.InvariantCulture);
             }
             else
-                throw new InvalidProgramException(String.Format("{0} is not a valid enum type!", enumType.Name));
+                throw new InvalidProgramException(string.Format("{0} is not a valid enum type!", enumType.Name));
         }
 
         public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
@@ -84,7 +83,7 @@ namespace Serenity.Data
             if (reader == null)
                 throw new ArgumentNullException("reader");
 
-            Int32 v;
+            int v;
 
             switch (reader.TokenType)
             {
@@ -99,7 +98,7 @@ namespace Serenity.Data
                     if (EnumType == null)
                         _setValue(row, v);
                     else
-                        _setValue(row, (Int32)ConvertEnumFromInt(EnumType, v));
+                        _setValue(row, (int)ConvertEnumFromInt(EnumType, v));
                     break;
                 case JsonToken.String:
                     string s = ((string)reader.Value).TrimToNull();                  
@@ -108,39 +107,13 @@ namespace Serenity.Data
                     else if (EnumType == null)
                         _setValue(row, Convert.ToInt32(s, CultureInfo.InvariantCulture));
                     else
-                        _setValue(row, (Int32)ConvertEnumFromString(EnumType, s));
+                        _setValue(row, (int)ConvertEnumFromString(EnumType, s));
                     break;
                 default:
                     throw JsonUnexpectedToken(reader);
             }
 
             row.FieldAssignedValue(this);
-        }
-
-        Int64? IIdField.this[IRow row]
-        {
-            get
-            {
-                CheckUnassignedRead(row);
-                return _getValue(row);
-            }
-            set
-            {
-                if (value.HasValue)
-                    checked
-                    {
-                        _setValue(row, (Int32)value.Value);
-                    }
-                else
-                    _setValue(row, null);
-                
-                row.FieldAssignedValue(this);
-            }
-        }
-
-        bool IIdField.IsIntegerType
-        {
-            get { return true; }
         }
     }
 }

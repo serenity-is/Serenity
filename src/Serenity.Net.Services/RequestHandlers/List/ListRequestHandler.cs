@@ -13,7 +13,8 @@
     using System.Reflection;
     using System.Security.Claims;
 
-    public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestHandler, IListRequestProcessor
+    public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestProcessor, 
+        IRequestHandler<TRow>, IRequestType<TListRequest>, IResponseType<TListResponse>
         where TRow: class, IRow, new()
         where TListRequest: ListRequest
         where TListResponse: ListResponse<TRow>, new()
@@ -43,7 +44,7 @@
             if (!sortOrders.IsEmptyOrNull())
                 return sortOrders.Select(x => new SortBy(x.Item1.PropertyName ?? x.Item1.Name, x.Item2)).ToArray();
 
-            var nameField = Row.GetNameField();
+            var nameField = Row.NameField;
             if (nameField is object)
                 return new SortBy[] { new SortBy(nameField.Name, false) };
 
@@ -115,15 +116,12 @@
 
             var selection = Request.ColumnSelection;
 
-            switch (selection)
+            return selection switch
             {
-                case ColumnSelection.List:
-                    return mode <= SelectLevel.List;
-                case ColumnSelection.Details:
-                    return mode <= SelectLevel.Details;
-                default:
-                    return false;
-            }
+                ColumnSelection.List => mode <= SelectLevel.List,
+                ColumnSelection.Details => mode <= SelectLevel.Details,
+                _ => false,
+            };
         }
 
         protected bool IsIncluded(Field field)
@@ -166,9 +164,8 @@
 
         protected virtual void ApplyKeyOrder(SqlQuery query)
         {
-            var idRow = Row as IIdRow;
-            if (idRow != null)
-                query.OrderBy((Field)idRow.IdField);
+            if (Row is IIdRow idRow)
+                query.OrderBy(idRow.IdField);
         }
 
         protected virtual IEnumerable<Field> GetQuickSearchFields(string containsField)
@@ -191,7 +188,7 @@
 
                 if (!fields.Any())
                 {
-                    var nameField = Row.GetNameField();
+                    var nameField = Row.NameField;
                     if (nameField is object)
                         return new Field[] { nameField };
                 }
@@ -279,9 +276,9 @@
         protected virtual void ApplyFieldContainsText(Field field, string containsText, long? id,
             ref BaseCriteria criteria, ref bool orFalse)
         {
-            var attr = field.CustomAttributes == null ? null : field.CustomAttributes.OfType<QuickSearchAttribute>().FirstOrDefault();
+            var attr = field.CustomAttributes?.OfType<QuickSearchAttribute>().FirstOrDefault();
             var searchType = attr == null ? SearchType.Auto : attr.SearchType;
-            var numericOnly = attr == null ? null : attr.NumericOnly;
+            var numericOnly = attr?.NumericOnly;
 
             if (numericOnly == null)
                 numericOnly = field is Int32Field || field is Int16Field || field is Int64Field;
@@ -358,7 +355,7 @@
 
         protected virtual void ApplyCriteria(SqlQuery query)
         {
-            if (Object.ReferenceEquals(null, Request.Criteria) ||
+            if (Request.Criteria is null ||
                 Request.Criteria.IsEmpty)
             {
                 return;
@@ -376,13 +373,13 @@
                 field.Flags.HasFlag(FieldFlags.NotMapped))
             {
                 throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name, 
-                    String.Format("Can't apply equality filter on field {0}", field.PropertyName ?? field.Name));
+                    $"Can't apply equality filter on field {field.PropertyName ?? field.Name}");
             }
 
-            if (!(value is string) && value is IEnumerable)
+            if (!(value is string) && value is IEnumerable enumerable)
             {
                 var values = new List<object>();
-                foreach (var val in (IEnumerable)value)
+                foreach (var val in enumerable)
                     values.Add(field.ConvertValue(val, CultureInfo.InvariantCulture));
                 if (values.Count > 0)
                     query.Where(field.In(values));
@@ -401,11 +398,11 @@
             if (value == null)
                 return true;
 
-            if (value is string && ((string)value).Length == 0)
+            if (value is string str && str.Length == 0)
                 return true;
 
             if (!(value is string) && value is IEnumerable && 
-                !((value as IEnumerable).GetEnumerator().MoveNext()))
+                !(value as IEnumerable).GetEnumerator().MoveNext())
                 return true;
 
             return false;
@@ -426,9 +423,9 @@
                     continue;
 
                 var field = Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key);
-                if (ReferenceEquals(null, field))
-                    throw new ArgumentOutOfRangeException(pair.Key, 
-                        String.Format("Can't find field {0} in row for equality filter.", pair.Key));
+                if (field is null)
+                    throw new ArgumentOutOfRangeException(pair.Key,
+                        string.Format("Can't find field {0} in row for equality filter.", pair.Key));
 
                 ApplyFieldEqualityFilter(query, field, pair.Value);
             }
@@ -468,10 +465,10 @@
 
         protected virtual void ApplySortBy(SqlQuery query, SortBy sortBy)
         {
-            var field = this.Row.FindField(sortBy.Field) ??
-                this.Row.FindFieldByPropertyName(sortBy.Field);
+            var field = Row.FindField(sortBy.Field) ??
+                Row.FindFieldByPropertyName(sortBy.Field);
 
-            if (!ReferenceEquals(null, field))
+            if (field is object)
             {
                 if (field.Flags.HasFlag(FieldFlags.NotMapped))
                     return;
@@ -511,7 +508,7 @@
                     var field = Row.FindFieldByPropertyName(x.Field) ??
                         Row.FindField(x.Field);
 
-                    if (ReferenceEquals(null, field) ||
+                    if (field is null ||
                         (field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped ||
                         !AllowSelectField(field))
                         return null;
@@ -520,7 +517,7 @@
                 }).ToArray();
 
                 // if any of fields are invalid, return an empty array to avoid errors
-                if (result.Any(x => ReferenceEquals(null, x)))
+                if (result.Any(x => x is null))
                     return new Field[0];
 
                 return result;
@@ -532,16 +529,14 @@
         public TListResponse Process(IDbConnection connection, TListRequest request)
         {
             StateBag.Clear();
-
-            if (connection == null)
-                throw new ArgumentNullException("connection");
-
-            Connection = connection;
+            Connection = connection ?? throw new ArgumentNullException("connection");
             Request = request;
             ValidateRequest();
 
-            Response = new TListResponse();
-            Response.Entities = new List<TRow>();
+            Response = new TListResponse
+            {
+                Entities = new List<TRow>()
+            };
 
             Row = new TRow();
 
@@ -622,11 +617,12 @@
 
         public Field[] DistinctFields { get; private set; }
         public IDbConnection Connection { get; private set; }
-        IRow IListRequestHandler.Row { get { return this.Row; } }
         public SqlQuery Query { get; private set; }
-        ListRequest IListRequestHandler.Request { get { return this.Request; } }
-        IListResponse IListRequestHandler.Response { get { return this.Response; } }
         public IDictionary<string, object> StateBag { get; private set; }
+
+        IRow IListRequestHandler.Row => Row;
+        ListRequest IListRequestHandler.Request => Request;
+        IListResponse IListRequestHandler.Response => Response;
         bool IListRequestHandler.AllowSelectField(Field field) { return AllowSelectField(field); }
         bool IListRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
     }
@@ -650,7 +646,7 @@
         }
     }
 
-    public interface IListRequestProcessor
+    public interface IListRequestProcessor : IListRequestHandler
     {
         IListResponse Process(IDbConnection connection, ListRequest request);
     }

@@ -205,7 +205,7 @@
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception(String.Format(FieldReadValueError,
+                        throw new Exception(string.Format(FieldReadValueError,
                             field.PropertyName ?? field.Name, row.GetType().FullName, ex.Message), ex);
                     }
                     continue;
@@ -222,7 +222,7 @@
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception(String.Format(FieldReadValueError,
+                        throw new Exception(string.Format(FieldReadValueError,
                             field.PropertyName ?? field.Name, row.GetType().FullName, ex.Message), ex);
                     }
                     continue;

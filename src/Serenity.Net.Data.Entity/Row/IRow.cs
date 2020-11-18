@@ -19,6 +19,8 @@ namespace Serenity.Data
         bool IsAnyFieldChanged { get; }
         bool IsAssigned(Field field);
         void ClearAssignment(Field field);
+        Field IdField { get; }
+        Field NameField { get; }
         object this[string fieldName] { get; set; }
     }
 

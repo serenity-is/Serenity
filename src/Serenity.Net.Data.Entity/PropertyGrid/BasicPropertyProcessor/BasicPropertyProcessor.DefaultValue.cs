@@ -17,7 +17,7 @@ namespace Serenity.PropertyGrid
                 }
             }
 
-            if (!ReferenceEquals(null, source.BasedOnField) && source.BasedOnField.DefaultValue != null)
+            if (source.BasedOnField is object && source.BasedOnField.DefaultValue != null)
                 item.DefaultValue = source.BasedOnField.DefaultValue;
         }
     }

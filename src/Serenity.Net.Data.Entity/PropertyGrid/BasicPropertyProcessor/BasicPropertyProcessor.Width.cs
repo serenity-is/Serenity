@@ -14,7 +14,7 @@ namespace Serenity.PropertyGrid
             var basedOnField = source.BasedOnField;
 
             item.Width = widthAttr == null || widthAttr.Value == 0 ? 
-                (!ReferenceEquals(null, basedOnField) ? AutoWidth(basedOnField) : 80) : widthAttr.Value;
+                (basedOnField is object ? AutoWidth(basedOnField) : 80) : widthAttr.Value;
 
             if (widthAttr != null && widthAttr.Value != 0)
                 item.WidthSet = true;
@@ -37,8 +37,6 @@ namespace Serenity.PropertyGrid
 
         private static int AutoWidth(Field field)
         {
-            var name = field.Name;
-
             switch (field.Type)
             {
                 case FieldType.String:

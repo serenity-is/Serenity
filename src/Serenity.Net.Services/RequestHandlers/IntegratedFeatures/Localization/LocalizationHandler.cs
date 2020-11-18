@@ -36,13 +36,13 @@ namespace Serenity.Data
 
             var localAttr = typeof(TRow).GetCustomAttribute<LocalizationRowAttribute>(false);
             if (localAttr == null || localAttr.LocalizationRow == null)
-                throw new InvalidOperationException(String.Format("{0} row type has no localization row type defined!", typeof(TRow).Name));
+                throw new InvalidOperationException(string.Format("{0} row type has no localization row type defined!", typeof(TRow).Name));
 
             var localInstance = (IRow)Activator.CreateInstance(localAttr.LocalizationRow);
 
             var localRow = localInstance as ILocalizationRow;
             if (localRow == null)
-                throw new InvalidOperationException(String.Format("Localization table {0} doesn't implement ILocalizationRow interface!",
+                throw new InvalidOperationException(string.Format("Localization table {0} doesn't implement ILocalizationRow interface!",
                     localAttr.LocalizationRow.GetType().FullName, schemaName, typeof(TRow).Name));
 
             schemaName = localInstance.GetFields().ConnectionKey;
@@ -55,7 +55,7 @@ namespace Serenity.Data
             newInfo.localRowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(localInstance.EnumerateTableFields(), x => x.Name);
             newInfo.mappedIdField = (IIdField)((IRow)localInstance).FindField(localAttr.MappedIdField ?? ((Field)new TRow().IdField).Name);
             if (newInfo.mappedIdField == null)
-                throw new InvalidOperationException(String.Format("Can't locate localization table mapped ID field for {0}!",
+                throw new InvalidOperationException(string.Format("Can't locate localization table mapped ID field for {0}!",
                     localInstance.Table));
 
             info = newInfo;
@@ -176,7 +176,7 @@ namespace Serenity.Data
 
                 var match = GetLocalizationMatch(field);
                 if (ReferenceEquals(null, match))
-                    throw new ValidationError("CantLocalize", field.Name, String.Format("{0} can't be localized!", 
+                    throw new ValidationError("CantLocalize", field.Name, string.Format("{0} can't be localized!", 
                         field.GetTitle(localizer)));
 
                 var value = field.AsObject(row);

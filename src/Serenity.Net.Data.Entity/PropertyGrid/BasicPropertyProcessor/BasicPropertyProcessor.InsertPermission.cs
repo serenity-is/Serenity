@@ -19,7 +19,7 @@ namespace Serenity.PropertyGrid
                 }
             }
 
-            if (!ReferenceEquals(null, source.BasedOnField))
+            if (source.BasedOnField is object)
             {
                 if (source.BasedOnField.InsertPermission != null &&
                     source.BasedOnField.InsertPermission != "*")

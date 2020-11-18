@@ -6,7 +6,7 @@ namespace Serenity.Data
     {
         public CaptureLogAttribute(Type logRow)
         {
-            this.LogRow = logRow;
+            LogRow = logRow ?? throw new ArgumentNullException(nameof(logRow));
         }
 
         public Type LogRow { get; private set; }

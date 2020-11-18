@@ -13,7 +13,7 @@ namespace Serenity.PropertyGrid
                 if (attr.IsRequired)
                     item.Required = true;
             }
-            else if (!ReferenceEquals(null, source.BasedOnField) &&
+            else if (source.BasedOnField is object &&
                 (source.BasedOnField.Flags & FieldFlags.NotNull) == FieldFlags.NotNull)
             {
                 item.Required = true;

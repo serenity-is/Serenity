@@ -20,7 +20,7 @@ namespace Serenity.PropertyGrid
                 return;
             }
 
-            if (!ReferenceEquals(null, source.BasedOnField) &&
+            if (source.BasedOnField is object &&
                 source.BasedOnField.Flags.HasFlag(FieldFlags.NotMapped))
                     item.Sortable = false;
         }

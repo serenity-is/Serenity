@@ -356,5 +356,9 @@ namespace Serenity.Data
         {
             get { return fields.Joins; }
         }
+
+        public Field IdField => Fields.IdField;
+
+        public Field NameField => Fields.NameField;
     }
 }

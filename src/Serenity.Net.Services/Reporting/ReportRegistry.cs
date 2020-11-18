@@ -38,7 +38,7 @@ namespace Serenity.Reporting
             if (attr.Length == 1)
                 return ((CategoryAttribute)attr[0]).Category;
 
-            return String.Empty;
+            return string.Empty;
         }
 
         public static string GetReportCategoryTitle(string key, ITextLocalizer localizer)
@@ -46,10 +46,10 @@ namespace Serenity.Reporting
             var title = localizer?.TryGet("Report.Category." + key.Replace("/", "."));
             if (title == null)
             {
-                key = key ?? "";
+                key ??= "";
                 var idx = key.LastIndexOf('/');
                 if (idx >= 0 && idx < key.Length - 1)
-                    key = key.Substring(idx + 1);
+                    key = key[(idx + 1)..];
                 return key;
             }
 
@@ -75,9 +75,8 @@ namespace Serenity.Reporting
                     reportByKeyNew[key] = report;
 
                     var category = report.Category.Key;
-                    List<Report> reports;
 
-                    if (!reportsByCategoryNew.TryGetValue(category, out reports))
+                    if (!reportsByCategoryNew.TryGetValue(category, out List<Report> reports))
                     {
                         reports = new List<Report>();
                         reportsByCategoryNew[category] = reports;
@@ -95,8 +94,7 @@ namespace Serenity.Reporting
         {
             EnsureTypes();
 
-            List<Report> reports;
-            if (!reportsByCategory.TryGetValue(categoryKey, out reports))
+            if (!reportsByCategory.TryGetValue(categoryKey, out List<Report> reports))
                 return false;
 
             foreach (var report in reports)
@@ -114,7 +112,7 @@ namespace Serenity.Reporting
 
             foreach (var k in reportsByCategory)
                 if (categoryKey.IsNullOrEmpty() ||
-                    String.Compare(k.Key, categoryKey, StringComparison.OrdinalIgnoreCase) == 0 ||
+                    string.Compare(k.Key, categoryKey, StringComparison.OrdinalIgnoreCase) == 0 ||
                     (k.Key + "/").StartsWith((categoryKey ?? ""), StringComparison.OrdinalIgnoreCase))
                 {
                     foreach (var report in k.Value)
@@ -136,8 +134,7 @@ namespace Serenity.Reporting
             if (reportByKey.IsEmptyOrNull())
                 throw new ArgumentNullException("reportKey");
 
-            Report report;
-            if (reportByKey.TryGetValue(reportKey, out report))
+            if (reportByKey.TryGetValue(reportKey, out Report report))
             {
                 if (validatePermission && report.Permission != null)
                     permissions.ValidatePermission(report.Permission, localizer);
@@ -158,10 +155,7 @@ namespace Serenity.Reporting
 
             public Report(Type type, ITextLocalizer localizer)
             {
-                if (type == null)
-                    throw new ArgumentNullException("type");
-
-                this.Type = type;
+                this.Type = type ?? throw new ArgumentNullException("type");
 
                 this.Key = GetReportKey(type);
 

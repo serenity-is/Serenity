@@ -16,7 +16,9 @@ namespace Serenity.Data
         internal Dictionary<string, Field> byName;
         internal Dictionary<string, Field> byPropertyName;
         internal Dictionary<Type, Field[]> byAttribute;
+        internal Field idField;
         internal Field[] primaryKeys;
+        internal Field nameField;
         internal Tuple<Field, bool>[] sortOrders;
         internal bool isInitialized;
         internal string fieldPrefix;
@@ -255,8 +257,8 @@ namespace Serenity.Data
                         PermissionAttributeBase insertPermission;
                         PermissionAttributeBase updatePermission;
 
-                        FieldFlags addFlags = (FieldFlags)0;
-                        FieldFlags removeFlags = (FieldFlags)0;
+                        FieldFlags addFlags = 0;
+                        FieldFlags removeFlags = 0;
 
                         OriginPropertyDictionary propertyDictionary = null;
 
@@ -495,6 +497,24 @@ namespace Serenity.Data
 
                             field.customAttributes = property.GetAttributes<Attribute>().ToArray();
                         }
+
+                        var idFieldAttribute = field.GetAttribute<IdPropertyAttribute>();
+                        if (idFieldAttribute != null)
+                        {
+                            if (idField is object)
+                                throw new InvalidProgramException($"{rowType.FullName} have multiple [IdProperty] attributes!");
+
+                            idField = field;
+                        }
+
+                        var nameFieldAttribute = field.GetAttribute<NamePropertyAttribute>();
+                        if (nameFieldAttribute != null)
+                        {
+                            if (nameField is object)
+                                throw new InvalidProgramException($"{rowType.FullName} have multiple [NameProperty] attributes!");
+
+                            nameField = field;
+                        }
                     }
                 }
 
@@ -708,6 +728,9 @@ namespace Serenity.Data
             }
         }
 
+        public Field IdField => idField;
+        public Field NameField => nameField;
+
         public Field[] PrimaryKeys
         {
             get
@@ -827,11 +850,17 @@ namespace Serenity.Data
             if (calledRowCreated)
                 return;
 
+            if (row is IIdRow && idField is null)
+                throw new ArgumentOutOfRangeException(nameof(IdField),
+                    $"Row type {this.GetType().FullName} has IIdRow interface but does not have a field with [IdProperty] attribute!");
+
+            if (row is INameRow && nameField is null)
+                throw new ArgumentOutOfRangeException(nameof(IdField),
+                    $"Row type {this.GetType().FullName} has INameRow interface but does not have a field with [NameProperty] attribute!");
+
             var readPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
             if (readPerm != null && readPerm.Permission != null && !readPerm.ApplyToLookups)
             {
-                var idField = (row as IIdRow)?.IdField as Field;
-                var nameField = row.GetNameField();
                 var permission = readPerm.Permission;
                 foreach (var field in this)
                 {

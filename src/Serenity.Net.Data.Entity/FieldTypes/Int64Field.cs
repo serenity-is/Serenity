@@ -6,16 +6,16 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
-    public sealed class Int64Field : GenericValueField<Int64>, IIdField
+    public sealed class Int64Field : GenericValueField<long>
     {
         public Int64Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<IRow, Int64?> getValue = null, Action<IRow, Int64?> setValue = null)
+            Func<IRow, long?> getValue = null, Action<IRow, long?> setValue = null)
             : base(collection, FieldType.Int64, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static Int64Field Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<IRow, Int64?> getValue, Action<IRow, Int64?> setValue)
+            Func<IRow, long?> getValue, Action<IRow, long?> setValue)
         {
             return new Int64Field(collection, name, caption, size, flags, getValue, setValue);
         }
@@ -83,25 +83,6 @@ namespace Serenity.Data
             }
 
             row.FieldAssignedValue(this);
-        }
-
-        Int64? IIdField.this[IRow row]
-        {
-            get 
-            {
-                CheckUnassignedRead(row);
-                return _getValue(row); 
-            }
-            set
-            {
-                _setValue(row, value);
-                row.FieldAssignedValue(this);
-            }
-        }
-
-        bool IIdField.IsIntegerType
-        {
-            get { return true; }
         }
     }
 }

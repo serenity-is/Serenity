@@ -58,8 +58,7 @@ namespace Serenity.Data
             originByAlias = origins.ToLookup(x => x.Value.Join);
             prefixByAlias = originByAlias.ToDictionary(x => x.Key, x =>
             {
-                Tuple<string, ForeignKeyAttribute, ISqlJoin> joinProperty;
-                if (joinPropertyByAlias.TryGetValue(x.Key, out joinProperty))
+                if (joinPropertyByAlias.TryGetValue(x.Key, out Tuple<string, ForeignKeyAttribute, ISqlJoin> joinProperty))
                 {
                     if (joinProperty.Item3.PropertyPrefix != null)
                         return joinProperty.Item3.PropertyPrefix;
@@ -69,8 +68,7 @@ namespace Serenity.Data
                         return joinProperty.Item1[0..^2];
                 }
 
-                ISqlJoin join;
-                if (rowJoinByAlias.TryGetValue(x.Key, out join))
+                if (rowJoinByAlias.TryGetValue(x.Key, out ISqlJoin join))
                 {
                     if (join.PropertyPrefix != null)
                         return join.PropertyPrefix;
@@ -95,7 +93,7 @@ namespace Serenity.Data
                     prefix = prefix.Substring(0, current.Length);
 
                 while (!current.StartsWith(prefix) && prefix.Length > 0)
-                    prefix = prefix.Substring(0, prefix.Length - 1);
+                    prefix = prefix[0..^1];
             }
 
             return prefix;
@@ -127,9 +125,11 @@ namespace Serenity.Data
             }
             else if (!d.TryGetValue(name, out pi))
             {
-                d = new Dictionary<string, Tuple<PropertyInfo, Type>>();
-                d[name] = pi = new Tuple<PropertyInfo, Type>(GetOriginProperty(propertyByName[name],
-                    origins[name], out originType), originType);
+                d = new Dictionary<string, Tuple<PropertyInfo, Type>>
+                {
+                    [name] = pi = new Tuple<PropertyInfo, Type>(GetOriginProperty(propertyByName[name],
+                    origins[name], out originType), originType)
+                };
                 originPropertyByName = d;
             }
 
@@ -150,7 +150,7 @@ namespace Serenity.Data
 
                 if (originRowType == null)
                 {
-                    throw new ArgumentOutOfRangeException("origin", String.Format(
+                    throw new ArgumentOutOfRangeException("origin", string.Format(
                         "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                         "but [ForeignKey] and [LeftJoin] attributes on related join " +
                         "property '{2}' doesn't use a typeof(SomeRow)!",
@@ -162,7 +162,7 @@ namespace Serenity.Data
                 originRowType = rowJoin.RowType;
                 if (originRowType == null)
                 {
-                    throw new ArgumentOutOfRangeException("origin", String.Format(
+                    throw new ArgumentOutOfRangeException("origin", string.Format(
                         "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                         "but related join declaration on row has no RowType!",
                             property.Name, rowType.Name, joinAlias));
@@ -170,7 +170,7 @@ namespace Serenity.Data
             }
             else
             {
-                throw new ArgumentOutOfRangeException("origin", String.Format(
+                throw new ArgumentOutOfRangeException("origin", string.Format(
                     "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                     "but declaration of join '{2}' is not found!",
                         property.Name, rowType.Name, joinAlias));
@@ -201,7 +201,7 @@ namespace Serenity.Data
             if (originProperty == null &&
                 !originDictionary.propertyByName.TryGetValue(originPropertyName, out originProperty))
             {
-                throw new ArgumentOutOfRangeException("origin", String.Format(
+                throw new ArgumentOutOfRangeException("origin", string.Format(
                     "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                     "but its corresponding property '{2}' on row type '{3}' is not found!",
                         property.Name, rowType.Name, originPropertyName, originRowType.Name));
@@ -281,11 +281,9 @@ namespace Serenity.Data
                 throw new DivideByZeroException("Infinite origin recursion detected!");
 
             DisplayNameAttribute attr;
-
-            ISqlJoin join;
             string prefix = "";
-            Tuple<string, ForeignKeyAttribute, ISqlJoin> propJoin;
-            if (joinPropertyByAlias.TryGetValue(origin.Join, out propJoin))
+
+            if (joinPropertyByAlias.TryGetValue(origin.Join, out Tuple<string, ForeignKeyAttribute, ISqlJoin> propJoin))
             {
                 if (propJoin.Item3.TitlePrefix != null)
                     prefix = propJoin.Item3.TitlePrefix;
@@ -298,7 +296,7 @@ namespace Serenity.Data
                         prefix = propJoin.Item1;
                 }
             }
-            else if (rowJoinByAlias.TryGetValue(origin.Join, out join) &&
+            else if (rowJoinByAlias.TryGetValue(origin.Join, out ISqlJoin join) &&
                 join.TitlePrefix != null)
             {
                 prefix = join.TitlePrefix.Length > 0 ? join.TitlePrefix + " " : "";
@@ -416,8 +414,7 @@ namespace Serenity.Data
                         }
                         else
                         {
-                            var oaa = sqlJoin as OuterApplyAttribute;
-                            if (oaa != null)
+                            if (sqlJoin is OuterApplyAttribute oaa)
                                 sqlJoin = new OuterApplyAttribute(ija.Alias, mappedCriteria);
                         }
                     }

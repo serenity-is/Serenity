@@ -30,22 +30,20 @@ namespace Serenity.Data
                 throw new ArgumentNullException("connection");
             if (tableName == null || tableName.Length == 0)
                 throw new ArgumentNullException("tableName");
-            if (ReferenceEquals(null, orderField))
+            if (orderField is null)
                 throw new ArgumentNullException("orderField");
 
-            using (IDataReader reader = SqlHelper.ExecuteReader(connection,
+            using IDataReader reader = SqlHelper.ExecuteReader(connection,
                 new SqlQuery().Select(
                     Sql.Max(orderField.Name))
                 .From(
                     tableName, Alias.T0)
                 .Where(
-                    filter)))
-            {
-                if (reader.Read() && !reader.IsDBNull(0))
-                    return Convert.ToInt32(reader.GetValue(0)) + 1;
-                else
-                    return 1;
-            }
+                    filter));
+            if (reader.Read() && !reader.IsDBNull(0))
+                return Convert.ToInt32(reader.GetValue(0)) + 1;
+            else
+                return 1;
         }
 
         /// <summary>
@@ -97,9 +95,9 @@ namespace Serenity.Data
                 throw new ArgumentNullException("connection");
             if (tableName == null || tableName.Length == 0)
                 throw new ArgumentNullException("tableName");
-            if (ReferenceEquals(null, keyField))
+            if (keyField is null)
                 throw new ArgumentNullException("keyField");
-            if (ReferenceEquals(null, orderField))
+            if (orderField is null)
                 throw new ArgumentNullException("orderField");
 
             // last assigned display order value
@@ -137,13 +135,15 @@ namespace Serenity.Data
                     // each records actual display order value is one more than previous one
                     order++;
                     // create an entry to hold current and new display order value of the record
-                    OrderRecord r = new OrderRecord();
-                    // record ID
-                    r.recordID = reader.GetValue(0);
-                    // old display order field value (not the actual display order!)
-                    r.oldOrder = Convert.ToInt32(reader.GetValue(1));
-                    // new display order value (actual one to be set)
-                    r.newOrder = order;
+                    OrderRecord r = new OrderRecord
+                    {
+                        // record ID
+                        recordID = reader.GetValue(0),
+                        // old display order field value (not the actual display order!)
+                        oldOrder = Convert.ToInt32(reader.GetValue(1)),
+                        // new display order value (actual one to be set)
+                        newOrder = order
+                    };
 
                     orderRecords.Add(r);
 
@@ -190,14 +190,13 @@ namespace Serenity.Data
             if (id == null || id == DBNull.Value)
                 throw new ArgumentNullException("displayOrderID");
 
-            if (id is string)
-                return ((string)id).ToSql();
+            if (id is string str)
+                return str.ToSql();
 
-            if (id is Guid)
-                return ((Guid?)id).ToSql();
+            if (id is Guid guid)
+                return ((Guid?)guid).ToSql();
 
-            long l;
-            if (long.TryParse(id.ToString(), out l))
+            if (long.TryParse(id.ToString(), out long l))
                 return l.ToString();
 
             throw new ArgumentOutOfRangeException("displayOrderIDType");
@@ -213,10 +212,10 @@ namespace Serenity.Data
             if (tableName.IsEmptyOrNull())
                 throw new ArgumentNullException("tableName");
 
-            if (ReferenceEquals(null, keyField))
+            if (keyField is null)
                 throw new ArgumentNullException("keyField");
 
-            if (ReferenceEquals(null, orderField))
+            if (orderField is null)
                 throw new ArgumentNullException("orderField");
 
             // StringBuilder that will contain query(s)
@@ -230,23 +229,23 @@ namespace Serenity.Data
 
             int updateCount = 0;
 
-            Action<object, long> appendSingleUpdate = delegate(object id, long newOrder)
+            void appendSingleUpdate(object id, long newOrder)
             {
-                queries.AppendLine(String.Format(
+                queries.AppendLine(string.Format(
                     "UPDATE {0} SET {1} = {2} WHERE {3} = {4};", tableName,
                     orderField.Name, newOrder, keyField.Name, IdToSql(id)));
                 updateCount++;
-            };
+            }
 
             if (hasUniqueConstraint)
             {
-                var byCurrentOrder = new Dictionary<Int64, OrderRecord>();
+                var byCurrentOrder = new Dictionary<long, OrderRecord>();
                 foreach (var rec in orderRecords)
                     byCurrentOrder[rec.oldOrder] = rec;
 
                 var list = new List<OrderRecord>();
                 list.AddRange(orderRecords);
-                list.Sort((x, y) => (x.newOrder - y.newOrder));
+                list.Sort((x, y) => x.newOrder - y.newOrder);
 
                 foreach (var rec in list)
                 {
@@ -254,8 +253,7 @@ namespace Serenity.Data
                     {
                         byCurrentOrder.Remove(rec.oldOrder);
 
-                        OrderRecord congestion;
-                        if (byCurrentOrder.TryGetValue(rec.newOrder, out congestion))
+                        if (byCurrentOrder.TryGetValue(rec.newOrder, out OrderRecord congestion))
                         {
                             var empty = list.Count * 2;
                             while (byCurrentOrder.ContainsKey(empty))
@@ -327,7 +325,7 @@ namespace Serenity.Data
                     // if only one record in batch, no need to use IN clause
                     if (start == finish)
                     {
-                        queries.AppendLine(String.Format(
+                        queries.AppendLine(string.Format(
                             "UPDATE {0} SET {1} = {2} WHERE {3} = {4};", tableName,
                             orderField.Name, rs.newOrder, keyField.Name, IdToSql(rs.recordID)));
                         updateCount++;
@@ -337,7 +335,7 @@ namespace Serenity.Data
                         // batch update, use IN (...)
                         OrderRecord rf = orderRecords[finish];
 
-                        queries.AppendLine(String.Format(
+                        queries.AppendLine(string.Format(
                             "UPDATE {0} SET {1} = {1} - ({2}) WHERE ({3} IN ({4}));",
                             tableName,
                             orderField.Name,

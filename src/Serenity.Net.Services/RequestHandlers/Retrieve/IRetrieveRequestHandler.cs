@@ -7,7 +7,7 @@ namespace Serenity.Services
     /// <summary>
     /// Represents a RetrieveRequestHandler. Is used with RetrieveBehavior objects.
     /// </summary>
-    public interface IRetrieveRequestHandler
+    public interface IRetrieveRequestHandler : IRequestHandler
     {
         /// <summary>
         /// Loader row
@@ -47,5 +47,10 @@ namespace Serenity.Services
         /// <param name="field">Field</param>
         /// <returns>True if field should be selected</returns>
         bool ShouldSelectField(Field field);
+
+        /// <summary>
+        /// Current request context
+        /// </summary>
+        IRequestContext Context { get; }
     }
 }

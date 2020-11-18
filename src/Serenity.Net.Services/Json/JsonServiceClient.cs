@@ -37,27 +37,22 @@ namespace Serenity.Services
             using (var requestStream = Task.Run(() => wr.GetRequestStreamAsync()).Result)
                 requestStream.Write(rb, 0, rb.Length);
 
-            using (var response = Task.Run(() => wr.GetResponseAsync()).Result)
+            using var response = Task.Run(() => wr.GetResponseAsync()).Result;
+            using var rs = response.GetResponseStream();
+            using var sr = new StreamReader(rs);
+            var rt = sr.ReadToEnd();
+            var resp = JsonConvert.DeserializeObject<TResponse>(rt, JsonSettings.Tolerant); // fazladan eklenmiş alan varsa önemseme
+
+            if (resp is ServiceResponse serviceResponse &&
+                serviceResponse.Error != null)
             {
-                using (var rs = response.GetResponseStream())
-                using (var sr = new StreamReader(rs))
-                {
-                    var rt = sr.ReadToEnd();
-                    var resp = JsonConvert.DeserializeObject<TResponse>(rt, JsonSettings.Tolerant); // fazladan eklenmiş alan varsa önemseme
-                    var serviceResponse = resp as ServiceResponse;
-
-                    if (serviceResponse != null &&
-                        serviceResponse.Error != null)
-                    {
-                        throw new ValidationError(
-                            serviceResponse.Error.Code,
-                            serviceResponse.Error.Arguments,
-                            serviceResponse.Error.Message);
-                    }
-
-                    return resp;
-                }
+                throw new ValidationError(
+                    serviceResponse.Error.Code,
+                    serviceResponse.Error.Arguments,
+                    serviceResponse.Error.Message);
             }
+
+            return resp;
         }
     }
 }

@@ -9,8 +9,8 @@ namespace Serenity.Services
     {
         public class GenerationUpdater
         {
-            private string groupKey;
-            private ITwoLevelCache cache;
+            private readonly string groupKey;
+            private readonly ITwoLevelCache cache;
 
             public GenerationUpdater(ITwoLevelCache cache, string groupKey)
             {
@@ -24,7 +24,7 @@ namespace Serenity.Services
             }
         }
 
-        private static Hashtable byGroupKey;
+        private static readonly Hashtable byGroupKey;
 
         static BatchGenerationUpdater()
         {
@@ -36,9 +36,7 @@ namespace Serenity.Services
             if (groupKey.IsNullOrEmpty())
                 throw new ArgumentNullException("generationKey");
 
-            var updater = byGroupKey[groupKey] as GenerationUpdater;
-
-            if (updater == null)
+            if (!(byGroupKey[groupKey] is GenerationUpdater updater))
             {
                 var locked = Hashtable.Synchronized(byGroupKey);
                 updater = new GenerationUpdater(cache, groupKey);

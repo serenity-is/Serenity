@@ -17,8 +17,10 @@ namespace Serenity.Net.Data.Entity.Tests
         public void Can_Create_Row_With_Initialized_Fields()
         {
             var fields = new ComplexRow.RowFields().Init(annotations: null);
-            var row = new ComplexRow(fields);
-            row.BasicExpression = "test";
+            new ComplexRow(fields)
+            {
+                BasicExpression = "test"
+            }.ToString();
         }
 
         [Fact]
@@ -27,8 +29,10 @@ namespace Serenity.Net.Data.Entity.Tests
             RowFieldsProvider.TestScope(() =>
             {
                 var fields = new ComplexRow.RowFields().Init(annotations: null);
-                var row = new ComplexRow(fields);
-                row.BasicExpression = "test";
+                var row = new ComplexRow(fields)
+                {
+                    BasicExpression = "test"
+                };
             }, new DefaultRowFieldsProvider());
         }
 

@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Serenity.Data
 {
-    public sealed class GuidField : GenericValueField<Guid>, IIdField
+    public sealed class GuidField : GenericValueField<Guid>
     {
         public GuidField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
             Func<IRow, Guid?> getValue = null, Action<IRow, Guid?> setValue = null)
@@ -86,27 +86,6 @@ namespace Serenity.Data
                 return new Guid(source as byte[]);
 
             return Convert.ChangeType(source, typeof(Guid), provider);
-        }
-
-        bool IIdField.IsIntegerType
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        long? IIdField.this[IRow row]
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

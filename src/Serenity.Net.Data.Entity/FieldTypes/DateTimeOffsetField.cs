@@ -31,10 +31,10 @@ namespace Serenity.Data
             {
                 DateTimeOffset dto;
                 var value = reader.GetValue(index);
-                if (value is DateTime)
-                    dto = (DateTimeOffset)(DateTime)value;
-                else if (value is DateTimeOffset)
-                    dto = (DateTimeOffset)value;
+                if (value is DateTime dt)
+                    dto = dt;
+                else if (value is DateTimeOffset dtofs)
+                    dto = dtofs;
                 else
                     dto = DateTimeOffset.Parse(value.ToString());
 
@@ -100,10 +100,10 @@ namespace Serenity.Data
                 case JsonToken.Date:
                     var obj = reader.Value;
                     DateTimeOffset value;
-                    if (obj is DateTime)
-                        value = (DateTimeOffset)(DateTime)obj;
-                    else if (obj is DateTimeOffset)
-                        value = (DateTimeOffset)obj;
+                    if (obj is DateTime dt)
+                        value = dt;
+                    else if (obj is DateTimeOffset dto)
+                        value = dto;
                     else
                         value = DateTimeOffset.Parse(reader.Value.ToString(), CultureInfo.InvariantCulture);
                     _setValue(row, value);

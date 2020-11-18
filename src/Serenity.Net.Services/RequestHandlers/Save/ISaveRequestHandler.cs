@@ -7,7 +7,7 @@ namespace Serenity.Services
     /// <summary>
     /// Represents a SaveRequestHandler. Is used with SaveBehavior objects.
     /// </summary>
-    public interface ISaveRequestHandler
+    public interface ISaveRequestHandler : IRequestHandler
     {
         /// <summary>
         /// Old row, if any, otherwise null
@@ -53,5 +53,10 @@ namespace Serenity.Services
         /// Current transaction
         /// </summary>
         IUnitOfWork UnitOfWork { get; }
+
+        /// <summary>
+        /// Current request context
+        /// </summary>
+        IRequestContext Context { get; }
     }
 }

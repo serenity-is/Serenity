@@ -21,7 +21,7 @@ namespace Serenity.Services
         {
             var sortBy = (SortBy)value;
 
-            string s = sortBy.Field ?? String.Empty;
+            string s = sortBy.Field ?? string.Empty;
             if (sortBy.Descending)
                 s += " DESC";
 
@@ -53,7 +53,7 @@ namespace Serenity.Services
 
             if (field.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
             {
-                sortBy.Field = field.Substring(0, field.Length - 5).TrimToEmpty();
+                sortBy.Field = field[0..^5].TrimToEmpty();
                 sortBy.Descending = true;
             }
             else

@@ -306,7 +306,7 @@ namespace Serenity.Data
             set { updatePermission = value; }
         }
 
-        public LeftJoin ForeignJoin(Int32? foreignIndex = null)
+        public LeftJoin ForeignJoin(int? foreignIndex = null)
         {
             if (ForeignTable.IsNullOrEmpty())
                 throw new ArgumentNullException("ForeignTable");
@@ -356,7 +356,7 @@ namespace Serenity.Data
             if (!GetIsNull(row))
                 return;
 
-            throw new InvalidOperationException(String.Format(
+            throw new InvalidOperationException(string.Format(
                 "{0} field on {1} is read before assigned a value! Make sure this field is selected in your SqlQuery. Extensions like connection.List only loads table fields by default, view / expression fields are not loaded unless explicitly selected.", 
                     this.Name, row.GetType().Name));
         }

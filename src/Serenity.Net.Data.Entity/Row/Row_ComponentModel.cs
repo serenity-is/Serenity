@@ -11,7 +11,7 @@ namespace Serenity.Data
         internal Row<TFields> previousValues;
         internal PropertyChangedEventHandler propertyChanged;
         internal Action<Row<TFields>> postHandler;
-        private Dictionary<String, String> validationErrors;
+        private Dictionary<string, string> validationErrors;
 
         internal void RaisePropertyChanged(Field field)
         {
@@ -106,8 +106,7 @@ namespace Serenity.Data
                     insidePostHandler--;
                 }
 
-                if (PostEnded != null)
-                    PostEnded(this, new EventArgs());
+                PostEnded?.Invoke(this, new EventArgs());
             }
             else
             {
@@ -143,7 +142,7 @@ namespace Serenity.Data
             if (validationErrors == null)
                 validationErrors = new Dictionary<string, string>();
 
-            validationErrors[propertyName ?? String.Empty] = error;
+            validationErrors[propertyName ?? string.Empty] = error;
         }
 
         public void ClearValidationErrors()
@@ -158,7 +157,7 @@ namespace Serenity.Data
         public void RemoveValidationError(string propertyName)
         {
             if (validationErrors != null)
-                validationErrors.Remove(propertyName ?? String.Empty);
+                validationErrors.Remove(propertyName ?? string.Empty);
         }
 
         public IDictionary<string, string> ValidationErrors

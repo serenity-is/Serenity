@@ -7,10 +7,8 @@ namespace Serenity.Services
     /// <summary>
     /// Represents a ListRequestHandler. Is used with ListBehavior objects.
     /// </summary>
-    public interface IListRequestHandler
+    public interface IListRequestHandler : IRequestHandler
     {
-        IRequestContext Context { get; }
-
         /// <summary>
         /// Loader row
         /// </summary>
@@ -35,6 +33,11 @@ namespace Serenity.Services
         /// Current connection
         /// </summary>
         IDbConnection Connection { get; }
+
+        /// <summary>
+        /// Current request context
+        /// </summary>
+        IRequestContext Context { get; }
 
         /// <summary>
         /// Returns true if field is allowed to be selected, based on permissions and SelectLevel.Never.

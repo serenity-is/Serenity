@@ -6,16 +6,16 @@ using Newtonsoft.Json;
 
 namespace Serenity.Data
 {
-    public sealed class SingleField : GenericValueField<Single>
+    public sealed class SingleField : GenericValueField<float>
     {
         public SingleField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<IRow, Single?> getValue = null, Action<IRow, Single?> setValue = null)
+            Func<IRow, float?> getValue = null, Action<IRow, float?> setValue = null)
             : base(collection, FieldType.Single, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static SingleField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<IRow, Single?> getValue, Action<IRow, Single?> setValue)
+            Func<IRow, float?> getValue, Action<IRow, float?> setValue)
         {
             return new SingleField(collection, name, caption, size, flags, getValue, setValue);
         }
@@ -28,8 +28,8 @@ namespace Serenity.Data
             var value = reader.GetValue(index);
             if (value is DBNull)
                 _setValue(row, null);
-            else if (value is Single)
-                _setValue(row, (Single)value);
+            else if (value is float f)
+                _setValue(row, f);
             else
                 _setValue(row, Convert.ToSingle(value, CultureInfo.InvariantCulture));
 

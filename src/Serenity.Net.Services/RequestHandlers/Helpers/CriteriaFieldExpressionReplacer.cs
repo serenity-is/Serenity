@@ -51,19 +51,19 @@
             
             criteria = result as Criteria;
 
-            if (!Object.ReferenceEquals(null, criteria))
+            if (criteria is object)
             {
                 var field = FindField(criteria.Expression);
-                if (ReferenceEquals(null, field))
+                if (field is null)
                 {
                     throw new ValidationError("InvalidCriteriaField", criteria.Expression,
-                        String.Format("'{0}' criteria field is not found!", criteria.Expression));
+                        string.Format("'{0}' criteria field is not found!", criteria.Expression));
                 }
 
                 if (!CanFilterField(field))
                 {
                     throw new ValidationError("CantFilterField", criteria.Expression,
-                        String.Format("Can't filter on field '{0}'!", criteria.Expression));
+                        string.Format("Can't filter on field '{0}'!", criteria.Expression));
                 }
 
                 return new Criteria(field);
@@ -77,24 +77,22 @@
             field = null;
             value = null;
 
-            if (ReferenceEquals(null, criteria) ||
+            if (criteria is null ||
                 criteria.Operator < CriteriaOperator.EQ ||
                 criteria.Operator > CriteriaOperator.NotIn)
                 return false;
 
-            var left = criteria.LeftOperand as Criteria;
-            if (ReferenceEquals(null, left))
+            if (!(criteria.LeftOperand is Criteria left))
                 return false;
 
             field = FindField(left.Expression);
-            if (ReferenceEquals(null, field))
+            if (field is null)
                 return false;
 
             if (field is StringField)
                 return false;
 
-            var right = criteria.RightOperand as ValueCriteria;
-            if (ReferenceEquals(null, right))
+            if (!(criteria.RightOperand is ValueCriteria right))
                 return false;
 
             value = right.Value;
@@ -103,31 +101,29 @@
 
         protected override BaseCriteria VisitBinary(BinaryCriteria criteria)
         {
-            Field field;
-            object value;
-            if (ShouldConvertValues(criteria, out field, out value))
-            try
-            {
-                var str = value as string;
-                if (str == null && value is IEnumerable)
+            if (ShouldConvertValues(criteria, out Field field, out object value))
+                try
                 {
-                    var values = new List<object>();
-                    foreach (var v in value as IEnumerable)
-                        values.Add(field.ConvertValue(v, CultureInfo.InvariantCulture));
+                    var str = value as string;
+                    if (str == null && value is IEnumerable)
+                    {
+                        var values = new List<object>();
+                        foreach (var v in value as IEnumerable)
+                            values.Add(field.ConvertValue(v, CultureInfo.InvariantCulture));
 
-                    return new BinaryCriteria(new Criteria(field), criteria.Operator, new ValueCriteria(values));
+                        return new BinaryCriteria(new Criteria(field), criteria.Operator, new ValueCriteria(values));
+                    }
+
+                    if (str == null || str.Length != 0)
+                    {
+                        value = field.ConvertValue(value, CultureInfo.InvariantCulture);
+                        return new BinaryCriteria(new Criteria(field), criteria.Operator, new ValueCriteria(value));
+                    }
                 }
-
-                if (str == null || str.Length != 0)
+                catch
                 {
-                    value = field.ConvertValue(value, CultureInfo.InvariantCulture);
-                    return new BinaryCriteria(new Criteria(field), criteria.Operator, new ValueCriteria(value));
+                    // swallow exceptions for backward compability
                 }
-            }
-            catch
-            {
-                // swallow exceptions for backward compability
-            }
 
             return base.VisitBinary(criteria);
         }

@@ -4,7 +4,7 @@ namespace Serenity.Data
 {
     public class RowFieldsProvider
     {
-        private static object sync = new object();
+        private static readonly object sync = new object();
         private static IRowFieldsProvider current;
 
         static RowFieldsProvider()

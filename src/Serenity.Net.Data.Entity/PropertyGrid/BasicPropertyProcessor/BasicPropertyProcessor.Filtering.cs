@@ -34,7 +34,7 @@ namespace Serenity.PropertyGrid
             }
 
             var basedOnField = source.BasedOnField;
-            if (!ReferenceEquals(null, basedOnField) &&
+            if (basedOnField is object &&
                 notFilterableAttr == null)
             {
                 if (basedOnField.Flags.HasFlag(FieldFlags.DenyFiltering) ||
@@ -60,7 +60,7 @@ namespace Serenity.PropertyGrid
                 if (idFieldName != null)
                 {
                     idField = basedOnField.Fields.FindFieldByPropertyName(idFieldName) ?? basedOnField.Fields.FindField(idFieldName);
-                    if (Object.ReferenceEquals(idField, null) ||
+                    if (idField is null ||
                         (idField.TextualField != basedOnField.PropertyName &&
                          idField.TextualField != basedOnField.Name))
                     {
@@ -81,7 +81,7 @@ namespace Serenity.PropertyGrid
                 var editorAttr = source.GetAttribute<EditorTypeAttribute>() ??
                     idField.GetAttribute<EditorTypeAttribute>();
 
-                Action<string[]> copyParamsFromEditor = (keys) =>
+                void copyParamsFromEditor(string[] keys)
                 {
                     var prm = new Dictionary<string, object>();
                     editorAttr.SetParams(prm);
@@ -91,7 +91,7 @@ namespace Serenity.PropertyGrid
                         if (prm.TryGetValue(key, out object o))
                             item.FilteringParams[key] = o;
                     }
-                };
+                }
 
                 if (idFieldName != null)
                 {
@@ -101,12 +101,12 @@ namespace Serenity.PropertyGrid
 
                 if (editorAttr != null && !standardFilteringEditors.Contains(editorAttr.EditorType))
                 {
-                    if (editorAttr is LookupEditorAttribute lea)
+                    if (editorAttr is LookupEditorAttribute)
                     {
                         item.FilteringType = "Lookup";
                         copyParamsFromEditor(lookupCopyToFilterParams);
                     }
-                    else if (editorAttr is ServiceLookupEditorAttribute slea)
+                    else if (editorAttr is ServiceLookupEditorAttribute)
                     {
                         item.FilteringType = "ServiceLookup";
                         copyParamsFromEditor(serviceLookupCopyToFilterParams);
@@ -115,7 +115,7 @@ namespace Serenity.PropertyGrid
                     {
                         item.FilteringType = "Editor";
                         item.FilteringParams["editorType"] = editorAttr.EditorType;
-                        item.FilteringParams["useLike"] = source.ValueType == typeof(String);
+                        item.FilteringParams["useLike"] = source.ValueType == typeof(string);
                         if (editorAttr is LookupEditorBaseAttribute leba &&
                             leba.Async == true)
                             item.FilteringParams["async"] = true;
@@ -128,9 +128,9 @@ namespace Serenity.PropertyGrid
                 }
                 else if (valueType == typeof(DateTime))
                 {
-                    if (!ReferenceEquals(null, basedOnField) &&
-                        basedOnField is DateTimeField &&
-                        !((DateTimeField)basedOnField).DateOnly)
+                    if (basedOnField is object &&
+                        basedOnField is DateTimeField dtf &&
+                        !dtf.DateOnly)
                     {
                         item.FilteringType = "DateTime";
                     }
@@ -139,15 +139,15 @@ namespace Serenity.PropertyGrid
                 }
                 else if (valueType == typeof(bool))
                     item.FilteringType = "Boolean";
-                else if (valueType == typeof(Decimal) ||
-                    valueType == typeof(Double) ||
-                    valueType == typeof(Single))
+                else if (valueType == typeof(decimal) ||
+                    valueType == typeof(double) ||
+                    valueType == typeof(float))
                 {
                     item.FilteringType = "Decimal";
                 }
-                else if (valueType == typeof(Int32) ||
-                    valueType == typeof(Int16) ||
-                    valueType == typeof(Int64))
+                else if (valueType == typeof(int) ||
+                    valueType == typeof(short) ||
+                    valueType == typeof(long))
                 {
                     item.FilteringType = "Integer";
                 }
@@ -172,13 +172,12 @@ namespace Serenity.PropertyGrid
 
                     if (!item.FilteringParams.ContainsKey("useLike"))
                     {
-                        if (valueType == typeof(String))
+                        if (valueType == typeof(string))
                             item.FilteringParams["useLike"] = true;
                     }
                 }
 
-                object idFieldObj;
-                if (item.FilteringParams.TryGetValue("idField", out idFieldObj) && idFieldObj is string)
+                if (item.FilteringParams.TryGetValue("idField", out object idFieldObj) && idFieldObj is string)
                     item.FilteringIdField = (idFieldObj as string).TrimToNull();
                 else
                     item.FilteringIdField = idFieldName;
@@ -195,7 +194,7 @@ namespace Serenity.PropertyGrid
                 var key = param.Key;
                 if (key != null &&
                     key.Length >= 1)
-                    key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
+                    key = key.Substring(0, 1).ToLowerInvariant() + key[1..];
 
                 if (key == "idField")
                     item.FilteringIdField = (param.Value as string) ?? item.FilteringIdField;
@@ -210,7 +209,7 @@ namespace Serenity.PropertyGrid
                 var key = param.Key;
                 if (key != null &&
                     key.Length >= 1)
-                    key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
+                    key = key.Substring(0, 1).ToLowerInvariant() + key[1..];
 
                 item.QuickFilterParams[key] = param.Value;
             }
@@ -235,7 +234,7 @@ namespace Serenity.PropertyGrid
             "includeDeleted"
         };
 
-        private static HashSet<string> standardFilteringEditors = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly HashSet<string> standardFilteringEditors = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "Date",
             "Serenity.Date",

@@ -22,19 +22,19 @@ namespace Serenity.PropertyGrid
                 }
                 else if (valueType == typeof(DateTime) || valueType == typeof(DateTime?))
                 {
-                    if (!ReferenceEquals(null, basedOnField) && 
-                        basedOnField is DateTimeField &&
-                        !((DateTimeField)basedOnField).DateOnly)
+                    if (basedOnField is object && 
+                        basedOnField is DateTimeField dtf &&
+                        !dtf.DateOnly)
                         item.FormatterType = "DateTime";
                     else
                         item.FormatterType = "Date";
                 }
                 else if (valueType == typeof(bool))
                     item.FormatterType = "Checkbox";
-                else if (valueType == typeof(Decimal) ||
-                    valueType == typeof(Double) ||
-                    valueType == typeof(Single) ||
-                    valueType == typeof(Int32))
+                else if (valueType == typeof(decimal) ||
+                    valueType == typeof(double) ||
+                    valueType == typeof(float) ||
+                    valueType == typeof(int))
                 {
                     item.FormatterType = "Number";
                 }
@@ -57,7 +57,7 @@ namespace Serenity.PropertyGrid
                 var key = param.Key;
                 if (key != null &&
                     key.Length >= 1)
-                    key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
+                    key = key.Substring(0, 1).ToLowerInvariant() + key[1..];
 
                 item.FormatterParams[key] = param.Value;
             }

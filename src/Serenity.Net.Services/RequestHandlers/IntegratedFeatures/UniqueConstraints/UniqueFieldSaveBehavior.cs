@@ -65,7 +65,7 @@ namespace Serenity.Services
             { 
                 throw new ValidationError("UniqueViolation",
                     String.Join(", ", fields.Select(x => x.PropertyName ?? x.Name)),
-                    String.Format(!string.IsNullOrEmpty(errorMessage) ?
+                    string.Format(!string.IsNullOrEmpty(errorMessage) ?
                         (LocalText.TryGet(errorMessage) ?? errorMessage) :
                             LocalText.Get("Validation.UniqueConstraint"),
                         String.Join(", ", fields.Select(x => x.Title))));

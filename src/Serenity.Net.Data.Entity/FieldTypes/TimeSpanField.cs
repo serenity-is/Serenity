@@ -32,10 +32,10 @@ namespace Serenity.Data
             {
                 var value = reader.GetValue(index);
                 TimeSpan timeSpan;
-                if (value is TimeSpan)
-                    timeSpan = (TimeSpan)value;
-                else if (value is DateTime)
-                    timeSpan = ((DateTime)value).TimeOfDay;
+                if (value is TimeSpan ts)
+                    timeSpan = ts;
+                else if (value is DateTime dt)
+                    timeSpan = dt.TimeOfDay;
                 else
                     timeSpan = TimeSpan.Parse(value.ToString(), CultureInfo.InvariantCulture);
 
@@ -102,11 +102,11 @@ namespace Serenity.Data
                 case JsonToken.Date:
                     var obj = reader.Value;
                     DateTime value;
-                    if (obj is DateTime)
-                        value = (DateTime)obj;
-                    else if (obj is DateTimeOffset)
+                    if (obj is DateTime dt)
+                        value = dt;
+                    else if (obj is DateTimeOffset dto)
                     {
-                        _setValue(row, ((DateTimeOffset)obj).TimeOfDay);
+                        _setValue(row, dto.TimeOfDay);
                         break;
                     }
                     else

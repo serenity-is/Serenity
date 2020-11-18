@@ -47,7 +47,7 @@ namespace Serenity.Services
                 if (rowType.IsAbstract ||
                     !typeof(IRow).IsAssignableFrom(rowType))
                 {
-                    throw new ArgumentException(String.Format(
+                    throw new ArgumentException(string.Format(
                         "Row type '{1}' has an ExtensionRelation attribute " +
                         "but its specified extension row type '{0}' is not a valid row class!",
                             rowType.FullName,
@@ -61,7 +61,7 @@ namespace Serenity.Services
                 {
                     if (!(row is IIdRow))
                     {
-                        throw new ArgumentException(String.Format(
+                        throw new ArgumentException(string.Format(
                             "Row type '{0}' has an ExtensionRelation attribute " +
                             "but its ThisKey is not specified!",
                                 row.GetType().FullName));
@@ -73,7 +73,7 @@ namespace Serenity.Services
                 {
                     info.ThisKeyField = row.FindFieldByPropertyName(attr.ThisKey) ?? row.FindField(attr.ThisKey);
                     if (ReferenceEquals(info.ThisKeyField, null))
-                        throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                        throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                             "This field is specified for an ExtensionRelation attribute",
                             attr.ThisKey,
                             row.GetType().FullName));
@@ -90,7 +90,7 @@ namespace Serenity.Services
                         info.OtherKeyField = (Field)(((IIdRow)row).IdField);
 
                     if (ReferenceEquals(info.OtherKeyField, null))
-                        throw new ArgumentException(String.Format(
+                        throw new ArgumentException(string.Format(
                             "Row type '{1}' has an ExtensionRelation attribute " +
                             "but its OtherKey is not specified!",
                                 row.GetType().FullName));
@@ -99,7 +99,7 @@ namespace Serenity.Services
                 {
                     info.OtherKeyField = ext.FindFieldByPropertyName(attr.OtherKey) ?? ext.FindField(attr.OtherKey);
                     if (ReferenceEquals(info.OtherKeyField, null))
-                        throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                        throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                             "This field is specified for an ExtensionRelation attribute on '{2}'",
                             attr.OtherKey,
                             ext.GetType().FullName,
@@ -110,7 +110,7 @@ namespace Serenity.Services
                 {
                     info.FilterField = ext.FindFieldByPropertyName(attr.FilterField) ?? ext.FindField(attr.FilterField);
                     if (ReferenceEquals(info.FilterField, null))
-                        throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                        throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                             "This field is specified as FilterField for an ExtensionRelation attribute on '{2}'",
                             attr.OtherKey,
                             ext.GetType().FullName,
@@ -123,7 +123,7 @@ namespace Serenity.Services
                 {
                     info.PresenceField = row.FindFieldByPropertyName(attr.PresenceField) ?? row.FindField(attr.PresenceField);
                     if (ReferenceEquals(info.PresenceField, null))
-                        throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                        throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                             "This field is specified as PresenceField as an ExtensionRelation attribute.",
                             attr.PresenceField,
                             row.GetType().FullName));
@@ -185,7 +185,7 @@ namespace Serenity.Services
                         continue;
 
                     if (field.GetType() != match.GetType())
-                        throw new ArgumentException(String.Format(
+                        throw new ArgumentException(string.Format(
                             "Row type '{0}' has an ExtensionRelation attribute to '{1}'." +
                             "Their '{2}' and '{3}' fields are matched but they have different types ({4} and {5})!",
                                 row.GetType().FullName,
@@ -199,7 +199,7 @@ namespace Serenity.Services
                 }
 
                 if (info.Mappings.Count == 0)
-                    throw new ArgumentException(String.Format(
+                    throw new ArgumentException(string.Format(
                         "Row type '{0}' has an ExtensionRelation attribute " +
                         "but no view fields could be matched to extension row '{1}'!",
                             row.GetType().FullName,
@@ -248,7 +248,7 @@ namespace Serenity.Services
             var existing = listHandler.Process(connection, listRequest).Entities;
 
             if (existing.Count > 1)
-                throw new Exception(String.Format("Found multiple extension rows for UpdatableExtension '{0}'", 
+                throw new Exception(string.Format("Found multiple extension rows for UpdatableExtension '{0}'", 
                     info.Attr.Alias));
 
             if (existing.Count == 0)

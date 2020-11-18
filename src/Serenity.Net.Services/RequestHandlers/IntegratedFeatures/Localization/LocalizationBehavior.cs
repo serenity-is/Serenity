@@ -34,7 +34,7 @@ namespace Serenity.Services
             localRowType = attr.LocalizationRow;
             if (!typeof(ILocalizationRow).IsAssignableFrom(localRowType))
             {
-                throw new ArgumentException(String.Format(
+                throw new ArgumentException(string.Format(
                     "Row type '{0}' has a LocalizationRowAttribute, " +
                     "but its localization row type ('{1}') doesn't implement ILocalizationRow interface!",
                         row.GetType().FullName, localRowType.FullName));
@@ -42,7 +42,7 @@ namespace Serenity.Services
 
             if (!typeof(IIdRow).IsAssignableFrom(localRowType))
             {
-                throw new ArgumentException(String.Format(
+                throw new ArgumentException(string.Format(
                     "Row type '{0}' has a LocalizationRowAttribute, " +
                     "but its localization row type ('{1}') doesn't implement IIdRow interface!",
                         row.GetType().FullName, localRowType.FullName));
@@ -50,7 +50,7 @@ namespace Serenity.Services
 
             if (!(row is IIdRow))
             {
-                throw new ArgumentException(String.Format(
+                throw new ArgumentException(string.Format(
                     "Row type '{0}' has a LocalizationRowAttribute, " +
                     "but row type itself doesn't implement IIdRow interface!",
                         row.GetType().FullName));
@@ -73,7 +73,7 @@ namespace Serenity.Services
 
             if (ReferenceEquals(null, foreignKeyField))
             {
-                throw new ArgumentException(String.Format(
+                throw new ArgumentException(string.Format(
                     "Row type '{0}' has a LocalizationRowAttribute, " +
                     "but its localization row type ('{1}') doesn't have a field with name '{2}'!",
                         row.GetType().FullName, localRowType.FullName, foreignKeyFieldName));
@@ -275,7 +275,7 @@ namespace Serenity.Services
 
                     var match = GetLocalizationMatch(field);
                     if (ReferenceEquals(null, match))
-                        throw new ValidationError("CantLocalize", field.Name, String.Format("{0} field is not localizable!", field.Title));
+                        throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!", field.Title));
 
                     var value = field.AsObject(row);
                     match.AsObject(localRow, value);

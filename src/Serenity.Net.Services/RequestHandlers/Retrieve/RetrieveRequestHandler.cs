@@ -11,7 +11,8 @@
     using System.Reflection;
     using System.Security.Claims;
 
-    public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestHandler, IRetrieveRequestProcessor
+    public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestProcessor,
+        IRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse>
         where TRow: class, IRow, new()
         where TRetrieveRequest: RetrieveRequest
         where TRetrieveResponse: RetrieveResponse<TRow>, new()
@@ -99,15 +100,12 @@
 
             var selection = Request.ColumnSelection;
 
-            switch (selection)
+            return selection switch
             {
-                case RetrieveColumnSelection.List:
-                    return mode <= SelectLevel.List;
-                case RetrieveColumnSelection.Details:
-                    return mode <= SelectLevel.Details;
-                default:
-                    return false;
-            }
+                RetrieveColumnSelection.List => mode <= SelectLevel.List,
+                RetrieveColumnSelection.Details => mode <= SelectLevel.Details,
+                _ => false,
+            };
         }
 
         protected virtual void SelectField(SqlQuery query, Field field)
@@ -199,23 +197,18 @@
         {
             StateBag.Clear();
 
-            if (connection == null)
-                throw new ArgumentNullException("connection");
-
-            if (request == null)
-                throw new ArgumentNullException(nameof(request));
+            Connection = connection ?? throw new ArgumentNullException("connection");
+            Request = request ?? throw new ArgumentNullException(nameof(request));
 
             if (request.EntityId == null)
                 throw DataValidation.RequiredError("entityId", Localizer);
 
-            Connection = connection;
-            Request = request;
             ValidateRequest();
 
             Response = new TRetrieveResponse();
             Row = new TRow();
            
-            this.Query = CreateQuery();
+            Query = CreateQuery();
 
             PrepareQuery(Query);
 
@@ -238,7 +231,7 @@
         public ClaimsPrincipal User => Context.User;
 
         public IDbConnection Connection { get; private set; }
-        IRow IRetrieveRequestHandler.Row { get { return this.Row; } }
+        IRow IRetrieveRequestHandler.Row => Row;
         public SqlQuery Query { get; private set; }
         RetrieveRequest IRetrieveRequestHandler.Request { get { return this.Request; } }
         IRetrieveResponse IRetrieveRequestHandler.Response { get { return this.Response; } }
@@ -262,7 +255,7 @@
         }
     }
 
-    public interface IRetrieveRequestProcessor
+    public interface IRetrieveRequestProcessor : IRetrieveRequestHandler
     {
         IRetrieveResponse Process(IDbConnection connection, RetrieveRequest request);
     }

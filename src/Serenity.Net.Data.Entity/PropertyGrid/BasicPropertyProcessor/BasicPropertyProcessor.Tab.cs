@@ -11,7 +11,7 @@ namespace Serenity.PropertyGrid
             if (attr != null)
                 item.Tab = attr.Value;
             else if (Items != null && Items.Count > 0)
-                item.Tab = Items[Items.Count - 1].Tab;
+                item.Tab = Items[^1].Tab;
         }
     }
 }

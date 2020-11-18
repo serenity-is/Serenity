@@ -4,6 +4,6 @@ namespace Serenity.Services
 {
     public interface IBehaviorFactory
     {
-        object Create(Type behaviorType);
+        object CreateInstance(Type behaviorType);
     }
 }

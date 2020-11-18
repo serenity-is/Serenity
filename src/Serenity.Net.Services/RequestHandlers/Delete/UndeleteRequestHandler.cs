@@ -17,6 +17,9 @@ namespace Serenity.Services
         protected TUndeleteResponse Response;
         protected UndeleteRequest Request;
         private static bool loggingInitialized;
+#if TODO 
+        // fix capture log handler after adding a behavior system for undelete handler
+#endif
         //protected static CaptureLogHandler<TRow> captureLogHandler;
         protected Lazy<IDeleteBehavior[]> behaviors;
 
@@ -41,12 +44,11 @@ namespace Serenity.Services
 
         protected virtual void OnAfterUndelete()
         {
-            var displayOrderRow = Row as IDisplayOrderRow;
-            if (displayOrderRow != null)
+            if (Row is IDisplayOrderRow displayOrderRow)
             {
                 var filter = GetDisplayOrderFilter();
                 DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter,
-                    Row.IdField[Row].Value, displayOrderRow.DisplayOrderField[Row].Value, false);
+                    Row.IdField.AsObject(Row), displayOrderRow.DisplayOrderField[Row].Value, false);
             }
         }
 
@@ -57,8 +59,8 @@ namespace Serenity.Services
         protected virtual void DoCaptureLog()
         {
             var newRow = Row.Clone();
-            if (newRow is IIsActiveRow)
-                ((IIsActiveRow)newRow).IsActiveField[newRow] = 1;
+            if (newRow is IIsActiveRow activeRow)
+                activeRow.IsActiveField[newRow] = 1;
             //captureLogHandler.Log(UnitOfWork, Row, newRow, 
             //    User.GetIdentifier());
         }
@@ -123,12 +125,9 @@ namespace Serenity.Services
 
         public TUndeleteResponse Process(IUnitOfWork unitOfWork, UndeleteRequest request)
         {
-            if (unitOfWork == null)
-                throw new ArgumentNullException("unitOfWork");
+            UnitOfWork = unitOfWork ?? throw new ArgumentNullException("unitOfWork");
 
             ValidatePermissions();
-
-            UnitOfWork = unitOfWork;
 
             Request = request;
             Response = new TUndeleteResponse();

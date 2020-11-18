@@ -6,16 +6,16 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
-    public sealed class Int16Field : GenericValueField<Int16>, IIdField
+    public sealed class Int16Field : GenericValueField<short>
     {
         public Int16Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
-            Func<IRow, Int16?> getValue = null, Action<IRow, Int16?> setValue = null)
+            Func<IRow, short?> getValue = null, Action<IRow, short?> setValue = null)
             : base(collection, FieldType.Int16, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static Int16Field Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<IRow, Int16?> getValue, Action<IRow, Int16?> setValue)
+            Func<IRow, short?> getValue, Action<IRow, short?> setValue)
         {
             return new Int16Field(collection, name, caption, size, flags, getValue, setValue);
         }
@@ -64,7 +64,7 @@ namespace Serenity.Data
                     if (EnumType == null)
                         _setValue(row, v);
                     else
-                        _setValue(row, (Int16)Int32Field.ConvertEnumFromInt(EnumType, v));
+                        _setValue(row, (short)Int32Field.ConvertEnumFromInt(EnumType, v));
                     break;
                 case JsonToken.String:
                     string s = ((string)reader.Value).TrimToNull();                  
@@ -73,7 +73,7 @@ namespace Serenity.Data
                     else if (EnumType == null)
                         _setValue(row, Convert.ToInt16(s, CultureInfo.InvariantCulture));
                     else
-                        _setValue(row, (Int16)Int32Field.ConvertEnumFromString(EnumType, s));
+                        _setValue(row, (short)Int32Field.ConvertEnumFromString(EnumType, s));
                     break;
 
                 default:
@@ -81,32 +81,6 @@ namespace Serenity.Data
             }
 
             row.FieldAssignedValue(this);
-        }
-
-        Int64? IIdField.this[IRow row]
-        {
-            get
-            {
-                CheckUnassignedRead(row);
-                return _getValue(row);
-            }
-            set
-            {
-                if (value.HasValue)
-                    checked
-                    {
-                        _setValue(row, (Int16)value.Value);
-                    }
-                else
-                    _setValue(row, null);
-
-                row.FieldAssignedValue(this);
-            }
-        }
-
-        bool IIdField.IsIntegerType
-        {
-            get { return true; }
         }
     }
 }
