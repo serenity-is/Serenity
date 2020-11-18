@@ -14,17 +14,17 @@ namespace Serenity.Services
             this.activator = activator ?? throw new ArgumentNullException(nameof(activator));
         }
 
-        public object CreateDefaultHandler(Type rowType, Type handlerType, Type genericType)
+        public object CreateHandler(Type rowType, Type handlerInterface)
         {
             if (rowType == null)
                 throw new ArgumentNullException(nameof(rowType));
 
-            if (handlerType == null)
-                throw new ArgumentNullException(nameof(handlerType));
+            if (handlerInterface == null)
+                throw new ArgumentNullException(nameof(handlerInterface));
 
             var requestHandler = typeof(IRequestHandler<>).MakeGenericType(rowType);
 
-            var handlers = registry.GetTypes(handlerType)
+            var handlers = registry.GetTypes(handlerInterface)
                 .Where(type => requestHandler.IsAssignableFrom(type))
                 .ToArray();
 
@@ -33,17 +33,18 @@ namespace Serenity.Services
 
             if (handlers.Length == 0)
             {
-                if (genericType == null)
-                    throw new ArgumentNullException(nameof(genericType));
+                var attr = handlerInterface.GetAttribute<GenericHandlerTypeAttribute>();
+                if (attr == null)
+                    throw new InvalidProgramException($"{handlerInterface.FullName} does not have a GenericHandlerTypeAttribute!");
 
-                return activator.CreateInstance(genericType.MakeGenericType(rowType));
+                return activator.CreateInstance(attr.Value.MakeGenericType(rowType));
             }
 
             var defaults = handlers.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value == true);
             if (defaults.Count() == 1)
                 return activator.CreateInstance(defaults.First());
 
-            throw new InvalidProgramException($"There are multiple {handlerType.FullName} types " +
+            throw new InvalidProgramException($"There are multiple {handlerInterface.FullName} types " +
                 $"for row type {rowType.FullName}. Please add [DefaultHandler] to one of them.");
         }
     }

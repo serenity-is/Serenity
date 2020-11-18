@@ -4,6 +4,6 @@ namespace Serenity.Services
 {
     public interface IDefaultHandlerFactory
     {
-        object CreateDefaultHandler(Type rowType, Type handlerType, Type genericType);
+        object CreateHandler(Type rowType, Type handlerInterface);
     }
 }
