@@ -87,7 +87,7 @@ namespace Serenity.Services
 
         protected virtual void LoadEntity()
         {
-            var idField = (Field)Row.IdField;
+            var idField = Row.IdField;
             var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
             var query = new SqlQuery()
@@ -116,11 +116,11 @@ namespace Serenity.Services
 
         protected virtual void InvalidateCacheOnCommit()
         {
-            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, Row.GetFields().GenerationKey);
+            BatchGenerationUpdater.OnCommit(UnitOfWork, Context.Cache, Row.GetFields().GenerationKey);
             var attr = typeof(TRow).GetCustomAttribute<TwoLevelCachedAttribute>(false);
             if (attr != null)
                 foreach (var key in attr.GenerationKeys)
-                    BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, key);
+                    BatchGenerationUpdater.OnCommit(UnitOfWork, Context.Cache, key);
         }
 
         public TUndeleteResponse Process(IUnitOfWork unitOfWork, UndeleteRequest request)
@@ -144,7 +144,7 @@ namespace Serenity.Services
             if (isActiveDeletedRow == null && isDeletedRow == null && deleteLogRow == null)
                 throw new NotImplementedException();
 
-            var idField = (Field)Row.IdField;
+            var idField = Row.IdField;
             var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
             LoadEntity();
@@ -153,7 +153,7 @@ namespace Serenity.Services
 
             if ((isDeletedRow != null && isDeletedRow.IsDeletedField[Row] != true) ||
                 (isActiveDeletedRow != null && isActiveDeletedRow.IsActiveField[Row] >= 0) ||
-                (deleteLogRow != null && ((Field)deleteLogRow.DeleteUserIdField).IsNull(Row)))
+                (deleteLogRow != null && deleteLogRow.DeleteUserIdField.IsNull(Row)))
                 Response.WasNotDeleted = true;
             else
             {
@@ -175,11 +175,11 @@ namespace Serenity.Services
 
                 if (deleteLogRow != null)
                 {
-                    update.Set((Field)deleteLogRow.DeleteUserIdField, null)
+                    update.Set(deleteLogRow.DeleteUserIdField, null)
                         .Set(deleteLogRow.DeleteDateField, null);
 
                     if (isActiveDeletedRow == null && isDeletedRow == null)
-                        update.Where(((Field)deleteLogRow.DeleteUserIdField).IsNotNull());
+                        update.Where(deleteLogRow.DeleteUserIdField.IsNotNull());
                 }
 
                 if (update.Execute(Connection) != 1)

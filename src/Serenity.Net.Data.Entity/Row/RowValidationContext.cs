@@ -10,7 +10,7 @@ namespace Serenity.Services
         public RowValidationContext(IDbConnection connection, IRow row)
         {
             this.row = row;
-            this.Connection = connection;
+            Connection = connection;
         }
 
         public object GetFieldValue(string fieldName)

@@ -14,7 +14,7 @@ namespace Serenity.Data.Mapping
         /// <param name="value">The value.</param>
         public SizeAttribute(int value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

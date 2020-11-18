@@ -15,7 +15,7 @@ namespace Serenity.Data
         /// <param name="connectionKey">The connection key.</param>
         public ConnectionKeyAttribute(string connectionKey)
         {
-            this.Value = connectionKey;
+            Value = connectionKey;
         }
 
         /// <summary>
@@ -36,8 +36,8 @@ namespace Serenity.Data
                     "ConnectionKeyAttribute is created with source type " + sourceType.Name +
                     ", but that class has no ConnectionKey attribute");
 
-            this.Value = attr.Value;
-            this.SourceType = sourceType;
+            Value = attr.Value;
+            SourceType = sourceType;
         }
 
         /// <summary>

@@ -24,7 +24,7 @@ namespace Serenity.Web
         public ImpersonatingUserAccessor(IUserAccessor userContext, IRequestItemsAccessor itemsAccessor)
         {
             this.userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
-            this.requestContext = itemsAccessor ?? throw new ArgumentNullException(nameof(itemsAccessor));
+            requestContext = itemsAccessor ?? throw new ArgumentNullException(nameof(itemsAccessor));
         }
 
         private Stack<ClaimsPrincipal> GetImpersonationStack(bool createIfNull)

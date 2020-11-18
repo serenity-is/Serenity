@@ -16,7 +16,7 @@ namespace Serenity.Data
         /// <param name="generationKeys">The generation keys.</param>
         public TwoLevelCachedAttribute(params string[] generationKeys)
         {
-            this.GenerationKeys = generationKeys;
+            GenerationKeys = generationKeys;
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace Serenity.ComponentModel
         /// <param name="insertable">True to make field insertable</param>
         public InsertableAttribute(bool insertable = true)
         {
-            this.Value = insertable;
+            Value = insertable;
         }
 
         /// <summary>

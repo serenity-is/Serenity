@@ -15,7 +15,7 @@ namespace Serenity.Data
         /// Local means dates should be converted to server local time. Utc means dates should be converted to UTC timezone.</param>
         public DateTimeKindAttribute(DateTimeKind value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

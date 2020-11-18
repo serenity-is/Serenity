@@ -47,10 +47,10 @@
         /// <param name="target">The target.</param>
         protected void CloneParams(QueryWithParams target)
         {
-            if (this.parameters != null)
+            if (parameters != null)
             {
                 var p = new Dictionary();
-                foreach (var pair in this.parameters)
+                foreach (var pair in parameters)
                     p.Add(pair.Key, pair.Value);
 
                 target.parameters = p;
@@ -168,7 +168,7 @@
         /// </summary>
         public ISqlDialect Dialect()
         {
-            return this.dialect;
+            return dialect;
         }
 
         /// <summary>
@@ -181,7 +181,7 @@
         {
             get
             {
-                return this.dialectOverridden;
+                return dialectOverridden;
             }
         }
 
@@ -195,7 +195,7 @@
         {
             get
             {
-                return SqlDebugDumper.Dump(ToString(), this.Params, dialect);
+                return SqlDebugDumper.Dump(ToString(), Params, dialect);
             }
         }
     }

@@ -16,7 +16,7 @@ namespace Serenity.ComponentModel
         /// <param name="key">The key.</param>
         public DynamicScriptAttribute(string key)
         {
-            this.Key = key;
+            Key = key;
         }
 
         /// <summary>

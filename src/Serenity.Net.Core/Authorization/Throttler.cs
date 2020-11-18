@@ -55,7 +55,7 @@ namespace Serenity
         /// <returns>True if under throttle limit, false otherwise</returns>
         public bool Check()
         {
-            var hit = cache.TryGet<HitInfo>(this.CacheKey);
+            var hit = cache.TryGet<HitInfo>(CacheKey);
 
             if (hit == null)
             {

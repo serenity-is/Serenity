@@ -14,7 +14,7 @@ namespace Serenity.ComponentModel
         /// </summary>
         public RequiredAttribute()
         {
-            this.IsRequired = true;
+            IsRequired = true;
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Serenity.ComponentModel
         /// <param name="isRequired">if set to <c>true</c> [is required].</param>
         public RequiredAttribute(bool isRequired)
         {
-            this.IsRequired = isRequired;
+            IsRequired = isRequired;
         }
 
         /// <summary>

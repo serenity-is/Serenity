@@ -1,0 +1,11 @@
+﻿[*.{cs,vb}]
+
+# IDE0003: Remove qualification
+dotnet_diagnostic.IDE0003.severity = suggestion
+
+# IDE0004: Remove Unnecessary Cast
+dotnet_diagnostic.IDE0004.severity = suggestion
+
+# IDE0049: Simplify Names
+dotnet_diagnostic.IDE0049.severity = suggestion
+

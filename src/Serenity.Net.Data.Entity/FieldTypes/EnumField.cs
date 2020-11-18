@@ -16,7 +16,7 @@ namespace Serenity.Data
             if (Enum.GetUnderlyingType(typeof(TEnum)) != typeof(Int32))
                 throw new InvalidProgramException(typeof(TEnum).FullName + " is used as type parameter for an EnumField but it is not based on Int32!");
 
-            this.EnumType = typeof(TEnum);
+            EnumType = typeof(TEnum);
         }
 
         public new TEnum? this[IRow row]

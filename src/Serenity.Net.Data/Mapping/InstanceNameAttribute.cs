@@ -14,7 +14,7 @@ namespace Serenity.Data
         /// <param name="instanceName">Name of the instance.</param>
         public InstanceNameAttribute(string instanceName)
         {
-            this.InstanceName = instanceName;
+            InstanceName = instanceName;
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace Serenity.ComponentModel
         /// <param name="module">The module.</param>
         public ModuleAttribute(string module)
         {
-            this.Value = module;
+            Value = module;
         }
 
         /// <summary>

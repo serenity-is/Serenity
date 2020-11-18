@@ -8,18 +8,15 @@ namespace Serenity.Services
         public static BaseCriteria GetDisplayOrderFilterFor(IRow row)
         {
             var flt = Criteria.Empty;
-            var parentIdRow = row as IParentIdRow;
-            if (parentIdRow != null)
-                flt = flt & (new Criteria((Field)parentIdRow.ParentIdField) == Convert.ToInt64(((Field)parentIdRow.ParentIdField).AsObject(row)));
+            if (row as IParentIdRow != null)
+                flt &= new Criteria((row as IParentIdRow).ParentIdField) == Convert.ToInt64((row as IParentIdRow).ParentIdField.AsObject(row));
 
-            var activeRow = row as IIsActiveRow;
-            if (activeRow != null)
-                flt = flt & new Criteria((Field)activeRow.IsActiveField) >= 0;
+            if (row is IIsActiveRow activeRow)
+                flt &= new Criteria(activeRow.IsActiveField) >= 0;
             else
             {
-                var deletedRow = row as IIsDeletedRow;
-                if (deletedRow != null)
-                    flt = flt & deletedRow.IsDeletedField == 0;
+                if (row is IIsDeletedRow deletedRow)
+                    flt &= deletedRow.IsDeletedField == 0;
             }
 
             return flt;

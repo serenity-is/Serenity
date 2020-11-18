@@ -20,7 +20,7 @@ namespace Serenity.Services
 
             public void Update()
             {
-                cache.ExpireGroupItems(this.groupKey);
+                cache.ExpireGroupItems(groupKey);
             }
         }
 

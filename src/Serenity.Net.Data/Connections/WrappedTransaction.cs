@@ -68,10 +68,10 @@ namespace Serenity.Data
 
         private void DetachConnection()
         {
-            if (this.wrappedConnection != null)
+            if (wrappedConnection != null)
             {
-                this.wrappedConnection.Release(this);
-                this.wrappedConnection = null;
+                wrappedConnection.Release(this);
+                wrappedConnection = null;
             }
         }
     }

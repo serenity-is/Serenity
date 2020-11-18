@@ -14,7 +14,7 @@ namespace Serenity.Data.Mapping
         /// <param name="value">The value.</param>
         public MinSelectLevelAttribute(SelectLevel value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

@@ -59,7 +59,7 @@ namespace Serenity.Data
         ///   If none, 1.</returns>
         public static int GetNextValue(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null)
         {
-            return GetNextValue(connection, ((IRow)row).Table, row.DisplayOrderField, filter);
+            return GetNextValue(connection, row.Table, row.DisplayOrderField, filter);
         }
 
         /// <summary>
@@ -390,7 +390,7 @@ namespace Serenity.Data
         public static bool ReorderValues(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null, 
             object recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
         {
-            return ReorderValues(connection, ((IRow)row).Table, (Field)((IIdRow)row).IdField, row.DisplayOrderField, filter, recordID, 
+            return ReorderValues(connection, row.Table, row.IdField, row.DisplayOrderField, filter, recordID, 
                 newDisplayOrder, descendingKeyOrder, hasUniqueConstraint);
         }
 

@@ -14,8 +14,8 @@ namespace Serenity.Data
             Func<IRow, TValue?> getValue = null, Action<IRow, TValue?> setValue = null)
             : base(collection, type, name, caption, size, flags)
         {
-            _getValue = getValue ?? (r => (TValue?)(r.GetIndexedData(this.index)));
-            _setValue = setValue ?? ((r, v) => r.SetIndexedData(this.index, v));
+            _getValue = getValue ?? (r => (TValue?)(r.GetIndexedData(index)));
+            _setValue = setValue ?? ((r, v) => r.SetIndexedData(index, v));
         }
 
         public override object ConvertValue(object source, IFormatProvider provider)
@@ -77,7 +77,7 @@ namespace Serenity.Data
                     _setValue(row, (TValue)value);
                 } catch (InvalidCastException ex)
                 {
-                    throw new InvalidCastException($"Invalid cast exception while trying to set the value of {this.Name} field on {row.GetType().Name} as object.", ex);
+                    throw new InvalidCastException($"Invalid cast exception while trying to set the value of {Name} field on {row.GetType().Name} as object.", ex);
                 }
             }
 

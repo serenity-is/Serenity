@@ -35,7 +35,7 @@
         /// <param name="query">The query.</param>
         public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
-            sb.Append(this.name);
+            sb.Append(name);
         }
 
         /// <summary>

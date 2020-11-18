@@ -54,7 +54,7 @@
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            this.expression = field.Expression;
+            expression = field.Expression;
         }
 
         /// <summary>
@@ -73,7 +73,7 @@
 
             if (String.IsNullOrEmpty(alias))
                 throw new ArgumentNullException("alias");
-            this.expression = alias + "." + SqlSyntax.AutoBracketValid(field);
+            expression = alias + "." + SqlSyntax.AutoBracketValid(field);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@
             if (joinNumber < 0)
                 throw new ArgumentOutOfRangeException("joinNumber");
 
-            this.expression = joinNumber.TableAliasDot() + SqlSyntax.AutoBracketValid(field);
+            expression = joinNumber.TableAliasDot() + SqlSyntax.AutoBracketValid(field);
         }
 
         /// <summary>
@@ -202,7 +202,7 @@
         /// <param name="query">The target query to add params into.</param>
         public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
-            sb.Append(this.expression);
+            sb.Append(expression);
         }
 
         /// <summary>

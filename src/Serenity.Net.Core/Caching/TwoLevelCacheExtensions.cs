@@ -272,7 +272,7 @@ namespace Serenity
                     if (serialized != null)
                     {
                         cachedObj = deserialize(serialized);
-                        localCache.Add(cacheKey, (object)cachedObj ?? DBNull.Value, localExpiration);
+                        localCache.Add(cacheKey, cachedObj ?? DBNull.Value, localExpiration);
                         localCache.Add(itemGenerationKey, getGroupGenerationValue(), localExpiration);
                         return (TItem)cachedObj;
                     }

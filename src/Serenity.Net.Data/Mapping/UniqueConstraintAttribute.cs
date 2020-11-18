@@ -19,8 +19,8 @@ namespace Serenity.Data.Mapping
             if (fields.IsEmptyOrNull())
                 throw new ArgumentNullException("fields");
 
-            this.Fields = fields;
-            this.CheckBeforeSave = true;
+            Fields = fields;
+            CheckBeforeSave = true;
         }
 
         /// <summary>

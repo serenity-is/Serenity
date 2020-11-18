@@ -38,7 +38,7 @@ namespace Serenity.Data
                     referencedAliases = aliases;
             }
 
-            var toTableAliases = JoinAliasLocator.Locate(this.Table);
+            var toTableAliases = JoinAliasLocator.Locate(Table);
             if (toTableAliases != null && toTableAliases.Count > 0)
             {
                 if (referencedAliases == null)
@@ -52,11 +52,11 @@ namespace Serenity.Data
 
             if (joins != null)
             {
-                if (joins.ContainsKey(this.Name))
+                if (joins.ContainsKey(Name))
                     throw new ArgumentException(string.Format(
-                        "There is already a join with alias '{0}'", this.Name));
+                        "There is already a join with alias '{0}'", Name));
 
-                joins.Add(this.Name, this);
+                joins.Add(Name, this);
             }
         }
 

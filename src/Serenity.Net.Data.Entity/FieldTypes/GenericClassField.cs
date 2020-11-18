@@ -13,8 +13,8 @@ namespace Serenity.Data
             Func<IRow, TValue> getValue = null, Action<IRow, TValue> setValue = null)
             : base(collection, type, name, caption, size, flags)
         {
-            _getValue = getValue ?? (r => (TValue)(r.GetIndexedData(this.index)));
-            _setValue = setValue ?? ((r, v) => r.SetIndexedData(this.index, v));
+            _getValue = getValue ?? (r => (TValue)(r.GetIndexedData(index)));
+            _setValue = setValue ?? ((r, v) => r.SetIndexedData(index, v));
         }
 
         public override void Copy(IRow source, IRow target)

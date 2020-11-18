@@ -14,8 +14,8 @@ namespace Serenity.Data.Mapping
         /// <param name="remove">Set of flags to turn off (exclude)</param>
         public SetFieldFlagsAttribute(FieldFlags add, FieldFlags remove = FieldFlags.None)
         {
-            this.Add = add;
-            this.Remove = remove;
+            Add = add;
+            Remove = remove;
         }
 
         /// <summary>

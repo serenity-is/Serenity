@@ -105,12 +105,12 @@ namespace Serenity.Data
 
         private DateTime ToDateTimeKind(DateTimeOffset value)
         {
-            return ToDateTimeKind(value, this.dateTimeKind);
+            return ToDateTimeKind(value, dateTimeKind);
         }
 
         private DateTime ToDateTimeKind(DateTime value)
         {
-            return ToDateTimeKind(value, this.dateTimeKind);
+            return ToDateTimeKind(value, dateTimeKind);
         }
 
         public new DateTime? this[IRow row]

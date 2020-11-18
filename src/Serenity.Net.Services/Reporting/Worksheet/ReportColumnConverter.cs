@@ -16,8 +16,10 @@ namespace Serenity.Reporting
             if (member == null)
                 throw new ArgumentNullException("member");
 
-            var result = new ReportColumn();
-            result.Name = member.Name;
+            var result = new ReportColumn
+            {
+                Name = member.Name
+            };
             var displayAttr = member.GetCustomAttribute<DisplayNameAttribute>();
             if (displayAttr != null)
                 result.Title = displayAttr.DisplayName;
@@ -32,19 +34,19 @@ namespace Serenity.Reporting
             else
             {
                 var dtf = baseField as DateTimeField;
-                if (!ReferenceEquals(null, dtf) && !dtf.DateOnly)
+                if (dtf is object && !dtf.DateOnly)
                 {
                     result.Format = "dd/MM/yyyy HH:mm";
                 }
-                else if (!ReferenceEquals(null, dtf) ||
-                         dataType == typeof (DateTime) ||
-                         dataType == typeof (DateTime?))
+                else if (dtf is object ||
+                    dataType == typeof (DateTime) ||
+                    dataType == typeof (DateTime?))
                 {
                     result.Format = "dd/MM/yyyy";
                 }
             }
 
-            if (!ReferenceEquals(null, baseField))
+            if (baseField is object)
             {
                 if (result.Title == null)
                     result.Title = baseField.GetTitle(localizer);
@@ -120,9 +122,11 @@ namespace Serenity.Reporting
 
         public static ReportColumn FromField(Field field, ITextLocalizer localizer)
         {
-            var column = new ReportColumn();
-            column.Name = field.Name;
-            column.Title = field.GetTitle(localizer);
+            var column = new ReportColumn
+            {
+                Name = field.Name,
+                Title = field.GetTitle(localizer)
+            };
 
             if (field is StringField)
                 if (field.Size != 0)

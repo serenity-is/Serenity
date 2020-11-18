@@ -14,7 +14,7 @@ namespace Serenity.ComponentModel
         /// <param name="maxLength">The maximum length.</param>
         public MaxLengthAttribute(int maxLength)
         {
-            this.MaxLength = maxLength;
+            MaxLength = maxLength;
         }
 
         /// <summary>

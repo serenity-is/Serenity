@@ -1,7 +1,6 @@
 ﻿namespace Serenity.Services
 {
     using Serenity.Abstractions;
-    using Serenity.ComponentModel;
     using Serenity.Data;
     using System;
     using System.Collections.Generic;
@@ -185,7 +184,7 @@
                 .Dialect(Connection.GetDialect())
                 .From(Row);
 
-            var idField = (Field)(((IIdRow)Row).IdField);
+            var idField = ((IIdRow)Row).IdField;
             var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
             query.WhereEqual(idField, id);
@@ -233,8 +232,8 @@
         public IDbConnection Connection { get; private set; }
         IRow IRetrieveRequestHandler.Row => Row;
         public SqlQuery Query { get; private set; }
-        RetrieveRequest IRetrieveRequestHandler.Request { get { return this.Request; } }
-        IRetrieveResponse IRetrieveRequestHandler.Response { get { return this.Response; } }
+        RetrieveRequest IRetrieveRequestHandler.Request { get { return Request; } }
+        IRetrieveResponse IRetrieveRequestHandler.Response { get { return Response; } }
         bool IRetrieveRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
         bool IRetrieveRequestHandler.AllowSelectField(Field field) { return AllowSelectField(field); }
 
@@ -244,20 +243,5 @@
         }
 
         public IDictionary<string, object> StateBag { get; private set; }
-    }
-
-    public class RetrieveRequestHandler<TRow> : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>
-        where TRow : class, IRow, new()
-    {
-        public RetrieveRequestHandler(IRequestContext context)
-            : base(context)
-        {
-        }
-    }
-
-    [GenericHandlerType(typeof(RetrieveRequestHandler<>))]
-    public interface IRetrieveRequestProcessor : IRetrieveRequestHandler
-    {
-        IRetrieveResponse Process(IDbConnection connection, RetrieveRequest request);
     }
 }

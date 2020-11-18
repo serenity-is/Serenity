@@ -25,7 +25,7 @@ namespace Serenity.Services
                     if (row != null)
                     {
                         var field = ((IRow)ext.FirstIntoRow).FindFieldByPropertyName(sort);
-                        if (!ReferenceEquals(null, field))
+                        if (field is object)
                         {
                             expr = ((IGetExpressionByName)query).GetExpression(field.Name);
                             if (expr == null)
@@ -78,15 +78,14 @@ namespace Serenity.Services
         }
 
         public static SqlQuery ApplyContainsText(this SqlQuery query, string containsText,
-            Action<string, Int64?> filter)
+            Action<string, long?> filter)
         {
             containsText = containsText.TrimToNull();
             if (containsText == null)
                 return query;
 
-            Int64? parsedId;
-            Int64 l;
-            if (Int64.TryParse(containsText, out l))
+            long? parsedId;
+            if (long.TryParse(containsText, out long l))
                 parsedId = l;
             else
                 parsedId = null;
@@ -112,8 +111,7 @@ namespace Serenity.Services
 
         public static BaseCriteria GetNotDeletedCriteria(IRow row)
         {
-            var isActiveDeletedRow = row as IIsActiveDeletedRow;
-            if (isActiveDeletedRow != null)
+            if (row is IIsActiveDeletedRow isActiveDeletedRow)
             {
                 var criteria = isActiveDeletedRow.IsActiveField >= 0;
                 if ((isActiveDeletedRow.IsActiveField.Flags & FieldFlags.NotNull) != FieldFlags.NotNull)
@@ -122,8 +120,7 @@ namespace Serenity.Services
                 return criteria;
             }
 
-            var isDeletedRow = row as IIsDeletedRow;
-            if (isDeletedRow != null)
+            if (row is IIsDeletedRow isDeletedRow)
             {
                 var criteria = isDeletedRow.IsDeletedField == 0;
                 if ((isDeletedRow.IsDeletedField.Flags & FieldFlags.NotNull) != FieldFlags.NotNull)
@@ -131,10 +128,9 @@ namespace Serenity.Services
 
                 return criteria;
             }
-            
-            var deleteLogRow = row as IDeleteLogRow;
-            if (deleteLogRow != null)
-                return ((Field)deleteLogRow.DeleteUserIdField).IsNull();
+
+            if (row is IDeleteLogRow deleteLogRow)
+                return deleteLogRow.DeleteUserIdField.IsNull();
 
             return null;
         }

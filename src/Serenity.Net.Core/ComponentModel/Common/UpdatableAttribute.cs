@@ -15,7 +15,7 @@ namespace Serenity.ComponentModel
         /// <param name="updatable">True to make field updatable</param>
         public UpdatableAttribute(bool updatable = true)
         {
-            this.Value = updatable;
+            Value = updatable;
         }
 
         /// <summary>

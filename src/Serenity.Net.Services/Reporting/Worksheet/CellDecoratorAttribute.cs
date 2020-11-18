@@ -6,7 +6,7 @@
     {
         public CellDecoratorAttribute(Type decorator)
         {
-            this.DecoratorType = decorator;
+            DecoratorType = decorator;
         }
 
         public Type DecoratorType { get; set; }

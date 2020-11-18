@@ -51,7 +51,7 @@ namespace Serenity.Caching
                 if (!dictionary.TryGetValue(key, out object value))
                 {
                     dictionary[key] = (long)amount;
-                    return (long)amount;
+                    return amount;
                 }
                 else
                 {

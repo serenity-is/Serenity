@@ -20,7 +20,7 @@
                 throw new ArgumentNullException("tableName");
 
             this.tableName = tableName;
-            this.nameValuePairs = new List<string>();
+            nameValuePairs = new List<string>();
             cachedQuery = null;
         }
 
@@ -133,9 +133,9 @@
         public SqlInsert Clone()
         {
             SqlInsert clone = new SqlInsert(tableName);
-            clone.nameValuePairs.AddRange(this.nameValuePairs);
+            clone.nameValuePairs.AddRange(nameValuePairs);
             CloneParams(clone);
-            clone.cachedQuery = this.cachedQuery;
+            clone.cachedQuery = cachedQuery;
             return clone;
         }
 

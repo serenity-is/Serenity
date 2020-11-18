@@ -11,8 +11,8 @@ namespace Serenity.Services
 
         public JsonServiceClient(string baseUrl)
         {
-            this.BaseUrl = baseUrl;
-            this.cookies = new CookieContainer();
+            BaseUrl = baseUrl;
+            cookies = new CookieContainer();
         }
 
         protected string BaseUrl { get; set; }

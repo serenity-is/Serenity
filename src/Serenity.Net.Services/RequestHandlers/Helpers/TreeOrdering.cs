@@ -17,8 +17,7 @@ namespace Serenity.Services
 
             var visited = new HashSet<TIdentity>();
 
-            Action<TIdentity> takeChildren = null;
-            takeChildren = delegate(TIdentity theParentId)
+            void takeChildren(TIdentity theParentId)
             {
                 if (visited.Contains(theParentId))
                     return;
@@ -30,7 +29,7 @@ namespace Serenity.Services
                     result.Add(item);
                     takeChildren(getId(item));
                 }
-            };
+            }
 
             foreach (var item in items)
             {

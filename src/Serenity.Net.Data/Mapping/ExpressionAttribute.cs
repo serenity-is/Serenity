@@ -15,7 +15,7 @@ namespace Serenity.Data.Mapping
         /// <param name="value">An SQL expression like (T0.Firstname + ' ' + T0.LastName)</param>
         public ExpressionAttribute(string value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

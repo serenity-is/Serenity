@@ -155,20 +155,20 @@ namespace Serenity.Reporting
 
             public Report(Type type, ITextLocalizer localizer)
             {
-                this.Type = type ?? throw new ArgumentNullException("type");
+                Type = type ?? throw new ArgumentNullException("type");
 
-                this.Key = GetReportKey(type);
+                Key = GetReportKey(type);
 
                 var attr = type.GetCustomAttributes(typeof(DisplayNameAttribute), false);
                 if (attr.Length == 1)
-                    this.Title = ((DisplayNameAttribute)attr[0]).DisplayName;
+                    Title = ((DisplayNameAttribute)attr[0]).DisplayName;
 
                 var category = GetReportCategory(type);
-                this.Category = new ReportRegistry.Category(category, GetReportCategoryTitle(category, localizer));
+                Category = new ReportRegistry.Category(category, GetReportCategoryTitle(category, localizer));
 
                 attr = type.GetCustomAttributes(typeof(RequiredPermissionAttribute), false);
                 if (attr.Length > 0)
-                    this.Permission = ((RequiredPermissionAttribute)attr[0]).Permission ?? "?";
+                    Permission = ((RequiredPermissionAttribute)attr[0]).Permission ?? "?";
             }
         }
 
@@ -179,8 +179,8 @@ namespace Serenity.Reporting
 
             public Category(string key, string title)
             {
-                this.Key = key;
-                this.Title = title;
+                Key = key;
+                Title = title;
             }
         }
     }

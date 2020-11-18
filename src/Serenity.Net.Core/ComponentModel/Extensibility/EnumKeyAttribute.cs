@@ -15,7 +15,7 @@ namespace Serenity.ComponentModel
         /// <param name="value">The value.</param>
         public EnumKeyAttribute(string value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

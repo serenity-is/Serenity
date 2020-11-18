@@ -14,7 +14,7 @@ namespace Serenity.ComponentModel
         /// <param name="value">The prefix.</param>
         public LocalTextPrefixAttribute(string value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

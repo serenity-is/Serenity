@@ -138,7 +138,7 @@ namespace Serenity.Data.Schema
 
             if (match == null)
             {
-                var primaryKeys = this.GetPrimaryKeyFields(connection, schema, table);
+                var primaryKeys = GetPrimaryKeyFields(connection, schema, table);
                 if (primaryKeys.Count() == 1)
                     return primaryKeys;
 

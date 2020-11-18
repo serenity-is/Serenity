@@ -14,7 +14,7 @@ namespace Serenity.ComponentModel
         /// <param name="value">if set to <c>true</c> quick filter is enabled.</param>
         public QuickFilterAttribute(bool value = true)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

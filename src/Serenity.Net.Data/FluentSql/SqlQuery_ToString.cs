@@ -23,7 +23,7 @@ namespace Serenity.Data
             }
 
             // sub queries should be enclosed in paranthesis
-            if (this.parent != null)
+            if (parent != null)
                 sb.Append("(");
 
             if (skip > 0 && orderBy == null && !dialect.CanUseSkipKeyword && !dialect.UseRowNum)
@@ -342,7 +342,7 @@ namespace Serenity.Data
             }
 
             // sub queries should be enclosed in paranthesis
-            if (this.parent != null)
+            if (parent != null)
                 sb.Append(")");
 
             return sb.ToString();

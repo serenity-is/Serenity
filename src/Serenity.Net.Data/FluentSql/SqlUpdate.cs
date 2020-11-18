@@ -252,12 +252,12 @@
         public SqlUpdate Clone()
         {
             SqlUpdate clone = new SqlUpdate(_tableName);
-            clone._nameValuePairs.AddRange(this._nameValuePairs);
-            clone._where.Append(this._where.ToString());
-            if (this._params != null)
+            clone._nameValuePairs.AddRange(_nameValuePairs);
+            clone._where.Append(_where.ToString());
+            if (_params != null)
             {
                 clone._params = new Dictionary();
-                foreach (var pair in this._params)
+                foreach (var pair in _params)
                     clone._params.Add(pair.Key, pair.Value);
             }
             return clone;

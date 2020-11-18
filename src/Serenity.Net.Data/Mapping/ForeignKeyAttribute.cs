@@ -31,7 +31,7 @@ namespace Serenity.Data.Mapping
         /// (implementing IIdRow won't help)</param>
         public ForeignKeyAttribute(Type rowType, string field = null)
         {
-            this.RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
+            RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
 
             var attr = rowType.GetCustomAttribute<TableNameAttribute>(true);
             if (attr == null || string.IsNullOrEmpty(attr.Name))
@@ -39,7 +39,7 @@ namespace Serenity.Data.Mapping
                     string.Format("Type '{0}' is specified for a ForeignKey attribute " +
                         "but it has no [TableName] attribute", rowType.FullName));
 
-            this.Table = attr.Name;
+            Table = attr.Name;
 
             if (string.IsNullOrEmpty(field))
             {

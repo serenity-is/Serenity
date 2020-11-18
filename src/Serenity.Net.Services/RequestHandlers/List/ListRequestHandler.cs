@@ -349,7 +349,7 @@
 
         protected virtual BaseCriteria ReplaceFieldExpressions(BaseCriteria criteria)
         {
-            return new CriteriaFieldExpressionReplacer(this.Row, Permissions)
+            return new CriteriaFieldExpressionReplacer(Row, Permissions)
                 .Process(criteria);
         }
 
@@ -541,7 +541,7 @@
             Row = new TRow();
 
             var query = CreateQuery();
-            this.Query = query;
+            Query = query;
 
             DistinctFields = GetDistinctFields();
             if (DistinctFields != null)
@@ -625,30 +625,5 @@
         IListResponse IListRequestHandler.Response => Response;
         bool IListRequestHandler.AllowSelectField(Field field) { return AllowSelectField(field); }
         bool IListRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
-    }
-
-    public class ListRequestHandler<TRow> : ListRequestHandler<TRow, ListRequest, ListResponse<TRow>>
-        where TRow : class, IRow, new()
-    {
-        public ListRequestHandler(IRequestContext context)
-            : base(context)
-        {
-        }
-    }
-
-    public class ListRequestHandler<TRow, TListRequest> : ListRequestHandler<TRow, TListRequest, ListResponse<TRow>>
-        where TRow : class, IRow, new()
-        where TListRequest: ListRequest
-    {
-        public ListRequestHandler(IRequestContext context)
-            : base(context)
-        {
-        }
-    }
-
-    [GenericHandlerType(typeof(ListRequestHandler<>))]
-    public interface IListRequestProcessor : IListRequestHandler
-    {
-        IListResponse Process(IDbConnection connection, ListRequest request);
     }
 }

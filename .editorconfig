@@ -1,4 +1,0 @@
-﻿[*.{cs,vb}]
-
-# IDE0049: Simplify Names
-dotnet_diagnostic.IDE0049.severity = suggestion

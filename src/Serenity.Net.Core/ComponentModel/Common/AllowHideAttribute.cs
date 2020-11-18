@@ -13,7 +13,7 @@ namespace Serenity.ComponentModel
         /// <param name="value">if set to <c>false</c> column can't be hidden by user.</param>
         public AllowHideAttribute(bool value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

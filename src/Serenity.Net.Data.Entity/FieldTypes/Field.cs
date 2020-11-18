@@ -98,7 +98,7 @@ namespace Serenity.Data
             get
             {
                 if (autoTextKey == null)
-                    autoTextKey = "Db." + this.Fields.LocalTextPrefix + "." + (propertyName ?? name);
+                    autoTextKey = "Db." + Fields.LocalTextPrefix + "." + (propertyName ?? name);
 
                 return autoTextKey;
             }
@@ -133,8 +133,8 @@ namespace Serenity.Data
                 if (customAttributes != value)
                 {
                     customAttributes = value;
-                    if (this.fields != null)
-                        this.fields.byAttribute = null;
+                    if (fields != null)
+                        fields.byAttribute = null;
                 }
             }
         }
@@ -191,7 +191,7 @@ namespace Serenity.Data
                                 var theJoin = enumerator.Current;
 
                                 if (theJoin == "t0" || theJoin == "T0")
-                                    flags = (FieldFlags)(flags ^ FieldFlags.Foreign) | FieldFlags.Calculated;
+                                    flags = flags ^ FieldFlags.Foreign | FieldFlags.Calculated;
                                 else
                                 {
                                     flags |= FieldFlags.Foreign;
@@ -331,10 +331,10 @@ namespace Serenity.Data
             var sourceAlias = "T0";
             var sourceKeyField = Name;
 
-            var join = new LeftJoin(this.Fields.Joins, ForeignTable, foreignJoin,
+            var join = new LeftJoin(Fields.Joins, ForeignTable, foreignJoin,
                 new Criteria(foreignJoin, joinKeyField) == new Criteria(sourceAlias, sourceKeyField));
 
-            this.ForeignJoinAlias = join;
+            ForeignJoinAlias = join;
             return join;
         }
 
@@ -358,7 +358,7 @@ namespace Serenity.Data
 
             throw new InvalidOperationException(string.Format(
                 "{0} field on {1} is read before assigned a value! Make sure this field is selected in your SqlQuery. Extensions like connection.List only loads table fields by default, view / expression fields are not loaded unless explicitly selected.", 
-                    this.Name, row.GetType().Name));
+                    Name, row.GetType().Name));
         }
 
         public abstract void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer);
@@ -410,7 +410,7 @@ namespace Serenity.Data
             if (caption is null)
             {
                 if (autoTextKey == null)
-                    autoTextKey = "Db." + this.Fields.LocalTextPrefix + "." + (propertyName ?? name);
+                    autoTextKey = "Db." + Fields.LocalTextPrefix + "." + (propertyName ?? name);
 
                 return localizer?.TryGet(autoTextKey) ?? propertyName ?? name;
             }

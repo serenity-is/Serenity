@@ -173,7 +173,7 @@ namespace Serenity.PropertyGrid
                     if (rowInstance is IIdRow idRow &&
                         !editorParams.ContainsKey("idField"))
                     {
-                        var idField = ((Field)idRow.IdField);
+                        var idField = idRow.IdField;
                         editorParams["idField"] = idField.PropertyName ?? idField.Name;
                     }
 

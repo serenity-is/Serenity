@@ -56,7 +56,7 @@ namespace Serenity.Services
             }
 
             var row = newRow.CreateNew();
-            var idField = (Field)(((IIdRow)newRow).IdField);
+            var idField = newRow.IdField;
 
             var query = new SqlQuery()
                 .Dialect(connection.GetDialect())

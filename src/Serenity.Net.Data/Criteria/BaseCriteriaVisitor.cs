@@ -61,8 +61,8 @@
         /// <returns></returns>
         protected virtual BaseCriteria VisitBinary(BinaryCriteria criteria)
         {
-            var left = this.Visit(criteria.LeftOperand);
-            var right = this.Visit(criteria.RightOperand);
+            var left = Visit(criteria.LeftOperand);
+            var right = Visit(criteria.RightOperand);
 
             if (!Object.ReferenceEquals(left, criteria.LeftOperand) ||
                 !Object.ReferenceEquals(right, criteria.RightOperand))
@@ -81,7 +81,7 @@
         /// <returns></returns>
         protected virtual BaseCriteria VisitUnary(UnaryCriteria criteria)
         {
-            var operand = this.Visit(criteria.Operand);
+            var operand = Visit(criteria.Operand);
             if (!Object.ReferenceEquals(operand, criteria.Operand))
             {
                 return new UnaryCriteria(criteria.Operator, operand);

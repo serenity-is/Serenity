@@ -44,7 +44,7 @@ namespace Serenity.IO
             {
                 var excludes = exclude.Where(x => !string.IsNullOrEmpty(x));
                 if (excludes.Any())
-                    this.excludeFilter = new GlobFilter(excludes);
+                    excludeFilter = new GlobFilter(excludes);
             }
         }
 
@@ -54,7 +54,7 @@ namespace Serenity.IO
         /// <param name="globs">List of patterns</param>
         public GlobFilter(IEnumerable<string> globs)
         {
-            this.matchers = new List<Func<string, bool>>();
+            matchers = new List<Func<string, bool>>();
 
             if (globs == null)
                 return;

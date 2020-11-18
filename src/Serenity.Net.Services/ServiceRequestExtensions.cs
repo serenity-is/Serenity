@@ -11,7 +11,7 @@ namespace Serenity.Data
         public static TRequest IncludeField<TRequest>(this TRequest request, Field field) 
             where TRequest : ServiceRequest, IIncludeExcludeColumns
         {
-            request.IncludeColumns = request.IncludeColumns ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            request.IncludeColumns ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             request.IncludeColumns.Add(field.PropertyName ?? field.Name);
             return request;
         }

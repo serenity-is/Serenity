@@ -96,7 +96,7 @@ namespace Serenity.Services
             var isActiveDeletedRow = Row as IIsActiveDeletedRow;
             var isDeletedRow = Row as IIsDeletedRow;
             var deleteLogRow = Row as IDeleteLogRow;
-            var idField = (Field)Row.IdField;
+            var idField = Row.IdField;
             var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
             if (isActiveDeletedRow == null && isDeletedRow == null && deleteLogRow == null)
@@ -158,11 +158,11 @@ namespace Serenity.Services
 
         protected virtual void InvalidateCacheOnCommit()
         {
-            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, Row.GetFields().GenerationKey);
+            BatchGenerationUpdater.OnCommit(UnitOfWork, Context.Cache, Row.GetFields().GenerationKey);
             var attr = typeof(TRow).GetCustomAttribute<TwoLevelCachedAttribute>(false);
             if (attr != null)
                 foreach (var key in attr.GenerationKeys)
-                    BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, key);
+                    BatchGenerationUpdater.OnCommit(UnitOfWork, Context.Cache, key);
         }
 
         protected virtual void DoAudit()
@@ -242,20 +242,5 @@ namespace Serenity.Services
         DeleteRequest IDeleteRequestHandler.Request => Request;
         DeleteResponse IDeleteRequestHandler.Response => Response;
         public IDictionary<string, object> StateBag { get; private set; }
-    }
-
-    public class DeleteRequestHandler<TRow> : DeleteRequestHandler<TRow, DeleteRequest, DeleteResponse>
-        where TRow : class, IRow, IIdRow, new()
-    {
-        public DeleteRequestHandler(IRequestContext context)
-            : base(context)
-        {
-        }
-    }
-
-    [GenericHandlerType(typeof(DeleteRequestHandler<>))]
-    public interface IDeleteRequestProcessor : IDeleteRequestHandler
-    {
-        DeleteResponse Process(IUnitOfWork uow, DeleteRequest request);
     }
 }

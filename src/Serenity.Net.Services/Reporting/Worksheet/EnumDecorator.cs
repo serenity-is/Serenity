@@ -4,8 +4,8 @@
 
     public class EnumDecorator : BaseCellDecorator
     {
-        private Type enumType;
-        private ITextLocalizer localizer;
+        private readonly Type enumType;
+        private readonly ITextLocalizer localizer;
 
         public EnumDecorator(Type enumType, ITextLocalizer localizer)
         {

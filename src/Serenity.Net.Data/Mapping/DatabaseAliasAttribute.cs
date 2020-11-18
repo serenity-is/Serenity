@@ -14,7 +14,7 @@ namespace Serenity.Data
         /// <param name="value">The value.</param>
         public DatabaseAliasAttribute(string value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

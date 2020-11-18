@@ -23,7 +23,7 @@ namespace Serenity.Data
             var row = new TRow() { TrackWithChecks = true };
             if (new SqlQuery().From(row)
                     .SelectTableFields()
-                    .Where(new Criteria((IField)row.IdField) == new ValueCriteria(id))
+                    .Where(new Criteria(row.IdField) == new ValueCriteria(id))
                     .GetSingle(connection))
                 return row;
 
@@ -45,7 +45,7 @@ namespace Serenity.Data
         {
             var row = new TRow() { TrackWithChecks = true };
             var query = new SqlQuery().From(row)
-                .Where(new Criteria((IField)row.IdField) == new ValueCriteria(id));
+                .Where(new Criteria(row.IdField) == new ValueCriteria(id));
 
             editQuery(query);
 
@@ -156,7 +156,7 @@ namespace Serenity.Data
         public static int Count<TRow>(this IDbConnection connection)
             where TRow: class, IRow, new()
         {
-            return connection.Count<TRow>((Criteria)null);
+            return connection.Count<TRow>(null);
         }
 
         public static int Count<TRow>(this IDbConnection connection, ICriteria where)
@@ -177,7 +177,7 @@ namespace Serenity.Data
             return new SqlQuery()
                     .From(row)
                     .Select("1")
-                    .Where(new Criteria((IField)row.IdField) == new ValueCriteria(id))
+                    .Where(new Criteria(row.IdField) == new ValueCriteria(id))
                     .Exists(connection);
         }
 
@@ -233,7 +233,7 @@ namespace Serenity.Data
         public static void UpdateById<TRow>(this IDbConnection connection, TRow row, ExpectedRows expectedRows = ExpectedRows.One)
             where TRow: IIdRow
         {
-            var idField = (Field)row.IdField;
+            var idField = row.IdField;
             var r = (IRow)(object)row;
 
             if (idField.IsNull(r))
@@ -248,7 +248,7 @@ namespace Serenity.Data
         {
             var row = new TRow();
             return new SqlDelete(row.Table)
-                .Where((Field)row.IdField == new ValueCriteria(id))
+                .Where(row.IdField == new ValueCriteria(id))
                 .Execute(connection, expectedRows);
         }
 
@@ -262,7 +262,7 @@ namespace Serenity.Data
             insert.Set(row);
 
             if (row as IIdRow != null)
-                insert.IdentityColumn(((Field)(((IIdRow)row).IdField)).Name);
+                insert.IdentityColumn(row.IdField.Name);
 
             return insert;
         }
@@ -278,9 +278,9 @@ namespace Serenity.Data
 
             var update = new SqlUpdate(row.Table);
 
-            update.Set((IRow)row, (Field)(row.IdField));
-            var idField = (Field)row.IdField;
-            update.Where(idField == new ValueCriteria(idField.AsSqlValue((IRow)row)));
+            var idField = row.IdField;
+            update.Set(row, idField);
+            update.Where(idField == new ValueCriteria(idField.AsSqlValue(row)));
 
             return update;
         }

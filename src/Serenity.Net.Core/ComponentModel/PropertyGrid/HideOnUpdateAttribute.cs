@@ -13,7 +13,7 @@ namespace Serenity.ComponentModel
         /// <param name="value">True to hide field on update</param>
         public HideOnUpdateAttribute(bool value = true)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

@@ -66,7 +66,7 @@ namespace Serenity.Services
             {
                 if (Row.IsAnyFieldAssigned)
                 {
-                    var idField = (Field)Row.IdField;
+                    var idField = Row.IdField;
 
                     if (idField.IndexCompare(Old, Row) != 0)
                     {
@@ -98,7 +98,7 @@ namespace Serenity.Services
                 {
                     Connection.Insert(Row);
                     if (idField is object)
-                        Response.EntityId = ((Field)idField).AsObject(Row);
+                        Response.EntityId = idField.AsObject(Row);
                 }
 
                 InvalidateCacheOnCommit();
@@ -163,7 +163,7 @@ namespace Serenity.Services
                     connection: Connection,
                     row: displayOrderRow,
                     filter: GetDisplayOrderFilter(),
-                    recordID: ((Field)Row.IdField).AsObject(Row),
+                    recordID: Row.IdField.AsObject(Row),
                     newDisplayOrder: displayOrderRow.DisplayOrderField[Row].Value,
                     hasUniqueConstraint: false);
             }
@@ -214,7 +214,7 @@ namespace Serenity.Services
         {
             if (!PrepareQuery().GetFirst(Connection))
             {
-                var idField = (Field)(Row.IdField);
+                var idField = Row.IdField;
                 var id = Request.EntityId != null ?
                     idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
                     : idField.AsObject(Row);
@@ -231,7 +231,7 @@ namespace Serenity.Services
 
         protected virtual SqlQuery PrepareQuery()
         {
-            var idField = (Field)(Row.IdField);
+            var idField = Row.IdField;
             var id = Request.EntityId != null ?
                 idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
                 : idField.AsSqlValue(Row);
@@ -409,7 +409,7 @@ namespace Serenity.Services
                 var validators = field.CustomAttributes.OfType<ICustomValidator>();
                 foreach (var validator in validators)
                 {
-                    context.Value = field.AsObject(this.Row);
+                    context.Value = field.AsObject(Row);
 
                     var error = CustomValidate(context, field, validator);
 
@@ -437,7 +437,7 @@ namespace Serenity.Services
 
         protected virtual void ValidateAndClearIdField()
         {
-            var idField = (Field)(Row.IdField);
+            var idField = Row.IdField;
             if (Row.IsAssigned(idField))
                 Row.ValidateRequired(idField, Localizer);
 
@@ -467,11 +467,11 @@ namespace Serenity.Services
 
         protected virtual void InvalidateCacheOnCommit()
         {
-            BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, Row.GetFields().GenerationKey);
+            BatchGenerationUpdater.OnCommit(UnitOfWork, Context.Cache, Row.GetFields().GenerationKey);
             var attr = typeof(TRow).GetCustomAttribute<TwoLevelCachedAttribute>(false);
             if (attr != null)
                 foreach (var key in attr.GenerationKeys)
-                    BatchGenerationUpdater.OnCommit(this.UnitOfWork, Context.Cache, key);
+                    BatchGenerationUpdater.OnCommit(UnitOfWork, Context.Cache, key);
         }
 
         SaveResponse ISaveRequestProcessor.Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type)
@@ -500,28 +500,13 @@ namespace Serenity.Services
 
         public TSaveResponse Response { get; protected set; }
 
-        ISaveRequest ISaveRequestHandler.Request { get { return this.Request; } }
+        ISaveRequest ISaveRequestHandler.Request { get { return Request; } }
 
-        SaveResponse ISaveRequestHandler.Response { get { return this.Response; } }
+        SaveResponse ISaveRequestHandler.Response { get { return Response; } }
 
-        IRow ISaveRequestHandler.Old { get { return this.Old; } }
-        IRow ISaveRequestHandler.Row { get { return this.Row; } }
+        IRow ISaveRequestHandler.Old { get { return Old; } }
+        IRow ISaveRequestHandler.Row { get { return Row; } }
 
         public IDictionary<string, object> StateBag { get; private set; }
-    }
-
-    public class SaveRequestHandler<TRow> : SaveRequestHandler<TRow, SaveRequest<TRow>, SaveResponse>
-        where TRow : class, IRow, IIdRow, new()
-    {
-        public SaveRequestHandler(IRequestContext context)
-            : base(context)
-        {
-        }
-    }
-
-    [GenericHandlerType(typeof(SaveRequestHandler<>))]
-    public interface ISaveRequestProcessor : ISaveRequestHandler
-    {
-        SaveResponse Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type);
     }
 }

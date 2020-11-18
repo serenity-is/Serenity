@@ -7,6 +7,7 @@ namespace Serenity.Services
     /// <summary>
     /// Represents a ListRequestHandler. Is used with ListBehavior objects.
     /// </summary>
+    [GenericHandlerType(typeof(ListRequestHandler<>))]
     public interface IListRequestHandler : IRequestHandler
     {
         /// <summary>

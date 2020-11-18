@@ -44,7 +44,7 @@ namespace Serenity.Data
 
             foreach (var field in row.Fields)
                 if (!ReferenceEquals(field, exclude) && row.IsAssigned(field))
-                    self.Set((IField)field, field.AsSqlValue(row));
+                    self.Set(field, field.AsSqlValue(row));
 
             return self;
         }

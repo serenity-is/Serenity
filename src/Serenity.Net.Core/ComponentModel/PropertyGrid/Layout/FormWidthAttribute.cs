@@ -83,7 +83,7 @@ namespace Serenity.ComponentModel
 
         private void Set(string prefix, int cols)
         {
-            var parts = (this.Value ?? "").Split(' ');
+            var parts = (Value ?? "").Split(' ');
             var index = Array.FindIndex(parts, x =>
                 x.Length > prefix.Length &&
                 x.StartsWith(prefix) &&
@@ -95,25 +95,25 @@ namespace Serenity.ComponentModel
                 if (cols <= 0)
                     return;
 
-                if (!string.IsNullOrEmpty(this.Value))
-                    this.Value += " ";
-                this.Value += prefix + cols;
+                if (!string.IsNullOrEmpty(Value))
+                    Value += " ";
+                Value += prefix + cols;
             }
             else
             {
                 if (cols <= 0)
-                    this.Value = string.Join(" ", parts.Take(index).Concat(parts.Skip(index + 1)));
+                    Value = string.Join(" ", parts.Take(index).Concat(parts.Skip(index + 1)));
                 else
                 {
                     parts[index] = prefix + cols;
-                    this.Value = string.Join(" ", parts);
+                    Value = string.Join(" ", parts);
                 }
             }
         }
 
         private int? Get(string prefix)
         {
-            var klass = (this.Value ?? "").Split(' ')
+            var klass = (Value ?? "").Split(' ')
                 .FirstOrDefault(x =>
                     x.Length > prefix.Length &&
                     x.StartsWith(prefix) &&

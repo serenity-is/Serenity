@@ -16,7 +16,7 @@ namespace Serenity.Extensibility
         /// <param name="type">The type.</param>
         public BaseRegistrarAttribute(Type type)
         {
-            this.Type = type;
+            Type = type;
         }
 
         /// <summary>

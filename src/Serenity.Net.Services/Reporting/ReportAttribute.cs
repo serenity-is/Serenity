@@ -6,7 +6,7 @@ namespace Serenity.Reporting
     {
         public ReportAttribute(string reportKey = null)
         {
-            this.ReportKey = reportKey;
+            ReportKey = reportKey;
         }
 
         public string ReportKey { get; private set; }

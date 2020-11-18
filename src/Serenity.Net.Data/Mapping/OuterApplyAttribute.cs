@@ -17,8 +17,8 @@ namespace Serenity.Data.Mapping
         /// <param name="innerQuery">The inner query.</param>
         public OuterApplyAttribute(string alias, string innerQuery)
         {
-            this.Alias = alias;
-            this.InnerQuery = innerQuery;
+            Alias = alias;
+            InnerQuery = innerQuery;
         }
 
         /// <summary>

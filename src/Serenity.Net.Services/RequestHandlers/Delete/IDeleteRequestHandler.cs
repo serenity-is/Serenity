@@ -7,6 +7,7 @@ namespace Serenity.Services
     /// <summary>
     /// Represents a DeleteRequestHandler. Is used with DeleteBehavior objects.
     /// </summary>
+    [GenericHandlerType(typeof(DeleteRequestHandler<>))]
     public interface IDeleteRequestHandler : IRequestHandler
     {
         /// <summary>

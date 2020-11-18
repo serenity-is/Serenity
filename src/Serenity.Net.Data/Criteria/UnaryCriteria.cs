@@ -38,33 +38,33 @@
         /// <param name="query">The target query to add params to.</param>
         public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
-            switch (this.op)
+            switch (op)
             {
                 case CriteriaOperator.Paren:
                     sb.Append('(');
-                    this.operand.ToString(sb, query);
+                    operand.ToString(sb, query);
                     sb.Append(')');
                     break;
 
                 case CriteriaOperator.Not:
                     sb.Append("NOT (");
-                    this.operand.ToString(sb, query);
+                    operand.ToString(sb, query);
                     sb.Append(')');
                     break;
 
                 case CriteriaOperator.IsNull:
-                    this.operand.ToString(sb, query);
+                    operand.ToString(sb, query);
                     sb.Append(" IS NULL");
                     break;
 
                 case CriteriaOperator.IsNotNull:
-                    this.operand.ToString(sb, query);
+                    operand.ToString(sb, query);
                     sb.Append(" IS NOT NULL");
                     break;
 
                 case CriteriaOperator.Exists:
                     sb.Append("EXISTS (");
-                    this.operand.ToString(sb, query);
+                    operand.ToString(sb, query);
                     sb.Append(')');
                     break;
             }

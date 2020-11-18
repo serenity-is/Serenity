@@ -26,7 +26,7 @@ namespace Serenity.Data
             }
 
             if (!fields.isInitialized)
-                throw new ArgumentOutOfRangeException("fields", $"{this.GetType().FullName} constructor is called " +
+                throw new ArgumentOutOfRangeException("fields", $"{GetType().FullName} constructor is called " +
                     $"with a fields object that is not initialized. Please call .Init() method on it before using!");
 
             this.fields = fields;

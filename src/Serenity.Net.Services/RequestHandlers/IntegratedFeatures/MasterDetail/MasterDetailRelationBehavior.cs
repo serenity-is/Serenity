@@ -1,5 +1,4 @@
-﻿#if TODO
-using Serenity;
+﻿using Serenity;
 using Serenity.Data;
 using Serenity.Data.Mapping;
 using System;
@@ -15,6 +14,7 @@ namespace Serenity.Services
     {
         public Field Target { get; set; }
 
+        private readonly IDefaultHandlerFactory handlerFactory;
         private MasterDetailRelationAttribute attr;
         private Func<IList> rowListFactory;
         private Func<IRow> rowFactory;
@@ -28,9 +28,14 @@ namespace Serenity.Services
         private BaseCriteria queryCriteria;
         private HashSet<string> includeColumns;
 
+        public MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
+        {
+            this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
+        }
+
         public bool ActivateFor(IRow row)
         {
-            if (ReferenceEquals(null, Target))
+            if (Target is null)
                 return false;
 
             attr = Target.GetAttribute<MasterDetailRelationAttribute>();
@@ -64,7 +69,8 @@ namespace Serenity.Services
                 // Use field from AltIdField
                 masterKeyField = row.FindFieldByPropertyName(attr.MasterKeyField) ??
                     row.FindField(attr.MasterKeyField);
-                if (ReferenceEquals(masterKeyField, null))
+
+                if (masterKeyField is null)
                     throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified for a master detail relation in field '{2}'.",
                         attr.MasterKeyField, row.GetType().FullName,
@@ -73,54 +79,54 @@ namespace Serenity.Services
             else
             {
                 // Default behaviour: use id field
-                masterKeyField = (Field)((row as IIdRow).IdField);
+                masterKeyField = row.IdField;
             }
 
             var detailRow = rowFactory();
             foreignKeyField = detailRow.FindFieldByPropertyName(attr.ForeignKey) ??
                 detailRow.FindField(attr.ForeignKey);
 
-            if (ReferenceEquals(foreignKeyField, null))
+            if (foreignKeyField is null)
                 throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a master detail relation in field '{2}' of row type '{3}'.",
                     attr.ForeignKey, detailRow.GetType().FullName,
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
 
-            this.foreignKeyCriteria = new Criteria(foreignKeyField.PropertyName ?? foreignKeyField.Name);
+            foreignKeyCriteria = new Criteria(foreignKeyField.PropertyName ?? foreignKeyField.Name);
 
             if (!string.IsNullOrEmpty(attr.FilterField))
             {
-                this.filterField = detailRow.FindFieldByPropertyName(attr.FilterField) ?? detailRow.FindField(attr.FilterField);
-                if (ReferenceEquals(null, this.filterField))
+                filterField = detailRow.FindFieldByPropertyName(attr.FilterField) ?? detailRow.FindField(attr.FilterField);
+                if (filterField is null)
                     throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified for a master detail relation as FilterField in field '{2}' of row type '{3}'.",
                         attr.FilterField, detailRow.GetType().FullName,
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
 
-                this.filterCriteria = new Criteria(filterField.PropertyName ?? filterField.Name);
-                this.filterValue = filterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
-                if (this.filterValue == null)
+                filterCriteria = new Criteria(filterField.PropertyName ?? filterField.Name);
+                filterValue = filterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
+                if (filterValue == null)
                 {
-                    this.filterCriteria = this.filterCriteria.IsNull();
-                    this.queryCriteria = this.filterField.IsNull();
+                    filterCriteria = filterCriteria.IsNull();
+                    queryCriteria = filterField.IsNull();
                 }
                 else
                 {
-                    this.filterCriteria = this.filterCriteria == new ValueCriteria(this.filterValue);
-                    this.queryCriteria = this.filterField == new ValueCriteria(this.filterValue);
+                    filterCriteria = filterCriteria == new ValueCriteria(filterValue);
+                    queryCriteria = filterField == new ValueCriteria(filterValue);
                 }
             }
 
-            queryCriteria = queryCriteria & ServiceQueryHelper.GetNotDeletedCriteria(detailRow);
+            queryCriteria &= ServiceQueryHelper.GetNotDeletedCriteria(detailRow);
 
-            this.includeColumns = new HashSet<string>();
+            includeColumns = new HashSet<string>();
 
             if (!string.IsNullOrEmpty(attr.IncludeColumns))
                 foreach (var s in attr.IncludeColumns.Split(','))
                 {
                     var col = s.TrimToNull();
                     if (col != null)
-                        this.includeColumns.Add(col);
+                        includeColumns.Add(col);
                 }
 
             return true;
@@ -138,15 +144,15 @@ namespace Serenity.Services
 
         public void OnReturn(IRetrieveRequestHandler handler)
         {
-            if (ReferenceEquals(null, Target) ||
+            if (Target is null ||
                 !handler.AllowSelectField(Target) ||
                 !handler.ShouldSelectField(Target))
                 return;
 
-            var listHandler = DefaultHandlerFactory.ListHandlerFor(rowType);
-            var listRequest = DefaultHandlerFactory.ListRequestFor(rowType);
-            listRequest.ColumnSelection = this.attr.ColumnSelection;
-            listRequest.IncludeColumns = this.includeColumns;
+            var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
+            var listRequest = listHandler.CreateRequest();
+            listRequest.ColumnSelection = attr.ColumnSelection;
+            listRequest.IncludeColumns = includeColumns;
             listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria;
 
             IListResponse response = listHandler.Process(handler.Connection, listRequest);
@@ -160,16 +166,16 @@ namespace Serenity.Services
 
         public void OnReturn(IListRequestHandler handler)
         {
-            if (ReferenceEquals(null, Target) ||
+            if (Target is null ||
                 !handler.AllowSelectField(Target) ||
                 !handler.ShouldSelectField(Target) ||
                 handler.Response.Entities.IsEmptyOrNull())
                 return;
 
-            var listHandler = DefaultHandlerFactory.ListHandlerFor(rowType);
-            var listRequest = DefaultHandlerFactory.ListRequestFor(rowType);
-            listRequest.ColumnSelection = this.attr.ColumnSelection;
-            listRequest.IncludeColumns = this.includeColumns;
+            var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
+            var listRequest = listHandler.CreateRequest();
+            listRequest.ColumnSelection = attr.ColumnSelection;
+            listRequest.IncludeColumns = includeColumns;
 
             var enumerator = handler.Response.Entities.Cast<IRow>();
             while (true)
@@ -206,21 +212,21 @@ namespace Serenity.Services
             detail = detail.Clone();
 
             foreignKeyField.AsObject(detail, masterId);
-            if (!ReferenceEquals(null, filterField))
+            if (filterField is object)
                 filterField.AsObject(detail, filterValue);
 
-            ((Field)((IIdRow)detail).IdField).AsObject(detail, detailId);
+            detail.IdField.AsObject(detail, detailId);
 
-            var saveHandler = DefaultHandlerFactory.SaveHandlerFor(rowType);
-            var saveRequest = DefaultHandlerFactory.SaveRequestFor(rowType);
+            var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(rowType);
+            var saveRequest = saveHandler.CreateRequest();
             saveRequest.Entity = detail;
             saveHandler.Process(uow, saveRequest, detailId == null ? SaveRequestType.Create : SaveRequestType.Update);
         }
 
         private void DeleteDetail(IUnitOfWork uow, object detailId)
         {
-            var deleteHandler = DefaultHandlerFactory.DeleteHandlerFor(rowType);
-            var deleteRequest = DefaultHandlerFactory.DeleteRequestFor(rowType);
+            var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessor>(rowType);
+            var deleteRequest = deleteHandler.CreateRequest();
             deleteRequest.EntityId = detailId;
             deleteHandler.Process(uow, deleteRequest);
         }
@@ -235,10 +241,8 @@ namespace Serenity.Services
 
         private void DetailListSave(IUnitOfWork uow, object masterId, IList oldList, IList newList)
         {
-            var row = oldList.Count > 0 ? oldList[0] : 
-                (newList.Count > 0) ? newList[0] : null;
-
-            if (row == null)
+            if (!((oldList.Count > 0 ? oldList[0] :
+                (newList.Count > 0) ? newList[0] : null) is IRow row))
                 return;
 
             if (oldList.Count == 0)
@@ -249,7 +253,7 @@ namespace Serenity.Services
                 return;
             }
 
-            var rowIdField = (Field)((row as IIdRow).IdField);
+            var rowIdField = row.IdField;
 
             if (newList.Count == 0)
             {
@@ -259,11 +263,11 @@ namespace Serenity.Services
                 return;
             }
 
-            var oldById = new Dictionary<string, Row>(oldList.Count);
+            var oldById = new Dictionary<string, IRow>(oldList.Count);
             foreach (IRow item in oldList)
                 oldById[AsString(rowIdField.AsObject(item))] = item;
 
-            var newById = new Dictionary<string, Row>(newList.Count);
+            var newById = new Dictionary<string, IRow>(newList.Count);
             foreach (IRow item in newList)
             {
                 var idStr = AsString(rowIdField.AsObject(item));
@@ -285,8 +289,7 @@ namespace Serenity.Services
                 var id = rowIdField.AsObject(item);
                 var idStr = AsString(id);
 
-                IRow old;
-                if (string.IsNullOrEmpty(idStr) || !oldById.TryGetValue(idStr, out old))
+                if (string.IsNullOrEmpty(idStr) || !oldById.TryGetValue(idStr, out IRow old))
                     continue;
 
                 if (attr.CheckChangesOnUpdate)
@@ -321,8 +324,7 @@ namespace Serenity.Services
 
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
-            var newList = Target.AsObject(handler.Row) as IList;
-            if (newList == null)
+            if (!(Target.AsObject(handler.Row) is IList newList))
                 return;
 
             var masterId = masterKeyField.AsObject(handler.Row);
@@ -348,7 +350,7 @@ namespace Serenity.Services
                 new SqlQuery()
                         .Dialect(handler.Connection.GetDialect())
                         .From(row)
-                        .Select((Field)rowIdField)
+                        .Select(rowIdField)
                         .Where(
                             foreignKeyField == new ValueCriteria(masterKeyField.AsSqlValue(handler.Row)) &
                             queryCriteria)
@@ -359,8 +361,8 @@ namespace Serenity.Services
             }
             else
             {
-                var listHandler = DefaultHandlerFactory.ListHandlerFor(rowType);
-                var listRequest = DefaultHandlerFactory.ListRequestFor(rowType);
+                var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
+                var listRequest = listHandler.CreateRequest();
                 listRequest.ColumnSelection = ColumnSelection.List;
                 listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria;
 
@@ -374,7 +376,7 @@ namespace Serenity.Services
 
         public override void OnBeforeDelete(IDeleteRequestHandler handler)
         {
-            if (ReferenceEquals(null, Target) ||
+            if (Target is null ||
                 (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
                 return;
 
@@ -382,16 +384,16 @@ namespace Serenity.Services
                 return;
 
             var row = rowFactory();
-            var rowIdField = (Field)((row as IIdRow).IdField);
+            var rowIdField = row.IdField;
 
             var deleteList = new List<object>();
             new SqlQuery()
                     .Dialect(handler.Connection.GetDialect())
                     .From(row)
-                    .Select((Field)rowIdField)
+                    .Select(rowIdField)
                     .Where(
-                            foreignKeyField == new ValueCriteria(masterKeyField.AsSqlValue(handler.Row)) &
-                            queryCriteria)
+                        foreignKeyField == new ValueCriteria(masterKeyField.AsSqlValue(handler.Row)) &
+                        queryCriteria)
                     .ForEach(handler.Connection, () =>
                     {
                         deleteList.Add(rowIdField.AsObject(row));
@@ -402,4 +404,3 @@ namespace Serenity.Services
         }
     }
 }
-#endif

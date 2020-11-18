@@ -6,52 +6,52 @@ namespace Serenity.Data
     {
         public BaseCriteria IsNull()
         {
-            return this.Criteria.IsNull();
+            return Criteria.IsNull();
         }
 
         public BaseCriteria IsNotNull()
         {
-            return this.Criteria.IsNotNull();
+            return Criteria.IsNotNull();
         }
 
         public BaseCriteria Like(string mask)
         {
-            return this.Criteria.Like(mask);
+            return Criteria.Like(mask);
         }
 
         public BaseCriteria NotLike(string mask)
         {
-            return this.Criteria.NotLike(mask);
+            return Criteria.NotLike(mask);
         }
 
         public BaseCriteria StartsWith(string mask)
         {
-            return this.Criteria.StartsWith(mask);
+            return Criteria.StartsWith(mask);
         }
 
         public BaseCriteria EndsWith(string mask)
         {
-            return this.Criteria.EndsWith(mask);
+            return Criteria.EndsWith(mask);
         }
 
         public BaseCriteria Contains(string mask)
         {
-            return this.Criteria.Contains(mask);
+            return Criteria.Contains(mask);
         }
 
         public BaseCriteria NotContains(string mask)
         {
-            return this.criteria.NotContains(mask);
+            return criteria.NotContains(mask);
         }
 
         public BaseCriteria In<T>(params T[] values)
         {
-            return this.Criteria.In(values);
+            return Criteria.In(values);
         }
 
         public BaseCriteria NotIn<T>(params T[] values)
         {
-            return this.Criteria.NotIn(values);
+            return Criteria.NotIn(values);
         }
 
         public static BaseCriteria operator ==(Field field, BaseCriteria criteria)

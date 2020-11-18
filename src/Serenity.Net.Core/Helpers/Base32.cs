@@ -172,7 +172,7 @@ namespace Serenity.Data
                 nextByte = (byte)((digit & 3) << 6);
                 if (i >= len)
                 {
-                    if (nextByte != (byte)0)
+                    if (nextByte != 0)
                     {
                         throw new ArgumentException(errorCanonicalEnd);
                     }
@@ -210,7 +210,7 @@ namespace Serenity.Data
                 nextByte = (byte)((digit & 15) << 4);
                 if (i >= len)
                 {
-                    if (nextByte != (byte)0)
+                    if (nextByte != 0)
                     {
                         throw new ArgumentException(errorCanonicalEnd);
                     }
@@ -233,7 +233,7 @@ namespace Serenity.Data
                 nextByte = (byte)((digit & 1) << 7);
                 if (i >= len)
                 {
-                    if (nextByte != (byte)0)
+                    if (nextByte != 0)
                     {
                         throw new ArgumentException(errorCanonicalEnd);
                     }
@@ -271,7 +271,7 @@ namespace Serenity.Data
                 nextByte = (byte)((digit & 7) << 5);
                 if (i >= len)
                 {
-                    if (nextByte != (byte)0)
+                    if (nextByte != 0)
                     {
                         throw new ArgumentException(errorCanonicalEnd);
                     }

@@ -22,7 +22,7 @@ namespace Serenity.ComponentModel
             if (key.IsEmptyOrNull())
                 throw new ArgumentNullException("key");
 
-            this.Key = key;
+            Key = key;
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace Serenity.ComponentModel
         /// <param name="value">if set to <c>true</c> (default) field is not filterable.</param>
         public NotFilterableAttribute(bool value = true)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

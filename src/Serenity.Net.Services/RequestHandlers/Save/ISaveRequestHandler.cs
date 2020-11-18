@@ -7,6 +7,7 @@ namespace Serenity.Services
     /// <summary>
     /// Represents a SaveRequestHandler. Is used with SaveBehavior objects.
     /// </summary>
+    [GenericHandlerType(typeof(SaveRequestHandler<>))]
     public interface ISaveRequestHandler : IRequestHandler
     {
         /// <summary>

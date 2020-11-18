@@ -424,7 +424,7 @@
             if (string.IsNullOrEmpty(columnName))
                 throw new ArgumentNullException("columnName");
 
-            this.Select(expression.ToString(), columnName);
+            Select(expression.ToString(), columnName);
 
             return this;
         }
@@ -439,7 +439,7 @@
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            this.Select(expression.ToString());
+            Select(expression.ToString());
 
             return this;
         }
@@ -485,7 +485,7 @@
         /// A new query that shares parameters.</returns>
         public SqlQuery SubQuery()
         {
-            return this.CreateSubQuery<SqlQuery>();
+            return CreateSubQuery<SqlQuery>();
         }
 
         /// <summary>
@@ -523,26 +523,26 @@
         /// <returns></returns>
         public SqlQuery Union(SqlUnionType unionType = SqlUnionType.Union)
         {
-            this.unionQuery = this.Clone();
-            this.unionQuery.countRecords = false;
-            this.unionQuery.parent = this;
-            this.unionQuery.parameters = null;
+            unionQuery = Clone();
+            unionQuery.countRecords = false;
+            unionQuery.parent = this;
+            unionQuery.parameters = null;
             this.unionType = unionType;
-            this.columns = new List<Column>();
-            this.from = new StringBuilder();
-            this.aliasExpressions = null;
-            this.aliasWithJoins = null;
-            this.distinct = false;
-            this.having = null;
-            this.groupBy = null;
-            this.orderBy = null;
-            this.forXml = null;
-            this.forJson = null;
-            this.skip = 0;
-            this.take = 0;
-            this.where = null;
-            this.intoIndex = -1;
-            this.into = new List<object>();
+            columns = new List<Column>();
+            from = new StringBuilder();
+            aliasExpressions = null;
+            aliasWithJoins = null;
+            distinct = false;
+            having = null;
+            groupBy = null;
+            orderBy = null;
+            forXml = null;
+            forJson = null;
+            skip = 0;
+            take = 0;
+            where = null;
+            intoIndex = -1;
+            into = new List<object>();
             return this;
         }
 
@@ -589,7 +589,7 @@
         /// <param name="expression">An expression</param>
         void IFilterableQuery.Where(string expression)
         {
-            this.Where(expression);
+            Where(expression);
         }
 
         /// <summary>
@@ -653,7 +653,7 @@
 
         int ISqlQueryExtensible.GetSelectIntoIndex(IField field)
         {
-            return this.columns.FindIndex(
+            return columns.FindIndex(
                 delegate (Column s) { return s.IntoField == field; });
         }
 
@@ -695,10 +695,10 @@
             /// <param name="intoField">The select into field.</param>
             public Column(string expression, string columnName, int intoRow, object intoField)
             {
-                this.Expression = expression;
-                this.ColumnName = columnName;
-                this.IntoRowIndex = intoRow;
-                this.IntoField = intoField;
+                Expression = expression;
+                ColumnName = columnName;
+                IntoRowIndex = intoRow;
+                IntoField = intoField;
             }
 
             /// <summary>

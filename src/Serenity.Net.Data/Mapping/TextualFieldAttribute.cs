@@ -16,7 +16,7 @@ namespace Serenity.Data.Mapping
         /// <param name="value">The value.</param>
         public TextualFieldAttribute(string value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace Serenity.Data.Mapping
         /// <param name="alias">Foreign join alias</param>
         public LeftJoinAttribute(string alias)
         {
-            this.Alias = alias;
+            Alias = alias;
         }
 
         /// <summary>
@@ -28,9 +28,9 @@ namespace Serenity.Data.Mapping
         /// this parameter is the ON criteria of the left join statement.</param>
         public LeftJoinAttribute(string alias, string toTable, string onCriteria)
         {
-            this.Alias = alias;
-            this.ToTable = toTable;
-            this.OnCriteria = onCriteria;
+            Alias = alias;
+            ToTable = toTable;
+            OnCriteria = onCriteria;
         }
 
         /// <summary>

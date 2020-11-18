@@ -15,7 +15,7 @@ namespace Serenity.ComponentModel
         /// <param name="value">if set to <c>true</c> (default) indicates this field is filter only.</param>
         public FilterOnlyAttribute(bool value = true)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

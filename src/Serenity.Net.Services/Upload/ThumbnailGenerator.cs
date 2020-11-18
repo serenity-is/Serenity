@@ -48,9 +48,9 @@ namespace Serenity.Web
             }
             
             // calculate thumb width / source image width
-            double horizontalScale = ((double)thumbWidth) / ((double)imageWidth);
+            double horizontalScale = thumbWidth / ((double)imageWidth);
             // calculate thumb height / source image height
-            double verticalScale = ((double)thumbHeight) / ((double)imageHeight);
+            double verticalScale = thumbHeight / ((double)imageHeight);
 
             // if thumb width is zero, thumb height is not zero
             // so calculate width by aspect ratio, do similar
@@ -58,13 +58,13 @@ namespace Serenity.Web
             // ratio of source and thumb will be same
             if (thumbWidth == 0)
             {
-                thumbWidth = Convert.ToInt32((double)imageWidth * verticalScale);
+                thumbWidth = Convert.ToInt32(imageWidth * verticalScale);
                 horizontalScale = verticalScale;
                 mode = ImageScaleMode.StretchToFit;
             }
             else if (thumbHeight == 0)
             {
-                thumbHeight = Convert.ToInt32((double)imageHeight * horizontalScale);
+                thumbHeight = Convert.ToInt32(imageHeight * horizontalScale);
                 verticalScale = horizontalScale;
                 mode = ImageScaleMode.StretchToFit;
             }
@@ -92,13 +92,13 @@ namespace Serenity.Web
                 // otherwise take all of the source image horizontally, and central part of it vertically
                 if (horizontalScale <= verticalScale)
                 {
-                    cropSize = Convert.ToInt32((double)thumbWidth / verticalScale);
+                    cropSize = Convert.ToInt32(thumbWidth / verticalScale);
                     imageRect.X = (imageRect.Width - cropSize) / 2;
                     imageRect.Width = cropSize;
                 }
                 else
                 {
-                    cropSize = Convert.ToInt32((double)thumbHeight / horizontalScale);
+                    cropSize = Convert.ToInt32(thumbHeight / horizontalScale);
                     imageRect.Y = (imageRect.Height - cropSize) / 2;
                     imageRect.Height = cropSize;
                 }
@@ -140,16 +140,14 @@ namespace Serenity.Web
                     thumb.SetResolution(xDPI, yDPI);
                 }
 
-                using (Graphics g = Graphics.FromImage(thumb))
-                {
-                    // high quality parameters
-                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                using Graphics g = Graphics.FromImage(thumb);
+                // high quality parameters
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
-                    g.Clear(backgroundColor);
-                    g.DrawImage(image, thumbRect, imageRect, GraphicsUnit.Pixel);
-                }
+                g.Clear(backgroundColor);
+                g.DrawImage(image, thumbRect, imageRect, GraphicsUnit.Pixel);
             }
             catch
             {               
@@ -175,10 +173,8 @@ namespace Serenity.Web
             Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
             if (width > 0 && height > 0 && color != Color.Empty)
             {
-                using (Graphics g = Graphics.FromImage(bitmap))
-                {
-                    g.Clear(color);
-                }
+                using Graphics g = Graphics.FromImage(bitmap);
+                g.Clear(color);
             }
             return bitmap;
         }

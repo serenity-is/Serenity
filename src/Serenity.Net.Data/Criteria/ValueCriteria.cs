@@ -74,7 +74,7 @@
             }
             else
             {
-                sb.Append(AddParam(query, this.value).Name);
+                sb.Append(AddParam(query, value).Name);
             }
         }
 

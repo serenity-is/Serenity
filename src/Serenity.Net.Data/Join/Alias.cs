@@ -81,7 +81,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("alias");
 
             this.alias = alias;
-            this.aliasDot = alias + ".";
+            aliasDot = alias + ".";
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace Serenity.Data
         /// <returns>Expression like t0.fieldName</returns>
         public string this[string fieldName]
         {
-            get { return this.aliasDot + fieldName; }
+            get { return aliasDot + fieldName; }
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Serenity.Data
                 if (field == null)
                     throw new ArgumentNullException("field");
 
-                return this.aliasDot + field.Name;
+                return aliasDot + field.Name;
             }
         }
 

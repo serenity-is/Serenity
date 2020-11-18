@@ -20,14 +20,14 @@ namespace Serenity.Services
 
         object ISaveRequest.Entity
         {
-            get { return this.Entity; }
-            set { this.Entity = (TEntity)value; }
+            get { return Entity; }
+            set { Entity = (TEntity)value; }
         }
 
         IDictionary ISaveRequest.Localizations
         {
-            get { return this.Localizations; }
-            set { this.Localizations = (Dictionary<string, TEntity>) value; }
+            get { return Localizations; }
+            set { Localizations = (Dictionary<string, TEntity>) value; }
         }
     }
 }

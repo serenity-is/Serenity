@@ -37,8 +37,8 @@ namespace Serenity.ComponentModel
         /// <param name="value">The value.</param>
         protected void SetOption(string key, object value)
         {
-            this.options ??= new Dictionary<string, object>();
-            this.options[key] = value;
+            options ??= new Dictionary<string, object>();
+            options[key] = value;
         }
 
         /// <summary>

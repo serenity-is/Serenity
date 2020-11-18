@@ -13,7 +13,7 @@ namespace Serenity.ComponentModel
         /// </summary>
         public ResizableAttribute()
         {
-            this.Value = true;
+            Value = true;
         }
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace Serenity.ComponentModel
         /// <param name="value">if set to <c>true</c> [value].</param>
         public ResizableAttribute(bool value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

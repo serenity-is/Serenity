@@ -18,7 +18,7 @@ namespace Serenity.Data.Mapping
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
-            this.Name = name;
+            Name = name;
         }
 
         /// <summary>

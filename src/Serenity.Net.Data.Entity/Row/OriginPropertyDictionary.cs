@@ -25,7 +25,7 @@ namespace Serenity.Data
         public OriginPropertyDictionary(Type rowType)
         {
             this.rowType = rowType;
-            this.rowJoinByAlias = new Dictionary<string, ISqlJoin>(StringComparer.OrdinalIgnoreCase);
+            rowJoinByAlias = new Dictionary<string, ISqlJoin>(StringComparer.OrdinalIgnoreCase);
 
             propertyByName = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
             foreach (var pi in rowType.GetProperties(BindingFlags.Public | BindingFlags.Instance))

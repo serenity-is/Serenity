@@ -12,7 +12,7 @@ namespace Serenity.ComponentModel
         /// </summary>
         public EditLinkAttribute()
         {
-            this.Value = true;
+            Value = true;
         }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Serenity.ComponentModel
         /// <param name="value">True if edit link should be enabled</param>
         public EditLinkAttribute(bool value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

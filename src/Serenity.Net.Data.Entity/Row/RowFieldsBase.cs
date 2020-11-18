@@ -383,7 +383,7 @@ namespace Serenity.Data
                             if (display != null)
                                 field.Caption = new LocalText(display.DisplayName);
 
-                            if ((int)addFlags != 0 || (int)removeFlags != 0)
+                            if (addFlags != 0 || removeFlags != 0)
                                 field.Flags = (field.Flags ^ removeFlags) | addFlags;
 
                             if (column != null && string.Compare(column.Name, field.Name, StringComparison.OrdinalIgnoreCase) != 0)
@@ -852,11 +852,11 @@ namespace Serenity.Data
 
             if (row is IIdRow && idField is null)
                 throw new ArgumentOutOfRangeException(nameof(IdField),
-                    $"Row type {this.GetType().FullName} has IIdRow interface but does not have a field with [IdProperty] attribute!");
+                    $"Row type {GetType().FullName} has IIdRow interface but does not have a field with [IdProperty] attribute!");
 
             if (row is INameRow && nameField is null)
                 throw new ArgumentOutOfRangeException(nameof(IdField),
-                    $"Row type {this.GetType().FullName} has INameRow interface but does not have a field with [NameProperty] attribute!");
+                    $"Row type {GetType().FullName} has INameRow interface but does not have a field with [NameProperty] attribute!");
 
             var readPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
             if (readPerm != null && readPerm.Permission != null && !readPerm.ApplyToLookups)

@@ -51,7 +51,7 @@ namespace Serenity.Data
             {
                 propertyChanged += value;
                 if (previousValues == null)
-                    previousValues = this.CloneRow();
+                    previousValues = CloneRow();
             }
             remove
             {
@@ -64,7 +64,7 @@ namespace Serenity.Data
             TrackAssignments = true;
 
             if (originalValues == null)
-                originalValues = this.CloneRow();
+                originalValues = CloneRow();
         }
 
         public void CancelEdit()

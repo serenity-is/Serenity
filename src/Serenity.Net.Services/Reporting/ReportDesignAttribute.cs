@@ -6,7 +6,7 @@ namespace Serenity.Reporting
     {
         public ReportDesignAttribute(string design)
         {
-            this.Design = design;
+            Design = design;
         }
 
         public string Design { get; private set; }

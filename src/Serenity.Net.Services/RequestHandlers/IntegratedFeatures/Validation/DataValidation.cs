@@ -98,10 +98,9 @@ namespace Serenity.Services
 
         public static ValidationError InvalidIdError(IRow row, Field field, ITextLocalizer localizer)
         {
-            var fld = (Field)field;
-            return new ValidationError("InvalidId", fld.Name, 
+            return new ValidationError("InvalidId", field.Name, 
                 Texts.Validation.FieldInvalidValue.ToString(localizer), 
-                fld.GetTitle(localizer), ((Field)field).AsObject(row));
+                field.GetTitle(localizer), field.AsObject(row));
         }
 
         public static ValidationError InvalidIdError(Field field, long value, ITextLocalizer localizer)

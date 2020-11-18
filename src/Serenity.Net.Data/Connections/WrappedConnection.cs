@@ -98,9 +98,9 @@ namespace Serenity.Data
 
         internal void Release(WrappedTransaction transaction)
         {
-            if (this.currentTransaction == transaction)
+            if (currentTransaction == transaction)
             {
-                this.currentTransaction = null;
+                currentTransaction = null;
             }
         }
 

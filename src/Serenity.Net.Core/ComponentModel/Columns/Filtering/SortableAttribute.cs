@@ -14,7 +14,7 @@ namespace Serenity.ComponentModel
         /// <param name="value">if set to <c>true</c> (default) sorting is enabled.</param>
         public SortableAttribute(bool value = true)
         {
-            this.Value = value;
+            Value = value;
         }
 
         /// <summary>

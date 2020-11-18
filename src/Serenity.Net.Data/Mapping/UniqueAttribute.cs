@@ -15,7 +15,7 @@ namespace Serenity.Data.Mapping
         public UniqueAttribute()
             : base(FieldFlags.Unique)
         {
-            this.CheckBeforeSave = true;
+            CheckBeforeSave = true;
         }
 
         /// <summary>
