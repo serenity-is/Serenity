@@ -90,10 +90,10 @@ namespace Serenity.Data
                         onCriteria = new Criteria(mapExpression(join.Value.OnCriteria.ToString()));
                 }
 
-                new ReplacedJoin(result.Joins, 
-                    mapExpression(join.Value.Table), 
+                new ReplacedJoin(result.Joins,
+                    mapExpression(join.Value.Table),
                     mapAlias(join.Value.Name),
-                    onCriteria, 
+                    onCriteria,
                     join.Value.GetKeyword());
             }
 
@@ -108,7 +108,7 @@ namespace Serenity.Data
         {
             private readonly string keyword;
 
-            public ReplacedJoin(IDictionary<string, Join> joins, 
+            public ReplacedJoin(IDictionary<string, Join> joins,
                 string toTable, string alias, ICriteria onCriteria, string keyword)
                 : base(joins, toTable, alias, onCriteria)
             {

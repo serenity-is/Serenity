@@ -13,11 +13,11 @@
     using System.Reflection;
     using System.Security.Claims;
 
-    public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestProcessor, 
+    public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestProcessor,
         IRequestHandler<TRow>, IRequestType<TListRequest>, IResponseType<TListResponse>
-        where TRow: class, IRow, new()
-        where TListRequest: ListRequest
-        where TListResponse: ListResponse<TRow>, new()
+        where TRow : class, IRow, new()
+        where TListRequest : ListRequest
+        where TListResponse : ListResponse<TRow>, new()
     {
         protected TRow Row;
         protected TListRequest Request;
@@ -69,7 +69,7 @@
                 return DistinctFields.Contains(field);
 
             var mode = field.MinSelectLevel;
-            
+
             if (mode == SelectLevel.Always)
                 return true;
 
@@ -153,7 +153,7 @@
                     SelectField(query, field);
             }
         }
-    
+
         protected virtual void PrepareQuery(SqlQuery query)
         {
             SelectFields(query);
@@ -198,8 +198,8 @@
 
             var field = Row.FindField(containsField) ?? Row.FindFieldByPropertyName(containsField);
             if (field is null ||
-                ((field.MinSelectLevel == SelectLevel.Never) && 
-                    (field.CustomAttributes == null || 
+                ((field.MinSelectLevel == SelectLevel.Never) &&
+                    (field.CustomAttributes == null ||
                      !field.CustomAttributes.OfType<QuickSearchAttribute>().Any())))
             {
                 throw new ArgumentOutOfRangeException("containsField");
@@ -208,7 +208,7 @@
             return new Field[] { field };
         }
 
-        protected virtual void AddFieldContainsCriteria(Field field, string containsText, long? id, 
+        protected virtual void AddFieldContainsCriteria(Field field, string containsText, long? id,
             SearchType searchType, bool numericOnly, ref BaseCriteria criteria, ref bool orFalse)
         {
             if (numericOnly == true && (id == null))
@@ -372,7 +372,7 @@
                 field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
                 field.Flags.HasFlag(FieldFlags.NotMapped))
             {
-                throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name, 
+                throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name,
                     $"Can't apply equality filter on field {field.PropertyName ?? field.Name}");
             }
 
@@ -401,7 +401,7 @@
             if (value is string str && str.Length == 0)
                 return true;
 
-            if (!(value is string) && value is IEnumerable && 
+            if (!(value is string) && value is IEnumerable &&
                 !(value as IEnumerable).GetEnumerator().MoveNext())
                 return true;
 
@@ -552,7 +552,7 @@
             if (DistinctFields == null)
                 ApplyKeyOrder(query);
 
-            query.ApplySkipTakeAndCount(request.Skip, request.Take, 
+            query.ApplySkipTakeAndCount(request.Skip, request.Take,
                 request.ExcludeTotalCount || DistinctFields != null);
 
             ApplyContainsText(query, request.ContainsText);

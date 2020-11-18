@@ -1,14 +1,14 @@
-﻿using System;
-using System.Data;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
-using Newtonsoft.Json;
 
 namespace Serenity.Data
 {
     public sealed class DoubleField : GenericValueField<Double>
     {
-        public DoubleField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public DoubleField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, Double?> getValue = null, Action<IRow, Double?> setValue = null)
             : base(collection, FieldType.Double, name, caption, size, flags, getValue, setValue)
         {

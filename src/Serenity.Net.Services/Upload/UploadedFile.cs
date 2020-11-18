@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Serenity.IO;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class UploadedFile
     {

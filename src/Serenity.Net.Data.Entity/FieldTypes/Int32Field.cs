@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
-using Newtonsoft.Json;
 
 namespace Serenity.Data
 {
     public class Int32Field : GenericValueField<int>
     {
-        public Int32Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public Int32Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, int?> getValue = null, Action<IRow, int?> setValue = null)
             : base(collection, FieldType.Int32, name, caption, size, flags, getValue, setValue)
         {
@@ -101,7 +101,7 @@ namespace Serenity.Data
                         _setValue(row, (int)ConvertEnumFromInt(EnumType, v));
                     break;
                 case JsonToken.String:
-                    string s = ((string)reader.Value).TrimToNull();                  
+                    string s = ((string)reader.Value).TrimToNull();
                     if (s == null)
                         _setValue(row, null);
                     else if (EnumType == null)

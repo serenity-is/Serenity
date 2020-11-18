@@ -68,7 +68,7 @@ namespace Serenity.Data
 
                     if (_newById.Contains(id.Value))
                         throw new ArgumentException("newItemId");
-     
+
                     _newById.Add(id.Value);
                 }
             }

@@ -1,7 +1,6 @@
 ﻿
 namespace Serenity
 {
-    using Serenity.Abstractions;
     using System;
 
     /// <summary>

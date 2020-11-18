@@ -22,7 +22,7 @@ namespace Serenity.PropertyGrid
                 }
                 else if (valueType == typeof(DateTime) || valueType == typeof(DateTime?))
                 {
-                    if (basedOnField is object && 
+                    if (basedOnField is object &&
                         basedOnField is DateTimeField dtf &&
                         !dtf.DateOnly)
                         item.FormatterType = "DateTime";
@@ -61,6 +61,6 @@ namespace Serenity.PropertyGrid
 
                 item.FormatterParams[key] = param.Value;
             }
-        } 
+        }
     }
 }

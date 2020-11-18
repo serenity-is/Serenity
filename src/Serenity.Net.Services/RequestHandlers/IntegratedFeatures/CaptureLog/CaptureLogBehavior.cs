@@ -48,7 +48,7 @@ namespace Serenity.Services
 
             if (handler.IsCreate)
             {
-                Log(handler.UnitOfWork,  null, handler.Row, handler.Context.User?.GetIdentifier());
+                Log(handler.UnitOfWork, null, handler.Row, handler.Context.User?.GetIdentifier());
 
                 return;
             }
@@ -62,7 +62,7 @@ namespace Serenity.Services
                      ReferenceEquals(insertLogRow.InsertUserIdField, field)))
                     continue;
 
-                if (handler.Row is IUpdateLogRow updateLogRow && 
+                if (handler.Row is IUpdateLogRow updateLogRow &&
                     (ReferenceEquals(updateLogRow.UpdateDateField, field) ||
                      ReferenceEquals(updateLogRow.UpdateUserIdField, field)))
                 {
@@ -88,7 +88,7 @@ namespace Serenity.Services
             var now = DateTime.Now;
             var rowInstance = row ?? old;
             var rowType = rowInstance.GetType();
-            var logRow = (Activator.CreateInstance(captureLogAttr.LogRow) as ICaptureLogRow) ?? 
+            var logRow = (Activator.CreateInstance(captureLogAttr.LogRow) as ICaptureLogRow) ??
                 throw new InvalidOperationException($"Capture log table {captureLogAttr.LogRow.FullName} " +
                     $"for {rowType.FullName} doesn't implement ICaptureLogRow interface!");
 

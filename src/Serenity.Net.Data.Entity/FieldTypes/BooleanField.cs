@@ -1,20 +1,20 @@
-﻿using System;
-using System.Data;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Data;
 using System.Globalization;
 
 namespace Serenity.Data
 {
     public sealed class BooleanField : GenericValueField<bool>
     {
-        public BooleanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public BooleanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, bool?> getValue = null, Action<IRow, bool?> setValue = null)
             : base(collection, FieldType.Boolean, name, caption, size, flags, getValue, setValue)
         {
         }
 
-        public static BooleanField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags, 
+        public static BooleanField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
             Func<IRow, bool?> getValue, Action<IRow, bool?> setValue)
         {
             return new BooleanField(collection, name, caption, size, flags, getValue, setValue);

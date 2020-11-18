@@ -1,7 +1,7 @@
-﻿using System;
-using System.Data;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Data;
 using System.Globalization;
 
 namespace Serenity.Data
@@ -49,7 +49,7 @@ namespace Serenity.Data
                 else
                     return 1;
             }
-            else 
+            else
                 return value1.CompareTo(value2);
         }
 

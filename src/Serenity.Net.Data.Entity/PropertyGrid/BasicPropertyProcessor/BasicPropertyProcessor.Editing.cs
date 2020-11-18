@@ -152,7 +152,7 @@ namespace Serenity.PropertyGrid
             SetServiceLookupParams(editorTypeAttr, item.EditorParams);
         }
 
-        private static void SetServiceLookupParams(EditorTypeAttribute editorTypeAttr, Dictionary<string, object> editorParams) 
+        private static void SetServiceLookupParams(EditorTypeAttribute editorTypeAttr, Dictionary<string, object> editorParams)
         {
             if (!(editorTypeAttr is ServiceLookupEditorAttribute sle) || sle.ItemType == null)
                 return;
@@ -194,7 +194,7 @@ namespace Serenity.PropertyGrid
                             .ToArray();
                     }
                 }
-                catch 
+                catch
                 {
                 }
             }
@@ -202,33 +202,33 @@ namespace Serenity.PropertyGrid
 
         private static string AutoDetermineEditorType(Type valueType, Type enumType, IDictionary<string, object> editorParams)
         {
-			if (enumType != null)
-				return "Enum";
-			else if (valueType == typeof(string))
-				return "String";
+            if (enumType != null)
+                return "Enum";
+            else if (valueType == typeof(string))
+                return "String";
             else if (valueType == typeof(int) ||
-				valueType == typeof(short))
-			{
-				if (IntegerEditorAttribute.AllowNegativesByDefault)
-					editorParams["allowNegatives"] = true;
+                valueType == typeof(short))
+            {
+                if (IntegerEditorAttribute.AllowNegativesByDefault)
+                    editorParams["allowNegatives"] = true;
 
-				if (valueType == typeof(short))
-					editorParams["maxValue"] = short.MaxValue;
+                if (valueType == typeof(short))
+                    editorParams["maxValue"] = short.MaxValue;
 
-				return "Integer";
-			}
-			else if (valueType == typeof(DateTime))
-				return "Date";
-			else if (valueType == typeof(bool))
-				return "Boolean";
-			else if (valueType == typeof(decimal) || valueType == typeof(double) || valueType == typeof(float))
-			{
-				if (DecimalEditorAttribute.AllowNegativesByDefault)
-					editorParams["allowNegatives"] = true;
-				return "Decimal";
-			}
-			else
-				return "String";
+                return "Integer";
+            }
+            else if (valueType == typeof(DateTime))
+                return "Date";
+            else if (valueType == typeof(bool))
+                return "Boolean";
+            else if (valueType == typeof(decimal) || valueType == typeof(double) || valueType == typeof(float))
+            {
+                if (DecimalEditorAttribute.AllowNegativesByDefault)
+                    editorParams["allowNegatives"] = true;
+                return "Decimal";
+            }
+            else
+                return "String";
         }
     }
 }

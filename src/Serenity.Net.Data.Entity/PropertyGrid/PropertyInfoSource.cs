@@ -15,7 +15,7 @@ namespace Serenity.PropertyGrid
             if (basedOnRow != null)
             {
                 BasedOnField = basedOnRow.Fields.FindFieldByPropertyName(property.Name);
-                    
+
                 if (BasedOnField is null)
                 {
                     // only use field found by field name if it has no property

@@ -6,7 +6,7 @@ using System.Data;
 namespace Serenity.Data
 {
     public class JsonField<TValue> : GenericClassField<TValue>
-        where TValue: class
+        where TValue : class
     {
         public JsonField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, TValue> getValue = null, Action<IRow, TValue> setValue = null)
@@ -60,7 +60,7 @@ namespace Serenity.Data
                 else
                     return 1;
             }
-            else 
+            else
                 return value1.ToJson().CompareTo(value2.ToJson());
         }
 

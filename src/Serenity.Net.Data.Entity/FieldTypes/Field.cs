@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using System.Data;
 
 namespace Serenity.Data
@@ -153,7 +153,7 @@ namespace Serenity.Data
         public string Expression
         {
             get { return expression; }
-            set 
+            set
             {
                 value = value.TrimToNull();
                 if (expression != value)
@@ -166,7 +166,7 @@ namespace Serenity.Data
 
                     if (value != null)
                     {
-                        if (expression != null && 
+                        if (expression != null &&
                             expression.StartsWith("T0.", StringComparison.OrdinalIgnoreCase) &&
                             SqlSyntax.IsValidQuotedIdentifier(expression[3..]))
                         {
@@ -310,7 +310,7 @@ namespace Serenity.Data
         {
             if (ForeignTable.IsNullOrEmpty())
                 throw new ArgumentNullException("ForeignTable");
-            
+
             string foreignJoin;
             if (foreignIndex == null)
             {
@@ -357,7 +357,7 @@ namespace Serenity.Data
                 return;
 
             throw new InvalidOperationException(string.Format(
-                "{0} field on {1} is read before assigned a value! Make sure this field is selected in your SqlQuery. Extensions like connection.List only loads table fields by default, view / expression fields are not loaded unless explicitly selected.", 
+                "{0} field on {1} is read before assigned a value! Make sure this field is selected in your SqlQuery. Extensions like connection.List only loads table fields by default, view / expression fields are not loaded unless explicitly selected.",
                     Name, row.GetType().Name));
         }
 
@@ -414,7 +414,7 @@ namespace Serenity.Data
 
                 return localizer?.TryGet(autoTextKey) ?? propertyName ?? name;
             }
-                
+
             return caption.ToString(localizer);
         }
 

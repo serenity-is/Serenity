@@ -27,7 +27,7 @@ namespace Serenity.Services
         IDictionary ISaveRequest.Localizations
         {
             get { return Localizations; }
-            set { Localizations = (Dictionary<string, TEntity>) value; }
+            set { Localizations = (Dictionary<string, TEntity>)value; }
         }
     }
 }

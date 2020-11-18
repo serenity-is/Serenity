@@ -8,7 +8,7 @@ namespace Serenity.Data
     ///   Contains static extension methods for DbField and Meta objects.</summary>
     public static class ServiceRequestExtensions
     {
-        public static TRequest IncludeField<TRequest>(this TRequest request, Field field) 
+        public static TRequest IncludeField<TRequest>(this TRequest request, Field field)
             where TRequest : ServiceRequest, IIncludeExcludeColumns
         {
             request.IncludeColumns ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);

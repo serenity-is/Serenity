@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 namespace Serenity.Data
 {
-    public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TValue: struct, IComparable<TValue>
+    public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TValue : struct, IComparable<TValue>
     {
         protected internal Func<IRow, TValue?> _getValue;
         protected internal Action<IRow, TValue?> _setValue;
         protected internal Type _enumType;
 
-        internal GenericValueField(ICollection<Field> collection, FieldType type, string name, LocalText caption, int size, FieldFlags flags, 
+        internal GenericValueField(ICollection<Field> collection, FieldType type, string name, LocalText caption, int size, FieldFlags flags,
             Func<IRow, TValue?> getValue = null, Action<IRow, TValue?> setValue = null)
             : base(collection, type, name, caption, size, flags)
         {
@@ -66,7 +66,7 @@ namespace Serenity.Data
             return _getValue(row);
         }
 
-        public override void AsObject(IRow row,object value)
+        public override void AsObject(IRow row, object value)
         {
             if (value == null)
                 _setValue(row, null);
@@ -75,7 +75,8 @@ namespace Serenity.Data
                 try
                 {
                     _setValue(row, (TValue)value);
-                } catch (InvalidCastException ex)
+                }
+                catch (InvalidCastException ex)
                 {
                     throw new InvalidCastException($"Invalid cast exception while trying to set the value of {Name} field on {row.GetType().Name} as object.", ex);
                 }

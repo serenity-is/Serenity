@@ -10,7 +10,7 @@ namespace Serenity.Reporting
 {
     public static class ReportColumnConverter
     {
-        private static ReportColumn FromMember(MemberInfo member, Type dataType, 
+        private static ReportColumn FromMember(MemberInfo member, Type dataType,
             Field baseField, ITextLocalizer localizer)
         {
             if (member == null)
@@ -39,8 +39,8 @@ namespace Serenity.Reporting
                     result.Format = "dd/MM/yyyy HH:mm";
                 }
                 else if (dtf is object ||
-                    dataType == typeof (DateTime) ||
-                    dataType == typeof (DateTime?))
+                    dataType == typeof(DateTime) ||
+                    dataType == typeof(DateTime?))
                 {
                     result.Format = "dd/MM/yyyy";
                 }
@@ -93,7 +93,7 @@ namespace Serenity.Reporting
                 Field baseField;
                 if (basedOnRow != null)
                 {
-                    var name = ((MemberInfo) fieldInfo ?? propertyInfo).Name;
+                    var name = ((MemberInfo)fieldInfo ?? propertyInfo).Name;
                     baseField = basedOnRow.FindFieldByPropertyName(name) ?? basedOnRow.FindField(name);
                 }
                 else

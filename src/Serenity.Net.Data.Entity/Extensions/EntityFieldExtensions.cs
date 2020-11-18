@@ -76,7 +76,7 @@ namespace Serenity.Data
         }
 
         public static TField OfJoin<TField>(this TField field, Join join, string origin, FieldFlags extraFlags = FieldFlags.Internal)
-            where TField: Field
+            where TField : Field
         {
             if (join == null)
                 throw new ArgumentNullException("join");
@@ -92,7 +92,7 @@ namespace Serenity.Data
         }
 
         public static TAttribute GetAttribute<TAttribute>(this Field field)
-            where TAttribute: Attribute
+            where TAttribute : Attribute
         {
             if (field is null)
                 return null;

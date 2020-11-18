@@ -7,6 +7,7 @@ namespace Serenity.Services
     /// <summary>
     /// Represents a RetrieveRequestHandler. Is used with RetrieveBehavior objects.
     /// </summary>
+    [GenericHandlerType(typeof(RetrieveRequestHandler<>))]
     public interface IRetrieveRequestHandler : IRequestHandler
     {
         /// <summary>

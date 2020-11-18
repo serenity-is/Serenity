@@ -8,7 +8,7 @@ namespace Serenity.Data
 {
     [JsonConverter(typeof(JsonRowConverter))]
     public abstract partial class Row<TFields> : IRow, IRow<TFields>, INotifyPropertyChanged, IEditableObject
-        where TFields: RowFieldsBase
+        where TFields : RowFieldsBase
     {
         protected readonly TFields fields;
         internal bool[] assignedFields;
@@ -39,7 +39,7 @@ namespace Serenity.Data
         public TFields Fields => fields;
         RowFieldsBase IRow.Fields => fields;
 
-        public void CloneInto(Row<TFields> clone, 
+        public void CloneInto(Row<TFields> clone,
             bool cloneHandlers)
         {
             clone.IgnoreConstraints = IgnoreConstraints;
@@ -182,10 +182,10 @@ namespace Serenity.Data
         public bool TrackAssignments
         {
             get
-            { 
+            {
                 return tracking;
             }
-            set 
+            set
             {
                 if (tracking != value)
                 {
@@ -208,7 +208,7 @@ namespace Serenity.Data
 
         public bool TrackWithChecks
         {
-            get 
+            get
             {
                 return tracking && trackWithChecks;
             }
@@ -235,7 +235,7 @@ namespace Serenity.Data
 
         public object this[string fieldName]
         {
-            get 
+            get
             {
                 var field = FindFieldByPropertyName(fieldName) ??
                     FindField(fieldName);
@@ -248,11 +248,11 @@ namespace Serenity.Data
                     return null;
                 }
 
-                return field.AsObject(this); 
+                return field.AsObject(this);
             }
             set
             {
-                (FindFieldByPropertyName(fieldName) ?? 
+                (FindFieldByPropertyName(fieldName) ??
                     FindFieldEnsure(fieldName)).AsObject(this, value);
             }
         }

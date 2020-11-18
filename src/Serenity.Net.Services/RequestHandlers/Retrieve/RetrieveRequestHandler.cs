@@ -12,9 +12,9 @@
 
     public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestProcessor,
         IRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse>
-        where TRow: class, IRow, new()
-        where TRetrieveRequest: RetrieveRequest
-        where TRetrieveResponse: RetrieveResponse<TRow>, new()
+        where TRow : class, IRow, new()
+        where TRetrieveRequest : RetrieveRequest
+        where TRetrieveResponse : RetrieveResponse<TRow>, new()
     {
         protected TRow Row;
         protected TRetrieveResponse Response;
@@ -206,7 +206,7 @@
 
             Response = new TRetrieveResponse();
             Row = new TRow();
-           
+
             Query = CreateQuery();
 
             PrepareQuery(Query);

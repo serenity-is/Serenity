@@ -5,7 +5,7 @@ using System.Data;
 
 namespace Serenity.Data
 {
-	public class VariantField : GenericClassField<Object>
+    public class VariantField : GenericClassField<Object>
     {
         public VariantField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, Object> getValue = null, Action<IRow, Object> setValue = null)
@@ -39,17 +39,17 @@ namespace Serenity.Data
 
             bool null1 = value1 == null;
             bool null2 = value2 == null;
-			if (null1 || null2)
-			{
-				if (null1 && null2)
-					return 0;
-				else if (null1)
-					return -1;
-				else
-					return 1;
-			}
-			else
-				return value1.GetHashCode().CompareTo(value2.GetHashCode());
+            if (null1 || null2)
+            {
+                if (null1 && null2)
+                    return 0;
+                else if (null1)
+                    return -1;
+                else
+                    return 1;
+            }
+            else
+                return value1.GetHashCode().CompareTo(value2.GetHashCode());
         }
 
         public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
@@ -69,9 +69,9 @@ namespace Serenity.Data
                     _setValue(row, null);
                     break;
                 case JsonToken.String:
-				case JsonToken.Integer:
-				case JsonToken.Float:
-				case JsonToken.Bytes:
+                case JsonToken.Integer:
+                case JsonToken.Float:
+                case JsonToken.Bytes:
                     _setValue(row, (string)reader.Value);
                     break;
                 default:

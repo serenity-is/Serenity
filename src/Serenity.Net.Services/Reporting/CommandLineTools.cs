@@ -24,10 +24,10 @@
 
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i] == null) 
-                    throw new ArgumentNullException("args[" + i + "]"); 
+                if (args[i] == null)
+                    throw new ArgumentNullException("args[" + i + "]");
 
-                if (invalidChar.IsMatch(args[i])) 
+                if (invalidChar.IsMatch(args[i]))
                     throw new ArgumentOutOfRangeException("args[" + i + "]");
 
                 if (i > 0)

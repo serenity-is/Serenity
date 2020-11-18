@@ -48,7 +48,7 @@
         protected override BaseCriteria VisitCriteria(Criteria criteria)
         {
             var result = base.VisitCriteria(criteria);
-            
+
             criteria = result as Criteria;
 
             if (criteria is object)

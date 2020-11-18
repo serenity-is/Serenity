@@ -1,14 +1,14 @@
-﻿using System;
-using System.Data;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Data;
 using System.Globalization;
 
 namespace Serenity.Data
 {
     public sealed class DecimalField : GenericValueField<Decimal>
     {
-        public DecimalField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public DecimalField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, Decimal?> getValue = null, Action<IRow, Decimal?> setValue = null)
             : base(collection, FieldType.Decimal, name, caption, size, flags, getValue, setValue)
         {

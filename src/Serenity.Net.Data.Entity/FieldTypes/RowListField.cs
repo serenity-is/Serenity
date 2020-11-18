@@ -5,9 +5,9 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     [NotMapped]
-    public class RowListField<TForeign> : CustomClassField<List<TForeign>> where TForeign: class, IRow
+    public class RowListField<TForeign> : CustomClassField<List<TForeign>> where TForeign : class, IRow
     {
-        public RowListField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped, 
+        public RowListField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
             Func<IRow, List<TForeign>> getValue = null, Action<IRow, List<TForeign>> setValue = null)
             : base(collection, name, caption, size, flags, getValue, setValue)
         {

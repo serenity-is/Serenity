@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Serenity.Services
 {
-    public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior, 
+    public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior,
         IImplicitBehavior, IRetrieveBehavior, IListBehavior, IFieldBehavior
     {
         public Field Target { get; set; }
@@ -279,7 +279,7 @@ namespace Serenity.Services
             deleteHandler.Process(uow, deleteRequest);
         }
 
-        private void DetailListSave(IUnitOfWork uow, object masterId, IList<IRow> oldRows, 
+        private void DetailListSave(IUnitOfWork uow, object masterId, IList<IRow> oldRows,
             IList<object> newItemKeys)
         {
             if (oldRows.Count == 0)
@@ -381,7 +381,7 @@ namespace Serenity.Services
                     .Select(itemKeyField)
                     .OrderBy(rowIdField)
                     .Where(
-                        thisKeyField == new ValueCriteria(masterId) & 
+                        thisKeyField == new ValueCriteria(masterId) &
                         queryCriteria)
                     .ForEach(handler.Connection, () =>
                     {

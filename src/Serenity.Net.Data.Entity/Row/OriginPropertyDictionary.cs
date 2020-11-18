@@ -235,7 +235,7 @@ namespace Serenity.Data
                 if (expressionAttr.Any())
                 {
                     var expression = expressionSelector.GetBestMatch(expressionAttr, x => x.Dialect);
-                    return originDictionary.PrefixAliases(expression.Value, aliasPrefix, 
+                    return originDictionary.PrefixAliases(expression.Value, aliasPrefix,
                         expressionSelector, extraJoins);
                 }
                 else
@@ -253,7 +253,7 @@ namespace Serenity.Data
         }
 
         public TAttr OriginAttribute<TAttr>(string propertyName, int recursion = 0)
-            where TAttr: Attribute
+            where TAttr : Attribute
         {
             if (recursion++ > 1000)
                 throw new DivideByZeroException("Infinite origin recursion detected!");
@@ -327,7 +327,7 @@ namespace Serenity.Data
             return addPrefix(originProperty.Name);
         }
 
-        internal string PrefixAliases(string expression, string alias, 
+        internal string PrefixAliases(string expression, string alias,
             DialectExpressionSelector expressionSelector, List<Attribute> extraJoins)
         {
             if (string.IsNullOrWhiteSpace(expression))

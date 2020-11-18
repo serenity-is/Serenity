@@ -1,14 +1,14 @@
-﻿using System;
-using System.Data;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Data;
 using System.Globalization;
 
 namespace Serenity.Data
 {
     public sealed class DateTimeOffsetField : GenericValueField<DateTimeOffset>
     {
-        public DateTimeOffsetField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public DateTimeOffsetField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, DateTimeOffset?> getValue = null, Action<IRow, DateTimeOffset?> setValue = null)
             : base(collection, FieldType.DateTime, name, caption, size, flags, getValue, setValue)
         {
@@ -67,7 +67,7 @@ namespace Serenity.Data
             return _getValue(row);
         }
 
-        public override void AsObject(IRow row,object value)
+        public override void AsObject(IRow row, object value)
         {
             if (value == null)
                 _setValue(row, null);

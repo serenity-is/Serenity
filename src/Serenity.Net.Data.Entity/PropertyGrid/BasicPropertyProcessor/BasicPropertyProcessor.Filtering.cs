@@ -75,7 +75,7 @@ namespace Serenity.PropertyGrid
             var filteringTypeAttr = source.GetAttribute<FilteringTypeAttribute>() ??
                 idField.GetAttribute<FilteringTypeAttribute>();
 
-            
+
             if (filteringTypeAttr == null)
             {
                 var editorAttr = source.GetAttribute<EditorTypeAttribute>() ??

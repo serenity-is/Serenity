@@ -1,15 +1,15 @@
-﻿using System;
-using System.Data;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using System.Globalization;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
 
 namespace Serenity.Data
 {
     public sealed class DateTimeField : GenericValueField<DateTime>
     {
-        public DateTimeField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public DateTimeField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, DateTime?> getValue = null, Action<IRow, DateTime?> setValue = null)
             : base(collection, FieldType.DateTime, name, caption, size, flags, getValue, setValue)
         {
@@ -136,7 +136,7 @@ namespace Serenity.Data
             return _getValue(row);
         }
 
-        public override void AsObject(IRow row,object value)
+        public override void AsObject(IRow row, object value)
         {
             if (value == null)
                 _setValue(row, null);

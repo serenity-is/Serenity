@@ -12,7 +12,7 @@ namespace Serenity.Data
         }
 
         public static TRow ApplyDefaultValues<TRow>(this TRow row, bool unassignedOnly = false)
-            where TRow: IRow
+            where TRow : IRow
         {
             if (row == null)
                 throw new ArgumentNullException("row");
@@ -51,7 +51,7 @@ namespace Serenity.Data
         }
 
         public static TFields Init<TFields>(this TFields fields, IAnnotatedType annotations)
-            where TFields: RowFieldsBase
+            where TFields : RowFieldsBase
         {
             fields.Initialize(annotations);
             return fields;

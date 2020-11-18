@@ -59,7 +59,7 @@ namespace Serenity.Data
             return _getValue(row);
         }
 
-        public override void AsObject(IRow row,object value)
+        public override void AsObject(IRow row, object value)
         {
             _setValue(row, (TValue)value);
             row.FieldAssignedValue(this);

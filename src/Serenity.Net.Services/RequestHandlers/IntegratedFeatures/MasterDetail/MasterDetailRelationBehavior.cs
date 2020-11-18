@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Serenity.Services
 {
-    public class MasterDetailRelationBehavior : BaseSaveDeleteBehavior, 
+    public class MasterDetailRelationBehavior : BaseSaveDeleteBehavior,
         IImplicitBehavior, IRetrieveBehavior, IListBehavior, IFieldBehavior
     {
         public Field Target { get; set; }

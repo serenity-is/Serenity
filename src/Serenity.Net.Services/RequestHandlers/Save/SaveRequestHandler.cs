@@ -117,9 +117,9 @@ namespace Serenity.Services
             foreach (var field in Row.GetFields())
                 if (field.Flags.HasFlag(flag))
                 {
-                    if ((IsCreate && (field.InsertPermission == null || 
+                    if ((IsCreate && (field.InsertPermission == null ||
                             Permissions.HasPermission(field.InsertPermission))) ||
-                        (IsUpdate && (field.UpdatePermission == null || 
+                        (IsUpdate && (field.UpdatePermission == null ||
                             Permissions.HasPermission(field.UpdatePermission))))
                         editable.Add(field);
                 }
@@ -155,8 +155,8 @@ namespace Serenity.Services
                 else
                     displayOrderFix = true;
             }
-            else if (afterSave && 
-                ((IsCreate && displayOrderFix) || 
+            else if (afterSave &&
+                ((IsCreate && displayOrderFix) ||
                  (IsUpdate && displayOrderRow.DisplayOrderField[Old] != displayOrderRow.DisplayOrderField[Row])))
             {
                 DisplayOrderHelper.ReorderValues(
@@ -448,8 +448,8 @@ namespace Serenity.Services
         protected virtual void ValidatePermissions()
         {
             PermissionAttributeBase attr = null;
-            
-            if (IsUpdate) 
+
+            if (IsUpdate)
             {
                 attr = typeof(TRow).GetCustomAttribute<UpdatePermissionAttribute>(true);
             }
@@ -486,10 +486,10 @@ namespace Serenity.Services
 
         public IDbConnection Connection { get { return UnitOfWork.Connection; } }
 
-        public IUnitOfWork UnitOfWork { get; protected set; }       
+        public IUnitOfWork UnitOfWork { get; protected set; }
 
         public TRow Old { get; protected set; }
-        
+
         public TRow Row { get; protected set; }
 
         public bool IsCreate { get { return Old == null; } }

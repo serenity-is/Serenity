@@ -30,7 +30,7 @@ namespace Serenity.Data
                 else
                     query.From(entity.Table, Alias.T0);
             }
-            
+
             return query.Into(entity);
         }
 

@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace Serenity.Web
-{  
+{
     /// <summary>
     ///   Static class that contains thumbnail generator methods</summary>
     public static class ThumbnailGenerator
@@ -32,7 +32,7 @@ namespace Serenity.Web
         ///   Specifies fill color for PreserveRatioWithFill mode.</param>
         /// <returns>
         ///   Generated thumbnail image. Should be disposed by caller.</returns>
-        public static Image Generate(Image image, int thumbWidth, int thumbHeight, 
+        public static Image Generate(Image image, int thumbWidth, int thumbHeight,
             ImageScaleMode mode, Color backgroundColor, float xDPI = 0, float yDPI = 0)
         {
             if (image == null)
@@ -46,7 +46,7 @@ namespace Serenity.Web
             {
                 return GenerateEmptyBitmap(thumbWidth, thumbHeight, backgroundColor);
             }
-            
+
             // calculate thumb width / source image width
             double horizontalScale = thumbWidth / ((double)imageWidth);
             // calculate thumb height / source image height
@@ -74,13 +74,13 @@ namespace Serenity.Web
 
             // source rectangle to use in source image, initially all of source image
             Rectangle imageRect = new Rectangle(0, 0, image.Width, image.Height);
-            
+
             // At this point, if mode is CropSourceImage, check to see is this mode is applicable,
             // as if horizontal and vertical ratios are very close, when StretchToFit is used
             // instead of CropSourceImage, someone looking at the generated thumb won't notice difference,
             // because AspectRatio mismatch is like one in a million.
             // If thumbWidth or thumbHeight is zero, CropSourceImage won't be used
-            if (mode == ImageScaleMode.CropSourceImage && 
+            if (mode == ImageScaleMode.CropSourceImage &&
                 Math.Abs(horizontalScale - verticalScale) >= 0.0001 &&
                 horizontalScale != 0 &&
                 verticalScale != 0)
@@ -132,7 +132,7 @@ namespace Serenity.Web
 
             // create a 24 bit thumbnail image
             Bitmap thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format24bppRgb);
-            try 
+            try
             {
                 if ((xDPI != 0 && (thumb.HorizontalResolution != xDPI)) ||
                     (yDPI != 0 && (thumb.VerticalResolution != yDPI)))
@@ -150,7 +150,7 @@ namespace Serenity.Web
                 g.DrawImage(image, thumbRect, imageRect, GraphicsUnit.Pixel);
             }
             catch
-            {               
+            {
                 // dispose generated image if any errors occur
                 thumb.Dispose();
                 throw;

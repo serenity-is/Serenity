@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using Newtonsoft.Json;
 
 namespace Serenity.Data
 {
     public class CustomClassField<TValue> : GenericClassField<TValue>
-        where TValue: class
+        where TValue : class
     {
         public CustomClassField(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
             Func<IRow, TValue> getValue, Action<IRow, TValue> setValue)

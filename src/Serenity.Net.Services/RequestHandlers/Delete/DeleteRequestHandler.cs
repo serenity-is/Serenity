@@ -13,7 +13,7 @@ namespace Serenity.Services
     public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDeleteRequestProcessor,
         IRequestHandler<TRow, TDeleteRequest, TDeleteResponse>
         where TRow : class, IRow, IIdRow, new()
-        where TDeleteRequest: DeleteRequest
+        where TDeleteRequest : DeleteRequest
         where TDeleteResponse : DeleteResponse, new()
     {
         protected TRow Row;
@@ -110,7 +110,7 @@ namespace Serenity.Services
             {
                 if (isDeletedRow != null || isActiveDeletedRow != null)
                 {
-                    
+
                     var update = new SqlUpdate(Row.Table)
                         .WhereEqual(idField, id)
                         .Where(ServiceQueryHelper.GetNotDeletedCriteria(Row));
@@ -126,13 +126,13 @@ namespace Serenity.Services
 
                     if (deleteLogRow != null)
                     {
-                        update.Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
+                        update.Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
                                         deleteLogRow.DeleteDateField.DateTimeKind))
                               .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID());
                     }
                     else if (Row is IUpdateLogRow updateLogRow)
                     {
-                        update.Set(updateLogRow.UpdateDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
+                        update.Set(updateLogRow.UpdateDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
                                         updateLogRow.UpdateDateField.DateTimeKind))
                               .Set(updateLogRow.UpdateUserIdField, User?.GetIdentifier().TryParseID());
                     }
@@ -143,7 +143,7 @@ namespace Serenity.Services
                 else //if (deleteLogRow != null)
                 {
                     if (new SqlUpdate(Row.Table)
-                            .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
+                            .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
                                         deleteLogRow.DeleteDateField.DateTimeKind))
                             .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
                             .WhereEqual(idField, id)

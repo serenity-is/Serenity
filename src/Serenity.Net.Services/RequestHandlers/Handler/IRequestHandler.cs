@@ -9,7 +9,7 @@ namespace Serenity.Services
     {
     }
 
-    public interface IRequestHandler<TRow, TRequest, TResponse> : 
+    public interface IRequestHandler<TRow, TRequest, TResponse> :
         IRequestHandler<TRow>, IRequestType<TRequest>, IResponseType<TResponse>
     {
     }

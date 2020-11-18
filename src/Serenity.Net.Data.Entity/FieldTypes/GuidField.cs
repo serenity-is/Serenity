@@ -1,14 +1,14 @@
-﻿using System;
-using System.Data;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Data;
 
 namespace Serenity.Data
 {
     public sealed class GuidField : GenericValueField<Guid>
     {
-        public GuidField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public GuidField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, Guid?> getValue = null, Action<IRow, Guid?> setValue = null)
             : base(collection, FieldType.Guid, name, caption, size, flags, getValue, setValue)
         {

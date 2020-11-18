@@ -33,14 +33,14 @@ namespace Serenity
         /// <param name="permissions">Permissions service</param>
         /// <param name="permission">Permission key</param>
         /// <param name="localizer">Localizer</param>
-        public static void ValidatePermission(this IPermissionService permissions, 
+        public static void ValidatePermission(this IPermissionService permissions,
             string permission, ITextLocalizer localizer)
         {
             if (permissions == null)
                 throw new ArgumentNullException(nameof(permissions));
 
             if (!permissions.HasPermission(permission))
-                throw new ValidationError("AccessDenied", null, 
+                throw new ValidationError("AccessDenied", null,
                     Core.Texts.Authorization.AccessDenied.ToString(localizer));
         }
 
@@ -51,7 +51,7 @@ namespace Serenity
         public static void ValidateLoggedIn(this IUserAccessor userAccessor, ITextLocalizer localizer)
         {
             if (!IsLoggedIn(userAccessor))
-                throw new ValidationError("NotLoggedIn", null, 
+                throw new ValidationError("NotLoggedIn", null,
                     Core.Texts.Authorization.NotLoggedIn.ToString(localizer));
         }
 

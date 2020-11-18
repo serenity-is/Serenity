@@ -46,7 +46,7 @@ namespace Serenity.Data
             else
             {
                 var fields = row.Fields;
-                foreach (var f in fields)  
+                foreach (var f in fields)
                     if (!f.IsNull(row) || serializer.NullValueHandling == NullValueHandling.Include)
                     {
                         writer.WritePropertyName(f.PropertyName ?? f.Name);
@@ -100,14 +100,14 @@ namespace Serenity.Data
                 {
                     case JsonToken.PropertyName:
                         string fieldName = (string)reader.Value;
-                        
+
                         if (!reader.Read())
                             throw new JsonSerializationException("Unexpected end when deserializing object.");
 
                         var field = row.Fields.FindField(fieldName);
                         if (field is null)
                             field = row.Fields.FindFieldByPropertyName(fieldName);
-                        
+
                         if (field is null &&
                             serializer.MissingMemberHandling == MissingMemberHandling.Error)
                             throw new JsonSerializationException(string.Format("Could not find field '{0}' on row of type '{1}'", fieldName, objectType.Name));
@@ -119,7 +119,7 @@ namespace Serenity.Data
                             reader.Skip();
                         else
                             field.ValueFromJson(reader, row, serializer);
-                        
+
                         break;
 
                     case JsonToken.EndObject:

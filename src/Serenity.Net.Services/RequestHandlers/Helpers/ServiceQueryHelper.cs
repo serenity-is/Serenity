@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Serenity.Data;
+using System;
 using System.Collections.Generic;
-using Serenity.Data;
 
 namespace Serenity.Services
 {

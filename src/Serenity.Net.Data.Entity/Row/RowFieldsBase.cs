@@ -199,7 +199,7 @@ namespace Serenity.Data
                     var pi = member as PropertyInfo;
                     if (pi != null)
                     {
-                        rowProperties[pi.Name] = annotations != null ? 
+                        rowProperties[pi.Name] = annotations != null ?
                             annotations.GetAnnotatedProperty(pi) : new WrappedProperty(pi);
                     }
                 }
@@ -252,7 +252,7 @@ namespace Serenity.Data
                         DefaultValueAttribute defaultValue = null;
                         TextualFieldAttribute textualField = null;
                         DateTimeKindAttribute dateTimeKind = null;
-                        
+
                         PermissionAttributeBase readPermission;
                         PermissionAttributeBase insertPermission;
                         PermissionAttributeBase updatePermission;
@@ -589,7 +589,7 @@ namespace Serenity.Data
         }
 
         private static TAttr GetFieldAttr<TAttr>(Field x)
-            where TAttr: Attribute
+            where TAttr : Attribute
         {
             return x.CustomAttributes.FirstOrDefault(z => typeof(TAttr).IsAssignableFrom(z.GetType())) as TAttr;
         }
@@ -877,7 +877,7 @@ namespace Serenity.Data
                     }
                 }
             }
-            
+
             calledRowCreated = true;
         }
 
@@ -898,7 +898,7 @@ namespace Serenity.Data
         {
             get { return alias; }
         }
-        
+
         string IAlias.NameDot
         {
             get { return aliasDot; }

@@ -13,7 +13,7 @@ namespace Serenity.PropertyGrid
             var widthAttr = source.GetAttribute<WidthAttribute>();
             var basedOnField = source.BasedOnField;
 
-            item.Width = widthAttr == null || widthAttr.Value == 0 ? 
+            item.Width = widthAttr == null || widthAttr.Value == 0 ?
                 (basedOnField is object ? AutoWidth(basedOnField) : 80) : widthAttr.Value;
 
             if (widthAttr != null && widthAttr.Value != 0)

@@ -20,7 +20,7 @@ namespace Serenity.Services
             this.implicitBehaviors = implicitBehaviors ??
                 throw new ArgumentNullException(nameof(implicitBehaviors));
 
-            this.behaviorFactory = behaviorFactory ?? 
+            this.behaviorFactory = behaviorFactory ??
                 throw new ArgumentNullException(nameof(behaviorFactory));
 
             this.fieldsProvider = fieldsProvider ??

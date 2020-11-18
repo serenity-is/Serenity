@@ -6,7 +6,7 @@ namespace Serenity.Services
     public interface IRetrieveResponse
     {
         object Entity { get; }
-        IDictionary Localizations { get; set;  }
+        IDictionary Localizations { get; set; }
     }
 
     public class RetrieveResponse<T> : ServiceResponse, IRetrieveResponse

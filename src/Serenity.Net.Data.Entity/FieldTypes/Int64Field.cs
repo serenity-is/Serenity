@@ -1,14 +1,14 @@
-﻿using System;
-using System.Data;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Data;
 using System.Globalization;
 
 namespace Serenity.Data
 {
     public sealed class Int64Field : GenericValueField<long>
     {
-        public Int64Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public Int64Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, long?> getValue = null, Action<IRow, long?> setValue = null)
             : base(collection, FieldType.Int64, name, caption, size, flags, getValue, setValue)
         {

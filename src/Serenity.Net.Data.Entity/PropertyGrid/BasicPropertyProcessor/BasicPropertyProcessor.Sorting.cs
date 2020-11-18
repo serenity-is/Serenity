@@ -22,7 +22,7 @@ namespace Serenity.PropertyGrid
 
             if (source.BasedOnField is object &&
                 source.BasedOnField.Flags.HasFlag(FieldFlags.NotMapped))
-                    item.Sortable = false;
+                item.Sortable = false;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Serenity.Data
 {
     public sealed class TimeSpanField : GenericValueField<TimeSpan>
     {
-        public TimeSpanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public TimeSpanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, TimeSpan?> getValue = null, Action<IRow, TimeSpan?> setValue = null)
             : base(collection, FieldType.Time, name, caption, size, flags, getValue, setValue)
         {
@@ -69,7 +69,7 @@ namespace Serenity.Data
             return _getValue(row);
         }
 
-        public override void AsObject(IRow row,object value)
+        public override void AsObject(IRow row, object value)
         {
             if (value == null)
                 _setValue(row, null);

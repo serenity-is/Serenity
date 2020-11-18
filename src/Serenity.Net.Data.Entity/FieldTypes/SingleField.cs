@@ -1,14 +1,14 @@
-﻿using System;
-using System.Data;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
-using Newtonsoft.Json;
 
 namespace Serenity.Data
 {
     public sealed class SingleField : GenericValueField<float>
     {
-        public SingleField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public SingleField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, float?> getValue = null, Action<IRow, float?> setValue = null)
             : base(collection, FieldType.Single, name, caption, size, flags, getValue, setValue)
         {

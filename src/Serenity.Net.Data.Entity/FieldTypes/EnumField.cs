@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     public class EnumField<TEnum> : Int32Field
-        where TEnum: struct, IComparable, IFormattable, IConvertible
+        where TEnum : struct, IComparable, IFormattable, IConvertible
     {
-        public EnumField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public EnumField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, Int32?> getValue = null, Action<IRow, Int32?> setValue = null)
             : base(collection, name, caption, size, flags, getValue, setValue)
         {

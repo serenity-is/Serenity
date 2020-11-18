@@ -13,7 +13,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException(nameof(assemblies));
 
             return assemblies.SelectMany(x => x.GetTypes())
-                .Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(IRow)) && 
+                .Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(IRow)) &&
                     (connectionKey == null || string.Compare(type.GetCustomAttribute<ConnectionKeyAttribute>()?.Value,
                         connectionKey, StringComparison.OrdinalIgnoreCase) == 0));
         }
