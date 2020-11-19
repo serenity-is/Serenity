@@ -1,0 +1,259 @@
+﻿@import "serenity.mixins.less";
+
+.s-Form .fieldset {
+    padding: 3px 6px 6px 8px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+}
+
+.s-Form input.checkbox {
+    height: 18px;
+    width: auto;
+}
+
+.s-Form .field {
+    padding: 3px 3px;
+}
+
+.s-Form label.caption {
+    line-height: 22px;
+}
+
+.s-Form input {
+    padding: 1px;
+}
+
+.s-Form textarea {
+    padding: 1px;
+}
+
+.s-Form select {
+    padding: 2px 2px 2px 0px;
+    margin: 0;
+    .border-radius(3px, 3px, 3px, 3px);
+}
+
+.s-Form input, .s-Form select, .s-Form textarea {
+    border: 1px solid #ccc;
+}
+
+.s-Form .caption {
+    width: 100px;
+    text-align: right;
+    padding: 0 6px 0 0;
+}
+
+.s-Form .caption sup {
+    color: red;
+    padding-right: 2px;
+    vertical-align: top;
+}
+
+.s-Form .caption, .s-Form .editor, s.Form .widget-wrapper {
+    float: left;
+}
+
+.ui-datepicker-trigger svg {
+    width: 16px;
+    height: 16px;
+}
+
+img.ui-datepicker-trigger {
+    width: 16px;
+    height: 16px;
+}
+
+.s-Form .ui-datepicker-trigger {
+    display: block;
+    float: left;
+    margin: 1px 0 0 1px;
+}
+
+.s-Form .separator {
+    display: block;
+    float: left;
+    padding: 0 4px 0 4px;
+}
+
+.s-Form .error {
+    background-color: #ffefef;
+}
+
+.s-Form input.error,
+.s-Form select.error,
+.s-Form textarea.error {
+    border: 1px solid #ff4040;
+}
+
+.s-Form .select2-container.error .select2-choice {
+    background-color: #ffefef;
+    border-color: #ff4040;
+}
+
+.s-Form label.error {
+    background: transparent url(images/unchecked.gif) no-repeat scroll center center;
+    display: block;
+    color: #EA5200;
+    padding: 22px 0 0 20px;
+    height: 0px;
+    width: 0px;
+    overflow: hidden;
+    float: left;
+}
+
+.s-Form label.checked {
+    background: transparent none no-repeat scroll center center;
+    display: block;
+    float: left;
+}
+
+.s-Form .value-box {
+    height: 13px;
+    background: transparent;
+    padding: 2px 1px 1px 1px;
+    float: left;
+    border: 1px solid #9bbdcf;
+}
+
+.s-Form input[type=checkbox] {
+    margin-top: 2px;
+}
+
+.s-Form .fieldset {
+    .gradient(#f7fafc, #ffffff, #f7fafc);
+    border-color: #d7d7d7;
+    border-radius: 3px;
+}
+
+.s-Form .s-BooleanYesNoEditor label {
+    margin-left: 4px;
+    margin-right: 14px;
+}
+
+.s-Form .s-BooleanYesNoEditor.readonly {
+    background-color: transparent;
+}
+
+.s-Form .s-ClickDown {
+    padding: 1px 16px 1px 1px;
+}
+
+.s-Form .readonly {
+    color: #006;
+    background-color: #eee;
+}
+
+.s-Form .vx {
+    float: left;
+    height: 18px;
+}
+
+.s-Form {
+    .fieldset {
+        border: none;
+        background: none;
+        padding: 0;
+    }
+
+    .categories {
+        padding: 0;
+    }
+
+    .field {
+        padding: 4px 3px;
+    }
+
+    label {
+        font-weight: normal;
+        margin-bottom: 0;
+    }
+
+    label.caption {
+        padding-top: 4px;
+        padding-right: 7px;
+        line-height: initial;
+        color: #112383;
+        text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
+    }
+
+    .caption sup {
+        top: 5px;
+        font-size: 10px;
+    }
+
+    .vx {
+        margin-top: 2px;
+        min-height: 22px;
+        width: 20px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="search"],
+    input[type="url"],
+    input[type="password"],
+    select {
+        line-height: initial;
+        height: initial;
+        .box-sizing();
+    }
+
+    input[type=checkbox] {
+        margin-top: 6px;
+    }
+
+    .ui-datepicker-trigger {
+        margin-top: 1px;
+    }
+
+    .inplace-calc b {
+        margin-top: 2px;
+    }
+}
+
+.s-EditorItemLink {
+    width: 50px;
+    height: 15px;
+    text-align: right;
+    padding: 0;
+    background-color: #fff;
+    margin: 0 0 0 1px;
+}
+
+.s-EditorItemLink a {
+    display: block;
+    padding: 2px 2px 1px 1px;
+    height: 12px;
+    line-height: 11px;
+    text-align: right;
+}
+
+.s-EditorItemLink a:hover {
+    background-color: #ee7;
+}
+
+
+.emailuser, .s-Form .emailuser { 
+    width: 200px;
+}
+
+.emailat { 
+    width: 11px;
+    float: left;
+    margin: 4px 2px 0 2px;
+}
+
+.emaildomain { 
+    width: 100px;
+    float: left;
+}
+
+.emaildomain.disabled {
+    background-color: #f0f0f7;
+}
+
+.s-RadioButtonEditor {
+    label { margin-right: 8px; }   
+    input { margin-right: 2px; position: relative; top: 2px; }
+}

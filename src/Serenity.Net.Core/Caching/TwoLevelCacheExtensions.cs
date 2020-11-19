@@ -76,7 +76,7 @@ namespace Serenity
             string groupKey, Func<TItem> loader)
             where TItem : class
         {
-            return GetInternal<TItem, TItem>(cache, cacheKey, localExpiration, remoteExpiration,
+            return GetInternal(cache, cacheKey, localExpiration, remoteExpiration,
                 groupKey, loader, x => x, x => x);
         }
 
@@ -104,7 +104,7 @@ namespace Serenity
         public static TItem Get<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan expiration, string groupKey, Func<TItem> loader)
             where TItem : class
         {
-            return GetInternal<TItem, TItem>(cache, cacheKey, expiration, expiration,
+            return GetInternal(cache, cacheKey, expiration, expiration,
                 groupKey, loader, x => x, x => x);
         }
 
@@ -172,7 +172,7 @@ namespace Serenity
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
         /// or distributed cache, or all found items are expired.</param>
-        public static TItem GetLocalStoreOnly<TItem>(ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration,
+        public static TItem GetLocalStoreOnly<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration,
             string groupKey, Func<TItem> loader)
             where TItem : class
         {

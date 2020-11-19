@@ -1,82 +1,85 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Serenity.Web
 {
-    public static partial class DynamicScriptManager
+    public partial class DynamicScriptManager
     {
-        private static ConcurrentDictionary<string, Item> registeredScripts;
-        private static event Action<string> scriptChanged;
+        private ConcurrentDictionary<string, Item> registeredScripts;
+        private Action<string> scriptChanged;
 
-        static DynamicScriptManager()
+        private readonly ITwoLevelCache cache;
+
+        public DynamicScriptManager(ITwoLevelCache cache)
         {
+            this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            
             registeredScripts = new ConcurrentDictionary<string, Item>(StringComparer.OrdinalIgnoreCase);
-
             Register(new RegisteredScripts());
         }
 
-        public static bool IsRegistered(string name)
+        public bool IsRegistered(string name)
         {
             return registeredScripts.ContainsKey(name);
         }
 
-        public static void Changed(string name)
+        public void Changed(string name)
         {
-            Item item;
-            if (registeredScripts.TryGetValue(name, out item) &&
+            if (registeredScripts.TryGetValue(name, out Item item) &&
                 item != null)
             {
                 item.Generator.Changed();
             }
         }
 
-        public static void IfNotRegistered(string name, Action callback)
+        public void IfNotRegistered(string name, Action callback)
         {
             if (!registeredScripts.ContainsKey(name))
                 callback();
         }
 
-        public static void Register(INamedDynamicScript script)
+        public void Register(INamedDynamicScript script)
         {
             Register(script.ScriptName, script);
         }
 
-        public static void Register(string name, IDynamicScript script)
+        public void Register(string name, IDynamicScript script)
         {
             var item = new Item(name, script);
             registeredScripts[name] = item;
         }
 
-        public static Dictionary<string, string> GetRegisteredScripts()
+        public Dictionary<string, string> GetRegisteredScripts()
         {
             var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var s in registeredScripts)
             {
-                var key = (string)s.Key;
+                var key = s.Key;
                 if (key != "RegisteredScripts")
                 {
-                    var value = s.Value as Item;
+                    var value = s.Value;
                     result[key] = value.Content.Hash;
                 }
             }
             return result;
         }
 
-        public static void Reset()
+        public void Reset()
         {
             foreach (Item script in registeredScripts.Values)
                 script.Generator.Changed();
         }
 
-        public static void CheckScriptRights(string name)
+        public void CheckScriptRights(string name)
         {
             Item item;
             if (registeredScripts.TryGetValue(name, out item) && item != null)
                 item.Generator.CheckRights();
         }
 
-        public static string GetScriptText(string name)
+        public string GetScriptText(string name)
         {
             Item item;
             if (!registeredScripts.TryGetValue(name, out item)
@@ -89,7 +92,7 @@ namespace Serenity.Web
             return script.ScriptText;
         }
 
-        public static string GetScriptInclude(string name, string extension = ".js")
+        public string GetScriptInclude(string name, string extension = ".js")
         {
             Item item;
             if (!registeredScripts.TryGetValue(name, out item)
@@ -103,10 +106,9 @@ namespace Serenity.Web
             return name + extension + "?v=" + (script.Hash ?? script.Time.Ticks.ToString());
         }
 
-        internal static Script GetScript(string name)
+        internal Script GetScript(string name)
         {
-            Item item;
-            if (!registeredScripts.TryGetValue(name, out item) ||
+            if (!registeredScripts.TryGetValue(name, out Item item) ||
                 item == null)
             {
                 return null;
@@ -116,14 +118,12 @@ namespace Serenity.Web
             return item.EnsureContentBytes();
         }
 
-        private static void RaiseScriptChanged(string name)
+        private void RaiseScriptChanged(string name)
         {
-            var handlers = scriptChanged;
-            if (handlers != null)
-                handlers(name);
+            scriptChanged?.Invoke(name);
         }
 
-        public static event Action<string> ScriptChanged
+        public event Action<string> ScriptChanged
         {
             add
             {

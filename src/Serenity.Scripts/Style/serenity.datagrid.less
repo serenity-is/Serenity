@@ -1,0 +1,159 @@
+﻿@import (reference) "bootstrap/mixins.less";
+@import (reference) "bootstrap/variables.less";
+@import (reference) "serenity.variables.less";
+
+.grid-title, .panel-titlebar {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 6px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #e7e7e7;
+    color: @grid-title-color;
+}
+
+.s-Panel {
+    padding: 10px;
+    border-radius: 3px;
+    background: #fff;
+    border-top: 3px solid #3c8dbc;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.s-DataGrid input[type=checkbox] {
+    box-shadow: none;
+}
+
+.s-ApplyTreeOrdering { float: right; margin: 3px 4px 0 2px; width: 18px; height: 18px; padding: 1px; }
+.s-ApplyTreeOrdering.hover { padding: 0px; border: 1px solid #aaa; }
+.s-ApplyTreeOrdering a { width: 18px; height: 18px; display: block; background: transparent url(images/node-select-all.png) no-repeat center center; opacity: 0.7; }
+.s-ApplyTreeOrdering.active { padding: 0px; border: 1px solid #aaa; } 
+.s-ApplyTreeOrdering.active a { opacity: 1; background-color: #fe7; }
+
+.s-IncludeDeleted { float: right; margin: 3px 4px 0 2px; width: 18px; height: 18px; padding: 1px; }
+.s-IncludeDeleted.hover { padding: 0px; border: 1px solid #aaa; }
+.s-IncludeDeleted a { width: 18px; height: 18px; display: block; background: transparent url(images/eraser-plus.png) no-repeat center center; opacity: 0.7; }
+.s-IncludeDeleted.active { padding: 0px; border: 1px solid #aaa; } 
+.s-IncludeDeleted.active a { opacity: 1; background-color: #fe7; }
+
+.delete-item {
+    background: url(images/delete.png) no-repeat center center;
+    display: block;
+    float: right;
+    width: 16px;
+    height: 16px;
+    padding: 1px;
+}
+
+.s-ColumnPickerDialog {
+    > .size { min-height: 250px; }
+
+    .sortable-ghost {
+        opacity: .5;
+        background-color: darksalmon;
+    }
+
+    .ui-dialog-content {
+        overflow-x: hidden;
+        flex-direction: column;
+    }
+
+    .search {
+        flex: 0 0 auto;
+        text-align: right;
+
+        input {
+            margin: 6px 6px 2px 6px;
+        }
+    }
+
+    .columns-container {
+        flex: 1 1 90%;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .column-list {
+        flex: 1 1 50%;
+        margin: 6px;
+        ul {
+            padding-left: 0;
+            min-height: 50px;
+            flex: 1 1 90%;
+        }
+    }
+
+    h5 {
+        padding: 8px;
+        margin: 0;
+        background-color: rgba(0, 0, 0, 0.1);
+        font-size: 13px;
+        font-weight: bold;
+        white-space: nowrap;
+        overflow-x: hidden;
+        flex: 0 0 auto;
+
+        i {
+            color: darkmagenta;
+            margin-right: 2px;
+            font-size: 15px;
+        }
+    }
+
+    li {
+        cursor: move;
+        list-style: none;
+        padding: 5px 5px;
+        position: relative;
+    }
+
+    .drag-handle {
+        color: #5F9EDF;
+        margin-right: 6px;
+        font: bold 20px Sans-Serif;
+        display: inline-block;
+        cursor: move;
+        cursor: -webkit-grabbing;
+        position: relative;
+        top: 2px;
+    }
+
+    i.js-show, i.js-hide {
+        -webkit-transition: opacity .2s;
+        transition: opacity .2s;
+        opacity: 0.5;
+        display: block;
+        cursor: pointer;
+        right: 8px;
+        position: absolute;
+        font-size: 14px;
+        font-weight: bold;
+        font-style: normal;
+    }
+
+    i.js-hide {
+        top: 11px;
+        color: #c00;
+    }
+
+    i.js-show {
+        top: 15px;
+        color: limegreen;
+    }
+
+    .visible-list i.js-show {
+        display: none;
+    }
+
+    .hidden-list i.js-hide {
+        display: none;
+    }
+
+    li:hover i.js-show, li:hover i.js-hide {
+        opacity: 1;
+    }
+
+    .restore-defaults {
+        position: absolute;
+        left: 6px;
+    }
+}

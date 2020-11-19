@@ -12,7 +12,6 @@ namespace Serenity.Web
     {
         internal static ConcurrentDictionary<string, string> expandVersion;
 
-
         static BundleUtils()
         {
             expandVersion = new ConcurrentDictionary<string, string>();

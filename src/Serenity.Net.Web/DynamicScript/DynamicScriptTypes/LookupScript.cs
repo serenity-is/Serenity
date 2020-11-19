@@ -17,8 +17,7 @@ namespace Serenity.Web
         public LookupScript(Func<IEnumerable> getItems)
             : this()
         {
-            Check.NotNull(getItems, "getItems");
-            this.getItems = getItems;
+            this.getItems = getItems ?? throw new ArgumentNullException(nameof(getItems));
         }
 
         public override string GetScript()

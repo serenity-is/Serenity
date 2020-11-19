@@ -2,7 +2,7 @@
 
 namespace Serenity.Web
 {
-    public static partial class DynamicScriptManager
+    public partial class DynamicScriptManager
     {
         internal class Script
         {

@@ -1,72 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
-    <AssemblyName>Serenity.Web</AssemblyName>
-    <PackageId>Serenity.Web.AspNetCore</PackageId>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.0;net45;net461</TargetFrameworks>
+    <AssemblyName>Serenity.Net.Web</AssemblyName>
+    <TargetFrameworks>net5.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="CodeGeneration\**\*.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
-    <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj" />
-    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj" />
-    <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj" />
+    <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NUglify" Version="1.5.13" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.0" />
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-    <DefineConstants>$(DefineConstants)</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.4" />
-  </ItemGroup>  
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);ASPNETCORE22</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461'">
-    <PackageReference Include="System.Data.Common" Version="4.3.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
-    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Antiforgery" Version="2.2.0" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <DefineConstants>$(DefineConstants);NET45;ASPNETCORE22</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>$(DefineConstants);NET45;ASPNETMVC</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
-    <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.7" />
-    <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.2.7" />
-    <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Web" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+  <ItemGroup>
+    <PackageReference Include="NUglify" Version="1.11.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="$(FrameworkPackageVersion)" />
   </ItemGroup>
 </Project>

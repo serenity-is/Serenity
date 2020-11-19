@@ -1,0 +1,133 @@
+﻿@import "serenity.mixins.less";
+
+.fileinput-button input:disabled {
+    cursor: default;
+}
+
+.upload-progress {
+    width: 120px;
+    height: 11px;
+    margin: 4px 4px 0 0;
+    border: 1px solid #aaa;
+    padding: 2px;
+    background-color: #fff;
+    display: none;
+}
+
+.upload-progress div {
+    background-color: #ff7060;
+    height: 100%;
+}
+
+.s-Toolbar .upload-progress {
+    float: right;
+}
+
+.file-item {
+    border: 1px solid #ccc;
+    padding: 1px;
+    width: 132px;
+
+    .deleted {
+        text-decoration: overline;
+    }
+
+    .thumb {
+        background-repeat: no-repeat;
+        background-position: left top;
+        display: block;
+        width: 128px;
+        height: 96px;
+    }
+
+    .download {
+        padding: 4px 0 4px 38px;
+        background: url(site/paper-clip.png) no-repeat 18px 4px;
+    }
+
+    .download a {
+        color: #48c;
+    }
+
+    .filename {
+        position: relative;
+        white-space: nowrap;
+        padding-right: 16px;
+        display: block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        text-align: center;
+        font-size: 11px;
+    }
+
+    &.file-binary .thumb {
+        background-image: url(images/thumb-file-72.png);
+        background-position: center center;
+        background-color: lavender;
+    }
+}
+
+.s-ImageUploadEditor, .s-MultipleImageUploadEditor {
+    ul {
+        border-width: 1px;
+        border-style: none solid solid solid;
+        border-color: #eee;
+        padding: 6px 6px 8px 6px;
+        overflow-y: auto;
+        background-color: #fff;
+        min-height: 116px;
+    }
+
+    .file-item {
+        box-shadow: 1px 1px 4px rgba(4, 4, 4, 0.2);
+    }
+
+    .s-Toolbar {
+        border-radius: 0px;
+        padding: 4px;
+        background-color: #eee;
+        margin-bottom: 0;
+
+        .tool-button {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.s-MultipleImageUploadEditor li {
+    float: left;
+    margin-right: 6px;
+
+    .delete {
+        display: block;
+        position: absolute;
+        top: 2px;
+        right: 0px;
+        width: 16px;
+        height: 16px;
+        background: url(images/cross-script.png) no-repeat center center;
+        opacity: 0.5;
+        cursor: pointer;
+    }
+
+    .delete:hover {
+        opacity: 1;
+    }
+}
+
+.s-ImageUploadEditor.hide-original-name ul {
+    min-height: 100px;
+}
+
+.file-download-link {
+    display: inline-block;
+    padding-left: 22px;
+    min-height: 20px;
+    background: url(images/arrow-down.png) no-repeat left 1px;
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.file-download-link:hover {
+    opacity: 1;
+}

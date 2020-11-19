@@ -1,20 +1,23 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.WebUtilities;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
-#if !ASPNETMVC
-using Microsoft.AspNetCore.WebUtilities;
-#else
-using System.Web;
-#endif
 
 namespace Serenity.Web
 {
-    public static partial class DynamicScriptManager
+    public partial class DynamicScriptManager
     {
         private class Item
         {
+            private readonly DynamicScriptManager scriptManager;
+
+            public Item(DynamicScriptManager scriptManager)
+            {
+                this.scriptManager = scriptManager;
+            }
+
             public string Name;
             public IDynamicScript Generator;
 
@@ -36,10 +39,10 @@ namespace Serenity.Web
                     if (Generator.GroupKey == null)
                         return content;
 
-                    TwoLevelCache.GetLocalStoreOnly("DynamicScriptCheck:" + this.Name, TimeSpan.Zero,
+                    scriptManager.cache.GetLocalStoreOnly("DynamicScriptCheck:" + Name, TimeSpan.Zero,
                         Generator.GroupKey, () =>
                         {
-                            this.Reset();
+                            Reset();
                             return new object();
                         });
 
@@ -65,20 +68,14 @@ namespace Serenity.Web
             private void ScriptChanged(object sender, EventArgs e)
             {
                 Reset();
-                RaiseScriptChanged(Name);
+                scriptManager.RaiseScriptChanged(Name);
             }
 
             private static string GetMD5HashString(byte[] bytes)
             {
-#if !ASPNETMVC
                 var md5 = MD5.Create();
                 byte[] result = md5.ComputeHash(bytes);
                 return WebEncoders.Base64UrlEncode(result);
-#else
-                var md5 = new MD5CryptoServiceProvider();
-                byte[] result = md5.ComputeHash(bytes);
-                return HttpServerUtility.UrlTokenEncode(result);
-#endif
             }
 
             private Script GenerateContent()
@@ -123,12 +120,12 @@ namespace Serenity.Web
                             DateTime.Now.Add(Generator.Expiration)
                     };
 
-                    this.content = script;
+                    content = script;
 
                     if (Generator.GroupKey == null)
                         return script;
 
-                    TwoLevelCache.GetLocalStoreOnly("DynamicScriptCheck:" + this.Name, Generator.Expiration,
+                    scriptManager.cache.GetLocalStoreOnly("DynamicScriptCheck:" + Name, Generator.Expiration,
                         Generator.GroupKey, () =>
                         {
                             return new object();
@@ -150,7 +147,7 @@ namespace Serenity.Web
 
             private void Reset()
             {
-                this.content = new Script
+                content = new Script
                 {
                     Time = DateTime.UtcNow,
                     Hash = null,

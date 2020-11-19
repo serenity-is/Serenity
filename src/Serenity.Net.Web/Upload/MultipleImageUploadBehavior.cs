@@ -17,8 +17,14 @@ namespace Serenity.Services
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
         private UploadHelper uploadHelper;
         private Dictionary<string, Field> replaceFields;
+        private readonly ITextLocalizer localizer;
 
-        public bool ActivateFor(Row row)
+        public MultipleImageUploadBehavior(ITextLocalizer localizer)
+        {
+            this.localizer = localizer;
+        }
+
+        public bool ActivateFor(IRow row)
         {
             if (ReferenceEquals(null, Target))
                 return false;
@@ -175,7 +181,7 @@ namespace Serenity.Services
                 if (!filename.ToLowerInvariant().StartsWith("temporary/"))
                     throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
-                ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, ref filename);
+                ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, localizer, ref filename);
 
                 var idField = (Field)(((IIdRow)handler.Row).IdField);
                 var copyResult = uploadHelper.CopyTemporaryFile(filename, idField.AsObject(handler.Row), filesToDelete,

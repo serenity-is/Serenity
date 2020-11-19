@@ -18,11 +18,17 @@ namespace Serenity.Services
         private ImageUploadEditorAttribute attr;
         private string fileNameFormat;
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
+        private readonly ITextLocalizer localizer;
         private UploadHelper uploadHelper;
         private StringField originalNameField;
         private Dictionary<string, Field> replaceFields;
 
-        public bool ActivateFor(Row row)
+        public ImageUploadBehavior(ITextLocalizer localizer)
+        {
+            this.localizer = localizer;
+        }
+
+        public bool ActivateFor(IRow row)
         {
             if (ReferenceEquals(null, Target))
                 return false;
@@ -74,7 +80,7 @@ namespace Serenity.Services
             return true;
         }
 
-        internal static Dictionary<string, Field> ParseReplaceFields(string fileNameFormat, Row row, Field target)
+        internal static Dictionary<string, Field> ParseReplaceFields(string fileNameFormat, IRow row, Field target)
         {
             if (fileNameFormat.IndexOf('|') < 0)
                 return null;
@@ -280,7 +286,7 @@ namespace Serenity.Services
         {
             var fileName = (StringField)Target;
             var newFilename = fileName[handler.Row] = fileName[handler.Row].TrimToNull();
-            CheckUploadedImageAndCreateThumbs(attr, ref newFilename);
+            CheckUploadedImageAndCreateThumbs(attr, localizer, ref newFilename);
 
             var idField = (Field)(((IIdRow)handler.Row).IdField);
 
@@ -316,7 +322,7 @@ namespace Serenity.Services
             filename[handler.Row] = copyResult.DbFileName;
         }
 
-        public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attr, ref string temporaryFile)
+        public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attr, ITextLocalizer localizer, ref string temporaryFile)
         {
             ImageCheckResult[] supportedFormats = null;
 
@@ -343,11 +349,11 @@ namespace Serenity.Services
                 using (var fs = new FileStream(temporaryPath, FileMode.Open))
                 {
                     if (attr.MinSize != 0 && fs.Length < attr.MinSize)
-                        throw new ValidationError(String.Format(Texts.Controls.ImageUpload.UploadFileTooSmall,
+                        throw new ValidationError(String.Format(Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
                             UploadHelper.FileSizeDisplay(attr.MinSize)));
 
                     if (attr.MaxSize != 0 && fs.Length > attr.MaxSize)
-                        throw new ValidationError(String.Format(Texts.Controls.ImageUpload.UploadFileTooBig,
+                        throw new ValidationError(String.Format(Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
                             UploadHelper.FileSizeDisplay(attr.MaxSize)));
 
                     ImageCheckResult result;

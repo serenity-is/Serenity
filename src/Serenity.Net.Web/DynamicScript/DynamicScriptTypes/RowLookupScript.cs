@@ -1,38 +1,36 @@
 ﻿using Serenity.Data;
 using Serenity.Data.Mapping;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-#if !NET45
-using System;
-#endif
 
 namespace Serenity.Web
 {
     public class RowLookupScript<TRow> : LookupScript
-        where TRow: Row, new()
+        where TRow: class, IRow, new()
     {
+        private readonly IConnectionFactory connections;
+
         protected virtual void ApplyOrder(SqlQuery query)
         {
-            var row = (Row)((query as ISqlQueryExtensible).FirstIntoRow);
+            var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
 
-            var nameField = row.GetNameField();
-            if (!ReferenceEquals(null, nameField))
-                query.OrderBy(nameField);
-            else if (row is IIdRow)
-                query.OrderBy((Field)((IIdRow)row).IdField);
+            if (row.NameField is object)
+                query.OrderBy(row.NameField);
+            else if (row.IdField is object)
+                query.OrderBy(row.IdField);
         }
 
         protected virtual void PrepareQuery(SqlQuery query)
         {
-            var row = (Row)((query as ISqlQueryExtensible).FirstIntoRow);
+            var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
 
-            if (row is IIdRow)
-                query.Select((Field)((IIdRow)row).IdField);
+            if (row.IdField is object)
+                query.Select(row.IdField);
 
-            var nameField = row.GetNameField();
-            if (!ReferenceEquals(null, nameField))
-                query.Select(nameField);
+            if (row.NameField is object)
+                query.Select(row.NameField);
 
             var list = new List<object>();
 
@@ -44,39 +42,34 @@ namespace Serenity.Web
             }
         }
 
-        public RowLookupScript()
+        public RowLookupScript(IConnectionFactory connections)
             : base()
         {
+            this.connections = connections ?? throw new ArgumentNullException(nameof(connections));
+
             var row = new TRow();
 
-            Field field;
-
-            var idRow = row as IIdRow;
-            if (idRow != null)
+            if (row.IdField is object)
             {
-                field = ((Field)idRow.IdField);
-                this.IdField = field.PropertyName ?? field.Name;
+                IdField = row.IdField.PropertyName ?? row.IdField.Name;
             }
 
-            var nameField = row.GetNameField();
-            if (!ReferenceEquals(null, nameField))
+            if (row.NameField is Field nameField)
             {
-                this.TextField = nameField.PropertyName ?? nameField.Name;
+                TextField = nameField.PropertyName ?? nameField.Name;
             }
 
-            var treeRow = row as IParentIdRow;
-            if (treeRow != null)
+            if (row is IParentIdRow treeRow)
             {
-                field = ((Field)treeRow.ParentIdField);
-                this.ParentIdField = field.PropertyName ?? field.Name;
+                ParentIdField = treeRow.ParentIdField.PropertyName ?? treeRow.ParentIdField.Name;
             }
 
             var readPermission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
             if (readPermission != null)
-                this.Permission = readPermission.Permission ?? "?";
+                Permission = readPermission.Permission ?? "?";
 
-            this.GroupKey = row.GetFields().GenerationKey;
-            this.getItems = GetItems;
+            GroupKey = row.GetFields().GenerationKey;
+            getItems = GetItems;
         }
 
         protected virtual List<TRow> GetItems()
@@ -90,7 +83,7 @@ namespace Serenity.Web
             PrepareQuery(query);
             ApplyOrder(query);
 
-            using (var connection = SqlConnections.NewByKey(loader.GetFields().ConnectionKey))
+            using (var connection = connections.NewByKey(loader.Fields.ConnectionKey))
             {
                 query.ForEach(connection, delegate ()
                 {

@@ -7,13 +7,16 @@ using System;
 namespace Serenity.Web
 {
     public class DistinctValuesScript<TRow> : LookupScript
-       where TRow : Row, new()
+       where TRow : class, IRow, new()
     {
-        private string propertyName;
+        private readonly IConnectionFactory connections;
+        private readonly string propertyName;
 
-        public DistinctValuesScript(string propertyName)
+        public DistinctValuesScript(IConnectionFactory connections, string propertyName)
         {
-            this.propertyName = propertyName;
+            this.connections = connections ?? throw new ArgumentNullException(nameof(connections));
+            this.propertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
+
             var row = new TRow();
             var field = GetFieldFrom(row);
 
@@ -21,23 +24,23 @@ namespace Serenity.Web
                 typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
             if (readPermission != null)
-                this.Permission = readPermission.Permission ?? "?";
+                Permission = readPermission.Permission ?? "?";
 
-            this.GroupKey = row.GetFields().GenerationKey;
-            this.getItems = GetItems;
+            GroupKey = row.GetFields().GenerationKey;
+            getItems = GetItems;
 
-            this.TextField = "v";
-            this.IdField = "v";
+            TextField = "v";
+            IdField = "v";
         }
 
-        private Field GetFieldFrom(Row row)
+        private Field GetFieldFrom(IRow row)
         {
             Field field = row.FindFieldByPropertyName(propertyName) ??
                 row.FindField(propertyName);
 
-            if (ReferenceEquals(null, field))
+            if (field is null)
             {
-                throw new Exception(String.Format(
+                throw new InvalidProgramException(string.Format(
                     "Property '{0}' specified in a distinct values script on " +
                     "row type {1} is not found!", propertyName, row.GetType().FullName));
             }
@@ -47,13 +50,13 @@ namespace Serenity.Web
 
         protected virtual void ApplyOrder(SqlQuery query)
         {
-            var row = (Row)((query as ISqlQueryExtensible).FirstIntoRow);
+            var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
             query.OrderBy(GetFieldFrom(row));
         }
 
         protected virtual void PrepareQuery(SqlQuery query)
         {
-            var row = (Row)((query as ISqlQueryExtensible).FirstIntoRow);
+            var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
             var field = GetFieldFrom(row);
 
             query.Select(field)
@@ -83,7 +86,7 @@ namespace Serenity.Web
             PrepareQuery(query);
             ApplyOrder(query);
 
-            using (var connection = SqlConnections.NewByKey(loader.GetFields().ConnectionKey))
+            using (var connection = connections.NewByKey(loader.Fields.ConnectionKey))
             {
                 query.ForEach(connection, delegate ()
                 {

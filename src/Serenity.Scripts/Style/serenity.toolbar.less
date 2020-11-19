@@ -1,0 +1,162 @@
+﻿@import (reference) "bootstrap/mixins.less";
+@import (reference) "bootstrap/variables.less";
+@import (reference) "serenity.variables.less";
+
+.s-Toolbar {
+    border-style: none;
+    min-height: 40px;
+    padding-bottom: 3px;
+    margin-bottom: 8px;
+
+    .separator {
+        float: left;
+        height: 24px;
+        border-left: 1px solid #ccc;
+        margin: 2px 6px 0 3px;
+    }
+
+    .buttons-inner {
+        float: left;
+        padding: 2px 3px 2px 0;
+    }
+
+    .button-inner {
+        float: left;
+        display: block;
+        padding: 3px 3px 3px 20px;
+        background-repeat: no-repeat;
+        background-position: center left;
+    }
+
+    .no-text .button-inner {
+        padding: 3px 3px 16px 13px;
+    }
+
+    .no-text.icon-tool-button .button-inner {
+        padding: 0;
+    }
+
+    .select2-container {
+        margin-top: 2px;
+        min-width: 150px;
+        margin-right: 6px;
+    }
+
+    .select2-container .select2-choice {
+        line-height: 25px;
+        height: 26px;
+    }
+}
+
+.tool-button {
+    color: #000;
+    float: left;
+    display: block;
+    cursor: pointer;
+    border: 1px solid #aaa;
+    margin-right: 3px;
+    margin-bottom: 5px;
+    border-radius: 3px;
+    background: linear-gradient(rgb(255, 255, 255) 0px, rgb(238, 238, 238) 100%) repeat-x rgb(247, 247, 247);
+
+    .button-outer {
+        float: left;
+        padding: 0px 3px;
+        border-left: 1px solid #fff;
+        border-top: 1px solid #fff;
+        border-right: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        border-radius: 3px;
+    }
+
+    &:hover {
+        border: 1px solid #aaa;
+
+        .button-outer {
+            background-color: #fcfcf0;
+            border-left: 1px solid #fff;
+            border-top: 1px solid #fff;
+            border-right: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+    }
+
+    &:active {
+        box-shadow: 0px 0px 0px #fff;
+
+        .button-outer {
+            border-left: 1px solid #d7d7d7;
+            border-top: 1px solid #d7d7d7;
+            border-right: 1px solid #fff;
+            border-bottom: 1px solid #fff;
+        }
+    }
+
+    &.pressed {
+        background: linear-gradient(#eeb 0px, #ffc 100%) repeat-x #eee;
+    
+        .button-outer {
+            border-left: 1px solid #d7d7d7;
+            border-top: 1px solid #d7d7d7;
+            border-right: 1px solid #fff;
+            border-bottom: 1px solid #fff;
+        }
+    }
+
+    &.disabled {
+        cursor: default;
+        border-color: #ccc;
+        opacity: 0.3;
+
+        .button-outer, &:hover, &:hover .button-outer {
+            background-color: transparent;
+        }
+
+        .button-outer {
+            border-left: 1px solid #fff;
+            border-top: 1px solid #fff;
+            border-right: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+    }
+}
+
+.s-Toolbar .s-ToggleButton {
+    float: right; 
+    margin: 4px 4px 0 2px; 
+}
+
+.s-ToggleButton {
+    width: 18px; 
+    height: 18px; 
+    padding: 1px;
+}
+
+.s-ToggleButton.pressed {
+    padding: 0px; 
+    border: 1px solid #aaa;
+}
+
+.s-ToggleButton.pressed a {
+    opacity: 1; 
+    background-color: #fe7;
+}
+
+.s-ToggleButton:hover {
+    padding: 0px; 
+    border: 1px solid #aaa;
+}
+
+.s-ToggleButton a {
+    width: 18px; 
+    height: 18px; 
+    display: block; 
+    background-color: transparent; 
+    background-repeat: no-repeat; 
+    background-position: center center; 
+    opacity: 0.7;
+}
+
+.s-IncludeDeletedToggle a {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOvwAADr8BOAVTJAAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC42/Ixj3wAAAnBJREFUOE+90F1IU3EYBvDXA2M5seWcUQqT6dxNwbmsaELWxboOAq8l/mMUuxCcF7VMKydhMqShc+mwLDPCZGNhV7Mxho25VGasGgwbzKbLbU7F6OPtf8ZZ47SIguiBH+fzeTgc+O9xQ9MxJzRddkHjFSeojvO3/y5ckRv4OvsSvz0P4Ayork6D6gT/+M/CFbjiF7cfUw+eYWpyNj/2hFF1T0HjSf6134cbeQqqrs8uH67fc+HGhFswNsk09E6Cspl//dfp6+tjzWYz+TTzApOOGUyOOwVjUfMwbtoe4wSjvMVXStPT08NSZG9vD3d2dvDD6LRg7M0NK77rHcKPw1M4zihv8zVhTCYTS5Hd3V3c2tr6oTD2unsQI9fv4Lr1IY4xDZZRqG/hq8V0dnayRqORbG9vYzqdLrFsGsBwlwXXBu+jnakftEP9ab5aTHt7O2swGEgul8NUKlUiFArh4uIixgccOMIorcOgOMNXi9HpdKxeryfZbBaTyWSJQCCAwWAQo9Eoym4qvfscNW/hkdzG14tpa2sjmUwGE4lECb/fj/Pz8xiJRFCtVpOyMfnKhc0OhAl5kK8X09ramh+Kx+MCXq8XfT4fhsNhLO+o8ZYNyVbgrix4foMgd8yzVxW/TKvVshqNJj+2urqa5/F4cG5uDpeWllAqlRKwHFhpWTuHPwOrVPhldXV1rEKhILFYLP9jC0QiEaGPWdBLbNC/P8g5+r4ZC+fQXyn4V1WUWiwWn5VIJIQvF5yiFNRhqhquVbyqjR1B6K5YoNcMJUg5VU3VUlzhEHWQklMySkpVUhK4KLKDTrQAl0Qj9LqM+pcB+A57H7OVBxeVzAAAAABJRU5ErkJggg==) no-repeat center center;
+}

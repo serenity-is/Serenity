@@ -20,7 +20,7 @@ namespace Serenity.Data
         }
 
         public static List<TRow> ToRows<TRow>(string forXml,
-            Action<XElement, TRow> readRow) where TRow : Row, new()
+            Action<XElement, TRow> readRow) where TRow : class, IRow, new()
         {
             var result = new List<TRow>();
             forXml = forXml.TrimToNull();

@@ -1,0 +1,78 @@
+﻿@import (reference) "bootstrap/mixins.less";
+@import (reference) "bootstrap/variables.less";
+@import (reference) "serenity.variables.less";
+
+.s-QuickSearchBar {
+    margin: 2px 5px 5px 0;
+    float: left;
+    border-right: 1px solid #aaa;
+    border-radius: 0 4px 4px 0;
+    background-clip: padding-box;
+
+    .quick-search-icon {
+        display: inline-block;
+        float: left;
+        padding: 0 0 0 8px;
+        border-radius: 5px 0 0 5px;
+        background: @grid-title-color;
+        height: 28px;
+        width: 36px;
+
+        i {
+            display: inline-block;
+            width: 22px;
+            height: 28px;
+            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOvwAADr8BOAVTJAAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC42/Ixj3wAAAJtJREFUOE/NktENgCAMRBnFERyFkRzBERjFERzFDeodHImoaFQ+fElDer02VXDNMTOPmBFbmHtZroFxiC11BlnPgYEbZAKik94pz9Q3QjF/QpBUQD2VbZZ0RAYSN9hDPZXNJJVAvzYIWeoe1cm7TQhqTf7J99shMNy9k8ztoOqLRSwxS2evlmewUQPI/wZNkp+DZg6aEKOkrzi3AvUng4YlvGpNAAAAAElFTkSuQmCC) no-repeat center center;
+        }
+    }
+
+    .s-QuickSearchInput {
+        padding: 0 2px 0 4px;
+        border-radius: 0 4px 4px 0;
+        background-clip: padding-box;
+        border: 1px solid #aaa;
+        border-style: solid none solid none;
+        box-shadow: none;
+        float: left;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    input.s-QuickSearchInput {
+        line-height: 23px;
+        height: 28px;
+    }
+}
+
+.has-quick-search-fields {
+    border-right: none;
+}
+
+.s-QuickSearchBar.has-quick-search-fields input.s-QuickSearchInput {
+    border-radius: 0;
+}
+
+.s-QuickSearchLoading, .s-QuickSearchLoading input {
+    cursor: wait;
+}
+
+.s-QuickSearchLoading span i {
+    background: #fff url(images/quick-search-loading.gif) no-repeat center center;
+}
+
+a.quick-search-field {
+    padding: 0 13px 0 3px;
+    background: #fff url(images/down.gif) no-repeat right 5px;
+    float: right;
+    font-size: 11px;
+    height: 30px;
+    line-height: 25px;
+    cursor: pointer;
+    margin-right: 1px;
+    color: #0090d9;
+    border: 1px solid #ddd;
+    border-radius: 0 4px 4px 0;
+    border-style: solid solid solid none;
+}

@@ -1,11 +1,12 @@
-﻿#if !ASPNETMVC
-
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serenity.Abstractions;
 using Serenity.Caching;
-using Serenity.Configuration;
+using Serenity.Data;
+using Serenity.Localization;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Serenity.Extensions.DependencyInjection
 {
@@ -13,51 +14,41 @@ namespace Serenity.Extensions.DependencyInjection
     {
         public static void AddConfig(this IServiceCollection services, IConfiguration configuration)
         {
-            services.TryAddSingleton<IConfiguration>(configuration);
-            services.TryAddSingleton<IConfigurationRepository, AppSettingsJsonConfigRepository>();
-            services.TryAddSingleton<IConfigurationManager, WebConfigurationWrapper>();
+            services.TryAddSingleton(configuration);
         }
 
-#if NET45
         public static void AddCaching(this IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.TryAddSingleton<ILocalCache, MemoryLocalCache>();
             services.TryAddSingleton<IDistributedCache, DistributedCacheEmulator>();
-        }
-
-        public static void AddFileLogging(this IServiceCollection services)
-        {
-            services.TryAddSingleton<ILogger, Serenity.Logging.FileLogger>();
         }
 
         public static void AddTextRegistry(this IServiceCollection services)
         {
-            services.TryAddSingleton<ILocalTextRegistry, Serenity.Localization.LocalTextRegistry>();
+            services.TryAddSingleton<ILocalTextRegistry, LocalTextRegistry>();
+            services.TryAddSingleton<ITextLocalizer, DefaultTextLocalizer>();
         }
 
-        public static void AddNestedTexts(this ILocalTextRegistry registry, System.Collections.Generic.IEnumerable<System.Reflection.Assembly> assemblies = null)
+        public static void AddNestedTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies)
         {
-            Serenity.Localization.NestedLocalTextRegistration.Initialize(assemblies, registry);
+            NestedLocalTextRegistration.AddNestedTexts(registry, assemblies);
         }
 
-        public static void AddEnumTexts(this ILocalTextRegistry registry, System.Collections.Generic.IEnumerable<System.Reflection.Assembly> assemblies = null,
+        public static void AddEnumTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies,
             string languageID = LocalText.InvariantLanguageID)
         {
-            Serenity.Localization.EnumLocalTextRegistration.Initialize(assemblies, languageID);
+            EnumLocalTextRegistration.AddEnumTexts(registry, assemblies, languageID);
         }
 
-        public static void AddRowTexts(this ILocalTextRegistry registry,
+        public static void AddRowTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies, 
             string languageID = LocalText.InvariantLanguageID)
         {
-            Serenity.Localization.EntityLocalTexts.Initialize(languageID, registry);
+            EntityLocalTexts.AddRowTexts(registry, RowRegistry.EnumerateRowInstances(assemblies), languageID);
         }
 
         public static void AddJsonTexts(this ILocalTextRegistry registry, string path)
         {
-            Serenity.Localization.JsonLocalTextRegistration.AddFromFilesInFolder(path, registry);
+            JsonLocalTextRegistration.AddJsonTexts(registry, path);
         }
-#endif
     }
 }
-#endif

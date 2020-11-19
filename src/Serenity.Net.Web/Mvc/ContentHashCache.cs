@@ -1,31 +1,27 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
+using Serenity.IO;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using System.Web.Hosting;
 using System.Web;
-using Serenity.ComponentModel;
-using System.Collections.Generic;
-using Serenity.IO;
-using System.Collections.Concurrent;
-#if !ASPNETMVC
-using Microsoft.AspNetCore.WebUtilities;
-#endif
+using System.Web.Hosting;
 
 namespace Serenity.Web
 {
-    /// <summary>
-    ///   Static class which contains javascript helper functions</summary>
-    public static class ContentHashCache
+    public class ContentHashCache
     {
-        private static Hashtable hashByContentPath;
-        private static bool cdnEnabled;
-        private static string cdnHttp;
-        private static string cdnHttps;
-        private static GlobFilter cdnFilter;
+        private Hashtable hashByContentPath;
+        private readonly bool cdnEnabled;
+        private readonly string cdnHttp;
+        private readonly string cdnHttps;
+        private readonly GlobFilter cdnFilter;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        [SettingKey("CDNSettings"), SettingScope("Application")]
-        private class CDNSettings
+        public class CDNSettings
         {
             public bool? Enabled { get; set; }
             public string Url { get; set; }
@@ -34,10 +30,12 @@ namespace Serenity.Web
             public List<string> Exclude { get; set; }
         }
 
-        static ContentHashCache()
+        public ContentHashCache(IOptions<CDNSettings> cdnSettings, IHttpContextAccessor httpContextAccessor = null)
         {
+            this.httpContextAccessor = httpContextAccessor;
+
+            var cdn = cdnSettings.Value;
             hashByContentPath = new Hashtable(StringComparer.OrdinalIgnoreCase);
-            var cdn = Config.Get<CDNSettings>();
             cdnEnabled = cdn.Enabled == true && !string.IsNullOrEmpty(cdn.Url);
             cdnHttp = cdn.Url;
             if (string.IsNullOrEmpty(cdn.HttpsUrl))
@@ -48,7 +46,7 @@ namespace Serenity.Web
             cdnFilter = new GlobFilter(cdn.Include, cdn.Exclude);
         }
 
-        public static void ScriptsChanged()
+        public void ScriptsChanged()
         {
             hashByContentPath = new Hashtable(StringComparer.OrdinalIgnoreCase);
         }
@@ -57,21 +55,13 @@ namespace Serenity.Web
         {
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 120000))
             { 
-#if !ASPNETMVC
                 var md5 = MD5.Create();
                 byte[] hash = md5.ComputeHash(fs);
                 return WebEncoders.Base64UrlEncode(hash);
-#else
-                using (MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider())
-                {
-                    byte[] hash = md5.ComputeHash(fs);
-                    return HttpServerUtility.UrlTokenEncode(hash);
-                }
-#endif
             }
         }
 
-        public static string ResolvePath(string contentPath)
+        public string ResolvePath(string contentPath)
         {
             if (contentPath.IsNullOrEmpty())
                 throw new ArgumentNullException("contentPath");
@@ -84,20 +74,13 @@ namespace Serenity.Web
             if (!cdnEnabled)
                 return contentPath;
 
-#if !ASPNETMVC
-            var contextAccessor = Dependency.TryResolve<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
-            bool isSecureConnection = contextAccessor != null && contextAccessor.HttpContext != null &&
-                contextAccessor.HttpContext.Request.IsHttps;
-#else
-            bool isSecureConnection = HttpContext.Current != null &&
-                HttpContext.Current.Request.IsSecureConnection;
-#endif
+            bool isSecureConnection = httpContextAccessor?.HttpContext?.Request?.IsHttps == true;
 
             string cdnRoot = isSecureConnection ? cdnHttps : cdnHttp;
             return UriHelper.Combine(cdnRoot, contentPath);
         }
 
-        public static string ResolveWithHash(string contentUrl)
+        public string ResolveWithHash(string contentUrl)
         {
             if (contentUrl.IsNullOrEmpty())
                 throw new ArgumentNullException("contentUrl");
@@ -149,14 +132,8 @@ namespace Serenity.Web
             if (!cdnFilter.IsMatch(cdnMatch.Replace('/', Path.DirectorySeparatorChar)))
                 return contentUrl;
 
-#if !ASPNETMVC
-            var contextAccessor = Dependency.TryResolve<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
-            bool isSecureConnection = contextAccessor != null && contextAccessor.HttpContext != null &&
-                contextAccessor.HttpContext.Request.IsHttps;
-#else
-            bool isSecureConnection = HttpContext.Current != null && 
-                HttpContext.Current.Request.IsSecureConnection;
-#endif
+            bool isSecureConnection = httpContextAccessor?.HttpContext?.Request?.IsHttps == true;
+
             string cdnRoot = isSecureConnection ? cdnHttps : cdnHttp;
             contentUrl = VirtualPathUtility.ToAbsolute(contentUrl);
             return UriHelper.Combine(cdnRoot, contentUrl);
