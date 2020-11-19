@@ -26,14 +26,12 @@ namespace Serenity.Net.Data.Entity.Tests
         [Fact]
         public void Can_Create_Row_With_Initialized_Fields_With_DefaultScope()
         {
-            RowFieldsProvider.TestScope(() =>
+            RowFieldsProvider.SetLocal(new DefaultRowFieldsProvider());
+            var fields = new ComplexRow.RowFields().Init(annotations: null);
+            new ComplexRow(fields)
             {
-                var fields = new ComplexRow.RowFields().Init(annotations: null);
-                var row = new ComplexRow(fields)
-                {
-                    BasicExpression = "test"
-                };
-            }, new DefaultRowFieldsProvider());
+                BasicExpression = "test"
+            }.ToString();
         }
 
         [Fact]

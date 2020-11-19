@@ -1,67 +1,52 @@
 ﻿using System;
+using System.Threading;
 
 namespace Serenity.Data
 {
     public class RowFieldsProvider
     {
-        private static readonly object sync = new object();
-        private static IRowFieldsProvider current;
+        private static IRowFieldsProvider defaultProvider;
+        private static readonly AsyncLocal<IRowFieldsProvider> localProvider;
 
         static RowFieldsProvider()
         {
-            current = new DefaultRowFieldsProvider();
+            defaultProvider = new DefaultRowFieldsProvider();
+            localProvider = new AsyncLocal<IRowFieldsProvider>();
         }
 
         /// <summary>
-        /// Gets current row fields provider. This instance is required
-        /// as rows might have to be created in contexts where dependency injection
-        /// is not possible, like deserialization.
+        /// Gets current row fields provider. Returns async local provider if available,
+        /// otherwise the default provider.
         /// </summary>
-        public static IRowFieldsProvider Current
-        {
-            get
-            {
-                lock (sync)
-                    return current;
-            }
-        }
+        public static IRowFieldsProvider Current => localProvider.Value ?? defaultProvider;
 
-        /// Sets current row fields provider. This instance is required
+        /// <summary>
+        /// Sets default row fields provider. This instance is required
         /// as rows might have to be created in contexts where dependency injection
         /// is not possible, like deserialization. If using a DI container,
         /// set this at startup to the same singleton service you register with DI.
-        public static IRowFieldsProvider SetCurrent(IRowFieldsProvider provider)
+        /// </summary>
+        /// <param name="provider">Provider. Required.</param>
+        /// <returns>Old default provider</returns>
+        public static IRowFieldsProvider SetDefault(IRowFieldsProvider provider)
         {
-            if (provider == null)
-                throw new ArgumentNullException(nameof(provider));
-
-            lock (sync)
-            {
-                var old = current;
-                current = provider;
-                return old;
-            }
+            var old = defaultProvider;
+            defaultProvider = provider ?? throw new ArgumentNullException(nameof(provider));
+            return old;
         }
 
         /// <summary>
-        /// Runs operation in locked context, please use only for tests
+        /// Sets local row fields provider for current thread and async context. 
+        /// Useful for testing and async methods to set provider locally and for 
+        /// auto spawned threads.
         /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="factory"></param>
-        public static void TestScope(Action operation, IRowFieldsProvider factory)
+        /// <param name="provider">Row fields provider. Can be null.</param>
+        /// <returns>Old local provider if any.</returns>
+        public static IRowFieldsProvider SetLocal(IRowFieldsProvider provider)
         {
-            lock (sync)
-            {
-                var old = SetCurrent(factory);
-                try
-                {
-                    operation();
-                }
-                finally
-                {
-                    SetCurrent(old);
-                }
-            }
+            var old = localProvider.Value;
+            localProvider.Value = provider;
+            return old;
         }
     }
 }
