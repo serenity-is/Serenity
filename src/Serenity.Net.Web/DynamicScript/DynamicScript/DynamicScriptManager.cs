@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Serenity.Web
 {
-    public partial class DynamicScriptManager
+    public partial class DynamicScriptManager : IDynamicScriptManager
     {
         private ConcurrentDictionary<string, Item> registeredScripts;
         private Action<string> scriptChanged;
@@ -15,7 +15,7 @@ namespace Serenity.Web
         public DynamicScriptManager(ITwoLevelCache cache)
         {
             this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            
+
             registeredScripts = new ConcurrentDictionary<string, Item>(StringComparer.OrdinalIgnoreCase);
             Register(new RegisteredScripts());
         }

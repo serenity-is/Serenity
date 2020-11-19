@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Web.Hosting;
 
 namespace Serenity.Web
 {
@@ -41,19 +40,6 @@ namespace Serenity.Web
             return null;
         }
 
-        private void WatchForChanges(string rootPath)
-        {
-            var sw = new FileSystemWatcher(rootPath);
-            sw.IncludeSubdirectories = true;
-            sw.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite;
-            sw.Changed += (s, e) => Changed(rootPath, e.Name);
-            sw.Created += (s, e) => Changed(rootPath, e.Name);
-            sw.Deleted += (s, e) => Changed(rootPath, e.Name);
-            sw.Renamed += (s, e) => Changed(rootPath, e.OldName);
-
-            sw.EnableRaisingEvents = true;
-        }
-
         private void Changed(string rootPath, string name)
         {
             string key = GetKey(rootPath, rootPath + name);
@@ -68,16 +54,13 @@ namespace Serenity.Web
                 bundle.Changed();
         }
 
-        public void Initialize(string[] rootUrls, bool watchForChanges = true)
+        public void Initialize(IDynamicScriptManager manager, string[] paths, bool watchForChanges = true)
         {
             var bundleList = new List<Func<string>>();
 
-            foreach (var rootUrl in rootUrls)
+            foreach (var p in paths)
             {
-                var path = rootUrl;
-                if (path.StartsWith("~/"))
-                    path = HostingEnvironment.MapPath(path);
-
+                var path = p;
                 if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()))
                     path = path + Path.DirectorySeparatorChar;
 
@@ -91,17 +74,20 @@ namespace Serenity.Web
                         continue;
 
                     var script = new TemplateScript(key, () => File.ReadAllText(file));
-                    DynamicScriptManager.Register(script);
+                    manager.Register(script);
                     scriptByKey[key.ToLowerInvariant()] = script;
                     bundleList.Add(script.GetScript);
                 }
 
                 if (watchForChanges)
-                    WatchForChanges(path);
+                {
+                    var watcher = new FileWatcher(path, "*.html");
+                    watcher.Changed += name => Changed(path, name);
+                }
             }
 
             bundle = new ConcatenatedScript(bundleList);
-            DynamicScriptManager.Register("TemplateBundle", bundle);
+            manager.Register("TemplateBundle", bundle);
         }
     }
 }

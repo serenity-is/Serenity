@@ -7,7 +7,6 @@ namespace Serenity.Reporting
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
-    using System.Web.Hosting;
 
     public class HtmlToPdfConverter : IHtmlToPdfOptions
     {       
@@ -25,11 +24,9 @@ namespace Serenity.Reporting
 
         public byte[] Execute()
         {
-#if !ASPNETMVC
-            var exePath = UtilityExePath ?? Path.Combine(HostingEnvironment.MapPath("~/"), "../App_Data/Reporting/wkhtmltopdf.exe".Replace('/', Path.DirectorySeparatorChar));
-#else
-            var exePath = UtilityExePath ?? HostingEnvironment.MapPath("~/App_Data/Reporting/wkhtmltopdf.exe");
-#endif
+
+            var exePath = UtilityExePath ?? throw new ArgumentNullException(nameof(UtilityExePath));
+            
             if (!File.Exists(exePath))
             {
                 throw new InvalidOperationException(String.Format("Can't find wkhtmltopdf.exe which is required for PDF generation.\n" +

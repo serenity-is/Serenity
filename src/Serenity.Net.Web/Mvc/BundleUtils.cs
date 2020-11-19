@@ -1,10 +1,10 @@
-﻿using Serenity.Data;
+﻿using Microsoft.AspNetCore.Hosting;
+using Serenity.Data;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.Hosting;
 
 namespace Serenity.Web
 {
@@ -49,7 +49,7 @@ namespace Serenity.Web
                     if (s.Length < 0)
                         return false;
                     int y;
-                    return s.Split('.').All(x => Int32.TryParse(x, out y));
+                    return s.Split('.').All(x => int.TryParse(x, out y));
                 })
                 .ToArray();
 
@@ -63,7 +63,7 @@ namespace Serenity.Web
 
                 for (var i = 0; i < Math.Min(px.Length, py.Length); i++)
                 {
-                    var c = Int32.Parse(px[i]).CompareTo(Int32.Parse(py[i]));
+                    var c = int.Parse(px[i]).CompareTo(int.Parse(py[i]));
                     if (c != 0)
                         return c;
                 }
@@ -74,7 +74,7 @@ namespace Serenity.Web
             return files.Last();
         }
 
-        public static string ExpandVersionVariable(string scriptUrl)
+        public static string ExpandVersionVariable(string webRootPath, string scriptUrl)
         {
             if (scriptUrl.IsNullOrEmpty())
                 return scriptUrl;
@@ -84,6 +84,7 @@ namespace Serenity.Web
 
             if (idx < 0)
                 return scriptUrl;
+
             string result;
             if (expandVersion.TryGetValue(scriptUrl, out result))
                 return result;
@@ -92,13 +93,12 @@ namespace Serenity.Web
             var after = scriptUrl.Substring(idx + tpl.Length);
             var extension = Path.GetExtension(scriptUrl);
 
-            var path = HostingEnvironment.MapPath(before);
-
+            var path = PathHelper.SecureCombine(webRootPath, before.StartsWith("~/") ? before[2..] : before);
             path = Path.GetDirectoryName(path);
 
-            var beforeName = Path.GetFileName(before.Replace('/', System.IO.Path.DirectorySeparatorChar));
+            var beforeName = Path.GetFileName(before.Replace('/', Path.DirectorySeparatorChar));
 
-            var latest = GetLatestVersion(path, beforeName + "*" + extension.Replace('/', System.IO.Path.DirectorySeparatorChar));
+            var latest = GetLatestVersion(path, beforeName + "*" + extension.Replace('/', Path.DirectorySeparatorChar));
             if (latest == null)
             {
                 expandVersion[scriptUrl] = scriptUrl;
@@ -150,10 +150,10 @@ namespace Serenity.Web
                 string replace;
                 if (falsey)
                 {
-                    if (value is Boolean && (Boolean)value == true)
+                    if (value is bool && (bool)value == true)
                         return null;
 
-                    if (value != null && (!(value is Boolean) || ((Boolean)value == true)))
+                    if (value != null && (!(value is bool) || ((bool)value == true)))
                         return null;
 
                     replace = "";
@@ -163,16 +163,16 @@ namespace Serenity.Web
                     if (value == null)
                         return null;
 
-                    if (value is Boolean && (Boolean)value == false)
+                    if (value is bool b && b == false)
                         return null;
 
-                    if (value is Boolean && (Boolean)value == true)
+                    if (value is bool b2 && b2 == true)
                         replace = "";
                     else
                         replace = value.ToString();
                 }
 
-                scriptUrl = scriptUrl.Substring(0, idx) + replace + scriptUrl.Substring(end + 1);
+                scriptUrl = scriptUrl.Substring(0, idx) + replace + scriptUrl[(end + 1)..];
                 idx = end + 1 + (replace.Length - key.Length - (falsey ? 1 : 0));
             }
             while (idx < scriptUrl.Length - 1);
@@ -209,9 +209,9 @@ namespace Serenity.Web
                         if (recursionCheck != null)
                         {
                             if (recursionCheck.Contains(subBundleKey) || recursionCheck.Count > 100)
-                                throw new InvalidOperationException(String.Format(
+                                throw new InvalidOperationException(string.Format(
                                     "Caught infinite recursion with {1} bundles '{0}'!",
-                                        String.Join(", ", recursionCheck), bundleType));
+                                        string.Join(", ", recursionCheck), bundleType));
                         }
                         else
                             recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

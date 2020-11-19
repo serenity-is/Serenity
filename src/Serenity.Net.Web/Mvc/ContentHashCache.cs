@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Serenity.IO;
@@ -7,18 +8,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using System.Web;
-using System.Web.Hosting;
 
 namespace Serenity.Web
 {
-    public class ContentHashCache
+    public class ContentHashCache : IContentHashCache
     {
         private Hashtable hashByContentPath;
         private readonly bool cdnEnabled;
         private readonly string cdnHttp;
         private readonly string cdnHttps;
         private readonly GlobFilter cdnFilter;
+        private readonly IWebHostEnvironment hostEnvironment;
         private readonly IHttpContextAccessor httpContextAccessor;
 
         public class CDNSettings
@@ -30,8 +30,10 @@ namespace Serenity.Web
             public List<string> Exclude { get; set; }
         }
 
-        public ContentHashCache(IOptions<CDNSettings> cdnSettings, IHttpContextAccessor httpContextAccessor = null)
+        public ContentHashCache(IOptions<CDNSettings> cdnSettings,
+            IWebHostEnvironment hostEnvironment, IHttpContextAccessor httpContextAccessor = null)
         {
+            this.hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
             this.httpContextAccessor = httpContextAccessor;
 
             var cdn = cdnSettings.Value;
@@ -54,23 +56,23 @@ namespace Serenity.Web
         private static string GetFileSHA1(string filePath)
         {
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 120000))
-            { 
+            {
                 var md5 = MD5.Create();
                 byte[] hash = md5.ComputeHash(fs);
                 return WebEncoders.Base64UrlEncode(hash);
             }
         }
 
-        public string ResolvePath(string contentPath)
+        public string ResolvePath(PathString pathBase, string contentPath)
         {
             if (contentPath.IsNullOrEmpty())
-                throw new ArgumentNullException("contentPath");
+                throw new ArgumentNullException(nameof(contentPath));
 
             if (contentPath[0] != '/' &&
                 (contentPath[0] != '~' || contentPath.Length < 2 || contentPath[1] != '/'))
                 return contentPath;
 
-            contentPath = VirtualPathUtility.ToAbsolute(contentPath);
+            contentPath = VirtualPathUtility.ToAbsolute(pathBase, contentPath);
             if (!cdnEnabled)
                 return contentPath;
 
@@ -80,7 +82,7 @@ namespace Serenity.Web
             return UriHelper.Combine(cdnRoot, contentPath);
         }
 
-        public string ResolveWithHash(string contentUrl)
+        public string ResolveWithHash(PathString pathBase, string contentUrl)
         {
             if (contentUrl.IsNullOrEmpty())
                 throw new ArgumentNullException("contentUrl");
@@ -101,7 +103,7 @@ namespace Serenity.Web
             else
             {
                 var path = contentUrl;
-                path = HostingEnvironment.MapPath(path);
+                path = PathHelper.SecureCombine(hostEnvironment.WebRootPath, path.StartsWith("~/") ? path[2..] : path);
 
                 object hash;
                 hash = hashByContentPath[path];
@@ -115,19 +117,19 @@ namespace Serenity.Web
                     Hashtable.Synchronized(hashByContentPath)[path] = hash;
                 }
 
-                contentUrl = VirtualPathUtility.ToAbsolute(contentUrl) + "?v=" + (string)hash;
+                contentUrl = VirtualPathUtility.ToAbsolute(pathBase, contentUrl) + "?v=" + (string)hash;
                 if (!cdnEnabled)
                     return contentUrl;
             }
 
             if (cdnMatch[0] == '/')
             {
-                var root = VirtualPathUtility.ToAbsolute("~/");
+                var root = VirtualPathUtility.ToAbsolute(pathBase, "~/");
                 if (cdnMatch.StartsWith(root, StringComparison.OrdinalIgnoreCase))
-                    cdnMatch = cdnMatch.Substring(root.Length);
+                    cdnMatch = cdnMatch[root.Length..];
             }
             else
-                cdnMatch = cdnMatch.Substring(2);
+                cdnMatch = cdnMatch[2..];
 
             if (!cdnFilter.IsMatch(cdnMatch.Replace('/', Path.DirectorySeparatorChar)))
                 return contentUrl;
@@ -135,7 +137,7 @@ namespace Serenity.Web
             bool isSecureConnection = httpContextAccessor?.HttpContext?.Request?.IsHttps == true;
 
             string cdnRoot = isSecureConnection ? cdnHttps : cdnHttp;
-            contentUrl = VirtualPathUtility.ToAbsolute(contentUrl);
+            contentUrl = VirtualPathUtility.ToAbsolute(pathBase, contentUrl);
             return UriHelper.Combine(cdnRoot, contentUrl);
         }
     }

@@ -7,16 +7,18 @@ namespace Serenity.Web
     public class FilesToDelete : List<string>, IDisposable
     {
         private List<string> OldFiles;
+        private readonly UploadSettings settings;
 
-        public FilesToDelete()
+        public FilesToDelete(UploadSettings settings)
         {
             OldFiles = new List<string>();
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
         public void Dispose()
         {
             foreach (var file in this)
-                UploadHelper.DeleteFileAndRelated(file, DeleteType.TryDeleteOrMark);
+                UploadHelper.DeleteFileAndRelated(settings, file, DeleteType.TryDeleteOrMark);
 
             this.Clear();
         }

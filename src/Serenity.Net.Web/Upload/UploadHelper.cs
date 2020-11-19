@@ -1,45 +1,27 @@
-﻿using Serenity.ComponentModel;
-using Serenity.Data;
+﻿using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using Serenity.IO;
-using System.Web.Hosting;
 using System.Linq;
-#if ASPNETMVC
-using System.Web;
-#endif
+using Serenity.Abstractions;
 
 namespace Serenity.Web
 {
-
     public class UploadHelper
     {
-
-        private static UploadSettings settings;
-
-        public static UploadSettings Settings
-        {
-            get
-            {
-                if (settings == null)
-                    settings = Config.Get<UploadSettings>();
-
-                return settings;
-            }
-        }
-
+        private UploadSettings settings;
         private string dbFileFormat;
 
-        public UploadHelper(string dbFileFormat)
+        public UploadHelper(UploadSettings settings, string dbFileFormat)
         {
-            this.dbFileFormat = dbFileFormat;
+            this.dbFileFormat = dbFileFormat ?? throw new ArgumentNullException(nameof(dbFileFormat));
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
-        public static string DbFilePath(string dbFileName)
+        public static string DbFilePath(UploadSettings settings, string dbFileName)
         {
-            CheckFileNameSecurity(dbFileName);
-            return Path.Combine(RootPath, ToPath(dbFileName));
+            return PathHelper.SecureCombine(GetRootPath(settings), ToPath(dbFileName));
         }
 
         public string FormatDbFileName(object entityId, string extension, string originalName = null)
@@ -49,14 +31,14 @@ namespace Serenity.Web
 
         public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, object entityId, FilesToDelete filesToDelete, Func<string, string> fileNameReplacer = null)
         {
-            var result = CopyTemporaryFile(dbTemporaryFile, entityId, fileNameReplacer);
+            var result = CopyTemporaryFile(settings, dbTemporaryFile, entityId, fileNameReplacer);
             filesToDelete.Register(result);
             return result;
         }
 
-        public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, object entityId, Func<string, string> fileNameReplacer = null)
+        public CopyTemporaryFileResult CopyTemporaryFile(UploadSettings settings, string dbTemporaryFile, object entityId, Func<string, string> fileNameReplacer = null)
         {
-            string temporaryFilePath = DbFilePath(dbTemporaryFile);
+            string temporaryFilePath = DbFilePath(settings, dbTemporaryFile);
 
             string originalName;
             using (var sr = new StreamReader(File.OpenRead(Path.ChangeExtension(temporaryFilePath, ".orig"))))
@@ -68,7 +50,7 @@ namespace Serenity.Web
             if (fileNameReplacer != null)
                 dbFileName = fileNameReplacer(dbFileName);
 
-            string filePath = DbFilePath(dbFileName);
+            string filePath = DbFilePath(settings, dbFileName);
             string basePath = null;
             int tries = 0;
             while (File.Exists(filePath) && ++tries < 10000)
@@ -82,7 +64,7 @@ namespace Serenity.Web
             if (tries > 0)
                 dbFileName = Path.ChangeExtension(dbFileName, null) + " (" + tries + ")" + (extension ?? ""); 
 
-            UploadHelper.CopyFileAndRelated(temporaryFilePath, filePath);
+            CopyFileAndRelated(temporaryFilePath, filePath);
             long size = new FileInfo(filePath).Length;
             bool hasThumbnail = File.Exists(GetThumbFileName(filePath));
 
@@ -98,12 +80,12 @@ namespace Serenity.Web
             };
         }
 
-        public static string CopyFileAndRelatedToHistory(string sourceFilePath)
+        public static string CopyFileAndRelatedToHistory(UploadSettings settings, string sourceFilePath)
         {
             string date = DateTime.UtcNow.ToString("yyyyMMdd", Invariants.DateTimeFormat);
             string historyFile = "history/" + date + "/" + Guid.NewGuid().ToString("N") + Path.GetExtension(sourceFilePath);
 
-            CopyFileAndRelated(sourceFilePath, DbFilePath(historyFile));
+            CopyFileAndRelated(sourceFilePath, DbFilePath(settings, historyFile));
 
             return historyFile;
         }
@@ -158,52 +140,37 @@ namespace Serenity.Web
                 return fileName;
         }
 
-        public static string RootPath
+        public static string GetRootPath(UploadSettings settings)
         {
-            get
-            {
-                var path = Settings.Path;
-                if (path.IsEmptyOrNull())
-                    throw new InvalidOperationException("Please make sure Path in appSettings\\UploadSettings is configured!");
+            var path = settings.Path;
+            if (path.IsEmptyOrNull())
+                throw new InvalidOperationException("Please make sure Path in UploadSettings is configured!");
 
-                string pre1 = @"~\";
-                string pre2 = @"~/";
-                if (path.StartsWith(pre1) || path.StartsWith(pre2))
-                {
-#if !NET45
-                    path = Path.Combine(Path.GetDirectoryName(HostingEnvironment.MapPath(pre2)), ToPath(path.Substring(pre2.Length)));
-#else
-                    path = Path.Combine(HostingEnvironment.MapPath(pre2), ToPath(path.Substring(pre2.Length)));
-#endif
-                    settings.Path = path;
-                }
+            string pre1 = @"~\";
+            string pre2 = @"~/";
+            if (path.StartsWith(pre1) || path.StartsWith(pre2))
+            {
+                path = Path.Combine(AppContext.BaseDirectory, ToPath(path.Substring(pre2.Length)));
+                settings.Path = path;
+            }
                 
-                return path;
-            }
+            return path;
         }
 
-        public static string TemporaryPath
+        public static string GetTemporaryPath(UploadSettings settings)
         {
-            get
+            var path = Path.Combine(GetRootPath(settings),
+                @"temporary/".Replace('/', Path.DirectorySeparatorChar));
+            
+            if (!Directory.Exists(path))
             {
-                var path = Path.Combine(RootPath, @"temporary/".Replace('/', Path.DirectorySeparatorChar));
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                    File.WriteAllText(Path.Combine(path, ".temporary"), "");
-                }
-                return path;
+                Directory.CreateDirectory(path);
+                File.WriteAllText(Path.Combine(path, ".temporary"), "");
             }
-        }
 
-        public static string RootUrl
-        {
-            get
-            {
-                return Settings.Url;
-            }
+            return path;
         }
-        
+       
         /// <summary>
         ///   Gets URL of an image file or its thumbnail under a subfolder of file upload root. 
         ///   If filename starts with "approval?", approval folder is used instead of 
@@ -215,7 +182,7 @@ namespace Serenity.Web
         ///   True to return thumbnail URL.</param>
         /// <returns>
         ///   URL of the image file or its thumbnail, or null.</returns>       
-        public static string ImageFileUrl(string fileName, bool thumbnailUrl)
+        public static string ImageFileUrl(UploadSettings settings, string fileName, bool thumbnailUrl)
         {
             fileName = StringHelper.TrimToNull(fileName);
 
@@ -223,9 +190,9 @@ namespace Serenity.Web
                 return null;
 
             if (thumbnailUrl)
-                fileName = UploadHelper.GetThumbFileName(fileName);
+                fileName = GetThumbFileName(fileName);
 
-            return RootUrl + ToUrl(fileName);
+            return settings.Url + ToUrl(fileName);
         }
 
         public static string FormatDbFileName(string format, object identity, string extension, string originalName = null)
@@ -252,16 +219,16 @@ namespace Serenity.Web
                     groupKey = s.SafeSubstring(0, 2);
             }
 
-            return String.Format(format, identity, groupKey, TemporaryFileHelper.RandomFileCode(), DateTime.Now, 
+            return string.Format(format, identity, groupKey, TemporaryFileHelper.RandomFileCode(), DateTime.Now, 
                 Path.GetFileNameWithoutExtension(originalName)) + extension;
         }
 
-        public static void DeleteFileAndRelated(string dbFileName, DeleteType deleteType)
+        public static void DeleteFileAndRelated(UploadSettings settings, string dbFileName, DeleteType deleteType)
         {
             dbFileName = StringHelper.TrimToEmpty(dbFileName);
             if (dbFileName.Length > 0)
             {
-                var fileName = Path.Combine(RootPath, ToPath(dbFileName));
+                var fileName = PathHelper.SecureCombine(GetRootPath(settings), ToPath(dbFileName));
 
                 if (deleteType == DeleteType.TryDeleteOrMark)
                 {
@@ -356,7 +323,7 @@ namespace Serenity.Web
             return value + " " + suffix;
         }
 
-        public static void RegisterFilesToDelete(IUnitOfWork unitOfWork, FilesToDelete filesToDelete)
+        public static void RegisterFilesToDelete(IUnitOfWork unitOfWork, FilesToDelete filesToDelete, IExceptionLogger logger)
         {
             unitOfWork.OnCommit += delegate()
             {
@@ -367,7 +334,7 @@ namespace Serenity.Web
                 }
                 catch (Exception ex)
                 {
-                    ex.Log();
+                    logger?.Log(ex);
                 }
             };
 
@@ -379,7 +346,7 @@ namespace Serenity.Web
                 }
                 catch (Exception ex)
                 {
-                    ex.Log();
+                    logger?.Log(ex);
                 }
             };
         }
@@ -419,19 +386,6 @@ namespace Serenity.Web
                 return mimeType;
             else
                 mimeType = "application/unknown";
-
-#if NET45
-            try
-            {
-                Microsoft.Win32.RegistryKey regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext);
-                if (regKey != null && regKey.GetValue("Content Type") != null)
-                    mimeType = regKey.GetValue("Content Type").ToString();
-            }
-            catch (Exception)
-            {
-                return "application/unknown";
-            }
-#endif
             return mimeType;
 
         }

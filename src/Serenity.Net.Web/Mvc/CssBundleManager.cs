@@ -1,16 +1,16 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Serenity.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
-using System.Web.Hosting;
 
 namespace Serenity.Web
 {
-    public class CssBundleManager
+    public class CssBundleManager : ICssBundleManager
     {
         public class CssBundlingSettings
         {
@@ -31,18 +31,24 @@ namespace Serenity.Web
         private Dictionary<string, List<string>> bundleIncludes;
 
         private const string errorLines = "\r\n/*\r\n!!!ERROR: {0}!!!\r\n*/\r\n";
-        private readonly DynamicScriptManager scriptManager;
+        private readonly IDynamicScriptManager scriptManager;
+        private readonly IWebHostEnvironment hostEnvironment;
+        private readonly IHttpContextAccessor contextAccessor;
         private readonly IExceptionLogger logger;
         private readonly IOptions<CssBundlingSettings> options;
 
         [ThreadStatic]
         private static HashSet<string> recursionCheck;
 
-        public CssBundleManager(IOptions<CssBundlingSettings> options, DynamicScriptManager scriptManager, IExceptionLogger logger = null)
+        public CssBundleManager(IOptions<CssBundlingSettings> options, IDynamicScriptManager scriptManager, IWebHostEnvironment hostEnvironment,
+            IHttpContextAccessor contextAccessor = null, IExceptionLogger logger = null)
         {
             this.options = options ?? throw new ArgumentNullException(nameof(options));
             this.scriptManager = scriptManager ?? throw new ArgumentNullException(nameof(scriptManager));
+            this.hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
+            this.contextAccessor = contextAccessor;
             this.logger = logger;
+
             Reset();
             scriptManager.ScriptChanged += name =>
             {
@@ -169,7 +175,7 @@ namespace Serenity.Web
                                         }
                                     }
 
-                                    var scriptUrl = VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + scriptName);
+                                    var scriptUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/DynJS.axd/" + scriptName);
                                     return RewriteUrlsToAbsolute(scriptUrl, code);
                                 }
                                 finally
@@ -181,8 +187,8 @@ namespace Serenity.Web
                             continue;
                         }
 
-                        string sourceUrl = BundleUtils.ExpandVersionVariable(sourceFile);
-                        sourceUrl = VirtualPathUtility.ToAbsolute(sourceUrl);
+                        string sourceUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, sourceFile);
+                        sourceUrl = VirtualPathUtility.ToAbsolute(contextAccessor, sourceUrl);
 
                         if (sourceUrl.IsNullOrEmpty())
                             continue;
@@ -191,9 +197,9 @@ namespace Serenity.Web
 
                         bundleParts.Add(() =>
                         {
-                            var sourcePath = HostingEnvironment.MapPath(sourceUrl);
+                            var sourcePath = PathHelper.SecureCombine(hostEnvironment.WebRootPath, sourceUrl);
                             if (!File.Exists(sourcePath))
-                                return String.Format(errorLines, String.Format("File {0} is not found!", sourcePath));
+                                return string.Format(errorLines, string.Format("File {0} is not found!", sourcePath));
 
                             string code = null;
 
@@ -207,8 +213,8 @@ namespace Serenity.Web
                                     if (File.Exists(minPath))
                                     {
                                         sourcePath = minPath;
-                                        using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
-                                            code = sr.ReadToEnd();
+                                        using StreamReader sr = new StreamReader(File.OpenRead(sourcePath));
+                                        code = sr.ReadToEnd();
                                     }
                                 }
 
@@ -231,8 +237,8 @@ namespace Serenity.Web
                             }
                             else
                             {
-                                using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
-                                    code = sr.ReadToEnd();
+                                using StreamReader sr = new StreamReader(File.OpenRead(sourcePath));
+                                code = sr.ReadToEnd();
                             }
 
                             code = RewriteUrlsToAbsolute(sourceUrl, code);
@@ -334,7 +340,7 @@ namespace Serenity.Web
             return prefix + new Uri("x:" + absolutePath + url).AbsolutePath.Substring(2) + suffix;
         }
 
-        private static string RewriteUrlsToAbsolute(string virtualPath, string content)
+        private string RewriteUrlsToAbsolute(string virtualPath, string content)
         {
             if (string.IsNullOrEmpty(content) ||
                 string.IsNullOrEmpty(virtualPath))
@@ -347,7 +353,7 @@ namespace Serenity.Web
                 return content;
 
             if (absolutePath.StartsWith("~"))
-                absolutePath = VirtualPathUtility.ToAbsolute(absolutePath);
+                absolutePath = VirtualPathUtility.ToAbsolute(contextAccessor, absolutePath);
 
             if (!absolutePath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
                 absolutePath += "/";
@@ -376,13 +382,13 @@ namespace Serenity.Web
                 if (bySrcUrl == null || !bySrcUrl.TryGetValue(cssUrl, out bundleKey))
                 {
                     cssUrl = scriptManager.GetScriptInclude(scriptName, ".css");
-                    return VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + cssUrl);
+                    return VirtualPathUtility.ToAbsolute(contextAccessor, "~/DynJS.axd/" + cssUrl);
                 }
             }
             else
             {
-                cssUrl = BundleUtils.ExpandVersionVariable(cssUrl);
-                cssUrl = VirtualPathUtility.ToAbsolute(cssUrl);
+                cssUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, cssUrl);
+                cssUrl = VirtualPathUtility.ToAbsolute(contextAccessor, cssUrl);
 
                 if (bySrcUrl == null ||
                     !bySrcUrl.TryGetValue(cssUrl, out bundleKey))
@@ -390,7 +396,7 @@ namespace Serenity.Web
             }
 
             string include = scriptManager.GetScriptInclude("CssBundle." + bundleKey, ".css");
-            return VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + include);
+            return VirtualPathUtility.ToAbsolute(contextAccessor, "~/DynJS.axd/" + include);
         }
     }
 }

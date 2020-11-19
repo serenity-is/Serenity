@@ -1,184 +1,169 @@
-﻿using Serenity.Localization;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
-#if !ASPNETMVC
 using System.Net;
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using IHtmlString = Microsoft.AspNetCore.Html.HtmlString;
-using HtmlHelper = Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper;
-using HttpContextBase = Microsoft.AspNetCore.Http.HttpContext;
-using VirtualPathUtility = System.Web.VirtualPathUtility;
-#else
-using System.Web;
-using System.Web.Mvc;
-#endif
+using System.Text;
 
 namespace Serenity.Web
 {
     public static class HtmlScriptExtensions
     {
-        public static HtmlString Stylesheet(this HtmlHelper helper, string cssUrl)
+        public static HtmlString Stylesheet(this IHtmlHelper helper, string cssUrl)
         {
             if (helper == null)
-                throw new ArgumentNullException("helper");
+                throw new ArgumentNullException(nameof(helper));
 
-            if (String.IsNullOrEmpty(cssUrl))
-                throw new ArgumentNullException("cssUrl");
+            if (cssUrl == null)
+                throw new ArgumentNullException(nameof(cssUrl));
 
             var context = helper.ViewContext.HttpContext;
-
-            var css = CssBundleManager.GetCssBundle(cssUrl);
+            var css = context.RequestServices.GetRequiredService<ICssBundleManager>()
+                .GetCssBundle(cssUrl);
             var included = GetIncludedCssList(context);
 
             if (!included.Contains(css))
             {
                 included.Add(css);
 
-                return new HtmlString(String.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
-#if !ASPNETMVC
-                    WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(css))));
-#else
-                    HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(css))));
-#endif
+                return new HtmlString(string.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
+                    WebUtility.HtmlEncode(context.RequestServices.GetRequiredService<IContentHashCache>()
+                        .ResolveWithHash(context.Request.PathBase, css))));
             }
             else
-                return new HtmlString("");
+                return HtmlString.Empty;
         }
 
-        public static IHtmlString StyleBundle(this HtmlHelper helper, string bundleKey)
+        public static HtmlString StyleBundle(this IHtmlHelper helper, string bundleKey)
         {
             if (helper == null)
-                throw new ArgumentNullException("helper");
+                throw new ArgumentNullException(nameof(helper));
 
-            if (String.IsNullOrEmpty(bundleKey))
-                throw new ArgumentNullException("bundleKey");
+            if (string.IsNullOrEmpty(bundleKey))
+                throw new ArgumentNullException(nameof(bundleKey));
 
             var context = helper.ViewContext.HttpContext;
-            if (!CssBundleManager.IsEnabled)
+            var bundleManager = context.RequestServices.GetRequiredService<ICssBundleManager>();
+            var scriptManager = context.RequestServices.GetRequiredService<IDynamicScriptManager>();
+            var hostEnvironment = context.RequestServices.GetRequiredService<IWebHostEnvironment>();
+            var contentHashCache = context.RequestServices.GetRequiredService<IContentHashCache>();
+
+            if (bundleManager.IsEnabled)
+                return Stylesheet(helper, "dynamic://CssBundle." + bundleKey);
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var include in bundleManager.GetBundleIncludes(bundleKey))
             {
-                StringBuilder sb = new StringBuilder();
-                foreach (var include in CssBundleManager.GetBundleIncludes(bundleKey))
+                var cssUrl = include;
+                if (string.IsNullOrEmpty(cssUrl))
+                    continue;
+
+                if (cssUrl != null && cssUrl.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
                 {
-                    var cssUrl = include;
-                    if (string.IsNullOrEmpty(cssUrl))
-                        continue;
-
-                    if (cssUrl != null && cssUrl.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var scriptName = cssUrl.Substring(10);
-                        cssUrl = DynamicScriptManager.GetScriptInclude(scriptName, ".css");
-                        cssUrl = VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + cssUrl);
-                    }
-                    else
-                    {
-                        cssUrl = BundleUtils.ExpandVersionVariable(cssUrl);
-                        cssUrl = VirtualPathUtility.ToAbsolute(cssUrl);
-                    }
-
-                    var cssList = GetIncludedCssList(context);
-
-                    if (!cssList.Contains(cssUrl))
-                    {
-                        cssList.Add(cssUrl);
-                        sb.AppendLine(String.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
-#if !ASPNETMVC
-                            WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(cssUrl))));
-#else
-                            HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(cssUrl))));
-#endif
-                    }
+                    var scriptName = cssUrl[10..];
+                    cssUrl = scriptManager.GetScriptInclude(scriptName, ".css");
+                    cssUrl = VirtualPathUtility.ToAbsolute(context, "~/DynJS.axd/" + cssUrl);
+                }
+                else
+                {
+                    cssUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, cssUrl);
+                    cssUrl = VirtualPathUtility.ToAbsolute(context, cssUrl);
                 }
 
-                return new HtmlString(sb.ToString());
+                var cssList = GetIncludedCssList(context);
+
+                if (!cssList.Contains(cssUrl))
+                {
+                    cssList.Add(cssUrl);
+                    sb.AppendLine(string.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
+                        WebUtility.HtmlEncode(contentHashCache.ResolveWithHash(context.Request.PathBase, cssUrl))));
+                }
             }
 
-            return Stylesheet(helper, "dynamic://CssBundle." + bundleKey);
+            return new HtmlString(sb.ToString());
         }
 
-        public static IHtmlString Script(this HtmlHelper helper, string includeJS)
+        public static HtmlString Script(this IHtmlHelper helper, string includeJS)
         {
             if (helper == null)
-                throw new ArgumentNullException("helper");
+                throw new ArgumentNullException(nameof(helper));
 
-            if (String.IsNullOrEmpty(includeJS))
-                throw new ArgumentNullException("includeJS");
+            if (string.IsNullOrEmpty(includeJS))
+                throw new ArgumentNullException(nameof(includeJS));
 
             var context = helper.ViewContext.HttpContext;
-
-            var script = ScriptBundleManager.GetScriptBundle(includeJS);
+            var script = context.RequestServices.GetRequiredService<IScriptBundleManager>()
+                .GetScriptBundle(includeJS);
             var scripts = GetIncludedScripts(context);
 
             if (!scripts.Contains(script))
             {
                 scripts.Add(script);
 
-                return new HtmlString(String.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
-#if !ASPNETMVC
-                    WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(script))));
-#else
-                    HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(script))));
-#endif
+                return new HtmlString(string.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
+                    WebUtility.HtmlEncode(context.RequestServices.GetRequiredService<IContentHashCache>()
+                        .ResolveWithHash(context.Request.PathBase, script))));
             }
             else
                 return new HtmlString("");
         }
 
-        public static IHtmlString ScriptBundle(this HtmlHelper helper, string bundleKey)
+        public static HtmlString ScriptBundle(this IHtmlHelper helper, string bundleKey)
         {
             if (helper == null)
-                throw new ArgumentNullException("helper");
+                throw new ArgumentNullException(nameof(helper));
 
-            if (String.IsNullOrEmpty(bundleKey))
-                throw new ArgumentNullException("bundleKey");
+            if (string.IsNullOrEmpty(bundleKey))
+                throw new ArgumentNullException(nameof(bundleKey));
 
             var context = helper.ViewContext.HttpContext;
-            if (!ScriptBundleManager.IsEnabled)
+            var bundleManager = context.RequestServices.GetRequiredService<IScriptBundleManager>();
+            var scriptManager = context.RequestServices.GetRequiredService<IDynamicScriptManager>();
+            var hostEnvironment = context.RequestServices.GetRequiredService<IWebHostEnvironment>();
+            var contentHashCache = context.RequestServices.GetRequiredService<IContentHashCache>();
+
+            if (bundleManager.IsEnabled)
+                return Stylesheet(helper, "dynamic://Bundle." + bundleKey);
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var include in bundleManager.GetBundleIncludes(bundleKey))
             {
-                StringBuilder sb = new StringBuilder();
-                foreach (var include in ScriptBundleManager.GetBundleIncludes(bundleKey))
+                var scriptUrl = include;
+                if (string.IsNullOrEmpty(scriptUrl))
+                    continue;
+
+                if (scriptUrl != null && scriptUrl.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
                 {
-                    var scriptUrl = include;
-                    if (string.IsNullOrEmpty(scriptUrl))
-                        continue;
-
-                    if (scriptUrl != null && scriptUrl.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var scriptName = scriptUrl.Substring(10);
-                        scriptUrl = DynamicScriptManager.GetScriptInclude(scriptName);
-                        scriptUrl = VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + scriptUrl);
-                    }
-                    else
-                    {
-                        scriptUrl = BundleUtils.ExpandVersionVariable(scriptUrl);
-                        scriptUrl = VirtualPathUtility.ToAbsolute(scriptUrl);
-                    }
-
-                    var scripts = GetIncludedScripts(context);
-
-                    if (!scripts.Contains(scriptUrl))
-                    {
-                        scripts.Add(scriptUrl);
-                        sb.AppendLine(String.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
-#if !ASPNETMVC
-                            WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(scriptUrl))));
-#else
-                            HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(scriptUrl))));
-#endif
-                    }
+                    var scriptName = scriptUrl.Substring(10);
+                    scriptUrl = scriptManager.GetScriptInclude(scriptName);
+                    scriptUrl = VirtualPathUtility.ToAbsolute(context, "~/DynJS.axd/" + scriptUrl);
+                }
+                else
+                {
+                    scriptUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, scriptUrl);
+                    scriptUrl = VirtualPathUtility.ToAbsolute(context, scriptUrl);
                 }
 
-                return new HtmlString(sb.ToString());
-            }
+                var scripts = GetIncludedScripts(context);
 
-            return Script(helper, "dynamic://Bundle." + bundleKey);
+                if (!scripts.Contains(scriptUrl))
+                {
+                    scripts.Add(scriptUrl);
+                    sb.AppendLine(string.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
+                        WebUtility.HtmlEncode(contentHashCache.ResolveWithHash(context.Request.PathBase, scriptUrl))));
+                }
+            }
+            
+            return new HtmlString(sb.ToString());
         }
 
         const string IncludedScriptsKey = "IncludedScripts";
 
-        private static HashSet<string> GetIncludedScripts(HttpContextBase context)
+        private static HashSet<string> GetIncludedScripts(HttpContext context)
         {
             HashSet<string> scripts = (HashSet<string>)context.Items[IncludedScriptsKey];
             if (scripts == null)
@@ -192,7 +177,7 @@ namespace Serenity.Web
 
         const string IncludedCssListKey = "IncludedStylesheets";
 
-        private static HashSet<string> GetIncludedCssList(HttpContextBase context)
+        private static HashSet<string> GetIncludedCssList(HttpContext context)
         {
             HashSet<string> styleSheets = (HashSet<string>)context.Items[IncludedCssListKey];
             if (styleSheets == null)
@@ -205,46 +190,43 @@ namespace Serenity.Web
         }
 
 
-        public static string GetLocalTextContent(this HtmlHelper page, string package)
+        public static string GetLocalTextContent(this IHtmlHelper page, string package, bool isPending = false)
         {
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
-            var context = Dependency.TryResolve<ILocalTextContext>();
-            var isPending = context != null && context.IsApprovalMode;
-            string scriptName = Serenity.Web.LocalTextScript.GetScriptName(package, languageId, isPending);
-            DynamicScriptManager.IfNotRegistered(scriptName, () =>
+            string scriptName = Web.LocalTextScript.GetScriptName(package, languageId, isPending);
+            var scriptManager = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IDynamicScriptManager>();
+            scriptManager.IfNotRegistered(scriptName, () =>
             {
-                var script = new LocalTextScript(package, (string)languageId, isPending);
-                DynamicScriptManager.Register(script);
+                var script = new LocalTextScript(package, languageId, isPending);
+                scriptManager.Register(script);
             });
 
-            return DynamicScriptManager.GetScriptText(scriptName);
+            return scriptManager.GetScriptText(scriptName);
         }
 
-        public static string GetLocalTextInclude(this HtmlHelper page, string package)
+        public static string GetLocalTextInclude(this IHtmlHelper page, string package, bool isPending = false)
         {
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
-            var context = Dependency.TryResolve<ILocalTextContext>();
-            var isPending = context != null && context.IsApprovalMode;
-            string scriptName = Serenity.Web.LocalTextScript.GetScriptName(package, languageId, isPending);
-            DynamicScriptManager.IfNotRegistered(scriptName, () =>
+            string scriptName = Web.LocalTextScript.GetScriptName(package, languageId, isPending);
+            var scriptManager = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IDynamicScriptManager>();
+            scriptManager.IfNotRegistered(scriptName, () =>
             {
-                var script = new Serenity.Web.LocalTextScript(package, (string)languageId, isPending);
-                DynamicScriptManager.Register(script);
+                var script = new LocalTextScript(package, languageId, isPending);
+                scriptManager.Register(script);
             });
 
-            return DynamicScriptManager.GetScriptInclude(scriptName);
+            return scriptManager.GetScriptInclude(scriptName);
         }
 
-        public static IHtmlString LocalTextScript(this HtmlHelper page, string package)
+        public static HtmlString LocalTextScript(this IHtmlHelper page, string package, bool isPending = false)
         {
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
-            var context = Dependency.TryResolve<ILocalTextContext>();
-            var isPending = context != null && context.IsApprovalMode;
-            string scriptName = Serenity.Web.LocalTextScript.GetScriptName(package, languageId, isPending);
-            DynamicScriptManager.IfNotRegistered(scriptName, () =>
+            string scriptName = Web.LocalTextScript.GetScriptName(package, languageId, isPending);
+            var scriptManager = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IDynamicScriptManager>();
+            scriptManager.IfNotRegistered(scriptName, () =>
             {
-                var script = new LocalTextScript(package, (string)languageId, isPending);
-                DynamicScriptManager.Register(script);
+                var script = new LocalTextScript(package, languageId, isPending);
+                scriptManager.Register(script);
             });
 
             return Script(page, "dynamic://" + scriptName);

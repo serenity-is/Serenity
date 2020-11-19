@@ -1,27 +1,32 @@
-﻿#if !ASPNETMVC
-using Microsoft.AspNetCore.Http;
-using Serenity;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 
-namespace System.Web
+namespace Serenity.Web
 {
     public static class VirtualPathUtility
     {
-        public static string ToAbsolute(string contentPath)
+        public static string ToAbsolute(IHttpContextAccessor accessor, string contentPath)
         {
-            var context = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
-            return GenerateClientUrl(context.Request.PathBase, contentPath);
+            return ToAbsolute(accessor?.HttpContext, contentPath);
         }
 
-        private static string GenerateClientUrl(PathString applicationPath, string path)
+        public static string ToAbsolute(HttpContext context, string contentPath)
         {
+            return ToAbsolute(context?.Request?.PathBase ?? PathString.Empty, contentPath);
+        }
+
+        public static string ToAbsolute(PathString pathBase, string path)
+        {
+            if (!pathBase.HasValue)
+                pathBase = PathString.Empty;
+
             if (path.StartsWith("~/", StringComparison.Ordinal))
             {
-                var segment = new PathString(path.Substring(1));
-                return applicationPath.Add(segment).Value;
+                var segment = new PathString(path[1..]);
+                return pathBase.Add(segment).Value;
             }
 
             return path;
         }
     }
 }
-#endif
