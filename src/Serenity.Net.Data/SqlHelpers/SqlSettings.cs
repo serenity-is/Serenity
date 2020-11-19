@@ -8,6 +8,8 @@ namespace Serenity.Data
     /// </summary>
     public static class SqlSettings
     {
+        private static ISqlDialect defaultDialect = new SqlServer2012Dialect();
+
         /// <summary>
         /// Gets or sets a value indicating whether to automatically quote identifiers.
         /// </summary>
@@ -27,7 +29,11 @@ namespace Serenity.Data
         /// <summary>
         /// The default dialect
         /// </summary>
-        public static ISqlDialect DefaultDialect = new SqlServer2012Dialect();
+        public static ISqlDialect DefaultDialect
+        {
+            get => defaultDialect;
+            set => defaultDialect = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         /// <summary>
         /// A delegate that will be used to determine dialect for connection key 
