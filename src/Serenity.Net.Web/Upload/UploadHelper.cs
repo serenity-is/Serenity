@@ -109,67 +109,6 @@ namespace Serenity.Web
                 File.Copy(f, Path.Combine(targetPath, targetBase + thumbSuffix), overwrite);
             }
         }
-
-        /// <summary>
-        ///   Converts backslashes to forward slashes</summary>
-        /// <param name="fileName">
-        ///   Filename.</param>
-        /// <returns>
-        ///   Converted filename.</returns>
-        public static string ToUrl(string fileName)
-        {
-            if (fileName != null && fileName.IndexOf('\\') >= 0)
-                return fileName.Replace('\\', '/');
-            else
-                return fileName;
-        }
-
-        /// <summary>
-        ///   Converts forward slashes to backslashes</summary>
-        /// <param name="fileName">
-        ///   Filename.</param>
-        /// <returns>
-        ///   Converted filename.</returns>
-        public static string ToPath(string fileName)
-        {
-            var separator = Path.DirectorySeparatorChar;
-            var opposite = separator == '/' ? '\\' : '/';
-            if (fileName != null && fileName.IndexOf(opposite) >= 0)
-                return fileName.Replace(opposite, separator);
-            else
-                return fileName;
-        }
-
-        public static string GetRootPath(UploadSettings settings)
-        {
-            var path = settings.Path;
-            if (path.IsEmptyOrNull())
-                throw new InvalidOperationException("Please make sure Path in UploadSettings is configured!");
-
-            string pre1 = @"~\";
-            string pre2 = @"~/";
-            if (path.StartsWith(pre1) || path.StartsWith(pre2))
-            {
-                path = Path.Combine(AppContext.BaseDirectory, ToPath(path.Substring(pre2.Length)));
-                settings.Path = path;
-            }
-                
-            return path;
-        }
-
-        public static string GetTemporaryPath(UploadSettings settings)
-        {
-            var path = Path.Combine(GetRootPath(settings),
-                @"temporary/".Replace('/', Path.DirectorySeparatorChar));
-            
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-                File.WriteAllText(Path.Combine(path, ".temporary"), "");
-            }
-
-            return path;
-        }
        
         /// <summary>
         ///   Gets URL of an image file or its thumbnail under a subfolder of file upload root. 

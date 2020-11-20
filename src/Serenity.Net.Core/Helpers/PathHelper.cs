@@ -70,5 +70,36 @@ namespace Serenity
 
             return true;
         }
+
+
+        /// <summary>
+        ///   Converts backslashes to forward slashes</summary>
+        /// <param name="fileName">
+        ///   Filename.</param>
+        /// <returns>
+        ///   Converted filename.</returns>
+        public static string ToUrl(string fileName)
+        {
+            if (fileName != null && fileName.IndexOf('\\') >= 0)
+                return fileName.Replace('\\', '/');
+            else
+                return fileName;
+        }
+
+        /// <summary>
+        ///   Converts forward slashes to backslashes</summary>
+        /// <param name="fileName">
+        ///   Filename.</param>
+        /// <returns>
+        ///   Converted filename.</returns>
+        public static string ToPath(string fileName)
+        {
+            var separator = Path.DirectorySeparatorChar;
+            var opposite = separator == '/' ? '\\' : '/';
+            if (fileName != null && fileName.IndexOf(opposite) >= 0)
+                return fileName.Replace(opposite, separator);
+            else
+                return fileName;
+        }
     }
 }
