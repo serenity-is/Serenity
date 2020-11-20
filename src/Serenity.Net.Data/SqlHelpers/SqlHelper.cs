@@ -325,7 +325,7 @@
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">query.IdentityColumn is null</exception>
         /// <exception cref="NotImplementedException">The connection dialect doesn't support returning inserted identity.</exception>
-        public static Int64? ExecuteAndGetID(this SqlInsert query, IDbConnection connection, ILogger logger = null)
+        public static long? ExecuteAndGetID(this SqlInsert query, IDbConnection connection, ILogger logger = null)
         {
             string queryText = query.ToString();
             var dialect = connection.GetDialect();

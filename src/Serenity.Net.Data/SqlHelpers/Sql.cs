@@ -454,7 +454,7 @@ namespace Serenity.Data
             /// </summary>
             /// <param name="query">The query.</param>
             /// <returns>
-            /// A <see cref="System.String" /> that represents this instance.
+            /// A <see cref="string" /> that represents this instance.
             /// </returns>
             /// <exception cref="System.InvalidOperationException">
             /// There should be at least one WHEN/THEN pair.

@@ -7,13 +7,13 @@ namespace Serenity.Data
         where TEnum : struct, IComparable, IFormattable, IConvertible
     {
         public EnumField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-            Func<IRow, Int32?> getValue = null, Action<IRow, Int32?> setValue = null)
+            Func<IRow, int?> getValue = null, Action<IRow, int?> setValue = null)
             : base(collection, name, caption, size, flags, getValue, setValue)
         {
             if (!typeof(TEnum).IsEnum)
                 throw new InvalidProgramException(typeof(TEnum).FullName + " is used as type parameter for an EnumField but it is not an enum type!");
 
-            if (Enum.GetUnderlyingType(typeof(TEnum)) != typeof(Int32))
+            if (Enum.GetUnderlyingType(typeof(TEnum)) != typeof(int))
                 throw new InvalidProgramException(typeof(TEnum).FullName + " is used as type parameter for an EnumField but it is not based on Int32!");
 
             EnumType = typeof(TEnum);
@@ -32,7 +32,7 @@ namespace Serenity.Data
             }
             set
             {
-                Int32? v = value == null ? (Int32?)null : Convert.ToInt32(value);
+                int? v = value == null ? (int?)null : Convert.ToInt32(value);
                 _setValue(row, v);
                 row.FieldAssignedValue(this);
             }

@@ -115,7 +115,7 @@ namespace Serenity.Web
             using (BinaryReader reader = new BinaryReader(stream))
             {
                 // Read MAGIC FIELD
-                magicBytes = new String(reader.ReadChars(3));
+                magicBytes = new string(reader.ReadChars(3));
 
                 if (magicBytes != "FWS" && magicBytes != "CWS")
                     throw new Exception(" is not a valid/supported SWF file.");

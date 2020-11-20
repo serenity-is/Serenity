@@ -58,9 +58,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The enum key.
         /// </value>
-        public String EnumKey
+        public string EnumKey
         {
-            get { return GetOption<String>("enumKey"); }
+            get { return GetOption<string>("enumKey"); }
             set { SetOption("enumKey", value); }
         }
 
@@ -70,9 +70,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The lookup key.
         /// </value>
-        public String LookupKey
+        public string LookupKey
         {
-            get { return GetOption<String>("lookupKey"); }
+            get { return GetOption<string>("lookupKey"); }
             set { SetOption("lookupKey", value); }
         }
     }

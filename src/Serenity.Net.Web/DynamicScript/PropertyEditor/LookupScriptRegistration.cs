@@ -1,6 +1,5 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data;
-using Serenity.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -9,9 +8,14 @@ namespace Serenity.Web
 {
     public class LookupScriptRegistration
     {
-        public static void RegisterLookupScripts()
+        public static void RegisterLookupScripts(IDynamicScriptManager scriptManager, IEnumerable<Assembly> assemblies)
         {
-            var assemblies = ExtensibilityHelper.SelfAssemblies;
+            if (scriptManager == null)
+                throw new ArgumentNullException(nameof(scriptManager));
+
+            if (assemblies == null)
+                throw new ArgumentNullException(nameof(assemblies));
+
             var registeredType = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var assembly in assemblies)
@@ -24,7 +28,7 @@ namespace Serenity.Web
 
                     LookupScript script;
 
-                    if (typeof(Row).IsAssignableFrom(type))
+                    if (typeof(IRow).IsAssignableFrom(type))
                     {
                         if (attr.LookupType == null)
                             script = (LookupScript)Activator.CreateInstance(typeof(RowLookupScript<>).MakeGenericType(type));
@@ -42,7 +46,7 @@ namespace Serenity.Web
                     else if (!typeof(LookupScript).IsAssignableFrom(type) ||
                         type.IsAbstract)
                     {
-                        throw new InvalidOperationException(String.Format("Type {0} can't be registered as a lookup script!", type.FullName));
+                        throw new InvalidOperationException(string.Format("Type {0} can't be registered as a lookup script!", type.FullName));
                     }
                     else
                     {
@@ -55,7 +59,7 @@ namespace Serenity.Web
                     Type otherType;
                     if (registeredType.TryGetValue(script.LookupKey, out otherType))
                     {
-                        throw new InvalidOperationException(String.Format("Types {0} and {1} has the same lookup key (\"{2}\"). " +
+                        throw new InvalidOperationException(string.Format("Types {0} and {1} has the same lookup key (\"{2}\"). " +
                             "\r\n\r\nPlease remove LookupScript attribute from one of them or change the lookup key!",
                             type.FullName, otherType.FullName, script.LookupKey));
                     }
@@ -68,7 +72,7 @@ namespace Serenity.Web
                     if (attr.Expiration != 0)
                         script.Expiration = TimeSpan.FromSeconds(attr.Expiration);
 
-                    DynamicScriptManager.Register(script.ScriptName, script);
+                    scriptManager.Register(script.ScriptName, script);
                 }
             }
         }

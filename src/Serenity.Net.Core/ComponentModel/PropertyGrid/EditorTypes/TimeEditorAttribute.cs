@@ -22,9 +22,9 @@ namespace Serenity.ComponentModel
         /// <value>
         ///   <c>true</c> if no empty option; otherwise, <c>false</c>.
         /// </value>
-        public Boolean NoEmptyOption
+        public bool NoEmptyOption
         {
-            get { return GetOption<Boolean>("noEmptyOption"); }
+            get { return GetOption<bool>("noEmptyOption"); }
             set { SetOption("noEmptyOption", value); }
         }
 
@@ -34,9 +34,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The start hour.
         /// </value>
-        public Int32 StartHour
+        public int StartHour
         {
-            get { return GetOption<Int32>("startHour"); }
+            get { return GetOption<int>("startHour"); }
             set { SetOption("startHour", value); }
         }
 
@@ -46,9 +46,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The end hour.
         /// </value>
-        public Int32 EndHour
+        public int EndHour
         {
-            get { return GetOption<Int32>("endHour"); }
+            get { return GetOption<int>("endHour"); }
             set { SetOption("endHour", value); }
         }
 
@@ -58,9 +58,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The interval minutes.
         /// </value>
-        public Int32 IntervalMinutes
+        public int IntervalMinutes
         {
-            get { return GetOption<Int32>("intervalMinutes"); }
+            get { return GetOption<int>("intervalMinutes"); }
             set { SetOption("intervalMinutes", value); }
         }
     }

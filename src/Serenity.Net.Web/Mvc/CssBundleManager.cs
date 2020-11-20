@@ -145,9 +145,9 @@ namespace Serenity.Web
                                 if (recursionCheck != null)
                                 {
                                     if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
-                                        return String.Format(errorLines,
-                                            String.Format("Caught infinite recursion with dynamic scripts '{0}'!",
-                                                String.Join(", ", recursionCheck)));
+                                        return string.Format(errorLines,
+                                            string.Format("Caught infinite recursion with dynamic scripts '{0}'!",
+                                                string.Join(", ", recursionCheck)));
                                 }
                                 else
                                     recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -157,8 +157,8 @@ namespace Serenity.Web
                                 {
                                     var code = scriptManager.GetScriptText(scriptName);
                                     if (code == null)
-                                        return String.Format(errorLines,
-                                            String.Format("Dynamic script with name '{0}' is not found!", scriptName));
+                                        return string.Format(errorLines,
+                                            string.Format("Dynamic script with name '{0}' is not found!", scriptName));
 
                                     if (minimize &&
                                         !scriptName.StartsWith("Bundle.", StringComparison.OrdinalIgnoreCase))
@@ -253,9 +253,9 @@ namespace Serenity.Web
                             if (recursionCheck != null)
                             {
                                 if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
-                                    throw new InvalidOperationException(String.Format(
+                                    throw new InvalidOperationException(string.Format(
                                         "Caught infinite recursion with dynamic scripts '{0}'!",
-                                            String.Join(", ", recursionCheck)));
+                                            string.Join(", ", recursionCheck)));
                             }
                             else
                                 recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

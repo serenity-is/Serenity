@@ -31,6 +31,6 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The key.
         /// </value>
-        public String Key { get; private set; }
+        public string Key { get; private set; }
     }
 }

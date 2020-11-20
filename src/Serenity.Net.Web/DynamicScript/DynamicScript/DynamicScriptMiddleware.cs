@@ -1,19 +1,18 @@
-﻿#if !ASPNETMVC
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Hosting;
-using Serenity.Extensibility;
 using System;
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
 using System.Linq;
 using Serenity.Services;
-#if !ASPNETCORE22
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
-#endif
+using System.Reflection;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Hosting;
+using Serenity.Data;
+using Serenity.PropertyGrid;
 
 namespace Serenity.Web.Middleware
 {
@@ -49,10 +48,10 @@ namespace Serenity.Web.Middleware
 
         public async static Task ReturnScript(HttpContext context, string scriptKey, string contentType)
         {
-            DynamicScriptManager.Script dynamicScript;
+            IDynamicScriptData dynamicScript;
             try
             {
-                dynamicScript = DynamicScriptManager.GetScript(scriptKey);
+                dynamicScript = context.RequestServices.GetRequiredService<IDynamicScriptManager>().GetScriptData(scriptKey);
             }
             catch (ValidationError ve)
             {
@@ -85,8 +84,8 @@ namespace Serenity.Web.Middleware
             };
 
             // allow CDNs to cache anonymous resources
-            if (!string.IsNullOrEmpty((string)context.Request.Query["v"]) &&
-                !Authorization.IsLoggedIn)
+            if (!string.IsNullOrEmpty(context.Request.Query["v"]) &&
+                context.User?.IsLoggedIn() != true)
                 cacheControl.Public = true;
             else                
                 cacheControl.Private = true;
@@ -141,27 +140,46 @@ namespace Serenity.Web.Middleware
 
     public static class DynamicScriptMiddlewareExtensions
     {
-        public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder, IEnumerable<Assembly> assemblies)
         {
-            DynamicScriptRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
-            LookupScriptRegistration.RegisterLookupScripts();
-            DistinctValuesRegistration.RegisterDistinctValueScripts();
-            FormScriptRegistration.RegisterFormScripts();
-            ColumnsScriptRegistration.RegisterColumnsScripts();
+            if (assemblies == null)
+                throw new ArgumentNullException(nameof(assemblies));
 
-            var contentPath = builder.ApplicationServices.GetService<IHostingEnvironment>().ContentRootPath;
+            var scriptManager = builder.ApplicationServices.GetRequiredService<IDynamicScriptManager>();
+            var connections = builder.ApplicationServices.GetRequiredService<IConnectionFactory>();
+            var propertyRegistry = builder.ApplicationServices.GetRequiredService<IPropertyItemRegistry>();
+
+            DynamicScriptRegistration.Initialize(scriptManager, connections, assemblies);
+            LookupScriptRegistration.RegisterLookupScripts(scriptManager, assemblies);
+            DistinctValuesRegistration.RegisterDistinctValueScripts(scriptManager, assemblies);
+            FormScriptRegistration.RegisterFormScripts(scriptManager, propertyRegistry, assemblies);
+            ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager, propertyRegistry, assemblies);
+
+            var hostEnvironment = builder.ApplicationServices.GetService<IWebHostEnvironment>();
             new TemplateScriptRegistrar()
-                .Initialize(new[] 
+                .Initialize(scriptManager, new[] 
                 {
-                    System.IO.Path.Combine(contentPath, "Views" + System.IO.Path.DirectorySeparatorChar + "Templates"),
-                    System.IO.Path.Combine(contentPath, "Modules")
+                    System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Views" + System.IO.Path.DirectorySeparatorChar + "Templates"),
+                    System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Modules")
                 }, watchForChanges: true);
 
-            ScriptFileWatcher.WatchForChanges();
-            CssFileWatcher.WatchForChanges();
+            var scriptsPath = System.IO.Path.Combine(hostEnvironment.WebRootPath, "Scripts");
+            var scriptWatcher = new FileWatcher(scriptsPath, "*.js");
+            scriptWatcher.Changed += (name) =>
+            {
+                builder.ApplicationServices.GetService<IScriptBundleManager>()?.ScriptsChanged();
+                builder.ApplicationServices.GetService<IContentHashCache>()?.ScriptsChanged();
+            };
+
+            var contentPath = System.IO.Path.Combine(hostEnvironment.WebRootPath, "Content");
+            var cssWatcher = new FileWatcher(contentPath, "*.css");
+            scriptWatcher.Changed += (name) =>
+            {
+                builder.ApplicationServices.GetService<ICssBundleManager>()?.CssChanged();
+                builder.ApplicationServices.GetService<IContentHashCache>()?.ScriptsChanged();
+            };
 
             return builder.UseMiddleware<DynamicScriptMiddleware>();
         }
     }
 }
-#endif

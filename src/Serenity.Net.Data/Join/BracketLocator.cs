@@ -102,7 +102,7 @@ namespace Serenity.Data
                 else if (c == '[')
                 {
                     if (i > 0 &&
-                        (Char.IsLetterOrDigit(expression[i - 1]) ||
+                        (char.IsLetterOrDigit(expression[i - 1]) ||
                          expression[i - 1] == '_'))
                     {
                         // might be an array indexer expression like a[5]

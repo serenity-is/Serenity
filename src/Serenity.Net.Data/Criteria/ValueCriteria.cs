@@ -89,12 +89,12 @@
             if (!k.GetType().IsPrimitive)
                 return false;
 
-            return k is Byte ||
-                   k is SByte ||
-                   k is Int16 ||
-                   k is UInt16 ||
-                   k is UInt32 ||
-                   k is UInt64;
+            return k is byte ||
+                   k is sbyte ||
+                   k is short ||
+                   k is ushort ||
+                   k is uint ||
+                   k is ulong;
         }
 
         private Parameter AddParam(IQueryWithParams query, object value)

@@ -24,9 +24,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The maximum year.
         /// </value>
-        public String MaxYear
+        public string MaxYear
         {
-            get { return GetOption<String>("maxYear"); }
+            get { return GetOption<string>("maxYear"); }
             set { SetOption("maxYear", value); }
         }
 
@@ -38,9 +38,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The minimum year. 
         /// </value>
-        public String MinYear
+        public string MinYear
         {
-            get { return GetOption<String>("minYear"); }
+            get { return GetOption<string>("minYear"); }
             set { SetOption("minYear", value); }
         }
 
@@ -50,9 +50,9 @@ namespace Serenity.ComponentModel
         /// <value>
         ///   <c>true</c> if descending; otherwise, <c>false</c>.
         /// </value>
-        public Boolean Descending
+        public bool Descending
         {
-            get { return GetOption<Boolean>("descending"); }
+            get { return GetOption<bool>("descending"); }
             set { SetOption("descending", value); }
         }
     }

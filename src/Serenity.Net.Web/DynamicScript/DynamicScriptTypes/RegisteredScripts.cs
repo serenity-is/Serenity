@@ -7,17 +7,20 @@ namespace Serenity.Web
 {
     public class RegisteredScripts : DynamicScript, INamedDynamicScript
     {
+        private readonly IDynamicScriptManager scriptManager;
+
         public string ScriptName { get { return "RegisteredScripts"; } }
 
-        public RegisteredScripts()
+        public RegisteredScripts(IDynamicScriptManager scriptManager)
         {
             Expiration = TimeSpan.FromDays(-1);
+            this.scriptManager = scriptManager;
         }
 
         public override string GetScript()
         {
             return "Q.ScriptData.setRegisteredScripts(" +
-                ToJsonFast(DynamicScriptManager.GetRegisteredScripts()) + ");";
+                ToJsonFast(scriptManager.GetRegisteredScripts()) + ");";
         }
 
         private static string ToJsonFast(IDictionary<string, string> dictionary)

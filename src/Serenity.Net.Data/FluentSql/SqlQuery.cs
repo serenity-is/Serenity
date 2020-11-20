@@ -301,14 +301,14 @@
                 orderBy = new List<string>();
 
             string search = (expression ?? "").Trim();
-            orderBy.RemoveAll(x => String.Compare((x ?? "").Trim(), search, StringComparison.OrdinalIgnoreCase) == 0);
+            orderBy.RemoveAll(x => string.Compare((x ?? "").Trim(), search, StringComparison.OrdinalIgnoreCase) == 0);
 
             if (search.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
                 search = search[0..^5].Trim();
             else
                 search += " DESC";
 
-            orderBy.RemoveAll(x => String.Compare((x ?? "").Trim(), search, StringComparison.OrdinalIgnoreCase) == 0);
+            orderBy.RemoveAll(x => string.Compare((x ?? "").Trim(), search, StringComparison.OrdinalIgnoreCase) == 0);
 
             if (orderBy.Count > 0)
                 orderBy.Insert(0, expression);

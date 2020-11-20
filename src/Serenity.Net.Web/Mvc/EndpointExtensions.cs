@@ -1,36 +1,22 @@
-﻿using Serenity.Data;
-using System;
-using System.Data;
-#if !ASPNETMVC
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-#else
-using System.Web;
-using System.Web.Mvc;
-#endif
+using Serenity.Data;
+using System;
+using System.Data;
 
 namespace Serenity.Services
 {
     public static class EndpointExtensions
     {
-        public static TResponse ConvertToResponse<TResponse>(this Exception exception)
+        public static TResponse ConvertToResponse<TResponse>(this Exception exception, HttpContext context)
             where TResponse: ServiceResponse, new()
         {
-            exception.Log();
+            //exception.Log();
 
-#if !ASPNETMVC
-            var context = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
-#if ASPNETCORE22
-            bool showDetails = context != null && context.RequestServices.GetService<IHostingEnvironment>().IsDevelopment();
-#else
-            bool showDetails = context != null && context.RequestServices
-                .GetService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>().EnvironmentName?.ToLowerInvariant() == "development";
-#endif
-#else
-            bool showDetails = HttpContext.Current != null && !HttpContext.Current.IsCustomErrorEnabled;
-#endif
+            bool showDetails = context != null && context.RequestServices.GetRequiredService<IWebHostEnvironment>()
+                .EnvironmentName?.ToLowerInvariant() == "development";
 
             var response = new TResponse();
             var error = new ServiceError();
@@ -69,12 +55,9 @@ namespace Serenity.Services
             }
             catch (Exception exception)
             {
-                response = exception.ConvertToResponse<TResponse>();
+                response = exception.ConvertToResponse<TResponse>(controller.HttpContext);
                 controller.HttpContext.Response.Clear();
                 controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
-#if ASPNETMVC
-                controller.HttpContext.Response.TrySkipIisCustomErrors = true;
-#endif
             }
 
             return new Result<TResponse>(response);
@@ -86,17 +69,15 @@ namespace Serenity.Services
             TResponse response;
             try
             {
-                using (var connection = SqlConnections.NewByKey(connectionKey))
+                var factory = controller.HttpContext.RequestServices.GetRequiredService<IConnectionFactory>();
+                using (var connection = factory.NewByKey(connectionKey))
                     response = handler(connection);
             }
             catch (Exception exception)
             {
-                response = exception.ConvertToResponse<TResponse>();
+                response = exception.ConvertToResponse<TResponse>(controller.HttpContext);
                 controller.HttpContext.Response.Clear();
                 controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
-#if ASPNETMVC
-                controller.HttpContext.Response.TrySkipIisCustomErrors = true;
-#endif
             }
 
             return new Result<TResponse>(response);
@@ -109,7 +90,9 @@ namespace Serenity.Services
             TResponse response;
             try
             {
-                using (var connection = SqlConnections.NewByKey(connectionKey))
+                var factory = controller.HttpContext.RequestServices.GetRequiredService<IConnectionFactory>();
+
+                using (var connection = factory.NewByKey(connectionKey))
                 using (var uow = new UnitOfWork(connection))
                 {
                     response = handler(uow);
@@ -118,13 +101,9 @@ namespace Serenity.Services
             }
             catch (Exception exception)
             {
-                response = exception.ConvertToResponse<TResponse>();
+                response = exception.ConvertToResponse<TResponse>(controller.HttpContext);
                 controller.HttpContext.Response.Clear();
                 controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
-#if ASPNETMVC
-                controller.HttpContext.Response.TrySkipIisCustomErrors = true;
-#endif
-
             }
 
             return new Result<TResponse>(response);

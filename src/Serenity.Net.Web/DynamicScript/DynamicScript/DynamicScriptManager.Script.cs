@@ -4,14 +4,14 @@ namespace Serenity.Web
 {
     public partial class DynamicScriptManager
     {
-        internal class Script
+        internal class Script : IDynamicScriptData
         {
-            internal string Hash;
-            internal DateTime Time;
-            internal DateTime Expiration;
-            internal string ScriptText;
-            internal byte[] UncompressedBytes;
-            internal byte[] CompressedBytes;
+            public string Hash { get; set; }
+            public DateTime Time { get; set; }
+            public DateTime Expiration { get; set; }
+            public string ScriptText { get; set; }
+            public byte[] UncompressedBytes { get; set; }
+            public byte[] CompressedBytes { get; set; }
         }
     }
 }

@@ -22,9 +22,9 @@ namespace Serenity.ComponentModel
         /// <value>
         ///   <c>true</c> if allow clear; otherwise, <c>false</c>.
         /// </value>
-        public Boolean AllowClear
+        public bool AllowClear
         {
-            get { return GetOption<Boolean>("allowClear"); }
+            get { return GetOption<bool>("allowClear"); }
             set { SetOption("allowClear", value); }
         }
 

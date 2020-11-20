@@ -25,9 +25,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The decimals allowed.
         /// </value>
-        public Int32 Decimals
+        public int Decimals
         {
-            get { return GetOption<Int32>("decimals"); }
+            get { return GetOption<int>("decimals"); }
             set { SetOption("decimals", value); }
         }
 
@@ -37,9 +37,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The maximum value.
         /// </value>
-        public Object MaxValue
+        public object MaxValue
         {
-            get { return GetOption<String>("maxValue"); }
+            get { return GetOption<string>("maxValue"); }
             set { SetOption("maxValue", value == null ? null : Convert.ToString(value, CultureInfo.InvariantCulture)); }
         }
 
@@ -49,9 +49,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The minimum value.
         /// </value>
-        public Object MinValue
+        public object MinValue
         {
-            get { return GetOption<String>("minValue"); }
+            get { return GetOption<string>("minValue"); }
             set { SetOption("minValue", value == null ? null : Convert.ToString(value, CultureInfo.InvariantCulture)); }
         }
 
@@ -61,9 +61,9 @@ namespace Serenity.ComponentModel
         /// <value>
         ///   <c>true</c> if pad decimals with zero; otherwise, <c>false</c>.
         /// </value>
-        public Boolean PadDecimals
+        public bool PadDecimals
         {
-            get { return GetOption<Boolean>("padDecimals"); }
+            get { return GetOption<bool>("padDecimals"); }
             set { SetOption("padDecimals", value); }
         }
 
@@ -73,9 +73,9 @@ namespace Serenity.ComponentModel
         /// <value>
         ///   <c>true</c> if should allow negatives; otherwise, <c>false</c>.
         /// </value>
-        public Boolean AllowNegatives
+        public bool AllowNegatives
         {
-            get { return GetOption<Boolean>("allowNegatives"); }
+            get { return GetOption<bool>("allowNegatives"); }
             set { SetOption("allowNegatives", value); }
         }
 

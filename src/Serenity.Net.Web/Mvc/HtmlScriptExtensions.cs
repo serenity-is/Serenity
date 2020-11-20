@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Serenity.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -197,7 +199,9 @@ namespace Serenity.Web
             var scriptManager = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IDynamicScriptManager>();
             scriptManager.IfNotRegistered(scriptName, () =>
             {
-                var script = new LocalTextScript(package, languageId, isPending);
+                var registry = page.ViewContext.HttpContext.RequestServices.GetRequiredService<ILocalTextRegistry>();
+                var packages = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<LocalTextScript.PackageSettings>>();
+                var script = new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
                 scriptManager.Register(script);
             });
 
@@ -211,7 +215,9 @@ namespace Serenity.Web
             var scriptManager = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IDynamicScriptManager>();
             scriptManager.IfNotRegistered(scriptName, () =>
             {
-                var script = new LocalTextScript(package, languageId, isPending);
+                var registry = page.ViewContext.HttpContext.RequestServices.GetRequiredService<ILocalTextRegistry>();
+                var packages = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<LocalTextScript.PackageSettings>>();
+                var script = new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
                 scriptManager.Register(script);
             });
 
@@ -225,7 +231,9 @@ namespace Serenity.Web
             var scriptManager = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IDynamicScriptManager>();
             scriptManager.IfNotRegistered(scriptName, () =>
             {
-                var script = new LocalTextScript(package, languageId, isPending);
+                var registry = page.ViewContext.HttpContext.RequestServices.GetRequiredService<ILocalTextRegistry>();
+                var packages = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<LocalTextScript.PackageSettings>>();
+                var script = new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
                 scriptManager.Register(script);
             });
 

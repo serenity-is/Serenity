@@ -77,7 +77,7 @@ namespace Serenity.Data
         /// <exception cref="System.ArgumentNullException">alias</exception>
         public Alias(string alias)
         {
-            if (String.IsNullOrEmpty(alias))
+            if (string.IsNullOrEmpty(alias))
                 throw new ArgumentNullException("alias");
 
             this.alias = alias;
@@ -143,7 +143,7 @@ namespace Serenity.Data
         /// Gets the prefixed expression with the specified field name.
         /// </summary>
         /// <value>
-        /// The <see cref="System.String"/>.
+        /// The <see cref="string"/>.
         /// </value>
         /// <param name="fieldName">Name of the field.</param>
         /// <returns>Expression like t0.fieldName</returns>
@@ -156,7 +156,7 @@ namespace Serenity.Data
         /// Gets the prefixed expression with the specified field.
         /// </summary>
         /// <value>
-        /// The <see cref="System.String"/>.
+        /// The <see cref="string"/>.
         /// </value>
         /// <param name="field">The field.</param>
         /// <returns>Expression like t0.fieldName</returns>

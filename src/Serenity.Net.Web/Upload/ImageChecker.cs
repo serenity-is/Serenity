@@ -202,9 +202,9 @@ namespace Serenity.Web
         ///   Gets/sets minimum height allowed. 0 means any height.</summary>
         public int MinHeight { get; set; }
 
-        public string FormatErrorMessage(ImageCheckResult result)
+        public string FormatErrorMessage(ImageCheckResult result, ITextLocalizer localizer)
         {
-            var format = LocalText.Get("Enums.ImageCheckResult." + Enum.GetName(typeof(ImageCheckResult), result));
+            var format = localizer.Get("Enums.ImageCheckResult." + Enum.GetName(typeof(ImageCheckResult), result));
             switch (result)
             {
                 case ImageCheckResult.GIFImage:
@@ -215,19 +215,19 @@ namespace Serenity.Web
                 case ImageCheckResult.ImageIsEmpty:
                     return format;
                 case ImageCheckResult.DataSizeTooHigh:
-                    return String.Format(format, MaxDataSize, DataSize);
+                    return string.Format(format, MaxDataSize, DataSize);
                 case ImageCheckResult.SizeMismatch:
-                    return String.Format(format, MinWidth, MinHeight, Width, Height);
+                    return string.Format(format, MinWidth, MinHeight, Width, Height);
                 case ImageCheckResult.WidthMismatch:
                 case ImageCheckResult.WidthTooHigh:
-                    return String.Format(format, MaxWidth, Width);
+                    return string.Format(format, MaxWidth, Width);
                 case ImageCheckResult.WidthTooLow:
-                    return String.Format(format, MinWidth, Width);
+                    return string.Format(format, MinWidth, Width);
                 case ImageCheckResult.HeightMismatch:
                 case ImageCheckResult.HeightTooHigh:
-                    return String.Format(format, MaxHeight, MaxHeight);
+                    return string.Format(format, MaxHeight, MaxHeight);
                 case ImageCheckResult.HeightTooLow:
-                    return String.Format(format, MinHeight, MaxHeight);
+                    return string.Format(format, MinHeight, MaxHeight);
                 default:
                     throw new ArgumentOutOfRangeException("ImageCheckResult");
             }

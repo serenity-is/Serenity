@@ -39,7 +39,7 @@ namespace Serenity.Data.Mapping
         /// <value>
         /// The alias.
         /// </value>
-        public String Alias { get; private set; }
+        public string Alias { get; private set; }
 
         /// <summary>
         /// Gets the table.
@@ -47,7 +47,7 @@ namespace Serenity.Data.Mapping
         /// <value>
         /// The table joined to.
         /// </value>
-        public String ToTable { get; private set; }
+        public string ToTable { get; private set; }
 
         /// <summary>
         /// Gets the ON criteria.
@@ -55,7 +55,7 @@ namespace Serenity.Data.Mapping
         /// <value>
         /// The ON criteria.
         /// </value>
-        public String OnCriteria { get; private set; }
+        public string OnCriteria { get; private set; }
 
         /// <summary>
         /// Gets the property prefix.
@@ -63,7 +63,7 @@ namespace Serenity.Data.Mapping
         /// <value>
         /// The property prefix.
         /// </value>
-        public String PropertyPrefix { get; set; }
+        public string PropertyPrefix { get; set; }
 
         /// <summary>
         /// Gets or sets the title prefix.
@@ -71,7 +71,7 @@ namespace Serenity.Data.Mapping
         /// <value>
         /// The title prefix.
         /// </value>
-        public String TitlePrefix { get; set; }
+        public string TitlePrefix { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the row.

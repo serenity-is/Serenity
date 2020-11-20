@@ -10,15 +10,15 @@ namespace Serenity.ComponentModel
         {
         }
 
-        public String Domain
+        public string Domain
         {
-            get { return GetOption<String>("domain"); }
+            get { return GetOption<string>("domain"); }
             set { SetOption("domain", value); }
         }
 
-        public Boolean ReadOnlyDomain
+        public bool ReadOnlyDomain
         {
-            get { return GetOption<Boolean>("readOnlyDomain"); }
+            get { return GetOption<bool>("readOnlyDomain"); }
             set { SetOption("readOnlyDomain", value); }
         }
 

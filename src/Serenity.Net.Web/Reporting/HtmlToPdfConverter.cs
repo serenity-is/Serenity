@@ -29,12 +29,12 @@ namespace Serenity.Reporting
             
             if (!File.Exists(exePath))
             {
-                throw new InvalidOperationException(String.Format("Can't find wkhtmltopdf.exe which is required for PDF generation.\n" +
+                throw new InvalidOperationException(string.Format("Can't find wkhtmltopdf.exe which is required for PDF generation.\n" +
                     "Please download a stable version from http://wkhtmltopdf.org/downloads.html\n and place it under directory '{0}'.", 
                     Path.GetDirectoryName(exePath)));
             }
 
-            if (String.IsNullOrEmpty(this.Url))
+            if (string.IsNullOrEmpty(this.Url))
                 throw new ArgumentNullException("url");
 
             var args = new List<string>();
@@ -165,7 +165,7 @@ namespace Serenity.Reporting
                     throw new InvalidOperationException("Timeout while PDF generation!");
 
                 if (process.ExitCode != 0 && process.ExitCode != 1)
-                    throw new InvalidOperationException(String.Format("PDF generator returned error code {0}!", process.ExitCode));
+                    throw new InvalidOperationException(string.Format("PDF generator returned error code {0}!", process.ExitCode));
 
                 if (!File.Exists(tempFile))
                     throw new InvalidOperationException("Can't find generatored PDF file!");

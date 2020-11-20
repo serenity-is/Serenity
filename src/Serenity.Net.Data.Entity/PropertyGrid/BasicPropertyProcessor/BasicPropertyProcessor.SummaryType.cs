@@ -22,18 +22,18 @@ namespace Serenity.PropertyGrid
                 }
 
                 var valueType = source.ValueType;
-                if (valueType == typeof(Decimal) ||
-                    valueType == typeof(Double) ||
-                    valueType == typeof(Single) ||
-                    valueType == typeof(Int64) ||
-                    valueType == typeof(Int32) ||
-                    valueType == typeof(Int16))
+                if (valueType == typeof(decimal) ||
+                    valueType == typeof(double) ||
+                    valueType == typeof(float) ||
+                    valueType == typeof(long) ||
+                    valueType == typeof(int) ||
+                    valueType == typeof(short))
                 {
                     item.SummaryType = SummaryType.Sum;
                     return;
                 }
 
-                if (valueType != typeof(String) &&
+                if (valueType != typeof(string) &&
                     valueType != typeof(bool) &&
                     valueType != typeof(Stream) &&
                     valueType != typeof(Guid) &&

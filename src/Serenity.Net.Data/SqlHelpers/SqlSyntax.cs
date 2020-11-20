@@ -90,13 +90,13 @@ namespace Serenity.Data
                 return false;
 
             var c = s[0];
-            if (c != '_' && !Char.IsLetter(c))
+            if (c != '_' && !char.IsLetter(c))
                 return false;
 
             for (var i = 1; i < s.Length; i++)
             {
                 c = s[i];
-                if (c != '_' && !Char.IsLetterOrDigit(c))
+                if (c != '_' && !char.IsLetterOrDigit(c))
                     return false;
             }
 
@@ -118,13 +118,13 @@ namespace Serenity.Data
             if (s[1] == ' ' || s[^2] == ' ')
                 return false;
 
-            Char c;
+            char c;
             for (var i = 2; i <= s.Length - 2; i++)
             {
                 c = s[i];
                 if (c != ' ' &&
                     c != '_' &&
-                    !Char.IsLetterOrDigit(c))
+                    !char.IsLetterOrDigit(c))
                     return false;
             }
 

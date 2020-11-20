@@ -9,11 +9,8 @@ namespace Serenity.Web
 
         public TemplateScript(string key, Func<string> getTemplate)
         {
-            Check.NotNull(key, "key");
-            Check.NotNull(getTemplate, "getTemplate");
-
-            this.getTemplate = getTemplate;
-            this.key = key;
+            this.getTemplate = getTemplate ?? throw new ArgumentNullException(nameof(getTemplate));
+            this.key = key ?? throw new ArgumentNullException(nameof(key));
         }
 
         public string ScriptName { get { return "Template." + key; } }
@@ -22,7 +19,7 @@ namespace Serenity.Web
         {
             string templateText = getTemplate();
 
-            return String.Format("Q.ScriptData.set({0}, {1})", 
+            return string.Format("Q.ScriptData.set({0}, {1})", 
                 ("Template." + key).ToSingleQuoted(),
                 templateText.ToSingleQuoted()); 
         }

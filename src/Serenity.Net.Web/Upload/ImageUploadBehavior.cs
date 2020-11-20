@@ -92,7 +92,7 @@ namespace Serenity.Services
             {
                 var end = fileNameFormat.IndexOf('|', start + 1);
                 if (end <= start + 1)
-                    throw new ArgumentException(String.Format(
+                    throw new ArgumentException(string.Format(
                         "Field '{0}' on row type '{1}' has a UploadEditor attribute " +
                         "with invalid format string '{2}'!",
                             target.PropertyName ?? target.Name,
@@ -164,7 +164,7 @@ namespace Serenity.Services
 
                 var colon = p.Key.IndexOf(":");
                 if (colon >= 0)
-                    str = String.Format("{0:" + p.Key.Substring(colon + 1, p.Key.Length - colon - 2) + "}", val);
+                    str = string.Format("{0:" + p.Key.Substring(colon + 1, p.Key.Length - colon - 2) + "}", val);
                 else
                     str = Convert.ToString(val ?? "", CultureInfo.InvariantCulture);
 
@@ -349,11 +349,11 @@ namespace Serenity.Services
                 using (var fs = new FileStream(temporaryFilePath, FileMode.Open))
                 {
                     if (attr.MinSize != 0 && fs.Length < attr.MinSize)
-                        throw new ValidationError(String.Format(Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
+                        throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
                             UploadHelper.FileSizeDisplay(attr.MinSize)));
 
                     if (attr.MaxSize != 0 && fs.Length > attr.MaxSize)
-                        throw new ValidationError(String.Format(Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
+                        throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
                             UploadHelper.FileSizeDisplay(attr.MaxSize)));
 
                     ImageCheckResult result;
@@ -376,7 +376,7 @@ namespace Serenity.Services
                     if (result > ImageCheckResult.UnsupportedFormat || 
                         (supportedFormats != null && Array.IndexOf(supportedFormats, result) < 0))
                     {
-                        string error = checker.FormatErrorMessage(result);
+                        string error = checker.FormatErrorMessage(result, localizer);
                         throw new ValidationError(error);
                     }
 
@@ -411,8 +411,8 @@ namespace Serenity.Services
                         var dims = sizeStr.ToLowerInvariant().Split(new char[] { 'x' });
                         int w, h;
                         if (dims.Length != 2 ||
-                            !Int32.TryParse(dims[0], out w) ||
-                            !Int32.TryParse(dims[1], out h) ||
+                            !int.TryParse(dims[0], out w) ||
+                            !int.TryParse(dims[1], out h) ||
                             w < 0 ||
                             h < 0 ||
                             (w == 0 && h == 0))

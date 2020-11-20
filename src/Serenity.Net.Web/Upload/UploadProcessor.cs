@@ -64,7 +64,7 @@ namespace Serenity.Web
                 extension.EndsWith(".php");
         }
 
-        public bool ProcessStream(System.IO.Stream fileContent, string extension)
+        public bool ProcessStream(System.IO.Stream fileContent, string extension, ITextLocalizer localizer)
         {
             extension = extension.TrimToEmpty().ToLowerInvariant();
             if (IsDangerousExtension(extension))
@@ -101,7 +101,7 @@ namespace Serenity.Web
                             fileContent.CopyTo(fs);
                             FileSize = fs.Length;
                         }
-                        success = ProcessImageStream(fileContent, extension);
+                        success = ProcessImageStream(fileContent, extension, localizer);
                     }
                     else
                     {
@@ -140,7 +140,7 @@ namespace Serenity.Web
             return success;
         }
 
-        private bool ProcessImageStream(Stream fileContent, string extension)
+        private bool ProcessImageStream(Stream fileContent, string extension, ITextLocalizer localizer)
         {
             var imageChecker = new ImageChecker();
             Image image;
@@ -155,7 +155,7 @@ namespace Serenity.Web
                     CheckResult != ImageCheckResult.GIFImage &&
                     CheckResult != ImageCheckResult.PNGImage)
                 {
-                    ErrorMessage = imageChecker.FormatErrorMessage(CheckResult);
+                    ErrorMessage = imageChecker.FormatErrorMessage(CheckResult, localizer);
                     return false;
                 }
                 else

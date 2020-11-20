@@ -10,15 +10,20 @@ namespace Serenity.Web
 {
     public class DistinctValuesRegistration
     {
-        public static void RegisterDistinctValueScripts()
+        public static void RegisterDistinctValueScripts(IDynamicScriptManager scriptManager, IEnumerable<Assembly> assemblies)
         {
-            var assemblies = ExtensibilityHelper.SelfAssemblies;
+            if (scriptManager == null)
+                throw new ArgumentNullException(nameof(scriptManager));
+
+            if (assemblies == null)
+                throw new ArgumentNullException(nameof(assemblies));
+
             var list = new List<DistinctValuesEditorAttribute>();
             foreach (var assembly in assemblies)
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    bool isRow = type.IsSubclassOf(typeof(Row));
+                    bool isRow = type.IsSubclassOf(typeof(IRow));
 
                     if (!isRow &&
                         type.GetCustomAttribute<FormScriptAttribute>() == null &&
@@ -41,7 +46,7 @@ namespace Serenity.Web
                         {
                             if (attr.RowType.IsInterface ||
                                 attr.RowType.IsAbstract ||
-                                !attr.RowType.IsSubclassOf(typeof(Row)))
+                                !attr.RowType.IsSubclassOf(typeof(IRow)))
                             {
                                 throw new Exception("DistinctValuesEditor can't be used with type: " +
                                     attr.RowType.FullName + " as it is not a row type. This attribute is specified " +
@@ -58,7 +63,7 @@ namespace Serenity.Web
                                 var basedOnRowAttr = type.GetCustomAttribute<BasedOnRowAttribute>();
                                 if (basedOnRowAttr == null || basedOnRowAttr.RowType == null ||
                                     basedOnRowAttr.RowType.IsAbstract ||
-                                    !basedOnRowAttr.RowType.IsSubclassOf(typeof(Row)))
+                                    !basedOnRowAttr.RowType.IsSubclassOf(typeof(IRow)))
                                 {
                                     throw new Exception("Invalid usage of DistinctValuesEditor attribute on " +
                                         "property " + property.Name + " of " + type.FullName + ". " +
@@ -83,7 +88,7 @@ namespace Serenity.Web
 
             foreach (var key in byRowProperty)
             {
-                var row = (Row)Activator.CreateInstance(key.Key.Item1);
+                var row = (IRow)Activator.CreateInstance(key.Key.Item1);
 
                 var script = (LookupScript)Activator.CreateInstance(typeof(DistinctValuesScript<>)
                     .MakeGenericType(key.Key.Item1), new object[] { key.Key.Item2 });
@@ -99,7 +104,7 @@ namespace Serenity.Web
                 if (withExpiration != null)
                     script.Expiration = TimeSpan.FromSeconds(withExpiration.Expiration);
 
-                DynamicScriptManager.Register(script.ScriptName, script);
+                scriptManager.Register(script.ScriptName, script);
             }
         }
     }

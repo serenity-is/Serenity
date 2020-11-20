@@ -34,63 +34,63 @@ namespace Serenity.ComponentModel
         /// <summary>
         /// Should non-image uploads be allowed.
         /// </summary>
-        public Boolean AllowNonImage
+        public bool AllowNonImage
         {
-            get { return GetOption<Boolean>("allowNonImage"); }
+            get { return GetOption<bool>("allowNonImage"); }
             set { SetOption("allowNonImage", value); }
         }
 
         /// <summary>
         /// Maximum size in bytes of the uploaded file.
         /// </summary>
-        public Int32 MaxSize
+        public int MaxSize
         {
-            get { return GetOption<Int32>("maxSize"); }
+            get { return GetOption<int>("maxSize"); }
             set { SetOption("maxSize", value); }
         }
 
         /// <summary>
         /// Minimum size in bytes of the uploaded file.
         /// </summary>
-        public Int32 MinSize
+        public int MinSize
         {
-            get { return GetOption<Int32>("minSize"); }
+            get { return GetOption<int>("minSize"); }
             set { SetOption("minSize", value); }
         }
 
         /// <summary>
         /// Maximum height in pixels of the uploaded image.
         /// </summary>
-        public Int32 MaxHeight
+        public int MaxHeight
         {
-            get { return GetOption<Int32>("maxHeight"); }
+            get { return GetOption<int>("maxHeight"); }
             set { SetOption("maxHeight", value); }
         }
 
         /// <summary>
         /// Maximum width in pixels of the uploaded image.
         /// </summary>
-        public Int32 MaxWidth
+        public int MaxWidth
         {
-            get { return GetOption<Int32>("maxWidth"); }
+            get { return GetOption<int>("maxWidth"); }
             set { SetOption("maxWidth", value); }
         }
 
         /// <summary>
         /// Minimum height in pixels of the uploaded image.
         /// </summary>
-        public Int32 MinHeight
+        public int MinHeight
         {
-            get { return GetOption<Int32>("minHeight"); }
+            get { return GetOption<int>("minHeight"); }
             set { SetOption("minHeight", value); }
         }
 
         /// <summary>
         /// Minimum width in pixels of the uploaded image.
         /// </summary>
-        public Int32 MinWidth
+        public int MinWidth
         {
-            get { return GetOption<Int32>("minWidth"); }
+            get { return GetOption<int>("minWidth"); }
             set { SetOption("minWidth", value); }
         }
 
@@ -141,9 +141,9 @@ namespace Serenity.ComponentModel
         /// set this to the name of another string field. Only used
         /// for single image uploads.
         /// </summary>
-        public String OriginalNameProperty
+        public string OriginalNameProperty
         {
-            get { return GetOption<String>("originalNameProperty"); }
+            get { return GetOption<string>("originalNameProperty"); }
             set { SetOption("originalNameProperty", value); }
         }
 
@@ -152,9 +152,9 @@ namespace Serenity.ComponentModel
         /// name in file name with {4} format parameter, set this
         /// to true to force ImageUploadEditor show file name.
         /// </summary>
-        public Boolean DisplayFileName
+        public bool DisplayFileName
         {
-            get { return GetOption<Boolean>("displayFileName"); }
+            get { return GetOption<bool>("displayFileName"); }
             set { SetOption("displayFileName", value); }
         }
 

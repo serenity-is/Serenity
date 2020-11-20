@@ -26,7 +26,7 @@
         /// </summary>
         /// <param name="values">The values.</param>
         public ConstantCriteria(IEnumerable<int> values)
-            : base(String.Join(",", values))
+            : base(string.Join(",", values))
         {
         }
 
@@ -44,7 +44,7 @@
         /// </summary>
         /// <param name="values">The values.</param>
         public ConstantCriteria(IEnumerable<long> values)
-            : base(String.Join(",", values))
+            : base(string.Join(",", values))
         {
         }
 
@@ -64,7 +64,7 @@
         /// <param name="values">The values.</param>
         /// <param name="dialect">The dialect.</param>
         public ConstantCriteria(IEnumerable<string> values, ISqlDialect dialect = null)
-            : base(String.Join(",", values.Select(x => x.ToSql(dialect))))
+            : base(string.Join(",", values.Select(x => x.ToSql(dialect))))
         {
         }
     }

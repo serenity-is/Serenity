@@ -27,7 +27,7 @@ namespace Serenity.Data.Mapping
         /// <value>
         /// The alias.
         /// </value>
-        public String Alias { get; private set; }
+        public string Alias { get; private set; }
 
         /// <summary>
         /// Gets the inner query.
@@ -35,7 +35,7 @@ namespace Serenity.Data.Mapping
         /// <value>
         /// The inner query.
         /// </value>
-        public String InnerQuery { get; private set; }
+        public string InnerQuery { get; private set; }
 
         /// <summary>
         /// Gets the property prefix.
@@ -43,7 +43,7 @@ namespace Serenity.Data.Mapping
         /// <value>
         /// The property prefix.
         /// </value>
-        public String PropertyPrefix { get; set; }
+        public string PropertyPrefix { get; set; }
 
         /// <summary>
         /// Gets or sets the title prefix.
@@ -51,7 +51,7 @@ namespace Serenity.Data.Mapping
         /// <value>
         /// The title prefix.
         /// </value>
-        public String TitlePrefix { get; set; }
+        public string TitlePrefix { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the row.

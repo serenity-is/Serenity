@@ -30,7 +30,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns></returns>
-        public static string ToSql(this Double? value)
+        public static string ToSql(this double? value)
         {
             if (!value.HasValue)
                 return Null;
@@ -42,7 +42,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns></returns>
-        public static string ToSql(this Decimal? value)
+        public static string ToSql(this decimal? value)
         {
             if (!value.HasValue)
                 return Null;
@@ -54,7 +54,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns></returns>
-        public static string ToSql(this Int64? value)
+        public static string ToSql(this long? value)
         {
             if (!value.HasValue)
                 return Null;

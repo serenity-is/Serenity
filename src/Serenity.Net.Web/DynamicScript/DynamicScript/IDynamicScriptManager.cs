@@ -12,6 +12,7 @@ namespace Serenity.Web
         Dictionary<string, string> GetRegisteredScripts();
         string GetScriptInclude(string name, string extension = ".js");
         string GetScriptText(string name);
+        IDynamicScriptData GetScriptData(string name);
         void IfNotRegistered(string name, Action callback);
         bool IsRegistered(string name);
         void Register(INamedDynamicScript script);

@@ -1,5 +1,5 @@
 ﻿using Serenity.ComponentModel;
-using Serenity.Extensibility;
+using Serenity.PropertyGrid;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -8,9 +8,13 @@ namespace Serenity.Web
 {
     public class FormScriptRegistration
     {
-        public static void RegisterFormScripts()
+        public static void RegisterFormScripts(IDynamicScriptManager scriptManager, IPropertyItemRegistry registry, IEnumerable<Assembly> assemblies)
         {
-            var assemblies = ExtensibilityHelper.SelfAssemblies;
+            if (scriptManager == null)
+                throw new ArgumentNullException(nameof(scriptManager));
+
+            if (assemblies == null)
+                throw new ArgumentNullException(nameof(assemblies));
 
             var scripts = new List<Func<string>>();
 
@@ -20,13 +24,13 @@ namespace Serenity.Web
                     var attr = type.GetCustomAttribute<FormScriptAttribute>();
                     if (attr != null)
                     {
-                        var script = new FormScript(attr.Key, type);
-                        DynamicScriptManager.Register(script);
+                        var script = new FormScript(attr.Key, type, registry);
+                        scriptManager.Register(script);
                         scripts.Add(script.GetScript);
                     }
                 }
 
-            DynamicScriptManager.Register("FormBundle", new ConcatenatedScript(scripts));
+            scriptManager.Register("FormBundle", new ConcatenatedScript(scripts));
         }
     }
 }

@@ -1,12 +1,4 @@
-﻿#if !ASPNETMVC
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Serenity.Data;
-using System;
-using System.Data;
-using System.Linq;
-using System.Reflection;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Serenity.Services
 {
@@ -16,8 +8,7 @@ namespace Serenity.Services
         {
             context.ExceptionHandled = true;
             context.Result = new ResultWithStatus<ServiceResponse>(context.Exception is ValidationError ? 400 : 500,
-                context.Exception.ConvertToResponse<ServiceResponse>());
+                context.Exception.ConvertToResponse<ServiceResponse>(context.HttpContext));
         }
     }
 }
-#endif

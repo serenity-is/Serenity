@@ -19,7 +19,7 @@ namespace Serenity.Reflection
         /// <param name="indentSize">Size of the indent.</param>
         public CodeWriter(StringBuilder sb, int indentSize)
         {
-            space = new String(' ', indentSize);
+            space = new string(' ', indentSize);
             indent = "";
             this.sb = sb;
         }

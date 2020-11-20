@@ -22,9 +22,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The enum key.
         /// </value>
-        public String EnumKey
+        public string EnumKey
         {
-            get { return GetOption<String>("enumKey"); }
+            get { return GetOption<string>("enumKey"); }
             set { SetOption("enumKey", value); }
         }
     }

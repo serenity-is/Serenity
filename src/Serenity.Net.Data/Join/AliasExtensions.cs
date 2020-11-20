@@ -14,7 +14,7 @@ namespace Serenity.Data
         /// <returns></returns>
         public static Alias WithNoLock(this IAlias alias)
         {
-            if (String.IsNullOrEmpty(alias.Table))
+            if (string.IsNullOrEmpty(alias.Table))
                 return new Alias(alias.Name + " WITH(NOLOCK)");
 
             return new Alias(alias.Table, alias.Name + " WITH(NOLOCK)");

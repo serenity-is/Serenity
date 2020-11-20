@@ -30,15 +30,15 @@ namespace Serenity.Data
         /// <exception cref="ArgumentOutOfRangeException">newItemId</exception>
         /// <exception cref="DuplicateNameException">newItemId</exception>
         public DeltaLister(IEnumerable<TItem> oldList, IEnumerable<TItem> newList,
-            Func<TItem, Int64?> getItemId, DeltaOptions options = DeltaOptions.Default)
+            Func<TItem, long?> getItemId, DeltaOptions options = DeltaOptions.Default)
         {
             _options = options;
             _oldItems = oldList ?? throw new ArgumentNullException("oldList");
             _newItems = newList ?? throw new ArgumentNullException("newList");
             _getItemId = getItemId ?? throw new ArgumentNullException("getItemId");
 
-            _oldById = new Dictionary<Int64, TItem>();
-            _newById = new HashSet<Int64>();
+            _oldById = new Dictionary<long, TItem>();
+            _newById = new HashSet<long>();
 
             foreach (var item in oldList)
             {

@@ -24,9 +24,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The cols.
         /// </value>
-        public Int32 Cols
+        public int Cols
         {
-            get { return GetOption<Int32>("cols"); }
+            get { return GetOption<int>("cols"); }
             set { SetOption("cols", value); }
         }
 
@@ -37,9 +37,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The rows.
         /// </value>
-        public Int32 Rows
+        public int Rows
         {
-            get { return GetOption<Int32>("rows"); }
+            get { return GetOption<int>("rows"); }
             set { SetOption("rows", value); }
         }
     }

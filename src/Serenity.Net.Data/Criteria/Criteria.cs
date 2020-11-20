@@ -68,10 +68,10 @@
         /// </exception>
         public Criteria(string alias, string field)
         {
-            if (String.IsNullOrEmpty(field))
+            if (string.IsNullOrEmpty(field))
                 throw new ArgumentNullException("field");
 
-            if (String.IsNullOrEmpty(alias))
+            if (string.IsNullOrEmpty(alias))
                 throw new ArgumentNullException("alias");
             expression = alias + "." + SqlSyntax.AutoBracketValid(field);
         }
@@ -86,7 +86,7 @@
         /// <exception cref="ArgumentOutOfRangeException">joinNumber is less than zero</exception>
         public Criteria(int joinNumber, string field)
         {
-            if (String.IsNullOrEmpty(field))
+            if (string.IsNullOrEmpty(field))
                 throw new ArgumentNullException("field");
 
             if (joinNumber < 0)
@@ -158,7 +158,7 @@
         /// <exception cref="ArgumentNullException">fieldName is null or empty string.</exception>
         public static Criteria Bracket(string fieldName)
         {
-            if (String.IsNullOrEmpty(fieldName))
+            if (string.IsNullOrEmpty(fieldName))
                 throw new ArgumentNullException("fieldName");
 
             return new Criteria("[" + fieldName + "]");
@@ -190,7 +190,7 @@
         {
             get
             {
-                return String.IsNullOrEmpty(expression);
+                return string.IsNullOrEmpty(expression);
             }
         }
 

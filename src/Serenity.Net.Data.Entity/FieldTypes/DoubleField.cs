@@ -6,16 +6,16 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
-    public sealed class DoubleField : GenericValueField<Double>
+    public sealed class DoubleField : GenericValueField<double>
     {
         public DoubleField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-            Func<IRow, Double?> getValue = null, Action<IRow, Double?> setValue = null)
+            Func<IRow, double?> getValue = null, Action<IRow, double?> setValue = null)
             : base(collection, FieldType.Double, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static DoubleField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<IRow, Double?> getValue, Action<IRow, Double?> setValue)
+            Func<IRow, double?> getValue, Action<IRow, double?> setValue)
         {
             return new DoubleField(collection, name, caption, size, flags, getValue, setValue);
         }
@@ -28,7 +28,7 @@ namespace Serenity.Data
             var value = reader.GetValue(index);
             if (value is DBNull)
                 _setValue(row, null);
-            else if (value is Double)
+            else if (value is double)
                 _setValue(row, (double)value);
             else
                 _setValue(row, Convert.ToDouble(value, CultureInfo.InvariantCulture));

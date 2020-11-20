@@ -20,7 +20,7 @@ namespace Serenity.Web
             this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
             this.localizer = localizer;
             registeredScripts = new ConcurrentDictionary<string, Item>(StringComparer.OrdinalIgnoreCase);
-            Register(new RegisteredScripts());
+            Register(new RegisteredScripts(this));
         }
 
         public bool IsRegistered(string name)
@@ -109,7 +109,7 @@ namespace Serenity.Web
             return name + extension + "?v=" + (script.Hash ?? script.Time.Ticks.ToString());
         }
 
-        internal Script GetScript(string name)
+        public IDynamicScriptData GetScriptData(string name)
         {
             if (!registeredScripts.TryGetValue(name, out Item item) ||
                 item == null)

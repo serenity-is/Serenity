@@ -22,9 +22,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The false text.
         /// </value>
-        public String FalseText
+        public string FalseText
         {
-            get { return GetOption<String>("falseText"); }
+            get { return GetOption<string>("falseText"); }
             set { SetOption("falseText", value); }
         }
 
@@ -34,9 +34,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The true text.
         /// </value>
-        public String TrueText
+        public string TrueText
         {
-            get { return GetOption<String>("trueText"); }
+            get { return GetOption<string>("trueText"); }
             set { SetOption("trueText", value); }
         }
     }
@@ -76,9 +76,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The display format.
         /// </value>
-        public String DisplayFormat
+        public string DisplayFormat
         {
-            get { return GetOption<String>("displayFormat"); }
+            get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
         }
     }
@@ -103,9 +103,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The display format.
         /// </value>
-        public String DisplayFormat
+        public string DisplayFormat
         {
-            get { return GetOption<String>("displayFormat"); }
+            get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
         }
     }
@@ -132,9 +132,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The enum key.
         /// </value>
-        public String EnumKey
+        public string EnumKey
         {
-            get { return GetOption<String>("enumKey"); }
+            get { return GetOption<string>("enumKey"); }
             set { SetOption("enumKey", value); }
         }
     }
@@ -159,9 +159,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The display format.
         /// </value>
-        public String DisplayFormat
+        public string DisplayFormat
         {
-            get { return GetOption<String>("displayFormat"); }
+            get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
         }
 
@@ -172,9 +172,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The original name property.
         /// </value>
-        public String OriginalNameProperty
+        public string OriginalNameProperty
         {
-            get { return GetOption<String>("originalNameProperty"); }
+            get { return GetOption<string>("originalNameProperty"); }
             set { SetOption("originalNameProperty", value); }
         }
     }
@@ -199,9 +199,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The display format.
         /// </value>
-        public String DisplayFormat
+        public string DisplayFormat
         {
-            get { return GetOption<String>("displayFormat"); }
+            get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
         }
     }
@@ -226,9 +226,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The display format.
         /// </value>
-        public String DisplayFormat
+        public string DisplayFormat
         {
-            get { return GetOption<String>("displayFormat"); }
+            get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
         }
     }
@@ -253,9 +253,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The display property.
         /// </value>
-        public String DisplayProperty
+        public string DisplayProperty
         {
-            get { return GetOption<String>("displayProperty"); }
+            get { return GetOption<string>("displayProperty"); }
             set { SetOption("displayProperty", value); }
         }
 
@@ -265,9 +265,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The display format.
         /// </value>
-        public String DisplayFormat
+        public string DisplayFormat
         {
-            get { return GetOption<String>("displayFormat"); }
+            get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
         }
 
@@ -277,9 +277,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The URL property.
         /// </value>
-        public String UrlProperty
+        public string UrlProperty
         {
-            get { return GetOption<String>("urlProperty"); }
+            get { return GetOption<string>("urlProperty"); }
             set { SetOption("urlProperty", value); }
         }
 
@@ -289,9 +289,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The URL format.
         /// </value>
-        public String UrlFormat
+        public string UrlFormat
         {
-            get { return GetOption<String>("urlFormat"); }
+            get { return GetOption<string>("urlFormat"); }
             set { SetOption("urlFormat", value); }
         }
 
@@ -301,9 +301,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The target.
         /// </value>
-        public String Target
+        public string Target
         {
-            get { return GetOption<String>("target"); }
+            get { return GetOption<string>("target"); }
             set { SetOption("target", value); }
         }
     }

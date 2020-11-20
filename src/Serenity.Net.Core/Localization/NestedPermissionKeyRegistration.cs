@@ -45,7 +45,7 @@ namespace Serenity.Localization
             foreach (var member in type.GetFields(BindingFlags.Static | BindingFlags.DeclaredOnly |
                 BindingFlags.Public | BindingFlags.NonPublic))
             {
-                if (member.FieldType != typeof(String))
+                if (member.FieldType != typeof(string))
                     continue;
 
                 if (!(member.GetValue(null) is string key))

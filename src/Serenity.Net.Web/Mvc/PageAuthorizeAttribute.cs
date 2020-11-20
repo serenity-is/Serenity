@@ -1,18 +1,13 @@
 ﻿using Serenity.Data;
 using System;
 using System.Linq;
-#if !ASPNETMVC
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-#else
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Security;
-#endif
+using Serenity.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Serenity.Web
 {
-#if !ASPNETMVC
     public class PageAuthorizeAttribute : TypeFilterAttribute
     {
         public PageAuthorizeAttribute()
@@ -37,25 +32,17 @@ namespace Serenity.Web
             public void OnResourceExecuting(ResourceExecutingContext context)
             {
                 if ((string.IsNullOrEmpty(attr.Permission) &&
-                     !Authorization.IsLoggedIn) ||
+                     !context.HttpContext.User.IsLoggedIn()) ||
                     (!string.IsNullOrEmpty(attr.Permission) &&
-                     !Authorization.HasPermission(attr.Permission)))
+                     !context.HttpContext.RequestServices.GetRequiredService<IPermissionService>().HasPermission(attr.Permission)))
                 {
-                    if (Authorization.IsLoggedIn)
+                    if (context.HttpContext.User.IsLoggedIn())
                         context.Result = new ForbidResult();
                     else
                         context.Result = new ChallengeResult();
                 }
             }
         }
-#else
-    public class PageAuthorizeAttribute : AuthorizeAttribute
-    {
-        public PageAuthorizeAttribute()
-            : base()
-        {
-        }
-#endif
 
         protected PageAuthorizeAttribute(Type sourceType, params Type[] attributeTypes)
             : this()
@@ -112,43 +99,6 @@ namespace Serenity.Web
             : this(module.ToString() + ":" + submodule + ":" + permission)
         {
         }
-
-#if ASPNETMVC
-        protected override bool AuthorizeCore(HttpContextBase httpContext)
-        {
-            if (!base.AuthorizeCore(httpContext))
-                return false;
-
-            return Permission.IsEmptyOrNull() || Authorization.HasPermission(Permission);
-        }
-
-        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
-        {
-            if (FormsAuthentication.IsEnabled)
-            {
-                var loginUrl = FormsAuthentication.LoginUrl;
-                if (loginUrl.IndexOf('?') < 0)
-                    loginUrl += '?';
-                else
-                    loginUrl += '&';
-
-                var currentUrl = loginUrl.IndexOf("://") < 0 ?
-                    HttpContext.Current.Request.Url.PathAndQuery :
-                    HttpContext.Current.Request.Url.OriginalString;
-
-                loginUrl += "returnUrl=" + Uri.EscapeDataString(currentUrl);
-
-                if (Authorization.IsLoggedIn)
-                    loginUrl += "&denied=1";
-
-                filterContext.Result = new RedirectResult(loginUrl);
-
-                return;
-            }
-
-            base.HandleUnauthorizedRequest(filterContext);
-        }
-#endif
 
         public string Permission { get; private set; }
     }

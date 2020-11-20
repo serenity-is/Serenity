@@ -56,7 +56,7 @@ namespace Serenity.Data
                             startIdent < index &&
                             index - startIdent == 2 &&
                             expression[startIdent + 1] == '0' &&
-                            Char.ToLowerInvariant(expression[startIdent]) == 't')
+                            char.ToLowerInvariant(expression[startIdent]) == 't')
                         {
                             sb.Length -= 3;
                         }

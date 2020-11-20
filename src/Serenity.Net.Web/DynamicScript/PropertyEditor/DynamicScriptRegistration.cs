@@ -6,20 +6,20 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-#if !ASPNETMVC
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-#else
-using System.Web.Mvc;
-#endif
 
 namespace Serenity.Web
 {
     public class DynamicScriptRegistration
     {
-        public static void Initialize(IEnumerable<Assembly> assemblies)
+        public static void Initialize(IDynamicScriptManager scriptManager, IConnectionFactory connections, IEnumerable<Assembly> assemblies)
         {
-            Check.NotNull(assemblies, "assemblies");
+            if (scriptManager == null)
+                throw new ArgumentNullException(nameof(scriptManager));
+
+            if (assemblies == null)
+                throw new ArgumentNullException(nameof(assemblies));
 
             DataScriptAttribute attr;
 
@@ -37,7 +37,7 @@ namespace Serenity.Web
                     if (attr != null)
                     {
                         var script = (INamedDynamicScript)Activator.CreateInstance(type);
-                        DynamicScriptManager.Register(script);
+                        scriptManager.Register(script);
                         continue;
                     }
 
@@ -51,7 +51,7 @@ namespace Serenity.Web
                             continue;
 
                         if (string.IsNullOrEmpty(attr.Key))
-                            throw new ArgumentNullException("scripKey", String.Format(
+                            throw new ArgumentNullException("scripKey", string.Format(
                                 "DataScript attribute on method {1} of type {0} has empty key!",
                                 type.Name, method.Name));
 
@@ -60,7 +60,7 @@ namespace Serenity.Web
                             parameters.Any(x => x.ParameterType != typeof(ServiceRequest) &&
                                 x.ParameterType != typeof(IDbConnection)))
                         {
-                            throw new ArgumentOutOfRangeException("parameters", String.Format(
+                            throw new ArgumentOutOfRangeException("parameters", string.Format(
                                 "DataScript actions shouldn't have any parameters other " + 
                                 "than an a base ServiceRequest and optional IDbConnection. Method {0} of type {1} has {2} arguments",
                                 type.Name, method.Name, parameters.Length));
@@ -72,7 +72,7 @@ namespace Serenity.Web
                         {
                             var connectionKeyAttr = type.GetCustomAttribute<ConnectionKeyAttribute>();
                             if (connectionKeyAttr == null || connectionKeyAttr.Value.IsEmptyOrNull())
-                                throw new ArgumentOutOfRangeException("connectionKey", String.Format(
+                                throw new ArgumentOutOfRangeException("connectionKey", string.Format(
                                     "Cannot determine connection key for DynamicScript defined on type {0}, method {1}",
                                     type.Name, method.Name));
 
@@ -82,14 +82,14 @@ namespace Serenity.Web
                         var returnType = method.ReturnType;
 
                         if (returnType == typeof(void))
-                            throw new ArgumentOutOfRangeException("returnType", String.Format(
+                            throw new ArgumentOutOfRangeException("returnType", string.Format(
                                 "DynamicScript defined on method {1} of type {0} has void return type",
                                 type.Name, method.Name));
 
                         var isResult = returnType.IsGenericType && 
                             returnType.GetGenericTypeDefinition() == typeof(Result<>);
                         if (!isResult && typeof(ActionResult).IsAssignableFrom(returnType))
-                            throw new ArgumentOutOfRangeException("returnType", String.Format(
+                            throw new ArgumentOutOfRangeException("returnType", string.Format(
                                 "DynamicScript defined on method {1} of type {0} has ActionResult descendant return type. " +
                                 "It must be Result<T> or a regular class!",
                                 type.Name, method.Name));
@@ -118,7 +118,7 @@ namespace Serenity.Web
                                     else
                                     {
                                         if (connection == null)
-                                            connection = SqlConnections.NewByKey(connectionKey);
+                                            connection = connections.NewByKey(connectionKey);
 
                                         prm[i] = connection;
                                     }
@@ -155,7 +155,7 @@ namespace Serenity.Web
                                 dataScript.Permission = "?";
                         }
 
-                        DynamicScriptManager.Register(dataScript.ScriptName, dataScript);
+                        scriptManager.Register(dataScript.ScriptName, dataScript);
                     }
                 }
             }

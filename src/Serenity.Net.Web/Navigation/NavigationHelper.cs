@@ -1,6 +1,6 @@
 ﻿namespace Serenity.Navigation
 {
-    using Serenity.Extensibility;
+    using Serenity.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -8,16 +8,19 @@
 
     public class NavigationHelper
     {
-        public static List<NavigationItem> GetNavigationItems(Func<string, string> resolveUrl = null,
+        public static List<NavigationItem> GetNavigationItems(IPermissionService permissions, IEnumerable<Assembly> assemblies, Func<string, string> resolveUrl = null,
             Func<NavigationItemAttribute, bool> filter = null)
         {
-            var menuItems = GetNavigationItemAttributes(filter);
-            return ConvertToNavigationItems(menuItems, resolveUrl);
+            var menuItems = GetNavigationItemAttributes(assemblies, filter);
+            return ConvertToNavigationItems(permissions, menuItems, resolveUrl);
         }
 
-        public static List<NavigationItem> ConvertToNavigationItems(ILookup<string, NavigationItemAttribute> attrByCategory,
+        public static List<NavigationItem> ConvertToNavigationItems(IPermissionService permissions, ILookup<string, NavigationItemAttribute> attrByCategory,
             Func<string, string> resolveUrl)
         {
+            if (permissions == null)
+                throw new ArgumentException(nameof(permissions));
+
             var result = new List<NavigationItem>();
 
             Action<List<NavigationItem>, NavigationItemAttribute> processAttr = null;
@@ -34,7 +37,7 @@
                 };
 
                 bool isAuthorizedSection = !attr.Url.IsEmptyOrNull() &&
-                    (attr.Permission.IsEmptyOrNull() || Authorization.HasPermission(attr.Permission));
+                    (attr.Permission.IsEmptyOrNull() || permissions.HasPermission(attr.Permission));
 
                 var path = (attr.Category.IsEmptyOrNull() ? "" : (attr.Category + "/"));
                 path += (attr.Title ?? "");
@@ -53,23 +56,21 @@
             return result;
         }
 
-        private static ILookup<string, NavigationItemAttribute> GetNavigationItemAttributes(
+        private static ILookup<string, NavigationItemAttribute> GetNavigationItemAttributes(IEnumerable<Assembly> assemblies,
             Func<NavigationItemAttribute, bool> filter)
         {
-            return LocalCache.Get("NavigationHelper:NavigationItems", TimeSpan.Zero, () =>
-            {
-                var list = new List<NavigationItemAttribute>();
+            var list = new List<NavigationItemAttribute>();
 
-                foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
+            foreach (var assembly in assemblies)
+            {
+                foreach (NavigationItemAttribute attr in assembly.GetCustomAttributes<NavigationItemAttribute>())
                 {
-                    foreach (NavigationItemAttribute attr in assembly.GetCustomAttributes<NavigationItemAttribute>())
-                    {
-                        if (filter == null || filter(attr))
-                            list.Add(attr);
-                    }
+                    if (filter == null || filter(attr))
+                        list.Add(attr);
                 }
 
-                foreach (var navItemType in ExtensibilityHelper.GetTypesWithInterface(typeof(INavigationItemSource)))
+                foreach (var navItemType in assembly.GetTypes().Where(x => !x.IsAbstract &&
+                    typeof(INavigationItemSource).IsAssignableFrom(x)))
                 {
                     var navItem = (INavigationItemSource)Activator.CreateInstance(navItemType);
                     foreach (var item in navItem.GetItems())
@@ -78,9 +79,9 @@
                             list.Add(item);
                     }
                 }
+            }
 
-                return ByCategory(list);
-            });
+            return ByCategory(list);
         }
 
         public static ILookup<string, NavigationItemAttribute> ByCategory(IEnumerable<NavigationItemAttribute> list)

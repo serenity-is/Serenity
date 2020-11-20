@@ -119,7 +119,7 @@
         ///   SqlInsert object itself.</returns>
         public SqlInsert SetNull(string field)
         {
-            if (String.IsNullOrEmpty(field))
+            if (string.IsNullOrEmpty(field))
                 throw new ArgumentNullException(field);
 
             nameValuePairs.Add(field);

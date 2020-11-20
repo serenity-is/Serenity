@@ -20,7 +20,7 @@
 
         private void Initialize(string tableName)
         {
-            if (String.IsNullOrEmpty(tableName))
+            if (string.IsNullOrEmpty(tableName))
                 throw new ArgumentNullException("tableName");
 
             _tableName = tableName;

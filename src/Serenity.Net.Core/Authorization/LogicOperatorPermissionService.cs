@@ -18,7 +18,7 @@ namespace Serenity.Web
     /// </remarks>
     public partial class LogicOperatorPermissionService : IPermissionService
     {
-        private static readonly char[] chars = new Char[] { '|', '&', '!', '(', ')' };
+        private static readonly char[] chars = new char[] { '|', '&', '!', '(', ')' };
         private readonly IPermissionService permissionService;
         private readonly ConcurrentDictionary<string, string[]> cache =
             new ConcurrentDictionary<string, string[]>();

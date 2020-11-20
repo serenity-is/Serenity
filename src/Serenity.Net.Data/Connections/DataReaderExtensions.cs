@@ -47,7 +47,7 @@ namespace Serenity.Data
         ///   Index.</param>
         /// <returns>
         ///   Field value or Null.Decimal if value is DbNull.</returns>
-        public static Decimal? AsDecimal(this IDataReader reader, int index)
+        public static decimal? AsDecimal(this IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
                 return null;
@@ -63,7 +63,7 @@ namespace Serenity.Data
         ///   Index.</param>
         /// <returns>
         ///   Field value or Null.Decimal if value is DbNull.</returns>
-        public static Decimal? ToDecimal(this IDataReader reader, int index)
+        public static decimal? ToDecimal(this IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
                 return null;
@@ -79,7 +79,7 @@ namespace Serenity.Data
         ///   Index.</param>
         /// <returns>
         ///   Field value or Null.Double if value is DbNull.</returns>
-        public static Double? AsDouble(this IDataReader reader, int index)
+        public static double? AsDouble(this IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
                 return null;
@@ -95,7 +95,7 @@ namespace Serenity.Data
         ///   Index.</param>
         /// <returns>
         ///   Field value or Null.Double if value is DbNull.</returns>
-        public static Double? ToDouble(this IDataReader reader, int index)
+        public static double? ToDouble(this IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
                 return null;
@@ -111,7 +111,7 @@ namespace Serenity.Data
         ///   Index.</param>
         /// <returns>
         ///   Field value or Null.Int32 if value is DbNull.</returns>
-        public static Int32? AsInt32(this IDataReader reader, int index)
+        public static int? AsInt32(this IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
                 return null;
@@ -127,7 +127,7 @@ namespace Serenity.Data
         ///   Index.</param>
         /// <returns>
         ///   Field value or Null.Int32 if value is DbNull.</returns>
-        public static Int32? ToInt32(this IDataReader reader, int index)
+        public static int? ToInt32(this IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
                 return null;
@@ -143,7 +143,7 @@ namespace Serenity.Data
         ///   Index.</param>
         /// <returns>
         ///   Field value or Null.Int64 if value is DbNull.</returns>
-        public static Int64? AsInt64(this IDataReader reader, int index)
+        public static long? AsInt64(this IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
                 return null;
@@ -159,7 +159,7 @@ namespace Serenity.Data
         ///   Index.</param>
         /// <returns>
         ///   Field value or Null.Int64 if value is DbNull.</returns>
-        public static Int64? ToInt64(this IDataReader reader, int index)
+        public static long? ToInt64(this IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
                 return null;
@@ -175,7 +175,7 @@ namespace Serenity.Data
         ///   Index.</param>
         /// <returns>
         ///   Field value or null if value is DbNull.</returns>
-        public static String AsString(this IDataReader reader, int index)
+        public static string AsString(this IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
                 return null;
@@ -191,7 +191,7 @@ namespace Serenity.Data
         ///   Index.</param>
         /// <returns>
         ///   Field value or null if value is DbNull.</returns>
-        public static String ToString(this IDataReader reader, int index)
+        public static string ToString(this IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
                 return null;

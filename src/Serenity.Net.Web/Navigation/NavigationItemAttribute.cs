@@ -60,14 +60,14 @@ namespace Serenity.Navigation
 
             if (actionMethod == null)
                 throw new ArgumentOutOfRangeException("action",
-                    String.Format("Controller {1} doesn't have an action with name {0}!",
+                    string.Format("Controller {1} doesn't have an action with name {0}!",
                         action, controller.FullName));
 
             var routeController = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
             var routeAction = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
 
             if (routeController == null && routeAction == null)
-                throw new InvalidOperationException(String.Format(
+                throw new InvalidOperationException(string.Format(
                     "Route attribute for {0} action of {1} controller is not found!",
                         action, controller.FullName));
 

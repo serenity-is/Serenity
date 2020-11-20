@@ -23,9 +23,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The mask.
         /// </value>
-        public String Mask
+        public string Mask
         {
-            get { return GetOption<String>("mask"); }
+            get { return GetOption<string>("mask"); }
             set { SetOption("mask", value); }
         }
 
@@ -35,9 +35,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The placeholder.
         /// </value>
-        public String Placeholder
+        public string Placeholder
         {
-            get { return GetOption<String>("placeholder"); }
+            get { return GetOption<string>("placeholder"); }
             set { SetOption("placeholder", value); }
         }
     }

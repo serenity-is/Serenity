@@ -21,7 +21,7 @@ namespace Serenity
         /// </summary>
         /// <param name="query">The target query to add params to.</param>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        /// A <see cref="string" /> that represents this instance.
         /// </returns>
         string ToString(IQueryWithParams query);
 

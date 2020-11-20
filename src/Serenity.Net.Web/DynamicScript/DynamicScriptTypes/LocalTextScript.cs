@@ -6,59 +6,59 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-#if !NET45
-using Microsoft.Extensions.Configuration;
-#else
-using System.Configuration;
-#endif
-
 
 namespace Serenity.Web
 {
     public class LocalTextScript : DynamicScript, INamedDynamicScript
     {
-        private string scriptName;
-        private string package;
-        private string languageId;
-        private bool isPending;
-        private static Dictionary<string, string[]> packages;
+        private readonly string scriptName;
+        private readonly string[] includes;
+        private readonly string languageId;
+        private readonly bool isPending;
+        private readonly ILocalTextRegistry registry;
 
-        public LocalTextScript(string package, string languageId, bool isPending)
+        public class PackageSettings : Dictionary<string, string[]>
         {
-            this.package = package;
+        }
+
+        public LocalTextScript(ILocalTextRegistry registry, string package, string[] includes, string languageId, bool isPending)
+        {
+            this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
+            this.includes = includes ?? Array.Empty<string>();
             this.languageId = languageId;
             this.isPending = isPending;
-            this.scriptName = GetScriptName(package, languageId, isPending);
+            scriptName = GetScriptName(package ?? throw new ArgumentNullException(nameof(package)), languageId, isPending);
         }
 
         public string ScriptName { get { return scriptName; } }
 
         public static string GetScriptName(string package, string languageId, bool isPending)
         {
-            return String.Format("LocalText.{0}.{1}.{2}", package, languageId, isPending ? "Pending" : "Public");
+            return string.Format("LocalText.{0}.{1}.{2}", package, languageId, isPending ? "Pending" : "Public");
         }
 
-        public static string GetLocalTextPackageScript(string package, string languageId, bool isPending)
+        public static string GetLocalTextPackageScript(ILocalTextRegistry registry, PackageSettings packages, string package, string languageId, bool isPending)
         {
+            if (package == null)
+                throw new ArgumentNullException(nameof(package));
+
             if (packages == null)
-            {
-                packages = (Dictionary<string, string[]>)Dependency.Resolve<IConfigurationManager>()
-                    .AppSetting("LocalTextPackages", typeof(Dictionary<string, string[]>)) ?? new Dictionary<string, string[]>();
-            }
+                throw new ArgumentNullException(nameof(packages));
 
-            string[] packageItems;
-            if (!packages.TryGetValue(package, out packageItems) ||
-                packageItems.Length == 0)
-                return String.Empty;
+            if (!packages.TryGetValue(package, out string[] includes))
+                includes = Array.Empty<string>();
 
-            return GetLocalTextPackageScript(packageItems, languageId, isPending);
+            return GetLocalTextPackageScript(registry, includes, languageId, isPending);
         }
 
-        public static string GetLocalTextPackageScript(string[] packageItems, string languageId, bool isPending)
-        { 
+        public static string GetLocalTextPackageScript(ILocalTextRegistry registry, string[] includes, string languageId, bool isPending)
+        {
+            if (registry == null)
+                throw new ArgumentNullException(nameof(registry));
+
             StringBuilder sb = new StringBuilder("^(");
             bool append = false;
-            foreach (object obj in packageItems)
+            foreach (object obj in includes)
             {
                 if (append)
                     sb.Append('|');
@@ -73,8 +73,7 @@ namespace Serenity.Web
             }
             sb.Append(")$");
             var regex = new Regex(sb.ToString(), RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var texts = ((LocalTextRegistry)Dependency.Resolve<ILocalTextRegistry>())
-                .GetAllAvailableTextsInLanguage(languageId, isPending);
+            var texts = registry is LocalTextRegistry ltr ? ltr.GetAllAvailableTextsInLanguage(languageId, isPending) : new Dictionary<string, string>();
 
             var list = new List<KeyValuePair<string, string>>();
 
@@ -82,7 +81,7 @@ namespace Serenity.Web
                 if (regex.IsMatch(pair.Key))
                     list.Add(pair);
 
-            list.Sort((i1, i2) => String.CompareOrdinal(i1.Key, i2.Key));
+            list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));
 
             StringBuilder jwBuilder = new StringBuilder("Q.LT.add(");
             JsonWriter jw = new JsonTextWriter(new StringWriter(jwBuilder));
@@ -170,7 +169,7 @@ namespace Serenity.Web
 
         public override string GetScript()
         {
-            return GetLocalTextPackageScript(package, languageId, isPending);
-        }
+            return GetLocalTextPackageScript(registry, includes, languageId, isPending);
+        }  
     }
 }

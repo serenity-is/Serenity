@@ -1,16 +1,12 @@
 ﻿using Serenity.Data;
 using System;
 using System.Linq;
-#if !ASPNETMVC
 using Microsoft.AspNetCore.Mvc.Filters;
-#else
-using System.Web;
-using System.Web.Mvc;
-#endif
+using Microsoft.Extensions.DependencyInjection;
+using Serenity.Abstractions;
 
 namespace Serenity.Services
 {
-#if !ASPNETMVC
     public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
     {
         public void OnResourceExecuted(ResourceExecutedContext context)
@@ -20,18 +16,20 @@ namespace Serenity.Services
         public void OnResourceExecuting(ResourceExecutingContext context)
         {
             if ((string.IsNullOrEmpty(Permission) &&
-                    !Authorization.IsLoggedIn) ||
+                    !context.HttpContext.User.IsLoggedIn()) ||
                 (!string.IsNullOrEmpty(Permission) &&
-                    !Authorization.HasPermission(Permission)))
+                    !context.HttpContext.RequestServices.GetRequiredService<IPermissionService>().HasPermission(Permission)))
             {
-                if (Authorization.IsLoggedIn)
+                var localizer = context.HttpContext.RequestServices.GetRequiredService<ITextLocalizer>();
+
+                if (!context.HttpContext.User.IsLoggedIn())
                 {
                     context.Result = new Result<ServiceResponse>(new ServiceResponse
                     {
                         Error = new ServiceError
                         {
                             Code = "AccessDenied",
-                            Message = LocalText.Get("Authorization.AccessDenied")
+                            Message = localizer.Get("Authorization.AccessDenied")
                         }
                     });
                     context.HttpContext.Response.StatusCode = 400;
@@ -43,17 +41,14 @@ namespace Serenity.Services
                         Error = new ServiceError
                         {
                             Code = "NotLoggedIn",
-                            Message = LocalText.Get("Authorization.NotLoggedIn")
+                            Message = localizer.Get("Authorization.NotLoggedIn")
                         }
                     });
                     context.HttpContext.Response.StatusCode = 400;
                 }
             }
         }
-#else
-    public class ServiceAuthorizeAttribute : AuthorizeAttribute
-    {
-#endif
+     
         public ServiceAuthorizeAttribute()
         {
         }
@@ -114,45 +109,5 @@ namespace Serenity.Services
         }
 
         public string Permission { get; private set; }
-
-#if ASPNETMVC
-        protected override bool AuthorizeCore(HttpContextBase httpContext)
-        {
-            if (!base.AuthorizeCore(httpContext))
-                return false;
-
-            return Permission.IsEmptyOrNull() || Authorization.HasPermission(Permission);
-        }
-
-        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
-        {
-            if (Authorization.IsLoggedIn)
-            {
-                filterContext.Result = new Result<ServiceResponse>(new ServiceResponse
-                {
-                    Error = new ServiceError
-                    {
-                        Code = "AccessDenied",
-                        Message = LocalText.Get("Authorization.AccessDenied")
-                    }
-                });
-            }
-            else
-            {
-                filterContext.Result = new Result<ServiceResponse>(new ServiceResponse
-                {
-                    Error = new ServiceError
-                    {
-                        Code = "NotLoggedIn",
-                        Message = LocalText.Get("Authorization.NotLoggedIn")
-                    }
-                });
-            }
-
-            filterContext.HttpContext.Response.Clear();
-            filterContext.HttpContext.Response.StatusCode = 400;
-            filterContext.HttpContext.Response.TrySkipIisCustomErrors = true;
-        }
-#endif
     }
 }

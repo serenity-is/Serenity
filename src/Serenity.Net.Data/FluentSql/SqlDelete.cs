@@ -99,7 +99,7 @@
             StringBuilder sb = new StringBuilder("DELETE FROM ", 24 + where.Length);
             sb.Append(SqlSyntax.AutoBracketValid(tableName));
 
-            if (!String.IsNullOrEmpty(where))
+            if (!string.IsNullOrEmpty(where))
             {
                 sb.Append(" WHERE ");
                 sb.Append(where);

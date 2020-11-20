@@ -58,9 +58,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The start hour.
         /// </value>
-        public Int32 StartHour
+        public int StartHour
         {
-            get { return GetOption<Int32>("startHour"); }
+            get { return GetOption<int>("startHour"); }
             set { SetOption("startHour", value); }
         }
 
@@ -70,9 +70,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The end hour.
         /// </value>
-        public Int32 EndHour
+        public int EndHour
         {
-            get { return GetOption<Int32>("endHour"); }
+            get { return GetOption<int>("endHour"); }
             set { SetOption("endHour", value); }
         }
 
@@ -82,9 +82,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The interval minutes.
         /// </value>
-        public Int32 IntervalMinutes
+        public int IntervalMinutes
         {
-            get { return GetOption<Int32>("intervalMinutes"); }
+            get { return GetOption<int>("intervalMinutes"); }
             set { SetOption("intervalMinutes", value); }
         }
 
@@ -94,9 +94,9 @@ namespace Serenity.ComponentModel
         /// <value>
         ///   <c>true</c> if UTC format should be used; otherwise, <c>false</c>.
         /// </value>
-        public Boolean UseUtc
+        public bool UseUtc
         {
-            get { return GetOption<Boolean>("useUtc"); }
+            get { return GetOption<bool>("useUtc"); }
             set { SetOption("useUtc", value); }
         }
     }

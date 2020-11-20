@@ -42,9 +42,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The identifier field.
         /// </value>
-        public String IdField
+        public string IdField
         {
-            get { return GetOption<String>("idField"); }
+            get { return GetOption<string>("idField"); }
             set { SetOption("idField", value); }
         }
     }

@@ -22,9 +22,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The false text.
         /// </value>
-        public String FalseText
+        public string FalseText
         {
-            get { return GetOption<String>("falseText"); }
+            get { return GetOption<string>("falseText"); }
             set { SetOption("falseText", value); }
         }
 
@@ -34,9 +34,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The true text.
         /// </value>
-        public String TrueText
+        public string TrueText
         {
-            get { return GetOption<String>("trueText"); }
+            get { return GetOption<string>("trueText"); }
             set { SetOption("trueText", value); }
         }
     }

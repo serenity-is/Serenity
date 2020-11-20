@@ -18,9 +18,9 @@ namespace Serenity.ComponentModel
         /// <summary>
         /// Gets/sets optional display format to use for display of filter
         /// </summary>
-        public String DisplayFormat
+        public string DisplayFormat
         {
-            get { return GetOption<String>("displayFormat"); }
+            get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
         }
     }

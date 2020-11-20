@@ -5,16 +5,16 @@ using System.Data;
 
 namespace Serenity.Data
 {
-    public class VariantField : GenericClassField<Object>
+    public class VariantField : GenericClassField<object>
     {
         public VariantField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-            Func<IRow, Object> getValue = null, Action<IRow, Object> setValue = null)
+            Func<IRow, object> getValue = null, Action<IRow, object> setValue = null)
             : base(collection, FieldType.String, name, caption, size, flags, getValue, setValue)
         {
         }
 
         public static VariantField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-            Func<IRow, Object> getValue, Action<IRow, Object> setValue)
+            Func<IRow, object> getValue, Action<IRow, object> setValue)
         {
             return new VariantField(collection, name, caption, size, flags, getValue, setValue);
         }

@@ -43,9 +43,9 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The type of the editor.
         /// </value>
-        public String EditorType
+        public string EditorType
         {
-            get { return GetOption<String>("editorType"); }
+            get { return GetOption<string>("editorType"); }
             set { SetOption("editorType", value); }
         }
 
@@ -55,9 +55,9 @@ namespace Serenity.ComponentModel
         /// <value>
         ///   <c>true</c> if should use relative comparisons; otherwise, <c>false</c>.
         /// </value>
-        public Boolean UseRelative
+        public bool UseRelative
         {
-            get { return GetOption<Boolean>("useRelative"); }
+            get { return GetOption<bool>("useRelative"); }
             set { SetOption("useSearch", value); }
         }
 
@@ -68,9 +68,9 @@ namespace Serenity.ComponentModel
         /// <value>
         ///   <c>true</c> if should use LIKE operators; otherwise, <c>false</c>.
         /// </value>
-        public Boolean UseLike
+        public bool UseLike
         {
-            get { return GetOption<Boolean>("useLike"); }
+            get { return GetOption<bool>("useLike"); }
             set { SetOption("useLike", value); }
         }
     }

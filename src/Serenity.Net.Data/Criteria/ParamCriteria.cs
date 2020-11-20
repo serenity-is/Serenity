@@ -19,7 +19,7 @@
         /// <exception cref="ArgumentOutOfRangeException">name starts with @.</exception>
         public ParamCriteria(string name)
         {
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
             if (!name.StartsWith("@"))
