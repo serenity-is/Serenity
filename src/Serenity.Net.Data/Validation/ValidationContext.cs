@@ -29,5 +29,10 @@ namespace Serenity
         /// The connection.
         /// </value>
         IDbConnection Connection { get; }
+
+        /// <summary>
+        /// Localizer
+        /// </summary>
+        ITextLocalizer Localizer { get; }
     }
 }

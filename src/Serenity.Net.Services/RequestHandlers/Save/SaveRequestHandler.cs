@@ -396,7 +396,7 @@ namespace Serenity.Services
 
         protected virtual void ValidateFieldValues()
         {
-            var context = new RowValidationContext(Connection, Row);
+            var context = new RowValidationContext(Connection, Row, Localizer);
 
             foreach (var field in Row.GetFields())
             {

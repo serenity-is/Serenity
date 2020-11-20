@@ -7,10 +7,11 @@ namespace Serenity.Services
     {
         private readonly IRow row;
 
-        public RowValidationContext(IDbConnection connection, IRow row)
+        public RowValidationContext(IDbConnection connection, IRow row, ITextLocalizer localizer)
         {
             this.row = row;
             Connection = connection;
+            Localizer = localizer;
         }
 
         public object GetFieldValue(string fieldName)
@@ -24,5 +25,6 @@ namespace Serenity.Services
 
         public IDbConnection Connection { get; private set; }
         public object Value { get; set; }
+        public ITextLocalizer Localizer { get; private set; }
     }
 }

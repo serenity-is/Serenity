@@ -1,9 +1,9 @@
-﻿using Serenity.ComponentModel;
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
+using Serenity.PropertyGrid;
 using Serenity.Web.PropertyEditor;
 using System;
-#if !NET45
-using System.Reflection;
-#endif
+using System.Linq;
 
 namespace Serenity.Web
 {
@@ -17,11 +17,13 @@ namespace Serenity.Web
         private string scriptName;
         private Type type;
         private EventHandler scriptChanged;
+        private IPropertyItemRegistry registry;
 
-        protected PropertyItemsScript(string scriptName, Type type)
+        protected PropertyItemsScript(string scriptName, Type type, IPropertyItemRegistry registry)
         {
-            this.type = type;
+            this.type = type ?? throw new ArgumentNullException(nameof(type));
             this.scriptName = scriptName;
+            this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
         }
 
         protected static string CheckName(string name)
@@ -45,7 +47,7 @@ namespace Serenity.Web
 
         public string GetScript()
         {
-            var items = Serenity.PropertyGrid.PropertyItemHelper.GetPropertyItemsFor(type);
+            var items = registry.GetPropertyItemsFor(type).ToList();
             if (typeof(ICustomizedFormScript).IsAssignableFrom(type))
             {
                 var instance = Activator.CreateInstance(type) as ICustomizedFormScript;
@@ -55,7 +57,7 @@ namespace Serenity.Web
             return String.Format("Q.ScriptData.set({0}, {1});", (scriptName).ToSingleQuoted(), items.ToJson());
         }
 
-        public void CheckRights()
+        public void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
         {
         }
 

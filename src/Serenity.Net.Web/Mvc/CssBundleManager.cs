@@ -246,7 +246,7 @@ namespace Serenity.Web
                         });
                     }
 
-                    var bundle = new ConcatenatedScript(bundleParts, "\n\n", checkRights: () =>
+                    var bundle = new ConcatenatedScript(bundleParts, "\n\n", checkRights: (permissions, localizer) =>
                     {
                         foreach (var scriptName in scriptNames)
                         {

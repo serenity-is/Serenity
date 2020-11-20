@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using System;
 
 namespace Serenity.Web
 {
@@ -18,10 +19,10 @@ namespace Serenity.Web
 
         public abstract string GetScript();
 
-        public virtual void CheckRights()
+        public virtual void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
         {
             if (Permission != null)
-                Authorization.ValidatePermission(Permission);
+                permissions.ValidatePermission(Permission, localizer);
         }
 
         public event System.EventHandler ScriptChanged

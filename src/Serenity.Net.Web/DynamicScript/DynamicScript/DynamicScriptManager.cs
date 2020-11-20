@@ -11,11 +11,14 @@ namespace Serenity.Web
         private Action<string> scriptChanged;
 
         private readonly ITwoLevelCache cache;
+        private readonly IPermissionService permissions;
+        private readonly ITextLocalizer localizer;
 
-        public DynamicScriptManager(ITwoLevelCache cache)
+        public DynamicScriptManager(ITwoLevelCache cache, IPermissionService permissions, ITextLocalizer localizer)
         {
             this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
-
+            this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
+            this.localizer = localizer;
             registeredScripts = new ConcurrentDictionary<string, Item>(StringComparer.OrdinalIgnoreCase);
             Register(new RegisteredScripts());
         }
@@ -76,7 +79,7 @@ namespace Serenity.Web
         {
             Item item;
             if (registeredScripts.TryGetValue(name, out item) && item != null)
-                item.Generator.CheckRights();
+                item.Generator.CheckRights(permissions, localizer);
         }
 
         public string GetScriptText(string name)
@@ -114,7 +117,8 @@ namespace Serenity.Web
                 return null;
             }
 
-            item.Generator.CheckRights();
+            item.Generator.CheckRights(permissions, localizer);
+
             return item.EnsureContentBytes();
         }
 

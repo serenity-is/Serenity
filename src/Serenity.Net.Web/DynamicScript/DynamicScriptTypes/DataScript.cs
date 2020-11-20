@@ -15,8 +15,7 @@ namespace Serenity.Web
 
         public DataScript(string key, Func<object> getData)
         {
-            Check.NotNull(getData, "getData");
-            this.getData = getData;
+            this.getData = getData ?? throw new ArgumentNullException(nameof(getData));
             this.key = key;
         }
 

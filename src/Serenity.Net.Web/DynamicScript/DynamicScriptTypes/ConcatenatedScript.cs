@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,24 +9,22 @@ namespace Serenity.Web
     {
         private string separator;
         private IEnumerable<Func<string>> scriptParts;
-        private Action checkRights;
+        private Action<IPermissionService, ITextLocalizer> checkRights;
 
         public ConcatenatedScript(IEnumerable<Func<string>> scriptParts,
-            string separator = "\r\n;\r\n", Action checkRights = null)
+            string separator = "\r\n;\r\n", Action<IPermissionService, ITextLocalizer> checkRights = null)
         {
-            Check.NotNull(scriptParts, "scriptParts");
-
-            this.scriptParts = scriptParts;
+            this.scriptParts = scriptParts ?? throw new ArgumentNullException(nameof(scriptParts));
             this.separator = separator;
             this.checkRights = checkRights;
         }
 
-        public override void CheckRights()
+        public override void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
         {
-            base.CheckRights();
+            base.CheckRights(permissions, localizer);
 
             if (checkRights != null)
-                checkRights();
+                checkRights(permissions, localizer);
         }
 
         public override string GetScript()
