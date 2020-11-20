@@ -182,12 +182,5 @@ namespace Serenity.ComponentModel
         /// and want to handle it manually, set to true (not recommended)
         /// </summary>
         public bool DisableDefaultBehavior { get; set; }
-
-        /// <summary>
-        /// Avoid. For compability with older versions.
-        /// This part of filename is used as a prefix to FilenameFormat,
-        /// but it is not stored in database.
-        /// </summary>
-        public string SubFolder { get; set; }
     }
 }

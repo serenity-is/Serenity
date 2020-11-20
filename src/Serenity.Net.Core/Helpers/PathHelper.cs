@@ -71,6 +71,15 @@ namespace Serenity
             return true;
         }
 
+        /// <summary>
+        /// Validates if filename is a secure relative file
+        /// </summary>
+        /// <param name="filename">Relative filename</param>
+        public static void ValidateSecureRelativeFile(string filename)
+        {
+            if (!IsSecureRelativeFile(filename))
+                throw new ArgumentOutOfRangeException(nameof(filename));
+        }
 
         /// <summary>
         ///   Converts backslashes to forward slashes</summary>

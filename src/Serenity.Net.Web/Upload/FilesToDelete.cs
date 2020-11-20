@@ -4,29 +4,23 @@ using Serenity.IO;
 
 namespace Serenity.Web
 {
-    public class FilesToDelete : List<string>, IDisposable
+    public class FilesToDelete : List<string>, IDisposable, IFilesToDelete
     {
+        private readonly IUploadStorage storage;
         private List<string> OldFiles;
-        private readonly UploadSettings settings;
 
-        public FilesToDelete(UploadSettings settings)
+        public FilesToDelete(IUploadStorage storage)
         {
             OldFiles = new List<string>();
-            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
         }
 
         public void Dispose()
         {
             foreach (var file in this)
-                UploadHelper.DeleteFileAndRelated(settings, file, DeleteType.TryDeleteOrMark);
+                storage.DeleteFileAndRelated(file, DeleteType.TryDeleteOrMark);
 
-            this.Clear();
-        }
-
-        public void Register(CopyTemporaryFileResult result)
-        {
-            RegisterNewFile(result.FilePath);
-            RegisterOldFile(result.TemporaryFilePath);
+            Clear();
         }
 
         public void RegisterNewFile(string file)
@@ -41,10 +35,9 @@ namespace Serenity.Web
 
         public void KeepNewFiles()
         {
-            this.Clear();
-            this.AddRange(OldFiles);
-            this.Dispose();
+            Clear();
+            AddRange(OldFiles);
+            Dispose();
         }
     }
-
 }

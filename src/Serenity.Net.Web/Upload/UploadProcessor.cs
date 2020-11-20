@@ -1,16 +1,19 @@
-﻿using System;
-using System.IO;
-using Serenity.IO;
+﻿using Serenity.IO;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 
 namespace Serenity.Web
 {
     public class UploadProcessor
     {
-        public UploadProcessor()
+        private string temporaryPath;
+
+        public UploadProcessor(string temporaryPath)
         {
             ThumbBackColor = Color.Empty;
+            this.temporaryPath = temporaryPath ?? throw new ArgumentNullException(nameof(temporaryPath));
         }
 
         public int ThumbWidth { get; set; }
@@ -61,7 +64,7 @@ namespace Serenity.Web
                 extension.EndsWith(".php");
         }
 
-        public bool ProcessStream(Stream fileContent, string extension)
+        public bool ProcessStream(System.IO.Stream fileContent, string extension)
         {
             extension = extension.TrimToEmpty().ToLowerInvariant();
             if (IsDangerousExtension(extension))
@@ -78,10 +81,10 @@ namespace Serenity.Web
 
             var success = false;
 
-            var temporaryPath = UploadHelper.TemporaryPath;
+            var temporaryPath = this.temporaryPath;
             Directory.CreateDirectory(temporaryPath);
             TemporaryFileHelper.PurgeDirectoryDefault(temporaryPath);
-            string baseFileName = System.IO.Path.Combine(temporaryPath, Guid.NewGuid().ToString("N"));
+            string baseFileName = Path.Combine(temporaryPath, Guid.NewGuid().ToString("N"));
 
             try
             {
@@ -139,8 +142,8 @@ namespace Serenity.Web
 
         private bool ProcessImageStream(Stream fileContent, string extension)
         {
-            Image image = null;
             var imageChecker = new ImageChecker();
+            Image image;
             CheckResult = imageChecker.CheckStream(fileContent, true, out image);
             try
             {
@@ -159,10 +162,10 @@ namespace Serenity.Web
                 {
                     IsImage = true;
 
-                    extension = (CheckResult == ImageCheckResult.PNGImage ? ".png" :
-                        (CheckResult == ImageCheckResult.GIFImage ? ".gif" : ".jpg"));
+                    extension = CheckResult == ImageCheckResult.PNGImage ? ".png" :
+                        (CheckResult == ImageCheckResult.GIFImage ? ".gif" : ".jpg");
 
-                    var temporaryPath = UploadHelper.TemporaryPath;
+                    var temporaryPath = this.temporaryPath;
                     Directory.CreateDirectory(temporaryPath);
                     TemporaryFileHelper.PurgeDirectoryDefault(temporaryPath);
 
@@ -175,14 +178,14 @@ namespace Serenity.Web
 
                     if (ThumbWidth > 0 || ThumbHeight > 0)
                     {
-                        using (System.Drawing.Image thumbImage =
+                        using (Image thumbImage =
                             ThumbnailGenerator.Generate(image, ThumbWidth, ThumbHeight, ThumbScaleMode, ThumbBackColor))
                         {
                             ThumbFile = baseFileName + "_t.jpg";
 
                             if (ThumbQuality != 0)
                             {
-                                var p = new System.Drawing.Imaging.EncoderParameters(1);
+                                var p = new EncoderParameters(1);
                                 p.Param[0] = new EncoderParameter(Encoder.Quality, ThumbQuality);
 
                                 ImageCodecInfo jpegCodec = null;
@@ -195,7 +198,7 @@ namespace Serenity.Web
                                 thumbImage.Save(ThumbFile, jpegCodec, p);
                             }
                             else
-                                thumbImage.Save(ThumbFile, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                thumbImage.Save(ThumbFile, ImageFormat.Jpeg);
 
                             ThumbHeight = thumbImage.Width;
                             ThumbWidth = thumbImage.Height;
@@ -208,10 +211,7 @@ namespace Serenity.Web
             finally
             {
                 if (image != null)
-                {
                     image.Dispose();
-                    image = null;
-                }
             }
         }
     }
