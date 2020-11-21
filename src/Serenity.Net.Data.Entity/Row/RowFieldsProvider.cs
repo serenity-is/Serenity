@@ -37,7 +37,7 @@ namespace Serenity.Data
 
         /// <summary>
         /// Sets local row fields provider for current thread and async context. 
-        /// Useful for testing and async methods to set provider locally and for 
+        /// Useful for background tasks, async methods, and testing to set provider locally and for 
         /// auto spawned threads.
         /// </summary>
         /// <param name="provider">Row fields provider. Can be null.</param>
