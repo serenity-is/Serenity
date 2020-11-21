@@ -12,27 +12,22 @@ namespace Serenity.Services
     {
         private readonly IImplicitBehaviorRegistry implicitBehaviors;
         private readonly IBehaviorFactory behaviorFactory;
-        private readonly IRowFieldsProvider fieldsProvider;
 
         public BehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors,
-            IBehaviorFactory behaviorFactory, IRowFieldsProvider fieldsProvider)
+            IBehaviorFactory behaviorFactory)
         {
             this.implicitBehaviors = implicitBehaviors ??
                 throw new ArgumentNullException(nameof(implicitBehaviors));
 
             this.behaviorFactory = behaviorFactory ??
                 throw new ArgumentNullException(nameof(behaviorFactory));
-
-            this.fieldsProvider = fieldsProvider ??
-                throw new ArgumentNullException(nameof(fieldsProvider));
         }
 
         public IEnumerable Resolve(Type handlerType, Type rowType, Type behaviorType)
         {
             var list = new List<object>();
 
-            var fields = fieldsProvider.Resolve(rowType);
-            var row = (IRow)Activator.CreateInstance(rowType, fields);
+            var row = (IRow)Activator.CreateInstance(rowType);
 
             foreach (var type in implicitBehaviors.GetTypes())
             {
