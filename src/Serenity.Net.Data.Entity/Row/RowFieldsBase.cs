@@ -527,6 +527,18 @@ namespace Serenity.Data
                 foreach (var attr in rowCustomAttributes.OfType<OuterApplyAttribute>())
                     new OuterApply(joins, attr.InnerQuery, attr.Alias);
 
+                primaryKeys = this.Where(x => x.flags.HasFlag(FieldFlags.PrimaryKey))
+                    .ToArray();
+
+                if (idField is null)
+                {
+                    var identity = this.Where(x => x.flags.HasFlag(FieldFlags.Identity));
+                    if (identity.Count() == 1)
+                        idField = identity.First();
+                    else if (primaryKeys.Length == 1)
+                        idField = primaryKeys[0];
+                }
+
                 InferTextualFields();
                 AfterInitialize();
             }
@@ -730,20 +742,7 @@ namespace Serenity.Data
 
         public Field IdField => idField;
         public Field NameField => nameField;
-
-        public Field[] PrimaryKeys
-        {
-            get
-            {
-                if (primaryKeys == null)
-                {
-                    primaryKeys = this.Where(x => x.flags.HasFlag(FieldFlags.PrimaryKey))
-                        .ToArray();
-                }
-
-                return primaryKeys;
-            }
-        }
+        public Field[] PrimaryKeys => primaryKeys;
 
         public Tuple<Field, bool>[] SortOrders
         {
