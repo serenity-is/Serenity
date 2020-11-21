@@ -17,13 +17,15 @@ namespace Serenity.Data
         internal bool tracking;
         internal bool trackWithChecks;
 
-        protected Row(TFields fields = null)
+        protected Row()
+            : this((TFields)RowFieldsProvider.Current.Resolve(typeof(TFields)))
+        {
+        }
+
+        protected Row(TFields fields)
         {
             if (fields == null)
-            {
-                var fieldsProvider = RowFieldsProvider.Current;
-                fields = (TFields)fieldsProvider.Resolve(typeof(TFields));
-            }
+                throw new ArgumentNullException(nameof(fields));
 
             if (!fields.isInitialized)
                 throw new ArgumentOutOfRangeException("fields", $"{GetType().FullName} constructor is called " +

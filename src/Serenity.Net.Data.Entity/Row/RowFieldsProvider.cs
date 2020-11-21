@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Serenity.Data
 {
-    public class RowFieldsProvider
+    public static class RowFieldsProvider
     {
         private static IRowFieldsProvider defaultProvider;
         private static readonly AsyncLocal<IRowFieldsProvider> localProvider;
