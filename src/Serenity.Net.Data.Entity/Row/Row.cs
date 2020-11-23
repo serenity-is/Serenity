@@ -38,8 +38,10 @@ namespace Serenity.Data
             TrackAssignments = true;
         }
 
-        public TFields Fields => fields;
+        TFields IRow<TFields>.Fields => fields;
         RowFieldsBase IRow.Fields => fields;
+        public TFields GetFields() => fields;
+        public static TFields Fields => (TFields)RowFieldsProvider.Current.Resolve(typeof(TFields));
 
         public void CloneInto(Row<TFields> clone,
             bool cloneHandlers)
@@ -359,8 +361,8 @@ namespace Serenity.Data
             get { return fields.Joins; }
         }
 
-        public Field IdField => Fields.IdField;
-
-        public Field NameField => Fields.NameField;
+        public Field IdField => fields.IdField;
+        
+        public Field NameField => fields.NameField;
     }
 }

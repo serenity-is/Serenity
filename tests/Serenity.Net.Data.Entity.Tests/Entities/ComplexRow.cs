@@ -10,71 +10,71 @@ namespace Serenity.Net.Data.Entity.Tests
         [DisplayName("Complex ID"), Column("ComplexID"), Identity]
         public int? ID
         {
-            get { return Fields.ID[this]; }
-            set { Fields.ID[this] = value; }
+            get { return fields.ID[this]; }
+            set { fields.ID[this] = value; }
         }
 
         [DisplayName("OverridenCaption"), Column("ManualName"), Expression("T0.OverridenExpression")]
         public string Overriden
         {
-            get { return Fields.Overriden[this]; }
-            set { Fields.Overriden[this] = value; }
+            get { return fields.Overriden[this]; }
+            set { fields.Overriden[this] = value; }
         }
 
         [Expression("T0.Name")]
         public string Name
         {
-            get { return Fields.Name[this]; }
-            set { Fields.Name[this] = value; }
+            get { return fields.Name[this]; }
+            set { fields.Name[this] = value; }
         }
 
         [Expression("(T0.Name + ' ' + T0.Surname)")]
         public string FullName
         {
-            get { return Fields.FullName[this]; }
-            set { Fields.FullName[this] = value; }
+            get { return fields.FullName[this]; }
+            set { fields.FullName[this] = value; }
         }
 
         [ForeignKey("TheCountryTable", "TheCountryID"), LeftJoin("c")]
         public int? CountryID
         {
-            get { return Fields.CountryID[this]; }
-            set { Fields.CountryID[this] = value; }
+            get { return fields.CountryID[this]; }
+            set { fields.CountryID[this] = value; }
         }
 
         [DisplayName("Country Name"), Expression("c.Name")]
         public string CountryName
         {
-            get { return Fields.CountryName[this]; }
-            set { Fields.CountryName[this] = value; }
+            get { return fields.CountryName[this]; }
+            set { fields.CountryName[this] = value; }
         }
 
         [DisplayName("Concat Expression"), Expression("CONCAT('A', 'B')")]
         public string ConcatExpression
         {
-            get { return Fields.ConcatExpression[this]; }
-            set { Fields.ConcatExpression[this] = value; }
+            get { return fields.ConcatExpression[this]; }
+            set { fields.ConcatExpression[this] = value; }
         }
 
         [DisplayName("Basic Expression"), Expression("SomeField")]
         public string BasicExpression
         {
-            get { return Fields.BasicExpression[this]; }
-            set { Fields.BasicExpression[this] = value; }
+            get { return fields.BasicExpression[this]; }
+            set { fields.BasicExpression[this] = value; }
         }
 
         [DisplayName("Quoted Expression"), Expression("[SomeField]")]
         public string QuotedExpression
         {
-            get { return Fields.QuotedExpression[this]; }
-            set { Fields.QuotedExpression[this] = value; }
+            get { return fields.QuotedExpression[this]; }
+            set { fields.QuotedExpression[this] = value; }
         }
 
         [DisplayName("Alias Dot Quoted Expression"), Expression("t0.[ThatField]")]
         public string AliasDotQuotedExpression
         {
-            get { return Fields.AliasDotQuotedExpression[this]; }
-            set { Fields.AliasDotQuotedExpression[this] = value; }
+            get { return fields.AliasDotQuotedExpression[this]; }
+            set { fields.AliasDotQuotedExpression[this] = value; }
         }
 
         public class RowFields : RowFieldsBase
@@ -99,7 +99,12 @@ namespace Serenity.Net.Data.Entity.Tests
             }
         }
 
-        public ComplexRow(RowFields fields = null)
+        public ComplexRow()
+            : base()
+        {
+        }
+
+        public ComplexRow(RowFields fields)
             : base(fields)
         {
         }

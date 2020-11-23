@@ -17,18 +17,20 @@ namespace Serenity.Data
 
         public RowFieldsBase Resolve(Type fieldsType)
         {
-            return byType.GetOrAdd(fieldsType, (t) =>
+            return byType.GetOrAdd(fieldsType, CreateType);
+        }
+
+        private RowFieldsBase CreateType(Type fieldsType)
+        {
+            var fields = (RowFieldsBase)Activator.CreateInstance(fieldsType);
+            IAnnotatedType annotations = null;
+            if (annotationRegistry != null)
             {
-                var fields = (RowFieldsBase)Activator.CreateInstance(t);
-                IAnnotatedType annotations = null;
-                if (annotationRegistry != null)
-                {
-                    annotations = annotationRegistry.GetAnnotationTypesFor(t)
-                        .GetAnnotatedType();
-                }
-                fields.Initialize(annotations);
-                return fields;
-            });
+                annotations = annotationRegistry.GetAnnotationTypesFor(fieldsType)
+                    .GetAnnotatedType();
+            }
+            fields.Initialize(annotations);
+            return fields;
         }
     }
 }

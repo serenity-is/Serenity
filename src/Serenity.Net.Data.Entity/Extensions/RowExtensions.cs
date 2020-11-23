@@ -39,13 +39,8 @@ namespace Serenity.Data
         {
             return row.Fields.FindFieldByPropertyName(name);
         }
-
+        
         public static RowFieldsBase GetFields(this IRow row)
-        {
-            return row.Fields;
-        }
-
-        public static TFields GetFields<TFields>(this IRow<TFields> row)
         {
             return row.Fields;
         }
