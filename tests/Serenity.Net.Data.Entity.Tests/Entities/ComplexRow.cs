@@ -38,8 +38,8 @@ namespace Serenity.Net.Data.Entity.Tests
         [ForeignKey("TheCountryTable", "TheCountryID"), LeftJoin("c")]
         public int? CountryID
         {
-            get { return fields.CountryID[this]; }
-            set { fields.CountryID[this] = value; }
+            get => fields.CountryID[this];
+            set => fields.CountryID[this] = value;
         }
 
         [DisplayName("Country Name"), Expression("c.Name")]

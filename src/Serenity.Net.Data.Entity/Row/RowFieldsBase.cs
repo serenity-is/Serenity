@@ -789,7 +789,7 @@ namespace Serenity.Data
 
             base.InsertItem(index, item);
 
-            item.Fields = this;
+            item.fields = this;
             item.Index = index;
 
             byName[item.Name] = item;
@@ -803,7 +803,7 @@ namespace Serenity.Data
             var item = base[index];
             base.RemoveItem(index);
             item.Index = -1;
-            item.Fields = null;
+            item.fields = null;
             byName.Remove(item.Name);
             for (int i = index; i < Count; i++)
                 this[i].index = i;
@@ -826,11 +826,11 @@ namespace Serenity.Data
             base.SetItem(index, item);
 
             old.Index = -1;
-            old.Fields = null;
+            old.fields = null;
             byName.Remove(old.Name);
 
             item.Index = index;
-            item.Fields = this;
+            item.fields = this;
             byName[item.Name] = item;
         }
 

@@ -10,7 +10,7 @@ namespace Serenity.Data
         private string autoTextKey;
         internal LocalText caption;
         internal string expression;
-        private RowFieldsBase fields;
+        internal RowFieldsBase fields;
         internal FieldFlags flags;
         private string foreignTable;
         private string foreignField;
@@ -50,7 +50,6 @@ namespace Serenity.Data
         public RowFieldsBase Fields
         {
             get { return fields; }
-            internal set { fields = value; }
         }
 
         public int Index
