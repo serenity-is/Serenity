@@ -1,3 +1,8 @@
+## 3.14.4 (2020-11-23)
+
+Bugfixes:
+  - fix changeSelect2 is raised even when value is set through .value property due to check using hasClass instead of data
+
 ## 3.14.3 (2020-10-21)
 
 Bugfixes:
