@@ -7,6 +7,7 @@
     using System.Data.SqlClient;
     using System.IO;
     using System.Text;
+    using static Dapper.SqlMapper;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
     /// <summary>
@@ -306,11 +307,18 @@
         /// <returns>New parameter</returns>
         public static DbParameter AddParamWithValue(this DbCommand command, string name, object value, ISqlDialect dialect)
         {
-            DbParameter param = command.CreateParameter();
-
             name = dialect.ParameterPrefix != '@' &&
                 name.StartsWith("@") ? dialect.ParameterPrefix + name.Substring(1) :
                     name;
+
+#if !NET45
+            if (value is ICustomQueryParameter cqp)
+            {
+                cqp.AddParameter(command, name);
+                return command.Parameters[command.Parameters.Count - 1];
+            }
+#endif
+            DbParameter param = command.CreateParameter();
 
             param.ParameterName = name;
 
