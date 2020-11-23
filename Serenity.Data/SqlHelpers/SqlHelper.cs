@@ -7,7 +7,6 @@
     using System.Data.SqlClient;
     using System.IO;
     using System.Text;
-    using static Dapper.SqlMapper;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
     /// <summary>
@@ -312,7 +311,7 @@
                     name;
 
 #if !NET45
-            if (value is ICustomQueryParameter cqp)
+            if (value is Dapper.SqlMapper.ICustomQueryParameter cqp)
             {
                 cqp.AddParameter(command, name);
                 return command.Parameters[command.Parameters.Count - 1];
