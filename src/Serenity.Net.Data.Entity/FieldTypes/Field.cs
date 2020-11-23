@@ -97,7 +97,7 @@ namespace Serenity.Data
             get
             {
                 if (autoTextKey == null)
-                    autoTextKey = "Db." + Fields.LocalTextPrefix + "." + (propertyName ?? name);
+                    autoTextKey = "Db." + fields.LocalTextPrefix + "." + (propertyName ?? name);
 
                 return autoTextKey;
             }
@@ -330,7 +330,7 @@ namespace Serenity.Data
             var sourceAlias = "T0";
             var sourceKeyField = Name;
 
-            var join = new LeftJoin(Fields.Joins, ForeignTable, foreignJoin,
+            var join = new LeftJoin(fields.Joins, ForeignTable, foreignJoin,
                 new Criteria(foreignJoin, joinKeyField) == new Criteria(sourceAlias, sourceKeyField));
 
             ForeignJoinAlias = join;
@@ -396,7 +396,7 @@ namespace Serenity.Data
 
         IDictionary<string, Join> IFieldWithJoinInfo.Joins
         {
-            get { return Fields.Joins; }
+            get { return fields.Joins; }
         }
 
         public string ColumnAlias
@@ -409,7 +409,7 @@ namespace Serenity.Data
             if (caption is null)
             {
                 if (autoTextKey == null)
-                    autoTextKey = "Db." + Fields.LocalTextPrefix + "." + (propertyName ?? name);
+                    autoTextKey = "Db." + fields.LocalTextPrefix + "." + (propertyName ?? name);
 
                 return localizer?.TryGet(autoTextKey) ?? propertyName ?? name;
             }
