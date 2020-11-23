@@ -70,7 +70,7 @@ namespace Serenity {
 
             // for jquery validate to work
             hidden.on('change.' + this.uniqueName, e => {
-                if (!$(e.target).hasClass('select2-change-triggered') && 
+                if ($(e.target).data('select2-change-triggered') !== true && 
                     hidden.closest('form').data('validator')) {
                         hidden.valid();
                 }
@@ -392,7 +392,7 @@ namespace Serenity {
             });
 
             this.element.change((e) => {
-                if ($(e.target).hasClass('select2-change-triggered'))
+                if ($(e.target).data('select2-change-triggered') === true)
                     return;
                 if (this.isMultiple()) {
                     var values = this.get_values();

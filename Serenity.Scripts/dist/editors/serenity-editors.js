@@ -1328,7 +1328,7 @@ var Serenity;
             hidden.attr('type', 'text');
             // for jquery validate to work
             hidden.on('change.' + _this.uniqueName, function (e) {
-                if (!$(e.target).hasClass('select2-change-triggered') &&
+                if ($(e.target).data('select2-change-triggered') !== true &&
                     hidden.closest('form').data('validator')) {
                     hidden.valid();
                 }
@@ -1621,7 +1621,7 @@ var Serenity;
                 inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
             });
             this.element.change(function (e) {
-                if ($(e.target).hasClass('select2-change-triggered'))
+                if ($(e.target).data('select2-change-triggered') === true)
                     return;
                 if (_this.isMultiple()) {
                     var values = _this.get_values();
