@@ -257,7 +257,7 @@ namespace Serenity.Services
                 if (copyToHistory)
                 {
                     if (storage.FileExists(oldFilename))
-                        storage.ArchiveFileAndRelated(oldFilename);
+                        storage.ArchiveFile(oldFilename);
                 }
             }
         }
@@ -281,7 +281,7 @@ namespace Serenity.Services
         {
             var fileName = (StringField)Target;
             var newFilename = fileName[handler.Row] = fileName[handler.Row].TrimToNull();
-            CheckUploadedImageAndCreateThumbs(attr, localizer, storage.TempPath, ref newFilename);
+            CheckUploadedImageAndCreateThumbs(attr, localizer, storage, ref newFilename);
 
             var idField = ((IIdRow)handler.Row).IdField;
 
@@ -289,7 +289,7 @@ namespace Serenity.Services
             {
                 DbFileFormat = fileNameFormat,
                 DbFileReplacer = s => ProcessReplaceFields(s, replaceFields, handler),
-                DbTemporaryFile = newFilename,
+                TemporaryFile = newFilename,
                 EntityId = idField.AsObject(handler.Row),
                 FilesToDelete = filesToDelete,
                 OriginalName = storage.GetOriginalName(newFilename)
@@ -322,7 +322,7 @@ namespace Serenity.Services
         }
 
         public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attr, ITextLocalizer localizer,
-            string temporaryPath, ref string temporaryFile)
+            IUploadStorage storage, ref string temporaryFile)
         {
             ImageCheckResult[] supportedFormats = null;
 
@@ -345,8 +345,7 @@ namespace Serenity.Services
             Image image = null;
             try
             {
-                var temporaryFilePath = Path.Combine(temporaryPath, temporaryFile);
-                using (var fs = new FileStream(temporaryFilePath, FileMode.Open))
+                using (var fs = storage.OpenFile(temporaryFile))
                 {
                     if (attr.MinSize != 0 && fs.Length < attr.MinSize)
                         throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
@@ -383,10 +382,9 @@ namespace Serenity.Services
                     if (result >= ImageCheckResult.FlashMovie)
                         return;
 
-                    string basePath = temporaryPath;
-                    string baseFile = Path.GetFileNameWithoutExtension(Path.GetFileName(temporaryFilePath));
+                    string baseFile = Path.ChangeExtension(temporaryFile, null);
 
-                    TemporaryFileHelper.PurgeDirectoryDefault(basePath);
+                    storage.PurgeTemporaryFiles();
 
                     if ((attr.ScaleWidth > 0 || attr.ScaleHeight > 0) &&
                         ((attr.ScaleWidth > 0 && (attr.ScaleSmaller || checker.Width > attr.ScaleWidth)) ||
@@ -397,8 +395,12 @@ namespace Serenity.Services
                         {
                             temporaryFile = baseFile + ".jpg";
                             fs.Close();
-                            scaledImage.Save(Path.Combine(basePath, temporaryFile), System.Drawing.Imaging.ImageFormat.Jpeg);
-                            temporaryFile = "temporary/" + temporaryFile;
+                            using (var ms = new MemoryStream())
+                            {
+                                scaledImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                ms.Seek(0, SeekOrigin.Begin);
+                                storage.WriteFile(temporaryFile, ms, false);
+                            }
                         }
                     }
 
@@ -420,10 +422,13 @@ namespace Serenity.Services
 
                         using (Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, Color.Empty))
                         {
-                            string thumbFile = Path.Combine(basePath,
-                                baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg");
-
-                            thumbImage.Save(thumbFile);
+                            string thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
+                            using (var ms = new MemoryStream())
+                            {
+                                thumbImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                ms.Seek(0, SeekOrigin.Begin);
+                                storage.WriteFile(thumbFile, ms, false);
+                            }
                         }
                     }
                 }

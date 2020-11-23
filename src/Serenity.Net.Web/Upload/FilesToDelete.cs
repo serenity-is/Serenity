@@ -18,7 +18,7 @@ namespace Serenity.Web
         public void Dispose()
         {
             foreach (var file in this)
-                storage.DeleteFileAndRelated(file, DeleteType.TryDeleteOrMark);
+                storage.DeleteFile(file);
 
             Clear();
         }

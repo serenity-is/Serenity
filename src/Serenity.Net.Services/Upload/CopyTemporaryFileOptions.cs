@@ -2,7 +2,7 @@
 {
     public class CopyTemporaryFileOptions : FormatDbFilenameOptions
     {
-        public string DbTemporaryFile { get; set; }
+        public string TemporaryFile { get; set; }
         public IFilesToDelete FilesToDelete { get; set; }
     }
 }

@@ -161,14 +161,14 @@ namespace Serenity.Services
                 if (!filename.ToLowerInvariant().StartsWith("temporary/"))
                     throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
-                ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, localizer, storage.TempPath, ref filename);
+                ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, localizer, storage, ref filename);
 
                 var idField = ((IIdRow)handler.Row).IdField;
                 var copyResult = UploadHelper.CopyTemporaryFile(storage, new CopyTemporaryFileOptions
                 {
                     DbFileFormat = fileNameFormat,
                     DbFileReplacer = s => ImageUploadBehavior.ProcessReplaceFields(s, replaceFields, handler),
-                    DbTemporaryFile = filename,
+                    TemporaryFile = filename,
                     EntityId = idField.AsObject(handler.Row),
                     FilesToDelete = filesToDelete,
                     OriginalName = storage.GetOriginalName(filename)

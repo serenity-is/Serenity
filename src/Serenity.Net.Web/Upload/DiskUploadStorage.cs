@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Serenity.IO;
+﻿using Serenity.IO;
 using System;
 using System.IO;
 
@@ -9,11 +8,10 @@ namespace Serenity.Web
     {
         public string RootPath { get; private set; }
         public string RootUrl { get; private set; }
-        public string TempPath { get; private set; }
 
-        public DiskUploadStorage(IOptions<DiskUploadStorageOptions> options)
+        public DiskUploadStorage(DiskUploadStorageOptions options)
         {
-            var opt = (options ?? throw new ArgumentNullException(nameof(options))).Value;
+            var opt = options ?? throw new ArgumentNullException(nameof(options));
 
             if (string.IsNullOrWhiteSpace(opt.RootPath))
                 throw new ArgumentNullException(nameof(opt.RootPath));
@@ -22,100 +20,79 @@ namespace Serenity.Web
                 throw new ArgumentNullException(nameof(opt.RootUrl));
 
             RootUrl = opt.RootUrl;
-
             RootPath = opt.RootPath;
+
             if (!Path.IsPathRooted(RootPath))
                 RootPath = Path.Combine(AppContext.BaseDirectory, PathHelper.ToPath(RootPath));
-
-            var tempPath = string.IsNullOrEmpty(opt.TempPath) ? Path.Combine(RootPath, "temporary") :
-                opt.TempPath;
-
-            if (string.IsNullOrWhiteSpace(tempPath))
-                throw new ArgumentNullException(nameof(opt.TempPath));
-
-            tempPath = PathHelper.ToPath(tempPath);
-
-            try
-            {
-                if (!Directory.Exists(tempPath))
-                {
-                    Directory.CreateDirectory(tempPath);
-                    File.WriteAllText(Path.Combine(tempPath, ".temporary"), "");
-                }
-            }
-            catch (Exception)
-            {
-            }
         }
 
-        public string DbFilePath(string dbFileName)
+        public string FilePath(string path)
         {
-            return PathHelper.SecureCombine(RootPath, PathHelper.ToPath(dbFileName));
+            return PathHelper.SecureCombine(RootPath, PathHelper.ToPath(path));
         }
 
-        public string DbFileUrl(string dbFileName)
+        public string GetFileUrl(string path)
         {
-            return PathHelper.SecureCombine(RootUrl, PathHelper.ToUrl(dbFileName));
+            return PathHelper.SecureCombine(RootUrl, PathHelper.ToUrl(path));
         }
 
-        public bool FileExists(string dbFileName)
+        public bool FileExists(string path)
         {
-            return File.Exists(DbFilePath(dbFileName));
+            return File.Exists(FilePath(path));
         }
 
-        public string GetOriginalName(string dbTemporaryFile)
+        public virtual string GetOriginalName(string path)
         {
-            var temporaryFilePath = DbFilePath(dbTemporaryFile);
+            var temporaryFilePath = FilePath(path);
             var origFile = Path.ChangeExtension(temporaryFilePath, ".orig");
-            using (var sr = new StreamReader(File.OpenRead(origFile)))
-                return sr.ReadLine();
+            if (File.Exists(origFile))
+                using (var sr = new StreamReader(File.OpenRead(origFile)))
+                    return sr.ReadLine();
+
+            return Path.GetFileName(path);
         }
 
-        public void CopyFileAndRelated(string dbSourceFile, string dbTargetFile, bool overwrite)
+        public void CopyFile(IUploadStorage store, string sourcePath, string targetPath, bool overwrite)
         {
-            var sourceFile = DbFilePath(dbSourceFile);
-            var targetFile = DbFilePath(dbTargetFile);
-            var sourcePath = Path.GetDirectoryName(sourceFile);
-            var targetPath = Path.GetDirectoryName(targetFile);
-            
-            if (!Directory.Exists(targetPath))
-                Directory.CreateDirectory(targetPath);
+            var targetFile = FilePath(targetPath);
 
-            File.Copy(sourceFile, targetFile, overwrite);
+            if (!overwrite && File.Exists(targetFile))
+                throw new IOException($"Target file {targetPath} exists in storage {GetType().FullName}");
 
-            var sourceBase = Path.GetFileNameWithoutExtension(sourceFile);
-            var targetBase = Path.GetFileNameWithoutExtension(targetFile);
+            using var source = store.OpenFile(sourcePath);
+            WriteFile(targetFile, source, overwrite);
 
-            foreach (var f in Directory.GetFiles(sourcePath,
-                sourceBase + "_t*.jpg"))
+            var sourceBase = Path.ChangeExtension(sourcePath, null);
+            var targetBase = Path.ChangeExtension(targetPath, null);
+
+            var sourceDir = Path.GetDirectoryName(sourcePath);
+            foreach (var f in store.GetFiles(sourceDir, sourceBase + "_t*.jpg"))
             {
                 string thumbSuffix = Path.GetFileName(f).Substring(sourceBase.Length);
-                File.Copy(f, Path.Combine(targetPath, targetBase + thumbSuffix), overwrite);
+                using var src = store.OpenFile(f);
+                WriteFile(targetBase + thumbSuffix, src, overwrite);
             }
         }
 
-        public string ArchiveFileAndRelated(string dbSourceFile)
+        public string ArchiveFile(string path)
         {
             string date = DateTime.UtcNow.ToString("yyyyMMdd", Invariants.DateTimeFormat);
-            string dbHistoryFile = "history/" + date + "/" + Guid.NewGuid().ToString("N") + Path.GetExtension(dbSourceFile);
-            CopyFileAndRelated(dbSourceFile, dbHistoryFile, false);
+            string dbHistoryFile = "history/" + date + "/" + Guid.NewGuid().ToString("N") + Path.GetExtension(path);
+            CopyFile(this, path, dbHistoryFile, false);
             return dbHistoryFile;
         }
 
-        public void DeleteFileAndRelated(string dbFileName, DeleteType deleteType)
+        public void DeleteFile(string path)
         {
-            if (string.IsNullOrEmpty(dbFileName))
+            if (string.IsNullOrEmpty(path))
                 return;
 
-            var fileName = Path.Combine(RootPath, PathHelper.ToPath(dbFileName));
+            var fileName = PathHelper.SecureCombine(RootPath, PathHelper.ToPath(path));
 
-            if (deleteType == DeleteType.TryDeleteOrMark)
-            {
-                var folder = Path.GetDirectoryName(fileName);
-                TemporaryFileHelper.TryDeleteMarkedFiles(folder);
-            }
+            var folder = Path.GetDirectoryName(fileName);
+            TemporaryFileHelper.TryDeleteMarkedFiles(folder);
 
-            TemporaryFileHelper.Delete(fileName, deleteType);
+            TemporaryFileHelper.Delete(fileName, DeleteType.TryDeleteOrMark);
 
             string sourcePath = Path.GetDirectoryName(fileName);
             string sourceBase = Path.GetFileNameWithoutExtension(fileName);
@@ -123,16 +100,45 @@ namespace Serenity.Web
             foreach (var f in Directory.GetFiles(sourcePath,
                 sourceBase + "_t*.jpg"))
             {
-                TemporaryFileHelper.Delete(f, deleteType);
+                TemporaryFileHelper.Delete(f, DeleteType.TryDeleteOrMark);
             }
 
-            TemporaryFileHelper.Delete(fileName + ".meta", deleteType);
-            TemporaryFileHelper.Delete(fileName + ".orig", deleteType);
+            TemporaryFileHelper.Delete(fileName + ".meta", DeleteType.TryDeleteOrMark);
+            TemporaryFileHelper.Delete(fileName + ".orig", DeleteType.TryDeleteOrMark);
         }
 
-        public long GetFileSize(string dbFileName)
+        public long GetFileSize(string path)
         {
-            return new FileInfo(DbFilePath(dbFileName)).Length;
+            return new FileInfo(FilePath(path)).Length;
+        }
+
+        public string[] GetFiles(string path, string searchPattern)
+        {
+            return Directory.GetFiles(FilePath(path), searchPattern);
+        }
+
+        public Stream OpenFile(string path)
+        {
+            return File.OpenRead(FilePath(path));
+        }
+
+        public virtual void PurgeTemporaryFiles()
+        {
+        }
+
+        public void WriteFile(string path, Stream source, bool overwrite)
+        {
+            var targetFile = FilePath(path);
+            var targetDir = Path.GetDirectoryName(targetFile);
+
+            if (!overwrite && File.Exists(targetFile))
+                throw new IOException($"Target file {path} exists in storage {GetType().FullName}");
+
+            if (!Directory.Exists(targetDir))
+                Directory.CreateDirectory(targetDir);
+
+            using var target = File.Create(targetFile);
+            source.CopyTo(target);
         }
     }
 }

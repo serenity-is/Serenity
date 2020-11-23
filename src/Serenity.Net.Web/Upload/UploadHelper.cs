@@ -23,7 +23,7 @@ namespace Serenity.Web
 
             var dbFileThumb = GetThumbFileName(dbFileName);
 
-            return storage.DbFileUrl(dbFileThumb);
+            return storage.GetFileUrl(dbFileThumb);
         }
 
         public static string FormatDbFileName(FormatDbFilenameOptions options)
@@ -82,9 +82,9 @@ namespace Serenity.Web
             string dbFileName = PathHelper.ToUrl(FormatDbFileName(options));
             dbFileName = FindAvailableName(storage, dbFileName);
 
-            storage.CopyFileAndRelated(options.DbTemporaryFile, dbFileName, false);
-            long size = storage.GetFileSize(options.DbTemporaryFile);
-            bool hasThumbnail = storage.FileExists(GetThumbFileName(options.DbTemporaryFile));
+            storage.CopyFile(storage, options.TemporaryFile, dbFileName, false);
+            long size = storage.GetFileSize(options.TemporaryFile);
+            bool hasThumbnail = storage.FileExists(GetThumbFileName(options.TemporaryFile));
 
             var result = new CopyTemporaryFileResult()
             {
@@ -95,7 +95,7 @@ namespace Serenity.Web
             };
 
             options.FilesToDelete?.RegisterNewFile(dbFileName);
-            options.FilesToDelete?.RegisterOldFile(options.DbTemporaryFile);
+            options.FilesToDelete?.RegisterOldFile(options.TemporaryFile);
             return result;
         }
 
