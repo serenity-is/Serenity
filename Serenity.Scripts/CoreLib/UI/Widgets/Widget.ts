@@ -120,8 +120,8 @@
         };
 
         public changeSelect2(handler: (e: JQueryEventObject) => void) {
-            this.element.on('change.' + this.uniqueName, function(e) {
-                if ($(e.target).data('select2-change-triggered') !== true)
+            this.element.on('change.' + this.uniqueName, function (e, valueSet) {
+                if (valueSet !== true)
                     handler(e);
             });
         };

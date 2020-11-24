@@ -69,11 +69,9 @@ namespace Serenity {
             hidden.attr('type', 'text');
 
             // for jquery validate to work
-            hidden.on('change.' + this.uniqueName, e => {
-                if ($(e.target).data('select2-change-triggered') !== true && 
-                    hidden.closest('form').data('validator')) {
+            hidden.on('change.' + this.uniqueName, (e: any, valueSet) => {
+                if (valueSet !== true && hidden.closest('form').data('validator'))
                         hidden.valid();
-                }
             });
 
             this.setCascadeFrom((this.options as Select2EditorOptions).cascadeFrom);
@@ -391,8 +389,8 @@ namespace Serenity {
                 inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
             });
 
-            this.element.change((e) => {
-                if ($(e.target).data('select2-change-triggered') === true)
+            this.element.change((e: any, valueSet: boolean) => {
+                if (valueSet === true)
                     return;
                 if (this.isMultiple()) {
                     var values = this.get_values();
@@ -570,7 +568,7 @@ namespace Serenity {
                 el.select2('val', val);
                 el.data('select2-change-triggered', true);
                 try {
-                    el.triggerHandler('change')
+                    el.triggerHandler('change', [true]); // valueSet: true
                 } finally {
                     el.data('select2-change-triggered', false);
                 }
