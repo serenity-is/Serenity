@@ -26,7 +26,7 @@ namespace Serenity.Web
             return storage.GetFileUrl(dbFileThumb);
         }
 
-        public static string FormatDbFileName(FormatDbFilenameOptions options)
+        public static string FormatDbFileName(FormatFilenameOptions options)
         {
             long l;
             object groupKey;
@@ -51,12 +51,12 @@ namespace Serenity.Web
                     groupKey = s.SafeSubstring(0, 2);
             }
 
-            var formatted = string.Format(options.DbFileFormat, identity, groupKey, 
+            var formatted = string.Format(options.Format, identity, groupKey, 
                 TemporaryFileHelper.RandomFileCode(), DateTime.Now,
                 Path.GetFileNameWithoutExtension(options.OriginalName)) + Path.GetExtension(options.OriginalName);
 
-            if (options.DbFileReplacer != null)
-                formatted = options.DbFileReplacer(formatted);
+            if (options.PostFormat != null)
+                formatted = options.PostFormat(formatted);
 
             return formatted;
         }

@@ -166,8 +166,8 @@ namespace Serenity.Services
                 var idField = ((IIdRow)handler.Row).IdField;
                 var copyResult = UploadHelper.CopyTemporaryFile(storage, new CopyTemporaryFileOptions
                 {
-                    DbFileFormat = fileNameFormat,
-                    DbFileReplacer = s => ImageUploadBehavior.ProcessReplaceFields(s, replaceFields, handler),
+                    Format = fileNameFormat,
+                    PostFormat = s => ImageUploadBehavior.ProcessReplaceFields(s, replaceFields, handler),
                     TemporaryFile = filename,
                     EntityId = idField.AsObject(handler.Row),
                     FilesToDelete = filesToDelete,

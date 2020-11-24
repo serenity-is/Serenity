@@ -23,10 +23,10 @@ namespace Serenity.Services
         private StringField originalNameField;
         private Dictionary<string, Field> replaceFields;
 
-        public ImageUploadBehavior(ITextLocalizer localizer, IUploadStorage storage)
+        public ImageUploadBehavior(IUploadStorage storage, ITextLocalizer localizer)
         {
-            this.localizer = localizer;
             this.storage = storage;
+            this.localizer = localizer;
         }
 
         public bool ActivateFor(IRow row)
@@ -287,8 +287,8 @@ namespace Serenity.Services
 
             var copyResult = UploadHelper.CopyTemporaryFile(storage, new CopyTemporaryFileOptions
             {
-                DbFileFormat = fileNameFormat,
-                DbFileReplacer = s => ProcessReplaceFields(s, replaceFields, handler),
+                Format = fileNameFormat,
+                PostFormat = s => ProcessReplaceFields(s, replaceFields, handler),
                 TemporaryFile = newFilename,
                 EntityId = idField.AsObject(handler.Row),
                 FilesToDelete = filesToDelete,

@@ -2,10 +2,10 @@
 
 namespace Serenity.Web
 {
-    public class FormatDbFilenameOptions
+    public class FormatFilenameOptions
     {
-        public string DbFileFormat { get; set; }
-        public Func<string, string> DbFileReplacer { get; set; }
+        public string Format { get; set; }
+        public Func<string, string> PostFormat { get; set; }
         public object EntityId { get; set; }
         public string OriginalName { get; set; }
     }
