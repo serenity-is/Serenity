@@ -203,7 +203,7 @@ namespace Serenity.Services
         public override void OnBeforeSave(ISaveRequestHandler handler)
         {
             var filesToDelete = new FilesToDelete(storage);
-            UploadHelper.RegisterFilesToDelete(handler.UnitOfWork, filesToDelete);
+            handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
             handler.StateBag[GetType().FullName + "_" + Target.Name + "_FilesToDelete"] = filesToDelete;
 
             var filename = (StringField)(Target);
@@ -244,7 +244,7 @@ namespace Serenity.Services
             if (handler.IsUpdate)
             {
                 var copyResult = CopyTemporaryFile(handler, filesToDelete);
-                filename[handler.Row] = copyResult.DbFileName;
+                filename[handler.Row] = copyResult.Path;
             }
         }
 
@@ -272,7 +272,7 @@ namespace Serenity.Services
             var filename = (StringField)(Target);
             var oldFilename = filename[handler.Row];
             var filesToDelete = new FilesToDelete(storage);
-            UploadHelper.RegisterFilesToDelete(handler.UnitOfWork, filesToDelete);
+            handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
 
             DeleteOldFile(storage, filesToDelete, oldFilename, attr.CopyToHistory);
         }
@@ -285,7 +285,7 @@ namespace Serenity.Services
 
             var idField = ((IIdRow)handler.Row).IdField;
 
-            var copyResult = UploadHelper.CopyTemporaryFile(storage, new CopyTemporaryFileOptions
+            var copyResult = storage.CopyTemporaryFile(new CopyTemporaryFileOptions
             {
                 Format = fileNameFormat,
                 PostFormat = s => ProcessReplaceFields(s, replaceFields, handler),
@@ -314,11 +314,11 @@ namespace Serenity.Services
             var idField = ((IIdRow)handler.Row).IdField;
 
             new SqlUpdate(handler.Row.Table)
-                .Set(filename, copyResult.DbFileName)
+                .Set(filename, copyResult.Path)
                 .Where(idField == new ValueCriteria(idField.AsObject(handler.Row)))
                 .Execute(handler.UnitOfWork.Connection);
 
-            filename[handler.Row] = copyResult.DbFileName;
+            filename[handler.Row] = copyResult.Path;
         }
 
         public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attr, ITextLocalizer localizer,
@@ -333,7 +333,7 @@ namespace Serenity.Services
                     ImageCheckResult.PNGImage
                 };
 
-            UploadHelper.CheckFileNameSecurity(temporaryFile);
+            UploadPathHelper.CheckFileNameSecurity(temporaryFile);
 
             var checker = new ImageChecker();
             checker.MinWidth = attr.MinWidth;
@@ -349,11 +349,11 @@ namespace Serenity.Services
                 {
                     if (attr.MinSize != 0 && fs.Length < attr.MinSize)
                         throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
-                            UploadHelper.FileSizeDisplay(attr.MinSize)));
+                            UploadFormatting.FileSizeDisplay(attr.MinSize)));
 
                     if (attr.MaxSize != 0 && fs.Length > attr.MaxSize)
                         throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
-                            UploadHelper.FileSizeDisplay(attr.MaxSize)));
+                            UploadFormatting.FileSizeDisplay(attr.MaxSize)));
 
                     ImageCheckResult result;
                     if (Path.GetExtension(temporaryFile).ToLowerInvariant() == ".swf")
@@ -399,7 +399,7 @@ namespace Serenity.Services
                             {
                                 scaledImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
                                 ms.Seek(0, SeekOrigin.Begin);
-                                storage.WriteFile(temporaryFile, ms, false);
+                                temporaryFile = storage.WriteFile(temporaryFile, ms, false);
                             }
                         }
                     }

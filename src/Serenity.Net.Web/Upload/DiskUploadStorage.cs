@@ -1,5 +1,6 @@
 ﻿using Serenity.IO;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Serenity.Web
@@ -52,25 +53,32 @@ namespace Serenity.Web
             return Path.GetFileName(path);
         }
 
-        public void CopyFile(IUploadStorage store, string sourcePath, string targetPath, bool overwrite)
+        public string CopyFrom(IUploadStorage store, string sourcePath, string targetPath, bool autoRename)
         {
-            var targetFile = FilePath(targetPath);
-
-            if (!overwrite && File.Exists(targetFile))
-                throw new IOException($"Target file {targetPath} exists in storage {GetType().FullName}");
-
+            var newFiles = new List<string>();
             using var source = store.OpenFile(sourcePath);
-            WriteFile(targetFile, source, overwrite);
-
-            var sourceBase = Path.ChangeExtension(sourcePath, null);
-            var targetBase = Path.ChangeExtension(targetPath, null);
-
-            var sourceDir = Path.GetDirectoryName(sourcePath);
-            foreach (var f in store.GetFiles(sourceDir, sourceBase + "_t*.jpg"))
+            targetPath = WriteFile(targetPath, source, autoRename);
+            newFiles.Add(targetPath);
+            try
             {
-                string thumbSuffix = Path.GetFileName(f).Substring(sourceBase.Length);
-                using var src = store.OpenFile(f);
-                WriteFile(targetBase + thumbSuffix, src, overwrite);
+                var sourceBase = Path.ChangeExtension(sourcePath, null);
+                var targetBase = Path.ChangeExtension(targetPath, null);
+
+                var sourceDir = Path.GetDirectoryName(sourcePath);
+                foreach (var f in store.GetFiles(sourceDir, sourceBase + "_t*.jpg"))
+                {
+                    string thumbSuffix = Path.GetFileName(f).Substring(sourceBase.Length);
+                    using var src = store.OpenFile(f);
+                    newFiles.Add(WriteFile(targetBase + thumbSuffix, src, false));
+                }
+
+                return targetPath;
+            }
+            catch
+            {
+                foreach (var newFile in newFiles)
+                    TemporaryFileHelper.TryDeleteOrMark(FilePath(newFile));
+                throw;
             }
         }
 
@@ -78,7 +86,7 @@ namespace Serenity.Web
         {
             string date = DateTime.UtcNow.ToString("yyyyMMdd", Invariants.DateTimeFormat);
             string dbHistoryFile = "history/" + date + "/" + Guid.NewGuid().ToString("N") + Path.GetExtension(path);
-            CopyFile(this, path, dbHistoryFile, false);
+            CopyFrom(this, path, dbHistoryFile, false);
             return dbHistoryFile;
         }
 
@@ -126,19 +134,26 @@ namespace Serenity.Web
         {
         }
 
-        public void WriteFile(string path, Stream source, bool overwrite)
+        public string WriteFile(string path, Stream source, bool autoRename)
         {
             var targetFile = FilePath(path);
+
+            if (File.Exists(targetFile))
+            {
+                if (!autoRename)
+                    throw new IOException($"Target file {path} exists in storage {GetType().FullName}");
+
+                path = UploadPathHelper.FindAvailableName(path, FileExists);
+            }
+
             var targetDir = Path.GetDirectoryName(targetFile);
-
-            if (!overwrite && File.Exists(targetFile))
-                throw new IOException($"Target file {path} exists in storage {GetType().FullName}");
-
             if (!Directory.Exists(targetDir))
                 Directory.CreateDirectory(targetDir);
 
             using var target = File.Create(targetFile);
             source.CopyTo(target);
+
+            return path;
         }
     }
 }

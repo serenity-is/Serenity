@@ -1,5 +1,4 @@
-﻿using Serenity.IO;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -8,12 +7,12 @@ namespace Serenity.Web
 {
     public class UploadProcessor
     {
-        private string temporaryPath;
+        private IUploadStorage storage;
 
-        public UploadProcessor(string temporaryPath)
+        public UploadProcessor(IUploadStorage storage)
         {
             ThumbBackColor = Color.Empty;
-            this.temporaryPath = temporaryPath ?? throw new ArgumentNullException(nameof(temporaryPath));
+            this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
         }
 
         public int ThumbWidth { get; set; }
@@ -29,7 +28,6 @@ namespace Serenity.Web
         public string ErrorMessage { get; private set; }
         public long FileSize { get; private set; }
         public string FilePath { get; private set; }
-        public string FileUrl { get; private set; }
         public bool IsImage { get; private set; }
 
 
@@ -81,40 +79,25 @@ namespace Serenity.Web
 
             var success = false;
 
-            var temporaryPath = this.temporaryPath;
-            Directory.CreateDirectory(temporaryPath);
-            TemporaryFileHelper.PurgeDirectoryDefault(temporaryPath);
-            string baseFileName = Path.Combine(temporaryPath, Guid.NewGuid().ToString("N"));
-
+            storage.PurgeTemporaryFiles();
+            var basePath = "temporary/" + Guid.NewGuid().ToString("N");
             try
             {
                 try
                 {
+                    FileSize = fileContent.Length;
+                    fileContent.Seek(0, System.IO.SeekOrigin.Begin);
+                    FilePath = storage.WriteFile(basePath + extension, fileContent, false);
+
                     if (IsImageExtension(extension))
                     {
                         IsImage = true;
-                        success = true;
-                        FilePath = baseFileName + extension;
-                        fileContent.Seek(0, SeekOrigin.Begin);
-                        using (FileStream fs = new FileStream(FilePath, FileMode.Create))
-                        {
-                            fileContent.CopyTo(fs);
-                            FileSize = fs.Length;
-                        }
                         success = ProcessImageStream(fileContent, extension, localizer);
                     }
                     else
                     {
-                        FilePath = baseFileName + extension;
-                        fileContent.Seek(0, SeekOrigin.Begin);
-                        using (FileStream fs = new FileStream(FilePath, FileMode.Create))
-                        {
-                            fileContent.CopyTo(fs);
-                            FileSize = fs.Length;
-                        }
                         success = true;
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -128,10 +111,10 @@ namespace Serenity.Web
                 if (!success)
                 {
                     if (!ThumbFile.IsNullOrEmpty())
-                        TemporaryFileHelper.TryDelete(ThumbFile);
+                        storage.DeleteFile(ThumbFile);
 
                     if (!FilePath.IsNullOrEmpty())
-                        TemporaryFileHelper.TryDelete(FilePath);
+                        storage.DeleteFile(FilePath);
                 }
 
                 fileContent.Dispose();
@@ -140,7 +123,7 @@ namespace Serenity.Web
             return success;
         }
 
-        private bool ProcessImageStream(Stream fileContent, string extension, ITextLocalizer localizer)
+        private bool ProcessImageStream(System.IO.Stream fileContent, string extension, ITextLocalizer localizer)
         {
             var imageChecker = new ImageChecker();
             Image image;
@@ -165,41 +148,36 @@ namespace Serenity.Web
                     extension = CheckResult == ImageCheckResult.PNGImage ? ".png" :
                         (CheckResult == ImageCheckResult.GIFImage ? ".gif" : ".jpg");
 
-                    var temporaryPath = this.temporaryPath;
-                    Directory.CreateDirectory(temporaryPath);
-                    TemporaryFileHelper.PurgeDirectoryDefault(temporaryPath);
-
-                    string baseFileName = System.IO.Path.Combine(temporaryPath, Guid.NewGuid().ToString("N"));
-
-                    FilePath = baseFileName + extension;
-                    fileContent.Seek(0, SeekOrigin.Begin);
-                    using (FileStream fs = new FileStream(FilePath, FileMode.Create))
-                        fileContent.CopyTo(fs);
+                    storage.PurgeTemporaryFiles();
 
                     if (ThumbWidth > 0 || ThumbHeight > 0)
                     {
                         using (Image thumbImage =
                             ThumbnailGenerator.Generate(image, ThumbWidth, ThumbHeight, ThumbScaleMode, ThumbBackColor))
                         {
-                            ThumbFile = baseFileName + "_t.jpg";
+                            var thumbFile = UploadPathHelper.GetThumbnailName(FilePath);
 
-                            if (ThumbQuality != 0)
+                            using (var ms = new MemoryStream())
                             {
-                                var p = new EncoderParameters(1);
-                                p.Param[0] = new EncoderParameter(Encoder.Quality, ThumbQuality);
+                                if (ThumbQuality != 0)
+                                {
+                                    var p = new EncoderParameters(1);
+                                    p.Param[0] = new EncoderParameter(Encoder.Quality, ThumbQuality);
 
-                                ImageCodecInfo jpegCodec = null;
-                                ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
-                                // Find the correct image codec 
-                                for (int i = 0; i < codecs.Length; i++)
-                                    if (codecs[i].MimeType == "image/jpeg")
-                                        jpegCodec = codecs[i];
+                                    ImageCodecInfo jpegCodec = null;
+                                    ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
+                                    // Find the correct image codec 
+                                    for (int i = 0; i < codecs.Length; i++)
+                                        if (codecs[i].MimeType == "image/jpeg")
+                                            jpegCodec = codecs[i];
 
-                                thumbImage.Save(ThumbFile, jpegCodec, p);
+                                    thumbImage.Save(ms, jpegCodec, p);
+                                }
+                                else
+                                    thumbImage.Save(ms, ImageFormat.Jpeg);
+                                ms.Seek(0, SeekOrigin.Begin);
+                                ThumbFile = storage.WriteFile(thumbFile, ms, autoRename: false);
                             }
-                            else
-                                thumbImage.Save(ThumbFile, ImageFormat.Jpeg);
-
                             ThumbHeight = thumbImage.Width;
                             ThumbWidth = thumbImage.Height;
                         }

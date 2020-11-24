@@ -29,12 +29,12 @@ namespace Serenity.Web
             return mainStorage.ArchiveFile(path);
         }
 
-        public void CopyFile(IUploadStorage source, string path, string targetPath, bool overwrite)
+        public string CopyFrom(IUploadStorage source, string path, string targetPath, bool autoRename)
         {
             if (IsSubPath(targetPath))
-                subStorage.CopyFile(source, path, targetPath.Substring(subPrefix.Length), overwrite);
+                return subStorage.CopyFrom(source, path, targetPath.Substring(subPrefix.Length), autoRename);
             else
-                mainStorage.CopyFile(source, path, targetPath, overwrite);
+                return mainStorage.CopyFrom(source, path, targetPath, autoRename);
         }
 
         public void DeleteFile(string path)
@@ -99,12 +99,12 @@ namespace Serenity.Web
             subStorage.PurgeTemporaryFiles();
         }
 
-        public void WriteFile(string path, Stream source, bool overwrite)
+        public string WriteFile(string path, Stream source, bool autoRename)
         {
             if (IsSubPath(path))
-                subStorage.WriteFile(path, source, overwrite);
+                return subStorage.WriteFile(path, source, autoRename);
             else
-                mainStorage.WriteFile(path, source, overwrite);
+                return mainStorage.WriteFile(path, source, autoRename);
         }
     }
 }

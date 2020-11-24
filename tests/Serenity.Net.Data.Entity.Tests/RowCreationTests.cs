@@ -43,8 +43,8 @@ namespace Serenity.Net.Data.Entity.Tests
             var fields2 = new ComplexRow.RowFields().Init(annotations: null);
             fields2.BasicExpression.Expression = "Test2";
             var row2 = new ComplexRow(fields2);
-            Assert.Equal("Test1", row1.Fields.BasicExpression.Expression);
-            Assert.Equal("Test2", row2.Fields.BasicExpression.Expression);
+            Assert.Equal("Test1", row1.GetFields().BasicExpression.Expression);
+            Assert.Equal("Test2", row2.GetFields().BasicExpression.Expression);
         }
     }
 }

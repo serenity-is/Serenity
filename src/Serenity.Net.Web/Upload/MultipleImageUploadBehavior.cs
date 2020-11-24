@@ -111,7 +111,7 @@ namespace Serenity.Services
             var newFileList = ParseAndValidate(newFilesJSON, "newFiles");
 
             var filesToDelete = new FilesToDelete(storage);
-            UploadHelper.RegisterFilesToDelete(handler.UnitOfWork, filesToDelete);
+            handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
             handler.StateBag[GetType().FullName + "_" + Target.Name + "_FilesToDelete"] = filesToDelete;
 
             foreach (var file in oldFileList)
@@ -143,7 +143,7 @@ namespace Serenity.Services
             var oldFileList = ParseAndValidate(oldFilesJSON, "oldFiles");
 
             var filesToDelete = new FilesToDelete(storage);
-            UploadHelper.RegisterFilesToDelete(handler.UnitOfWork, filesToDelete);
+            handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
 
             foreach (var file in oldFileList)
                 ImageUploadBehavior.DeleteOldFile(storage, filesToDelete, file.Filename, attr.CopyToHistory);
@@ -164,7 +164,7 @@ namespace Serenity.Services
                 ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, localizer, storage, ref filename);
 
                 var idField = ((IIdRow)handler.Row).IdField;
-                var copyResult = UploadHelper.CopyTemporaryFile(storage, new CopyTemporaryFileOptions
+                var copyResult = storage.CopyTemporaryFile(new CopyTemporaryFileOptions
                 {
                     Format = fileNameFormat,
                     PostFormat = s => ImageUploadBehavior.ProcessReplaceFields(s, replaceFields, handler),
@@ -174,7 +174,7 @@ namespace Serenity.Services
                     OriginalName = storage.GetOriginalName(filename)
                 });
 
-                file.Filename = copyResult.DbFileName;
+                file.Filename = copyResult.Path;
             }
 
             return JSON.Stringify(newFileList);
