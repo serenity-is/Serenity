@@ -1,14 +1,14 @@
-﻿
+﻿using Serenity;
+using Serenity.Data;
+using Serenity.Services;
+using System.Data;{{if AspNetCore}}
+using Microsoft.AspNetCore.Mvc;{{else}}
+using System.Web.Mvc;{{end}}
+using MyRepository = {{RootNamespace}}{{DotModule}}.Repositories.{{ClassName}}Repository;
+using MyRow = {{RootNamespace}}{{DotModule}}.Entities.{{RowClassName}};
+
 namespace {{RootNamespace}}{{DotModule}}.Endpoints
 {
-    using Serenity;
-    using Serenity.Data;
-    using Serenity.Services;
-    using System.Data;{{if AspNetCore}}
-    using Microsoft.AspNetCore.Mvc;{{else}}
-    using System.Web.Mvc;{{end}}
-    using MyRepository = Repositories.{{ClassName}}Repository;
-    using MyRow = Entities.{{RowClassName}};
 {{if AspNetCore}}
     [Route("Services/{{ModuleSlash}}{{ClassName}}/[action]")]{{else}}
     [RoutePrefix("Services/{{ModuleSlash}}{{ClassName}}"), Route("{action}")]{{end}}
