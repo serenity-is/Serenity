@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Serenity.Abstractions;
 using Serenity.Data;
 using System;
 using System.Data;
@@ -12,9 +13,9 @@ namespace Serenity.Services
     [HandleServiceException]
     public abstract class ServiceEndpoint : Controller
     {
-
         private IDbConnection connection;
         private UnitOfWork unitOfWork;
+        private IRequestContext context;
 
         protected override void Dispose(bool disposing)
         {
@@ -38,7 +39,7 @@ namespace Serenity.Services
             var uowParam = context.ActionDescriptor.Parameters.FirstOrDefault(x => x.ParameterType == typeof(IUnitOfWork));
             if (uowParam != null)
             {
-                var connectionKey = this.GetType().GetCustomAttribute<ConnectionKeyAttribute>();
+                var connectionKey = GetType().GetCustomAttribute<ConnectionKeyAttribute>();
                 if (connectionKey == null)
                     throw new ArgumentNullException("connectionKey");
 
@@ -52,7 +53,7 @@ namespace Serenity.Services
             var cnnParam = context.ActionDescriptor.Parameters.FirstOrDefault(x => x.ParameterType == typeof(IDbConnection));
             if (cnnParam != null)
             {
-                var connectionKey = this.GetType().GetCustomAttribute<ConnectionKeyAttribute>();
+                var connectionKey = GetType().GetCustomAttribute<ConnectionKeyAttribute>();
                 if (connectionKey == null)
                     throw new ArgumentNullException("connectionKey");
 
@@ -95,5 +96,26 @@ namespace Serenity.Services
 
             base.OnActionExecuted(context);
         }
+
+        protected IRequestContext Context
+        {
+            get
+            {
+                if (context == null)
+                    context = HttpContext?.RequestServices?.GetRequiredService<IRequestContext>();
+
+                return context;
+            }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
+                context = value;
+            }
+        }
+
+        protected ITextLocalizer Localizer => Context?.Localizer;
+        protected IPermissionService Permissions => Context?.Permissions;
     }
 }
