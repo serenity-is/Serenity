@@ -7,8 +7,8 @@ namespace Serenity.Services
     {
         IBehaviorProvider Behaviors { get; }
         ITwoLevelCache Cache { get; }
-        ClaimsPrincipal User { get; }
         ITextLocalizer Localizer { get; }
         IPermissionService Permissions { get; }
+        ClaimsPrincipal User { get; }
     }
 }
