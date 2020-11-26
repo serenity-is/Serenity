@@ -3,11 +3,11 @@ using System;
 
 namespace Serenity.Services
 {
-    public class BehaviorFactory : IBehaviorFactory
+    public class DefaultBehaviorFactory : IBehaviorFactory
     {
         private readonly IServiceProvider provider;
 
-        protected BehaviorFactory(IServiceProvider provider)
+        protected DefaultBehaviorFactory(IServiceProvider provider)
         {
             this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }

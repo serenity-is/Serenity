@@ -8,12 +8,12 @@ using System.Reflection;
 
 namespace Serenity.Services
 {
-    public class BehaviorProvider : IBehaviorProvider
+    public class DefaultBehaviorProvider : IBehaviorProvider
     {
         private readonly IImplicitBehaviorRegistry implicitBehaviors;
         private readonly IBehaviorFactory behaviorFactory;
 
-        public BehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors,
+        public DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors,
             IBehaviorFactory behaviorFactory)
         {
             this.implicitBehaviors = implicitBehaviors ??

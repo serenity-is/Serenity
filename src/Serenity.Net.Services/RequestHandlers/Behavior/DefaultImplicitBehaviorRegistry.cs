@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Serenity.Services
 {
-    public class ImplicitBehaviorRegistry : IImplicitBehaviorRegistry
+    public class DefaultImplicitBehaviorRegistry : IImplicitBehaviorRegistry
     {
         private readonly IEnumerable<Type> behaviorTypes;
 
@@ -13,7 +13,7 @@ namespace Serenity.Services
         /// Creates a new instance
         /// </summary>
         /// <param name="behaviorTypes">Types with IImplicitBehavior interface</param>
-        public ImplicitBehaviorRegistry(IEnumerable<Type> behaviorTypes)
+        public DefaultImplicitBehaviorRegistry(IEnumerable<Type> behaviorTypes)
         {
             this.behaviorTypes = behaviorTypes ?? throw new ArgumentNullException(nameof(behaviorTypes));
         }
