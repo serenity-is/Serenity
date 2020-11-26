@@ -165,17 +165,16 @@ namespace Serenity.CodeGeneration.Test
             actual = actual.Replace("\r", "");
 
             var searchText =
-                @"
+                @"using Serenity;
+using Serenity.ComponentModel;
+using Serenity.Data;
+using Serenity.Data.Mapping;
+using System;
+using System.ComponentModel;
+using System.IO;
+
 namespace MyApplication.MyModule.Entities
 {
-    using Serenity;
-    using Serenity.ComponentModel;
-    using Serenity.Data;
-    using Serenity.Data.Mapping;
-    using System;
-    using System.ComponentModel;
-    using System.IO;
-
     [ConnectionKey(""MyConnection""), Module(""MyModule""), TableName(""my_table"")]
     [DisplayName(""My Table""), InstanceName(""My Table"")]
     [ReadPermission(""MyPermission"")]
