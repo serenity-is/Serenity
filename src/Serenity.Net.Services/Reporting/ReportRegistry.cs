@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Serenity.Reporting
 {
-    public class ReportRegistry
+    public class ReportRegistry : IReportRegistry
     {
         private Dictionary<string, Report> reportByKey;
         private Dictionary<string, List<Report>> reportsByCategory;
