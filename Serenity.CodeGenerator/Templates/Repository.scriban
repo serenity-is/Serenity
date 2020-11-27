@@ -1,13 +1,12 @@
-﻿
+﻿using Serenity;
+using Serenity.Data;
+using Serenity.Services;
+using System;
+using System.Data;
+using MyRow = {{RootNamespace}}{{DotModule}}.Entities.{{RowClassName}};
+
 namespace {{RootNamespace}}{{DotModule}}.Repositories
 {
-    using Serenity;
-    using Serenity.Data;
-    using Serenity.Services;
-    using System;
-    using System.Data;
-    using MyRow = Entities.{{RowClassName}};
-
     public class {{ClassName}}Repository
     {
         private static MyRow.RowFields fld { get { return MyRow.Fields; } }

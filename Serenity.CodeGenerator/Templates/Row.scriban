@@ -1,14 +1,13 @@
-﻿
+﻿using Serenity;
+using Serenity.ComponentModel;
+using Serenity.Data;
+using Serenity.Data.Mapping;
+using System;
+using System.ComponentModel;
+using System.IO;
+
 namespace {{RootNamespace}}{{DotModule}}.Entities
 {
-    using Serenity;
-    using Serenity.ComponentModel;
-    using Serenity.Data;
-    using Serenity.Data.Mapping;
-    using System;
-    using System.ComponentModel;
-    using System.IO;
-
     [ConnectionKey("{{ConnectionKey}}"){{if Module}}, Module("{{Module}}"){{end}}, TableName("{{SchemaAndTable}}")]
     [DisplayName("{{Title}}"), InstanceName("{{Title}}")]
     [ReadPermission("{{Permission}}")]
