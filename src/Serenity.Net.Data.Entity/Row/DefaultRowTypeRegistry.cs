@@ -17,7 +17,7 @@ namespace Serenity.Data
                 .ToLookup(x => x.GetCustomAttribute<ConnectionKeyAttribute>().Value);
         }
 
-        public IEnumerable<Type> All => rowTypes;
+        public IEnumerable<Type> AllRowTypes => rowTypes;
 
         public IEnumerable<Type> ByConnectionKey(string connectionKey)
         {

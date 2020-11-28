@@ -22,13 +22,12 @@ namespace Serenity.Extensions.DependencyInjection
             services.TryAddSingleton<IRequestContext, DefaultRequestContext>();
         }
 
-        public static void AddAllTexts(this ILocalTextRegistry textRegistry, IEnumerable<string> jsonTextPaths,
-            IEnumerable<Assembly> assemblies)
+        public static void AddAllTexts(this ILocalTextRegistry textRegistry, IRowTypeRegistry rowTypeRegistry,
+            IEnumerable<string> jsonTextPaths, IEnumerable<Assembly> assemblies)
         {
             textRegistry.AddNestedTexts(assemblies);
             textRegistry.AddEnumTexts(assemblies);
-            var rowInstances = DefaultRowTypeRegistry.EnumerateRowTypes(assemblies)
-                .Select(x => (IRow)Activator.CreateInstance(x));
+            var rowInstances = rowTypeRegistry.AllRowTypes.Select(x => (IRow)Activator.CreateInstance(x));
             textRegistry.AddRowTexts(rowInstances);
             foreach (var path in jsonTextPaths)
                 textRegistry.AddJsonTexts(path);
