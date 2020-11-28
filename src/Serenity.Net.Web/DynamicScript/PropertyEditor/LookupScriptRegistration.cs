@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
@@ -8,13 +9,17 @@ namespace Serenity.Web
 {
     public class LookupScriptRegistration
     {
-        public static void RegisterLookupScripts(IDynamicScriptManager scriptManager, IEnumerable<Assembly> assemblies)
+        public static void RegisterLookupScripts(IDynamicScriptManager scriptManager, IEnumerable<Assembly> assemblies,
+            IServiceProvider serviceProvider)
         {
             if (scriptManager == null)
                 throw new ArgumentNullException(nameof(scriptManager));
 
             if (assemblies == null)
                 throw new ArgumentNullException(nameof(assemblies));
+
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
 
             var registeredType = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
@@ -31,11 +36,14 @@ namespace Serenity.Web
                     if (typeof(IRow).IsAssignableFrom(type))
                     {
                         if (attr.LookupType == null)
-                            script = (LookupScript)Activator.CreateInstance(typeof(RowLookupScript<>).MakeGenericType(type));
+                            script = (LookupScript)ActivatorUtilities.CreateInstance(serviceProvider,
+                                typeof(RowLookupScript<>).MakeGenericType(type));
                         else if (attr.LookupType.IsGenericType)
-                            script = (LookupScript)Activator.CreateInstance(attr.LookupType.MakeGenericType(type));
+                            script = (LookupScript)ActivatorUtilities.CreateInstance(serviceProvider,
+                                attr.LookupType.MakeGenericType(type));
                         else if (attr.LookupType.GetCustomAttribute<LookupScriptAttribute>() == null)
-                            script = (LookupScript)Activator.CreateInstance(attr.LookupType);
+                            script = (LookupScript)ActivatorUtilities.CreateInstance(serviceProvider,
+                                attr.LookupType);
                         else
                         {
                             // lookup script type already has a LookupScript attribute, 
