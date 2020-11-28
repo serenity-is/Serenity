@@ -63,9 +63,41 @@ namespace Serenity
         public static string GetIdentifier(this ClaimsPrincipal identity)
         {
             if (identity == null)
-                throw new ArgumentNullException(nameof(identity));
+                return null;
 
             return identity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
+
+        /// <summary>
+        /// Gets user definition for given user identity
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="userRetrieveService">User retrieve service</param>
+        /// <returns></returns>
+        public static TUserDefinition GetUserDefinition<TUserDefinition>(this ClaimsPrincipal identity, 
+            IUserRetrieveService userRetrieveService)
+                where TUserDefinition: class, IUserDefinition
+        {
+            if (!IsLoggedIn(identity))
+                return null;
+
+            return (TUserDefinition)userRetrieveService.ByUsername(identity.Identity.Name);
+        }
+
+        /// <summary>
+        /// Gets user definition for given user identity
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="userRetrieveService">User retrieve service</param>
+        /// <returns></returns>
+        public static IUserDefinition GetUserDefinition(this ClaimsPrincipal identity,
+            IUserRetrieveService userRetrieveService)
+        {
+            if (!IsLoggedIn(identity))
+                return null;
+
+            return userRetrieveService.ByUsername(identity.Identity.Name);
+        }
+
     }
 }
