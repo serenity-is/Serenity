@@ -1,5 +1,4 @@
-﻿#if TODO
-using Serenity.Data;
+﻿using Serenity.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,18 +11,24 @@ namespace Serenity.Services
 {
     public class LocalizationBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IRetrieveBehavior
     {
+        private readonly IDefaultHandlerFactory handlerFactory;
         private LocalizationRowAttribute attr;
         private int rowPrefixLength;
-        private Func<IRow> rowFactory;
+        private Func<IIdRow> rowFactory;
         private Type localRowType;
-        private Func<IRow> localRowFactory;
+        private Func<ILocalizationRow> localRowFactory;
         private int localRowPrefixLength;
         private Field foreignKeyField;
         private Field localRowIdField;
         private Field cultureIdField;
-        private IRow localRowInstance;
+        private ILocalizationRow localRowInstance;
         private BaseCriteria foreignKeyCriteria;
         private Func<IDictionary> dictionaryFactory;
+
+        public LocalizationBehavior(IDefaultHandlerFactory handlerFactory)
+        {
+            this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
+        }
 
         public bool ActivateFor(IRow row)
         {
@@ -56,22 +61,25 @@ namespace Serenity.Services
                         row.GetType().FullName));
             }
 
-            rowFactory = FastReflection.DelegateForConstructor<IRow>(row.GetType());
-            localRowFactory = FastReflection.DelegateForConstructor<IRow>(localRowType);
+            var rowType = row.GetType();
+            rowFactory = () => (IIdRow)Activator.CreateInstance(rowType);
+            localRowFactory = () => (ILocalizationRow)Activator.CreateInstance(localRowType);
 
             var localRow = localRowFactory();
             localRowInstance = localRow;
 
-            rowPrefixLength = PrefixHelper.DeterminePrefixLength(row.EnumerateTableFields(), x => x.Name);
-            localRowPrefixLength = PrefixHelper.DeterminePrefixLength(localRow.EnumerateTableFields(), x => x.Name);
-            localRowIdField = (Field)(((IIdRow)localRow).IdField);
-            cultureIdField = ((ILocalizationRow)localRow).CultureIdField;
+            rowPrefixLength = PrefixHelper.DeterminePrefixLength(row.EnumerateTableFields(),
+                x => x.Name);
+            localRowPrefixLength = PrefixHelper.DeterminePrefixLength(localRow.EnumerateTableFields(),
+                x => x.Name);
+            localRowIdField = localRow.IdField;
+            cultureIdField = localRow.CultureIdField;
 
-            var foreignKeyFieldName = attr.MappedIdField ?? ((Field)((IIdRow)row).IdField).PropertyName;
+            var foreignKeyFieldName = attr.MappedIdField ?? row.IdField.PropertyName;
             foreignKeyField = localRow.FindFieldByPropertyName(foreignKeyFieldName) ??
                 localRow.FindField(foreignKeyFieldName);
 
-            if (ReferenceEquals(null, foreignKeyField))
+            if (foreignKeyField is null)
             {
                 throw new ArgumentException(string.Format(
                     "Row type '{0}' has a LocalizationRowAttribute, " +
@@ -79,55 +87,59 @@ namespace Serenity.Services
                         row.GetType().FullName, localRowType.FullName, foreignKeyFieldName));
             }
 
-            dictionaryFactory = FastReflection.DelegateForConstructor<IDictionary>(
-                typeof(Dictionary<,>).MakeGenericType(typeof(string), row.GetType()));
+            var dictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), row.GetType());
+            dictionaryFactory = () => (IDictionary)Activator.CreateInstance(dictionaryType);
 
-            this.foreignKeyCriteria = new Criteria(foreignKeyField.PropertyName ?? foreignKeyField.Name);
+            foreignKeyCriteria = new Criteria(foreignKeyField.PropertyName ?? foreignKeyField.Name);
             return true;
         }
 
         private bool IsLocalized(Field field)
         {
-            return !ReferenceEquals(null, GetLocalizationMatch(field));
+            return GetLocalizationMatch(field) is object;
         }
 
         private Field GetLocalizationMatch(Field field)
         {
+            return GetLocalizationMatch(field, localRowInstance, localRowPrefixLength, rowPrefixLength);
+        }
+
+        internal static Field GetLocalizationMatch(Field field, ILocalizationRow localRowInstance,
+            int localRowPrefixLength, int rowPrefixLength)
+        {
             if (!field.IsTableField())
                 return null;
 
-            var name = field.Name.Substring(rowPrefixLength);
-            name = localRowIdField.Name.Substring(0, localRowPrefixLength) + name;
+            var name = field.Name[rowPrefixLength..];
+            name = localRowInstance.IdField.Name.Substring(0, localRowPrefixLength) + name;
             var match = localRowInstance.FindField(name);
-            if (ReferenceEquals(null, match) && field.PropertyName != null)
+            if (match is null && field.PropertyName != null)
                 match = localRowInstance.FindFieldByPropertyName(field.PropertyName);
 
-            if (ReferenceEquals(null, match))
+            if (match is null)
                 return null;
 
             if (!match.IsTableField())
                 return null;
 
-            if (ReferenceEquals(match, localRowIdField) ||
-                ReferenceEquals(match, (localRowInstance as ILocalizationRow).CultureIdField))
+            if (ReferenceEquals(match, localRowInstance.IdField) ||
+                ReferenceEquals(match, localRowInstance.CultureIdField))
                 return null;
 
-            if (localRowInstance is IIsActiveRow &&
-                ReferenceEquals(match, ((IIsActiveRow)localRowInstance).IsActiveField))
+            if (localRowInstance is IIsActiveRow iar &&
+                ReferenceEquals(match, iar.IsActiveField))
                 return null;
 
-            if (localRowInstance is IIsDeletedRow &&
-                ReferenceEquals(match, ((IIsDeletedRow)localRowInstance).IsDeletedField))
+            if (localRowInstance is IIsDeletedRow idr &&
+                ReferenceEquals(match, idr.IsDeletedField))
                 return null;
 
-            var insertLog = localRowInstance as IInsertLogRow;
-            if (insertLog != null && (
+            if (localRowInstance is IInsertLogRow insertLog && (
                 ReferenceEquals(match, insertLog.InsertUserIdField) ||
                 ReferenceEquals(match, insertLog.InsertDateField)))
                 return null;
 
-            var updateLog = localRowInstance as IUpdateLogRow;
-            if (updateLog != null && (
+            if (localRowInstance is IUpdateLogRow updateLog && (
                 ReferenceEquals(match, updateLog.UpdateUserIdField) ||
                 ReferenceEquals(match, updateLog.UpdateDateField)))
                 return null;
@@ -153,11 +165,6 @@ namespace Serenity.Services
         public void OnBeforeExecuteQuery(IRetrieveRequestHandler handler) { }
         public void OnPrepareQuery(IRetrieveRequestHandler handler, SqlQuery query) { }
         public void OnValidateRequest(IRetrieveRequestHandler handler) { }
-        public void OnPrepareQuery(IListRequestHandler handler, SqlQuery query) { }
-        public void OnValidateRequest(IListRequestHandler handler) { }
-        public void OnApplyFilters(IListRequestHandler handler, SqlQuery query) { }
-        public void OnBeforeExecuteQuery(IListRequestHandler handler) { }
-        public void OnAfterExecuteQuery(IListRequestHandler handler) { }
 
         public void OnReturn(IRetrieveRequestHandler handler)
         {
@@ -166,18 +173,18 @@ namespace Serenity.Services
                 !handler.Request.IncludeColumns.Contains("Localizations"))
                 return;
 
-            var localIdField = (Field)((handler.Row as IIdRow).IdField);
+            var localIdField = handler.Row.IdField;
 
-            var listHandler = DefaultHandlerFactory.ListHandlerFor(localRowType);
+            var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(localRowType);
+            var listRequest = listHandler.CreateRequest();
 
-            var listRequest = DefaultHandlerFactory.ListRequestFor(localRowType);
             listRequest.ColumnSelection = ColumnSelection.List;
             listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(localIdField.AsObject(handler.Row));
 
             IListResponse response = listHandler.Process(handler.Connection, listRequest);
 
             var row = rowFactory();
-            var rowIdField = (Field)(((IIdRow)row).IdField);
+            var rowIdField = row.IdField;
             var fields = row.GetFields();
             var matches = new Field[fields.Count];
             for (var i = 0; i < fields.Count; i++)
@@ -199,7 +206,7 @@ namespace Serenity.Services
                 for (var i = 0; i < fields.Count; i++)
                 {
                     var match = matches[i];
-                    if (!ReferenceEquals(null, match))
+                    if (match is object)
                     {
                         var field = fields[i];
                         var value = match.AsObject(localRow);
@@ -214,23 +221,23 @@ namespace Serenity.Services
             handler.Response.Localizations = dictionary;
         }
 
-        private void SaveLocalRow(IUnitOfWork uow, IRow localRow, object masterId, object localRowId)
+        private void SaveLocalRow(IUnitOfWork uow, ILocalizationRow localRow, object masterId, object localRowId)
         {
             localRow = localRow.Clone();
 
             foreignKeyField.AsObject(localRow, masterId);
-            ((Field)((IIdRow)localRow).IdField).AsObject(localRow, localRowId);
+            localRow.IdField.AsObject(localRow, localRowId);
 
-            var saveHandler = DefaultHandlerFactory.SaveHandlerFor(localRowType);
-            var saveRequest = DefaultHandlerFactory.SaveRequestFor(localRowType);
+            var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(localRowType);
+            var saveRequest = saveHandler.CreateRequest();
             saveRequest.Entity = localRow;
             saveHandler.Process(uow, saveRequest, localRowId == null ? SaveRequestType.Create : SaveRequestType.Update);
         }
 
         private void DeleteLocalRow(IUnitOfWork uow, object detailId)
         {
-            var deleteHandler = DefaultHandlerFactory.DeleteHandlerFor(localRowType);
-            var deleteRequest = DefaultHandlerFactory.DeleteRequestFor(localRowType);
+            var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessor>(localRowType);
+            var deleteRequest = deleteHandler.CreateRequest();
             deleteRequest.EntityId = detailId;
             deleteHandler.Process(uow, deleteRequest);
         }
@@ -247,11 +254,11 @@ namespace Serenity.Services
         {
             var localizations = handler.Request.Localizations;
             if (localizations == null)
-                return; 
+                return;
 
-            var idField = (Field)((handler.Row as IIdRow).IdField);
+            var idField = handler.Row.IdField;
             var masterId = idField.AsObject(handler.Row);
-            
+
             foreach (DictionaryEntry pair in localizations)
             {
                 var cultureId = cultureIdField.ConvertValue(pair.Key, CultureInfo.InvariantCulture);
@@ -261,7 +268,7 @@ namespace Serenity.Services
                 if (oldId == null)
                     cultureIdField.AsObject(localRow, cultureId);
 
-                var row = pair.Value as Row;
+                var row = pair.Value as IRow;
 
                 bool anyNonEmpty = false;
 
@@ -274,8 +281,9 @@ namespace Serenity.Services
                         continue;
 
                     var match = GetLocalizationMatch(field);
-                    if (ReferenceEquals(null, match))
-                        throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!", field.Title));
+                    if (match is null)
+                        throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
+                            field.PropertyName ?? field.Name));
 
                     var value = field.AsObject(row);
                     match.AsObject(localRow, value);
@@ -299,7 +307,7 @@ namespace Serenity.Services
             if (ServiceQueryHelper.UseSoftDelete(handler.Row))
                 return;
 
-            var idField = (Field)((handler.Row as IIdRow).IdField);
+            var idField = handler.Row.IdField;
             var localRow = localRowFactory();
 
             var deleteList = new List<object>();
@@ -319,4 +327,3 @@ namespace Serenity.Services
         }
     }
 }
-#endif

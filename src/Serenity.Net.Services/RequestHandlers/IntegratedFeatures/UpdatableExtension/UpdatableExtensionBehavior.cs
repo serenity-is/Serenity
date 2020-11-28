@@ -1,7 +1,5 @@
-﻿#if TODO
-using Serenity.Data;
+﻿using Serenity.Data;
 using Serenity.Data.Mapping;
-using Serenity.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -26,6 +24,13 @@ namespace Serenity.Services
             public object PresenceValue;
         }
 
+        private readonly IDefaultHandlerFactory handlerFactory;
+
+        public UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory)
+        {
+            this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
+        }
+
         private List<RelationInfo> infoList;
 
         public bool ActivateFor(IRow row)
@@ -38,10 +43,12 @@ namespace Serenity.Services
             var sourceByExpression = row.GetFields().ToLookup(x =>
                 BracketLocator.ReplaceBrackets(x.Expression.TrimToEmpty(), BracketRemoverDialect.Instance));
 
-            this.infoList = attrs.Select(attr =>
+            infoList = attrs.Select(attr =>
             {
-                var info = new RelationInfo();
-                info.Attr = attr;
+                var info = new RelationInfo
+                {
+                    Attr = attr
+                };
 
                 var rowType = attr.RowType;
                 if (rowType.IsAbstract ||
@@ -54,7 +61,7 @@ namespace Serenity.Services
                             row.GetType().FullName));
                 }
 
-                info.RowFactory = FastReflection.DelegateForConstructor<IRow>(rowType);
+                info.RowFactory = () => (IRow)Activator.CreateInstance(rowType);
 
                 var thisKey = attr.ThisKey;
                 if (string.IsNullOrEmpty(thisKey))
@@ -67,12 +74,13 @@ namespace Serenity.Services
                                 row.GetType().FullName));
                     }
 
-                    info.ThisKeyField = (Field)(((IIdRow)row).IdField);
+                    info.ThisKeyField = row.IdField;
                 }
                 else
                 {
-                    info.ThisKeyField = row.FindFieldByPropertyName(attr.ThisKey) ?? row.FindField(attr.ThisKey);
-                    if (ReferenceEquals(info.ThisKeyField, null))
+                    info.ThisKeyField = row.FindFieldByPropertyName(attr.ThisKey) ?? 
+                        row.FindField(attr.ThisKey);
+                    if (info.ThisKeyField is null)
                         throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                             "This field is specified for an ExtensionRelation attribute",
                             attr.ThisKey,
@@ -86,10 +94,10 @@ namespace Serenity.Services
                 {
                     info.OtherKeyField = ext.FindField(info.ThisKeyField.Name);
 
-                    if (ReferenceEquals(info.OtherKeyField, null) && ext is IIdRow)
-                        info.OtherKeyField = (Field)(((IIdRow)row).IdField);
+                    if (info.OtherKeyField is null && ext is IIdRow)
+                        info.OtherKeyField = row.IdField;
 
-                    if (ReferenceEquals(info.OtherKeyField, null))
+                    if (info.OtherKeyField is null)
                         throw new ArgumentException(string.Format(
                             "Row type '{1}' has an ExtensionRelation attribute " +
                             "but its OtherKey is not specified!",
@@ -98,7 +106,7 @@ namespace Serenity.Services
                 else
                 {
                     info.OtherKeyField = ext.FindFieldByPropertyName(attr.OtherKey) ?? ext.FindField(attr.OtherKey);
-                    if (ReferenceEquals(info.OtherKeyField, null))
+                    if (info.OtherKeyField is null)
                         throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                             "This field is specified for an ExtensionRelation attribute on '{2}'",
                             attr.OtherKey,
@@ -109,7 +117,7 @@ namespace Serenity.Services
                 if (!string.IsNullOrEmpty(attr.FilterField))
                 {
                     info.FilterField = ext.FindFieldByPropertyName(attr.FilterField) ?? ext.FindField(attr.FilterField);
-                    if (ReferenceEquals(info.FilterField, null))
+                    if (info.FilterField is null)
                         throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                             "This field is specified as FilterField for an ExtensionRelation attribute on '{2}'",
                             attr.OtherKey,
@@ -122,7 +130,7 @@ namespace Serenity.Services
                 if (!string.IsNullOrEmpty(attr.PresenceField))
                 {
                     info.PresenceField = row.FindFieldByPropertyName(attr.PresenceField) ?? row.FindField(attr.PresenceField);
-                    if (ReferenceEquals(info.PresenceField, null))
+                    if (info.PresenceField is null)
                         throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                             "This field is specified as PresenceField as an ExtensionRelation attribute.",
                             attr.PresenceField,
@@ -137,7 +145,7 @@ namespace Serenity.Services
 
                 var joinByKey = new HashSet<string>(extFields.Joins.Keys, StringComparer.OrdinalIgnoreCase);
 
-                Func<string, string> mapAlias = x =>
+                string mapAlias(string x)
                 {
                     if (x == "t0" || x == "T0")
                         return alias;
@@ -146,15 +154,15 @@ namespace Serenity.Services
                         return x;
 
                     return aliasPrefix + x;
-                };
+                }
 
-                Func<string, string> mapExpression = x =>
+                string mapExpression(string x)
                 {
                     if (x == null)
                         return null;
 
                     return JoinAliasLocator.ReplaceAliases(x, mapAlias);
-                };
+                }
 
                 info.Mappings = new List<Tuple<Field, Field>>();
                 foreach (var field in extFields)
@@ -175,7 +183,7 @@ namespace Serenity.Services
                         BracketRemoverDialect.Instance);
 
                     var match = sourceByExpression[expression].FirstOrDefault();
-                    if (ReferenceEquals(null, match))
+                    if (match is null)
                         continue;
 
                     if (match.IsTableField())
@@ -231,7 +239,7 @@ namespace Serenity.Services
             var criteria = new Criteria(info.OtherKeyField.PropertyName ?? info.OtherKeyField.Name) ==
                 new ValueCriteria(thisKey);
 
-            if (!ReferenceEquals(null, info.FilterField))
+            if (info.FilterField is object)
             {
                 var flt = new Criteria(info.FilterField.PropertyName ?? info.FilterField.Name);
                 if (info.FilterValue == null)
@@ -240,8 +248,8 @@ namespace Serenity.Services
                     criteria &= flt == new ValueCriteria(info.FilterValue);
             }
 
-            var listHandler = DefaultHandlerFactory.ListHandlerFor(info.Attr.RowType);
-            var listRequest = DefaultHandlerFactory.ListRequestFor(info.Attr.RowType);
+            var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(info.Attr.RowType);
+            var listRequest = listHandler.CreateRequest();
             listRequest.ColumnSelection = ColumnSelection.KeyOnly;
             listRequest.Criteria = criteria;
 
@@ -254,17 +262,17 @@ namespace Serenity.Services
             if (existing.Count == 0)
                 return null;
 
-            return ((Field)((IIdRow)existing[0]).IdField).AsObject((IRow)existing[0]);
+            return ((IRow)existing[0]).IdField.AsObject((IRow)existing[0]);
         }
 
         private bool CheckPresenceValue(RelationInfo info, IRow row)
         {
-            if (!ReferenceEquals(null, info.PresenceField))
+            if (info.PresenceField is object)
             {
                 if (!(info.PresenceField is BooleanField) &&
-                    info.PresenceValue is Boolean)
+                    info.PresenceValue is bool b)
                 {
-                    if (info.PresenceField.IsNull(row) == (bool)info.PresenceValue)
+                    if (info.PresenceField.IsNull(row) == b)
                         return false;
                 }
                 else
@@ -284,8 +292,7 @@ namespace Serenity.Services
         {
             foreach (var info in infoList)
             {
-                object mappingsObj;
-                if (!handler.StateBag.TryGetValue("UpdatableExtensionBehavior_Assignments_" + info.Attr.Alias, out mappingsObj))
+                if (!handler.StateBag.TryGetValue("UpdatableExtensionBehavior_Assignments_" + info.Attr.Alias, out object mappingsObj))
                     continue;
 
                 var mappings = (IEnumerable<Tuple<Field, Field>>)mappingsObj;
@@ -293,7 +300,7 @@ namespace Serenity.Services
                     continue;
 
                 var thisKey = info.ThisKeyField.AsObject(handler.Row);
-                if (ReferenceEquals(null, thisKey))
+                if (thisKey is null)
                     continue;
 
                 object oldID = GetExistingID(handler.Connection, info, thisKey);
@@ -303,21 +310,22 @@ namespace Serenity.Services
                 var extension = info.RowFactory();
 
                 if (oldID != null)
-                    ((Field)((IIdRow)extension).IdField).AsObject(extension, oldID);
+                    ((IIdRow)extension).IdField.AsObject(extension, oldID);
 
                 info.OtherKeyField.AsObject(extension, thisKey);
-                if (!ReferenceEquals(null, info.FilterField))
+                if (info.FilterField is object)
                     info.FilterField.AsObject(extension, info.FilterValue);
 
-                var request = DefaultHandlerFactory.SaveRequestFor(info.Attr.RowType);
+                var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(info.Attr.RowType);
+                var request = saveHandler.CreateRequest();
                 request.Entity = extension;
                 request.EntityId = oldID;
 
                 foreach (var mapping in mappings)
                     mapping.Item2.AsObject(extension, mapping.Item1.AsObject(handler.Row));
 
-                DefaultHandlerFactory.SaveHandlerFor(info.Attr.RowType)
-                    .Process(handler.UnitOfWork, request, oldID == null ? SaveRequestType.Create : SaveRequestType.Update);
+                saveHandler.Process(handler.UnitOfWork, 
+                    request, oldID == null ? SaveRequestType.Create : SaveRequestType.Update);
             }
         }
 
@@ -329,19 +337,18 @@ namespace Serenity.Services
                     continue;
 
                 var thisKey = info.ThisKeyField.AsObject(handler.Row);
-                if (ReferenceEquals(null, thisKey))
+                if (thisKey is null)
                     continue;
 
                 var oldID = GetExistingID(handler.Connection, info, thisKey);
                 if (oldID == null)
                     continue;
 
-                var deleteHandler = DefaultHandlerFactory.DeleteHandlerFor(info.Attr.RowType);
-                var deleteRequest = DefaultHandlerFactory.DeleteRequestFor(info.Attr.RowType);
+                var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessor>(info.Attr.RowType);
+                var deleteRequest = deleteHandler.CreateRequest();
                 deleteRequest.EntityId = oldID;
                 deleteHandler.Process(handler.UnitOfWork, deleteRequest);
             }
         }
     }
 }
-#endif
