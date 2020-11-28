@@ -20,9 +20,10 @@ namespace Serenity.Web
             var scriptManager = builder.ApplicationServices.GetRequiredService<IDynamicScriptManager>();
             var connections = builder.ApplicationServices.GetRequiredService<IConnectionFactory>();
             var propertyItems = builder.ApplicationServices.GetRequiredService<IPropertyItemProvider>();
+            var serviceProvider = builder.ApplicationServices;
 
             DynamicScriptRegistration.Initialize(scriptManager, connections, assemblies);
-            LookupScriptRegistration.RegisterLookupScripts(scriptManager, assemblies);
+            LookupScriptRegistration.RegisterLookupScripts(scriptManager, assemblies, serviceProvider);
             DistinctValuesRegistration.RegisterDistinctValueScripts(scriptManager, assemblies);
             FormScriptRegistration.RegisterFormScripts(scriptManager, propertyItems, assemblies);
             ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager, propertyItems, assemblies);
