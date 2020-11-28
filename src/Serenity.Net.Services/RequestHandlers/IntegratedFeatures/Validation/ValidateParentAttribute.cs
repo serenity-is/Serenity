@@ -1,11 +1,23 @@
-﻿#if TODO
-using Serenity.Data;
+﻿using Serenity.Data;
+using Serenity.Data.Mapping;
+using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Serenity.Services
 {
-    public class ValidateParentAttribute : SaveRequestBehaviorAttribute
+    public class ValidateParentBehavior : BaseSaveBehavior
     {
+        private readonly IRowTypeRegistry rowTypeRegistry;
+        private readonly ITextLocalizer localizer;
+
+        public ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocalizer localizer)
+        {
+            this.rowTypeRegistry = rowTypeRegistry ?? 
+                throw new ArgumentNullException(nameof(rowTypeRegistry));
+            this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
+        }
+
         public override void OnValidateRequest(ISaveRequestHandler handler)
         {
             base.OnValidateRequest(handler);
@@ -14,40 +26,36 @@ namespace Serenity.Services
             var old = handler.Old;
             var isUpdate = old == null;
 
-            var parentIdRow = row as IParentIdRow;
-            if (parentIdRow == null)
+            if (!(row is IParentIdRow parentIdRow))
                 return;
 
-            var parentId = parentIdRow.ParentIdField[row];
+            var parentId = parentIdRow.ParentIdField.AsObject(row);
             if (parentId == null)
                 return;
 
-            if (isUpdate && parentId == parentIdRow.ParentIdField[old])
+            if (isUpdate && parentId == parentIdRow.ParentIdField.AsObject(old))
                 return;
 
-            var parentIdField = (Field)parentIdRow.ParentIdField;
+            var parentIdField = parentIdRow.ParentIdField;
             if (parentIdField.ForeignTable.IsNullOrEmpty())
                 return;
 
-            var foreignRow = RowRegistry.ByConnectionKey(row.GetFields().ConnectionKey)
-                [parentIdField.ForeignTable].FirstOrDefault();
+            var foreignRowType = rowTypeRegistry.ByConnectionKey(row.GetFields().ConnectionKey)
+                .FirstOrDefault(x => x.GetCustomAttribute<TableNameAttribute>()?.Name == 
+                    parentIdField.ForeignTable);
 
-            if (foreignRow == null)
+            if (foreignRowType == null)
                 return;
 
-            var idForeign = (IIdRow)foreignRow;
-            if (idForeign == null)
+            if (!(Activator.CreateInstance(foreignRowType) is IIdRow foreignRow) ||
+                !(foreignRow is IIsActiveRow iar))
                 return;
 
-            var isActiveForeign = (IIsActiveRow)foreignRow;
-            if (isActiveForeign == null)
-                return;
-
-            ServiceHelper.CheckParentNotDeleted(handler.UnitOfWork.Connection, foreignRow.Table, 
+            ServiceHelper.CheckParentNotDeleted(handler.UnitOfWork.Connection, 
+                foreignRow.Table,
                 query => query.Where(
-                    new Criteria((Field)idForeign.IdField) == parentId.Value &
-                    new Criteria(isActiveForeign.IsActiveField) < 0));
+                    new Criteria(foreignRow.IdField) == new ValueCriteria(parentId) &
+                    new Criteria(iar.IsActiveField) < 0), localizer);
         }
     }
 }
-#endif

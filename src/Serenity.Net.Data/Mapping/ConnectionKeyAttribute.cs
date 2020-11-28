@@ -15,7 +15,7 @@ namespace Serenity.Data
         /// <param name="connectionKey">The connection key.</param>
         public ConnectionKeyAttribute(string connectionKey)
         {
-            Value = connectionKey;
+            Value = connectionKey ?? throw new ArgumentNullException(nameof(connectionKey));
         }
 
         /// <summary>
