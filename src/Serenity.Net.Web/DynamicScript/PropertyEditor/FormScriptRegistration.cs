@@ -8,7 +8,7 @@ namespace Serenity.Web
 {
     public class FormScriptRegistration
     {
-        public static void RegisterFormScripts(IDynamicScriptManager scriptManager, IPropertyItemRegistry registry, IEnumerable<Assembly> assemblies)
+        public static void RegisterFormScripts(IDynamicScriptManager scriptManager, IPropertyItemProvider registry, IEnumerable<Assembly> assemblies)
         {
             if (scriptManager == null)
                 throw new ArgumentNullException(nameof(scriptManager));

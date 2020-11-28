@@ -17,9 +17,9 @@ namespace Serenity.Web
         private string scriptName;
         private Type type;
         private EventHandler scriptChanged;
-        private IPropertyItemRegistry registry;
+        private IPropertyItemProvider registry;
 
-        protected PropertyItemsScript(string scriptName, Type type, IPropertyItemRegistry registry)
+        protected PropertyItemsScript(string scriptName, Type type, IPropertyItemProvider registry)
         {
             this.type = type ?? throw new ArgumentNullException(nameof(type));
             this.scriptName = scriptName;

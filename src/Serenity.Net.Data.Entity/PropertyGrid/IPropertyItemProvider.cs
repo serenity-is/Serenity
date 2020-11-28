@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Serenity.PropertyGrid
 {
-    public interface IPropertyItemRegistry
+    public interface IPropertyItemProvider
     {
         public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type);
     }

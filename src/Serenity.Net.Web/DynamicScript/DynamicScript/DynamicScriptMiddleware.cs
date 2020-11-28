@@ -1,18 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Net.Http.Headers;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
+using Serenity.Services;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using System.Linq;
-using Serenity.Services;
-using System.Reflection;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Hosting;
-using Serenity.Data;
-using Serenity.PropertyGrid;
 
 namespace Serenity.Web.Middleware
 {
@@ -135,51 +129,6 @@ namespace Serenity.Web.Middleware
 
             context.Response.GetTypedHeaders().LastModified = lastWriteTime;
             await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
-        }
-    }
-
-    public static class DynamicScriptMiddlewareExtensions
-    {
-        public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder, IEnumerable<Assembly> assemblies)
-        {
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
-
-            var scriptManager = builder.ApplicationServices.GetRequiredService<IDynamicScriptManager>();
-            var connections = builder.ApplicationServices.GetRequiredService<IConnectionFactory>();
-            var propertyRegistry = builder.ApplicationServices.GetRequiredService<IPropertyItemRegistry>();
-
-            DynamicScriptRegistration.Initialize(scriptManager, connections, assemblies);
-            LookupScriptRegistration.RegisterLookupScripts(scriptManager, assemblies);
-            DistinctValuesRegistration.RegisterDistinctValueScripts(scriptManager, assemblies);
-            FormScriptRegistration.RegisterFormScripts(scriptManager, propertyRegistry, assemblies);
-            ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager, propertyRegistry, assemblies);
-
-            var hostEnvironment = builder.ApplicationServices.GetService<IWebHostEnvironment>();
-            new TemplateScriptRegistrar()
-                .Initialize(scriptManager, new[] 
-                {
-                    System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Views" + System.IO.Path.DirectorySeparatorChar + "Templates"),
-                    System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Modules")
-                }, watchForChanges: true);
-
-            var scriptsPath = System.IO.Path.Combine(hostEnvironment.WebRootPath, "Scripts");
-            var scriptWatcher = new FileWatcher(scriptsPath, "*.js");
-            scriptWatcher.Changed += (name) =>
-            {
-                builder.ApplicationServices.GetService<IScriptBundleManager>()?.ScriptsChanged();
-                builder.ApplicationServices.GetService<IContentHashCache>()?.ScriptsChanged();
-            };
-
-            var contentPath = System.IO.Path.Combine(hostEnvironment.WebRootPath, "Content");
-            var cssWatcher = new FileWatcher(contentPath, "*.css");
-            scriptWatcher.Changed += (name) =>
-            {
-                builder.ApplicationServices.GetService<ICssBundleManager>()?.CssChanged();
-                builder.ApplicationServices.GetService<IContentHashCache>()?.ScriptsChanged();
-            };
-
-            return builder.UseMiddleware<DynamicScriptMiddleware>();
         }
     }
 }

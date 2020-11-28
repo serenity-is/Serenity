@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Data.Mapping;
 using System;
@@ -8,13 +9,16 @@ using System.Reflection;
 
 namespace Serenity.PropertyGrid
 {
-    public partial class PropertyItemRegistry : IPropertyItemRegistry
+    public partial class DefaultPropertyItemProvider : IPropertyItemProvider
     {
-        private readonly IEnumerable<Func<IPropertyProcessor>> processorFactories;
+        private readonly IServiceProvider provider;
+        private readonly IEnumerable<ObjectFactory> processorFactories;
 
-        public PropertyItemRegistry(IEnumerable<Func<IPropertyProcessor>> processorFactories)
+        public DefaultPropertyItemProvider(IServiceProvider provider, IEnumerable<Type> processorTypes)
         {
-            this.processorFactories = processorFactories ?? throw new ArgumentNullException(nameof(processorFactories));
+            this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            processorFactories = (processorTypes ?? throw new ArgumentNullException(nameof(processorTypes)))
+                .Select(type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
         }
 
         public static IEnumerable<Type> FindProcessorTypes(IEnumerable<Assembly> assemblies)
@@ -34,7 +38,7 @@ namespace Serenity.PropertyGrid
             var list = new List<PropertyItem>();
 
             var basedOnRow = GetBasedOnRow(type, out bool checkNames);
-            var processors = processorFactories.Select(x => x())
+            var processors = processorFactories.Select(x => (IPropertyProcessor)x(provider, Array.Empty<object>()))
                 .OrderBy(x => x.Priority).ToList();
 
             foreach (var processor in processors)

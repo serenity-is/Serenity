@@ -8,7 +8,7 @@ namespace Serenity.Web
 {
     public class ColumnsScriptRegistration
     {
-        public static void RegisterColumnsScripts(IDynamicScriptManager scriptManager, IPropertyItemRegistry registry, IEnumerable<Assembly> assemblies)
+        public static void RegisterColumnsScripts(IDynamicScriptManager scriptManager, IPropertyItemProvider registry, IEnumerable<Assembly> assemblies)
         {
             if (scriptManager == null)
                 throw new ArgumentNullException(nameof(scriptManager));
