@@ -15,9 +15,10 @@ namespace Serenity.Reporting
         private readonly IPermissionService permissions;
         private readonly ITextLocalizer localizer;
 
-        public ReportRegistry(IEnumerable<Type> types, IPermissionService permissions, ITextLocalizer localizer)
+        public ReportRegistry(ITypeSource typeSource, IPermissionService permissions, ITextLocalizer localizer)
         {
-            this.types = types ?? throw new ArgumentNullException(nameof(types));
+            types = (typeSource ?? throw new ArgumentNullException(nameof(types)))
+                .GetTypesWithAttribute(typeof(ReportAttribute));
             this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
             this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
