@@ -10,6 +10,7 @@ namespace Serenity.Web
         void Changed(string name);
         void CheckScriptRights(string name);
         Dictionary<string, string> GetRegisteredScripts();
+        IEnumerable<string> GetRegisteredScriptNames();
         string GetScriptInclude(string name, string extension = ".js");
         string GetScriptText(string name);
         IScriptContent ReadScriptContent(string name);

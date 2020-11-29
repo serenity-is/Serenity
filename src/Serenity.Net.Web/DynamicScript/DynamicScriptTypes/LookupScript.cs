@@ -1,28 +1,22 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 
 namespace Serenity.Web
 {
-    public class LookupScript : DynamicScript, INamedDynamicScript
+    public abstract class LookupScript : DynamicScript, INamedDynamicScript
     {
         private Dictionary<string, object> lookupParams;
-        protected Func<IEnumerable> getItems;
 
         protected LookupScript()
         {
             lookupParams = new Dictionary<string, object>();
         }
 
-        public LookupScript(Func<IEnumerable> getItems)
-            : this()
-        {
-            this.getItems = getItems ?? throw new ArgumentNullException(nameof(getItems));
-        }
+        protected abstract IEnumerable GetItems();
 
         public override string GetScript()
         {
-            IEnumerable items = getItems();
+            IEnumerable items = GetItems();
 
             return string.Format("Q.ScriptData.set({0}, new Q.Lookup({1}, \n{2}\n));",
                 ("Lookup." + LookupKey).ToSingleQuoted(), LookupParams.ToJson(), items.ToJson());
@@ -53,8 +47,7 @@ namespace Serenity.Web
         {
             get
             {
-                object value;
-                if (lookupParams.TryGetValue("textField", out value) && value != null)
+                if (lookupParams.TryGetValue("textField", out object value) && value != null)
                     return value.ToString();
 
                 return null;
@@ -69,8 +62,7 @@ namespace Serenity.Web
         {
             get
             {
-                object value;
-                if (lookupParams.TryGetValue("parentIdField", out value) && value != null)
+                if (lookupParams.TryGetValue("parentIdField", out object value) && value != null)
                     return value.ToString();
 
                 return null;

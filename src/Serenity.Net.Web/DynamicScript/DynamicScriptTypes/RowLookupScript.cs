@@ -1,6 +1,7 @@
 ﻿using Serenity.Data;
 using Serenity.Data.Mapping;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -69,10 +70,9 @@ namespace Serenity.Web
                 Permission = readPermission.Permission ?? "?";
 
             GroupKey = row.GetFields().GenerationKey;
-            getItems = GetItems;
         }
 
-        protected virtual List<TRow> GetItems()
+        protected override IEnumerable GetItems()
         {
             var list = new List<TRow>();
             var loader = new TRow();

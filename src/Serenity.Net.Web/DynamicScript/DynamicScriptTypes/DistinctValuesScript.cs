@@ -1,8 +1,9 @@
 ﻿using Serenity.Data;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System;
 
 namespace Serenity.Web
 {
@@ -27,7 +28,6 @@ namespace Serenity.Web
                 Permission = readPermission.Permission ?? "?";
 
             GroupKey = row.GetFields().GenerationKey;
-            getItems = GetItems;
 
             TextField = "v";
             IdField = "v";
@@ -70,11 +70,11 @@ namespace Serenity.Web
         public override string GetScript()
         {
             return "Q.ScriptData.set(" + ("Lookup." + LookupKey).ToSingleQuoted() +
-                ", new Q.Lookup(" + LookupParams.ToJson() + ", " + getItems().ToJson() + 
+                ", new Q.Lookup(" + LookupParams.ToJson() + ", " + GetItems().ToJson() + 
                 ".map(function(x) { return { v: x }; })));";
         }
 
-        protected virtual List<object> GetItems()
+        protected override IEnumerable GetItems()
         {
             var loader = new TRow();
             var field = GetFieldFrom(loader);
