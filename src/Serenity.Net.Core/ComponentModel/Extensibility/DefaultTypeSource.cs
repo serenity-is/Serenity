@@ -16,9 +16,7 @@ namespace Serenity.Abstractions
         /// Creates a new instance
         /// </summary>
         /// <param name="assemblies">List of assemblies</param>
-        /// <param name="additionalTypes">
-        public DefaultTypeSource(IEnumerable<Assembly> assemblies,
-            IEnumerable<Type> additionalTypes = null)
+        public DefaultTypeSource(IEnumerable<Assembly> assemblies)
         {
             this.assemblies = assemblies ?? throw new ArgumentNullException(nameof(assemblies));
         }
