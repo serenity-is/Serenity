@@ -1,4 +1,4 @@
-﻿using Serenity.Extensibility;
+﻿using Serenity.ComponentModel;
 
 namespace Serenity.Services
 {

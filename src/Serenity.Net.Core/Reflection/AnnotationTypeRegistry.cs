@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Serenity.Reflection
     /// <summary>
     /// Default annotation type registry
     /// </summary>
-    /// <seealso cref="Serenity.Reflection.IAnnotationTypeRegistry" />
+    /// <seealso cref="IAnnotationTypeRegistry" />
     public class AnnotationTypeRegistry : IAnnotationTypeRegistry
     {
         private readonly IEnumerable<Type> annotationTypes;
@@ -17,23 +18,11 @@ namespace Serenity.Reflection
         /// <summary>
         /// Creates a new instance
         /// </summary>
-        /// <param name="annotationTypes">Types with AnnotationType attributes</param>
-        public AnnotationTypeRegistry(IEnumerable<Type> annotationTypes)
+        /// <param name="typeSource">Type source</param>
+        public AnnotationTypeRegistry(ITypeSource typeSource)
         {
-            this.annotationTypes = annotationTypes ?? throw new ArgumentNullException(nameof(annotationTypes));
-        }
-
-        /// <summary>
-        /// Gets the annotation types.
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerable<Type> FindAnnotationTypes(IEnumerable<Assembly> assemblies)
-        {
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
-
-            return assemblies.SelectMany(assembly => assembly.GetTypes())
-                .Where(type => type.GetCustomAttribute<AnnotationTypeAttribute>() != null);
+            annotationTypes = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
+                .GetTypesWithAttribute(typeof(AnnotationTypeAttribute));
         }
 
         /// <summary>

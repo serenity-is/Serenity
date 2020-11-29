@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Serenity.Extensibility
+namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Indicates that this class contains local texts with optionally

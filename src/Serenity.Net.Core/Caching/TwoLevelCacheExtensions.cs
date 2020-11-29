@@ -279,6 +279,9 @@ namespace Serenity
                 }
             }
 
+            if (loader == null)
+                return null;
+
             // couldn't find valid item in local or distributed cache, produce value by calling loader
             var item = loader();
 

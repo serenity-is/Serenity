@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
 using Serenity.PropertyGrid;
 using System;
 using System.Collections.Generic;
@@ -8,27 +9,24 @@ namespace Serenity.Web
 {
     public class FormScriptRegistration
     {
-        public static void RegisterFormScripts(IDynamicScriptManager scriptManager, IPropertyItemProvider registry, IEnumerable<Assembly> assemblies)
+        public static void RegisterFormScripts(IDynamicScriptManager scriptManager, IPropertyItemProvider registry, 
+            ITypeSource typeSource)
         {
             if (scriptManager == null)
                 throw new ArgumentNullException(nameof(scriptManager));
 
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
+            if (typeSource == null)
+                throw new ArgumentNullException(nameof(typeSource));
 
             var scripts = new List<Func<string>>();
 
-            foreach (var assembly in assemblies)
-                foreach (var type in assembly.GetTypes())
-                {
-                    var attr = type.GetCustomAttribute<FormScriptAttribute>();
-                    if (attr != null)
-                    {
-                        var script = new FormScript(attr.Key, type, registry);
-                        scriptManager.Register(script);
-                        scripts.Add(script.GetScript);
-                    }
-                }
+            foreach (var type in typeSource.GetTypesWithAttribute(typeof(FormScriptAttribute)))
+            {
+                var attr = type.GetCustomAttribute<FormScriptAttribute>();
+                var script = new FormScript(attr.Key, type, registry);
+                scriptManager.Register(script);
+                scripts.Add(script.GetScript);
+            }
 
             scriptManager.Register("FormBundle", new ConcatenatedScript(scripts));
         }

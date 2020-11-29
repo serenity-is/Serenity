@@ -1,7 +1,7 @@
-﻿namespace Serenity.Web
-{
-    using Serenity.Extensibility;
+﻿using Serenity.ComponentModel;
 
+namespace Serenity.Web
+{
     [NestedLocalTexts]
     internal static partial class Texts
     {

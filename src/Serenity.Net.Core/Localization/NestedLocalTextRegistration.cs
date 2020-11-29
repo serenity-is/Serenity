@@ -1,10 +1,9 @@
 ﻿
 namespace Serenity.Localization
 {
-    using Extensibility;
     using Serenity.Abstractions;
+    using Serenity.ComponentModel;
     using System;
-    using System.Collections.Generic;
     using System.Reflection;
 
     /// <summary>
@@ -20,29 +19,31 @@ namespace Serenity.Localization
         /// <summary>
         /// Adds translations from static nested local text classes marked with NestedLocalTextAttribute.
         /// </summary>
-        public static void AddNestedTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies)
+        public static void AddNestedTexts(this ILocalTextRegistry registry, ITypeSource typeSource)
         {
-            if (assemblies == null)
-                throw new ArgumentNullException("assemblies");
+            if (typeSource == null)
+                throw new ArgumentNullException(nameof(typeSource));
 
-            foreach (var assembly in assemblies)
-                foreach (var type in assembly.GetTypes())
+            foreach (var type in typeSource.GetTypesWithAttribute(typeof(NestedLocalTextsAttribute)))
+            {
+                var attr = type.GetCustomAttribute<NestedLocalTextsAttribute>();
+                if (attr != null)
                 {
-                    var attr = type.GetCustomAttribute<NestedLocalTextsAttribute>();
-                    if (attr != null)
-                    {
-                        Initialize(registry, type, attr.LanguageID ?? LocalText.InvariantLanguageID, attr.Prefix ?? "");
-                    }
+                    Initialize(registry, type, attr.LanguageID ?? LocalText.InvariantLanguageID, 
+                        attr.Prefix ?? "");
                 }
+            }
         }
 
-        private static void Initialize(ILocalTextRegistry registry, Type type, string languageID, string prefix)
+        private static void Initialize(ILocalTextRegistry registry, Type type, 
+            string languageID, string prefix)
         {
             if (registry == null)
                 throw new ArgumentNullException(nameof(registry));
 
             var provider = registry;
-            foreach (var member in type.GetMembers(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly))
+            foreach (var member in type.GetMembers(
+                BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
                 var fi = member as FieldInfo;
                 if (fi != null &&

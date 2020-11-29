@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Data.Mapping;
 using System;
@@ -70,7 +71,8 @@ namespace Serenity.Reporting
             return FromMember(property, property.PropertyType, baseField, localizer);
         }
 
-        public static List<ReportColumn> ObjectTypeToList(Type objectType, ITextLocalizer localizer)
+        public static List<ReportColumn> ObjectTypeToList(Type objectType, 
+            IServiceProvider serviceProvider, ITextLocalizer localizer)
         {
             var list = new List<ReportColumn>();
 
@@ -110,7 +112,8 @@ namespace Serenity.Reporting
                 var cellDecorator = member.GetCustomAttribute<CellDecoratorAttribute>();
                 if (cellDecorator != null)
                 {
-                    var decorator = ((ICellDecorator)Activator.CreateInstance(cellDecorator.DecoratorType));
+                    var decorator = (ICellDecorator)ActivatorUtilities.CreateInstance(
+                        serviceProvider, cellDecorator.DecoratorType);
                     column.Decorator = decorator;
                 }
 

@@ -1,32 +1,37 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Serenity.Abstractions;
 using Serenity.Data;
 using Serenity.PropertyGrid;
 using Serenity.Web.Middleware;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace Serenity.Web
 {
     public static class DynamicScriptServiceCollectionExtensions
     {
-        public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder, IEnumerable<Assembly> assemblies)
+        public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder)
         {
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
-
-            var scriptManager = builder.ApplicationServices.GetRequiredService<IDynamicScriptManager>();
-            var connections = builder.ApplicationServices.GetRequiredService<IConnectionFactory>();
-            var propertyItems = builder.ApplicationServices.GetRequiredService<IPropertyItemProvider>();
             var serviceProvider = builder.ApplicationServices;
+            var scriptManager = serviceProvider.GetRequiredService<IDynamicScriptManager>();
+            var connections = serviceProvider.GetRequiredService<IConnectionFactory>();
+            var propertyItemProvider = serviceProvider.GetRequiredService<IPropertyItemProvider>();
+            var typeSource = serviceProvider.GetRequiredService<ITypeSource>();
 
-            DynamicScriptRegistration.Initialize(scriptManager, connections, assemblies);
-            LookupScriptRegistration.RegisterLookupScripts(scriptManager, assemblies, serviceProvider);
-            DistinctValuesRegistration.RegisterDistinctValueScripts(scriptManager, assemblies);
-            FormScriptRegistration.RegisterFormScripts(scriptManager, propertyItems, assemblies);
-            ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager, propertyItems, assemblies);
+            DataScriptRegistration.RegisterDataScripts(scriptManager, 
+                typeSource, serviceProvider);
+            
+            LookupScriptRegistration.RegisterLookupScripts(scriptManager, 
+                typeSource, serviceProvider);
+            
+            DistinctValuesRegistration.RegisterDistinctValueScripts(scriptManager, 
+                typeSource, serviceProvider);
+
+            ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager, 
+                propertyItemProvider, typeSource);
+
+            FormScriptRegistration.RegisterFormScripts(scriptManager, 
+                propertyItemProvider, typeSource);
 
             var hostEnvironment = builder.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
             new TemplateScriptRegistrar()

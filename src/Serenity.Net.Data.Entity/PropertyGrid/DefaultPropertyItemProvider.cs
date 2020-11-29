@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Data.Mapping;
@@ -14,20 +15,13 @@ namespace Serenity.PropertyGrid
         private readonly IServiceProvider provider;
         private readonly IEnumerable<ObjectFactory> processorFactories;
 
-        public DefaultPropertyItemProvider(IServiceProvider provider, IEnumerable<Type> processorTypes)
+        public DefaultPropertyItemProvider(IServiceProvider provider, ITypeSource typeSource)
         {
             this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
-            processorFactories = (processorTypes ?? throw new ArgumentNullException(nameof(processorTypes)))
+            processorFactories = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
+                .GetTypesWithInterface(typeof(IPropertyProcessor))
+                .Where(x => !x.IsAbstract && !x.IsInterface)
                 .Select(type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
-        }
-
-        public static IEnumerable<Type> FindProcessorTypes(IEnumerable<Assembly> assemblies)
-        {
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
-
-            return assemblies.SelectMany(x => x.GetTypes())
-                .Where(type => !type.IsInterface && typeof(IPropertyProcessor).IsAssignableFrom(type));
         }
 
         public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type)

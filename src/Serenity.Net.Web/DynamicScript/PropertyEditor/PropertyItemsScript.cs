@@ -1,4 +1,5 @@
-﻿using Serenity.Abstractions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using Serenity.PropertyGrid;
 using Serenity.Web.PropertyEditor;
@@ -16,14 +17,19 @@ namespace Serenity.Web
 
         private string scriptName;
         private Type type;
+        private readonly IServiceProvider serviceProvider;
+        private readonly IPropertyItemProvider propertyProvider;
         private EventHandler scriptChanged;
-        private IPropertyItemProvider registry;
 
-        protected PropertyItemsScript(string scriptName, Type type, IPropertyItemProvider registry)
+        protected PropertyItemsScript(string scriptName, Type type, 
+            IServiceProvider serviceProvider, IPropertyItemProvider propertyProvider)
         {
             this.type = type ?? throw new ArgumentNullException(nameof(type));
+            this.serviceProvider = serviceProvider ?? 
+                throw new ArgumentNullException(nameof(serviceProvider));
+            this.propertyProvider = propertyProvider ?? 
+                throw new ArgumentNullException(nameof(PropertyItemsScript.propertyProvider));
             this.scriptName = scriptName;
-            this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
         }
 
         protected static string CheckName(string name)
@@ -47,21 +53,23 @@ namespace Serenity.Web
 
         public string GetScript()
         {
-            var items = registry.GetPropertyItemsFor(type).ToList();
+            var items = propertyProvider.GetPropertyItemsFor(type).ToList();
             if (typeof(ICustomizedFormScript).IsAssignableFrom(type))
             {
-                var instance = Activator.CreateInstance(type) as ICustomizedFormScript;
+                var instance = ActivatorUtilities.CreateInstance(
+                    serviceProvider, type) as ICustomizedFormScript;
                 instance.Customize(items);
             }
 
-            return string.Format("Q.ScriptData.set({0}, {1});", (scriptName).ToSingleQuoted(), items.ToJson());
+            return string.Format("Q.ScriptData.set({0}, {1});", 
+                scriptName.ToSingleQuoted(), items.ToJson());
         }
 
         public void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
         {
         }
 
-        public event System.EventHandler ScriptChanged
+        public event EventHandler ScriptChanged
         {
             add { scriptChanged += value; }
             remove { scriptChanged -= value; }

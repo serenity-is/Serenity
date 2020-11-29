@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
 using Serenity.PropertyGrid;
 using System;
 using System.Collections.Generic;
@@ -8,27 +9,24 @@ namespace Serenity.Web
 {
     public class ColumnsScriptRegistration
     {
-        public static void RegisterColumnsScripts(IDynamicScriptManager scriptManager, IPropertyItemProvider registry, IEnumerable<Assembly> assemblies)
+        public static void RegisterColumnsScripts(IDynamicScriptManager scriptManager, IPropertyItemProvider registry, 
+            ITypeSource typeSource)
         {
             if (scriptManager == null)
                 throw new ArgumentNullException(nameof(scriptManager));
 
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
+            if (typeSource == null)
+                throw new ArgumentNullException(nameof(typeSource));
 
             var scripts = new List<Func<string>>();
 
-            foreach (var assembly in assemblies)
-                foreach (var type in assembly.GetTypes())
-                {
-                    var attr = type.GetCustomAttribute<ColumnsScriptAttribute>();
-                    if (attr != null)
-                    {
-                        var script = new ColumnsScript(attr.Key, type, registry);
-                        scriptManager.Register(script);
-                        scripts.Add(script.GetScript);
-                    }
-                }
+            foreach (var type in typeSource.GetTypesWithAttribute(typeof(ColumnsScriptAttribute)))
+            {
+                var attr = type.GetCustomAttribute<ColumnsScriptAttribute>();
+                var script = new ColumnsScript(attr.Key, type, registry);
+                scriptManager.Register(script);
+                scripts.Add(script.GetScript);
+            }
 
             scriptManager.Register("ColumnsBundle", new ConcatenatedScript(scripts));
         }

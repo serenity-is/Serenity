@@ -1,8 +1,8 @@
 ﻿
 namespace Serenity.Localization
 {
-    using Extensibility;
     using Serenity.Abstractions;
+    using Serenity.ComponentModel;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
@@ -18,27 +18,30 @@ namespace Serenity.Localization
     public static class NestedPermissionKeyRegistration
     {
         /// <summary>
-        /// Gets permission keys and adds texts if any from static nested permission key classes marked with NestedPermissionKeys attribute.
+        /// Gets permission keys and adds texts if any from static nested permission key 
+        /// classes marked with NestedPermissionKeys attribute.
         /// </summary>
-        public static HashSet<string> AddNestedPermissions(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies)
+        public static HashSet<string> AddNestedPermissions(this ILocalTextRegistry registry, 
+            ITypeSource typeSource)
         {
-            if (assemblies == null)
-                throw new ArgumentNullException("assemblies");
+            if (typeSource == null)
+                throw new ArgumentNullException(nameof(typeSource));
 
             var permissions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var assembly in assemblies)
-                foreach (var type in assembly.GetTypes())
-                {
-                    var attr = type.GetCustomAttribute<NestedPermissionKeysAttribute>();
-                    if (attr != null)
-                        AddKeysFrom(permissions, registry, type, attr.LanguageID ?? LocalText.InvariantLanguageID);
-                }
+            foreach (var type in typeSource.GetTypesWithAttribute(typeof(NestedPermissionKeysAttribute)))
+            {
+                var attr = type.GetCustomAttribute<NestedPermissionKeysAttribute>();
+                if (attr != null)
+                    AddKeysFrom(permissions, registry, type, 
+                        attr.LanguageID ?? LocalText.InvariantLanguageID);
+            }
 
             return permissions;
         }
 
-        private static void AddKeysFrom(HashSet<string> permissions, ILocalTextRegistry registry, Type type, string languageID)
+        private static void AddKeysFrom(HashSet<string> permissions, ILocalTextRegistry registry, 
+            Type type, string languageID)
         {
             var thisKeys = new List<string>();
 

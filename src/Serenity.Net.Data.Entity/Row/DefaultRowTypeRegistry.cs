@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,10 +11,13 @@ namespace Serenity.Data
         private readonly IEnumerable<Type> rowTypes;
         private readonly ILookup<string, Type> byConnectionKey;
 
-        public DefaultRowTypeRegistry(IEnumerable<Type> rowTypes)
+        public DefaultRowTypeRegistry(ITypeSource typeSource)
         {
-            this.rowTypes = rowTypes ?? throw new ArgumentNullException(nameof(rowTypes));
-            byConnectionKey = this.rowTypes.Where(x => x.GetCustomAttribute<ConnectionKeyAttribute>() != null)
+            rowTypes = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
+                .GetTypesWithInterface(typeof(IRow))
+                .Where(x => !x.IsAbstract && !x.IsInterface);
+
+            byConnectionKey = rowTypes.Where(x => x.GetCustomAttribute<ConnectionKeyAttribute>() != null)
                 .ToLookup(x => x.GetCustomAttribute<ConnectionKeyAttribute>().Value);
         }
 
@@ -22,19 +26,6 @@ namespace Serenity.Data
         public IEnumerable<Type> ByConnectionKey(string connectionKey)
         {
             return byConnectionKey[connectionKey];
-        }
-
-        public static IEnumerable<Type> EnumerateRowTypes(IEnumerable<Assembly> assemblies, 
-            string connectionKey = null)
-        {
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
-
-            return assemblies.SelectMany(x => x.GetTypes())
-                .Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(IRow)) &&
-                    (connectionKey == null || string.Compare(
-                        type.GetCustomAttribute<ConnectionKeyAttribute>()?.Value,
-                        connectionKey, StringComparison.OrdinalIgnoreCase) == 0));
         }
     }
 }

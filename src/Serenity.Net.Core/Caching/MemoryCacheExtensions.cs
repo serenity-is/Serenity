@@ -58,6 +58,9 @@
 
             if (cachedObj == null)
             {
+                if (loader == null)
+                    return null;
+
                 var item = loader();
                 cache.Add(cacheKey, (object)item ?? DBNull.Value, expiration);
                 return item;

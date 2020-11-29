@@ -201,8 +201,7 @@ namespace Serenity.Web
             {
                 var registry = page.ViewContext.HttpContext.RequestServices.GetRequiredService<ILocalTextRegistry>();
                 var packages = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<LocalTextScript.PackageSettings>>();
-                var script = new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
-                scriptManager.Register(script);
+                return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
             });
 
             return scriptManager.GetScriptText(scriptName);
@@ -217,8 +216,7 @@ namespace Serenity.Web
             {
                 var registry = page.ViewContext.HttpContext.RequestServices.GetRequiredService<ILocalTextRegistry>();
                 var packages = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<LocalTextScript.PackageSettings>>();
-                var script = new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
-                scriptManager.Register(script);
+                return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
             });
 
             return scriptManager.GetScriptInclude(scriptName);
@@ -233,8 +231,7 @@ namespace Serenity.Web
             {
                 var registry = page.ViewContext.HttpContext.RequestServices.GetRequiredService<ILocalTextRegistry>();
                 var packages = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<LocalTextScript.PackageSettings>>();
-                var script = new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
-                scriptManager.Register(script);
+                return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
             });
 
             return Script(page, "dynamic://" + scriptName);

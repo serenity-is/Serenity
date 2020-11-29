@@ -42,10 +42,11 @@ namespace Serenity.Web.Middleware
 
         public async static Task ReturnScript(HttpContext context, string scriptKey, string contentType)
         {
-            IDynamicScriptData dynamicScript;
+            IScriptContent scriptContent;
             try
             {
-                dynamicScript = context.RequestServices.GetRequiredService<IDynamicScriptManager>().GetScriptData(scriptKey);
+                scriptContent = context.RequestServices.GetRequiredService<IDynamicScriptManager>()
+                    .ReadScriptContent(scriptKey);
             }
             catch (ValidationError ve)
             {
@@ -58,7 +59,7 @@ namespace Serenity.Web.Middleware
                 throw;
             }
 
-            if (dynamicScript == null)
+            if (scriptContent == null)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 await context.Response.WriteAsync("File not found!");
@@ -87,19 +88,20 @@ namespace Serenity.Web.Middleware
             cacheControl.MustRevalidate = false;
             responseHeaders.CacheControl = cacheControl;
 
-            var supportsGzip = dynamicScript.CompressedBytes != null &&
+            var supportsGzip = scriptContent.CanCompress && 
                 context.Request.Headers["Accept-Encoding"].Any(x => x.IndexOf("gzip") >= 0);
 
             byte[] contentBytes;
             if (supportsGzip)
             {
                 context.Response.Headers["Content-Encoding"] = "gzip";
-                contentBytes = dynamicScript.CompressedBytes;
+                contentBytes = scriptContent.CompressedContent;
             }
             else
-                contentBytes = dynamicScript.UncompressedBytes;
+                contentBytes = scriptContent.Content;
 
-            await WriteWithIfModifiedSinceControl(context, contentBytes, dynamicScript.Time);
+            await WriteWithIfModifiedSinceControl(context, contentBytes, 
+                scriptContent.Time);
         }
 
         public async static Task WriteWithIfModifiedSinceControl(HttpContext context, byte[] bytes, DateTime lastWriteTime)

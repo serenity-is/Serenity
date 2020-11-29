@@ -85,7 +85,7 @@ namespace Serenity.Data
             if (reader.TokenType == JsonToken.Null)
                 return null;
 
-            var row = (IRow)(Activator.CreateInstance(objectType));
+            var row = (IRow)Activator.CreateInstance(objectType);
             if (row == null)
                 throw new JsonSerializationException(string.Format("No row of type {0} could be created.", objectType.Name));
 

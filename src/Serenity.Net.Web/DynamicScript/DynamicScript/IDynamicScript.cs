@@ -10,6 +10,5 @@ namespace Serenity.Web
         void Changed();
         string GroupKey { get; }
         TimeSpan Expiration { get; }
-        event EventHandler ScriptChanged;
     }
 }

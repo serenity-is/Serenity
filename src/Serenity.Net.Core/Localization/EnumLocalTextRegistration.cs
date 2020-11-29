@@ -3,7 +3,6 @@ namespace Serenity.Localization
 {
     using Serenity.Abstractions;
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Reflection;
 
@@ -21,35 +20,32 @@ namespace Serenity.Localization
         /// fullname of the enumeration type. This can be overridden by attaching a EnumKey
         /// attribute.
         /// </summary>
-        /// <param name="assemblies">Assemblies to search for enumeration classes in</param>
+        /// <param name="typeSource">Type source to search for enumeration classes in</param>
         /// <param name="languageID">Language ID texts will be added (default is invariant language)</param>
         /// <param name="registry">Registry</param>
-        public static void AddEnumTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies,
+        public static void AddEnumTexts(this ILocalTextRegistry registry, ITypeSource typeSource,
             string languageID = LocalText.InvariantLanguageID)
         {
-            if (assemblies == null)
+            if (typeSource == null)
                 throw new ArgumentNullException("assemblies");
 
             var provider = registry ?? throw new ArgumentNullException(nameof(registry));
 
-            foreach (var assembly in assemblies)
+            foreach (var type in typeSource.GetTypes())
             {
-                foreach (var type in assembly.GetTypes())
+                if (type.IsEnum)
                 {
-                    if (type.IsEnum)
+                    var enumKey = EnumMapper.GetEnumTypeKey(type);
+
+                    foreach (var name in Enum.GetNames(type))
                     {
-                        var enumKey = EnumMapper.GetEnumTypeKey(type);
+                        var member = type.GetMember(name);
+                        if (member.Length == 0)
+                            continue;
 
-                        foreach (var name in Enum.GetNames(type))
-                        {
-                            var member = type.GetMember(name);
-                            if (member.Length == 0)
-                                continue;
-
-                            var descAttr = member[0].GetCustomAttribute<DescriptionAttribute>();
-                            if (descAttr != null)
-                                provider.Add(languageID, "Enums." + enumKey + "." + name, descAttr.Description);
-                        }
+                        var descAttr = member[0].GetCustomAttribute<DescriptionAttribute>();
+                        if (descAttr != null)
+                            provider.Add(languageID, "Enums." + enumKey + "." + name, descAttr.Description);
                     }
                 }
             }

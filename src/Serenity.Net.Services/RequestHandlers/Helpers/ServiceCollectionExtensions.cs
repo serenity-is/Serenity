@@ -5,28 +5,28 @@ using Serenity.Data;
 using Serenity.Localization;
 using Serenity.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Serenity.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddRequestHandlers(this IServiceCollection services, IEnumerable<Assembly> assemblies)
+        public static void AddRequestHandlers(this IServiceCollection services)
         {
             services.TryAddSingleton<IBehaviorFactory, DefaultBehaviorFactory>();
-            services.TryAddSingleton<IImplicitBehaviorRegistry>(s => new DefaultImplicitBehaviorRegistry(
-                DefaultImplicitBehaviorRegistry.FindImplicitBehaviorTypes(assemblies)));
+            services.TryAddSingleton<IImplicitBehaviorRegistry, DefaultImplicitBehaviorRegistry>();
             services.TryAddSingleton<IBehaviorProvider, DefaultBehaviorProvider>();
             services.TryAddSingleton<IRequestContext, DefaultRequestContext>();
         }
 
-        public static void AddAllTexts(this ILocalTextRegistry textRegistry, IRowTypeRegistry rowTypeRegistry,
-            IEnumerable<string> jsonTextPaths, IEnumerable<Assembly> assemblies)
+        public static void AddAllTexts(this IServiceProvider provider,
+            params string[] jsonTextPaths)
         {
-            textRegistry.AddNestedTexts(assemblies);
-            textRegistry.AddEnumTexts(assemblies);
+            var typeSource = provider.GetRequiredService<ITypeSource>();
+            var textRegistry = provider.GetRequiredService<ILocalTextRegistry>();
+            var rowTypeRegistry = provider.GetRequiredService<IRowTypeRegistry>();
+            textRegistry.AddNestedTexts(typeSource);
+            textRegistry.AddEnumTexts(typeSource);
             var rowInstances = rowTypeRegistry.AllRowTypes.Select(x => (IRow)Activator.CreateInstance(x));
             textRegistry.AddRowTexts(rowInstances);
             foreach (var path in jsonTextPaths)

@@ -1,6 +1,7 @@
-﻿using Serenity.ComponentModel;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Serenity.Abstractions;
+using Serenity.ComponentModel;
 using Serenity.Data;
-using Serenity.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,77 +11,78 @@ namespace Serenity.Web
 {
     public class DistinctValuesRegistration
     {
-        public static void RegisterDistinctValueScripts(IDynamicScriptManager scriptManager, IEnumerable<Assembly> assemblies)
+        public static void RegisterDistinctValueScripts(IDynamicScriptManager scriptManager, 
+            ITypeSource typeSource, IServiceProvider serviceProvider)
         {
             if (scriptManager == null)
                 throw new ArgumentNullException(nameof(scriptManager));
 
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
+            if (typeSource == null)
+                throw new ArgumentNullException(nameof(typeSource));
+
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
 
             var list = new List<DistinctValuesEditorAttribute>();
-            foreach (var assembly in assemblies)
+            foreach (var type in typeSource.GetTypes())
             {
-                foreach (var type in assembly.GetTypes())
+                bool isRow = type.IsSubclassOf(typeof(IRow));
+
+                if (!isRow &&
+                    type.GetCustomAttribute<FormScriptAttribute>() == null &&
+                    type.GetCustomAttribute<ColumnsScriptAttribute>() == null)
                 {
-                    bool isRow = type.IsSubclassOf(typeof(IRow));
+                    continue;
+                }
 
-                    if (!isRow &&
-                        type.GetCustomAttribute<FormScriptAttribute>() == null &&
-                        type.GetCustomAttribute<ColumnsScriptAttribute>() == null)
-                    {
+                if (isRow &&
+                    type.IsAbstract)
+                    continue;
+
+                foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                {
+                    var attr = property.GetCustomAttribute<DistinctValuesEditorAttribute>();
+                    if (attr == null)
                         continue;
-                    }
 
-                    if (isRow &&
-                        type.IsAbstract)
-                        continue;
-
-                    foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                    if (attr.RowType != null)
                     {
-                        var attr = property.GetCustomAttribute<DistinctValuesEditorAttribute>();
-                        if (attr == null)
-                            continue;
-
-                        if (attr.RowType != null)
+                        if (attr.RowType.IsInterface ||
+                            attr.RowType.IsAbstract ||
+                            !attr.RowType.IsSubclassOf(typeof(IRow)))
                         {
-                            if (attr.RowType.IsInterface ||
-                                attr.RowType.IsAbstract ||
-                                !attr.RowType.IsSubclassOf(typeof(IRow)))
+                            throw new Exception("DistinctValuesEditor can't be used with type: " +
+                                attr.RowType.FullName + " as it is not a row type. This attribute is specified " +
+                                "on " + property.Name + " property of " + type.FullName);
+                        }
+
+                        attr.PropertyName = attr.PropertyName.IsEmptyOrNull() ? property.Name :
+                            attr.PropertyName;
+                    }
+                    else
+                    {
+                        if (!isRow)
+                        {
+                            var basedOnRowAttr = type.GetCustomAttribute<BasedOnRowAttribute>();
+                            if (basedOnRowAttr == null || basedOnRowAttr.RowType == null ||
+                                basedOnRowAttr.RowType.IsAbstract ||
+                                !basedOnRowAttr.RowType.IsSubclassOf(typeof(IRow)))
                             {
-                                throw new Exception("DistinctValuesEditor can't be used with type: " +
-                                    attr.RowType.FullName + " as it is not a row type. This attribute is specified " +
-                                    "on " + property.Name + " property of " + type.FullName);
+                                throw new Exception("Invalid usage of DistinctValuesEditor attribute on " +
+                                    "property " + property.Name + " of " + type.FullName + ". " +
+                                    "RowType has to be specified!");
                             }
 
-                            attr.PropertyName = attr.PropertyName.IsEmptyOrNull() ? property.Name :
-                                attr.PropertyName;
+                            attr.RowType = basedOnRowAttr.RowType;
                         }
                         else
-                        {
-                            if (!isRow)
-                            {
-                                var basedOnRowAttr = type.GetCustomAttribute<BasedOnRowAttribute>();
-                                if (basedOnRowAttr == null || basedOnRowAttr.RowType == null ||
-                                    basedOnRowAttr.RowType.IsAbstract ||
-                                    !basedOnRowAttr.RowType.IsSubclassOf(typeof(IRow)))
-                                {
-                                    throw new Exception("Invalid usage of DistinctValuesEditor attribute on " +
-                                        "property " + property.Name + " of " + type.FullName + ". " +
-                                        "RowType has to be specified!");
-                                }
+                            attr.RowType = type;
 
-                                attr.RowType = basedOnRowAttr.RowType;
-                            }
-                            else
-                                attr.RowType = type;
-
-                            attr.PropertyName = attr.PropertyName.IsEmptyOrNull() ? property.Name :
-                                attr.PropertyName;
-                        }
-
-                        list.Add(attr);
+                        attr.PropertyName = attr.PropertyName.IsEmptyOrNull() ? property.Name :
+                            attr.PropertyName;
                     }
+
+                    list.Add(attr);
                 }
             }
 
@@ -90,8 +92,9 @@ namespace Serenity.Web
             {
                 var row = (IRow)Activator.CreateInstance(key.Key.Item1);
 
-                var script = (LookupScript)Activator.CreateInstance(typeof(DistinctValuesScript<>)
-                    .MakeGenericType(key.Key.Item1), new object[] { key.Key.Item2 });
+                var script = (LookupScript)ActivatorUtilities.CreateInstance(serviceProvider,
+                    typeof(DistinctValuesScript<>).MakeGenericType(key.Key.Item1), 
+                    new object[] { key.Key.Item2 });
 
                 script.LookupKey = "Distinct." + row.GetFields().LocalTextPrefix + "." +
                     key.Key.Item2;
