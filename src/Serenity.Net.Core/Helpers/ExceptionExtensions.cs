@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using System;
 
 namespace Serenity
 {
@@ -18,6 +19,17 @@ namespace Serenity
         public static void SetData(this Exception exception, string property, object value)
         {
             exception.GetBaseException().Data[property] = value;
+        }
+
+        /// <summary>
+        /// Logs the exception if logger instance is not null
+        /// </summary>
+        /// <param name="exception">Exception</param>
+        /// <param name="logger">Logger</param>
+        /// <param name="category">Optional category</param>
+        public static void Log(this Exception exception, IExceptionLogger logger, string category = null)
+        {
+            logger?.Log(exception, category);
         }
     }
 }

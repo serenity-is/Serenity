@@ -11,6 +11,7 @@ namespace Serenity.Abstractions
         /// Logs the specified exception.
         /// </summary>
         /// <param name="exception">The exception.</param>
-        void Log(Exception exception);
+        /// <param name="category">Optional category, can be null</param>
+        void Log(Exception exception, string category);
     }
 }
