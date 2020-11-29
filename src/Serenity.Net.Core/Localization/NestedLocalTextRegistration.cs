@@ -1,11 +1,10 @@
-﻿
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
+using System;
+using System.Reflection;
+
 namespace Serenity.Localization
 {
-    using Serenity.Abstractions;
-    using Serenity.ComponentModel;
-    using System;
-    using System.Reflection;
-
     /// <summary>
     /// Contains helper methods for registration of local texts in nested static classes.
     /// Nested static contains LocalText objects with actual translations as keys. This class locates

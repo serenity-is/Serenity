@@ -1,7 +1,7 @@
-﻿namespace Serenity.Reporting
-{
-    using System;
+﻿using System;
 
+namespace Serenity.Reporting
+{
     public class EnumDecorator : BaseCellDecorator
     {
         private readonly Type enumType;

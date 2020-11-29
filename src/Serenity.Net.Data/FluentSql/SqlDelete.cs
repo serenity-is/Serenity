@@ -1,8 +1,8 @@
-﻿namespace Serenity.Data
-{
-    using System;
-    using System.Text;
+﻿using System;
+using System.Text;
 
+namespace Serenity.Data
+{
     /// <summary>
     ///   Class to generate queries of form <c>DELETE FROM tablename WHERE [conditions]</c>.</summary>
     public sealed class SqlDelete : QueryWithParams, IFilterableQuery

@@ -1,7 +1,7 @@
-﻿namespace Serenity.Data
-{
-    using Serenity.Services;
+﻿using Serenity.Services;
 
+namespace Serenity.Data
+{
     /// <summary>
     /// Validates a criteria for allowed field names, operators and SQL injection safety
     /// </summary>

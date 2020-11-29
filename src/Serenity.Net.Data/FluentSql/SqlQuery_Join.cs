@@ -1,8 +1,8 @@
-﻿namespace Serenity.Data
-{
-    using System;
-    using System.Text;
+﻿using System;
+using System.Text;
 
+namespace Serenity.Data
+{
     public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressionByName
     {
         private void JoinToString(Join join, StringBuilder sb, bool modifySelf)

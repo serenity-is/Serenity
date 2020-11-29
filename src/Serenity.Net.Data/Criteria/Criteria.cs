@@ -1,8 +1,8 @@
-﻿namespace Serenity.Data
-{
-    using System;
-    using System.Text;
+﻿using System;
+using System.Text;
 
+namespace Serenity.Data
+{
     /// <summary>
     ///   An object that is used to create criterias by employing operator overloading 
     ///   features of C# language, instead of using string based criterias.</summary>

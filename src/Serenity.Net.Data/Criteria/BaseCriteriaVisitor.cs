@@ -1,7 +1,7 @@
-﻿namespace Serenity.Data
-{
-    using System;
+﻿using System;
 
+namespace Serenity.Data
+{
     /// <summary>
     /// A visitor implementation for BaseCriteria object trees.
     /// </summary>

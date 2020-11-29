@@ -1,8 +1,8 @@
-﻿namespace Serenity.Data
-{
-    using System;
-    using System.Text;
+﻿using System;
+using System.Text;
 
+namespace Serenity.Data
+{
     /// <summary>
     /// Binary criteria object, which has two operands and a operator.
     /// </summary>

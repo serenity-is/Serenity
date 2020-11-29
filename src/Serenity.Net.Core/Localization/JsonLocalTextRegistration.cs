@@ -1,13 +1,12 @@
-﻿
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Serenity.Abstractions;
+using System;
+using System.Collections.Generic;
+using System.IO;
+
 namespace Serenity.Localization
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-    using Serenity.Abstractions;
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-
     /// <summary>
     /// Contains helper methods for registration of local texts in hierarchical/dictionary formatted JSON files.
     /// </summary>

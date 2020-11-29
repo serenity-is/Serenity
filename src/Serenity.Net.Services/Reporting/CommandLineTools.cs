@@ -1,9 +1,9 @@
-﻿namespace Serenity.IO
-{
-    using System;
-    using System.Text;
-    using System.Text.RegularExpressions;
+﻿using System;
+using System.Text;
+using System.Text.RegularExpressions;
 
+namespace Serenity.IO
+{
     public class CommandLineTools
     {
         private static readonly Regex invalidChar = new Regex("[\x00\x0a\x0d]", RegexOptions.Compiled); //  these can not be escaped

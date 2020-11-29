@@ -1,9 +1,9 @@
-﻿namespace Serenity.Data
-{
-    using System;
-    using System.Collections;
-    using System.Text;
+﻿using System;
+using System.Collections;
+using System.Text;
 
+namespace Serenity.Data
+{
     /// <summary>
     /// Criteria object with one value
     /// </summary>

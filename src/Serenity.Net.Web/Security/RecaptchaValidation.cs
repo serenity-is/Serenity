@@ -1,13 +1,12 @@
-﻿
+﻿using Newtonsoft.Json;
+using Serenity.Services;
+using System;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
+
 namespace Serenity.Web
 {
-    using Newtonsoft.Json;
-    using Serenity.Services;
-    using System;
-    using System.IO;
-    using System.Net;
-    using System.Threading.Tasks;
-
     public static class RecaptchaValidation
     {
         /// <summary>

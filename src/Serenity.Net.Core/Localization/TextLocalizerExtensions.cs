@@ -1,7 +1,7 @@
-﻿namespace Serenity
-{
-    using System;
+﻿using System;
 
+namespace Serenity
+{
     /// <summary>
     /// Extensions for local text context
     /// </summary>

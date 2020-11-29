@@ -1,7 +1,7 @@
-﻿namespace Serenity.Reporting
-{
-    using System;
+﻿using System;
 
+namespace Serenity.Reporting
+{
     public class CellDecoratorAttribute : Attribute
     {
         public CellDecoratorAttribute(Type decorator)

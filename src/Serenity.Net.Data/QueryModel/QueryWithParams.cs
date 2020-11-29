@@ -1,9 +1,9 @@
-﻿namespace Serenity.Data
-{
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using Dictionary = System.Collections.Generic.Dictionary<string, object>;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
+namespace Serenity.Data
+{
     /// <summary>
     /// Base class for queries with params like SqlQuery, SqlUpdate, SqlInsert
     /// </summary>

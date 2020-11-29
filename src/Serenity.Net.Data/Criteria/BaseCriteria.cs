@@ -1,12 +1,12 @@
-﻿namespace Serenity.Data
-{
-    using Newtonsoft.Json;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Text;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
 
+namespace Serenity.Data
+{
     /// <summary>
     /// Base criteria object type
     /// </summary>

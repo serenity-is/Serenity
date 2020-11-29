@@ -1,9 +1,9 @@
-﻿namespace Serenity.Data
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace Serenity.Data
+{
     /// <summary>
     /// A constant criteria object, which only contains a value expression
     /// that would be converted to its string representation in SQL,

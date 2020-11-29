@@ -1,10 +1,9 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
+
 namespace Serenity.Data
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Xml.Linq;
-
     public static class ForXmlHelper
     {
         public const string Statement = " FOR XML RAW";

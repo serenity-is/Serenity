@@ -1,10 +1,9 @@
-﻿
+﻿using System;
+using System.IO;
+using System.Text;
+
 namespace Serenity.Data
 {
-    using System;
-    using System.IO;
-    using System.Text;
-
     /// <summary>
     /// Contains helper functions for serialization and deserialization of data items (e.g.cached items)
     /// </summary>

@@ -1,9 +1,9 @@
-﻿namespace Serenity.Data
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
+namespace Serenity.Data
+{
     /// <summary>
     ///   Class to generate queries of the form <c>INSERT INTO tablename (field1, field2..fieldN) 
     ///   VALUES (value1, value2..valueN)</c></summary>

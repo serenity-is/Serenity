@@ -1,11 +1,10 @@
-﻿
+﻿using Serenity.Abstractions;
+using System;
+using System.ComponentModel;
+using System.Reflection;
+
 namespace Serenity.Localization
 {
-    using Serenity.Abstractions;
-    using System;
-    using System.ComponentModel;
-    using System.Reflection;
-
     /// <summary>
     /// Contains initialization method for adding local text translations defined by
     /// Description attributes in enumeration classes.

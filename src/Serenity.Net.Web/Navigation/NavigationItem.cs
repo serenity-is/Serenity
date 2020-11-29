@@ -1,7 +1,7 @@
-﻿namespace Serenity.Navigation
-{
-    using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
+namespace Serenity.Navigation
+{
     public class NavigationItem
     {
         public string Title { get; set; }

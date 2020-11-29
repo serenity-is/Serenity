@@ -1,12 +1,11 @@
-﻿
+﻿using Serenity.Abstractions;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using ItemKey = System.Tuple<string, string>;
+
 namespace Serenity.Localization
 {
-    using Serenity.Abstractions;
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using ItemKey = System.Tuple<string, string>;
-
     /// <summary>
     /// Default ILocalTextRegistry implementation.
     /// </summary>

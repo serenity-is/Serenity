@@ -1,8 +1,8 @@
-﻿namespace Serenity.Data
-{
-    using System;
-    using System.Text;
+﻿using System;
+using System.Text;
 
+namespace Serenity.Data
+{
     /// <summary>
     /// A criteria object containing a parameter name
     /// </summary>

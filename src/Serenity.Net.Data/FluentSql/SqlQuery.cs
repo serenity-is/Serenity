@@ -1,9 +1,9 @@
-﻿namespace Serenity.Data
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
+namespace Serenity.Data
+{
     /// <summary>
     /// SQL query string builder
     /// </summary>

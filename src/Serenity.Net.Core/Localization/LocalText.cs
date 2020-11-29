@@ -1,8 +1,7 @@
-﻿
+﻿using System;
+
 namespace Serenity
 {
-    using System;
-
     /// <summary>
     /// Defines a localizable text resource. Contains a local text key and has implicit conversions to and 
     /// from String.

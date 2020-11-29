@@ -1,11 +1,11 @@
-﻿namespace Serenity.Navigation
-{
-    using Microsoft.Extensions.DependencyInjection;
-    using Serenity.Abstractions;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Serenity.Abstractions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace Serenity.Navigation
+{
     public class NavigationHelper
     {
         public static List<NavigationItem> GetNavigationItems(IPermissionService permissions, 

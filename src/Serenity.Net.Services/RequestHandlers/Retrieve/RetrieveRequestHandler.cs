@@ -1,15 +1,15 @@
-﻿namespace Serenity.Services
-{
-    using Serenity.Abstractions;
-    using Serenity.Data;
-    using System;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Globalization;
-    using System.Linq;
-    using System.Reflection;
-    using System.Security.Claims;
+﻿using Serenity.Abstractions;
+using Serenity.Data;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Security.Claims;
 
+namespace Serenity.Services
+{
     public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestProcessor,
         IRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse>
         where TRow : class, IRow, new()

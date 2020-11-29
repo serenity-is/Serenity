@@ -1,13 +1,12 @@
-﻿
+﻿using Serenity.Abstractions;
+using Serenity.Data;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
+
 namespace Serenity.Localization
 {
-    using Serenity.Abstractions;
-    using Serenity.Data;
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Reflection;
-
     public static class EntityLocalTexts
     {
         public static void AddRowTexts(this ILocalTextRegistry registry, IEnumerable<IRow> rowInstances,

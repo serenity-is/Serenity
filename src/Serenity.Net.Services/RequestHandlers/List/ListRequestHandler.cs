@@ -1,18 +1,18 @@
-﻿namespace Serenity.Services
-{
-    using ComponentModel;
-    using Serenity.Abstractions;
-    using Serenity.Data;
-    using Serenity.Data.Mapping;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Globalization;
-    using System.Linq;
-    using System.Reflection;
-    using System.Security.Claims;
+﻿using Serenity.ComponentModel;
+using Serenity.Abstractions;
+using Serenity.Data;
+using Serenity.Data.Mapping;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Security.Claims;
 
+namespace Serenity.Services
+{
     public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestProcessor,
         IRequestHandler<TRow>, IRequestType<TListRequest>, IResponseType<TListResponse>
         where TRow : class, IRow, new()

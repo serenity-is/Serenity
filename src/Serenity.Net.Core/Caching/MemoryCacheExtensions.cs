@@ -1,8 +1,8 @@
-﻿namespace Serenity
-{
-    using Microsoft.Extensions.Caching.Memory;
-    using System;
+﻿using Microsoft.Extensions.Caching.Memory;
+using System;
 
+namespace Serenity
+{
     /// <summary>
     /// Contains extensions methods to work with IMemoryCache provider.
     /// </summary>

@@ -1,12 +1,12 @@
-﻿namespace Serenity.Data
-{
-    using Serenity.Abstractions;
-    using Serenity.Services;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
+﻿using Serenity.Abstractions;
+using Serenity.Services;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
 
+namespace Serenity.Data
+{
     public class CriteriaFieldExpressionReplacer : SafeCriteriaValidator
     {
         private readonly IPermissionService permissions;
