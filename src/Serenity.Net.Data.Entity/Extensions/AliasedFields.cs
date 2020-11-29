@@ -11,7 +11,7 @@ namespace Serenity.Data
             new ConcurrentDictionary<Tuple<Type, string>, RowFieldsBase>();
 
         public static TFields As<TFields>(this TFields fields, string alias)
-            where TFields : RowFieldsBase, new()
+            where TFields : RowFieldsBase
         {
             if (string.IsNullOrWhiteSpace(alias))
                 throw new ArgumentNullException(nameof(alias));
@@ -30,8 +30,7 @@ namespace Serenity.Data
             if (cache.TryGetValue(key, out RowFieldsBase cached))
                 return (TFields)cached;
 
-            var result = new TFields();
-            result.Initialize(annotations: fields.annotations);
+            var result = (TFields)RowFieldsProvider.Current.Resolve(typeof(TFields));
 
             var aliasPrefix = alias + "_";
 
