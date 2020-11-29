@@ -115,6 +115,7 @@ namespace Serenity.Services
             }
         }
 
+        protected ITwoLevelCache Cache => Context?.Cache;
         protected ITextLocalizer Localizer => Context?.Localizer;
         protected IPermissionService Permissions => Context?.Permissions;
     }
