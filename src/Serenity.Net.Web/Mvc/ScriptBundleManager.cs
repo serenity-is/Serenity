@@ -170,7 +170,7 @@ namespace Serenity.Web
                                         }
                                         catch (Exception ex)
                                         {
-                                            logger?.Log(ex);
+                                            ex.Log(logger);
                                         }
                                     }
 
@@ -227,7 +227,7 @@ namespace Serenity.Web
                                 }
                                 catch (Exception ex)
                                 {
-                                    logger?.Log(ex);
+                                    ex.Log(logger);
                                     return code;
                                 }
                             }
