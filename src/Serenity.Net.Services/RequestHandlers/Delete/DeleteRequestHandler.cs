@@ -158,11 +158,12 @@ namespace Serenity.Services
 
         protected virtual void InvalidateCacheOnCommit()
         {
-            BatchGenerationUpdater.OnCommit(UnitOfWork, Context.Cache, Row.GetFields().GenerationKey);
+            Cache.InvalidateOnCommit(UnitOfWork, Row.GetFields());
+
             var attr = typeof(TRow).GetCustomAttribute<TwoLevelCachedAttribute>(false);
             if (attr != null)
                 foreach (var key in attr.GenerationKeys)
-                    BatchGenerationUpdater.OnCommit(UnitOfWork, Context.Cache, key);
+                    Cache.InvalidateOnCommit(UnitOfWork, key);
         }
 
         protected virtual void DoAudit()
@@ -232,6 +233,7 @@ namespace Serenity.Services
             return Process(uow, (TDeleteRequest)request);
         }
 
+        public ITwoLevelCache Cache => Context.Cache;
         public IRequestContext Context { get; private set; }
         public ITextLocalizer Localizer => Context.Localizer;
         public IPermissionService Permissions => Context.Permissions;

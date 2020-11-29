@@ -11,6 +11,7 @@ namespace Serenity.Services
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        protected ITwoLevelCache Cache => Context.Cache;
         protected IRequestContext Context { get; }
         protected ITextLocalizer Localizer => Context.Localizer;
         protected IPermissionService Permissions => Context.Permissions;

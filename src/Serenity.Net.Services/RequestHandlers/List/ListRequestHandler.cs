@@ -610,6 +610,7 @@
             ignoredEqualityFilters.Add(field);
         }
 
+        public ITwoLevelCache Cache => Context.Cache;
         public IRequestContext Context { get; private set; }
         public ITextLocalizer Localizer => Context.Localizer;
         public IPermissionService Permissions => Context.Permissions;
