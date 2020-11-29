@@ -5,10 +5,9 @@ namespace Serenity.Web
 {
     public class FormScript : PropertyItemsScript
     {
-        public FormScript(string name, Type formType, 
-            IServiceProvider serviceProvider, IPropertyItemProvider propertyProvider)
-            : base("Form." + CheckName(name), formType, 
-                  serviceProvider, propertyProvider)
+        public FormScript(string name, Type formType, IPropertyItemProvider propertyProvider, 
+            IServiceProvider serviceProvider)
+            : base("Form." + CheckName(name), formType, propertyProvider, serviceProvider)
         {
         }
     }

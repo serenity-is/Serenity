@@ -9,8 +9,8 @@ namespace Serenity.Web
 {
     public class FormScriptRegistration
     {
-        public static void RegisterFormScripts(IDynamicScriptManager scriptManager, IPropertyItemProvider registry, 
-            ITypeSource typeSource)
+        public static void RegisterFormScripts(IDynamicScriptManager scriptManager,
+            ITypeSource typeSource, IPropertyItemProvider propertyProvider, IServiceProvider serviceProvider)
         {
             if (scriptManager == null)
                 throw new ArgumentNullException(nameof(scriptManager));
@@ -18,12 +18,15 @@ namespace Serenity.Web
             if (typeSource == null)
                 throw new ArgumentNullException(nameof(typeSource));
 
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
+
             var scripts = new List<Func<string>>();
 
             foreach (var type in typeSource.GetTypesWithAttribute(typeof(FormScriptAttribute)))
             {
                 var attr = type.GetCustomAttribute<FormScriptAttribute>();
-                var script = new FormScript(attr.Key, type, registry);
+                var script = new FormScript(attr.Key, type, propertyProvider, serviceProvider);
                 scriptManager.Register(script);
                 scripts.Add(script.GetScript);
             }

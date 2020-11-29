@@ -22,7 +22,7 @@ namespace Serenity.Web
         private EventHandler scriptChanged;
 
         protected PropertyItemsScript(string scriptName, Type type, 
-            IServiceProvider serviceProvider, IPropertyItemProvider propertyProvider)
+            IPropertyItemProvider propertyProvider, IServiceProvider serviceProvider)
         {
             this.type = type ?? throw new ArgumentNullException(nameof(type));
             this.serviceProvider = serviceProvider ?? 

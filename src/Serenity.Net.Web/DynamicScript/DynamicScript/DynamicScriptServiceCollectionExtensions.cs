@@ -15,7 +15,7 @@ namespace Serenity.Web
             var serviceProvider = builder.ApplicationServices;
             var scriptManager = serviceProvider.GetRequiredService<IDynamicScriptManager>();
             var connections = serviceProvider.GetRequiredService<IConnectionFactory>();
-            var propertyItemProvider = serviceProvider.GetRequiredService<IPropertyItemProvider>();
+            var propertyProvider = serviceProvider.GetRequiredService<IPropertyItemProvider>();
             var typeSource = serviceProvider.GetRequiredService<ITypeSource>();
 
             DataScriptRegistration.RegisterDataScripts(scriptManager, 
@@ -28,10 +28,10 @@ namespace Serenity.Web
                 typeSource, serviceProvider);
 
             ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager, 
-                propertyItemProvider, typeSource);
+                typeSource, propertyProvider, serviceProvider);
 
             FormScriptRegistration.RegisterFormScripts(scriptManager, 
-                propertyItemProvider, typeSource);
+                typeSource, propertyProvider, serviceProvider);
 
             var hostEnvironment = builder.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
             new TemplateScriptRegistrar()

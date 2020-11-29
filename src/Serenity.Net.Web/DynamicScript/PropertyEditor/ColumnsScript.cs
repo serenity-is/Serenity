@@ -5,10 +5,10 @@ namespace Serenity.Web
 {
     public class ColumnsScript : PropertyItemsScript
     {
-        public ColumnsScript(string name, Type columnsType, 
-            IServiceProvider serviceProvider, IPropertyItemProvider propertyProvider)
+        public ColumnsScript(string name, Type columnsType, IPropertyItemProvider propertyProvider, 
+            IServiceProvider serviceProvider)
             : base("Columns." + CheckName(name), columnsType, 
-                serviceProvider, propertyProvider)
+                 propertyProvider, serviceProvider)
         {
         }
     }
