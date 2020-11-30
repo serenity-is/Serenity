@@ -20,8 +20,8 @@ namespace Serenity.Data
             {
                 var fields = (entity as IRow).Fields;
                 query.From(fields);
-                if (!query.IsDialectOverridden && !string.IsNullOrEmpty(fields.connectionKey))
-                    query.Dialect(SqlConnections.GetDialect(fields.connectionKey));
+                if (!query.IsDialectOverridden)
+                    query.Dialect(fields.Dialect);
             }
             else
             {

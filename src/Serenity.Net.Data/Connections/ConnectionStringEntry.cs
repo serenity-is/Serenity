@@ -14,8 +14,13 @@
         /// </summary>
         public string ProviderName { get; set; }
         /// <summary>
-        /// Gets / sets dialect
+        /// Gets / sets dialect name
         /// </summary>
         public string Dialect { get; set; }
+
+        /// <summary>
+        /// Gets / sets the dialect instance
+        /// </summary>
+        public ISqlDialect DialectInstance { get; set; }
     }
 }

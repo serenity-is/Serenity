@@ -9,7 +9,7 @@ namespace Serenity.Data
     /// <summary>
     /// Default connection string source
     /// </summary>
-    public class ConnectionStrings : IConnectionStrings
+    public class DefaultConnectionStrings : IConnectionStrings
     {
         private readonly IOptions<ConnectionStringOptions> options;
 
@@ -17,7 +17,7 @@ namespace Serenity.Data
         /// Creates a new instance of DefaultConnectionStringSource
         /// </summary>
         /// <param name="options">Connection string options</param>
-        public ConnectionStrings(IOptions<ConnectionStringOptions> options)
+        public DefaultConnectionStrings(IOptions<ConnectionStringOptions> options)
         {
             this.options = options ?? throw new ArgumentNullException(nameof(options));
         }
@@ -46,6 +46,9 @@ namespace Serenity.Data
             if (entry == null)
                 throw new ArgumentNullException(nameof(entry));
 
+            if (entry.DialectInstance != null)
+                return entry.DialectInstance;
+
             if (!string.IsNullOrEmpty(entry.Dialect))
             {
                 var dialectType = Type.GetType("Serenity.Data." + entry.Dialect + "Dialect") ??
@@ -69,7 +72,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="connectionKey">Connection key</param>
         /// <returns>Connection string or null if not found</returns>
-        public IConnectionString TryGet(string connectionKey)
+        public IConnectionString TryGetConnectionString(string connectionKey)
         {
             if (byKey.TryGetValue(connectionKey, out ConnectionStringInfo info))
                 return info;
@@ -88,9 +91,9 @@ namespace Serenity.Data
         /// Lists all known connections strings
         /// </summary>
         /// <returns>List of all registered connections</returns>
-        public IEnumerable<IConnectionString> List()
+        public IEnumerable<IConnectionString> ListConnectionStrings()
         {
-            return options.Value.Keys.Select(x => TryGet(x));
+            return options.Value.Keys.Select(x => TryGetConnectionString(x));
         }
     }
 }

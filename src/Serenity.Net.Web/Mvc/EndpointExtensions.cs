@@ -69,7 +69,7 @@ namespace Serenity.Services
             TResponse response;
             try
             {
-                var factory = controller.HttpContext.RequestServices.GetRequiredService<IConnectionFactory>();
+                var factory = controller.HttpContext.RequestServices.GetRequiredService<ISqlConnections>();
                 using (var connection = factory.NewByKey(connectionKey))
                     response = handler(connection);
             }
@@ -90,7 +90,7 @@ namespace Serenity.Services
             TResponse response;
             try
             {
-                var factory = controller.HttpContext.RequestServices.GetRequiredService<IConnectionFactory>();
+                var factory = controller.HttpContext.RequestServices.GetRequiredService<ISqlConnections>();
 
                 using (var connection = factory.NewByKey(connectionKey))
                 using (var uow = new UnitOfWork(connection))

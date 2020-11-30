@@ -28,6 +28,7 @@ namespace Serenity.Data
         internal Func<IRow> rowFactory;
         internal Type rowType;
         internal IAnnotatedType annotations;
+        internal ISqlDialect dialect;
         internal string moduleIdentifier;
         internal string connectionKey;
         internal string generationKey;
@@ -136,7 +137,6 @@ namespace Serenity.Data
             tableOnly = ParseDatabaseAndSchema(tableName, out database, out schema);
         }
 
-
         private void DetermineConnectionKey()
         {
             var connectionKeyAttr = rowType.GetCustomAttribute<ConnectionKeyAttribute>();
@@ -210,7 +210,7 @@ namespace Serenity.Data
         {
         }
 
-        public void Initialize(IAnnotatedType annotations)
+        public void Initialize(IAnnotatedType annotations, ISqlDialect dialect)
         {
             if (isInitialized)
                 return;
@@ -220,7 +220,9 @@ namespace Serenity.Data
                 this.annotations = annotations;
                 GetRowFieldsAndProperties(out Dictionary<string, FieldInfo> rowFields, out Dictionary<string, IPropertyInfo> rowProperties);
 
-                var expressionSelector = new DialectExpressionSelector(connectionKey);
+                this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
+
+                var expressionSelector = new DialectExpressionSelector(dialect);
                 var rowCustomAttributes = rowType.GetCustomAttributes().ToList();
 
                 var fieldsReadPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
@@ -723,6 +725,8 @@ namespace Serenity.Data
         {
             get { return connectionKey; }
         }
+
+        public ISqlDialect Dialect { get => dialect; }
 
         public string GenerationKey
         {

@@ -18,7 +18,7 @@ namespace Serenity.Data
             if (connectionStrings == null)
                 throw new ArgumentNullException(nameof(connectionStrings));
 
-            var connectionString = connectionStrings.TryGet(connectionKey);
+            var connectionString = connectionStrings.TryGetConnectionString(connectionKey);
             if (connectionString == null)
                 throw new ArgumentOutOfRangeException(nameof(connectionKey));
 

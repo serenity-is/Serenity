@@ -11,7 +11,7 @@ namespace Serenity.Web
     public class RowLookupScript<TRow> : LookupScript
         where TRow: class, IRow, new()
     {
-        private readonly IConnectionFactory connections;
+        private readonly ISqlConnections connections;
 
         protected virtual void ApplyOrder(SqlQuery query)
         {
@@ -43,7 +43,7 @@ namespace Serenity.Web
             }
         }
 
-        public RowLookupScript(IConnectionFactory connections)
+        public RowLookupScript(ISqlConnections connections)
             : base()
         {
             this.connections = connections ?? throw new ArgumentNullException(nameof(connections));

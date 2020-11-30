@@ -10,10 +10,10 @@ namespace Serenity.Web
     public class DistinctValuesScript<TRow> : LookupScript
        where TRow : class, IRow, new()
     {
-        private readonly IConnectionFactory connections;
+        private readonly ISqlConnections connections;
         private readonly string propertyName;
 
-        public DistinctValuesScript(IConnectionFactory connections, string propertyName)
+        public DistinctValuesScript(ISqlConnections connections, string propertyName)
         {
             this.connections = connections ?? throw new ArgumentNullException(nameof(connections));
             this.propertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));

@@ -3,9 +3,9 @@
 namespace Serenity.Data
 {
     /// <summary>
-    /// An interface used to abstract connection factories
+    /// An interface used to abstract sql connections
     /// </summary>
-    public interface IConnectionFactory
+    public interface ISqlConnections : IConnectionStrings
     {
         /// <summary>
         /// Creates a new <see cref="IDbConnection"/> for given connection string, provider name and dialect.</summary>

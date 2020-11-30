@@ -44,12 +44,5 @@ namespace Serenity.Data
         {
             return row.Fields;
         }
-
-        public static TFields Init<TFields>(this TFields fields, IAnnotatedType annotations)
-            where TFields : RowFieldsBase
-        {
-            fields.Initialize(annotations);
-            return fields;
-        }
     }
 }

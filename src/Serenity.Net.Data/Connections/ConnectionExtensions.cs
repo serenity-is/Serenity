@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Data;
-using System.Data.Common;
 using System.Reflection;
 
 namespace Serenity.Data
 {
     /// <summary>
-    /// Contains DB connection related functions
+    /// Contains DB connection related extensions
     /// </summary>
-    public static class SqlConnections
+    public static class ConnectionExtensions
     {
         /// <summary>
         /// Default connection key, this is an optional name
@@ -23,7 +22,7 @@ namespace Serenity.Data
         /// <param name="factory">Connection factory</param>
         /// <returns>A new connection</returns>
         /// <exception cref="System.ArgumentOutOfRangeException">Type has no ConnectionKey attribute!</exception>
-        public static IDbConnection NewFor<TClass>(this IConnectionFactory factory)
+        public static IDbConnection NewFor<TClass>(this ISqlConnections factory)
         {
             var attr = typeof(TClass).GetCustomAttribute<ConnectionKeyAttribute>();
             if (attr == null)
@@ -98,46 +97,6 @@ namespace Serenity.Data
                 return SqlSettings.DefaultDialect;
 
             return wrapped.Dialect ?? SqlSettings.DefaultDialect;
-        }
-
-        /// <summary>
-        /// Gets the dialect for given connection key. Should only be used where accessing 
-        /// connection strings through DI is not available or feasible.
-        /// </summary>
-        /// <param name="connectionKey">Connection key.</param>
-        /// <returns>The sql dialect.</returns>
-        public static ISqlDialect GetDialect(string connectionKey)
-        {
-            var byConnectionKey = SqlSettings.DialectByConnectionKey;
-            if (byConnectionKey != null)
-                return byConnectionKey(connectionKey) ?? SqlSettings.DefaultDialect;
-
-            return SqlSettings.DefaultDialect;
-        }
-
-        private static readonly string[] databaseNameKeys = new string[]
-        {
-            "Initial Catalog",
-            "Database"
-        };
-
-        /// <summary>
-        /// Exracts database name from connection string
-        /// </summary>
-        /// <param name="connectionString">Connection string</param>
-        /// <returns></returns>
-        public static string GetDatabaseName(string connectionString)
-        {
-            var csb = new DbConnectionStringBuilder
-            {
-                ConnectionString = connectionString
-            };
-
-            foreach (var s in databaseNameKeys)
-                if (csb.ContainsKey(s))
-                    return csb[s] as string;
-
-            return null;
         }
     }
 }

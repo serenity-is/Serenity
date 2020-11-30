@@ -5,6 +5,7 @@ using Serenity.Abstractions;
 using Serenity.Data;
 using Serenity.PropertyGrid;
 using Serenity.Web.Middleware;
+using System;
 
 namespace Serenity.Web
 {
@@ -12,9 +13,12 @@ namespace Serenity.Web
     {
         public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder)
         {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
             var serviceProvider = builder.ApplicationServices;
             var scriptManager = serviceProvider.GetRequiredService<IDynamicScriptManager>();
-            var connections = serviceProvider.GetRequiredService<IConnectionFactory>();
+            var connections = serviceProvider.GetRequiredService<ISqlConnections>();
             var propertyProvider = serviceProvider.GetRequiredService<IPropertyItemProvider>();
             var typeSource = serviceProvider.GetRequiredService<ITypeSource>();
 

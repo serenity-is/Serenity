@@ -43,7 +43,7 @@ namespace Serenity.Services
                 if (connectionKey == null)
                     throw new ArgumentNullException("connectionKey");
 
-                connection = HttpContext.RequestServices.GetRequiredService<IConnectionFactory>().NewByKey(connectionKey.Value);
+                connection = HttpContext.RequestServices.GetRequiredService<ISqlConnections>().NewByKey(connectionKey.Value);
                 unitOfWork = new UnitOfWork(connection);
                 context.ActionArguments[uowParam.Name] = unitOfWork;
                 base.OnActionExecuting(context);
@@ -57,7 +57,7 @@ namespace Serenity.Services
                 if (connectionKey == null)
                     throw new ArgumentNullException("connectionKey");
 
-                connection = HttpContext.RequestServices.GetRequiredService<IConnectionFactory>().NewByKey(connectionKey.Value);
+                connection = HttpContext.RequestServices.GetRequiredService<ISqlConnections>().NewByKey(connectionKey.Value);
                 context.ActionArguments[cnnParam.Name] = connection;
                 base.OnActionExecuting(context);
                 return;

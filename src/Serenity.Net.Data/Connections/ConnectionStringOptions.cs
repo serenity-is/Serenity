@@ -6,7 +6,8 @@ namespace Serenity.Data
     /// <summary>
     /// Connection string options
     /// </summary>
-    public class ConnectionStringOptions : Dictionary<string, ConnectionStringEntry>, IOptions<ConnectionStringOptions>
+    public class ConnectionStringOptions : Dictionary<string, ConnectionStringEntry>, 
+        IOptions<ConnectionStringOptions>
     {
         /// <summary>
         /// Returns this

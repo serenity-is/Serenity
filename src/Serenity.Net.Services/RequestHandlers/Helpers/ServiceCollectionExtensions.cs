@@ -13,6 +13,9 @@ namespace Serenity.Extensions.DependencyInjection
     {
         public static void AddRequestHandlers(this IServiceCollection services)
         {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
             services.TryAddSingleton<IBehaviorFactory, DefaultBehaviorFactory>();
             services.TryAddSingleton<IImplicitBehaviorRegistry, DefaultImplicitBehaviorRegistry>();
             services.TryAddSingleton<IBehaviorProvider, DefaultBehaviorProvider>();
@@ -22,6 +25,9 @@ namespace Serenity.Extensions.DependencyInjection
         public static void AddAllTexts(this IServiceProvider provider,
             params string[] jsonTextPaths)
         {
+            if (provider == null)
+                throw new ArgumentNullException(nameof(provider));
+
             var typeSource = provider.GetRequiredService<ITypeSource>();
             var textRegistry = provider.GetRequiredService<ILocalTextRegistry>();
             var rowTypeRegistry = provider.GetRequiredService<IRowTypeRegistry>();

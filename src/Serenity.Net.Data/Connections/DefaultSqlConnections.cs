@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 
@@ -7,7 +8,7 @@ namespace Serenity.Data
     /// <summary>
     /// Default connection factory
     /// </summary>
-    public class ConnectionFactory : IConnectionFactory
+    public class DefaultSqlConnections : ISqlConnections
     {
         private readonly IConnectionStrings connectionStrings;
         private readonly IConnectionProfiler profiler;
@@ -17,10 +18,19 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="connectionStrings">Named connection strings</param>
         /// <param name="profiler">Profiler if any</param>
-        public ConnectionFactory(IConnectionStrings connectionStrings, IConnectionProfiler profiler = null)
+        public DefaultSqlConnections(IConnectionStrings connectionStrings, IConnectionProfiler profiler = null)
         {
             this.connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
             this.profiler = profiler;
+        }
+
+        /// <summary>
+        /// Lists all known connections strings
+        /// </summary>
+        /// <returns>List of all registered connections</returns>
+        public IEnumerable<IConnectionString> ListConnectionStrings()
+        {
+            return connectionStrings.ListConnectionStrings();
         }
 
         /// <summary>
@@ -61,12 +71,22 @@ namespace Serenity.Data
         /// <returns>A new <see cref="IDbConnection"/> object.</returns>
         public virtual IDbConnection NewByKey(string connectionKey)
         {
-            var info = connectionStrings.TryGet(connectionKey);
+            var info = connectionStrings.TryGetConnectionString(connectionKey);
 
             if (info == null)
                 throw new InvalidOperationException(string.Format("No connection string with key {0} in configuration file!", connectionKey));
 
             return New(info.ConnectionString, info.ProviderName, info.Dialect);
+        }
+
+        /// <summary>
+        /// Gets a connection string by its key
+        /// </summary>
+        /// <param name="connectionKey">Connection key</param>
+        /// <returns>Connection string or null if not found</returns>
+        public IConnectionString TryGetConnectionString(string connectionKey)
+        {
+            return connectionStrings.TryGetConnectionString(connectionKey);
         }
     }
 }

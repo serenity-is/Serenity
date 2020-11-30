@@ -6,18 +6,13 @@ namespace Serenity.Data
 {
     public class DialectExpressionSelector
     {
-        private readonly string connectionKey;
         private string dialectServerType;
         private string dialectTypeName;
 
-        public DialectExpressionSelector(string connectionKey)
-        {
-            this.connectionKey = connectionKey;
-        }
-
         public DialectExpressionSelector(ISqlDialect dialect)
         {
-            dialect ??= SqlSettings.DefaultDialect;
+            if (dialect == null)
+                throw new ArgumentNullException(nameof(dialect));
             dialectServerType = dialect.ServerType;
             dialectTypeName = dialect.GetType().Name;
         }
@@ -28,22 +23,11 @@ namespace Serenity.Data
                 dialectTypeName.StartsWith(s, StringComparison.OrdinalIgnoreCase);
         }
 
-        public TAttribute GetBestMatch<TAttribute>(IEnumerable<TAttribute> expressions, Func<TAttribute, string> getDialect)
+        public TAttribute GetBestMatch<TAttribute>(IEnumerable<TAttribute> expressions, 
+            Func<TAttribute, string> getDialect)
         {
             if (!expressions.Any(x => !string.IsNullOrEmpty(getDialect(x))))
                 return expressions.FirstOrDefault();
-
-            if (dialectTypeName == null)
-            {
-                ISqlDialect dialect = null;
-
-                if (!string.IsNullOrEmpty(connectionKey))
-                    dialect = SqlConnections.GetDialect(connectionKey);
-
-                dialect ??= SqlSettings.DefaultDialect;
-                dialectServerType = dialect.ServerType;
-                dialectTypeName = dialect.GetType().Name;
-            }
 
             var st = dialectServerType;
             var tn = dialectTypeName;
