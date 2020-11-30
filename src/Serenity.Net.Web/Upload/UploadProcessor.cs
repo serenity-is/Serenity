@@ -27,7 +27,7 @@ namespace Serenity.Web
         public ImageCheckResult CheckResult { get; private set; }
         public string ErrorMessage { get; private set; }
         public long FileSize { get; private set; }
-        public string FilePath { get; private set; }
+        public string TemporaryFile { get; private set; }
         public bool IsImage { get; private set; }
 
 
@@ -87,7 +87,7 @@ namespace Serenity.Web
                 {
                     FileSize = fileContent.Length;
                     fileContent.Seek(0, System.IO.SeekOrigin.Begin);
-                    FilePath = storage.WriteFile(basePath + extension, fileContent, false);
+                    TemporaryFile = storage.WriteFile(basePath + extension, fileContent, false);
 
                     if (IsImageExtension(extension))
                     {
@@ -113,8 +113,8 @@ namespace Serenity.Web
                     if (!ThumbFile.IsNullOrEmpty())
                         storage.DeleteFile(ThumbFile);
 
-                    if (!FilePath.IsNullOrEmpty())
-                        storage.DeleteFile(FilePath);
+                    if (!TemporaryFile.IsNullOrEmpty())
+                        storage.DeleteFile(TemporaryFile);
                 }
 
                 fileContent.Dispose();
@@ -155,7 +155,7 @@ namespace Serenity.Web
                         using (Image thumbImage =
                             ThumbnailGenerator.Generate(image, ThumbWidth, ThumbHeight, ThumbScaleMode, ThumbBackColor))
                         {
-                            var thumbFile = UploadPathHelper.GetThumbnailName(FilePath);
+                            var thumbFile = UploadPathHelper.GetThumbnailName(TemporaryFile);
 
                             using (var ms = new MemoryStream())
                             {
