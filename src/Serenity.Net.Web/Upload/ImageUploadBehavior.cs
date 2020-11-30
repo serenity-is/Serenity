@@ -345,90 +345,88 @@ namespace Serenity.Services
             Image image = null;
             try
             {
-                using (var fs = storage.OpenFile(temporaryFile))
+                using var fs = storage.OpenFile(temporaryFile);
+                if (attr.MinSize != 0 && fs.Length < attr.MinSize)
+                    throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
+                        UploadFormatting.FileSizeDisplay(attr.MinSize)));
+
+                if (attr.MaxSize != 0 && fs.Length > attr.MaxSize)
+                    throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
+                        UploadFormatting.FileSizeDisplay(attr.MaxSize)));
+
+                ImageCheckResult result;
+                if (Path.GetExtension(temporaryFile).ToLowerInvariant() == ".swf")
                 {
-                    if (attr.MinSize != 0 && fs.Length < attr.MinSize)
-                        throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
-                            UploadFormatting.FileSizeDisplay(attr.MinSize)));
+                    result = ImageCheckResult.FlashMovie;
+                    // validate swf file somehow!
+                }
+                else
+                {
+                    result = checker.CheckStream(fs, true, out image);
+                }
 
-                    if (attr.MaxSize != 0 && fs.Length > attr.MaxSize)
-                        throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
-                            UploadFormatting.FileSizeDisplay(attr.MaxSize)));
+                if (result == ImageCheckResult.InvalidImage &&
+                    attr.AllowNonImage)
+                {
+                    return;
+                }
 
-                    ImageCheckResult result;
-                    if (Path.GetExtension(temporaryFile).ToLowerInvariant() == ".swf")
+                if (result > ImageCheckResult.UnsupportedFormat ||
+                    (supportedFormats != null && Array.IndexOf(supportedFormats, result) < 0))
+                {
+                    string error = checker.FormatErrorMessage(result, localizer);
+                    throw new ValidationError(error);
+                }
+
+                if (result >= ImageCheckResult.FlashMovie)
+                    return;
+
+                string baseFile = Path.ChangeExtension(temporaryFile, null);
+
+                storage.PurgeTemporaryFiles();
+
+                if ((attr.ScaleWidth > 0 || attr.ScaleHeight > 0) &&
+                    ((attr.ScaleWidth > 0 && (attr.ScaleSmaller || checker.Width > attr.ScaleWidth)) ||
+                        (attr.ScaleHeight > 0 && (attr.ScaleSmaller || checker.Height > attr.ScaleHeight))))
+                {
+                    using (Image scaledImage = ThumbnailGenerator.Generate(
+                        image, attr.ScaleWidth, attr.ScaleHeight, attr.ScaleMode, Color.Empty))
                     {
-                        result = ImageCheckResult.FlashMovie;
-                        // validate swf file somehow!
-                    }
-                    else
-                    {
-                        result = checker.CheckStream(fs, true, out image);
-                    }
-
-                    if (result == ImageCheckResult.InvalidImage &&
-                        attr.AllowNonImage)
-                    {
-                        return;
-                    }
-
-                    if (result > ImageCheckResult.UnsupportedFormat || 
-                        (supportedFormats != null && Array.IndexOf(supportedFormats, result) < 0))
-                    {
-                        string error = checker.FormatErrorMessage(result, localizer);
-                        throw new ValidationError(error);
-                    }
-
-                    if (result >= ImageCheckResult.FlashMovie)
-                        return;
-
-                    string baseFile = Path.ChangeExtension(temporaryFile, null);
-
-                    storage.PurgeTemporaryFiles();
-
-                    if ((attr.ScaleWidth > 0 || attr.ScaleHeight > 0) &&
-                        ((attr.ScaleWidth > 0 && (attr.ScaleSmaller || checker.Width > attr.ScaleWidth)) ||
-                            (attr.ScaleHeight > 0 && (attr.ScaleSmaller || checker.Height > attr.ScaleHeight))))
-                    {
-                        using (Image scaledImage = ThumbnailGenerator.Generate(
-                            image, attr.ScaleWidth, attr.ScaleHeight, attr.ScaleMode, Color.Empty))
+                        temporaryFile = baseFile + ".jpg";
+                        fs.Close();
+                        using (var ms = new MemoryStream())
                         {
-                            temporaryFile = baseFile + ".jpg";
-                            fs.Close();
-                            using (var ms = new MemoryStream())
-                            {
-                                scaledImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                ms.Seek(0, SeekOrigin.Begin);
-                                temporaryFile = storage.WriteFile(temporaryFile, ms, false);
-                            }
+                            scaledImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                            ms.Seek(0, SeekOrigin.Begin);
+                            temporaryFile = storage.WriteFile(temporaryFile, ms, false);
                         }
                     }
+                }
 
-                    var thumbSizes = attr.ThumbSizes.TrimToNull();
-                    if (thumbSizes == null)
-                        return;
+                var thumbSizes = attr.ThumbSizes.TrimToNull();
+                if (thumbSizes == null)
+                    return;
 
-                    foreach (var sizeStr in thumbSizes.Replace(";", ",").Split(new char[] { ',' }))
+                foreach (var sizeStr in thumbSizes.Replace(";", ",").Split(new char[] { ',' }))
+                {
+                    var dims = sizeStr.ToLowerInvariant().Split(new char[] { 'x' });
+                    int w, h;
+                    if (dims.Length != 2 ||
+                        !int.TryParse(dims[0], out w) ||
+                        !int.TryParse(dims[1], out h) ||
+                        w < 0 ||
+                        h < 0 ||
+                        (w == 0 && h == 0))
+                        throw new ArgumentOutOfRangeException("thumbSizes");
+
+                    using (Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, Color.Empty))
                     {
-                        var dims = sizeStr.ToLowerInvariant().Split(new char[] { 'x' });
-                        int w, h;
-                        if (dims.Length != 2 ||
-                            !int.TryParse(dims[0], out w) ||
-                            !int.TryParse(dims[1], out h) ||
-                            w < 0 ||
-                            h < 0 ||
-                            (w == 0 && h == 0))
-                            throw new ArgumentOutOfRangeException("thumbSizes");
-
-                        using (Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, Color.Empty))
+                        string thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
+                        using (var ms = new MemoryStream())
                         {
-                            string thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
-                            using (var ms = new MemoryStream())
-                            {
-                                thumbImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                ms.Seek(0, SeekOrigin.Begin);
-                                storage.WriteFile(thumbFile, ms, false);
-                            }
+                            thumbImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                            ms.Seek(0, SeekOrigin.Begin);
+                            storage.WriteFile(thumbFile, ms, false);
                         }
                     }
                 }

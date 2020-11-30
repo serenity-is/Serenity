@@ -1,4 +1,6 @@
-﻿namespace Serenity.Web
+﻿using System.IO;
+
+namespace Serenity.Web
 {
     public static class UploadStorageExtensions
     {
@@ -30,6 +32,15 @@
             options.FilesToDelete?.RegisterNewFile(path);
             options.FilesToDelete?.RegisterOldFile(options.TemporaryFile);
             return result;
+        }
+
+        public static byte[] ReadAllFileBytes(this IUploadStorage uploadStorage, string path)
+        {
+            using var ms = new MemoryStream();
+            using (var fs = uploadStorage.OpenFile(path))
+                fs.CopyTo(ms);
+
+            return ms.ToArray();
         }
     }
 }
