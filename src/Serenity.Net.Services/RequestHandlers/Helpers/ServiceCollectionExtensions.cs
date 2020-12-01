@@ -11,11 +11,14 @@ namespace Serenity.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddRequestHandlers(this IServiceCollection services)
+        public static void AddServiceHandlers(this IServiceCollection services)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
+            services.AddCaching();
+            services.AddEntities();
+            services.AddTextRegistry();
             services.TryAddSingleton<IBehaviorFactory, DefaultBehaviorFactory>();
             services.TryAddSingleton<IImplicitBehaviorRegistry, DefaultImplicitBehaviorRegistry>();
             services.TryAddSingleton<IBehaviorProvider, DefaultBehaviorProvider>();

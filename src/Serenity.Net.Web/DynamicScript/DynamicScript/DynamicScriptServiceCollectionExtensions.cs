@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serenity.Abstractions;
 using Serenity.Data;
+using Serenity.Extensions.DependencyInjection;
 using Serenity.PropertyGrid;
 using Serenity.Web.Middleware;
 using System;
@@ -11,6 +13,17 @@ namespace Serenity.Web
 {
     public static class DynamicScriptServiceCollectionExtensions
     {
+        public static void AddDynamicScripts(this IServiceCollection collection)
+        {
+            collection.AddCaching();
+            collection.AddTextRegistry();
+            collection.TryAddSingleton<IPropertyItemProvider, DefaultPropertyItemProvider>();
+            collection.TryAddSingleton<IContentHashCache, ContentHashCache>();
+            collection.TryAddSingleton<ICssBundleManager, CssBundleManager>();
+            collection.TryAddSingleton<IScriptBundleManager, ScriptBundleManager>();
+            collection.TryAddSingleton<IDynamicScriptManager, DynamicScriptManager>();
+        }
+
         public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder)
         {
             if (builder == null)
@@ -18,7 +31,6 @@ namespace Serenity.Web
 
             var serviceProvider = builder.ApplicationServices;
             var scriptManager = serviceProvider.GetRequiredService<IDynamicScriptManager>();
-            var connections = serviceProvider.GetRequiredService<ISqlConnections>();
             var propertyProvider = serviceProvider.GetRequiredService<IPropertyItemProvider>();
             var typeSource = serviceProvider.GetRequiredService<ITypeSource>();
 
