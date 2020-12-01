@@ -28,7 +28,7 @@ namespace Serenity.Data
 
             if (row.TrackAssignments)
             {
-                if (row.IsAnyFieldChanged)
+                if (row.IsAnyFieldAssigned)
                 {
                     var fields = row.Fields;
                     for (var i = 0; i < row.Fields.Count; i++)
