@@ -12,15 +12,15 @@ namespace Serenity.Web
     public class LocalTextScript : DynamicScript, INamedDynamicScript
     {
         private readonly string scriptName;
-        private readonly string[] includes;
         private readonly string languageId;
+        private readonly string includes;
         private readonly bool isPending;
         private readonly ILocalTextRegistry registry;
 
-        public LocalTextScript(ILocalTextRegistry registry, string package, string[] includes, string languageId, bool isPending)
+        public LocalTextScript(ILocalTextRegistry registry, string package, string includes, string languageId, bool isPending)
         {
             this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
-            this.includes = includes ?? Array.Empty<string>();
+            this.includes = includes;
             this.languageId = languageId;
             this.isPending = isPending;
             scriptName = GetScriptName(package ?? throw new ArgumentNullException(nameof(package)), languageId, isPending);
@@ -42,42 +42,28 @@ namespace Serenity.Web
             if (packages == null)
                 throw new ArgumentNullException(nameof(packages));
 
-            if (!packages.TryGetValue(package, out string[] includes))
-                includes = Array.Empty<string>();
+            if (!packages.TryGetValue(package, out string includes))
+                includes = null;
 
             return GetLocalTextPackageScript(registry, includes, languageId, isPending);
         }
 
-        public static string GetLocalTextPackageScript(ILocalTextRegistry registry, string[] includes, string languageId, bool isPending)
+        public static string GetLocalTextPackageScript(ILocalTextRegistry registry, string includes, string languageId, bool isPending)
         {
             if (registry == null)
                 throw new ArgumentNullException(nameof(registry));
 
-            StringBuilder sb = new StringBuilder("^(");
-            bool append = false;
-            foreach (object obj in includes)
-            {
-                if (append)
-                    sb.Append('|');
-                string item = Convert.ToString(obj);
-                if (item.Length > 0)
-                {
-                    if (item[0] == '^' && item[item.Length - 1] == '$')
-                        sb.Append(item.Substring(1, item.Length - 2));
-                    else sb.Append(item.Replace(".", "\\.") + ".*");
-                    append = true;
-                }
-            }
-            sb.Append(")$");
-            var regex = new Regex(sb.ToString(), RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var texts = registry is LocalTextRegistry ltr ? ltr.GetAllAvailableTextsInLanguage(languageId, isPending) : new Dictionary<string, string>();
-
             var list = new List<KeyValuePair<string, string>>();
 
-            foreach (var pair in texts)
-                if (regex.IsMatch(pair.Key))
-                    list.Add(pair);
+            if (!string.IsNullOrEmpty(includes))
+            {
+                var regex = new Regex(includes, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                var texts = registry is LocalTextRegistry ltr ? ltr.GetAllAvailableTextsInLanguage(languageId, isPending) : new Dictionary<string, string>();
 
+                foreach (var pair in texts)
+                    if (regex.IsMatch(pair.Key))
+                        list.Add(pair);
+            }
             list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));
 
             StringBuilder jwBuilder = new StringBuilder("Q.LT.add(");

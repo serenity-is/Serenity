@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace Serenity.Web
 {
-    public class LocalTextPackages : Dictionary<string, string[]>
+    public class LocalTextPackages : Dictionary<string, string>
     {
         public const string SectionKey = "LocalTextPackages";
 
