@@ -7,7 +7,7 @@ namespace Serenity.Services
     {
         private readonly IServiceProvider provider;
 
-        protected DefaultBehaviorFactory(IServiceProvider provider)
+        public DefaultBehaviorFactory(IServiceProvider provider)
         {
             this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
