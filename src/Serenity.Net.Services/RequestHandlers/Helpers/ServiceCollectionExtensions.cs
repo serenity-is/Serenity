@@ -23,6 +23,9 @@ namespace Serenity.Extensions.DependencyInjection
             services.TryAddSingleton<IImplicitBehaviorRegistry, DefaultImplicitBehaviorRegistry>();
             services.TryAddSingleton<IBehaviorProvider, DefaultBehaviorProvider>();
             services.TryAddSingleton<IRequestContext, DefaultRequestContext>();
+            services.TryAddSingleton<IHandlerActivator, DefaultHandlerActivator>();
+            services.TryAddSingleton<IDefaultHandlerRegistry, DefaultHandlerRegistry>();
+            services.TryAddSingleton<IDefaultHandlerFactory, DefaultHandlerFactory>();
         }
 
         public static void AddAllTexts(this IServiceProvider provider,

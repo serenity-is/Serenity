@@ -31,6 +31,9 @@ namespace Serenity.Services
 
             foreach (var type in implicitBehaviors.GetTypes())
             {
+                if (!behaviorType.IsAssignableFrom(type))
+                    continue;
+
                 var behavior = behaviorFactory.CreateInstance(type);
                 if (behavior == null)
                     continue;
@@ -53,7 +56,7 @@ namespace Serenity.Services
                     {
                         list.Add(behavior);
 
-                        behavior = behaviorFactory.CreateInstance(behaviorType);
+                        behavior = behaviorFactory.CreateInstance(type);
                         implicitBehavior = behavior as IImplicitBehavior;
                         fieldBehavior = behavior as IFieldBehavior;
                     }

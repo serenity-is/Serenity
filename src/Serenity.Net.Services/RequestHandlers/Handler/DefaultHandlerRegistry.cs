@@ -1,38 +1,29 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace Serenity.Services
 {
-    public abstract class DefaultHandlerRegistry : IDefaultHandlerRegistry
+    public class DefaultHandlerRegistry : IDefaultHandlerRegistry
     {
-        private readonly IEnumerable<Type> types;
+        private readonly ITypeSource typeSource;
 
-        protected DefaultHandlerRegistry(IEnumerable<Type> types)
+        public DefaultHandlerRegistry(ITypeSource typeSource)
         {
-            this.types = types ?? throw new ArgumentNullException(nameof(types));
+            this.typeSource = typeSource ?? throw new ArgumentNullException(nameof(typeSource));
         }
 
         public virtual IEnumerable<Type> GetTypes()
         {
-            return types;
-        }
-
-        public static IEnumerable<Type> FindHandlerTypes(Assembly[] assemblies)
-        {
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
-
-            return assemblies.SelectMany(assembly => assembly.GetTypes())
-                .Where(type => !type.IsInterface &&
-                    !type.IsAbstract &&
-                    typeof(IRequestHandler).IsAssignableFrom(type));
+            return typeSource.GetTypesWithInterface(typeof(IRequestHandler))
+                .Where(type => !type.IsInterface && !type.IsAbstract);
         }
 
         public IEnumerable<Type> GetTypes(Type handlerType)
         {
-            return types.Where(type => handlerType.IsAssignableFrom(type));
+            return GetTypes().Where(type => handlerType.IsAssignableFrom(type));
         }
     }
 }

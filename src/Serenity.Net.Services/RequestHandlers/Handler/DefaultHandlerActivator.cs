@@ -3,18 +3,18 @@ using System;
 
 namespace Serenity.Services
 {
-    public class HandlerActivator : IHandlerActivator
+    public class DefaultHandlerActivator : IHandlerActivator
     {
         private readonly IServiceProvider provider;
 
-        protected HandlerActivator(IServiceProvider provider)
+        public DefaultHandlerActivator(IServiceProvider provider)
         {
             this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
         public object CreateInstance(Type handlerType)
         {
-            return provider.GetRequiredService(handlerType);
+            return ActivatorUtilities.CreateInstance(provider, handlerType);
         }
     }
 }

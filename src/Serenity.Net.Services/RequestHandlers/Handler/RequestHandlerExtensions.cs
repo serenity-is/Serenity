@@ -36,7 +36,8 @@ namespace Serenity.Services
                 throw new ArgumentNullException(nameof(handler));
 
             return handler.GetType().GetInterfaces()
-                .FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IRequestType<>))?.GetGenericArguments()[0];
+                .FirstOrDefault(x => x.IsGenericType &&
+                    x.GetGenericTypeDefinition() == typeof(IRequestType<>))?.GetGenericArguments()[0];
         }
 
         public static Type GetResponseType(this IRequestHandler handler)
@@ -45,7 +46,8 @@ namespace Serenity.Services
                 throw new ArgumentNullException(nameof(handler));
 
             return handler.GetType().GetInterfaces()
-                .FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IResponseType<>))?.GetGenericArguments()[0];
+                .FirstOrDefault(x => x.IsGenericType &&
+                    x.GetGenericTypeDefinition() == typeof(IResponseType<>))?.GetGenericArguments()[0];
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Serenity.Services
 
         public object CreateInstance(Type behaviorType)
         {
-            return provider.GetRequiredService(behaviorType);
+            return ActivatorUtilities.CreateInstance(provider, behaviorType);
         }
     }
 }
