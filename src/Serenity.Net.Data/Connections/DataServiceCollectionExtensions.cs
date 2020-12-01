@@ -38,6 +38,7 @@ namespace Serenity.Extensions.DependencyInjection
             if (setupAction == null)
                 throw new ArgumentNullException(nameof(setupAction));
 
+            services.AddSqlConnections();
             services.Configure(setupAction);
         }
     }

@@ -17,10 +17,6 @@ namespace Serenity.Web
         private readonly bool isPending;
         private readonly ILocalTextRegistry registry;
 
-        public class PackageSettings : Dictionary<string, string[]>
-        {
-        }
-
         public LocalTextScript(ILocalTextRegistry registry, string package, string[] includes, string languageId, bool isPending)
         {
             this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
@@ -37,7 +33,8 @@ namespace Serenity.Web
             return string.Format("LocalText.{0}.{1}.{2}", package, languageId, isPending ? "Pending" : "Public");
         }
 
-        public static string GetLocalTextPackageScript(ILocalTextRegistry registry, PackageSettings packages, string package, string languageId, bool isPending)
+        public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
+            LocalTextPackages packages, string package, string languageId, bool isPending)
         {
             if (package == null)
                 throw new ArgumentNullException(nameof(package));

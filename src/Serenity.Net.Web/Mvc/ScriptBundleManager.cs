@@ -11,16 +11,6 @@ namespace Serenity.Web
 {
     public class ScriptBundleManager : IScriptBundleManager
     {
-        public class ScriptBundlingSettings
-        {
-            public bool? Enabled { get; set; }
-            public bool? Minimize { get; set; }
-            public bool? UseMinJS { get; set; }
-            public string[] NoMinimize { get; set; }
-            public Dictionary<string, object> Replacements { get; set; }
-            public Dictionary<string, string[]> Bundles { get; set; }
-        }
-
         private static object sync = new object();
 
         private bool isEnabled;
@@ -34,15 +24,15 @@ namespace Serenity.Web
         private readonly IWebHostEnvironment hostEnvironment;
         private readonly IHttpContextAccessor contextAccessor;
         private readonly IExceptionLogger logger;
-        private readonly IOptions<ScriptBundlingSettings> options;
+        private readonly ScriptBundlingOptions options;
 
         [ThreadStatic]
         private static HashSet<string> recursionCheck;
 
-        public ScriptBundleManager(IOptions<ScriptBundlingSettings> options, IDynamicScriptManager scriptManager, IWebHostEnvironment hostEnvironment,
+        public ScriptBundleManager(IOptions<ScriptBundlingOptions> options, IDynamicScriptManager scriptManager, IWebHostEnvironment hostEnvironment,
             IHttpContextAccessor contextAccessor = null, IExceptionLogger logger = null)
         {
-            this.options = options ?? throw new ArgumentNullException(nameof(options));
+            this.options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
             this.scriptManager = scriptManager ?? throw new ArgumentNullException(nameof(scriptManager));
             this.hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
             this.contextAccessor = contextAccessor;

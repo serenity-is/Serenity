@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serenity.Abstractions;
-using Serenity.Data;
 using Serenity.Extensions.DependencyInjection;
 using Serenity.PropertyGrid;
 using Serenity.Web.Middleware;
@@ -17,11 +16,54 @@ namespace Serenity.Web
         {
             collection.AddCaching();
             collection.AddTextRegistry();
+            collection.TryAddSingleton<IDynamicScriptManager, DynamicScriptManager>();
             collection.TryAddSingleton<IPropertyItemProvider, DefaultPropertyItemProvider>();
+        }
+
+        public static void AddCssBundling(this IServiceCollection collection)
+        {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            collection.AddOptions();
             collection.TryAddSingleton<IContentHashCache, ContentHashCache>();
             collection.TryAddSingleton<ICssBundleManager, CssBundleManager>();
+        }
+
+        public static void AddCssBundling(this IServiceCollection collection,
+            Action<CssBundlingOptions> setupAction)
+        {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            if (setupAction == null)
+                throw new ArgumentNullException(nameof(setupAction));
+
+            collection.AddCssBundling();
+            collection.TryAddSingleton<IContentHashCache, ContentHashCache>();
+            collection.Configure(setupAction);
+        }
+
+        public static void AddScriptBundling(this IServiceCollection collection)
+        {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            collection.AddOptions();
             collection.TryAddSingleton<IScriptBundleManager, ScriptBundleManager>();
-            collection.TryAddSingleton<IDynamicScriptManager, DynamicScriptManager>();
+        }
+
+        public static void AddScriptBundling(this IServiceCollection collection, 
+            Action<ScriptBundlingOptions> setupAction)
+        {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            if (setupAction == null)
+                throw new ArgumentNullException(nameof(setupAction));
+
+            collection.AddScriptBundling();
+            collection.Configure(setupAction);
         }
 
         public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder)

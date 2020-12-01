@@ -87,23 +87,37 @@ namespace Serenity.Web
             if (contentUrl.IsNullOrEmpty())
                 throw new ArgumentNullException("contentUrl");
 
-            if (contentUrl[0] != '/' &&
-                (contentUrl[0] != '~' || contentUrl.Length < 2 || contentUrl[1] != '/'))
-                return contentUrl;
+            if (contentUrl[0] == '~')
+            {
+                if (contentUrl.Length < 2 || contentUrl[1] != '/')
+                    return VirtualPathUtility.ToAbsolute(pathBase, contentUrl);
+            }
+            else if (contentUrl[0] == '/')
+            {
+                if (contentUrl.Length < 2)
+                    return contentUrl;
+
+                var v = pathBase.Value ?? "";
+                if (v.Length == 0 || v[v.Length - 1] != '/')
+                    v += '/';
+                if (!contentUrl.StartsWith(v, StringComparison.OrdinalIgnoreCase))
+                    return contentUrl;
+                contentUrl = "~/" + contentUrl.Substring(v.Length);
+            }
 
             string cdnMatch = contentUrl;
 
             if (contentUrl.IndexOf(".axd/", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 if (!cdnEnabled)
-                    return contentUrl;
+                    return VirtualPathUtility.ToAbsolute(pathBase, contentUrl);
 
                 cdnMatch = contentUrl.Split('?')[0];
             }
             else
             {
                 var path = contentUrl;
-                path = PathHelper.SecureCombine(hostEnvironment.WebRootPath, path.StartsWith("~/") ? path[2..] : path);
+                path = PathHelper.SecureCombine(hostEnvironment.WebRootPath, PathHelper.ToPath(contentUrl.Substring(2)));
 
                 object hash;
                 hash = hashByContentPath[path];

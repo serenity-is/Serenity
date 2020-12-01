@@ -199,8 +199,9 @@ namespace Serenity.Web
             var scriptManager = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IDynamicScriptManager>();
             scriptManager.IfNotRegistered(scriptName, () =>
             {
-                var registry = page.ViewContext.HttpContext.RequestServices.GetRequiredService<ILocalTextRegistry>();
-                var packages = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<LocalTextScript.PackageSettings>>();
+                var services = page.ViewContext.HttpContext.RequestServices;
+                var registry = services.GetRequiredService<ILocalTextRegistry>();
+                var packages = services.GetRequiredService<IOptions<LocalTextPackages>>();
                 return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
             });
 
@@ -214,8 +215,9 @@ namespace Serenity.Web
             var scriptManager = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IDynamicScriptManager>();
             scriptManager.IfNotRegistered(scriptName, () =>
             {
-                var registry = page.ViewContext.HttpContext.RequestServices.GetRequiredService<ILocalTextRegistry>();
-                var packages = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<LocalTextScript.PackageSettings>>();
+                var services = page.ViewContext.HttpContext.RequestServices;
+                var registry = services.GetRequiredService<ILocalTextRegistry>();
+                var packages = services.GetRequiredService<IOptions<LocalTextPackages>>();
                 return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
             });
 
@@ -229,8 +231,9 @@ namespace Serenity.Web
             var scriptManager = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IDynamicScriptManager>();
             scriptManager.IfNotRegistered(scriptName, () =>
             {
-                var registry = page.ViewContext.HttpContext.RequestServices.GetRequiredService<ILocalTextRegistry>();
-                var packages = page.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<LocalTextScript.PackageSettings>>();
+                var services = page.ViewContext.HttpContext.RequestServices;
+                var registry = services.GetRequiredService<ILocalTextRegistry>();
+                var packages = services.GetRequiredService<IOptions<LocalTextPackages>>();
                 return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
             });
 
