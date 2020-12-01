@@ -83,14 +83,14 @@ namespace Serenity.CodeGenerator
 
                 for (var i = last.Length; i > parts.Length; i--)
                 {
-                    var close = (new String(' ', (i * 4)) + "}");
+                    var close = (new string(' ', (i * 4)) + "}");
                     sb.AppendLine(close);
                 }
 
                 var x = Math.Min(last.Length, parts.Length) - 2;
                 while (x >= 0 && last[x] != parts[x])
                 {
-                    var close = (new String(' ', ((x + 2) * 4)) + "}");
+                    var close = (new string(' ', ((x + 2) * 4)) + "}");
                     x--;
                     sb.AppendLine(close);
                     sb.AppendLine();
@@ -98,7 +98,7 @@ namespace Serenity.CodeGenerator
 
                 for (var i = Math.Max(x + 1, 0); i < parts.Length - 1; i++)
                 {
-                    var indent = new String(' ', (i + 2) * 4);
+                    var indent = new string(' ', (i + 2) * 4);
                     var u = parts[i];
                     if (i > 0 && parts[i - 1] == u)
                         u = u + "_";
@@ -110,7 +110,7 @@ namespace Serenity.CodeGenerator
                 if (parts.Length - 1 > 0 && parts[parts.Length - 2] == n)
                     n += "_";
 
-                sb.Append(new String(' ', (parts.Length + 1) * 4));
+                sb.Append(new string(' ', (parts.Length + 1) * 4));
                 sb.AppendLine("public const string " + n + " = \"~/" + path.Replace(@"\", "/") + "\";");
 
                 last = parts;
@@ -118,7 +118,7 @@ namespace Serenity.CodeGenerator
 
             for (var i = last.Length - 1; i > 0; i--)
             {
-                sb.AppendLine(new String(' ', ((i + 1) * 4)) + "}" + Environment.NewLine);
+                sb.AppendLine(new string(' ', ((i + 1) * 4)) + "}" + Environment.NewLine);
             }
 
             sb.AppendLine("    }");

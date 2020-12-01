@@ -80,7 +80,7 @@ namespace Serenity.CodeGeneration
                         x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
                     .ToList();
 
-                list.Sort((i1, i2) => String.CompareOrdinal(i1, i2));
+                list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));
 
                 var jwBuilder = new StringBuilder();
                 var jw = new JsonTextWriter(new StringWriter(jwBuilder));

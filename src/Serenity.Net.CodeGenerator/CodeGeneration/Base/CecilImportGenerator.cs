@@ -148,7 +148,9 @@ namespace Serenity.CodeGeneration
                     foreach (var fromType in types)
                     {
                         var nestedLocalTexts = CecilUtils.GetAttr(fromType, "Serenity.Extensibility",
-                            "NestedLocalTextsAttribute", emptyTypes);
+                            "NestedLocalTextsAttribute", emptyTypes) ??
+                            CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", 
+                                "NestedLocalTextsAttribute", emptyTypes);
                         if (nestedLocalTexts != null)
                         {
                             string prefix = null;
@@ -169,11 +171,13 @@ namespace Serenity.CodeGeneration
                         if (CecilUtils.Contains(baseClasses, "Serenity.Services", "ServiceRequest") ||
                             CecilUtils.Contains(baseClasses, "Serenity.Services", "ServiceResponse") ||
                             CecilUtils.Contains(baseClasses, "Serenity.Data", "Row") ||
+                            CecilUtils.Contains(baseClasses, "Serenity.Data", "Row`1") ||
                             CecilUtils.Contains(baseClasses, "Serenity.Services", "ServiceEndpoint") ||
                             CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "ScriptIncludeAttribute", baseClasses) != null ||
                             CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "FormScriptAttribute", baseClasses) != null ||
                             CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "ColumnsScriptAttribute", baseClasses) != null ||
                             CecilUtils.GetAttr(fromType, "Serenity.Extensibility", "NestedPermissionKeysAttribute", emptyTypes) != null ||
+                            CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "NestedPermissionKeysAttribute", emptyTypes) != null ||
                             ((CecilUtils.Contains(baseClasses, "Microsoft.AspNetCore.Mvc", "Controller") ||
                               CecilUtils.Contains(baseClasses, "System.Web.Mvc", "Controller")) && // backwards compability
                              fromType.Namespace != null &&
@@ -226,7 +230,7 @@ namespace Serenity.CodeGeneration
                 if (attr.HasProperties)
                 {
                     attrInfo.Inherited = attr.Properties.FirstOrDefault(x =>
-                        x.Name == "Inherited").Argument.Value as Boolean? ?? true;
+                        x.Name == "Inherited").Argument.Value as bool? ?? true;
 
                     attrInfo.Namespaces = attr.Properties.FirstOrDefault(x =>
                         x.Name == "Namespaces").Argument.Value as string[];

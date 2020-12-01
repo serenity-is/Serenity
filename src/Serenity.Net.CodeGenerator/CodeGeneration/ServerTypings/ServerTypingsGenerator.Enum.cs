@@ -1,10 +1,7 @@
-﻿using System;
+﻿using Mono.Cecil;
 using Serenity.Reflection;
+using System;
 using System.Linq;
-#if !NET45
-using System.Reflection;
-#endif
-using Mono.Cecil;
 
 namespace Serenity.CodeGeneration
 {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 
 namespace Serenity.Data
@@ -9,6 +10,14 @@ namespace Serenity.Data
     public class ConnectionStringOptions : Dictionary<string, ConnectionStringEntry>, 
         IOptions<ConnectionStringOptions>
     {
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        public ConnectionStringOptions()
+            : base(StringComparer.OrdinalIgnoreCase)
+        {
+        }
+
         /// <summary>
         /// Returns this
         /// </summary>

@@ -96,7 +96,7 @@ namespace Serenity.CodeGenerator
                 Title = Inflector.Inflector.Titleize(fieldInfo.FieldName.Substring(prefixLength)),
                 Flags = flags,
                 Name = fieldInfo.FieldName,
-                Size = fieldInfo.Size == 0 ? (Int32?)null : fieldInfo.Size,
+                Size = fieldInfo.Size == 0 ? (int?)null : fieldInfo.Size,
                 Scale = fieldInfo.Scale
             };
         }
@@ -272,7 +272,7 @@ namespace Serenity.CodeGenerator
                     f.PKColumn = foreign.PKColumn;
 
                     var frgfld = schemaProvider.GetFieldInfos(connection, foreign.PKSchema, foreign.PKTable).ToList();
-                    int frgPrefix = RowGenerator.DeterminePrefixLength(frgfld, z => z.FieldName);
+                    int frgPrefix = DeterminePrefixLength(frgfld, z => z.FieldName);
                     var j = new EntityJoin();
                     j.Fields = new List<EntityField>();
                     j.Name = GenerateVariableName(f.Name.Substring(prefix));
@@ -303,7 +303,7 @@ namespace Serenity.CodeGenerator
                         atk.Add("DisplayName(\"" + k.Title + "\")");
                         k.Expression = "j" + j.Name + ".[" + k.Name + "]";
                         atk.Add("Expression(\"" + k.Expression + "\")");
-                        k.Attributes = String.Join(", ", atk);
+                        k.Attributes = string.Join(", ", atk);
 
                         if (f.TextualField == null && k.FieldType == "String")
                             f.TextualField = k.Ident;
@@ -341,10 +341,10 @@ namespace Serenity.CodeGenerator
                 if (x.Scale > 0)
                     attrs.Add("Scale(" + x.Scale + ")");
 
-                if (!String.IsNullOrEmpty(x.Flags))
+                if (!string.IsNullOrEmpty(x.Flags))
                     attrs.Add(x.Flags);
 
-                if (!String.IsNullOrEmpty(x.PKTable))
+                if (!string.IsNullOrEmpty(x.PKTable))
                 {
                     attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
                     attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
@@ -356,7 +356,7 @@ namespace Serenity.CodeGenerator
                 if (x.TextualField != null)
                     attrs.Add("TextualField(\"" + x.TextualField + "\")");
 
-                x.Attributes = String.Join(", ", attrs.ToArray());
+                x.Attributes = string.Join(", ", attrs.ToArray());
             }
 
             return model;
@@ -365,7 +365,7 @@ namespace Serenity.CodeGenerator
         private static bool IsStringLowerCase(string s)
         {
             foreach (char c in s)
-                if (!Char.IsLower(c))
+                if (!char.IsLower(c))
                     return false;
             return s.Length > 0;
         }
@@ -382,7 +382,7 @@ namespace Serenity.CodeGenerator
                 tableName = tableName.Substring(3);
             else if (tableName.StartsWith("aspnet_"))
                 tableName = "AspNet" + tableName.Substring(7);
-            return RowGenerator.GenerateVariableName(tableName);
+            return GenerateVariableName(tableName);
         }
 
         private static string ClassNameToLowerCase(string className)
@@ -394,13 +394,13 @@ namespace Serenity.CodeGenerator
             for (int i = 0; i < className.Length; i++)
             {
                 char c = className[i];
-                if (Char.IsUpper(c) &&
+                if (char.IsUpper(c) &&
                     c >= 'A' &&
                     c <= 'Z')
                 {
-                    c = Char.ToLowerInvariant(c);
+                    c = char.ToLowerInvariant(c);
                     if (i > 0 &&
-                        !Char.IsUpper(className[i - 1]) &&
+                        !char.IsUpper(className[i - 1]) &&
                         className[i - 1] != '_')
                         sb.Append("_");
                     sb.Append(c);

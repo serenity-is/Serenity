@@ -49,7 +49,7 @@ namespace Serenity.CodeGenerator
                             var ar = line.Substring(idx + s.Length, idx2 - idx - s.Length).TrimToNull();
                             if (ar != null)
                             {
-                                int comp = String.CompareOrdinal(key, ar);
+                                int comp = string.CompareOrdinal(key, ar);
                                 if (comp > 0)
                                     insertAfter = lineNum;
                                 else if (comp == 0)
@@ -74,7 +74,7 @@ namespace Serenity.CodeGenerator
 
                 using (var sw = new StreamWriter(File.Create(file), utf8))
                 {
-                    sw.Write(String.Join(Environment.NewLine, lines));
+                    sw.Write(string.Join(Environment.NewLine, lines));
                 }
                 return true;
             }
@@ -147,7 +147,7 @@ namespace Serenity.CodeGenerator
                         "Please install it, or if it is not installed to default location, " +
                         "set its path in CodeGenerator.config file!");
 
-                throw new Exception(String.Format(
+                throw new Exception(string.Format(
                     "Couldn't locate KDiff3 utility at '{0}' which is required to merge changes. " +
                     "Please install it, or if it is not installed to default location, " +
                     "set its path in CodeGenerator.config file!", Kdiff3Path));
@@ -217,7 +217,7 @@ namespace Serenity.CodeGenerator
                         "Please install it, or if it is not installed to default location, " +
                         "set its path in CodeGenerator.config file (TSCPath setting)!");
 
-                throw new Exception(String.Format(
+                throw new Exception(string.Format(
                     "Couldn't locate TSC.EXE file at '{0}' which is required for TypeScript compilation. " +
                     "Please install it, or if it is not installed to default location, " +
                     "set its path in CodeGenerator.config file! (TSCPath setting)", TSCPath));

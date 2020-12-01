@@ -57,9 +57,9 @@ namespace Serenity.CodeGenerator
                 }
 
                 string contentType;
-                if (String.Compare(Path.GetExtension(codeFile), ".cs") == 0)
+                if (string.Compare(Path.GetExtension(codeFile), ".cs") == 0)
                     contentType = "Compile";
-                else if (String.Compare(Path.GetExtension(codeFile), ".ts") == 0)
+                else if (string.Compare(Path.GetExtension(codeFile), ".ts") == 0)
                     contentType = "TypeScriptCompile";
                 else
                     contentType = "Content";

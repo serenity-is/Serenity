@@ -19,7 +19,7 @@ namespace Serenity.CodeGenerator
 
             if (config.RootNamespace.IsEmptyOrNull())
             {
-                System.Console.Error.WriteLine("Please set RootNamespace option in sergen.json file!");
+                Console.Error.WriteLine("Please set RootNamespace option in sergen.json file!");
                 Environment.Exit(1);
             }
 

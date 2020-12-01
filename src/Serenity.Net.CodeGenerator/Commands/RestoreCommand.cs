@@ -62,7 +62,7 @@ namespace Serenity.CodeGenerator
                 return false;
             };
 
-            var csprojElement = XElement.Parse(System.IO.File.ReadAllText(csproj));
+            var csprojElement = XElement.Parse(File.ReadAllText(csproj));
 
             EnumerateProjectDeps(csprojElement, (fw, id, ver) =>
             {
@@ -110,7 +110,7 @@ namespace Serenity.CodeGenerator
                     foreach (var file in Directory.GetFiles(contentRoot, "*.*", SearchOption.AllDirectories))
                     {
                         var extension = Path.GetExtension(file);
-                        if (String.Compare(extension, ".transform", StringComparison.OrdinalIgnoreCase) == 0)
+                        if (string.Compare(extension, ".transform", StringComparison.OrdinalIgnoreCase) == 0)
                             continue;
 
                         var relative = file.Substring(contentRoot.Length);
@@ -177,7 +177,7 @@ namespace Serenity.CodeGenerator
                     {
                         var target = group.Attribute("targetFramework").Value;
                         if (string.IsNullOrEmpty(target) ||
-                            String.Compare(target, fw, StringComparison.OrdinalIgnoreCase) == 0 ||
+                            string.Compare(target, fw, StringComparison.OrdinalIgnoreCase) == 0 ||
                             target.StartsWith(".NETStandard", StringComparison.OrdinalIgnoreCase) ||
                             target.StartsWith("netstandard", StringComparison.OrdinalIgnoreCase) ||
                             target.StartsWith("netcore", StringComparison.OrdinalIgnoreCase))

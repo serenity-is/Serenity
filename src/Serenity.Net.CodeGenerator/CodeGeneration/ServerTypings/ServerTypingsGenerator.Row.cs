@@ -33,7 +33,9 @@ namespace Serenity.CodeGeneration
                     }
                 }
             }
-            while ((rowType = (rowType.BaseType?.Resolve())) != null && rowType.FullName != "Serenity.Data.Row");
+            while ((rowType = (rowType.BaseType?.Resolve())) != null && 
+                rowType.FullName != "Serenity.Data.Row" &&
+                rowType.FullName != "Serenity.Data.Row`1");
         }
 
         private void GenerateRowMembers(TypeDefinition rowType)
@@ -80,7 +82,9 @@ namespace Serenity.CodeGeneration
                         return name;
                 }
             }
-            while ((rowType = (rowType.BaseType?.Resolve())) != null && rowType.FullName != "Serenity.Data.Row");
+            while ((rowType = (rowType.BaseType?.Resolve())) != null && 
+                rowType.FullName != "Serenity.Data.Row" &&
+                rowType.FullName != "Serenity.Data.Row`1");
 
             return null;
         }
@@ -266,6 +270,32 @@ namespace Serenity.CodeGeneration
             var idProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.IIdRow" }, 
                 "Serenity.Data.IIdField", "IdField", 
                 "Serenity.Data.IIdField Serenity.Data.IIdRow::get_IdField()");
+
+            if (idProperty == null)
+            {
+                idProperty = rowType.Properties.FirstOrDefault(x =>
+                    x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
+                        "Serenity.Data", "IdPropertyAttribute") != null)?.Name;
+            }
+
+            if (idProperty == null)
+            {
+                var identities = rowType.Properties.Where(x =>
+                    x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
+                        "Serenity.Data.Mapping", "IdentityAttribute") != null);
+
+                if (identities.Count() == 1)
+                    idProperty = identities.First().Name;
+                else if (!identities.Any())
+                {
+                    var primaryKeys = rowType.Properties.Where(x =>
+                        x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
+                            "Serenity.Data.Mapping", "PrimaryKeyAttribute") != null);
+
+                    if (primaryKeys.Count() == 1)
+                        idProperty = primaryKeys.First().Name;
+                }
+            }
 
             var nameProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.INameRow" }, 
                     "Serenity.Data.StringField", "NameField",

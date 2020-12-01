@@ -18,6 +18,7 @@ namespace Serenity.CodeGenerator
         public string CustomTemplates { get; set; }
         public Dictionary<string, string> CustomGenerate { get; set; }
         public Dictionary<string, object> CustomSettings { get; set; }
+        public string[] AppSettingFiles { get; set; }
         [JsonIgnore]
         public bool GenerateRow { get; set; }
         [JsonIgnore]
@@ -37,6 +38,7 @@ namespace Serenity.CodeGenerator
             GenerateService = true;
             GenerateUI = true;
             GenerateCustom = true;
+            AppSettingFiles = new string[] { "appsettings.json", "appsettings.machine.json" };
         }
 
         public string SaveToJson()
@@ -69,6 +71,7 @@ namespace Serenity.CodeGenerator
             public string Key { get; set; }
             public string ConnectionString { get; set; }
             public string ProviderName { get; set; }
+            public string Dialect { get; set; }
             public List<Table> Tables { get; set; }
 
             public Connection()

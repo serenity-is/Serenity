@@ -24,6 +24,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)tools\Images\serenity-logo-128.png" Pack="true" PackagePath="" />
+    <None Include="$(MSBuildThisFileDirectory)..\tools\Images\serenity-logo-128.png" Pack="true" PackagePath="" />
   </ItemGroup>
 </Project>

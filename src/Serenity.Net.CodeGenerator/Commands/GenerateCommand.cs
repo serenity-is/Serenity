@@ -2,7 +2,7 @@
 using Serenity.Data.Schema;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 
@@ -12,11 +12,11 @@ namespace Serenity.CodeGenerator
     {
         private class AppSettingsFormat
         {
-            public Dictionary<string, ConnectionInfo> Data { get; }
+            public ConnectionStringOptions Data { get; }
 
             public AppSettingsFormat()
             {
-                Data = new Dictionary<string, ConnectionInfo>(StringComparer.OrdinalIgnoreCase);
+                Data = new ConnectionStringOptions();
             }
 
             public class ConnectionInfo
@@ -62,39 +62,50 @@ namespace Serenity.CodeGenerator
 
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
+            var connectionStringOptions = new ConnectionStringOptions();
+
             if (!string.IsNullOrEmpty(config.CustomTemplates))
                 Templates.TemplatePath = Path.Combine(projectDir, config.CustomTemplates);
 
-            var connectionKeys = config.Connections
-                .Where(x => !x.ConnectionString.IsEmptyOrNull())
-                .Select(x => x.Key).ToList();
-
-            var appSettingsFile = Path.Combine(projectDir, "appsettings.json");
-            AppSettingsFormat appSettings;
-            if (File.Exists(appSettingsFile))
-                appSettings = JSON.ParseTolerant<AppSettingsFormat>(File.ReadAllText(appSettingsFile).TrimToNull() ?? "{}");
-            else
-                appSettings = new AppSettingsFormat();
-
-            connectionKeys.AddRange(appSettings.Data.Keys);
-
-            var appSettingsFile2 = Path.Combine(projectDir, "appsettings.machine.json");
-            if (File.Exists(appSettingsFile2))
+            foreach (var x in config.Connections.Where(x => !x.ConnectionString.IsEmptyOrNull()))
             {
-                var appSettings2 = JSON.ParseTolerant<AppSettingsFormat>(File.ReadAllText(appSettingsFile2).TrimToNull() ?? "{}");
-                foreach (var pair in appSettings2.Data)
-                    appSettings.Data[pair.Key] = pair.Value;
+                connectionStringOptions[x.Key] = new ConnectionStringEntry
+                {
+                    ConnectionString = x.ConnectionString,
+                    ProviderName = x.ProviderName,
+                    Dialect = x.Dialect
+                };
             }
 
-            connectionKeys.AddRange(appSettings.Data.Keys);
-
-            connectionKeys = connectionKeys.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(x => x).ToList();
-
-            if (connectionKeys.Count == 0)
+            foreach (var name in config.AppSettingFiles)
             {
-                Console.Error.WriteLine("No connections in appsettings.json or sergen.json!");
+                var path = Path.Combine(projectDir, name);
+                if (File.Exists(name))
+                {
+                    var appSettings = JSON.ParseTolerant<AppSettingsFormat>(File.ReadAllText(path).TrimToNull() ?? "{}");
+                    if (appSettings.Data != null)
+                        foreach (var data in appSettings.Data)
+                        {
+                            // not so nice fix for relative paths, e.g. sqlite etc.
+                            if (data.Value.ConnectionString.IndexOf("../../..") >= 0)
+                                data.Value.ConnectionString = data.Value
+                                    .ConnectionString.Replace("../../..", Path.GetDirectoryName(csproj));
+                            else if (data.Value.ConnectionString.IndexOf(@"..\..\..\") >= 0)
+                                data.Value.ConnectionString = data.Value.ConnectionString.Replace(@"..\..\..\", 
+                                    Path.GetDirectoryName(csproj));
+
+                            connectionStringOptions[data.Key] = data.Value;
+                        }
+                }
+            }
+
+            if (connectionStringOptions.Count == 0)
+            {
+                Console.Error.WriteLine("No connections in appsettings files or sergen.json!");
                 Environment.Exit(1);
             }
+
+            var connectionKeys = connectionStringOptions.Keys.OrderBy(x => x).ToArray();
 
             if (outFile == null && connectionKey == null)
             {
@@ -113,7 +124,7 @@ namespace Serenity.CodeGenerator
             }
             else if (connectionKey == null)
             {
-                File.WriteAllText(outFile, JSON.Stringify(connectionKeys));
+                File.WriteAllText(outFile, JSON.Stringify(connectionStringOptions.Keys.OrderBy(x => x)));
                 Environment.Exit(0);
             }
 
@@ -121,7 +132,7 @@ namespace Serenity.CodeGenerator
 
             if (outFile == null && connectionKey == null)
             {
-                userInput = connectionKeys.Count == 1 ? connectionKeys[0] : null;
+                userInput = connectionKeys.Length == 1 ? connectionKeys[0] : null;
                 while (connectionKey == null ||
                     !connectionKeys.Contains(connectionKey, StringComparer.OrdinalIgnoreCase))
                 {
@@ -140,8 +151,7 @@ namespace Serenity.CodeGenerator
             }
 
             userInput = connectionKey;
-            connectionKey = connectionKeys.Find(x => string.Compare(x, userInput, StringComparison.OrdinalIgnoreCase) == 0);
-            if (connectionKey == null)
+            if (!connectionStringOptions.ContainsKey(userInput))
             {
                 Console.Error.WriteLine("Can't find connection with key: " + userInput + "!");
                 Environment.Exit(1);
@@ -153,43 +163,33 @@ namespace Serenity.CodeGenerator
                 Console.WriteLine();
             }
 
-            var dataConnection = appSettings.Data.ContainsKey(connectionKey) ?
-                appSettings.Data[connectionKey] : null;
+            DbProviderFactories.RegisterFactory("Microsoft.Data.SqlClient", 
+                Microsoft.Data.SqlClient.SqlClientFactory.Instance);
+            DbProviderFactories.RegisterFactory("System.Data.SqlClient",
+                Microsoft.Data.SqlClient.SqlClientFactory.Instance);
+            DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite", 
+                Microsoft.Data.Sqlite.SqliteFactory.Instance);
+            DbProviderFactories.RegisterFactory("Npgsql", 
+                Npgsql.NpgsqlFactory.Instance);
+            DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient", 
+                FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
+            DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", 
+                MySqlConnector.MySqlConnectorFactory.Instance);
 
-            var confConnection = config.Connections.FirstOrDefault(x =>
-                string.Compare(x.Key, connectionKey, StringComparison.OrdinalIgnoreCase) == 0);
-
-            var connectionString = dataConnection != null ? dataConnection.ConnectionString.TrimToNull() : null;
-            if (connectionString == null && confConnection != null)
-                connectionString = confConnection.ConnectionString.TrimToNull();
-
-            var providerName = dataConnection != null ? dataConnection.ProviderName.TrimToNull() : null;
-            if (providerName == null && confConnection != null)
-                providerName = confConnection.ProviderName.TrimToNull();
-            providerName = providerName ?? "System.Data.SqlClient";
-
-#if !NET45
-            DbProviderFactories.RegisterFactory("System.Data.SqlClient", SqlClientFactory.Instance);
-            DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite", Microsoft.Data.Sqlite.SqliteFactory.Instance);
-            DbProviderFactories.RegisterFactory("Npgsql", Npgsql.NpgsqlFactory.Instance);
-            DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient", FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
-            DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
-#endif
-
-            if (connectionString.IndexOf("../../..") >= 0)
-                connectionString = connectionString.Replace("../../..", Path.GetDirectoryName(csproj));
-            else if (connectionString.IndexOf(@"..\..\..\") >= 0)
-                connectionString = connectionString.Replace(@"..\..\..\", Path.GetDirectoryName(csproj));
+            var sqlConnections = new DefaultSqlConnections(
+                new DefaultConnectionStrings(connectionStringOptions));
 
             ISchemaProvider schemaProvider;
             List<TableName> tableNames;
-            using (var connection = SqlConnections.New(connectionString, providerName))
+            using (var connection = sqlConnections.NewByKey(connectionKey))
             {
                 schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
                 tableNames = schemaProvider.GetTableNames(connection).ToList();
             }
 
             var tables = tableNames.Select(x => x.Tablename).ToList();
+            var confConnection = config.Connections.FirstOrDefault(x =>
+                string.Compare(x.Key, connectionKey, StringComparison.OrdinalIgnoreCase) == 0);
 
             if (outFile == null && table == null)
             {
@@ -383,7 +383,7 @@ namespace Serenity.CodeGenerator
 
             File.WriteAllText(Path.Combine(projectDir, "sergen.json"), config.SaveToJson());
 
-            using (var connection = SqlConnections.New(connectionString, providerName))
+            using (var connection = sqlConnections.NewByKey(connectionKey))
             {
                 connection.Open();
 

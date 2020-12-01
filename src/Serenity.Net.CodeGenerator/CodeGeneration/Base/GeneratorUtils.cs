@@ -36,14 +36,14 @@ namespace Serenity.Reflection
 
         public static bool IsSimpleType(Type type)
         {
-            if (type == typeof(String) ||
-                type == typeof(Int32) ||
-                type == typeof(Int64) ||
-                type == typeof(Int16) ||
-                type == typeof(Double) ||
-                type == typeof(Decimal) ||
+            if (type == typeof(string) ||
+                type == typeof(int) ||
+                type == typeof(long) ||
+                type == typeof(short) ||
+                type == typeof(double) ||
+                type == typeof(decimal) ||
                 type == typeof(DateTime) ||
-                type == typeof(Boolean) ||
+                type == typeof(bool) ||
                 type == typeof(TimeSpan))
                 return true;
 

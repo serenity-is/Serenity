@@ -1,22 +1,15 @@
 ﻿using Newtonsoft.Json.Linq;
 using Serenity.CodeGeneration;
-using Serenity.Data;
-using Serenity.Localization;
-using Serenity.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Xml.Linq;
 
 namespace Serenity.CodeGenerator
 {
     public class ServerTypingsCommand
     {
-        private static Encoding utf8 = new System.Text.UTF8Encoding(true);
-
         public void Run(string csproj, List<ExternalType> tsTypes)
         {
             var projectDir = Path.GetDirectoryName(csproj);
@@ -32,7 +25,7 @@ namespace Serenity.CodeGenerator
 
                 if (xtarget == null || string.IsNullOrEmpty(xtarget.Value))
                 {
-                    System.Console.Error.WriteLine("Couldn't read TargetFramework from project file for server typings generation!");
+                    Console.Error.WriteLine("Couldn't read TargetFramework from project file for server typings generation!");
                     Environment.Exit(1);
                 }
 
@@ -46,7 +39,8 @@ namespace Serenity.CodeGenerator
                 var outputExtension = ".dll";
                 var targetFramework = xtarget.Value;
                 if (targetFramework.StartsWith("net") &&
-                    !targetFramework.StartsWith("netcoreapp"))
+                    !targetFramework.StartsWith("netcoreapp") &&
+                    targetFramework.IndexOf('.') < 0)
                     outputExtension = ".exe";
 
                 var outputPath1 = Path.Combine(Path.GetDirectoryName(csproj), "bin/Debug/" + targetFramework + "/" + outputName + outputExtension)
@@ -66,7 +60,7 @@ namespace Serenity.CodeGenerator
                     assemblyFiles = new[] { outputPath2 };
                 else
                 {
-                    System.Console.Error.WriteLine(String.Format("Couldn't find output file for server typings generation at {0}!" + Environment.NewLine + 
+                    Console.Error.WriteLine(string.Format("Couldn't find output file for server typings generation at {0}!" + Environment.NewLine + 
                         "Make sure project is built successfully before running Sergen", outputPath1));
                     Environment.Exit(1);
                 }
@@ -76,13 +70,13 @@ namespace Serenity.CodeGenerator
             {
                 if (config.ServerTypings == null)
                 {
-                    System.Console.Error.WriteLine("ServerTypings is not configured in sergen.json file!");
+                    Console.Error.WriteLine("ServerTypings is not configured in sergen.json file!");
                     Environment.Exit(1);
                 }
 
                 if (config.ServerTypings.Assemblies.IsEmptyOrNull())
                 {
-                    System.Console.Error.WriteLine("ServerTypings has no assemblies configured in sergen.json file!");
+                    Console.Error.WriteLine("ServerTypings has no assemblies configured in sergen.json file!");
                     Environment.Exit(1);
                 }
 
@@ -107,7 +101,7 @@ namespace Serenity.CodeGenerator
                         assemblyFiles[i] = assemblyFile2;
                     else
                     {
-                        System.Console.Error.WriteLine(String.Format(String.Format("Assembly file '{0}' specified in sergen.json is not found! " +
+                        Console.Error.WriteLine(string.Format(string.Format("Assembly file '{0}' specified in sergen.json is not found! " +
                         "This might happen when project is not successfully built or file name doesn't match the output DLL." +
                         "Please check path in sergen.json and try again.", assemblyFile1)));
                         Environment.Exit(1);
@@ -117,12 +111,14 @@ namespace Serenity.CodeGenerator
 
             if (config.RootNamespace.IsEmptyOrNull())
             {
-                System.Console.Error.WriteLine("Please set RootNamespace option in sergen.json file!");
+                Console.Error.WriteLine("Please set RootNamespace option in sergen.json file!");
                 Environment.Exit(1);
             }
 
-            var generator = new ServerTypingsGenerator(assemblyFiles.ToArray());
-            generator.LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts;
+            var generator = new ServerTypingsGenerator(assemblyFiles.ToArray())
+            {
+                LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts
+            };
 
             var appSettings = Path.Combine(projectDir, "appsettings.json");
             if (generator.LocalTexts && File.Exists(appSettings))
@@ -130,7 +126,7 @@ namespace Serenity.CodeGenerator
                 try
                 {
                     var obj = JObject.Parse(File.ReadAllText(appSettings));
-                    var packages = ((obj["AppSettings"] as JObject)?["LocalTextPackages"] as JObject);
+                    var packages = (obj["AppSettings"] as JObject)?["LocalTextPackages"] as JObject;
                     if (packages != null)
                     {
                         foreach (var p in packages.PropertyValues())
@@ -140,7 +136,7 @@ namespace Serenity.CodeGenerator
                 }
                 catch (Exception ex)
                 {
-                    System.Console.WriteLine("Error occurred while parsing appsettings.json!" + Environment.NewLine + 
+                    Console.WriteLine("Error occurred while parsing appsettings.json!" + Environment.NewLine + 
                         ex.ToString());
                 }
             }

@@ -76,12 +76,12 @@ namespace Serenity.CodeGeneration
                     }
                 }
 
-                if (Char.IsLower(optionName[0]))
+                if (char.IsLower(optionName[0]))
                 {
                     if (optionName == "id")
                         optionName = "ID";
                     else
-                        optionName = Char.ToUpperInvariant(optionName[0]) +
+                        optionName = char.ToUpperInvariant(optionName[0]) +
                             optionName.Substring(1);
                 }
 

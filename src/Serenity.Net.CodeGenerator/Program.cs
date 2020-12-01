@@ -26,8 +26,8 @@ namespace Serenity.CodeGenerator
 
             if (!File.Exists(sergenJson))
             {
-                System.Console.Error.WriteLine("Can't find sergen.json in current directory!");
-                System.Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
+                Console.Error.WriteLine("Can't find sergen.json in current directory!");
+                Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
                 Environment.Exit(1);
             }
 
@@ -36,8 +36,8 @@ namespace Serenity.CodeGenerator
 
             if (!Directory.Exists(Path.Combine(projectDir, "wwwroot")))
             {
-                System.Console.Error.WriteLine("Can't find wwwroot folder in current directory!");
-                System.Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
+                Console.Error.WriteLine("Can't find wwwroot folder in current directory!");
+                Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
                 Environment.Exit(1);
             }
 
@@ -47,15 +47,15 @@ namespace Serenity.CodeGenerator
 
             if (csprojs.Length == 0)
             {
-                System.Console.Error.WriteLine("Can't find a project file in current directory!");
-                System.Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
+                Console.Error.WriteLine("Can't find a project file in current directory!");
+                Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
                 Environment.Exit(1);
             }
 
             if (csprojs.Length > 1)
             {
-                System.Console.Error.WriteLine("Multiple project files found in current directory!");
-                System.Console.Error.WriteLine("Please run Sergen in a folder that contains only one Asp.Net Core project.");
+                Console.Error.WriteLine("Multiple project files found in current directory!");
+                Console.Error.WriteLine("Please run Sergen in a folder that contains only one Asp.Net Core project.");
                 Environment.Exit(1);
             }
 
@@ -112,11 +112,7 @@ namespace Serenity.CodeGenerator
         private static void WriteHelp()
         {
             Console.WriteLine("Serenity Code Generator " +
-#if !NET45
                 System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
-#else
-                typeof(Program).GetType().Assembly.GetName().Version.ToString());
-#endif
             Console.WriteLine();
             Console.WriteLine("Usage: sergen [command]");
             Console.WriteLine();

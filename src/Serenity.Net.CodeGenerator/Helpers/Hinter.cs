@@ -17,7 +17,7 @@ namespace Serenity.CodeGenerator
             Console.OutputEncoding = Encoding.UTF8;
             ConsoleKeyInfo input;
 
-            userInput = userInput ?? String.Empty;
+            userInput = userInput ?? string.Empty;
 
             if (userInput.Length > 0)
             {
@@ -42,7 +42,7 @@ namespace Serenity.CodeGenerator
                     lastUserInput = lastUserInput ?? userInput;
                     var suggestions = hintSource
                         .Where(item => item.Length >= lastUserInput.Length &&
-                            String.Compare(item.Substring(0, lastUserInput.Length), lastUserInput, StringComparison.OrdinalIgnoreCase) == 0)
+                            string.Compare(item.Substring(0, lastUserInput.Length), lastUserInput, StringComparison.OrdinalIgnoreCase) == 0)
                         .Distinct()
                         .OrderBy(x => x)
                         .ToList();
@@ -69,7 +69,7 @@ namespace Serenity.CodeGenerator
                         lastUserInput = null;
                     }
                 }
-                else if (input != null && input.KeyChar != '\0' && Regex.IsMatch(input.KeyChar.ToString(), inputRegex))
+                else if (input.KeyChar != '\0' && Regex.IsMatch(input.KeyChar.ToString(), inputRegex))
                     userInput += input.KeyChar;
 
                 var same = 0;

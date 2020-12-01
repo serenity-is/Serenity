@@ -36,8 +36,8 @@ namespace Serenity.CodeGenerator
                 .Concat(Directory.GetFiles(Path.Combine(projectDir, @"typings"), "*.ts", SearchOption.AllDirectories))
                 .Where(x => !x.EndsWith(".d.ts") || x.IndexOf("Serenity") >= 0).OrderBy(x => x);
 
-            var tsServices = GetEmbeddedScript("Serenity.CodeGenerator.typeScriptServices.js");
-            var codeGeneration = GetEmbeddedScript("Serenity.CodeGenerator.Serenity.CodeGeneration.js");
+            var tsServices = GetEmbeddedScript("Serenity.CodeGenerator.Resource.typescriptServices.js");
+            var codeGeneration = GetEmbeddedScript("Serenity.CodeGenerator.Resource.Serenity.CodeGeneration.js");
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("var fs = require('fs');");

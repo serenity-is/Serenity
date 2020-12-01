@@ -80,7 +80,8 @@ namespace Serenity.CodeGeneration
                     run(EnqueueTypeMembers);
                     return;
                 }
-                else if (CecilUtils.GetAttr(type, "Serenity.Extensibility", "NestedPermissionKeysAttribute") != null)
+                else if (CecilUtils.GetAttr(type, "Serenity.Extensibility", "NestedPermissionKeysAttribute") != null ||
+                    CecilUtils.GetAttr(type, "Serenity.ComponentModel", "NestedPermissionKeysAttribute") != null)
                 {
                     run(GeneratePermissionKeys);
                 }
@@ -107,7 +108,8 @@ namespace Serenity.CodeGeneration
 
             cw.InBrace(delegate
             {
-                if (CecilUtils.IsSubclassOf(type, "Serenity.Data", "Row"))
+                if (CecilUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
+                    CecilUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
                     GenerateRowMembers(type);
                 else
                 {
@@ -167,7 +169,8 @@ namespace Serenity.CodeGeneration
                 }
             });
 
-            if (CecilUtils.IsSubclassOf(type, "Serenity.Data", "Row"))
+            if (CecilUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
+                CecilUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
                 GenerateRowMetadata(type);
         }
     }

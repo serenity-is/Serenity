@@ -1,7 +1,5 @@
 ﻿using System.Globalization;
-#if !NET45
 using System;
-#endif
 
 namespace Serenity
 {
@@ -18,11 +16,7 @@ namespace Serenity
             DateOrder = DateHelper.DateOrderString(order);
             DateFormat = DateHelper.DefaultDateFormat(order);
             DateTimeFormat = DateHelper.DefaultDateTimeFormat(order);
-#if !NET45
             DateSeparator = DateTime.MaxValue.ToString("yy/MM/dd", culture.DateTimeFormat)[2].ToString();
-#else
-            DateSeparator = culture.DateTimeFormat.DateSeparator;
-#endif
             DecimalSeparator = culture.NumberFormat.NumberDecimalSeparator;
             GroupSepearator = culture.NumberFormat.NumberGroupSeparator;
         }

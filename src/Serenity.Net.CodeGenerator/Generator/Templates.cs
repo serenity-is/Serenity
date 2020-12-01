@@ -41,7 +41,7 @@ namespace Serenity.CodeGenerator
                     template = sr.ReadToEnd();
             }
 
-            t = Scriban.Template.Parse(template);
+            t = Template.Parse(template);
             templateCache[templateKey] = t;
             return t;
         }

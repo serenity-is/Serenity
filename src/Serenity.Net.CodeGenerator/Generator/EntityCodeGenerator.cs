@@ -91,7 +91,7 @@ namespace Serenity.CodeGenerator
                         outputFile.StartsWith("//"))
                         throw new ArgumentOutOfRangeException("outputFile");
 
-                    outputFile = String.Format(outputFile, model.ClassName, model.Module, 
+                    outputFile = string.Format(outputFile, model.ClassName, model.Module, 
                         Path.GetDirectoryName(moduleClass), Path.GetDirectoryName(typingClass), rootDir);
 
                     var content = Templates.Render(templateKey, model);

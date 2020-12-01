@@ -1,57 +1,33 @@
-﻿<Project>
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>dotnet-sergen</AssemblyName>
-    <BaseIntermediateOutputPath>obj\Serenity.CodeGenerator\</BaseIntermediateOutputPath>
-    <TargetFrameworks>netcoreapp2.2;netcoreapp3.1;net461</TargetFrameworks>
+    <AssemblyName>sergen</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>Serenity.CodeGenerator</PackageId>
+    <RootNamespace>Serenity.CodeGenerator</RootNamespace>
+    <TargetFrameworks>net5.0</TargetFrameworks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PackAsTool>true</PackAsTool>
+    <PackageId>sergen</PackageId>
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>
     <EmbeddedResource Include="..\Serenity.Scripts\dist\Serenity.CodeGeneration.js">
-      <Link>Serenity.CodeGeneration.js</Link>
+      <Link>Resource\Serenity.CodeGeneration.js</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
-      <Link>typeScriptServices.js</Link>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resource\typescriptServices.js" />
     <EmbeddedResource Include="Templates\*.scriban" />
-    <Compile Remove="obj\**\*" />
-    <None Remove="obj\**\*" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj" />
+    <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Scriban" Version="2.1.1" />
-    <PackageReference Include="Mono.Cecil" Version="0.11.1" />
+    <PackageReference Include="Scriban" Version="3.0.4" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.3" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.5.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="$(FrameworkPackageVersion)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="$(FrameworkPackageVersion)" />
+    <PackageReference Include="MySqlConnector" Version="1.2.0" />
+    <PackageReference Include="Npgsql" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.0" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.1.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
-    <PackageReference Include="MySqlConnector" Version="0.61.0" />
-    <PackageReference Include="Npgsql" Version="4.1.2" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.1.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.1.0" />
-    <PackageReference Include="MySqlConnector" Version="0.61.0" />
-    <PackageReference Include="Npgsql" Version="4.1.2" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <DefineConstants>$(DefineConstants);ASPNETCORE22;NET45</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-    <DefineConstants>$(DefineConstants)</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
-    <DefineConstants>$(DefineConstants)</DefineConstants>
-  </PropertyGroup>
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>

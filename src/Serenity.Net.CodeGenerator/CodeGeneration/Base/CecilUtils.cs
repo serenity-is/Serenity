@@ -104,20 +104,16 @@ namespace Serenity.Reflection
                 return x;
             }).ToList();
 
-#if !NET45
             var resolver = ICSharpCode.Decompiler.UniversalAssemblyResolver
                 .LoadMainModule(assemblyLocations.First(), inMemory: true).AssemblyResolver
                     as ICSharpCode.Decompiler.UniversalAssemblyResolver;
-#else
-            var resolver = new Mono.Cecil.DefaultAssemblyResolver();
-#endif
 
             foreach (var assembly in assemblyLocations)
                 resolver.AddSearchDirectory(Path.GetDirectoryName(assembly));
 
             var assemblyDefinitions = new List<AssemblyDefinition>();
             foreach (var assembly in assemblyLocations)
-                assemblyDefinitions.Add(Mono.Cecil.AssemblyDefinition.ReadAssembly(
+                assemblyDefinitions.Add(AssemblyDefinition.ReadAssembly(
                     assembly, new Mono.Cecil.ReaderParameters
                     {
                         AssemblyResolver = resolver,
