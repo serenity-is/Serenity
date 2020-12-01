@@ -11,6 +11,11 @@ namespace Serenity.Data
         IOptions<ConnectionStringOptions>
     {
         /// <summary>
+        /// Default sectionkey for ConnectionStringOptions
+        /// </summary>
+        public const string SectionKey = "Data";
+
+        /// <summary>
         /// Creates a new instance
         /// </summary>
         public ConnectionStringOptions()
