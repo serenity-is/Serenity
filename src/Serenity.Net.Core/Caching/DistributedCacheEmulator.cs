@@ -16,9 +16,9 @@ namespace Serenity.Caching
         /// Creates a new instance
         /// </summary>
         /// <param name="clock">Clock source for testing purposes</param>
-        public DistributedCacheEmulator(ISystemClock clock)
+        public DistributedCacheEmulator(ISystemClock clock = null)
         {
-            this.clock = clock ?? throw new ArgumentNullException(nameof(clock));
+            this.clock = clock ?? new SystemClock();
         }
 
         /// <summary>
