@@ -10,13 +10,7 @@ namespace Serenity.Data
         private readonly IServiceProvider serviceProvider;
         private readonly ConcurrentDictionary<Type, RowFieldsBase> byType;
 
-        internal DefaultRowFieldsProvider()
-        {
-            byType = new ConcurrentDictionary<Type, RowFieldsBase>();
-        }
-
         public DefaultRowFieldsProvider(IServiceProvider serviceProvider)
-            : this()
         {
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
@@ -28,22 +22,16 @@ namespace Serenity.Data
 
         private RowFieldsBase CreateType(Type fieldsType)
         {
-            RowFieldsBase fields;
-            if (serviceProvider == null)
-            {
-                fields = (RowFieldsBase)Activator.CreateInstance(fieldsType);
-                fields.Initialize(annotations: null, SqlSettings.DefaultDialect);
-                return fields;
-            }
-
             var annotationRegistry = serviceProvider.GetService<IAnnotationTypeRegistry>();
             var connectionStrings = serviceProvider.GetService<IConnectionStrings>();
-            fields = (RowFieldsBase)ActivatorUtilities.CreateInstance(serviceProvider, fieldsType);
+            var fields = (RowFieldsBase)ActivatorUtilities.CreateInstance(serviceProvider, fieldsType);
 
             IAnnotatedType annotations = null;
-            if (annotationRegistry != null)
+            if (annotationRegistry != null &&
+                fieldsType.IsNested &&
+                typeof(IRow).IsAssignableFrom(fieldsType.DeclaringType))
             {
-                annotations = annotationRegistry.GetAnnotationTypesFor(fieldsType)
+                annotations = annotationRegistry.GetAnnotationTypesFor(fieldsType.DeclaringType)
                     .GetAnnotatedType();
             }
 

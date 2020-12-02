@@ -4,6 +4,7 @@ using Serenity.Abstractions;
 using Serenity.Caching;
 using Serenity.Localization;
 using Serenity.Reflection;
+using System.Reflection;
 
 namespace Serenity.Extensions.DependencyInjection
 {
@@ -41,6 +42,16 @@ namespace Serenity.Extensions.DependencyInjection
         public static void AddAnnotationTypes(this IServiceCollection services)
         {
             services.TryAddSingleton<IAnnotationTypeRegistry, AnnotationTypeRegistry>();
+        }
+
+        /// <summary>
+        /// Adds a type source to the registry.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        /// <param name="assemblies">List of assembles</param>
+        public static void AddTypeSource(this IServiceCollection services, Assembly[] assemblies)
+        {
+            services.TryAddSingleton<ITypeSource>(new DefaultTypeSource(assemblies));
         }
     }
 }

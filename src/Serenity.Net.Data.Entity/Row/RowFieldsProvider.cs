@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading;
 
 namespace Serenity.Data
@@ -10,7 +11,7 @@ namespace Serenity.Data
 
         static RowFieldsProvider()
         {
-            defaultProvider = new DefaultRowFieldsProvider();
+            defaultProvider = FallbackRowFieldsProvider.Instance;
             localProvider = new AsyncLocal<IRowFieldsProvider>();
         }
 
@@ -36,6 +37,17 @@ namespace Serenity.Data
         }
 
         /// <summary>
+        /// Sets default row fields provider by resolving it from the service provider.
+        /// </summary>
+        /// <param name="services">Services. Required.</param>
+        /// <returns>Old default provider</returns>
+        public static IRowFieldsProvider SetDefaultFrom(IServiceProvider services)
+        {
+            return SetDefault((services ?? throw new ArgumentNullException(nameof(services)))
+                .GetRequiredService<IRowFieldsProvider>());
+        }
+
+        /// <summary>
         /// Sets local row fields provider for current thread and async context. 
         /// Useful for background tasks, async methods, and testing to set provider locally and for 
         /// auto spawned threads.
@@ -47,6 +59,29 @@ namespace Serenity.Data
             var old = localProvider.Value;
             localProvider.Value = provider;
             return old;
+        }
+
+        /// <summary>
+        /// Sets local row fields provider by resolving it from the service provider.
+        /// </summary>
+        /// <param name="services">Services. Required.</param>
+        /// <returns>Old default provider</returns>
+        public static IRowFieldsProvider SetLocalFrom(IServiceProvider services)
+        {
+            return SetLocal((services ?? throw new ArgumentNullException(nameof(services)))
+                .GetRequiredService<IRowFieldsProvider>());
+        }
+
+        /// <summary>
+        /// Resolves a fields class using current row fields provider
+        /// </summary>
+        /// <typeparam name="TFields"></typeparam>
+        /// <param name="fieldsProvider"></param>
+        /// <returns></returns>
+        public static TFields Resolve<TFields>()
+            where TFields : RowFieldsBase
+        {
+            return (TFields)Current.Resolve(typeof(TFields));
         }
     }
 }
