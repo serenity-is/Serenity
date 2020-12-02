@@ -12,6 +12,7 @@ namespace Serenity.Data
 
         public DefaultRowFieldsProvider(IServiceProvider serviceProvider)
         {
+            this.byType = new ConcurrentDictionary<Type, RowFieldsBase>();
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
