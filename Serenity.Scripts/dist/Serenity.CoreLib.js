@@ -7420,12 +7420,7 @@ var Serenity;
         };
         TimeEditor.prototype.set_readOnly = function (value) {
             if (value !== this.get_readOnly()) {
-                if (value) {
-                    this.element.addClass('readonly').attr('readonly', 'readonly');
-                }
-                else {
-                    this.element.removeClass('readonly').removeAttr('readonly');
-                }
+                Serenity.EditorUtils.setReadonly(this.element, value);
                 Serenity.EditorUtils.setReadonly(this.minutes, value);
             }
         };
