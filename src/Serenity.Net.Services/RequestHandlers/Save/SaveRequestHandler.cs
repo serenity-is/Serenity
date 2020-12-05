@@ -92,7 +92,7 @@ namespace Serenity.Services
                 {
                     var entityId = Connection.InsertAndGetID(Row);
                     Response.EntityId = entityId;
-                    Row.IdField.AsObject(Row, entityId);
+                    Row.IdField.AsObject(Row, Row.IdField.ConvertValue(entityId, CultureInfo.InvariantCulture));
                 }
                 else
                 {
