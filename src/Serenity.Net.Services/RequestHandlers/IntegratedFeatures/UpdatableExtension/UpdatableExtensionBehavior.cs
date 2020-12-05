@@ -52,7 +52,8 @@ namespace Serenity.Services
 
                 var rowType = attr.RowType;
                 if (rowType.IsAbstract ||
-                    !typeof(IRow).IsAssignableFrom(rowType))
+                    !typeof(IRow).IsAssignableFrom(rowType) ||
+                    rowType.IsInterface)
                 {
                     throw new ArgumentException(string.Format(
                         "Row type '{1}' has an ExtensionRelation attribute " +

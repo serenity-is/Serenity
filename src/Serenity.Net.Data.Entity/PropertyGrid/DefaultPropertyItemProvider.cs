@@ -106,7 +106,9 @@ namespace Serenity.PropertyGrid
                 return null;
 
             var basedOnRowType = basedOnRowAttr.RowType;
-            if (!typeof(IRow).IsAssignableFrom(basedOnRowType))
+            if (!typeof(IRow).IsAssignableFrom(basedOnRowType) ||
+                basedOnRowType.IsInterface ||
+                basedOnRowType.IsAbstract)
                 throw new InvalidOperationException(string.Format(
                     "BasedOnRowAttribute value ({0}) must be set to a subclass of {1}!",
                         type.FullName, typeof(IRow).FullName));

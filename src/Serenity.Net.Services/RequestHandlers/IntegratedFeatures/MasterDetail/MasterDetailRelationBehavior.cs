@@ -53,7 +53,8 @@ namespace Serenity.Services
 
             rowType = rowListType.GetGenericArguments()[0];
             if (rowType.IsAbstract ||
-                !typeof(IRow).IsAssignableFrom(rowType))
+                !typeof(IRow).IsAssignableFrom(rowType) ||
+                rowType.IsInterface)
             {
                 throw new ArgumentException(string.Format(
                     "Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +

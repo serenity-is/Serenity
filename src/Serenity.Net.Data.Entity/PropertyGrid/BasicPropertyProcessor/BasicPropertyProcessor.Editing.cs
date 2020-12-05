@@ -43,6 +43,7 @@ namespace Serenity.PropertyGrid
                             var isRow = source.Property != null &&
                                 source.Property.ReflectedType != null &&
                                 !source.Property.ReflectedType.IsAbstract &&
+                                !source.Property.ReflectedType.IsInterface &&
                                 typeof(IRow).IsAssignableFrom(source.Property.ReflectedType);
 
                             if (!isRow)
@@ -162,6 +163,7 @@ namespace Serenity.PropertyGrid
 
             if (typeof(IRow).IsAssignableFrom(sle.ItemType) &&
                 !sle.ItemType.IsAbstract &&
+                !sle.ItemType.IsInterface &&
                 (!editorParams.ContainsKey("idField") ||
                     !editorParams.ContainsKey("textField") ||
                     (!editorParams.ContainsKey("includeColumns") &&

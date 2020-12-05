@@ -26,7 +26,8 @@ namespace Serenity.Web
             var list = new List<DistinctValuesEditorAttribute>();
             foreach (var type in typeSource.GetTypes())
             {
-                bool isRow = type.IsSubclassOf(typeof(IRow));
+                bool isRow = typeof(IRow).IsAssignableFrom(type) &&
+                    !type.IsInterface;
 
                 if (!isRow &&
                     type.GetCustomAttribute<FormScriptAttribute>() == null &&
@@ -49,7 +50,7 @@ namespace Serenity.Web
                     {
                         if (attr.RowType.IsInterface ||
                             attr.RowType.IsAbstract ||
-                            !attr.RowType.IsSubclassOf(typeof(IRow)))
+                            !typeof(IRow).IsAssignableFrom(attr.RowType))
                         {
                             throw new Exception("DistinctValuesEditor can't be used with type: " +
                                 attr.RowType.FullName + " as it is not a row type. This attribute is specified " +
@@ -66,7 +67,8 @@ namespace Serenity.Web
                             var basedOnRowAttr = type.GetCustomAttribute<BasedOnRowAttribute>();
                             if (basedOnRowAttr == null || basedOnRowAttr.RowType == null ||
                                 basedOnRowAttr.RowType.IsAbstract ||
-                                !basedOnRowAttr.RowType.IsSubclassOf(typeof(IRow)))
+                                basedOnRowAttr.RowType.IsInterface ||
+                                !typeof(IRow).IsAssignableFrom(basedOnRowAttr.RowType))
                             {
                                 throw new Exception("Invalid usage of DistinctValuesEditor attribute on " +
                                     "property " + property.Name + " of " + type.FullName + ". " +

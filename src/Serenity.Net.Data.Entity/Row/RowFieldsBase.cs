@@ -67,7 +67,8 @@ namespace Serenity.Data
                     "RowFields type {0} must be a nested type!", fieldsType.Name));
 
             rowType = fieldsType.DeclaringType;
-            if (!typeof(IRow).IsAssignableFrom(rowType))
+            if (!typeof(IRow).IsAssignableFrom(rowType) ||
+                rowType.IsInterface)
                 throw new InvalidProgramException(string.Format(
                     "RowFields {0}'s declaring row type {0} must be a subclass of Row!", fieldsType.Name, rowType.Name));
 
