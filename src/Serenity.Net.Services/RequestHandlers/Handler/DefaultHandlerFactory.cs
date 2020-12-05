@@ -33,7 +33,7 @@ namespace Serenity.Services
 
             if (handlers.Length == 0)
             {
-                var attr = handlerInterface.GetAttribute<GenericHandlerTypeAttribute>();
+                var attr = handlerInterface.GetAttribute<GenericHandlerTypeAttribute>(true);
                 if (attr == null)
                     throw new InvalidProgramException($"{handlerInterface.FullName} does not have a GenericHandlerTypeAttribute!");
 
