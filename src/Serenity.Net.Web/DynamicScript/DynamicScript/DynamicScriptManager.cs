@@ -72,7 +72,7 @@ namespace Serenity.Web
                 var key = s.Key;
                 if (key != "RegisteredScripts")
                 {
-                    result[key] = PeekScripHash(key, s.Value);
+                    result[key] = PeekScriptHash(key, s.Value);
                 }
             }
             return result;
@@ -83,7 +83,7 @@ namespace Serenity.Web
             return registeredScripts.Keys;
         }
 
-        public string PeekScripHash(string name, IDynamicScript script)
+        public string PeekScriptHash(string name, IDynamicScript script)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -100,7 +100,8 @@ namespace Serenity.Web
             else
                 scriptContent = cache.GetLocalStoreOnly<ScriptContent>(cacheKey, TimeSpan.Zero, groupKey, null);
 
-            if (scriptLastChange.TryGetValue(name, out DateTime lastChange) &&
+            if (scriptContent != null &&
+                scriptLastChange.TryGetValue(name, out DateTime lastChange) &&
                 lastChange >= scriptContent.Time)
             {
                 if (groupKey == null)
@@ -187,7 +188,7 @@ namespace Serenity.Web
             if (!registeredScripts.TryGetValue(name, out var script))
                 return name;
 
-            var hash = PeekScripHash(name, script);
+            var hash = PeekScriptHash(name, script);
 
             return name + extension + "?v=" + hash;
         }
