@@ -3,9 +3,9 @@ using Serenity.Web;
 using System;
 using Xunit;
 
-namespace Serenity.Net.Core.Tests
+namespace Serenity.Tests.Authorization
 {
-    public partial class LogicOperatorPermissionServiceTests
+    public class LogicOperatorPermissionServiceTests
     {
         private class FakePermissionService : IPermissionService
         {
@@ -34,9 +34,9 @@ namespace Serenity.Net.Core.Tests
             Assert.False(lops.HasPermission("B:C"));
 
             expected = true;
-            Assert.True( lops.HasPermission(""));
-            Assert.True( lops.HasPermission("A"));
-            Assert.True( lops.HasPermission("B:C"));
+            Assert.True(lops.HasPermission(""));
+            Assert.True(lops.HasPermission("A"));
+            Assert.True(lops.HasPermission("B:C"));
         }
 
         private static IPermissionService FakeService()
@@ -59,22 +59,22 @@ namespace Serenity.Net.Core.Tests
         public void ReturnsTrueForOrWhenAllTrue()
         {
             var lops = new LogicOperatorPermissionService(FakeService());
-            Assert.True( lops.HasPermission("T|Y"));
-            Assert.True( lops.HasPermission("Y|T"));
-            Assert.True( lops.HasPermission("Y|Y|Y"));
-            Assert.True( lops.HasPermission("Y|Y|T|T"));
-            Assert.True( lops.HasPermission("Y|T|Y|T"));
+            Assert.True(lops.HasPermission("T|Y"));
+            Assert.True(lops.HasPermission("Y|T"));
+            Assert.True(lops.HasPermission("Y|Y|Y"));
+            Assert.True(lops.HasPermission("Y|Y|T|T"));
+            Assert.True(lops.HasPermission("Y|T|Y|T"));
         }
 
         [Fact]
         public void ReturnsTrueForOrWhenSomeTrue()
         {
             var lops = new LogicOperatorPermissionService(FakeService());
-            Assert.True( lops.HasPermission("T|F"));
-            Assert.True( lops.HasPermission("Y|N"));
-            Assert.True( lops.HasPermission("N|Y|N"));
-            Assert.True( lops.HasPermission("F|F|T|T"));
-            Assert.True( lops.HasPermission("N|Y|N|F|N|N"));
+            Assert.True(lops.HasPermission("T|F"));
+            Assert.True(lops.HasPermission("Y|N"));
+            Assert.True(lops.HasPermission("N|Y|N"));
+            Assert.True(lops.HasPermission("F|F|T|T"));
+            Assert.True(lops.HasPermission("N|Y|N|F|N|N"));
         }
 
         [Fact]
@@ -92,11 +92,11 @@ namespace Serenity.Net.Core.Tests
         public void ReturnsTrueForAndWhenAllTrue()
         {
             var lops = new LogicOperatorPermissionService(FakeService());
-            Assert.True( lops.HasPermission("T&Y"));
-            Assert.True( lops.HasPermission("Y&T"));
-            Assert.True( lops.HasPermission("Y&Y&Y"));
-            Assert.True( lops.HasPermission("Y&Y&T&T"));
-            Assert.True( lops.HasPermission("Y&T&Y&T"));
+            Assert.True(lops.HasPermission("T&Y"));
+            Assert.True(lops.HasPermission("Y&T"));
+            Assert.True(lops.HasPermission("Y&Y&Y"));
+            Assert.True(lops.HasPermission("Y&Y&T&T"));
+            Assert.True(lops.HasPermission("Y&T&Y&T"));
         }
 
         [Fact]
@@ -116,11 +116,11 @@ namespace Serenity.Net.Core.Tests
             var lops = new LogicOperatorPermissionService(FakeService());
             Assert.False(lops.HasPermission("F|T&F"));
             Assert.False(lops.HasPermission("F|F&T"));
-            Assert.True( lops.HasPermission("T|F&T"));
+            Assert.True(lops.HasPermission("T|F&T"));
             Assert.False(lops.HasPermission("F&T|F&T"));
             Assert.False(lops.HasPermission("T&F|F|F&T"));
             Assert.False(lops.HasPermission("T&T&T&F|F&F&F&T"));
-            Assert.True( lops.HasPermission("T&T&T&F|T&T|F&F&F&T"));
+            Assert.True(lops.HasPermission("T&T&T&F|T&T|F&F&F&T"));
         }
 
         [Theory]

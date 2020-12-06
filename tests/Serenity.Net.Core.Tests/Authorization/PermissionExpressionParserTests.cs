@@ -1,11 +1,10 @@
-﻿
-using Serenity.Services;
+﻿using Serenity.Services;
 using System;
 using Xunit;
 
-namespace Serenity.Test
+namespace Serenity.Tests.Authorization
 {
-    public partial class PermissionExpressionParserTests
+    public class PermissionExpressionParserTests
     {
         private bool HasPermission(string permission)
         {
@@ -88,7 +87,7 @@ namespace Serenity.Test
         {
             var tokens = PermissionExpressionParser.Tokenize(expression);
             var rpn = PermissionExpressionParser.ShuntingYard(tokens);
-            Assert.Throws<InvalidOperationException>(() => 
+            Assert.Throws<InvalidOperationException>(() =>
             {
                 PermissionExpressionParser.Evaluate(rpn, HasPermission);
             });
