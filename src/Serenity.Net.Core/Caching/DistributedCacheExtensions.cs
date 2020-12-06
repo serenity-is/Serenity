@@ -19,6 +19,9 @@ namespace Serenity
         public static void SetAutoJson<TValue>(this IDistributedCache cache, string key, TValue value)
             where TValue: class
         {
+            if (cache == null)
+                throw new ArgumentNullException(nameof(cache));
+
             if (value == null)
                 cache.Remove(key);
             else if (value is string s)
@@ -39,6 +42,9 @@ namespace Serenity
         public static void SetAutoJson<TValue>(this IDistributedCache cache, string key, TValue value, TimeSpan expiration)
             where TValue: class
         {
+            if (cache == null)
+                throw new ArgumentNullException(nameof(cache));
+
             if (value == null || expiration < TimeSpan.Zero)
             {
                 cache.Remove(key);
@@ -72,6 +78,9 @@ namespace Serenity
         public static TValue GetAutoJson<TValue>(this IDistributedCache cache, string key)
             where TValue: class
         {
+            if (cache == null)
+                throw new ArgumentNullException(nameof(cache));
+
             var b = cache.Get(key);
             if (b == null)
                 return null;
