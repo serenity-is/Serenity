@@ -27,7 +27,7 @@ namespace Serenity.Net.Entity.Tests
         [Fact]
         public void Can_Create_Row_With_Initialized_Fields_With_DefaultScope()
         {
-            RowFieldsProvider.SetLocal(new DefaultRowFieldsProvider());
+            RowFieldsProvider.SetLocal(FallbackRowFieldsProvider.Instance);
             var fields = new ComplexRow.RowFields();
             fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance);
             new ComplexRow(fields)
