@@ -6,7 +6,7 @@
     <Description>Contains classes for CRUD service / repository implementations...</Description>            
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Net.Data.Entity\Serenity.Net.Data.Entity.csproj" />
+    <ProjectReference Include="..\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="$(FrameworkPackageVersion)" />
