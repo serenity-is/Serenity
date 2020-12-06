@@ -1,28 +1,32 @@
-﻿using FakeItEasy;
-using Serenity.Abstractions;
+﻿using Serenity.Abstractions;
 using Serenity.Web;
+using System;
 using Xunit;
 
-namespace Serenity.Test
+namespace Serenity.Net.Core.Tests
 {
-    [Collection("AvoidParallel")]
     public partial class LogicOperatorPermissionServiceTests
     {
-        private class OneZeroPermissionService : IPermissionService
+        private class FakePermissionService : IPermissionService
         {
+            private readonly Func<string, bool> hasPermission;
+
+            public FakePermissionService(Func<string, bool> hasPermission)
+            {
+                this.hasPermission = hasPermission ?? throw new ArgumentNullException(nameof(hasPermission));
+            }
+
             public bool HasPermission(string permission)
             {
-                return permission != null && permission.IndexOf("1") >= 0;
+                return hasPermission(permission);
             }
         }
 
         [Fact]
         public void ShouldDelegateSimplePermissionsToUnderlyingOne()
         {
-            var ps = A.Fake<IPermissionService>();
             var expected = false;
-            A.CallTo(() => ps.HasPermission(A<string>.Ignored))
-                .ReturnsLazily(s => expected);
+            var ps = new FakePermissionService(p => expected);
 
             var lops = new LogicOperatorPermissionService(ps);
             Assert.False(lops.HasPermission(""));
@@ -35,14 +39,9 @@ namespace Serenity.Test
             Assert.True( lops.HasPermission("B:C"));
         }
 
-        private IPermissionService FakeService()
+        private static IPermissionService FakeService()
         {
-            var ps = A.Fake<IPermissionService>();
-            A.CallTo(() => ps.HasPermission("T")).Returns(true);
-            A.CallTo(() => ps.HasPermission("F")).Returns(false);
-            A.CallTo(() => ps.HasPermission("Y")).Returns(true);
-            A.CallTo(() => ps.HasPermission("N")).Returns(false);
-            return ps;
+            return new FakePermissionService(p => p == "T" || p == "Y");
         }
 
         [Fact]
@@ -174,9 +173,9 @@ namespace Serenity.Test
         [InlineData("(!0 | (1 | !0) & !1 | (!(0 & 0) & 0))", true)]
         [InlineData("(!(!0 | (1 | !0) & !1 | (!(0 & 0) & 0)))", false)]
         [InlineData("(!(!Module:0 | (Module:1 | !0) & !Module:1 | (!(Module:Permission:0 & Module:SubModule:0) & Module:SubModule:0)))", false)]
-        public void Evaluate_Permission(string permission, bool expected)
+        public void Evaluates_Expression_As_Expected(string permission, bool expected)
         {
-            var lops = new LogicOperatorPermissionService(new OneZeroPermissionService());
+            var lops = new LogicOperatorPermissionService(new FakePermissionService(p => p != null && p.IndexOf("1") >= 0));
             var actual = lops.HasPermission(permission);
             if (expected)
                 Assert.True(actual);
