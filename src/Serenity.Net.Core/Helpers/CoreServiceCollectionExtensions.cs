@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serenity.Abstractions;
-using Serenity.Caching;
 using Serenity.Localization;
 using Serenity.Reflection;
 using System.Reflection;
@@ -21,7 +20,7 @@ namespace Serenity.Extensions.DependencyInjection
         public static void AddCaching(this IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.TryAddSingleton<IDistributedCache, DistributedCacheEmulator>();
+            services.AddDistributedMemoryCache();
             services.TryAddSingleton<ITwoLevelCache, TwoLevelCache>();
         }
 
