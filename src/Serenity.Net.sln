@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Core", "Sereni
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Data", "Serenity.Net.Data\Serenity.Net.Data.csproj", "{A2B991E8-3E2C-477F-B70A-22355C52A8B8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Data.Entity", "Serenity.Net.Data.Entity\Serenity.Net.Data.Entity.csproj", "{716C65D4-B1B0-49D1-80BD-780659577150}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Entity", "Serenity.Net.Entity\Serenity.Net.Entity.csproj", "{716C65D4-B1B0-49D1-80BD-780659577150}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Services", "Serenity.Net.Services\Serenity.Net.Services.csproj", "{D0697A40-5BCB-4B2E-B72C-E371AFEF3BD9}"
 EndProject

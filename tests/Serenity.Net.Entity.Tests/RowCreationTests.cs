@@ -2,7 +2,7 @@ using Serenity.Data;
 using System;
 using Xunit;
 
-namespace Serenity.Net.Data.Entity.Tests
+namespace Serenity.Net.Entity.Tests
 {
     public class RowCreationTests
     {
