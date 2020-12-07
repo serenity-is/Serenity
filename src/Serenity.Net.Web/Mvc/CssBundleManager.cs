@@ -179,15 +179,17 @@ namespace Serenity.Web
 
                         string sourceUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, sourceFile);
                         sourceUrl = VirtualPathUtility.ToAbsolute(contextAccessor, sourceUrl);
+                        var rootUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/");
 
-                        if (sourceUrl.IsNullOrEmpty())
+                        if (sourceUrl.IsNullOrEmpty() || !sourceUrl.StartsWith(rootUrl))
                             continue;
 
                         registerInBundle(sourceUrl);
 
                         bundleParts.Add(() =>
                         {
-                            var sourcePath = PathHelper.SecureCombine(hostEnvironment.WebRootPath, sourceUrl);
+                            var sourcePath = PathHelper.SecureCombine(hostEnvironment.WebRootPath, 
+                                sourceUrl.Substring(rootUrl.Length));
                             if (!File.Exists(sourcePath))
                                 return string.Format(errorLines, string.Format("File {0} is not found!", sourcePath));
 
@@ -215,7 +217,10 @@ namespace Serenity.Web
 
                                     try
                                     {
-                                        var result = NUglify.Uglify.Css(code);
+                                        var result = NUglify.Uglify.Css(code, new NUglify.Css.CssSettings
+                                        {
+                                            LineBreakThreshold = 1000
+                                        });
                                         if (!result.HasErrors)
                                             code = result.Code;
                                     }

@@ -129,7 +129,7 @@ namespace Serenity.Web
             var contentHashCache = context.RequestServices.GetRequiredService<IContentHashCache>();
 
             if (bundleManager.IsEnabled)
-                return Stylesheet(helper, "dynamic://Bundle." + bundleKey);
+                return Script(helper, "dynamic://Bundle." + bundleKey);
 
             StringBuilder sb = new StringBuilder();
             foreach (var include in bundleManager.GetBundleIncludes(bundleKey))
