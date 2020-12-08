@@ -288,6 +288,15 @@ namespace Serenity.CodeGenerator
                         if (frg.FieldName.Equals(foreign.PKColumn, StringComparison.OrdinalIgnoreCase))
                             continue;
 
+                        if (frg.FieldName.Equals("password", StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        if (frg.FieldName.Equals("passwordhash", StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        if (frg.FieldName.Equals("passwordsalt", StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        
                         var k = ToEntityField(frg, frgPrefix);
                         k.Flags = null;
                         k.Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName.Substring(frgPrefix)));
