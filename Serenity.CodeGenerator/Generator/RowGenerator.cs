@@ -214,6 +214,10 @@ namespace Serenity.CodeGenerator
                     removeForeignFields.Add(n);
             }
 
+            removeForeignFields.Add("password");
+            removeForeignFields.Add("passwordhash");
+            removeForeignFields.Add("passwordsalt");
+
             if (baseRowFieldset != null &&
                 baseRowFieldset.Count > 0)
             {
@@ -286,15 +290,6 @@ namespace Serenity.CodeGenerator
                     foreach (var frg in frgfld)
                     {
                         if (frg.FieldName.Equals(foreign.PKColumn, StringComparison.OrdinalIgnoreCase))
-                            continue;
-
-                        if (frg.FieldName.Equals("password", StringComparison.OrdinalIgnoreCase))
-                            continue;
-
-                        if (frg.FieldName.Equals("passwordhash", StringComparison.OrdinalIgnoreCase))
-                            continue;
-
-                        if (frg.FieldName.Equals("passwordsalt", StringComparison.OrdinalIgnoreCase))
                             continue;
                         
                         var k = ToEntityField(frg, frgPrefix);
