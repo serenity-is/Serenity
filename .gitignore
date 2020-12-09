@@ -14,7 +14,6 @@ StyleCop.Cache
 Documentation/Samples/packages/*/*
 TestResults/
 CodeGenerator/app.config
-Build/
 /Bin/
 Samples/Serene/packages/
 Samples/Serene/Serene/Serene.Web/bin
