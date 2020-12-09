@@ -17,8 +17,6 @@
   <files>
 	<file src="style\*.css" target="content/Content/serenity" />
     <file src="texts\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content/Scripts/serenity/texts" />
-    <file src="dist\Serenity.CodeGeneration.js" target="content/Scripts/serenity" />
-	<file src="dist\Serenity.CodeGeneration.min.js" target="content/Scripts/serenity" />
 	<file src="dist\Serenity.CoreLib.d.ts" target="content/Scripts/serenity" />	
     <file src="dist\Serenity.CoreLib.js" target="content/Scripts/serenity" />
     <file src="dist\Serenity.CoreLib.js.map" target="content/Scripts/serenity" />
