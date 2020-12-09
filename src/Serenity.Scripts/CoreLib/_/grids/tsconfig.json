@@ -1,0 +1,44 @@
+﻿{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outFile": "../../../dist/grids/serenity-grids.js",
+    "composite": true,
+	"rootDir": "../../"
+  },
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../slick"
+    },
+    {
+      "path": "../widget"
+    },
+    {
+      "path": "../forms"
+    },
+    {
+      "path": "../editors"
+    },
+    {
+      "path": "../dialogs"
+    },
+    {
+      "path": "../quickfilter"
+    },
+    {
+      "path": "../filterpanel"
+    }
+  ],
+  "files": [
+    "../../UI/DataGrid/SlickPager.ts",
+    "../../UI/Helpers/SlickHelpers.ts",
+    "../../UI/Formatters/Formatters.ts",
+    "../../UI/DataGrid/DataGrid.ts",
+    "../../UI/DataGrid/ColumnPickerDialog.ts",
+    "../../UI/DataGrid/EntityGrid.ts",
+    "../../UI/DataGrid/TreeGridMixin.ts",
+    "../../UI/Editors/CheckTreeEditor.ts"
+  ]
+}

@@ -1,0 +1,42 @@
+﻿{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outFile": "../../../dist/widget/serenity-widget.js",
+    "composite": true,
+	"rootDir": "../../"
+  },
+  "references": [
+    {
+      "path": "../core"
+    }
+  ],
+  "files": [
+    "../../Types/Decorators.ts",
+    "../../Types/IDialog.ts",
+    "../../Types/IEditDialog.ts",
+    "../../Types/IBooleanValue.ts",
+    "../../Types/IDoubleValue.ts",
+    "../../Types/IStringValue.ts",
+    "../../Types/IGetEditValue.ts",
+    "../../Types/ISetEditValue.ts",
+    "../../Types/IReadOnly.ts",
+    "../../Types/IValidateRequired.ts",  
+    "../../Types/CaptureOperationType.ts",
+    "../../Types/DataChangeInfo.ts",
+    "../../Types/DialogTypeRegistry.ts",
+    "../../Types/EditorTypeRegistry.ts",
+    "../../Types/EnumTypeRegistry.ts",
+    "../../Types/ReflectionUtils.ts",
+    "../../UI/Widgets/CreateWidgetParams.ts",
+    "../../UI/Widgets/Widget.ts",
+    "../../UI/Widgets/TemplatedWidget.ts",
+    "../../UI/Editors/CascadedWidgetLink.ts",
+    "../../UI/Helpers/UploadHelper.ts",
+    "../../UI/Widgets/Toolbar.ts",
+    "../../UI/Editors/EditorUtils.ts",
+    "../../UI/Helpers/LazyLoadHelper.ts",
+    "../../UI/Helpers/SubDialogHelper.ts",
+    "../../UI/Widgets/PrefixedContext.ts",
+    "../../Imports/jQueryUIFixes.ts"
+  ]
+}

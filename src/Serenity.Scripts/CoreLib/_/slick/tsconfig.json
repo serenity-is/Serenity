@@ -1,0 +1,24 @@
+﻿{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outFile": "../../../dist/slick/serenity-slick.js",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../core" 
+    }
+  ],
+  "files": [
+    "../../SlickGrid/Event.ts",
+    "../../SlickGrid/Grouping.ts",
+    "../../SlickGrid/Formatter.ts",
+    "../../SlickGrid/Column.ts",
+    "../../SlickGrid/GridOptions.ts",
+    "../../SlickGrid/Grid.ts",
+    "../../SlickGrid/Aggregators.ts",
+    "../../SlickGrid/RemoteView.ts",
+    "../../SlickGrid/Autotooltips.ts",
+    "../../SlickGrid/RowMoveManager.ts"
+  ]
+}
