@@ -3,5 +3,5 @@
 [assembly: AssemblyCompany("Serenity")]
 [assembly: AssemblyProduct("Serenity Platform")]
 [assembly: AssemblyCopyright("Copyright © Volkan Ceylan")]
-[assembly: AssemblyVersion("5.0.2")]
-[assembly: AssemblyFileVersion("5.0.2")]
+[assembly: AssemblyVersion("5.0.3")]
+[assembly: AssemblyFileVersion("5.0.3")]
