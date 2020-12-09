@@ -1,10 +1,10 @@
-﻿
+﻿using Serenity;
+using Serenity.Web;{{if AspNetCore}}
+using Microsoft.AspNetCore.Mvc;{{else}}
+using System.Web.Mvc;{{end}}
+
 namespace {{RootNamespace}}{{DotModule}}.Pages
 {
-    using Serenity;
-    using Serenity.Web;{{if AspNetCore}}
-    using Microsoft.AspNetCore.Mvc;{{else}}
-    using System.Web.Mvc;{{end}}
 {{if !AspNetCore}}
     [RoutePrefix("{{ModuleSlash}}{{ClassName}}"), Route("{action=index}")]{{end}}
     [PageAuthorize(typeof(Entities.{{RowClassName}}))]

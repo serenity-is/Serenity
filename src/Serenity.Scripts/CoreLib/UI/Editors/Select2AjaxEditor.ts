@@ -155,8 +155,12 @@
                 var el = this.element;
                 el.select2('val', value);
                 el.data('select2-change-triggered', true);
-                el.triggerHandler('change', [true])
-                el.data('select2-change-triggered', false);
+                try {
+                    el.triggerHandler('change', [true]); // valueSet: true
+                }
+                finally {
+                    el.data('select2-change-triggered', false);
+                }
             }
         }
 

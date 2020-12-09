@@ -3,6 +3,7 @@ using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Serenity.Services
 {
@@ -50,14 +51,51 @@ namespace Serenity.Services
             uow.OnCommit += updater.Update;
         }
 
-        public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, RowFieldsBase fields)
+        private static void ProcessTwoLevelCachedAttribute(ITwoLevelCache cache, IUnitOfWork uow, Type type)
         {
-            InvalidateOnCommit(cache, uow, fields.GenerationKey);
+            if (type == null)
+                return;
+
+            var attr = type.DeclaringType.GetCustomAttribute<TwoLevelCachedAttribute>(true);
+            if (attr == null)
+                return;
+
+            if (attr.GenerationKeys != null)
+            {
+                foreach (var key in attr.GenerationKeys)
+                {
+                    InvalidateOnCommit(cache, uow, key);
+                }
+            }
+
+            if (attr.LinkedRows != null)
+            {
+                foreach (var rowType in attr.LinkedRows)
+                {
+                    var rowInstance = (IRow)Activator.CreateInstance(rowType);
+                    InvalidateOnCommit(cache, uow, rowInstance.GetFields().GenerationKey);
+                }
+            }
         }
 
-        public static void InvalidateOnCommit(ITwoLevelCache cache, IUnitOfWork uow, IRow row)
+        public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, RowFieldsBase fields)
         {
+            if (fields is null)
+                throw new ArgumentNullException(nameof(fields));
+
+            InvalidateOnCommit(cache, uow, fields.GenerationKey);
+
+            if (fields.GetType().IsNested)
+                ProcessTwoLevelCachedAttribute(cache, uow, fields.GetType().DeclaringType);
+        }
+
+        public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, IRow row)
+        {
+            if (row is null)
+                throw new ArgumentNullException(nameof(row));
+
             InvalidateOnCommit(cache, uow, row.GetFields().GenerationKey);
+            ProcessTwoLevelCachedAttribute(cache, uow, row.GetType());
         }
     }
 }

@@ -3,7 +3,6 @@ Serenity Application Platform
 
 <img src="https://github.com/volkanceylan/Serenity/blob/master/Tools/Images/serenity-logo-128.png" />
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3b9118bb630f4ee593757b8d59d0322f)](https://www.codacy.com/app/Serenity/Serenity?utm_source=github.com&utm_medium=referral&utm_content=volkanceylan/Serenity&utm_campaign=badger)
 [![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Core/)
 
 ## What is Serenity Platform

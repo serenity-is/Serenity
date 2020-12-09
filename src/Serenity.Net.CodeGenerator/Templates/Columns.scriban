@@ -1,14 +1,13 @@
-﻿
+﻿using Serenity;
+using Serenity.ComponentModel;
+using Serenity.Data;
+using System;
+using System.ComponentModel;
+using System.Collections.Generic;
+using System.IO;
+
 namespace {{RootNamespace}}{{DotModule}}.Columns
 {
-    using Serenity;
-    using Serenity.ComponentModel;
-    using Serenity.Data;
-    using System;
-    using System.ComponentModel;
-    using System.Collections.Generic;
-    using System.IO;
-
     [ColumnsScript("{{ModuleDot}}{{ClassName}}")]
     [BasedOnRow(typeof(Entities.{{RowClassName}}), CheckNames = true)]
     public class {{ClassName}}Columns

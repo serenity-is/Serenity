@@ -1048,8 +1048,8 @@ var Serenity;
         };
         ;
         Widget.prototype.changeSelect2 = function (handler) {
-            this.element.on('change.' + this.uniqueName, function (e) {
-                if (!$(e.target).hasClass('select2-change-triggered'))
+            this.element.on('change.' + this.uniqueName, function (e, valueSet) {
+                if (valueSet !== true)
                     handler(e);
             });
         };

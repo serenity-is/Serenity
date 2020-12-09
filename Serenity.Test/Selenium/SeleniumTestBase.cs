@@ -8,6 +8,7 @@ using System.IO;
 using System.Threading;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
+using WebDriverManager.Helpers;
 
 namespace Serenity.Testing
 {
@@ -73,7 +74,7 @@ namespace Serenity.Testing
 
             private SeleniumDriverManager()
             {
-                new DriverManager().SetUpDriver(new ChromeConfig());
+                new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
                 var options = new ChromeOptions();
                 options.AddArgument("-headless");
                 driver = new ChromeDriver(options);

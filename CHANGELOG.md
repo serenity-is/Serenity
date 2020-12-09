@@ -1,3 +1,16 @@
+## 3.14.5 (2020-11-24)
+
+Features:
+  - support ICustomQueryParameter interface of Dapper, used to control parameter type like varchar (ansi), fixed length etc.
+
+Bugfixes:
+  - try another logic similar to original one implemented for changeSelect2
+
+## 3.14.4 (2020-11-23)
+
+Bugfixes:
+  - fix changeSelect2 is raised even when value is set through .value property due to check using hasClass instead of data
+
 ## 3.14.3 (2020-10-21)
 
 Bugfixes:
