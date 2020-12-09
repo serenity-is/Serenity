@@ -39,7 +39,7 @@
   </Target>
   <Target Name="MinimizeScripts" AfterTargets="AfterBuild" Inputs="@(ToMinimize)" Outputs="@(ToMinimize->'%(RecursiveDir)%(Filename).min.js')">
     <Message Text="Minimizing %(ToMinimize.Identity)..." Importance="high"></Message>
-    <Exec Command="node &quot;$(ProjectDir)node_modules/uglify-js/bin/uglifyjs&quot; &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename)%(ToMinimize.Extension)&quot; -o &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename).min.js&quot; --comments --mangle" />
+    <Exec Command="node &quot;$(ProjectDir)node_modules/uglify-js/bin/uglifyjs&quot; &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename)%(ToMinimize.Extension)&quot; -o &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename).min.js&quot; --comments --mangle -b &quot;beautify=false, max_line_len=1000&quot; " />
   </Target>
   <Target Name="CompileSerenityLess" AfterTargets="AfterBuild" Inputs="@(ToSerenityLess)" Outputs="style\serenity.css">
     <Exec Command="node &quot;$(ProjectDir)node_modules/less/bin/lessc&quot; &quot;$(ProjectDir)style\serenity.less&quot; &gt; &quot;$(ProjectDir)style\serenity.css&quot;" />
