@@ -56,7 +56,7 @@ namespace Serenity.Services
             if (type == null)
                 return;
 
-            var attr = type.DeclaringType.GetCustomAttribute<TwoLevelCachedAttribute>(true);
+            var attr = type.GetCustomAttribute<TwoLevelCachedAttribute>(true);
             if (attr == null)
                 return;
 
@@ -85,8 +85,9 @@ namespace Serenity.Services
 
             InvalidateOnCommit(cache, uow, fields.GenerationKey);
 
-            if (fields.GetType().IsNested)
-                ProcessTwoLevelCachedAttribute(cache, uow, fields.GetType().DeclaringType);
+            var fieldsType = fields.GetType();
+            if (fieldsType.IsNested && fieldsType.DeclaringType != null)
+                ProcessTwoLevelCachedAttribute(cache, uow, fieldsType.DeclaringType);
         }
 
         public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, IRow row)
