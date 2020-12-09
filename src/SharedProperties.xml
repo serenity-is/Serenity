@@ -1,7 +1,7 @@
 ﻿<Project>
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
-    <VersionPrefix>5.0.0</VersionPrefix>
+    <VersionPrefix>5.0.1</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -13,12 +13,14 @@
     <PackageTags>Serenity</PackageTags>
   </PropertyGroup>
   <PropertyGroup>
-	<NewtonsoftJsonVersion>12.0.3</NewtonsoftJsonVersion>
-	<FrameworkPackageVersion>5.0</FrameworkPackageVersion>
-	<AspNetCorePackageVersion>5.0</AspNetCorePackageVersion>
+    <NewtonsoftJsonVersion>12.0.3</NewtonsoftJsonVersion>
+    <FrameworkPackageVersion>5.0</FrameworkPackageVersion>
+    <AspNetCorePackageVersion>5.0</AspNetCorePackageVersion>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.3" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)SharedAssemblyInfo.cs" />
