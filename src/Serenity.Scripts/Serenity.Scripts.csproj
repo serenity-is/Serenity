@@ -18,7 +18,11 @@
     <EmbeddedResource Remove="node_modules\**" />
     <TypeScriptCompile Remove="node_modules\**" />
     <ToMinimize Include="dist\**\*.js"></ToMinimize>
+    <ToMinimize Include="..\Serenity.Assets\Scripts\jquery-ui.js"></ToMinimize>
+    <ToMinimize Include="..\Serenity.Assets\Scripts\jquery.dialogExtendQ.js"></ToMinimize>
+    <ToMinimize Include="..\Serenity.Assets\Scripts\SlickGrid\slick.grid.js"></ToMinimize>
     <ToMinimize Remove="dist\**\*.min.js"></ToMinimize>
+    <ToSerenityLess Include="style\**\*.less"></ToSerenityLess>
   </ItemGroup>
 
   <ItemGroup>
@@ -35,7 +39,9 @@
   </Target>
   <Target Name="MinimizeScripts" AfterTargets="AfterBuild" Inputs="@(ToMinimize)" Outputs="@(ToMinimize->'%(RecursiveDir)%(Filename).min.js')">
     <Message Text="Minimizing %(ToMinimize.Identity)..." Importance="high"></Message>
-    <Exec Command="node &quot;$(ProjectDir)node_modules/uglify-js/bin/uglifyjs&quot; &quot;$(ProjectDir)%(ToMinimize.Identity)&quot; -o &quot;$(ProjectDir)dist\%(ToMinimize.RecursiveDir)%(ToMinimize.Filename).min.js&quot; --comments --mangle" />
-  </Target>  
-
+    <Exec Command="node &quot;$(ProjectDir)node_modules/uglify-js/bin/uglifyjs&quot; &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename)%(ToMinimize.Extension)&quot; -o &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename).min.js&quot; --comments --mangle" />
+  </Target>
+  <Target Name="CompileSerenityLess" AfterTargets="AfterBuild" Inputs="@(ToSerenityLess)" Outputs="style\serenity.css">
+    <Exec Command="node &quot;$(ProjectDir)node_modules/less/bin/lessc&quot; &quot;$(ProjectDir)style\serenity.less&quot; &gt; &quot;$(ProjectDir)style\serenity.css&quot;" />
+  </Target>
 </Project>
