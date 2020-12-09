@@ -576,6 +576,13 @@ namespace Serenity.CodeGeneration
                 responseType = (responseType as GenericInstanceType).GenericArguments[0];
                 return true;
             }
+            else if (responseType != null &&
+                responseType.IsGenericInstance &&
+                (responseType as GenericInstanceType).ElementType.FullName.StartsWith("System.Threading.Tasks.Task`1"))
+            {
+                responseType = (responseType as GenericInstanceType).GenericArguments[0];
+                return true;
+            }
             else if (CecilUtils.IsOrSubClassOf(responseType.Resolve(), "System.Web.Mvc", "ActionResult") ||
                 CecilUtils.IsOrSubClassOf(responseType.Resolve(), "Microsoft.AspNetCore.Mvc", "ActionResult"))
                 return false;
