@@ -1,11 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Serenity.Abstractions;
-using Serenity.Extensions.DependencyInjection;
-using Serenity.PropertyGrid;
-using Serenity.Web.Middleware;
 using System;
 
 namespace Serenity.Web

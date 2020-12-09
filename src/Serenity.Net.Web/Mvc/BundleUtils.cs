@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Serenity.Data;
+﻿using Serenity.Data;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
