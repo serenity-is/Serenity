@@ -18,7 +18,8 @@
     "flatpickr": "4.6.3"
   },
   "devDependencies": {
-    "jest": "25.4.0"
+    "jest": "25.4.0",
+    "uglify-js": "3.12.1"
   },
   "scripts": {},
   "author": "",
