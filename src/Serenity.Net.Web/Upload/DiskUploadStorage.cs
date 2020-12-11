@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Serenity.Web
 {
@@ -27,34 +28,103 @@ namespace Serenity.Web
                 RootPath = Path.Combine(AppContext.BaseDirectory, PathHelper.ToPath(RootPath));
         }
 
-        public string FilePath(string path)
+        private string FilePath(string path)
         {
             return PathHelper.SecureCombine(RootPath, PathHelper.ToPath(path));
         }
 
         public string GetFileUrl(string path)
         {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            if (IsInternalFile(path))
+                throw new ArgumentOutOfRangeException(nameof(path));
+
             return PathHelper.SecureCombine(RootUrl, PathHelper.ToUrl(path));
+        }
+
+        private bool IsInternalFile(string path)
+        {
+            return path != null && Path.GetExtension(path)?.ToLowerInvariant()?.Trim() == "meta";
         }
 
         public bool FileExists(string path)
         {
-            return File.Exists(FilePath(path));
+            return File.Exists(FilePath(path)) && !IsInternalFile(path);
         }
 
-        public virtual string GetOriginalName(string path)
+        public virtual IDictionary<string, string> GetFileMetadata(string path)
         {
-            var temporaryFilePath = FilePath(path);
-            var origFile = Path.ChangeExtension(temporaryFilePath, ".orig");
-            if (File.Exists(origFile))
-                using (var sr = new StreamReader(File.OpenRead(origFile)))
-                    return sr.ReadLine();
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
 
-            return Path.GetFileName(path);
+            if (IsInternalFile(path))
+                throw new ArgumentOutOfRangeException(nameof(path));
+
+            var filePath = FilePath(path);
+            var metaFile = filePath + ".meta";
+            if (File.Exists(metaFile))
+            {
+                var json = File.ReadAllText(metaFile);
+                if (!string.IsNullOrEmpty(json) &&
+                    json[0] == '{' &&
+                    json[1] == '}')
+                {
+                    return JSON.Parse<Dictionary<string, string>>(json);
+                }
+            }
+
+            return new Dictionary<string, string>();
+        }
+
+        public virtual void SetFileMetadata(string path, IDictionary<string, string> metadata, bool overwriteAll)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            if (metadata == null)
+                throw new ArgumentNullException(nameof(metadata));
+
+            if (IsInternalFile(path))
+                throw new ArgumentOutOfRangeException(nameof(path));
+
+            var filePath = FilePath(path);
+            var metaFile = filePath + ".meta";
+
+            if (overwriteAll && metadata.Count == 0)
+            {
+                if (File.Exists(metaFile))
+                    TemporaryFileHelper.TryDeleteOrMark(metaFile);
+            }
+            else if (metadata.Count == 0)
+                return;
+            
+            if (!overwriteAll && File.Exists(metaFile))
+            {
+                var existing = GetFileMetadata(path);
+                foreach (var x in metadata)
+                    existing[x.Key] = x.Value;
+                metadata = existing;
+            }
+
+            File.WriteAllText(metaFile, JSON.StringifyIndented(metadata));
         }
 
         public string CopyFrom(IUploadStorage store, string sourcePath, string targetPath, bool autoRename)
         {
+            if (string.IsNullOrEmpty(sourcePath))
+                throw new ArgumentNullException(sourcePath);
+
+            if (IsInternalFile(sourcePath))
+                throw new ArgumentOutOfRangeException(nameof(sourcePath));
+
+            if (string.IsNullOrEmpty(targetPath))
+                throw new ArgumentNullException(nameof(targetPath));
+
+            if (IsInternalFile(targetPath))
+                throw new ArgumentOutOfRangeException(nameof(targetPath));
+
             var newFiles = new List<string>();
             using var source = store.OpenFile(sourcePath);
             targetPath = WriteFile(targetPath, source, autoRename);
@@ -84,6 +154,12 @@ namespace Serenity.Web
 
         public string ArchiveFile(string path)
         {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            if (IsInternalFile(path))
+                throw new ArgumentOutOfRangeException(nameof(path));
+
             string date = DateTime.UtcNow.ToString("yyyyMMdd", Invariants.DateTimeFormat);
             string dbHistoryFile = "history/" + date + "/" + Guid.NewGuid().ToString("N") + Path.GetExtension(path);
             CopyFrom(this, path, dbHistoryFile, false);
@@ -94,6 +170,9 @@ namespace Serenity.Web
         {
             if (string.IsNullOrEmpty(path))
                 return;
+
+            if (IsInternalFile(path))
+                throw new ArgumentOutOfRangeException(nameof(path));
 
             var fileName = PathHelper.SecureCombine(RootPath, PathHelper.ToPath(path));
 
@@ -112,17 +191,25 @@ namespace Serenity.Web
             }
 
             TemporaryFileHelper.Delete(fileName + ".meta", DeleteType.TryDeleteOrMark);
-            TemporaryFileHelper.Delete(fileName + ".orig", DeleteType.TryDeleteOrMark);
         }
 
         public long GetFileSize(string path)
         {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            if (IsInternalFile(path))
+                throw new ArgumentOutOfRangeException(nameof(path));
+
             return new FileInfo(FilePath(path)).Length;
         }
 
         public string[] GetFiles(string path, string searchPattern)
         {
-            return Directory.GetFiles(FilePath(path), searchPattern);
+            return Directory.GetFiles(FilePath(path), searchPattern)
+                .Select(x => Path.GetRelativePath(RootPath, x))
+                .Where(x => !IsInternalFile(x))
+                .ToArray();
         }
 
         public Stream OpenFile(string path)
@@ -136,6 +223,12 @@ namespace Serenity.Web
 
         public string WriteFile(string path, Stream source, bool autoRename)
         {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            if (IsInternalFile(path))
+                throw new ArgumentOutOfRangeException(nameof(path));
+
             var targetFile = FilePath(path);
 
             if (File.Exists(targetFile))

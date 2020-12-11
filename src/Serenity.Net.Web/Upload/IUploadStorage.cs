@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace Serenity.Web
 {
@@ -11,7 +12,8 @@ namespace Serenity.Web
         string GetFileUrl(string path);
         long GetFileSize(string path);
         string[] GetFiles(string path, string searchPattern);
-        string GetOriginalName(string path);
+        IDictionary<string, string> GetFileMetadata(string path);
+        void SetFileMetadata(string path, IDictionary<string, string> metadata, bool overwriteAll);
         Stream OpenFile(string path);
         void PurgeTemporaryFiles();
         string WriteFile(string path, Stream source, bool autoRename);

@@ -1,25 +1,31 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Serenity.Web
 {
     public static class UploadStorageExtensions
     {
-        public static string GetThumbnailUrl(this IUploadStorage storage, string path)
+        public static string GetThumbnailUrl(this IUploadStorage uploadStorage, string path)
         {
             if (string.IsNullOrEmpty(path))
                 return null;
 
             var thumb = UploadPathHelper.GetThumbnailName(path);
 
-            return storage.GetFileUrl(thumb);
+            return uploadStorage.GetFileUrl(thumb);
         }
       
-        public static CopyTemporaryFileResult CopyTemporaryFile(this IUploadStorage storage, CopyTemporaryFileOptions options)
+        public static CopyTemporaryFileResult CopyTemporaryFile(this IUploadStorage uploadStorage, 
+            CopyTemporaryFileOptions options)
         {
-            long size = storage.GetFileSize(options.TemporaryFile);
+            if (uploadStorage is null)
+                throw new ArgumentNullException(nameof(uploadStorage));
+
+            long size = uploadStorage.GetFileSize(options.TemporaryFile);
             string path = PathHelper.ToUrl(UploadFormatting.FormatFilename(options));
-            path = storage.CopyFrom(storage, options.TemporaryFile, path, autoRename: true);
-            bool hasThumbnail = storage.FileExists(UploadPathHelper.GetThumbnailName(options.TemporaryFile));
+            path = uploadStorage.CopyFrom(uploadStorage, options.TemporaryFile, path, autoRename: true);
+            bool hasThumbnail = uploadStorage.FileExists(UploadPathHelper.GetThumbnailName(options.TemporaryFile));
 
             var result = new CopyTemporaryFileResult()
             {
@@ -36,11 +42,40 @@ namespace Serenity.Web
 
         public static byte[] ReadAllFileBytes(this IUploadStorage uploadStorage, string path)
         {
+            if (uploadStorage is null)
+                throw new ArgumentNullException(nameof(uploadStorage));
+
             using var ms = new MemoryStream();
             using (var fs = uploadStorage.OpenFile(path))
                 fs.CopyTo(ms);
 
             return ms.ToArray();
+        }
+
+        public static string GetOriginalName(this IUploadStorage uploadStorage, string path)
+        {
+            if (uploadStorage is null)
+                throw new ArgumentNullException(nameof(uploadStorage));
+
+            var metadata = uploadStorage.GetFileMetadata(path);
+            if (metadata != null &&
+                metadata.TryGetValue(FileMetadataKeys.OriginalName, out string originalName))
+                return originalName;
+
+            return null;
+        }
+
+        public static void SetOriginalName(this IUploadStorage uploadStorage, string path, string originalName)
+        {
+            if (uploadStorage is null)
+                throw new ArgumentNullException(nameof(uploadStorage));
+
+            var metadata = new Dictionary<string, string>()
+            {
+                [FileMetadataKeys.OriginalName] = originalName
+            };
+
+            uploadStorage.SetFileMetadata(path, metadata, overwriteAll: false);
         }
     }
 }
