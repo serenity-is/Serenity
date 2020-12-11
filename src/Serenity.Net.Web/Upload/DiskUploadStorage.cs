@@ -28,7 +28,7 @@ namespace Serenity.Web
                 RootPath = Path.Combine(AppContext.BaseDirectory, PathHelper.ToPath(RootPath));
         }
 
-        private string FilePath(string path)
+        protected string FilePath(string path)
         {
             return PathHelper.SecureCombine(RootPath, PathHelper.ToPath(path));
         }

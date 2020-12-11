@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Serenity.Web
@@ -77,14 +78,6 @@ namespace Serenity.Web
             return mainStorage.GetFileUrl(path);
         }
 
-        public string GetOriginalName(string path)
-        {
-            if (IsSubPath(path))
-                return subStorage.GetOriginalName(path.Substring(subPrefix.Length));
-
-            return mainStorage.GetOriginalName(path);
-        }
-
         public Stream OpenFile(string path)
         {
             if (IsSubPath(path))
@@ -105,6 +98,22 @@ namespace Serenity.Web
                 return subStorage.WriteFile(path, source, autoRename);
             else
                 return mainStorage.WriteFile(path, source, autoRename);
+        }
+
+        public IDictionary<string, string> GetFileMetadata(string path)
+        {
+            if (IsSubPath(path))
+                return subStorage.GetFileMetadata(path);
+            else
+                return mainStorage.GetFileMetadata(path);
+        }
+
+        public void SetFileMetadata(string path, IDictionary<string, string> metadata, bool overwriteAll)
+        {
+            if (IsSubPath(path))
+               subStorage.SetFileMetadata(path, metadata, overwriteAll);
+            else
+               mainStorage.SetFileMetadata(path, metadata, overwriteAll);
         }
     }
 }

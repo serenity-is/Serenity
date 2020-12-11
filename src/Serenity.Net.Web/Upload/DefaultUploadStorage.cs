@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Serenity.Web
@@ -27,8 +28,8 @@ namespace Serenity.Web
                 }),
                 new TempUploadStorage(new DiskUploadStorageOptions
                 {
-                    RootPath = Path.Combine(opt.Path),
-                    RootUrl = opt.Url + "temporary/"
+                    RootPath = Path.Combine(opt.Path, "temporary"),
+                    RootUrl = UriHelper.Combine(opt.Url, "temporary/")
                 }),
                 "temporary/");
         }
@@ -68,11 +69,6 @@ namespace Serenity.Web
             return combined.GetFileUrl(path);
         }
 
-        public string GetOriginalName(string path)
-        {
-            return combined.GetOriginalName(path);
-        }
-
         public Stream OpenFile(string path)
         {
             return combined.OpenFile(path);
@@ -86,6 +82,16 @@ namespace Serenity.Web
         public string WriteFile(string path, Stream source, bool autoRename)
         {
             return combined.WriteFile(path, source, autoRename);
+        }
+
+        public IDictionary<string, string> GetFileMetadata(string path)
+        {
+            return combined.GetFileMetadata(path);
+        }
+
+        public void SetFileMetadata(string path, IDictionary<string, string> metadata, bool overwriteAll)
+        {
+            combined.SetFileMetadata(path, metadata, overwriteAll);
         }
     }
 }
