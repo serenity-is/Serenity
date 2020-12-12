@@ -25,7 +25,7 @@ namespace Serenity.Web
         public string ArchiveFile(string path)
         {
             if (IsSubPath(path))
-                subStorage.ArchiveFile(path[subPrefix.Length..]);
+                return subStorage.ArchiveFile(path[subPrefix.Length..]);
             
             return mainStorage.ArchiveFile(path);
         }
@@ -34,8 +34,8 @@ namespace Serenity.Web
         {
             if (IsSubPath(targetPath))
                 return subStorage.CopyFrom(source, path, targetPath[subPrefix.Length..], autoRename);
-            else
-                return mainStorage.CopyFrom(source, path, targetPath, autoRename);
+                
+            return mainStorage.CopyFrom(source, path, targetPath, autoRename);
         }
 
         public void DeleteFile(string path)
@@ -96,16 +96,16 @@ namespace Serenity.Web
         {
             if (IsSubPath(path))
                 return subStorage.WriteFile(path[subPrefix.Length..], source, autoRename);
-            else
-                return mainStorage.WriteFile(path, source, autoRename);
+                
+            return mainStorage.WriteFile(path, source, autoRename);
         }
 
         public IDictionary<string, string> GetFileMetadata(string path)
         {
             if (IsSubPath(path))
                 return subStorage.GetFileMetadata(path[subPrefix.Length..]);
-            else
-                return mainStorage.GetFileMetadata(path);
+                
+            return mainStorage.GetFileMetadata(path);
         }
 
         public void SetFileMetadata(string path, IDictionary<string, string> metadata, bool overwriteAll)
