@@ -32,9 +32,8 @@
     </PackageReference>
   </ItemGroup>
 
-  <Target Name="NpmInstall" BeforeTargets="BeforeBuild">
-    <Message Text="Installing NPM packages..." Importance="high">
-    </Message>
+  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\@types\jquery\index.d.ts')">
+    <Message Text="Installing NPM packages..." Importance="high"></Message>
     <Exec Command="npm install" />
   </Target>
   <Target Name="MinimizeScripts" AfterTargets="AfterBuild" Inputs="@(ToMinimize)" Outputs="@(ToMinimize->'%(RecursiveDir)%(Filename).min.js')">
