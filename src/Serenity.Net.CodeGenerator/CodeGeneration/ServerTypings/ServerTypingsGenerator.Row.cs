@@ -20,6 +20,17 @@ namespace Serenity.CodeGeneration
 
                 var fieldsType = rowType.NestedTypes.FirstOrDefault(x =>
                     CecilUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
+
+                if (fieldsType == null &&
+                    rowType.HasGenericParameters)
+                {
+                    var gp = rowType.GenericParameters.FirstOrDefault(x => 
+                        x.HasConstraints &&
+                        x.Constraints.Any(c => CecilUtils.IsSubclassOf(c.ConstraintType.Resolve(), "Serenity.Data", "RowFieldsBase")));
+                    if (gp != null)
+                        fieldsType = gp.Constraints.First(c => CecilUtils.IsSubclassOf(c.ConstraintType.Resolve(), "Serenity.Data", "RowFieldsBase"))
+                            .ConstraintType.Resolve();
+                }
                 
                 if (fieldsType != null)
                 {
