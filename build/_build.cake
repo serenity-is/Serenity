@@ -191,6 +191,7 @@ Task("Clean")
     CleanDirectories(nupkgDir);
     CreateDirectory(nupkgDir);
     CleanDirectories(src + "/Serenity.*/**/bin/" + configuration);
+	CleanDirectories(root + "tests/**/bin/");
 });
 
 Task("Restore")
@@ -233,7 +234,17 @@ Task("Test")
     .IsDependentOn("Compile")
     .Does(() =>
 {
-    XUnit2(root + "tests/*.Tests/**/bin/" + configuration + "/*.Tests.dll");
+		var projects = GetFiles(root + "/tests/**/*.csproj");
+        foreach(var project in projects)
+        {
+            DotNetCoreTest(
+                project.FullPath,
+                new DotNetCoreTestSettings()
+                {
+                    Configuration = configuration,
+                    NoBuild = true
+                });
+        }
 });
 
 Task("Pack")
