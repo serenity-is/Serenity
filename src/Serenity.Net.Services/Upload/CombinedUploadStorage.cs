@@ -25,7 +25,7 @@ namespace Serenity.Web
         public string ArchiveFile(string path)
         {
             if (IsSubPath(path))
-                subStorage.ArchiveFile(path.Substring(subPrefix.Length));
+                subStorage.ArchiveFile(path[subPrefix.Length..]);
             
             return mainStorage.ArchiveFile(path);
         }
@@ -33,7 +33,7 @@ namespace Serenity.Web
         public string CopyFrom(IUploadStorage source, string path, string targetPath, bool autoRename)
         {
             if (IsSubPath(targetPath))
-                return subStorage.CopyFrom(source, path, targetPath.Substring(subPrefix.Length), autoRename);
+                return subStorage.CopyFrom(source, path, targetPath[subPrefix.Length..], autoRename);
             else
                 return mainStorage.CopyFrom(source, path, targetPath, autoRename);
         }
@@ -41,7 +41,7 @@ namespace Serenity.Web
         public void DeleteFile(string path)
         {
             if (IsSubPath(path))
-                subStorage.DeleteFile(path.Substring(subPrefix.Length));
+                subStorage.DeleteFile(path[subPrefix.Length..]);
             else
                 mainStorage.DeleteFile(path);
         }
@@ -49,7 +49,7 @@ namespace Serenity.Web
         public bool FileExists(string path)
         {
             if (IsSubPath(path))
-                return subStorage.FileExists(path.Substring(subPrefix.Length));
+                return subStorage.FileExists(path[subPrefix.Length..]);
                 
             return mainStorage.FileExists(path);
         }
@@ -57,7 +57,7 @@ namespace Serenity.Web
         public string[] GetFiles(string path, string searchPattern)
         {
             if (IsSubPath(path))
-                return subStorage.GetFiles(path.Substring(subPrefix.Length), searchPattern);
+                return subStorage.GetFiles(path[subPrefix.Length..], searchPattern);
                 
             return mainStorage.GetFiles(path, searchPattern);
         }
@@ -65,7 +65,7 @@ namespace Serenity.Web
         public long GetFileSize(string path)
         {
             if (IsSubPath(path))
-                return subStorage.GetFileSize(path.Substring(subPrefix.Length));
+                return subStorage.GetFileSize(path[subPrefix.Length..]);
                 
             return mainStorage.GetFileSize(path);
         }
@@ -73,7 +73,7 @@ namespace Serenity.Web
         public string GetFileUrl(string path)
         {
             if (IsSubPath(path))
-                return subStorage.GetFileUrl(path.Substring(subPrefix.Length));
+                return subStorage.GetFileUrl(path[subPrefix.Length..]);
                 
             return mainStorage.GetFileUrl(path);
         }
@@ -81,7 +81,7 @@ namespace Serenity.Web
         public Stream OpenFile(string path)
         {
             if (IsSubPath(path))
-                return subStorage.OpenFile(path.Substring(subPrefix.Length));
+                return subStorage.OpenFile(path[subPrefix.Length..]);
             
             return mainStorage.OpenFile(path);
         }
@@ -95,7 +95,7 @@ namespace Serenity.Web
         public string WriteFile(string path, Stream source, bool autoRename)
         {
             if (IsSubPath(path))
-                return subStorage.WriteFile(path, source, autoRename);
+                return subStorage.WriteFile(path[subPrefix.Length..], source, autoRename);
             else
                 return mainStorage.WriteFile(path, source, autoRename);
         }
@@ -103,7 +103,7 @@ namespace Serenity.Web
         public IDictionary<string, string> GetFileMetadata(string path)
         {
             if (IsSubPath(path))
-                return subStorage.GetFileMetadata(path);
+                return subStorage.GetFileMetadata(path[subPrefix.Length..]);
             else
                 return mainStorage.GetFileMetadata(path);
         }
@@ -111,7 +111,7 @@ namespace Serenity.Web
         public void SetFileMetadata(string path, IDictionary<string, string> metadata, bool overwriteAll)
         {
             if (IsSubPath(path))
-               subStorage.SetFileMetadata(path, metadata, overwriteAll);
+               subStorage.SetFileMetadata(path[subPrefix.Length..], metadata, overwriteAll);
             else
                mainStorage.SetFileMetadata(path, metadata, overwriteAll);
         }

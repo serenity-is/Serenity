@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,7 @@ namespace Serenity.Web
     {
         private readonly CombinedUploadStorage combined;
 
-        public DefaultUploadStorage(IOptions<UploadSettings> options)
+        public DefaultUploadStorage(IOptions<UploadSettings> options, IWebHostEnvironment hostEnvironment = null)
         {
             var opt = (options ?? throw new ArgumentNullException(nameof(options))).Value;
             if (string.IsNullOrEmpty(opt.Path))
@@ -20,15 +21,22 @@ namespace Serenity.Web
                 throw new ArgumentOutOfRangeException(nameof(opt.Path),
                     "Please set UploadSettings.Url in appsettings.json!");
 
+            var path = opt.Path;
+            if (path.StartsWith("~/", StringComparison.OrdinalIgnoreCase))
+                path = path[2..]; // compatibility with old settings
+
+            path = Path.Combine(hostEnvironment?.ContentRootPath ?? AppDomain.CurrentDomain.BaseDirectory,
+                PathHelper.ToPath(path));
+
             combined = new CombinedUploadStorage(
                 new DiskUploadStorage(new DiskUploadStorageOptions
                 {
-                    RootPath = opt.Path,
+                    RootPath = path,
                     RootUrl = opt.Url
                 }),
                 new TempUploadStorage(new DiskUploadStorageOptions
                 {
-                    RootPath = Path.Combine(opt.Path, "temporary"),
+                    RootPath = Path.Combine(path, "temporary"),
                     RootUrl = UriHelper.Combine(opt.Url, "temporary/")
                 }),
                 "temporary/");
