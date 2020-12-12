@@ -102,7 +102,7 @@ namespace Serenity.CodeGenerator
         }
 
         public static EntityModel GenerateModel(IDbConnection connection, string tableSchema, string table,
-            string module, string connectionKey, string entityClass, string permission, GeneratorConfig config)
+            string module, string connectionKey, string entityClass, string permission, GeneratorConfig config, bool net5Plus)
         {
             var model = new EntityModel();
             model.Module = module;
@@ -243,6 +243,9 @@ namespace Serenity.CodeGenerator
                 model.FieldsBaseClass = "RowFieldsBase";
             }
 
+            if (net5Plus)
+                model.RowBaseClass = model.RowBaseClass + "<" + model.RowClassName + ".RowFields>";
+
             var fieldByIdent = new Dictionary<string, EntityField>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var field in fields)
@@ -354,8 +357,15 @@ namespace Serenity.CodeGenerator
                     attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
                 }
 
+                if (model.IdField == x.Ident && net5Plus)
+                    attrs.Add("IdProperty");
+
                 if (model.NameField == x.Ident)
+                {
                     attrs.Add("QuickSearch");
+                    if (net5Plus)
+                        attrs.Add("NameProperty");
+                }
 
                 if (x.TextualField != null)
                     attrs.Add("TextualField(\"" + x.TextualField + "\")");

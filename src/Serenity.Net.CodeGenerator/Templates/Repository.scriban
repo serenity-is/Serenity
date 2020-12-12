@@ -7,38 +7,74 @@ using MyRow = {{RootNamespace}}{{DotModule}}.Entities.{{RowClassName}};
 
 namespace {{RootNamespace}}{{DotModule}}.Repositories
 {
-    public class {{ClassName}}Repository
+    public class {{ClassName}}Repository : BaseRepository
     {
-        private static MyRow.RowFields fld { get { return MyRow.Fields; } }
-
+        private static MyRow.RowFields Fld => MyRow.Fields;
+{{if NET5Plus}}
+        public {{ClassName}}Repository(IRequestContext context)
+            : base(context)
+        {
+        }
+{{end}}
         public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return new MySaveHandler().Process(uow, request, SaveRequestType.Create);
+            return new MySaveHandler({{if NET5Plus}}Context{{end}}).Process(uow, request, SaveRequestType.Create);
         }
 
         public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return new MySaveHandler().Process(uow, request, SaveRequestType.Update);
+            return new MySaveHandler({{if NET5Plus}}Context{{end}}).Process(uow, request, SaveRequestType.Update);
         }
 
         public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
         {
-            return new MyDeleteHandler().Process(uow, request);
+            return new MyDeleteHandler({{if NET5Plus}}Context{{end}}).Process(uow, request);
         }
 
         public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
         {
-            return new MyRetrieveHandler().Process(connection, request);
+            return new MyRetrieveHandler({{if NET5Plus}}Context{{end}}).Process(connection, request);
         }
 
         public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
-            return new MyListHandler().Process(connection, request);
+            return new MyListHandler({{if NET5Plus}}Context{{end}}).Process(connection, request);
         }
 
-        private class MySaveHandler : SaveRequestHandler<MyRow> { }
-        private class MyDeleteHandler : DeleteRequestHandler<MyRow> { }
-        private class MyRetrieveHandler : RetrieveRequestHandler<MyRow> { }
-        private class MyListHandler : ListRequestHandler<MyRow> { }
+        private class MySaveHandler : SaveRequestHandler<MyRow> 
+        {
+{{-if NET5Plus}}
+            public MySaveHandler(IRequestContext context)
+                : base(context)
+            {
+            }{{end}}
+        }
+        
+        private class MyDeleteHandler : DeleteRequestHandler<MyRow> 
+        {
+{{-if NET5Plus}}
+            public MyDeleteHandler(IRequestContext context)
+                : base(context)
+            {
+            }{{end}}
+        }
+
+        private class MyRetrieveHandler : RetrieveRequestHandler<MyRow> 
+        {
+{{-if NET5Plus}}
+            public MyRetrieveHandler(IRequestContext context)
+                : base(context)
+            {
+            }{{end}}
+        }
+        
+        private class MyListHandler : ListRequestHandler<MyRow> 
+        {
+{{-if NET5Plus}}
+            public MyListHandler(IRequestContext context)
+                : base(context)
+            {
+            }{{end}}
+        }
     }
 }

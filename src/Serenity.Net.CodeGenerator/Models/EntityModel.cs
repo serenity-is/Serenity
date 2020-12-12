@@ -24,6 +24,7 @@ namespace Serenity.CodeGenerator
         public string NameField { get; set; }
         public string FieldPrefix { get; set; }
         public bool AspNetCore { get; set; }
+        public bool NET5Plus { get; set; }
 
         public string IdField { get { return Identity; } }
         public Dictionary<string, object> CustomSettings { get; set; }

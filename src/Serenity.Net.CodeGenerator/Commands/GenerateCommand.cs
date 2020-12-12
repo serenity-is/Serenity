@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Serenity.CodeGenerator
 {
@@ -387,10 +388,15 @@ namespace Serenity.CodeGenerator
             {
                 connection.Open();
 
+                var csprojContent = File.ReadAllText(csproj);
+                var net5Plus = !new Regex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)
+                    .IsMatch(csprojContent);
+
                 var rowModel = RowGenerator.GenerateModel(connection, tableName.Schema, tableName.Table,
-                    module, connectionKey, identifier, permissionKey, config);
+                    module, connectionKey, identifier, permissionKey, config, net5Plus);
 
                 rowModel.AspNetCore = true;
+                rowModel.NET5Plus = net5Plus;
 
                 var kdiff3Paths = new[]
                 {

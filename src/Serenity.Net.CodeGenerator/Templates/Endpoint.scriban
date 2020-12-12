@@ -9,8 +9,7 @@ using MyRow = {{RootNamespace}}{{DotModule}}.Entities.{{RowClassName}};
 
 namespace {{RootNamespace}}{{DotModule}}.Endpoints
 {
-{{if AspNetCore}}
-    [Route("Services/{{ModuleSlash}}{{ClassName}}/[action]")]{{else}}
+{{if AspNetCore}}    [Route("Services/{{ModuleSlash}}{{ClassName}}/[action]")]{{else}}
     [RoutePrefix("Services/{{ModuleSlash}}{{ClassName}}"), Route("{action}")]{{end}}
     [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
     public class {{ClassName}}Controller : ServiceEndpoint
@@ -18,31 +17,31 @@ namespace {{RootNamespace}}{{DotModule}}.Endpoints
         [HttpPost, AuthorizeCreate(typeof(MyRow))]
         public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return new MyRepository().Create(uow, request);
+            return new MyRepository({{if NET5Plus}}Context{{end}}).Create(uow, request);
         }
 
         [HttpPost, AuthorizeUpdate(typeof(MyRow))]
         public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return new MyRepository().Update(uow, request);
+            return new MyRepository({{if NET5Plus}}Context{{end}}).Update(uow, request);
         }
  
         [HttpPost, AuthorizeDelete(typeof(MyRow))]
         public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
         {
-            return new MyRepository().Delete(uow, request);
+            return new MyRepository({{if NET5Plus}}Context{{end}}).Delete(uow, request);
         }
 
         [HttpPost]
         public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
         {
-            return new MyRepository().Retrieve(connection, request);
+            return new MyRepository({{if NET5Plus}}Context{{end}}).Retrieve(connection, request);
         }
 
         [HttpPost]
         public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
-            return new MyRepository().List(connection, request);
+            return new MyRepository({{if NET5Plus}}Context{{end}}).List(connection, request);
         }
     }
 }

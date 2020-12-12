@@ -1,5 +1,6 @@
-﻿@{
-    ViewData["Title"] = Serenity.LocalText.Get("Db{{DotModule}}.{{ClassName}}.EntityPlural");
+﻿@inject Serenity.ITextLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer.Get("Db{{DotModule}}.{{ClassName}}.EntityPlural");
 }
 
 <div id="GridDiv"></div>

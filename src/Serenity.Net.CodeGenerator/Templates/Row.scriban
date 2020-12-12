@@ -18,8 +18,8 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
         [{{x.Attributes}}]
         public {{x.PropertyType}} {{x.Ident}}
         {
-            get { return Fields.{{x.Ident}}[this]; }
-            set { Fields.{{x.Ident}}[this] = value; }
+            get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this];
+            set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this] = value;
         }
 {{end}}
 {{-for j in Joins}}
@@ -27,22 +27,27 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
         [{{k.Attributes}}]
         public {{k.PropertyType}} {{k.Ident}}
         {
-            get { return Fields.{{k.Ident}}[this]; }
-            set { Fields.{{k.Ident}}[this] = value; }
+            get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this];
+            set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this] = value;
         }
 {{end}}
 {{-end}}
-{{-if Identity}}
-        IIdField IIdRow.IdField
+{{-if NET5Plus}}
+        public {{RowClassName}}()
+            : base()
         {
-            get { return Fields.{{Identity}}; }
         }
+
+        public {{RowClassName}}(RowFields fields)
+            : base(fields)
+        {
+        }
+{{-else}}
+{{-if Identity}}
+        IIdField IIdRow.IdField => Fields.{{Identity}};
 {{end-}}
 {{-if NameField}}
-        StringField INameRow.NameField
-        {
-            get { return Fields.{{NameField}}; }
-        }
+        StringField INameRow.NameField => Fields.{{NameField}};
 {{end}}
         public static readonly RowFields Fields = new RowFields().Init();
 
@@ -50,6 +55,7 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
             : base(Fields)
         {
         }
+{{end}}
 
         public class RowFields : {{FieldsBaseClass}}
         {
