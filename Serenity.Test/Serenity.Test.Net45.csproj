@@ -157,6 +157,7 @@
     <Compile Include="Data\DateTimeFieldKindTests.cs" />
     <Compile Include="Data\RowMappingTests.OuterApplyRow.cs" />
     <Compile Include="Data\RowMappingTests.NamePropertyRow.cs" />
+    <Compile Include="Data\RowTests.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidLoadsDetailsOnRetrieve.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidDetailRow.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.Int32DetailRow.cs" />

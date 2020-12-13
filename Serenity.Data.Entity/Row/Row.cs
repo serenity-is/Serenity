@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace Serenity.Data
 {
     [JsonConverter(typeof(JsonRowConverter))]
-    public abstract partial class Row : IEntityWithJoins, 
+    public abstract partial class Row : IEntityWithJoins,
         INotifyPropertyChanged, IEditableObject
 #if NET45
         , IDataErrorInfo
@@ -31,7 +31,7 @@ namespace Serenity.Data
             TrackAssignments = true;
         }
 
-        public void CloneInto(Row clone, 
+        public void CloneInto(Row clone,
             bool cloneHandlers)
         {
             clone.ignoreConstraints = ignoreConstraints;
@@ -49,14 +49,16 @@ namespace Serenity.Data
                 }
             }
             else
+            {
                 clone.assignedFields = null;
+            }
 
             clone.trackWithChecks = trackWithChecks;
 
             clone.originalValues = originalValues;
 
             if (dictionaryData != null)
-                clone.dictionaryData = (Hashtable)this.dictionaryData.Clone();
+                clone.dictionaryData = (Hashtable) dictionaryData.Clone();
             else
                 clone.dictionaryData = null;
 
@@ -67,7 +69,9 @@ namespace Serenity.Data
                     clone.indexedData[i] = indexedData[i];
             }
             else
+            {
                 clone.indexedData = null;
+            }
 
             if (previousValues != null)
                 clone.previousValues = previousValues.CloneRow();
@@ -76,11 +80,11 @@ namespace Serenity.Data
 
             if (cloneHandlers)
             {
-                clone.postHandler = this.postHandler;
-                clone.propertyChanged = this.propertyChanged;
+                clone.postHandler = postHandler;
+                clone.propertyChanged = propertyChanged;
 
-                if (this.validationErrors != null)
-                    clone.validationErrors = new Dictionary<string, string>(this.validationErrors);
+                if (validationErrors != null)
+                    clone.validationErrors = new Dictionary<string, string>(validationErrors);
                 else
                     clone.validationErrors = null;
             }
@@ -112,13 +116,11 @@ namespace Serenity.Data
                 RemoveValidationError(field.PropertyName ?? field.Name);
 
             if (propertyChanged != null)
-            {
-                if (field.IndexCompare(previousValues, this) != 0)
+                if (previousValues != null && field.IndexCompare(previousValues, this) != 0)
                 {
                     RaisePropertyChanged(field);
                     field.Copy(this, previousValues);
                 }
-            }
         }
 
         public Field FindField(string fieldName)
@@ -136,44 +138,29 @@ namespace Serenity.Data
             return fields;
         }
 
-        public int FieldCount
-        {
-            get { return fields.Count; }
-        }
+        public int FieldCount => fields.Count;
 
-        public bool IsAnyFieldAssigned
-        {
-            get
-            {
-                return tracking && assignedFields != null;
-            }
-        }
+        public bool IsAnyFieldAssigned => tracking && assignedFields != null;
 
         public bool IgnoreConstraints
         {
-            get { return ignoreConstraints; }
-            set { ignoreConstraints = value; }
+            get => ignoreConstraints;
+            set => ignoreConstraints = value;
         }
 
-        public string Table
-        {
-            get { return fields.TableName; }
-        }
+        public string Table => fields.TableName;
 
         public bool TrackAssignments
         {
-            get
-            { 
-                return tracking;
-            }
-            set 
+            get => tracking;
+            set
             {
                 if (tracking != value)
                 {
                     if (value)
                     {
                         if (propertyChanged != null)
-                            previousValues = this.CloneRow();
+                            previousValues = CloneRow();
 
                         tracking = value;
                     }
@@ -189,10 +176,7 @@ namespace Serenity.Data
 
         public bool TrackWithChecks
         {
-            get 
-            {
-                return tracking && trackWithChecks;
-            }
+            get => tracking && trackWithChecks;
             set
             {
                 if (value != TrackWithChecks)
@@ -205,21 +189,21 @@ namespace Serenity.Data
             }
         }
 
-        private Field FindFieldEnsure(string fieldName)
+        Field FindFieldEnsure(string fieldName)
         {
             var field = FindField(fieldName);
             if (ReferenceEquals(null, field))
-                throw new ArgumentOutOfRangeException("fieldName", String.Format(
-                    "{0} has no field with name '{1}'.", this.GetType().Name, fieldName));
+                throw new ArgumentOutOfRangeException("fieldName", string.Format(
+                    "{0} has no field with name '{1}'.", GetType().Name, fieldName));
             return field;
         }
 
         public object this[string fieldName]
         {
-            get 
+            get
             {
                 var field = FindFieldByPropertyName(fieldName) ??
-                    FindField(fieldName);
+                            FindField(fieldName);
 
                 if (ReferenceEquals(null, field))
                 {
@@ -229,13 +213,11 @@ namespace Serenity.Data
                     return null;
                 }
 
-                return field.AsObject(this); 
+                return field.AsObject(this);
             }
-            set
-            {
-                (FindFieldByPropertyName(fieldName) ?? 
-                    FindFieldEnsure(fieldName)).AsObject(this, value);
-            }
+            set =>
+                (FindFieldByPropertyName(fieldName) ??
+                 FindFieldEnsure(fieldName)).AsObject(this, value);
         }
 
         public void SetDictionaryData(object key, object value)
@@ -275,7 +257,7 @@ namespace Serenity.Data
             else
             {
                 if (indexedData == null)
-                    indexedData = new object[this.FieldCount];
+                    indexedData = new object[FieldCount];
 
                 indexedData[index] = value;
             }
@@ -326,9 +308,6 @@ namespace Serenity.Data
             }
         }
 
-        IDictionary<string, Join> IHaveJoins.Joins
-        {
-            get { return fields.Joins; }
-        }
+        IDictionary<string, Join> IHaveJoins.Joins => fields.Joins;
     }
 }
