@@ -6,11 +6,12 @@ namespace Q {
     function validateShowLabel(element: HTMLElement, message: string) {
         oldShowLabel.call(this, element, message);
         this.errorsFor(element).each(function (i: number, e: any) {
-
-            if ($(element).hasClass('error'))
-                $(e).removeClass('checked');
-
-            $(e).attr('title', $(e).text());
+            var $e = $(e);
+            if ($e.parent('.vx').length) {
+                $e.attr('title', $e.text());
+                if (message && $e.hasClass('error'))
+                    $e.removeClass('checked');
+            }
         });
     };
 
@@ -105,13 +106,14 @@ namespace Q {
                         }
 
                         if ($.fn.tooltip) {
-                            var $el = $(el);
-                            if ($el.hasClass('select2-offscreen') &&
-                                el.id) {
-                                $el = $('#s2id_' + el.id);
-                            }
+                            var $el: any;
+                            var hl = Q.getHighlightTarget(el);
+                            if (hl)
+                                $el = $(hl);
+                            else
+                                $el = $(el);
 
-                            $.fn.tooltip && ($el as any).tooltip({
+                            $.fn.tooltip && $el.tooltip({
                                 title: validator.errorList[0].message,
                                 trigger: 'manual'
                             }).tooltip('show');
