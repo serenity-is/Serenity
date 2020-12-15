@@ -696,6 +696,7 @@ declare namespace JQueryValidation {
     }
 }
 declare namespace Q {
+    function getHighlightTarget(el: HTMLElement): HTMLElement;
     function baseValidateOptions(): JQueryValidation.ValidationOptions;
     function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
     function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
@@ -1973,7 +1974,7 @@ declare namespace Serenity {
     }
     interface ImageUploadEditorOptions extends FileUploadEditorOptions {
     }
-    class FileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
+    class FileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
         constructor(div: JQuery, opt: FileUploadEditorOptions);
         protected getUploadInputOptions(): UploadInputOptions;
         protected addFileButtonText(): string;
@@ -1982,6 +1983,8 @@ declare namespace Serenity {
         protected updateInterface(): void;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
+        get_required(): boolean;
+        set_required(value: boolean): void;
         get_value(): UploadedFile;
         get value(): UploadedFile;
         set_value(value: UploadedFile): void;
@@ -1993,15 +1996,17 @@ declare namespace Serenity {
         protected progress: JQuery;
         protected fileSymbols: JQuery;
         protected uploadInput: JQuery;
+        protected hiddenInput: JQuery;
     }
     class ImageUploadEditor extends FileUploadEditor {
         constructor(div: JQuery, opt: ImageUploadEditorOptions);
     }
-    class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
+    class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
         private entities;
         private toolbar;
         private fileSymbols;
         private uploadInput;
+        protected hiddenInput: JQuery;
         constructor(div: JQuery, opt: ImageUploadEditorOptions);
         protected addFileButtonText(): string;
         protected getToolButtons(): ToolButton[];
@@ -2009,6 +2014,8 @@ declare namespace Serenity {
         protected updateInterface(): void;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
+        get_required(): boolean;
+        set_required(value: boolean): void;
         get_value(): UploadedFile[];
         get value(): UploadedFile[];
         set_value(value: UploadedFile[]): void;

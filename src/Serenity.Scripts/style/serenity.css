@@ -27,6 +27,19 @@
 .inactive div {
   color: #999 !important;
 }
+.s-offscreen {
+  clip: rect(0 0 0 0) !important;
+  width: 1px !important;
+  height: 1px !important;
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  outline: 0 !important;
+  left: 0px !important;
+  top: 0px !important;
+}
 .ui-helper-hidden {
   display: none;
 }
@@ -2466,6 +2479,7 @@ body.mobile-device.modal-dialog-open {
   overflow-y: auto;
   background-color: #fff;
   min-height: 116px;
+  margin-bottom: 0;
 }
 .s-ImageUploadEditor .file-item,
 .s-MultipleImageUploadEditor .file-item {
@@ -2481,6 +2495,14 @@ body.mobile-device.modal-dialog-open {
 .s-ImageUploadEditor .s-Toolbar .tool-button,
 .s-MultipleImageUploadEditor .s-Toolbar .tool-button {
   margin-bottom: 0;
+}
+.s-ImageUploadEditor.error,
+.s-MultipleImageUploadEditor.error {
+  border: 1px solid #ff4040;
+}
+.s-ImageUploadEditor.error ul,
+.s-MultipleImageUploadEditor.error ul {
+  background-color: #ffefef;
 }
 .s-MultipleImageUploadEditor li {
   float: left;

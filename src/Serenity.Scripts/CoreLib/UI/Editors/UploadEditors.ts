@@ -8,10 +8,10 @@
     export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
     }
 
-    @Serenity.Decorators.registerEditor('Serenity.FileUploadEditor', [IReadOnly])
+    @Serenity.Decorators.registerEditor('Serenity.FileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
     @Serenity.Decorators.element('<div/>')
     export class FileUploadEditor extends Widget<FileUploadEditorOptions>
-        implements IReadOnly, IGetEditValue, ISetEditValue {
+        implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
         constructor(div: JQuery, opt: FileUploadEditorOptions) {
             super(div, opt);
@@ -28,7 +28,7 @@
                 buttons: this.getToolButtons()
             });
 
-            var progress = $('<div><div></div></div>')
+            $('<div><div></div></div>')
                 .addClass('upload-progress')
                 .prependTo(this.toolbar.element);
 
@@ -36,6 +36,14 @@
             this.uploadInput = UploadHelper.addUploadInput(uio);
 
             this.fileSymbols = $('<ul/>').appendTo(this.element);
+
+            if (!this.element.attr('id'))
+                this.element.attr('id', this.uniqueName);
+
+            this.hiddenInput = $('<input type="text" class="s-offscreen" name="' + this.uniqueName +
+                '_Validator" data-vx-highlight="' + this.element.attr('id') + '"/>')
+                .appendTo(this.element);
+
             this.updateInterface();
         }
 
@@ -58,6 +66,11 @@
                     this.entity = newEntity;
                     this.populate();
                     this.updateInterface();
+
+                    var validator = this.hiddenInput.closest('form').data('validator');
+                    if (validator != null) {
+                        validator.element(this.hiddenInput);
+                    }
                 }
             }
         }
@@ -82,6 +95,11 @@
                         this.entity = null;
                         this.populate();
                         this.updateInterface();
+
+                        var validator = this.hiddenInput.closest('form').data('validator');
+                        if (validator != null) {
+                            validator.element(this.hiddenInput);
+                        }
                     }
                 }
             ];
@@ -100,6 +118,8 @@
                     this.fileSymbols, [this.entity], displayOriginalName,
                     this.options.urlPrefix);
             }
+
+            this.hiddenInput.val(Q.trimToNull((this.get_value() || {}).Filename));
         }
 
         protected updateInterface(): void {
@@ -117,13 +137,30 @@
         set_readOnly(value: boolean): void {
             if (this.get_readOnly() !== value) {
                 if (value) {
-                    (this.uploadInput.attr('disabled', 'disabled') as any).fileupload('disable');
+                    this.uploadInput.attr('disabled', 'disabled');
+                    try {
+                        this.uploadInput.fileupload('disable');
+                    }
+                    catch {
+                    }
                 }
                 else {
-                    (this.uploadInput.removeAttr('disabled') as any).fileupload('enable');
+                    this.uploadInput.removeAttr('disabled');
+                    try {
+                        this.uploadInput.fileupload('enable');
+                    } catch {
+                    }
                 }
                 this.updateInterface();
             }
+        }
+
+        get_required(): boolean {
+            return this.hiddenInput.hasClass('required');
+        }
+
+        set_required(value: boolean): void {
+            this.hiddenInput.toggleClass('required', !!value);
         }
 
         get_value(): UploadedFile {
@@ -139,6 +176,22 @@
         }
 
         set_value(value: UploadedFile): void {
+            var stringValue = value as string;
+            if (typeof stringValue === "string") {
+                var stringValue = Q.trimToNull(stringValue);
+                if (value != null) {
+                    var idx = stringValue.indexOf('/');
+                    if (idx < 0)
+                        idx = stringValue.indexOf('\\');
+                    value = <Serenity.UploadedFile>{
+                        Filename: value,
+                        OriginalName: stringValue.substring(idx + 1)
+                    }
+                }
+            }
+            else if (Q.isTrimmedEmpty(value.Filename))
+                value = null;
+
             if (value != null) {
                 if (value.Filename == null) {
                     this.entity = null;
@@ -151,6 +204,12 @@
                 this.entity = null;
             }
             this.populate();
+
+            var validator = this.hiddenInput.closest('form').data('validator');
+            if (validator != null) {
+                validator.element(this.hiddenInput);
+            }
+
             this.updateInterface();
         }
 
@@ -191,6 +250,7 @@
         protected progress: JQuery;
         protected fileSymbols: JQuery;
         protected uploadInput: JQuery;
+        protected hiddenInput: JQuery;
     }
 
     @Decorators.registerEditor('Serenity.ImageUploadEditor')
@@ -205,15 +265,16 @@
         }
     }
 
-    @Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly])
+    @Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
     @Decorators.element('<div/>')
     export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
-        implements IReadOnly, IGetEditValue, ISetEditValue {
+        implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
         private entities: UploadedFile[];
         private toolbar: Toolbar;
         private fileSymbols: JQuery;
         private uploadInput: JQuery;
+        protected hiddenInput: JQuery;
 
         constructor(div: JQuery, opt: ImageUploadEditorOptions) {
             super(div, opt);
@@ -241,12 +302,26 @@
                     var newEntity = { OriginalName: name, Filename: response.TemporaryFile };
                     self.entities.push(newEntity);
                     self.populate();
+
+                    var validator = this.hiddenInput.closest('form').data('validator');
+                    if (validator != null) {
+                        validator.element(this.hiddenInput);
+                    }
+
                     self.updateInterface();
                 }
             });
 
             this.fileSymbols = $('<ul/>').appendTo(this.element);
+            if (!this.element.attr('id')) {
+                this.element.attr('id', this.uniqueName);
+            }
+
+            this.hiddenInput = $('<input type="text" class="s-offscreen" name="' + this.uniqueName +
+                '_Validator" data-vx-highlight="' + this.element.attr('id') + '"/>').appendTo(this.element);
+
             this.updateInterface();
+
         }
 
         protected addFileButtonText(): string {
@@ -273,8 +348,15 @@
                         ev.preventDefault();
                         this.entities.splice(x, 1);
                         this.populate();
+
+                        var validator = this.hiddenInput.closest('form').data('validator');
+                        if (validator != null) {
+                            validator.element(this.hiddenInput);
+                        }
                     });
             });
+
+            this.hiddenInput.val(Q.trimToNull((this.get_value()[0] || {}).Filename));
         }
 
         protected updateInterface(): void {
@@ -290,13 +372,30 @@
         set_readOnly(value: boolean): void {
             if (this.get_readOnly() !== value) {
                 if (value) {
-                    (this.uploadInput.attr('disabled', 'disabled') as any).fileupload('disable');
+                    this.uploadInput.attr('disabled', 'disabled');
+                    try {
+                        this.uploadInput.fileupload('disable');
+                    }
+                    catch {
+                    }
                 }
                 else {
-                    (this.uploadInput.removeAttr('disabled') as any).fileupload('enable');
+                    this.uploadInput.removeAttr('disabled');
+                    try {
+                        this.uploadInput.fileupload('enable');
+                    } catch {
+                    }
                 }
                 this.updateInterface();
             }
+        }
+
+        get_required(): boolean {
+            return this.hiddenInput.hasClass('required');
+        }
+
+        set_required(value: boolean): void {
+            this.hiddenInput && this.hiddenInput.toggleClass('required', !!value);
         }
 
         get_value(): UploadedFile[] {

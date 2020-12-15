@@ -2921,6 +2921,14 @@ var Q;
             el.attr('title', val || '').tooltip('_fixTitle');
         return el;
     }
+    function getHighlightTarget(el) {
+        var hl = el.dataset.vxHighlight;
+        if (hl)
+            return document.getElementById(hl);
+        else if (el.classList.contains("select2-offscreen") && el.id)
+            return document.getElementById('s2id_' + el.id);
+    }
+    Q.getHighlightTarget = getHighlightTarget;
     function baseValidateOptions() {
         return {
             errorClass: 'error',
@@ -2934,11 +2942,12 @@ var Q;
                     this.findByName(element.name).addClass(errorClass).removeClass(validClass);
                 }
                 else {
-                    var $el = $(element);
-                    $el.addClass(errorClass).removeClass(validClass);
-                    if ($el.hasClass('select2-offscreen') &&
-                        element.id) {
-                        $('#s2id_' + element.id).addClass(errorClass).removeClass(validClass);
+                    element.classList.add(errorClass);
+                    element.classList.remove(validClass);
+                    var hl = Q.getHighlightTarget(element);
+                    if (hl && hl.classList) {
+                        hl.classList.add(errorClass);
+                        hl.classList.remove(validClass);
                     }
                 }
             },
@@ -2947,42 +2956,40 @@ var Q;
                     this.findByName(element.name).removeClass(errorClass).addClass(validClass);
                 }
                 else {
-                    var $el = $(element);
-                    $el.removeClass(errorClass).addClass(validClass);
-                    if ($el.hasClass('select2-offscreen') &&
-                        element.id) {
-                        $('#s2id_' + element.id).removeClass(errorClass).addClass(validClass);
+                    element.classList.remove(errorClass);
+                    element.classList.add(validClass);
+                    var hl = Q.getHighlightTarget(element);
+                    if (hl && hl.classList) {
+                        hl.classList.remove(errorClass);
+                        hl.classList.add(validClass);
                     }
                 }
             },
-            showErrors: function (errorMap, errorList) {
-                var _this = this;
-                $.each(this.validElements(), function (index, element) {
-                    var $el = $(element);
-                    $el.removeClass(_this.settings.errorClass).addClass(_this.settings.validClass);
-                    if ($el.hasClass('select2-offscreen') &&
-                        $el.id) {
-                        $el = $('#s2id_' + element.id)
-                            .removeClass(_this.settings.errorClass)
-                            .addClass(_this.settings.validClass);
-                        if (!$el.length)
-                            $el = $(element);
-                    }
-                    setTooltip($el, '')
-                        .tooltip('hide');
-                });
-                $.each(errorList, function (index, error) {
-                    var $el = $(error.element).addClass(_this.settings.errorClass);
-                    if ($el.hasClass('select2-offscreen') &&
-                        error.element.id) {
-                        $el = $('#s2id_' + error.element.id).addClass(_this.settings.errorClass);
-                        if (!$el.length)
+            showErrors: function () {
+                if ($.fn.tooltip) {
+                    var i, elements, error, $el, hl;
+                    for (i = 0; this.errorList[i]; i++) {
+                        error = this.errorList[i];
+                        hl = Q.getHighlightTarget(error.element);
+                        if (hl != null)
+                            $el = $(hl);
+                        else
                             $el = $(error.element);
+                        if (i != 0)
+                            setTooltip($el, '').tooltip('hide');
+                        else
+                            setTooltip($el, error.message).toolTip('show');
                     }
-                    setTooltip($el, error.message);
-                    if (index == 0)
-                        $el.tooltip('show');
-                });
+                    for (i = 0, elements = this.validElements(); elements[i]; i++) {
+                        hl = Q.getHighlightTarget(error.element);
+                        if (hl != null)
+                            $el = $(hl);
+                        else
+                            $el = $(error.element);
+                        setTooltip($el, '').tooltip('hide');
+                    }
+                }
+                $.validator["prototype"].defaultShowErrors.call(this);
             }
         };
     }
