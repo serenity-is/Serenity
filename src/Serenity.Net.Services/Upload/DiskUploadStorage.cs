@@ -69,7 +69,7 @@ namespace Serenity.Web
                 var json = File.ReadAllText(metaFile);
                 if (!string.IsNullOrEmpty(json) &&
                     json[0] == '{' &&
-                    json[1] == '}')
+                    json[^1] == '}')
                 {
                     return JSON.Parse<Dictionary<string, string>>(json);
                 }
@@ -131,15 +131,17 @@ namespace Serenity.Web
             newFiles.Add(targetPath);
             try
             {
-                var sourceBase = Path.ChangeExtension(sourcePath, null);
-                var targetBase = Path.ChangeExtension(targetPath, null);
+                var sourceBasePath = Path.ChangeExtension(sourcePath, null);
+                var sourceBaseName = Path.GetFileNameWithoutExtension(sourceBasePath);
+                var targetBasePath = Path.ChangeExtension(targetPath, null);
 
                 var sourceDir = Path.GetDirectoryName(sourcePath);
-                foreach (var f in store.GetFiles(sourceDir, sourceBase + "_t*.jpg"))
+                foreach (var f in store.GetFiles(sourceDir,
+                     sourceBaseName + "_t*.jpg"))
                 {
-                    string thumbSuffix = Path.GetFileName(f).Substring(sourceBase.Length);
+                    string thumbSuffix = Path.GetFileName(f).Substring(sourceBaseName.Length);
                     using var src = store.OpenFile(f);
-                    newFiles.Add(WriteFile(targetBase + thumbSuffix, src, false));
+                    newFiles.Add(WriteFile(targetBasePath + thumbSuffix, src, false));
                 }
 
                 return targetPath;
@@ -207,8 +209,8 @@ namespace Serenity.Web
         public string[] GetFiles(string path, string searchPattern)
         {
             return Directory.GetFiles(FilePath(path), searchPattern)
-                .Select(x => Path.GetRelativePath(RootPath, x))
                 .Where(x => !IsInternalFile(x))
+                .Select(x => Path.GetRelativePath(RootPath, x))
                 .ToArray();
         }
 

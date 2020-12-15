@@ -45,10 +45,10 @@ namespace Serenity
             if (string.IsNullOrEmpty(root))
                 throw new ArgumentNullException(nameof(root));
 
-            if (string.IsNullOrEmpty(relativePath))
+            if (relativePath == null)
                 throw new ArgumentNullException(nameof(relativePath));
 
-            if (!IsSecureRelativePath(relativePath))
+            if (relativePath.Length > 0 && !IsSecureRelativePath(relativePath))
                 throw new ArgumentOutOfRangeException(nameof(relativePath));
 
             return Path.Combine(root, relativePath);
