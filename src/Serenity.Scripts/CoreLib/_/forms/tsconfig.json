@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outFile": "../../../dist/forms/serenity-forms.js",
     "composite": true,
-	"rootDir": "../../"
+	  "rootDir": "../../"
   },
   "references": [
     {

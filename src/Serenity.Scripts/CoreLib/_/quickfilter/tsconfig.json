@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outFile": "../../../dist/quickfilter/serenity-quickfilter.js",
     "composite": true,
-	"rootDir": "../../"
+	  "rootDir": "../../"
   },
   "references": [
     {
@@ -19,6 +19,6 @@
   "files": [
     "../../UI/Filtering/QuickFilter.ts",
     "../../UI/Filtering/QuickFilterBar.ts",
-    "../../UI/Filtering/QuickSearchInput.ts",
+    "../../UI/Filtering/QuickSearchInput.ts"
   ]
 }

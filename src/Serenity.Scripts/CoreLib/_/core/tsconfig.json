@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outFile": "../../../dist/core/serenity-core.js",
     "composite": true,
-	"rootDir": "../../"
+	  "rootDir": "../../"
   },
   "files": [
     "../../Imports/Helpers.ts",

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outFile": "../../../dist/dialogs/serenity-dialogs.js",
     "composite": true,
-	"rootDir": "../../"
+	  "rootDir": "../../"
   },
   "references": [
     {

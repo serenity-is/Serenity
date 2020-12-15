@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outFile": "../../../dist/filterpanel/serenity-filterpanel.js",
     "composite": true,
-	"rootDir": "../../"
+	  "rootDir": "../../"
   },
   "references": [
     {
@@ -33,6 +33,6 @@
     "../../UI/Filtering/FilterWidgetBase.ts",
     "../../UI/Filtering/FilterPanel.ts",
     "../../UI/Filtering/FilterDialog.ts",
-    "../../UI/Filtering/FilterDisplayBar.ts",
+    "../../UI/Filtering/FilterDisplayBar.ts"
   ]
 }
