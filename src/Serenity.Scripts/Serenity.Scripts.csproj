@@ -32,7 +32,7 @@
     </PackageReference>
   </ItemGroup>
 
-  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\@types\jquery\index.d.ts')">
+  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\uglify-js\bin\uglifyjs') Or !Exists('node_modules\less\bin\lessc')">
     <Message Text="Installing NPM packages..." Importance="high"></Message>
     <Exec Command="npm install" />
   </Target>
