@@ -872,4 +872,9 @@ namespace Q {
         else
             return [s];
     }
+
+    export function today(): Date {
+        var d = new Date();
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    }    
 }
