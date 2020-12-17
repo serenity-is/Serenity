@@ -1,11 +1,9 @@
-﻿namespace Serenity {
+﻿import { registerInterface } from "../Decorators";
 
-    @Decorators.registerInterface('Serenity.IDialog')
-    export class IDialog {
-    }
+@registerInterface('Serenity.IDialog')
+export class IDialog {
+}
 
-    export interface IDialog {
-        dialogOpen(asPanel?: boolean): void;
-    }
-
+export interface IDialog {
+    dialogOpen(asPanel?: boolean): void;
 }

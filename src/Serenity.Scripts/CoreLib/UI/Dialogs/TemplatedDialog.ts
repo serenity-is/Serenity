@@ -297,27 +297,7 @@
         }
 
         public static closePanel(element: JQuery, e?: JQueryEventObject) {
-            if (!element.hasClass('s-Panel') || element.hasClass('hidden'))
-                return;
-
-            var query = $.Event(e as any);
-            (query as any).type = 'panelbeforeclose';
-            query.target = element[0];
-            element.trigger(query);
-            if (query.isDefaultPrevented())
-                return;
-
-            element.addClass('hidden');
-            var uniqueName = element.data('paneluniquename') || new Date().getTime();
-            var klass = 'panel-hidden-' + uniqueName;
-            $('.' + klass).removeClass(klass).removeClass('panel-hidden');
-            $(window).triggerHandler('resize');
-            $('.require-layout:visible').triggerHandler('layout');
-
-            var e = $.Event(e as any);
-            (e as any).type = 'panelclose';
-            (e as any).target = element[0];
-            element.trigger(e);
+            return Q.closePanel(element, e);
         }
 
         protected onDialogOpen(): void {
