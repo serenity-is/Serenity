@@ -1,5 +1,4 @@
-﻿import { Serenity } from "../CoreLib";
-import { alert } from "./Dialogs";
+﻿import { alert } from "./Dialogs";
 import { htmlEncode } from "./Html";
 import { notifyError } from "./Notify";
 import type { ServiceError } from "../Services/ServiceModels";

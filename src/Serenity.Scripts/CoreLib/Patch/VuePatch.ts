@@ -4,7 +4,7 @@ import { ElementAttribute } from "../Types/Attributes";
 import { set as setOption } from "../UI/Widgets/ReflectionOptionsSetter";
 import * as EditorUtils from "../UI/Editors/EditorUtils";
 
-export function vuePatch() {
+export function vuePatch(Vue: any) {
     function vueIntegration() {
         // @ts-ignore
         if (typeof Vue === "undefined")

@@ -1,5 +1,4 @@
-﻿
-namespace Slick.Aggregators
+﻿export namespace Aggregators
 {
     export function Avg(field: string): void {
         this.field_ = field;

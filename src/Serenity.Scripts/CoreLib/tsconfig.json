@@ -34,7 +34,7 @@
     "jsx": "react"
   },
   "typeRoots": [
-    "../node_modules/@types/"
+    
   ],
   "files": [   
     "Interfaces/Select2.ts",

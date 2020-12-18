@@ -29,7 +29,7 @@ export function deepClone<T = any>(a: T, a2?: any, a3?: any): T {
     if (!a)
         return a;
     
-    let v;
+    let v: any;
     let b: T = Array.isArray(a) ? [] : {} as any;
     for (const k in a) {
         v = a[k];

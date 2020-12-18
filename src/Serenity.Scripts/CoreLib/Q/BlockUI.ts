@@ -12,8 +12,8 @@ function blockUIWithCheck(opt: JQBlockUIOptions) {
         return;
     }
 
-    if ($.blockUI) {
-        $.blockUI && $.blockUI(opt as any);
+    if (($ as any).blockUI) {
+        ($ as any).blockUI(opt);
     }
     else {
         $('<div class="blockUI blockOverlay" style="z-index: 2000; border: none; margin: 0px; padding: 0px; width: 100%; height: 100%; top: 0px; left: 0px; opacity: 0; cursor: wait; position: fixed;"></div>')
@@ -58,8 +58,8 @@ export function blockUndo() {
     }
 
     blockUICount--;
-    if ($.unblockUI)
-        $.unblockUI({ fadeOut: 0 });
+    if (($ as any).unblockUI)
+        ($ as any).unblockUI({ fadeOut: 0 });
     else 
         $(document.body).children('.blockUI.blockOverlay').remove();
 }

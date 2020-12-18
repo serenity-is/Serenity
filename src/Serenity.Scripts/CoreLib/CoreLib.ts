@@ -1,5 +1,7 @@
-﻿import * as Q from './CoreLibQ';
-import * as Serenity from './CoreLibSerenity';
+﻿import * as Q from './CoreLib.Q';
+import * as Serenity from './CoreLib.Serenity';
+import * as Slick from "./CoreLib.Slick";
+export * from "./SlickGrid/Imports";
 import { jQueryPatch } from './Patch/jQueryPatch'
 //import { vuePatch } from './Patch/VuePatch'
 
@@ -8,8 +10,8 @@ if (typeof jQuery === "function") {
 }
 
 // @ts-ignore
-//if (typeof Vue == "function")
+if (typeof Vue == "function")
 // @ts-ignore
-//    vuePatch(Vue, typeof jQuery == "function" ? jQuery : null);
+    vuePatch(Vue);
 
-export { Q, Serenity };
+export { Q, Serenity, Slick };
