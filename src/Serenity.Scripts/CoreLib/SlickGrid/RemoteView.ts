@@ -4,6 +4,15 @@ import { Grid } from "./Grid";
 import { ListRequest, ListResponse, ServiceResponse } from "../Services/ServiceModels";
 import { notifyError } from "../Q/Notify";
 import { text } from "../Q/LocalText";
+import { Event } from "./Event";
+import {} from "./Globals";
+
+export namespace Data {
+    export interface GroupItemMetadataProvider {
+        getGroupRowMetadata(item: any): any;
+        getTotalsRowMetadata(item: any): any;
+    }
+}
 
 export interface RemoteViewOptions {
     autoLoad?: boolean;
@@ -21,7 +30,7 @@ export interface RemoteViewOptions {
     onProcessData?: RemoteViewProcessCallback<any>;
     method?: string;
     inlineFilters?: boolean;
-    groupItemMetadataProvider?: Slick.Data.GroupItemMetadataProvider;
+    groupItemMetadataProvider?: Data.GroupItemMetadataProvider;
     onAjaxCall?: RemoteViewAjaxCallback<any>;
     getItemMetadata?: (p1?: any, p2?: number) => any;
     errorMsg?: string;
@@ -82,15 +91,15 @@ export class RemoteView<TEntity> {
         var page = 1;
         var totalRows = 0;
 
-        var onDataChanged = new Slick.Event();
-        var onDataLoading = new Slick.Event();
-        var onDataLoaded = new Slick.Event();
-        var onGroupExpanded = new Slick.Event();
-        var onGroupCollapsed = new Slick.Event();
-        var onPagingInfoChanged = new Slick.Event();
-        var onRowCountChanged = new Slick.Event();
-        var onRowsChanged = new Slick.Event();
-        var onRowsOrCountChanged = new Slick.Event();
+        var onDataChanged: Event = new Slick.Event();
+        var onDataLoading: Event = new Slick.Event();
+        var onDataLoaded: Event = new Slick.Event();
+        var onGroupExpanded: Event = new Slick.Event();
+        var onGroupCollapsed: Event = new Slick.Event();
+        var onPagingInfoChanged: Event = new Slick.Event();
+        var onRowCountChanged: Event = new Slick.Event();
+        var onRowsChanged: Event = new Slick.Event();
+        var onRowsOrCountChanged: Event = new Slick.Event();
 
         var loading: any = false;
         var errorMessage: string = null;
@@ -1112,7 +1121,7 @@ export class RemoteView<TEntity> {
          * @param preserveHiddenOnSelectionChange {Boolean} Whether to keep selected items
          *     that are currently out of the view (see preserveHidden) as selected when selection
          *     changes.
-         * @return {Slick.Event} An event that notifies when an internal list of selected row ids
+         * @return {Event} An event that notifies when an internal list of selected row ids
          *     changes.  This is useful since, in combination with the above two options, it allows
          *     access to the full list selected row ids, and not just the ones visible to the grid.
          * @method syncGridSelection

@@ -10,6 +10,7 @@
     "sourceMap": true,
     "module": "ES2015",
     "moduleResolution": "Node",
+    "isolatedModules": true,
     "types": [
       "jquery",
       "jquery.blockui",
@@ -36,9 +37,7 @@
   "typeRoots": [
     
   ],
-  "files": [   
-    "Interfaces/Select2.ts",
-    "Interfaces/Validate.ts",
+  "files": [  
     "CoreLib.ts"
   ]
 }

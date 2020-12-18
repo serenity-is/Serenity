@@ -16,4 +16,4 @@ export * from "./Q/TypeSystem";
 export * from "./Q/UserDefinition";
 export * from "./Q/Validation";
 
-export { ServiceOptions } from "./Services/ServiceModels";
+export type { ServiceOptions } from "./Services/ServiceModels";

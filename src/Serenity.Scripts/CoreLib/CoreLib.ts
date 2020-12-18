@@ -1,7 +1,8 @@
-﻿import * as Q from './CoreLib.Q';
-import * as Serenity from './CoreLib.Serenity';
-import * as Slick from "./CoreLib.Slick";
-export * from "./SlickGrid/Imports";
+﻿import * as Q from './CoreLibQ';
+import * as Serenity from './CoreLibSerenity';
+import * as Slick from "./CoreLibSlick";
+export * from "./Globals/Select2";
+export * from "./Globals/Validate";
 import { jQueryPatch } from './Patch/jQueryPatch'
 //import { vuePatch } from './Patch/VuePatch'
 

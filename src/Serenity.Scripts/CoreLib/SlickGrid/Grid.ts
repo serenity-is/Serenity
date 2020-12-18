@@ -1,9 +1,6 @@
 ﻿import { Column } from "./Column";
 import { GridOptions } from "./GridOptions";
-
-export declare class Grid {
-    constructor(container: JQuery, data: any, columns: Column[], options: GridOptions);
-}
+import { Event } from "./Event";
 
 export interface ColumnSort {
     columnId?: string;
@@ -30,9 +27,6 @@ export interface RangeInfo {
     bottom?: number;
     leftPx?: number;
     rightPx?: number;
-}
-
-export declare class RowSelectionModel {
 }
 
 export interface Grid {
@@ -107,33 +101,33 @@ export interface Grid {
     getSortColumns(): any;
     getTopPanel(): any;
     setHeaderRowVisibility(visible: boolean): void;
-    onScroll?: Slick.Event;
-    onSort?: Slick.Event;
-    onHeaderContextMenu?: Slick.Event;
-    onHeaderClick?: Slick.Event;
-    onMouseEnter?: Slick.Event;
-    onMouseLeave?: Slick.Event;
-    onClick?: Slick.Event;
-    onDblClick?: Slick.Event;
-    onContextMenu?: Slick.Event;
-    onKeyDown?: Slick.Event;
-    onAddNewRow?: Slick.Event;
-    onValidationError?: Slick.Event;
-    onViewportChanged?: Slick.Event;
-    onColumnsReordered?: Slick.Event;
-    onColumnsResized?: Slick.Event;
-    onCellChange?: Slick.Event;
-    onBeforeEditCell?: Slick.Event;
-    onBeforeCellEditorDestroy?: Slick.Event;
-    onHeaderCellRendered?: Slick.Event;
-    onBeforeHeaderCellDestroy?: Slick.Event;
-    onBeforeDestroy?: Slick.Event;
-    onActiveCellChanged?: Slick.Event;
-    onActiveCellPositionChanged?: Slick.Event;
-    onDragInit?: Slick.Event;
-    onDragStart?: Slick.Event;
-    onDrag?: Slick.Event;
-    onDragEnd?: Slick.Event;
-    onSelectedRowsChanged?: Slick.Event;
-    onCellCssStylesChanged?: Slick.Event;
+    onScroll?: Event;
+    onSort?: Event;
+    onHeaderContextMenu?: Event;
+    onHeaderClick?: Event;
+    onMouseEnter?: Event;
+    onMouseLeave?: Event;
+    onClick?: Event;
+    onDblClick?: Event;
+    onContextMenu?: Event;
+    onKeyDown?: Event;
+    onAddNewRow?: Event;
+    onValidationError?: Event;
+    onViewportChanged?: Event;
+    onColumnsReordered?: Event;
+    onColumnsResized?: Event;
+    onCellChange?: Event;
+    onBeforeEditCell?: Event;
+    onBeforeCellEditorDestroy?: Event;
+    onHeaderCellRendered?: Event;
+    onBeforeHeaderCellDestroy?: Event;
+    onBeforeDestroy?: Event;
+    onActiveCellChanged?: Event;
+    onActiveCellPositionChanged?: Event;
+    onDragInit?: Event;
+    onDragStart?: Event;
+    onDrag?: Event;
+    onDragEnd?: Event;
+    onSelectedRowsChanged?: Event;
+    onCellCssStylesChanged?: Event;
 }
