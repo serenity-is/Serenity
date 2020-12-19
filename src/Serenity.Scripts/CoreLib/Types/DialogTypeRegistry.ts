@@ -1,29 +1,36 @@
-﻿namespace Serenity.DialogTypeRegistry {
+﻿import { Config } from "../Q/Config";
+import { Exception } from "../Q/Exceptions";
+import { IDialog } from "../Interfaces/IDialog";
+import { notifyError } from "../Q/Notify";
+import { endsWith } from "../Q/Strings";
+import { getType, isAssignableFrom } from "../Q/TypeSystem";
+
+export namespace DialogTypeRegistry {
 
     function search(typeName: string) {
 
-        var dialogType = Q.getType(typeName);
-        if (dialogType != null && Q.isAssignableFrom(Serenity.IDialog, dialogType)) {
+        var dialogType = getType(typeName);
+        if (dialogType != null && isAssignableFrom(IDialog, dialogType)) {
             return dialogType;
         }
 
-        for (var ns of Q.Config.rootNamespaces) {
-            dialogType = Q.getType(ns + '.' + typeName);
-            if (dialogType != null && Q.isAssignableFrom(Serenity.IDialog, dialogType)) {
+        for (var ns of Config.rootNamespaces) {
+            dialogType = getType(ns + '.' + typeName);
+            if (dialogType != null && isAssignableFrom(IDialog, dialogType)) {
                 return dialogType;
             }
         }
         return null;
     }
 
-    var knownTypes: Q.Dictionary<WidgetDialogClass> = {};
+    var knownTypes: { [key: string]: any } = {};
 
-    export function tryGet(key: string): WidgetDialogClass {
+    export function tryGet(key: string): any {
         if (knownTypes[key] == null) {
             var typeName = key;
             var dialogType = search(typeName);
 
-            if (dialogType == null && !Q.endsWith(key, 'Dialog')) {
+            if (dialogType == null && !endsWith(key, 'Dialog')) {
                 typeName = key + 'Dialog';
                 dialogType = search(typeName);
             }
@@ -39,7 +46,7 @@
         return knownTypes[key];
     }
 
-    export function get(key: string): WidgetDialogClass {
+    export function get(key: string): any {
 
         var type = tryGet(key);
 
@@ -50,9 +57,9 @@
                 'check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). ' +
                 "You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.";
 
-            Q.notifyError(message, '', null);
+            notifyError(message, '', null);
 
-            throw new Q.Exception(message);
+            throw new Exception(message);
         }
 
         return type;

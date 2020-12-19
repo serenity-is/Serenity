@@ -7,7 +7,7 @@
         pageSize?: number;
         minimumResultsForSearch?: any;
         sort: string[];
-        columnSelection?: Serenity.ColumnSelection;
+        columnSelection?: ColumnSelection;
         includeColumns?: string[];
         excludeColumns?: string[];
         includeDeleted?: boolean;
@@ -16,7 +16,7 @@
         criteria?: any[];
     }
 
-    @Serenity.Decorators.registerEditor("Serenity.ServiceLookupEditorBase")
+    @registerEditor("Serenity.ServiceLookupEditorBase")
     export class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
 
         constructor(input: JQuery, opt?: TOptions) {
@@ -29,7 +29,7 @@
                 return dialogTypeKey;
 
             var service = this.getService();
-            if (Q.startsWith(service, "~/Services/"))
+            if (startsWith(service, "~/Services/"))
                 service = service.substr("~/Services/".length);
 
             if (service.split('/').length == 3)
@@ -47,11 +47,11 @@
             if (url == null)
                 throw new Error("ServiceLookupEditor requires 'service' option to be configured!");
 
-            if (!Q.startsWith(url, "~") && !Q.startsWith(url, "/") && url.indexOf('://') < 0)
+            if (!startsWith(url, "~") && !startsWith(url, "/") && url.indexOf('://') < 0)
                 url = "~/Services/" + url;
 
-            if (Q.startsWith(url, "~"))
-                url = Q.resolveUrl(url);
+            if (startsWith(url, "~"))
+                url = resolveUrl(url);
 
             return url;
         }
@@ -80,7 +80,7 @@
 
             if (val == null || val === '') {
 
-                if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+                if (!isEmptyOrNull(this.get_cascadeField())) {
                     return ['1', '=', '0'];
                 }
 
@@ -118,20 +118,20 @@
         }
 
         protected getCriteria(query: Select2SearchQuery): any[] {
-            return Serenity.Criteria.and(
-                Serenity.Criteria.and(this.getIdListCriteria(query.idList), this.options.criteria),
-                Serenity.Criteria.and(this.getCascadeCriteria(), this.getFilterCriteria()));
+            return Criteria.and(
+                Criteria.and(this.getIdListCriteria(query.idList), this.options.criteria),
+                Criteria.and(this.getCascadeCriteria(), this.getFilterCriteria()));
         }
 
         protected getListRequest(query: Select2SearchQuery): ListRequest {
 
-            var request: Serenity.ListRequest = {};
+            var request: ListRequest = {};
 
             if (query.searchTerm)
                 request.ContainsText = query.searchTerm;
 
             request.Sort = this.getSort();
-            request.ColumnSelection = this.options.columnSelection || Serenity.ColumnSelection.KeyOnly;
+            request.ColumnSelection = this.options.columnSelection || ColumnSelection.KeyOnly;
             request.IncludeColumns = this.getIncludeColumns();
             request.ExcludeColumns = this.options.excludeColumns;
             request.ContainsField = this.options.containsField;
@@ -170,11 +170,11 @@
 
         protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise {
             var opt = this.getServiceCallOptions(query, results);
-            return Q.serviceCall(opt);
+            return serviceCall(opt);
         }
     }
 
-    @Decorators.registerEditor('Serenity.ServiceLookupEditor')
+    @registerEditor('Serenity.ServiceLookupEditor')
     export class ServiceLookupEditor extends ServiceLookupEditorBase<ServiceLookupEditorOptions, any> {
         constructor(hidden: JQuery, opt?: ServiceLookupEditorOptions) {
             super(hidden, opt);

@@ -1,4 +1,5 @@
-﻿
+﻿export {}
+
 interface LayoutTimerReg {
     handler: () => void;
     element: () => HTMLElement;

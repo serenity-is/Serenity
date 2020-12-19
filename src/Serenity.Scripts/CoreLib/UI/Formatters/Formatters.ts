@@ -4,14 +4,14 @@
         initializeColumn(column: Slick.Column): void;
     }
 
-    @Serenity.Decorators.registerInterface('Serenity.IInitializeColumn')
+    @registerInterface('Serenity.IInitializeColumn')
     export class IInitializeColumn {
     }
 
-    import Option = Serenity.Decorators.option
+    import Option = option
 
     function Formatter(name: string, intf?: any[]) {
-        return Decorators.registerFormatter('Serenity.' + name + 'Formatter', intf)
+        return registerFormatter('Serenity.' + name + 'Formatter', intf)
     }
 
     @Formatter('Boolean')
@@ -24,25 +24,25 @@
 
             var text;
             if (!!ctx.value) {
-                text = Q.tryGetText(this.trueText);
+                text = tryGetText(this.trueText);
                 if (text == null) {
                     text = this.trueText;
                     if (text == null) {
-                        text = Q.coalesce(Q.tryGetText('Dialogs.YesButton'), 'Yes');
+                        text = coalesce(tryGetText('Dialogs.YesButton'), 'Yes');
                     }
                 }
             }
             else {
-                text = Q.tryGetText(this.falseText);
+                text = tryGetText(this.falseText);
                 if (text == null) {
                     text = this.falseText;
                     if (text == null) {
-                        text = Q.coalesce(Q.tryGetText('Dialogs.NoButton'), 'No');
+                        text = coalesce(tryGetText('Dialogs.NoButton'), 'No');
                     }
                 }
             }
 
-            return Q.htmlEncode(text);
+            return htmlEncode(text);
         }
 
         @Option()
@@ -62,7 +62,7 @@
     @Formatter('Date')
     export class DateFormatter implements Slick.Formatter {
         constructor() {
-            this.displayFormat = Q.Culture.dateFormat;
+            this.displayFormat = Culture.dateFormat;
         }
 
         static format(value: any, format?: string) {
@@ -76,17 +76,17 @@
                 date = value;
             }
             else if (typeof value === 'string') {
-                date = Q.parseISODateTime(value);
+                date = parseISODateTime(value);
 
                 if (date == null) {
-                    return Q.htmlEncode(value);
+                    return htmlEncode(value);
                 }
             }
             else {
                 return value.toString();
             }
 
-            return Q.htmlEncode(Q.formatDate(date, format));
+            return htmlEncode(formatDate(date, format));
         }
 
         @Option()
@@ -101,7 +101,7 @@
     export class DateTimeFormatter extends DateFormatter {
         constructor() {
             super();
-            this.displayFormat = Q.Culture.dateTimeFormat;
+            this.displayFormat = Culture.dateTimeFormat;
         }
     }
 
@@ -121,25 +121,25 @@
                 return '';
             }
 
-            var name = Q.Enum.toString(enumType, value);
-            var enumKeyAttr = Q.getAttributes(enumType, EnumKeyAttribute, false);
-            var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : Q.getTypeFullName(enumType));
+            var name = Enum.toString(enumType, value);
+            var enumKeyAttr = getAttributes(enumType, EnumKeyAttribute, false);
+            var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : getTypeFullName(enumType));
             return EnumFormatter.getText(enumKey, name);
         }
 
         static getText(enumKey: string, name: string) {
-            if (Q.isEmptyOrNull(name)) {
+            if (isEmptyOrNull(name)) {
                 return '';
             }
 
-            return Q.htmlEncode(Q.coalesce(Q.tryGetText('Enums.' + enumKey + '.' + name), name));
+            return htmlEncode(coalesce(tryGetText('Enums.' + enumKey + '.' + name), name));
         }
 
         static getName(enumType: any, value: any) {
             if (value == null) {
                 return '';
             }
-            return Q.Enum.toString(enumType, value);
+            return Enum.toString(enumType, value);
         }
     }
 
@@ -147,31 +147,31 @@
     export class FileDownloadFormatter implements Slick.Formatter, IInitializeColumn {
 
         format(ctx: Slick.FormatterContext): string {
-            var dbFile = Q.safeCast(ctx.value, String);
-            if (Q.isEmptyOrNull(dbFile)) {
+            var dbFile = safeCast(ctx.value, String);
+            if (isEmptyOrNull(dbFile)) {
                 return '';
             }
 
             var downloadUrl = FileDownloadFormatter.dbFileUrl(dbFile);
-            var originalName = (!Q.isEmptyOrNull(this.originalNameProperty) ?
-                Q.safeCast(ctx.item[this.originalNameProperty], String) : null);
+            var originalName = (!isEmptyOrNull(this.originalNameProperty) ?
+                safeCast(ctx.item[this.originalNameProperty], String) : null);
 
-            originalName = Q.coalesce(originalName, '');
-            var text = Q.format(Q.coalesce(this.displayFormat, '{0}'),
+            originalName = (originalName ?? '');
+            var text = format((this.displayFormat ?? '{0}'),
                 originalName, dbFile, downloadUrl);
 
             return "<a class='file-download-link' target='_blank' href='" +
-                Q.attrEncode(downloadUrl) + "'>" + Q.htmlEncode(text) + '</a>';
+                attrEncode(downloadUrl) + "'>" + htmlEncode(text) + '</a>';
         }
 
         static dbFileUrl(filename: string): string {
-            filename = Q.replaceAll(Q.coalesce(filename, ''), '\\', '/');
-            return Q.resolveUrl('~/upload/') + filename;
+            filename = replaceAll((filename ?? ''), '\\', '/');
+            return resolveUrl('~/upload/') + filename;
         }
 
         initializeColumn(column: Slick.Column): void {
             column.referencedFields = column.referencedFields || [];
-            if (!Q.isEmptyOrNull(this.originalNameProperty)) {
+            if (!isEmptyOrNull(this.originalNameProperty)) {
                 column.referencedFields.push(this.originalNameProperty);
                 return;
             }
@@ -209,7 +209,7 @@
             else
                 minuteStr = minute.toString();
 
-            return Q.format('{0}:{1}', hourStr, minuteStr);
+            return format('{0}:{1}', hourStr, minuteStr);
         }
     }
 
@@ -220,7 +220,7 @@
         }
 
         static format(value: any, format?: string): string {
-            format = Q.coalesce(format, '0.##');
+            format = (format ?? '0.##');
             if (value == null)
                 return '';
 
@@ -228,14 +228,14 @@
                 if (isNaN(value))
                     return '';
 
-                return Q.htmlEncode(Q.formatNumber(value, format));
+                return htmlEncode(formatNumber(value, format));
             }
 
-            var dbl = Q.parseDecimal(value.toString());
+            var dbl = parseDecimal(value.toString());
             if (dbl == null)
                 return '';
 
-            return Q.htmlEncode(value.toString());
+            return htmlEncode(value.toString());
         }
 
         @Option()
@@ -246,31 +246,31 @@
     export class UrlFormatter implements Slick.Formatter, IInitializeColumn {
 
         format(ctx: Slick.FormatterContext): string {
-            var url = (!Q.isEmptyOrNull(this.urlProperty) ?
-                Q.coalesce(ctx.item[this.urlProperty], '').toString() :
-                Q.coalesce(ctx.value, '').toString());
+            var url = (!isEmptyOrNull(this.urlProperty) ?
+                (ctx.item[this.urlProperty] ?? '').toString() :
+                (ctx.value ?? '').toString());
 
-            if (Q.isEmptyOrNull(url))
+            if (isEmptyOrNull(url))
                 return '';
 
-            if (!Q.isEmptyOrNull(this.urlFormat))
-                url = Q.format(this.urlFormat, url);
+            if (!isEmptyOrNull(this.urlFormat))
+                url = format(this.urlFormat, url);
 
-            if (url != null && Q.startsWith(url, '~/'))
-                url = Q.resolveUrl(url);
+            if (url != null && startsWith(url, '~/'))
+                url = resolveUrl(url);
 
-            var display = (!Q.isEmptyOrNull(this.displayProperty) ?
-                Q.coalesce(ctx.item[this.displayProperty], '').toString() :
-                Q.coalesce(ctx.value, '').toString());
+            var display = (!isEmptyOrNull(this.displayProperty) ?
+                (ctx.item[this.displayProperty] ?? '').toString() :
+                (ctx.value ?? '').toString());
 
-            if (!Q.isEmptyOrNull(this.displayFormat))
-                display = Q.format(this.displayFormat, display);
+            if (!isEmptyOrNull(this.displayFormat))
+                display = format(this.displayFormat, display);
 
-            var s = "<a href='" + Q.attrEncode(url) + "'";
-            if (!Q.isEmptyOrNull(this.target))
+            var s = "<a href='" + attrEncode(url) + "'";
+            if (!isEmptyOrNull(this.target))
                 s += " target='" + this.target + "'";
 
-            s += '>' + Q.htmlEncode(display) + '</a>';
+            s += '>' + htmlEncode(display) + '</a>';
 
             return s;
         }
@@ -278,12 +278,12 @@
         initializeColumn(column: Slick.Column): void {
             column.referencedFields = column.referencedFields || [];
 
-            if (!Q.isEmptyOrNull(this.displayProperty)) {
+            if (!isEmptyOrNull(this.displayProperty)) {
                 column.referencedFields.push(this.displayProperty);
                 return;
             }
 
-            if (!Q.isEmptyOrNull(this.urlProperty)) {
+            if (!isEmptyOrNull(this.urlProperty)) {
                 column.referencedFields.push(this.urlProperty);
                 return;
             }
@@ -307,16 +307,16 @@
 
     export namespace FormatterTypeRegistry {
 
-        let knownTypes: Q.Dictionary<Function>;
+        let knownTypes: { [key: string]: Function };
 
         function setTypeKeysWithoutFormatterSuffix() {
             var suffix = 'formatter';
             for (var k of Object.keys(knownTypes)) {
-                if (!Q.endsWith(k, suffix)) 
+                if (!endsWith(k, suffix)) 
                     continue;
                 
                 var p = k.substr(0, k.length - suffix.length);
-                if (Q.isEmptyOrNull(p))
+                if (isEmptyOrNull(p))
                     continue;
                 
                 if (knownTypes[p] != null)
@@ -333,16 +333,16 @@
             }
 
             knownTypes = {};
-            var types = Q.getTypes();
+            var types = getTypes();
             for (var type of types) {
-                if (!Q.isAssignableFrom(Serenity.ISlickFormatter, type))
+                if (!isAssignableFrom(ISlickFormatter, type))
                     continue;
                     
-                var fullName = Q.getTypeFullName(type).toLowerCase();
+                var fullName = getTypeFullName(type).toLowerCase();
                 knownTypes[fullName] = type;
 
-                for (var k of Q.Config.rootNamespaces) {
-                    if (Q.startsWith(fullName, k.toLowerCase() + '.')) {
+                for (var k of Config.rootNamespaces) {
+                    if (startsWith(fullName, k.toLowerCase() + '.')) {
                         var kx = fullName.substr(k.length + 1).toLowerCase();
                         if (knownTypes[kx] == null) {
                             knownTypes[kx] = type;
@@ -355,14 +355,14 @@
         }
 
         export function get(key: string): Function {
-            if (Q.isEmptyOrNull(key)) 
-                throw new Q.ArgumentNullException('key');
+            if (isEmptyOrNull(key)) 
+                throw new ArgumentNullException('key');
             
             initialize();
 
             var formatterType = knownTypes[key.toLowerCase()];
             if (formatterType == null) {
-                throw new Q.Exception(Q.format(
+                throw new Exception(format(
                     "Can't find {0} formatter type!", key));
             }
 

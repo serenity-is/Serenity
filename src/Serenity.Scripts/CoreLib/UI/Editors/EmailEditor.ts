@@ -5,8 +5,8 @@
         readOnlyDomain?: boolean;
     }
 
-    @Decorators.registerEditor('Serenity.EmailEditor', [IStringValue, IReadOnly])
-    @Decorators.element('<input type="text"/>')
+    @registerEditor('Serenity.EmailEditor', [IStringValue, IReadOnly])
+    @element('<input type="text"/>')
     export class EmailEditor extends Widget<EmailEditorOptions> {
 
         constructor(input: JQuery, opt: EmailEditorOptions) {
@@ -26,7 +26,7 @@
                 }
             });
 
-            if (!Q.isEmptyOrNull(this.options.domain)) {
+            if (!isEmptyOrNull(this.options.domain)) {
                 domain.val(this.options.domain);
             }
 
@@ -73,15 +73,15 @@
                 else {
                     return $.validator.methods.email.call(this, value + '@dummy.com', element);
                 }
-            }, Q.tryGetText("Validation.Email") ?? $.validator.messages.email);
+            }, tryGetText("Validation.Email") ?? $.validator.messages.email);
         }
 
         get_value(): string {
             var domain = this.element.nextAll('.emaildomain');
             var value = this.element.val();
             var domainValue = domain.val();
-            if (Q.isEmptyOrNull(value)) {
-                if (this.options.readOnlyDomain || Q.isEmptyOrNull(domainValue)) {
+            if (isEmptyOrNull(value)) {
+                if (this.options.readOnlyDomain || isEmptyOrNull(domainValue)) {
                     return '';
                 }
                 return '@' + domainValue;
@@ -95,7 +95,7 @@
 
         set_value(value: string): void {
             var domain = this.element.nextAll('.emaildomain');
-            value = Q.trimToNull(value);
+            value = trimToNull(value);
             if (value == null) {
                 if (!this.options.readOnlyDomain)
                     domain.val('');
@@ -108,7 +108,7 @@
                         domain.val(parts[1]);
                         this.element.val(parts[0]);
                     }
-                    else if (!Q.isEmptyOrNull(this.options.domain)) {
+                    else if (!isEmptyOrNull(this.options.domain)) {
                         if (parts[1] !== this.options.domain)
                             this.element.val(value);
                         else 

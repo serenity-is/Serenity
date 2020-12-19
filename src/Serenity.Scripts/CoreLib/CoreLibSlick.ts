@@ -4,5 +4,4 @@ export * from "./SlickGrid/Event";
 export * from "./SlickGrid/Grid";
 export * from "./SlickGrid/GridOptions";
 export * from "./SlickGrid/Grouping";
-export * from "./SlickGrid/Types";
 export * from "./SlickGrid/RemoteView";

@@ -1,6 +1,6 @@
 ﻿namespace Serenity {
 
-    @Decorators.registerEditor('Serenity.DateYearEditor')
+    @registerEditor('Serenity.DateYearEditor')
     export class DateYearEditor extends SelectEditor {
 
         constructor(hidden: JQuery, opt: DateYearEditorOptions) {
@@ -20,22 +20,22 @@
             var minYear = (new Date()).getFullYear();
             var maxYear = (new Date()).getFullYear();
 
-            opt.minYear = Q.coalesce(opt.minYear, '-10').toString();
-            if (Q.startsWith(opt.minYear, '-')) {
+            opt.minYear = (opt.minYear ?? '-10').toString();
+            if (startsWith(opt.minYear, '-')) {
                 minYear -= parseInt(opt.minYear.substr(1), 10);
             }
-            else if (Q.startsWith(opt.minYear, '+')) {
+            else if (startsWith(opt.minYear, '+')) {
                 minYear += parseInt(opt.minYear.substr(1), 10);
             }
             else {
                 minYear = parseInt(opt.minYear, 10);
             }
 
-            opt.maxYear = Q.coalesce(opt.maxYear, '+10').toString();
-            if (Q.startsWith(opt.maxYear, '-')) {
+            opt.maxYear = (opt.maxYear ?? '+10').toString();
+            if (startsWith(opt.maxYear, '-')) {
                 maxYear -= parseInt(opt.maxYear.substr(1), 10);
             }
-            else if (Q.startsWith(opt.maxYear, '+')) {
+            else if (startsWith(opt.maxYear, '+')) {
                 maxYear += parseInt(opt.maxYear.substr(1), 10);
             }
             else {

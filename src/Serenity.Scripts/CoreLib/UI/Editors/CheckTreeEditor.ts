@@ -11,12 +11,12 @@
         source?: TSource;
     }
 
-    @Serenity.Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
-    @Serenity.Decorators.element("<div/>")
+    @registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
+    @element("<div/>")
     export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends DataGrid<TItem, TOptions>
         implements IGetEditValue, ISetEditValue, IReadOnly {
 
-        private byId: Q.Dictionary<TItem>;
+        private byId: { [key: string]: TItem };
 
         constructor(div: JQuery, opt?: TOptions) {
             super(div, opt);
@@ -39,10 +39,10 @@
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
                 item.children = [];
-                if (!Q.isEmptyOrNull(item.id)) {
+                if (!isEmptyOrNull(item.id)) {
                     itemById[item.id] = item;
                 }
-                if (!Q.isEmptyOrNull(item.parentId)) {
+                if (!isEmptyOrNull(item.parentId)) {
                     var parent = itemById[item.parentId];
                     if (parent != null) {
                         parent.children.push(item);
@@ -68,13 +68,13 @@
 
         protected getButtons(): ToolButton[] {
             var selectAllText = this.getSelectAllText();
-            if (Q.isEmptyOrNull(selectAllText)) {
+            if (isEmptyOrNull(selectAllText)) {
                 return null;
             }
 
             var self = this;
             var buttons: ToolButton[] = [];
-            buttons.push(Serenity.GridSelectAllButtonHelper.define(function () {
+            buttons.push(GridSelectAllButtonHelper.define(function () {
                 return self;
             }, function (x) {
                 return x.id;
@@ -96,7 +96,7 @@
         }
 
         protected getSelectAllText(): string {
-            return Q.coalesce(Q.tryGetText('Controls.CheckTreeEditor.SelectAll'), 'Select All');
+            return coalesce(tryGetText('Controls.CheckTreeEditor.SelectAll'), 'Select All');
         }
 
         protected isThreeStateHierarchy(): boolean {
@@ -118,7 +118,7 @@
 
             var items = this.view.getItems();
             var self = this;
-            return Serenity.SlickTreeHelper.filterCustom(item, function (x) {
+            return SlickTreeHelper.filterCustom(item, function (x) {
                 if (x.parentId == null) {
                     return null;
                 }
@@ -144,7 +144,7 @@
         protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
             response = super.onViewProcessData(response);
             this.byId = null;
-            Serenity.SlickTreeHelper.setIndents(response.Entities, function (x) {
+            SlickTreeHelper.setIndents(response.Entities, function (x) {
                 return x.id;
             }, function (x1) {
                 return x1.parentId;
@@ -156,7 +156,7 @@
             super.onClick(e, row, cell);
 
             if (!e.isDefaultPrevented()) {
-                Serenity.SlickTreeHelper.toggleClick(e, row, cell, this.view, function (x) {
+                SlickTreeHelper.toggleClick(e, row, cell, this.view, function (x) {
                     return x.id;
                 });
             }
@@ -196,7 +196,7 @@
         }
 
         protected updateSelectAll(): void {
-            Serenity.GridSelectAllButtonHelper.update(this, function (x) {
+            GridSelectAllButtonHelper.update(this, function (x) {
                 return x.isSelected;
             });
         }
@@ -309,7 +309,7 @@
             var self = this;
             var columns = [];
             columns.push({
-                field: 'text', name: 'Kayıt', width: 80, format: Serenity.SlickFormatting.treeToggle(function () {
+                field: 'text', name: 'Kayıt', width: 80, format: SlickFormatting.treeToggle(function () {
                     return self.view;
                 }, function (x) {
                     return x.id;
@@ -337,7 +337,7 @@
         }
 
         protected getItemText(ctx: Slick.FormatterContext): string {
-            return Q.htmlEncode(ctx.value);
+            return htmlEncode(ctx.value);
         }
 
         protected getSlickOptions(): Slick.GridOptions {
@@ -364,7 +364,7 @@
                 if (y.isSelected && !x1.isSelected) {
                     return 1;
                 }
-                var c = Q.Culture.stringCompare(x1.text, y.text);
+                var c = Culture.stringCompare(x1.text, y.text);
                 if (c !== 0) {
                     return c;
                 }
@@ -412,7 +412,7 @@
             if (value != null) {
                 if (typeof value == "string") {
                     value = value.split(',')
-                        .map(x => Q.trimToNull(x))
+                        .map(x => trimToNull(x))
                         .filter(x => x != null);
                 }
 
@@ -459,8 +459,8 @@
         filterValue?: any;
     }
 
-    @Decorators.registerEditor("Serenity.CheckLookupEditor")
-    export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<Serenity.CheckTreeItem<TItem>, CheckLookupEditorOptions> {
+    @registerEditor("Serenity.CheckLookupEditor")
+    export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeItem<TItem>, CheckLookupEditorOptions> {
 
         private searchText: string;
         private enableUpdateItems: boolean;
@@ -471,7 +471,7 @@
             this.enableUpdateItems = true;
             this.setCascadeFrom(this.options.cascadeFrom);
             this.updateItems();
-            Q.ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName,
+            ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName,
                 () => this.updateItems());
         }
 
@@ -484,14 +484,14 @@
             return this.options.lookupKey;
         }
 
-        protected getButtons(): Serenity.ToolButton[] {
-            return Q.coalesce(super.getButtons(), this.options.hideSearch ? null : []);
+        protected getButtons(): ToolButton[] {
+            return coalesce(super.getButtons(), this.options.hideSearch ? null : []);
         }
 
         protected createToolbarExtensions() {
             super.createToolbarExtensions();
 
-            Serenity.GridUtils.addQuickSearchInputCustom(this.toolbar.element, (field, text) => {
+            GridUtils.addQuickSearchInputCustom(this.toolbar.element, (field, text) => {
                 this.searchText = Select2.util.stripDiacritics(text || '').toUpperCase();
                 this.view.setItems(this.view.getItems(), true);
             });
@@ -510,7 +510,7 @@
 
             if (val == null || val === '') {
 
-                if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+                if (!isEmptyOrNull(this.get_cascadeField())) {
                     return [];
                 }
 
@@ -521,7 +521,7 @@
             var fld = this.get_cascadeField();
 
             return items.filter(x => {
-                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                var itemKey = (x[fld], ReflectionUtils.getPropertyValue(x ?? fld));
                 return !!(itemKey != null && itemKey.toString() === key);
             });
         }
@@ -537,28 +537,28 @@
             var fld = this.get_filterField();
 
             return items.filter(x => {
-                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                var itemKey = (x[fld], ReflectionUtils.getPropertyValue(x ?? fld));
                 return !!(itemKey != null && itemKey.toString() === key);
             });
         }
 
-        protected getLookupItems(lookup: Q.Lookup<TItem>): TItem[] {
+        protected getLookupItems(lookup: Lookup<TItem>): TItem[] {
             return this.filterItems(this.cascadeItems(lookup.items));
         }
 
         protected getTreeItems() {
-            var lookup = Q.getLookup<TItem>(this.options.lookupKey);
+            var lookup = getLookup<TItem>(this.options.lookupKey);
             var items = this.getLookupItems(lookup);
-            return items.map(item => <Serenity.CheckTreeItem<TItem>>{
-                id: Q.coalesce(item[lookup.idField], "").toString(),
-                text: Q.coalesce(item[lookup.textField], "").toString(),
+            return items.map(item => <CheckTreeItem<TItem>>{
+                id: (item[lookup.idField] ?? "").toString(),
+                text: (item[lookup.textField] ?? "").toString(),
                 source: item
             });
         }
 
         protected onViewFilter(item: CheckTreeItem<TItem>) {
             return super.onViewFilter(item) &&
-                (Q.isEmptyOrNull(this.searchText) ||
+                (isEmptyOrNull(this.searchText) ||
                     Select2.util.stripDiacritics(item.text || '')
                         .toUpperCase().indexOf(this.searchText) >= 0);
         }
@@ -575,15 +575,15 @@
             return this.get_cascadeFrom();
         }
 
-        protected getCascadeFromValue(parent: Serenity.Widget<any>) {
-            return Serenity.EditorUtils.getValue(parent);
+        protected getCascadeFromValue(parent: Widget<any>) {
+            return EditorUtils.getValue(parent);
         }
 
-        protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
+        protected cascadeLink: CascadedWidgetLink<Widget<any>>;
 
         protected setCascadeFrom(value: string) {
 
-            if (Q.isEmptyOrNull(value)) {
+            if (isEmptyOrNull(value)) {
                 if (this.cascadeLink != null) {
                     this.cascadeLink.set_parentID(null);
                     this.cascadeLink = null;
@@ -592,7 +592,7 @@
                 return;
             }
 
-            this.cascadeLink = new Serenity.CascadedWidgetLink<Widget<any>>(Widget, this, p => {
+            this.cascadeLink = new CascadedWidgetLink<Widget<any>>(Widget, this, p => {
                 this.set_cascadeValue(this.getCascadeFromValue(p));
             });
 
@@ -612,7 +612,7 @@
         }
 
         protected get_cascadeField() {
-            return Q.coalesce(this.options.cascadeField, this.options.cascadeFrom);
+            return (this.options.cascadeField ?? this.options.cascadeFrom);
         }
 
         get cascadeField(): string {

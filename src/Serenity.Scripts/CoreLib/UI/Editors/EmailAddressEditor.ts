@@ -1,7 +1,7 @@
 ﻿namespace Serenity {
     
-    @Decorators.registerEditor('Serenity.EmailAddressEditor')
-    export class EmailAddressEditor extends Serenity.StringEditor {
+    @registerEditor('Serenity.EmailAddressEditor')
+    export class EmailAddressEditor extends StringEditor {
         constructor(input: JQuery) {
             super(input);
 

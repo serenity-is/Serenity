@@ -1,177 +1,183 @@
-﻿namespace Serenity {
+﻿import { registerClass } from "../../Decorators";
+import { ArgumentNullException } from "../../Q/Exceptions";
+import { Culture } from "../../Q/Formatting";
+import { text, tryGetText } from "../../Q/LocalText";
+import { PropertyItem } from "../../Services/PropertyItem";
+import { FilterLine } from "./FilterLine";
+import { Criteria } from "../../Services/Criteria";
+import { delegateCombine, delegateRemove } from "../../Q/TypeSystem";
 
-    @Decorators.registerClass('FilterStore')
-    export class FilterStore {
+@registerClass('FilterStore')
+export class FilterStore {
 
-        constructor(fields: PropertyItem[]) {
+    constructor(fields: PropertyItem[]) {
 
-            this.items = [];
+        this.items = [];
 
-            if (fields == null) {
-                throw new Q.ArgumentNullException('source');
-            }
-
-            this.fields = fields.slice();
-
-            this.get_fields().sort(function (x, y) {
-                var titleX = Q.tryGetText(x.title);
-                if (titleX == null) {
-                    titleX = x.title;
-                    if (titleX == null)
-                        titleX = x.name;
-                }
-
-                var titleY = Q.tryGetText(y.title);
-                if (titleY == null) {
-                    titleY = y.title;
-                    if (titleY == null)
-                        titleY = y.name;
-                }
-
-                return Q.Culture.stringCompare(titleX, titleY);
-            });
-
-            this.fieldByName = {};
-
-            for (var field of fields) {
-                this.get_fieldByName()[field.name] = field;
-            }
+        if (fields == null) {
+            throw new ArgumentNullException('source');
         }
 
-        static getCriteriaFor(items: FilterLine[]): any[] {
+        this.fields = fields.slice();
 
-            if (items == null)
-                return [''];
-
-            var inParens = false;
-            var currentBlock = [''];
-            var isBlockOr = false;
-            var criteria = [''];
-
-            for (var i = 0; i < items.length; i++) {
-                var line = items[i];
-
-                if (line.leftParen || inParens && line.rightParen) {
-
-                    if (!Serenity.Criteria.isEmpty(currentBlock)) {
-
-                        if (inParens)
-                            currentBlock = Serenity.Criteria.paren(currentBlock);
-
-                        if (isBlockOr)
-                            criteria = Serenity.Criteria.join(criteria,
-                                'or', currentBlock);
-                        else
-                            criteria = Serenity.Criteria.join(criteria,
-                                'and', currentBlock);
-
-                        currentBlock = [''];
-                    }
-
-                    inParens = false;
-                }
-
-                if (line.leftParen) {
-                    isBlockOr = line.isOr;
-                    inParens = true;
-                }
-
-                if (line.isOr)
-                    currentBlock = Serenity.Criteria.join(currentBlock,
-                        'or', line.criteria);
-                else
-                    currentBlock = Serenity.Criteria.join(currentBlock,
-                        'and', line.criteria);
+        this.get_fields().sort(function (x, y) {
+            var titleX = tryGetText(x.title);
+            if (titleX == null) {
+                titleX = x.title;
+                if (titleX == null)
+                    titleX = x.name;
             }
 
-            if (!Serenity.Criteria.isEmpty(currentBlock)) {
-                if (isBlockOr)
-                    criteria = Serenity.Criteria.join(criteria,
-                        'or', Serenity.Criteria.paren(currentBlock));
-                else
-                    criteria = Serenity.Criteria.join(criteria,
-                        'and', Serenity.Criteria.paren(currentBlock));
+            var titleY = tryGetText(y.title);
+            if (titleY == null) {
+                titleY = y.title;
+                if (titleY == null)
+                    titleY = y.name;
             }
 
-            return criteria;
+            return Culture.stringCompare(titleX, titleY);
+        });
+
+        this.fieldByName = {};
+
+        for (var field of fields) {
+            this.get_fieldByName()[field.name] = field;
+        }
+    }
+
+    static getCriteriaFor(items: FilterLine[]): any[] {
+
+        if (items == null)
+            return [''];
+
+        var inParens = false;
+        var currentBlock = [''];
+        var isBlockOr = false;
+        var criteria = [''];
+
+        for (var i = 0; i < items.length; i++) {
+            var line = items[i];
+
+            if (line.leftParen || inParens && line.rightParen) {
+
+                if (!Criteria.isEmpty(currentBlock)) {
+
+                    if (inParens)
+                        currentBlock = Criteria.paren(currentBlock);
+
+                    if (isBlockOr)
+                        criteria = Criteria.join(criteria,
+                            'or', currentBlock);
+                    else
+                        criteria = Criteria.join(criteria,
+                            'and', currentBlock);
+
+                    currentBlock = [''];
+                }
+
+                inParens = false;
+            }
+
+            if (line.leftParen) {
+                isBlockOr = line.isOr;
+                inParens = true;
+            }
+
+            if (line.isOr)
+                currentBlock = Criteria.join(currentBlock,
+                    'or', line.criteria);
+            else
+                currentBlock = Criteria.join(currentBlock,
+                    'and', line.criteria);
         }
 
-        static getDisplayTextFor(items: FilterLine[]): string {
+        if (!Criteria.isEmpty(currentBlock)) {
+            if (isBlockOr)
+                criteria = Criteria.join(criteria,
+                    'or', Criteria.paren(currentBlock));
+            else
+                criteria = Criteria.join(criteria,
+                    'and', Criteria.paren(currentBlock));
+        }
 
-            if (items == null)
-                return '';
+        return criteria;
+    }
 
-            var inParens = false;
-            var displayText = '';
+    static getDisplayTextFor(items: FilterLine[]): string {
 
-            for (var i = 0; i < items.length; i++) {
-                var line = items[i];
+        if (items == null)
+            return '';
 
-                if (inParens && (line.rightParen || line.leftParen)) {
-                    displayText += ')';
-                    inParens = false;
-                }
+        var inParens = false;
+        var displayText = '';
 
-                if (displayText.length > 0) {
-                    displayText += ' ' + Q.text('Controls.FilterPanel.' +
-                        (line.isOr ? 'Or' : 'And')) + ' ';
-                }
+        for (var i = 0; i < items.length; i++) {
+            var line = items[i];
 
-                if (line.leftParen) {
-                    displayText += '(';
-                    inParens = true;
-                }
-
-                displayText += line.displayText;
-            }
-
-            if (inParens) {
+            if (inParens && (line.rightParen || line.leftParen)) {
                 displayText += ')';
+                inParens = false;
             }
 
-            return displayText;
+            if (displayText.length > 0) {
+                displayText += ' ' + text('Controls.FilterPanel.' +
+                    (line.isOr ? 'Or' : 'And')) + ' ';
+            }
+
+            if (line.leftParen) {
+                displayText += '(';
+                inParens = true;
+            }
+
+            displayText += line.displayText;
         }
 
-        private changed: any;
-        private displayText: string;
-        private fields: PropertyItem[];
-        private fieldByName: Q.Dictionary<PropertyItem>
-        private items: FilterLine[];
-
-        get_fields(): PropertyItem[] {
-            return this.fields;
+        if (inParens) {
+            displayText += ')';
         }
 
-        get_fieldByName(): Q.Dictionary<PropertyItem> {
-            return this.fieldByName;
-        }
+        return displayText;
+    }
 
-        get_items(): FilterLine[] {
-            return this.items;
-        }
+    private changed: any;
+    private displayText: string;
+    private fields: PropertyItem[];
+    private fieldByName: { [key: string]: PropertyItem }
+    private items: FilterLine[];
 
-        raiseChanged(): void {
-            this.displayText = null;
-            this.changed && this.changed(this, {});
-        }
+    get_fields(): PropertyItem[] {
+        return this.fields;
+    }
 
-        add_changed(value: (e: JQueryEventObject, a: any) => void): void {
-            this.changed = Q.delegateCombine(this.changed, value);
-        }
+    get_fieldByName(): { [key: string]: PropertyItem } {
+        return this.fieldByName;
+    }
 
-        remove_changed(value: (e: JQueryEventObject, a: any) => void): void {
-            this.changed = Q.delegateRemove(this.changed, value);
-        }
+    get_items(): FilterLine[] {
+        return this.items;
+    }
 
-        get_activeCriteria(): any[] {
-            return FilterStore.getCriteriaFor(this.items);
-        }
+    raiseChanged(): void {
+        this.displayText = null;
+        this.changed && this.changed(this, {});
+    }
 
-        get_displayText(): string {
-            if (this.displayText == null)
-                this.displayText = FilterStore.getDisplayTextFor(this.items);
-            
-            return this.displayText;
-        }
+    add_changed(value: (e: JQueryEventObject, a: any) => void): void {
+        this.changed = delegateCombine(this.changed, value);
+    }
+
+    remove_changed(value: (e: JQueryEventObject, a: any) => void): void {
+        this.changed = delegateRemove(this.changed, value);
+    }
+
+    get_activeCriteria(): any[] {
+        return FilterStore.getCriteriaFor(this.items);
+    }
+
+    get_displayText(): string {
+        if (this.displayText == null)
+            this.displayText = FilterStore.getDisplayTextFor(this.items);
+        
+        return this.displayText;
     }
 }

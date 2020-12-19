@@ -5,8 +5,8 @@
         language?: string;
     }
 
-    @Decorators.registerEditor('Serenity.Recaptcha', [IStringValue])
-    @Decorators.element("<div/>")
+    @registerEditor('Serenity.Recaptcha', [IStringValue])
+    @element("<div/>")
     export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
         constructor(div: JQuery, opt: RecaptchaOptions) {
             super(div, opt);
@@ -16,7 +16,7 @@
                 var src = 'https://www.google.com/recaptcha/api.js';
                 var lng = this.options.language;
                 if (lng == null) {
-                    lng = Q.coalesce($('html').attr('lang'), '');
+                    lng = coalesce($('html').attr('lang'), '');
                 }
                 src += '?hl=' + lng;
                 $('<script/>').attr('id', 'RecaptchaInclude').attr('src', src).appendTo(document.body);
@@ -34,9 +34,9 @@
             var input = valInput.css(gro);
             var self = this;
 
-            Q.addValidationRule(input, this.uniqueName, e => {
-                if (Q.isEmptyOrNull(this.get_value())) {
-                    return Q.text('Validation.Required');
+            addValidationRule(input, this.uniqueName, e => {
+                if (isEmptyOrNull(this.get_value())) {
+                    return text('Validation.Required');
                 }
                 return null;
             });

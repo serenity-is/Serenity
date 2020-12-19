@@ -8,8 +8,8 @@
     export interface CKEditorConfig {
     }    
 
-    @Decorators.registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])
-    @Decorators.element('<textarea/>')
+    @registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])
+    @element('<textarea/>')
     export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
         implements IStringValue, IReadOnly {
 
@@ -22,7 +22,7 @@
             HtmlContentEditor.includeCKEditor();
 
             var id = textArea.attr('id');
-            if (Q.isTrimmedEmpty(id)) {
+            if (isTrimmedEmpty(id)) {
                 textArea.attr('id', this.uniqueName);
                 id = this.uniqueName;
             }
@@ -35,15 +35,15 @@
 
             this.addValidationRule(this.uniqueName, e => {
                 if (e.hasClass('required')) {
-                    var value = Q.trimToNull(this.get_value());
+                    var value = trimToNull(this.get_value());
                     if (value == null)
-                        return Q.text('Validation.Required');
+                        return text('Validation.Required');
                 }
 
                 return null;
             });
 
-            Serenity.LazyLoadHelper.executeOnceWhenShown(this.element, () => {
+            LazyLoadHelper.executeOnceWhenShown(this.element, () => {
                 var config = this.getConfig();
                 window['CKEDITOR'] && window['CKEDITOR'].replace(id, config);
             });
@@ -65,7 +65,7 @@
 
             var CKEDITOR = window['CKEDITOR'];
 
-            var lang = Q.coalesce(Q.trimToNull($('html').attr('lang')), 'en');
+            var lang = coalesce(trimToNull($('html').attr('lang')), 'en');
             if (!!CKEDITOR.lang.languages[lang]) {
                 return lang;
             }
@@ -117,7 +117,7 @@
                 format_tags: 'p;h1;h2;h3;pre',
                 removeDialogTabs: 'image:advanced;link:advanced',
                 removePlugins: 'uploadimage,image2',
-                contentsCss: Q.resolveUrl('~/Content/site/site.htmlcontent.css'),
+                contentsCss: resolveUrl('~/Content/site/site.htmlcontent.css'),
                 entities: false,
                 entities_latin: false,
                 entities_greek: false,
@@ -164,7 +164,7 @@
         }
 
         get_readOnly(): boolean {
-            return !Q.isEmptyOrNull(this.element.attr('disabled'));
+            return !isEmptyOrNull(this.element.attr('disabled'));
         }
 
         set_readOnly(value: boolean) {
@@ -197,13 +197,13 @@
 
             $('<script/>').attr('type', 'text/javascript')
                 .attr('id', 'CKEditorScript')
-                .attr('src', Q.resolveUrl('~/Scripts/ckeditor/ckeditor.js?v=' +
+                .attr('src', resolveUrl('~/Scripts/ckeditor/ckeditor.js?v=' +
                     HtmlContentEditor.CKEditorVer))
                 .appendTo(window.document.head);
         };
     }
 
-    @Decorators.registerEditor('Serenity.HtmlNoteContentEditor')
+    @registerEditor('Serenity.HtmlNoteContentEditor')
     export class HtmlNoteContentEditor extends HtmlContentEditor {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions) {
             super(textArea, opt);
@@ -223,7 +223,7 @@
         }
     }
 
-    @Decorators.registerEditor('Serenity.HtmlReportContentEditor')
+    @registerEditor('Serenity.HtmlReportContentEditor')
     export class HtmlReportContentEditor extends HtmlContentEditor {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions) {
             super(textArea, opt);

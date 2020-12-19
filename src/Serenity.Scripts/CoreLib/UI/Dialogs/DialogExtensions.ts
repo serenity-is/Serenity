@@ -1,4 +1,6 @@
-﻿namespace Serenity.DialogExtensions {
+﻿import { Flexify } from "../Widgets/Flexify";
+
+export namespace DialogExtensions {
 
     export function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery {
         var dlg = dialog.dialog();
@@ -28,4 +30,9 @@
 
         return dialog;
     }
-}    
+
+    export function dialogFlexify(dialog: JQuery): JQuery {
+        new Flexify(dialog.closest('.ui-dialog'), {});
+        return dialog;
+    }
+}

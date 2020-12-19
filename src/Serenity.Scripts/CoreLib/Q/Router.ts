@@ -145,7 +145,7 @@ export namespace Router {
 
         resolving++;
         try {
-            hash = coalesce(coalesce(hash, window.location.hash), '');
+            hash = hash ?? window.location.hash ?? '';
             if (hash.charAt(0) == '#')
                 hash = hash.substr(1, hash.length - 1);
 

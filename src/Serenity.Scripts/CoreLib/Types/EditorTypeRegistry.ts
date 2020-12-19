@@ -6,90 +6,92 @@ import { getAttributes, getType, getTypes, getTypeFullName } from "../Q/TypeSyst
 import { EditorAttribute } from "../Types/Attributes";
 
 // @ts-ignore
-let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : this));
+let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
 
 let knownTypes: { [key: string] : any };
 
-export function get(key: string): any {
+export namespace EditorTypeRegistry {
+    export function get(key: string): any {
 
-    if (isEmptyOrNull(key)) {
-        throw new ArgumentNullException('key');
-    }
-
-    initialize();
-
-    var editorType = knownTypes[key.toLowerCase()];
-    if (editorType == null) {
-
-        var type = getType(key) ?? getType(key, globalObj);
-        if (type != null) {
-            knownTypes[key.toLowerCase()] = type as any;
-            return type as any;
+        if (isEmptyOrNull(key)) {
+            throw new ArgumentNullException('key');
         }
 
-        throw new Exception(format("Can't find {0} editor type!", key));
-    }
-    return editorType;
+        initialize();
 
-}
+        var editorType = knownTypes[key.toLowerCase()];
+        if (editorType == null) {
 
-function initialize(): void {
-
-    if (knownTypes != null)
-        return;
-
-    knownTypes = {};
-
-    for (var type of getTypes()) {
-
-        var fullName = getTypeFullName(type).toLowerCase();
-        knownTypes[fullName] = type;
-
-        var editorAttr = getAttributes(type, EditorAttribute, false);
-        if (editorAttr != null && editorAttr.length > 0) {
-            var attrKey = editorAttr[0].key;
-            if (!isEmptyOrNull(attrKey)) {
-                knownTypes[attrKey.toLowerCase()] = type;
+            var type = getType(key) ?? getType(key, globalObj);
+            if (type != null) {
+                knownTypes[key.toLowerCase()] = type as any;
+                return type as any;
             }
-        }
 
-        for (var k of Config.rootNamespaces) {
-            if (startsWith(fullName, k.toLowerCase() + '.')) {
-                var kx = fullName.substr(k.length + 1).toLowerCase();
-                if (knownTypes[kx] == null) {
-                    knownTypes[kx] = type;
+            throw new Exception(format("Can't find {0} editor type!", key));
+        }
+        return editorType;
+
+    }
+
+    function initialize(): void {
+
+        if (knownTypes != null)
+            return;
+
+        knownTypes = {};
+
+        for (var type of getTypes()) {
+
+            var fullName = getTypeFullName(type).toLowerCase();
+            knownTypes[fullName] = type;
+
+            var editorAttr = getAttributes(type, EditorAttribute, false);
+            if (editorAttr != null && editorAttr.length > 0) {
+                var attrKey = editorAttr[0].key;
+                if (!isEmptyOrNull(attrKey)) {
+                    knownTypes[attrKey.toLowerCase()] = type;
+                }
+            }
+
+            for (var k of Config.rootNamespaces) {
+                if (startsWith(fullName, k.toLowerCase() + '.')) {
+                    var kx = fullName.substr(k.length + 1).toLowerCase();
+                    if (knownTypes[kx] == null) {
+                        knownTypes[kx] = type;
+                    }
                 }
             }
         }
+
+        setTypeKeysWithoutEditorSuffix();
     }
 
-    setTypeKeysWithoutEditorSuffix();
-}
-
-export function reset(): void {
-    knownTypes = null;
-}
-
-function setTypeKeysWithoutEditorSuffix() {
-    var keys = Object.keys(knownTypes);
-    for (var k of keys) {
-        setWithoutSuffix(k, knownTypes[k]);
+    export function reset(): void {
+        knownTypes = null;
     }
-}
 
-function setWithoutSuffix(key: string, t: any) {
-    var suffix = 'editor';
+    function setTypeKeysWithoutEditorSuffix() {
+        var keys = Object.keys(knownTypes);
+        for (var k of keys) {
+            setWithoutSuffix(k, knownTypes[k]);
+        }
+    }
 
-    if (!endsWith(key, suffix))
-        return;
+    function setWithoutSuffix(key: string, t: any) {
+        var suffix = 'editor';
 
-    var p = key.substr(0, key.length - suffix.length);
+        if (!endsWith(key, suffix))
+            return;
 
-    if (isEmptyOrNull(p))
-        return;
+        var p = key.substr(0, key.length - suffix.length);
 
-    if (knownTypes[p] != null)
-        return;
+        if (isEmptyOrNull(p))
+            return;
 
-    knownTypes[p] = knownTypes[key];
+        if (knownTypes[p] != null)
+            return;
+
+        knownTypes[p] = knownTypes[key];
+    }
 }

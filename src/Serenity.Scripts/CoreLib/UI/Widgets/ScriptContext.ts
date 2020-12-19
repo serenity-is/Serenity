@@ -1,8 +1,8 @@
-﻿namespace Serenity {
-    export interface ScriptContext {
-    }
+﻿import { registerClass } from "../../Decorators";
 
-    @Decorators.registerClass('Serenity.ScriptContext')
-    export class ScriptContext {
-    }
+export interface ScriptContext {
+}
+
+@registerClass('Serenity.ScriptContext')
+export class ScriptContext {
 }

@@ -1,11 +1,11 @@
 ﻿namespace Serenity {
     
-    import Option = Serenity.Decorators.option
+    import Option = option
 
     export let datePickerIconSvg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M14 2v-1h-3v1h-5v-1h-3v1h-3v15h17v-15h-3zM12 2h1v2h-1v-2zM4 2h1v2h-1v-2zM16 16h-15v-8.921h15v8.921zM1 6.079v-3.079h2v2h3v-2h5v2h3v-2h2v3.079h-15z" fill="#000000"></path></svg>';
 
-    @Decorators.registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
-    @Decorators.element('<input type="text"/>')
+    @registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
+    @element('<input type="text"/>')
     export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
 
         private minValue: string;
@@ -26,7 +26,7 @@
                     beforeShow: (inp, inst) => {
                         return !input.hasClass('readonly') as any;
                     },
-                    yearRange: Q.coalesce(this.yearRange, '-100:+50')
+                    yearRange: (this.yearRange ?? '-100:+50')
                 });
 
             }
@@ -36,30 +36,30 @@
 
             input.on('keyup.' + this.uniqueName, e => {
                 if (e.which === 32 && !this.get_readOnly()) {
-                    if (this.get_valueAsDate() != Q.today()) {
-                        this.set_valueAsDate(Q.today());
+                    if (this.get_valueAsDate() != today()) {
+                        this.set_valueAsDate(today());
                         this.element.trigger('change');
                     }
                 }
                 else {
-                    Serenity.DateEditor.dateInputKeyup(e);
+                    DateEditor.dateInputKeyup(e);
                 }
             });
 
-            input.on('change.' + this.uniqueName, Serenity.DateEditor.dateInputChange);
+            input.on('change.' + this.uniqueName, DateEditor.dateInputChange);
 
-            Q.addValidationRule(input, this.uniqueName, e1 => {
+            addValidationRule(input, this.uniqueName, e1 => {
                 var value = this.get_value();
-                if (Q.isEmptyOrNull(value)) {
+                if (isEmptyOrNull(value)) {
                     return null;
                 }
 
-                if (!Q.isEmptyOrNull(this.get_minValue()) && Q.Invariant.stringCompare(value, this.get_minValue()) < 0) {
-                    return Q.format(Q.text('Validation.MinDate'), Q.formatDate(this.get_minValue(), null));
+                if (!isEmptyOrNull(this.get_minValue()) && Invariant.stringCompare(value, this.get_minValue()) < 0) {
+                    return format(text('Validation.MinDate'), formatDate(this.get_minValue(), null));
                 }
 
-                if (!Q.isEmptyOrNull(this.get_maxValue()) && Q.Invariant.stringCompare(value, this.get_maxValue()) >= 0) {
-                    return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(this.get_maxValue(), null));
+                if (!isEmptyOrNull(this.get_maxValue()) && Invariant.stringCompare(value, this.get_maxValue()) >= 0) {
+                    return format(text('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
                 }
 
                 return null;
@@ -74,7 +74,7 @@
             return {
                 clickOpens: true,
                 allowInput: true,
-                dateFormat: Q.Culture.dateOrder.split('').join(Q.Culture.dateSeparator).replace('y', 'Y'),
+                dateFormat: Culture.dateOrder.split('').join(Culture.dateSeparator).replace('y', 'Y'),
                 onChange: function() {
                     input.triggerHandler('change');
                 }
@@ -87,7 +87,7 @@
                 return null;
             }
 
-			return Q.formatDate(value, 'yyyy-MM-dd');
+			return formatDate(value, 'yyyy-MM-dd');
         }
 
         get value(): string {
@@ -99,10 +99,10 @@
                 this.element.val('');
             }
 			else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
-                this.element.val(Q.formatDate(Q.today(), null));
+                this.element.val(formatDate(today(), null));
             }
 			else {
-                this.element.val(Q.formatDate(value, null));
+                this.element.val(formatDate(value, null));
             }
         }
 
@@ -111,11 +111,11 @@
         }
 
         private get_valueAsDate(): Date {
-            if (Q.isEmptyOrNull(this.get_value())) {
+            if (isEmptyOrNull(this.get_value())) {
                 return null;
             }
 
-			return Q.parseISODateTime(this.get_value());
+			return parseISODateTime(this.get_value());
         }
 
         get valueAsDate(): Date {
@@ -127,7 +127,7 @@
                 this.set_value(null);
             }
 
-			this.set_value(Q.formatDate(value, 'yyyy-MM-dd'));
+			this.set_value(formatDate(value, 'yyyy-MM-dd'));
         }
 
         set valueAsDate(v: Date) {
@@ -174,20 +174,20 @@
         }
 
         get_minDate(): Date {
-            return Q.parseISODateTime(this.get_minValue());
+            return parseISODateTime(this.get_minValue());
         }
 
         set_minDate(value: Date): void {
-            this.set_minValue(Q.formatDate(value, 'yyyy-MM-dd'));
+            this.set_minValue(formatDate(value, 'yyyy-MM-dd'));
         }
 
         @Option()
         get_maxDate(): Date {
-            return Q.parseISODateTime(this.get_maxValue());
+            return parseISODateTime(this.get_maxValue());
         }
 
         set_maxDate(value: Date) {
-            this.set_maxValue(Q.formatDate(value, 'yyyy-MM-dd'));
+            this.set_maxValue(formatDate(value, 'yyyy-MM-dd'));
         }
 
         @Option()
@@ -207,22 +207,22 @@
         }
 
         static dateInputChange = function (e: JQueryEventObject) {
-            if (Q.Culture.dateOrder !== 'dmy') {
+            if (Culture.dateOrder !== 'dmy') {
                 return;
             }
             var input = $(e.target);
             if (!input.is(':input') || input.attr("type") == "date") {
                 return;
             }
-            var val = Q.coalesce(input.val(), '');
+            var val = coalesce(input.val(), '');
             var x = {};
             if (val.length >= 6 && /^[0-9]*$/g.test(val)) {
-                input.val(val.substr(0, 2) + Q.Culture.dateSeparator + val.substr(2, 2) + Q.Culture.dateSeparator + val.substr(4));
+                input.val(val.substr(0, 2) + Culture.dateSeparator + val.substr(2, 2) + Culture.dateSeparator + val.substr(4));
             }
-            val = Q.coalesce(input.val(), '');
-            if (!!(val.length >= 5 && Q.parseDate(val) !== false)) {
-                var d = Q.parseDate(val);
-                input.val(Q.formatDate(d, null));
+            val = coalesce(input.val(), '');
+            if (!!(val.length >= 5 && parseDate(val) !== false)) {
+                var d = parseDate(val);
+                input.val(formatDate(d, null));
             }
         };
 
@@ -238,7 +238,7 @@
 
         static dateInputKeyup(e: JQueryEventObject) {
 
-            if (Q.Culture.dateOrder !== 'dmy') {
+            if (Culture.dateOrder !== 'dmy') {
                 return;
             }
 
@@ -252,14 +252,14 @@
                 return;
             }
 
-            var val: string = Q.coalesce(input.val(), '');
+            var val: string = coalesce(input.val(), '');
             if (!!(val.length === 0 || (input[0] as any).selectionEnd !== val.length)) {
                 return;
             }
 
-            if (val.indexOf(Q.Culture.dateSeparator + Q.Culture.dateSeparator) !== -1) {
-                input.val(Q.replaceAll(val, Q.Culture.dateSeparator + Q.Culture.dateSeparator,
-                    Q.Culture.dateSeparator));
+            if (val.indexOf(Culture.dateSeparator + Culture.dateSeparator) !== -1) {
+                input.val(replaceAll(val, Culture.dateSeparator + Culture.dateSeparator,
+                    Culture.dateSeparator));
                 return;
             }
 
@@ -269,13 +269,13 @@
 
             if (e.which === 47 || e.which === 111) {
 
-                if (val.length >= 2 && val.charAt(val.length - 1) === Q.Culture.dateSeparator &&
-                    val.charAt(val.length - 2) === Q.Culture.dateSeparator) {
+                if (val.length >= 2 && val.charAt(val.length - 1) === Culture.dateSeparator &&
+                    val.charAt(val.length - 2) === Culture.dateSeparator) {
                     input.val(val.substr(0, val.length - 1));
                     return;
                 }
 
-                if (val.charAt(val.length - 1) !== Q.Culture.dateSeparator) {
+                if (val.charAt(val.length - 1) !== Culture.dateSeparator) {
                     return;
                 }
 
@@ -293,9 +293,9 @@
                     case 4: {
                         if (isNumeric(val.charCodeAt(0)) &&
                             isNumeric(val.charCodeAt(2)) &&
-                            val.charAt(1) == Q.Culture.dateSeparator) {
-                            val = '0' + val.charAt(0) + Q.Culture.dateSeparator + '0' +
-                                val.charAt(2) + Q.Culture.dateSeparator;
+                            val.charAt(1) == Culture.dateSeparator) {
+                            val = '0' + val.charAt(0) + Culture.dateSeparator + '0' +
+                                val.charAt(2) + Culture.dateSeparator;
                             break;
                         }
                         else {
@@ -307,16 +307,16 @@
                         if (isNumeric(val.charCodeAt(0)) &&
                             isNumeric(val.charCodeAt(2)) &&
                             isNumeric(val.charCodeAt(3)) &&
-                            val.charAt(1) === Q.Culture.dateSeparator) {
+                            val.charAt(1) === Culture.dateSeparator) {
                             val = '0' + val;
                             break;
                         }
                         else if (isNumeric(val.charCodeAt(0)) &&
                             isNumeric(val.charCodeAt(1)) &&
                             isNumeric(val.charCodeAt(3)) &&
-                            val.charAt(2) === Q.Culture.dateSeparator) {
+                            val.charAt(2) === Culture.dateSeparator) {
                             val = val.charAt(0) + val.charAt(1) +
-                                Q.Culture.dateSeparator + '0' + val.charAt(3) + Q.Culture.dateSeparator;
+                                Culture.dateSeparator + '0' + val.charAt(3) + Culture.dateSeparator;
                             break;
                         }
                         else {
@@ -350,17 +350,17 @@
 
                     case 3: {
                         if (!isNumeric(val.charCodeAt(0)) ||
-                            val.charAt(1) !== Q.Culture.dateSeparator ||
+                            val.charAt(1) !== Culture.dateSeparator ||
                             val.charCodeAt(2) <= 49) {
                             return;
                         }
 
-                        val = '0' + val.charAt(0) + Q.Culture.dateSeparator + '0' + val.charAt(2);
+                        val = '0' + val.charAt(0) + Culture.dateSeparator + '0' + val.charAt(2);
                         break;
                     }
 
                     case 4: {
-                        if (val.charAt(1) == Q.Culture.dateSeparator) {
+                        if (val.charAt(1) == Culture.dateSeparator) {
                             if (!isNumeric(val.charCodeAt(0)) ||
                                 !isNumeric(val.charCodeAt(2))) {
                                 return;
@@ -369,14 +369,14 @@
                             val = '0' + val;
                             break;
                         }
-                        else if (val.charAt(2) == Q.Culture.dateSeparator) {
+                        else if (val.charAt(2) == Culture.dateSeparator) {
                             if (!isNumeric(val.charCodeAt(0)) ||
                                 !isNumeric(val.charCodeAt(1)) ||
                                 val.charCodeAt(3) <= 49) {
                                 return;
                             }
 
-                            val = val.charAt(0) + val.charAt(1) + Q.Culture.dateSeparator +
+                            val = val.charAt(0) + val.charAt(1) + Culture.dateSeparator +
                                 '0' + val.charAt(3);
                             break;
                         }
@@ -385,7 +385,7 @@
                         }
                     }
                     case 5: {
-                        if (val.charAt(2) !== Q.Culture.dateSeparator ||
+                        if (val.charAt(2) !== Culture.dateSeparator ||
                             !isNumeric(val.charCodeAt(0)) ||
                             !isNumeric(val.charCodeAt(1)) ||
                             !isNumeric(val.charCodeAt(3))) {
@@ -400,7 +400,7 @@
                     }
                 }
 
-                input.val(val + Q.Culture.dateSeparator);
+                input.val(val + Culture.dateSeparator);
             }
         };
     }
@@ -408,8 +408,8 @@
     function jQueryDatepickerInitialization(): boolean {
         if (!$.datepicker || !$.datepicker.regional || !$.datepicker.regional.en)
             return false;
-        let order = Q.Culture.dateOrder;
-        let s = Q.Culture.dateSeparator;
+        let order = Culture.dateOrder;
+        let s = Culture.dateSeparator;
         let culture = ($('html').attr('lang') || 'en').toLowerCase();
         if (!$.datepicker.regional[culture]) {
             culture = culture.split('-')[0];

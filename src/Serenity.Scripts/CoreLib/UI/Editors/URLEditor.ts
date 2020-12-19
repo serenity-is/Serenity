@@ -1,6 +1,6 @@
 ﻿namespace Serenity {
     
-    @Decorators.registerEditor('Serenity.URLEditor', [IStringValue])
+    @registerEditor('Serenity.URLEditor', [IStringValue])
     export class URLEditor extends StringEditor {
 
         constructor(input: JQuery) {
@@ -16,7 +16,7 @@
                 if (!input.hasClass("error"))
                     return;
 
-                var value = Q.trimToNull(input.val());
+                var value = trimToNull(input.val());
                 if (!value)
                     return;
 

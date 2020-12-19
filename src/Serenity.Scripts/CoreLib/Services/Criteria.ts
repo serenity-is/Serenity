@@ -1,4 +1,6 @@
-﻿export function Criteria(field: string): any[] {
+﻿export {}
+
+export function Criteria(field: string): any[] {
     return [field];
 }
 

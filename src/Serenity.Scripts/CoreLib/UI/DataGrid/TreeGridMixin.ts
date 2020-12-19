@@ -42,10 +42,10 @@
             };
 
             if (options.toggleField) {
-                var col = Q.tryFirst(dg['allColumns'] || dg.slickGrid.getColumns() || [], x => x.field == options.toggleField);
+                var col = tryFirst(dg['allColumns'] || dg.slickGrid.getColumns() || [], x => x.field == options.toggleField);
                 if (col) {
                     col.format = SlickFormatting.treeToggle(() => dg.view, getId,
-                        col.format || (ctx => Q.htmlEncode(ctx.value)));
+                        col.format || (ctx => htmlEncode(ctx.value)));
                     col.formatter = SlickHelper.convertToFormatter(col.format);
                 }
             }
@@ -81,8 +81,8 @@
         static applyTreeOrdering<TItem>(items: TItem[], getId: (item: TItem) => any, getParentId: (item: TItem) => any): TItem[] {
             var result: TItem[] = [];
 
-            var byId = Q.toGrouping(items, getId);
-            var byParentId = Q.toGrouping(items, getParentId);
+            var byId = toGrouping(items, getId);
+            var byParentId = toGrouping(items, getParentId);
             var visited = {};
 
             function takeChildren(theParentId: any) {
@@ -112,7 +112,7 @@
 
     export interface TreeGridMixinOptions<TItem> {
         // data grid object
-        grid: Serenity.DataGrid<TItem, any>;
+        grid: DataGrid<TItem, any>;
         // a function to get parent id
         getParentId: (item: TItem) => any;
         // where should the toggle button be placed

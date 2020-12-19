@@ -8,8 +8,8 @@
     export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
     }
 
-    @Serenity.Decorators.registerEditor('Serenity.FileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
-    @Serenity.Decorators.element('<div/>')
+    @registerEditor('Serenity.FileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
+    @element('<div/>')
     export class FileUploadEditor extends Widget<FileUploadEditorOptions>
         implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
@@ -21,7 +21,7 @@
 
             div.addClass('s-FileUploadEditor');
             
-            if (Q.isEmptyOrNull(this.options.originalNameProperty))
+            if (isEmptyOrNull(this.options.originalNameProperty))
                 div.addClass('hide-original-name');
 
             this.toolbar = new Toolbar($('<div/>').appendTo(this.element), {
@@ -76,7 +76,7 @@
         }
 
         protected addFileButtonText(): string {
-            return Q.text('Controls.ImageUpload.AddFileButton');
+            return text('Controls.ImageUpload.AddFileButton');
         }
 
         protected getToolButtons(): ToolButton[] {
@@ -89,7 +89,7 @@
                 },
                 {
                     title: '',
-                    hint: Q.text('Controls.ImageUpload.DeleteButtonHint'),
+                    hint: text('Controls.ImageUpload.DeleteButtonHint'),
                     cssClass: 'delete-button',
                     onClick: () => {
                         this.entity = null;
@@ -107,7 +107,7 @@
 
         protected populate(): void {
             var displayOriginalName = this.options.displayFileName ||
-                !Q.isTrimmedEmpty(this.options.originalNameProperty);
+                !isTrimmedEmpty(this.options.originalNameProperty);
 
             if (this.entity == null) {
                 UploadHelper.populateFileSymbols(this.fileSymbols,
@@ -119,7 +119,7 @@
                     this.options.urlPrefix);
             }
 
-            this.hiddenInput.val(Q.trimToNull((this.get_value() || {}).Filename));
+            this.hiddenInput.val(trimToNull((this.get_value() || {}).Filename));
         }
 
         protected updateInterface(): void {
@@ -167,7 +167,7 @@
             if (this.entity == null) {
                 return null;
             }
-            var copy = Q.extend({}, this.entity);
+            var copy = extend({}, this.entity);
             return copy;
         }
 
@@ -178,18 +178,18 @@
         set_value(value: UploadedFile): void {
             var stringValue = value as string;
             if (typeof stringValue === "string") {
-                var stringValue = Q.trimToNull(stringValue);
+                var stringValue = trimToNull(stringValue);
                 if (value != null) {
                     var idx = stringValue.indexOf('/');
                     if (idx < 0)
                         idx = stringValue.indexOf('\\');
-                    value = <Serenity.UploadedFile>{
+                    value = <UploadedFile>{
                         Filename: value,
                         OriginalName: stringValue.substring(idx + 1)
                     }
                 }
             }
-            else if (Q.isTrimmedEmpty(value.Filename))
+            else if (isTrimmedEmpty(value.Filename))
                 value = null;
 
             if (value != null) {
@@ -197,7 +197,7 @@
                     this.entity = null;
                 }
                 else {
-                    this.entity = Q.extend({}, value);
+                    this.entity = extend({}, value);
                 }
             }
             else {
@@ -219,17 +219,17 @@
 
         getEditValue(property: PropertyItem, target: any) {
             target[property.name] = this.entity == null ? null :
-                Q.trimToNull(this.entity.Filename);
+                trimToNull(this.entity.Filename);
         }
 
         setEditValue(source: any, property: PropertyItem) {
             var value: UploadedFile = {};
             value.Filename = source[property.name];
-            if (Q.isEmptyOrNull(this.options.originalNameProperty)) {
+            if (isEmptyOrNull(this.options.originalNameProperty)) {
 
                 if (this.options.displayFileName) {
-                    var s = Q.coalesce(value.Filename, '');
-                    var idx = Q.replaceAll(s, '\\', '/').lastIndexOf('/');
+                    var s = (value.Filename ?? '');
+                    var idx = replaceAll(s, '\\', '/').lastIndexOf('/');
                     if (idx >= 0) {
                         value.OriginalName = s.substr(idx + 1);
                     }
@@ -253,7 +253,7 @@
         protected hiddenInput: JQuery;
     }
 
-    @Decorators.registerEditor('Serenity.ImageUploadEditor')
+    @registerEditor('Serenity.ImageUploadEditor')
     export class ImageUploadEditor extends FileUploadEditor {
         constructor(div: JQuery, opt: ImageUploadEditorOptions) {
             super(div, opt);
@@ -265,8 +265,8 @@
         }
     }
 
-    @Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
-    @Decorators.element('<div/>')
+    @registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
+    @element('<div/>')
     export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
         implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
@@ -290,7 +290,7 @@
 
             var addFileButton = this.toolbar.findButton('add-file-button');
 
-            this.uploadInput = Serenity.UploadHelper.addUploadInput({
+            this.uploadInput = UploadHelper.addUploadInput({
                 container: addFileButton,
                 zone: this.element,
                 inputName: this.uniqueName,
@@ -325,7 +325,7 @@
         }
 
         protected addFileButtonText(): string {
-            return Q.text('Controls.ImageUpload.AddFileButton');
+            return text('Controls.ImageUpload.AddFileButton');
         }
 
         protected getToolButtons(): ToolButton[] {
@@ -338,7 +338,7 @@
         }
 
         protected populate(): void {
-            Serenity.UploadHelper.populateFileSymbols(this.fileSymbols, this.entities,
+            UploadHelper.populateFileSymbols(this.fileSymbols, this.entities,
                 true, this.options.urlPrefix);
 
             this.fileSymbols.children().each((i, e) => {
@@ -356,7 +356,7 @@
                     });
             });
 
-            this.hiddenInput.val(Q.trimToNull((this.get_value()[0] || {}).Filename));
+            this.hiddenInput.val(trimToNull((this.get_value()[0] || {}).Filename));
         }
 
         protected updateInterface(): void {
@@ -400,7 +400,7 @@
 
         get_value(): UploadedFile[] {
             return this.entities.map(function (x) {
-                return Q.extend({}, x);
+                return extend({}, x);
             });
         }
 
@@ -410,7 +410,7 @@
 
         set_value(value: UploadedFile[]) {
             this.entities = (value || []).map(function (x) {
-                return Q.extend({}, x);
+                return extend({}, x);
             });
             this.populate();
             this.updateInterface();
@@ -431,9 +431,9 @@
 
         setEditValue(source: any, property: PropertyItem) {
             var val = source[property.name];
-            if (Q.isInstanceOfType(val, String)) {
-                var json = Q.coalesce(Q.trimToNull(val), '[]');
-                if (Q.startsWith(json, '[') && Q.endsWith(json, ']')) {
+            if (isInstanceOfType(val, String)) {
+                var json = coalesce(trimToNull(val), '[]');
+                if (startsWith(json, '[') && endsWith(json, ']')) {
                     this.set_value($.parseJSON(json));
                 }
                 else {
@@ -448,11 +448,11 @@
             }
         }
 
-        @Decorators.option()
+        @option()
         public jsonEncodeValue: boolean;
     }
 
-    @Decorators.registerEditor('Serenity.MultipleImageUploadEditor')
+    @registerEditor('Serenity.MultipleImageUploadEditor')
     export class MultipleImageUploadEditor extends MultipleFileUploadEditor {
         constructor(div: JQuery, opt: ImageUploadEditorOptions) {
             super(div, opt);

@@ -93,6 +93,12 @@ export class FilterableAttribute {
     }
 }
 
+@Attr('Flexify')
+export class FlexifyAttribute {
+    constructor(public value = true) {
+    }
+}
+
 @Attr('FormKey')
 export class FormKeyAttribute {
     constructor(public value: string) {

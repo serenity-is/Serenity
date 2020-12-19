@@ -180,7 +180,7 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
                     if (i != 0)
                         setTooltip($el, '').tooltip('hide');
                     else
-                        setTooltip($el, error.message).toolTip('show');
+                        setTooltip($el, error.message).tooltip('show');
                 }
 
                 for (i = 0, elements = this.validElements(); elements[i]; i++) {

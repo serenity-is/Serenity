@@ -1,7 +1,7 @@
 ﻿import {  Group, GroupInfo, GroupTotals } from "./Grouping";
 import { deepClone, extend } from "../Q/Basics";
 import { Grid } from "./Grid";
-import { ListRequest, ListResponse, ServiceResponse } from "../Services/ServiceModels";
+import type { ListRequest, ListResponse, ServiceResponse } from "../Services/Models";
 import { notifyError } from "../Q/Notify";
 import { text } from "../Q/LocalText";
 import { Event } from "./Event";

@@ -1,9 +1,9 @@
 ﻿namespace Serenity {
 
-    import Option = Serenity.Decorators.option
+    import Option = option
 
-    @Decorators.registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])
-    @Decorators.element('<input type="text"/>')
+    @registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])
+    @element('<input type="text"/>')
     export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements IStringValue, IReadOnly {
 
         private minValue: string;
@@ -36,7 +36,7 @@
                     beforeShow: function () {
                         return !input.hasClass('readonly');
                     } as any,
-                    yearRange: Q.coalesce(this.options.yearRange, '-100:+50')
+                    yearRange: (this.options.yearRange ?? '-100:+50')
                 });
 
                 input.bind('change.' + this.uniqueName, (e) => {
@@ -65,30 +65,30 @@
                 });
     
                 var timeOpt = DateTimeEditor.getTimeOptions(
-                    Q.coalesce(this.options.startHour, 0), 0,
-                    Q.coalesce(this.options.endHour, 23), 59,
-                    Q.coalesce(this.options.intervalMinutes, 5));
+                    (this.options.startHour ?? 0), 0,
+                    (this.options.endHour ?? 23), 59,
+                    (this.options.intervalMinutes ?? 5));
     
                 for (var t of timeOpt) {
-                    Q.addOption(this.time, t, t);
+                    addOption(this.time, t, t);
                 }
     
-                Q.addValidationRule(input, this.uniqueName, e1 => {
+                addValidationRule(input, this.uniqueName, e1 => {
                     var value = this.get_value();
-                    if (Q.isEmptyOrNull(value)) {
+                    if (isEmptyOrNull(value)) {
                         return null;
                     }
     
-                    if (!Q.isEmptyOrNull(this.get_minValue()) &&
-                        Q.Invariant.stringCompare(value, this.get_minValue()) < 0) {
-                        return Q.format(Q.text('Validation.MinDate'),
-                            Q.formatDate(this.get_minValue(), null));
+                    if (!isEmptyOrNull(this.get_minValue()) &&
+                        Invariant.stringCompare(value, this.get_minValue()) < 0) {
+                        return format(text('Validation.MinDate'),
+                            formatDate(this.get_minValue(), null));
                     }
     
-                    if (!Q.isEmptyOrNull(this.get_maxValue()) &&
-                        Q.Invariant.stringCompare(value, this.get_maxValue()) >= 0) {
-                        return Q.format(Q.text('Validation.MaxDate'),
-                            Q.formatDate(this.get_maxValue(), null));
+                    if (!isEmptyOrNull(this.get_maxValue()) &&
+                        Invariant.stringCompare(value, this.get_maxValue()) >= 0) {
+                        return format(text('Validation.MaxDate'),
+                            formatDate(this.get_maxValue(), null));
                     }
                     return null;
                 });   
@@ -109,7 +109,7 @@
                     }
                     else {
                         var before = this.element.val();
-                        Serenity.DateEditor.dateInputKeyup(e);
+                        DateEditor.dateInputKeyup(e);
                         if (before != this.element.val())
                             this.lastSetValue = null;
                     }
@@ -140,7 +140,7 @@
                 time_24hr: true,
                 enableSeconds: !!this.options.seconds,
                 minuteIncrement: this.options.intervalMinutes ?? 5,
-                dateFormat: Q.Culture.dateOrder.split('').join(Q.Culture.dateSeparator).replace('y', 'Y') + " H:i" + (this.options.seconds ? ":S" : ""),
+                dateFormat: Culture.dateOrder.split('').join(Culture.dateSeparator).replace('y', 'Y') + " H:i" + (this.options.seconds ? ":S" : ""),
                 onChange: () => {
                     this.lastSetValue = null;
                     this.element && this.element.triggerHandler('change');
@@ -156,15 +156,15 @@
 
             var result: string;
             if (this.time) {
-                var datePart = Q.formatDate(value, 'yyyy-MM-dd');
+                var datePart = formatDate(value, 'yyyy-MM-dd');
                 var timePart = this.time.val();
                  result = datePart + 'T' + timePart + ':00.000';
             }
             else
-                result = Q.formatDate(Q.parseDate(this.element.val()), "yyyy-MM-ddTHH:mm:ss.fff");
+                result = formatDate(parseDate(this.element.val()), "yyyy-MM-ddTHH:mm:ss.fff");
 
             if (this.options.useUtc)
-                result = Q.formatISODateTimeUTC(Q.parseISODateTime(result));
+                result = formatISODateTimeUTC(parseISODateTime(result));
 
             if (this.lastSetValue != null &&
                 this.lastSetValueGet == result)
@@ -178,13 +178,13 @@
         }
 
         set_value(value: string) {
-            if (Q.isEmptyOrNull(value)) {
+            if (isEmptyOrNull(value)) {
                 this.element.val('');
                 this.time && this.time.val('00:00');
             }
 			else if (value.toLowerCase() === 'today') {
                 if (this.time) {
-                    this.element.val(Q.formatDate(Q.today(), null));
+                    this.element.val(formatDate(today(), null));
                     this.time.val('00:00');
                 }
                 else {
@@ -192,29 +192,29 @@
                 }
             }
 			else {
-                var val = ((value.toLowerCase() === 'now') ? new Date() : Q.parseISODateTime(value));
+                var val = ((value.toLowerCase() === 'now') ? new Date() : parseISODateTime(value));
                 if (this.time) {
-                    val = Serenity.DateTimeEditor.roundToMinutes(val, Q.coalesce(this.options.intervalMinutes, 5));
-                    this.element.val(Q.formatDate(val, null));
-                    this.time.val(Q.formatDate(val, 'HH:mm'));
+                    val = DateTimeEditor.roundToMinutes(val, (this.options.intervalMinutes ?? 5));
+                    this.element.val(formatDate(val, null));
+                    this.time.val(formatDate(val, 'HH:mm'));
                 }
                 else
-                    this.element.val(Q.formatDate(val, this.getDisplayFormat()));
+                    this.element.val(formatDate(val, this.getDisplayFormat()));
             }
 
             this.lastSetValue = null;
-            if (!Q.isEmptyOrNull(value) && value.toLowerCase() != 'today' && value.toLowerCase() != 'now') {
+            if (!isEmptyOrNull(value) && value.toLowerCase() != 'today' && value.toLowerCase() != 'now') {
                 this.lastSetValueGet = this.get_value();
                 this.lastSetValue = value;
             }
         }
 
         private getInplaceNowText(): string {
-            return Q.coalesce(Q.tryGetText('Controls.DateTimeEditor.SetToNow'), 'set to now');
+            return coalesce(tryGetText('Controls.DateTimeEditor.SetToNow'), 'set to now');
         }
 
         private getDisplayFormat(): string {
-            return (this.options.seconds ? Q.Culture.dateTimeFormat : Q.Culture.dateTimeFormat.replace(':ss', ''));
+            return (this.options.seconds ? Culture.dateTimeFormat : Culture.dateTimeFormat.replace(':ss', ''));
         }
 
         set value(v: string) {
@@ -222,11 +222,11 @@
         }
 
         private get_valueAsDate(): Date {
-            if (Q.isEmptyOrNull(this.get_value())) {
+            if (isEmptyOrNull(this.get_value())) {
                 return null;
             }
 
-			return Q.parseISODateTime(this.get_value());
+			return parseISODateTime(this.get_value());
         }
 
         get valueAsDate() {
@@ -238,7 +238,7 @@
                 this.set_value(null);
             }
 
-			this.set_value(Q.formatDate(value, 'yyyy-MM-ddTHH:mm' + (this.options.seconds ? ':ss' : '')));
+			this.set_value(formatDate(value, 'yyyy-MM-ddTHH:mm' + (this.options.seconds ? ':ss' : '')));
         }
 
         set valueAsDate(value: Date) {
@@ -264,20 +264,20 @@
         }
 
         get_minDate(): Date {
-            return Q.parseISODateTime(this.get_minValue());
+            return parseISODateTime(this.get_minValue());
         }
 
         set_minDate(value: Date): void {
-            this.set_minValue(Q.formatDate(value, 'yyyy-MM-ddTHH:mm:ss'));
+            this.set_minValue(formatDate(value, 'yyyy-MM-ddTHH:mm:ss'));
         }
 
         @Option()
         get_maxDate(): Date {
-            return Q.parseISODateTime(this.get_maxValue());
+            return parseISODateTime(this.get_maxValue());
         }
 
         set_maxDate(value: Date) {
-            this.set_maxValue(Q.formatDate(value, 'yyyy-MM-ddTHH:mm:ss'));
+            this.set_maxValue(formatDate(value, 'yyyy-MM-ddTHH:mm:ss'));
         }
 
         @Option()
@@ -314,13 +314,13 @@
                     this.element.nextAll('.inplace-now').css('opacity', '1');
                 }
 
-                this.time && Serenity.EditorUtils.setReadonly(this.time, value);
+                this.time && EditorUtils.setReadonly(this.time, value);
             }
         }
 
         static roundToMinutes(date: Date, minutesStep: number) {
             date = new Date(date.getTime());
-            var m = Q.trunc(Q.round(date.getMinutes() / minutesStep) * minutesStep);
+            var m = trunc(round(date.getMinutes() / minutesStep) * minutesStep);
             date.setMinutes(m);
             date.setSeconds(0);
             date.setMilliseconds(0);

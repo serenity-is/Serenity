@@ -8,17 +8,17 @@
 		allowNegatives?: boolean;
     }
 
-    @Decorators.registerEditor('Serenity.DecimalEditor', [IDoubleValue])
-    @Decorators.element('<input type="text"/>')
+    @registerEditor('Serenity.DecimalEditor', [IDoubleValue])
+    @element('<input type="text"/>')
     export class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
 
         constructor(input: JQuery, opt?: DecimalEditorOptions) {
             super(input, opt);
 
             input.addClass('decimalQ');
-			var numericOptions = Q.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(), {
-				vMin: Q.coalesce(this.options.minValue, this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-999999999999.99') : '0.00'),
-                vMax: Q.coalesce(this.options.maxValue, '999999999999.99')
+			var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(), {
+				vMin: (this.options.minValue ?? this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-999999999999.99') : '0.00'),
+                vMax: (this.options.maxValue ?? '999999999999.99')
             });
 
             if (this.options.decimals != null) {
@@ -44,7 +44,7 @@
             }
 
             var val = this.element.val();
-            return Q.parseDecimal(val);
+            return parseDecimal(val);
         }
 
         get value(): number {
@@ -59,7 +59,7 @@
                 (this.element as any).autoNumeric('set', value);
             }
             else
-                this.element.val(Q.formatNumber(value));
+                this.element.val(formatNumber(value));
         }
 
         set value(v: number) {
@@ -72,9 +72,9 @@
 
         static defaultAutoNumericOptions(): any {
             return {
-                aDec: Q.Culture.decimalSeparator,
-                altDec: ((Q.Culture.decimalSeparator === '.') ? ',' : '.'),
-                aSep: ((Q.Culture.decimalSeparator === '.') ? ',' : '.'),
+                aDec: Culture.decimalSeparator,
+                altDec: ((Culture.decimalSeparator === '.') ? ',' : '.'),
+                aSep: ((Culture.decimalSeparator === '.') ? ',' : '.'),
                 aPad: true
             };
         }

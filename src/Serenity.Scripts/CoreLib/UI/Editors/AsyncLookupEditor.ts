@@ -1,16 +1,19 @@
-﻿namespace Serenity {
+﻿import { registerEditor } from "../../Decorators";
+import { IGetEditValue } from "../../Interfaces/IGetEditValue";
+import { IReadOnly } from "../../Interfaces/IReadOnly";
+import { ISetEditValue } from "../../Interfaces/ISetEditValue";
+import { IStringValue } from "../../Interfaces/IStringValue";
 
-    // legacy, don't use!
-    @Serenity.Decorators.registerEditor('Serenity.AsyncLookupEditor',
-        [Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly])
-    export class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
-        constructor(hidden: JQuery, opt: LookupEditorOptions) {
-            super(hidden, opt);
-        }
+// legacy, don't use!
+@registerEditor('Serenity.AsyncLookupEditor',
+    [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
+export class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
+    constructor(hidden: JQuery, opt: LookupEditorOptions) {
+        super(hidden, opt);
+    }
 
-        getLookupKey() {
-            return Q.coalesce(this.options.lookupKey, super.getLookupKey());
-        }
+    getLookupKey() {
+        return (this.options.lookupKey ?? super.getLookupKey());
     }
 }
 

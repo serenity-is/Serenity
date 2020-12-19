@@ -1,6 +1,13 @@
 ﻿
 namespace Serenity {
 
+    export interface Select2Item {
+        id: string;
+        text: string;
+        source?: any;
+        disabled?: boolean;
+    }
+    
     export interface Select2CommonOptions {
         allowClear?: boolean;
         delimited?: boolean;
@@ -45,14 +52,14 @@ namespace Serenity {
         more: boolean;
     }
 
-    @Serenity.Decorators.registerClass('Serenity.Select2Editor',
-        [Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly])
-    @Serenity.Decorators.element("<input type=\"hidden\"/>")
+    @registerClass('Serenity.Select2Editor',
+        [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
+    @element("<input type=\"hidden\"/>")
     export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
-        Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly {
+        ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
 
         private _items: Select2Item[];
-        private _itemById: Q.Dictionary<Select2Item>;
+        private _itemById: { [key: string]: Select2Item };
         protected lastCreateTerm: string;
 
         constructor(hidden: JQuery, opt?: any) {
@@ -77,7 +84,7 @@ namespace Serenity {
             this.setCascadeFrom((this.options as Select2EditorOptions).cascadeFrom);
 
             if (this.useInplaceAdd())
-                this.addInplaceCreate(Q.text('Controls.SelectEditor.InplaceAdd'), null);
+                this.addInplaceCreate(text('Controls.SelectEditor.InplaceAdd'), null);
         }
 
         destroy() {
@@ -101,12 +108,12 @@ namespace Serenity {
         }
 
         protected getTypeDelay() {
-            return Q.coalesce(this.options['typeDelay'], 500);
+            return (this.options['typeDelay'] ?? 500);
         }
 
         protected emptyItemText() {
-            return Q.coalesce(this.element.attr('placeholder'),
-                Q.text('Controls.SelectEditor.EmptyItemText'));
+            return coalesce(this.element.attr('placeholder'),
+                text('Controls.SelectEditor.EmptyItemText'));
         }
 
         protected getPageSize(): number {
@@ -165,7 +172,7 @@ namespace Serenity {
             var emptyItemText = this.emptyItemText();
             var opt: Select2Options = {
                 multiple: this.isMultiple(),
-                placeHolder: (!Q.isEmptyOrNull(emptyItemText) ? emptyItemText : null),
+                placeHolder: (!isEmptyOrNull(emptyItemText) ? emptyItemText : null),
                 allowClear: this.allowClear(),
                 createSearchChoicePosition: 'bottom'
             }
@@ -176,7 +183,7 @@ namespace Serenity {
                 opt.query = query => {
                     var pageSize = this.getPageSize();
                     var searchQuery: Select2SearchQuery = {
-                        searchTerm: Q.trimToNull(query.term),
+                        searchTerm: trimToNull(query.term),
                         skip: (query.page - 1) * pageSize,
                         take: pageSize,
                         checkMore: true
@@ -233,7 +240,7 @@ namespace Serenity {
                             if (this.isAutoComplete &&
                                 items.length != idList.length) {
                                 for (var v of idList) {
-                                    if (!Q.any(items, z => z.id == v)) {
+                                    if (!any(items, z => z.id == v)) {
                                         items.push({
                                             id: v,
                                             text: v
@@ -332,14 +339,14 @@ namespace Serenity {
                 this._itemById[item.id] = item;
         }
 
-        protected get itemById(): Q.Dictionary<Select2Item> {
+        protected get itemById(): { [key: string]: Select2Item } {
             if (this.hasAsyncSource())
                 throw new Error("Can't read items property of an async select editor!");
 
             return this._itemById;
         }
 
-        protected set itemById(value: Q.Dictionary<Select2Item>) {
+        protected set itemById(value: { [key: string]: Select2Item }) {
             if (this.hasAsyncSource())
                 throw new Error("Can't set itemById of an async select editor!");
 
@@ -373,8 +380,8 @@ namespace Serenity {
 
         protected addInplaceCreate(addTitle: string, editTitle: string) {
             var self = this;
-            addTitle = Q.coalesce(addTitle, Q.text('Controls.SelectEditor.InplaceAdd'));
-            editTitle = Q.coalesce(editTitle, Q.text('Controls.SelectEditor.InplaceEdit'));
+            addTitle = (addTitle ?? text('Controls.SelectEditor.InplaceAdd'));
+            editTitle = (editTitle ?? text('Controls.SelectEditor.InplaceEdit'));
             var inplaceButton = $('<a><b/></a>')
                 .addClass('inplace-button inplace-create')
                 .attr('title', addTitle)
@@ -385,7 +392,7 @@ namespace Serenity {
             this.get_select2Container().add(this.element).addClass('has-inplace-button');
 
             this.element.change(() => {
-                var isNew = this.isMultiple() || Q.isEmptyOrNull(this.get_value());
+                var isNew = this.isMultiple() || isEmptyOrNull(this.get_value());
                 inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
             });
 
@@ -426,7 +433,7 @@ namespace Serenity {
             return !this.isAutoComplete() &&
                 (this.options as Select2EditorOptions).inplaceAdd &&
                 ((this.options as Select2EditorOptions).inplaceAddPermission == null ||
-                    Q.Authorization.hasPermission((this.options as Select2EditorOptions).inplaceAddPermission));
+                    Authorization.hasPermission((this.options as Select2EditorOptions).inplaceAddPermission));
         }
 
         protected isAutoComplete(): boolean {
@@ -437,22 +444,22 @@ namespace Serenity {
             return (s: string) => {
 
                 this.lastCreateTerm = s;
-                s = Q.coalesce(Select2.util.stripDiacritics(s), '').toLowerCase();
+                s = coalesce(Select2.util.stripDiacritics(s), '').toLowerCase();
 
-                if (Q.isTrimmedEmpty(s)) {
+                if (isTrimmedEmpty(s)) {
                     return null;
                 }
 
                 var isAsyncSource = false;
 
-                if (Q.any(this._items || [], (x: Select2Item) => {
+                if (any(this._items || [], (x: Select2Item) => {
                         var text = getName ? getName(x.source) : x.text;
-                        return Select2.util.stripDiacritics(Q.coalesce(text, '')).toLowerCase() == s;
+                        return Select2.util.stripDiacritics((text ?? '')).toLowerCase() == s;
                 }))
                     return null;
 
-                if (!Q.any(this._items || [], x1 => {
-                    return Q.coalesce(Select2.util.stripDiacritics(x1.text), '').toLowerCase().indexOf(s) !== -1;
+                if (!any(this._items || [], x1 => {
+                    return coalesce(Select2.util.stripDiacritics(x1.text), '').toLowerCase().indexOf(s) !== -1;
                 })) {
                     if (this.isAutoComplete()) {
                         return {
@@ -463,7 +470,7 @@ namespace Serenity {
 
                     return {
                         id: (-2147483648).toString(),
-                        text: Q.text('Controls.SelectEditor.NoResultsClickToDefine')
+                        text: text('Controls.SelectEditor.NoResultsClickToDefine')
                     };
                 }
 
@@ -476,14 +483,14 @@ namespace Serenity {
 
                 return {
                     id: (-2147483648).toString(),
-                    text: Q.text('Controls.SelectEditor.ClickToDefine')
+                    text: text('Controls.SelectEditor.ClickToDefine')
                 };
             }
         }
 
         setEditValue(source: any, property: PropertyItem) {
             var val = source[property.name];
-            if(Q.isArray(val)) {
+            if(isArray(val)) {
                 this.set_values(val);
             }
 			else {
@@ -524,7 +531,7 @@ namespace Serenity {
                 if (text == null || !text.length)
                     return false;
                 text = Select2.util.stripDiacritics(text).toUpperCase();
-                if (Q.startsWith(text, term))
+                if (startsWith(text, term))
                     return true;
                 if (text.indexOf(term) >= 0)
                     contains.push(item);
@@ -538,7 +545,7 @@ namespace Serenity {
             var val;
             if (this.element.data('select2')) {
                 val = this.element.select2('val');
-                if (val != null && Q.isArray(val)) {
+                if (val != null && isArray(val)) {
                     return val.join(',');
                 }
             }
@@ -556,9 +563,9 @@ namespace Serenity {
 
             if (value != this.get_value()) {
                 var val: any = value;
-                if (!Q.isEmptyOrNull(value) && this.isMultiple()) {
+                if (!isEmptyOrNull(value) && this.isMultiple()) {
                     val = value.split(String.fromCharCode(44)).map(function (x) {
-                        return Q.trimToNull(x);
+                        return trimToNull(x);
                     }).filter(function (x1) {
                         return x1 != null;
                     });
@@ -613,12 +620,12 @@ namespace Serenity {
                 return [];
             }
 
-			if (Q.isArray(val)) {
+			if (isArray(val)) {
                 return val;
             }
 
             var str = val;
-            if (Q.isEmptyOrNull(str)) {
+            if (isEmptyOrNull(str)) {
                 return [];
             }
 
@@ -644,7 +651,7 @@ namespace Serenity {
         }
 
         protected get_text(): string {
-            return Q.coalesce(this.element.select2('data'), {}).text;
+            return coalesce(this.element.select2('data'), {}).text;
         }
 
         get text(): string {
@@ -652,7 +659,7 @@ namespace Serenity {
         }
 
         get_readOnly(): boolean {
-            return !Q.isEmptyOrNull(this.element.attr('readonly'));
+            return !isEmptyOrNull(this.element.attr('readonly'));
         }
 
         get readOnly(): boolean {
@@ -680,15 +687,15 @@ namespace Serenity {
             this.set_readOnly(value);
         }
 
-        protected getCascadeFromValue(parent: Serenity.Widget<any>) {
-            return Serenity.EditorUtils.getValue(parent);
+        protected getCascadeFromValue(parent: Widget<any>) {
+            return EditorUtils.getValue(parent);
         }
 
-        protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
+        protected cascadeLink: CascadedWidgetLink<Widget<any>>;
 
         protected setCascadeFrom(value: string) {
 
-            if (Q.isEmptyOrNull(value)) {
+            if (isEmptyOrNull(value)) {
                 if (this.cascadeLink != null) {
                     this.cascadeLink.set_parentID(null);
                     this.cascadeLink = null;
@@ -697,7 +704,7 @@ namespace Serenity {
                 return;
             }
 
-            this.cascadeLink = new Serenity.CascadedWidgetLink<Widget<any>>(Widget, this, p => {
+            this.cascadeLink = new CascadedWidgetLink<Widget<any>>(Widget, this, p => {
                 this.set_cascadeValue(this.getCascadeFromValue(p));
             });
 
@@ -725,7 +732,7 @@ namespace Serenity {
         }
 
         protected get_cascadeField() {
-            return Q.coalesce((this.options as Select2EditorOptions).cascadeField, (this.options as Select2EditorOptions).cascadeFrom);
+            return coalesce((this.options as Select2EditorOptions).cascadeField, (this.options as Select2EditorOptions).cascadeFrom);
         }
 
         get cascadeField(): string {
@@ -802,7 +809,7 @@ namespace Serenity {
 
             if (val == null || val === '') {
 
-                if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+                if (!isEmptyOrNull(this.get_cascadeField())) {
                     return [];
                 }
 
@@ -813,7 +820,7 @@ namespace Serenity {
             var fld = this.get_cascadeField();
 
             return items.filter(x => {
-                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                var itemKey = (x[fld], ReflectionUtils.getPropertyValue(x ?? fld));
                 return !!(itemKey != null && itemKey.toString() === key);
             });
         }
@@ -829,7 +836,7 @@ namespace Serenity {
             var fld = this.get_filterField();
 
             return items.filter(x => {
-                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                var itemKey = (x[fld], ReflectionUtils.getPropertyValue(x ?? fld));
                 return !!(itemKey != null && itemKey.toString() === key);
             });
         }
@@ -847,8 +854,8 @@ namespace Serenity {
 
         protected createEditDialog(callback: (dlg: IEditDialog) => void) {
             var dialogTypeKey = this.getDialogTypeKey();
-            var dialogType = Serenity.DialogTypeRegistry.get(dialogTypeKey);
-            Serenity.Widget.create({
+            var dialogType = DialogTypeRegistry.get(dialogTypeKey);
+            Widget.create({
                 type: dialogType,
                 init: x => callback(x as any)
             });
@@ -857,11 +864,11 @@ namespace Serenity {
         public onInitNewEntity: (entity: TItem) => void;
 
         protected initNewEntity(entity: TItem) {
-            if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+            if (!isEmptyOrNull(this.get_cascadeField())) {
                 entity[this.get_cascadeField()] = this.get_cascadeValue();
             }
 
-            if (!Q.isEmptyOrNull(this.get_filterField())) {
+            if (!isEmptyOrNull(this.get_filterField())) {
                 entity[this.get_filterField()] = this.get_filterValue();
             }
 
@@ -895,7 +902,7 @@ namespace Serenity {
                 if (this.get_readOnly())
                     this.setEditDialogReadOnly(dialog);
 
-                Serenity.SubDialogHelper.bindToDataChange(dialog, this, (x, dci) => {
+                SubDialogHelper.bindToDataChange(dialog, this, (x, dci) => {
                     this.editDialogDataChange();
                     this.updateItems();
                     this.lastCreateTerm = null;
@@ -939,9 +946,9 @@ namespace Serenity {
                         (dialog as any).dialogOpen(this.openDialogAsPanel);
                     }, null);
                 }
-                else if (this.isMultiple() || Q.isEmptyOrNull(this.get_value())) {
+                else if (this.isMultiple() || isEmptyOrNull(this.get_value())) {
                     var entity: TItem = {} as any;
-                    this.setTermOnNewEntity(entity, Q.trimToEmpty(this.lastCreateTerm));
+                    this.setTermOnNewEntity(entity, trimToEmpty(this.lastCreateTerm));
                     this.initNewEntity(entity);
                     dialog.load(entity, () => {
                         (dialog as any).dialogOpen(this.openDialogAsPanel);

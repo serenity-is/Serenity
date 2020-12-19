@@ -1,7 +1,7 @@
 ﻿namespace Serenity {
 
-    @Decorators.registerEditor('Serenity.Select2AjaxEditor', [IStringValue])
-    @Decorators.element('<input type="hidden" />')
+    @registerEditor('Serenity.Select2AjaxEditor', [IStringValue])
+    @element('<input type="hidden" />')
     export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
         pageSize: number = 50;
 
@@ -27,7 +27,7 @@
         protected emptyItemText(): string {
             var txt = this.element.attr('placeholder');
             if (txt == null) {
-                txt = Q.text('Controls.SelectEditor.EmptyItemText');
+                txt = text('Controls.SelectEditor.EmptyItemText');
             }
             return txt;
         }
@@ -37,7 +37,7 @@
         }
 
         protected query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void {
-            var options: Q.ServiceOptions<any> = {
+            var options: ServiceOptions<any> = {
                 blockUI: false,
                 service: this.getService() + '/List',
                 request: request,
@@ -49,11 +49,11 @@
         }
 
         protected executeQuery(options: ServiceOptions<ListResponse<any>>): void {
-            Q.serviceCall(options);
+            serviceCall(options);
         }
 
         protected queryByKey(key: string, callback: (p1: any) => void): void {
-            var options: Q.ServiceOptions<any> = {
+            var options: ServiceOptions<any> = {
                 blockUI: false,
                 service: this.getService() + '/Retrieve',
                 request: { EntityId: key },
@@ -65,7 +65,7 @@
         }
 
         protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void {
-            Q.serviceCall(options);
+            serviceCall(options);
         }
 
         protected getItemKey(item: any): string {
@@ -85,11 +85,11 @@
             var queryTimeout = 0;
             return {
                 minimumResultsForSearch: 10,
-                placeHolder: (!Q.isEmptyOrNull(emptyItemText) ? emptyItemText : null),
-                allowClear: Q.isValue(emptyItemText),
+                placeHolder: (!isEmptyOrNull(emptyItemText) ? emptyItemText : null),
+                allowClear: isValue(emptyItemText),
                 query: query => {
                     var request = {
-                        ContainsText: Q.trimToNull(query.term), Skip: (query.page - 1) * this.pageSize, Take: this.pageSize + 1
+                        ContainsText: trimToNull(query.term), Skip: (query.page - 1) * this.pageSize, Take: this.pageSize + 1
                     };
 
                     if (queryTimeout !== 0) {
@@ -109,7 +109,7 @@
                 },
                 initSelection: (element, callback) => {
                     var val = element.val();
-                    if (Q.isEmptyOrNull(val)) {
+                    if (isEmptyOrNull(val)) {
                         callback(null);
                         return;
                     }
@@ -143,7 +143,7 @@
         }
 
         get_value(): string {
-            return Q.safeCast(this.element.select2('val'), String);
+            return safeCast(this.element.select2('val'), String);
         }
 
         get value(): string {

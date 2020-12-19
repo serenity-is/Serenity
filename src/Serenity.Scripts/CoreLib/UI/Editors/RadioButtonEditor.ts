@@ -6,22 +6,22 @@
         lookupKey?: string;
     }
 
-    @Decorators.registerEditor('Serenity.RadioButtonEditor', [IStringValue, IReadOnly])
-    @Decorators.element('<div/>')
+    @registerEditor('Serenity.RadioButtonEditor', [IStringValue, IReadOnly])
+    @element('<div/>')
     export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
         implements IReadOnly {
 
         constructor(input: JQuery, opt: RadioButtonEditorOptions) {
             super(input, opt);
 
-            if (Q.isEmptyOrNull(this.options.enumKey) &&
+            if (isEmptyOrNull(this.options.enumKey) &&
                 this.options.enumType == null &&
-                Q.isEmptyOrNull(this.options.lookupKey)) {
+                isEmptyOrNull(this.options.lookupKey)) {
                 return;
             }
 
-            if (!Q.isEmptyOrNull(this.options.lookupKey)) {
-                var lookup = Q.getLookup(this.options.lookupKey);
+            if (!isEmptyOrNull(this.options.lookupKey)) {
+                var lookup = getLookup(this.options.lookupKey);
                 for (var item of lookup.items) {
                     var textValue = item[lookup.textField];
                     var text = (textValue == null ? '' : textValue.toString());
@@ -31,19 +31,19 @@
                 }
             }
             else {
-                var enumType = this.options.enumType || Serenity.EnumTypeRegistry.get(this.options.enumKey);
+                var enumType = this.options.enumType || EnumTypeRegistry.get(this.options.enumKey);
                 var enumKey = this.options.enumKey;
                 if (enumKey == null && enumType != null) {
-                    var enumKeyAttr = Q.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
+                    var enumKeyAttr = getAttributes(enumType, EnumKeyAttribute, false);
                     if (enumKeyAttr.length > 0) {
                         enumKey = enumKeyAttr[0].value;
                     }
                 }
 
-                var values = Q.Enum.getValues(enumType);
+                var values = Enum.getValues(enumType);
                 for (var x of values) {
-                    var name = Q.Enum.toString(enumType, x);
-                    this.addRadio(x.toString(), Q.coalesce(Q.tryGetText(
+                    var name = Enum.toString(enumType, x);
+                    this.addRadio(x.toString(), coalesce(tryGetText(
                         'Enums.' + enumKey + '.' + name), name));
                 }
             }
@@ -72,7 +72,7 @@
                 if (checks.length > 0) {
                     (checks[0] as HTMLInputElement).checked = false;
                 }
-                if (!Q.isEmptyOrNull(value)) {
+                if (!isEmptyOrNull(value)) {
                     checks = inputs.filter('[value=' + value + ']');
                     if (checks.length > 0) {
                         (checks[0] as HTMLInputElement).checked = true;

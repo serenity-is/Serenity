@@ -12,7 +12,7 @@
     emailAllowOnlyAscii: true,
 
     /**
-     * Set this to true, to enable responsive dialogs by default, without having to add Serenity.Decorators.responsive()"
+     * Set this to true, to enable responsive dialogs by default, without having to add Decorators.responsive()"
      * on dialog classes manually. It's false by default for backward compatibility.
      */
     responsiveDialogs: false,

@@ -5,8 +5,8 @@
         idPrefix?: string;
     }
 
-    @Serenity.Decorators.registerClass('Serenity.QuickFilterBar')
-    @Serenity.Decorators.element("<div/>")
+    @registerClass('Serenity.QuickFilterBar')
+    @element("<div/>")
     export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
 
         constructor(container: JQuery, options?: QuickFilterBarOptions) {
@@ -20,7 +20,7 @@
                 this.add(filter);
             }
 
-            this.options.idPrefix = Q.coalesce(this.options.idPrefix, this.uniqueName + '_');
+            this.options.idPrefix = (this.options.idPrefix ?? this.uniqueName + '_');
         }
 
         public addSeparator(): void {
@@ -30,7 +30,7 @@
         public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
 
             if (opt == null) {
-                throw new Q.ArgumentNullException('opt');
+                throw new ArgumentNullException('opt');
             }
 
             if (opt.separator) {
@@ -63,14 +63,14 @@
                 quickFilter.data('qfloadstate', opt.loadState);
             }
 
-            if (!Q.isEmptyOrNull(opt.cssClass)) {
+            if (!isEmptyOrNull(opt.cssClass)) {
                 quickFilter.addClass(opt.cssClass);
             }
 
-            var widget = Serenity.Widget.create({
+            var widget = Widget.create({
                 type: opt.type,
                 element: e => {
-                    if (!Q.isEmptyOrNull(opt.field)) {
+                    if (!isEmptyOrNull(opt.field)) {
                         e.attr('id', this.options.idPrefix + opt.field);
                     }
                     e.attr('placeholder', ' ');
@@ -83,15 +83,15 @@
                 init: opt.init
             });
 
-            var submitHandler = (request: Serenity.ListRequest) => {
+            var submitHandler = (request: ListRequest) => {
 
                 if (quickFilter.hasClass('ignore')) {
                     return;
                 }
 
                 request.EqualityFilter = request.EqualityFilter || {};
-                var value = Serenity.EditorUtils.getValue(widget);
-                var active = value != null && !Q.isEmptyOrNull(value.toString());
+                var value = EditorUtils.getValue(widget);
+                var active = value != null && !isEmptyOrNull(value.toString());
                 if (opt.handler != null) {
                     var args = {
                         field: opt.field,
@@ -127,19 +127,19 @@
             return widget;
         }
 
-        public addDateRange(field: string, title?: string): Serenity.DateEditor {
-            return this.add(QuickFilterBar.dateRange(field, title)) as Serenity.DateEditor;
+        public addDateRange(field: string, title?: string): DateEditor {
+            return this.add(QuickFilterBar.dateRange(field, title)) as DateEditor;
         }
 
         public static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions> {
-            var end: Serenity.DateEditor = null;
+            var end: DateEditor = null;
             return <QuickFilter<DateEditor, DateTimeEditorOptions>>{
                 field: field,
-                type: Serenity.DateEditor,
+                type: DateEditor,
                 title: title,
                 element: function (e1) {
-                    end = Serenity.Widget.create({
-                        type: Serenity.DateEditor,
+                    end = Widget.create({
+                        type: DateEditor,
                         element: function (e2) {
                             e2.insertAfter(e1);
                         },
@@ -154,42 +154,42 @@
                     $('<span/>').addClass('range-separator').text('-').insertAfter(e1);
                 },
                 handler: function (args) {
-                    var active1 = !Q.isTrimmedEmpty(args.widget.value);
-                    var active2 = !Q.isTrimmedEmpty(end.value);
-                    if (active1 && !Q.parseDate(args.widget.element.val())) {
+                    var active1 = !isTrimmedEmpty(args.widget.value);
+                    var active2 = !isTrimmedEmpty(end.value);
+                    if (active1 && !parseDate(args.widget.element.val())) {
                         active1 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+                        notifyWarning(text('Validation.DateInvalid'), '', null);
                         args.widget.element.val('');
                     }
-                    if (active2 && !Q.parseDate(end.element.val())) {
+                    if (active2 && !parseDate(end.element.val())) {
                         active2 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+                        notifyWarning(text('Validation.DateInvalid'), '', null);
                         end.element.val('');
                     }
                     args.active = active1 || active2;
                     if (active1) {
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and',
+                        args.request.Criteria = Criteria.join(args.request.Criteria, 'and',
                             [[args.field], '>=', args.widget.value]);
                     }
                     if (active2) {
                         var next = new Date(end.valueAsDate.valueOf());
                         next.setDate(next.getDate() + 1);
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and',
-                            [[args.field], '<', Q.formatDate(next, 'yyyy-MM-dd')]);
+                        args.request.Criteria = Criteria.join(args.request.Criteria, 'and',
+                            [[args.field], '<', formatDate(next, 'yyyy-MM-dd')]);
                     }
                 },
                 displayText: function (w, l) {
-                    var v1 = Serenity.EditorUtils.getDisplayText(w);
-                    var v2 = Serenity.EditorUtils.getDisplayText(end);
-                    if (Q.isEmptyOrNull(v1) && Q.isEmptyOrNull(v2)) {
+                    var v1 = EditorUtils.getDisplayText(w);
+                    var v2 = EditorUtils.getDisplayText(end);
+                    if (isEmptyOrNull(v1) && isEmptyOrNull(v2)) {
                         return null;
                     }
                     var text1 = l + ' >= ' + v1;
                     var text2 = l + ' <= ' + v2;
-                    if (!Q.isEmptyOrNull(v1) && !Q.isEmptyOrNull(v2)) {
-                        return text1 + ' ' + Q.coalesce(Q.tryGetText('Controls.FilterPanel.And'), 'and') + ' ' + text2;
+                    if (!isEmptyOrNull(v1) && !isEmptyOrNull(v2)) {
+                        return text1 + ' ' + coalesce(tryGetText('Controls.FilterPanel.And'), 'and') + ' ' + text2;
                     }
-                    else if (!Q.isEmptyOrNull(v1)) {
+                    else if (!isEmptyOrNull(v1)) {
                         return text1;
                     }
                     else {
@@ -197,33 +197,33 @@
                     }
                 },
                 saveState: function (w1) {
-                    return [Serenity.EditorUtils.getValue(w1), Serenity.EditorUtils.getValue(end)];
+                    return [EditorUtils.getValue(w1), EditorUtils.getValue(end)];
                 },
                 loadState: function (w2, state) {
-                    if (state == null || !Q.isArray(state) || state.length !== 2) {
+                    if (state == null || !isArray(state) || state.length !== 2) {
                         state = [null, null];
                     }
 
-                    Serenity.EditorUtils.setValue(w2, state[0]);
-                    Serenity.EditorUtils.setValue(end, state[1]);
+                    EditorUtils.setValue(w2, state[0]);
+                    EditorUtils.setValue(end, state[1]);
                 }
             };
         }
 
         public addDateTimeRange(field: string, title?: string) {
-            return this.add(QuickFilterBar.dateTimeRange(field, title)) as Serenity.DateTimeEditor;
+            return this.add(QuickFilterBar.dateTimeRange(field, title)) as DateTimeEditor;
         }
 
         public static dateTimeRange(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions> {
-            var end: Serenity.DateTimeEditor = null;
+            var end: DateTimeEditor = null;
 
             return <QuickFilter<DateTimeEditor, DateTimeEditorOptions>>{
                 field: field,
-                type: Serenity.DateTimeEditor,
+                type: DateTimeEditor,
                 title: title,
                 element: function (e1) {
-                    end = Serenity.Widget.create({
-                        type: Serenity.DateTimeEditor,
+                    end = Widget.create({
+                        type: DateTimeEditor,
                         element: function (e2) {
                             e2.insertAfter(e1);
                         },
@@ -243,40 +243,40 @@
                     });
                 },
                 handler: function (args) {
-                    var active1 = !Q.isTrimmedEmpty(args.widget.value);
-                    var active2 = !Q.isTrimmedEmpty(end.value);
-                    if (active1 && !Q.parseDate(args.widget.element.val())) {
+                    var active1 = !isTrimmedEmpty(args.widget.value);
+                    var active2 = !isTrimmedEmpty(end.value);
+                    if (active1 && !parseDate(args.widget.element.val())) {
                         active1 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+                        notifyWarning(text('Validation.DateInvalid'), '', null);
                         args.widget.element.val('');
                     }
-                    if (active2 && !Q.parseDate(end.element.val())) {
+                    if (active2 && !parseDate(end.element.val())) {
                         active2 = false;
-                        Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+                        notifyWarning(text('Validation.DateInvalid'), '', null);
                         end.element.val('');
                     }
                     args.active = active1 || active2;
                     if (active1) {
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and',
+                        args.request.Criteria = Criteria.join(args.request.Criteria, 'and',
                             [[args.field], '>=', args.widget.value]);
                     }
                     if (active2) {
-                        args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and',
+                        args.request.Criteria = Criteria.join(args.request.Criteria, 'and',
                             [[args.field], '<=', end.value]);
                     }
                 },
                 displayText: function (w, l) {
-                    var v1 = Serenity.EditorUtils.getDisplayText(w);
-                    var v2 = Serenity.EditorUtils.getDisplayText(end);
-                    if (Q.isEmptyOrNull(v1) && Q.isEmptyOrNull(v2)) {
+                    var v1 = EditorUtils.getDisplayText(w);
+                    var v2 = EditorUtils.getDisplayText(end);
+                    if (isEmptyOrNull(v1) && isEmptyOrNull(v2)) {
                         return null;
                     }
                     var text1 = l + ' >= ' + v1;
                     var text2 = l + ' <= ' + v2;
-                    if (!Q.isEmptyOrNull(v1) && !Q.isEmptyOrNull(v2)) {
-                        return text1 + ' ' + Q.coalesce(Q.tryGetText('Controls.FilterPanel.And'), 'and') + ' ' + text2;
+                    if (!isEmptyOrNull(v1) && !isEmptyOrNull(v2)) {
+                        return text1 + ' ' + coalesce(tryGetText('Controls.FilterPanel.And'), 'and') + ' ' + text2;
                     }
-                    else if (!Q.isEmptyOrNull(v1)) {
+                    else if (!isEmptyOrNull(v1)) {
                         return text1;
                     }
                     else {
@@ -284,14 +284,14 @@
                     }
                 },
                 saveState: function (w1) {
-                    return [Serenity.EditorUtils.getValue(w1), Serenity.EditorUtils.getValue(end)];
+                    return [EditorUtils.getValue(w1), EditorUtils.getValue(end)];
                 },
                 loadState: function (w2, state) {
-                    if (state == null || !Q.isArray(state) || state.length !== 2) {
+                    if (state == null || !isArray(state) || state.length !== 2) {
                         state = [null, null];
                     }
-                    Serenity.EditorUtils.setValue(w2, state[0]);
-                    Serenity.EditorUtils.setValue(end, state[1]);
+                    EditorUtils.setValue(w2, state[0]);
+                    EditorUtils.setValue(end, state[1]);
                 }
             };
         }
@@ -306,13 +306,13 @@
 
             var trueText = yes;
             if (trueText == null) {
-                trueText = Q.text('Controls.FilterPanel.OperatorNames.true');
+                trueText = text('Controls.FilterPanel.OperatorNames.true');
             }
             items.push(['1', trueText]);
 
             var falseText = no;
             if (falseText == null) {
-                falseText = Q.text('Controls.FilterPanel.OperatorNames.false');
+                falseText = text('Controls.FilterPanel.OperatorNames.false');
             }
 
             items.push(['0', falseText]);
@@ -321,12 +321,12 @@
 
             return {
                 field: field,
-                type: Serenity.SelectEditor,
+                type: SelectEditor,
                 title: title,
                 options: opt,
                 handler: function (args) {
-                    args.equalityFilter[args.field] = args.value == null || Q.isEmptyOrNull(args.value.toString()) ?
-                        null : !!Q.toId(args.value);
+                    args.equalityFilter[args.field] = args.value == null || isEmptyOrNull(args.value.toString()) ?
+                        null : !!toId(args.value);
                 }
             };
         }
@@ -340,16 +340,16 @@
             super.destroy();
         }
 
-        public onSubmit(request: Serenity.ListRequest) {
+        public onSubmit(request: ListRequest) {
             this.submitHandlers && this.submitHandlers(request);
         }
 
-        protected add_submitHandlers(action: (request: Serenity.ListRequest) => void): void {
-            this.submitHandlers = Q.delegateCombine(this.submitHandlers, action);
+        protected add_submitHandlers(action: (request: ListRequest) => void): void {
+            this.submitHandlers = delegateCombine(this.submitHandlers, action);
         }
 
-        protected remove_submitHandlers(action: (request: Serenity.ListRequest) => void): void {
-            this.submitHandlers = Q.delegateRemove(this.submitHandlers, action);
+        protected remove_submitHandlers(action: (request: ListRequest) => void): void {
+            this.submitHandlers = delegateRemove(this.submitHandlers, action);
         }
 
         protected clear_submitHandlers() {

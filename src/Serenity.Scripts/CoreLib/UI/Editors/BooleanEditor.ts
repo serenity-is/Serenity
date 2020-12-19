@@ -1,7 +1,7 @@
 ﻿namespace Serenity {
 
-    @Decorators.registerEditor('Serenity.BooleanEditor', [IBooleanValue])
-    @Decorators.element('<input type="checkbox"/>')
+    @registerEditor('Serenity.BooleanEditor', [IBooleanValue])
+    @element('<input type="checkbox"/>')
     export class BooleanEditor extends Widget<any> {
 
         public get value(): boolean {

@@ -37,6 +37,15 @@ declare global {
             constructor(container: JQuery, data: any, columns: Column[], options: GridOptions);
         }
 
+        export interface PagerOptions {
+            view?: any;
+            showRowsPerPage?: boolean;
+            rowsPerPage?: number;
+            rowsPerPageOptions?: number[],
+            onChangePage?: (newPage: number) => void;
+            onRowsPerPageChange?: (n: number) => void;
+        }
+    
         export interface RowMoveManagerOptions {
             cancelEditOnDrag: boolean;
         }

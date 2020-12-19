@@ -1,9 +1,9 @@
 ﻿namespace Serenity {
-    @Serenity.Decorators.registerClass('Serenity.CascadedWidgetLink')
+    @registerClass('Serenity.CascadedWidgetLink')
     export class CascadedWidgetLink<TParent extends Widget<any>> {
 
         constructor(private parentType: { new(...args: any[]): TParent },
-            private widget: Serenity.Widget<any>,
+            private widget: Widget<any>,
             private parentChange: (p1: TParent) => void) {
             this.bind();
             this.widget.element.bind('remove.' + (widget as any).uniqueName + 'cwh', e => {
@@ -17,11 +17,11 @@
 
         bind() {
 
-            if (Q.isEmptyOrNull(this._parentID)) {
+            if (isEmptyOrNull(this._parentID)) {
                 return null;
             }
 
-            var parent = Q.findElementWithRelativeId(this.widget.element, this._parentID)
+            var parent = findElementWithRelativeId(this.widget.element, this._parentID)
                 .tryGetWidget(this.parentType);
 
             if (parent != null) {
@@ -31,18 +31,18 @@
                 return parent;
             }
             else {
-                Q.notifyError("Can't find cascaded parent element with ID: " + this._parentID + '!', '', null);
+                notifyError("Can't find cascaded parent element with ID: " + this._parentID + '!', '', null);
                 return null;
             }
         }
 
         unbind() {
 
-            if (Q.isEmptyOrNull(this._parentID)) {
+            if (isEmptyOrNull(this._parentID)) {
                 return null;
             }
 
-            var parent = Q.findElementWithRelativeId(this.widget.element, this._parentID).tryGetWidget(this.parentType);
+            var parent = findElementWithRelativeId(this.widget.element, this._parentID).tryGetWidget(this.parentType);
 
             if (parent != null) {
                 parent.element.unbind('.' + (this.widget as any).uniqueName);

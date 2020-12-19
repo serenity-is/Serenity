@@ -1,8 +1,8 @@
 ﻿import { MemberType, types } from "../Q/TypeSystem";
 import { startsWith } from "../Q/Strings";
 import { addAttribute, registerInterface } from "./Base";
-import { DialogTypeAttribute, EditorAttribute, ElementAttribute, EnumKeyAttribute,
-         FilterableAttribute, ItemNameAttribute, MaximizableAttribute, OptionsTypeAttribute,
+import { DialogTypeAttribute, EditorAttribute, ElementAttribute, EnumKeyAttribute, FilterableAttribute,
+         FlexifyAttribute, ItemNameAttribute, MaximizableAttribute, OptionsTypeAttribute,
          PanelAttribute, ResizableAttribute, ResponsiveAttribute, ServiceAttribute } from "../Types/Attributes";
 import { ISlickFormatter } from "../UI/DataGrid/ISlickFormatter";
 import { SummaryType } from "../Services/PropertyItem";
@@ -113,6 +113,12 @@ export function element(value: string) {
 export function filterable(value = true) {
     return function (target: Function) {
         addAttribute(target, new FilterableAttribute(value));
+    }
+}
+
+export function flexify(value = true) {
+    return function (target: Function) {
+        addAttribute(target, new FlexifyAttribute(value));
     }
 }
 

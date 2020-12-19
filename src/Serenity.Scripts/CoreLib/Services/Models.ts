@@ -1,9 +1,4 @@
-﻿
-export interface ServiceError {
-    Code?: string;
-    Arguments?: string;
-    Message?: string;
-}
+﻿import { ServiceError } from "./ServiceError";
 
 export interface ServiceResponse {
     Error?: ServiceError;

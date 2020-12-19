@@ -1,15 +1,15 @@
 ﻿/// <reference types="react" />
-//import * as $ from "jquery";
 
 import { Config } from "../../Q/Config";
 import { Exception, ArgumentNullException } from "../../Q/Exceptions";
 import { format } from "../../Q/Formatting";
 import { replaceAll, startsWith } from "../../Q/Strings";
 import { getAttributes, getInstanceType, getTypeName, getTypeFullName, isAssignableFrom  } from "../../Q/TypeSystem";
-import { IDialog } from "../../Types/IDialog";
+import { IDialog } from "../../Interfaces/IDialog";
 import { registerClass } from "../../Decorators/Base";
 import { ElementAttribute } from "../../Types/Attributes";
-
+import { addValidationRule as addValRule } from "../../Q/Validation";
+import { notifyError } from "../../Q/Notify";
 
 export interface WidgetClass<TOptions = object> {
     new(element: JQuery, options?: TOptions): Widget<TOptions>;
@@ -47,6 +47,14 @@ export function reactPatch() {
             }
         }
     }
+}
+
+export interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
+    type?: new (element: JQuery, options?: TOptions) => TWidget;
+    options?: TOptions;
+    container?: JQuery;
+    element?: (e: JQuery) => void;
+    init?: (w: TWidget) => void;
 }
 
 @registerClass()
@@ -124,8 +132,8 @@ export class Widget<TOptions> extends React.Component<TOptions> {
     };
 
     public addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery {
-        return addValidationRule(this.element, eventClass, rule);
-    }   
+        return addValRule(this.element, eventClass, rule);
+    }
 
     public getGridField(): JQuery {
         return this.element.closest('.field');
@@ -207,7 +215,7 @@ if (typeof $ !== "undefined" && $.fn) {
         return null;
     };
 
-    $.fn.getWidget = function (this: JQuery, type: any) {
+    $.fn.getWidget = function<TWidget>(this: JQuery, type: { new (...args: any[]): TWidget }) {
         if (this == null) {
             throw new ArgumentNullException('element');
         }
@@ -229,7 +237,7 @@ if (typeof $ !== "undefined" && $.fn) {
     };
 }
 
-export interface WidgetComponentProps<W extends Serenity.Widget<any>> {
+export interface WidgetComponentProps<W extends Widget<any>> {
     id?: string;
     name?: string;
     className?: string;
@@ -249,9 +257,3 @@ export declare interface Widget<TOptions> {
     change(handler: (e: JQueryEventObject) => void): void;
     changeSelect2(handler: (e: JQueryEventObject) => void): void;
 }
-
-//    export declare interface JQuery {
-//        getWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
-//        tryGetWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
-//   }
-

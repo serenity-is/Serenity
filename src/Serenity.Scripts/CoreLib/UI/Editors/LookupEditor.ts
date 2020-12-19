@@ -5,7 +5,7 @@
         async?: boolean;
     }
 
-    @Serenity.Decorators.registerEditor("Serenity.LookupEditorBase")
+    @registerEditor("Serenity.LookupEditorBase")
     export class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
 
         constructor(input: JQuery, opt?: TOptions) {
@@ -14,7 +14,7 @@
             if (!this.hasAsyncSource()) {
                 this.updateItems();
                 var self = this;
-                Q.ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName, function () {
+                ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName, function () {
                     self.updateItems();
                 });
             }
@@ -26,7 +26,7 @@
 
         destroy(): void {
             if (!this.hasAsyncSource())
-                Q.ScriptData.unbindFromChange(this.uniqueName);
+                ScriptData.unbindFromChange(this.uniqueName);
 
             super.destroy();
         }
@@ -36,31 +36,31 @@
                 return this.options.lookupKey;
             }
 
-            var key = Q.getTypeFullName(Q.getInstanceType(this));
+            var key = getTypeFullName(getInstanceType(this));
 
             var idx = key.indexOf('.');
             if (idx >= 0) {
                 key = key.substring(idx + 1);
             }
 
-            if (Q.endsWith(key, 'Editor')) {
+            if (endsWith(key, 'Editor')) {
                 key = key.substr(0, key.length - 6);
             }
 
             return key;
         }
 
-        protected lookup: Q.Lookup<TItem>;
+        protected lookup: Lookup<TItem>;
 
-        protected getLookupAsync(): PromiseLike<Q.Lookup<TItem>> {
-            return Q.getLookupAsync<TItem>(this.getLookupKey());
+        protected getLookupAsync(): PromiseLike<Lookup<TItem>> {
+            return getLookupAsync<TItem>(this.getLookupKey());
         }
 
-        protected getLookup(): Q.Lookup<TItem> {
-            return Q.getLookup<TItem>(this.getLookupKey());
+        protected getLookup(): Lookup<TItem> {
+            return getLookup<TItem>(this.getLookupKey());
         }
 
-        protected getItems(lookup: Q.Lookup<TItem>) {
+        protected getItems(lookup: Lookup<TItem>) {
             return this.filterItems(this.cascadeItems(lookup.items));
         }
 
@@ -68,7 +68,7 @@
             return this.lookup != null ? this.lookup.idField : super.getIdField();
         }
 
-        protected getItemText(item: TItem, lookup: Q.Lookup<TItem>) {
+        protected getItemText(item: TItem, lookup: Lookup<TItem>) {
             if (lookup == null)
                 return super.itemText(item);
 
@@ -85,7 +85,7 @@
             };
         }
 
-        protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>) {
+        protected getItemDisabled(item: TItem, lookup: Lookup<TItem>) {
             return super.itemDisabled(item);
         }
 
@@ -133,11 +133,11 @@
         }
 
         protected editDialogDataChange() {
-            Q.reloadLookup(this.getLookupKey());
+            reloadLookup(this.getLookupKey());
         }
     }
 
-    @Decorators.registerEditor('Serenity.LookupEditor')
+    @registerEditor('Serenity.LookupEditor')
     export class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(hidden: JQuery, opt?: LookupEditorOptions) {
             super(hidden, opt);

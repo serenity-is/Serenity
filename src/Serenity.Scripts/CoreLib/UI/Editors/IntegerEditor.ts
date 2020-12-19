@@ -6,18 +6,18 @@
 		allowNegatives?: boolean;
     }
 
-    @Decorators.registerEditor('Serenity.IntegerEditor', [IDoubleValue])
-    @Decorators.element('<input type="text"/>')
+    @registerEditor('Serenity.IntegerEditor', [IDoubleValue])
+    @element('<input type="text"/>')
     export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
 
         constructor(input: JQuery, opt?: IntegerEditorOptions) {
             super(input, opt);
 
             input.addClass('integerQ');
-            var numericOptions = Q.extend(Serenity.DecimalEditor.defaultAutoNumericOptions(),
+            var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(),
                 {
-					vMin: Q.coalesce(this.options.minValue, this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-2147483647') : '0'),
-                    vMax: Q.coalesce(this.options.maxValue, 2147483647),
+					vMin: (this.options.minValue ?? this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-2147483647') : '0'),
+                    vMax: (this.options.maxValue ?? 2147483647),
                     aSep: null
                 });
 
@@ -28,16 +28,16 @@
         get_value(): number {
             if ($.fn.autoNumeric) {
                 var val = (this.element as any).autoNumeric('get') as string;
-                if (!!Q.isTrimmedEmpty(val))
+                if (!!isTrimmedEmpty(val))
                     return null;
                 else 
                     return parseInt(val, 10);
             } 
             else {
-                var val = Q.trimToNull(this.element.val());
+                var val = trimToNull(this.element.val());
                 if (val == null)
                     return null;
-                return Q.parseInteger(val)
+                return parseInteger(val)
             }
 
         }
@@ -52,7 +52,7 @@
             else if ($.fn.autoNumeric)
                 (this.element as any).autoNumeric('set', value);
             else
-                this.element.val(Q.formatNumber(value));
+                this.element.val(formatNumber(value));
         }
 
         set value(v: number) {

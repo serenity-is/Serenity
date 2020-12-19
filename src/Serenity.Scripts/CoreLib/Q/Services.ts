@@ -1,7 +1,7 @@
 ﻿import { extend } from "./Basics";
 import { Config } from "./Config"
 import { ErrorHandling } from "./ErrorHandling";
-import type { ListRequest, ServiceOptions } from "../Services/ServiceModels";
+import type { ListRequest, ServiceOptions } from "../Services/Models";
 import { alert, iframeDialog } from "./Dialogs";
 import { blockUI, blockUndo } from "./BlockUI";
 
