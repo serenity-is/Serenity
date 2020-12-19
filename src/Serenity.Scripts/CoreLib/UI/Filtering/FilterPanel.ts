@@ -1,5 +1,14 @@
 ﻿import { registerClass } from "../../Decorators";
+import { text, tryGetText } from "../../Q/LocalText";
+import { isEmptyOrNull } from "../../Q/Strings";
+import { cast } from "../../Q/TypeSystem";
 import { PropertyItem } from "../../Services/PropertyItem";
+import { Select2Editor } from "../Editors/Select2Editor";
+import { ReflectionOptionsSetter } from "../Widgets/ReflectionOptionsSetter";
+import { FilteringTypeRegistry, IFiltering } from "./Filtering";
+import { FilterLine } from "./FilterLine";
+import { FilterOperator } from "./FilterOperator";
+import { FilterWidgetBase } from "./FilterWidgetBase";
 
 @registerClass('Serenity.FilterFieldSelect')
 class FilterFieldSelect extends Select2Editor<any, PropertyItem> {
@@ -7,8 +16,8 @@ class FilterFieldSelect extends Select2Editor<any, PropertyItem> {
         super(hidden);
 
         for (var field of fields) {
-            this.addOption(field.name, coalesce(tryGetText(field.title),
-                (field.title ?? field.name)), field);
+            this.addOption(field.name, (tryGetText(field.title) ??
+                field.title ?? field.name), field);
         }
     }
 
@@ -33,8 +42,8 @@ class FilterOperatorSelect extends Select2Editor<any, FilterOperator> {
         super(hidden);
 
         for (var op of source) {
-            var title = coalesce(op.title, coalesce(
-                tryGetText("Controls.FilterPanel.OperatorNames." + op.key), op.key));
+            var title = (op.title ?? (
+                tryGetText("Controls.FilterPanel.OperatorNames." + op.key) ?? op.key));
             this.addOption(op.key, title, op);
         }
 

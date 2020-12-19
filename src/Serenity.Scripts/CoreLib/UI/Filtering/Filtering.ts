@@ -1,14 +1,26 @@
-﻿import { registerClass, registerInterface } from "../../Decorators";
+﻿import { option, registerClass, registerInterface } from "../../Decorators";
 import { deepClone, extend } from "../../Q/Basics";
+import { Config } from "../../Q/Config";
 import { ArgumentNullException, Exception } from "../../Q/Exceptions";
-import { format } from "../../Q/Formatting";
+import { format, formatDate, parseISODateTime } from "../../Q/Formatting";
 import { text, tryGetText } from "../../Q/LocalText";
-import { isEmptyOrNull } from "../../Q/Strings";
-import { getInstanceType, getTypeName } from "../../Q/TypeSystem";
+import { endsWith, isEmptyOrNull, startsWith } from "../../Q/Strings";
+import { getInstanceType, getTypeFullName, getTypeName, getTypes, isAssignableFrom } from "../../Q/TypeSystem";
+import { Criteria } from "../../Services/Criteria";
 import { PropertyItem } from "../../Services/PropertyItem";
+import { EditorTypeRegistry } from "../../Types/EditorTypeRegistry";
+import { DateEditor } from "../Editors/DateEditor";
+import { DateTimeEditor } from "../Editors/DateTimeEditor";
+import { DecimalEditor } from "../Editors/DecimalEditor";
 import { EditorUtils } from "../Editors/EditorUtils";
+import { EnumEditor } from "../Editors/EnumEditor";
+import { IntegerEditor } from "../Editors/IntegerEditor";
+import { LookupEditor } from "../Editors/LookupEditor";
+import { ServiceLookupEditor } from "../Editors/ServiceLookupEditor";
+import { StringEditor } from "../Editors/StringEditor";
 import { Widget } from "../Widgets/Widget";
 import { FilterOperator, FilterOperators } from "./FilterOperator";
+import { QuickFilter } from "./QuickFilter";
 
 export interface IFiltering {
     createEditor(): void;
@@ -493,31 +505,31 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
         super(Widget)
     }
 
-    @Option()
+    @option()
     editorType: string;
 
-    @Option()
+    @option()
     useRelative: boolean;
 
-    @Option()
+    @option()
     useLike: boolean;
 
     getOperators(): FilterOperator[] {
         var list = [];
 
-        list.push({ key: Operators.EQ });
-        list.push({ key: Operators.NE });
+        list.push({ key: FilterOperators.EQ });
+        list.push({ key: FilterOperators.NE });
 
         if (this.useRelative) {
-            list.push({ key: Operators.LT });
-            list.push({ key: Operators.LE });
-            list.push({ key: Operators.GT });
-            list.push({ key: Operators.GE });
+            list.push({ key: FilterOperators.LT });
+            list.push({ key: FilterOperators.LE });
+            list.push({ key: FilterOperators.GT });
+            list.push({ key: FilterOperators.GE });
         }
 
         if (this.useLike) {
-            list.push({ key: Operators.contains });
-            list.push({ key: Operators.startsWith });
+            list.push({ key: FilterOperators.contains });
+            list.push({ key: FilterOperators.startsWith });
         }
 
         this.appendNullableOperators(list);
@@ -528,18 +540,18 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
     protected useEditor() {
         var op = this.get_operator().key;
 
-        return op === Operators.EQ ||
-            op === Operators.NE ||
+        return op === FilterOperators.EQ ||
+            op === FilterOperators.NE ||
             (this.useRelative && (
-                op === Operators.LT ||
-                op === Operators.LE ||
-                op === Operators.GT ||
-                op === Operators.GE));
+                op === FilterOperators.LT ||
+                op === FilterOperators.LE ||
+                op === FilterOperators.GT ||
+                op === FilterOperators.GE));
     }
 
     getEditorOptions() {
         var opt = super.getEditorOptions();
-        if (this.useEditor() && this.editorType === coalesce(this.get_field().editorType, 'String')) {
+        if (this.useEditor() && this.editorType === (this.get_field().editorType ?? 'String')) {
             opt = extend(opt, this.get_field().editorParams);
         }
 
@@ -580,7 +592,7 @@ export class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
     }
 
     getOperators() {
-        var op = [{ key: Operators.EQ }, { key: Operators.NE }];
+        var op = [{ key: FilterOperators.EQ }, { key: FilterOperators.NE }];
         return this.appendNullableOperators(op);
     }
 }
@@ -604,13 +616,13 @@ export class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
     }
 
     getOperators(): FilterOperator[] {
-        var ops = [{ key: Operators.EQ }, { key: Operators.NE }, { key: Operators.contains }, { key: Operators.startsWith }]
+        var ops = [{ key: FilterOperators.EQ }, { key: FilterOperators.NE }, { key: FilterOperators.contains }, { key: FilterOperators.startsWith }]
         return this.appendNullableOperators(ops);
     }
 
     protected useEditor(): boolean {
         var op = this.get_operator().key;
-        return op == Operators.EQ || op == Operators.NE;
+        return op == FilterOperators.EQ || op == FilterOperators.NE;
     }
 
     protected useIdField(): boolean {
@@ -634,13 +646,13 @@ export class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEdi
     }
 
     getOperators(): FilterOperator[] {
-        var ops = [{ key: Operators.EQ }, { key: Operators.NE }, { key: Operators.contains }, { key: Operators.startsWith }]
+        var ops = [{ key: FilterOperators.EQ }, { key: FilterOperators.NE }, { key: FilterOperators.contains }, { key: FilterOperators.startsWith }]
         return this.appendNullableOperators(ops);
     }
 
     protected useEditor(): boolean {
         var op = this.get_operator().key;
-        return op == Operators.EQ || op == Operators.NE;
+        return op == FilterOperators.EQ || op == FilterOperators.NE;
     }
 
     protected useIdField(): boolean {
@@ -661,10 +673,10 @@ export class StringFiltering extends BaseFiltering {
 
     getOperators(): FilterOperator[] {
         var ops = [
-            { key: Operators.contains }, 
-            { key: Operators.startsWith }, 
-            { key: Operators.EQ },
-            { key: Operators.NE }
+            { key: FilterOperators.contains }, 
+            { key: FilterOperators.startsWith }, 
+            { key: FilterOperators.EQ },
+            { key: FilterOperators.NE }
         ];
         return this.appendNullableOperators(ops);
     }

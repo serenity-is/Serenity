@@ -1,6 +1,8 @@
 ﻿import { registerClass } from "../../Decorators";
 import { text } from "../../Q/LocalText";
 import { trimToNull } from "../../Q/Strings";
+import { FilterDialog } from "./FilterDialog";
+import { FilterWidgetBase } from "./FilterWidgetBase";
 
 @registerClass('Serenity.FilterDisplayBar')
 export class FilterDisplayBar extends FilterWidgetBase<any> {
