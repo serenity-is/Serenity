@@ -1,41 +1,41 @@
-﻿
-namespace Serenity {
+﻿import { registerClass } from "../../Decorators";
+import { isEmptyOrNull } from "../../Q/Strings";
+import { Select2CommonOptions, Select2Editor } from "./Select2Editor";
 
-    @registerClass('Serenity.SelectEditor')
-    export class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
-        constructor(hidden: JQuery, opt?: SelectEditorOptions) {
-            super(hidden, opt);
-            this.updateItems();
+@registerClass('Serenity.SelectEditor')
+export class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
+    constructor(hidden: JQuery, opt?: SelectEditorOptions) {
+        super(hidden, opt);
+        this.updateItems();
+    }
+
+    getItems() {
+        return this.options.items || [];
+    }
+
+    protected emptyItemText() {
+        if (!isEmptyOrNull(this.options.emptyOptionText)) {
+            return this.options.emptyOptionText;
         }
+        return super.emptyItemText();
+    }
 
-        getItems() {
-            return this.options.items || [];
-        }
+    updateItems() {
+        var items = this.getItems();
+        this.clearItems();
 
-        protected emptyItemText() {
-            if (!isEmptyOrNull(this.options.emptyOptionText)) {
-                return this.options.emptyOptionText;
-            }
-            return super.emptyItemText();
-        }
-
-        updateItems() {
-            var items = this.getItems();
-            this.clearItems();
-
-            if (items.length > 0) {
-                var isStrings = typeof (items[0]) === 'string';
-                for (var item of items) {
-                    var key = isStrings ? item : item[0];
-                    var text = isStrings ? item : (item[1] ?? item[0]);
-                    this.addOption(key, text, item, false);
-                }
+        if (items.length > 0) {
+            var isStrings = typeof (items[0]) === 'string';
+            for (var item of items) {
+                var key = isStrings ? item : item[0];
+                var text = isStrings ? item : (item[1] ?? item[0]);
+                this.addOption(key, text, item, false);
             }
         }
     }
+}
 
-    export interface SelectEditorOptions extends Select2CommonOptions {
-        items?: any[];
-        emptyOptionText?: string;
-    }
+export interface SelectEditorOptions extends Select2CommonOptions {
+    items?: any[];
+    emptyOptionText?: string;
 }

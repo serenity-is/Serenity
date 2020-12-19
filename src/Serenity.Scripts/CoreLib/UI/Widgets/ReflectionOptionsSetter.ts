@@ -1,6 +1,6 @@
 ﻿import { getInstanceType, getMembers, isInstanceOfType, MemberType } from "../../Q/TypeSystem";
 import { OptionAttribute, DisplayNameAttribute } from "../../Types/Attributes";
-import { makeCamelCase } from "../../Types/ReflectionUtils";
+import { ReflectionUtils } from "../../Types/ReflectionUtils";
 
 export namespace ReflectionOptionsSetter {
     export function set(target: any, options: any): void {
@@ -28,7 +28,7 @@ export namespace ReflectionOptionsSetter {
 
             propByName = {};
             for (var k of propList) {
-                propByName[makeCamelCase(k.name)] = k;
+                propByName[ReflectionUtils.makeCamelCase(k.name)] = k;
             }
 
             type.__propByName = propByName;
@@ -47,7 +47,7 @@ export namespace ReflectionOptionsSetter {
             fieldByName = {};
             for (var $t2 = 0; $t2 < fieldList.length; $t2++) {
                 var k1 = fieldList[$t2];
-                fieldByName[makeCamelCase(k1.name)] = k1;
+                fieldByName[ReflectionUtils.makeCamelCase(k1.name)] = k1;
             }
             type.__fieldByName = fieldByName;
         }
@@ -55,7 +55,7 @@ export namespace ReflectionOptionsSetter {
         var keys = Object.keys(options);
         for (var k2 of keys) {
             var v = options[k2];
-            var cc = makeCamelCase(k2);
+            var cc = ReflectionUtils.makeCamelCase(k2);
             var p = propByName[cc] || propByName[k2];
             if (p != null) {
                 var func = (target[p.setter] as Function);

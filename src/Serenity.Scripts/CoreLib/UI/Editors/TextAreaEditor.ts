@@ -1,5 +1,6 @@
-﻿import { registerEditor } from "../../Decorators";
+﻿import { element, registerEditor } from "../../Decorators";
 import { IStringValue } from "../../Interfaces/IStringValue";
+import { Widget } from "../Widgets/Widget";
 
 export interface TextAreaEditorOptions {
     cols?: number;

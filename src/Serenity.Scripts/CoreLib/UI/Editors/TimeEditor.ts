@@ -1,4 +1,12 @@
-﻿namespace Serenity {
+﻿import { element, registerEditor } from "../../Decorators";
+import { IDoubleValue } from "../../Interfaces/IDoubleValue";
+import { IReadOnly } from "../../Interfaces/IReadOnly";
+import { toId } from "../../Q/Formatting";
+import { addOption } from "../../Q/Html";
+import { Widget } from "../Widgets/Widget";
+import { EditorUtils } from "./EditorUtils";
+
+namespace Serenity {
 
     export interface TimeEditorOptions {
         noEmptyOption?: boolean;

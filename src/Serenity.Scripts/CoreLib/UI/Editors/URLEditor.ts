@@ -1,32 +1,34 @@
-﻿namespace Serenity {
-    
-    @registerEditor('Serenity.URLEditor', [IStringValue])
-    export class URLEditor extends StringEditor {
+﻿import { registerEditor } from "../../Decorators";
+import { IStringValue } from "../../Interfaces/IStringValue";
+import { trimToNull } from "../../Q/Strings";
+import { StringEditor } from "./StringEditor";
 
-        constructor(input: JQuery) {
-            super(input);
+@registerEditor('Serenity.URLEditor', [IStringValue])
+export class URLEditor extends StringEditor {
 
-            input.addClass("url").attr("title", "URL should be entered in format: 'http://www.site.com/page'.");
+    constructor(input: JQuery) {
+        super(input);
 
-            input.on("blur." + this.uniqueName, e => {
-                var validator = input.closest("form").data("validator") as JQueryValidation.Validator;
-                if (validator == null)
-                    return;
+        input.addClass("url").attr("title", "URL should be entered in format: 'http://www.site.com/page'.");
 
-                if (!input.hasClass("error"))
-                    return;
+        input.on("blur." + this.uniqueName, e => {
+            var validator = input.closest("form").data("validator") as JQueryValidation.Validator;
+            if (validator == null)
+                return;
 
-                var value = trimToNull(input.val());
-                if (!value)
-                    return;
+            if (!input.hasClass("error"))
+                return;
 
-                value = "http://" + value;
+            var value = trimToNull(input.val());
+            if (!value)
+                return;
 
-                if ($.validator.methods['url'].call(validator, value, input[0]) == true) {
-                    input.val(value);
-                    validator.element(input);
-                }
-            });
-        }
+            value = "http://" + value;
+
+            if ($.validator.methods['url'].call(validator, value, input[0]) == true) {
+                input.val(value);
+                validator.element(input);
+            }
+        });
     }
 }
