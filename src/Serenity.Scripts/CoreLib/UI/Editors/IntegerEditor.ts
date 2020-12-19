@@ -27,12 +27,12 @@ export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoub
                 aSep: null
             });
 
-        if ($.fn.autoNumeric)
+        if (($.fn as any).autoNumeric)
             (input as any).autoNumeric(numericOptions);
     }
 
     get_value(): number {
-        if ($.fn.autoNumeric) {
+        if (($.fn as any).autoNumeric) {
             var val = (this.element as any).autoNumeric('get') as string;
             if (!!isTrimmedEmpty(val))
                 return null;
@@ -55,7 +55,7 @@ export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoub
     set_value(value: number) {
         if (value == null || (value as any) === '')
             this.element.val('');
-        else if ($.fn.autoNumeric)
+        else if (($.fn as any).autoNumeric)
             (this.element as any).autoNumeric('set', value);
         else
             this.element.val(formatNumber(value));

@@ -151,7 +151,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
             if (value) {
                 this.uploadInput.attr('disabled', 'disabled');
                 try {
-                    this.uploadInput.fileupload('disable');
+                    (this.uploadInput as any).fileupload('disable');
                 }
                 catch {
                 }
@@ -159,7 +159,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
             else {
                 this.uploadInput.removeAttr('disabled');
                 try {
-                    this.uploadInput.fileupload('enable');
+                    (this.uploadInput as any).fileupload('enable');
                 } catch {
                 }
             }
@@ -386,7 +386,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
             if (value) {
                 this.uploadInput.attr('disabled', 'disabled');
                 try {
-                    this.uploadInput.fileupload('disable');
+                    (this.uploadInput as any).fileupload('disable');
                 }
                 catch {
                 }
@@ -394,7 +394,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
             else {
                 this.uploadInput.removeAttr('disabled');
                 try {
-                    this.uploadInput.fileupload('enable');
+                    (this.uploadInput as any).fileupload('enable');
                 } catch {
                 }
             }

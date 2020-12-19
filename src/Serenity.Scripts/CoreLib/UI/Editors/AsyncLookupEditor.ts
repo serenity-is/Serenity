@@ -3,6 +3,7 @@ import { IGetEditValue } from "../../Interfaces/IGetEditValue";
 import { IReadOnly } from "../../Interfaces/IReadOnly";
 import { ISetEditValue } from "../../Interfaces/ISetEditValue";
 import { IStringValue } from "../../Interfaces/IStringValue";
+import { LookupEditorBase, LookupEditorOptions } from "./LookupEditor";
 
 // legacy, don't use!
 @registerEditor('Serenity.AsyncLookupEditor',

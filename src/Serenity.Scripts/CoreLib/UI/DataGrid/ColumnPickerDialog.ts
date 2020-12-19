@@ -6,10 +6,11 @@ import { text } from "../../Q/LocalText";
 import { trimToNull } from "../../Q/Strings";
 import { Column } from "../../SlickGrid/Column";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
-import { QuickSearchInput } from "../Filtering/QuickSearchInput";
+import { QuickSearchInput } from "../DataGrid/QuickSearchInput";
 import { ToolButton } from "../Widgets/Toolbar";
-import { DataGrid, PersistedGridSettings } from "./DataGrid";
-import type {} from "../../SlickGrid/Globals"
+import { IDataGrid } from "./IDataGrid";
+import { Router } from "../../Q/Router";
+import { centerDialog } from "../../Q/Layout";
 
 @registerClass()
 @resizable()
@@ -47,29 +48,29 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
         this.dialogTitle = text("Controls.ColumnPickerDialog.Title");
     }
 
-    public static createToolButton(grid: DataGrid<any, any>): ToolButton {
+    public static createToolButton(grid: IDataGrid): ToolButton {
         function onClick() {
             var picker = new ColumnPickerDialog();
             picker.allColumns = (grid as any).allColumns;
             if ((grid as any).initialSettings) {
-                var initialSettings = (grid as any).initialSettings as PersistedGridSettings;
+                var initialSettings = (grid as any).initialSettings;
                 if (initialSettings.columns && initialSettings.columns.length)
-                    picker.defaultColumns = initialSettings.columns.map(x => x.id);
+                    picker.defaultColumns = initialSettings.columns.map((x: any) => x.id);
             }
-            picker.visibleColumns = grid.slickGrid.getColumns().map(x => x.id);
+            picker.visibleColumns = grid.getGrid().getColumns().map(x => x.id);
             picker.done = () => {
                 (grid as any).allColumns = picker.allColumns;
                 var visible = picker.allColumns.filter(x => x.visible === true);
-                grid.slickGrid.setColumns(visible);
+                grid.getGrid().setColumns(visible);
                 (grid as any).persistSettings();
-                grid.refresh();
+                grid.getView().populate();
             };
 
-            Q["Router"] && Q["Router"].dialog && Q["Router"].dialog(grid.element, picker.element, () => "columns");
+            Router && Router.dialog && Router.dialog((grid as any).element, picker.element, () => "columns");
             picker.dialogOpen();
         }
 
-        grid.element.on('handleroute.' + (grid as any).uniqueName, (e, arg) => {
+        (grid as any).element.on('handleroute.' + (grid as any).uniqueName, (e: any, arg: any) => {
             if (arg && !arg.handled && arg.route == "columns") {
                 onClick();
             }
@@ -226,9 +227,10 @@ ${ allowHide ? `<i class="js-hide" title="${ text("Controls.ColumnPickerDialog.H
 
         this.updateListStates();
 
-        if (typeof Sortable !== "undefined" &&
-            Sortable.create) {
+        // @ts-ignore
+        if (typeof Sortable !== "undefined" && Sortable.create) {
 
+            // @ts-ignore
             Sortable.create(this.ulVisible[0], {
                 group: this.uniqueName + "_group",
                 filter: '.js-hide',
@@ -246,6 +248,7 @@ ${ allowHide ? `<i class="js-hide" title="${ text("Controls.ColumnPickerDialog.H
                 onEnd: evt => this.updateListStates()
             });
 
+            // @ts-ignore
             Sortable.create(this.ulHidden[0], {
                 group: this.uniqueName + "_group",
                 sort: false,

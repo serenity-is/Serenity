@@ -1,5 +1,21 @@
 ﻿import { registerClass } from "../../Decorators";
-import { clearKeys } from "../../Q/TypeSystem";
+import { Authorization } from "../../Q/Authorization";
+import { Culture } from "../../Q/Formatting";
+import { attrEncode, htmlEncode } from "../../Q/Html";
+import { text, tryGetText } from "../../Q/LocalText";
+import { serviceCall } from "../../Q/Services";
+import { isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
+import { clearKeys, safeCast } from "../../Q/TypeSystem";
+import { SaveRequest } from "../../Services/Models";
+import { PropertyItem } from "../../Services/PropertyItem";
+import { Column, ColumnFormatter, Format, Formatter, FormatterContext } from "../../SlickGrid/Column";
+import { Grid } from "../../SlickGrid/Grid";
+import { RemoteView } from "../../SlickGrid/RemoteView";
+import { IDataGrid } from "../DataGrid/IDataGrid";
+import { QuickSearchField, QuickSearchInput } from "../DataGrid/QuickSearchInput";
+import { DateFormatter, EnumFormatter, FormatterTypeRegistry, IInitializeColumn, NumberFormatter } from "../Formatters/Formatters";
+import { ReflectionOptionsSetter } from "../Widgets/ReflectionOptionsSetter";
+import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 
 export interface GridRowSelectionMixinOptions {
     selectable?: (item: any) => boolean;
@@ -131,7 +147,7 @@ export class GridRowSelectionMixin {
             this.options.selectable(item));
     }
 
-    static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column {
+    static createSelectColumn(getMixin: () => GridRowSelectionMixin): Column {
         return {
             name: '<span class="select-all-items check-box no-float "></span>',
             toolTip: ' ',
@@ -251,7 +267,7 @@ export class GridRadioSelectionMixin {
         this.include[key] = true;
     }
 
-    static createSelectColumn(getMixin: () => GridRadioSelectionMixin): Slick.Column {
+    static createSelectColumn(getMixin: () => GridRadioSelectionMixin): Column {
         return {
             name: '',
             toolTip: ' ',
@@ -292,8 +308,8 @@ export namespace GridSelectAllButtonHelper {
         text?: string, onClick?: () => void): ToolButton {
 
         if (text == null) {
-            text = coalesce(tryGetText('Controls.CheckTreeEditor.SelectAll'),
-                'Select All');
+            text = tryGetText('Controls.CheckTreeEditor.SelectAll') ??
+                'Select All';
         }
         return {
             title: text,
@@ -341,7 +357,7 @@ export namespace GridUtils {
     }
 
     export function addIncludeDeletedToggle(toolDiv: JQuery,
-        view: Slick.RemoteView<any>, hint?: string, initial?: boolean): void {
+        view: RemoteView<any>, hint?: string, initial?: boolean): void {
 
         var includeDeleted = false;
         var oldSubmit = view.onSubmit;
@@ -369,7 +385,7 @@ export namespace GridUtils {
     }
 
     export function addQuickSearchInput(toolDiv: JQuery,
-        view: Slick.RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void {
+        view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void {
 
         var oldSubmit = view.onSubmit;
         var input: QuickSearchInput;
@@ -430,7 +446,7 @@ export namespace GridUtils {
         });
     }
 
-    export function makeOrderable(grid: Slick.Grid,
+    export function makeOrderable(grid: Grid,
         handleMove: (p1: any, p2: number) => void): void {
 
         var moveRowsPlugin = new Slick.RowMoveManager({ cancelEditOnDrag: true });
@@ -457,11 +473,11 @@ export namespace GridUtils {
         grid.registerPlugin(moveRowsPlugin);
     }
 
-    export function makeOrderableWithUpdateRequest(grid: DataGrid<any, any>,
+    export function makeOrderableWithUpdateRequest(grid: IDataGrid,
         getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string,
         getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void {
 
-        makeOrderable(grid.slickGrid, function (rows, insertBefore) {
+        makeOrderable(grid.getGrid(), function (rows, insertBefore) {
             if (rows.length === 0) {
                 return;
             }
@@ -471,9 +487,8 @@ export namespace GridUtils {
             if (index < 0) {
                 order = 1;
             }
-            else if (insertBefore >= grid.rowCount()) {
-                order = coalesce(getDisplayOrder(
-                    grid.itemAt(grid.rowCount() - 1)), 0);
+            else if (insertBefore >= grid.getGrid().getDataLength()) {
+                order = (getDisplayOrder(grid.getGrid().getDataItem(grid.getGrid().getDataLength() - 1)) ?? 0);
                 if (order === 0) {
                     order = insertBefore + 1;
                 }
@@ -482,8 +497,7 @@ export namespace GridUtils {
                 }
             }
             else {
-                order = coalesce(getDisplayOrder(
-                    grid.itemAt(insertBefore)), 0);
+                order = (getDisplayOrder(grid.getGrid().getDataItem(insertBefore)) ?? 0);
                 if (order === 0) {
                     order = insertBefore + 1;
                 }
@@ -495,14 +509,14 @@ export namespace GridUtils {
                 serviceCall({
                     service: service,
                     request: getUpdateRequest(getId(
-                        grid.itemAt(rows[i])), order++),
+                        grid.getGrid().getDataItem(rows[i])), order++),
                     onSuccess: function (response) {
                         i++;
                         if (i < rows.length) {
                             next();
                         }
                         else {
-                            grid.view.populate();
+                            grid.getView().populate();
                         }
                     }
                 });
@@ -513,8 +527,8 @@ export namespace GridUtils {
 }
 
 export namespace PropertyItemSlickConverter {
-    export function toSlickColumns(items: PropertyItem[]): Slick.Column[] {
-        var result: Slick.Column[] = [];
+    export function toSlickColumns(items: PropertyItem[]): Column[] {
+        var result: Column[] = [];
         if (items == null) {
             return result;
         }
@@ -524,8 +538,8 @@ export namespace PropertyItemSlickConverter {
         return result;
     }
 
-    export function toSlickColumn(item: PropertyItem): Slick.Column {
-        var result: Slick.Column = {
+    export function toSlickColumn(item: PropertyItem): Column {
+        var result: Column = {
             field: item.name,
             sourceItem: item,
             cssClass: item.cssClass,
@@ -558,7 +572,7 @@ export namespace PropertyItemSlickConverter {
         if (item.formatterType != null && item.formatterType.length > 0) {
 
             var formatterType = FormatterTypeRegistry.get(item.formatterType) as any;
-            var formatter = new formatterType() as Slick.Formatter;
+            var formatter = new formatterType() as Formatter;
 
             if (item.formatterParams != null) {
                 ReflectionOptionsSetter.set(formatter, item.formatterParams);
@@ -581,9 +595,9 @@ export namespace SlickFormatting {
         return EnumFormatter.getText(enumKey, name);
     }
 
-    export function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any,
-        formatter: Slick.Format): Slick.Format {
-        return function (ctx: Slick.FormatterContext) {
+    export function treeToggle<TItem>(getView: () => RemoteView<TItem>, getId: (x: TItem) => any,
+        formatter: Format): Format {
+        return function (ctx: FormatterContext) {
             var text = formatter(ctx);
             var view = getView();
             var indent = ctx.item._indent ?? 0;
@@ -606,33 +620,33 @@ export namespace SlickFormatting {
         };
     }
 
-    export function date(format?: string): Slick.Format {
+    export function date(format?: string): Format {
         if (format == null) {
             format = Culture.dateFormat;
         }
 
-        return function (ctx: Slick.FormatterContext) {
+        return function (ctx: FormatterContext) {
             return htmlEncode(DateFormatter.format(ctx.value, format));
         };
     }
 
-    export function dateTime(format?: string): Slick.Format {
+    export function dateTime(format?: string): Format {
         if (format == null) {
             format = Culture.dateTimeFormat;
         }
-        return function (ctx: Slick.FormatterContext) {
+        return function (ctx: FormatterContext) {
             return htmlEncode(DateFormatter.format(ctx.value, format));
         };
     }
 
-    export function checkBox(): Slick.Format {
-        return function (ctx: Slick.FormatterContext) {
+    export function checkBox(): Format {
+        return function (ctx: FormatterContext) {
             return '<span class="check-box no-float ' + (!!ctx.value ? ' checked' : '') + '"></span>';
         };
     }
 
-    export function number(format: string): Slick.Format {
-        return function (ctx: Slick.FormatterContext) {
+    export function number(format: string): Format {
+        return function (ctx: FormatterContext) {
             return NumberFormatter.format(ctx.value, format);
         };
     }
@@ -657,9 +671,9 @@ export namespace SlickFormatting {
             (encode ? htmlEncode(text ?? '') : text ?? '') + '</a>';
     }
 
-    export function itemLink(itemType: string, idField: string, getText: Slick.Format,
-        cssClass?: Slick.Format, encode?: boolean): Slick.Format {
-        return function (ctx: Slick.FormatterContext) {
+    export function itemLink(itemType: string, idField: string, getText: Format,
+        cssClass?: Format, encode?: boolean): Format {
+        return function (ctx: FormatterContext) {
             return itemLinkText(itemType, ctx.item[idField],
                 (getText == null ? ctx.value : getText(ctx)),
                 (cssClass == null ? '' : cssClass(ctx)), encode);
@@ -668,7 +682,7 @@ export namespace SlickFormatting {
 }
 
 export namespace SlickHelper {
-    export function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any {
+    export function setDefaults(columns: Column[], localTextPrefix?: string): any {
         for (var col of columns) {
             col.sortable = (col.sortable != null ? col.sortable : true);
             var id = col.id;
@@ -696,12 +710,12 @@ export namespace SlickHelper {
         return columns;
     }
 
-    export function convertToFormatter(format: Slick.Format): Slick.ColumnFormatter {
+    export function convertToFormatter(format: Format): ColumnFormatter {
         if (format == null) {
             return null;
         }
         else {
-            return function (row: number, cell: number, value: any, column: Slick.Column, item: any) {
+            return function (row: number, cell: number, value: any, column: Column, item: any) {
                 return format({
                     row: row,
                     cell: cell,
@@ -731,7 +745,7 @@ export namespace SlickTreeHelper {
         return true;
     }
 
-    export function filterById<TItem>(item: TItem, view: Slick.RemoteView<TItem>,
+    export function filterById<TItem>(item: TItem, view: RemoteView<TItem>,
         getParentId: (x: TItem) => any): boolean {
         return filterCustom(item, function (x) {
             var parentId = getParentId(x);
@@ -786,7 +800,7 @@ export namespace SlickTreeHelper {
     }
 
     export function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number,
-        view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void {
+        view: RemoteView<TItem>, getId: (x: TItem) => any): void {
         var target = $(e.target);
         if (!target.hasClass('s-TreeToggle')) {
             return;

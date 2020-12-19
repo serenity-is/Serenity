@@ -1,4 +1,5 @@
 ﻿import { registerClass } from "../../Decorators";
+import { IEditDialog } from "../../Interfaces/IEditDialog";
 import { Authorization } from "../../Q/Authorization";
 import { format } from "../../Q/Formatting";
 import { LT, text, tryGetText } from "../../Q/LocalText";
@@ -13,6 +14,7 @@ import { EditorUtils } from "../Editors/EditorUtils";
 import { SubDialogHelper } from "../Helpers/SubDialogHelper";
 import { ToolButton } from "../Widgets/Toolbar";
 import { Widget, WidgetDialogClass } from "../Widgets/Widget";
+import { ColumnPickerDialog } from "./ColumnPickerDialog";
 import { DataGrid } from "./DataGrid";
 
 @registerClass('Serenity.EntityGrid')
@@ -186,7 +188,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
 
     protected editItem(entityOrId: any): void {
         this.createEntityDialog(this.getItemType(), dlg => {
-            var dialog = safeCast(dlg, Serenity['IEditDialog']);
+            var dialog = safeCast(dlg, IEditDialog);
             if (dialog != null) {
                 dialog.load(entityOrId, () => {
                     dialog.dialogOpen(this.openDialogsAsPanel);
@@ -209,7 +211,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         }
 
         this.createEntityDialog(itemType, dlg => {
-            var dialog = safeCast(dlg, Serenity['IEditDialog']);
+            var dialog = safeCast(dlg, IEditDialog);
             if (dialog != null) {
                 dialog.load(entityOrId, () =>
                     dialog.dialogOpen(this.openDialogsAsPanel));

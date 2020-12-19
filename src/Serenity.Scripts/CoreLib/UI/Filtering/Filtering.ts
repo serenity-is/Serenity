@@ -20,7 +20,7 @@ import { ServiceLookupEditor } from "../Editors/ServiceLookupEditor";
 import { StringEditor } from "../Editors/StringEditor";
 import { Widget } from "../Widgets/Widget";
 import { FilterOperator, FilterOperators } from "./FilterOperator";
-import { QuickFilter } from "./QuickFilter";
+import { QuickFilter } from "../DataGrid/QuickFilter";
 
 export interface IFiltering {
     createEditor(): void;

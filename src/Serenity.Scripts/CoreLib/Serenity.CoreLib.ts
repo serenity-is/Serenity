@@ -1,6 +1,6 @@
-﻿import * as Q from './CoreLibQ';
-import * as Serenity from './CoreLibSerenity';
-import * as Slick from "./CoreLibSlick";
+﻿export * as Q from './Serenity.CoreLib.Q';
+export * as Serenity from './Serenity.CoreLib.Serenity';
+export * as Slick from "./Serenity.CoreLib.Slick";
 export * from "./Globals/Select2";
 export * from "./Globals/Validate";
 import { jQueryPatch } from './Patch/jQueryPatch'
@@ -14,5 +14,3 @@ if (typeof jQuery === "function") {
 if (typeof Vue == "function")
 // @ts-ignore
     vuePatch(Vue);
-
-export { Q, Serenity, Slick };

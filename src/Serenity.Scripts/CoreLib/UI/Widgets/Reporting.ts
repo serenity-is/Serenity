@@ -6,6 +6,7 @@ import type { ServiceRequest, ServiceResponse } from "../../Services/Models";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
 import { PropertyGrid } from "./PropertyGrid";
 import { Widget } from "./Widget";
+import { QuickSearchInput } from "../DataGrid/QuickSearchInput";
 
 export namespace Reporting {
     export interface ReportDialogOptions {

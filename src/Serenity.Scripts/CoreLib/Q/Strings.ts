@@ -15,8 +15,8 @@ export function isTrimmedEmpty(s: string) {
 }
 
 export function padLeft(s: string | number, len: number, ch: string = ' ') {
-    if (s["padStart"])
-        return s["padStart"](len, ch);
+    if ((s as any).padStart)
+        return (s as any).padStart(len, ch);
     s = s.toString();
     while (s.length < len)
         s = ch + s;

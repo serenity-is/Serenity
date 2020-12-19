@@ -1,19 +1,25 @@
-﻿import ts from "@wessberg/rollup-plugin-ts";
+﻿import typescript from '@rollup/plugin-typescript';
 import {terser} from "rollup-plugin-terser";
 import pkg from "./package.json";
 import {builtinModules} from "module";
 
+var globals = {
+	'jquery': '$',
+	'flatpickr': 'flatpickr'
+}
+
 export default [
 	{
-		input: "CoreLib/CoreLib.ts",
+		input: "CoreLib/Serenity.CoreLib.ts",
 		output: [
 			{
-				file: 'dist/Serenity.CoreLib.js',
+				dir: 'dist',
 				format: "iife",
 				sourcemap: true,
 				name: "window",
-				extend: true
-			},
+				extend: true,
+				globals
+			}/*,
 			{
 				file: 'dist/Serenity.CoreLib.min.js',
 				format: "iife",
@@ -22,7 +28,8 @@ export default [
 				extend: true,
 				plugins: [
 					terser()
-				]
+				],
+				globals
 			},
 			{
 				file: 'dist/Serenity.CoreLib.esm.js',
@@ -35,19 +42,29 @@ export default [
 				sourcemap: false,
 				plugins: [
 					terser()
-				]
-			}
+				],
+				globals
+			}*/
 		],
 		plugins: [
-			ts({
-				tsconfig: 'CoreLib/tsconfig.json'
+			typescript({
+				tsconfig: 'CoreLib/tsconfig.json',
+				outDir: 'dist'
 			}),
 			{
 				name: 'stripExportsForGlobal',
 				generateBundle(o, b) {
-					for (var k of Object.keys(b)) {
-						if (/CoreLib\.d\.ts/.test(k)) {
-							var src = b[k].source;
+					for (var fileName of Object.keys(b)) {
+						var result = /^Serenity\.CoreLib\.([A-Za-z]*)\.d\.ts$/.exec(fileName);
+						if (result && result.length > 1) {
+							var ns = result[1];
+							var src = b[fileName].source;
+							if (src) {
+								src = src + '\nexport as namespace ' + ns + ';';
+								b[fileName].source = src;
+							}
+						}
+						/*	var src = b[k].source;
 							src = src.replace(/^(declare\s+global.*\s*\{\r?\n)((^\s+.*\r?\n)*)\}/gmi, function(x, y, z) {
 								var r = z.indexOf('\r') >= 0;
 								return z.replace(/\r/g, '').split('\n')
@@ -57,7 +74,7 @@ export default [
 							});
 
 							b[k].source = src.replace(/^export\s*\{[^\}]*\}\s*\;/gmi, '');
-						}
+						}*/
 					}
 				}
 			}

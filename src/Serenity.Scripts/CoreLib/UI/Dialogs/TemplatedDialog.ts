@@ -8,7 +8,7 @@ import { positionToastContainer } from "../../Q/Notify";
 import { endsWith, isEmptyOrNull } from "../../Q/Strings";
 import { getAttributes, getInstanceType } from "../../Q/TypeSystem";
 import { validateOptions } from "../../Q/ValidateOptions";
-import { MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../Types/Attributes";
+import { FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../Types/Attributes";
 import { IDialog } from "../../Interfaces/IDialog";
 import { TemplatedWidget } from "../Widgets/TemplatedWidget";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
@@ -131,8 +131,8 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
 
             this.element.closest('.ui-dialog').addClass('flex-layout');
         }
-        else if (Serenity["FlexifyAttribute"] && DialogExtensions["dialogFlexify"] &&
-            getAttributes(type, Serenity["FlexifyAttribute"], true).length > 0) {
+        else if (DialogExtensions["dialogFlexify"] &&
+            getAttributes(type, FlexifyAttribute, true).length > 0) {
             DialogExtensions["dialogFlexify"](this.element);
             DialogExtensions.dialogResizable(this.element);
         }

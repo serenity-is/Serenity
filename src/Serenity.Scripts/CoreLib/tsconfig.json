@@ -11,6 +11,7 @@
     "module": "ES2015",
     "moduleResolution": "Node",
     "isolatedModules": true,
+    "skipLibCheck": true,
     "types": [
       "jquery",
       "jquery.blockui",
@@ -38,6 +39,6 @@
     "../node_modules/@types"
   ],
   "files": [  
-    "CoreLib.ts"
+    "Serenity.CoreLib.ts"
   ]
 }

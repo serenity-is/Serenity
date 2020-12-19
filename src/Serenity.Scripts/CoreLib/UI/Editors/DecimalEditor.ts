@@ -33,12 +33,12 @@ export class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoub
             numericOptions.aPad = this.options.padDecimals;
         }
 
-        if ($.fn.autoNumeric)
+        if (($.fn as any).autoNumeric)
             (input as any).autoNumeric(numericOptions);
     }
 
     get_value(): number {
-        if ($.fn.autoNumeric) {
+        if (($.fn as any).autoNumeric) {
             var val = (this.element as any).autoNumeric('get');
 
             if (!!(val == null || val === ''))
@@ -59,7 +59,7 @@ export class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoub
         if (value == null || (value as any) === '') {
             this.element.val('');
         }
-        else if ($.fn.autoNumeric) {
+        else if (($.fn as any).autoNumeric) {
             (this.element as any).autoNumeric('set', value);
         }
         else
