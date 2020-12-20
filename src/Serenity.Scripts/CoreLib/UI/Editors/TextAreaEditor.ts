@@ -7,7 +7,7 @@ export interface TextAreaEditorOptions {
     rows?: number;
 }
 
-@registerEditor('Sereniy.TextAreaEditor', [IStringValue])
+@registerEditor('Serenity.TextAreaEditor', [IStringValue])
 @element("<textarea />")
 export class TextAreaEditor extends Widget<TextAreaEditorOptions> {
 
