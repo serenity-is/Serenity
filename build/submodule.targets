@@ -9,7 +9,7 @@
     <CreateItem Include="$(SolutionDir)Serenity\src\Serenity.Scripts\style\**\*.less">
       <Output TaskParameter="Include" ItemName="SubmoduleCompileSerenityLessInputs" />
     </CreateItem>
-	<CreateItem Include="$(SolutionDir)Serenity\src\Serenity.Scripts\dist\**\*.js;$(SolutionDir)Serenity\src\Serenity.Scripts\dist\**\*.map;$(SolutionDir)Serenity\src\Serenity.Scripts\dist\**\*.ts" 
+	<CreateItem Include="$(SolutionDir)Serenity\src\Serenity.Scripts\dist\*.js;$(SolutionDir)Serenity\src\Serenity.Scripts\dist\*.map;$(SolutionDir)Serenity\src\Serenity.Scripts\dist\*.ts" 
 		Exclude="$(SolutionDir)Serenity\src\Serenity.Scripts\dist\Serenity.CodeGenerator.*">
 	  <Output TaskParameter="Include" ItemName="SubmoduleSerenityScriptsDist" /> 
 	</CreateItem>
