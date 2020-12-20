@@ -16,13 +16,6 @@ import { Widget } from "../Widgets/Widget";
 import { CascadedWidgetLink } from "./CascadedWidgetLink";
 import { EditorUtils } from "./EditorUtils";
 
-export interface Select2Item {
-    id: string;
-    text: string;
-    source?: any;
-    disabled?: boolean;
-}
-
 export interface Select2CommonOptions {
     allowClear?: boolean;
     delimited?: boolean;

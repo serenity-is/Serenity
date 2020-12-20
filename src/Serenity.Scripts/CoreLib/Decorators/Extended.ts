@@ -33,6 +33,10 @@ export function registerEnum(target: any, enumKey?: string, name?: string) {
     }
 }
 
+export function registerEnumType(target: any, name?: string, enumKey?: string) {
+    registerEnum(target, enumKey ?? name, name);
+}
+
 export function enumKey(value: string) {
     return function (target: Function) {
         addAttribute(target, new EnumKeyAttribute(value));

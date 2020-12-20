@@ -8,9 +8,7 @@ import { isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
 import { clearKeys, safeCast } from "../../Q/TypeSystem";
 import { SaveRequest } from "../../Services/Models";
 import { PropertyItem } from "../../Services/PropertyItem";
-import { Column, ColumnFormatter, Format, Formatter, FormatterContext } from "../../SlickGrid/Column";
-import { Grid } from "../../SlickGrid/Grid";
-import { RemoteView } from "../../SlickGrid/RemoteView";
+import { RemoteView } from "../../Slick/RemoteView";
 import { IDataGrid } from "../DataGrid/IDataGrid";
 import { QuickSearchField, QuickSearchInput } from "../DataGrid/QuickSearchInput";
 import { DateFormatter, EnumFormatter, FormatterTypeRegistry, IInitializeColumn, NumberFormatter } from "../Formatters/Formatters";
@@ -147,7 +145,7 @@ export class GridRowSelectionMixin {
             this.options.selectable(item));
     }
 
-    static createSelectColumn(getMixin: () => GridRowSelectionMixin): Column {
+    static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column {
         return {
             name: '<span class="select-all-items check-box no-float "></span>',
             toolTip: ' ',
@@ -267,7 +265,7 @@ export class GridRadioSelectionMixin {
         this.include[key] = true;
     }
 
-    static createSelectColumn(getMixin: () => GridRadioSelectionMixin): Column {
+    static createSelectColumn(getMixin: () => GridRadioSelectionMixin): Slick.Column {
         return {
             name: '',
             toolTip: ' ',
@@ -446,7 +444,7 @@ export namespace GridUtils {
         });
     }
 
-    export function makeOrderable(grid: Grid,
+    export function makeOrderable(grid: Slick.Grid,
         handleMove: (p1: any, p2: number) => void): void {
 
         var moveRowsPlugin = new Slick.RowMoveManager({ cancelEditOnDrag: true });
@@ -527,8 +525,8 @@ export namespace GridUtils {
 }
 
 export namespace PropertyItemSlickConverter {
-    export function toSlickColumns(items: PropertyItem[]): Column[] {
-        var result: Column[] = [];
+    export function toSlickColumns(items: PropertyItem[]): Slick.Column[] {
+        var result: Slick.Column[] = [];
         if (items == null) {
             return result;
         }
@@ -538,8 +536,8 @@ export namespace PropertyItemSlickConverter {
         return result;
     }
 
-    export function toSlickColumn(item: PropertyItem): Column {
-        var result: Column = {
+    export function toSlickColumn(item: PropertyItem): Slick.Column {
+        var result: Slick.Column = {
             field: item.name,
             sourceItem: item,
             cssClass: item.cssClass,
@@ -572,7 +570,7 @@ export namespace PropertyItemSlickConverter {
         if (item.formatterType != null && item.formatterType.length > 0) {
 
             var formatterType = FormatterTypeRegistry.get(item.formatterType) as any;
-            var formatter = new formatterType() as Formatter;
+            var formatter = new formatterType() as Slick.Formatter;
 
             if (item.formatterParams != null) {
                 ReflectionOptionsSetter.set(formatter, item.formatterParams);
@@ -596,8 +594,8 @@ export namespace SlickFormatting {
     }
 
     export function treeToggle<TItem>(getView: () => RemoteView<TItem>, getId: (x: TItem) => any,
-        formatter: Format): Format {
-        return function (ctx: FormatterContext) {
+        formatter: Slick.Format): Slick.Format {
+        return function (ctx: Slick.FormatterContext) {
             var text = formatter(ctx);
             var view = getView();
             var indent = ctx.item._indent ?? 0;
@@ -620,33 +618,33 @@ export namespace SlickFormatting {
         };
     }
 
-    export function date(format?: string): Format {
+    export function date(format?: string): Slick.Format {
         if (format == null) {
             format = Culture.dateFormat;
         }
 
-        return function (ctx: FormatterContext) {
+        return function (ctx: Slick.FormatterContext) {
             return htmlEncode(DateFormatter.format(ctx.value, format));
         };
     }
 
-    export function dateTime(format?: string): Format {
+    export function dateTime(format?: string): Slick.Format {
         if (format == null) {
             format = Culture.dateTimeFormat;
         }
-        return function (ctx: FormatterContext) {
+        return function (ctx: Slick.FormatterContext) {
             return htmlEncode(DateFormatter.format(ctx.value, format));
         };
     }
 
-    export function checkBox(): Format {
-        return function (ctx: FormatterContext) {
+    export function checkBox(): Slick.Format {
+        return function (ctx: Slick.FormatterContext) {
             return '<span class="check-box no-float ' + (!!ctx.value ? ' checked' : '') + '"></span>';
         };
     }
 
-    export function number(format: string): Format {
-        return function (ctx: FormatterContext) {
+    export function number(format: string): Slick.Format {
+        return function (ctx: Slick.FormatterContext) {
             return NumberFormatter.format(ctx.value, format);
         };
     }
@@ -671,9 +669,9 @@ export namespace SlickFormatting {
             (encode ? htmlEncode(text ?? '') : text ?? '') + '</a>';
     }
 
-    export function itemLink(itemType: string, idField: string, getText: Format,
-        cssClass?: Format, encode?: boolean): Format {
-        return function (ctx: FormatterContext) {
+    export function itemLink(itemType: string, idField: string, getText: Slick.Format,
+        cssClass?: Slick.Format, encode?: boolean): Slick.Format {
+        return function (ctx: Slick.FormatterContext) {
             return itemLinkText(itemType, ctx.item[idField],
                 (getText == null ? ctx.value : getText(ctx)),
                 (cssClass == null ? '' : cssClass(ctx)), encode);
@@ -682,7 +680,7 @@ export namespace SlickFormatting {
 }
 
 export namespace SlickHelper {
-    export function setDefaults(columns: Column[], localTextPrefix?: string): any {
+    export function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any {
         for (var col of columns) {
             col.sortable = (col.sortable != null ? col.sortable : true);
             var id = col.id;
@@ -710,12 +708,12 @@ export namespace SlickHelper {
         return columns;
     }
 
-    export function convertToFormatter(format: Format): ColumnFormatter {
+    export function convertToFormatter(format: Slick.Format): Slick.ColumnFormatter {
         if (format == null) {
             return null;
         }
         else {
-            return function (row: number, cell: number, value: any, column: Column, item: any) {
+            return function (row: number, cell: number, value: any, column: Slick.Column, item: any) {
                 return format({
                     row: row,
                     cell: cell,

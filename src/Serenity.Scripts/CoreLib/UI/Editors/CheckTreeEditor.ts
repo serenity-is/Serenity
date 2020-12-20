@@ -10,9 +10,6 @@ import { getLookup, ScriptData } from "../../Q/ScriptData";
 import { isEmptyOrNull, trimToNull } from "../../Q/Strings";
 import { ListResponse } from "../../Services/Models";
 import { PropertyItem } from "../../Services/PropertyItem";
-import { Column, FormatterContext } from "../../SlickGrid/Column";
-import { Grid } from "../../SlickGrid/Grid";
-import { GridOptions } from "../../SlickGrid/GridOptions";
 import { ReflectionUtils } from "../../Types/ReflectionUtils";
 import { DataGrid } from "../DataGrid/DataGrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../Helpers/SlickHelpers";
@@ -124,7 +121,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
         return false;
     }
 
-    protected createSlickGrid(): Grid {
+    protected createSlickGrid(): Slick.Grid {
         this.element.addClass('slick-no-cell-border').addClass('slick-no-odd-even');
         var result = super.createSlickGrid();
         this.element.addClass('slick-hide-header');
@@ -326,7 +323,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
         return false;
     }
 
-    protected getColumns(): Column[] {
+    protected getColumns(): Slick.Column[] {
         var self = this;
         var columns = [];
         columns.push({
@@ -357,11 +354,11 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
         return columns;
     }
 
-    protected getItemText(ctx: FormatterContext): string {
+    protected getItemText(ctx: Slick.FormatterContext): string {
         return htmlEncode(ctx.value);
     }
 
-    protected getSlickOptions(): GridOptions {
+    protected getSlickOptions(): Slick.GridOptions {
         var opt = super.getSlickOptions();
         opt.forceFitColumns = true;
         return opt;

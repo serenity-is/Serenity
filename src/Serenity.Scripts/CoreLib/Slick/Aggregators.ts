@@ -1,4 +1,5 @@
-﻿export namespace Aggregators
+﻿export {}
+export namespace Aggregators
 {
     export function Avg(field: string): void {
         this.field_ = field;

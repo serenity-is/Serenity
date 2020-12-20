@@ -4,12 +4,10 @@ import { FilterLine } from "../Filtering/FilterLine";
 import { QuickSearchField, QuickSearchInput } from "./QuickSearchInput";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { Widget } from "../Widgets/Widget";
-import { RemoteView, RemoteViewOptions } from "../../SlickGrid/RemoteView";
-import { ColumnSort, Grid } from "../../SlickGrid/Grid";
+import { RemoteView, RemoteViewOptions } from "../../Slick/RemoteView";
 import { FilterStore } from "../Filtering/FilterStore";
 import { FilterDisplayBar } from "../Filtering/FilterDisplayBar";
 import { QuickFilterBar } from ".//QuickFilterBar";
-import { Column, Format, FormatterContext } from "../../SlickGrid/Column";
 import { getAttributes, getInstanceType, getTypeFullName, getTypeName, isInstanceOfType } from "../../Q/TypeSystem";
 import { LayoutTimer } from "../../Q/LayoutTimer";
 import { endsWith, isEmptyOrNull, startsWith, trimEnd, trimToNull } from "../../Q/Strings";
@@ -32,7 +30,6 @@ import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActive
 import { SlickPager } from "./SlickPager";
 import { getColumns } from "../../Q/ScriptData";
 import { htmlEncode } from "../../Q/Html";
-import { GridOptions } from "../../SlickGrid/GridOptions";
 import { DateEditor } from "../Editors/DateEditor";
 import { SelectEditor } from "../Editors/SelectEditor";
 import { EditorUtils } from "../Editors/EditorUtils";
@@ -82,7 +79,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     protected quickFiltersDiv: JQuery;
     protected quickFiltersBar: QuickFilterBar;
     protected slickContainer: JQuery;
-    protected allColumns: Column[];
+    protected allColumns: Slick.Column[];
     protected initialSettings: PersistedGridSettings;
     protected restoringSettings: number = 0;
     private idProperty: string;
@@ -93,7 +90,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     private slickGridOnSort: any;
     private slickGridOnClick: any;
     public view: RemoteView<TItem>;
-    public slickGrid: Grid;
+    public slickGrid: Slick.Grid;
     public openDialogsAsPanel: boolean;
 
     public static defaultRowHeight: number;
@@ -409,7 +406,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return { cssClasses: itemClass };
     }
 
-    protected postProcessColumns(columns: Column[]): Column[] {
+    protected postProcessColumns(columns: Slick.Column[]): Slick.Column[] {
         SlickHelper.setDefaults(columns, this.getLocalTextDbPrefix());
         return columns;
     }
@@ -429,7 +426,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }
     }
 
-    protected canFilterColumn(column: Column): boolean {
+    protected canFilterColumn(column: Slick.Column): boolean {
         return (column.sourceItem != null && 
             column.sourceItem.notFilterable !== true &&
             (column.sourceItem.readPermission == null ||
@@ -452,9 +449,9 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         });
     }
 
-    protected createSlickGrid(): Grid {
+    protected createSlickGrid(): Slick.Grid {
 
-        var visibleColumns: Column[];
+        var visibleColumns: Slick.Column[];
 
         this.allColumns = this.getColumns();
         visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
@@ -462,7 +459,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         });
 
         var slickOptions = this.getSlickOptions();
-        var grid = new Slick.Grid(this.slickContainer, this.view as any, visibleColumns, slickOptions) as Grid;
+        var grid = new Slick.Grid(this.slickContainer, this.view as any, visibleColumns, slickOptions) as Slick.Grid;
         grid.registerPlugin(new Slick.AutoTooltips({
             enableForHeaderCells: true
         }));
@@ -483,7 +480,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }
 
         var mapped = sortBy.map(function (s) {
-            var x: ColumnSort = {};
+            var x: Slick.ColumnSort = {};
             if (s && endsWith(s.toLowerCase(), ' desc')) {
                 x.columnId = trimEnd(s.substr(0, s.length - 5));
                 x.sortAsc = false;
@@ -821,8 +818,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return 'Item';
     }
 
-    protected itemLink(itemType?: string, idField?: string, text?: (ctx: FormatterContext) => string,
-        cssClass?: (ctx: FormatterContext) => string, encode: boolean = true): Format {
+    protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string,
+        cssClass?: (ctx: Slick.FormatterContext) => string, encode: boolean = true): Slick.Format {
 
         if (itemType == null) {
             itemType = this.getItemType();
@@ -855,12 +852,12 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return [];
     }
 
-    protected getColumns(): Column[] {
+    protected getColumns(): Slick.Column[] {
         var propertyItems = this.getPropertyItems();
         return this.propertyItemsToSlickColumns(propertyItems);
     }
 
-    protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[] {
+    protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Slick.Column[] {
         var columns = PropertyItemSlickConverter.toSlickColumns(propertyItems);
         for (var i = 0; i < propertyItems.length; i++) {
             var item = propertyItems[i];
@@ -871,13 +868,13 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
                 column.format = this.itemLink(
                     item.editLinkItemType != null ? item.editLinkItemType : null,
                     item.editLinkIdField != null ? item.editLinkIdField : null,
-                    function(ctx: FormatterContext) {
+                    function(ctx: Slick.FormatterContext) {
                         if (this.oldFormat.$ != null) {
                             return this.oldFormat.$(ctx);
                         }
                         return htmlEncode(ctx.value);
                     }.bind({ oldFormat: oldFormat }),
-                    function(ctx1: FormatterContext) {
+                    function(ctx1: Slick.FormatterContext) {
                         return (this.css.$ ?? '');
                     }.bind({ css: css }), false);
 
@@ -890,8 +887,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return columns;
     }
 
-    protected getSlickOptions(): GridOptions {
-        var opt: GridOptions = {};
+    protected getSlickOptions(): Slick.GridOptions {
+        var opt: Slick.GridOptions = {};
         opt.multiSelect = false;
         opt.multiColumnSort = true;
         opt.enableCellNavigation = false;
@@ -1112,7 +1109,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return {};
     }
 
-    protected canShowColumn(column: Column) {
+    protected canShowColumn(column: Slick.Column) {
         if (column == null) {
             return false;
         }
@@ -1156,8 +1153,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }
 
         var columns = this.slickGrid.getColumns();
-        var colById: { [key: string]: Column } = null;
-        var updateColById = function(cl: Column[]) {
+        var colById: { [key: string]: Slick.Column } = null;
+        var updateColById = function(cl: Slick.Column[]) {
             colById = {};
             for (var $t1 = 0; $t1 < cl.length; $t1++) {
                 var c = cl[$t1];
@@ -1407,7 +1404,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return this.element;
     }
 
-    getGrid(): Grid {
+    getGrid(): Slick.Grid {
         return this.slickGrid;
     }
 

@@ -1,5 +1,5 @@
-﻿import { validatorAbortHandler } from "../../Q/ValidateOptions";
-import { addValidationRule as addValRule, removeValidationRule as removeValRule } from "../../Q/Validation";
+﻿import { Exception } from "../../Q/Exceptions";
+import { validatorAbortHandler } from "../../Q/ValidateOptions";
 import { Widget } from "../Widgets/Widget";
 
 export namespace ValidationHelper {
@@ -51,8 +51,19 @@ export namespace ValidationHelper {
 }
 
 export namespace VX {
-    export var addValidationRule = addValRule;
-    export var removeValidationRule = removeValRule;
+    export function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery {
+        if (!element.length)
+        return element;
+        if (rule == null)
+            throw new Exception('rule is null!');
+        element.addClass('customValidate').bind('customValidate.' + eventClass, rule as any);
+        return element;        
+    }
+
+    export function removeValidationRule(element: JQuery, eventClass: string): JQuery {
+        element.unbind('customValidate.' + eventClass);
+        return element;
+    }    
 
     export function validateElement(validator: JQueryValidation.Validator, widget: Widget<any>): boolean {
         return validator.element(widget.element[0] as any);

@@ -3,7 +3,6 @@ import { htmlEncode } from "../../Q/Html";
 import { ListResponse } from "../../Services/Models";
 import { SlickFormatting, SlickHelper, SlickTreeHelper } from "../Helpers/SlickHelpers";
 import { DataGrid } from "./DataGrid";
-import { Grid } from "../../SlickGrid/Grid";
 
 /**
  * A mixin that can be applied to a DataGrid for tree functionality

@@ -7,13 +7,12 @@ import { tryGetText } from "../../Q/LocalText";
 import { resolveUrl } from "../../Q/Services";
 import { endsWith, isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
 import { Enum, getAttributes, getTypeFullName, getTypes, isAssignableFrom, safeCast } from "../../Q/TypeSystem";
-import { Column, Formatter, FormatterContext } from "../../SlickGrid/Column";
 import { EnumKeyAttribute } from "../../Types/Attributes";
 import { EnumTypeRegistry } from "../../Types/EnumTypeRegistry";
 import { ISlickFormatter } from "../DataGrid/ISlickFormatter";
 
 export interface IInitializeColumn {
-    initializeColumn(column: Column): void;
+    initializeColumn(column: Slick.Column): void;
 }
 
 @registerInterface('Serenity.IInitializeColumn')
@@ -25,8 +24,8 @@ function Formatter(name: string, intf?: any[]) {
 }
 
 @Formatter('Boolean')
-export class BooleanFormatter implements Formatter {
-    format(ctx: FormatterContext) {
+export class BooleanFormatter implements Slick.Formatter {
+    format(ctx: Slick.FormatterContext) {
 
         if (ctx.value == null) {
             return '';
@@ -63,14 +62,14 @@ export class BooleanFormatter implements Formatter {
 }
 
 @Formatter('Checkbox')
-export class CheckboxFormatter implements Formatter {
-    format(ctx: FormatterContext) {
+export class CheckboxFormatter implements Slick.Formatter {
+    format(ctx: Slick.FormatterContext) {
         return '<span class="check-box no-float readonly ' + (!!ctx.value ? ' checked' : '') + '"></span>';
     }
 }
 
 @Formatter('Date')
-export class DateFormatter implements Formatter {
+export class DateFormatter implements Slick.Formatter {
     constructor() {
         this.displayFormat = Culture.dateFormat;
     }
@@ -102,7 +101,7 @@ export class DateFormatter implements Formatter {
     @option()
     public displayFormat: string;
 
-    format(ctx: FormatterContext): string {
+    format(ctx: Slick.FormatterContext): string {
         return DateFormatter.format(ctx.value, this.displayFormat);
     }
 }
@@ -116,9 +115,9 @@ export class DateTimeFormatter extends DateFormatter {
 }
 
 @Formatter('Enum')
-export class EnumFormatter implements Formatter {
+export class EnumFormatter implements Slick.Formatter {
 
-    format(ctx: FormatterContext): string {
+    format(ctx: Slick.FormatterContext): string {
         return EnumFormatter.format(EnumTypeRegistry.get(this.enumKey), ctx.value);
     }
 
@@ -154,9 +153,9 @@ export class EnumFormatter implements Formatter {
 }
 
 @Formatter('FileDownload', [ISlickFormatter, IInitializeColumn])
-export class FileDownloadFormatter implements Formatter, IInitializeColumn {
+export class FileDownloadFormatter implements Slick.Formatter, IInitializeColumn {
 
-    format(ctx: FormatterContext): string {
+    format(ctx: Slick.FormatterContext): string {
         var dbFile = safeCast(ctx.value, String);
         if (isEmptyOrNull(dbFile)) {
             return '';
@@ -179,7 +178,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
         return resolveUrl('~/upload/') + filename;
     }
 
-    initializeColumn(column: Column): void {
+    initializeColumn(column: Slick.Column): void {
         column.referencedFields = column.referencedFields || [];
         if (!isEmptyOrNull(this.originalNameProperty)) {
             column.referencedFields.push(this.originalNameProperty);
@@ -195,9 +194,9 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 }
 
 @Formatter('Minute')
-export class MinuteFormatter implements Formatter {
+export class MinuteFormatter implements Slick.Formatter {
 
-    format(ctx: FormatterContext) {
+    format(ctx: Slick.FormatterContext) {
         return MinuteFormatter.format(ctx.value);
     }
 
@@ -225,7 +224,7 @@ export class MinuteFormatter implements Formatter {
 
 @Formatter('Number')
 export class NumberFormatter {
-    format(ctx: FormatterContext): string {
+    format(ctx: Slick.FormatterContext): string {
         return NumberFormatter.format(ctx.value, this.displayFormat);
     }
 
@@ -253,9 +252,9 @@ export class NumberFormatter {
 }
 
 @Formatter('Url', [ISlickFormatter, IInitializeColumn])
-export class UrlFormatter implements Formatter, IInitializeColumn {
+export class UrlFormatter implements Slick.Formatter, IInitializeColumn {
 
-    format(ctx: FormatterContext): string {
+    format(ctx: Slick.FormatterContext): string {
         var url = (!isEmptyOrNull(this.urlProperty) ?
             (ctx.item[this.urlProperty] ?? '').toString() :
             (ctx.value ?? '').toString());
@@ -285,7 +284,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
         return s;
     }
 
-    initializeColumn(column: Column): void {
+    initializeColumn(column: Slick.Column): void {
         column.referencedFields = column.referencedFields || [];
 
         if (!isEmptyOrNull(this.displayProperty)) {

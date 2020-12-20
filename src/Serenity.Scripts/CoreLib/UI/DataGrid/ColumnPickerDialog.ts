@@ -4,7 +4,6 @@ import { Culture } from "../../Q/Formatting";
 import { htmlEncode } from "../../Q/Html";
 import { text } from "../../Q/LocalText";
 import { trimToNull } from "../../Q/Strings";
-import { Column } from "../../SlickGrid/Column";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
 import { QuickSearchInput } from "../DataGrid/QuickSearchInput";
 import { ToolButton } from "../Widgets/Toolbar";
@@ -19,9 +18,9 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
 
     private ulVisible: JQuery;
     private ulHidden: JQuery;
-    private colById: { [key: string]: Column };
+    private colById: { [key: string]: Slick.Column };
 
-    public allColumns: Column[];
+    public allColumns: Slick.Column[];
     public visibleColumns: string[];
     public defaultColumns: string[];
     public done: () => void;
@@ -119,7 +118,7 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
             {
                 text: text("Dialogs.OkButton"),
                 click: () => {
-                    let newColumns: Column[] = [];
+                    let newColumns: Slick.Column[] = [];
 
                     for (var col of this.allColumns)
                         col.visible = false;
@@ -157,18 +156,18 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
         return opt;
     }
 
-    private getTitle(col: Column) {
+    private getTitle(col: Slick.Column) {
         if (col.id == "__select__")
             return "[x]";
 
         return col.name || col.toolTip || col.id;
     }
 
-    private allowHide(col: Column): boolean {
+    private allowHide(col: Slick.Column): boolean {
         return col.sourceItem == null || col.sourceItem.allowHide == null || col.sourceItem.allowHide;
     }
 
-    private createLI(col: Column): JQuery {
+    private createLI(col: Slick.Column): JQuery {
         var allowHide = this.allowHide(col);
         return $(`
 <li data-key="${col.id}" class="${allowHide ? "" : "cant-hide"}">
@@ -201,7 +200,7 @@ ${ allowHide ? `<i class="js-hide" title="${ text("Controls.ColumnPickerDialog.H
         if (this.defaultColumns == null)
             this.defaultColumns = this.visibleColumns.slice(0);
 
-        let hidden: Column[] = [];
+        let hidden: Slick.Column[] = [];
 
         for (let c of this.allColumns) {
             if (!visible[c.id] && (!c.sourceItem ||

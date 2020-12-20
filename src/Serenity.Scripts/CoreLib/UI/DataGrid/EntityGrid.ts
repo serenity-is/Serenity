@@ -7,7 +7,7 @@ import { Router } from "../../Q/Router";
 import { resolveUrl } from "../../Q/Services";
 import { endsWith, isEmptyOrNull, replaceAll } from "../../Q/Strings";
 import { cast, getInstanceType, getTypeFullName, safeCast } from "../../Q/TypeSystem";
-import { RemoteViewOptions } from "../../SlickGrid/RemoteView";
+import { RemoteViewOptions } from "../../Slick/RemoteView";
 import { DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../Types/Attributes";
 import { DialogTypeRegistry } from "../../Types/DialogTypeRegistry";
 import { EditorUtils } from "../Editors/EditorUtils";

@@ -1,8 +1,7 @@
 ﻿export * as Q from './Q/indexAll';
 export * as Serenity from './Serenity/indexAll';
-export * as Slick from "./SlickGrid";
-export * from "./Globals/Select2";
-export * from "./Globals/Validate";
+export * as Slick from "./Slick";
+export * from "./Globals";
 import { jQueryPatch } from './Patch/jQueryPatch'
 //import { vuePatch } from './Patch/VuePatch'
 

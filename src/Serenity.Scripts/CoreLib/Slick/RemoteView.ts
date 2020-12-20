@@ -1,11 +1,7 @@
-﻿import {  Group, GroupInfo, GroupTotals } from "./Grouping";
-import { deepClone, extend } from "../Q/Basics";
-import { Grid } from "./Grid";
+﻿import { deepClone, extend } from "../Q/Basics";
 import type { ListRequest, ListResponse, ServiceResponse } from "../Services/Models";
 import { notifyError } from "../Q/Notify";
 import { text } from "../Q/LocalText";
-import { Event } from "./Event";
-import {} from "./Globals";
 
 export namespace Data {
     export interface GroupItemMetadataProvider {
@@ -91,15 +87,15 @@ export class RemoteView<TEntity> {
         var page = 1;
         var totalRows = 0;
 
-        var onDataChanged: Event = new Slick.Event();
-        var onDataLoading: Event = new Slick.Event();
-        var onDataLoaded: Event = new Slick.Event();
-        var onGroupExpanded: Event = new Slick.Event();
-        var onGroupCollapsed: Event = new Slick.Event();
-        var onPagingInfoChanged: Event = new Slick.Event();
-        var onRowCountChanged: Event = new Slick.Event();
-        var onRowsChanged: Event = new Slick.Event();
-        var onRowsOrCountChanged: Event = new Slick.Event();
+        var onDataChanged: Slick.Event = new Slick.Event();
+        var onDataLoading: Slick.Event = new Slick.Event();
+        var onDataLoaded: Slick.Event = new Slick.Event();
+        var onGroupExpanded: Slick.Event = new Slick.Event();
+        var onGroupCollapsed: Slick.Event = new Slick.Event();
+        var onPagingInfoChanged: Slick.Event = new Slick.Event();
+        var onRowCountChanged: Slick.Event = new Slick.Event();
+        var onRowsChanged: Slick.Event = new Slick.Event();
+        var onRowsOrCountChanged: Slick.Event = new Slick.Event();
 
         var loading: any = false;
         var errorMessage: string = null;
@@ -709,7 +705,7 @@ export class RemoteView<TEntity> {
             var group = groupsByVal[val];
 
             if (!group) {
-                group = new Group<any>();
+                group = new Slick.Group<any>();
                 group.value = val;
                 group.level = level;
                 group.groupingKey = (parentGroup ? parentGroup.groupingKey + groupingDelimiter : '') + val;
@@ -789,7 +785,7 @@ export class RemoteView<TEntity> {
 
         function addGroupTotals(group: any) {
             var gi = groupingInfos[group.level];
-            var totals = new GroupTotals<TEntity>();
+            var totals = new Slick.GroupTotals<TEntity>();
             totals.group = group;
             group.totals = totals;
             if (!gi.lazyTotalsCalculation) {
@@ -1177,7 +1173,7 @@ export class RemoteView<TEntity> {
             return onSelectedRowIdsChanged;
         }
 
-        function syncGridCellCssStyles(grid: Grid, key: string) {
+        function syncGridCellCssStyles(grid: Slick.Grid, key: string) {
             var hashById: any;
             var inHandler: any;
 
@@ -1488,9 +1484,9 @@ interface PagingInfo {
 export interface RemoteView<TEntity> {
     constructor(options: RemoteViewOptions): void;
     onSubmit: CancellableViewCallback<TEntity>;
-    onDataChanged: Event;
-    onDataLoaded: Event;
-    onPagingInfoChanged: Event;
+    onDataChanged: Slick.Event;
+    onDataLoaded: Slick.Event;
+    onPagingInfoChanged: Slick.Event;
     getPagingInfo(): PagingInfo;
     onGroupExpanded: Event,
     onGroupCollapsed: Event,
@@ -1510,7 +1506,7 @@ export interface RemoteView<TEntity> {
     addItem(item: TEntity): void;
     getIdxById(id: any): any;
     getItemByIdx(index: number): any;
-    setGrouping(groupInfo: GroupInfo<TEntity>[]): void;
+    setGrouping(groupInfo: Slick.GroupInfo<TEntity>[]): void;
     collapseAllGroups(level: number): void;
     expandAllGroups(level: number): void;
     expandGroup(keys: any[]): void;
