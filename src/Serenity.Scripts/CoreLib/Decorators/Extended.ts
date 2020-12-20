@@ -5,7 +5,6 @@ import { DialogTypeAttribute, EditorAttribute, ElementAttribute, EnumKeyAttribut
          FlexifyAttribute, ItemNameAttribute, MaximizableAttribute, OptionsTypeAttribute,
          PanelAttribute, ResizableAttribute, ResponsiveAttribute, ServiceAttribute } from "../Types/Attributes";
 import { ISlickFormatter } from "../UI/DataGrid/ISlickFormatter";
-import { SummaryType } from "../Services/PropertyItem";
 import { OptionAttribute } from "../Types/Attributes";
 
 export function registerEnum(target: any, enumKey?: string, name?: string) {
@@ -44,6 +43,17 @@ export function enumKey(value: string) {
 }
 
 registerInterface('Serenity.ISlickFormatter')(ISlickFormatter);
+
+
+enum SummaryType {
+    Disabled = -1,
+    None = 0,
+    Sum = 1,
+    Avg = 2,
+    Min = 3,
+    Max = 4
+}
+
 registerEnum(SummaryType, 'Serenity.SummaryType');
 
 export function option() {

@@ -2,7 +2,6 @@
 import { ArgumentNullException } from "../../Q/Exceptions";
 import { Culture } from "../../Q/Formatting";
 import { text, tryGetText } from "../../Q/LocalText";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { FilterLine } from "./FilterLine";
 import { Criteria } from "../../Services/Criteria";
 import { delegateCombine, delegateRemove } from "../../Q/TypeSystem";
@@ -10,7 +9,7 @@ import { delegateCombine, delegateRemove } from "../../Q/TypeSystem";
 @registerClass('FilterStore')
 export class FilterStore {
 
-    constructor(fields: PropertyItem[]) {
+    constructor(fields: Serenity.PropertyItem[]) {
 
         this.items = [];
 
@@ -141,15 +140,15 @@ export class FilterStore {
 
     private changed: any;
     private displayText: string;
-    private fields: PropertyItem[];
-    private fieldByName: { [key: string]: PropertyItem }
+    private fields: Serenity.PropertyItem[];
+    private fieldByName: { [key: string]: Serenity.PropertyItem }
     private items: FilterLine[];
 
-    get_fields(): PropertyItem[] {
+    get_fields(): Serenity.PropertyItem[] {
         return this.fields;
     }
 
-    get_fieldByName(): { [key: string]: PropertyItem } {
+    get_fieldByName(): { [key: string]: Serenity.PropertyItem } {
         return this.fieldByName;
     }
 

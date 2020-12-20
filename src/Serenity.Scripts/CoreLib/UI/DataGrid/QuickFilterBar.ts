@@ -7,7 +7,6 @@ import { notifyWarning } from "../../Q/Notify";
 import { isEmptyOrNull, isTrimmedEmpty } from "../../Q/Strings";
 import { delegateCombine, delegateRemove } from "../../Q/TypeSystem";
 import { Criteria } from "../../Services/Criteria";
-import { ListRequest } from "../../Services/Models";
 import { DateEditor } from "../Editors/DateEditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../Editors/DateTimeEditor";
 import { EditorUtils } from "../Editors/EditorUtils";
@@ -99,7 +98,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
             init: opt.init
         });
 
-        var submitHandler = (request: ListRequest) => {
+        var submitHandler = (request: Serenity.ListRequest) => {
 
             if (quickFilter.hasClass('ignore')) {
                 return;
@@ -356,15 +355,15 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
         super.destroy();
     }
 
-    public onSubmit(request: ListRequest) {
+    public onSubmit(request: Serenity.ListRequest) {
         this.submitHandlers && this.submitHandlers(request);
     }
 
-    protected add_submitHandlers(action: (request: ListRequest) => void): void {
+    protected add_submitHandlers(action: (request: Serenity.ListRequest) => void): void {
         this.submitHandlers = delegateCombine(this.submitHandlers, action);
     }
 
-    protected remove_submitHandlers(action: (request: ListRequest) => void): void {
+    protected remove_submitHandlers(action: (request: Serenity.ListRequest) => void): void {
         this.submitHandlers = delegateRemove(this.submitHandlers, action);
     }
 

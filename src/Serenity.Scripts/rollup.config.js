@@ -85,6 +85,24 @@ var toGlobal = function(ns) {
 	}
 }
 
+var extendGlobals = function() {
+	return {
+		name: 'extendGlobals',
+		generateBundle(o, b) {
+			for (var fileName of Object.keys(b)) {
+				if (b[fileName].code && fileName.indexOf('.js') >= 0) {
+					var src = b[fileName].code;
+					src = src.replace(/^(\s*)exports\.([A-Za-z]*)\s*=\s*(.+?);/gm, function(match, grp1, grp2, grp3) {
+						console.log(grp1);
+						return grp1 + "exports." + grp2 + " = exports." + grp2 + " || {}; extend(exports." + grp2 + ", " + grp3 + ");";
+					});
+					b[fileName].code = src;
+				}
+			}
+		}
+	}
+}
+
 export default [
 	{
 		input: "CoreLib/CoreLib.ts",
@@ -95,7 +113,11 @@ export default [
 				sourcemap: true,
 				name: "window",
 				extend: true,
-				globals
+				freeze: false,
+				globals,
+				plugins: [
+					extendGlobals()
+				]
 			}/*,
 			{
 				file: 'dist/Serenity.CoreLib.min.js',

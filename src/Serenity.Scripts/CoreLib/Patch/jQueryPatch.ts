@@ -32,6 +32,13 @@
     !applyJQueryUIFixes() && typeof $ !== "undefined" && $(applyJQueryUIFixes);
 
     if (typeof $ !== "undefined") {
+
+        // for backward compatibility
+        if (!$.toJSON)
+            $.toJSON = JSON.stringify;
+        if (!$.parseJSON)
+            $.parseJSON = JSON.parse;
+
         ($ as any).cleanData = (function (orig) {
             return function (elems: any[]) {
                 var events, elem, i, e;

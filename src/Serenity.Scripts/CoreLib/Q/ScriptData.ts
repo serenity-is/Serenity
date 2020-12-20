@@ -1,11 +1,9 @@
-﻿import { PropertyItem } from "../Services/PropertyItem";
-import { resolveUrl } from "./Services";
+﻿import { resolveUrl } from "./Services";
 import { startsWith } from "./Strings";
 import { blockUI, blockUndo } from "./BlockUI";
 import { alert, iframeDialog } from "./Dialogs";
 import { notifyError } from "./Notify";
 import { format } from "./Formatting";
-import { Lookup } from "./Lookup";
 
 export namespace ScriptData {
     let registered: { [key: string]: any } = {};
@@ -187,7 +185,7 @@ export function getRemoteDataAsync(key: string) {
     return ScriptData.ensureAsync('RemoteData.' + key);
 }
 
-export function getLookup<TItem>(key: string): Lookup<TItem> {
+export function getLookup<TItem>(key: string): Q.Lookup<TItem> {
     var name = 'Lookup.' + key;
     if (!ScriptData.canLoad(name)) {
         var message = 'No lookup with key "' + key + '" is registered. Please make sure you have a' +
@@ -199,7 +197,7 @@ export function getLookup<TItem>(key: string): Lookup<TItem> {
     return ScriptData.ensure('Lookup.' + key);
 }
 
-export function getLookupAsync<TItem>(key: string): PromiseLike<Lookup<TItem>> {
+export function getLookupAsync<TItem>(key: string): PromiseLike<Q.Lookup<TItem>> {
     return ScriptData.ensureAsync('Lookup.' + key);
 }
 
@@ -211,19 +209,19 @@ export function reloadLookupAsync(key: string) {
     return ScriptData.reloadAsync('Lookup.' + key);
 }
 
-export function getColumns(key: string): PropertyItem[] {
+export function getColumns(key: string): Serenity.PropertyItem[] {
     return ScriptData.ensure('Columns.' + key);
 }
 
-export function getColumnsAsync(key: string): PromiseLike<PropertyItem[]> {
+export function getColumnsAsync(key: string): PromiseLike<Serenity.PropertyItem[]> {
     return ScriptData.ensureAsync('Columns.' + key);
 }
 
-export function getForm(key: string): PropertyItem[] {
+export function getForm(key: string): Serenity.PropertyItem[] {
     return ScriptData.ensure('Form.' + key);
 }
 
-export function getFormAsync(key: string): PromiseLike<PropertyItem[]> {
+export function getFormAsync(key: string): PromiseLike<Serenity.PropertyItem[]> {
     return ScriptData.ensureAsync('Form.' + key);
 }
 

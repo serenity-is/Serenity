@@ -1,5 +1,4 @@
-﻿import flatpickr from "flatpickr";
-import { format } from "jquery";
+﻿import { format } from "jquery";
 import { element, option, registerEditor } from "../../Decorators";
 import { IReadOnly } from "../../Interfaces/IReadOnly";
 import { IStringValue } from "../../Interfaces/IStringValue";
@@ -25,7 +24,9 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
     constructor(input: JQuery) {
         super(input);
 
+        // @ts-ignore
         if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$.fn.datepicker)) {
+            // @ts-ignore
             flatpickr(input[0], DateEditor.flatPickrOptions(input));
         }
         else if ($.fn.datepicker) {

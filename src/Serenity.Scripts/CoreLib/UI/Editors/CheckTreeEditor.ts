@@ -5,11 +5,8 @@ import { ISetEditValue } from "../../Interfaces/ISetEditValue";
 import { Culture } from "../../Q/Formatting";
 import { htmlEncode } from "../../Q/Html";
 import { tryGetText } from "../../Q/LocalText";
-import { Lookup } from "../../Q/Lookup";
 import { getLookup, ScriptData } from "../../Q/ScriptData";
 import { isEmptyOrNull, trimToNull } from "../../Q/Strings";
-import { ListResponse } from "../../Services/Models";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { ReflectionUtils } from "../../Types/ReflectionUtils";
 import { DataGrid } from "../DataGrid/DataGrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../Helpers/SlickHelpers";
@@ -72,14 +69,14 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
         this.updateFlags();
     }
 
-    getEditValue(property: PropertyItem, target: any): void {
+    getEditValue(property: Serenity.PropertyItem, target: any): void {
         if (this.getDelimited())
             target[property.name] = this.get_value().join(",");
         else
             target[property.name] = this.get_value();
     }
 
-    setEditValue(source: any, property: PropertyItem): void {
+    setEditValue(source: any, property: Serenity.PropertyItem): void {
         var value = source[property.name];
         this.set_value(value);
     }
@@ -159,7 +156,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
         return false;
     }
 
-    protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
+    protected onViewProcessData(response: Serenity.ListResponse<TItem>): Serenity.ListResponse<TItem> {
         response = super.onViewProcessData(response);
         this.byId = null;
         SlickTreeHelper.setIndents(response.Entities, function (x) {
@@ -560,7 +557,7 @@ export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIte
         });
     }
 
-    protected getLookupItems(lookup: Lookup<TItem>): TItem[] {
+    protected getLookupItems(lookup: Q.Lookup<TItem>): TItem[] {
         return this.filterItems(this.cascadeItems(lookup.items));
     }
 

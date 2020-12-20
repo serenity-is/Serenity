@@ -1,6 +1,5 @@
 ﻿import { toGrouping, tryFirst } from "../../Q/Arrays";
 import { htmlEncode } from "../../Q/Html";
-import { ListResponse } from "../../Services/Models";
 import { SlickFormatting, SlickHelper, SlickTreeHelper } from "../Helpers/SlickHelpers";
 import { DataGrid } from "./DataGrid";
 
@@ -36,7 +35,7 @@ export class TreeGridMixin<TItem> {
         };
 
         var oldProcessData = (dg as any).onViewProcessData;
-        (dg as any).onViewProcessData = function (response: ListResponse<TItem>) {
+        (dg as any).onViewProcessData = function (response: Serenity.ListResponse<TItem>) {
 
             response = oldProcessData.apply(this, [response]);
             response.Entities = TreeGridMixin.applyTreeOrdering(response.Entities, getId, options.getParentId);

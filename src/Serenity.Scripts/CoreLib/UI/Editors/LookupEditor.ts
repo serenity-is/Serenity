@@ -1,5 +1,4 @@
 ﻿import { registerEditor } from "../../Decorators";
-import { Lookup } from "../../Q/Lookup";
 import { getLookup, getLookupAsync, reloadLookup, ScriptData } from "../../Q/ScriptData";
 import { endsWith } from "../../Q/Strings";
 import { getInstanceType, getTypeFullName } from "../../Q/TypeSystem";
@@ -55,17 +54,17 @@ export class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> exten
         return key;
     }
 
-    protected lookup: Lookup<TItem>;
+    protected lookup: Q.Lookup<TItem>;
 
-    protected getLookupAsync(): PromiseLike<Lookup<TItem>> {
+    protected getLookupAsync(): PromiseLike<Q.Lookup<TItem>> {
         return getLookupAsync<TItem>(this.getLookupKey());
     }
 
-    protected getLookup(): Lookup<TItem> {
+    protected getLookup(): Q.Lookup<TItem> {
         return getLookup<TItem>(this.getLookupKey());
     }
 
-    protected getItems(lookup: Lookup<TItem>) {
+    protected getItems(lookup: Q.Lookup<TItem>) {
         return this.filterItems(this.cascadeItems(lookup.items));
     }
 
@@ -73,7 +72,7 @@ export class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> exten
         return this.lookup != null ? this.lookup.idField : super.getIdField();
     }
 
-    protected getItemText(item: TItem, lookup: Lookup<TItem>) {
+    protected getItemText(item: TItem, lookup: Q.Lookup<TItem>) {
         if (lookup == null)
             return super.itemText(item);
 
@@ -90,7 +89,7 @@ export class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> exten
         };
     }
 
-    protected getItemDisabled(item: TItem, lookup: Lookup<TItem>) {
+    protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>) {
         return super.itemDisabled(item);
     }
 

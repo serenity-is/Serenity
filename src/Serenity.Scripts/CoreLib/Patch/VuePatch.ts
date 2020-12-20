@@ -1,8 +1,8 @@
-﻿import { get as getEditorType } from "../Types/EditorTypeRegistry";
+﻿import { EditorTypeRegistry } from "../Types/EditorTypeRegistry";
 import { getAttributes } from "../Q/TypeSystem";
 import { ElementAttribute } from "../Types/Attributes";
-import { set as setOption } from "../UI/Widgets/ReflectionOptionsSetter";
-import * as EditorUtils from "../UI/Editors/EditorUtils";
+import { ReflectionOptionsSetter } from "../UI/Widgets/ReflectionOptionsSetter";
+import { EditorUtils } from "../UI/Editors/EditorUtils";
 
 export function vuePatch(Vue: any) {
     function vueIntegration() {
@@ -39,7 +39,7 @@ export function vuePatch(Vue: any) {
                 }
             },
             render: function (createElement: any) {
-                var editorType = getEditorType(this.type);
+                var editorType = EditorTypeRegistry.get(this.type);
                 var elementAttr = getAttributes(editorType, ElementAttribute, true);
                 var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>') as string;
                 var domProps: any = {};
@@ -93,7 +93,7 @@ export function vuePatch(Vue: any) {
                 }
 
                 if (this.options)
-                    setOption(this.$widget, this.options);
+                    ReflectionOptionsSetter.set(this.$widget, this.options);
 
                 if (this.value != null)
                     EditorUtils.setValue(this.$widget, this.value);

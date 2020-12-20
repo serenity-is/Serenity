@@ -1,10 +1,9 @@
 ﻿import { registerInterface } from "../Decorators";
-import { PropertyItem } from "../Services/PropertyItem";
 
 @registerInterface()
 export class ISetEditValue {
 }
 
 export interface ISetEditValue {
-    setEditValue(source: any, property: PropertyItem): void;
+    setEditValue(source: any, property: Serenity.PropertyItem): void;
 }

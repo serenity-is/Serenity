@@ -10,7 +10,6 @@
     "sourceMap": true,
     "module": "ES2015",
     "moduleResolution": "Node",
-    "isolatedModules": true,
     "skipLibCheck": true,
     "types": [
       "jquery",

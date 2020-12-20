@@ -7,7 +7,6 @@ import { extend } from "../../Q/Basics";
 import { text } from "../../Q/LocalText";
 import { endsWith, isEmptyOrNull, isTrimmedEmpty, replaceAll, startsWith, trimToNull } from "../../Q/Strings";
 import { isInstanceOfType } from "../../Q/TypeSystem";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { FileUploadConstraints, UploadedFile, UploadHelper, UploadInputOptions } from "../Helpers/UploadHelper";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { Widget } from "../Widgets/Widget";
@@ -229,12 +228,12 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
         this.set_value(v);
     }
 
-    getEditValue(property: PropertyItem, target: any) {
+    getEditValue(property: Serenity.PropertyItem, target: any) {
         target[property.name] = this.entity == null ? null :
             trimToNull(this.entity.Filename);
     }
 
-    setEditValue(source: any, property: PropertyItem) {
+    setEditValue(source: any, property: Serenity.PropertyItem) {
         var value: UploadedFile = {};
         value.Filename = source[property.name];
         if (isEmptyOrNull(this.options.originalNameProperty)) {
@@ -432,7 +431,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
         this.set_value(v);
     }
 
-    getEditValue(property: PropertyItem, target: any) {
+    getEditValue(property: Serenity.PropertyItem, target: any) {
         if (this.jsonEncodeValue) {
             target[property.name] = JSON.stringify(this.get_value());
         }
@@ -441,7 +440,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
         }
     }
 
-    setEditValue(source: any, property: PropertyItem) {
+    setEditValue(source: any, property: Serenity.PropertyItem) {
         var val = source[property.name];
         if (isInstanceOfType(val, String)) {
             var json = trimToNull(val) ?? '[]';

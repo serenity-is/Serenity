@@ -49,6 +49,8 @@ export function reactPatch() {
     }
 }
 
+reactPatch();
+
 export interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
     type?: new (element: JQuery, options?: TOptions) => TWidget;
     options?: TOptions;

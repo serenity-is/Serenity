@@ -175,14 +175,14 @@ export let getTypes = (from?: any): any[] => {
     var result = [];
     if (!from) {
         for (var t in types) {
-            if (types.hasOwnProperty(t))
+            if (Object.prototype.hasOwnProperty.call(types, t))
                 result.push(types[t]);
         }
     }
     else {
         var traverse = function (s: any, n: string) {
             for (var c in s) {
-                if (s.hasOwnProperty(c))
+                if (Object.prototype.hasOwnProperty.call(s, c))
                     traverse(s[c], c);
             }
             if (typeof (s) === 'function' &&
@@ -197,7 +197,7 @@ export let getTypes = (from?: any): any[] => {
 
 export let clearKeys = (d: any) => {
     for (var n in d) {
-        if (d.hasOwnProperty(n))
+        if (Object.prototype.hasOwnProperty.call(d, n))
             delete d[n];
     }
 }
@@ -250,7 +250,7 @@ export namespace Enum {
         var parts = [];
         var values = enumType.prototype;
         for (var i in values) {
-            if (values.hasOwnProperty(i))
+            if (Object.prototype.hasOwnProperty.call(values, i))
                 parts.push(values[i]);
         }
         return parts;
@@ -355,10 +355,12 @@ export function prop(type: any, name: string, getter?: string, setter?: string) 
 }
 
 export function setTypeName(target: Type, value: string) {
-    Object.defineProperty(target, '__typeName', {
-        get: function() { return this.hasOwnProperty('__typeName$') ? this.___typeName$ : void 0; },
-        set: function(v) { this.___typeName$ = v; }
-    });
+    if (!Object.hasOwnProperty.call(target, '__typeName')) {
+        Object.defineProperty(target, '__typeName', {
+            get: function() { return Object.prototype.hasOwnProperty.call(this, '__typeName$') ? this.__typeName$ : void 0; },
+            set: function(v) { this.__typeName$ = v; }
+        });
+    }
     (target as any).__typeName = value;
 }
 
@@ -377,7 +379,7 @@ export function initializeTypes(root: any, pre: string, limit: number) {
         if (k == "prototype")
             continue;
 
-        if (!root.hasOwnProperty(k))
+        if (!Object.prototype.hasOwnProperty.call(root, k))
             continue;
 
         var obj = root[k];
@@ -391,8 +393,7 @@ export function initializeTypes(root: any, pre: string, limit: number) {
             continue;
 
         if ($.isFunction(obj) || (obj.__enum && obj.__register)) {
-            if (obj.hasOwnProperty("__typeName") &&
-                !obj.__register)
+            if (obj.__typeName && !obj.__register)
                 continue;
 
             if (!obj.__interfaces &&

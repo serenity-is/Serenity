@@ -1,5 +1,4 @@
-﻿import flatpickr from "flatpickr";
-import { element, option, registerEditor } from "../../Decorators";
+﻿import { element, option, registerEditor } from "../../Decorators";
 import { IReadOnly } from "../../Interfaces/IReadOnly";
 import { IStringValue } from "../../Interfaces/IStringValue";
 import { today } from "../../Q/Basics";
@@ -31,8 +30,10 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
             input.addClass('dateTimeQ');
             // just a basic input, usually read only display
         }
+        // @ts-ignore
         else if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$.fn.datepicker || this.options.seconds)) {
             input.addClass('dateTimeQ');
+            // @ts-ignore
             flatpickr(input[0], this.getFlatpickrOptions());
         }
         else if ($.fn.datepicker) {

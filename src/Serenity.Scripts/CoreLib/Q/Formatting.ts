@@ -99,7 +99,7 @@ export let Culture: Locale = {
 (function() {
     let k: string;
     for (k in Invariant)
-        if (Culture[k] === undefined && Invariant.hasOwnProperty(k))
+        if (Culture[k] === undefined && Object.prototype.hasOwnProperty.call(Invariant, k))
             Culture[k] = Invariant[k];
 
     if (typeof $ != "undefined" && (k = trimToNull($('script#ScriptCulture').html())) != null) {
@@ -114,7 +114,7 @@ export let Culture: Locale = {
         delete sc.groupSeparator;
         delete sc.decimal;
         for (k in sc) {
-            if (Culture[k] === undefined && sc.hasOwnProperty(k))
+            if (Culture[k] === undefined && Object.prototype.hasOwnProperty.call(sc, k))
                 Culture[k.charAt(0).toLowerCase() + k.substr(1)] = sc[k];
         }
     }

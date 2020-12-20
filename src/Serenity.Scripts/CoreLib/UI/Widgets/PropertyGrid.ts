@@ -1,6 +1,5 @@
 ﻿import { registerClass } from "../../Decorators";
 import { Widget } from "./Widget";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { any } from "../../Q/Arrays";
 import { extend } from "../../Q/Basics";
 import { isEmptyOrNull, startsWith, trimToEmpty, trimToNull } from "../../Q/Strings";
@@ -17,7 +16,7 @@ import { Authorization } from "../../Q/Authorization";
 export class PropertyGrid extends Widget<PropertyGridOptions> {
 
     private editors: Widget<any>[];
-    private items: PropertyItem[];
+    private items: Serenity.PropertyItem[];
 
     constructor(div: JQuery, opt: PropertyGridOptions) {
         super(div, opt);
@@ -111,7 +110,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         Widget.prototype.destroy.call(this);
     }
 
-    private createItems(container: JQuery, items: PropertyItem[]) {
+    private createItems(container: JQuery, items: Serenity.PropertyItem[]) {
         var categoryIndexes = {};
         var categoriesDiv = container;
 
@@ -246,7 +245,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         return text;
     }
 
-    private createField(container: JQuery, item: PropertyItem) {
+    private createField(container: JQuery, item: Serenity.PropertyItem) {
         var fieldDiv = $('<div/>').addClass('field')
             .addClass(item.name).data('PropertyItem', item).appendTo(container);
 
@@ -375,7 +374,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         return editor;
     }
 
-    private getCategoryOrder(items: PropertyItem[]) {
+    private getCategoryOrder(items: Serenity.PropertyItem[]) {
         var order = 0;
         var result = {};
         var categoryOrder = trimToNull(this.options.categoryOrder);
@@ -406,7 +405,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         return result;
     }
 
-    private createCategoryLinks(container: JQuery, items: PropertyItem[]) {
+    private createCategoryLinks(container: JQuery, items: Serenity.PropertyItem[]) {
         var idx = 0;
         var itemIndex = {};
         var itemCategory = {};
@@ -480,7 +479,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         return this.editors;
     }
 
-    get_items(): PropertyItem[] {
+    get_items(): Serenity.PropertyItem[] {
         return this.items;
     }
 
@@ -501,12 +500,12 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
 
     // Obsolete
     static loadEditorValue(editor: Widget<any>,
-        item: PropertyItem, source: any): void {
+        item: Serenity.PropertyItem, source: any): void {
     }
 
     // Obsolete
     static saveEditorValue(editor: Widget<any>,
-        item: PropertyItem, target: any): void {
+        item: Serenity.PropertyItem, target: any): void {
 
         EditorUtils.saveValue(editor, item, target);
     }
@@ -573,7 +572,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         this.load(val);
     }
 
-    private canModifyItem(item: PropertyItem) {
+    private canModifyItem(item: Serenity.PropertyItem) {
         if (this.get_mode() === PropertyGridMode.insert) {
             if (item.insertable === false) {
                 return false;
@@ -621,7 +620,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         }
     }
 
-    enumerateItems(callback: (p1: PropertyItem, p2: Widget<any>) => void): void {
+    enumerateItems(callback: (p1: Serenity.PropertyItem, p2: Widget<any>) => void): void {
         for (var i = 0; i < this.editors.length; i++) {
             var item = this.items[i];
             var editor = this.editors[i];
@@ -637,7 +636,7 @@ export const enum PropertyGridMode {
 
 export interface PropertyGridOptions {
     idPrefix?: string;
-    items?: PropertyItem[];
+    items?: Serenity.PropertyItem[];
     useCategories?: boolean;
     categoryOrder?: string;
     defaultCategory?: string;

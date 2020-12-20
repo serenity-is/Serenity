@@ -1,7 +1,6 @@
 ﻿import { extend } from "./Basics";
 import { Config } from "./Config"
 import { ErrorHandling } from "./ErrorHandling";
-import type { ListRequest, ServiceOptions } from "../Services/Models";
 import { alert, iframeDialog } from "./Dialogs";
 import { blockUI, blockUndo } from "./BlockUI";
 
@@ -23,7 +22,7 @@ typeof $ != 'undefined' && $.ajaxSetup && $.ajaxSetup({
     }
 });
 
-export function serviceCall<TResponse>(options: ServiceOptions<TResponse>) {
+export function serviceCall<TResponse>(options: Serenity.ServiceOptions<TResponse>) {
     let handleError = function (response: any) {
         if (Config.notLoggedInHandler != null &&
             response &&
@@ -45,7 +44,7 @@ export function serviceCall<TResponse>(options: ServiceOptions<TResponse>) {
     if (url && url.length && url.charAt(0) != '~' && url.charAt(0) != '/' && url.indexOf('://') < 0)
         url = resolveUrl("~/services/") + url;
 
-    options = extend<ServiceOptions<TResponse>>({
+    options = extend<Serenity.ServiceOptions<TResponse>>({
         dataType: 'json',
         contentType: 'application/json',
         type: 'POST',
@@ -120,15 +119,15 @@ export function serviceCall<TResponse>(options: ServiceOptions<TResponse>) {
 }
 
 export function serviceRequest<TResponse>(service: string, request?: any,
-    onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>) {
-    return serviceCall(extend<ServiceOptions<TResponse>>({
+    onSuccess?: (response: TResponse) => void, options?: Serenity.ServiceOptions<TResponse>) {
+    return serviceCall(extend<Serenity.ServiceOptions<TResponse>>({
         service: service,
         request: request,
         onSuccess: onSuccess
     }, options));
 }
 
-export function setEquality(request: ListRequest, field: string, value: any) {
+export function setEquality(request: Serenity.ListRequest, field: string, value: any) {
     if (request.EqualityFilter == null) {
         request.EqualityFilter = {};
     }

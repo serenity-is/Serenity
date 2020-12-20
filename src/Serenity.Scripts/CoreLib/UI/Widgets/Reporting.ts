@@ -1,8 +1,6 @@
 ﻿import { registerClass } from "../../Decorators";
 import { postToService, serviceCall } from "../../Q/Services";
 import { trimToNull } from "../../Q/Strings";
-import { PropertyItem } from "../../Services/PropertyItem";
-import type { ServiceRequest, ServiceResponse } from "../../Services/Models";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
 import { PropertyGrid } from "./PropertyGrid";
 import { Widget } from "./Widget";
@@ -24,7 +22,7 @@ export namespace Reporting {
         }
 
         protected propertyGrid: PropertyGrid;
-        protected propertyItems: PropertyItem[];
+        protected propertyItems: Serenity.PropertyItem[];
         protected reportKey: string;
 
         protected createPropertyGrid(): void {
@@ -104,7 +102,7 @@ export namespace Reporting {
         }
     }
 
-    export interface ReportExecuteRequest extends ServiceRequest {
+    export interface ReportExecuteRequest extends Serenity.ServiceRequest {
         ExportType?: string;
         ReportKey?: string;
         DesignId?: string;
@@ -184,13 +182,13 @@ export namespace Reporting {
         }
     }
 
-    export interface ReportRetrieveRequest extends ServiceRequest {
+    export interface ReportRetrieveRequest extends Serenity.ServiceRequest {
         ReportKey?: string;
     }
 
-    export interface ReportRetrieveResponse extends ServiceResponse {
+    export interface ReportRetrieveResponse extends Serenity.ServiceResponse {
         ReportKey?: string;
-        Properties?: PropertyItem[];
+        Properties?: Serenity.PropertyItem[];
         Title?: string;
         InitialSettings?: any;
         IsDataOnlyReport?: boolean;

@@ -3,11 +3,14 @@ export * as Serenity from './Serenity/indexAll';
 export * as Slick from "./Slick";
 export * from "./Globals";
 import { jQueryPatch } from './Patch/jQueryPatch'
-//import { vuePatch } from './Patch/VuePatch'
+import { promisePatch } from './Patch/PromisePatch'
+import { vuePatch } from './Patch/VuePatch'
 
 if (typeof jQuery === "function") {
     jQueryPatch(jQuery);
 }
+
+promisePatch();
 
 // @ts-ignore
 if (typeof Vue == "function")

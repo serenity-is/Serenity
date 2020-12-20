@@ -2,7 +2,6 @@
 import { text, tryGetText } from "../../Q/LocalText";
 import { isEmptyOrNull } from "../../Q/Strings";
 import { cast } from "../../Q/TypeSystem";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { Select2Editor } from "../Editors/Select2Editor";
 import { ReflectionOptionsSetter } from "../Widgets/ReflectionOptionsSetter";
 import { FilteringTypeRegistry, IFiltering } from "./Filtering";
@@ -11,8 +10,8 @@ import { FilterOperator } from "./FilterOperator";
 import { FilterWidgetBase } from "./FilterWidgetBase";
 
 @registerClass('Serenity.FilterFieldSelect')
-class FilterFieldSelect extends Select2Editor<any, PropertyItem> {
-    constructor(hidden: JQuery, fields: PropertyItem[]) {
+class FilterFieldSelect extends Select2Editor<any, Serenity.PropertyItem> {
+    constructor(hidden: JQuery, fields: Serenity.PropertyItem[]) {
         super(hidden);
 
         for (var field of fields) {

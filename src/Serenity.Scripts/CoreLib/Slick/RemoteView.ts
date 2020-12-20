@@ -1,5 +1,4 @@
 ﻿import { deepClone, extend } from "../Q/Basics";
-import type { ListRequest, ListResponse, ServiceResponse } from "../Services/Models";
 import { notifyError } from "../Q/Notify";
 import { text } from "../Q/LocalText";
 
@@ -10,30 +9,8 @@ export namespace Data {
     }
 }
 
-export interface RemoteViewOptions {
-    autoLoad?: boolean;
-    idField?: string;
-    contentType?: string;
-    dataType?: string;
-    filter?: any;
-    params?: any;
-    onSubmit?: CancellableViewCallback<any>;
-    url?: string;
-    localSort?: boolean;
-    sortBy?: any;
-    rowsPerPage?: number;
-    seekToPage?: number;
-    onProcessData?: RemoteViewProcessCallback<any>;
-    method?: string;
-    inlineFilters?: boolean;
-    groupItemMetadataProvider?: Data.GroupItemMetadataProvider;
-    onAjaxCall?: RemoteViewAjaxCallback<any>;
-    getItemMetadata?: (p1?: any, p2?: number) => any;
-    errorMsg?: string;
-}
-
 export class RemoteView<TEntity> {
-    constructor(options: RemoteViewOptions) {
+    constructor(options: Slick.RemoteViewOptions) {
         var self = this;
 
         var defaults = {
@@ -106,7 +83,7 @@ export class RemoteView<TEntity> {
         var totalCount: number = null;
         var localSort: boolean = options?.localSort ?? false;
 
-        var intf: this;
+        var intf: Slick.RemoteView<TEntity>;
 
         function beginUpdate() {
             suspend++;
@@ -226,14 +203,14 @@ export class RemoteView<TEntity> {
                 populate();
         }
 
-        function getPagingInfo() {
+        function getPagingInfo(): Slick.PagingInfo {
             return {
                 rowsPerPage: intf.rowsPerPage,
                 page: page,
                 totalCount: totalCount,
                 loading: loading,
                 error: errorMessage,
-                dataView: self
+                dataView: intf
             };
         }
 
@@ -1278,7 +1255,7 @@ export class RemoteView<TEntity> {
             if (!intf.seekToPage)
                 intf.seekToPage = 1;
 
-            var request: ListRequest = {};
+            var request: Serenity.ListRequest = {};
 
             var skip = (intf.seekToPage - 1) * intf.rowsPerPage;
             if (skip)
@@ -1307,7 +1284,7 @@ export class RemoteView<TEntity> {
                 url: intf.url,
                 data: request,
                 dataType: dt,
-                success: function (response: ServiceResponse) {
+                success: function (response: Serenity.ServiceResponse) {
                     loading = false;
                     if (response.Error)
                         notifyError(response.Error.Message || response.Error.Code);
@@ -1365,90 +1342,88 @@ export class RemoteView<TEntity> {
                     populate();
             }
         }
-
-        intf = {
-            // methods
-            "beginUpdate": beginUpdate,
-            "endUpdate": endUpdate,
-            "setPagingOptions": setPagingOptions,
-            "getPagingInfo": getPagingInfo,
-            "getIdPropertyName": getIdPropertyName,
-            "getRows": getRows,
-            "getItems": getItems,
-            "setItems": setItems,
-            "getFilter": getFilter,
-            "getFilteredItems": getFilteredItems,
-            "setFilter": setFilter,
-            "sort": sort,
-            "fastSort": fastSort,
-            "reSort": reSort,
-            "getLocalSort": getLocalSort,
-            "setLocalSort": setLocalSort,
-            "setSummaryOptions": setSummaryOptions,
-            "getGrandTotals": getGrandTotals,
-            "setGrouping": setGrouping,
-            "getGrouping": getGrouping,
-            "collapseAllGroups": collapseAllGroups,
-            "expandAllGroups": expandAllGroups,
-            "collapseGroup": collapseGroup,
-            "expandGroup": expandGroup,
-            "getGroups": getGroups,
-            "getIdxById": getIdxById,
-            "getRowByItem": getRowByItem,
-            "getRowById": getRowById,
-            "getItemById": getItemById,
-            "getItemByIdx": getItemByIdx,
-            "mapItemsToRows": mapItemsToRows,
-            "mapRowsToIds": mapRowsToIds,
-            "mapIdsToRows": mapIdsToRows,
-            "setRefreshHints": setRefreshHints,
-            "setFilterArgs": setFilterArgs,
-            "refresh": refresh,
-            "updateItem": updateItem,
-            "insertItem": insertItem,
-            "addItem": addItem,
-            "deleteItem": deleteItem,
-            "sortedAddItem": sortedAddItem,
-            "sortedUpdateItem": sortedUpdateItem,
-            "syncGridSelection": syncGridSelection,
-            "syncGridCellCssStyles": syncGridCellCssStyles,
-
-            "getLength": getLength,
-            "getItem": getItem,
-            "getItemMetadata": getItemMetadata,
-
-            "onRowCountChanged": onRowCountChanged,
-            "onRowsChanged": onRowsChanged,
-            "onRowsOrCountChanged": onRowsOrCountChanged,
-            "onPagingInfoChanged": onPagingInfoChanged,
-            "onGroupExpanded": onGroupExpanded,
-            "onGroupCollapsed": onGroupCollapsed,
-
-            "addData": addData,
-            "populate": populate,
-            "populateLock": populateLock,
-            "populateUnlock": populateUnlock,
-            "onDataChanged": onDataChanged,
-            "onDataLoaded": onDataLoaded,
-            "onDataLoading": onDataLoading
-        } as any;
-
         idProperty = options.idField || 'id';
         contentType = options.contentType || "application/json";
         dataType = options.dataType || 'json';
         filter = options.filter || null;
 
-        intf.params = options.params || {};
-        intf.onSubmit = options.onSubmit || null;
-        intf.url = options.url || null;
-        intf.rowsPerPage = options.rowsPerPage || 0;
-        intf.seekToPage = options.seekToPage || 1;
-        intf.onAjaxCall = options.onAjaxCall || null;
-        intf.onProcessData = options.onProcessData || null;
-        intf.method = options.method || 'POST';
-        intf.errormsg = intf.errormsg || text("Controls.Pager.DefaultLoadError");
-        intf.sortBy = typeof options.sortBy == "string" ? [options.sortBy] : (options.sortBy || []);
-        intf.idField = idProperty;
+        intf = {
+            // methods
+            beginUpdate: beginUpdate,
+            endUpdate: endUpdate,
+            setPagingOptions: setPagingOptions,
+            getPagingInfo: getPagingInfo,
+            getIdPropertyName: getIdPropertyName,
+            getRows: getRows,
+            getItems: getItems,
+            setItems: setItems,
+            getFilter: getFilter,
+            getFilteredItems: getFilteredItems,
+            setFilter: setFilter,
+            sort: sort,
+            fastSort: fastSort,
+            reSort: reSort,
+            getLocalSort: getLocalSort,
+            setLocalSort: setLocalSort,
+            setSummaryOptions: setSummaryOptions,
+            getGrandTotals: getGrandTotals,
+            setGrouping: setGrouping,
+            getGrouping: getGrouping,
+            collapseAllGroups: collapseAllGroups,
+            expandAllGroups: expandAllGroups,
+            collapseGroup: collapseGroup,
+            expandGroup: expandGroup,
+            getGroups: getGroups,
+            getIdxById: getIdxById,
+            getRowByItem: getRowByItem,
+            getRowById: getRowById,
+            getItemById: getItemById,
+            getItemByIdx: getItemByIdx,
+            mapItemsToRows: mapItemsToRows,
+            mapRowsToIds: mapRowsToIds,
+            mapIdsToRows: mapIdsToRows,
+            setRefreshHints: setRefreshHints,
+            setFilterArgs: setFilterArgs,
+            refresh: refresh,
+            updateItem: updateItem,
+            insertItem: insertItem,
+            addItem: addItem,
+            deleteItem: deleteItem,
+            sortedAddItem: sortedAddItem,
+            sortedUpdateItem: sortedUpdateItem,
+            syncGridSelection: syncGridSelection,
+            syncGridCellCssStyles: syncGridCellCssStyles,
+
+            getLength: getLength,
+            getItem: getItem,
+            getItemMetadata: getItemMetadata,
+
+            onRowCountChanged: onRowCountChanged,
+            onRowsChanged: onRowsChanged,
+            onRowsOrCountChanged: onRowsOrCountChanged,
+            onPagingInfoChanged: onPagingInfoChanged,
+            onGroupExpanded: onGroupExpanded,
+            onGroupCollapsed: onGroupCollapsed,
+
+            addData: addData,
+            populate: populate,
+            populateLock: populateLock,
+            populateUnlock: populateUnlock,
+            onDataChanged: onDataChanged,
+            onDataLoaded: onDataLoaded,
+            onDataLoading: onDataLoading,
+            params: options.params || {},
+            onSubmit: options.onSubmit || null,
+            url: options.url || null,
+            rowsPerPage: options.rowsPerPage || 0,
+            seekToPage: options.seekToPage || 1,
+            onAjaxCall: options.onAjaxCall || null,
+            onProcessData: options.onProcessData || null,
+            method: options.method || "POST",
+            errormsg: text("Controls.Pager.DefaultLoadError"),
+            sortBy: typeof options.sortBy == "string" ? [options.sortBy] : (options.sortBy || []),
+            idField: idProperty
+        };
 
         if (options.url && options.autoLoad) {
             populate();
@@ -1456,80 +1431,4 @@ export class RemoteView<TEntity> {
 
         return intf;
     }
-}
-
-export type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
-export type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
-export type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
-export type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
-
-interface SummaryOptions {
-    aggregators: any[];
-}
-
-interface PagingOptions {
-    rowsPerPage?: number;
-    page?: number;
-}
-
-interface PagingInfo {
-    rowsPerPage: number;
-    page: number,
-    totalCount: number;
-    loading: boolean,
-    error: string;
-    dataView: RemoteView<any>
-}
-
-export interface RemoteView<TEntity> {
-    constructor(options: RemoteViewOptions): void;
-    onSubmit: CancellableViewCallback<TEntity>;
-    onDataChanged: Slick.Event;
-    onDataLoaded: Slick.Event;
-    onPagingInfoChanged: Slick.Event;
-    getPagingInfo(): PagingInfo;
-    onGroupExpanded: Event,
-    onGroupCollapsed: Event,
-    onAjaxCall: RemoteViewAjaxCallback<TEntity>;
-    onProcessData: RemoteViewProcessCallback<TEntity>;
-    addData(data: ListResponse<TEntity>): void;
-    beginUpdate(): void;
-    endUpdate(): void;
-    deleteItem(id: any): void;
-    getItems(): TEntity[];
-    setFilter(filter: RemoteViewFilter<TEntity>): void;
-    setItems(items: any[], newIdProperty?: boolean | string): void;
-    getIdPropertyName(): string;
-    getItemById(id: any): TEntity;
-    getRowById(id: any): number;
-    updateItem(id: any, item: TEntity): void;
-    addItem(item: TEntity): void;
-    getIdxById(id: any): any;
-    getItemByIdx(index: number): any;
-    setGrouping(groupInfo: Slick.GroupInfo<TEntity>[]): void;
-    collapseAllGroups(level: number): void;
-    expandAllGroups(level: number): void;
-    expandGroup(keys: any[]): void;
-    collapseGroup(keys: any[]): void;
-    setSummaryOptions(options: SummaryOptions): void;
-    setPagingOptions(options: PagingOptions): void;
-    refresh(): void;
-    populate(): void;
-    populateLock(): void;
-    populateUnlock(): void;
-    getItem(row: number): any;
-    getLength(): number;
-    rowsPerPage: number;
-    errormsg: string;
-    params: any;
-    getLocalSort(): boolean;
-    setLocalSort(value: boolean): boolean;
-    sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
-    reSort(): void;
-    sortBy: string[];
-    url: string;
-    method: string;
-    idField: string;
-    seekToPage?: number;
-    loading: boolean;
 }

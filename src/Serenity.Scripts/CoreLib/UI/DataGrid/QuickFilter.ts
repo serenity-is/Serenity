@@ -1,10 +1,9 @@
-﻿import type { ListRequest } from "../../Services/Models";
-import type { Widget } from "../Widgets/Widget";
+﻿import type { Widget } from "../Widgets/Widget";
 
 export interface QuickFilterArgs<TWidget> {
     field?: string;
     widget?: TWidget;
-    request?: ListRequest;
+    request?: Serenity.ListRequest;
     equalityFilter?: any;
     value?: any;
     active?: boolean;

@@ -5,7 +5,6 @@ import { text } from "../../Q/LocalText";
 import { serviceCall } from "../../Q/Services";
 import { isEmptyOrNull, trimToNull } from "../../Q/Strings";
 import { safeCast } from "../../Q/TypeSystem";
-import { ListRequest, ListResponse, RetrieveResponse, ServiceOptions } from "../../Services/Models";
 import { ValidationHelper } from "../Helpers/ValidationHelper";
 import { Widget } from "../Widgets/Widget";
 import { WX } from "../Widgets/WX";
@@ -46,8 +45,8 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
         throw new Error("Not implemented!");
     }
 
-    protected query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void {
-        var options: ServiceOptions<any> = {
+    protected query(request: Serenity.ListRequest, callback: (p1: Serenity.ListResponse<any>) => void): void {
+        var options: Serenity.ServiceOptions<any> = {
             blockUI: false,
             service: this.getService() + '/List',
             request: request,
@@ -58,12 +57,12 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
         this.executeQuery(options);
     }
 
-    protected executeQuery(options: ServiceOptions<ListResponse<any>>): void {
+    protected executeQuery(options: Serenity.ServiceOptions<Serenity.ListResponse<any>>): void {
         serviceCall(options);
     }
 
     protected queryByKey(key: string, callback: (p1: any) => void): void {
-        var options: ServiceOptions<any> = {
+        var options: Serenity.ServiceOptions<any> = {
             blockUI: false,
             service: this.getService() + '/Retrieve',
             request: { EntityId: key },
@@ -74,7 +73,7 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
         this.executeQueryByKey(options);
     }
 
-    protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void {
+    protected executeQueryByKey(options: Serenity.ServiceOptions<Serenity.RetrieveResponse<any>>): void {
         serviceCall(options);
     }
 

@@ -3,7 +3,6 @@ import { text } from "../../Q/LocalText";
 import { getForm } from "../../Q/ScriptData";
 import { endsWith } from "../../Q/Strings";
 import { getAttributes, getInstanceType, getTypeFullName } from "../../Q/TypeSystem";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { FormKeyAttribute } from "../../Types/Attributes";
 import { PropertyGrid, PropertyGridOptions } from "../Widgets/PropertyGrid";
 import { TemplatedDialog } from "./TemplatedDialog";
@@ -110,7 +109,7 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
         };
     }
 
-    protected getPropertyItems(): PropertyItem[] {
+    protected getPropertyItems(): Serenity.PropertyItem[] {
         var formKey = this.getFormKey();
         return getForm(formKey);
     }

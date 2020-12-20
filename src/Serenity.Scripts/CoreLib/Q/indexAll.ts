@@ -2,4 +2,5 @@ export * from "./index";
 export * from "./Layout";
 export * from "./Router";
 
-export type { ServiceOptions } from "../Services/Models";
+export interface ServiceOptions<TResponse extends Serenity.ServiceResponse> extends Serenity.ServiceOptions<TResponse> {
+}

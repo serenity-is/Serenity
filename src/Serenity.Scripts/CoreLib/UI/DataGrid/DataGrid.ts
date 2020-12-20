@@ -4,7 +4,7 @@ import { FilterLine } from "../Filtering/FilterLine";
 import { QuickSearchField, QuickSearchInput } from "./QuickSearchInput";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { Widget } from "../Widgets/Widget";
-import { RemoteView, RemoteViewOptions } from "../../Slick/RemoteView";
+import { RemoteView } from "../../Slick/RemoteView";
 import { FilterStore } from "../Filtering/FilterStore";
 import { FilterDisplayBar } from "../Filtering/FilterDisplayBar";
 import { QuickFilterBar } from ".//QuickFilterBar";
@@ -17,13 +17,11 @@ import { debounce } from "../../Q/Debounce";
 import { layoutFillHeight } from "../../Q/Layout";
 import { QuickFilter } from "./QuickFilter";
 import { Authorization } from "../../Q/Authorization";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { BooleanFiltering, DateFiltering, DateTimeFiltering, FilteringTypeRegistry, IFiltering, IQuickFiltering } from "../Filtering/Filtering";
 import { ReflectionOptionsSetter } from "../Widgets/ReflectionOptionsSetter";
 import { FilterOperators } from "../Filtering/FilterOperator";
 import { deepClone, extend } from "../../Q/Basics";
 import { LazyLoadHelper } from "../Helpers/LazyLoadHelper";
-import { ListResponse } from "../../Services/Models";
 import { Criteria } from "../../Services/Criteria";
 import { setEquality } from "../../Q/Services";
 import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../Types/Attributes";
@@ -89,7 +87,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     private rows: any;
     private slickGridOnSort: any;
     private slickGridOnClick: any;
-    public view: RemoteView<TItem>;
+    public view: Slick.RemoteView<TItem>;
     public slickGrid: Slick.Grid;
     public openDialogsAsPanel: boolean;
 
@@ -243,7 +241,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
             .filter(x => x != null);
     }
 
-    public static propertyItemToQuickFilter(item: PropertyItem) {
+    public static propertyItemToQuickFilter(item: Serenity.PropertyItem) {
         var quick: any = {};
 
         var name = item.name;
@@ -631,7 +629,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }
     }
 
-    protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
+    protected onViewProcessData(response: Serenity.ListResponse<TItem>): Serenity.ListResponse<TItem> {
         return response;
     }
 
@@ -697,9 +695,9 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return $('<div class="grid-container"></div>').appendTo(this.element);
     }
 
-    protected createView(): RemoteView<TItem> {
+    protected createView(): Slick.RemoteView<TItem> {
         var opt = this.getViewOptions();
-        return new RemoteView<TItem>(opt);
+        return new RemoteView<TItem>(opt) as any;
     }
 
     protected getDefaultSortBy(): any[] {
@@ -760,7 +758,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected getViewOptions() {
-        var opt: RemoteViewOptions = {};
+        var opt: Slick.RemoteViewOptions = {};
         opt.idField = this.getIdProperty();
         opt.sortBy = this.getDefaultSortBy();
 
@@ -841,7 +839,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return null;
     }
 
-    protected getPropertyItems(): PropertyItem[] {
+    protected getPropertyItems(): Serenity.PropertyItem[] {
         var attr = this.attrs(ColumnsKeyAttribute);
 
         var columnsKey = this.getColumnsKey();
@@ -857,7 +855,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return this.propertyItemsToSlickColumns(propertyItems);
     }
 
-    protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Slick.Column[] {
+    protected propertyItemsToSlickColumns(propertyItems: Serenity.PropertyItem[]): Slick.Column[] {
         var columns = PropertyItemSlickConverter.toSlickColumns(propertyItems);
         for (var i = 0; i < propertyItems.length; i++) {
             var item = propertyItems[i];
@@ -1408,7 +1406,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return this.slickGrid;
     }
 
-    getView(): RemoteView<TItem> {
+    getView(): Slick.RemoteView<TItem> {
         return this.view;
     }
 

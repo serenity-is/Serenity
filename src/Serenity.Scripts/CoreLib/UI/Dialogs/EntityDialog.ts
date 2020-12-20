@@ -10,8 +10,6 @@ import { serviceCall } from "../../Q/Services";
 import { endsWith, isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
 import { getAttributes, getInstanceType, getTypeFullName, safeCast } from "../../Q/TypeSystem";
 import { validatorAbortHandler } from "../../Q/ValidateOptions";
-import { PropertyItem } from "../../Services/PropertyItem";
-import type { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse } from "../../Services/Models";
 import { EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../Types/Attributes";
 import { IEditDialog } from "../../Interfaces/IEditDialog";
 import { IReadOnly } from "../../Interfaces/IReadOnly";
@@ -149,22 +147,22 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         return this.isNew() || this.isDeleted();
     }
 
-    protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse> {
+    protected getDeleteOptions(callback: (response: Serenity.DeleteResponse) => void): Serenity.ServiceOptions<Serenity.DeleteResponse> {
         return {};
     }
 
-    protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void {
+    protected deleteHandler(options: Serenity.ServiceOptions<Serenity.DeleteResponse>, callback: (response: Serenity.DeleteResponse) => void): void {
         serviceCall(options);
     }
 
-    protected doDelete(callback: (response: DeleteResponse) => void): void {
+    protected doDelete(callback: (response: Serenity.DeleteResponse) => void): void {
         var self = this;
 
-        var request: DeleteRequest = {
+        var request: Serenity.DeleteRequest = {
             EntityId: this.get_entityId()
         };
 
-        var baseOptions: ServiceOptions<DeleteResponse> = {
+        var baseOptions: Serenity.ServiceOptions<Serenity.DeleteResponse> = {
             service: this.getService() + '/Delete',
             request: request,
             onSuccess: response => {
@@ -186,7 +184,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         this.deleteHandler(finalOptions, callback);
     }
 
-    protected onDeleteSuccess(response: DeleteResponse): void {
+    protected onDeleteSuccess(response: Serenity.DeleteResponse): void {
     }
 
     protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
@@ -440,15 +438,15 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             });
     }
 
-    protected onLoadingData(data: RetrieveResponse<TItem>): void {
+    protected onLoadingData(data: Serenity.RetrieveResponse<TItem>): void {
     }
 
-    protected getLoadByIdOptions(id: any, callback: (response: RetrieveResponse<TItem>) => void): ServiceOptions<RetrieveResponse<TItem>> {
+    protected getLoadByIdOptions(id: any, callback: (response: Serenity.RetrieveResponse<TItem>) => void): Serenity.ServiceOptions<Serenity.RetrieveResponse<TItem>> {
         return {};
     }
 
-    protected getLoadByIdRequest(id: any): RetrieveRequest {
-        var request: RetrieveRequest = {};
+    protected getLoadByIdRequest(id: any): Serenity.RetrieveRequest {
+        var request: Serenity.RetrieveRequest = {};
         request.EntityId = id;
         return request;
     }
@@ -457,8 +455,8 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         this.loadById(this.get_entityId());
     }
 
-    loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void) {
-        var baseOptions: ServiceOptions<RetrieveResponse<TItem>> = {
+    loadById(id: any, callback?: (response: Serenity.RetrieveResponse<TItem>) => void, fail?: () => void) {
+        var baseOptions: Serenity.ServiceOptions<Serenity.RetrieveResponse<TItem>> = {
             service: this.getService() + '/Retrieve',
             blockUI: true,
             request: this.getLoadByIdRequest(id),
@@ -478,7 +476,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         this.loadByIdHandler(finalOptions, callback, fail);
     }
 
-    protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void {
+    protected loadByIdHandler(options: Serenity.ServiceOptions<Serenity.RetrieveResponse<TItem>>, callback: (response: Serenity.RetrieveResponse<TItem>) => void, fail: () => void): void {
         var request = serviceCall(options);
         fail && request.fail(fail);
     }
@@ -504,7 +502,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         pgOptions.idPrefix = this.idPrefix + 'Localization_';
 
-        var items: PropertyItem[] = [];
+        var items: Serenity.PropertyItem[] = [];
         for (var item1 of pgOptions.items) {
             var langs = null;
 
@@ -608,7 +606,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             return;
         }
 
-        var opt = <ServiceOptions<any>>{
+        var opt = <Serenity.ServiceOptions<any>>{
             service: this.getService() + '/Retrieve',
             blockUI: true,
             request: {
@@ -732,9 +730,9 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         return true;
     }
 
-    protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse> {
+    protected getSaveOptions(callback: (response: Serenity.SaveResponse) => void): Serenity.ServiceOptions<Serenity.SaveResponse> {
 
-        var opt: ServiceOptions<SaveResponse> = {};
+        var opt: Serenity.ServiceOptions<Serenity.SaveResponse> = {};
 
         opt.service = this.getService() + '/' + (this.isEditMode() ? 'Update' : 'Create'),
 
@@ -785,10 +783,10 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         return entity;
     }
 
-    protected getSaveRequest(): SaveRequest<TItem> {
+    protected getSaveRequest(): Serenity.SaveRequest<TItem> {
 
         var entity = this.getSaveEntity();
-        var req: SaveRequest<TItem> = {};
+        var req: Serenity.SaveRequest<TItem> = {};
         req.Entity = entity;
 
         if (this.isEditMode()) {
@@ -805,22 +803,22 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         return req;
     }
 
-    protected onSaveSuccess(response: SaveResponse): void {
+    protected onSaveSuccess(response: Serenity.SaveResponse): void {
     }
 
-    protected save_submitHandler(callback: (response: SaveResponse) => void): void {
+    protected save_submitHandler(callback: (response: Serenity.SaveResponse) => void): void {
         var options = this.getSaveOptions(callback);
         this.saveHandler(options, callback);
     }
 
-    protected save(callback?: (response: SaveResponse) => void): void | boolean {
+    protected save(callback?: (response: Serenity.SaveResponse) => void): void | boolean {
         return ValidationHelper.submit(this.byId('Form'),
             () => this.validateBeforeSave(),
             () => this.save_submitHandler(callback));
     }
 
-    protected saveHandler(options: ServiceOptions<SaveResponse>,
-        callback: (response: SaveResponse) => void): void {
+    protected saveHandler(options: Serenity.ServiceOptions<Serenity.SaveResponse>,
+        callback: (response: Serenity.SaveResponse) => void): void {
         serviceCall(options);
     }
 
@@ -840,7 +838,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         this.localizationButton = this.toolbar.findButton('localization-button');
     }
 
-    protected showSaveSuccessMessage(response: SaveResponse): void {
+    protected showSaveSuccessMessage(response: Serenity.SaveResponse): void {
         notifySuccess(text('Controls.EntityDialog.SaveSuccessMessage'), '', null);
     }
 
@@ -1041,19 +1039,19 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             EditorUtils.setContainerReadOnly(this.byId("Form"), true);
     }
 
-    protected getUndeleteOptions(callback?: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse> {
+    protected getUndeleteOptions(callback?: (response: Serenity.UndeleteResponse) => void): Serenity.ServiceOptions<Serenity.UndeleteResponse> {
         return {}
     }
 
-    protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void {
+    protected undeleteHandler(options: Serenity.ServiceOptions<Serenity.UndeleteResponse>, callback: (response: Serenity.UndeleteResponse) => void): void {
         serviceCall(options);
     }
 
-    protected undelete(callback?: (response: UndeleteResponse) => void): void {
-        var baseOptions: ServiceOptions<UndeleteResponse> = {};
+    protected undelete(callback?: (response: Serenity.UndeleteResponse) => void): void {
+        var baseOptions: Serenity.ServiceOptions<Serenity.UndeleteResponse> = {};
         baseOptions.service = this.getService() + '/Undelete';
 
-        var request: UndeleteRequest = {};
+        var request: Serenity.UndeleteRequest = {};
         request.EntityId = this.get_entityId();
 
         baseOptions.request = request;

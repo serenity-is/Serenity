@@ -8,7 +8,6 @@ import { any, isArray } from "../../Q/Arrays";
 import { Authorization } from "../../Q/Authorization";
 import { text } from "../../Q/LocalText";
 import { isEmptyOrNull, isTrimmedEmpty, startsWith, trimToEmpty, trimToNull } from "../../Q/Strings";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { DialogTypeRegistry } from "../../Types/DialogTypeRegistry";
 import { ReflectionUtils } from "../../Types/ReflectionUtils";
 import { SubDialogHelper } from "../Helpers/SubDialogHelper";
@@ -496,7 +495,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         }
     }
 
-    setEditValue(source: any, property: PropertyItem) {
+    setEditValue(source: any, property: Serenity.PropertyItem) {
         var val = source[property.name];
         if(isArray(val)) {
             this.set_values(val);
@@ -506,7 +505,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         }
     }
 
-    getEditValue(property: PropertyItem, target: any) {
+    getEditValue(property: Serenity.PropertyItem, target: any) {
         if (!this.isMultiple() || this.get_delimited()) {
             target[property.name] = this.get_value();
         }

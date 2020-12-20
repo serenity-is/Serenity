@@ -15,7 +15,7 @@ export let today = (): Date => {
 
 export function extend<T = any>(a: T, b: T): T {
     for (var key in b)
-        if (b.hasOwnProperty(key))
+        if (Object.prototype.hasOwnProperty.call(b, key))
             a[key] = b[key];
     return a;
 }

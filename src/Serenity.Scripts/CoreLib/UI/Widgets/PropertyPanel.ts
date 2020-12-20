@@ -2,7 +2,6 @@
 import { getForm } from "../../Q/ScriptData";
 import { endsWith } from "../../Q/Strings";
 import { getAttributes, getInstanceType, getTypeFullName } from "../../Q/TypeSystem";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { FormKeyAttribute } from "../../Types/Attributes";
 import { PropertyGrid, PropertyGridOptions } from "./PropertyGrid";
 import { TemplatedPanel } from "./TemplatedPanel";
@@ -81,7 +80,7 @@ export class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
         };
     }
 
-    protected getPropertyItems(): PropertyItem[] {
+    protected getPropertyItems(): Serenity.PropertyItem[] {
         var formKey = this.getFormKey();
         return getForm(formKey);
     }

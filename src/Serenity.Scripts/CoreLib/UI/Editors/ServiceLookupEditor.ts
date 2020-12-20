@@ -2,7 +2,6 @@
 import { resolveUrl, serviceCall } from "../../Q/Services";
 import { isEmptyOrNull, startsWith } from "../../Q/Strings";
 import { Criteria } from "../../Services/Criteria";
-import { ColumnSelection, ListRequest, ListResponse, ServiceOptions } from "../../Services/Models";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./Select2Editor";
 
 export interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -12,7 +11,7 @@ export interface ServiceLookupEditorOptions extends Select2EditorOptions {
     pageSize?: number;
     minimumResultsForSearch?: any;
     sort: string[];
-    columnSelection?: ColumnSelection;
+    columnSelection?: Serenity.ColumnSelection;
     includeColumns?: string[];
     excludeColumns?: string[];
     includeDeleted?: boolean;
@@ -128,15 +127,15 @@ export class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions
             Criteria.and(this.getCascadeCriteria(), this.getFilterCriteria()));
     }
 
-    protected getListRequest(query: Select2SearchQuery): ListRequest {
+    protected getListRequest(query: Select2SearchQuery): Serenity.ListRequest {
 
-        var request: ListRequest = {};
+        var request: Serenity.ListRequest = {};
 
         if (query.searchTerm)
             request.ContainsText = query.searchTerm;
 
         request.Sort = this.getSort();
-        request.ColumnSelection = this.options.columnSelection || ColumnSelection.KeyOnly;
+        request.ColumnSelection = this.options.columnSelection || Serenity.ColumnSelection.KeyOnly;
         request.IncludeColumns = this.getIncludeColumns();
         request.ExcludeColumns = this.options.excludeColumns;
         request.ContainsField = this.options.containsField;
@@ -150,7 +149,7 @@ export class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions
         return request;
     }
 
-    protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): ServiceOptions<ListResponse<TItem>> {
+    protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Serenity.ServiceOptions<Serenity.ListResponse<TItem>> {
         return {
             blockUI: false,
             url: this.getServiceUrl(),

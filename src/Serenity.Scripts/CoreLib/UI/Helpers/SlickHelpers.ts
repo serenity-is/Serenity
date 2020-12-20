@@ -6,9 +6,6 @@ import { text, tryGetText } from "../../Q/LocalText";
 import { serviceCall } from "../../Q/Services";
 import { isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
 import { clearKeys, safeCast } from "../../Q/TypeSystem";
-import { SaveRequest } from "../../Services/Models";
-import { PropertyItem } from "../../Services/PropertyItem";
-import { RemoteView } from "../../Slick/RemoteView";
 import { IDataGrid } from "../DataGrid/IDataGrid";
 import { QuickSearchField, QuickSearchInput } from "../DataGrid/QuickSearchInput";
 import { DateFormatter, EnumFormatter, FormatterTypeRegistry, IInitializeColumn, NumberFormatter } from "../Formatters/Formatters";
@@ -355,7 +352,7 @@ export namespace GridUtils {
     }
 
     export function addIncludeDeletedToggle(toolDiv: JQuery,
-        view: RemoteView<any>, hint?: string, initial?: boolean): void {
+        view: Slick.RemoteView<any>, hint?: string, initial?: boolean): void {
 
         var includeDeleted = false;
         var oldSubmit = view.onSubmit;
@@ -383,7 +380,7 @@ export namespace GridUtils {
     }
 
     export function addQuickSearchInput(toolDiv: JQuery,
-        view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void {
+        view: Slick.RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void {
 
         var oldSubmit = view.onSubmit;
         var input: QuickSearchInput;
@@ -473,7 +470,7 @@ export namespace GridUtils {
 
     export function makeOrderableWithUpdateRequest(grid: IDataGrid,
         getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string,
-        getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void {
+        getUpdateRequest: (p1: number, p2: number) => Serenity.SaveRequest<any>): void {
 
         makeOrderable(grid.getGrid(), function (rows, insertBefore) {
             if (rows.length === 0) {
@@ -525,7 +522,7 @@ export namespace GridUtils {
 }
 
 export namespace PropertyItemSlickConverter {
-    export function toSlickColumns(items: PropertyItem[]): Slick.Column[] {
+    export function toSlickColumns(items: Serenity.PropertyItem[]): Slick.Column[] {
         var result: Slick.Column[] = [];
         if (items == null) {
             return result;
@@ -536,7 +533,7 @@ export namespace PropertyItemSlickConverter {
         return result;
     }
 
-    export function toSlickColumn(item: PropertyItem): Slick.Column {
+    export function toSlickColumn(item: Serenity.PropertyItem): Slick.Column {
         var result: Slick.Column = {
             field: item.name,
             sourceItem: item,
@@ -593,7 +590,7 @@ export namespace SlickFormatting {
         return EnumFormatter.getText(enumKey, name);
     }
 
-    export function treeToggle<TItem>(getView: () => RemoteView<TItem>, getId: (x: TItem) => any,
+    export function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any,
         formatter: Slick.Format): Slick.Format {
         return function (ctx: Slick.FormatterContext) {
             var text = formatter(ctx);
@@ -743,7 +740,7 @@ export namespace SlickTreeHelper {
         return true;
     }
 
-    export function filterById<TItem>(item: TItem, view: RemoteView<TItem>,
+    export function filterById<TItem>(item: TItem, view: Slick.RemoteView<TItem>,
         getParentId: (x: TItem) => any): boolean {
         return filterCustom(item, function (x) {
             var parentId = getParentId(x);
@@ -798,7 +795,7 @@ export namespace SlickTreeHelper {
     }
 
     export function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number,
-        view: RemoteView<TItem>, getId: (x: TItem) => any): void {
+        view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void {
         var target = $(e.target);
         if (!target.hasClass('s-TreeToggle')) {
             return;

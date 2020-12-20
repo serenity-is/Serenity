@@ -1,11 +1,10 @@
 ﻿import { alert } from "./Dialogs";
 import { htmlEncode } from "./Html";
 import { notifyError } from "./Notify";
-import type { ServiceError } from "../Services/ServiceError";
 
 export namespace ErrorHandling {
 
-    export function showServiceError(error: ServiceError) {
+    export function showServiceError(error: Serenity.ServiceError) {
         let msg: any;
         if (error == null) {
             msg = '??ERROR??';

@@ -7,7 +7,6 @@ import { Router } from "../../Q/Router";
 import { resolveUrl } from "../../Q/Services";
 import { endsWith, isEmptyOrNull, replaceAll } from "../../Q/Strings";
 import { cast, getInstanceType, getTypeFullName, safeCast } from "../../Q/TypeSystem";
-import { RemoteViewOptions } from "../../Slick/RemoteView";
 import { DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../Types/Attributes";
 import { DialogTypeRegistry } from "../../Types/DialogTypeRegistry";
 import { EditorUtils } from "../Editors/EditorUtils";
@@ -239,7 +238,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         return this.service;
     }
 
-    protected getViewOptions(): RemoteViewOptions {
+    protected getViewOptions(): Slick.RemoteViewOptions {
         var opt = super.getViewOptions();
         opt.url = resolveUrl('~/Services/' + this.getService() + '/List');
         return opt;

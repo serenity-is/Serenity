@@ -7,7 +7,6 @@ import { text, tryGetText } from "../../Q/LocalText";
 import { endsWith, isEmptyOrNull, startsWith } from "../../Q/Strings";
 import { getInstanceType, getTypeFullName, getTypeName, getTypes, isAssignableFrom } from "../../Q/TypeSystem";
 import { Criteria } from "../../Services/Criteria";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { EditorTypeRegistry } from "../../Types/EditorTypeRegistry";
 import { DateEditor } from "../Editors/DateEditor";
 import { DateTimeEditor } from "../Editors/DateTimeEditor";
@@ -28,8 +27,8 @@ export interface IFiltering {
     getOperators(): FilterOperator[];
     loadState(state: any): void;
     saveState(): any;
-    get_field(): PropertyItem;
-    set_field(value: PropertyItem): void;
+    get_field(): Serenity.PropertyItem;
+    set_field(value: Serenity.PropertyItem): void;
     get_container(): JQuery;
     set_container(value: JQuery): void;
     get_operator(): FilterOperator;
@@ -56,13 +55,13 @@ export class IQuickFiltering {
 @registerClass('Serenity.BaseFiltering', [IFiltering, IQuickFiltering])
 export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 
-    private field: PropertyItem;
+    private field: Serenity.PropertyItem;
 
     public get_field() {
         return this.field;
     }
 
-    set_field(value: PropertyItem) {
+    set_field(value: Serenity.PropertyItem) {
         this.field = value;
     }
 
@@ -140,7 +139,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         return op.format ?? tryGetText('Controls.FilterPanel.OperatorFormats.' + op.key) ?? op.key;
     }
 
-    protected getTitle(field: PropertyItem) {
+    protected getTitle(field: Serenity.PropertyItem) {
         return tryGetText(field.title) ??(field.title ?? field.name);
     }
 

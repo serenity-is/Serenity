@@ -9,7 +9,6 @@ import { parseDecimal } from "../../Q/Formatting";
 import { text, tryGetText } from "../../Q/LocalText";
 import { isTrimmedEmpty } from "../../Q/Strings";
 import { cast, isInstanceOfType, safeCast } from "../../Q/TypeSystem";
-import { PropertyItem } from "../../Services/PropertyItem";
 import { Widget } from "../Widgets/Widget";
 
 export namespace EditorUtils {
@@ -40,7 +39,7 @@ export namespace EditorUtils {
         return value.toString();
     }
 
-    var dummy: PropertyItem = { name: '_' };
+    var dummy: Serenity.PropertyItem = { name: '_' };
 
     export function getValue(editor: Widget<any>): any {
         var target = {};
@@ -48,7 +47,7 @@ export namespace EditorUtils {
         return target['_'];
     }
 
-    export function saveValue(editor: Widget<any>, item: PropertyItem, target: any): void {
+    export function saveValue(editor: Widget<any>, item: Serenity.PropertyItem, target: any): void {
 
         var getEditValue = safeCast(editor, IGetEditValue);
 
@@ -92,7 +91,7 @@ export namespace EditorUtils {
         loadValue(editor, dummy, source);
     }
 
-    export function loadValue(editor: Widget<any>, item: PropertyItem, source: any): void {
+    export function loadValue(editor: Widget<any>, item: Serenity.PropertyItem, source: any): void {
 
         var setEditValue = safeCast(editor, ISetEditValue);
         if (setEditValue != null) {

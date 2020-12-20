@@ -7,6 +7,19 @@ export interface LookupOptions<TItem> {
     textFormatter?(item: TItem): string;
 }
 
+declare global {
+    namespace Q {
+        export interface Lookup<TItem> {
+            items: TItem[];
+            itemById: { [key: string]: TItem };
+            idField: string;
+            parentIdField: string;
+            textField: string;
+            textFormatter: (item: TItem) => string;
+        }
+    }
+}
+
 export class Lookup<TItem> {
     public items: TItem[] = [];
     public itemById: { [key: string]: TItem } = {};
