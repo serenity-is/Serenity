@@ -1,6 +1,6 @@
-﻿export * as Q from './Serenity.CoreLib.Q';
-export * as Serenity from './Serenity.CoreLib.Serenity';
-export * as Slick from "./Serenity.CoreLib.Slick";
+﻿export * as Q from './index.Q';
+export * as Serenity from './index.Serenity';
+export * as Slick from "./index.Slick";
 export * from "./Globals/Select2";
 export * from "./Globals/Validate";
 import { jQueryPatch } from './Patch/jQueryPatch'

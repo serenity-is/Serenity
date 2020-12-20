@@ -2,6 +2,7 @@
 import {terser} from "rollup-plugin-terser";
 import pkg from "./package.json";
 import {builtinModules} from "module";
+import dts from "rollup-plugin-dts";
 
 var globals = {
 	'jquery': '$',
@@ -10,10 +11,10 @@ var globals = {
 
 export default [
 	{
-		input: "CoreLib/Serenity.CoreLib.ts",
+		input: "CoreLib/index.ts",
 		output: [
 			{
-				dir: 'dist',
+				file: 'dist/Serenity.CoreLib.js',
 				format: "iife",
 				sourcemap: true,
 				name: "window",
@@ -49,13 +50,13 @@ export default [
 		plugins: [
 			typescript({
 				tsconfig: 'CoreLib/tsconfig.json',
-				outDir: 'dist'
+				outDir: 'CoreLib/built'
 			}),
 			{
 				name: 'stripExportsForGlobal',
 				generateBundle(o, b) {
 					for (var fileName of Object.keys(b)) {
-						var result = /^Serenity\.CoreLib\.([A-Za-z]*)\.d\.ts$/.exec(fileName);
+						/*var result = /^Serenity\.CoreLib\.([A-Za-z]*)\.d\.ts$/.exec(fileName);
 						if (result && result.length > 1) {
 							var ns = result[1];
 							var src = b[fileName].source;
@@ -64,7 +65,7 @@ export default [
 								b[fileName].source = src;
 							}
 						}
-						/*	var src = b[k].source;
+							var src = b[k].source;
 							src = src.replace(/^(declare\s+global.*\s*\{\r?\n)((^\s+.*\r?\n)*)\}/gmi, function(x, y, z) {
 								var r = z.indexOf('\r') >= 0;
 								return z.replace(/\r/g, '').split('\n')
@@ -85,5 +86,20 @@ export default [
 			...(pkg.devDependencies == null ? [] : Object.keys(pkg.devDependencies)),
 			...(pkg.peerDependencies == null ? [] : Object.keys(pkg.peerDependencies))
 		]
+	},
+	{
+		input: "./dist/built/index.Q.d.ts",
+		output: [{ file: "./dist/built/global.Q.d.ts", format: "es" }],
+		plugins: [dts()],
+	},
+	{
+		input: "./dist/built/index.Serenity.d.ts",
+		output: [{ file: "./dist/built/global.Serenity.d.ts", format: "es" }],
+		plugins: [dts()],
+	},
+	{
+		input: "./dist/built/index.Slick.d.ts",
+		output: [{ file: "./dist/built/global.Slick.d.ts", format: "es" }],
+		plugins: [dts()],
 	}
 ];
