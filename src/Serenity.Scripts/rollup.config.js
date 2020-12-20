@@ -92,8 +92,9 @@ var extendGlobals = function() {
 			for (var fileName of Object.keys(b)) {
 				if (b[fileName].code && fileName.indexOf('.js') >= 0) {
 					var src = b[fileName].code;
-					src = src.replace(/^(\s*)exports\.([A-Za-z]*)\s*=\s*(.+?);/gm, function(match, grp1, grp2, grp3) {
-						console.log(grp1);
+					src = src.replace(/^(\s*)exports\.([A-Za-z_]+)\s*=\s*(.+?);/gm, function(match, grp1, grp2, grp3) {
+						if (grp2.charAt(0) == '_' && grp2.charAt(1) == '_')
+							return grp1 + "exports." + grp2 + " = exports." + grp2 + " || " + grp3 + ";";
 						return grp1 + "exports." + grp2 + " = exports." + grp2 + " || {}; extend(exports." + grp2 + ", " + grp3 + ");";
 					});
 					b[fileName].code = src;
