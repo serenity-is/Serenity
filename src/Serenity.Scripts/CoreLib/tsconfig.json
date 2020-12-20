@@ -37,7 +37,13 @@
   "typeRoots": [
     "../node_modules/@types"
   ],
-  "files": [  
+  "files": [
+    "./Globals/jQueryStatic.ts",
+    "./Globals/Promise.ts",
+    "./Globals/Select2.ts",
+    "./Globals/Validate.ts",
+    "./Slick/Globals.ts",
+    "./Serenity/Globals.ts",
     "./CoreLib.ts"
   ]
 }

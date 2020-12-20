@@ -90,14 +90,19 @@ var extendGlobals = function() {
 		name: 'extendGlobals',
 		generateBundle(o, b) {
 			for (var fileName of Object.keys(b)) {
-				if (b[fileName].code && fileName.indexOf('.js') >= 0) {
-					var src = b[fileName].code;
+				var code = b[fileName].code ?? b[fileName].source;
+
+				if (code && fileName.indexOf('.js') >= 0) {
+					var src = code;
 					src = src.replace(/^(\s*)exports\.([A-Za-z_]+)\s*=\s*(.+?);/gm, function(match, grp1, grp2, grp3) {
 						if (grp2.charAt(0) == '_' && grp2.charAt(1) == '_')
 							return grp1 + "exports." + grp2 + " = exports." + grp2 + " || " + grp3 + ";";
 						return grp1 + "exports." + grp2 + " = exports." + grp2 + " || {}; extend(exports." + grp2 + ", " + grp3 + ");";
 					});
 					b[fileName].code = src;
+				}
+				else if (code && /(Globals\/.*|Globals)\.d\.ts$/i.test(fileName) && code.indexOf('declare global') < 0) {
+					outputs.push(code);
 				}
 			}
 		}
@@ -142,10 +147,7 @@ export default [
 				name: "window",
 				extend: true,
 				freeze: false,
-				globals,
-				plugins: [
-					extendGlobals()
-				]
+				globals
 			}
 		],
 		plugins: [
@@ -153,6 +155,7 @@ export default [
 				tsconfig: 'CoreLib/tsconfig.json',
 				outDir: 'CoreLib/built'
 			}),
+			extendGlobals(),
 			writeMinJS()
 		],
 		external: [
@@ -180,12 +183,7 @@ export default [
 	{
 		input: "./dist/built/Slick/index.d.ts",
 		output: [{ file: "./dist/built/Slick/index.bundle.d.ts", format: "es" }],
-		plugins: [dts(), toGlobal('Slick')]
-	},
-	{
-		input: "./dist/built/Globals/index.d.ts",
-		output: [{ file: "./dist/built/Globals/index.bundle.d.ts", format: "es" }],
-		plugins: [dts(), toGlobal(null), {
+		plugins: [dts(), toGlobal('Slick'), {
 			name: 'writeFinal',
 			generateBundle: function() {
 				var src = outputs.join('\n');
@@ -198,6 +196,6 @@ export default [
 				src = refTypes.join('') + '\n' + src
 				fs.writeFileSync('./dist/Serenity.CoreLib.d.ts', src);
 			}
-		}],
+		}]
 	}
 ];

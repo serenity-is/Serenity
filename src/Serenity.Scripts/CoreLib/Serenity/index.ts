@@ -1,5 +1,4 @@
-﻿export * from "./Globals";
-export * from "../Interfaces";
+﻿export * from "../Interfaces";
 export * from "../UI/DataGrid/ISlickFormatter";
 export * from "../Decorators";
 export * from "../Services/Criteria";
