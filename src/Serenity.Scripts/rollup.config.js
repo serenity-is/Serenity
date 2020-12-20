@@ -1,5 +1,5 @@
 ﻿import typescript from '@rollup/plugin-typescript';
-//import {terser} from "rollup-plugin-terser";
+import { minify } from "terser";
 import path from 'path';
 import fs from 'fs';
 import pkg from "./package.json";
@@ -104,6 +104,33 @@ var extendGlobals = function() {
 	}
 }
 
+var writeMinJS = function() {
+	return {
+		name: 'writeMinJS',
+		generateBundle: async function(o, b) {
+			var self = this;
+			Object.keys(b).forEach(async function(fileName) {
+				if (b[fileName].code && /\.js$/i.test(fileName) >= 0) {
+					var src = b[fileName].code;
+					var minified = await minify(src, {
+						mangle: true,
+						format: {
+							beautify: false,
+							max_line_len: 1000
+						}
+					});
+					var toEmit = {
+						type: 'asset',
+						fileName: fileName.replace(/\.js$/, '.min.js'),
+						source: minified.code
+					};
+					self.emitFile(toEmit);
+				}
+			});
+		}
+	}
+}
+
 export default [
 	{
 		input: "CoreLib/CoreLib.ts",
@@ -119,24 +146,14 @@ export default [
 				plugins: [
 					extendGlobals()
 				]
-			}/*,
-			{
-				file: 'dist/Serenity.CoreLib.min.js',
-				format: "iife",
-				sourcemap: false,
-				name: "window",
-				extend: true,
-				plugins: [
-					terser()
-				],
-				globals
-			}*/
+			}
 		],
 		plugins: [
 			typescript({
 				tsconfig: 'CoreLib/tsconfig.json',
 				outDir: 'CoreLib/built'
-			})
+			}),
+			writeMinJS()
 		],
 		external: [
 			...builtinModules,
