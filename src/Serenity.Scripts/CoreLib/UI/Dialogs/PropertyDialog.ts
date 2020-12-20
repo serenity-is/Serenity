@@ -8,8 +8,6 @@ import { FormKeyAttribute } from "../../Types/Attributes";
 import { PropertyGrid, PropertyGridOptions } from "../Widgets/PropertyGrid";
 import { TemplatedDialog } from "./TemplatedDialog";
 
-export type DialogButton = JQueryUI.DialogButtonOptions;
-
 @registerClass('Serenity.PropertyDialog')
 export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
     protected _entity: TItem;
