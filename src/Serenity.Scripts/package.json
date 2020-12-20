@@ -19,7 +19,6 @@
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.1.0",
-    "dts-bundle": "^0.7.3",
     "jest": "25.4.0",
     "less": "3.12.2",
     "rollup": "^2.35.1",
