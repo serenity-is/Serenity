@@ -1,10 +1,10 @@
-﻿import { registerInterface } from "../Decorators";
+﻿import { Decorators } from "../Decorators";
 
 export interface IValidateRequired {
     get_required(): boolean;
     set_required(value: boolean): void;
 }
 
-@registerInterface('Serenity.IValidateRequired')
+@Decorators.registerInterface('Serenity.IValidateRequired')
 export class IValidateRequired {
 }

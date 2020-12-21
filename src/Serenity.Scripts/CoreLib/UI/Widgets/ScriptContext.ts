@@ -1,8 +1,8 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 
 export interface ScriptContext {
 }
 
-@registerClass('Serenity.ScriptContext')
+@Decorators.registerClass('Serenity.ScriptContext')
 export class ScriptContext {
 }

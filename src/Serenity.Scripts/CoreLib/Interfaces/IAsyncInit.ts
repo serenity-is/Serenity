@@ -1,5 +1,5 @@
-﻿import { registerInterface } from "../Decorators";
+﻿import { Decorators } from "../Decorators";
 
-@registerInterface('Serenity.IAsyncInit')
+@Decorators.registerInterface('Serenity.IAsyncInit')
 export class IAsyncInit {
 }

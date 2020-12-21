@@ -1,4 +1,4 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { postToService, serviceCall } from "../../Q/Services";
 import { trimToNull } from "../../Q/Strings";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
@@ -11,7 +11,7 @@ export namespace Reporting {
         reportKey?: string;
     }
 
-    @registerClass('Serenity.Reporting.ReportDialog')
+    @Decorators.registerClass('Serenity.Reporting.ReportDialog')
     export class ReportDialog extends TemplatedDialog<ReportDialogOptions> {
         constructor(opt: ReportDialogOptions) {
             super(opt);
@@ -109,7 +109,7 @@ export namespace Reporting {
         Parameters?: any;
     }
 
-    @registerClass('Serenity.Reporting.ReportPage')
+    @Decorators.registerClass('Serenity.Reporting.ReportPage')
     export class ReportPage extends Widget<any> {
         constructor(div: JQuery) {
             super(div);

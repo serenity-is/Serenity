@@ -1,6 +1,5 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
-import { IStringValue } from "../../Interfaces/IStringValue";
+﻿import { Decorators } from "../../Decorators";
+import { IReadOnly, IStringValue } from "../../Interfaces";
 import { tryGetText } from "../../Q/LocalText";
 import { isEmptyOrNull, trimToNull } from "../../Q/Strings";
 import { Widget } from "../Widgets/Widget";
@@ -10,8 +9,8 @@ export interface EmailEditorOptions {
     readOnlyDomain?: boolean;
 }
 
-@registerEditor('Serenity.EmailEditor', [IStringValue, IReadOnly])
-@element('<input type="text"/>')
+@Decorators.registerEditor('Serenity.EmailEditor', [IStringValue, IReadOnly])
+@Decorators.element('<input type="text"/>')
 export class EmailEditor extends Widget<EmailEditorOptions> {
 
     constructor(input: JQuery, opt: EmailEditorOptions) {

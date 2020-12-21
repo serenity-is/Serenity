@@ -1,11 +1,10 @@
-﻿import { option, registerClass, registerInterface } from "../../Decorators";
-import { deepClone, extend } from "../../Q/Basics";
+﻿import { Decorators } from "../../Decorators";
+import { deepClone, extend, ArgumentNullException, Exception } from "../../Q/System";
 import { Config } from "../../Q/Config";
-import { ArgumentNullException, Exception } from "../../Q/Exceptions";
 import { format, formatDate, parseISODateTime } from "../../Q/Formatting";
 import { text, tryGetText } from "../../Q/LocalText";
 import { endsWith, isEmptyOrNull, startsWith } from "../../Q/Strings";
-import { getInstanceType, getTypeFullName, getTypeName, getTypes, isAssignableFrom } from "../../Q/TypeSystem";
+import { getInstanceType, getTypeFullName, getTypeName, getTypes, isAssignableFrom } from "../../Q/System";
 import { Criteria } from "../../Services/Criteria";
 import { EditorTypeRegistry } from "../../Types/EditorTypeRegistry";
 import { DateEditor } from "../Editors/DateEditor";
@@ -35,7 +34,7 @@ export interface IFiltering {
     set_operator(value: FilterOperator): void;
 }
 
-@registerInterface('Serenity.IFiltering')
+@Decorators.registerInterface('Serenity.IFiltering')
 export class IFiltering {
 }
 
@@ -48,11 +47,11 @@ export interface IQuickFiltering {
     initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
 }
 
-@registerInterface('Serenity.IQuickFiltering')
+@Decorators.registerInterface('Serenity.IQuickFiltering')
 export class IQuickFiltering {
 }
 
-@registerClass('Serenity.BaseFiltering', [IFiltering, IQuickFiltering])
+@Decorators.registerClass('Serenity.BaseFiltering', [IFiltering, IQuickFiltering])
 export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 
     private field: Serenity.PropertyItem;
@@ -296,7 +295,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 }
 
 function Filtering(name: string) {
-    return registerClass('Serenity.' + name + 'Filtering')
+    return Decorators.registerClass('Serenity.' + name + 'Filtering')
 }
 
 @Filtering('BaseEditor')
@@ -504,13 +503,13 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
         super(Widget)
     }
 
-    @option()
+    @Decorators.option()
     editorType: string;
 
-    @option()
+    @Decorators.option()
     useRelative: boolean;
 
-    @option()
+    @Decorators.option()
     useLike: boolean;
 
     getOperators(): FilterOperator[] {

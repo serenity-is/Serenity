@@ -1,13 +1,13 @@
 ﻿import { Widget } from "./Widget";
-import { registerClass } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { text } from "../../Q/LocalText";
 import { startsWith, replaceAll } from "../../Q/Strings";
 import { format } from "../../Q/Formatting";
-import { getBaseType, getInstanceType, getTypeName, getTypeFullName } from "../../Q/TypeSystem";
+import { getBaseType, getInstanceType, getTypeName, getTypeFullName } from "../../Q/System";
 import { Config } from "../../Q/Config";
 import { canLoadScriptData, getTemplate } from "../../Q/ScriptData";
 
-@registerClass("Serenity.TemplatedWidget")
+@Decorators.registerClass("Serenity.TemplatedWidget")
 export class TemplatedWidget<TOptions> extends Widget<TOptions> {
 
     protected idPrefix: string;

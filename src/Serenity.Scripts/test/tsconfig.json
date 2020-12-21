@@ -1,14 +1,13 @@
 ﻿{
-  "compileOnSave": true,
+  "compileOnSave": false,
   "compilerOptions": {
     "preserveConstEnums": false,
     "experimentalDecorators": true,
-    "declaration": true,
-    "emitBOM": true,
+    "declaration": false,
+    "emitBOM": false,
     "noEmit": true,
-    "noImplicitAny": true,
-    "sourceMap": true,
-    "module": "ES2015",
+    "sourceMap": false,
+    "module": "CommonJS",
     "moduleResolution": "Node",
     "skipLibCheck": true,
     "typeRoots": [
@@ -23,12 +22,12 @@
       "bootstrap",
       "sortablejs",
       "toastr",
-      "react"
+      "react",
+      "jest",
+      "node"
     ],
-    "inlineSources": true,
-    "outDir": "../dist",
+    "outDir": "./built",
     "suppressImplicitAnyIndexErrors": true,
-    "target": "ES5",
     "lib": [
       "ES5",
       "ES2015",
@@ -37,14 +36,8 @@
     "noEmitHelpers": false,
     "jsx": "react"
   },
-  "files": [
-    "./Globals/jQueryStatic.ts",
-    "./Globals/Promise.ts",
-    "./Globals/Select2.ts",
-    "./Globals/Validate.ts",
-    "./Slick/Globals.ts",
-    "./Serenity/Globals.ts",
-    "./CoreLib.ts"
-  ],
-  "exclude": ["**/*.spec.ts"]
+  "include": [
+    "CoreLib/util.ts",
+    "**/*.spec.ts"
+  ]
 }

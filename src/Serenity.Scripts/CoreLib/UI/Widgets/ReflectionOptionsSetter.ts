@@ -1,5 +1,5 @@
-﻿import { getInstanceType, getMembers, isInstanceOfType, MemberType } from "../../Q/TypeSystem";
-import { OptionAttribute, DisplayNameAttribute } from "../../Types/Attributes";
+﻿import { getInstanceType, getMembers, isInstanceOfType, MemberType } from "../../Q/System";
+import { OptionAttribute, DisplayNameAttribute } from "../../Decorators";
 import { ReflectionUtils } from "../../Types/ReflectionUtils";
 
 export namespace ReflectionOptionsSetter {

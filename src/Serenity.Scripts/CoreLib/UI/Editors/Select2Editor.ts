@@ -1,9 +1,6 @@
-﻿import { element, registerClass } from "../../Decorators";
-import { IEditDialog } from "../../Interfaces/IEditDialog";
-import { IGetEditValue } from "../../Interfaces/IGetEditValue";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
-import { ISetEditValue } from "../../Interfaces/ISetEditValue";
-import { IStringValue } from "../../Interfaces/IStringValue";
+﻿import { Decorators } from "../../Decorators";
+import { IEditDialog, IGetEditValue, IReadOnly } from "../../Interfaces";
+import { ISetEditValue, IStringValue } from "../../Interfaces";
 import { any, isArray } from "../../Q/Arrays";
 import { Authorization } from "../../Q/Authorization";
 import { text } from "../../Q/LocalText";
@@ -59,9 +56,9 @@ export interface Select2SearchResult<TItem> {
     more: boolean;
 }
 
-@registerClass('Serenity.Select2Editor',
+@Decorators.registerClass('Serenity.Select2Editor',
     [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
-@element("<input type=\"hidden\"/>")
+@Decorators.element("<input type=\"hidden\"/>")
 export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
 

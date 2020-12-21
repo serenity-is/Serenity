@@ -1,9 +1,9 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IStringValue } from "../../Interfaces/IStringValue";
+﻿import { Decorators } from "../../Decorators";
+import { IStringValue } from "../../Interfaces";
 import { Widget } from "../Widgets/Widget";
 
-@registerEditor('Serenity.StringEditor', [IStringValue])
-@element("<input type=\"text\"/>")
+@Decorators.registerEditor('Serenity.StringEditor', [IStringValue])
+@Decorators.element("<input type=\"text\"/>")
 export class StringEditor extends Widget<any> {
 
     constructor(input: JQuery) {

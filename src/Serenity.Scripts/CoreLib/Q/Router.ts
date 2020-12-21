@@ -1,5 +1,4 @@
-﻿import { coalesce } from "./Basics";
-import { startsWith } from "./Strings";
+﻿import { startsWith } from "./Strings";
 import { closePanel } from "./Dialogs";
 
 export namespace Router {

@@ -1,9 +1,9 @@
-﻿import { registerEditor } from "../../Decorators";
-import { IStringValue } from "../../Interfaces/IStringValue";
+﻿import { Decorators } from "../../Decorators";
+import { IStringValue } from "../../Interfaces";
 import { trimToNull } from "../../Q/Strings";
 import { StringEditor } from "./StringEditor";
 
-@registerEditor('Serenity.URLEditor', [IStringValue])
+@Decorators.registerEditor('Serenity.URLEditor', [IStringValue])
 export class URLEditor extends StringEditor {
 
     constructor(input: JQuery) {

@@ -1,7 +1,6 @@
-﻿import { registerEditor } from "../../Decorators";
+﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
 import { tryGetText } from "../../Q/LocalText";
-import { Enum, getAttributes } from "../../Q/TypeSystem";
-import { EnumKeyAttribute } from "../../Types/Attributes";
+import { Enum, getAttributes } from "../../Q/System";
 import { EnumTypeRegistry } from "../../Types/EnumTypeRegistry";
 import { Select2CommonOptions, Select2Editor } from "./Select2Editor";
 
@@ -10,7 +9,7 @@ export interface EnumEditorOptions extends Select2CommonOptions {
     enumType?: any;
 }
 
-@registerEditor('Serenity.EnumEditor')
+@Decorators.registerEditor('Serenity.EnumEditor')
 export class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
     constructor(hidden: JQuery, opt: EnumEditorOptions) {
         super(hidden, opt);

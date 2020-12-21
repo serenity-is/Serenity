@@ -1,18 +1,16 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators, OptionsTypeAttribute, ElementAttribute } from "../../Decorators";
 import { Widget } from "./Widget";
 import { any } from "../../Q/Arrays";
-import { extend } from "../../Q/Basics";
+import { extend, getAttributes, getTypeName } from "../../Q/System";
 import { isEmptyOrNull, startsWith, trimToEmpty, trimToNull } from "../../Q/Strings";
 import { text, tryGetText } from "../../Q/LocalText";
 import { EditorTypeRegistry } from "../../Types/EditorTypeRegistry";
-import { getAttributes, getTypeName } from "../../Q/TypeSystem";
-import { OptionsTypeAttribute, ElementAttribute } from "../../Types/Attributes";
 import { ReflectionOptionsSetter } from "./ReflectionOptionsSetter";
 import { EditorUtils } from "../Editors/EditorUtils";
 import { Culture } from "../../Q/Formatting";
 import { Authorization } from "../../Q/Authorization";
 
-@registerClass('Serenity.PropertyGrid')
+@Decorators.registerClass('Serenity.PropertyGrid')
 export class PropertyGrid extends Widget<PropertyGridOptions> {
 
     private editors: Widget<any>[];

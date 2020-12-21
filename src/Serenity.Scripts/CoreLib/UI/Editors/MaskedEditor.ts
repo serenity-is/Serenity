@@ -1,10 +1,10 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IStringValue } from "../../Interfaces/IStringValue";
+﻿import { Decorators } from "../../Decorators";
+import { IStringValue } from "../../Interfaces";
 import { Widget } from "../Widgets/Widget";
 
 // http://digitalbush.com/projects/masked-input-plugin/
-@registerEditor('Serenity.MaskedEditor', [IStringValue])
-@element("<input type=\"text\"/>")
+@Decorators.registerEditor('Serenity.MaskedEditor', [IStringValue])
+@Decorators.element("<input type=\"text\"/>")
 export class MaskedEditor extends Widget<MaskedEditorOptions> {
 
     constructor(input: JQuery, opt?: MaskedEditorOptions) {

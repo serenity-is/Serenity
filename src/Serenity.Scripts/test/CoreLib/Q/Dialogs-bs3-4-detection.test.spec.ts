@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 beforeEach(() => {
     jest.resetModules();
 });
@@ -10,38 +14,37 @@ function setupDummyJQueryForModal(callback) {
     global.$ = global.jQuery = function dummyJQueryForModal(html) {
         return {
             _html: html,
-            html: function() {
+            html: function () {
                 return null;
             },
-            eq: function(index) {
+            eq: function () {
                 return this;
             },
-            find: function(selector) {
+            find: function () {
                 return this;
             },
-            click: function() {
+            click: function () {
             },
-            appendTo: function(target) {
+            appendTo: function () {
                 return this;
             },
-            modal: function() {
+            modal: function () {
                 expect(this._html).toBe(html);
                 callback(html);
             }
         }
-    }
+    } as any;
 }
 
 test('BS3 is detected when modal version starts with 3', function() {
 
-    var Q = require("serenity-core").Q;
-
+    var alert = require("../../../CoreLib/Q/Dialogs").alert;
     var passedHtml;
     setupDummyJQueryForModal(function(html) {
         passedHtml = html;
     });
     try {
-        global.$.fn = {
+        (global.$ as any).fn = {
             modal: {
                 Constructor: {
                     VERSION: '3.3.1'
@@ -49,7 +52,7 @@ test('BS3 is detected when modal version starts with 3', function() {
             }
         }
 
-        Q.alert("hello");
+        alert("hello");
 
         expect(passedHtml).not.toBeNull();
 
@@ -67,19 +70,19 @@ test('BS3 is detected when modal version starts with 3', function() {
 
 test('BS4 is detected when modal version does not exist', function() {
     
-    var Q = require("serenity-core").Q;
+    var alert = require("../../../CoreLib/Q/Dialogs").alert;
 
     var passedHtml;
     setupDummyJQueryForModal(function(html) {
         passedHtml = html;
     });
     try {
-        global.$.fn = {
+        (global.$ as any).fn = {
             modal: {
             }
         }        
 
-        Q.alert("hello");
+        alert("hello");
 
         expect(passedHtml).not.toBeNull();
 
@@ -91,19 +94,19 @@ test('BS4 is detected when modal version does not exist', function() {
     }
     finally {
         delete global.$;
-        delete global.fn;
+        delete global.jQuery;
     }
 });
 
 test('BS4 is detected when modal version is something other than 3', function() {
-    
-    var Q = require("serenity-core").Q;
+
+    var alert = require("../../../CoreLib/Q/Dialogs").alert;
     var passedHtml;
     setupDummyJQueryForModal(function(html) {
         passedHtml = html;
     });
     try {
-        global.$.fn = {
+        (global.$ as any).fn = {
             modal: {
                 Constructor: {
                     VERSION: '4.1.0'
@@ -111,7 +114,7 @@ test('BS4 is detected when modal version is something other than 3', function() 
             }
         }           
 
-        Q.alert("hello");
+        alert("hello");
 
         expect(passedHtml).not.toBeNull();
 
@@ -123,6 +126,6 @@ test('BS4 is detected when modal version is something other than 3', function() 
     }
     finally {
         delete global.$;
-        delete global.fn;
+        delete global.jQuery;
     }    
 });

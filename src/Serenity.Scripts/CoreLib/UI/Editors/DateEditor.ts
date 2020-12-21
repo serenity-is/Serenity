@@ -1,8 +1,7 @@
 ﻿import { format } from "jquery";
-import { element, option, registerEditor } from "../../Decorators";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
-import { IStringValue } from "../../Interfaces/IStringValue";
-import { today } from "../../Q/Basics";
+import { Decorators } from "../../Decorators";
+import { IReadOnly, IStringValue } from "../../Interfaces";
+import { today } from "../../Q/System";
 import { Culture, formatDate, Invariant, parseDate, parseISODateTime } from "../../Q/Formatting";
 import { text } from "../../Q/LocalText";
 import { isEmptyOrNull, replaceAll } from "../../Q/Strings";
@@ -11,8 +10,8 @@ import { Widget } from "../Widgets/Widget";
 
 export let datePickerIconSvg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M14 2v-1h-3v1h-5v-1h-3v1h-3v15h17v-15h-3zM12 2h1v2h-1v-2zM4 2h1v2h-1v-2zM16 16h-15v-8.921h15v8.921zM1 6.079v-3.079h2v2h3v-2h5v2h3v-2h2v3.079h-15z" fill="#000000"></path></svg>';
 
-@registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
-@element('<input type="text"/>')
+@Decorators.registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
+@Decorators.element('<input type="text"/>')
 export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
 
     private minValue: string;
@@ -161,10 +160,10 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
         }
     }
 
-    @option()
+    @Decorators.option()
     public yearRange: string;
 
-    @option()
+    @Decorators.option()
     get_minValue(): string {
         return this.minValue;
     }
@@ -173,7 +172,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
         this.minValue = value;
     }
 
-    @option()
+    @Decorators.option()
     get_maxValue(): string {
         return this.maxValue;
     }
@@ -190,7 +189,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
         this.set_minValue(formatDate(value, 'yyyy-MM-dd'));
     }
 
-    @option()
+    @Decorators.option()
     get_maxDate(): Date {
         return parseISODateTime(this.get_maxValue());
     }
@@ -199,7 +198,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
         this.set_maxValue(formatDate(value, 'yyyy-MM-dd'));
     }
 
-    @option()
+    @Decorators.option()
     get_sqlMinMax(): boolean {
         return this.get_minValue() === '1753-01-01' && this.get_maxValue() === '9999-12-31';
     }

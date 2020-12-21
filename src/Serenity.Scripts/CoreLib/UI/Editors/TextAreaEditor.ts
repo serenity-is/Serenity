@@ -1,5 +1,5 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IStringValue } from "../../Interfaces/IStringValue";
+﻿import { Decorators } from "../../Decorators";
+import { IStringValue } from "../../Interfaces";
 import { Widget } from "../Widgets/Widget";
 
 export interface TextAreaEditorOptions {
@@ -7,8 +7,8 @@ export interface TextAreaEditorOptions {
     rows?: number;
 }
 
-@registerEditor('Serenity.TextAreaEditor', [IStringValue])
-@element("<textarea />")
+@Decorators.registerEditor('Serenity.TextAreaEditor', [IStringValue])
+@Decorators.element("<textarea />")
 export class TextAreaEditor extends Widget<TextAreaEditorOptions> {
 
     constructor(input: JQuery, opt?: TextAreaEditorOptions) {

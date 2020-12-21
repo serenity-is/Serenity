@@ -1,13 +1,13 @@
-﻿import { registerClass } from "../../Decorators";
-import { IEditDialog } from "../../Interfaces/IEditDialog";
+﻿import { Decorators, DialogTypeAttribute, DisplayNameAttribute } from "../../Decorators";
+import { EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../Decorators";
+import { IEditDialog } from "../../Interfaces";
 import { Authorization } from "../../Q/Authorization";
 import { format } from "../../Q/Formatting";
 import { LT, text, tryGetText } from "../../Q/LocalText";
 import { Router } from "../../Q/Router";
 import { resolveUrl } from "../../Q/Services";
 import { endsWith, isEmptyOrNull, replaceAll } from "../../Q/Strings";
-import { cast, getInstanceType, getTypeFullName, safeCast } from "../../Q/TypeSystem";
-import { DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../Types/Attributes";
+import { cast, getInstanceType, getTypeFullName, safeCast } from "../../Q/System";
 import { DialogTypeRegistry } from "../../Types/DialogTypeRegistry";
 import { EditorUtils } from "../Editors/EditorUtils";
 import { SubDialogHelper } from "../Helpers/SubDialogHelper";
@@ -16,7 +16,7 @@ import { Widget, WidgetDialogClass } from "../Widgets/Widget";
 import { ColumnPickerDialog } from "./ColumnPickerDialog";
 import { DataGrid } from "./DataGrid";
 
-@registerClass('Serenity.EntityGrid')
+@Decorators.registerClass('Serenity.EntityGrid')
 export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
 
     constructor(container: JQuery, options?: TOptions) {

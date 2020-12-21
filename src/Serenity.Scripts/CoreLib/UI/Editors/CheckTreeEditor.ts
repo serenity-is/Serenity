@@ -1,7 +1,5 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IGetEditValue } from "../../Interfaces/IGetEditValue";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
-import { ISetEditValue } from "../../Interfaces/ISetEditValue";
+﻿import { Decorators } from "../../Decorators";
+import { IGetEditValue, IReadOnly, ISetEditValue } from "../../Interfaces";
 import { Culture } from "../../Q/Formatting";
 import { htmlEncode } from "../../Q/Html";
 import { tryGetText } from "../../Q/LocalText";
@@ -26,8 +24,8 @@ export interface CheckTreeItem<TSource> {
     source?: TSource;
 }
 
-@registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
-@element("<div/>")
+@Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
+@Decorators.element("<div/>")
 export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends DataGrid<TItem, TOptions>
     implements IGetEditValue, ISetEditValue, IReadOnly {
 
@@ -474,7 +472,7 @@ export interface CheckLookupEditorOptions {
     filterValue?: any;
 }
 
-@registerEditor("Serenity.CheckLookupEditor")
+@Decorators.registerEditor("Serenity.CheckLookupEditor")
 export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeItem<TItem>, CheckLookupEditorOptions> {
 
     private searchText: string;

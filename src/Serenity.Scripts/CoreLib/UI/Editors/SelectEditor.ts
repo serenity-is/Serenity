@@ -1,8 +1,8 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { isEmptyOrNull } from "../../Q/Strings";
 import { Select2CommonOptions, Select2Editor } from "./Select2Editor";
 
-@registerClass('Serenity.SelectEditor')
+@Decorators.registerClass('Serenity.SelectEditor')
 export class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
     constructor(hidden: JQuery, opt?: SelectEditorOptions) {
         super(hidden, opt);

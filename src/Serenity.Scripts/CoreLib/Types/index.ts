@@ -1,4 +1,3 @@
-export * from "./Attributes";
 export * from "./CaptureOperationType";
 export * from "./DataChangeInfo";
 export * from "./ReflectionUtils";

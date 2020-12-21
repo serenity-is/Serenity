@@ -1,4 +1,4 @@
-﻿import { Exception } from "../../Q/Exceptions";
+﻿import { Exception } from "../../Q/System";
 import { validatorAbortHandler } from "../../Q/ValidateOptions";
 import { Widget } from "../Widgets/Widget";
 

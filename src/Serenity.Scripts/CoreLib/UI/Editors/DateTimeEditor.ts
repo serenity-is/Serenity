@@ -1,7 +1,6 @@
-﻿import { element, option, registerEditor } from "../../Decorators";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
-import { IStringValue } from "../../Interfaces/IStringValue";
-import { today } from "../../Q/Basics";
+﻿import { Decorators } from "../../Decorators";
+import { IReadOnly, IStringValue } from "../../Interfaces";
+import { today } from "../../Q/System";
 import { Culture, format, formatDate, formatISODateTimeUTC, Invariant, parseDate, parseISODateTime, round, trunc } from "../../Q/Formatting";
 import { addOption } from "../../Q/Html";
 import { text, tryGetText } from "../../Q/LocalText";
@@ -11,8 +10,8 @@ import { Widget } from "../Widgets/Widget";
 import { DateEditor } from "./DateEditor";
 import { EditorUtils } from "./EditorUtils";
 
-@registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])
-@element('<input type="text"/>')
+@Decorators.registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])
+@Decorators.element('<input type="text"/>')
 export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements IStringValue, IReadOnly {
 
     private minValue: string;
@@ -253,7 +252,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
         this.set_valueAsDate(value);
     }
 
-    @option()
+    @Decorators.option()
     get_minValue(): string {
         return this.minValue;
     }
@@ -262,7 +261,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
         this.minValue = value;
     }
 
-    @option()
+    @Decorators.option()
     get_maxValue(): string {
         return this.maxValue;
     }
@@ -279,7 +278,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
         this.set_minValue(formatDate(value, 'yyyy-MM-ddTHH:mm:ss'));
     }
 
-    @option()
+    @Decorators.option()
     get_maxDate(): Date {
         return parseISODateTime(this.get_maxValue());
     }
@@ -288,7 +287,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
         this.set_maxValue(formatDate(value, 'yyyy-MM-ddTHH:mm:ss'));
     }
 
-    @option()
+    @Decorators.option()
     get_sqlMinMax(): boolean {
         return this.get_minValue() === '1753-01-01' && this.get_maxValue() === '9999-12-31';
     }

@@ -1,6 +1,5 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IDoubleValue } from "../../Interfaces/IDoubleValue";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
+﻿import { Decorators } from "../../Decorators";
+import { IDoubleValue, IReadOnly } from "../../Interfaces";
 import { toId } from "../../Q/Formatting";
 import { addOption } from "../../Q/Html";
 import { Widget } from "../Widgets/Widget";
@@ -15,8 +14,8 @@ namespace Serenity {
         intervalMinutes?: any;
     }
 
-    @registerEditor('Serenity.TimeEditor', [IDoubleValue, IReadOnly])
-    @element("<select />")
+    @Decorators.registerEditor('Serenity.TimeEditor', [IDoubleValue, IReadOnly])
+    @Decorators.element("<select />")
     export class TimeEditor extends Widget<TimeEditorOptions> {
 
         private minutes: JQuery;

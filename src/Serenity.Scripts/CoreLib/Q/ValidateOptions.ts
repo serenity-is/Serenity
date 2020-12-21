@@ -1,4 +1,4 @@
-﻿import { extend } from "./Basics";
+﻿import { extend } from "./System";
 import { notifyError } from "./Notify";
 import { text } from "./LocalText";
 import { baseValidateOptions, getHighlightTarget } from "./Validation";

@@ -1,8 +1,8 @@
-﻿import { registerEditor } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { startsWith } from "../../Q/Strings";
 import { SelectEditor, SelectEditorOptions } from "./SelectEditor";
 
-@registerEditor('Serenity.DateYearEditor')
+@Decorators.registerEditor('Serenity.DateYearEditor')
 export class DateYearEditor extends SelectEditor {
 
     constructor(hidden: JQuery, opt: DateYearEditorOptions) {

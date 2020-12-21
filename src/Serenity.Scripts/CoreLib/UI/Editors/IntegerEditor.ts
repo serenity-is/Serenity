@@ -1,6 +1,6 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IDoubleValue } from "../../Interfaces/IDoubleValue";
-import { extend } from "../../Q/Basics";
+﻿import { Decorators } from "../../Decorators";
+import { IDoubleValue } from "../../Interfaces";
+import { extend } from "../../Q/System";
 import { formatNumber, parseInteger } from "../../Q/Formatting";
 import { isTrimmedEmpty, trimToNull } from "../../Q/Strings";
 import { Widget } from "../Widgets/Widget";
@@ -12,8 +12,8 @@ export interface IntegerEditorOptions {
     allowNegatives?: boolean;
 }
 
-@registerEditor('Serenity.IntegerEditor', [IDoubleValue])
-@element('<input type="text"/>')
+@Decorators.registerEditor('Serenity.IntegerEditor', [IDoubleValue])
+@Decorators.element('<input type="text"/>')
 export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
 
     constructor(input: JQuery, opt?: IntegerEditorOptions) {

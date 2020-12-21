@@ -1,7 +1,7 @@
-﻿import { registerEditor } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { getLookup, getLookupAsync, reloadLookup, ScriptData } from "../../Q/ScriptData";
 import { endsWith } from "../../Q/Strings";
-import { getInstanceType, getTypeFullName } from "../../Q/TypeSystem";
+import { getInstanceType, getTypeFullName } from "../../Q/System";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./Select2Editor";
 
 export interface LookupEditorOptions extends Select2EditorOptions {
@@ -9,7 +9,7 @@ export interface LookupEditorOptions extends Select2EditorOptions {
     async?: boolean;
 }
 
-@registerEditor("Serenity.LookupEditorBase")
+@Decorators.registerEditor("Serenity.LookupEditorBase")
 export class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
 
     constructor(input: JQuery, opt?: TOptions) {
@@ -141,7 +141,7 @@ export class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> exten
     }
 }
 
-@registerEditor('Serenity.LookupEditor')
+@Decorators.registerEditor('Serenity.LookupEditor')
 export class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
     constructor(hidden: JQuery, opt?: LookupEditorOptions) {
         super(hidden, opt);

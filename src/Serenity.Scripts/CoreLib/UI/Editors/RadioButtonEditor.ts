@@ -1,11 +1,9 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
-import { IStringValue } from "../../Interfaces/IStringValue";
+﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
+import { IReadOnly, IStringValue } from "../../Interfaces";
 import { tryGetText } from "../../Q/LocalText";
 import { getLookup } from "../../Q/ScriptData";
 import { isEmptyOrNull } from "../../Q/Strings";
-import { Enum, getAttributes } from "../../Q/TypeSystem";
-import { EnumKeyAttribute } from "../../Types/Attributes";
+import { Enum, getAttributes } from "../../Q/System";
 import { EnumTypeRegistry } from "../../Types/EnumTypeRegistry";
 import { Widget } from "../Widgets/Widget";
 
@@ -15,8 +13,8 @@ export interface RadioButtonEditorOptions {
     lookupKey?: string;
 }
 
-@registerEditor('Serenity.RadioButtonEditor', [IStringValue, IReadOnly])
-@element('<div/>')
+@Decorators.registerEditor('Serenity.RadioButtonEditor', [IStringValue, IReadOnly])
+@Decorators.element('<div/>')
 export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
     implements IReadOnly {
 

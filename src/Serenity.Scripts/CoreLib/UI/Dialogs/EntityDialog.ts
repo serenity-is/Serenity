@@ -1,18 +1,17 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators, EntityTypeAttribute, FormKeyAttribute } from "../../Decorators";
+import { IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute } from "../../Decorators";
+import { LocalTextPrefixAttribute,NamePropertyAttribute, ServiceAttribute } from "../../Decorators";
 import { any, isArray } from "../../Q/Arrays";
-import { extend } from "../../Q/Basics";
-import { Exception } from "../../Q/Exceptions";
+import { extend, Exception } from "../../Q/System";
 import { format } from "../../Q/Formatting";
 import { LT, text, tryGetText } from "../../Q/LocalText";
 import { notifySuccess } from "../../Q/Notify";
 import { getForm } from "../../Q/ScriptData";
 import { serviceCall } from "../../Q/Services";
 import { endsWith, isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
-import { getAttributes, getInstanceType, getTypeFullName, safeCast } from "../../Q/TypeSystem";
+import { getAttributes, getInstanceType, getTypeFullName, safeCast } from "../../Q/System";
 import { validatorAbortHandler } from "../../Q/ValidateOptions";
-import { EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../Types/Attributes";
-import { IEditDialog } from "../../Interfaces/IEditDialog";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
+import { IEditDialog, IReadOnly } from "../../Interfaces";
 import { EditorUtils } from "../Editors/EditorUtils";
 import { ValidationHelper } from "../Helpers/ValidationHelper";
 import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../Widgets/PropertyGrid";
@@ -24,7 +23,7 @@ import { SubDialogHelper } from "../Helpers/SubDialogHelper";
 import { TabsExtensions } from "../Helpers/TabsExtensions";
 import { Authorization } from "../../Q/Authorization";
 
-@registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
+@Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
 export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
 
     protected entity: TItem;

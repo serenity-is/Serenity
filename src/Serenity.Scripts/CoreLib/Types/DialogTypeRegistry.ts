@@ -1,9 +1,9 @@
 ﻿import { Config } from "../Q/Config";
-import { Exception } from "../Q/Exceptions";
-import { IDialog } from "../Interfaces/IDialog";
+import { Exception } from "../Q/System";
+import { IDialog } from "../Interfaces";
 import { notifyError } from "../Q/Notify";
 import { endsWith } from "../Q/Strings";
-import { getType, isAssignableFrom } from "../Q/TypeSystem";
+import { getType, isAssignableFrom } from "../Q/System";
 
 export namespace DialogTypeRegistry {
 

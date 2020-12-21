@@ -1,7 +1,7 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { text, tryGetText } from "../../Q/LocalText";
 import { isEmptyOrNull } from "../../Q/Strings";
-import { cast } from "../../Q/TypeSystem";
+import { cast } from "../../Q/System";
 import { Select2Editor } from "../Editors/Select2Editor";
 import { ReflectionOptionsSetter } from "../Widgets/ReflectionOptionsSetter";
 import { FilteringTypeRegistry, IFiltering } from "./Filtering";
@@ -9,7 +9,7 @@ import { FilterLine } from "./FilterLine";
 import { FilterOperator } from "./FilterOperator";
 import { FilterWidgetBase } from "./FilterWidgetBase";
 
-@registerClass('Serenity.FilterFieldSelect')
+@Decorators.registerClass('Serenity.FilterFieldSelect')
 class FilterFieldSelect extends Select2Editor<any, Serenity.PropertyItem> {
     constructor(hidden: JQuery, fields: Serenity.PropertyItem[]) {
         super(hidden);
@@ -35,7 +35,7 @@ class FilterFieldSelect extends Select2Editor<any, Serenity.PropertyItem> {
     }
 }
 
-@registerClass('Serenity.FilterOperatorSelect')
+@Decorators.registerClass('Serenity.FilterOperatorSelect')
 class FilterOperatorSelect extends Select2Editor<any, FilterOperator> {
     constructor(hidden: JQuery, source: FilterOperator[]) {
         super(hidden);

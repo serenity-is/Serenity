@@ -1,4 +1,4 @@
-﻿import { registerClass, resizable, responsive } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { Authorization } from "../../Q/Authorization";
 import { Culture } from "../../Q/Formatting";
 import { htmlEncode } from "../../Q/Html";
@@ -11,9 +11,9 @@ import { IDataGrid } from "./IDataGrid";
 import { Router } from "../../Q/Router";
 import { centerDialog } from "../../Q/Layout";
 
-@registerClass()
-@resizable()
-@responsive()
+@Decorators.registerClass()
+@Decorators.resizable()
+@Decorators.responsive()
 export class ColumnPickerDialog extends TemplatedDialog<any> {
 
     private ulVisible: JQuery;

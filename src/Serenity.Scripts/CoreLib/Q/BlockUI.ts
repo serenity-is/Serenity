@@ -1,4 +1,4 @@
-﻿import { extend } from "./Basics"
+﻿import { extend } from "./System"
 
 export interface JQBlockUIOptions {
     useTimeout?: boolean;   

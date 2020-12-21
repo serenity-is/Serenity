@@ -1,5 +1,5 @@
-﻿import { Widget } from "./Widget";
-import { element, registerEditor } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
+import { Widget } from "./Widget";
 import { LazyLoadHelper } from "../Helpers/LazyLoadHelper";
 
 export interface GoogleMapOptions {
@@ -12,8 +12,8 @@ export interface GoogleMapOptions {
     markerLongitude?: any;
 }
 
-@registerEditor('Serenity.GoogleMap', [])
-@element('<div/>')
+@Decorators.registerEditor('Serenity.GoogleMap', [])
+@Decorators.element('<div/>')
 export class GoogleMap extends Widget<GoogleMapOptions> {
 
     private map: any;

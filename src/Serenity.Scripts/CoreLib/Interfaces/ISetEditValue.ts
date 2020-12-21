@@ -1,6 +1,6 @@
-﻿import { registerInterface } from "../Decorators";
+﻿import { Decorators } from "../Decorators";
 
-@registerInterface()
+@Decorators.registerInterface()
 export class ISetEditValue {
 }
 

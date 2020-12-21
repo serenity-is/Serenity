@@ -1,6 +1,6 @@
-﻿import { extend } from "./Basics";
+﻿import { extend } from "./System";
 import { Config } from "./Config";
-import { Exception } from "./Exceptions";
+import { Exception } from "./System";
 import { tryGetText } from "./LocalText";
 import { parseDate, parseHourAndMin, parseDayHourAndMin, parseDecimal, parseInteger } from "./Formatting";
 import { isBS3 } from "./Dialogs";

@@ -1,12 +1,12 @@
-﻿import { registerClass } from "../../Decorators";
-import { ArgumentNullException } from "../../Q/Exceptions";
+﻿import { Decorators } from "../../Decorators";
+import { ArgumentNullException } from "../../Q/System";
 import { Culture } from "../../Q/Formatting";
 import { text, tryGetText } from "../../Q/LocalText";
 import { FilterLine } from "./FilterLine";
 import { Criteria } from "../../Services/Criteria";
-import { delegateCombine, delegateRemove } from "../../Q/TypeSystem";
+import { delegateCombine, delegateRemove } from "../../Q/System";
 
-@registerClass('FilterStore')
+@Decorators.registerClass('FilterStore')
 export class FilterStore {
 
     constructor(fields: Serenity.PropertyItem[]) {

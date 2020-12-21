@@ -1,5 +1,6 @@
-﻿import { element, registerClass, registerInterface } from "../../Decorators";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
+﻿import { Decorators, ColumnsKeyAttribute, FilterableAttribute } from "../../Decorators";
+import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../Decorators";
+import { IReadOnly } from "../../Interfaces";
 import { FilterLine } from "../Filtering/FilterLine";
 import { QuickSearchField, QuickSearchInput } from "./QuickSearchInput";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
@@ -8,7 +9,8 @@ import { RemoteView } from "../../Slick/RemoteView";
 import { FilterStore } from "../Filtering/FilterStore";
 import { FilterDisplayBar } from "../Filtering/FilterDisplayBar";
 import { QuickFilterBar } from ".//QuickFilterBar";
-import { getAttributes, getInstanceType, getTypeFullName, getTypeName, isInstanceOfType } from "../../Q/TypeSystem";
+import { deepClone, extend, getAttributes, getInstanceType } from "../../Q/System";
+import { getTypeFullName, getTypeName, isInstanceOfType } from "../../Q/System";
 import { LayoutTimer } from "../../Q/LayoutTimer";
 import { endsWith, isEmptyOrNull, startsWith, trimEnd, trimToNull } from "../../Q/Strings";
 import { tryGetText } from "../../Q/LocalText";
@@ -20,11 +22,9 @@ import { Authorization } from "../../Q/Authorization";
 import { BooleanFiltering, DateFiltering, DateTimeFiltering, FilteringTypeRegistry, IFiltering, IQuickFiltering } from "../Filtering/Filtering";
 import { ReflectionOptionsSetter } from "../Widgets/ReflectionOptionsSetter";
 import { FilterOperators } from "../Filtering/FilterOperator";
-import { deepClone, extend } from "../../Q/Basics";
 import { LazyLoadHelper } from "../Helpers/LazyLoadHelper";
 import { Criteria } from "../../Services/Criteria";
 import { setEquality } from "../../Q/Services";
-import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../Types/Attributes";
 import { SlickPager } from "./SlickPager";
 import { getColumns } from "../../Q/ScriptData";
 import { htmlEncode } from "../../Q/Html";
@@ -67,8 +67,8 @@ export interface GridPersistanceFlags {
     includeDeleted?: boolean;
 }
 
-@registerClass('Serenity.DataGrid', [IReadOnly])
-@element("<div/>")
+@Decorators.registerClass('Serenity.DataGrid', [IReadOnly])
+@Decorators.element("<div/>")
 export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid, IReadOnly {
 
     protected titleDiv: JQuery;

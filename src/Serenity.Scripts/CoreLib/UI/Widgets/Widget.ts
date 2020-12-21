@@ -1,13 +1,12 @@
 ﻿/// <reference types="react" />
 
+import { Decorators, ElementAttribute } from "../../Decorators";
 import { Config } from "../../Q/Config";
-import { Exception, ArgumentNullException } from "../../Q/Exceptions";
+import { Exception, ArgumentNullException } from "../../Q/System";
 import { format } from "../../Q/Formatting";
 import { replaceAll, startsWith } from "../../Q/Strings";
-import { getAttributes, getInstanceType, getTypeName, getTypeFullName, isAssignableFrom  } from "../../Q/TypeSystem";
-import { IDialog } from "../../Interfaces/IDialog";
-import { registerClass } from "../../Decorators/Base";
-import { ElementAttribute } from "../../Types/Attributes";
+import { getAttributes, getInstanceType, getTypeName, getTypeFullName, isAssignableFrom  } from "../../Q/System";
+import { IDialog } from "../../Interfaces";
 import { addValidationRule as addValRule } from "../../Q/Validation";
 import { notifyError } from "../../Q/Notify";
 
@@ -59,7 +58,7 @@ export interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> 
     init?: (w: TWidget) => void;
 }
 
-@registerClass()
+@Decorators.registerClass()
 // @ts-ignore
 export class Widget<TOptions> extends React.Component<TOptions> {
     private static nextWidgetNumber = 0;

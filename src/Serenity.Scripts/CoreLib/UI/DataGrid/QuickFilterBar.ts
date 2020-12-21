@@ -1,11 +1,11 @@
-﻿import { element, registerClass } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { isArray } from "../../Q/Arrays";
-import { ArgumentNullException } from "../../Q/Exceptions";
+import { ArgumentNullException } from "../../Q/System";
 import { formatDate, parseDate, toId } from "../../Q/Formatting";
 import { text, tryGetText } from "../../Q/LocalText";
 import { notifyWarning } from "../../Q/Notify";
 import { isEmptyOrNull, isTrimmedEmpty } from "../../Q/Strings";
-import { delegateCombine, delegateRemove } from "../../Q/TypeSystem";
+import { delegateCombine, delegateRemove } from "../../Q/System";
 import { Criteria } from "../../Services/Criteria";
 import { DateEditor } from "../Editors/DateEditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../Editors/DateTimeEditor";
@@ -20,8 +20,8 @@ export interface QuickFilterBarOptions {
     idPrefix?: string;
 }
 
-@registerClass('Serenity.QuickFilterBar')
-@element("<div/>")
+@Decorators.registerClass('Serenity.QuickFilterBar')
+@Decorators.element("<div/>")
 export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
 
     constructor(container: JQuery, options?: QuickFilterBarOptions) {

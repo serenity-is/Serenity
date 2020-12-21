@@ -1,16 +1,16 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IStringValue } from "../../Interfaces/IStringValue";
-import { isValue } from "../../Q/Basics";
+﻿import { Decorators } from "../../Decorators";
+import { IStringValue } from "../../Interfaces";
+import { isValue } from "../../Q/System";
 import { text } from "../../Q/LocalText";
 import { serviceCall } from "../../Q/Services";
 import { isEmptyOrNull, trimToNull } from "../../Q/Strings";
-import { safeCast } from "../../Q/TypeSystem";
+import { safeCast } from "../../Q/System";
 import { ValidationHelper } from "../Helpers/ValidationHelper";
 import { Widget } from "../Widgets/Widget";
 import { WX } from "../Widgets/WX";
 
-@registerEditor('Serenity.Select2AjaxEditor', [IStringValue])
-@element('<input type="hidden" />')
+@Decorators.registerEditor('Serenity.Select2AjaxEditor', [IStringValue])
+@Decorators.element('<input type="hidden" />')
 export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
     pageSize: number = 50;
 

@@ -1,5 +1,5 @@
 ﻿import { Config } from "./Config";
-import { extend } from "./Basics";
+import { extend } from "./System";
 import { attrEncode, htmlEncode } from "./Html";
 import { startsWith } from "./Strings";
 import { tryGetText } from "./LocalText";

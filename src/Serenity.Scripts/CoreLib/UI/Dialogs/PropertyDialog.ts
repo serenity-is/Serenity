@@ -1,13 +1,12 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators, FormKeyAttribute } from "../../Decorators";
 import { text } from "../../Q/LocalText";
 import { getForm } from "../../Q/ScriptData";
 import { endsWith } from "../../Q/Strings";
-import { getAttributes, getInstanceType, getTypeFullName } from "../../Q/TypeSystem";
-import { FormKeyAttribute } from "../../Types/Attributes";
+import { getAttributes, getInstanceType, getTypeFullName } from "../../Q/System";
 import { PropertyGrid, PropertyGridOptions } from "../Widgets/PropertyGrid";
 import { TemplatedDialog } from "./TemplatedDialog";
 
-@registerClass('Serenity.PropertyDialog')
+@Decorators.registerClass('Serenity.PropertyDialog')
 export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
     protected _entity: TItem;
     protected _entityId: any;

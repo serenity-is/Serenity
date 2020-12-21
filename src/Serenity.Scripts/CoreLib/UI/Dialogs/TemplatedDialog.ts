@@ -1,20 +1,21 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators, FlexifyAttribute, MaximizableAttribute } from "../../Decorators";
+import { PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../Decorators";
 import { Config } from "../../Q/Config";
-import { bsModalMarkup, closePanel, DialogButton, dialogButtonToBS, dialogButtonToUI } from "../../Q/Dialogs";
+import { bsModalMarkup, closePanel, DialogButton } from "../../Q/Dialogs";
+import { dialogButtonToBS, dialogButtonToUI } from "../../Q/Dialogs";
 import { parseInteger } from "../../Q/Formatting";
 import { newBodyDiv } from "../../Q/Html";
 import { layoutFillHeight } from "../../Q/Layout";
 import { positionToastContainer } from "../../Q/Notify";
 import { endsWith, isEmptyOrNull } from "../../Q/Strings";
-import { getAttributes, getInstanceType } from "../../Q/TypeSystem";
+import { getAttributes, getInstanceType } from "../../Q/System";
 import { validateOptions } from "../../Q/ValidateOptions";
-import { FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../Types/Attributes";
-import { IDialog } from "../../Interfaces/IDialog";
+import { IDialog } from "../../Interfaces";
 import { TemplatedWidget } from "../Widgets/TemplatedWidget";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { DialogExtensions } from "./DialogExtensions";
 
-@registerClass([IDialog])
+@Decorators.registerClass([IDialog])
 export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
 
     protected tabs: JQuery;

@@ -1,5 +1,5 @@
 ﻿import { padLeft, startsWith, trim, trimToNull, zeroPad } from "./Strings";
-import { getInstanceType } from "./TypeSystem";
+import { getInstanceType } from "./System";
 
 export interface NumberFormat {
     decimalSeparator: string;

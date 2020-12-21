@@ -1,10 +1,10 @@
-﻿import { registerInterface } from "../Decorators";
+﻿import { Decorators } from "../Decorators";
 
 export interface IReadOnly {
     get_readOnly(): boolean;
     set_readOnly(value: boolean): void;
 }
 
-@registerInterface('Serenity.IReadOnly')
+@Decorators.registerInterface('Serenity.IReadOnly')
 export class IReadOnly {
 }

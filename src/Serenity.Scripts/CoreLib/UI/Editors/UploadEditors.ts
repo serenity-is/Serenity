@@ -1,12 +1,9 @@
-﻿import { element, option, registerEditor } from "../../Decorators";
-import { IGetEditValue } from "../../Interfaces/IGetEditValue";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
-import { ISetEditValue } from "../../Interfaces/ISetEditValue";
-import { IValidateRequired } from "../../Interfaces/IValidateRequired";
-import { extend } from "../../Q/Basics";
+﻿import { Decorators } from "../../Decorators";
+import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../Interfaces";
+import { extend } from "../../Q/System";
 import { text } from "../../Q/LocalText";
 import { endsWith, isEmptyOrNull, isTrimmedEmpty, replaceAll, startsWith, trimToNull } from "../../Q/Strings";
-import { isInstanceOfType } from "../../Q/TypeSystem";
+import { isInstanceOfType } from "../../Q/System";
 import { FileUploadConstraints, UploadedFile, UploadHelper, UploadInputOptions } from "../Helpers/UploadHelper";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { Widget } from "../Widgets/Widget";
@@ -19,8 +16,8 @@ export interface FileUploadEditorOptions extends FileUploadConstraints {
 export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 }
 
-@registerEditor('Serenity.FileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
-@element('<div/>')
+@Decorators.registerEditor('Serenity.FileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
+@Decorators.element('<div/>')
 export class FileUploadEditor extends Widget<FileUploadEditorOptions>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
@@ -264,7 +261,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
     protected hiddenInput: JQuery;
 }
 
-@registerEditor('Serenity.ImageUploadEditor')
+@Decorators.registerEditor('Serenity.ImageUploadEditor')
 export class ImageUploadEditor extends FileUploadEditor {
     constructor(div: JQuery, opt: ImageUploadEditorOptions) {
         super(div, opt);
@@ -276,8 +273,8 @@ export class ImageUploadEditor extends FileUploadEditor {
     }
 }
 
-@registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
-@element('<div/>')
+@Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
+@Decorators.element('<div/>')
 export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
@@ -459,11 +456,11 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
         }
     }
 
-    @option()
+    @Decorators.option()
     public jsonEncodeValue: boolean;
 }
 
-@registerEditor('Serenity.MultipleImageUploadEditor')
+@Decorators.registerEditor('Serenity.MultipleImageUploadEditor')
 export class MultipleImageUploadEditor extends MultipleFileUploadEditor {
     constructor(div: JQuery, opt: ImageUploadEditorOptions) {
         super(div, opt);

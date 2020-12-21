@@ -1,10 +1,10 @@
 ﻿import { Config } from "../Q/Config";
-import { Exception } from "../Q/Exceptions";
+import { Exception } from "../Q/System";
 import { notifyError } from "../Q/Notify";
 import { format } from "../Q/Formatting";
 import { startsWith } from "../Q/Strings";
-import { getAttributes, getTypes, getTypeFullName, isEnum } from "../Q/TypeSystem";
-import { EnumKeyAttribute } from "./Attributes";
+import { getAttributes, getTypes, getTypeFullName, isEnum } from "../Q/System";
+import { EnumKeyAttribute } from "../Decorators";
 
 export namespace EnumTypeRegistry {
 

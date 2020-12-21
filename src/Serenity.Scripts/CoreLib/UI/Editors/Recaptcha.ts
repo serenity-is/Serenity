@@ -1,5 +1,5 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IStringValue } from "../../Interfaces/IStringValue";
+﻿import { Decorators } from "../../Decorators";
+import { IStringValue } from "../../Interfaces";
 import { text } from "../../Q/LocalText";
 import { isEmptyOrNull } from "../../Q/Strings";
 import { addValidationRule } from "../../Q/Validation";
@@ -10,8 +10,8 @@ export interface RecaptchaOptions {
     language?: string;
 }
 
-@registerEditor('Serenity.Recaptcha', [IStringValue])
-@element("<div/>")
+@Decorators.registerEditor('Serenity.Recaptcha', [IStringValue])
+@Decorators.element("<div/>")
 export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
     constructor(div: JQuery, opt: RecaptchaOptions) {
         super(div, opt);

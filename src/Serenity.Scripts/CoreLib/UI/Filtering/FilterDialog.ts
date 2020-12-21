@@ -1,10 +1,10 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { text } from "../../Q/LocalText";
 import { notifyError } from "../../Q/Notify";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
 import { FilterPanel } from "./FilterPanel";
 
-@registerClass('Serenity.FilterDialog')
+@Decorators.registerClass('Serenity.FilterDialog')
 export class FilterDialog extends TemplatedDialog<any> {
 
     private filterPanel: FilterPanel;

@@ -1,9 +1,9 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IBooleanValue } from "../../Interfaces/IBooleanValue";
+﻿import { Decorators } from "../../Decorators";
+import { IBooleanValue } from "../../Interfaces";
 import { Widget } from "../Widgets/Widget";
 
-@registerEditor('Serenity.BooleanEditor', [IBooleanValue])
-@element('<input type="checkbox"/>')
+@Decorators.registerEditor('Serenity.BooleanEditor', [IBooleanValue])
+@Decorators.element('<input type="checkbox"/>')
 export class BooleanEditor extends Widget<any> {
 
     public get value(): boolean {

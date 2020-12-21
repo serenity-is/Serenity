@@ -1,5 +1,5 @@
 ﻿import { Widget } from "./Widget";
-import { registerClass, registerEditor } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { isEmptyOrNull, startsWith } from "../../Q/Strings";
 import { htmlEncode } from "../../Q/Html";
 
@@ -25,7 +25,7 @@ export interface PopupMenuButtonOptions {
     positionAt?: string;
 }
 
-@registerEditor('Serenity.PopupMenuButton')
+@Decorators.registerEditor('Serenity.PopupMenuButton')
 export class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
     constructor(div: JQuery, opt: PopupMenuButtonOptions) {
         super(div, opt);
@@ -69,7 +69,7 @@ export class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
 export interface PopupToolButtonOptions extends PopupMenuButtonOptions {
 }
 
-@registerEditor('Serenity.PopupToolButton')
+@Decorators.registerEditor('Serenity.PopupToolButton')
 export class PopupToolButton extends PopupMenuButton {
     constructor(div: JQuery, opt: PopupToolButtonOptions) {
         super(div, opt);
@@ -84,7 +84,7 @@ export interface ToolbarOptions {
     hotkeyContext?: any;
 }
 
-@registerClass('Serenity.Toolbar')
+@Decorators.registerClass('Serenity.Toolbar')
 export class Toolbar extends Widget<ToolbarOptions> {
     constructor(div: JQuery, options: ToolbarOptions) {
         super(div, options);

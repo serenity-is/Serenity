@@ -1,6 +1,6 @@
-﻿import { registerInterface } from "../Decorators";
+﻿import { Decorators } from "../Decorators";
 
-@registerInterface('Serenity.IDialog')
+@Decorators.registerInterface('Serenity.IDialog')
 export class IDialog {
 }
 

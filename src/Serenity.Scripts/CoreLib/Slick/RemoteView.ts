@@ -1,4 +1,4 @@
-﻿import { deepClone, extend } from "../Q/Basics";
+﻿import { deepClone, extend } from "../Q/System";
 import { notifyError } from "../Q/Notify";
 import { text } from "../Q/LocalText";
 

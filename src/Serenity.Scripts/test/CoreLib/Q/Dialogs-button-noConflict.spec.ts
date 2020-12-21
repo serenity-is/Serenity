@@ -7,27 +7,27 @@ afterEach(() => {
 });
 
 function setupDummyJQuery() {
-    global.$ = global.jQuery = function() {
+    global.$ = global.jQuery = function () {
         return {
-            html: function() {
+            html: function () {
                 return null;
             },
         }
-    }
-    global.$.fn = {};
+    } as any;
+    (global.$ as any).fn = {};
 }
 
 test('noConflict is not called if no jQuery ui button widget', function() {
     setupDummyJQuery();
     try {
         var noConflictCalled = false;
-        global.$.ui = {};
-        global.$.fn.button = {
+        (global.$ as any).ui = {};
+        (global.$ as any).fn.button = {
             noConflict: function() {
                 noConflictCalled = true;
             }
         }
-        var Q = require("serenity-core").Q;
+        require("../../../CoreLib/Q/Dialogs");
         expect(noConflictCalled).toBe(false);
     }
     finally {
@@ -39,13 +39,13 @@ test('noConflict is not called if no jQuery ui button widget', function() {
 test('noConflict skipped if button does not have noConflict method', function() {
     setupDummyJQuery();
     try {
-        global.$.ui = { 
+        (global.$ as any).ui = { 
             button: function() {
             }
         };
-        global.$.fn.button = {
+        (global.$ as any).fn.button = {
         }
-        var Q = require("serenity-core").Q;
+        require("../../../CoreLib/Q/Dialogs");
     }
     finally {
         delete global.$;
@@ -57,23 +57,26 @@ test('noConflict called if jQuery ui button widget exists and $.fn.button has no
     setupDummyJQuery();
     try {
         var noConflictCalled = false;
+
         function uiButton() {
         }
+
         function bsButton() {
         }
-        bsButton.noConflict = function() {
+        bsButton.noConflict = function () {
             noConflictCalled = true;
-            global.$.fn.button = uiButton;
+            (global.$ as any).fn.button = uiButton;
             return bsButton;
-        }
-        global.$.fn.button = bsButton;
-        global.$.ui = {
+        };
+
+        (global.$ as any).fn.button = bsButton;
+        (global.$ as any).ui = {
             button: uiButton
         };
-        var Q = require("serenity-core").Q;
+        require("../../../CoreLib/Q/Dialogs");
         expect(noConflictCalled).toBe(true);
         expect($.fn.button).toBe(uiButton);
-        expect($.fn.btn).toBe(bsButton);
+        expect(($.fn as any).btn).toBe(bsButton);
     }
     finally {
         delete global.$;

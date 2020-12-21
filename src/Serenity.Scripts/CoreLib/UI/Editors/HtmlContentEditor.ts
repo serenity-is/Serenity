@@ -1,6 +1,5 @@
-﻿import { element, registerEditor } from "../../Decorators";
-import { IReadOnly } from "../../Interfaces/IReadOnly";
-import { IStringValue } from "../../Interfaces/IStringValue";
+﻿import { Decorators } from "../../Decorators";
+import { IReadOnly, IStringValue } from "../../Interfaces";
 import { text } from "../../Q/LocalText";
 import { resolveUrl } from "../../Q/Services";
 import { isEmptyOrNull, isTrimmedEmpty, trimToNull } from "../../Q/Strings";
@@ -15,8 +14,8 @@ export interface HtmlContentEditorOptions {
 export interface CKEditorConfig {
 }    
 
-@registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])
-@element('<textarea/>')
+@Decorators.registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])
+@Decorators.element('<textarea/>')
 export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
     implements IStringValue, IReadOnly {
 
@@ -210,7 +209,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
     };
 }
 
-@registerEditor('Serenity.HtmlNoteContentEditor')
+@Decorators.registerEditor('Serenity.HtmlNoteContentEditor')
 export class HtmlNoteContentEditor extends HtmlContentEditor {
     constructor(textArea: JQuery, opt?: HtmlContentEditorOptions) {
         super(textArea, opt);
@@ -230,7 +229,7 @@ export class HtmlNoteContentEditor extends HtmlContentEditor {
     }
 }
 
-@registerEditor('Serenity.HtmlReportContentEditor')
+@Decorators.registerEditor('Serenity.HtmlReportContentEditor')
 export class HtmlReportContentEditor extends HtmlContentEditor {
     constructor(textArea: JQuery, opt?: HtmlContentEditorOptions) {
         super(textArea, opt);

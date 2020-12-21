@@ -1,8 +1,8 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { TemplatedWidget } from "../Widgets/TemplatedWidget";
 import { FilterStore } from "./FilterStore";
 
-@registerClass('Serenity.FilterWidgetBase')
+@Decorators.registerClass('Serenity.FilterWidgetBase')
 export class FilterWidgetBase<TOptions> extends TemplatedWidget<TOptions> {
     private store: FilterStore;
 

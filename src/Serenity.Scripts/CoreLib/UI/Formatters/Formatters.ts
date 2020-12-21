@@ -1,26 +1,25 @@
-﻿import { option, registerFormatter, registerInterface } from "../../Decorators";
+﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
 import { Config } from "../../Q/Config";
-import { ArgumentNullException, Exception } from "../../Q/Exceptions";
+import { ArgumentNullException, Exception } from "../../Q/System";
 import { Culture, format, formatDate, formatNumber, parseDecimal, parseISODateTime } from "../../Q/Formatting";
 import { attrEncode, htmlEncode } from "../../Q/Html";
 import { tryGetText } from "../../Q/LocalText";
 import { resolveUrl } from "../../Q/Services";
 import { endsWith, isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
-import { Enum, getAttributes, getTypeFullName, getTypes, isAssignableFrom, safeCast } from "../../Q/TypeSystem";
-import { EnumKeyAttribute } from "../../Types/Attributes";
+import { Enum, getAttributes, getTypeFullName, getTypes, isAssignableFrom, safeCast } from "../../Q/System";
 import { EnumTypeRegistry } from "../../Types/EnumTypeRegistry";
-import { ISlickFormatter } from "../DataGrid/ISlickFormatter";
+import { ISlickFormatter } from "../../Q/System";
 
 export interface IInitializeColumn {
     initializeColumn(column: Slick.Column): void;
 }
 
-@registerInterface('Serenity.IInitializeColumn')
+@Decorators.registerInterface('Serenity.IInitializeColumn')
 export class IInitializeColumn {
 }
 
 function Formatter(name: string, intf?: any[]) {
-    return registerFormatter('Serenity.' + name + 'Formatter', intf)
+    return Decorators.registerFormatter('Serenity.' + name + 'Formatter', intf)
 }
 
 @Formatter('Boolean')
@@ -54,10 +53,10 @@ export class BooleanFormatter implements Slick.Formatter {
         return htmlEncode(text);
     }
 
-    @option()
+    @Decorators.option()
     public falseText: string;
 
-    @option()
+    @Decorators.option()
     public trueText: string;
 }
 
@@ -98,7 +97,7 @@ export class DateFormatter implements Slick.Formatter {
         return htmlEncode(formatDate(date, format));
     }
 
-    @option()
+    @Decorators.option()
     public displayFormat: string;
 
     format(ctx: Slick.FormatterContext): string {
@@ -121,7 +120,7 @@ export class EnumFormatter implements Slick.Formatter {
         return EnumFormatter.format(EnumTypeRegistry.get(this.enumKey), ctx.value);
     }
 
-    @option()
+    @Decorators.option()
     enumKey: string;
 
     static format(enumType: any, value: any) {
@@ -186,10 +185,10 @@ export class FileDownloadFormatter implements Slick.Formatter, IInitializeColumn
         }
     }
 
-    @option()
+    @Decorators.option()
     displayFormat: string;
 
-    @option()
+    @Decorators.option()
     originalNameProperty: string;
 }
 
@@ -247,7 +246,7 @@ export class NumberFormatter {
         return htmlEncode(value.toString());
     }
 
-    @option()
+    @Decorators.option()
     displayFormat: string;
 }
 
@@ -298,19 +297,19 @@ export class UrlFormatter implements Slick.Formatter, IInitializeColumn {
         }
     }
 
-    @option()
+    @Decorators.option()
     displayProperty: string;
 
-    @option()
+    @Decorators.option()
     displayFormat: string;
 
-    @option()
+    @Decorators.option()
     urlProperty: string;
 
-    @option()
+    @Decorators.option()
     urlFormat: string;
 
-    @option()
+    @Decorators.option()
     target: string;
 }
 

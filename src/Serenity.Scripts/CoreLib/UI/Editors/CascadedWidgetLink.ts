@@ -1,10 +1,10 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { findElementWithRelativeId } from "../../Q/Html";
 import { notifyError } from "../../Q/Notify";
 import { isEmptyOrNull } from "../../Q/Strings";
 import { Widget } from "../Widgets/Widget";
 
-@registerClass('Serenity.CascadedWidgetLink')
+@Decorators.registerClass('Serenity.CascadedWidgetLink')
 export class CascadedWidgetLink<TParent extends Widget<any>> {
 
     constructor(private parentType: { new(...args: any[]): TParent },

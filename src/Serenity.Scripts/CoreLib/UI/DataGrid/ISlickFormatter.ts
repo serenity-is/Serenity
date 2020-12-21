@@ -1,2 +1,1 @@
-﻿export class ISlickFormatter {
-}
+﻿export { ISlickFormatter } from "../../Q/System";

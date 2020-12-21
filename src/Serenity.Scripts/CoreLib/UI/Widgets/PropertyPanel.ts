@@ -1,12 +1,11 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators, FormKeyAttribute } from "../../Decorators";
 import { getForm } from "../../Q/ScriptData";
 import { endsWith } from "../../Q/Strings";
-import { getAttributes, getInstanceType, getTypeFullName } from "../../Q/TypeSystem";
-import { FormKeyAttribute } from "../../Types/Attributes";
+import { getAttributes, getInstanceType, getTypeFullName } from "../../Q/System";
 import { PropertyGrid, PropertyGridOptions } from "./PropertyGrid";
 import { TemplatedPanel } from "./TemplatedPanel";
 
-@registerClass('Serenity.PropertyPanel')
+@Decorators.registerClass('Serenity.PropertyPanel')
 export class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
 
     private _entity: TItem;

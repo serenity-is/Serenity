@@ -1,11 +1,11 @@
-﻿import { registerClass } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { Authorization } from "../../Q/Authorization";
 import { Culture } from "../../Q/Formatting";
 import { attrEncode, htmlEncode } from "../../Q/Html";
 import { text, tryGetText } from "../../Q/LocalText";
 import { serviceCall } from "../../Q/Services";
 import { isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
-import { clearKeys, safeCast } from "../../Q/TypeSystem";
+import { clearKeys, safeCast } from "../../Q/System";
 import { IDataGrid } from "../DataGrid/IDataGrid";
 import { QuickSearchField, QuickSearchInput } from "../DataGrid/QuickSearchInput";
 import { DateFormatter, EnumFormatter, FormatterTypeRegistry, IInitializeColumn, NumberFormatter } from "../Formatters/Formatters";
@@ -16,7 +16,7 @@ export interface GridRowSelectionMixinOptions {
     selectable?: (item: any) => boolean;
 }
 
-@registerClass('Serenity.GridRowSelectionMixin')
+@Decorators.registerClass('Serenity.GridRowSelectionMixin')
 export class GridRowSelectionMixin {
 
     private idField: string;
@@ -168,7 +168,7 @@ export interface GridRadioSelectionMixinOptions {
     selectable?: (item: any) => boolean;
 }
 
-@registerClass('GridRadioSelectionMixin')
+@Decorators.registerClass('GridRadioSelectionMixin')
 export class GridRadioSelectionMixin {
 
     private idField: string;

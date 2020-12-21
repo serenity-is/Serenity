@@ -1,4 +1,4 @@
-﻿import { registerEditor } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { resolveUrl, serviceCall } from "../../Q/Services";
 import { isEmptyOrNull, startsWith } from "../../Q/Strings";
 import { Criteria } from "../../Services/Criteria";
@@ -20,7 +20,7 @@ export interface ServiceLookupEditorOptions extends Select2EditorOptions {
     criteria?: any[];
 }
 
-@registerEditor("Serenity.ServiceLookupEditorBase")
+@Decorators.registerEditor("Serenity.ServiceLookupEditorBase")
 export class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
 
     constructor(input: JQuery, opt?: TOptions) {
@@ -178,7 +178,7 @@ export class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions
     }
 }
 
-@registerEditor('Serenity.ServiceLookupEditor')
+@Decorators.registerEditor('Serenity.ServiceLookupEditor')
 export class ServiceLookupEditor extends ServiceLookupEditorBase<ServiceLookupEditorOptions, any> {
     constructor(hidden: JQuery, opt?: ServiceLookupEditorOptions) {
         super(hidden, opt);
