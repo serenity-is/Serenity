@@ -59,10 +59,6 @@ export function vuePatch(Vue: any) {
                 if (this.placeholder != null)
                     domProps.placeholder = this.placeholder;
 
-                var editorParams = this.options;
-                var optionsType: any = null;
-
-                var self = this
                 var el = createElement(element.tagName, {
                     domProps: domProps
                 });

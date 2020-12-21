@@ -90,7 +90,7 @@ var extendGlobals = function() {
 		name: 'extendGlobals',
 		generateBundle(o, b) {
 			for (var fileName of Object.keys(b)) {
-				var code = b[fileName].code ?? b[fileName].source;
+				var code = b[fileName].code || b[fileName].source;
 
 				if (code && fileName.indexOf('.js') >= 0) {
 					var src = code;
