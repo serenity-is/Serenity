@@ -175,7 +175,7 @@
         onCleanup?(): void;
     }
         
-    export enum SummaryType {
+    export const enum SummaryType {
         Disabled = -1,
         None = 0,
         Sum = 1,

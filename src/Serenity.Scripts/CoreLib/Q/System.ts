@@ -166,6 +166,7 @@ export function cast(instance: any, type: Type) {
 
 export function getBaseType(type: any) {
     if (type === Object ||
+        !type.prototype ||
         (type.__metadata as TypeMetadata)?.kind == TypeKind.Interface) {
         return null;
     }
@@ -323,7 +324,7 @@ export function delegateCombine(delegate1: any, delegate2: any) {
 
 export namespace Enum {
     export let toString = (enumType: any, value: number): string => {
-        var values = enumType.prototype;
+        var values = enumType;
         if (value === 0 || !(enumType.__metadata as TypeMetadata)?.enumFlags) {
             for (var i in values) {
                 if (values[i] === value) {
@@ -347,9 +348,10 @@ export namespace Enum {
 
     export let getValues = (enumType: any) => {
         var parts = [];
-        var values = enumType.prototype;
+        var values = enumType;
         for (var i in values) {
-            if (Object.prototype.hasOwnProperty.call(values, i))
+            if (Object.prototype.hasOwnProperty.call(values, i) &&
+                typeof values[i] == "number")
                 parts.push(values[i]);
         }
         return parts;
@@ -501,13 +503,6 @@ export function registerType(type: any, name: string, kind?: TypeKind, intf?: an
 
     if (kind == TypeKind.Interface)
         md.isAssignableFrom = interfaceIsAssignableFrom;
-
-    if (kind == TypeKind.Enum) {
-        type.prototype = type.prototype || {};
-        for (var k of Object.keys(type))
-            if (isNaN(parseInt(k)) && type[k] != null && !isNaN(parseInt(type[k])))
-                type.prototype[k] = type[k];
-    }
 }
 
 export function addAttribute(type: any, attr: any) {
@@ -567,6 +562,7 @@ export function initializeTypes(root: any, pre: string, limit: number) {
             var md = obj.__metadata as TypeMetadata;
 
             if (!md?.interfaces &&
+                obj.prototype &&
                 obj.prototype.format &&
                 k.substr(-9) == "Formatter") {
                 md = ensureMetadata(obj);
