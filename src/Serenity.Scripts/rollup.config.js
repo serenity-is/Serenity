@@ -31,7 +31,7 @@ var toGlobal = function(ns) {
 			for (var fileName of Object.keys(b)) {
 				if (b[fileName].code && fileName.indexOf('.bundle.d.ts') >= 0) {
 					var src = b[fileName].code;
-					src = src.replace('\r', '');
+					src = src.replace(/\r/g, '');
 					src = src.replace(rxRemoveExports, '');
 
 					var refTypes = [];
@@ -181,7 +181,7 @@ export default [
 		plugins: [dts(), toGlobal('Slick'), {
 			name: 'writeFinal',
 			generateBundle: function() {
-				var src = outputs.join('\n');
+				var src = outputs.join('\n').replace(/\r/g, '');
 				var refTypes = [];
 				src = src.replace(rxReferenceTypes, function(match, offset, str) {
 					refTypes.push(match);
