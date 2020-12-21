@@ -176,11 +176,6 @@ export default [
 		plugins: [dts(), toGlobal('Serenity')],
 	},
 	{
-		input: "./dist/built/Decorators/index.d.ts",
-		output: [{ file: "./dist/built/Decorators/index.bundle.d.ts", format: "es" }],
-		plugins: [dts(), toGlobal('Serenity.Decorators')],
-	},
-	{
 		input: "./dist/built/Slick/index.d.ts",
 		output: [{ file: "./dist/built/Slick/index.bundle.d.ts", format: "es" }],
 		plugins: [dts(), toGlobal('Slick'), {
