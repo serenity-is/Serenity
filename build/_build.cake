@@ -192,6 +192,7 @@ Task("Clean")
     CreateDirectory(nupkgDir);
     CleanDirectories(src + "/Serenity.*/**/bin/" + configuration);
 	CleanDirectories(root + "tests/**/bin/");
+	CleanDirectories(src + "/Serenity.Scripts/dist");
 });
 
 Task("Restore")
@@ -216,6 +217,11 @@ Task("Compile")
     .Does(context => 
 {
 
+	StartProcess("powershell", new ProcessSettings 
+	{ 
+		Arguments = "npx tsc -p tsconfig.json", 
+		WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts", "CodeGeneration") 
+	});
     var sasmi = System.IO.File.ReadAllText(System.IO.Path.Combine(src, "SharedAssemblyInfo.cs"));
     var sasmi1 = sasmi.IndexOf("AssemblyVersion(\"");
     serenityVersion = sasmi.Substring(sasmi1 + "AssemblyVersion(\"".Length).Split('"')[0];
@@ -245,6 +251,13 @@ Task("Test")
                     NoBuild = true
                 });
         }
+		
+		StartProcess("powershell", new ProcessSettings 
+		{ 
+			Arguments = "npx jest", 
+			WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts") 
+		});
+
 });
 
 Task("Pack")
