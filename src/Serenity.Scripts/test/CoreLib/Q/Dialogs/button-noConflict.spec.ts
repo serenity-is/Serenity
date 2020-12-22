@@ -20,7 +20,7 @@ test('noConflict is not called if no jQuery ui button widget', function() {
                     noConflictCalled = true;
                 }
             }
-            require("../../../../CoreLib/Q/Dialogs");
+            require("@Q/Dialogs");
             expect(noConflictCalled).toBe(false);
         }
         finally {
@@ -40,7 +40,7 @@ test('noConflict skipped if button does not have noConflict method', function() 
             };
             (global.$ as any).fn.button = {
             }
-            require("../../../../CoreLib/Q/Dialogs");
+            require("@Q/Dialogs");
         }
         finally {
             delete global.$;
@@ -70,7 +70,7 @@ test('noConflict called if jQuery ui button widget exists and $.fn.button has no
             (global.$ as any).ui = {
                 button: uiButton
             };
-            require("../../../../CoreLib/Q/Dialogs");
+            require("@Q/Dialogs");
             expect(noConflictCalled).toBe(true);
             expect($.fn.button).toBe(uiButton);
             expect(($.fn as any).btn).toBe(bsButton);

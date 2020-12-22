@@ -1,4 +1,4 @@
-import { formatDate, formatISODateTimeUTC, Culture } from "../../../../CoreLib/Q/Formatting";
+import { formatDate, formatISODateTimeUTC, Culture } from "@Q/Formatting";
 
 test('FormatDateWorks', function() {
     var backupDec = Culture.dateSeparator;

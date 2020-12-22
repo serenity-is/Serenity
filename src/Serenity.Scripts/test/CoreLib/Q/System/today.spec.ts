@@ -1,4 +1,4 @@
-import { today } from "../../../../CoreLib/Q/System";
+import { today } from "@Q/System";
 
 test('today returns a date without time part', function() {
     var d = today();

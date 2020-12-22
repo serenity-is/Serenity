@@ -27,6 +27,11 @@
       "node"
     ],
     "outDir": "./built",
+    "baseUrl": ".",
+    "paths": {
+      "@CoreLib/*": ["../CoreLib/*"],
+      "@Q/*": ["../CoreLib/Q/*"]
+    },
     "suppressImplicitAnyIndexErrors": true,
     "lib": [
       "ES5",

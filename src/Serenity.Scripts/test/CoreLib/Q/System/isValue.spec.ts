@@ -1,4 +1,4 @@
-import { isValue } from "../../../../CoreLib/Q/System";
+import { isValue } from "@Q/System";
 
 test('isValue returns false for null or undefined', function() {
     expect(isValue(null)).toBe(false);

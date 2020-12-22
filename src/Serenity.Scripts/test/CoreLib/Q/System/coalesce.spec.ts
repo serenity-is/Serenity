@@ -1,4 +1,4 @@
-import { coalesce, extend, isValue, today } from "../../../../CoreLib/Q/System";
+import { coalesce, extend, isValue, today } from "@Q/System";
 
 test('coalesce returns first value if not null', function() {
     expect(coalesce(1, 2)).toBe(1);

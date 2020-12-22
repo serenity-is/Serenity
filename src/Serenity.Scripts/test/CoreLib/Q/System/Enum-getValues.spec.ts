@@ -1,4 +1,4 @@
-import { Enum } from "../../../../CoreLib/Q/System";
+import { Enum } from "@Q/System";
 
 enum Test {
     Some = 1,

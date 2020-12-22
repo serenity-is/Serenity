@@ -31,7 +31,7 @@ function setupDummyJQueryForModal(callback) {
 test('BS3 is detected when modal version starts with 3', function() {
 
     jest.isolateModules(function() {
-        var alert = require("../../../../CoreLib/Q/Dialogs").alert;
+        var alert = require("@Q/Dialogs").alert;
         var passedHtml;
         setupDummyJQueryForModal(function(html) {
             passedHtml = html;
@@ -65,7 +65,7 @@ test('BS3 is detected when modal version starts with 3', function() {
 test('BS4 is detected when modal version does not exist', function() {
     
     jest.isolateModules(function() {
-        var alert = require("../../../../CoreLib/Q/Dialogs").alert;
+        var alert = require("@Q/Dialogs").alert;
 
         var passedHtml;
         setupDummyJQueryForModal(function(html) {
@@ -97,7 +97,7 @@ test('BS4 is detected when modal version does not exist', function() {
 test('BS4 is detected when modal version is something other than 3', function() {
 
     jest.isolateModules(function() {
-        var alert = require("../../../../CoreLib/Q/Dialogs").alert;
+        var alert = require("@Q/Dialogs").alert;
         var passedHtml;
         setupDummyJQueryForModal(function(html) {
             passedHtml = html;

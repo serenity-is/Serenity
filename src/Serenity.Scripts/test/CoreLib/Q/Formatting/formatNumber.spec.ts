@@ -1,4 +1,4 @@
-import { formatNumber, Culture } from "../../../../CoreLib/Q/Formatting";
+import { formatNumber, Culture } from "@Q/Formatting";
 
 test('format number with "." as decimal separator', function() {
     var backupDec = Culture.decimalSeparator;

@@ -1,4 +1,4 @@
-import { registerType, TypeKind, isEnum, getTypeFullName } from "../../../../CoreLib/Q/System";
+import { registerType, TypeKind, isEnum, getTypeFullName } from "@Q/System";
 
 test('registerType with Enum works properly', function() {
 
