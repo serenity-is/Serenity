@@ -7,12 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="CodeGeneration\tsconfig.json" />
-    <None Remove="CoreLib\tsconfig.spec.json" />
-    <Content Include="CodeGeneration\tsconfig.json" />
-    <Content Include="test\tsconfig.json" />
-    <None Remove="CoreLib\**\tsconfig.json" />
-    <Content Include="CoreLib\**\tsconfig.json" />
+    <None Remove="*\tsconfig.json" />
+    <Content Include="*\tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="node_modules\**" />
@@ -25,24 +21,6 @@
     <ToMinimize Include="..\Serenity.Assets\Scripts\SlickGrid\slick.grid.js"></ToMinimize>
     <ToCompileCoreLib Include="CoreLib\**\*.ts"></ToCompileCoreLib>
     <ToSerenityLess Include="style\**\*.less"></ToSerenityLess>
-  </ItemGroup>
-  <ItemGroup>
-    <ToCompileCoreLib Remove="CoreLib\Q\Formatting.spec.ts" />
-    <ToCompileCoreLib Remove="CoreLib\Q\Types.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Remove="CoreLib\Q\Formatting.spec.ts" />
-    <TypeScriptCompile Remove="test\CoreLib\Q\Dialogs-bs3-4-detection.test.spec.ts" />
-    <TypeScriptCompile Remove="test\CoreLib\Q\Dialogs-button-noConflict.spec.ts" />
-    <TypeScriptCompile Remove="test\CoreLib\Q\Dialogs-no-jquery-no-bs.spec.ts" />
-    <TypeScriptCompile Remove="test\CoreLib\Q\formatNumber.spec.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="test\CoreLib\Q\Dialogs-bs3-4-detection.test.spec.ts" />
-    <None Include="test\CoreLib\Q\Dialogs-button-noConflict.spec.ts" />
-    <None Include="test\CoreLib\Q\Dialogs-no-jquery-no-bs.spec.ts" />
-    <None Include="test\CoreLib\Q\formatDate.spec.ts" />
-    <None Include="test\CoreLib\Q\formatNumber.spec.ts" />
   </ItemGroup>
 
   <ItemGroup>
