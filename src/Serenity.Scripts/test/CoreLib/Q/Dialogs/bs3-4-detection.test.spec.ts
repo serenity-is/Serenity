@@ -2,14 +2,6 @@
  * @jest-environment jsdom
  */
 
-beforeEach(() => {
-    jest.resetModules();
-});
-
-afterEach(() => {
-    jest.resetModules();
-});
-
 function setupDummyJQueryForModal(callback) {
     global.$ = global.jQuery = function dummyJQueryForModal(html) {
         return {
@@ -38,94 +30,100 @@ function setupDummyJQueryForModal(callback) {
 
 test('BS3 is detected when modal version starts with 3', function() {
 
-    var alert = require("../../../../CoreLib/Q/Dialogs").alert;
-    var passedHtml;
-    setupDummyJQueryForModal(function(html) {
-        passedHtml = html;
-    });
-    try {
-        (global.$ as any).fn = {
-            modal: {
-                Constructor: {
-                    VERSION: '3.3.1'
+    jest.isolateModules(function() {
+        var alert = require("../../../../CoreLib/Q/Dialogs").alert;
+        var passedHtml;
+        setupDummyJQueryForModal(function(html) {
+            passedHtml = html;
+        });
+        try {
+            (global.$ as any).fn = {
+                modal: {
+                    Constructor: {
+                        VERSION: '3.3.1'
+                    }
                 }
             }
+
+            alert("hello");
+
+            expect(passedHtml).not.toBeNull();
+
+            var idx1 = passedHtml.indexOf('class="close"');
+            var idx2 = passedHtml.indexOf('<h5');
+            expect(idx1).toBeGreaterThan(-1);
+            expect(idx2).toBeGreaterThan(idx1);
         }
-
-        alert("hello");
-
-        expect(passedHtml).not.toBeNull();
-
-        var idx1 = passedHtml.indexOf('class="close"');
-        var idx2 = passedHtml.indexOf('<h5');
-        expect(idx1).toBeGreaterThan(-1);
-        expect(idx2).toBeGreaterThan(idx1);
-    }
-    finally {
-        delete global.$;
-        delete global.jQuery;
-    }
+        finally {
+            delete global.$;
+            delete global.jQuery;
+        }
+    });
 });
 
 
 test('BS4 is detected when modal version does not exist', function() {
     
-    var alert = require("../../../../CoreLib/Q/Dialogs").alert;
+    jest.isolateModules(function() {
+        var alert = require("../../../../CoreLib/Q/Dialogs").alert;
 
-    var passedHtml;
-    setupDummyJQueryForModal(function(html) {
-        passedHtml = html;
+        var passedHtml;
+        setupDummyJQueryForModal(function(html) {
+            passedHtml = html;
+        });
+        try {
+            (global.$ as any).fn = {
+                modal: {
+                }
+            }        
+
+            alert("hello");
+
+            expect(passedHtml).not.toBeNull();
+
+            var idx1 = passedHtml.indexOf('class="close"');
+            var idx2 = passedHtml.indexOf('<h5');
+            expect(idx1).toBeGreaterThan(-1);
+            expect(idx2).toBeGreaterThan(-1);
+            expect(idx1).toBeGreaterThan(idx2);
+        }
+        finally {
+            delete global.$;
+            delete global.jQuery;
+        }
     });
-    try {
-        (global.$ as any).fn = {
-            modal: {
-            }
-        }        
-
-        alert("hello");
-
-        expect(passedHtml).not.toBeNull();
-
-        var idx1 = passedHtml.indexOf('class="close"');
-        var idx2 = passedHtml.indexOf('<h5');
-        expect(idx1).toBeGreaterThan(-1);
-        expect(idx2).toBeGreaterThan(-1);
-        expect(idx1).toBeGreaterThan(idx2);
-    }
-    finally {
-        delete global.$;
-        delete global.jQuery;
-    }
 });
 
 test('BS4 is detected when modal version is something other than 3', function() {
 
-    var alert = require("../../../../CoreLib/Q/Dialogs").alert;
-    var passedHtml;
-    setupDummyJQueryForModal(function(html) {
-        passedHtml = html;
-    });
-    try {
-        (global.$ as any).fn = {
-            modal: {
-                Constructor: {
-                    VERSION: '4.1.0'
+    jest.isolateModules(function() {
+        var alert = require("../../../../CoreLib/Q/Dialogs").alert;
+        var passedHtml;
+        setupDummyJQueryForModal(function(html) {
+            passedHtml = html;
+        });
+        try {
+            (global.$ as any).fn = {
+                modal: {
+                    Constructor: {
+                        VERSION: '4.1.0'
+                    }
                 }
-            }
-        }           
+            }           
 
-        alert("hello");
+            alert("hello");
 
-        expect(passedHtml).not.toBeNull();
+            expect(passedHtml).not.toBeNull();
 
-        var idx1 = passedHtml.indexOf('class="close"');
-        var idx2 = passedHtml.indexOf('<h5');
-        expect(idx1).toBeGreaterThan(-1);
-        expect(idx2).toBeGreaterThan(-1);
-        expect(idx1).toBeGreaterThan(idx2);
-    }
-    finally {
-        delete global.$;
-        delete global.jQuery;
-    }    
+            var idx1 = passedHtml.indexOf('class="close"');
+            var idx2 = passedHtml.indexOf('<h5');
+            expect(idx1).toBeGreaterThan(-1);
+            expect(idx2).toBeGreaterThan(-1);
+            expect(idx1).toBeGreaterThan(idx2);
+        }
+        finally {
+            delete global.$;
+            delete global.jQuery;
+        } 
+    });
 });
