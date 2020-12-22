@@ -48,23 +48,25 @@ export declare const enum TypeKind {
     Enum = 2
 }
 
-interface TypeMetadata {
-    kind?: TypeKind;
-    enumFlags?: boolean;
-    interfaces?: any[];
-    attributes?: any[];
-    members?: TypeMember[];
-    propByName?: { [key: string]: any };
-    fieldByName?: { [key: string]: any };
-    isAssignableFrom?: (type: Function) => boolean;
-    isInstanceOfType?: (type: Function) => boolean;
+interface TypeExt {
+    __isAssignableFrom?: (from: any) => boolean;
+    __isInstanceOfType?: (instance: any) => boolean;
+    __metadata?: TypeMetadata;
+    __metadata$?: TypeMetadata;
+    __register?: boolean;
+    __typeKind?: TypeKind;
+    __typeName?: string;
+    __typeName$?: string;
+    __interfaces?: any[];
 }
 
-export interface Type {
-    prototype: any;
-    name?: string;
-    __typeName?: string;
+interface TypeMetadata {
+    enumFlags?: boolean;
+    attr?: any[];
+    members?: TypeMember[];
 }
+
+export type Type = Function | Object;
 
 export interface TypeMember {
     name: string;
@@ -74,7 +76,7 @@ export interface TypeMember {
     setter?: string;
 }
 
-export let types: { [key: string]: Type } = {};
+let types: { [key: string]: Type } = {};
 
 export function getNested(from: any, name: string) {
     var a = name.split('.');
@@ -104,7 +106,7 @@ export function getType(name: string, target?: any): Type  {
 }
 
 export function getTypeFullName(type: Type): string {
-    return type.__typeName || type.name ||
+    return (type as TypeExt).__typeName || (type as any).name ||
         (type.toString().match(/^\s*function\s*([^\s(]+)/) || [])[1] || 'Object';
 };
 
@@ -129,13 +131,11 @@ export function getInstanceType(instance: any): any {
 };
 
 export function isAssignableFrom(target: any, type: Type) {
-    if (target === type || type.prototype instanceof target)
+    if (target === type || (type as any).prototype instanceof target)
         return true;
 
-    var md = target.__metadata as TypeMetadata;
-    if (md != null &&
-        typeof md.isAssignableFrom === 'function')
-        return md.isAssignableFrom.call(target, type);
+    if (typeof (target as TypeExt).__isAssignableFrom === 'function')
+        return (target as TypeExt).__isAssignableFrom(type);
 
     return false;
 };
@@ -144,10 +144,8 @@ export function isInstanceOfType(instance: any, type: Type) {
     if (instance == null)
         return false;
 
-    var md = (type as any).__metadata as TypeMetadata;
-    if (md != null &&
-        typeof (md.isInstanceOfType) === 'function')
-        return md.isInstanceOfType.call(type, instance);
+    if (typeof (type as TypeExt).__isInstanceOfType === 'function')
+        return (type as TypeExt).__isInstanceOfType(instance);
 
     return isAssignableFrom(type, getInstanceType(instance));
 };
@@ -167,7 +165,7 @@ export function cast(instance: any, type: Type) {
 export function getBaseType(type: any) {
     if (type === Object ||
         !type.prototype ||
-        (type.__metadata as TypeMetadata)?.kind == TypeKind.Interface) {
+        (type as TypeExt).__typeKind === TypeKind.Interface) {
         return null;
     }
     else if (Object.getPrototypeOf) {
@@ -201,7 +199,7 @@ export function getAttributes(type: any, attrType: any, inherit?: boolean) {
             }
         }
     }
-    var attr = (type.__metadata as TypeMetadata)?.attributes;
+    var attr = (type as TypeExt).__metadata?.attr;
     if (attr != null) {
         for (var i = 0; i < attr.length; i++) {
             var a: any = attr[i];
@@ -229,7 +227,7 @@ export function getMembers(type: any, memberTypes: MemberType): TypeMember[] {
     if (b)
         result = getMembers(b, memberTypes & ~1);
 
-    var members = (type.__metadata as TypeMetadata).members;
+    var members = (type as TypeExt).__metadata?.members;
     if (members != null) {
         for (var m of members) {
             if (memberTypes & m.type)
@@ -247,7 +245,7 @@ export function addTypeMember(type: any, member: TypeMember): TypeMember {
     md.members = md.members || [];
 
     let existing: TypeMember;
-    for (var m of type.__metadata.members) {
+    for (var m of md.members) {
         if (m.name == name) {
             existing = m;
             break;
@@ -325,7 +323,7 @@ export function delegateCombine(delegate1: any, delegate2: any) {
 export namespace Enum {
     export let toString = (enumType: any, value: number): string => {
         var values = enumType;
-        if (value === 0 || !(enumType.__metadata as TypeMetadata)?.enumFlags) {
+        if (value === 0 || !((enumType as TypeExt).__metadata?.enumFlags)) {
             for (var i in values) {
                 if (values[i] === value) {
                     return i;
@@ -351,7 +349,7 @@ export namespace Enum {
         var values = enumType;
         for (var i in values) {
             if (Object.prototype.hasOwnProperty.call(values, i) &&
-                typeof values[i] == "number")
+                typeof values[i] === "number")
                 parts.push(values[i]);
         }
         return parts;
@@ -370,7 +368,7 @@ function delegateContains(targets: any[], object: any, method: any) {
 
 let _mkdel = (targets: any[]): any => {
     var delegate: any = function () {
-        if (targets.length == 2) {
+        if (targets.length === 2) {
             return targets[1].apply(targets[0], arguments);
         }
         else {
@@ -409,7 +407,7 @@ export let delegateRemove = (delegate1: any, delegate2: any) => {
 
     for (var i = 0; i < targets.length; i += 2) {
         if ((targets[i] === object) && (targets[i + 1] === method)) {
-            if (targets.length == 2) {
+            if (targets.length === 2) {
                 return null;
             }
             var t = targets.slice();
@@ -422,7 +420,7 @@ export let delegateRemove = (delegate1: any, delegate2: any) => {
 };
 
 export let isEnum = (type: any) => {
-    return (type.__metadata as TypeMetadata)?.kind == TypeKind.Interface;
+    return (type as TypeExt).__typeKind === TypeKind.Enum;
 };
 
 export function initFormType(typ: Function, nameWidgetPairs: any[]) {
@@ -459,15 +457,15 @@ function ensureMetadata(target: Type): TypeMetadata {
 
     if (!Object.hasOwnProperty.call(target, '__metadata')) {
         Object.defineProperty(target, '__metadata', {
-            get: function () { return Object.prototype.hasOwnProperty.call(this, '__metadata$') ? this.__metadata$ : void 0; },
-            set: function (v) { this.__metadata$ = v; }
+            get: function () { return Object.prototype.hasOwnProperty.call(this, '__metadata$') ? (this as TypeExt).__metadata$ : void 0; },
+            set: function (v) { (this as TypeExt).__metadata$ = v; }
         });
     }
-    if (!(target as any).__metadata) {
-        (target as any).__metadata = Object.create(null);
+    if (!(target as TypeExt).__metadata) {
+        (target as TypeExt).__metadata = Object.create(null);
     }
 
-    return (target as any).__metadata;
+    return (target as TypeExt).__metadata;
 }
 
 function distinct(arr: any[]) {
@@ -482,8 +480,7 @@ function merge(arr1: any[], arr2: any[]) {
 }
 
 function interfaceIsAssignableFrom(from: any) {
-    var fmd = from.__metadata as TypeMetadata;
-    return fmd != null && fmd.interfaces != null && fmd.interfaces.indexOf(this) >= 0;
+    return from != null && (from as TypeExt).__interfaces != null && (from as TypeExt).__interfaces.indexOf(this) >= 0;
 }
 
 export function registerType(type: any, name: string, kind?: TypeKind, intf?: any[]) {
@@ -491,34 +488,33 @@ export function registerType(type: any, name: string, kind?: TypeKind, intf?: an
         setTypeName(type, name);
         types[name] = type;
     }
-    else if (!type.__typeName)
-        type.__register = true;
+    else if (!(type as TypeExt).__typeName)
+        (type as TypeExt).__register = true;
     else
-        types[type.__typeName] = type;
+        types[(type as TypeExt).__typeName] = type;
 
-    var md = ensureMetadata(type);
-    md.kind = kind ?? TypeKind.Class;
+    (type as TypeExt).__typeKind = kind ?? TypeKind.Class;
     if (intf)
-        md.interfaces = merge(md.interfaces, intf);
+        (type as TypeExt).__interfaces = merge((type as TypeExt).__interfaces, intf);
 
-    if (kind == TypeKind.Interface)
-        md.isAssignableFrom = interfaceIsAssignableFrom;
+    if (kind === TypeKind.Interface)
+        (type as TypeExt).__isAssignableFrom = interfaceIsAssignableFrom;
 }
 
 export function addAttribute(type: any, attr: any) {
     var md = ensureMetadata(type);
-    md.attributes = md.attributes || [];
-    md.attributes.push(attr);
+    md.attr = md.attr || [];
+    md.attr.push(attr);
 }
 
 export function setTypeName(target: Type, value: string) {
     if (!Object.hasOwnProperty.call(target, '__typeName')) {
         Object.defineProperty(target, '__typeName', {
-            get: function() { return Object.prototype.hasOwnProperty.call(this, '__typeName$') ? this.__typeName$ : void 0; },
-            set: function(v) { this.__typeName$ = v; }
+            get: function() { return Object.prototype.hasOwnProperty.call(this, '__typeName$') ? (this as TypeExt).__typeName$ : void 0; },
+            set: function(v) { (this as TypeExt).__typeName$ = v; }
         });
     }
-    (target as any).__typeName = value;
+    (target as TypeExt).__typeName = value;
 }
 
 export class ISlickFormatter {
@@ -538,7 +534,7 @@ export function initializeTypes(root: any, pre: string, limit: number) {
         if (k.indexOf('$') >= 0)
             continue;
 
-        if (k == "prototype")
+        if (k === "prototype")
             continue;
 
         if (!Object.prototype.hasOwnProperty.call(root, k))
@@ -551,42 +547,39 @@ export function initializeTypes(root: any, pre: string, limit: number) {
             continue;
 
         var t = typeof (obj);
-        if (t == "string" || t == "number")
+        if (t === "string" || t === "number")
             continue;
 
-        if (obj.__typeName && !obj.__register)
+        if ((obj as TypeExt).__typeName && 
+            (!(obj as TypeExt).__register) || 
+                !Object.prototype.hasOwnProperty.call(obj, '__register'))
             continue;
 
-        if ($.isFunction(obj) || (obj.__register && md?.kind == TypeKind.Enum)) {
+        if ((typeof obj === "function" && obj.nodeType !== "number") || 
+            ((obj as TypeExt).__register && (obj as TypeExt).__typeKind === TypeKind.Enum)) {
 
-            var md = obj.__metadata as TypeMetadata;
-
-            if (!md?.interfaces &&
+            if (!obj.__interfaces &&
                 obj.prototype &&
                 obj.prototype.format &&
-                k.substr(-9) == "Formatter") {
-                md = ensureMetadata(obj);
-                md.kind = TypeKind.Class;
-                md.interfaces = [ISlickFormatter]
+                k.substr(-9) === "Formatter") {
+                if ((obj as TypeExt).__typeKind == null)
+                    (obj as TypeExt).__typeKind = TypeKind.Class;
+                (obj as TypeExt).__interfaces = [ISlickFormatter]
             }
 
-            if (!md || md.kind == null) {
+            if ((obj as TypeExt).__typeKind == null) {
                 var baseType = getBaseType(obj);
-                if (baseType) {
-                    var baseKind = baseType.__metadata?.kind;
-                    if (baseKind != null) {
-                        md = ensureMetadata(obj);
-                        md.kind = baseKind;
-                    }
+                if (baseType && (baseType as TypeExt).__typeKind != null) {
+                    (obj as TypeExt).__typeKind = (baseType as TypeExt).__typeKind;
                 }
             }
 
-            if (md != null && md.kind != null) {
-                setTypeName(obj, pre + k)
+            if ((obj as TypeExt).__typeKind != null) {
+                setTypeName(obj, pre + k);
                 types[pre + k] = obj;
             }
 
-            delete obj.__register;
+            delete (obj as TypeExt).__register;
         }
         
         if (limit > 0) 
@@ -629,3 +622,5 @@ export class InvalidCastException extends Exception {
         this.name = "InvalidCastException";
     }
 }
+
+export {}

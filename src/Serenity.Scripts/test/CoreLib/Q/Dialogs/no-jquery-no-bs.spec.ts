@@ -1,4 +1,4 @@
-import { alert, confirm, information, warning, iframeDialog } from "../../../CoreLib/Q/Dialogs";
+import { alert, confirm, information, warning, iframeDialog } from "../../../../CoreLib/Q/Dialogs";
 
 test('Q.alert uses window.alert when no BS/jQuery UI loaded', function() {
     var alertCount = 0;
