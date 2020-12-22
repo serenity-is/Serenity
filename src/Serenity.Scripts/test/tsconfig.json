@@ -42,7 +42,6 @@
     "jsx": "react"
   },
   "include": [
-    "CoreLib/util.ts",
     "**/*.spec.ts"
   ]
 }

@@ -92,7 +92,7 @@ export function getType(name: string, target?: any): Type  {
     var type: any;
     if (target == null) {
         type = types[name];
-        if (type != null || globalObj == null)
+        if (type != null || globalObj == null || name === "Object")
             return type;
 
         target = globalObj;
@@ -494,7 +494,7 @@ export function registerType(type: any, name: string, kind?: TypeKind, intf?: an
         types[(type as TypeExt).__typeName] = type;
 
     (type as TypeExt).__typeKind = kind ?? TypeKind.Class;
-    if (intf)
+    if (intf != null && intf.length)
         (type as TypeExt).__interfaces = merge((type as TypeExt).__interfaces, intf);
 
     if (kind === TypeKind.Interface)
