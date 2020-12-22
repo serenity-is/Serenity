@@ -1,4 +1,11 @@
-﻿namespace Serenity {
+﻿import { Decorators } from "../../Decorators";
+import { IDoubleValue, IReadOnly } from "../../Interfaces";
+import { toId } from "../../Q/Formatting";
+import { addOption } from "../../Q/Html";
+import { Widget } from "../Widgets/Widget";
+import { EditorUtils } from "./EditorUtils";
+
+namespace Serenity {
 
     export interface TimeEditorOptions {
         noEmptyOption?: boolean;
@@ -19,24 +26,24 @@
             input.addClass('editor s-TimeEditor hour');
 
             if (!this.options.noEmptyOption) {
-                Q.addOption(input, '', '--');
+                addOption(input, '', '--');
             }
 
             for (var h = (this.options.startHour || 0); h <= (this.options.endHour || 23); h++) {
-                Q.addOption(input, h.toString(), ((h < 10) ? ('0' + h) : h.toString()));
+                addOption(input, h.toString(), ((h < 10) ? ('0' + h) : h.toString()));
             }
 
             this.minutes = $('<select/>').addClass('editor s-TimeEditor minute').insertAfter(input);
             this.minutes.change(() => this.element.trigger("change"));
 
             for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
-                Q.addOption(this.minutes, m.toString(), ((m < 10) ? ('0' + m) : m.toString()));
+                addOption(this.minutes, m.toString(), ((m < 10) ? ('0' + m) : m.toString()));
             }
         }
 
         public get value(): number {
-            var hour = Q.toId(this.element.val());
-            var minute = Q.toId(this.minutes.val());
+            var hour = toId(this.element.val());
+            var minute = toId(this.minutes.val());
             if (hour == null || minute == null) {
                 return null;
             }
@@ -81,7 +88,7 @@
                 else {
                     this.element.removeClass('readonly').removeAttr('readonly');
                 }
-                Serenity.EditorUtils.setReadonly(this.minutes, value);
+                EditorUtils.setReadonly(this.minutes, value);
             }
         }
     }

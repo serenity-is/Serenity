@@ -1,35 +1,34 @@
-﻿namespace Serenity {
-    export namespace LazyLoadHelper {
-        let autoIncrement = 0;
+﻿import { LayoutTimer } from "../../Q/LayoutTimer";
 
-        export function executeOnceWhenShown(element: JQuery, callback: Function) {
-            var el = element && element[0];
-            if (!el)
-                return;
-            
-            if (el.offsetWidth > 0 && el.offsetHeight > 0) {
-                callback();
-                return;
-            }
+export namespace LazyLoadHelper {
 
-            var timer = Q.LayoutTimer.onShown(() => el, () => {
-                Q.LayoutTimer.off(timer);
-                callback();
-            });
+    export function executeOnceWhenShown(element: JQuery, callback: Function) {
+        var el = element && element[0];
+        if (!el)
+            return;
+        
+        if (el.offsetWidth > 0 && el.offsetHeight > 0) {
+            callback();
+            return;
         }
 
-        export function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean) {
-            var el = element && element[0];
-            if (!el)
-                return;
-            
-            if (callNowIfVisible && el.offsetWidth > 0 && el.offsetHeight > 0) {
-                callback();
-            }
+        var timer = LayoutTimer.onShown(() => el, () => {
+            LayoutTimer.off(timer);
+            callback();
+        });
+    }
 
-            Q.LayoutTimer.onShown(() => el, () => {
-                callback();
-            });
+    export function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean) {
+        var el = element && element[0];
+        if (!el)
+            return;
+        
+        if (callNowIfVisible && el.offsetWidth > 0 && el.offsetHeight > 0) {
+            callback();
         }
+
+        LayoutTimer.onShown(() => el, () => {
+            callback();
+        });
     }
 }

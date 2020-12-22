@@ -1,376 +1,383 @@
-﻿namespace Serenity {
+﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
+import { Config } from "../../Q/Config";
+import { ArgumentNullException, Exception } from "../../Q/System";
+import { Culture, format, formatDate, formatNumber, parseDecimal, parseISODateTime } from "../../Q/Formatting";
+import { attrEncode, htmlEncode } from "../../Q/Html";
+import { tryGetText } from "../../Q/LocalText";
+import { resolveUrl } from "../../Q/Services";
+import { endsWith, isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
+import { Enum, getAttributes, getTypeFullName, getTypes, isAssignableFrom, safeCast } from "../../Q/System";
+import { EnumTypeRegistry } from "../../Types/EnumTypeRegistry";
+import { ISlickFormatter } from "../../Q/System";
 
-    export interface IInitializeColumn {
-        initializeColumn(column: Slick.Column): void;
-    }
+export interface IInitializeColumn {
+    initializeColumn(column: Slick.Column): void;
+}
 
-    @Serenity.Decorators.registerInterface('Serenity.IInitializeColumn')
-    export class IInitializeColumn {
-    }
+@Decorators.registerInterface('Serenity.IInitializeColumn')
+export class IInitializeColumn {
+}
 
-    import Option = Serenity.Decorators.option
+function Formatter(name: string, intf?: any[]) {
+    return Decorators.registerFormatter('Serenity.' + name + 'Formatter', intf)
+}
 
-    function Formatter(name: string, intf?: any[]) {
-        return Decorators.registerFormatter('Serenity.' + name + 'Formatter', intf)
-    }
+@Formatter('Boolean')
+export class BooleanFormatter implements Slick.Formatter {
+    format(ctx: Slick.FormatterContext) {
 
-    @Formatter('Boolean')
-    export class BooleanFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext) {
+        if (ctx.value == null) {
+            return '';
+        }
 
-            if (ctx.value == null) {
-                return '';
-            }
-
-            var text;
-            if (!!ctx.value) {
-                text = Q.tryGetText(this.trueText);
+        var text;
+        if (!!ctx.value) {
+            text = tryGetText(this.trueText);
+            if (text == null) {
+                text = this.trueText;
                 if (text == null) {
-                    text = this.trueText;
-                    if (text == null) {
-                        text = Q.coalesce(Q.tryGetText('Dialogs.YesButton'), 'Yes');
-                    }
+                    text = tryGetText('Dialogs.YesButton') ?? 'Yes';
                 }
             }
-            else {
-                text = Q.tryGetText(this.falseText);
+        }
+        else {
+            text = tryGetText(this.falseText);
+            if (text == null) {
+                text = this.falseText;
                 if (text == null) {
-                    text = this.falseText;
-                    if (text == null) {
-                        text = Q.coalesce(Q.tryGetText('Dialogs.NoButton'), 'No');
-                    }
+                    text = tryGetText('Dialogs.NoButton') ?? 'No';
                 }
             }
-
-            return Q.htmlEncode(text);
         }
 
-        @Option()
-        public falseText: string;
-
-        @Option()
-        public trueText: string;
+        return htmlEncode(text);
     }
 
-    @Formatter('Checkbox')
-    export class CheckboxFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext) {
-            return '<span class="check-box no-float readonly ' + (!!ctx.value ? ' checked' : '') + '"></span>';
-        }
+    @Decorators.option()
+    public falseText: string;
+
+    @Decorators.option()
+    public trueText: string;
+}
+
+@Formatter('Checkbox')
+export class CheckboxFormatter implements Slick.Formatter {
+    format(ctx: Slick.FormatterContext) {
+        return '<span class="check-box no-float readonly ' + (!!ctx.value ? ' checked' : '') + '"></span>';
+    }
+}
+
+@Formatter('Date')
+export class DateFormatter implements Slick.Formatter {
+    constructor() {
+        this.displayFormat = Culture.dateFormat;
     }
 
-    @Formatter('Date')
-    export class DateFormatter implements Slick.Formatter {
-        constructor() {
-            this.displayFormat = Q.Culture.dateFormat;
+    static format(value: any, format?: string) {
+        if (value == null) {
+            return '';
         }
 
-        static format(value: any, format?: string) {
-            if (value == null) {
-                return '';
-            }
+        var date: Date;
 
-            var date: Date;
+        if (value instanceof Date) {
+            date = value;
+        }
+        else if (typeof value === 'string') {
+            date = parseISODateTime(value);
 
-            if (value instanceof Date) {
-                date = value;
+            if (date == null) {
+                return htmlEncode(value);
             }
-            else if (typeof value === 'string') {
-                date = Q.parseISODateTime(value);
-
-                if (date == null) {
-                    return Q.htmlEncode(value);
-                }
-            }
-            else {
-                return value.toString();
-            }
-
-            return Q.htmlEncode(Q.formatDate(date, format));
+        }
+        else {
+            return value.toString();
         }
 
-        @Option()
-        public displayFormat: string;
-
-        format(ctx: Slick.FormatterContext): string {
-            return DateFormatter.format(ctx.value, this.displayFormat);
-        }
+        return htmlEncode(formatDate(date, format));
     }
 
-    @Formatter('DateTime')
-    export class DateTimeFormatter extends DateFormatter {
-        constructor() {
-            super();
-            this.displayFormat = Q.Culture.dateTimeFormat;
-        }
+    @Decorators.option()
+    public displayFormat: string;
+
+    format(ctx: Slick.FormatterContext): string {
+        return DateFormatter.format(ctx.value, this.displayFormat);
+    }
+}
+
+@Formatter('DateTime')
+export class DateTimeFormatter extends DateFormatter {
+    constructor() {
+        super();
+        this.displayFormat = Culture.dateTimeFormat;
+    }
+}
+
+@Formatter('Enum')
+export class EnumFormatter implements Slick.Formatter {
+
+    format(ctx: Slick.FormatterContext): string {
+        return EnumFormatter.format(EnumTypeRegistry.get(this.enumKey), ctx.value);
     }
 
-    @Formatter('Enum')
-    export class EnumFormatter implements Slick.Formatter {
+    @Decorators.option()
+    enumKey: string;
 
-        format(ctx: Slick.FormatterContext): string {
-            return EnumFormatter.format(EnumTypeRegistry.get(this.enumKey), ctx.value);
+    static format(enumType: any, value: any) {
+
+        if (value == null) {
+            return '';
         }
 
-        @Option()
-        enumKey: string;
-
-        static format(enumType: any, value: any) {
-
-            if (value == null) {
-                return '';
-            }
-
-            var name = Q.Enum.toString(enumType, value);
-            var enumKeyAttr = Q.getAttributes(enumType, EnumKeyAttribute, false);
-            var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : Q.getTypeFullName(enumType));
-            return EnumFormatter.getText(enumKey, name);
-        }
-
-        static getText(enumKey: string, name: string) {
-            if (Q.isEmptyOrNull(name)) {
-                return '';
-            }
-
-            return Q.htmlEncode(Q.coalesce(Q.tryGetText('Enums.' + enumKey + '.' + name), name));
-        }
-
-        static getName(enumType: any, value: any) {
-            if (value == null) {
-                return '';
-            }
-            return Q.Enum.toString(enumType, value);
-        }
+        var name = Enum.toString(enumType, value);
+        var enumKeyAttr = getAttributes(enumType, EnumKeyAttribute, false);
+        var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : getTypeFullName(enumType));
+        return EnumFormatter.getText(enumKey, name);
     }
 
-    @Formatter('FileDownload', [ISlickFormatter, IInitializeColumn])
-    export class FileDownloadFormatter implements Slick.Formatter, IInitializeColumn {
-
-        format(ctx: Slick.FormatterContext): string {
-            var dbFile = Q.safeCast(ctx.value, String);
-            if (Q.isEmptyOrNull(dbFile)) {
-                return '';
-            }
-
-            var downloadUrl = FileDownloadFormatter.dbFileUrl(dbFile);
-            var originalName = (!Q.isEmptyOrNull(this.originalNameProperty) ?
-                Q.safeCast(ctx.item[this.originalNameProperty], String) : null);
-
-            originalName = Q.coalesce(originalName, '');
-            var text = Q.format(Q.coalesce(this.displayFormat, '{0}'),
-                originalName, dbFile, downloadUrl);
-
-            return "<a class='file-download-link' target='_blank' href='" +
-                Q.attrEncode(downloadUrl) + "'>" + Q.htmlEncode(text) + '</a>';
+    static getText(enumKey: string, name: string) {
+        if (isEmptyOrNull(name)) {
+            return '';
         }
 
-        static dbFileUrl(filename: string): string {
-            filename = Q.replaceAll(Q.coalesce(filename, ''), '\\', '/');
-            return Q.resolveUrl('~/upload/') + filename;
-        }
-
-        initializeColumn(column: Slick.Column): void {
-            column.referencedFields = column.referencedFields || [];
-            if (!Q.isEmptyOrNull(this.originalNameProperty)) {
-                column.referencedFields.push(this.originalNameProperty);
-                return;
-            }
-        }
-
-        @Option()
-        displayFormat: string;
-
-        @Option()
-        originalNameProperty: string;
+        return htmlEncode(tryGetText('Enums.' + enumKey + '.' + name) ?? name);
     }
 
-    @Formatter('Minute')
-    export class MinuteFormatter implements Slick.Formatter {
+    static getName(enumType: any, value: any) {
+        if (value == null) {
+            return '';
+        }
+        return Enum.toString(enumType, value);
+    }
+}
 
-        format(ctx: Slick.FormatterContext) {
-            return MinuteFormatter.format(ctx.value);
+@Formatter('FileDownload', [ISlickFormatter, IInitializeColumn])
+export class FileDownloadFormatter implements Slick.Formatter, IInitializeColumn {
+
+    format(ctx: Slick.FormatterContext): string {
+        var dbFile = safeCast(ctx.value, String);
+        if (isEmptyOrNull(dbFile)) {
+            return '';
         }
 
-        static format(value: number): string {
-            var hour = Math.floor(value / 60);
-            var minute = value - hour * 60;
-            var hourStr, minuteStr;
+        var downloadUrl = FileDownloadFormatter.dbFileUrl(dbFile);
+        var originalName = (!isEmptyOrNull(this.originalNameProperty) ?
+            safeCast(ctx.item[this.originalNameProperty], String) : null);
 
-            if (value == null || isNaN(value))
-                return '';
+        originalName = (originalName ?? '');
+        var text = format((this.displayFormat ?? '{0}'),
+            originalName, dbFile, downloadUrl);
 
-            if (hour < 10)
-                hourStr = '0' + hour;
-            else
-                hourStr = hour.toString();
+        return "<a class='file-download-link' target='_blank' href='" +
+            attrEncode(downloadUrl) + "'>" + htmlEncode(text) + '</a>';
+    }
 
-            if (minute < 10)
-                minuteStr = '0' + minute;
-            else
-                minuteStr = minute.toString();
+    static dbFileUrl(filename: string): string {
+        filename = replaceAll((filename ?? ''), '\\', '/');
+        return resolveUrl('~/upload/') + filename;
+    }
 
-            return Q.format('{0}:{1}', hourStr, minuteStr);
+    initializeColumn(column: Slick.Column): void {
+        column.referencedFields = column.referencedFields || [];
+        if (!isEmptyOrNull(this.originalNameProperty)) {
+            column.referencedFields.push(this.originalNameProperty);
+            return;
         }
     }
 
-    @Formatter('Number')
-    export class NumberFormatter {
-        format(ctx: Slick.FormatterContext): string {
-            return NumberFormatter.format(ctx.value, this.displayFormat);
-        }
+    @Decorators.option()
+    displayFormat: string;
 
-        static format(value: any, format?: string): string {
-            format = Q.coalesce(format, '0.##');
-            if (value == null)
-                return '';
+    @Decorators.option()
+    originalNameProperty: string;
+}
 
-            if (typeof (value) === 'number') {
-                if (isNaN(value))
-                    return '';
+@Formatter('Minute')
+export class MinuteFormatter implements Slick.Formatter {
 
-                return Q.htmlEncode(Q.formatNumber(value, format));
-            }
-
-            var dbl = Q.parseDecimal(value.toString());
-            if (dbl == null)
-                return '';
-
-            return Q.htmlEncode(value.toString());
-        }
-
-        @Option()
-        displayFormat: string;
+    format(ctx: Slick.FormatterContext) {
+        return MinuteFormatter.format(ctx.value);
     }
 
-    @Formatter('Url', [ISlickFormatter, IInitializeColumn])
-    export class UrlFormatter implements Slick.Formatter, IInitializeColumn {
+    static format(value: number): string {
+        var hour = Math.floor(value / 60);
+        var minute = value - hour * 60;
+        var hourStr, minuteStr;
 
-        format(ctx: Slick.FormatterContext): string {
-            var url = (!Q.isEmptyOrNull(this.urlProperty) ?
-                Q.coalesce(ctx.item[this.urlProperty], '').toString() :
-                Q.coalesce(ctx.value, '').toString());
+        if (value == null || isNaN(value))
+            return '';
 
-            if (Q.isEmptyOrNull(url))
-                return '';
+        if (hour < 10)
+            hourStr = '0' + hour;
+        else
+            hourStr = hour.toString();
 
-            if (!Q.isEmptyOrNull(this.urlFormat))
-                url = Q.format(this.urlFormat, url);
+        if (minute < 10)
+            minuteStr = '0' + minute;
+        else
+            minuteStr = minute.toString();
 
-            if (url != null && Q.startsWith(url, '~/'))
-                url = Q.resolveUrl(url);
+        return format('{0}:{1}', hourStr, minuteStr);
+    }
+}
 
-            var display = (!Q.isEmptyOrNull(this.displayProperty) ?
-                Q.coalesce(ctx.item[this.displayProperty], '').toString() :
-                Q.coalesce(ctx.value, '').toString());
-
-            if (!Q.isEmptyOrNull(this.displayFormat))
-                display = Q.format(this.displayFormat, display);
-
-            var s = "<a href='" + Q.attrEncode(url) + "'";
-            if (!Q.isEmptyOrNull(this.target))
-                s += " target='" + this.target + "'";
-
-            s += '>' + Q.htmlEncode(display) + '</a>';
-
-            return s;
-        }
-
-        initializeColumn(column: Slick.Column): void {
-            column.referencedFields = column.referencedFields || [];
-
-            if (!Q.isEmptyOrNull(this.displayProperty)) {
-                column.referencedFields.push(this.displayProperty);
-                return;
-            }
-
-            if (!Q.isEmptyOrNull(this.urlProperty)) {
-                column.referencedFields.push(this.urlProperty);
-                return;
-            }
-        }
-
-        @Option()
-        displayProperty: string;
-
-        @Option()
-        displayFormat: string;
-
-        @Option()
-        urlProperty: string;
-
-        @Option()
-        urlFormat: string;
-
-        @Option()
-        target: string;
+@Formatter('Number')
+export class NumberFormatter {
+    format(ctx: Slick.FormatterContext): string {
+        return NumberFormatter.format(ctx.value, this.displayFormat);
     }
 
-    export namespace FormatterTypeRegistry {
+    static format(value: any, format?: string): string {
+        format = (format ?? '0.##');
+        if (value == null)
+            return '';
 
-        let knownTypes: Q.Dictionary<Function>;
+        if (typeof (value) === 'number') {
+            if (isNaN(value))
+                return '';
 
-        function setTypeKeysWithoutFormatterSuffix() {
-            var suffix = 'formatter';
-            for (var k of Object.keys(knownTypes)) {
-                if (!Q.endsWith(k, suffix)) 
-                    continue;
-                
-                var p = k.substr(0, k.length - suffix.length);
-                if (Q.isEmptyOrNull(p))
-                    continue;
-                
-                if (knownTypes[p] != null)
-                    continue;
-                
-                knownTypes[p] = knownTypes[k];
-            }
+            return htmlEncode(formatNumber(value, format));
         }
 
-        function initialize() {
+        var dbl = parseDecimal(value.toString());
+        if (dbl == null)
+            return '';
 
-            if (knownTypes) {
-                return;
-            }
+        return htmlEncode(value.toString());
+    }
 
-            knownTypes = {};
-            var types = Q.getTypes();
-            for (var type of types) {
-                if (!Q.isAssignableFrom(Serenity.ISlickFormatter, type))
-                    continue;
-                    
-                var fullName = Q.getTypeFullName(type).toLowerCase();
-                knownTypes[fullName] = type;
+    @Decorators.option()
+    displayFormat: string;
+}
 
-                for (var k of Q.Config.rootNamespaces) {
-                    if (Q.startsWith(fullName, k.toLowerCase() + '.')) {
-                        var kx = fullName.substr(k.length + 1).toLowerCase();
-                        if (knownTypes[kx] == null) {
-                            knownTypes[kx] = type;
-                        }
-                    }
-                }
-            }
+@Formatter('Url', [ISlickFormatter, IInitializeColumn])
+export class UrlFormatter implements Slick.Formatter, IInitializeColumn {
 
-            setTypeKeysWithoutFormatterSuffix();
+    format(ctx: Slick.FormatterContext): string {
+        var url = (!isEmptyOrNull(this.urlProperty) ?
+            (ctx.item[this.urlProperty] ?? '').toString() :
+            (ctx.value ?? '').toString());
+
+        if (isEmptyOrNull(url))
+            return '';
+
+        if (!isEmptyOrNull(this.urlFormat))
+            url = format(this.urlFormat, url);
+
+        if (url != null && startsWith(url, '~/'))
+            url = resolveUrl(url);
+
+        var display = (!isEmptyOrNull(this.displayProperty) ?
+            (ctx.item[this.displayProperty] ?? '').toString() :
+            (ctx.value ?? '').toString());
+
+        if (!isEmptyOrNull(this.displayFormat))
+            display = format(this.displayFormat, display);
+
+        var s = "<a href='" + attrEncode(url) + "'";
+        if (!isEmptyOrNull(this.target))
+            s += " target='" + this.target + "'";
+
+        s += '>' + htmlEncode(display) + '</a>';
+
+        return s;
+    }
+
+    initializeColumn(column: Slick.Column): void {
+        column.referencedFields = column.referencedFields || [];
+
+        if (!isEmptyOrNull(this.displayProperty)) {
+            column.referencedFields.push(this.displayProperty);
+            return;
         }
 
-        export function get(key: string): Function {
-            if (Q.isEmptyOrNull(key)) 
-                throw new Q.ArgumentNullException('key');
+        if (!isEmptyOrNull(this.urlProperty)) {
+            column.referencedFields.push(this.urlProperty);
+            return;
+        }
+    }
+
+    @Decorators.option()
+    displayProperty: string;
+
+    @Decorators.option()
+    displayFormat: string;
+
+    @Decorators.option()
+    urlProperty: string;
+
+    @Decorators.option()
+    urlFormat: string;
+
+    @Decorators.option()
+    target: string;
+}
+
+export namespace FormatterTypeRegistry {
+
+    let knownTypes: { [key: string]: Function };
+
+    function setTypeKeysWithoutFormatterSuffix() {
+        var suffix = 'formatter';
+        for (var k of Object.keys(knownTypes)) {
+            if (!endsWith(k, suffix)) 
+                continue;
             
-            initialize();
+            var p = k.substr(0, k.length - suffix.length);
+            if (isEmptyOrNull(p))
+                continue;
+            
+            if (knownTypes[p] != null)
+                continue;
+            
+            knownTypes[p] = knownTypes[k];
+        }
+    }
 
-            var formatterType = knownTypes[key.toLowerCase()];
-            if (formatterType == null) {
-                throw new Q.Exception(Q.format(
-                    "Can't find {0} formatter type!", key));
+    function initialize() {
+
+        if (knownTypes) {
+            return;
+        }
+
+        knownTypes = {};
+        var types = getTypes();
+        for (var type of types) {
+            if (!isAssignableFrom(ISlickFormatter, type))
+                continue;
+                
+            var fullName = getTypeFullName(type).toLowerCase();
+            knownTypes[fullName] = type;
+
+            for (var k of Config.rootNamespaces) {
+                if (startsWith(fullName, k.toLowerCase() + '.')) {
+                    var kx = fullName.substr(k.length + 1).toLowerCase();
+                    if (knownTypes[kx] == null) {
+                        knownTypes[kx] = type;
+                    }
+                }
             }
-
-            return formatterType;
         }
 
-        export function reset() {
-            knownTypes = null;
+        setTypeKeysWithoutFormatterSuffix();
+    }
+
+    export function get(key: string): Function {
+        if (isEmptyOrNull(key)) 
+            throw new ArgumentNullException('key');
+        
+        initialize();
+
+        var formatterType = knownTypes[key.toLowerCase()];
+        if (formatterType == null) {
+            throw new Exception(format(
+                "Can't find {0} formatter type!", key));
         }
+
+        return formatterType;
+    }
+
+    export function reset() {
+        knownTypes = null;
     }
 }

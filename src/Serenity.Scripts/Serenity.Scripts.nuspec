@@ -22,41 +22,5 @@
     <file src="dist\Serenity.CoreLib.js.map" target="content/Scripts/serenity" />
 	<file src="dist\Serenity.CoreLib.min.js" target="content/Scripts/serenity" />
 	<!-- for older projects --><file src="dist\Serenity.CoreLib.d.ts" target="content/Scripts/typings/serenity" /> 
-    <file src="dist\core\serenity-core.d.ts" target="content/Scripts/serenity/core" />
-    <file src="dist\core\serenity-core.js" target="content/Scripts/serenity/core" />
-    <file src="dist\core\serenity-core.js.map" target="content/Scripts/serenity/core" />
-	<file src="dist\core\serenity-core.min.js" target="content/Scripts/serenity/core" />
-    <file src="dist\dialogs\serenity-dialogs.d.ts" target="content/Scripts/serenity/dialogs" />
-    <file src="dist\dialogs\serenity-dialogs.js" target="content/Scripts/serenity/dialogs" />
-    <file src="dist\dialogs\serenity-dialogs.js.map" target="content/Scripts/serenity/dialogs" />
-	<file src="dist\dialogs\serenity-dialogs.min.js" target="content/Scripts/serenity/dialogs" />
-    <file src="dist\editors\serenity-editors.js" target="content/Scripts/serenity/editors" />
-    <file src="dist\editors\serenity-editors.js.map" target="content/Scripts/serenity/editors" />
-	<file src="dist\editors\serenity-editors.min.js" target="content/Scripts/serenity/editors" />
-    <file src="dist\editors\serenity-editors.d.ts" target="content/Scripts/serenity/editors" />
-    <file src="dist\filterpanel\serenity-filterpanel.d.ts" target="content/Scripts/serenity/filterpanel" />
-    <file src="dist\filterpanel\serenity-filterpanel.js" target="content/Scripts/serenity/filterpanel" />
-    <file src="dist\filterpanel\serenity-filterpanel.js.map" target="content/Scripts/serenity/filterpanel" />
-	<file src="dist\filterpanel\serenity-filterpanel.min.js" target="content/Scripts/serenity/filterpanel" />
-    <file src="dist\forms\serenity-forms.d.ts" target="content/Scripts/serenity/forms" />
-    <file src="dist\forms\serenity-forms.js" target="content/Scripts/serenity/forms" />
-    <file src="dist\forms\serenity-forms.js.map" target="content/Scripts/serenity/forms" />
-    <file src="dist\forms\serenity-forms.min.js" target="content/Scripts/serenity/forms" />
-    <file src="dist\grids\serenity-grids.d.ts" target="content/Scripts/serenity/grids" />
-    <file src="dist\grids\serenity-grids.js" target="content/Scripts/serenity/grids" />
-    <file src="dist\grids\serenity-grids.js.map" target="content/Scripts/serenity/grids" />
-    <file src="dist\grids\serenity-grids.min.js" target="content/Scripts/serenity/grids" />
-    <file src="dist\quickfilter\serenity-quickfilter.d.ts" target="content/Scripts/serenity/quickfilter" />
-    <file src="dist\quickfilter\serenity-quickfilter.js" target="content/Scripts/serenity/quickfilter" />
-    <file src="dist\quickfilter\serenity-quickfilter.js.map" target="content/Scripts/serenity/quickfilter" />
-    <file src="dist\quickfilter\serenity-quickfilter.min.js" target="content/Scripts/serenity/quickfilter" />
-    <file src="dist\slick\serenity-slick.d.ts" target="content/Scripts/serenity/slick" />
-    <file src="dist\slick\serenity-slick.js" target="content/Scripts/serenity/slick" />
-    <file src="dist\slick\serenity-slick.js.map" target="content/Scripts/serenity/slick" />
-	<file src="dist\slick\serenity-slick.min.js" target="content/Scripts/serenity/slick" />
-    <file src="dist\widget\serenity-widget.d.ts" target="content/Scripts/serenity/widget" />
-    <file src="dist\widget\serenity-widget.js" target="content/Scripts/serenity/widget" />
-    <file src="dist\widget\serenity-widget.js.map" target="content/Scripts/serenity/widget" />
-    <file src="dist\widget\serenity-widget.min.js" target="content/Scripts/serenity/widget" />
   </files>
 </package>

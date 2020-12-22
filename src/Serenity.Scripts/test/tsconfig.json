@@ -1,0 +1,47 @@
+﻿{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "preserveConstEnums": false,
+    "experimentalDecorators": true,
+    "declaration": false,
+    "emitBOM": false,
+    "noEmit": true,
+    "sourceMap": false,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "typeRoots": [
+      "../node_modules/@types"
+    ],
+    "types": [
+      "jquery",
+      "jquery.blockui",
+      "jquery.cookie",
+      "jquery.validation",
+      "jqueryui",
+      "bootstrap",
+      "sortablejs",
+      "toastr",
+      "react",
+      "jest",
+      "node"
+    ],
+    "outDir": "./built",
+    "baseUrl": ".",
+    "paths": {
+      "@CoreLib/*": ["../CoreLib/*"],
+      "@Q/*": ["../CoreLib/Q/*"]
+    },
+    "suppressImplicitAnyIndexErrors": true,
+    "lib": [
+      "ES5",
+      "ES2015",
+      "DOM"
+    ],
+    "noEmitHelpers": false,
+    "jsx": "react"
+  },
+  "include": [
+    "**/*.spec.ts"
+  ]
+}

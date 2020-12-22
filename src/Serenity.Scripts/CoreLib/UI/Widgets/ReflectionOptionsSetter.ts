@@ -1,67 +1,69 @@
-﻿namespace Serenity {
-    export namespace ReflectionOptionsSetter {
-        export function set(target: any, options: any): void {
-            if (options == null) {
-                return;
+﻿import { getInstanceType, getMembers, isInstanceOfType, MemberType } from "../../Q/System";
+import { OptionAttribute, DisplayNameAttribute } from "../../Decorators";
+import { ReflectionUtils } from "../../Types/ReflectionUtils";
+
+export namespace ReflectionOptionsSetter {
+    export function set(target: any, options: any): void {
+        if (options == null) {
+            return;
+        }
+
+        var type = getInstanceType(target);
+
+        if (type === Object) {
+            return;
+        }
+
+        var propByName = type.__propByName;
+        var fieldByName = type.__fieldByName;
+        if (propByName == null) {
+            var props = getMembers(type, MemberType.property);
+            var propList = props.filter(function (x: any) {
+                return !!x.setter && ((x.attr || []).filter(function (a: any) {
+                    return isInstanceOfType(a, OptionAttribute);
+                }).length > 0 || (x.attr || []).filter(function (a: any) {
+                    return isInstanceOfType(a, DisplayNameAttribute);
+                }).length > 0);
+            });
+
+            propByName = {};
+            for (var k of propList) {
+                propByName[ReflectionUtils.makeCamelCase(k.name)] = k;
             }
 
-            var type = Q.getInstanceType(target);
+            type.__propByName = propByName;
+        }
 
-            if (type === Object) {
-                return;
+        if (fieldByName == null) {
+            var fields = getMembers(type, MemberType.field);
+            var fieldList = fields.filter(function (x1: any) {
+                return (x1.attr || []).filter(function (a: any) {
+                    return isInstanceOfType(a, OptionAttribute);
+                }).length > 0 || (x1.attr || []).filter(function (a: any) {
+                    return isInstanceOfType(a, DisplayNameAttribute);
+                }).length > 0;
+            });
+
+            fieldByName = {};
+            for (var $t2 = 0; $t2 < fieldList.length; $t2++) {
+                var k1 = fieldList[$t2];
+                fieldByName[ReflectionUtils.makeCamelCase(k1.name)] = k1;
             }
+            type.__fieldByName = fieldByName;
+        }
 
-            var propByName = type.__propByName;
-            var fieldByName = type.__fieldByName;
-            if (propByName == null) {
-                var props = Q.getMembers(type, Q.MemberType.property);
-                var propList = props.filter(function (x: any) {
-                    return !!x.setter && ((x.attr || []).filter(function (a: any) {
-                        return Q.isInstanceOfType(a, Serenity.OptionAttribute);
-                    }).length > 0 || (x.attr || []).filter(function (a: any) {
-                        return Q.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
-                    }).length > 0);
-                });
-
-                propByName = {};
-                for (var k of propList) {
-                    propByName[ReflectionUtils.makeCamelCase(k.name)] = k;
-                }
-
-                type.__propByName = propByName;
+        var keys = Object.keys(options);
+        for (var k2 of keys) {
+            var v = options[k2];
+            var cc = ReflectionUtils.makeCamelCase(k2);
+            var p = propByName[cc] || propByName[k2];
+            if (p != null) {
+                var func = (target[p.setter] as Function);
+                func && func.call(target, v);
             }
-
-            if (fieldByName == null) {
-                var fields = Q.getMembers(type, Q.MemberType.field);
-                var fieldList = fields.filter(function (x1: any) {
-                    return (x1.attr || []).filter(function (a: any) {
-                        return Q.isInstanceOfType(a, Serenity.OptionAttribute);
-                    }).length > 0 || (x1.attr || []).filter(function (a: any) {
-                        return Q.isInstanceOfType(a, System.ComponentModel.DisplayNameAttribute);
-                    }).length > 0;
-                });
-
-                fieldByName = {};
-                for (var $t2 = 0; $t2 < fieldList.length; $t2++) {
-                    var k1 = fieldList[$t2];
-                    fieldByName[ReflectionUtils.makeCamelCase(k1.name)] = k1;
-                }
-                type.__fieldByName = fieldByName;
-            }
-
-            var keys = Object.keys(options);
-            for (var k2 of keys) {
-                var v = options[k2];
-                var cc = ReflectionUtils.makeCamelCase(k2);
-                var p = propByName[cc] || propByName[k2];
-                if (p != null) {
-                    var func = (target[p.setter] as Function);
-                    func && func.call(target, v);
-                }
-                else {
-                    var f = fieldByName[cc] || fieldByName[k2];
-                    f && (target[f.name] = v);
-                }
+            else {
+                var f = fieldByName[cc] || fieldByName[k2];
+                f && (target[f.name] = v);
             }
         }
     }

@@ -1,9 +1,7 @@
-﻿declare namespace Serenity {
+﻿export {}
 
-    interface DataChangeInfo {
-        type: string;
-        entityId: any;
-        entity: any;
-    }
-
+export interface DataChangeInfo {
+    type: string;
+    entityId: any;
+    entity: any;
 }

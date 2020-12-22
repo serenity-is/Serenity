@@ -1,39 +1,40 @@
-﻿namespace Serenity {
+﻿import { Decorators } from "../../Decorators";
+import { IStringValue } from "../../Interfaces";
+import { Widget } from "../Widgets/Widget";
 
-    export interface TextAreaEditorOptions {
-        cols?: number;
-        rows?: number;
+export interface TextAreaEditorOptions {
+    cols?: number;
+    rows?: number;
+}
+
+@Decorators.registerEditor('Serenity.TextAreaEditor', [IStringValue])
+@Decorators.element("<textarea />")
+export class TextAreaEditor extends Widget<TextAreaEditorOptions> {
+
+    constructor(input: JQuery, opt?: TextAreaEditorOptions) {
+        super(input, opt);
+
+        if (this.options.cols !== 0) {
+            input.attr('cols', (this.options.cols ?? 80));
+        }
+        if (this.options.rows !== 0) {
+            input.attr('rows', (this.options.rows ?? 6));
+        }
     }
 
-    @Decorators.registerEditor('Sereniy.TextAreaEditor', [IStringValue])
-    @Decorators.element("<textarea />")
-    export class TextAreaEditor extends Widget<TextAreaEditorOptions> {
+    public get value(): string {
+        return this.element.val();
+    }
 
-        constructor(input: JQuery, opt?: TextAreaEditorOptions) {
-            super(input, opt);
+    protected get_value(): string {
+        return this.value;
+    }
 
-            if (this.options.cols !== 0) {
-                input.attr('cols', Q.coalesce(this.options.cols, 80));
-            }
-            if (this.options.rows !== 0) {
-                input.attr('rows', Q.coalesce(this.options.rows, 6));
-            }
-        }
+    public set value(value: string) {
+        this.element.val(value);
+    }
 
-        public get value(): string {
-            return this.element.val();
-        }
-
-        protected get_value(): string {
-            return this.value;
-        }
-
-        public set value(value: string) {
-            this.element.val(value);
-        }
-
-        protected set_value(value: string): void {
-            this.value = value;
-        }
+    protected set_value(value: string): void {
+        this.value = value;
     }
 }

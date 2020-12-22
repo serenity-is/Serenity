@@ -1,90 +1,97 @@
-﻿namespace Serenity {
-    export namespace EditorTypeRegistry {
-        let knownTypes: Q.Dictionary<WidgetClass>;
+﻿import { Config } from "../Q/Config";
+import { Exception, ArgumentNullException } from "../Q/System";
+import { format } from "../Q/Formatting";
+import { endsWith, isEmptyOrNull, startsWith } from "../Q/Strings";
+import { getAttributes, getType, getTypes, getTypeFullName } from "../Q/System";
+import { EditorAttribute } from "../Decorators";
 
-        export function get(key: string): WidgetClass {
+// @ts-ignore
+let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
 
-            if (Q.isEmptyOrNull(key)) {
-                throw new Q.ArgumentNullException('key');
-            }
+let knownTypes: { [key: string] : any };
 
-            initialize();
+export namespace EditorTypeRegistry {
+    export function get(key: string): any {
 
-            var editorType = knownTypes[key.toLowerCase()];
-            if (editorType == null) {
-
-                var type = Q.getType(key) ?? Q.getType(key, globalObj);
-                if (type != null) {
-                    knownTypes[key.toLowerCase()] = type as any;
-                    return type as any;
-                }
-
-                throw new Q.Exception(Q.format("Can't find {0} editor type!", key));
-            }
-            return editorType;
-
+        if (isEmptyOrNull(key)) {
+            throw new ArgumentNullException('key');
         }
 
-        function initialize(): void {
+        initialize();
 
-            if (knownTypes != null)
-                return;
+        var editorType = knownTypes[key.toLowerCase()];
+        if (editorType == null) {
 
-            knownTypes = {};
+            var type = getType(key) ?? getType(key, globalObj);
+            if (type != null) {
+                knownTypes[key.toLowerCase()] = type as any;
+                return type as any;
+            }
 
-            for (var type of Q.getTypes()) {
+            throw new Exception(format("Can't find {0} editor type!", key));
+        }
+        return editorType;
 
-                var fullName = Q.getTypeFullName(type).toLowerCase();
-                knownTypes[fullName] = type;
+    }
 
-                var editorAttr = Q.getAttributes(type, Serenity.EditorAttribute, false);
-                if (editorAttr != null && editorAttr.length > 0) {
-                    var attrKey = editorAttr[0].key;
-                    if (!Q.isEmptyOrNull(attrKey)) {
-                        knownTypes[attrKey.toLowerCase()] = type;
+    function initialize(): void {
+
+        if (knownTypes != null)
+            return;
+
+        knownTypes = {};
+
+        for (var type of getTypes()) {
+
+            var fullName = getTypeFullName(type).toLowerCase();
+            knownTypes[fullName] = type;
+
+            var editorAttr = getAttributes(type, EditorAttribute, false);
+            if (editorAttr != null && editorAttr.length > 0) {
+                var attrKey = editorAttr[0].key;
+                if (!isEmptyOrNull(attrKey)) {
+                    knownTypes[attrKey.toLowerCase()] = type;
+                }
+            }
+
+            for (var k of Config.rootNamespaces) {
+                if (startsWith(fullName, k.toLowerCase() + '.')) {
+                    var kx = fullName.substr(k.length + 1).toLowerCase();
+                    if (knownTypes[kx] == null) {
+                        knownTypes[kx] = type;
                     }
                 }
-
-                for (var k of Q.Config.rootNamespaces) {
-                    if (Q.startsWith(fullName, k.toLowerCase() + '.')) {
-                        var kx = fullName.substr(k.length + 1).toLowerCase();
-                        if (knownTypes[kx] == null) {
-                            knownTypes[kx] = type;
-                        }
-                    }
-                }
-            }
-
-            setTypeKeysWithoutEditorSuffix();
-        }
-
-        export function reset(): void {
-            knownTypes = null;
-        }
-
-        function setTypeKeysWithoutEditorSuffix() {
-            var suffix = 'editor';
-            var keys = Object.keys(knownTypes);
-            for (var k of keys) {
-                setWithoutSuffix(k, knownTypes[k]);
             }
         }
 
-        function setWithoutSuffix(key: string, t: WidgetClass) {
-            var suffix = 'editor';
+        setTypeKeysWithoutEditorSuffix();
+    }
 
-            if (!Q.endsWith(key, suffix))
-                return;
+    export function reset(): void {
+        knownTypes = null;
+    }
 
-            var p = key.substr(0, key.length - suffix.length);
-
-            if (Q.isEmptyOrNull(p))
-                return;
-
-            if (knownTypes[p] != null)
-                return;
-
-            knownTypes[p] = knownTypes[key];
+    function setTypeKeysWithoutEditorSuffix() {
+        var keys = Object.keys(knownTypes);
+        for (var k of keys) {
+            setWithoutSuffix(k, knownTypes[k]);
         }
+    }
+
+    function setWithoutSuffix(key: string, t: any) {
+        var suffix = 'editor';
+
+        if (!endsWith(key, suffix))
+            return;
+
+        var p = key.substr(0, key.length - suffix.length);
+
+        if (isEmptyOrNull(p))
+            return;
+
+        if (knownTypes[p] != null)
+            return;
+
+        knownTypes[p] = knownTypes[key];
     }
 }
