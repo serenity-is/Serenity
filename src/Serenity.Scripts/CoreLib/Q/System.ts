@@ -550,33 +550,32 @@ export function initializeTypes(root: any, pre: string, limit: number) {
         if (t === "string" || t === "number")
             continue;
 
-        if ((obj as TypeExt).__typeName && 
-            (!(obj as TypeExt).__register) || 
-                !Object.prototype.hasOwnProperty.call(obj, '__register'))
-            continue;
-
         if ((typeof obj === "function" && obj.nodeType !== "number") || 
             ((obj as TypeExt).__register && (obj as TypeExt).__typeKind === TypeKind.Enum)) {
 
-            if (!obj.__interfaces &&
-                obj.prototype &&
-                obj.prototype.format &&
-                k.substr(-9) === "Formatter") {
-                if ((obj as TypeExt).__typeKind == null)
-                    (obj as TypeExt).__typeKind = TypeKind.Class;
-                (obj as TypeExt).__interfaces = [ISlickFormatter]
-            }
-
-            if ((obj as TypeExt).__typeKind == null) {
-                var baseType = getBaseType(obj);
-                if (baseType && (baseType as TypeExt).__typeKind != null) {
-                    (obj as TypeExt).__typeKind = (baseType as TypeExt).__typeKind;
+            if (!(obj as TypeExt).__typeName ||
+                ((obj as TypeExt).__register) && Object.prototype.hasOwnProperty.call(obj, '__register')) {
+    
+                if (!obj.__interfaces &&
+                    obj.prototype &&
+                    obj.prototype.format &&
+                    k.substr(-9) === "Formatter") {
+                    if ((obj as TypeExt).__typeKind == null)
+                        (obj as TypeExt).__typeKind = TypeKind.Class;
+                    (obj as TypeExt).__interfaces = [ISlickFormatter]
                 }
-            }
 
-            if ((obj as TypeExt).__typeKind != null) {
-                setTypeName(obj, pre + k);
-                types[pre + k] = obj;
+                if ((obj as TypeExt).__typeKind == null) {
+                    var baseType = getBaseType(obj);
+                    if (baseType && (baseType as TypeExt).__typeKind != null) {
+                        (obj as TypeExt).__typeKind = (baseType as TypeExt).__typeKind;
+                    }
+                }
+
+                if ((obj as TypeExt).__typeKind != null) {
+                    setTypeName(obj, pre + k);
+                    types[pre + k] = obj;
+                }
             }
 
             delete (obj as TypeExt).__register;
