@@ -32,7 +32,8 @@ namespace Serenity.Web
             {
                 included.Add(css);
 
-                return new HtmlString(string.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
+                return new HtmlString(string.Format(CultureInfo.InvariantCulture,
+                    "    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
                     WebUtility.HtmlEncode(context.RequestServices.GetRequiredService<IContentHashCache>()
                         .ResolveWithHash(context.Request.PathBase, css))));
             }
@@ -64,7 +65,7 @@ namespace Serenity.Web
                 if (string.IsNullOrEmpty(cssUrl))
                     continue;
 
-                if (cssUrl != null && cssUrl.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
+                if (cssUrl.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
                 {
                     var scriptName = cssUrl[10..];
                     cssUrl = scriptManager.GetScriptInclude(scriptName, ".css");
@@ -81,7 +82,8 @@ namespace Serenity.Web
                 if (!cssList.Contains(cssUrl))
                 {
                     cssList.Add(cssUrl);
-                    sb.AppendLine(string.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
+                    sb.AppendLine(string.Format(CultureInfo.InvariantCulture,
+                        "    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
                         WebUtility.HtmlEncode(contentHashCache.ResolveWithHash(context.Request.PathBase, cssUrl))));
                 }
             }
@@ -106,7 +108,8 @@ namespace Serenity.Web
             {
                 scripts.Add(script);
 
-                return new HtmlString(string.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
+                return new HtmlString(string.Format(CultureInfo.InvariantCulture,
+                    "    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
                     WebUtility.HtmlEncode(context.RequestServices.GetRequiredService<IContentHashCache>()
                         .ResolveWithHash(context.Request.PathBase, script))));
             }
@@ -138,7 +141,7 @@ namespace Serenity.Web
                 if (string.IsNullOrEmpty(scriptUrl))
                     continue;
 
-                if (scriptUrl != null && scriptUrl.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
+                if (scriptUrl.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
                 {
                     var scriptName = scriptUrl.Substring(10);
                     scriptUrl = scriptManager.GetScriptInclude(scriptName);
@@ -155,7 +158,8 @@ namespace Serenity.Web
                 if (!scripts.Contains(scriptUrl))
                 {
                     scripts.Add(scriptUrl);
-                    sb.AppendLine(string.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
+                    sb.AppendLine(string.Format(CultureInfo.InvariantCulture, 
+                        "    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
                         WebUtility.HtmlEncode(contentHashCache.ResolveWithHash(context.Request.PathBase, scriptUrl))));
                 }
             }

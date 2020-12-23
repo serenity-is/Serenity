@@ -20,7 +20,7 @@ namespace Serenity.CodeGenerator
 
                 Func<string, XElement> findItemGroupOf = fileName =>
                 {
-                    var lowerFileName = fileName.ToLowerInvariant();
+                    var lowerFileName = fileName.ToUpperInvariant();
 
                     foreach (var group in doc.Elements(ns + "ItemGroup"))
                     {
@@ -29,11 +29,11 @@ namespace Serenity.CodeGenerator
                                     .Concat(group.Elements(ns + "Content"))
                                     .Concat(group.Elements(ns + "None")))
                         {
-                            var value = c.Attribute("Include").Value.ToLowerInvariant();
+                            var value = c.Attribute("Include").Value.ToUpperInvariant();
                             if (value == lowerFileName)
                                 return group;
 
-                            if (value.IndexOf("*.") >= 0)
+                            if (value.Contains("*.", StringComparison.Ordinal))
                             {
                                 var extension = Path.GetExtension(lowerFileName);
                                 if (value == Path.GetDirectoryName(lowerFileName) + @"\*" + extension)
@@ -57,9 +57,9 @@ namespace Serenity.CodeGenerator
                 }
 
                 string contentType;
-                if (string.Compare(Path.GetExtension(codeFile), ".cs") == 0)
+                if (string.Compare(Path.GetExtension(codeFile), ".cs", StringComparison.OrdinalIgnoreCase) == 0)
                     contentType = "Compile";
-                else if (string.Compare(Path.GetExtension(codeFile), ".ts") == 0)
+                else if (string.Compare(Path.GetExtension(codeFile), ".ts", StringComparison.OrdinalIgnoreCase) == 0)
                     contentType = "TypeScriptCompile";
                 else
                     contentType = "Content";
@@ -70,7 +70,7 @@ namespace Serenity.CodeGenerator
                     foreach (var group in doc.Elements(ns + "ItemGroup"))
                     {
                         var compiles = group.Elements(ns + contentType);
-                        if (compiles.Count() > 0)
+                        if (compiles.Any())
                         {
                             targetGroup = group;
                             break;

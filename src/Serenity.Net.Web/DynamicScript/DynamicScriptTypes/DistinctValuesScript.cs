@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -40,7 +41,7 @@ namespace Serenity.Web
 
             if (field is null)
             {
-                throw new InvalidProgramException(string.Format(
+                throw new InvalidProgramException(string.Format(CultureInfo.CurrentCulture,
                     "Property '{0}' specified in a distinct values script on " +
                     "row type {1} is not found!", propertyName, row.GetType().FullName));
             }

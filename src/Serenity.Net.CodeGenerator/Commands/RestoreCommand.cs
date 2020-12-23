@@ -76,9 +76,9 @@ namespace Serenity.CodeGenerator
                 var id = dep.Item2;
 
                 var ver = dep.Item3.Trim();
-                if (ver.EndsWith("-*"))
+                if (ver.EndsWith("-*", StringComparison.Ordinal))
                     ver = ver.Substring(0, ver.Length - 2);
-                else if (ver.StartsWith("[") && ver.EndsWith("]"))
+                else if (ver.StartsWith("[", StringComparison.Ordinal) && ver.EndsWith("]", StringComparison.Ordinal))
                 {
                     ver = ver.Substring(1, ver.Length - 2).Trim();
                 }
@@ -212,12 +212,12 @@ namespace Serenity.CodeGenerator
                 if (condition != null && !string.IsNullOrEmpty(condition.Value))
                 {
                     const string tf = "'$(TargetFramework)' == '";
-                    var idx = condition.Value.IndexOf(tf);
+                    var idx = condition.Value.IndexOf(tf, StringComparison.Ordinal);
                     if (idx >= 0)
                     {
-                        var end = condition.Value.IndexOf("'", idx + tf.Length);
+                        var end = condition.Value.IndexOf("'", idx + tf.Length, StringComparison.Ordinal);
                         if (end >= 0)
-                            target = condition.Value.Substring(idx + +tf.Length, end - idx - tf.Length);
+                            target = condition.Value.Substring(idx + tf.Length, end - idx - tf.Length);
                     }
                 }
 

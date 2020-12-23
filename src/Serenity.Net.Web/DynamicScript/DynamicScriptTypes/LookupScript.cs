@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Serenity.Web
 {
@@ -18,7 +19,7 @@ namespace Serenity.Web
         {
             IEnumerable items = GetItems();
 
-            return string.Format("Q.ScriptData.set({0}, new Q.Lookup({1}, \n{2}\n));",
+            return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, new Q.Lookup({1}, \n{2}\n));",
                 ("Lookup." + LookupKey).ToSingleQuoted(), LookupParams.ToJson(), items.ToJson());
         }
 

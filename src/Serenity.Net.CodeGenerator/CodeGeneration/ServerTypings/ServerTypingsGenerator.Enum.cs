@@ -1,6 +1,7 @@
 ﻿using Mono.Cecil;
 using Serenity.Reflection;
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace Serenity.CodeGeneration
@@ -28,7 +29,7 @@ namespace Serenity.CodeGeneration
                     (!x.HasCustomAttributes ||
                         CecilUtils.FindAttr(x.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") == null));
 
-                fields = fields.OrderBy(x => Convert.ToInt64(x.Constant));
+                fields = fields.OrderBy(x => Convert.ToInt64(x.Constant, CultureInfo.InvariantCulture));
 
                 var inserted = 0;
                 foreach (var field in fields)
@@ -38,7 +39,7 @@ namespace Serenity.CodeGeneration
 
                     cw.Indented(field.Name);
                     sb.Append(" = ");
-                    sb.Append(Convert.ToInt64(field.Constant));
+                    sb.Append(Convert.ToInt64(field.Constant, CultureInfo.InvariantCulture));
                     inserted++;
                 }
 

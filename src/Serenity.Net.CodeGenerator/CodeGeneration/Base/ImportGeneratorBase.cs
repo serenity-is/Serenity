@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Serenity.CodeGeneration
@@ -80,16 +81,16 @@ namespace Serenity.CodeGeneration
 
         protected bool IsGenericTypeName(string typeName)
         {
-            return typeName.IndexOf("`") >= 0;
+            return typeName.Contains("`", StringComparison.Ordinal);
         }
 
         protected string[] SplitGenericArguments(ref string typeName)
         {
             if (!IsGenericTypeName(typeName))
-                return new string[0];
+                return System.Array.Empty<string>();
 
-            var pos = typeName.IndexOf("<");
-            var last = typeName.LastIndexOf(">");
+            var pos = typeName.IndexOf("<", StringComparison.Ordinal);
+            var last = typeName.LastIndexOf(">", StringComparison.Ordinal);
             if (pos >= 0 && last > pos)
             {
                 char[] c = typeName.Substring(pos + 1, last - pos - 1).ToCharArray();
@@ -109,7 +110,7 @@ namespace Serenity.CodeGeneration
                 return new string(c).Split(new char[] { '€' });
             }
             else
-                return new string[0];
+                return System.Array.Empty<string>();
         }
 
         protected string RemoveRootNamespace(string ns, string name)
@@ -119,7 +120,7 @@ namespace Serenity.CodeGeneration
 
             foreach (var rn in RootNamespaces)
             {
-                if (name.StartsWith(rn + "."))
+                if (name.StartsWith(rn + ".", StringComparison.Ordinal))
                     return name.Substring(rn.Length + 1);
             }
 

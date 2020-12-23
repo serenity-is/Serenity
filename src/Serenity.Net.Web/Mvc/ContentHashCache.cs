@@ -6,6 +6,7 @@ using Serenity.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -41,7 +42,7 @@ namespace Serenity.Web
             cdnEnabled = cdn.Enabled == true && !string.IsNullOrEmpty(cdn.Url);
             cdnHttp = cdn.Url;
             if (string.IsNullOrEmpty(cdn.HttpsUrl))
-                cdnHttps = (cdnHttp ?? "").Replace("http://", "https://");
+                cdnHttps = (cdnHttp ?? "").Replace("http://", "https://", StringComparison.Ordinal);
             else
                 cdnHttps = cdn.HttpsUrl;
 
@@ -126,7 +127,7 @@ namespace Serenity.Web
                     if (File.Exists(path))
                         hash = GetFileSHA1(path);
                     else
-                        hash = DateTime.Now.ToString("yyyymmddhh");
+                        hash = DateTime.Now.ToString("yyyymmddhh", CultureInfo.InvariantCulture);
 
                     Hashtable.Synchronized(hashByContentPath)[path] = hash;
                 }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -43,9 +44,9 @@ namespace Serenity.CodeGenerator
 
         public string SaveToJson()
         {
-            Connections.Sort((x, y) => x.Key.CompareTo(y.Key));
+            Connections.Sort((x, y) => string.Compare(x.Key, y.Key, StringComparison.OrdinalIgnoreCase));
             foreach (var c in Connections)
-                c.Tables.Sort((x, y) => x.Tablename.CompareTo(y.Tablename));
+                c.Tables.Sort((x, y) => string.Compare(x.Tablename, y.Tablename, StringComparison.OrdinalIgnoreCase));
 
             return JSON.StringifyIndented(this, 2);
         }

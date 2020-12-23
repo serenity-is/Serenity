@@ -8,7 +8,7 @@ namespace Serenity.Web.Providers
         public static string ComputeSHA512(string s)
         {
             if (string.IsNullOrEmpty(s))
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(s));
 
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(s);
             var sha512 = SHA512.Create();

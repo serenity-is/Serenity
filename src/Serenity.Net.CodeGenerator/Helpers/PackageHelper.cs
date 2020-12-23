@@ -9,7 +9,7 @@ namespace Serenity.CodeGenerator
         {
             var packagesFolder = "/packages/".Replace('/', Path.DirectorySeparatorChar);
             var packagesDir = AppContext.BaseDirectory;
-            var packagesIdx = packagesDir.IndexOf(packagesFolder);
+            var packagesIdx = packagesDir.IndexOf(packagesFolder, StringComparison.OrdinalIgnoreCase);
 
             if (packagesIdx < 0)
             {
@@ -20,7 +20,7 @@ namespace Serenity.CodeGenerator
                 packagesDir = Path.Combine(userHomeDirectory, ".nuget/packages/"
                     .Replace('/', Path.DirectorySeparatorChar));
 
-                packagesIdx = packagesDir.IndexOf(packagesFolder);
+                packagesIdx = packagesDir.IndexOf(packagesFolder, StringComparison.OrdinalIgnoreCase);
             }
 
             if (packagesIdx < 0)

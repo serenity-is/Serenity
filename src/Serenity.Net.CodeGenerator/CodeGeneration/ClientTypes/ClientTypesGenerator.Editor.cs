@@ -1,4 +1,6 @@
-﻿namespace Serenity.CodeGeneration
+﻿using System;
+
+namespace Serenity.CodeGeneration
 {
     public partial class ClientTypesGenerator : ImportGeneratorBase
     {
@@ -46,7 +48,7 @@
                 return false;
 
             if (type.AssemblyName != null &&
-                type.AssemblyName.StartsWith("Serenity."))
+                type.AssemblyName.StartsWith("Serenity.", StringComparison.Ordinal))
                 return false;
 
             return GetAttribute(type, "Serenity.EditorAttribute", inherited: true) != null ||

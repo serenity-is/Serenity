@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Serenity.Web
 {
@@ -19,7 +20,7 @@ namespace Serenity.Web
         {
             string templateText = getTemplate();
 
-            return string.Format("Q.ScriptData.set({0}, {1})", 
+            return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, {1})", 
                 ("Template." + key).ToSingleQuoted(),
                 templateText.ToSingleQuoted()); 
         }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -24,14 +25,14 @@ namespace Serenity.Web
         public static string GetLatestVersion(string path, string mask)
         {
             if (path == null)
-                throw new ArgumentNullException("path");
+                throw new ArgumentNullException(nameof(path));
 
             if (mask.IsNullOrEmpty())
                 return null;
 
-            var idx = mask.IndexOf("*");
+            var idx = mask.IndexOf("*", StringComparison.Ordinal);
             if (idx <= 0)
-                throw new ArgumentOutOfRangeException("mask");
+                throw new ArgumentOutOfRangeException(nameof(mask));
 
             var before = mask.Substring(0, idx);
             var after = mask.Substring(idx + 1);
@@ -62,7 +63,8 @@ namespace Serenity.Web
 
                 for (var i = 0; i < Math.Min(px.Length, py.Length); i++)
                 {
-                    var c = int.Parse(px[i]).CompareTo(int.Parse(py[i]));
+                    var c = int.Parse(px[i], CultureInfo.InvariantCulture)
+                        .CompareTo(int.Parse(py[i], CultureInfo.InvariantCulture));
                     if (c != 0)
                         return c;
                 }
@@ -92,7 +94,7 @@ namespace Serenity.Web
             var after = scriptUrl.Substring(idx + tpl.Length);
             var extension = Path.GetExtension(scriptUrl);
 
-            var path = PathHelper.SecureCombine(webRootPath, before.StartsWith("~/") ? before[2..] : before);
+            var path = PathHelper.SecureCombine(webRootPath, before.StartsWith("~/", StringComparison.Ordinal) ? before[2..] : before);
             path = Path.GetDirectoryName(path);
 
             var beforeName = Path.GetFileName(before.Replace('/', Path.DirectorySeparatorChar));
@@ -132,7 +134,7 @@ namespace Serenity.Web
                     continue;
                 }
 
-                bool falsey = key.StartsWith("!");
+                bool falsey = key.StartsWith("!", StringComparison.Ordinal);
                 if (falsey)
                     key = key.Substring(1);
 
@@ -208,7 +210,7 @@ namespace Serenity.Web
                         if (recursionCheck != null)
                         {
                             if (recursionCheck.Contains(subBundleKey) || recursionCheck.Count > 100)
-                                throw new InvalidOperationException(string.Format(
+                                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                                     "Caught infinite recursion with {1} bundles '{0}'!",
                                         string.Join(", ", recursionCheck), bundleType));
                         }

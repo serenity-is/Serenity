@@ -33,7 +33,7 @@ namespace Serenity.CodeGeneration
             foreach (var nested in type.NestedTypes)
             {
                 var name = nested.Name;
-                if (name.EndsWith("_"))
+                if (name.EndsWith("_", StringComparison.Ordinal))
                     name = name.Substring(0, name.Length - 1);
 
                 AddNestedLocalTexts(nested, prefix + name + ".");
@@ -66,7 +66,7 @@ namespace Serenity.CodeGeneration
                         {
                             if (item[0] == '^' && item[item.Length - 1] == '$')
                                 fb.Append(item.Substring(1, item.Length - 2));
-                            else fb.Append(item.Replace(".", "\\.") + ".*");
+                            else fb.Append(item.Replace(".", "\\.", StringComparison.Ordinal) + ".*");
                             append = true;
                         }
                     }
@@ -136,7 +136,7 @@ namespace Serenity.CodeGeneration
                         if (i + 1 < list.Count)
                         {
                             var next = list[i + 1];
-                            if (next.StartsWith(key) &&
+                            if (next.StartsWith(key, StringComparison.Ordinal) &&
                                 next.Length > key.Length &&
                                 next[key.Length] == '.')
                                 nextStartsWithThis = true;

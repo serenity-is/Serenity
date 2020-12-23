@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -40,10 +41,10 @@ namespace Serenity.CodeGenerator
                     lines.Add(line);
                     line = spaceRegex.Replace(line.TrimToEmpty(), " ");
                     string s = " " + type + " ";
-                    var idx = line.IndexOf(s);
+                    var idx = line.IndexOf(s, StringComparison.Ordinal);
                     if (idx >= 0)
                     {
-                        var idx2 = line.IndexOf("=");
+                        var idx2 = line.IndexOf("=", StringComparison.Ordinal);
                         if (idx2 >= 0)
                         {
                             var ar = line.Substring(idx + s.Length, idx2 - idx - s.Length).TrimToNull();
@@ -121,7 +122,7 @@ namespace Serenity.CodeGenerator
         {
             var content1 = File.ReadAllText(file1, utf8);
             var content2 = File.ReadAllText(file2, utf8);
-            return content1.Trim().Replace("\r", "") == content2.Trim().Replace("\r", "");
+            return content1.Trim().Replace("\r", "", StringComparison.Ordinal) == content2.Trim().Replace("\r", "", StringComparison.Ordinal);
         }
 
         public static void MergeChanges(string backup, string file)
@@ -142,12 +143,12 @@ namespace Serenity.CodeGenerator
                 !File.Exists(Kdiff3Path))
             {
                 if (Kdiff3Path.IsNullOrEmpty())
-                    throw new Exception(
+                    throw new InvalidOperationException(
                         "Couldn't locate KDiff3 utility which is required to merge changes. " +
                         "Please install it, or if it is not installed to default location, " +
                         "set its path in CodeGenerator.config file!");
 
-                throw new Exception(string.Format(
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                     "Couldn't locate KDiff3 utility at '{0}' which is required to merge changes. " +
                     "Please install it, or if it is not installed to default location, " +
                     "set its path in CodeGenerator.config file!", Kdiff3Path));
@@ -212,12 +213,12 @@ namespace Serenity.CodeGenerator
                 !File.Exists(TSCPath))
             {
                 if (TSCPath.IsNullOrEmpty())
-                    throw new Exception(
+                    throw new InvalidOperationException(
                         "Couldn't locate TSC.EXE file which is required for TypeScript compilation. " +
                         "Please install it, or if it is not installed to default location, " +
                         "set its path in CodeGenerator.config file (TSCPath setting)!");
 
-                throw new Exception(string.Format(
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                     "Couldn't locate TSC.EXE file at '{0}' which is required for TypeScript compilation. " +
                     "Please install it, or if it is not installed to default location, " +
                     "set its path in CodeGenerator.config file! (TSCPath setting)", TSCPath));

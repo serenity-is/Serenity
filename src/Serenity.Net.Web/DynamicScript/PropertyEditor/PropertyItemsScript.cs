@@ -4,6 +4,7 @@ using Serenity.ComponentModel;
 using Serenity.PropertyGrid;
 using Serenity.Web.PropertyEditor;
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace Serenity.Web
@@ -61,7 +62,7 @@ namespace Serenity.Web
                 instance.Customize(items);
             }
 
-            return string.Format("Q.ScriptData.set({0}, {1});", 
+            return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, {1});", 
                 scriptName.ToSingleQuoted(), items.ToJson());
         }
 

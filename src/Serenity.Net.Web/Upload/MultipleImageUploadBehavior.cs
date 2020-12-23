@@ -3,6 +3,7 @@ using Serenity.Data;
 using Serenity.Web;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace Serenity.Services
@@ -34,12 +35,12 @@ namespace Serenity.Services
                 return false;
 
             if (!(Target is StringField))
-                throw new ArgumentException(string.Format(
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but it is not a String field!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
 
             if (!(row is IIdRow))
-                throw new ArgumentException(string.Format(
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but Row type doesn't implement IIdRow!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
 
@@ -48,22 +49,23 @@ namespace Serenity.Services
             if (format == null)
             {
                 format = row.GetType().Name;
-                if (format.EndsWith("Row"))
+                if (format.EndsWith("Row", StringComparison.Ordinal))
                     format = format.Substring(0, format.Length - 3);
                 format += "/~";
             }
 
-            fileNameFormat = format.Replace("~", SplittedFormat);
+            fileNameFormat = format.Replace("~", SplittedFormat, StringComparison.Ordinal);
             replaceFields = ImageUploadBehavior.ParseReplaceFields(fileNameFormat, row, Target);
 
             return true;
         }
 
-        private UploadedFile[] ParseAndValidate(string json, string key)
+        private static UploadedFile[] ParseAndValidate(string json, string key)
         {
             json = json.TrimToNull();
 
-            if (json != null && (!json.StartsWith("[") || !json.EndsWith("]")))
+            if (json != null && (!json.StartsWith("[", StringComparison.Ordinal) ||
+                !json.EndsWith("]", StringComparison.Ordinal)))
                 throw new ArgumentOutOfRangeException(key);
 
             var list = JSON.Parse<UploadedFile[]>(json ?? "[]");
@@ -158,7 +160,7 @@ namespace Serenity.Services
                 if (oldFileList.Any(x => string.Compare(x.Filename.Trim(), filename, StringComparison.OrdinalIgnoreCase) == 0))
                     continue;
 
-                if (!filename.ToLowerInvariant().StartsWith("temporary/"))
+                if (!filename.StartsWith("temporary/", StringComparison.OrdinalIgnoreCase))
                     throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
                 ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, localizer, storage, ref filename);

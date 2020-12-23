@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Inflector
@@ -197,12 +198,12 @@ namespace Inflector
 
         public static string Ordinalize(this string numberString)
         {
-            return Ordanize(int.Parse(numberString), numberString);
+            return Ordanize(int.Parse(numberString, CultureInfo.InvariantCulture), numberString);
         }
 
         public static string Ordinalize(this int number)
         {
-            return Ordanize(number, number.ToString());
+            return Ordanize(number, number.ToString(CultureInfo.CurrentCulture));
         }
 
         private static string Ordanize(int number, string numberString)

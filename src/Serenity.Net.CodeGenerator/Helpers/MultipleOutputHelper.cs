@@ -25,8 +25,8 @@ namespace Serenity.CodeGenerator
                 if (exists)
                 {
                     var content = File.ReadAllText(outFile, utf8);
-                    if (content.Trim().Replace("\r", "") ==
-                        pair.Value.Trim().Replace("\r", ""))
+                    if (content.Trim().Replace("\r", "", StringComparison.Ordinal) ==
+                        pair.Value.Trim().Replace("\r", "", StringComparison.Ordinal))
                         continue;
                 }
 

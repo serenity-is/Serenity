@@ -1,6 +1,7 @@
 ﻿using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Serenity.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -83,7 +84,7 @@ namespace Serenity.CodeGeneration
                 return editorType;
 
             editorType = editorTypeAttr.AttributeType.FullName;
-            if (editorType.EndsWith("Attribute"))
+            if (editorType.EndsWith("Attribute", StringComparison.Ordinal))
                 editorType = editorType.Substring(0, editorType.Length - "Attribute".Length);
 
             return editorType;
@@ -94,7 +95,7 @@ namespace Serenity.CodeGeneration
             var codeNamespace = GetNamespace(type);
 
             var identifier = type.Name;
-            if (identifier.EndsWith(requestSuffix) &&
+            if (identifier.EndsWith(requestSuffix, StringComparison.Ordinal) &&
                 CecilUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
             {
                 identifier = identifier.Substring(0,
@@ -195,7 +196,7 @@ namespace Serenity.CodeGeneration
 
                     var fullName = ShortenFullName(scriptType, codeNamespace);
                     var shortName = fullName;
-                    if (fullName.StartsWith("Serenity."))
+                    if (fullName.StartsWith("Serenity.", StringComparison.Ordinal))
                         shortName = "s." + fullName.Substring("Serenity.".Length);
 
                     propertyNames.Add(item.Name);

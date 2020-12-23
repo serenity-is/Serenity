@@ -12,7 +12,7 @@ namespace Serenity.CodeGenerator
             var providerType = Type.GetType("Serenity.Data.Schema." + serverType + "SchemaProvider, Serenity.Net.Data") ??
                 Type.GetType("Serenity.Data.Schema." + serverType + "SchemaProvider, SerenityData");
             if (providerType == null || !typeof(ISchemaProvider).GetTypeInfo().IsAssignableFrom(providerType))
-                throw new ArgumentOutOfRangeException("serverType", (object)serverType, "Unknown server type");
+                throw new ArgumentOutOfRangeException(nameof(serverType), (object)serverType, "Unknown server type");
 
             return (ISchemaProvider)Activator.CreateInstance(providerType);
         }
@@ -65,9 +65,8 @@ namespace Serenity.CodeGenerator
         {
             dataType = null;
             string fieldType;
-            sqlTypeName = sqlTypeName.ToLowerInvariant();
 
-            if (sqlTypeName == "varbinary")
+            if (string.Equals(sqlTypeName, "varbinary", StringComparison.OrdinalIgnoreCase))
             {
                 if (size == 0 || size > 256)
                     return "Stream";
@@ -75,7 +74,8 @@ namespace Serenity.CodeGenerator
                 dataType = "byte[]";
                 return "ByteArray";
             }
-            else if (sqlTypeName == "timestamp" || sqlTypeName == "rowversion")
+            else if (string.Equals(sqlTypeName, "timestamp", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(sqlTypeName, "rowversion", StringComparison.OrdinalIgnoreCase))
             {
                 dataType = "byte[]";
                 return "ByteArray";

@@ -61,15 +61,15 @@ namespace Serenity.CodeGenerator
 
             var csproj = csprojs.First();
 
-            if ("restore".StartsWith(command))
+            if ("restore".StartsWith(command, StringComparison.Ordinal))
             {
                 new RestoreCommand().Run(csproj);
             }
             else if (
-                "transform".StartsWith(command) ||
-                "servertypings".StartsWith(command) ||
-                "clienttypes".StartsWith(command) ||
-                "mvct".StartsWith(command))
+                "transform".StartsWith(command, StringComparison.Ordinal) ||
+                "servertypings".StartsWith(command, StringComparison.Ordinal) ||
+                "clienttypes".StartsWith(command, StringComparison.Ordinal) ||
+                "mvct".StartsWith(command, StringComparison.Ordinal))
             {
                 string tsTypesJson = null;
                 Func<List<ExternalType>> getTsTypes = () =>
@@ -84,22 +84,25 @@ namespace Serenity.CodeGenerator
                     return JSON.Parse<List<ExternalType>>(tsTypesJson);
                 };
 
-                if ("transform".StartsWith(command) || "mvct".StartsWith(command))
+                if ("transform".StartsWith(command, StringComparison.Ordinal) || 
+                    "mvct".StartsWith(command, StringComparison.Ordinal))
                 {
                     new MvcCommand().Run(csproj);
                 }
 
-                if ("transform".StartsWith(command) || "clienttypes".StartsWith(command) || command == "mvct")
+                if ("transform".StartsWith(command, StringComparison.Ordinal) || 
+                    "clienttypes".StartsWith(command, StringComparison.Ordinal) || command == "mvct")
                 {
                     new ClientTypesCommand().Run(csproj, getTsTypes());
                 }
 
-                if ("transform".StartsWith(command) || "servertypings".StartsWith(command))
+                if ("transform".StartsWith(command, StringComparison.Ordinal) || 
+                    "servertypings".StartsWith(command, StringComparison.Ordinal))
                 {
                     new ServerTypingsCommand().Run(csproj, getTsTypes());
                 }
             }
-            else if ("generate".StartsWith(command))
+            else if ("generate".StartsWith(command, StringComparison.Ordinal))
             {
                 new GenerateCommand().Run(csproj, args.Skip(1).ToArray());
             }

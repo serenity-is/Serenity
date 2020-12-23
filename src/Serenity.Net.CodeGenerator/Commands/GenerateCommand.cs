@@ -30,7 +30,7 @@ namespace Serenity.CodeGenerator
         private string GetOption(string[] args, string opt)
         {
             var dash = "-" + opt;
-            var val = args.FirstOrDefault(x => x.StartsWith(dash + ":"));
+            var val = args.FirstOrDefault(x => x.StartsWith(dash + ":", StringComparison.Ordinal));
             if (val != null)
                 return val.Substring(dash.Length + 1);
 
@@ -38,7 +38,8 @@ namespace Serenity.CodeGenerator
             if (idx >= 0 && idx < args.Length - 1)
             {
                 val = args[idx + 1];
-                if (val.StartsWith("\"") && val.EndsWith("\""))
+                if (val.StartsWith("\"", StringComparison.Ordinal) && 
+                    val.EndsWith("\"", StringComparison.Ordinal))
                     return val.Substring(1, val.Length - 2);
                 else
                     return val;
@@ -88,12 +89,12 @@ namespace Serenity.CodeGenerator
                         foreach (var data in appSettings.Data)
                         {
                             // not so nice fix for relative paths, e.g. sqlite etc.
-                            if (data.Value.ConnectionString.IndexOf("../../..") >= 0)
+                            if (data.Value.ConnectionString.Contains("../../..", StringComparison.Ordinal))
                                 data.Value.ConnectionString = data.Value
-                                    .ConnectionString.Replace("../../..", Path.GetDirectoryName(csproj));
-                            else if (data.Value.ConnectionString.IndexOf(@"..\..\..\") >= 0)
+                                    .ConnectionString.Replace("../../..", Path.GetDirectoryName(csproj), StringComparison.Ordinal);
+                            else if (data.Value.ConnectionString.Contains(@"..\..\..\", StringComparison.Ordinal))
                                 data.Value.ConnectionString = data.Value.ConnectionString.Replace(@"..\..\..\", 
-                                    Path.GetDirectoryName(csproj));
+                                    Path.GetDirectoryName(csproj), StringComparison.Ordinal);
 
                             connectionStringOptions[data.Key] = data.Value;
                         }
@@ -220,7 +221,7 @@ namespace Serenity.CodeGenerator
 
             userInput = tables.Count == 1 ? tables[0] : null;
             if (userInput == null && schemaProvider.DefaultSchema != null && 
-                tables.Any(x => x.StartsWith(schemaProvider.DefaultSchema + ".")))
+                tables.Any(x => x.StartsWith(schemaProvider.DefaultSchema + ".", StringComparison.Ordinal)))
                 userInput = schemaProvider.DefaultSchema + ".";
 
             if (outFile == null)
@@ -267,7 +268,7 @@ namespace Serenity.CodeGenerator
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Enter a Module name for table: ('!' to abort)");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    module = Hinter.ReadHintedLine(new string[0], userInput: userInput);
+                    module = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
                     userInput = module;
 
                     if (module == "!")
@@ -290,7 +291,7 @@ namespace Serenity.CodeGenerator
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Enter a class Identifier for table: ('!' to abort)");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    identifier = Hinter.ReadHintedLine(new string[0], userInput: userInput);
+                    identifier = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
                     userInput = identifier;
 
                     if (identifier == "!")
@@ -313,7 +314,7 @@ namespace Serenity.CodeGenerator
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Enter a Permission Key for table: ('!' to abort)");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    permissionKey = Hinter.ReadHintedLine(new string[0], userInput: userInput);
+                    permissionKey = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
                     userInput = permissionKey;
 
                     if (permissionKey == "!")
@@ -335,7 +336,7 @@ namespace Serenity.CodeGenerator
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Choose What to Generate (R:Row, S:Repo+Svc, U=UI, C=Custom)");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    what = Hinter.ReadHintedLine(new string[0], userInput: userInput);
+                    what = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
                     userInput = what;
 
                     if (what == "!")

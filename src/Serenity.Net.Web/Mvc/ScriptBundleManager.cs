@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Serenity.Abstractions;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -66,7 +67,7 @@ namespace Serenity.Web
                 var bundles = settings.Bundles ?? new Dictionary<string, string[]>();
 
                 bundles = bundles.Keys.ToDictionary(k => k,
-                    k => (bundles[k] ?? new string[0])
+                    k => (bundles[k] ?? Array.Empty<string>())
                         .Select(u => BundleUtils.DoReplacements(u, settings.Replacements))
                         .Where(u => !string.IsNullOrEmpty(u))
                         .ToArray());
@@ -105,7 +106,7 @@ namespace Serenity.Web
 
                     Action<string> registerInBundle = delegate (string sourceFile)
                     {
-                        if (bundleKey.IndexOf('/') < 0 && !bundleKeyBySourceUrl.ContainsKey(sourceFile))
+                        if (bundleKey.IndexOf('/', StringComparison.Ordinal) < 0 && !bundleKeyBySourceUrl.ContainsKey(sourceFile))
                             bundleKeyBySourceUrl[sourceFile] = bundleKey;
 
                         HashSet<string> bundleKeys;
@@ -134,8 +135,8 @@ namespace Serenity.Web
                                 if (recursionCheck != null)
                                 {
                                     if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
-                                        return string.Format(errorLines,
-                                            string.Format("Caught infinite recursion with dynamic scripts '{0}'!",
+                                        return string.Format(CultureInfo.CurrentCulture, errorLines,
+                                            string.Format(CultureInfo.CurrentCulture, "Caught infinite recursion with dynamic scripts '{0}'!",
                                                 string.Join(", ", recursionCheck)));
                                 }
                                 else
@@ -146,8 +147,8 @@ namespace Serenity.Web
                                 {
                                     var code = scriptManager.GetScriptText(scriptName);
                                     if (code == null)
-                                        return string.Format(errorLines,
-                                            string.Format("Dynamic script with name '{0}' is not found!", scriptName));
+                                        return string.Format(CultureInfo.CurrentCulture, errorLines,
+                                            string.Format(CultureInfo.CurrentCulture, "Dynamic script with name '{0}' is not found!", scriptName));
 
                                     if (minimize &&
                                         !scriptName.StartsWith("Bundle.", StringComparison.OrdinalIgnoreCase))
@@ -179,7 +180,7 @@ namespace Serenity.Web
                         sourceUrl = VirtualPathUtility.ToAbsolute(contextAccessor, sourceUrl);
                         var rootUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/");
 
-                        if (sourceUrl.IsNullOrEmpty() || !sourceUrl.StartsWith(rootUrl))
+                        if (sourceUrl.IsNullOrEmpty() || !sourceUrl.StartsWith(rootUrl, StringComparison.Ordinal))
                             continue;
 
                         registerInBundle(sourceUrl);
@@ -189,7 +190,8 @@ namespace Serenity.Web
                             var sourcePath = PathHelper.SecureCombine(hostEnvironment.WebRootPath, 
                                 sourceUrl.Substring(rootUrl.Length));
                             if (!File.Exists(sourcePath))
-                                return string.Format(errorLines, string.Format("File {0} is not found!", sourcePath));
+                                return string.Format(CultureInfo.CurrentCulture, errorLines, string.Format(CultureInfo.CurrentCulture, 
+                                    "File {0} is not found!", sourcePath));
 
                             if (minimize &&
                                 !noMinimize.Contains(sourceFile) &&
@@ -239,7 +241,7 @@ namespace Serenity.Web
                             if (recursionCheck != null)
                             {
                                 if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
-                                    throw new InvalidOperationException(string.Format(
+                                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                                         "Caught infinite recursion with dynamic scripts '{0}'!",
                                             string.Join(", ", recursionCheck)));
                             }
@@ -299,7 +301,7 @@ namespace Serenity.Web
                 if (bi != null && bi.TryGetValue(bundleKey, out includes) && includes != null)
                     return includes;
 
-                return new string[0];
+                return Array.Empty<string>();
             }
         }
 

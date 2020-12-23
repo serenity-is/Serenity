@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Serenity.CodeGeneration
 {
@@ -28,7 +29,7 @@ namespace Serenity.CodeGeneration
             });
         }
 
-        private bool IsFormatterType(ExternalType type)
+        private static bool IsFormatterType(ExternalType type)
         {
             if (type.IsAbstract)
                 return false;
@@ -37,7 +38,7 @@ namespace Serenity.CodeGeneration
                 return false;
 
             if (type.AssemblyName != null &&
-                type.AssemblyName.StartsWith("Serenity."))
+                type.AssemblyName.StartsWith("Serenity.", StringComparison.Ordinal))
                 return false;
 
             return type.Interfaces.Any(x =>

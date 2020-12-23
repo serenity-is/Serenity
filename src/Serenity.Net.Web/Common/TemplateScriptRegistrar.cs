@@ -25,7 +25,7 @@ namespace Serenity.Web
                     {
                         filename = filename.Substring(rootPath.Length);
 
-                        var moduleEnd = filename.IndexOf(Path.DirectorySeparatorChar);
+                        var moduleEnd = filename.IndexOf(Path.DirectorySeparatorChar, StringComparison.Ordinal);
                         if (moduleEnd >= 0)
                         {
                             var module = filename.Substring(0, moduleEnd);
@@ -61,7 +61,7 @@ namespace Serenity.Web
             foreach (var p in paths)
             {
                 var path = p;
-                if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                if (!path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
                     path = path + Path.DirectorySeparatorChar;
 
                 if (!Directory.Exists(path))

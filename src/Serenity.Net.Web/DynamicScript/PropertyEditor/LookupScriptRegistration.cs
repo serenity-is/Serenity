@@ -4,6 +4,7 @@ using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 
 namespace Serenity.Web
@@ -50,7 +51,8 @@ namespace Serenity.Web
                 else if (!typeof(LookupScript).IsAssignableFrom(type) ||
                     type.IsAbstract)
                 {
-                    throw new InvalidOperationException(string.Format("Type {0} can't be registered as a lookup script!", type.FullName));
+                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, 
+                        "Type {0} can't be registered as a lookup script!", type.FullName));
                 }
                 else
                 {
@@ -63,7 +65,8 @@ namespace Serenity.Web
                 Type otherType;
                 if (registeredType.TryGetValue(script.LookupKey, out otherType))
                 {
-                    throw new InvalidOperationException(string.Format("Types {0} and {1} has the same lookup key (\"{2}\"). " +
+                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, 
+                        "Types {0} and {1} has the same lookup key (\"{2}\"). " +
                         "\r\n\r\nPlease remove LookupScript attribute from one of them or change the lookup key!",
                         type.FullName, otherType.FullName, script.LookupKey));
                 }

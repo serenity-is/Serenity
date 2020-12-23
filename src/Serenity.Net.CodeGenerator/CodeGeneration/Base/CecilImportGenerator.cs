@@ -19,17 +19,17 @@ namespace Serenity.CodeGeneration
         protected string fileIdentifier;
         protected List<AnnotationTypeInfo> annotationTypes;
 
-        public CecilImportGenerator(params Assembly[] assemblies)
+        protected CecilImportGenerator(params Assembly[] assemblies)
             : this(CecilUtils.ToDefinitions(assemblies == null ? (string[])null : assemblies.Select(x => x.Location)))
         {
         }
 
-        public CecilImportGenerator(params string[] assemblyLocations)
+        protected CecilImportGenerator(params string[] assemblyLocations)
             : this(CecilUtils.ToDefinitions(assemblyLocations))
         {
         }
 
-        public CecilImportGenerator(params AssemblyDefinition[] assemblies)
+        protected CecilImportGenerator(params AssemblyDefinition[] assemblies)
             : base()
         {
             generatedTypes = new HashSet<string>();
@@ -88,16 +88,16 @@ namespace Serenity.CodeGeneration
             if (string.IsNullOrEmpty(ns) && type.IsNested)
                 ns = type.DeclaringType.Namespace;
 
-            if (ns.EndsWith(".Entities"))
+            if (ns.EndsWith(".Entities", StringComparison.Ordinal))
                 return ns.Substring(0, ns.Length - ".Entities".Length);
 
-            if (ns.EndsWith(".Endpoints"))
+            if (ns.EndsWith(".Endpoints", StringComparison.Ordinal))
                 return ns.Substring(0, ns.Length - ".Endpoints".Length);
 
-            if (ns.EndsWith(".Forms"))
+            if (ns.EndsWith(".Forms", StringComparison.Ordinal))
                 return ns.Substring(0, ns.Length - ".Forms".Length);
 
-            if (ns.EndsWith(".Columns"))
+            if (ns.EndsWith(".Columns", StringComparison.Ordinal))
                 return ns.Substring(0, ns.Length - ".Columns".Length);
 
             return ns;
@@ -107,7 +107,7 @@ namespace Serenity.CodeGeneration
         {
             string className = controller.Name;
 
-            if (className.EndsWith("Controller"))
+            if (className.EndsWith("Controller", StringComparison.Ordinal))
                 className = className.Substring(0, className.Length - 10);
 
             return className + "Service";
@@ -143,7 +143,7 @@ namespace Serenity.CodeGeneration
                         continue;
                     }
 
-                    TypeDefinition[] emptyTypes = new TypeDefinition[0];
+                    TypeDefinition[] emptyTypes = Array.Empty<TypeDefinition>();
 
                     foreach (var fromType in types)
                     {
@@ -181,7 +181,7 @@ namespace Serenity.CodeGeneration
                             ((CecilUtils.Contains(baseClasses, "Microsoft.AspNetCore.Mvc", "Controller") ||
                               CecilUtils.Contains(baseClasses, "System.Web.Mvc", "Controller")) && // backwards compability
                              fromType.Namespace != null &&
-                             fromType.Namespace.EndsWith(".Endpoints")))
+                             fromType.Namespace.EndsWith(".Endpoints", StringComparison.Ordinal)))
                         {
                             EnqueueType(fromType);
                             continue;
@@ -349,7 +349,7 @@ namespace Serenity.CodeGeneration
             }
 
             if ((codeNamespace != null && (ns == codeNamespace)) ||
-                (codeNamespace != null && codeNamespace.StartsWith((ns + "."))))
+                (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)))
             {
                 return "";
             }
@@ -359,8 +359,8 @@ namespace Serenity.CodeGeneration
 
             if (codeNamespace != null)
             {
-                var idx = codeNamespace.IndexOf('.');
-                if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1)))
+                var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
+                if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1), StringComparison.Ordinal))
                     return ns.Substring(idx + 1);
             }
 
@@ -377,7 +377,7 @@ namespace Serenity.CodeGeneration
             string ns = type.Namespace ?? "";
 
             if ((codeNamespace != null && (ns == codeNamespace)) ||
-                (codeNamespace != null && codeNamespace.StartsWith((ns + "."))))
+                (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)))
             {
                 return "";
             }
@@ -387,8 +387,8 @@ namespace Serenity.CodeGeneration
 
             if (codeNamespace != null)
             {
-                var idx = codeNamespace.IndexOf('.');
-                if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1)))
+                var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
+                if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1), StringComparison.Ordinal))
                     return ns.Substring(idx + 1);
             }
 
@@ -402,12 +402,12 @@ namespace Serenity.CodeGeneration
             if (type.IsGenericInstance)
             {
                 var name = type.Name;
-                var idx = name.IndexOf('`');
+                var idx = name.IndexOf('`', StringComparison.Ordinal);
                 if (idx >= 0)
                     name = name.Substring(0, idx);
 
                 sb.Append(name);
-                sb.Append("<");
+                sb.Append('<');
 
                 int i = 0;
                 foreach (var argument in (type as GenericInstanceType).GenericArguments)
@@ -418,19 +418,19 @@ namespace Serenity.CodeGeneration
                     HandleMemberType(argument, codeNamespace, sb);
                 }
 
-                sb.Append(">");
+                sb.Append('>');
 
                 return name + "`" + (type as GenericInstanceType).GenericArguments.Count;
             }
             else if (type.HasGenericParameters)
             {
                 var name = type.Name;
-                var idx = name.IndexOf('`');
+                var idx = name.IndexOf('`', StringComparison.Ordinal);
                 if (idx >= 0)
                     name = name.Substring(0, idx);
 
                 sb.Append(name);
-                sb.Append("<");
+                sb.Append('<');
 
                 int i = 0;
                 foreach (var argument in type.GenericParameters)
@@ -465,16 +465,16 @@ namespace Serenity.CodeGeneration
                 if (!string.IsNullOrEmpty(ns))
                 {
                     sb.Append(ns);
-                    sb.Append(".");
+                    sb.Append('.');
                 }
 
                 var name = type.Name;
-                var idx = name.IndexOf('`');
+                var idx = name.IndexOf('`', StringComparison.Ordinal);
                 if (idx >= 0)
                     name = name.Substring(0, idx);
 
                 sb.Append(name);
-                sb.Append("<");
+                sb.Append('<');
 
                 int i = 0;
                 foreach (var argument in (type as GenericInstanceType).GenericArguments)
@@ -485,7 +485,7 @@ namespace Serenity.CodeGeneration
                     HandleMemberType(argument, codeNamespace);
                 }
 
-                sb.Append(">");
+                sb.Append('>');
                 return;
             }
 
@@ -537,6 +537,9 @@ namespace Serenity.CodeGeneration
         protected bool IsPublicServiceMethod(MethodDefinition method, out TypeReference requestType, out TypeReference responseType,
             out string requestParam)
         {
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
+
             responseType = null;
             requestType = null;
             requestParam = null;
@@ -550,7 +553,7 @@ namespace Serenity.CodeGeneration
                 !CecilUtils.IsSubclassOf(method.DeclaringType, "Microsoft.AspNetCore.Mvc", "Controller"))
                 return false;
 
-            if (method.IsSpecialName && (method.Name.StartsWith("set_") || method.Name.StartsWith("get_")))
+            if (method.IsSpecialName && (method.Name.StartsWith("set_", StringComparison.Ordinal) || method.Name.StartsWith("get_", StringComparison.Ordinal)))
                 return false;
 
             var parameters = method.Parameters.Where(x => !x.ParameterType.Resolve().IsInterface).ToArray();
@@ -571,14 +574,14 @@ namespace Serenity.CodeGeneration
             responseType = method.ReturnType == null ? null : method.ReturnType;
             if (responseType != null &&
                 responseType.IsGenericInstance &&
-                (responseType as GenericInstanceType).ElementType.FullName.StartsWith("Serenity.Services.Result`1"))
+                (responseType as GenericInstanceType).ElementType.FullName.StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal))
             {
                 responseType = (responseType as GenericInstanceType).GenericArguments[0];
                 return true;
             }
             else if (responseType != null &&
                 responseType.IsGenericInstance &&
-                (responseType as GenericInstanceType).ElementType.FullName.StartsWith("System.Threading.Tasks.Task`1"))
+                (responseType as GenericInstanceType).ElementType.FullName.StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
             {
                 responseType = (responseType as GenericInstanceType).GenericArguments[0];
                 return true;
@@ -594,14 +597,17 @@ namespace Serenity.CodeGeneration
 
         protected string GetServiceUrlFromRoute(TypeDefinition controller)
         {
+            if (controller == null)
+                throw new ArgumentNullException(nameof(controller));
+
             var route = CecilUtils.GetAttr(controller, "System.Web.Mvc", "RouteAttribute") ??
                 CecilUtils.GetAttr(controller, "Microsoft.AspNetCore.Mvc", "RouteAttribute");
             string url = route == null || route.ConstructorArguments.Count == 0 || !(route.ConstructorArguments[0].Value is string) ? 
                 ("Services/HasNoRoute/" + controller.Name) : (route.ConstructorArguments[0].Value as string ?? "");
 
 #if !ASPNETMVC
-            url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
-            url = url.Replace("/[action]", "");
+            url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length), StringComparison.Ordinal);
+            url = url.Replace("/[action]", "", StringComparison.Ordinal);
 #else
             if (!url.StartsWith("~/"))
             {
@@ -611,16 +617,16 @@ namespace Serenity.CodeGeneration
             }
 #endif
 
-            if (!url.StartsWith("~/") && !url.StartsWith("/"))
+            if (!url.StartsWith("~/", StringComparison.Ordinal) && !url.StartsWith("/", StringComparison.Ordinal))
                 url = "~/" + url;
 
             while (true)
             {
-                var idx1 = url.IndexOf('{');
+                var idx1 = url.IndexOf('{', StringComparison.Ordinal);
                 if (idx1 <= 0)
                     break;
 
-                var idx2 = url.IndexOf("}", idx1 + 1);
+                var idx2 = url.IndexOf("}", idx1 + 1, StringComparison.Ordinal);
                 if (idx2 <= 0)
                     break;
 
@@ -630,7 +636,7 @@ namespace Serenity.CodeGeneration
             if (url.StartsWith("~/Services/", StringComparison.OrdinalIgnoreCase))
                 url = url.Substring("~/Services/".Length);
 
-            if (url.Length > 1 && url.EndsWith("/"))
+            if (url.Length > 1 && url.EndsWith("/", StringComparison.Ordinal))
                 url = url.Substring(0, url.Length - 1);
 
             return url;

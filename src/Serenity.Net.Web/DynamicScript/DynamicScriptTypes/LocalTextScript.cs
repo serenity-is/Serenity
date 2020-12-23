@@ -3,6 +3,7 @@ using Serenity.Abstractions;
 using Serenity.Localization;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -30,7 +31,7 @@ namespace Serenity.Web
 
         public static string GetScriptName(string package, string languageId, bool isPending)
         {
-            return string.Format("LocalText.{0}.{1}.{2}", package, languageId, isPending ? "Pending" : "Public");
+            return string.Format(CultureInfo.InvariantCulture, "LocalText.{0}.{1}.{2}", package, languageId, isPending ? "Pending" : "Public");
         }
 
         public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 

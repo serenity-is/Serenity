@@ -29,7 +29,7 @@ namespace Serenity.Navigation
             {
                 var item = new NavigationItem
                 {
-                    Title = (attr.Title ?? "").Replace("//", "/"),
+                    Title = (attr.Title ?? "").Replace("//", "/", StringComparison.Ordinal),
                     FullPath = attr.FullPath,
                     Url = (!string.IsNullOrEmpty(attr.Url) && resolveUrl != null) ? resolveUrl(attr.Url) : attr.Url,
                     IconClass = attr.IconClass.TrimToNull(),
@@ -98,7 +98,7 @@ namespace Serenity.Navigation
                 string path = group.Key;
                 while (!string.IsNullOrEmpty(path) && !missing.ContainsKey(path))
                 {
-                    var idx = path.Replace("//", "\x1\x1").LastIndexOf('/');
+                    var idx = path.Replace("//", "\x1\x1", StringComparison.Ordinal).LastIndexOf('/');
                     string parent;
                     string title;
                     if (idx < 0)

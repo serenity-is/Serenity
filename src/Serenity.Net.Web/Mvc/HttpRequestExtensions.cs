@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
+using System.Globalization;
 
 namespace Serenity.Web
 {
@@ -7,6 +8,9 @@ namespace Serenity.Web
     {
         public static Uri GetBaseUri(this HttpRequest request)
         {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
             var hostComponents = request.Host.ToUriComponent().Split(':');
 
             var builder = new UriBuilder
@@ -16,7 +20,7 @@ namespace Serenity.Web
             };
 
             if (hostComponents.Length == 2)
-                builder.Port = Convert.ToInt32(hostComponents[1]);
+                builder.Port = Convert.ToInt32(hostComponents[1], CultureInfo.InvariantCulture);
 
             return builder.Uri;
         }

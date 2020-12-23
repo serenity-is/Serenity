@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Globalization;
 #if !ASPNETMVC
 using Microsoft.AspNetCore.Mvc;
 #else
@@ -13,32 +14,30 @@ namespace Serenity.Navigation
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public abstract class NavigationItemAttribute : Attribute
     {
-        private string[] EmptyCategory = new string[0];
-
         protected NavigationItemAttribute(int order, string path, string url, object permission, string icon)
         {
             path = (path ?? "");
-            this.FullPath = path;
+            FullPath = path;
 
             var idx = path.LastIndexOf('/');
 
             if (idx > 0 && path[idx - 1] == '/')
-                idx = path.Replace("//", "\x1\x1").LastIndexOf('/');
+                idx = path.Replace("//", "\x1\x1", StringComparison.Ordinal).LastIndexOf('/');
 
             if (idx >= 0)
             {
-                this.Category = path.Substring(0, idx);
-                this.Title = path.Substring(idx + 1);
+                Category = path.Substring(0, idx);
+                Title = path.Substring(idx + 1);
             }
             else
             { 
-                this.Title = path;
+                Title = path;
             }
 
-            this.Order = order;
-            this.Permission = permission == null ? null : permission.ToString();
-            this.IconClass = icon;
-            this.Url = url;
+            Order = order;
+            Permission = permission == null ? null : permission.ToString();
+            IconClass = icon;
+            Url = url;
         }
 
         protected NavigationItemAttribute(int order, string path, Type controller, string icon, string action)
@@ -60,21 +59,21 @@ namespace Serenity.Navigation
 
             if (actionMethod == null)
                 throw new ArgumentOutOfRangeException("action",
-                    string.Format("Controller {1} doesn't have an action with name {0}!",
+                    string.Format(CultureInfo.CurrentCulture, "Controller {1} doesn't have an action with name {0}!",
                         action, controller.FullName));
 
             var routeController = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
             var routeAction = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
 
             if (routeController == null && routeAction == null)
-                throw new InvalidOperationException(string.Format(
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                     "Route attribute for {0} action of {1} controller is not found!",
                         action, controller.FullName));
 
             string url = (routeAction ?? routeController).Template ?? "";
 
 #if !ASPNETMVC
-            if (routeAction != null && !url.StartsWith("~/") && !url.StartsWith("/") && routeController != null)
+            if (routeAction != null && !url.StartsWith("~/", StringComparison.Ordinal) && !url.StartsWith("/", StringComparison.Ordinal) && routeController != null)
             {
                 var tmp = routeController.Template ?? "";
                 if (url.Length > 0 && tmp.Length > 0 && tmp[tmp.Length - 1] != '/')
@@ -85,10 +84,10 @@ namespace Serenity.Navigation
 
             const string ControllerSuffix = "Controller";
             var controllerName = controller.Name;
-            if (controllerName.EndsWith(ControllerSuffix))
+            if (controllerName.EndsWith(ControllerSuffix, StringComparison.Ordinal))
                 controllerName = controllerName.Substring(0, controllerName.Length - ControllerSuffix.Length);
-            url = url.Replace("[controller]", controllerName);
-            url = url.Replace("[action]", action);
+            url = url.Replace("[controller]", controllerName, StringComparison.Ordinal);
+            url = url.Replace("[action]", action, StringComparison.Ordinal);
 #else
             if (!url.StartsWith("~/"))
             {
@@ -119,16 +118,16 @@ namespace Serenity.Navigation
             }
 #endif
 
-            if (!url.StartsWith("~/") && !url.StartsWith("/"))
+            if (!url.StartsWith("~/", StringComparison.Ordinal) && !url.StartsWith("/", StringComparison.Ordinal))
                 url = "~/" + url;
 
             while (true)
             {
-                var idx1 = url.IndexOf('{');
+                var idx1 = url.IndexOf('{', StringComparison.Ordinal);
                 if (idx1 <= 0)
                     break;
 
-                var idx2 = url.IndexOf("}", idx1 + 1);
+                var idx2 = url.IndexOf("}", idx1 + 1, StringComparison.Ordinal);
                 if (idx2 <= 0)
                     break;
 

@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -28,7 +29,7 @@ namespace ICSharpCode.Decompiler
                 this.Version = parts[1];
                 this.Type = type;
                 this.Path = path;
-                this.RuntimeComponents = runtimeComponents ?? new string[0];
+                this.RuntimeComponents = runtimeComponents ?? Array.Empty<string>();
             }
         }
 
@@ -86,8 +87,8 @@ namespace ICSharpCode.Decompiler
                 var probingPaths = runtimeConfig["runtimeOptions"]?["additionalProbingPaths"];
                 if (probingPaths != null)
                 {
-                    foreach (var x in probingPaths.ToArray().OfType<JValue>().Select(x => x.ToString()))
-                        if (x.IndexOf('|') < 0 && lookupPaths.IndexOf(x) < 0 && Directory.Exists(x))
+                    foreach (var x in probingPaths.ToArray().OfType<JValue>().Select(x => x.ToString(CultureInfo.InvariantCulture)))
+                        if (x.IndexOf('|', StringComparison.Ordinal) < 0 && lookupPaths.IndexOf(x) < 0 && Directory.Exists(x))
                             lookupPaths.Add(x);
                 }
             }
@@ -161,8 +162,8 @@ namespace ICSharpCode.Decompiler
                 var type = library.First()["type"].ToString();
                 var path = library.First()["path"]?.ToString();
                 var rti = runtimeInfos.FirstOrDefault(r => r.Name == library.Name)?.First();
-                var runtimeInfo = (rti?["runtime"]?.Children().OfType<JProperty>().Select(i => i.Name) ?? new string[0])
-                    .Concat(rti?["compile"]?.Children().OfType<JProperty>().Select(i => i.Name) ?? new string[0])
+                var runtimeInfo = (rti?["runtime"]?.Children().OfType<JProperty>().Select(i => i.Name) ?? Array.Empty<string>())
+                    .Concat(rti?["compile"]?.Children().OfType<JProperty>().Select(i => i.Name) ?? Array.Empty<string>())
                     .ToArray();
 
                 yield return new DotNetCorePackageInfo(library.Name, type, path, runtimeInfo);
@@ -219,7 +220,7 @@ namespace ICSharpCode.Decompiler
         static string RemoveTrailingVersionInfo(string name)
         {
             string shortName = name;
-            int dashIndex = shortName.IndexOf('-');
+            int dashIndex = shortName.IndexOf('-', StringComparison.Ordinal);
             if (dashIndex > 0)
             {
                 shortName = shortName.Remove(dashIndex);

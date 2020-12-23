@@ -20,7 +20,7 @@ namespace Serenity.CodeGeneration
             }
 
             var nullablePrefix = "System.Nullable`1";
-            bool nullable = typeName.StartsWith(nullablePrefix);
+            bool nullable = typeName.StartsWith(nullablePrefix, StringComparison.Ordinal);
             if (nullable)
                 typeName = typeName.Substring(nullablePrefix.Length + 1,
                     typeName.Length - nullablePrefix.Length - 2);
@@ -29,7 +29,7 @@ namespace Serenity.CodeGeneration
             if (systemType == null)
                 return "object";
 
-            if (typeName.StartsWith("System."))
+            if (typeName.StartsWith("System.", StringComparison.Ordinal))
                 return typeName.Substring(7);
 
             return typeName;
@@ -66,7 +66,7 @@ namespace Serenity.CodeGeneration
                     var emo = option as ExternalMethod;
                     if (emo != null && emo.Arguments.Count == 1)
                     {
-                        if (jsName.StartsWith("set_"))
+                        if (jsName.StartsWith("set_", StringComparison.Ordinal))
                         {
                             jsName = jsName.Substring(4);
                             optionName = optionName.Substring(4);
@@ -141,10 +141,10 @@ namespace Serenity.CodeGeneration
                 {
                 }
 
-                if (member.Type.StartsWith("System.Func`") ||
-                    member.Type.StartsWith("System.Action`") ||
+                if (member.Type.StartsWith("System.Func`", StringComparison.Ordinal) ||
+                    member.Type.StartsWith("System.Action`", StringComparison.Ordinal) ||
                     member.Type == "System.Delegate" ||
-                    member.Type.Contains("System.TypeOption") ||
+                    member.Type.Contains("System.TypeOption", StringComparison.Ordinal) ||
                     member.Type == "Function")
                     continue;
 
@@ -183,7 +183,7 @@ namespace Serenity.CodeGeneration
             int loop = 0;
             do
             {
-                if (type.Namespace.StartsWith("System"))
+                if (type.Namespace.StartsWith("System", StringComparison.Ordinal))
                     break;
 
                 AddOptionMembers(result, type, isOptions: false);

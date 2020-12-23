@@ -62,7 +62,7 @@ namespace Serenity.CodeGenerator
             sb.AppendLine("    public static class Views");
             sb.AppendLine("    {");
 
-            var last = new string[0];
+            var last = Array.Empty<string>();
             var processed = new HashSet<string>();
 
             foreach (var file in files)
@@ -106,12 +106,12 @@ namespace Serenity.CodeGenerator
                     sb.AppendLine(indent + "{");
                 }
 
-                var n = parts[parts.Length - 1].Replace(".", "_");
+                var n = parts[parts.Length - 1].Replace(".", "_", StringComparison.Ordinal);
                 if (parts.Length - 1 > 0 && parts[parts.Length - 2] == n)
                     n += "_";
 
                 sb.Append(new string(' ', (parts.Length + 1) * 4));
-                sb.AppendLine("public const string " + n + " = \"~/" + path.Replace(@"\", "/") + "\";");
+                sb.AppendLine("public const string " + n + " = \"~/" + path.Replace(@"\", "/", StringComparison.Ordinal) + "\";");
 
                 last = parts;
             }

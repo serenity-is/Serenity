@@ -89,7 +89,7 @@ namespace Serenity.Web.Middleware
             responseHeaders.CacheControl = cacheControl;
 
             var supportsGzip = scriptContent.CanCompress && 
-                context.Request.Headers["Accept-Encoding"].Any(x => x.IndexOf("gzip") >= 0);
+                context.Request.Headers["Accept-Encoding"].Any(x => x.Contains("gzip", StringComparison.Ordinal));
 
             byte[] contentBytes;
             if (supportsGzip)
@@ -100,12 +100,15 @@ namespace Serenity.Web.Middleware
             else
                 contentBytes = scriptContent.Content;
 
-            await WriteWithIfModifiedSinceControl(context, contentBytes, 
+            await WriteWithIfModifiedSinceControl(context, contentBytes,
                 scriptContent.Time);
         }
 
         public async static Task WriteWithIfModifiedSinceControl(HttpContext context, byte[] bytes, DateTime lastWriteTime)
         {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
             string ifModifiedSince = context.Request.Headers["If-Modified-Since"];
             if (ifModifiedSince != null && ifModifiedSince.Length > 0)
             {

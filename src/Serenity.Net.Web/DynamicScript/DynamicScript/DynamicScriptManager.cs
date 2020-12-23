@@ -117,7 +117,7 @@ namespace Serenity.Web
             {
                 hash = DateTime.UtcNow.Ticks.ToString(CultureInfo.InvariantCulture);
                 if (script is ICacheSuffix ics2)
-                    hash = "-" + ics2.CacheSuffix.GetHashCode().ToString(CultureInfo.InvariantCulture);
+                    hash = "-" + ics2.CacheSuffix.GetHashCode(StringComparison.Ordinal).ToString(CultureInfo.InvariantCulture);
             }
 
             return hash;

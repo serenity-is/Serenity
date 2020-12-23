@@ -38,12 +38,12 @@ namespace Serenity.Services
                 return false;
 
             if (!(Target is StringField))
-                throw new ArgumentException(string.Format(
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but it is not a String field!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
 
             if (!(row is IIdRow))
-                throw new ArgumentException(string.Format(
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but Row type doesn't implement IIdRow!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
 
@@ -53,7 +53,7 @@ namespace Serenity.Services
                     row.FindField(attr.OriginalNameProperty);
 
                 if (ReferenceEquals(null, originalNameField))
-                    throw new ArgumentException(string.Format(
+                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                         "Field '{0}' on row type '{1}' has a UploadEditor attribute but " +
                         "a field with OriginalNameProperty '{2}' is not found!",
                             Target.PropertyName ?? Target.Name, 
@@ -68,12 +68,12 @@ namespace Serenity.Services
             if (format == null)
             {
                 format = row.GetType().Name;
-                if (format.EndsWith("Row"))
+                if (format.EndsWith("Row", StringComparison.Ordinal))
                     format = format.Substring(0, format.Length - 3);
                 format += "/~";
             }
 
-            fileNameFormat = format.Replace("~", SplittedFormat);
+            fileNameFormat = format.Replace("~", SplittedFormat, StringComparison.Ordinal);
             replaceFields = ParseReplaceFields(fileNameFormat, row, Target);
 
             return true;
@@ -81,7 +81,7 @@ namespace Serenity.Services
 
         internal static Dictionary<string, Field> ParseReplaceFields(string fileNameFormat, IRow row, Field target)
         {
-            if (fileNameFormat.IndexOf('|') < 0)
+            if (fileNameFormat.IndexOf('|', StringComparison.Ordinal) < 0)
                 return null;
 
             var replaceFields = new Dictionary<string, Field>();
@@ -91,7 +91,7 @@ namespace Serenity.Services
             {
                 var end = fileNameFormat.IndexOf('|', start + 1);
                 if (end <= start + 1)
-                    throw new ArgumentException(string.Format(
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                         "Field '{0}' on row type '{1}' has a UploadEditor attribute " +
                         "with invalid format string '{2}'!",
                             target.PropertyName ?? target.Name,
@@ -100,7 +100,7 @@ namespace Serenity.Services
 
                 var fieldName = fileNameFormat.Substring(start + 1, end - start - 1);
                 var actualName = fieldName;
-                var colon = fieldName.IndexOf(":");
+                var colon = fieldName.IndexOf(":", StringComparison.Ordinal);
                 if (colon >= 0)
                     actualName = fieldName.Substring(0, colon);
 
@@ -109,7 +109,7 @@ namespace Serenity.Services
 
                 if (ReferenceEquals(null, replaceField))
                 {
-                    throw new ArgumentException(string.Format(
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                         "Field '{0}' on row type '{1}' has a UploadEditor attribute that " +
                         "references field '{2}', but no such field is found!'",
                             target.PropertyName ?? target.Name,
@@ -161,24 +161,24 @@ namespace Serenity.Services
                 var val = p.Value.AsObject(row);
                 string str;
 
-                var colon = p.Key.IndexOf(":");
+                var colon = p.Key.IndexOf(":", StringComparison.Ordinal);
                 if (colon >= 0)
-                    str = string.Format("{0:" + p.Key.Substring(colon + 1, p.Key.Length - colon - 2) + "}", val);
+                    str = string.Format(CultureInfo.InvariantCulture, "{0:" + p.Key.Substring(colon + 1, p.Key.Length - colon - 2) + "}", val);
                 else
                     str = Convert.ToString(val ?? "", CultureInfo.InvariantCulture);
 
-                str = StringHelper.SanitizeFilename(str).Replace('\\', '_').Replace("..", "_");
+                str = StringHelper.SanitizeFilename(str).Replace('\\', '_').Replace("..", "_", StringComparison.Ordinal);
                 if (string.IsNullOrWhiteSpace(str))
                     str = "_";
 
-                while (str.EndsWith("."))
+                while (str.EndsWith(".", StringComparison.Ordinal))
                     str = str.Substring(0, str.Length - 1) + "_";
 
-                s = s.Replace(p.Key, str);
+                s = s.Replace(p.Key, str, StringComparison.Ordinal);
             }
 
-            while (s.IndexOf("//") > 0)
-                s = s.Replace("//", "/_/");
+            while (s.IndexOf("//", StringComparison.Ordinal) > 0)
+                s = s.Replace("//", "/_/", StringComparison.Ordinal);
 
             return s;
         }
@@ -230,7 +230,7 @@ namespace Serenity.Services
                 return;
             }
 
-            if (!newFilename.ToLowerInvariant().StartsWith("temporary/"))
+            if (!newFilename.StartsWith("temporary/", StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
             if (!ReferenceEquals(null, originalNameField))
@@ -323,6 +323,9 @@ namespace Serenity.Services
         public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attr, ITextLocalizer localizer,
             IUploadStorage storage, ref string temporaryFile)
         {
+            if (storage == null)
+                throw new ArgumentNullException(nameof(storage));
+
             ImageCheckResult[] supportedFormats = null;
 
             if (!attr.AllowNonImage)
@@ -346,15 +349,17 @@ namespace Serenity.Services
             {
                 using var fs = storage.OpenFile(temporaryFile);
                 if (attr.MinSize != 0 && fs.Length < attr.MinSize)
-                    throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
+                    throw new ValidationError(string.Format(CultureInfo.CurrentCulture, 
+                        Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
                         UploadFormatting.FileSizeDisplay(attr.MinSize)));
 
                 if (attr.MaxSize != 0 && fs.Length > attr.MaxSize)
-                    throw new ValidationError(string.Format(Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
+                    throw new ValidationError(string.Format(CultureInfo.CurrentCulture, 
+                        Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
                         UploadFormatting.FileSizeDisplay(attr.MaxSize)));
 
                 ImageCheckResult result;
-                if (Path.GetExtension(temporaryFile).ToLowerInvariant() == ".swf")
+                if (string.Compare(Path.GetExtension(temporaryFile), ".swf", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     result = ImageCheckResult.FlashMovie;
                     // validate swf file somehow!
@@ -406,9 +411,9 @@ namespace Serenity.Services
                 if (thumbSizes == null)
                     return;
 
-                foreach (var sizeStr in thumbSizes.Replace(";", ",").Split(new char[] { ',' }))
+                foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split(new char[] { ',' }))
                 {
-                    var dims = sizeStr.ToLowerInvariant().Split(new char[] { 'x' });
+                    var dims = sizeStr.ToUpperInvariant().Split(new char[] { 'X' });
                     int w, h;
                     if (dims.Length != 2 ||
                         !int.TryParse(dims[0], out w) ||
@@ -416,7 +421,7 @@ namespace Serenity.Services
                         w < 0 ||
                         h < 0 ||
                         (w == 0 && h == 0))
-                        throw new ArgumentOutOfRangeException("thumbSizes");
+                        throw new ArgumentOutOfRangeException(nameof(thumbSizes));
 
                     using (Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, Color.Empty))
                     {

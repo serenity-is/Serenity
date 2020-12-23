@@ -1,4 +1,5 @@
 ﻿using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -76,7 +77,7 @@ namespace Serenity.Reflection
         public static AssemblyDefinition[] ToDefinitions(IEnumerable<string> assemblyLocations)
         {
             if (assemblyLocations == null || !assemblyLocations.Any())
-                return new AssemblyDefinition[0];
+                return System.Array.Empty<AssemblyDefinition>();
 
             assemblyLocations = assemblyLocations.Select(x =>
             {
@@ -89,7 +90,7 @@ namespace Serenity.Reflection
                     return x;
 
                 var content = File.ReadAllText(asmInfo, System.Text.Encoding.Unicode);
-                var idx = content.LastIndexOf("\0file:///");
+                var idx = content.LastIndexOf("\0file:///", StringComparison.Ordinal);
                 if (idx < 0)
                     return x;
 

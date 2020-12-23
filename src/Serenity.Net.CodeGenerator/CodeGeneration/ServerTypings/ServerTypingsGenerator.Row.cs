@@ -2,6 +2,7 @@
 using Mono.Cecil.Cil;
 using Serenity.Data;
 using Serenity.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,7 +16,7 @@ namespace Serenity.CodeGeneration
             {
                 var propertyByName = rowType.Properties.Where(x =>
                     CecilUtils.IsPublicInstanceProperty(x) &&
-                    (!x.PropertyType.Name.EndsWith("Field") ||
+                    (!x.PropertyType.Name.EndsWith("Field", StringComparison.Ordinal) ||
                       x.PropertyType.Namespace != "Serenity.Data")).ToLookup(x => x.Name);
 
                 var fieldsType = rowType.NestedTypes.FirstOrDefault(x =>
@@ -108,10 +109,10 @@ namespace Serenity.CodeGeneration
 
             var ns = rowType.Namespace ?? "";
 
-            if (ns.EndsWith(".Entities"))
+            if (ns.EndsWith(".Entities", StringComparison.Ordinal))
                 ns = ns.Substring(0, ns.Length - 9);
 
-            var idx = ns.IndexOf(".");
+            var idx = ns.IndexOf(".", StringComparison.Ordinal);
             if (idx >= 0)
                 ns = ns.Substring(idx + 1);
 
@@ -121,7 +122,7 @@ namespace Serenity.CodeGeneration
         private string DetermineRowIdentifier(TypeDefinition rowType)
         {
             var name = rowType.Name;
-            if (name.EndsWith("Row"))
+            if (name.EndsWith("Row", StringComparison.Ordinal))
                 name = name.Substring(0, name.Length - 3);
 
             var moduleIdentifier = DetermineModuleIdentifier(rowType);
@@ -197,22 +198,22 @@ namespace Serenity.CodeGeneration
             {
                 module = type.Namespace ?? "";
 
-                if (module.EndsWith(".Entities"))
+                if (module.EndsWith(".Entities", StringComparison.Ordinal))
                     module = module.Substring(0, module.Length - 9);
-                else if (module.EndsWith(".Scripts"))
+                else if (module.EndsWith(".Scripts", StringComparison.Ordinal))
                     module = module.Substring(0, module.Length - 8);
-                else if (module.EndsWith(".Lookups"))
+                else if (module.EndsWith(".Lookups", StringComparison.Ordinal))
                     module = module.Substring(0, module.Length - 8);
 
-                var idx = module.IndexOf(".");
+                var idx = module.IndexOf(".", StringComparison.Ordinal);
                 if (idx >= 0)
                     module = module.Substring(idx + 1);
             }
 
             var name = type.Name;
-            if (name.EndsWith("Row"))
+            if (name.EndsWith("Row", StringComparison.Ordinal))
                 name = name.Substring(0, name.Length - 3);
-            else if (name.EndsWith("Lookup"))
+            else if (name.EndsWith("Lookup", StringComparison.Ordinal))
                 name = name.Substring(0, name.Length - 6);
 
             return string.IsNullOrEmpty(module) ? name :

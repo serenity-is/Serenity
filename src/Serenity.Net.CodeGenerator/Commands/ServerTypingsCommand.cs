@@ -2,6 +2,7 @@
 using Serenity.CodeGeneration;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -38,9 +39,9 @@ namespace Serenity.CodeGenerator
 
                 var outputExtension = ".dll";
                 var targetFramework = xtarget.Value;
-                if (targetFramework.StartsWith("net") &&
-                    !targetFramework.StartsWith("netcoreapp") &&
-                    targetFramework.IndexOf('.') < 0)
+                if (targetFramework.StartsWith("net", StringComparison.OrdinalIgnoreCase) &&
+                    !targetFramework.StartsWith("netcoreapp", StringComparison.Ordinal) &&
+                    targetFramework.IndexOf('.', StringComparison.Ordinal) < 0)
                     outputExtension = ".exe";
 
                 var outputPath1 = Path.Combine(Path.GetDirectoryName(csproj), "bin/Debug/" + targetFramework + "/" + outputName + outputExtension)
@@ -60,7 +61,8 @@ namespace Serenity.CodeGenerator
                     assemblyFiles = new[] { outputPath2 };
                 else
                 {
-                    Console.Error.WriteLine(string.Format("Couldn't find output file for server typings generation at {0}!" + Environment.NewLine + 
+                    Console.Error.WriteLine(string.Format(CultureInfo.CurrentCulture,
+                        "Couldn't find output file for server typings generation at {0}!" + Environment.NewLine + 
                         "Make sure project is built successfully before running Sergen", outputPath1));
                     Environment.Exit(1);
                 }
@@ -101,9 +103,10 @@ namespace Serenity.CodeGenerator
                         assemblyFiles[i] = assemblyFile2;
                     else
                     {
-                        Console.Error.WriteLine(string.Format(string.Format("Assembly file '{0}' specified in sergen.json is not found! " +
-                        "This might happen when project is not successfully built or file name doesn't match the output DLL." +
-                        "Please check path in sergen.json and try again.", assemblyFile1)));
+                        Console.Error.WriteLine(string.Format(CultureInfo.CurrentCulture, string.Format(CultureInfo.CurrentCulture, 
+                            "Assembly file '{0}' specified in sergen.json is not found! " +
+                            "This might happen when project is not successfully built or file name doesn't match the output DLL." +
+                            "Please check path in sergen.json and try again.", assemblyFile1)));
                         Environment.Exit(1);
                     }
                 }

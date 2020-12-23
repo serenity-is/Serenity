@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Serenity.Services;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace Serenity.Web
             if (string.IsNullOrEmpty(token))
                 throw new ValidationError("Recaptcha", localizer.Get("Validation.Recaptcha"));
 
-            var postData = string.Format("secret={0}&response={1}",
+            var postData = string.Format(CultureInfo.InvariantCulture, "secret={0}&response={1}",
                 Uri.EscapeDataString(secretKey),
                 Uri.EscapeDataString(token));
 
@@ -28,7 +29,7 @@ namespace Serenity.Web
 
             var webRequest = (HttpWebRequest)WebRequest.Create(verifyUri);
             webRequest.ContentType = "application/x-www-form-urlencoded";
-            webRequest.Headers["Content-Length"] = postDataBuffer.Length.ToString();
+            webRequest.Headers["Content-Length"] = postDataBuffer.Length.ToString(CultureInfo.InvariantCulture);
 
             webRequest.Method = "POST";
             using (var requestStream = Task.Run(() => webRequest.GetRequestStreamAsync()).Result)

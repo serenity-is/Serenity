@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -420,9 +421,12 @@ namespace ICSharpCode.Decompiler
 
         public static string ToHexString(IEnumerable<byte> bytes, int estimatedLength)
         {
+            if (bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
+
             StringBuilder sb = new StringBuilder(estimatedLength * 2);
             foreach (var b in bytes)
-                sb.AppendFormat("{0:x2}", b);
+                sb.AppendFormat(CultureInfo.InvariantCulture, "{0:x2}", b);
             return sb.ToString();
         }
 
@@ -605,7 +609,7 @@ namespace ICSharpCode.Decompiler
                 .Append("__");
 
             for (int i = 0; i < reference.PublicKeyToken.Length; i++)
-                gac_folder.Append(reference.PublicKeyToken[i].ToString("x2"));
+                gac_folder.Append(reference.PublicKeyToken[i].ToString("x2", CultureInfo.InvariantCulture));
 
             return Path.Combine(
                 Path.Combine(

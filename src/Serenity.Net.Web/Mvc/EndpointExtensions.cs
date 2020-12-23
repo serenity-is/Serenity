@@ -15,8 +15,8 @@ namespace Serenity.Services
         {
             //exception.Log();
 
-            bool showDetails = context != null && context.RequestServices.GetRequiredService<IWebHostEnvironment>()
-                .EnvironmentName?.ToLowerInvariant() == "development";
+            bool showDetails = context != null && string.Compare(context.RequestServices.GetRequiredService<IWebHostEnvironment>()
+                .EnvironmentName, "development", StringComparison.OrdinalIgnoreCase) == 0;
 
             var response = new TResponse();
             var error = new ServiceError();

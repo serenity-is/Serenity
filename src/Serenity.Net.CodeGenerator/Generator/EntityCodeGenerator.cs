@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -80,18 +81,18 @@ namespace Serenity.CodeGenerator
                         continue;
 
                     var templateKey = pair.Key;
-                    if (templateKey.IndexOf("..") >= 0 ||
-                        templateKey.StartsWith("\\") ||
-                        templateKey.StartsWith("//"))
+                    if (templateKey.Contains("..", StringComparison.Ordinal) ||
+                        templateKey.StartsWith("\\", StringComparison.Ordinal) ||
+                        templateKey.StartsWith("//", StringComparison.Ordinal))
                         throw new ArgumentOutOfRangeException("templateFile");
 
                     var outputFile = pair.Value;
-                    if (outputFile.IndexOf("..") >= 0 || 
-                        outputFile.StartsWith("\\") ||
-                        outputFile.StartsWith("//"))
+                    if (outputFile.Contains("..", StringComparison.Ordinal) || 
+                        outputFile.StartsWith("\\", StringComparison.Ordinal) ||
+                        outputFile.StartsWith("//", StringComparison.Ordinal))
                         throw new ArgumentOutOfRangeException("outputFile");
 
-                    outputFile = string.Format(outputFile, model.ClassName, model.Module, 
+                    outputFile = string.Format(CultureInfo.InvariantCulture, outputFile, model.ClassName, model.Module, 
                         Path.GetDirectoryName(moduleClass), Path.GetDirectoryName(typingClass), rootDir);
 
                     var content = Templates.Render(templateKey, model);
@@ -105,7 +106,8 @@ namespace Serenity.CodeGenerator
         {
             if (File.Exists(file))
             {
-                var backupFile = string.Format("{0}.{1}.bak", file, DateTime.Now.ToString("yyyyMMdd_HHmmss"));
+                var backupFile = string.Format(CultureInfo.InvariantCulture, "{0}.{1}.bak", file, 
+                    DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture));
                 CodeFileHelper.CheckoutAndWrite(backupFile, File.ReadAllBytes(file), false);
                 return backupFile;
             }
@@ -145,12 +147,12 @@ namespace Serenity.CodeGenerator
                 {
                     var importLine = "@import \"site." + model.Module.ToLowerInvariant() + ".less\";";
                     var lines = File.ReadAllLines(siteLess).ToList();
-                    if (!lines.Any(x => (x ?? "").ToLowerInvariant().IsTrimmedSame(importLine)))
+                    if (!lines.Any(x => string.Compare(x ?? "", importLine, StringComparison.OrdinalIgnoreCase) == 0))
                     {
                         var index = lines.FindLastIndex(x =>
                         {
-                            return x.StartsWith("@import") ||
-                                (x.StartsWith("//") && x.Contains("if:"));
+                            return x.StartsWith("@import", StringComparison.Ordinal) ||
+                                (x.StartsWith("//", StringComparison.Ordinal) && x.Contains("if:", StringComparison.Ordinal));
                         });
 
                         if (index < 0)
@@ -173,7 +175,8 @@ namespace Serenity.CodeGenerator
             string code = Templates.Render("Style", model);
             using (var ms = new MemoryStream())
             {
-                var firstLine = code.Replace("\r", "").Split('\n').FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+                var firstLine = code.Replace("\r", "", StringComparison.Ordinal)
+                    .Split('\n').FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
                 if (!string.IsNullOrWhiteSpace(firstLine))
                 {
                     var lines = File.ReadAllLines(file);
@@ -212,26 +215,26 @@ namespace Serenity.CodeGenerator
             else
             {
                 var lines = File.ReadAllLines(file).ToList();
-                var toInsert = code.Replace("\r", "").Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                var usingIndex = lines.FindLastIndex(x => x.TrimToEmpty().StartsWith("using "));
+                var toInsert = code.Replace("\r", "", StringComparison.Ordinal).Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var usingIndex = lines.FindLastIndex(x => x.TrimToEmpty().StartsWith("using ", StringComparison.Ordinal));
                 if (usingIndex < 0)
                     usingIndex = 0;
 
-                foreach (var usng in toInsert.Where(x => x.TrimToEmpty().StartsWith("using ")))
+                foreach (var usng in toInsert.Where(x => x.TrimToEmpty().StartsWith("using ", StringComparison.Ordinal)))
                 {
-                    if (lines.Find(x => x.TrimToEmpty().Replace(" ", "")
-                        .IsTrimmedSame(usng.TrimToEmpty().Replace(" ", ""))) == null)
+                    if (lines.Find(x => x.TrimToEmpty().Replace(" ", "", StringComparison.Ordinal)
+                        .IsTrimmedSame(usng.TrimToEmpty().Replace(" ", "", StringComparison.Ordinal))) == null)
                     {
                         lines.Insert(usingIndex, usng);
                         usingIndex++;
                     }
                 }
 
-                if (!lines.Any(x => x.Contains("MyPages." + model.ClassName + "Controller")))
+                if (!lines.Any(x => x.Contains("MyPages." + model.ClassName + "Controller", StringComparison.Ordinal)))
                 {
                     var insertIndex = lines.FindLastIndex(x => !string.IsNullOrWhiteSpace(x)) + 1;
                     foreach (var z in toInsert.Where(x => !string.IsNullOrWhiteSpace(x) &&
-                        !x.TrimToEmpty().StartsWith("using ")))
+                        !x.TrimToEmpty().StartsWith("using ", StringComparison.Ordinal)))
                         lines.Insert(insertIndex, z);
                 }
 

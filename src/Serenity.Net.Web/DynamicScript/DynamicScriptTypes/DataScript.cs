@@ -1,5 +1,6 @@
 ﻿using Serenity.ComponentModel;
 using System;
+using System.Globalization;
 using System.Reflection;
 
 namespace Serenity.Web
@@ -24,7 +25,7 @@ namespace Serenity.Web
         public override string GetScript()
         {
             var data = getData();
-            return string.Format("Q.ScriptData.set({0}, {1});", this.ScriptName.ToSingleQuoted(), data.ToJson());
+            return string.Format(CultureInfo.CurrentCulture, "Q.ScriptData.set({0}, {1});", ScriptName.ToSingleQuoted(), data.ToJson());
         }
       
     }
@@ -32,19 +33,19 @@ namespace Serenity.Web
     public abstract class DataScript<TData> : DataScript
         where TData: class
     {
-        public DataScript()
+        protected DataScript()
         {
-            this.getData = GetData;
-            var attr = this.GetType().GetCustomAttribute<DataScriptAttribute>();
+            getData = GetData;
+            var attr = GetType().GetCustomAttribute<DataScriptAttribute>();
             if (attr != null)
             {
-                this.key = attr.Key;
+                key = attr.Key;
                 if (attr.Key == null)
-                    this.key = DataScriptAttribute.AutoKeyFor(this.GetType());
+                    key = DataScriptAttribute.AutoKeyFor(GetType());
                     
-                this.Expiration = TimeSpan.FromSeconds(attr.CacheDuration);
-                this.Permission = attr.Permission;
-                this.GroupKey = attr.CacheGroupKey;
+                Expiration = TimeSpan.FromSeconds(attr.CacheDuration);
+                Permission = attr.Permission;
+                GroupKey = attr.CacheGroupKey;
             }
         }
 

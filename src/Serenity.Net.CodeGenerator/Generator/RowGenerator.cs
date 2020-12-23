@@ -15,13 +15,13 @@ namespace Serenity.CodeGenerator
             if (!Enumerable.Any<T>(list))
                 return 0;
             string str1 = getName(Enumerable.First<T>(list));
-            int length = str1.IndexOf('_');
+            int length = str1.IndexOf('_', StringComparison.Ordinal);
             if (length <= 0)
                 return 0;
             string str2 = str1.Substring(0, length + 1);
             foreach (T obj in list)
             {
-                if (!getName(obj).StartsWith(str2) || getName(obj).Length == str2.Length)
+                if (!getName(obj).StartsWith(str2, StringComparison.Ordinal) || getName(obj).Length == str2.Length)
                     return 0;
             }
             return str2.Length;
@@ -29,7 +29,7 @@ namespace Serenity.CodeGenerator
 
         public static string JI(string join, string field)
         {
-            if (field.ToLowerInvariant() == join.ToLowerInvariant())
+            if (string.Compare(field, join, StringComparison.OrdinalIgnoreCase) == 0)
                 return field;
             else
                 return join + field;
@@ -37,7 +37,7 @@ namespace Serenity.CodeGenerator
 
         public static string JU(string join, string field)
         {
-            if (join.ToLowerInvariant() == field.ToLowerInvariant())
+            if (string.Compare(join, field, StringComparison.OrdinalIgnoreCase) == 0)
                 return field;
             else
                 return join + "_" + field;
@@ -271,7 +271,7 @@ namespace Serenity.CodeGenerator
                 var foreign = foreigns.Find((k) => k.FKColumn.Equals(field.FieldName, StringComparison.OrdinalIgnoreCase));
                 if (foreign != null)
                 {
-                    if (f.Title.EndsWith(" Id") && f.Title.Length > 3)
+                    if (f.Title.EndsWith(" Id", StringComparison.Ordinal) && f.Title.Length > 3)
                         f.Title = f.Title.SafeSubstring(0, f.Title.Length - 3);
 
                     f.PKSchema = foreign.PKSchema;
@@ -283,7 +283,7 @@ namespace Serenity.CodeGenerator
                     var j = new EntityJoin();
                     j.Fields = new List<EntityField>();
                     j.Name = GenerateVariableName(f.Name.Substring(prefix));
-                    if (j.Name.EndsWith("Id") || j.Name.EndsWith("ID"))
+                    if (j.Name.EndsWith("Id", StringComparison.Ordinal) || j.Name.EndsWith("ID", StringComparison.Ordinal))
                         j.Name = j.Name.Substring(0, j.Name.Length - 2);
                     f.ForeignJoinAlias = j.Name;
                     j.SourceField = f.Ident;
@@ -386,15 +386,15 @@ namespace Serenity.CodeGenerator
 
         public static string GenerateVariableName(string fieldName)
         {
-            return Inflector.Inflector.Titleize(fieldName).Replace(" ", "");
+            return Inflector.Inflector.Titleize(fieldName).Replace(" ", "", StringComparison.Ordinal);
         }
 
         public static string ClassNameFromTableName(string tableName)
         {
-            tableName = tableName.Replace(" ", "");
-            if (tableName.StartsWith("tb_"))
+            tableName = tableName.Replace(" ", "", StringComparison.Ordinal);
+            if (tableName.StartsWith("tb_", StringComparison.Ordinal))
                 tableName = tableName.Substring(3);
-            else if (tableName.StartsWith("aspnet_"))
+            else if (tableName.StartsWith("aspnet_", StringComparison.Ordinal))
                 tableName = "AspNet" + tableName.Substring(7);
             return GenerateVariableName(tableName);
         }
