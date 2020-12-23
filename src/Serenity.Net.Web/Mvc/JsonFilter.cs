@@ -2,145 +2,131 @@
 using System;
 using System.IO;
 using System.Linq;
-#if !ASPNETMVC
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-#else
-using System.Web.Mvc;
-#endif
+using Microsoft.AspNetCore.Http;
 
 namespace Serenity.Services
 {
     public class JsonFilter : ActionFilterAttribute
     {
+        public JsonFilter()
+        {
+            ParamName = "request";
+        }
+
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            if (filterContext == null)
+                throw new ArgumentNullException(nameof(filterContext));
+
             var request = filterContext.HttpContext.Request;
-#if !ASPNETMVC
             string method = request.Method ?? "";
-#else
-            string method = request.HttpMethod ?? "";
-#endif
             var prms = filterContext.ActionDescriptor
-#if !ASPNETMVC
                 .Parameters
-#else
-                .GetParameters()
-#endif
                 .Where(x => !x.ParameterType.IsInterface);
 
-            if (!prms.Any())
+            if (!prms.Any() || string.IsNullOrEmpty(ParamName))
                 return;
 
             if (prms.Count() != 1)
             {
-#if !ASPNETMVC
-                prms = prms.Where(x => x.Name == "request");
-#else
-                prms = prms.Where(x => x.ParameterName == "request");
-#endif
+                prms = prms.Where(x => x.Name == ParamName);
 
                 if (prms.Count() != 1)
-                    throw new ArgumentOutOfRangeException(string.Format(
+                    throw new ArgumentOutOfRangeException(string.Format(CultureInfo.CurrentCulture,
                         "Method {0} has {1} parameters. JsonFilter requires an action method with only one parameter," + 
-                        "or a parameter with name 'request'!",
-#if !ASPNETMVC
-                            ((ControllerActionDescriptor)filterContext.ActionDescriptor).ActionName, filterContext.ActionDescriptor.Parameters.Count));
-#else
-                            filterContext.ActionDescriptor.ActionName, filterContext.ActionDescriptor.GetParameters().Length));
-#endif
+                        "or a parameter with name '{2}'!",
+                            ((ControllerActionDescriptor)filterContext.ActionDescriptor).ActionName, 
+                            filterContext.ActionDescriptor.Parameters.Count,
+                            ParamName));
             }
 
             var prm = prms.Single();
 
-#if !ASPNETMVC
             if (method.Equals("POST", StringComparison.OrdinalIgnoreCase) ||
                 method.Equals("PUT", StringComparison.OrdinalIgnoreCase))
-#else
-            if (method.Equals("POST", StringComparison.InvariantCultureIgnoreCase) ||
-                method.Equals("PUT", StringComparison.InvariantCultureIgnoreCase))
-#endif
             {
                 if ((request.ContentType ?? string.Empty)
-                    .Contains("application/json"))
+                    .Contains("application/json", StringComparison.OrdinalIgnoreCase))
                 {                   
-                    if (request.ContentLength == 0 &&
-#if !ASPNETMVC
-                        !((string)request.Headers["HTTP_VIA"]).IsTrimmedEmpty())
-#else
-                        !request.Headers["HTTP_VIA"].IsTrimmedEmpty())
-#endif
-                        throw new InvalidDataException("Sunucuya gelen isteğin gövdesi boş! " +
-                            "Sisteme bir vekil sunucu (proxy) üzerinden bağlandınız. Sorun bundan kaynaklanıyor olabilir. " +
-                            "Lütfen sunucu adresini tarayıcınızın istisna listesine ekleyiniz.");
-
-#if !ASPNETMVC
                     if (filterContext.HttpContext.Request.Body.CanSeek)
                         filterContext.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
 
                     using (var sr = new StreamReader(filterContext.HttpContext.Request.Body,
-                        System.Text.Encoding.GetEncoding((string)filterContext.HttpContext.Request.Headers["Content-Encoding"] ?? "utf-8"), true, 4096, true))
-#else
-                    if (filterContext.HttpContext.Request.InputStream.CanSeek)
-                        filterContext.HttpContext.Request.InputStream.Seek(0, SeekOrigin.Begin);
-
-                    using (var sr = new StreamReader(filterContext.HttpContext.Request.InputStream,
-                        filterContext.HttpContext.Request.ContentEncoding, true, 4096, true))
-#endif
-
+                        System.Text.Encoding.GetEncoding((string)filterContext.HttpContext
+                            .Request.Headers["Content-Encoding"] ?? "utf-8"), true, 4096, true))
                     {
                         var js = JsonSerializer.Create(JsonSettings.Strict);
                         using (var jr = new JsonTextReader(sr))
                         {
                             var obj = js.Deserialize(jr, prm.ParameterType);
-#if !ASPNETMVC
                             filterContext.ActionArguments[prm.Name] = obj;
-#else
-                            filterContext.ActionParameters[prm.ParameterName] = obj;
-#endif
                         }
                     }
                 }
-                else
+                else 
                 {
-#if !ASPNETMVC
-                    string req = (string)request.Form[prm.Name] ?? (string)request.Query[prm.Name] ??
-                            (string)request.Form["request"] ?? request.Query["request"];
-#else
-                    string req = request.Form[prm.ParameterName] ?? request.QueryString[prm.ParameterName] ??
-                            request.Form["request"] ?? request.QueryString["request"];
-#endif
+                    var req = FromFormOrQuery(request, prm.Name);
                     if (req != null)
                     {
                         var obj = JsonConvert.DeserializeObject(req, prm.ParameterType, JsonSettings.Strict);
-#if !ASPNETMVC
                         filterContext.ActionArguments[prm.Name] = obj;
-#else
-                        filterContext.ActionParameters[prm.ParameterName] = obj;
-#endif
                     }
                 }
             }
-            else
+            else if ((AllowGet ?? DefaultAllowGet) && 
+                method.Equals("GET", StringComparison.OrdinalIgnoreCase))
             {
-#if !ASPNETMVC
-                string req = (string)request.Form[prm.Name] ?? (string)request.Query[prm.Name] ??
-                        (string)request.Form["request"] ?? request.Query["request"];
-#else
-                string req = request.Form[prm.ParameterName] ?? request.QueryString[prm.ParameterName] ??
-                        request.Form["request"] ?? request.QueryString["request"];
-#endif
-
+                var req = FromFormOrQuery(request, prm.Name);
                 if (req != null)
                 {
                     var obj = JsonConvert.DeserializeObject(req, prm.ParameterType, JsonSettings.Strict);
-#if !ASPNETMVC
                     filterContext.ActionArguments[prm.Name] = obj;
-#else
-                    filterContext.ActionParameters[prm.ParameterName] = obj;
-#endif
                 }
             }
         }
+
+        private string FromFormOrQuery(HttpRequest request, string name)
+        {
+            var allowForm = AllowForm ?? DefaultAllowForm;
+            var allowQuery = AllowQuery ?? DefaultAllowQuery;
+            if (!allowForm && !allowQuery)
+                return null;
+
+            string value;
+            if (allowForm)
+            {
+                value = request.Form[name];
+                if (value != null)
+                    return value;
+            }
+
+            if (allowQuery)
+            {
+                value = request.Query[name];
+                if (value != null)
+                    return value;
+            }
+
+            if (name != ParamName && !string.IsNullOrEmpty(ParamName))
+                return FromFormOrQuery(request, ParamName);
+
+            if (name != "request")
+                return FromFormOrQuery(request, "request");
+
+            return null;
+        }
+
+        public string ParamName { get; set; }
+
+        public bool? AllowGet { get; set; }
+        public bool? AllowQuery { get; set; }
+        public bool? AllowForm { get; set; }
+
+        public static bool DefaultAllowGet { get; set; } = true;
+        public static bool DefaultAllowQuery { get; set; } = true;
+        public static bool DefaultAllowForm { get; set; } = true;
     }
 }
