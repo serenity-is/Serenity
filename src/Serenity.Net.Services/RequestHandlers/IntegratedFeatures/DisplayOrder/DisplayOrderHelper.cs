@@ -129,7 +129,8 @@ namespace Serenity.Data
             // read all existing records
             using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
             {
-                var recordIDStr = recordID == null ? null : IdToSql(recordID);
+                var recordIDStr = recordID == null ? null : 
+                    IdToSql(recordID, connection.GetDialect());
                 while (reader.Read())
                 {
                     // each records actual display order value is one more than previous one
@@ -148,7 +149,8 @@ namespace Serenity.Data
                     orderRecords.Add(r);
 
                     // if this is the one that is requested to be changed, hold a link to its entry
-                    if (recordID != null && recordIDStr == IdToSql(r.recordID))
+                    if (recordID != null && recordIDStr == 
+                            IdToSql(r.recordID, connection.GetDialect()))
                         changing = r;
                 }
             }
@@ -185,13 +187,13 @@ namespace Serenity.Data
             return UpdateOrders(connection, orderRecords, tableName, keyField, orderField, hasUniqueConstraint);
         }
 
-        private static string IdToSql(object id)
+        private static string IdToSql(object id, ISqlDialect dialect)
         {
             if (id == null || id == DBNull.Value)
                 throw new ArgumentNullException("displayOrderID");
 
             if (id is string str)
-                return str.ToSql();
+                return str.ToSql(dialect);
 
             if (id is Guid guid)
                 return ((Guid?)guid).ToSql();
@@ -233,7 +235,7 @@ namespace Serenity.Data
             {
                 queries.AppendLine(string.Format(
                     "UPDATE {0} SET {1} = {2} WHERE {3} = {4};", tableName,
-                    orderField.Name, newOrder, keyField.Name, IdToSql(id)));
+                    orderField.Name, newOrder, keyField.Name, IdToSql(id, connection.GetDialect())));
                 updateCount++;
             }
 
@@ -294,7 +296,7 @@ namespace Serenity.Data
                     sb.Length = 0;
 
                     // add this records ID to the IN (...) part
-                    sb.Append(IdToSql(rs.recordID));
+                    sb.Append(IdToSql(rs.recordID, connection.GetDialect()));
 
                     // now we'll find all following records whose display orders are changed same amount 
                     // (difference between old and new is same), so we will update them with just one query
@@ -317,7 +319,7 @@ namespace Serenity.Data
                             break;
 
                         sb.Append(',');
-                        sb.Append(IdToSql(rf.recordID));
+                        sb.Append(IdToSql(rf.recordID, connection.GetDialect()));
 
                         finish++;
                     }
@@ -327,7 +329,8 @@ namespace Serenity.Data
                     {
                         queries.AppendLine(string.Format(
                             "UPDATE {0} SET {1} = {2} WHERE {3} = {4};", tableName,
-                            orderField.Name, rs.newOrder, keyField.Name, IdToSql(rs.recordID)));
+                            orderField.Name, rs.newOrder, keyField.Name, 
+                            IdToSql(rs.recordID, connection.GetDialect())));
                         updateCount++;
                     }
                     else

@@ -224,7 +224,8 @@ namespace Serenity.Services
                     break;
 
                 case SearchType.FullTextContains:
-                    criteria |= new Criteria("CONTAINS(" + field.Expression + ", " + containsText.ToSql() + ")");
+                    criteria |= new Criteria("CONTAINS(" + field.Expression + ", " + 
+                        containsText.ToSql(Connection.GetDialect()) + ")");
                     break;
 
                 case SearchType.StartsWith:
