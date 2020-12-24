@@ -7,7 +7,7 @@ namespace Serenity.Web
 {
     public class UploadProcessor
     {
-        private IUploadStorage storage;
+        private readonly IUploadStorage storage;
 
         public UploadProcessor(IUploadStorage storage)
         {
@@ -62,7 +62,7 @@ namespace Serenity.Web
                 extension.EndsWith(".php");
         }
 
-        public bool ProcessStream(System.IO.Stream fileContent, string extension, ITextLocalizer localizer)
+        public bool ProcessStream(Stream fileContent, string extension, ITextLocalizer localizer)
         {
             extension = extension.TrimToEmpty().ToLowerInvariant();
             if (IsDangerousExtension(extension))
@@ -92,7 +92,7 @@ namespace Serenity.Web
                     if (IsImageExtension(extension))
                     {
                         IsImage = true;
-                        success = ProcessImageStream(fileContent, extension, localizer);
+                        success = ProcessImageStream(fileContent, localizer);                    
                     }
                     else
                     {
@@ -123,11 +123,10 @@ namespace Serenity.Web
             return success;
         }
 
-        private bool ProcessImageStream(System.IO.Stream fileContent, string extension, ITextLocalizer localizer)
+        private bool ProcessImageStream(Stream fileContent, ITextLocalizer localizer)
         {
             var imageChecker = new ImageChecker();
-            Image image;
-            CheckResult = imageChecker.CheckStream(fileContent, true, out image);
+            CheckResult = imageChecker.CheckStream(fileContent, true, out Image image);
             try
             {
                 FileSize = imageChecker.DataSize;
@@ -145,7 +144,7 @@ namespace Serenity.Web
                 {
                     IsImage = true;
 
-                    extension = CheckResult == ImageCheckResult.PNGImage ? ".png" :
+                    var extension = CheckResult == ImageCheckResult.PNGImage ? ".png" :
                         (CheckResult == ImageCheckResult.GIFImage ? ".gif" : ".jpg");
 
                     storage.PurgeTemporaryFiles();

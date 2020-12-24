@@ -5,7 +5,7 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Determines size (max length or numeric precision for) for the field.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class SizeAttribute : Attribute
     {
         /// <summary>

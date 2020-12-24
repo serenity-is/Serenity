@@ -5,7 +5,7 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Marks the property so that it should be included in quick text searches.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class QuickSearchAttribute : Attribute
     {
         /// <summary>

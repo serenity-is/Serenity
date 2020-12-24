@@ -27,7 +27,7 @@ namespace Serenity.Web
             scriptName = GetScriptName(package ?? throw new ArgumentNullException(nameof(package)), languageId, isPending);
         }
 
-        public string ScriptName { get { return scriptName; } }
+        public string ScriptName => scriptName;
 
         public static string GetScriptName(string package, string languageId, bool isPending)
         {
@@ -77,7 +77,7 @@ namespace Serenity.Web
             {
                 var pair = list[i];
                 // we can't handle keys that ends with '.' for now (possible clash between "site." and "site")
-                if (pair.Key.Length == 0 || pair.Key[pair.Key.Length - 1] == '.')
+                if (pair.Key.Length == 0 || pair.Key[^1] == '.')
                     continue;
 
                 var parts = pair.Key.Split('.');
@@ -112,7 +112,7 @@ namespace Serenity.Web
 
                 if (same != parts.Length)
                 {
-                    string part = parts[parts.Length - 1];
+                    string part = parts[^1];
 
                     bool nextStartsWithThis = false;
                     if (i + 1 < list.Count)

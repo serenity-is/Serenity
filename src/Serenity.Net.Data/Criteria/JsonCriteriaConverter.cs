@@ -216,19 +216,13 @@ namespace Serenity.Data
         ///   Gets a value indicating whether this <see cref="JsonConverter"/> can read JSON.</summary>
         /// <value>
         ///   True if this <see cref="JsonConverter"/> can write JSON; otherwise, false.</value>
-        public override bool CanRead
-        {
-            get { return true; }
-        }
+        public override bool CanRead => true;
 
         /// <summary>
         ///   Gets a value indicating whether this <see cref="JsonConverter"/> can write JSON.</summary>
         /// <value>
         ///   True if this <see cref="JsonConverter"/> can write JSON; otherwise, false.</value>
-        public override bool CanWrite
-        {
-            get { return true; }
-        }
+        public override bool CanWrite => true;
 
         private static readonly string[] OperatorToKey =
         {

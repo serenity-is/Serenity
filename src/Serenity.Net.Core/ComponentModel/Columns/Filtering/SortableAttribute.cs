@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Indicates if sorting is enabled for this property
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class SortableAttribute : Attribute
     {
         /// <summary>

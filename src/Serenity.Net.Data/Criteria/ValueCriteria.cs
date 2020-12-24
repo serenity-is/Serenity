@@ -7,7 +7,7 @@ namespace Serenity.Data
     /// <summary>
     /// Criteria object with one value
     /// </summary>
-    /// <seealso cref="Serenity.Data.BaseCriteria" />
+    /// <seealso cref="BaseCriteria" />
     public class ValueCriteria : BaseCriteria
     {
         private readonly object value;
@@ -27,13 +27,7 @@ namespace Serenity.Data
         /// <value>
         /// The value.
         /// </value>
-        public object Value
-        {
-            get
-            {
-                return value;
-            }
-        }
+        public object Value => value;
 
         /// <summary>
         /// Converts the criteria to string.

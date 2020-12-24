@@ -39,9 +39,6 @@ namespace Serenity.PropertyGrid
             SetWidth(source, item);
         }
 
-        public override int Priority
-        {
-            get { return 10; }
-        }
+        public override int Priority => 10;
     }
 }

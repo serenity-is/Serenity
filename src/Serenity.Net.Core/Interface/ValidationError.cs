@@ -5,7 +5,7 @@ namespace Serenity.Services
     /// <summary>
     /// Generic validation error mostly used by services.
     /// </summary>
-    /// <seealso cref="System.Exception" />
+    /// <seealso cref="Exception" />
     public class ValidationError : Exception
     {
         /// <summary>

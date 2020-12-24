@@ -14,7 +14,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">expression is null</exception>
+        /// <exception cref="ArgumentNullException">expression is null</exception>
         public static HashSet<string> Locate(string expression)
         {
             if (expression == null)
@@ -36,7 +36,7 @@ namespace Serenity.Data
         /// <param name="expression">The expression.</param>
         /// <param name="singleAlias">The single alias.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">expression is null</exception>
+        /// <exception cref="ArgumentNullException">expression is null</exception>
         public static HashSet<string> LocateOptimized(string expression, out string singleAlias)
         {
             if (expression == null)

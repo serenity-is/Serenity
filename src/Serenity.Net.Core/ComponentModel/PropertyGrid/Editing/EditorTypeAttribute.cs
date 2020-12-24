@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Sets editor type of the target property.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class EditorTypeAttribute : Attribute
     {
         /// <summary>

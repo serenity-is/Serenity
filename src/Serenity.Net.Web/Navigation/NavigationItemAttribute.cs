@@ -16,7 +16,7 @@ namespace Serenity.Navigation
     {
         protected NavigationItemAttribute(int order, string path, string url, object permission, string icon)
         {
-            path = (path ?? "");
+            path ??= "";
             FullPath = path;
 
             var idx = path.LastIndexOf('/');
@@ -27,7 +27,7 @@ namespace Serenity.Navigation
             if (idx >= 0)
             {
                 Category = path.Substring(0, idx);
-                Title = path.Substring(idx + 1);
+                Title = path[(idx + 1)..];
             }
             else
             { 
@@ -35,7 +35,7 @@ namespace Serenity.Navigation
             }
 
             Order = order;
-            Permission = permission == null ? null : permission.ToString();
+            Permission = permission?.ToString();
             IconClass = icon;
             Url = url;
         }
@@ -48,17 +48,17 @@ namespace Serenity.Navigation
         public static string GetUrlFromController(Type controller, string action)
         {
             if (controller == null)
-                throw new ArgumentNullException("controller");
+                throw new ArgumentNullException(nameof(controller));
 
             if (action.IsEmptyOrNull())
-                throw new ArgumentNullException("action");
+                throw new ArgumentNullException(nameof(action));
 
             var actionMethod = controller.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
                 .Where(x => x.Name == action)
                 .FirstOrDefault(x => x.GetAttribute<NonActionAttribute>() == null);
 
             if (actionMethod == null)
-                throw new ArgumentOutOfRangeException("action",
+                throw new ArgumentOutOfRangeException(nameof(action),
                     string.Format(CultureInfo.CurrentCulture, "Controller {1} doesn't have an action with name {0}!",
                         action, controller.FullName));
 
@@ -76,7 +76,7 @@ namespace Serenity.Navigation
             if (routeAction != null && !url.StartsWith("~/", StringComparison.Ordinal) && !url.StartsWith("/", StringComparison.Ordinal) && routeController != null)
             {
                 var tmp = routeController.Template ?? "";
-                if (url.Length > 0 && tmp.Length > 0 && tmp[tmp.Length - 1] != '/')
+                if (url.Length > 0 && tmp.Length > 0 && tmp[^1] != '/')
                     tmp += "/";
 
                 url = tmp + url;
@@ -131,7 +131,7 @@ namespace Serenity.Navigation
                 if (idx2 <= 0)
                     break;
 
-                url = url.Substring(0, idx1) + url.Substring(idx2 + 1);
+                url = url.Substring(0, idx1) + url[(idx2 + 1)..];
             }
 
             return url;
@@ -140,14 +140,14 @@ namespace Serenity.Navigation
         public static string GetPermissionFromController(Type controller, string action)
         {
             if (controller == null)
-                throw new ArgumentNullException("controller");
+                throw new ArgumentNullException(nameof(controller));
 
             if (action.IsEmptyOrNull())
-                throw new ArgumentNullException("action");
+                throw new ArgumentNullException(nameof(action));
 
             var actionMethod = controller.GetMethod(action, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             if (actionMethod == null)
-                throw new ArgumentOutOfRangeException("action");
+                throw new ArgumentOutOfRangeException(nameof(action));
 
             var pageAuthorize = actionMethod.GetCustomAttribute<PageAuthorizeAttribute>() ?? controller.GetCustomAttribute<PageAuthorizeAttribute>();
             if (pageAuthorize != null)

@@ -5,7 +5,7 @@
     /// This is generally a CK editor with only functionality compatible with common
     /// reporting tools like SSRS, Telerik, DevExpress etc. enabled.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class HtmlReportContentEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

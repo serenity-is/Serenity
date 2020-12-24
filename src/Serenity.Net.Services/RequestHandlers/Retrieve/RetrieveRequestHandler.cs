@@ -233,8 +233,8 @@ namespace Serenity.Services
         public IDbConnection Connection { get; private set; }
         IRow IRetrieveRequestHandler.Row => Row;
         public SqlQuery Query { get; private set; }
-        RetrieveRequest IRetrieveRequestHandler.Request { get { return Request; } }
-        IRetrieveResponse IRetrieveRequestHandler.Response { get { return Response; } }
+        RetrieveRequest IRetrieveRequestHandler.Request => Request;
+        IRetrieveResponse IRetrieveRequestHandler.Response => Response;
         bool IRetrieveRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
         bool IRetrieveRequestHandler.AllowSelectField(Field field) { return AllowSelectField(field); }
 

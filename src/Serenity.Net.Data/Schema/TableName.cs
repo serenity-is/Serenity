@@ -35,12 +35,6 @@
         /// <value>
         /// The tablename.
         /// </value>
-        public string Tablename
-        {
-            get
-            {
-                return Schema.IsEmptyOrNull() ? Table : Schema + "." + Table;
-            }
-        }
+        public string Tablename => Schema.IsEmptyOrNull() ? Table : Schema + "." + Table;
     }
 }

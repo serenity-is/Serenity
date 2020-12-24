@@ -5,7 +5,7 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Specifies a linking set relation (1-N relation of ID values, like a check list.)
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public sealed class LinkingSetRelationAttribute : Attribute
     {

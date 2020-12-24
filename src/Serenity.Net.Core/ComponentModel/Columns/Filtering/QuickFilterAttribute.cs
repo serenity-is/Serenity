@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Indicates that this property should have a quick filter on grid.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class QuickFilterAttribute : Attribute
     {
         /// <summary>

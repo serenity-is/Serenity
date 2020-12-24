@@ -3,7 +3,7 @@
     /// <summary>
     /// Indicates that property should use enum type of filtering
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFilteringAttribute" />
+    /// <seealso cref="CustomFilteringAttribute" />
     public class EnumFilteringAttribute : CustomFilteringAttribute
     {
         /// <summary>

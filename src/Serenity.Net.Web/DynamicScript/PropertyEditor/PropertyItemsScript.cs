@@ -16,8 +16,8 @@ namespace Serenity.Web
             public PropertyItem[] Items { get; set; }
         }
 
-        private string scriptName;
-        private Type type;
+        private readonly string scriptName;
+        private readonly Type type;
         private readonly IServiceProvider serviceProvider;
         private readonly IPropertyItemProvider propertyProvider;
         private EventHandler scriptChanged;
@@ -36,7 +36,7 @@ namespace Serenity.Web
         protected static string CheckName(string name)
         {
             if (name.IsEmptyOrNull())
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
 
             return name;
         }
@@ -46,11 +46,10 @@ namespace Serenity.Web
 
         public void Changed()
         {
-            if (scriptChanged != null)
-                scriptChanged(this, new EventArgs());
+            scriptChanged?.Invoke(this, new EventArgs());
         }
 
-        public string ScriptName { get { return scriptName; } }
+        public string ScriptName => scriptName;
 
         public string GetScript()
         {

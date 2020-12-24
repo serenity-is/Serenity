@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Base class for service lookup based editor types
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public abstract class ServiceLookupEditorBaseAttribute : CustomEditorAttribute
     {
         /// <summary>

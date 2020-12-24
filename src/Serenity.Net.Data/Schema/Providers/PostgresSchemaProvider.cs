@@ -7,7 +7,7 @@ namespace Serenity.Data.Schema
     /// <summary>
     /// PostgreSQL metadata provider
     /// </summary>
-    /// <seealso cref="Serenity.Data.Schema.ISchemaProvider" />
+    /// <seealso cref="ISchemaProvider" />
     public class PostgresSchemaProvider : ISchemaProvider
     {
         /// <summary>
@@ -16,7 +16,7 @@ namespace Serenity.Data.Schema
         /// <value>
         /// The default schema.
         /// </value>
-        public string DefaultSchema { get { return "public"; } }
+        public string DefaultSchema => "public";
 
         /// <summary>
         /// Gets the field infos.

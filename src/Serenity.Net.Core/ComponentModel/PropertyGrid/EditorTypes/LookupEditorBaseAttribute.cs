@@ -3,7 +3,7 @@
     /// <summary>
     /// Base class for lookup based editor types
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public abstract class LookupEditorBaseAttribute : CustomEditorAttribute
     {
         /// <summary>

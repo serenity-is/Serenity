@@ -3,7 +3,7 @@
     /// <summary>
     /// Sets filtering type as "Date"
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFilteringAttribute" />
+    /// <seealso cref="CustomFilteringAttribute" />
     public class DateFilteringAttribute : CustomFilteringAttribute
     {
         /// <summary>Initializes a new instance of the <see cref="DateFilteringAttribute"/> class.</summary>

@@ -41,7 +41,9 @@ namespace Serenity.Services
             {
                 var connectionKey = GetType().GetCustomAttribute<ConnectionKeyAttribute>();
                 if (connectionKey == null)
-                    throw new ArgumentNullException("connectionKey");
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+                    throw new ArgumentNullException(nameof(connectionKey));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
                 connection = HttpContext.RequestServices.GetRequiredService<ISqlConnections>().NewByKey(connectionKey.Value);
                 unitOfWork = new UnitOfWork(connection);
@@ -55,7 +57,9 @@ namespace Serenity.Services
             {
                 var connectionKey = GetType().GetCustomAttribute<ConnectionKeyAttribute>();
                 if (connectionKey == null)
-                    throw new ArgumentNullException("connectionKey");
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+                    throw new ArgumentNullException(nameof(connectionKey));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
                 connection = HttpContext.RequestServices.GetRequiredService<ISqlConnections>().NewByKey(connectionKey.Value);
                 context.ActionArguments[cnnParam.Name] = connection;
@@ -108,10 +112,7 @@ namespace Serenity.Services
             }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-
-                context = value;
+                context = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

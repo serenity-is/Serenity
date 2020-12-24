@@ -7,7 +7,7 @@ namespace Serenity.Data.Schema
     /// <summary>
     /// SQL server metadata provider
     /// </summary>
-    /// <seealso cref="Serenity.Data.Schema.ISchemaProvider" />
+    /// <seealso cref="ISchemaProvider" />
     public class SqlServerSchemaProvider : ISchemaProvider
     {
         /// <summary>
@@ -16,7 +16,7 @@ namespace Serenity.Data.Schema
         /// <value>
         /// The default schema.
         /// </value>
-        public string DefaultSchema { get { return "dbo"; } }
+        public string DefaultSchema => "dbo";
 
         /// <summary>
         /// Gets the field infos.

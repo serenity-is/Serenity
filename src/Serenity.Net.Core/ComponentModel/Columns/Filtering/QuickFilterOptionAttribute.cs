@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Add an option to the quick filtering.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
     public class QuickFilterOptionAttribute : Attribute
     {

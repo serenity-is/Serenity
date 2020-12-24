@@ -13,7 +13,7 @@ namespace Serenity.Web
 {
     public class CssBundleManager : ICssBundleManager
     {
-        private object sync = new object();
+        private readonly object sync = new object();
 
         private bool isEnabled;
         private Dictionary<string, string> bundleKeyBySourceUrl;
@@ -105,20 +105,19 @@ namespace Serenity.Web
                     var bundleParts = new List<Func<string>>();
                     var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                    Action<string> registerInBundle = delegate (string sourceFile)
+                    void registerInBundle(string sourceFile)
                     {
                         if (bundleKey.IndexOf('/', StringComparison.Ordinal) < 0 && !bundleKeyBySourceUrl.ContainsKey(sourceFile))
                             bundleKeyBySourceUrl[sourceFile] = bundleKey;
 
-                        HashSet<string> bundleKeys;
-                        if (!bundleKeysBySourceUrl.TryGetValue(sourceFile, out bundleKeys))
+                        if (!bundleKeysBySourceUrl.TryGetValue(sourceFile, out HashSet<string> bundleKeys))
                         {
                             bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                             bundleKeysBySourceUrl[sourceFile] = new HashSet<string>();
                         }
 
                         bundleKeys.Add(bundleKey);
-                    };
+                    }
 
                     foreach (var sourceFile in sourceFiles)
                     {
@@ -129,7 +128,7 @@ namespace Serenity.Web
                         {
                             registerInBundle(sourceFile);
 
-                            var scriptName = sourceFile.Substring(10);
+                            var scriptName = sourceFile[10..];
                             scriptNames.Add(scriptName);
                             bundleParts.Add(() =>
                             {
@@ -190,7 +189,7 @@ namespace Serenity.Web
                         bundleParts.Add(() =>
                         {
                             var sourcePath = PathHelper.SecureCombine(hostEnvironment.WebRootPath, 
-                                sourceUrl.Substring(rootUrl.Length));
+                                sourceUrl[rootUrl.Length..]);
                             if (!File.Exists(sourcePath))
                                 return string.Format(CultureInfo.CurrentCulture, errorLines, 
                                     string.Format(CultureInfo.CurrentCulture, "File {0} is not found!", sourcePath));
@@ -306,8 +305,7 @@ namespace Serenity.Web
             lock (sync)
             {
                 var bi = bundleIncludes;
-                List<string> includes;
-                if (bi != null && bi.TryGetValue(bundleKey, out includes) && includes != null)
+                if (bi != null && bi.TryGetValue(bundleKey, out List<string> includes) && includes != null)
                     return includes;
 
                 return Array.Empty<string>();
@@ -330,11 +328,11 @@ namespace Serenity.Web
             var question = url.IndexOf('?', StringComparison.Ordinal);
             if (question >= 0)
             {
-                return prefix + new Uri("x:" + absolutePath + url.Substring(0, question)).AbsolutePath.Substring(2)
-                    + url.Substring(question) + suffix;
+                return prefix + new Uri("x:" + absolutePath + url.Substring(0, question)).AbsolutePath[2..]
+                    + url[question..] + suffix;
             }
 
-            return prefix + new Uri("x:" + absolutePath + url).AbsolutePath.Substring(2) + suffix;
+            return prefix + new Uri("x:" + absolutePath + url).AbsolutePath[2..] + suffix;
         }
 
         private string RewriteUrlsToAbsolute(string virtualPath, string content)
@@ -375,7 +373,7 @@ namespace Serenity.Web
             if (cssUrl != null && cssUrl.StartsWith("dynamic://",
                 StringComparison.OrdinalIgnoreCase))
             {
-                var scriptName = cssUrl.Substring(10);
+                var scriptName = cssUrl[10..];
                 if (bySrcUrl == null || !bySrcUrl.TryGetValue(cssUrl, out bundleKey))
                 {
                     cssUrl = scriptManager.GetScriptInclude(scriptName, ".css");

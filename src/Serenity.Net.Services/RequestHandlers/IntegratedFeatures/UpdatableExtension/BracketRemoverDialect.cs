@@ -7,218 +7,62 @@ namespace Serenity.Services
     {
         public static readonly BracketRemoverDialect Instance = new BracketRemoverDialect();
 
-        public bool CanUseOffsetFetch
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool CanUseOffsetFetch => throw new NotImplementedException();
 
-        public bool CanUseRowNumber
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool CanUseRowNumber => throw new NotImplementedException();
 
-        public bool CanUseSkipKeyword
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool CanUseSkipKeyword => throw new NotImplementedException();
 
-        public char CloseQuote
-        {
-            get
-            {
-                return '\x1';
-            }
-        }
+        public char CloseQuote => '\x1';
 
-        public string ConcatOperator
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string ConcatOperator => throw new NotImplementedException();
 
-        public string DateFormat
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string DateFormat => throw new NotImplementedException();
 
-        public string DateTimeFormat
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string DateTimeFormat => throw new NotImplementedException();
 
-        public bool IsLikeCaseSensitive
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool IsLikeCaseSensitive => throw new NotImplementedException();
 
-        public bool MultipleResultsets
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool MultipleResultsets => throw new NotImplementedException();
 
-        public bool NeedsBoolWorkaround
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool NeedsBoolWorkaround => throw new NotImplementedException();
 
-        public bool NeedsExecuteBlockStatement
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool NeedsExecuteBlockStatement => throw new NotImplementedException();
 
-        public string OffsetFetchFormat
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string OffsetFetchFormat => throw new NotImplementedException();
 
-        public string OffsetFormat
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string OffsetFormat => throw new NotImplementedException();
 
-        public char OpenQuote
-        {
-            get
-            {
-                return '\x1';
-            }
-        }
+        public char OpenQuote => '\x1';
 
-        public char ParameterPrefix
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public char ParameterPrefix => throw new NotImplementedException();
 
-        public string ScopeIdentityExpression
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string ScopeIdentityExpression => throw new NotImplementedException();
 
-        public string ServerType
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string ServerType => throw new NotImplementedException();
 
-        public string SkipKeyword
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string SkipKeyword => throw new NotImplementedException();
 
-        public string TakeKeyword
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string TakeKeyword => throw new NotImplementedException();
 
-        public string TimeFormat
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string TimeFormat => throw new NotImplementedException();
 
         public string UnionKeyword(SqlUnionType unionType)
         {
             throw new NotImplementedException();
         }
 
-        public bool UseDateTime2
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool UseDateTime2 => throw new NotImplementedException();
 
-        public bool UseReturningIdentity
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool UseReturningIdentity => throw new NotImplementedException();
 
-        public bool UseReturningIntoVar
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool UseReturningIntoVar => throw new NotImplementedException();
 
-        public bool UseRowNum
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool UseRowNum => throw new NotImplementedException();
 
-        public bool UseScopeIdentity
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool UseScopeIdentity => throw new NotImplementedException();
 
-        public bool UseTakeAtEnd
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool UseTakeAtEnd => throw new NotImplementedException();
 
         public string QuoteColumnAlias(string s)
         {

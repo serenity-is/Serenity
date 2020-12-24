@@ -21,7 +21,7 @@ namespace Serenity.Data
         /// <typeparam name="TClass">The type of the class.</typeparam>
         /// <param name="factory">Connection factory</param>
         /// <returns>A new connection</returns>
-        /// <exception cref="System.ArgumentOutOfRangeException">Type has no ConnectionKey attribute!</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Type has no ConnectionKey attribute!</exception>
         public static IDbConnection NewFor<TClass>(this ISqlConnections factory)
         {
             var attr = typeof(TClass).GetCustomAttribute<ConnectionKeyAttribute>();
@@ -37,8 +37,8 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="connection">The connection.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">connection</exception>
-        /// <exception cref="System.InvalidOperationException">Can't auto open a closed connection that was previously open!</exception>
+        /// <exception cref="ArgumentNullException">connection</exception>
+        /// <exception cref="InvalidOperationException">Can't auto open a closed connection that was previously open!</exception>
         public static IDbConnection EnsureOpen(this IDbConnection connection)
         {
             if (connection == null)

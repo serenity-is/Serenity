@@ -28,8 +28,8 @@ namespace Serenity.Data
             var value = reader.GetValue(index);
             if (value is DBNull)
                 _setValue(row, null);
-            else if (value is double)
-                _setValue(row, (double)value);
+            else if (value is double d)
+                _setValue(row, d);
             else
                 _setValue(row, Convert.ToDouble(value, CultureInfo.InvariantCulture));
 

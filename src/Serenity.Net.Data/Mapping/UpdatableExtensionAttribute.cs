@@ -5,7 +5,7 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Marks the JOIN as an updatable extension.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class UpdatableExtensionAttribute : Attribute
     {

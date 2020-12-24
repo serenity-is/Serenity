@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// An abstract base attribute that all permission related attributes derive from.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public abstract class PermissionAttributeBase : Attribute
     {
         /// <summary>

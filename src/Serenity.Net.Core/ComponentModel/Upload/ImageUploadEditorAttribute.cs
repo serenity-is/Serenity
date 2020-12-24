@@ -8,7 +8,7 @@ namespace Serenity.ComponentModel
     /// the image upload behavior only works if it is in row, otherwise
     /// your files will stay in temporary directory.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class ImageUploadEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

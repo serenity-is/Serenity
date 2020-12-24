@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// Determines non-plural name for an entity.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class InstanceNameAttribute : Attribute
     {
         /// <summary>

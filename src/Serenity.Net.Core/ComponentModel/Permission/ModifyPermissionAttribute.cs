@@ -6,7 +6,7 @@ namespace Serenity.Data
     /// Modify permission is used for Insert/Update/Delete if they are
     /// not explicitly specified.
     /// </summary>
-    /// <seealso cref="Serenity.Data.PermissionAttributeBase" />
+    /// <seealso cref="PermissionAttributeBase" />
     public class ModifyPermissionAttribute : PermissionAttributeBase
     {
         /// <summary>

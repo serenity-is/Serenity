@@ -21,7 +21,7 @@ namespace Serenity.Navigation
             ILookup<string, NavigationItemAttribute> attrByCategory, Func<string, string> resolveUrl)
         {
             if (permissions == null)
-                throw new ArgumentException(nameof(permissions));
+                throw new ArgumentNullException(nameof(permissions));
 
             var result = new List<NavigationItem>();
 

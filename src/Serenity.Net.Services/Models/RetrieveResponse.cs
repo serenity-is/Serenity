@@ -15,7 +15,7 @@ namespace Serenity.Services
 
         public Dictionary<string, T> Localizations { get; set; }
 
-        object IRetrieveResponse.Entity { get { return Entity; } }
+        object IRetrieveResponse.Entity => Entity;
 
         IDictionary IRetrieveResponse.Localizations
         {

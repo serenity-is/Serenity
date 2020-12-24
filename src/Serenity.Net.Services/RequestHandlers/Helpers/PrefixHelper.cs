@@ -8,9 +8,9 @@ namespace Serenity
     {
         public static int DeterminePrefixLength<T>(IEnumerable<T> list, Func<T, string> getName)
         {
-            if (!Enumerable.Any<T>(list))
+            if (!Enumerable.Any(list))
                 return 0;
-            string str1 = getName(Enumerable.First<T>(list));
+            string str1 = getName(Enumerable.First(list));
             int length = str1.IndexOf('_');
             if (length <= 0)
                 return 0;

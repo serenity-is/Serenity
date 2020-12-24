@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// Determines database alias, used for unit test database contexts.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class DatabaseAliasAttribute : Attribute
     {
         /// <summary>

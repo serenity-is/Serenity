@@ -6,7 +6,7 @@ namespace Serenity.Web
     public class FilesToDelete : List<string>, IDisposable, IFilesToDelete
     {
         private readonly IUploadStorage storage;
-        private List<string> OldFiles;
+        private readonly List<string> OldFiles;
 
         public FilesToDelete(IUploadStorage storage)
         {

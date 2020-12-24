@@ -9,7 +9,7 @@ namespace Serenity.ComponentModel
     /// attribute are the default ones grouped by and their groupOrder
     /// determines in which order they are grouped by.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class GroupOrderAttribute : Attribute
     {
         /// <summary>

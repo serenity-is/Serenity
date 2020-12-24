@@ -84,7 +84,7 @@ namespace Serenity.Web
         public string ResolveWithHash(PathString pathBase, string contentUrl)
         {
             if (contentUrl.IsNullOrEmpty())
-                throw new ArgumentNullException("contentUrl");
+                throw new ArgumentNullException(nameof(contentUrl));
 
             if (contentUrl[0] == '~')
             {
@@ -97,16 +97,16 @@ namespace Serenity.Web
                     return contentUrl;
 
                 var v = pathBase.Value ?? "";
-                if (v.Length == 0 || v[v.Length - 1] != '/')
+                if (v.Length == 0 || v[^1] != '/')
                     v += '/';
                 if (!contentUrl.StartsWith(v, StringComparison.OrdinalIgnoreCase))
                     return contentUrl;
-                contentUrl = "~/" + contentUrl.Substring(v.Length);
+                contentUrl = "~/" + contentUrl[v.Length..];
             }
 
             string cdnMatch = contentUrl;
 
-            if (contentUrl.IndexOf(".axd/", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (contentUrl.Contains(".axd/", StringComparison.OrdinalIgnoreCase))
             {
                 if (!cdnEnabled)
                     return VirtualPathUtility.ToAbsolute(pathBase, contentUrl);
@@ -116,7 +116,7 @@ namespace Serenity.Web
             else
             {
                 var path = contentUrl;
-                path = PathHelper.SecureCombine(hostEnvironment.WebRootPath, PathHelper.ToPath(contentUrl.Substring(2)));
+                path = PathHelper.SecureCombine(hostEnvironment.WebRootPath, PathHelper.ToPath(contentUrl[2..]));
 
                 object hash;
                 hash = hashByContentPath[path];

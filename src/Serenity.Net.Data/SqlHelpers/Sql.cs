@@ -15,7 +15,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Sum(string field)
         {
             if (field == null || field.Length == 0)
@@ -29,7 +29,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Sum(IField field)
         {
             if (field == null)
@@ -43,7 +43,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Count(string field)
         {
             if (field == null || field.Length == 0)
@@ -56,7 +56,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Count(IField field)
         {
             if (field == null)
@@ -70,7 +70,7 @@ namespace Serenity.Data
         /// <param name="joinNumber">The join number.</param>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Count(int joinNumber, string field)
         {
             if (field == null || field.Length == 0)
@@ -93,7 +93,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="statements">The statements.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">fields is null or empty</exception>
+        /// <exception cref="ArgumentNullException">fields is null or empty</exception>
         public static string Coalesce(params string[] statements)
         {
             if (statements == null || statements.Length == 0)
@@ -116,7 +116,7 @@ namespace Serenity.Data
         /// <param name="query">The query.</param>
         /// <param name="values">The values.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">values is null or empty</exception>
+        /// <exception cref="ArgumentNullException">values is null or empty</exception>
         public static string Coalesce(this IQueryWithParams query, params object[] values)
         {
             if (values == null || values.Length == 0)
@@ -154,7 +154,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Min(string field)
         {
             if (field == null || field.Length == 0)
@@ -168,7 +168,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Min(IField field)
         {
             if (field == null)
@@ -184,7 +184,7 @@ namespace Serenity.Data
         /// <param name="joinNumber">The join number.</param>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Min(int joinNumber, string field)
         {
             if (field == null || field.Length == 0)
@@ -198,7 +198,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Max(string field)
         {
             if (field == null || field.Length == 0)
@@ -212,7 +212,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Max(IField field)
         {
             if (field == null)
@@ -227,7 +227,7 @@ namespace Serenity.Data
         /// <param name="joinNumber">The join number.</param>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Max(int joinNumber, string field)
         {
             if (field == null || field.Length == 0)
@@ -242,7 +242,7 @@ namespace Serenity.Data
         /// <param name="joinNumber">The join number.</param>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty.</exception>
         public static string Sum(int joinNumber, string field)
         {
             if (field == null || field.Length == 0)
@@ -256,7 +256,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Avg(string field)
         {
             if (field == null || field.Length == 0)
@@ -270,7 +270,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Avg(IField field)
         {
             if (field == null)
@@ -285,7 +285,7 @@ namespace Serenity.Data
         /// <param name="joinNumber">The join number.</param>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">field is null or empty</exception>
+        /// <exception cref="ArgumentNullException">field is null or empty</exception>
         public static string Avg(int joinNumber, string field)
         {
             if (field == null || field.Length == 0)
@@ -300,7 +300,7 @@ namespace Serenity.Data
         /// <param name="type">The type.</param>
         /// <param name="field">The field.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// type or field is null or empty.
         /// </exception>
         public static string Convert(string type, string field)
@@ -321,7 +321,7 @@ namespace Serenity.Data
         /// <param name="startIndex">The start index.</param>
         /// <param name="endIndex">The end index.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">expression</exception>
+        /// <exception cref="ArgumentNullException">expression</exception>
         public static string SubString(string expression, int startIndex, int endIndex)
         {
             if (string.IsNullOrEmpty(expression))
@@ -351,7 +351,7 @@ namespace Serenity.Data
         /// statement like CASE WHEN A = 1 THEN 'Result1' WHEN A = 2 THEN 'Result2' END.</param>
         /// <param name="elseStatement">Optional ELSE statement</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentOutOfRangeException">whenThenPairs is empty or contains odd number of elements</exception>
+        /// <exception cref="ArgumentOutOfRangeException">whenThenPairs is empty or contains odd number of elements</exception>
         public static string Case(string condition, string[] whenThenPairs, string elseStatement)
         {
             StringBuilder sb = new StringBuilder("CASE ");
@@ -438,7 +438,7 @@ namespace Serenity.Data
             /// </summary>
             /// <param name="elseValue">The else value.</param>
             /// <returns></returns>
-            /// <exception cref="System.InvalidOperationException">Internal else value is not null</exception>
+            /// <exception cref="InvalidOperationException">Internal else value is not null</exception>
             public CaseBuilder Else(object elseValue)
             {
                 if (this.elseValue is object)
@@ -456,7 +456,7 @@ namespace Serenity.Data
             /// <returns>
             /// A <see cref="string" /> that represents this instance.
             /// </returns>
-            /// <exception cref="System.InvalidOperationException">
+            /// <exception cref="InvalidOperationException">
             /// There should be at least one WHEN/THEN pair.
             /// or
             /// WHEN/THEN pairs doesn't match.

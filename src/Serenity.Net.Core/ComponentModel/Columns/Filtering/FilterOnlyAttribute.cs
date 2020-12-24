@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// Indicates that this field should not be shown, and could not be made visible 
     /// in column selection dialog, but only used for advanced filtering.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class FilterOnlyAttribute : Attribute
     {
         /// <summary>

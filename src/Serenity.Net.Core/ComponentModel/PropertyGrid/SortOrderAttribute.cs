@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// Sets the column as sorted by default, and its index among sorted columns.
     /// Negative values means descending sort. Applies only to columns.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class SortOrderAttribute : Attribute
     {
         /// <summary>
@@ -42,6 +42,6 @@ namespace Serenity.ComponentModel
         /// <value>
         ///   <c>true</c> if descending; otherwise, <c>false</c>.
         /// </value>
-        public bool Descending { get { return SortOrder < 0; } }
+        public bool Descending => SortOrder < 0;
     }
 }

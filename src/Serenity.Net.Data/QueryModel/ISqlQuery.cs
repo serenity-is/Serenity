@@ -4,8 +4,8 @@ namespace Serenity.Data
     /// <summary>
     /// SqlQuery interface.
     /// </summary>
-    /// <seealso cref="Serenity.Data.IQueryWithParams" />
-    /// <seealso cref="Serenity.IChainable" />
+    /// <seealso cref="IQueryWithParams" />
+    /// <seealso cref="IChainable" />
     public interface ISqlQuery : IQueryWithParams, IChainable
     {
     }

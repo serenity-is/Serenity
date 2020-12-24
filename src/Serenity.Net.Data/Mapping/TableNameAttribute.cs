@@ -5,14 +5,14 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Determines table name for the row.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class TableNameAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TableNameAttribute"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
-        /// <exception cref="System.ArgumentNullException">name</exception>
+        /// <exception cref="ArgumentNullException">name</exception>
         public TableNameAttribute(string name)
         {
             if (string.IsNullOrEmpty(name))

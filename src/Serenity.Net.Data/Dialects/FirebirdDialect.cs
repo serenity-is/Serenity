@@ -6,7 +6,7 @@ namespace Serenity.Data
     /// <summary>
     /// Firebird dialect
     /// </summary>
-    /// <seealso cref="Serenity.Data.ISqlDialect" />
+    /// <seealso cref="ISqlDialect" />
     public class FirebirdDialect : ISqlDialect
     {
         /// <summary>
@@ -54,13 +54,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if the server supports OFFSET FETCH; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool CanUseOffsetFetch
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool CanUseOffsetFetch => false;
 
         /// <summary>
         /// Gets a value indicating whether the server supports ROWNUMBER.
@@ -68,13 +62,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if the server supports ROWNUMBER; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool CanUseRowNumber
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool CanUseRowNumber => false;
 
         /// <summary>
         /// Gets a value indicating whether the server supports SKIP keyword (or a variation of it).
@@ -82,13 +70,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if the server supports a variation of SKIP keyword; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool CanUseSkipKeyword
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public virtual bool CanUseSkipKeyword => true;
 
         /// <summary>
         /// Gets the close quote character for quoting identifiers.
@@ -96,13 +78,7 @@ namespace Serenity.Data
         /// <value>
         /// The close quote.
         /// </value>
-        public virtual char CloseQuote
-        {
-            get
-            {
-                return '"';
-            }
-        }
+        public virtual char CloseQuote => '"';
 
         /// <summary>
         /// Gets the CONCAT operator keyword.
@@ -110,13 +86,7 @@ namespace Serenity.Data
         /// <value>
         /// The CONCAT operator keyword.
         /// </value>
-        public virtual string ConcatOperator
-        {
-            get
-            {
-                return " || ";
-            }
-        }
+        public virtual string ConcatOperator => " || ";
 
         /// <summary>
         /// Gets the date format.
@@ -124,13 +94,7 @@ namespace Serenity.Data
         /// <value>
         /// The date format.
         /// </value>
-        public virtual string DateFormat
-        {
-            get
-            {
-                return "\\'yyyy'-'MM'-'dd\\'";
-            }
-        }
+        public virtual string DateFormat => "\\'yyyy'-'MM'-'dd\\'";
 
         /// <summary>
         /// Gets the date time format.
@@ -138,13 +102,7 @@ namespace Serenity.Data
         /// <value>
         /// The date time format.
         /// </value>
-        public virtual string DateTimeFormat
-        {
-            get
-            {
-                return "\\'yyyy'-'MM'-'dd HH':'mm':'ss'.'fff\\'";
-            }
-        }
+        public virtual string DateTimeFormat => "\\'yyyy'-'MM'-'dd HH':'mm':'ss'.'fff\\'";
 
         /// <summary>
         /// Gets a value indicating whether the LIKE operator is case sensitive.
@@ -152,13 +110,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if the LIKE operator is sensitive; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool IsLikeCaseSensitive
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public virtual bool IsLikeCaseSensitive => true;
 
         /// <summary>
         /// Gets a value indicating whether the server supports multiple resultsets.
@@ -166,13 +118,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if the server supports multiple resultsets; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool MultipleResultsets
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool MultipleResultsets => false;
 
         /// <summary>
         /// Gets a value indicating whether the server needs a workaround to handle Boolean values false/true.
@@ -180,13 +126,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if the server needs a workaround to handle Boolean values false/true; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool NeedsBoolWorkaround
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool NeedsBoolWorkaround => false;
 
         /// <summary>
         /// Gets a value indicating whether the server needs EXECUTE BLOCK statement.
@@ -194,13 +134,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if the server needs EXECUTE BLOCK statement; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool NeedsExecuteBlockStatement
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public virtual bool NeedsExecuteBlockStatement => true;
 
         /// <summary>
         /// Gets the format for OFFSET only statements.
@@ -208,14 +142,8 @@ namespace Serenity.Data
         /// <value>
         /// The offset format.
         /// </value>
-        /// <exception cref="System.NotImplementedException"></exception>
-        public virtual string OffsetFormat
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        /// <exception cref="NotImplementedException"></exception>
+        public virtual string OffsetFormat => throw new NotImplementedException();
 
         /// <summary>
         /// Gets the format for OFFSET FETCH statements.
@@ -223,14 +151,8 @@ namespace Serenity.Data
         /// <value>
         /// The offset fetch format.
         /// </value>
-        /// <exception cref="System.NotImplementedException"></exception>
-        public virtual string OffsetFetchFormat
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        /// <exception cref="NotImplementedException"></exception>
+        public virtual string OffsetFetchFormat => throw new NotImplementedException();
 
         /// <summary>
         /// Gets the open quote character for quoting identifiers.
@@ -238,13 +160,7 @@ namespace Serenity.Data
         /// <value>
         /// The open quote.
         /// </value>
-        public virtual char OpenQuote
-        {
-            get
-            {
-                return '"';
-            }
-        }
+        public virtual char OpenQuote => '"';
 
         /// <summary>
         /// Quotes the column alias. This usually calls QuoteIdentifier except for Oracle.
@@ -298,14 +214,8 @@ namespace Serenity.Data
         /// <value>
         /// The SCOPE INDENTITY expression.
         /// </value>
-        /// <exception cref="System.NotImplementedException"></exception>
-        public virtual string ScopeIdentityExpression
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        /// <exception cref="NotImplementedException"></exception>
+        public virtual string ScopeIdentityExpression => throw new NotImplementedException();
 
         /// <summary>
         /// Gets the type of the server.
@@ -313,13 +223,7 @@ namespace Serenity.Data
         /// <value>
         /// The type of the server.
         /// </value>
-        public virtual string ServerType
-        {
-            get
-            {
-                return "Firebird";
-            }
-        }
+        public virtual string ServerType => "Firebird";
 
         /// <summary>
         /// Gets the skip keyword.
@@ -327,13 +231,7 @@ namespace Serenity.Data
         /// <value>
         /// The skip keyword.
         /// </value>
-        public virtual string SkipKeyword
-        {
-            get
-            {
-                return "SKIP";
-            }
-        }
+        public virtual string SkipKeyword => "SKIP";
 
         /// <summary>
         /// Gets the take keyword.
@@ -341,13 +239,7 @@ namespace Serenity.Data
         /// <value>
         /// The take keyword.
         /// </value>
-        public virtual string TakeKeyword
-        {
-            get
-            {
-                return "FIRST";
-            }
-        }
+        public virtual string TakeKeyword => "FIRST";
 
         /// <summary>
         /// Gets the time format.
@@ -355,13 +247,7 @@ namespace Serenity.Data
         /// <value>
         /// The time format.
         /// </value>
-        public virtual string TimeFormat
-        {
-            get
-            {
-                return "\\'HH':'mm':'ss\\'";
-            }
-        }
+        public virtual string TimeFormat => "\\'HH':'mm':'ss\\'";
 
         /// <summary>
         /// Gets the union keyword for specified union type.
@@ -370,7 +256,7 @@ namespace Serenity.Data
         /// <returns>
         /// Union keyword
         /// </returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public string UnionKeyword(SqlUnionType unionType)
         {
             return unionType switch
@@ -387,13 +273,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if use datetime2; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool UseDateTime2
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool UseDateTime2 => false;
 
         /// <summary>
         /// Gets a value indicating whether to use returning identity.
@@ -401,13 +281,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if should use returning identity; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool UseReturningIdentity
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public virtual bool UseReturningIdentity => true;
 
         /// <summary>
         /// Gets a value indicating whether use returning into variable.
@@ -415,13 +289,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if use returning into variable; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool UseReturningIntoVar
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool UseReturningIntoVar => false;
 
         /// <summary>
         /// Gets a value indicating whether to use scope identity.
@@ -429,13 +297,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if to use scope identity; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool UseScopeIdentity
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool UseScopeIdentity => false;
 
         /// <summary>
         /// Gets a value indicating whether to use TAKE at end.
@@ -443,13 +305,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if to use TAKE at end; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool UseTakeAtEnd
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool UseTakeAtEnd => false;
 
         /// <summary>
         /// Gets a value indicating whether ROWNUM.
@@ -457,13 +313,7 @@ namespace Serenity.Data
         /// <value>
         /// <c>true</c> if can use ROWNUM; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool UseRowNum
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool UseRowNum => false;
 
         /// <summary>
         /// Gets the parameter prefix character.
@@ -471,7 +321,7 @@ namespace Serenity.Data
         /// <value>
         /// The parameter prefix character.
         /// </value>
-        public virtual char ParameterPrefix { get { return '@'; } }
+        public virtual char ParameterPrefix => '@';
 
     }
 }

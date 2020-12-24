@@ -49,14 +49,8 @@ namespace Serenity
         ///   Returns one of "dmy", "ymd", "mdy" date element order depending on current culture.</summary>
         /// <returns>
         ///   Active date element order.</returns>
-        public static DateElementOrder CurrentDateElementOrder
-        {
-            get
-            {
-                return DateElementOrderFor(CultureInfo.CurrentCulture
+        public static DateElementOrder CurrentDateElementOrder => DateElementOrderFor(CultureInfo.CurrentCulture
                     .DateTimeFormat.ShortDatePattern);
-            }
-        }
 
         /// <summary>
         /// Gets the date element order for specified short date time format.
@@ -127,16 +121,10 @@ namespace Serenity
 
         /// <summary>
         ///   Gets default date format for current culture.</summary>
-        public static string CurrentDateFormat
-        {
-            get { return _defaultDateFormat[(int)CurrentDateElementOrder]; }
-        }
+        public static string CurrentDateFormat => _defaultDateFormat[(int)CurrentDateElementOrder];
 
         /// <summary>
         ///   Gets default date time format for current culture.</summary>
-        public static string CurrentDateTimeFormat
-        {
-            get { return _defaultDateTimeFormat[(int)CurrentDateElementOrder]; }
-        }
+        public static string CurrentDateTimeFormat => _defaultDateTimeFormat[(int)CurrentDateElementOrder];
     }
 }

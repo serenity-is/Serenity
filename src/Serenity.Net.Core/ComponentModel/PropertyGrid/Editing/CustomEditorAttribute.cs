@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// Base attribute class that all other custom editor types
     /// derives from.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.EditorTypeAttribute" />
+    /// <seealso cref="EditorTypeAttribute" />
     public abstract class CustomEditorAttribute : EditorTypeAttribute
     {
         private Dictionary<string, object> options;

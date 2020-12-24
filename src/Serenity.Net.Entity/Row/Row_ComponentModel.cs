@@ -115,25 +115,13 @@ namespace Serenity.Data
             }
         }
 
-        public bool IsEditing
-        {
-            get { return originalValues != null; }
-        }
+        public bool IsEditing => originalValues != null;
 
-        public Row<TFields> OriginalValues
-        {
-            get { return originalValues ?? this; }
-        }
+        public Row<TFields> OriginalValues => originalValues ?? this;
 
-        public Row<TFields> PreviousValues
-        {
-            get { return previousValues ?? this; }
-        }
+        public Row<TFields> PreviousValues => previousValues ?? this;
 
-        public bool HasPostHandler
-        {
-            get { return postHandler != null; }
-        }
+        public bool HasPostHandler => postHandler != null;
 
         public EventHandler PostEnded;
 
@@ -160,19 +148,9 @@ namespace Serenity.Data
                 validationErrors.Remove(propertyName ?? string.Empty);
         }
 
-        public IDictionary<string, string> ValidationErrors
-        {
-            get { return validationErrors; }
-        }
+        public IDictionary<string, string> ValidationErrors => validationErrors;
 
-        public bool HasErrors
-        {
-            get
-            {
-                return
-                    validationErrors != null &&
+        public bool HasErrors => validationErrors != null &&
                     validationErrors.Count > 0;
-            }
-        }
     }
 }

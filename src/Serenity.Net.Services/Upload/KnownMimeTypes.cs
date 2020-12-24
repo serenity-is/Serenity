@@ -8,7 +8,7 @@ namespace Serenity.Web
     {
         /// <summary>
         ///   (extension -> mime type) pairs for known mime types.</summary>
-        private static Dictionary<string, string> knownMimeTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, string> knownMimeTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { ".bmp", "image/bmp" },
             { ".css", "text/css" },

@@ -106,7 +106,7 @@ namespace Serenity.IO
                     // if not all files are going to be deleted, sort them by date
                     if (maxFilesInDirectory != 0)
                     {
-                        Array.Sort<FileInfo>(files,
+                        Array.Sort(files,
                             delegate (FileInfo x, FileInfo y)
                             { return x.CreationTime < y.CreationTime ? -1 : 1; });
                     }

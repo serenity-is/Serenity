@@ -18,8 +18,10 @@ namespace Serenity.Web
     {
         private static ActionContext GetActionContext(IServiceProvider serviceProvider)
         {
-            var httpContext = new DefaultHttpContext();
-            httpContext.RequestServices = serviceProvider;
+            var httpContext = new DefaultHttpContext
+            {
+                RequestServices = serviceProvider
+            };
             return new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
         }
 
@@ -35,9 +37,10 @@ namespace Serenity.Web
 
             var viewData = new ViewDataDictionary(
                 metadataProvider: new EmptyModelMetadataProvider(),
-                modelState: new ModelStateDictionary());
-
-            viewData.Model = model;
+                modelState: new ModelStateDictionary())
+            {
+                Model = model
+            };
 
             using StringWriter sw = new StringWriter();
             var engine = serviceProvider.GetService<ICompositeViewEngine>();

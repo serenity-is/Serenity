@@ -3,7 +3,7 @@
     /// <summary>
     /// Indicates that the target property should use a "Time" editor.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class TimeEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

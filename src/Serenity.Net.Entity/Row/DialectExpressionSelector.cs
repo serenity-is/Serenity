@@ -6,8 +6,8 @@ namespace Serenity.Data
 {
     public class DialectExpressionSelector
     {
-        private string dialectServerType;
-        private string dialectTypeName;
+        private readonly string dialectServerType;
+        private readonly string dialectTypeName;
 
         public DialectExpressionSelector(ISqlDialect dialect)
         {

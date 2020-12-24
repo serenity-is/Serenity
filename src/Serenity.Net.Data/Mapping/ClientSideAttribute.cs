@@ -5,7 +5,7 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Marks the field as NotMapped, obsolete, prefer [NotMapped] attribute.
     /// </summary>
-    /// <seealso cref="Serenity.Data.Mapping.SetFieldFlagsAttribute" />
+    /// <seealso cref="SetFieldFlagsAttribute" />
     [Obsolete("Prefer NotMapped attribute")]
     public class ClientSideAttribute : SetFieldFlagsAttribute
     {

@@ -481,7 +481,7 @@ namespace Serenity.Services
         public IPermissionService Permissions => Context.Permissions;
         public ClaimsPrincipal User => Context.User;
 
-        public IDbConnection Connection { get { return UnitOfWork.Connection; } }
+        public IDbConnection Connection => UnitOfWork.Connection;
 
         public IUnitOfWork UnitOfWork { get; protected set; }
 
@@ -489,20 +489,20 @@ namespace Serenity.Services
 
         public TRow Row { get; protected set; }
 
-        public bool IsCreate { get { return Old == null; } }
+        public bool IsCreate => Old == null;
 
-        public bool IsUpdate { get { return Old != null; } }
+        public bool IsUpdate => Old != null;
 
         public TSaveRequest Request { get; protected set; }
 
         public TSaveResponse Response { get; protected set; }
 
-        ISaveRequest ISaveRequestHandler.Request { get { return Request; } }
+        ISaveRequest ISaveRequestHandler.Request => Request;
 
-        SaveResponse ISaveRequestHandler.Response { get { return Response; } }
+        SaveResponse ISaveRequestHandler.Response => Response;
 
-        IRow ISaveRequestHandler.Old { get { return Old; } }
-        IRow ISaveRequestHandler.Row { get { return Row; } }
+        IRow ISaveRequestHandler.Old => Old;
+        IRow ISaveRequestHandler.Row => Row;
 
         public IDictionary<string, object> StateBag { get; private set; }
     }

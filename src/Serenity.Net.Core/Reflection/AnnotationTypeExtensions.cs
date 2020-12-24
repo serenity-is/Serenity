@@ -61,15 +61,9 @@ namespace Serenity.Reflection
                 this.annotations = annotations;
             }
 
-            public string Name
-            {
-                get { return property.Name; }
-            }
+            public string Name => property.Name;
 
-            public Type PropertyType
-            {
-                get { return property.PropertyType; }
-            }
+            public Type PropertyType => property.PropertyType;
 
             public TAttr GetAttribute<TAttr>() where TAttr : Attribute
             {

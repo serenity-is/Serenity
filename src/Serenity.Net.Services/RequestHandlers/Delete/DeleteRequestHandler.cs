@@ -33,10 +33,7 @@ namespace Serenity.Services
             return Context.Behaviors.Resolve<TRow, IDeleteBehavior>(GetType());
         }
 
-        public IDbConnection Connection
-        {
-            get { return UnitOfWork.Connection; }
-        }
+        public IDbConnection Connection => UnitOfWork.Connection;
 
         protected virtual void OnBeforeDelete()
         {

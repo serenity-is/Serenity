@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// RIGHT JOIN type
     /// </summary>
-    /// <seealso cref="Serenity.Data.Join" />
+    /// <seealso cref="Join" />
     public class RightJoin : Join
     {
         /// <summary>

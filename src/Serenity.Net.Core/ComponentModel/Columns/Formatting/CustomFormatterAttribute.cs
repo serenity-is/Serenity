@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Base class for custom formatter type attributes
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.FormatterTypeAttribute" />
+    /// <seealso cref="FormatterTypeAttribute" />
     public abstract class CustomFormatterAttribute : FormatterTypeAttribute
     {
         private Dictionary<string, object> options;

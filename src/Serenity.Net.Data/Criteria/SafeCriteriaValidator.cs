@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// Validates a criteria for allowed field names, operators and SQL injection safety
     /// </summary>
-    /// <seealso cref="Serenity.Data.BaseCriteriaVisitor" />
+    /// <seealso cref="BaseCriteriaVisitor" />
     public class SafeCriteriaValidator : BaseCriteriaVisitor
     {
         /// <summary>

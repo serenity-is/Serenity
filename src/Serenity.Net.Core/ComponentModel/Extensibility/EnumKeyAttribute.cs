@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Sets the enumeration key of an enum
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Enum, AllowMultiple = false)]
     public class EnumKeyAttribute : Attribute
     {

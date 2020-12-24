@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// Indicates that this class contains permission keys with optional
     /// subclasses that also contains permission keys.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class NestedPermissionKeysAttribute : Attribute
     {

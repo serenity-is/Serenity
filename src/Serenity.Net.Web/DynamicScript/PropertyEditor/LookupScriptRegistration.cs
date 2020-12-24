@@ -62,10 +62,9 @@ namespace Serenity.Web
                 script.LookupKey = attr.Key ??
                     LookupScriptAttribute.AutoLookupKeyFor(type);
 
-                Type otherType;
-                if (registeredType.TryGetValue(script.LookupKey, out otherType))
+                if (registeredType.TryGetValue(script.LookupKey, out Type otherType))
                 {
-                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, 
+                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                         "Types {0} and {1} has the same lookup key (\"{2}\"). " +
                         "\r\n\r\nPlease remove LookupScript attribute from one of them or change the lookup key!",
                         type.FullName, otherType.FullName, script.LookupKey));

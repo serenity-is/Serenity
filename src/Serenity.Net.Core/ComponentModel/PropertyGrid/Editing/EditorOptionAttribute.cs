@@ -7,7 +7,7 @@ namespace Serenity.ComponentModel
     /// Avoid using this where possible as option keys and values 
     /// are not checked.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
     public class EditorOptionAttribute : Attribute
     {

@@ -4,7 +4,7 @@ namespace Serenity.Data
     /// <summary>
     /// Sql Server 2012 dialect.
     /// </summary>
-    /// <seealso cref="Serenity.Data.SqlServer2008Dialect" />
+    /// <seealso cref="SqlServer2008Dialect" />
     public class SqlServer2012Dialect : SqlServer2008Dialect
     {
         /// <summary>
@@ -18,13 +18,7 @@ namespace Serenity.Data
         /// <value>
         ///   <c>true</c> if the server supports OFFSET FETCH; otherwise, <c>false</c>.
         /// </value>
-        public override bool CanUseOffsetFetch
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanUseOffsetFetch => true;
 
         /// <summary>
         /// Gets the format for OFFSET only statements.
@@ -32,13 +26,7 @@ namespace Serenity.Data
         /// <value>
         /// The offset format.
         /// </value>
-        public override string OffsetFormat
-        {
-            get
-            {
-                return " OFFSET {0} ROWS";
-            }
-        }
+        public override string OffsetFormat => " OFFSET {0} ROWS";
 
         /// <summary>
         /// Gets the format for OFFSET FETCH statements.
@@ -46,12 +34,6 @@ namespace Serenity.Data
         /// <value>
         /// The offset fetch format.
         /// </value>
-        public override string OffsetFetchFormat
-        {
-            get
-            {
-                return " OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY";
-            }
-        }
+        public override string OffsetFetchFormat => " OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY";
     }
 }

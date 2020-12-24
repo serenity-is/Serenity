@@ -7,11 +7,11 @@ namespace Serenity.Data
     /// <summary>
     /// SQL query string builder
     /// </summary>
-    /// <seealso cref="Serenity.Data.QueryWithParams" />
-    /// <seealso cref="Serenity.Data.IFilterableQuery" />
-    /// <seealso cref="Serenity.Data.IGetExpressionByName" />
-    /// <seealso cref="Serenity.Data.ISqlQuery" />
-    /// <seealso cref="Serenity.Data.ISqlQueryExtensible" />
+    /// <seealso cref="QueryWithParams" />
+    /// <seealso cref="IFilterableQuery" />
+    /// <seealso cref="IGetExpressionByName" />
+    /// <seealso cref="ISqlQuery" />
+    /// <seealso cref="ISqlQueryExtensible" />
     public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName, ISqlQueryExtensible
     {
         private Dictionary<string, string> aliasExpressions;
@@ -511,10 +511,7 @@ namespace Serenity.Data
         /// <summary>
         /// Gets current query text.
         /// </summary>
-        public string Text
-        {
-            get { return ToString(); }
-        }
+        public string Text => ToString();
 
         /// <summary>
         /// Adds a union to query with the specified union type.
@@ -614,20 +611,11 @@ namespace Serenity.Data
             set { countRecords = value; }
         }
 
-        object ISqlQueryExtensible.FirstIntoRow
-        {
-            get { return into.Count > 0 ? into[0] : null; }
-        }
+        object ISqlQueryExtensible.FirstIntoRow => into.Count > 0 ? into[0] : null;
 
-        IList<Column> ISqlQueryExtensible.Columns
-        {
-            get { return columns; }
-        }
+        IList<Column> ISqlQueryExtensible.Columns => columns;
 
-        IList<object> ISqlQueryExtensible.IntoRows
-        {
-            get { return into; }
-        }
+        IList<object> ISqlQueryExtensible.IntoRows => into;
 
         private IDictionary<string, IHaveJoins> AliasWithJoins
         {

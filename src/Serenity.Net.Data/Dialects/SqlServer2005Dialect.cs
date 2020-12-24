@@ -4,7 +4,7 @@ namespace Serenity.Data
     /// <summary>
     /// Sql Server 2005 dialect.
     /// </summary>
-    /// <seealso cref="Serenity.Data.SqlServer2000Dialect" />
+    /// <seealso cref="SqlServer2000Dialect" />
     public class SqlServer2005Dialect : SqlServer2000Dialect
     {
         /// <summary>
@@ -18,12 +18,6 @@ namespace Serenity.Data
         /// <value>
         ///   <c>true</c> if the server supports ROWNUMBER; otherwise, <c>false</c>.
         /// </value>
-        public override bool CanUseRowNumber
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanUseRowNumber => true;
     }
 }

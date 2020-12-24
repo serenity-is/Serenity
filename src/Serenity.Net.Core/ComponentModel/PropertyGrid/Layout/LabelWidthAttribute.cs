@@ -7,7 +7,7 @@ namespace Serenity.ComponentModel
     /// the properties following it until another of this attribute
     /// is used.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class LabelWidthAttribute : Attribute
     {
         /// <summary>

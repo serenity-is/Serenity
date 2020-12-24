@@ -6,7 +6,7 @@ namespace Serenity.Data
     /// <summary>
     /// A criteria object containing a parameter name
     /// </summary>
-    /// <seealso cref="Serenity.Data.BaseCriteria" />
+    /// <seealso cref="BaseCriteria" />
     public class ParamCriteria : BaseCriteria
     {
         private readonly string name;
@@ -44,9 +44,6 @@ namespace Serenity.Data
         /// <value>
         /// The parameter name.
         /// </value>
-        public string Name
-        {
-            get { return name; }
-        }
+        public string Name => name;
     }
 }

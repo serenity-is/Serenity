@@ -26,7 +26,7 @@
         /// <value>
         /// The old.
         /// </value>
-        public TItem Old { get { return _old; } }
+        public TItem Old => _old;
 
         /// <summary>
         /// Gets the new.
@@ -34,6 +34,6 @@
         /// <value>
         /// The new.
         /// </value>
-        public TItem New { get { return _new; } }
+        public TItem New => _new;
     }
 }

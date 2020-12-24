@@ -6,7 +6,7 @@ namespace Serenity.Data
     /// <summary>
     /// INNER JOIN type
     /// </summary>
-    /// <seealso cref="Serenity.Data.Join" />
+    /// <seealso cref="Join" />
     public class InnerJoin : Join
     {
         /// <summary>

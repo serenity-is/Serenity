@@ -7,9 +7,9 @@ namespace Serenity.Web
 {
     public class ConcatenatedScript : DynamicScript
     {
-        private string separator;
-        private IEnumerable<Func<string>> scriptParts;
-        private Action<IPermissionService, ITextLocalizer> checkRights;
+        private readonly string separator;
+        private readonly IEnumerable<Func<string>> scriptParts;
+        private readonly Action<IPermissionService, ITextLocalizer> checkRights;
 
         public ConcatenatedScript(IEnumerable<Func<string>> scriptParts,
             string separator = "\r\n;\r\n", Action<IPermissionService, ITextLocalizer> checkRights = null)
@@ -23,8 +23,7 @@ namespace Serenity.Web
         {
             base.CheckRights(permissions, localizer);
 
-            if (checkRights != null)
-                checkRights(permissions, localizer);
+            checkRights?.Invoke(permissions, localizer);
         }
 
         public override string GetScript()

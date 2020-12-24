@@ -12,7 +12,7 @@ namespace Serenity.Data.Mapping
         /// Initializes a new instance of the <see cref="ColumnAttribute"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
-        /// <exception cref="System.ArgumentNullException">name</exception>
+        /// <exception cref="ArgumentNullException">name</exception>
         public ColumnAttribute(string name)
         {
             if (string.IsNullOrEmpty(name))

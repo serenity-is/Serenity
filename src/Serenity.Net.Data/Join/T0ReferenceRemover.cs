@@ -13,7 +13,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">expression</exception>
+        /// <exception cref="ArgumentNullException">expression</exception>
         public static string RemoveT0Aliases(string expression)
         {
             if (expression == null)

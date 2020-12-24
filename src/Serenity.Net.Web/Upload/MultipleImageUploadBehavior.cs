@@ -27,7 +27,7 @@ namespace Serenity.Services
 
         public bool ActivateFor(IRow row)
         {
-            if (ReferenceEquals(null, Target))
+            if (Target is null)
                 return false;
 
             attr = Target.GetAttribute<ImageUploadEditorAttribute>();
@@ -50,7 +50,7 @@ namespace Serenity.Services
             {
                 format = row.GetType().Name;
                 if (format.EndsWith("Row", StringComparison.Ordinal))
-                    format = format.Substring(0, format.Length - 3);
+                    format = format[0..^3];
                 format += "/~";
             }
 
@@ -86,8 +86,8 @@ namespace Serenity.Services
                 foreach (var field in replaceFields.Values)
                 {
                     if (!field.IsTableField() &&
-                        (!(query is ISqlQueryExtensible) ||
-                          ((ISqlQueryExtensible)query).GetSelectIntoIndex(field) <= 0))
+                        (query is not ISqlQueryExtensible ex ||
+                          ex.GetSelectIntoIndex(field) <= 0))
                         query.Select(field);
                 }
             }

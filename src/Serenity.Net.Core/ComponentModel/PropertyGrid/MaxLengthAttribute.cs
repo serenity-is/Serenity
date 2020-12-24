@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Sets the maximum length of an editor attached to the target property.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class MaxLengthAttribute : Attribute
     {
         /// <summary>

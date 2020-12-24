@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Indicates that the target property should use a "Decimal" editor.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class DecimalEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

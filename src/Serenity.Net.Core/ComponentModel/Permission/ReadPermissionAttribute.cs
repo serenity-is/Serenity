@@ -4,7 +4,7 @@ namespace Serenity.Data
     /// <summary>
     /// Sets read permission for the row.
     /// </summary>
-    /// <seealso cref="Serenity.Data.PermissionAttributeBase" />
+    /// <seealso cref="PermissionAttributeBase" />
     public class ReadPermissionAttribute : PermissionAttributeBase
     {
         /// <summary>

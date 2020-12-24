@@ -45,6 +45,10 @@ namespace Serenity.Web
             }
         }
 
-        void IDisposable.Dispose() => Dispose(disposing: true);
+        void IDisposable.Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

@@ -4,7 +4,7 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Marks the property as part of the primary key.
     /// </summary>
-    /// <seealso cref="Serenity.Data.Mapping.SetFieldFlagsAttribute" />
+    /// <seealso cref="SetFieldFlagsAttribute" />
     public class PrimaryKeyAttribute : SetFieldFlagsAttribute
     {
         /// <summary>

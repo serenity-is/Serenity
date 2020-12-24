@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Registers a permission key.
     /// </summary>
-    /// <seealso cref="Serenity.Data.PermissionAttributeBase" />
+    /// <seealso cref="PermissionAttributeBase" />
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class, AllowMultiple = true)]
     public class RegisterPermissionKeyAttribute : PermissionAttributeBase
     {

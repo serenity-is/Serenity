@@ -6,7 +6,7 @@ namespace Serenity.Data
     /// precedence over ReadPermissionAttribute to determine permission for
     /// row's page and navigation item.
     /// </summary>
-    /// <seealso cref="Serenity.Data.PermissionAttributeBase" />
+    /// <seealso cref="PermissionAttributeBase" />
     public class NavigationPermissionAttribute : PermissionAttributeBase
     {
         /// <summary>

@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Specifies required permission to access an object, e.g. a report
     /// </summary>
-    /// <seealso cref="Serenity.Data.PermissionAttributeBase" />
+    /// <seealso cref="PermissionAttributeBase" />
     public class RequiredPermissionAttribute : PermissionAttributeBase
     {
         /// <summary>

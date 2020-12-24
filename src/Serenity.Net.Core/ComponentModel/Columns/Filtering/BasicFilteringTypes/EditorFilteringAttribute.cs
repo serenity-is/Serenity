@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// Indicates that property should a custom editor for filtering,
     /// which is usually determined by form editor type of the property.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFilteringAttribute" />
+    /// <seealso cref="CustomFilteringAttribute" />
     public class EditorFilteringAttribute : CustomFilteringAttribute
     {
         /// <summary>

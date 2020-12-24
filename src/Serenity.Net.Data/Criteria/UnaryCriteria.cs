@@ -6,7 +6,7 @@ namespace Serenity.Data
     /// <summary>
     /// Unary criteria with one operand and operator
     /// </summary>
-    /// <seealso cref="Serenity.Data.BaseCriteria" />
+    /// <seealso cref="BaseCriteria" />
     public class UnaryCriteria : BaseCriteria
     {
         private readonly CriteriaOperator op;
@@ -76,10 +76,7 @@ namespace Serenity.Data
         /// <value>
         /// The operator.
         /// </value>
-        public CriteriaOperator Operator
-        {
-            get { return op; }
-        }
+        public CriteriaOperator Operator => op;
 
         /// <summary>
         /// Gets the operand.
@@ -87,9 +84,6 @@ namespace Serenity.Data
         /// <value>
         /// The operand.
         /// </value>
-        public BaseCriteria Operand
-        {
-            get { return operand; }
-        }
+        public BaseCriteria Operand => operand;
     }
 }

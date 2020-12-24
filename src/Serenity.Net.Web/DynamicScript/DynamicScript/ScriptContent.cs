@@ -8,9 +8,9 @@ namespace Serenity.Web
 {
     public class ScriptContent : IScriptContent
     {
-        private bool canCompress;
+        private readonly bool canCompress;
         private string hash;
-        private byte[] content;
+        private readonly byte[] content;
         private byte[] compressedContent;
 
         public ScriptContent(byte[] content, DateTime time, bool canCompress)

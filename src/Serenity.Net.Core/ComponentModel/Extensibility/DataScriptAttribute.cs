@@ -8,7 +8,7 @@ namespace Serenity.ComponentModel
     /// script. Data contained by remote data scripts can be accessed
     /// client side using Q.getRemoteData("Key") function.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.DynamicScriptAttribute" />
+    /// <seealso cref="DynamicScriptAttribute" />
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
     public class DataScriptAttribute : Attribute
     {

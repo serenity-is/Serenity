@@ -3,7 +3,7 @@
     /// <summary>
     /// Indicates that the target property should use a "Enum" editor.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class EnumEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

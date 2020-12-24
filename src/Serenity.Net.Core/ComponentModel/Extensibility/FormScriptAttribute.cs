@@ -8,7 +8,7 @@ namespace Serenity.ComponentModel
     /// is an array of PropertyItem objects. Form scripts can be
     /// accessed from client side using Q.getForm("Key")
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class FormScriptAttribute : Attribute
     {

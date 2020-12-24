@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Sets filtering type for the field
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class FilteringTypeAttribute : Attribute
     {
         /// <summary>

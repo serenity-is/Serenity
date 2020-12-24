@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Indicates that the target property should use a "Date" editor.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public class DateEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

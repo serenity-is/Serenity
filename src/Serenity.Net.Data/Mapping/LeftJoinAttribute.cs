@@ -5,8 +5,8 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// LEFT JOIN type
     /// </summary>
-    /// <seealso cref="System.Attribute" />
-    /// <seealso cref="Serenity.Data.Mapping.ISqlJoin" />
+    /// <seealso cref="Attribute" />
+    /// <seealso cref="ISqlJoin" />
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = true)]
     public class LeftJoinAttribute : Attribute, ISqlJoin
     {

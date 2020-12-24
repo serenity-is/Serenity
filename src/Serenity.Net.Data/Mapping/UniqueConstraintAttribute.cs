@@ -5,7 +5,7 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Adds a unique constraint check to the row.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class UniqueConstraintAttribute : Attribute
     {
@@ -13,7 +13,7 @@ namespace Serenity.Data.Mapping
         /// Initializes a new instance of the <see cref="UniqueConstraintAttribute"/> class.
         /// </summary>
         /// <param name="fields">The fields.</param>
-        /// <exception cref="System.ArgumentNullException">fields</exception>
+        /// <exception cref="ArgumentNullException">fields</exception>
         public UniqueConstraintAttribute(params string[] fields)
         {
             if (fields.IsEmptyOrNull())

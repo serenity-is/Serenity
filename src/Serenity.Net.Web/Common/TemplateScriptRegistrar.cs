@@ -9,7 +9,7 @@ namespace Serenity.Web
         private static readonly string[] TemplateSuffixes = new[] { ".Template.html", ".ts.html" };
 
         private ConcatenatedScript bundle;
-        private Dictionary<string, TemplateScript> scriptByKey = new Dictionary<string, TemplateScript>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, TemplateScript> scriptByKey = new Dictionary<string, TemplateScript>(StringComparer.OrdinalIgnoreCase);
 
         private static string GetKey(string rootPath, string filename)
         {
@@ -23,7 +23,7 @@ namespace Serenity.Web
 
                     if (isModulesFolder && filename.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
                     {
-                        filename = filename.Substring(rootPath.Length);
+                        filename = filename[rootPath.Length..];
 
                         var moduleEnd = filename.IndexOf(Path.DirectorySeparatorChar, StringComparison.Ordinal);
                         if (moduleEnd >= 0)
@@ -46,8 +46,7 @@ namespace Serenity.Web
             if (key == null)
                 return;
 
-            TemplateScript ts;
-            if (scriptByKey.TryGetValue(key, out ts))
+            if (scriptByKey.TryGetValue(key, out TemplateScript ts))
                 ts.Changed();
 
             if (bundle != null)
@@ -62,7 +61,7 @@ namespace Serenity.Web
             {
                 var path = p;
                 if (!path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
-                    path = path + Path.DirectorySeparatorChar;
+                    path += Path.DirectorySeparatorChar;
 
                 if (!Directory.Exists(path))
                     continue;

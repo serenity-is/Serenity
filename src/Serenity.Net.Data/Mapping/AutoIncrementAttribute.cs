@@ -4,7 +4,7 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Marks the field as auto increment, e.g. generated on insert in SQL side
     /// </summary>
-    /// <seealso cref="Serenity.Data.Mapping.SetFieldFlagsAttribute" />
+    /// <seealso cref="SetFieldFlagsAttribute" />
     public class AutoIncrementAttribute : SetFieldFlagsAttribute
     {
         /// <summary>

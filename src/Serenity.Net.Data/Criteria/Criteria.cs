@@ -186,13 +186,7 @@ namespace Serenity.Data
 
         /// <summary>
         ///   Gets if criteria is empty.</summary>
-        public override bool IsEmpty
-        {
-            get
-            {
-                return string.IsNullOrEmpty(expression);
-            }
-        }
+        public override bool IsEmpty => string.IsNullOrEmpty(expression);
 
         /// <summary>
         /// Converts the criteria to its string representation while
@@ -211,9 +205,6 @@ namespace Serenity.Data
         /// <value>
         /// The raw criteria expression.
         /// </value>
-        public string Expression
-        {
-            get { return expression; }
-        }
+        public string Expression => expression;
     }
 }

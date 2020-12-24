@@ -6,8 +6,8 @@ namespace Serenity.Data
     /// <summary>
     /// Unit of work implementation.
     /// </summary>
-    /// <seealso cref="System.IDisposable" />
-    /// <seealso cref="Serenity.Data.IUnitOfWork" />
+    /// <seealso cref="IDisposable" />
+    /// <seealso cref="IUnitOfWork" />
     public class UnitOfWork : IDisposable, IUnitOfWork
     {
         private readonly IDbConnection _connection;
@@ -19,7 +19,7 @@ namespace Serenity.Data
         /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
         /// </summary>
         /// <param name="connection">The connection.</param>
-        /// <exception cref="System.ArgumentNullException">connection</exception>
+        /// <exception cref="ArgumentNullException">connection</exception>
         public UnitOfWork(IDbConnection connection)
         {
             _connection = connection ?? throw new ArgumentNullException("connection");
@@ -33,10 +33,7 @@ namespace Serenity.Data
         /// <value>
         /// The connection.
         /// </value>
-        public IDbConnection Connection
-        {
-            get { return _connection; }
-        }
+        public IDbConnection Connection => _connection;
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -60,7 +57,7 @@ namespace Serenity.Data
         /// <summary>
         /// Commits this transaction.
         /// </summary>
-        /// <exception cref="System.ArgumentNullException">transaction</exception>
+        /// <exception cref="ArgumentNullException">transaction</exception>
         public void Commit()
         {
             if (_transaction == null)

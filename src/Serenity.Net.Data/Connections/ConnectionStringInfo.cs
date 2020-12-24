@@ -8,7 +8,7 @@ namespace Serenity.Data
     public class ConnectionStringInfo : IConnectionString
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Data.ConnectionStringInfo"/> class.
+        /// Initializes a new instance of the <see cref="ConnectionStringInfo"/> class.
         /// </summary>
         /// <param name="connectionKey">The connection key.</param>
         /// <param name="connectionString">The connection string.</param>

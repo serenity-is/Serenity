@@ -6,7 +6,7 @@ namespace Serenity.Data
     /// <summary>
     /// Binary criteria object, which has two operands and a operator.
     /// </summary>
-    /// <seealso cref="Serenity.Data.BaseCriteria" />
+    /// <seealso cref="BaseCriteria" />
     public class BinaryCriteria : BaseCriteria
     {
         private readonly BaseCriteria left;
@@ -98,10 +98,7 @@ namespace Serenity.Data
         /// <value>
         /// The operator.
         /// </value>
-        public CriteriaOperator Operator
-        {
-            get { return op; }
-        }
+        public CriteriaOperator Operator => op;
 
         /// <summary>
         /// Gets the left operand.
@@ -109,10 +106,7 @@ namespace Serenity.Data
         /// <value>
         /// The left operand.
         /// </value>
-        public BaseCriteria LeftOperand
-        {
-            get { return left; }
-        }
+        public BaseCriteria LeftOperand => left;
 
         /// <summary>
         /// Gets the right operand.
@@ -120,9 +114,6 @@ namespace Serenity.Data
         /// <value>
         /// The right operand.
         /// </value>
-        public BaseCriteria RightOperand
-        {
-            get { return right; }
-        }
+        public BaseCriteria RightOperand => right;
     }
 }

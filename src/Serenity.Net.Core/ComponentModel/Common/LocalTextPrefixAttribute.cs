@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Sets local text prefix for the row.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class LocalTextPrefixAttribute : Attribute
     {
         /// <summary>

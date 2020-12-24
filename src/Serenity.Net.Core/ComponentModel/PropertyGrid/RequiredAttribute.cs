@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Determines if field is required in form.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public sealed class RequiredAttribute : Attribute
     {
 

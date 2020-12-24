@@ -102,9 +102,6 @@ namespace Serenity.Data
                 return _getValue(row2).HasValue ? -1 : 0;
         }
 
-        public override Type ValueType
-        {
-            get { return typeof(TValue?); }
-        }
+        public override Type ValueType => typeof(TValue?);
     }
 }

@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Adds a formatter option
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
     public class FormatterOptionAttribute : Attribute
     {

@@ -74,7 +74,7 @@ namespace Serenity.Data
         /// Initializes a new instance of the <see cref="Alias"/> class.
         /// </summary>
         /// <param name="alias">The alias.</param>
-        /// <exception cref="System.ArgumentNullException">alias</exception>
+        /// <exception cref="ArgumentNullException">alias</exception>
         public Alias(string alias)
         {
             if (string.IsNullOrEmpty(alias))
@@ -112,10 +112,7 @@ namespace Serenity.Data
         /// <value>
         /// The name.
         /// </value>
-        public string Name
-        {
-            get { return alias; }
-        }
+        public string Name => alias;
 
         /// <summary>
         /// Gets the name dot.
@@ -123,10 +120,7 @@ namespace Serenity.Data
         /// <value>
         /// The name dot.
         /// </value>
-        public string NameDot
-        {
-            get { return aliasDot; }
-        }
+        public string NameDot => aliasDot;
 
         /// <summary>
         /// Gets the table.
@@ -134,10 +128,7 @@ namespace Serenity.Data
         /// <value>
         /// The table.
         /// </value>
-        public string Table
-        {
-            get { return table; }
-        }
+        public string Table => table;
 
         /// <summary>
         /// Gets the prefixed expression with the specified field name.
@@ -160,7 +151,7 @@ namespace Serenity.Data
         /// </value>
         /// <param name="field">The field.</param>
         /// <returns>Expression like t0.fieldName</returns>
-        /// <exception cref="System.ArgumentNullException">field</exception>
+        /// <exception cref="ArgumentNullException">field</exception>
         public string this[IField field]
         {
             get
@@ -217,7 +208,7 @@ namespace Serenity.Data
         /// <returns>
         /// String containing prefixed field
         /// </returns>
-        /// <exception cref="System.ArgumentNullException">field</exception>
+        /// <exception cref="ArgumentNullException">field</exception>
         public static string operator +(Alias alias, IField field)
         {
             if (field == null)

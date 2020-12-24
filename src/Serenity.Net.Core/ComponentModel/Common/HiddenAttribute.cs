@@ -4,7 +4,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Sets a column as initially hidden
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.VisibleAttribute" />
+    /// <seealso cref="VisibleAttribute" />
     public class HiddenAttribute : VisibleAttribute
     {
         /// <summary>

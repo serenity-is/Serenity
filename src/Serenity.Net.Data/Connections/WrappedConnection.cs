@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// Wraps a connection to add current transaction and dialect support.
     /// </summary>
-    /// <seealso cref="System.Data.IDbConnection" />
+    /// <seealso cref="IDbConnection" />
     public class WrappedConnection : IDbConnection
     {
         private readonly IDbConnection actualConnection;
@@ -30,10 +30,7 @@ namespace Serenity.Data
         /// <value>
         ///   <c>true</c> if opened once; otherwise, <c>false</c>.
         /// </value>
-        public bool OpenedOnce
-        {
-            get { return openedOnce; }
-        }
+        public bool OpenedOnce => openedOnce;
 
         /// <summary>
         /// Gets the actual connection instance.
@@ -41,10 +38,7 @@ namespace Serenity.Data
         /// <value>
         /// The actual connection.
         /// </value>
-        public IDbConnection ActualConnection
-        {
-            get { return actualConnection; }
-        }
+        public IDbConnection ActualConnection => actualConnection;
 
         /// <summary>
         /// Gets or sets the SQL dialect.
@@ -64,10 +58,7 @@ namespace Serenity.Data
         /// <value>
         /// The current transaction.
         /// </value>
-        public WrappedTransaction CurrentTransaction
-        {
-            get { return currentTransaction; }
-        }
+        public WrappedTransaction CurrentTransaction => currentTransaction;
 
         /// <summary>
         /// Begins a database transaction with the specified <see cref="T:System.Data.IsolationLevel"></see> value.
@@ -147,10 +138,7 @@ namespace Serenity.Data
         /// <summary>
         /// Gets the time to wait while trying to establish a connection before terminating the attempt and generating an error.
         /// </summary>
-        public int ConnectionTimeout
-        {
-            get { return actualConnection.ConnectionTimeout; }
-        }
+        public int ConnectionTimeout => actualConnection.ConnectionTimeout;
 
         /// <summary>
         /// Creates and returns a Command object associated with the connection.
@@ -198,10 +186,7 @@ namespace Serenity.Data
         /// <summary>
         /// Gets the name of the current database or the database to be used after a connection is opened.
         /// </summary>
-        public string Database
-        {
-            get { return actualConnection.Database; }
-        }
+        public string Database => actualConnection.Database;
 
         /// <summary>
         /// Opens a database connection with the settings specified by the ConnectionString property of the provider-specific Connection object.
@@ -215,10 +200,7 @@ namespace Serenity.Data
         /// <summary>
         /// Gets the current state of the connection.
         /// </summary>
-        public ConnectionState State
-        {
-            get { return actualConnection.State; }
-        }
+        public ConnectionState State => actualConnection.State;
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

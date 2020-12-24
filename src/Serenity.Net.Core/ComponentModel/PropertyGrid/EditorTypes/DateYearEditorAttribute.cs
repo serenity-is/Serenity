@@ -3,7 +3,7 @@
     /// <summary>
     /// Indicates that the target property should use a "DateYear" editor.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class DateYearEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

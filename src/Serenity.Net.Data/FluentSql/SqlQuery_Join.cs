@@ -139,7 +139,7 @@ namespace Serenity.Data
         /// <param name="alias">The alias.</param>
         /// <param name="onCriteria">The on criteria.</param>
         /// <returns>SqlQuery itself.</returns>
-        /// <exception cref="System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// alias is null
         /// or
         /// alias.table is null
@@ -168,7 +168,7 @@ namespace Serenity.Data
         /// <param name="alias">The alias with tablename/alias name.</param>
         /// <param name="onCriteria">The ON criteria.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// alias is null
         /// or
         /// alias.table is null
@@ -197,7 +197,7 @@ namespace Serenity.Data
         /// <param name="alias">The alias.</param>
         /// <param name="onCriteria">The ON criteria.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// alias is null 
         /// or
         /// alias.table is null
@@ -266,7 +266,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="join">The join.</param>
         /// <returns>The query itself.</returns>
-        /// <exception cref="System.ArgumentNullException">join is null</exception>
+        /// <exception cref="ArgumentNullException">join is null</exception>
         public SqlQuery EnsureJoin(Join join)
         {
             if (join == null)

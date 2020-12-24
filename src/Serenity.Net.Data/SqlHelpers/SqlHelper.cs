@@ -134,7 +134,7 @@ namespace Serenity.Data
             if (value is Dapper.SqlMapper.ICustomQueryParameter cqp)
             {
                 cqp.AddParameter(command, name);
-                return command.Parameters[command.Parameters.Count - 1];
+                return command.Parameters[^1];
             }
 #endif
             DbParameter param = command.CreateParameter();

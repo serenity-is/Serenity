@@ -27,9 +27,6 @@ namespace Serenity.Localization
         /// <value>
         /// The initial text.
         /// </value>
-        public string InitialText
-        {
-            get { return initialText; }
-        }
+        public string InitialText => initialText;
     }
 }

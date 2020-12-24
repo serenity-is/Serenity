@@ -7,7 +7,7 @@ namespace Serenity.Data.Mapping
     /// in joined table (view fields in this row that originates from foreign table) should be used
     /// for display / filtering.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class TextualFieldAttribute : Attribute
     {
         /// <summary>

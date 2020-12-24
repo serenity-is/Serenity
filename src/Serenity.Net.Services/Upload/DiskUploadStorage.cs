@@ -139,7 +139,7 @@ namespace Serenity.Web
                 foreach (var f in store.GetFiles(sourceDir,
                      sourceBaseName + "_t*.jpg"))
                 {
-                    string thumbSuffix = Path.GetFileName(f).Substring(sourceBaseName.Length);
+                    string thumbSuffix = Path.GetFileName(f)[sourceBaseName.Length..];
                     using var src = store.OpenFile(f);
                     newFiles.Add(WriteFile(targetBasePath + thumbSuffix, src, false));
                 }

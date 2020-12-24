@@ -32,7 +32,7 @@ namespace Serenity.Data
         /// <param name="linkedRows">Types of linked rows</param>
         public TwoLevelCachedAttribute(params Type[] linkedRows)
         {
-            this.LinkedRows = linkedRows;
+            LinkedRows = linkedRows;
         }
 
         /// <summary>

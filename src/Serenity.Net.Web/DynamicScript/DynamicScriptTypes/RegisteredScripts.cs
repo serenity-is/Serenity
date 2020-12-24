@@ -9,7 +9,7 @@ namespace Serenity.Web
     {
         private readonly IDynamicScriptManager scriptManager;
 
-        public string ScriptName { get { return "RegisteredScripts"; } }
+        public string ScriptName => "RegisteredScripts";
 
         public RegisteredScripts(IDynamicScriptManager scriptManager)
         {

@@ -3,7 +3,7 @@
     /// <summary>
     /// Indicates that the target property should use a "Boolean" editor.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class BooleanEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

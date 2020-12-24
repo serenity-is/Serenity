@@ -3,7 +3,7 @@
     /// <summary>
     /// Indicates that the target property should use a "Recaptcha" (Google).
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class RecaptchaAttribute : CustomEditorAttribute
     {
         /// <summary>

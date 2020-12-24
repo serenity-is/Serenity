@@ -5,7 +5,7 @@
     /// This is generally a CK editor that contains more functionalities
     /// compared to other ones.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class HtmlContentEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

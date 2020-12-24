@@ -4,7 +4,7 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Specifies that field can not be null.
     /// </summary>
-    /// <seealso cref="Serenity.Data.Mapping.SetFieldFlagsAttribute" />
+    /// <seealso cref="SetFieldFlagsAttribute" />
     public class NotNullAttribute : SetFieldFlagsAttribute
     {
         /// <summary>

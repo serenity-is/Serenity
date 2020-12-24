@@ -9,7 +9,7 @@ namespace Serenity.ComponentModel
     /// prefix by default and its name doesn't take role in local text 
     /// key generation.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class NestedLocalTextsAttribute : Attribute
     {

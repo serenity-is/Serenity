@@ -3,7 +3,7 @@
     /// <summary>
     /// Indicates that the target property should use a "String" editor.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class StringEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

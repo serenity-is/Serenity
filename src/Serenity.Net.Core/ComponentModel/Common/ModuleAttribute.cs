@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// Sets the module name for the row. Module name is usually the folder name
     /// under ~/Modules folder entity resides in.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class ModuleAttribute : Attribute
     {
         /// <summary>

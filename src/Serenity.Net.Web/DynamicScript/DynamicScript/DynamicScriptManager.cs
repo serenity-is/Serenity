@@ -9,15 +9,15 @@ namespace Serenity.Web
 {
     public partial class DynamicScriptManager : IDynamicScriptManager
     {
-        private ConcurrentDictionary<string, IDynamicScript> registeredScripts;
-        private ConcurrentDictionary<string, DateTime> scriptLastChange;
+        private readonly ConcurrentDictionary<string, IDynamicScript> registeredScripts;
+        private readonly ConcurrentDictionary<string, DateTime> scriptLastChange;
         private Action<string> scriptChanged;
 
         private readonly ITwoLevelCache cache;
         private readonly IPermissionService permissions;
         private readonly ITextLocalizer localizer;
 
-        private static UTF8Encoding utf8Encoding = new UTF8Encoding(true);
+        private static readonly UTF8Encoding utf8Encoding = new UTF8Encoding(true);
 
         public DynamicScriptManager(ITwoLevelCache cache, IPermissionService permissions, ITextLocalizer localizer)
         {
@@ -57,11 +57,7 @@ namespace Serenity.Web
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
-
-            if (script == null)
-                throw new ArgumentNullException(nameof(script));
-
-            registeredScripts[name] = script;
+            registeredScripts[name] = script ?? throw new ArgumentNullException(nameof(script));
         }
 
         public Dictionary<string, string> GetRegisteredScripts()

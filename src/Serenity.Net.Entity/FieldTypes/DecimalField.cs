@@ -28,8 +28,8 @@ namespace Serenity.Data
             var value = reader.GetValue(index);
             if (value is DBNull)
                 _setValue(row, null);
-            else if (value is decimal)
-                _setValue(row, (decimal)value);
+            else if (value is decimal d)
+                _setValue(row, d);
             else
                 _setValue(row, Convert.ToDecimal(value, CultureInfo.InvariantCulture));
 

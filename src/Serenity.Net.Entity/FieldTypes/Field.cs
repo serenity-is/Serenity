@@ -47,10 +47,7 @@ namespace Serenity.Data
                 fields.Add(this);
         }
 
-        public RowFieldsBase Fields
-        {
-            get { return fields; }
-        }
+        public RowFieldsBase Fields => fields;
 
         public int Index
         {
@@ -58,15 +55,9 @@ namespace Serenity.Data
             internal set { index = value; }
         }
 
-        public string Name
-        {
-            get { return name; }
-        }
+        public string Name => name;
 
-        public FieldType Type
-        {
-            get { return type; }
-        }
+        public FieldType Type => type;
 
         public LocalText Caption
         {
@@ -103,10 +94,7 @@ namespace Serenity.Data
             }
         }
 
-        public int Size
-        {
-            get { return size; }
-        }
+        public int Size => size;
 
         public int Scale { get; set; }
 
@@ -227,10 +215,7 @@ namespace Serenity.Data
             }
         }
 
-        public string JoinAlias
-        {
-            get { return joinAlias; }
-        }
+        public string JoinAlias => joinAlias;
 
         public Join Join
         {
@@ -247,10 +232,7 @@ namespace Serenity.Data
             }
         }
 
-        public string Origin
-        {
-            get { return origin; }
-        }
+        public string Origin => origin;
 
         public string ForeignTable
         {
@@ -394,15 +376,9 @@ namespace Serenity.Data
             }
         }
 
-        IDictionary<string, Join> IFieldWithJoinInfo.Joins
-        {
-            get { return fields.Joins; }
-        }
+        IDictionary<string, Join> IFieldWithJoinInfo.Joins => fields.Joins;
 
-        public string ColumnAlias
-        {
-            get { return propertyName ?? name; }
-        }
+        public string ColumnAlias => propertyName ?? name;
 
         public string GetTitle(ITextLocalizer localizer)
         {

@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Determines resizability of a target column.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public sealed class ResizableAttribute : Attribute
     {
         /// <summary>

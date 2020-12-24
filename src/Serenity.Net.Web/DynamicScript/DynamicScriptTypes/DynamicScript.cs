@@ -13,8 +13,7 @@ namespace Serenity.Web
 
         public void Changed()
         {
-            if (scriptChanged != null)
-                scriptChanged(this, new EventArgs());
+            scriptChanged?.Invoke(this, new EventArgs());
         }
 
         public abstract string GetScript();
@@ -25,7 +24,7 @@ namespace Serenity.Web
                 permissions.ValidatePermission(Permission, localizer);
         }
 
-        public event System.EventHandler ScriptChanged
+        public event EventHandler ScriptChanged
         {
             add { scriptChanged += value; }
             remove { scriptChanged -= value; }

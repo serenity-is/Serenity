@@ -35,7 +35,7 @@ namespace Serenity.Web
                 throw new ArgumentOutOfRangeException(nameof(mask));
 
             var before = mask.Substring(0, idx);
-            var after = mask.Substring(idx + 1);
+            var after = mask[(idx + 1)..];
             var extension = Path.GetExtension(mask);
 
             var files = Directory.GetFiles(path, mask)
@@ -48,8 +48,7 @@ namespace Serenity.Web
                 {
                     if (s.Length < 0)
                         return false;
-                    int y;
-                    return s.Split('.').All(x => int.TryParse(x, out y));
+                    return s.Split('.').All(x => int.TryParse(x, out int y));
                 })
                 .ToArray();
 
@@ -86,12 +85,11 @@ namespace Serenity.Web
             if (idx < 0)
                 return scriptUrl;
 
-            string result;
-            if (expandVersion.TryGetValue(scriptUrl, out result))
+            if (expandVersion.TryGetValue(scriptUrl, out string result))
                 return result;
 
             var before = scriptUrl.Substring(0, idx);
-            var after = scriptUrl.Substring(idx + tpl.Length);
+            var after = scriptUrl[(idx + tpl.Length)..];
             var extension = Path.GetExtension(scriptUrl);
 
             var path = PathHelper.SecureCombine(webRootPath, before.StartsWith("~/", StringComparison.Ordinal) ? before[2..] : before);
@@ -136,14 +134,13 @@ namespace Serenity.Web
 
                 bool falsey = key.StartsWith("!", StringComparison.Ordinal);
                 if (falsey)
-                    key = key.Substring(1);
+                    key = key[1..];
 
                 if (string.IsNullOrEmpty(key))
                     return null;
 
-                object value;
                 if (replacements == null ||
-                    !replacements.TryGetValue(key, out value))
+                    !replacements.TryGetValue(key, out object value))
                 {
                     value = null;
                 }
@@ -151,10 +148,10 @@ namespace Serenity.Web
                 string replace;
                 if (falsey)
                 {
-                    if (value is bool && (bool)value == true)
+                    if (value is bool b && b == true)
                         return null;
 
-                    if (value != null && (!(value is bool) || ((bool)value == true)))
+                    if (value != null && (value is not bool b2 || (b2 == true)))
                         return null;
 
                     replace = "";
@@ -187,14 +184,11 @@ namespace Serenity.Web
             var recursionCheck = new HashSet<string>();
 
             var bundleIncludes = new Dictionary<string, List<string>>();
-            Func<string, List<string>> listBundleIncludes = null;
-
-            listBundleIncludes = (string bundleKey) =>
+            List<string> listBundleIncludes(string bundleKey)
             {
                 var includes = new List<string>();
 
-                string[] sourceFiles;
-                if (!bundles.TryGetValue(bundleKey, out sourceFiles) ||
+                if (!bundles.TryGetValue(bundleKey, out string[] sourceFiles) ||
                     sourceFiles == null ||
                     sourceFiles.Length == 0)
                     return includes;
@@ -206,7 +200,7 @@ namespace Serenity.Web
 
                     if (sourceFile.StartsWith(bundlePrefix, StringComparison.OrdinalIgnoreCase))
                     {
-                        var subBundleKey = sourceFile.Substring(17);
+                        var subBundleKey = sourceFile[17..];
                         if (recursionCheck != null)
                         {
                             if (recursionCheck.Contains(subBundleKey) || recursionCheck.Count > 100)
@@ -232,7 +226,7 @@ namespace Serenity.Web
                 }
 
                 return includes;
-            };
+            }
 
             foreach (var bundleKey in bundles.Keys)
             {

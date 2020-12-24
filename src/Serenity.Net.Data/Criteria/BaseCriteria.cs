@@ -24,10 +24,7 @@ namespace Serenity.Data
         /// <value>
         ///   <c>true</c> if this instance is empty; otherwise, <c>false</c>.
         /// </value>
-        public virtual bool IsEmpty
-        {
-            get { return false; }
-        }
+        public virtual bool IsEmpty => false;
 
         /// <summary>
         /// Creates a new unary IsNull criteria containing this criteria as the operand.
@@ -1210,15 +1207,9 @@ namespace Serenity.Data
                 throw new InvalidOperationException("Criteria should not have parameters!");
             }
 
-            public IDictionary<string, object> Params
-            {
-                get { return null; }
-            }
+            public IDictionary<string, object> Params => null;
 
-            public ISqlDialect Dialect
-            {
-                get { return SqlSettings.DefaultDialect; }
-            }
+            public ISqlDialect Dialect => SqlSettings.DefaultDialect;
         }
 
         private class IgnoreParams : IQueryWithParams
@@ -1238,15 +1229,9 @@ namespace Serenity.Data
                 return new Parameter((next++).IndexParam());
             }
 
-            public IDictionary<string, object> Params
-            {
-                get { return null; }
-            }
+            public IDictionary<string, object> Params => null;
 
-            public ISqlDialect Dialect
-            {
-                get { return SqlSettings.DefaultDialect; }
-            }
+            public ISqlDialect Dialect => SqlSettings.DefaultDialect;
         }
     }
 }

@@ -26,10 +26,7 @@ namespace Serenity.Reflection
         /// <value>
         /// The name.
         /// </value>
-        public string Name
-        {
-            get { return property.Name; }
-        }
+        public string Name => property.Name;
 
         /// <summary>
         /// Gets the type of the property.
@@ -37,10 +34,7 @@ namespace Serenity.Reflection
         /// <value>
         /// The type of the property.
         /// </value>
-        public Type PropertyType
-        {
-            get { return property.PropertyType; }
-        }
+        public Type PropertyType => property.PropertyType;
 
         /// <summary>
         /// Gets the attribute.

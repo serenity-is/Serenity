@@ -12,7 +12,7 @@ namespace Serenity.Web
 {
     public class ScriptBundleManager : IScriptBundleManager
     {
-        private static object sync = new object();
+        private static readonly object sync = new object();
 
         private bool isEnabled;
         private Dictionary<string, string> bundleKeyBySourceUrl;
@@ -104,20 +104,19 @@ namespace Serenity.Web
                     var bundleParts = new List<Func<string>>();
                     var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                    Action<string> registerInBundle = delegate (string sourceFile)
+                    void registerInBundle(string sourceFile)
                     {
                         if (bundleKey.IndexOf('/', StringComparison.Ordinal) < 0 && !bundleKeyBySourceUrl.ContainsKey(sourceFile))
                             bundleKeyBySourceUrl[sourceFile] = bundleKey;
 
-                        HashSet<string> bundleKeys;
-                        if (!bundleKeysBySourceUrl.TryGetValue(sourceFile, out bundleKeys))
+                        if (!bundleKeysBySourceUrl.TryGetValue(sourceFile, out HashSet<string> bundleKeys))
                         {
                             bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                             bundleKeysBySourceUrl[sourceFile] = new HashSet<string>();
                         }
 
                         bundleKeys.Add(bundleKey);
-                    };
+                    }
 
                     foreach (var sourceFile in sourceFiles)
                     {
@@ -128,7 +127,7 @@ namespace Serenity.Web
                         {
                             registerInBundle(sourceFile);
 
-                            var scriptName = sourceFile.Substring(10);
+                            var scriptName = sourceFile[10..];
                             scriptNames.Add(scriptName);
                             bundleParts.Add(() =>
                             {
@@ -188,7 +187,7 @@ namespace Serenity.Web
                         bundleParts.Add(() =>
                         {
                             var sourcePath = PathHelper.SecureCombine(hostEnvironment.WebRootPath, 
-                                sourceUrl.Substring(rootUrl.Length));
+                                sourceUrl[rootUrl.Length..]);
                             if (!File.Exists(sourcePath))
                                 return string.Format(CultureInfo.CurrentCulture, errorLines, string.Format(CultureInfo.CurrentCulture, 
                                     "File {0} is not found!", sourcePath));
@@ -297,8 +296,7 @@ namespace Serenity.Web
             lock (sync)
             {
                 var bi = bundleIncludes;
-                List<string> includes;
-                if (bi != null && bi.TryGetValue(bundleKey, out includes) && includes != null)
+                if (bi != null && bi.TryGetValue(bundleKey, out List<string> includes) && includes != null)
                     return includes;
 
                 return Array.Empty<string>();
@@ -317,7 +315,7 @@ namespace Serenity.Web
             if (scriptUrl != null && scriptUrl.StartsWith("dynamic://",
                 StringComparison.OrdinalIgnoreCase))
             {
-                var scriptName = scriptUrl.Substring(10);
+                var scriptName = scriptUrl[10..];
                 if (bySrcUrl == null || !bySrcUrl.TryGetValue(scriptUrl, out bundleKey))
                 {
                     scriptUrl = scriptManager.GetScriptInclude(scriptName);

@@ -13,13 +13,7 @@ namespace Serenity.Web
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public IDictionary<object, object> Items
-        {
-            get 
-            {
-                return httpContextAccessor?.HttpContext?.Items;
-            }
-        }
+        public IDictionary<object, object> Items => httpContextAccessor?.HttpContext?.Items;
     }
 }
 

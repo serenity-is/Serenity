@@ -34,12 +34,13 @@ namespace Serenity.Reporting
                     Path.GetDirectoryName(exePath)));
             }
 
-            if (string.IsNullOrEmpty(this.Url))
+            if (string.IsNullOrEmpty(Url))
                 throw new ArgumentNullException("url");
 
-            var args = new List<string>();
-
-            args.Add(!SmartShrinking ? "--disable-smart-shrinking" : "--enable-smart-shrinking");
+            var args = new List<string>
+            {
+                !SmartShrinking ? "--disable-smart-shrinking" : "--enable-smart-shrinking"
+            };
 
             if (!string.IsNullOrEmpty(PageSize))
             {
@@ -137,7 +138,7 @@ namespace Serenity.Reporting
                 args.Add(replace.Value);
             }
 
-            args.Add(this.Url);
+            args.Add(Url);
             foreach (var additional in AdditionalUrls)
                 args.Add(additional);
 

@@ -166,18 +166,9 @@ namespace Serenity.Data
             return fields.FindFieldByPropertyName(propertyName);
         }
 
-        public int FieldCount
-        {
-            get { return fields.Count; }
-        }
+        public int FieldCount => fields.Count;
 
-        public bool IsAnyFieldAssigned
-        {
-            get
-            {
-                return tracking && assignedFields != null;
-            }
-        }
+        public bool IsAnyFieldAssigned => tracking && assignedFields != null;
 
         public bool IgnoreConstraints { get; set; }
 
@@ -356,10 +347,7 @@ namespace Serenity.Data
             }
         }
 
-        IDictionary<string, Join> IHaveJoins.Joins
-        {
-            get { return fields.Joins; }
-        }
+        IDictionary<string, Join> IHaveJoins.Joins => fields.Joins;
 
         public Field IdField => fields.IdField;
         

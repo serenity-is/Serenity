@@ -8,22 +8,21 @@ namespace Serenity.Web
     {
         public static string FormatFilename(FormatFilenameOptions options)
         {
-            long l;
             object groupKey;
             string s;
             object identity = options.EntityId;
             if (identity == null)
                 groupKey = "_";
-            else if (identity is Guid)
+            else if (identity is Guid g)
             {
-                s = ((Guid)identity).ToString("N");
+                s = g.ToString("N");
                 identity = s;
                 groupKey = s.Substring(0, 2);
             }
             else
             {
                 s = identity.ToString();
-                if (long.TryParse(s, out l))
+                if (long.TryParse(s, out long l))
                     groupKey = l / 1000;
                 else if (s.Length == 0)
                     groupKey = "_";

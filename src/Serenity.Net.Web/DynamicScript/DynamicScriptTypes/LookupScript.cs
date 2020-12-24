@@ -6,7 +6,7 @@ namespace Serenity.Web
 {
     public abstract class LookupScript : DynamicScript, INamedDynamicScript
     {
-        private Dictionary<string, object> lookupParams;
+        private readonly Dictionary<string, object> lookupParams;
 
         protected LookupScript()
         {
@@ -23,17 +23,13 @@ namespace Serenity.Web
                 ("Lookup." + LookupKey).ToSingleQuoted(), LookupParams.ToJson(), items.ToJson());
         }
 
-        public Dictionary<string, object> LookupParams
-        {
-            get { return lookupParams; }
-        }
+        public Dictionary<string, object> LookupParams => lookupParams;
 
         public string IdField
         {
             get
             {
-                object value;
-                if (lookupParams.TryGetValue("idField", out value) && value != null)
+                if (lookupParams.TryGetValue("idField", out object value) && value != null)
                     return value.ToString();
 
                 return null;
@@ -75,6 +71,6 @@ namespace Serenity.Web
         }
 
         public string LookupKey { get; set; }
-        public string ScriptName { get { return "Lookup." + LookupKey; } }
+        public string ScriptName => "Lookup." + LookupKey;
     }
 }

@@ -20,8 +20,8 @@ namespace Serenity.Services
 
         public Result(TResponse data)
         {
-            this.Data = data;
-            this.SerializerSettings = JsonSettings.Strict;
+            Data = data;
+            SerializerSettings = JsonSettings.Strict;
         }
 
 #if !ASPNETMVC
@@ -31,21 +31,21 @@ namespace Serenity.Services
 #endif
         {
             if (context == null)
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
 
             var response = context.HttpContext.Response;
             response.ContentType = !string.IsNullOrEmpty(ContentType) ? ContentType : "application/json";
 
             if (ContentEncoding != null)
 #if !ASPNETMVC
-                response.Headers["Content-Encoding"] = this.ContentEncoding.WebName;
+                response.Headers["Content-Encoding"] = ContentEncoding.WebName;
 #else
                 response.ContentEncoding = this.ContentEncoding;
 #endif
             if (Data != null)
             {
 #if !ASPNETMVC
-                JsonTextWriter writer = new JsonTextWriter(new StreamWriter(response.Body)) { Formatting = this.Formatting };
+                JsonTextWriter writer = new JsonTextWriter(new StreamWriter(response.Body)) { Formatting = Formatting };
 #else
                 JsonTextWriter writer = new JsonTextWriter(response.Output) { Formatting = this.Formatting };
 #endif

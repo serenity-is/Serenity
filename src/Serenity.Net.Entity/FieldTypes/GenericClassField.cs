@@ -70,6 +70,6 @@ namespace Serenity.Data
             return _getValue(row) == null;
         }
 
-        public override Type ValueType { get { return typeof(TValue); } }
+        public override Type ValueType => typeof(TValue);
     }
 }

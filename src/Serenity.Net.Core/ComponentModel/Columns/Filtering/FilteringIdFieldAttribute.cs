@@ -7,7 +7,7 @@ namespace Serenity.ComponentModel
     /// is placed on EmployeeName field, EmployeeId can be the filtering field,
     /// so that values are filtered on ID not text value.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class FilteringIdFieldAttribute : Attribute
     {
         /// <summary>

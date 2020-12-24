@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// Indicates that the target property should use a "DistinctValues" editor
     /// and also defines an automatic lookup script for row fields.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class DistinctValuesEditorAttribute : LookupEditorBaseAttribute
     {
         /// <summary>

@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// LEFT JOIN type
     /// </summary>
-    /// <seealso cref="Serenity.Data.Join" />
+    /// <seealso cref="Join" />
     public class LeftJoin : Join
     {
         /// <summary>

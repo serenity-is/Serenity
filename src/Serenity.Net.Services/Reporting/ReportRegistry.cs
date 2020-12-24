@@ -164,7 +164,7 @@ namespace Serenity.Reporting
                     Title = ((DisplayNameAttribute)attr[0]).DisplayName;
 
                 var category = GetReportCategory(type);
-                Category = new ReportRegistry.Category(category, GetReportCategoryTitle(category, localizer));
+                Category = new Category(category, GetReportCategoryTitle(category, localizer));
 
                 attr = type.GetCustomAttributes(typeof(RequiredPermissionAttribute), false);
                 if (attr.Length > 0)

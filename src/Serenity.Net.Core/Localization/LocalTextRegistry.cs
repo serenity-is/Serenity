@@ -291,7 +291,7 @@ namespace Serenity.Localization
             languageFallbacks.Clear();
         }
 
-        private class ItemKeyComparer : IEqualityComparer<Tuple<string, string>>
+        private class ItemKeyComparer : IEqualityComparer<ItemKey>
         {
             public static readonly ItemKeyComparer Default = new ItemKeyComparer();
 

@@ -33,7 +33,7 @@ namespace Serenity.Data
             row.FieldAssignedValue(this);
         }
 
-        public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, JsonSerializer serializer)
+        public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             writer.WriteValue(_getValue(row));
         }

@@ -24,7 +24,7 @@ namespace Serenity.Data
         /// <param name="toTable">To table.</param>
         /// <param name="alias">The alias.</param>
         /// <param name="onCriteria">The ON criteria.</param>
-        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         protected Join(IDictionary<string, Join> joins, string toTable, string alias, ICriteria onCriteria)
             : base(toTable, alias)
         {
@@ -66,13 +66,7 @@ namespace Serenity.Data
         /// <value>
         /// The ON criteria.
         /// </value>
-        public ICriteria OnCriteria
-        {
-            get
-            {
-                return onCriteria;
-            }
-        }
+        public ICriteria OnCriteria => onCriteria;
 
         /// <summary>
         /// Gets the referenced aliases.
@@ -80,13 +74,7 @@ namespace Serenity.Data
         /// <value>
         /// The referenced aliases.
         /// </value>
-        public HashSet<string> ReferencedAliases
-        {
-            get
-            {
-                return referencedAliases;
-            }
-        }
+        public HashSet<string> ReferencedAliases => referencedAliases;
 
         /// <summary>
         /// Gets the joins.
@@ -94,10 +82,7 @@ namespace Serenity.Data
         /// <value>
         /// The joins.
         /// </value>
-        public IDictionary<string, Join> Joins
-        {
-            get { return joins; }
-        }
+        public IDictionary<string, Join> Joins => joins;
 
         /// <summary>
         /// Gets or sets the type of the row.

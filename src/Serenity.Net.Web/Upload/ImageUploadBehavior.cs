@@ -30,7 +30,7 @@ namespace Serenity.Services
 
         public bool ActivateFor(IRow row)
         {
-            if (ReferenceEquals(null, Target))
+            if (Target is null)
                 return false;
 
             attr = Target.GetAttribute<ImageUploadEditorAttribute>();
@@ -52,7 +52,7 @@ namespace Serenity.Services
                 var originalNameField = row.FindFieldByPropertyName(attr.OriginalNameProperty) ??
                     row.FindField(attr.OriginalNameProperty);
 
-                if (ReferenceEquals(null, originalNameField))
+                if (originalNameField is null)
                     throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                         "Field '{0}' on row type '{1}' has a UploadEditor attribute but " +
                         "a field with OriginalNameProperty '{2}' is not found!",
@@ -69,7 +69,7 @@ namespace Serenity.Services
             {
                 format = row.GetType().Name;
                 if (format.EndsWith("Row", StringComparison.Ordinal))
-                    format = format.Substring(0, format.Length - 3);
+                    format = format[0..^3];
                 format += "/~";
             }
 
@@ -107,7 +107,7 @@ namespace Serenity.Services
                 var replaceField = row.FindFieldByPropertyName(actualName) ??
                     row.FindField(actualName);
 
-                if (ReferenceEquals(null, replaceField))
+                if (replaceField is null)
                 {
                     throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                         "Field '{0}' on row type '{1}' has a UploadEditor attribute that " +
@@ -172,7 +172,7 @@ namespace Serenity.Services
                     str = "_";
 
                 while (str.EndsWith(".", StringComparison.Ordinal))
-                    str = str.Substring(0, str.Length - 1) + "_";
+                    str = str[0..^1] + "_";
 
                 s = s.Replace(p.Key, str, StringComparison.Ordinal);
             }
@@ -192,8 +192,8 @@ namespace Serenity.Services
                 foreach (var field in replaceFields.Values)
                 {
                     if (!field.IsTableField() &&
-                        (!(query is ISqlQueryExtensible) ||
-                          ((ISqlQueryExtensible)query).GetSelectIntoIndex(field) <= 0))
+                        (query is not ISqlQueryExtensible ex ||
+                          ex.GetSelectIntoIndex(field) <= 0))
                         query.Select(field);
                 }
             }
@@ -233,7 +233,7 @@ namespace Serenity.Services
             if (!newFilename.StartsWith("temporary/", StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
-            if (!ReferenceEquals(null, originalNameField))
+            if (originalNameField is not null)
             {
                 var originalName = storage.GetOriginalName(newFilename).TrimToNull();
 
@@ -337,12 +337,14 @@ namespace Serenity.Services
 
             UploadPathHelper.CheckFileNameSecurity(temporaryFile);
 
-            var checker = new ImageChecker();
-            checker.MinWidth = attr.MinWidth;
-            checker.MaxWidth = attr.MaxWidth;
-            checker.MinHeight = attr.MinHeight;
-            checker.MaxHeight = attr.MaxHeight;
-            checker.MaxDataSize = attr.MaxSize;
+            var checker = new ImageChecker
+            {
+                MinWidth = attr.MinWidth,
+                MaxWidth = attr.MaxWidth,
+                MinHeight = attr.MinHeight,
+                MaxHeight = attr.MaxHeight,
+                MaxDataSize = attr.MaxSize
+            };
 
             Image image = null;
             try
@@ -410,14 +412,15 @@ namespace Serenity.Services
                 foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split(new char[] { ',' }))
                 {
                     var dims = sizeStr.ToUpperInvariant().Split(new char[] { 'X' });
-                    int w, h;
                     if (dims.Length != 2 ||
-                        !int.TryParse(dims[0], out w) ||
-                        !int.TryParse(dims[1], out h) ||
+                        !int.TryParse(dims[0], out int w) ||
+                        !int.TryParse(dims[1], out int h) ||
                         w < 0 ||
                         h < 0 ||
                         (w == 0 && h == 0))
-                        throw new ArgumentOutOfRangeException(nameof(thumbSizes));
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+                        throw new ArgumentOutOfRangeException(nameof(attr.ThumbSizes));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
                     using Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, Color.Empty);
                     string thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";

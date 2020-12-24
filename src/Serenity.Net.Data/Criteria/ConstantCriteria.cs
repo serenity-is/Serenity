@@ -8,7 +8,7 @@ namespace Serenity.Data
     /// that would be converted to its string representation in SQL,
     /// not a parameterized value.
     /// </summary>
-    /// <seealso cref="Serenity.Data.Criteria" />
+    /// <seealso cref="Criteria" />
     public class ConstantCriteria : Criteria
     {
         /// <summary>

@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// Determines that the attached property is the ID field of the table.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class IdPropertyAttribute : Attribute
     {

@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// Determines Time kind for a DateTime field.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class DateTimeKindAttribute : Attribute
     {
         /// <summary>

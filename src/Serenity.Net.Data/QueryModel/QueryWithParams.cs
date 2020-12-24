@@ -7,7 +7,7 @@ namespace Serenity.Data
     /// <summary>
     /// Base class for queries with params like SqlQuery, SqlUpdate, SqlInsert
     /// </summary>
-    /// <seealso cref="Serenity.Data.IQueryWithParams" />
+    /// <seealso cref="IQueryWithParams" />
     [DebuggerDisplay("{DebugText}")]
     public class QueryWithParams : IQueryWithParams
     {
@@ -158,10 +158,7 @@ namespace Serenity.Data
             return subQuery;
         }
 
-        ISqlDialect IQueryWithParams.Dialect
-        {
-            get { return dialect; }
-        }
+        ISqlDialect IQueryWithParams.Dialect => dialect;
 
         /// <summary>
         /// Gets the dialect (SQL server type / version) for query.
@@ -177,13 +174,7 @@ namespace Serenity.Data
         /// <value>
         ///   <c>true</c> if the dialect is overridden; otherwise, <c>false</c>.
         /// </value>
-        public bool IsDialectOverridden
-        {
-            get
-            {
-                return dialectOverridden;
-            }
-        }
+        public bool IsDialectOverridden => dialectOverridden;
 
         /// <summary>
         /// Gets the debug text.
@@ -191,12 +182,6 @@ namespace Serenity.Data
         /// <value>
         /// The debug text.
         /// </value>
-        public string DebugText
-        {
-            get
-            {
-                return SqlDebugDumper.Dump(ToString(), Params, dialect);
-            }
-        }
+        public string DebugText => SqlDebugDumper.Dump(ToString(), Params, dialect);
     }
 }

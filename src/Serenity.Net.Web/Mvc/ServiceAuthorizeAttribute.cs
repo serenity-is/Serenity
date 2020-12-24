@@ -7,6 +7,7 @@ using Serenity.Abstractions;
 
 namespace Serenity.Services
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
     {
         public void OnResourceExecuted(ResourceExecutedContext context)
@@ -56,10 +57,10 @@ namespace Serenity.Services
         protected ServiceAuthorizeAttribute(Type sourceType, params Type[] attributeTypes)
         {
             if (sourceType == null)
-                throw new ArgumentNullException("sourceType");
+                throw new ArgumentNullException(nameof(sourceType));
 
             if (attributeTypes.IsEmptyOrNull())
-                throw new ArgumentNullException("attributeTypes");
+                throw new ArgumentNullException(nameof(attributeTypes));
 
             PermissionAttributeBase attr = null;
             foreach (var attributeType in attributeTypes)
@@ -78,13 +79,13 @@ namespace Serenity.Services
 
             if (attr == null)
             {
-                throw new ArgumentOutOfRangeException("sourceType",
+                throw new ArgumentOutOfRangeException(nameof(sourceType),
                     "ServiceAuthorize attribute is created with source type of " +
                     sourceType.Name + ", but it has no " +
                     string.Join(" OR ", attributeTypes.Select(x => x.Name)) + " attribute(s)");
             }
 
-            this.Permission = attr.Permission;
+            Permission = attr.Permission;
         }
 
         public ServiceAuthorizeAttribute(Type sourceType)
@@ -95,7 +96,7 @@ namespace Serenity.Services
         public ServiceAuthorizeAttribute(object permission)
             : this()
         {
-            this.Permission = permission == null ? null : permission.ToString();
+            Permission = permission?.ToString();
         }
 
         public ServiceAuthorizeAttribute(object module, object permission)

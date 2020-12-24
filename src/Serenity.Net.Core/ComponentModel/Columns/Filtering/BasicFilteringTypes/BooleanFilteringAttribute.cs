@@ -3,7 +3,7 @@
     /// <summary>
     /// Sets filtering type to "Boolean"
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFilteringAttribute" />
+    /// <seealso cref="CustomFilteringAttribute" />
     public class BooleanFilteringAttribute : CustomFilteringAttribute
     {
         /// <summary>

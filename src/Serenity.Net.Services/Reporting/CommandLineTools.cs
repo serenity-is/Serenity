@@ -16,8 +16,8 @@ namespace Serenity.IO
         /// </summary>
         /// <param name="args">A list of strings for arguments, may not contain null, '\0', '\r', or '\n'</param>
         /// <returns>The combined list of escaped/quoted strings</returns>
-        /// <exception cref="System.ArgumentNullException">Raised when one of the arguments is null</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Raised if an argument contains '\0', '\r', or '\n'</exception>
+        /// <exception cref="ArgumentNullException">Raised when one of the arguments is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Raised if an argument contains '\0', '\r', or '\n'</exception>
         public static string EscapeArguments(params string[] args)
         {
             var arguments = new StringBuilder();

@@ -5,7 +5,7 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Defines a unique constraint on the field
     /// </summary>
-    /// <seealso cref="Serenity.Data.Mapping.SetFieldFlagsAttribute" />
+    /// <seealso cref="SetFieldFlagsAttribute" />
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class UniqueAttribute : SetFieldFlagsAttribute
     {

@@ -143,7 +143,7 @@ namespace Serenity.Web
 
                 if (scriptUrl.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
                 {
-                    var scriptName = scriptUrl.Substring(10);
+                    var scriptName = scriptUrl[10..];
                     scriptUrl = scriptManager.GetScriptInclude(scriptName);
                     scriptUrl = VirtualPathUtility.ToAbsolute(context, "~/DynJS.axd/" + scriptUrl);
                 }

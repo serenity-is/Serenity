@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Indicates that property should use lookup editor type of filtering
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFilteringAttribute" />
+    /// <seealso cref="CustomFilteringAttribute" />
     public partial class LookupFilteringAttribute : CustomFilteringAttribute
     {
         /// <summary>

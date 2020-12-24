@@ -5,8 +5,8 @@ namespace Serenity.Data.Mapping
     /// <summary>
     /// Adds a OUTER APPLY to the row
     /// </summary>
-    /// <seealso cref="System.Attribute" />
-    /// <seealso cref="Serenity.Data.Mapping.ISqlJoin" />
+    /// <seealso cref="Attribute" />
+    /// <seealso cref="ISqlJoin" />
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class OuterApplyAttribute : Attribute, ISqlJoin
     {

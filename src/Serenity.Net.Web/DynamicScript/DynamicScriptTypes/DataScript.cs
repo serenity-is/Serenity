@@ -20,7 +20,7 @@ namespace Serenity.Web
             this.key = key;
         }
 
-        public string ScriptName { get { return "RemoteData." + key; } }
+        public string ScriptName => "RemoteData." + key;
 
         public override string GetScript()
         {

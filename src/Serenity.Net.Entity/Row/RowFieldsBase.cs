@@ -673,25 +673,13 @@ namespace Serenity.Data
             }
         }
 
-        public string TableName
-        {
-            get { return tableName; }
-        }
+        public string TableName => tableName;
 
-        public string Database
-        {
-            get { return database; }
-        }
+        public string Database => database;
 
-        public string Schema
-        {
-            get { return schema; }
-        }
+        public string Schema => schema;
 
-        public string TableOnly
-        {
-            get { return tableOnly; }
-        }
+        public string TableOnly => tableOnly;
 
         public string FieldPrefix
         {
@@ -705,10 +693,7 @@ namespace Serenity.Data
             set { localTextPrefix = value; }
         }
 
-        public string ModuleIdentifier
-        {
-            get { return moduleIdentifier; }
-        }
+        public string ModuleIdentifier => moduleIdentifier;
 
         public string RowIdentifier
         {
@@ -722,12 +707,9 @@ namespace Serenity.Data
             }
         }
 
-        public string ConnectionKey
-        {
-            get { return connectionKey; }
-        }
+        public string ConnectionKey => connectionKey;
 
-        public ISqlDialect Dialect { get => dialect; }
+        public ISqlDialect Dialect => dialect;
 
         public string GenerationKey
         {
@@ -893,29 +875,14 @@ namespace Serenity.Data
                 return null;
         }
 
-        public IDictionary<string, Join> Joins
-        {
-            get { return joins; }
-        }
+        public IDictionary<string, Join> Joins => joins;
 
-        string IAlias.Name
-        {
-            get { return alias; }
-        }
+        string IAlias.Name => alias;
 
-        string IAlias.NameDot
-        {
-            get { return aliasDot; }
-        }
+        string IAlias.NameDot => aliasDot;
 
-        string IAlias.Table
-        {
-            get { return tableName; }
-        }
+        string IAlias.Table => tableName;
 
-        public string AliasName
-        {
-            get { return alias; }
-        }
+        public string AliasName => alias;
     }
 }

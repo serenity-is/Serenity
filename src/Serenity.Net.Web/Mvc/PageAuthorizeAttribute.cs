@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Serenity.Web
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class PageAuthorizeAttribute : TypeFilterAttribute
     {
         public PageAuthorizeAttribute()
@@ -16,9 +17,9 @@ namespace Serenity.Web
             Arguments = new[] { this };
         }
 
-        private class PageAuthorizeFilter : Attribute, IResourceFilter
+        private class PageAuthorizeFilter : IResourceFilter
         {
-            PageAuthorizeAttribute attr;
+            readonly PageAuthorizeAttribute attr;
 
             public PageAuthorizeFilter(PageAuthorizeAttribute attr)
             {
@@ -48,10 +49,10 @@ namespace Serenity.Web
             : this()
         {
             if (sourceType == null)
-                throw new ArgumentNullException("sourceType");
+                throw new ArgumentNullException(nameof(sourceType));
 
             if (attributeTypes.IsEmptyOrNull())
-                throw new ArgumentNullException("attributeTypes");
+                throw new ArgumentNullException(nameof(attributeTypes));
 
             PermissionAttributeBase attr = null;
             foreach (var attributeType in attributeTypes)
@@ -70,13 +71,13 @@ namespace Serenity.Web
 
             if (attr == null)
             {
-                throw new ArgumentOutOfRangeException("sourceType",
+                throw new ArgumentOutOfRangeException(nameof(sourceType),
                     "PageAuthorize attribute is created with source type of " +
                     sourceType.Name + ", but it has no " +
                     string.Join(" OR ", attributeTypes.Select(x => x.Name)) + " attribute(s)");
             }
 
-            this.Permission = attr.Permission;
+            Permission = attr.Permission;
         }
 
         public PageAuthorizeAttribute(Type sourceType)
@@ -87,7 +88,7 @@ namespace Serenity.Web
         public PageAuthorizeAttribute(object permission)
             : this()
         {
-            this.Permission = permission == null ? null : permission.ToString();
+            Permission = permission?.ToString();
         }
 
         public PageAuthorizeAttribute(object module, object permission)

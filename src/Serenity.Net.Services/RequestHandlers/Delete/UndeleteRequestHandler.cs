@@ -28,10 +28,7 @@ namespace Serenity.Services
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        protected IDbConnection Connection
-        {
-            get { return UnitOfWork.Connection; }
-        }
+        protected IDbConnection Connection => UnitOfWork.Connection;
 
         protected virtual void OnBeforeUndelete()
         {

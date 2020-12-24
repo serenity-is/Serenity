@@ -3,7 +3,7 @@
     /// <summary>
     /// Sets editor type to "MultipleImageUpload" while allowing non-image files.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.ImageUploadEditorAttribute" />
+    /// <seealso cref="ImageUploadEditorAttribute" />
     public class MultipleFileUploadEditorAttribute : ImageUploadEditorAttribute
     {
         /// <summary>

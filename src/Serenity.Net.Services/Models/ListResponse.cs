@@ -5,7 +5,7 @@ namespace Serenity.Services
 {
     public class ListResponse<T> : ServiceResponse, IListResponse
     {
-        IList IListResponse.Entities { get { return Entities; } }
+        IList IListResponse.Entities => Entities;
 
         public List<T> Entities { get; set; }
         public List<object> Values { get; set; }

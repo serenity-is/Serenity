@@ -48,10 +48,7 @@ namespace Serenity.PropertyGrid
             }
         }
 
-        public override int Priority
-        {
-            get { return 15; }
-        }
+        public override int Priority => 15;
 
         private bool IsEnabled()
         {

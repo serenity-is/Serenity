@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Sets column width
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class WidthAttribute : Attribute
     {
         /// <summary>

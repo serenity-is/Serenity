@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Base class which other custom filtering types derive from.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.FilteringTypeAttribute" />
+    /// <seealso cref="FilteringTypeAttribute" />
     public abstract class CustomFilteringAttribute : FilteringTypeAttribute
     {
         private Dictionary<string, object> options;

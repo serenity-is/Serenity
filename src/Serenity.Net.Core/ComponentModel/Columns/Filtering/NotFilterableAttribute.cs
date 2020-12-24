@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Indicates that the field this attribute is placed on is not filterable.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class NotFilterableAttribute : Attribute
     {
         /// <summary>

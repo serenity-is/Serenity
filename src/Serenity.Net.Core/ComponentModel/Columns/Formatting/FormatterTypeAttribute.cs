@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// <summary>
     /// Sets formatter type.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class FormatterTypeAttribute : Attribute
     {
         /// <summary>

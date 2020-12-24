@@ -9,7 +9,7 @@ namespace Serenity.ComponentModel
     /// the value from the entity, but it doesn't get
     /// written back to save entity.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class OneWayAttribute : Attribute
     {
 

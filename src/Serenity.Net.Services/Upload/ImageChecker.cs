@@ -162,8 +162,10 @@ namespace Serenity.Web
         /// <seealso cref="CheckStream(Stream, bool, out Image)"/>
         public ImageCheckResult CheckStream(Stream inputStream)
         {
-            Image image;
-            return CheckStream(inputStream, false, out image);
+            var result = CheckStream(inputStream, false, out Image image);
+            if (image != null)
+                image.Dispose();
+            return result;
         }
 
         /// <summary>

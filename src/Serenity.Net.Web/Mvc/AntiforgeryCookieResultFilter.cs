@@ -8,7 +8,7 @@ namespace Serenity.Services
 {
     public class AntiforgeryCookieResultFilterAttribute : ResultFilterAttribute
     {
-        private IAntiforgery antiforgery;
+        private readonly IAntiforgery antiforgery;
 
         public AntiforgeryCookieResultFilterAttribute(IAntiforgery antiforgery)
         {

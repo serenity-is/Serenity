@@ -6,7 +6,7 @@ namespace Serenity.Data.Schema
     /// <summary>
     /// Oracle metadata provider.
     /// </summary>
-    /// <seealso cref="Serenity.Data.Schema.ISchemaProvider" />
+    /// <seealso cref="ISchemaProvider" />
     public class OracleSchemaProvider : ISchemaProvider
     {
         /// <summary>
@@ -15,7 +15,7 @@ namespace Serenity.Data.Schema
         /// <value>
         /// The default schema.
         /// </value>
-        public string DefaultSchema { get { return null; } }
+        public string DefaultSchema => null;
 
         /// <summary>
         /// Gets the field infos.

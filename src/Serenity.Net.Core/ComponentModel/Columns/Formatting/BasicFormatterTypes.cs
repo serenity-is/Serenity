@@ -3,7 +3,7 @@
     /// <summary>
     /// Sets formatting type to "Boolean"
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFormatterAttribute" />
+    /// <seealso cref="CustomFormatterAttribute" />
     public class BooleanFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
@@ -42,7 +42,7 @@
     /// <summary>
     /// Sets formatting type to "Checkbox"
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFormatterAttribute" />
+    /// <seealso cref="CustomFormatterAttribute" />
     public class CheckboxFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
@@ -57,7 +57,7 @@
     /// <summary>
     /// Sets formatting type to "Date"
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFormatterAttribute" />
+    /// <seealso cref="CustomFormatterAttribute" />
     public class DateFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
@@ -84,7 +84,7 @@
     /// <summary>
     /// Sets formatting type to "DateTime".
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFormatterAttribute" />
+    /// <seealso cref="CustomFormatterAttribute" />
     public class DateTimeFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
@@ -111,7 +111,7 @@
     /// <summary>
     /// Sets formatting type to "Enum".
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFormatterAttribute" />
+    /// <seealso cref="CustomFormatterAttribute" />
     public class EnumFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
@@ -140,7 +140,7 @@
     /// <summary>
     /// Sets formatting type to "FileDownload".
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFormatterAttribute" />
+    /// <seealso cref="CustomFormatterAttribute" />
     public class FileDownloadFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
@@ -180,7 +180,7 @@
     /// <summary>
     /// Sets formatting type to "Number"
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFormatterAttribute" />
+    /// <seealso cref="CustomFormatterAttribute" />
     public class NumberFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
@@ -207,7 +207,7 @@
     /// <summary>
     /// Sets formatting type to "Minute" which formats an integer value in HH:mm format.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFormatterAttribute" />
+    /// <seealso cref="CustomFormatterAttribute" />
     public class MinuteFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
@@ -234,7 +234,7 @@
     /// <summary>
     /// Sets formatting type to "Url"
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomFormatterAttribute" />
+    /// <seealso cref="CustomFormatterAttribute" />
     public class UrlFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>

@@ -5,8 +5,8 @@ namespace Serenity.Web
 {
     public class TemplateScript : DynamicScript, INamedDynamicScript
     {
-        private string key;
-        private Func<string> getTemplate;
+        private readonly string key;
+        private readonly Func<string> getTemplate;
 
         public TemplateScript(string key, Func<string> getTemplate)
         {
@@ -14,7 +14,7 @@ namespace Serenity.Web
             this.key = key ?? throw new ArgumentNullException(nameof(key));
         }
 
-        public string ScriptName { get { return "Template." + key; } }
+        public string ScriptName => "Template." + key;
 
         public override string GetScript()
         {

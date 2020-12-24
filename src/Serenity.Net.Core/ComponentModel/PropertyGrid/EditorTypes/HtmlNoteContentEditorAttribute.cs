@@ -4,7 +4,7 @@
     /// Indicates that the target property should use a "HtmlNoteContent" editor.
     /// This is generally a CK editor with only basic functionality for notes enabled.
     /// </summary>
-    /// <seealso cref="Serenity.ComponentModel.CustomEditorAttribute" />
+    /// <seealso cref="CustomEditorAttribute" />
     public partial class HtmlNoteContentEditorAttribute : CustomEditorAttribute
     {
         /// <summary>

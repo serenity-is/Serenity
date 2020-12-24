@@ -19,10 +19,7 @@ namespace Serenity.PropertyGrid
         {
         }
 
-        public virtual int Priority
-        {
-            get { return 50; }
-        }
+        public virtual int Priority => 50;
 
         public Type Type { get; set; }
         public IRow BasedOnRow { get; set; }

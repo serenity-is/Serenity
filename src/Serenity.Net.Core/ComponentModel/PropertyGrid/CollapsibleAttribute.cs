@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel
     /// Used to specify a target is collapsible.
     /// Commonly used with form categories to make them collapsible.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class CollapsibleAttribute : Attribute
     {
         /// <summary>

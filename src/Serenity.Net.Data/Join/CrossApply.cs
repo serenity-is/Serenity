@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// CROSS APPLY type of join
     /// </summary>
-    /// <seealso cref="Serenity.Data.Join" />
+    /// <seealso cref="Join" />
     public class CrossApply : Join
     {
         /// <summary>

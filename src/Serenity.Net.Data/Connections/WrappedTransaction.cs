@@ -5,7 +5,7 @@ namespace Serenity.Data
     /// <summary>
     /// Wraps a transaction instance to add current transaction support for the wrapped connection.
     /// </summary>
-    /// <seealso cref="System.Data.IDbTransaction" />
+    /// <seealso cref="IDbTransaction" />
     public class WrappedTransaction : IDbTransaction
     {
         private WrappedConnection wrappedConnection;
@@ -23,24 +23,15 @@ namespace Serenity.Data
 
         /// <summary>
         ///   Returns the connection associated with this transaction.</summary>
-        public IDbConnection Connection
-        {
-            get { return wrappedConnection; }
-        }
+        public IDbConnection Connection => wrappedConnection;
 
         /// <summary>
         ///   Returns the actual transaction.</summary>
-        public IDbTransaction ActualTransaction
-        {
-            get { return actualTransaction; }
-        }
+        public IDbTransaction ActualTransaction => actualTransaction;
 
         /// <summary>
         ///   Returns the transaction isolation level</summary>
-        public IsolationLevel IsolationLevel
-        {
-            get { return actualTransaction.IsolationLevel; }
-        }
+        public IsolationLevel IsolationLevel => actualTransaction.IsolationLevel;
 
         /// <summary>
         ///   Commits actual transaction and sets wrapped transaction for related connection to null.</summary>
