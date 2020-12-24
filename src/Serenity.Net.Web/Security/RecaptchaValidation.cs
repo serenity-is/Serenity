@@ -35,18 +35,16 @@ namespace Serenity.Web
             using (var requestStream = Task.Run(() => webRequest.GetRequestStreamAsync()).Result)
                 requestStream.Write(postDataBuffer, 0, postDataBuffer.Length);
 
-            using (var webResponse = Task.Run(() => webRequest.GetResponseAsync()).Result)
-            { 
-                string responseJson;
-                using (var sr = new StreamReader(webResponse.GetResponseStream()))
-                    responseJson = sr.ReadToEnd();
+            using var webResponse = Task.Run(() => webRequest.GetResponseAsync()).Result;
+            string responseJson;
+            using (var sr = new StreamReader(webResponse.GetResponseStream()))
+                responseJson = sr.ReadToEnd();
 
-                var response = JSON.ParseTolerant<RecaptchaResponse>(responseJson);
-                if (response == null ||
-                    !response.Success)
-                {
-                    throw new ValidationError("Recaptcha", localizer.Get("Validation.Recaptcha"));
-                }
+            var response = JSON.ParseTolerant<RecaptchaResponse>(responseJson);
+            if (response == null ||
+                !response.Success)
+            {
+                throw new ValidationError("Recaptcha", localizer.Get("Validation.Recaptcha"));
             }
         }
 

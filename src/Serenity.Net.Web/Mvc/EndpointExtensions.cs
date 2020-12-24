@@ -70,8 +70,8 @@ namespace Serenity.Services
             try
             {
                 var factory = controller.HttpContext.RequestServices.GetRequiredService<ISqlConnections>();
-                using (var connection = factory.NewByKey(connectionKey))
-                    response = handler(connection);
+                using var connection = factory.NewByKey(connectionKey);
+                response = handler(connection);
             }
             catch (Exception exception)
             {
@@ -92,12 +92,10 @@ namespace Serenity.Services
             {
                 var factory = controller.HttpContext.RequestServices.GetRequiredService<ISqlConnections>();
 
-                using (var connection = factory.NewByKey(connectionKey))
-                using (var uow = new UnitOfWork(connection))
-                {
-                    response = handler(uow);
-                    uow.Commit();
-                }
+                using var connection = factory.NewByKey(connectionKey);
+                using var uow = new UnitOfWork(connection);
+                response = handler(uow);
+                uow.Commit();
             }
             catch (Exception exception)
             {

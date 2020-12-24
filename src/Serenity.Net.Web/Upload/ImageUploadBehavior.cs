@@ -393,18 +393,14 @@ namespace Serenity.Services
                     ((attr.ScaleWidth > 0 && (attr.ScaleSmaller || checker.Width > attr.ScaleWidth)) ||
                         (attr.ScaleHeight > 0 && (attr.ScaleSmaller || checker.Height > attr.ScaleHeight))))
                 {
-                    using (Image scaledImage = ThumbnailGenerator.Generate(
-                        image, attr.ScaleWidth, attr.ScaleHeight, attr.ScaleMode, Color.Empty))
-                    {
-                        temporaryFile = baseFile + ".jpg";
-                        fs.Close();
-                        using (var ms = new MemoryStream())
-                        {
-                            scaledImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                            ms.Seek(0, SeekOrigin.Begin);
-                            temporaryFile = storage.WriteFile(temporaryFile, ms, false);
-                        }
-                    }
+                    using Image scaledImage = ThumbnailGenerator.Generate(
+                        image, attr.ScaleWidth, attr.ScaleHeight, attr.ScaleMode, Color.Empty);
+                    temporaryFile = baseFile + ".jpg";
+                    fs.Close();
+                    using var ms = new MemoryStream();
+                    scaledImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    temporaryFile = storage.WriteFile(temporaryFile, ms, false);
                 }
 
                 var thumbSizes = attr.ThumbSizes.TrimToNull();
@@ -423,16 +419,12 @@ namespace Serenity.Services
                         (w == 0 && h == 0))
                         throw new ArgumentOutOfRangeException(nameof(thumbSizes));
 
-                    using (Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, Color.Empty))
-                    {
-                        string thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
-                        using (var ms = new MemoryStream())
-                        {
-                            thumbImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                            ms.Seek(0, SeekOrigin.Begin);
-                            storage.WriteFile(thumbFile, ms, false);
-                        }
-                    }
+                    using Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, Color.Empty);
+                    string thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
+                    using var ms = new MemoryStream();
+                    thumbImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    storage.WriteFile(thumbFile, ms, false);
                 }
             }
             finally

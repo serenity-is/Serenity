@@ -152,35 +152,33 @@ namespace Serenity.Web
 
                     if (ThumbWidth > 0 || ThumbHeight > 0)
                     {
-                        using (Image thumbImage =
-                            ThumbnailGenerator.Generate(image, ThumbWidth, ThumbHeight, ThumbScaleMode, ThumbBackColor))
+                        using Image thumbImage =
+                            ThumbnailGenerator.Generate(image, ThumbWidth, ThumbHeight, ThumbScaleMode, ThumbBackColor);
+                        var thumbFile = UploadPathHelper.GetThumbnailName(TemporaryFile);
+
+                        using (var ms = new MemoryStream())
                         {
-                            var thumbFile = UploadPathHelper.GetThumbnailName(TemporaryFile);
-
-                            using (var ms = new MemoryStream())
+                            if (ThumbQuality != 0)
                             {
-                                if (ThumbQuality != 0)
-                                {
-                                    var p = new EncoderParameters(1);
-                                    p.Param[0] = new EncoderParameter(Encoder.Quality, ThumbQuality);
+                                var p = new EncoderParameters(1);
+                                p.Param[0] = new EncoderParameter(Encoder.Quality, ThumbQuality);
 
-                                    ImageCodecInfo jpegCodec = null;
-                                    ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
-                                    // Find the correct image codec 
-                                    for (int i = 0; i < codecs.Length; i++)
-                                        if (codecs[i].MimeType == "image/jpeg")
-                                            jpegCodec = codecs[i];
+                                ImageCodecInfo jpegCodec = null;
+                                ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
+                                // Find the correct image codec 
+                                for (int i = 0; i < codecs.Length; i++)
+                                    if (codecs[i].MimeType == "image/jpeg")
+                                        jpegCodec = codecs[i];
 
-                                    thumbImage.Save(ms, jpegCodec, p);
-                                }
-                                else
-                                    thumbImage.Save(ms, ImageFormat.Jpeg);
-                                ms.Seek(0, SeekOrigin.Begin);
-                                ThumbFile = storage.WriteFile(thumbFile, ms, autoRename: false);
+                                thumbImage.Save(ms, jpegCodec, p);
                             }
-                            ThumbHeight = thumbImage.Width;
-                            ThumbWidth = thumbImage.Height;
+                            else
+                                thumbImage.Save(ms, ImageFormat.Jpeg);
+                            ms.Seek(0, SeekOrigin.Begin);
+                            ThumbFile = storage.WriteFile(thumbFile, ms, autoRename: false);
                         }
+                        ThumbHeight = thumbImage.Width;
+                        ThumbWidth = thumbImage.Height;
                     }
 
                     return true;

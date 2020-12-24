@@ -56,12 +56,10 @@ namespace Serenity.Web
 
         private static string GetFileSHA1(string filePath)
         {
-            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 120000))
-            {
-                var md5 = MD5.Create();
-                byte[] hash = md5.ComputeHash(fs);
-                return WebEncoders.Base64UrlEncode(hash);
-            }
+            using FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 120000);
+            var md5 = MD5.Create();
+            byte[] hash = md5.ComputeHash(fs);
+            return WebEncoders.Base64UrlEncode(hash);
         }
 
         public string ResolvePath(PathString pathBase, string contentPath)

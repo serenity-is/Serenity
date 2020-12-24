@@ -54,17 +54,13 @@ namespace Serenity.Services
                     if (filterContext.HttpContext.Request.Body.CanSeek)
                         filterContext.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
 
-                    using (var sr = new StreamReader(filterContext.HttpContext.Request.Body,
+                    using var sr = new StreamReader(filterContext.HttpContext.Request.Body,
                         System.Text.Encoding.GetEncoding((string)filterContext.HttpContext
-                            .Request.Headers["Content-Encoding"] ?? "utf-8"), true, 4096, true))
-                    {
-                        var js = JsonSerializer.Create(JsonSettings.Strict);
-                        using (var jr = new JsonTextReader(sr))
-                        {
-                            var obj = js.Deserialize(jr, prm.ParameterType);
-                            filterContext.ActionArguments[prm.Name] = obj;
-                        }
-                    }
+                            .Request.Headers["Content-Encoding"] ?? "utf-8"), true, 4096, true);
+                    var js = JsonSerializer.Create(JsonSettings.Strict);
+                    using var jr = new JsonTextReader(sr);
+                    var obj = js.Deserialize(jr, prm.ParameterType);
+                    filterContext.ActionArguments[prm.Name] = obj;
                 }
                 else 
                 {

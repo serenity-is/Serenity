@@ -39,19 +39,17 @@ namespace Serenity.Web
 
             viewData.Model = model;
 
-            using (StringWriter sw = new StringWriter())
-            {
-                var engine = serviceProvider.GetService<ICompositeViewEngine>();
+            using StringWriter sw = new StringWriter();
+            var engine = serviceProvider.GetService<ICompositeViewEngine>();
 
-                var viewContext = new ViewContext(actionContext, viewEngineResult.View, viewData, 
-                    new TempDataDictionary(actionContext.HttpContext, serviceProvider.GetService<ITempDataProvider>()), 
-                        sw, new HtmlHelperOptions());
+            var viewContext = new ViewContext(actionContext, viewEngineResult.View, viewData,
+                new TempDataDictionary(actionContext.HttpContext, serviceProvider.GetService<ITempDataProvider>()),
+                    sw, new HtmlHelperOptions());
 
-                var t = viewEngineResult.View.RenderAsync(viewContext);
-                t.Wait();
+            var t = viewEngineResult.View.RenderAsync(viewContext);
+            t.Wait();
 
-                return sw.GetStringBuilder().ToString();
-            }
+            return sw.GetStringBuilder().ToString();
         }
     }
 }

@@ -55,16 +55,14 @@ namespace Serenity.Web
 
                 if (compressedContent == null)
                 {
-                    using (var cs = new MemoryStream(content.Length))
+                    using var cs = new MemoryStream(content.Length);
+                    using (var gz = new GZipStream(cs, CompressionMode.Compress))
                     {
-                        using (var gz = new GZipStream(cs, CompressionMode.Compress))
-                        {
-                            gz.Write(content, 0, content.Length);
-                            gz.Flush();
-                        }
-
-                        compressedContent = cs.ToArray();
+                        gz.Write(content, 0, content.Length);
+                        gz.Flush();
                     }
+
+                    compressedContent = cs.ToArray();
                 }
 
                 return compressedContent;
