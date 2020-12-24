@@ -6,7 +6,8 @@ namespace Serenity.Data
     /// Wraps a connection to add current transaction and dialect support.
     /// </summary>
     /// <seealso cref="IDbConnection" />
-    public class WrappedConnection : IDbConnection
+    public class WrappedConnection : IDbConnection, IHasActualConnection, IHasCommandTimeout, 
+        IHasCurrentTransaction, IHasDialect, IHasOpenedOnce
     {
         private readonly IDbConnection actualConnection;
         private bool openedOnce;
@@ -58,7 +59,7 @@ namespace Serenity.Data
         /// <value>
         /// The current transaction.
         /// </value>
-        public WrappedTransaction CurrentTransaction => currentTransaction;
+        public IDbTransaction CurrentTransaction => currentTransaction;
 
         /// <summary>
         /// Begins a database transaction with the specified <see cref="T:System.Data.IsolationLevel"></see> value.

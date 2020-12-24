@@ -46,8 +46,9 @@ namespace Serenity.Data
 
             if (connection.State != ConnectionState.Open)
             {
-                if (connection is WrappedConnection wrapped && wrapped.OpenedOnce)
-                    throw new InvalidOperationException("Can't auto open a closed connection that was previously open!");
+                if (connection is IHasOpenedOnce hoo && hoo.OpenedOnce)
+                    throw new InvalidOperationException("Can't auto open a closed connection " +
+                        "that was previously open!");
 
                 connection.Open();
             }
@@ -66,22 +67,23 @@ namespace Serenity.Data
         /// <returns>The current transaction for a connection</returns>
         public static IDbTransaction GetCurrentActualTransaction(this IDbConnection connection)
         {
-            if (connection is WrappedConnection wrapped && wrapped.CurrentTransaction != null)
-                return wrapped.CurrentTransaction.ActualTransaction;
+            if (connection is IHasCurrentTransaction hct &&
+                hct.CurrentTransaction is IHasActualTransaction hat)
+                return hat.ActualTransaction;
 
             return null;
         }
 
         /// <summary>Sets the default command timeout for given connection. 
-        /// Only works with WrappedConnection instances, which are usually
+        /// Only works with IHasCommandTimeout (WrappedConnection) instances, which are usually
         /// created by SqlConnections.NewXyz methods.</summary>
         /// <param name="connection">The connection.</param>
         /// <param name="timeout">The timeout value.</param>
         /// <exception cref="ArgumentOutOfRangeException">Connection is not a WrappedConnection.</exception>
         public static void SetCommandTimeout(this IDbConnection connection, int? timeout)
         {
-            if (connection is WrappedConnection wrapped)
-                wrapped.CommandTimeout = timeout;
+            if (connection is IHasCommandTimeout hct)
+                hct.CommandTimeout = timeout;
             else
                 throw new ArgumentOutOfRangeException(nameof(connection));
         }
@@ -93,10 +95,10 @@ namespace Serenity.Data
         /// <returns>The sql dialect.</returns>
         public static ISqlDialect GetDialect(this IDbConnection connection)
         {
-            if (!(connection is WrappedConnection wrapped))
+            if (!(connection is IHasDialect hasDialect))
                 return SqlSettings.DefaultDialect;
 
-            return wrapped.Dialect ?? SqlSettings.DefaultDialect;
+            return hasDialect.Dialect ?? SqlSettings.DefaultDialect;
         }
     }
 }

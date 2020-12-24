@@ -233,8 +233,8 @@ namespace Serenity.Data
         {
             if (exception is SqlException ex && ex.Number == 10054)
             {
-                if (connection is WrappedConnection wrapped &&
-                    (wrapped.OpenedOnce || wrapped.CurrentTransaction != null))
+                if ((connection is IHasOpenedOnce hoo && hoo.OpenedOnce) ||
+                    (connection is IHasCurrentTransaction hct && hct.CurrentTransaction != null))
                     return false;
 
                 SqlConnection.ClearAllPools();
