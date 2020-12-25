@@ -414,7 +414,7 @@ export let delegateRemove = (delegate1: any, delegate2: any) => {
 
 export let isEnum = (type: any) => {
     return typeof type !== "function" &&
-        (type as TypeExt).__interface == null;
+        (type as TypeExt).__interface === null;
 };
 
 export function initFormType(typ: Function, nameWidgetPairs: any[]) {
