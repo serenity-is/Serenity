@@ -838,7 +838,6 @@ export class RemoteView<TEntity> {
                 accumulatorInfo.body +
                 "}"
             );
-            fn.displayName = fn.name = "compiledAccumulatorLoop";
             return fn;
         }
 
