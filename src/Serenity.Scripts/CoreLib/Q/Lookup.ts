@@ -1,6 +1,4 @@
-﻿import { isEmptyOrNull } from "./Strings";
-
-export interface LookupOptions<TItem> {
+﻿export interface LookupOptions<TItem> {
     idField?: string;
     parentIdField?: string;
     textField?: string;
@@ -48,7 +46,7 @@ export class Lookup<TItem> {
                 this.items.push(k);
         }
         var idField = this.idField;
-        if (isEmptyOrNull(idField)) {
+        if (idField) {
             for (var r of this.items) {
                 var v = r[idField];
                 if (v != null) {
