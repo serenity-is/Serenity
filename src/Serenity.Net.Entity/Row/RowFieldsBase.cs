@@ -569,9 +569,6 @@ namespace Serenity.Data
 
             foreach (var field in this)
             {
-                if (field.CustomAttributes == null)
-                    continue;
-
                 foreach (var attr in field.CustomAttributes)
                 {
                     if (attrType.IsAssignableFrom(attr.GetType()))
@@ -606,7 +603,8 @@ namespace Serenity.Data
         private static TAttr GetFieldAttr<TAttr>(Field x)
             where TAttr : Attribute
         {
-            return x.CustomAttributes.FirstOrDefault(z => typeof(TAttr).IsAssignableFrom(z.GetType())) as TAttr;
+            return x.CustomAttributes.FirstOrDefault(z => 
+                typeof(TAttr).IsAssignableFrom(z.GetType())) as TAttr;
         }
 
         private static Delegate CreateFieldGetMethod(FieldInfo fieldInfo)
@@ -740,9 +738,6 @@ namespace Serenity.Data
                     var list = new List<Tuple<Field, int>>();
                     foreach (var field in this)
                     {
-                        if (field.CustomAttributes == null)
-                            continue;
-
                         var sortAttr = field.CustomAttributes
                             .OfType<SortOrderAttribute>().FirstOrDefault();
 

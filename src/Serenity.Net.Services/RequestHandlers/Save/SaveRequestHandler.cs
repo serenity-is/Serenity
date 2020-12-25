@@ -403,9 +403,6 @@ namespace Serenity.Services
                 if (!Row.IsAssigned(field))
                     continue;
 
-                if (field.CustomAttributes == null)
-                    continue;
-
                 var validators = field.CustomAttributes.OfType<ICustomValidator>();
                 foreach (var validator in validators)
                 {

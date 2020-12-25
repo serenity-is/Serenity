@@ -43,6 +43,7 @@ namespace Serenity.Data
             minSelectLevel = SelectLevel.Auto;
             naturalOrder = 0;
             this.caption = caption;
+            customAttributes = Array.Empty<object>();
             if (fields != null)
                 fields.Add(this);
         }
@@ -119,7 +120,7 @@ namespace Serenity.Data
             {
                 if (customAttributes != value)
                 {
-                    customAttributes = value;
+                    customAttributes = value ?? Array.Empty<object>();
                     if (fields != null)
                         fields.byAttribute = null;
                 }

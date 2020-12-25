@@ -54,8 +54,7 @@ namespace Serenity.PropertyGrid
             var attrList = new List<TAttribute>();
             attrList.AddRange(Property.GetCustomAttributes<TAttribute>());
 
-            if (BasedOnField is object &&
-                BasedOnField.CustomAttributes != null)
+            if (BasedOnField is object)
             {
                 foreach (var a in BasedOnField.CustomAttributes)
                     if (typeof(TAttribute).IsAssignableFrom(a.GetType()))

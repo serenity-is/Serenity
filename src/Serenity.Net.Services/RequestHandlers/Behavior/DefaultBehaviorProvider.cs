@@ -71,9 +71,6 @@ namespace Serenity.Services
 
             foreach (var field in row.GetFields())
             {
-                if (field.CustomAttributes == null)
-                    continue;
-
                 foreach (var attr in field.CustomAttributes.OfType<AddBehaviorAttribute>())
                 {
                     if (behaviorType.IsAssignableFrom(attr.Value) &&

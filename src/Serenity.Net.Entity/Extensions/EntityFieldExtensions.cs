@@ -97,12 +97,9 @@ namespace Serenity.Data
             if (field is null)
                 return null;
 
-            if (field.CustomAttributes != null)
-            {
-                foreach (var a in field.CustomAttributes)
-                    if (typeof(TAttribute).IsAssignableFrom(a.GetType()))
-                        return (TAttribute)a;
-            }
+            foreach (var a in field.CustomAttributes)
+                if (typeof(TAttribute).IsAssignableFrom(a.GetType()))
+                    return (TAttribute)a;
 
             return null;
         }
@@ -111,15 +108,12 @@ namespace Serenity.Data
         public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this Field field)
             where TAttribute : Attribute
         {
-            if (field is null)
+            if (field is null || field.CustomAttributes.Length == 0)
                 yield break;
 
-            if (field.CustomAttributes != null)
-            {
-                foreach (var a in field.CustomAttributes)
-                    if (typeof(TAttribute).IsAssignableFrom(a.GetType()))
-                        yield return (TAttribute)a;
-            }
+            foreach (var a in field.CustomAttributes)
+                if (typeof(TAttribute).IsAssignableFrom(a.GetType()))
+                    yield return (TAttribute)a;
 
             yield break;
         }

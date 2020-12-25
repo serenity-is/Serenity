@@ -174,9 +174,6 @@ namespace Serenity.Services
             {
                 var fields = Row.GetFields().Where(x =>
                 {
-                    if (x.CustomAttributes == null)
-                        return false;
-
                     var attr = x.CustomAttributes.OfType<QuickSearchAttribute>()
                         .FirstOrDefault();
 
@@ -199,8 +196,7 @@ namespace Serenity.Services
             var field = Row.FindField(containsField) ?? Row.FindFieldByPropertyName(containsField);
             if (field is null ||
                 ((field.MinSelectLevel == SelectLevel.Never) &&
-                    (field.CustomAttributes == null ||
-                     !field.CustomAttributes.OfType<QuickSearchAttribute>().Any())))
+                    (!field.CustomAttributes.OfType<QuickSearchAttribute>().Any())))
             {
                 throw new ArgumentOutOfRangeException("containsField");
             }
@@ -277,7 +273,7 @@ namespace Serenity.Services
         protected virtual void ApplyFieldContainsText(Field field, string containsText, long? id,
             ref BaseCriteria criteria, ref bool orFalse)
         {
-            var attr = field.CustomAttributes?.OfType<QuickSearchAttribute>().FirstOrDefault();
+            var attr = field.CustomAttributes.OfType<QuickSearchAttribute>().FirstOrDefault();
             var searchType = attr == null ? SearchType.Auto : attr.SearchType;
             var numericOnly = attr?.NumericOnly;
 

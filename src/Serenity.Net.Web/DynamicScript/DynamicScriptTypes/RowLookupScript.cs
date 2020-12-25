@@ -36,7 +36,6 @@ namespace Serenity.Web
             var list = new List<object>();
 
             foreach (var f in row.GetFields().Where(x => 
-                x.CustomAttributes != null && 
                 x.CustomAttributes.OfType<LookupIncludeAttribute>().Any()))
             {
                 query.Select(f);
