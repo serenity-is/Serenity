@@ -42,22 +42,15 @@ export function deepClone<T = any>(a: T, a2?: any, a3?: any): T {
 // @ts-ignore check for global
 let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
 
-export declare const enum TypeKind {
-    Class = 0,
-    Interface = 1,
-    Enum = 2
-}
-
 interface TypeExt {
+    __interface?: boolean;
+    __interfaces?: any[];
     __isAssignableFrom?: (from: any) => boolean;
     __isInstanceOfType?: (instance: any) => boolean;
     __metadata?: TypeMetadata;
     __metadata$?: TypeMetadata;
-    __register?: boolean;
-    __typeKind?: TypeKind;
     __typeName?: string;
     __typeName$?: string;
-    __interfaces?: any[];
 }
 
 interface TypeMetadata {
@@ -165,7 +158,7 @@ export function cast(instance: any, type: Type) {
 export function getBaseType(type: any) {
     if (type === Object ||
         !type.prototype ||
-        (type as TypeExt).__typeKind === TypeKind.Interface) {
+        (type as TypeExt).__interface === true) {
         return null;
     }
     else if (Object.getPrototypeOf) {
@@ -420,7 +413,8 @@ export let delegateRemove = (delegate1: any, delegate2: any) => {
 };
 
 export let isEnum = (type: any) => {
-    return (type as TypeExt).__typeKind === TypeKind.Enum;
+    return typeof type !== "function" &&
+        (type as TypeExt).__interface == null;
 };
 
 export function initFormType(typ: Function, nameWidgetPairs: any[]) {
@@ -483,22 +477,32 @@ function interfaceIsAssignableFrom(from: any) {
     return from != null && (from as TypeExt).__interfaces != null && (from as TypeExt).__interfaces.indexOf(this) >= 0;
 }
 
-export function registerType(type: any, name: string, kind?: TypeKind, intf?: any[]) {
-    if (name != null) {
+function registerType(type: any, name: string, intf: any[]) {
+    if (name && name.length) {
         setTypeName(type, name);
         types[name] = type;
     }
-    else if (!(type as TypeExt).__typeName)
-        (type as TypeExt).__register = true;
-    else
+    else if ((type as TypeExt).__typeName && (type as TypeExt).__typeName.length)
         types[(type as TypeExt).__typeName] = type;
 
-    (type as TypeExt).__typeKind = kind ?? TypeKind.Class;
     if (intf != null && intf.length)
         (type as TypeExt).__interfaces = merge((type as TypeExt).__interfaces, intf);
+}
 
-    if (kind === TypeKind.Interface)
-        (type as TypeExt).__isAssignableFrom = interfaceIsAssignableFrom;
+export function registerClass(type: any, name: string, intf?: any[]) {
+    registerType(type, name, intf);
+    (type as TypeExt).__interface = false;
+}
+
+export function registerEnum(type: any, name: string) {
+    registerType(type, name, undefined);
+    (type as TypeExt).__interface = null; // mark as enum
+}
+
+export function registerInterface(type: any, name: string, intf?: any[]) {
+    registerType(type, name, intf);
+    (type as TypeExt).__interface = true;
+    (type as TypeExt).__isAssignableFrom = interfaceIsAssignableFrom;
 }
 
 export function addAttribute(type: any, attr: any) {
@@ -520,7 +524,7 @@ export function setTypeName(target: Type, value: string) {
 export class ISlickFormatter {
 }
 
-registerType(ISlickFormatter, 'Serenity.ISlickFormatter', TypeKind.Interface);
+registerInterface(ISlickFormatter, 'Serenity.ISlickFormatter');
 
 export function initializeTypes(root: any, pre: string, limit: number) {
 
@@ -550,35 +554,30 @@ export function initializeTypes(root: any, pre: string, limit: number) {
         if (t === "string" || t === "number")
             continue;
 
-        if ((typeof obj === "function" && obj.nodeType !== "number") || 
-            ((obj as TypeExt).__register && (obj as TypeExt).__typeKind === TypeKind.Enum)) {
+        if (!(obj as TypeExt).__typeName &&
+            ((typeof obj === "function" && obj.nodeType !== "number") || 
+             ((obj as TypeExt).__interface !== undefined))) {
+   
+            if (!obj.__interfaces &&
+                obj.prototype &&
+                obj.prototype.format &&
+                k.substr(-9) === "Formatter") {
+                if ((obj as TypeExt).__interface === undefined)
+                    (obj as TypeExt).__interface = false;
+                (obj as TypeExt).__interfaces = [ISlickFormatter]
+            }
 
-            if (!(obj as TypeExt).__typeName ||
-                ((obj as TypeExt).__register) && Object.prototype.hasOwnProperty.call(obj, '__register')) {
-    
-                if (!obj.__interfaces &&
-                    obj.prototype &&
-                    obj.prototype.format &&
-                    k.substr(-9) === "Formatter") {
-                    if ((obj as TypeExt).__typeKind == null)
-                        (obj as TypeExt).__typeKind = TypeKind.Class;
-                    (obj as TypeExt).__interfaces = [ISlickFormatter]
-                }
-
-                if ((obj as TypeExt).__typeKind == null) {
-                    var baseType = getBaseType(obj);
-                    if (baseType && (baseType as TypeExt).__typeKind != null) {
-                        (obj as TypeExt).__typeKind = (baseType as TypeExt).__typeKind;
-                    }
-                }
-
-                if ((obj as TypeExt).__typeKind != null) {
-                    setTypeName(obj, pre + k);
-                    types[pre + k] = obj;
+            if ((obj as TypeExt).__interface === undefined) {
+                var baseType = getBaseType(obj);
+                if (baseType && (baseType as TypeExt).__interface === false) {
+                    (obj as TypeExt).__interface = false;
                 }
             }
 
-            delete (obj as TypeExt).__register;
+            if ((obj as TypeExt).__interface !== undefined) {
+                setTypeName(obj, pre + k);
+                types[pre + k] = obj;
+            }
         }
         
         if (limit > 0) 

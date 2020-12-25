@@ -1,12 +1,10 @@
-import {
-    addAttribute, addTypeMember, isEnum, MemberType,
-    registerType, TypeKind, ISlickFormatter
-} from "../Q/System"
+import { addAttribute, addTypeMember, isEnum, MemberType, ISlickFormatter } from "../Q/System";
+import { registerClass as regClass, registerInterface as regIntf, registerEnum as regEnum } from "../Q/System";
 import { startsWith } from "../Q/Strings";
 
 function Attr(name: string) {
     return function (target: Function) {
-        return registerType(target, 'Serenity.' + name + 'Attribute');
+        return regClass(target, 'Serenity.' + name + 'Attribute');
     }
 }
 
@@ -73,7 +71,7 @@ export class EditorTypeAttributeBase {
     }
 }
 
-registerType(EditorTypeAttributeBase, 'Serenity.EditorTypeAttributeBase');
+regClass(EditorTypeAttributeBase, 'Serenity.EditorTypeAttributeBase');
 
 @Attr('EditorType')
 export class EditorTypeAttribute extends EditorTypeAttributeBase {
@@ -245,9 +243,9 @@ export namespace Decorators {
     export function registerClass(nameOrIntf?: string | any[], intf2?: any[]) {
         return function (target: Function) {
             if (typeof nameOrIntf == "string")
-                registerType(target, nameOrIntf, TypeKind.Class, intf2);
+                regClass(target, nameOrIntf, intf2);
             else
-                registerType(target, null, TypeKind.Class, nameOrIntf);
+                regClass(target, null, nameOrIntf);
         }
     }
 
@@ -255,9 +253,9 @@ export namespace Decorators {
         return function (target: Function) {
 
             if (typeof nameOrIntf == "string")
-                registerType(target, nameOrIntf, TypeKind.Interface, intf2);
+                regIntf(target, nameOrIntf, intf2);
             else
-                registerType(target, null, TypeKind.Interface, nameOrIntf);
+                regIntf(target, null, nameOrIntf);
         }
     }
 
@@ -269,7 +267,7 @@ export namespace Decorators {
         if (isEnum(target))
             return;
 
-        registerType(target, name, TypeKind.Enum);
+        regEnum(target, name);
         if (enumKey)
             addAttribute(target, new EnumKeyAttribute(enumKey));
     }
