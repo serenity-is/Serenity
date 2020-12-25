@@ -76,12 +76,28 @@ namespace Serenity.Data
         /// Resolves a fields class using current row fields provider
         /// </summary>
         /// <typeparam name="TFields"></typeparam>
-        /// <param name="fieldsProvider"></param>
+        /// <param name="fieldsProvider">Provider</param>
         /// <returns></returns>
         public static TFields Resolve<TFields>()
             where TFields : RowFieldsBase
         {
             return (TFields)Current.Resolve(typeof(TFields));
+        }
+
+        /// <summary>
+        /// Resolves an aliased fields class using current row fields provider
+        /// </summary>
+        /// <typeparam name="TFields"></typeparam>
+        /// <param name="fieldsProvider">Provider</param>
+        /// <param name="alias">Alias for fields</param>
+        /// <returns></returns>
+        public static TFields Resolve<TFields>(string alias)
+            where TFields : RowFieldsBase
+        {
+            if (alias == null)
+                throw new ArgumentNullException(nameof(alias));
+
+            return (TFields)Current.ResolveWithAlias(typeof(TFields), alias);
         }
     }
 }

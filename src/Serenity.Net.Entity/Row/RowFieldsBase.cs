@@ -39,6 +39,7 @@ namespace Serenity.Data
         internal string tableName;
         internal string alias;
         internal string aliasDot;
+        internal bool aliasLocked;
 
         protected RowFieldsBase(string tableName = null, string fieldPrefix = "")
         {
@@ -868,6 +869,113 @@ namespace Serenity.Data
                 return field;
             else
                 return null;
+        }
+
+        public void LockAlias()
+        {
+            aliasLocked = true;
+        }
+
+        public void ReplaceAliasWith(string newAlias)
+        {
+            if (string.IsNullOrEmpty(newAlias))
+                throw new ArgumentNullException(nameof(newAlias));
+
+            if (aliasLocked)
+                throw new InvalidOperationException(
+                    "Please use As() method to alias this fields object!");
+
+            if (newAlias == alias)
+            {
+                aliasLocked = true;
+                return;
+            }
+
+            var aliasPrefix = newAlias + "_";
+
+            var joinByKey = new HashSet<string>(joins.Keys, StringComparer.OrdinalIgnoreCase);
+
+            string mapAlias(string x)
+            {
+                if (x == "t0" || x == "T0")
+                    return newAlias;
+
+                if (!joinByKey.Contains(x))
+                    return x;
+
+                return aliasPrefix + x;
+            }
+
+            string mapExpression(string x)
+            {
+                if (x == null)
+                    return null;
+
+                return JoinAliasLocator.ReplaceAliases(x, mapAlias);
+            }
+
+            aliasLocked = true;
+
+            foreach (var field in this)
+            {
+                field.expression = mapExpression(field.expression);
+
+                if (field.referencedAliases != null && field.ReferencedAliases.Count > 0)
+                {
+                    var old = field.ReferencedAliases.ToArray();
+                    field.ReferencedAliases.Clear();
+                    foreach (var x in old)
+                        field.ReferencedAliases.Add(mapAlias(x));
+                }
+
+                field.join = null;
+                field.joinAlias = field.joinAlias == null ? null : mapAlias(field.joinAlias);
+            }
+
+            var oldJoins = joins.ToArray();
+            joins.Clear();
+            foreach (var join in oldJoins)
+            {
+                BaseCriteria onCriteria;
+                if (join.Value.OnCriteria is BinaryCriteria bc)
+                    onCriteria = new BinaryCriteria(
+                        new Criteria(mapExpression(bc.LeftOperand.ToString())),
+                        bc.Operator,
+                        new Criteria(mapExpression(bc.RightOperand.ToString())));
+                else
+                {
+                    if (join.Value.OnCriteria is null)
+                        onCriteria = null;
+                    else
+                        onCriteria = new Criteria(mapExpression(join.Value.OnCriteria.ToString()));
+                }
+
+                new ReplacedJoin(joins,
+                    mapExpression(join.Value.Table),
+                    mapAlias(join.Value.Name),
+                    onCriteria,
+                    join.Value.GetKeyword());
+            }
+
+            alias = newAlias;
+            aliasDot = newAlias + ".";
+        }
+
+        private class ReplacedJoin : Join
+        {
+            private readonly string keyword;
+
+            public ReplacedJoin(IDictionary<string, Join> joins,
+                string toTable, string alias, ICriteria onCriteria, string keyword)
+                : base(joins, toTable, alias, onCriteria)
+            {
+                this.keyword = keyword;
+            }
+
+            public override string GetKeyword()
+            {
+                return keyword;
+            }
         }
 
         public IDictionary<string, Join> Joins => joins;
