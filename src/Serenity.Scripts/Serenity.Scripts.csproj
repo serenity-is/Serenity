@@ -4,6 +4,7 @@
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
     <TypeScriptBuildMode>true</TypeScriptBuildMode>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,7 +16,6 @@
     <Compile Remove="node_modules\**" />
     <EmbeddedResource Remove="node_modules\**" />
     <TypeScriptCompile Remove="node_modules\**" />
-    <ToMinimize Include="dist\Serenity.CodeGeneration.js"></ToMinimize>
     <ToMinimize Include="..\Serenity.Assets\Scripts\jquery-ui.js"></ToMinimize>
     <ToMinimize Include="..\Serenity.Assets\Scripts\jquery.dialogExtendQ.js"></ToMinimize>
     <ToMinimize Include="..\Serenity.Assets\Scripts\SlickGrid\slick.grid.js"></ToMinimize>

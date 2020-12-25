@@ -11,9 +11,9 @@
     <Deterministic>false</Deterministic>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Serenity.Scripts\dist\Serenity.CodeGeneration.js">
-      <Link>Resource\Serenity.CodeGeneration.js</Link>
-    </EmbeddedResource>
+    <None Remove="Resource\tsconfig.json" />
+    <Content Include="Resource\tsconfig.json" />
+    <EmbeddedResource Include="Resource\Serenity.CodeGeneration.js" />
     <EmbeddedResource Include="Resource\typescriptServices.js" />
     <EmbeddedResource Include="Templates\*.scriban" />
   </ItemGroup>

@@ -3,10 +3,10 @@
   "compilerOptions": {
     "preserveConstEnums": true,
     "experimentalDecorators": true,
-    "declaration": true,
-    "emitBOM": true,
-    "sourceMap": true,
-    "outFile": "../dist/Serenity.CodeGeneration.js",
+    "declaration": false,
+    "emitBOM": false,
+    "sourceMap": false,
+    "outFile": "Serenity.CodeGeneration.js",
     "target": "ES3",
     "types": [
     ]
