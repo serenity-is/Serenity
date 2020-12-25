@@ -219,8 +219,8 @@ Task("Compile")
 
 	StartProcess("powershell", new ProcessSettings 
 	{ 
-		Arguments = "npx tsc -p tsconfig.json", 
-		WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts", "CodeGeneration") 
+		Arguments = @"npx tsc -p ..\Serenity.Net.CodeGenerator\Resource\tsconfig.json", 
+		WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts") 
 	});
     var sasmi = System.IO.File.ReadAllText(System.IO.Path.Combine(src, "SharedAssemblyInfo.cs"));
     var sasmi1 = sasmi.IndexOf("AssemblyVersion(\"");
