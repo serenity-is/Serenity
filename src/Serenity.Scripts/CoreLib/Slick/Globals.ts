@@ -295,6 +295,10 @@
         lazyTotalsCalculation?: boolean;
     }
 
+    export class NonDataRow {
+        __nonDataRow: boolean;
+    }
+
     export interface PagerOptions {
         view?: any;
         showRowsPerPage?: boolean;

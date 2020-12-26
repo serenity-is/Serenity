@@ -20,6 +20,6 @@
   <Target Name="SubmoduleCopySerenityFiles" AfterTargets="AfterBuild">
     <Copy SourceFiles="@(SubmoduleSerenityImages)" DestinationFolder="$(ProjectDir)wwwroot\Content\serenity\images" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(SubmoduleSerenityTexts)" DestinationFolder="$(ProjectDir)wwwroot\Scripts\serenity\texts" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(SubmoduleSerenityScriptsDist)" DestinationFolder="$(ProjectDir)wwwroot\Scripts\serenity\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(SubmoduleSerenityScriptsDist)" DestinationFolder="$(ProjectDir)wwwroot\Scripts\serenity\" SkipUnchangedFiles="true" />
   </Target>
 </Project>

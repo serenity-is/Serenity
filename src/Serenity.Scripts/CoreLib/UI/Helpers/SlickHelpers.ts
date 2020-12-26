@@ -669,6 +669,11 @@ export namespace SlickFormatting {
     export function itemLink(itemType: string, idField: string, getText: Slick.Format,
         cssClass?: Slick.Format, encode?: boolean): Slick.Format {
         return function (ctx: Slick.FormatterContext) {
+            var text = (getText == null ? ctx.value : getText(ctx)) ?? '';
+            if (ctx.item?.__nonDataRow) {
+                return encode ? htmlEncode(text) : text;
+            }
+
             return itemLinkText(itemType, ctx.item[idField],
                 (getText == null ? ctx.value : getText(ctx)),
                 (cssClass == null ? '' : cssClass(ctx)), encode);

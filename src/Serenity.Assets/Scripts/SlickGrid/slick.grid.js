@@ -1021,7 +1021,7 @@ if (typeof Slick === "undefined") {
 
         function formatGroupTotal(total, columnDef) {
             if (columnDef.formatter != null) {
-                var item = {};
+                var item = new Slick.NonDataRow();
                 item[columnDef.field] = total;
                 try {
                     return columnDef.formatter(-1, -1, total, columnDef, item);
