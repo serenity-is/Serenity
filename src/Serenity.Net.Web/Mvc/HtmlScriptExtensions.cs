@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -10,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Serenity.Web
 {
@@ -26,12 +26,9 @@ namespace Serenity.Web
             var context = helper.ViewContext.HttpContext;
             var css = context.RequestServices.GetRequiredService<ICssBundleManager>()
                 .GetCssBundle(cssUrl);
-            var included = GetIncludedCssList(context);
 
-            if (!included.Contains(css))
+            if (!IsAlreadyIncluded(context.Items, css))
             {
-                included.Add(css);
-
                 return new HtmlString(string.Format(CultureInfo.InvariantCulture,
                     "    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
                     WebUtility.HtmlEncode(context.RequestServices.GetRequiredService<IContentHashCache>()
@@ -77,11 +74,8 @@ namespace Serenity.Web
                     cssUrl = VirtualPathUtility.ToAbsolute(context, cssUrl);
                 }
 
-                var cssList = GetIncludedCssList(context);
-
-                if (!cssList.Contains(cssUrl))
+                if (!IsAlreadyIncluded(context.Items, cssUrl))
                 {
-                    cssList.Add(cssUrl);
                     sb.AppendLine(string.Format(CultureInfo.InvariantCulture,
                         "    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
                         WebUtility.HtmlEncode(contentHashCache.ResolveWithHash(context.Request.PathBase, cssUrl))));
@@ -102,12 +96,8 @@ namespace Serenity.Web
             var context = helper.ViewContext.HttpContext;
             var script = context.RequestServices.GetRequiredService<IScriptBundleManager>()
                 .GetScriptBundle(includeJS);
-            var scripts = GetIncludedScripts(context);
-
-            if (!scripts.Contains(script))
+            if (!IsAlreadyIncluded(context.Items, script))
             {
-                scripts.Add(script);
-
                 return new HtmlString(string.Format(CultureInfo.InvariantCulture,
                     "    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
                     WebUtility.HtmlEncode(context.RequestServices.GetRequiredService<IContentHashCache>()
@@ -153,11 +143,8 @@ namespace Serenity.Web
                     scriptUrl = VirtualPathUtility.ToAbsolute(context, scriptUrl);
                 }
 
-                var scripts = GetIncludedScripts(context);
-
-                if (!scripts.Contains(scriptUrl))
+                if (!IsAlreadyIncluded(context.Items, scriptUrl))
                 {
-                    scripts.Add(scriptUrl);
                     sb.AppendLine(string.Format(CultureInfo.InvariantCulture, 
                         "    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
                         WebUtility.HtmlEncode(contentHashCache.ResolveWithHash(context.Request.PathBase, scriptUrl))));
@@ -167,34 +154,29 @@ namespace Serenity.Web
             return new HtmlString(sb.ToString());
         }
 
-        const string IncludedScriptsKey = "IncludedScripts";
+        const string IncludedScriptsAndCssKey = "HtmlScriptExtensions:IncludedScriptsAndCss";
+        static readonly Regex EndingWithVersionRegex = new Regex(@"\?v=[0-9a-zA-Z_-]*$", RegexOptions.Compiled);
 
-        private static HashSet<string> GetIncludedScripts(HttpContext context)
+        private static bool IsAlreadyIncluded(IDictionary<object, object> contextItems, string url)
         {
-            HashSet<string> scripts = (HashSet<string>)context.Items[IncludedScriptsKey];
-            if (scripts == null)
-            {
-                scripts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                context.Items[IncludedScriptsKey] = scripts;
+            if (string.IsNullOrEmpty(url))
+                return false;
+
+            var included = (HashSet<string>)contextItems[IncludedScriptsAndCssKey];
+            if (included == null)
+            { 
+                included = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                contextItems[IncludedScriptsAndCssKey] = included;
             }
 
-            return scripts;
+            var urlWithoutVer = EndingWithVersionRegex.Replace(url, "");
+            if (included.Contains(url) || included.Contains(urlWithoutVer))
+                return true;
+
+            included.Add(url);
+            included.Add(urlWithoutVer);
+            return false;
         }
-
-        const string IncludedCssListKey = "IncludedStylesheets";
-
-        private static HashSet<string> GetIncludedCssList(HttpContext context)
-        {
-            HashSet<string> styleSheets = (HashSet<string>)context.Items[IncludedCssListKey];
-            if (styleSheets == null)
-            {
-                styleSheets = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                context.Items[IncludedCssListKey] = styleSheets;
-            }
-
-            return styleSheets;
-        }
-
 
         public static string GetLocalTextContent(this IHtmlHelper page, string package, bool isPending = false)
         {
