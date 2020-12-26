@@ -40,21 +40,21 @@ namespace Serenity.Web
             return null;
         }
 
-        private void Changed(string rootPath, string name)
+        private void Changed(IDynamicScriptManager manager, string rootPath, string name)
         {
             string key = GetKey(rootPath, rootPath + name);
             if (key == null)
                 return;
 
             if (scriptByKey.TryGetValue(key, out TemplateScript ts))
-                ts.Changed();
+                manager.Changed(ts.ScriptName);
 
-            if (bundle != null)
-                bundle.Changed();
+            manager.Changed("TemplateBundle");
         }
 
-        public void Initialize(IDynamicScriptManager manager, string[] paths, bool watchForChanges = true)
+        public IEnumerable<FileWatcher> Initialize(IDynamicScriptManager manager, string[] paths, bool watchForChanges = true)
         {
+            var watchers = new List<FileWatcher>();
             var bundleList = new List<Func<string>>();
 
             foreach (var p in paths)
@@ -81,12 +81,14 @@ namespace Serenity.Web
                 if (watchForChanges)
                 {
                     var watcher = new FileWatcher(path, "*.html");
-                    watcher.Changed += name => Changed(path, name);
+                    watcher.Changed += name => Changed(manager, path, name);
+                    watchers.Add(watcher);
                 }
             }
 
             bundle = new ConcatenatedScript(bundleList);
             manager.Register("TemplateBundle", bundle);
+            return watchers;
         }
     }
 }

@@ -7,7 +7,6 @@ namespace Serenity.Web
     {
         string GetScript();
         void CheckRights(IPermissionService permissions, ITextLocalizer localizer);
-        void Changed();
         string GroupKey { get; }
         TimeSpan Expiration { get; }
     }

@@ -17,7 +17,7 @@ namespace Serenity.Web
         private bool isEnabled;
         private Dictionary<string, string> bundleKeyBySourceUrl;
         private Dictionary<string, HashSet<string>> bundleKeysBySourceUrl;
-        private Dictionary<string, ConcatenatedScript> bundleByKey;
+        private HashSet<string> bundleKeys;
         private Dictionary<string, List<string>> bundleIncludes;
 
         private const string errorLines = "\r\n//\r\n//!!!ERROR: {0}!!!\r\n//\r\n";
@@ -79,13 +79,13 @@ namespace Serenity.Web
                 {
                     bundleKeyBySourceUrl = null;
                     bundleKeysBySourceUrl = null;
-                    bundleByKey = null;
+                    bundleKeys = null;
                     return;
                 }
 
                 bundleKeyBySourceUrl = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 bundleKeysBySourceUrl = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-                bundleByKey = new Dictionary<string, ConcatenatedScript>(StringComparer.OrdinalIgnoreCase);
+                bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 bool minimize = settings.Minimize == true;
                 var noMinimize = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -260,7 +260,7 @@ namespace Serenity.Web
                     });
 
                     scriptManager.Register(bundleName, bundle);
-                    bundleByKey[bundleKey] = bundle;
+                    bundleKeys.Add(bundleKey);
                 }
 
                 isEnabled = true;
@@ -280,13 +280,14 @@ namespace Serenity.Web
         {
             BundleUtils.ClearVersionCache();
 
-            if (bundleByKey == null)
-                return;
-
             lock (sync)
             {
-                foreach (var bundle in bundleByKey.Values)
-                    bundle.Changed();
+                if (bundleKeys == null)
+                    return;
+
+                foreach (var bundleKey in bundleKeys)
+                    scriptManager.Changed("Bundle." + bundleKey);
+
                 Reset();
             }
         }

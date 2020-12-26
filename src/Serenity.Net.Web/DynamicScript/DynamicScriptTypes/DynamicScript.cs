@@ -5,15 +5,8 @@ namespace Serenity.Web
 {
     public abstract class DynamicScript : IDynamicScript
     {
-        private EventHandler scriptChanged;
-
         protected DynamicScript()
         {
-        }
-
-        public void Changed()
-        {
-            scriptChanged?.Invoke(this, new EventArgs());
         }
 
         public abstract string GetScript();
@@ -22,12 +15,6 @@ namespace Serenity.Web
         {
             if (Permission != null)
                 permissions.ValidatePermission(Permission, localizer);
-        }
-
-        public event EventHandler ScriptChanged
-        {
-            add { scriptChanged += value; }
-            remove { scriptChanged -= value; }
         }
 
         public string GroupKey { get; set; }

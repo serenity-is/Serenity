@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Serenity.Web
 {
-    public class FileWatcher : IDisposable
+    public class FileWatcher : IFileWatcher, IDisposable
     {
         private Action<string> changed;
         private bool disposed;
@@ -11,7 +11,13 @@ namespace Serenity.Web
 
         public FileWatcher(string path, string filter)
         {
-            watcher = new FileSystemWatcher(path ?? throw new ArgumentNullException(nameof(path)), filter)
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
+            Path = path ?? throw new ArgumentNullException(nameof(path));
+            Filter = filter ?? throw new ArgumentNullException(nameof(filter));
+
+            watcher = new FileSystemWatcher(Path, Filter)
             {
                 IncludeSubdirectories = true,
                 NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
@@ -50,5 +56,13 @@ namespace Serenity.Web
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        public void RaiseChanged(string name)
+        {
+            changed?.Invoke(name);
+        }
+
+        public string Path { get; }
+        public string Filter { get; }
     }
 }

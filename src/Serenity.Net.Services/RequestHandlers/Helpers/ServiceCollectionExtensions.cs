@@ -11,21 +11,34 @@ namespace Serenity.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddServiceHandlers(this IServiceCollection services)
+        public static IServiceCollection AddServiceBehaviors(this IServiceCollection collection)
         {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
+            collection.TryAddSingleton<IBehaviorFactory, DefaultBehaviorFactory>();
+            collection.TryAddSingleton<IImplicitBehaviorRegistry, DefaultImplicitBehaviorRegistry>();
+            collection.TryAddSingleton<IBehaviorProvider, DefaultBehaviorProvider>();
+            return collection;
+        }
 
-            services.AddCaching();
-            services.AddEntities();
-            services.AddTextRegistry();
-            services.TryAddSingleton<IBehaviorFactory, DefaultBehaviorFactory>();
-            services.TryAddSingleton<IImplicitBehaviorRegistry, DefaultImplicitBehaviorRegistry>();
-            services.TryAddSingleton<IBehaviorProvider, DefaultBehaviorProvider>();
-            services.TryAddSingleton<IRequestContext, DefaultRequestContext>();
-            services.TryAddSingleton<IHandlerActivator, DefaultHandlerActivator>();
-            services.TryAddSingleton<IDefaultHandlerRegistry, DefaultHandlerRegistry>();
-            services.TryAddSingleton<IDefaultHandlerFactory, DefaultHandlerFactory>();
+        public static IServiceCollection AddServiceHandlerFactory(this IServiceCollection collection)
+        {
+            collection.TryAddSingleton<IHandlerActivator, DefaultHandlerActivator>();
+            collection.TryAddSingleton<IDefaultHandlerRegistry, DefaultHandlerRegistry>();
+            collection.TryAddSingleton<IDefaultHandlerFactory, DefaultHandlerFactory>();
+            return collection;
+        }
+
+        public static IServiceCollection AddServiceHandlers(this IServiceCollection collection)
+        {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            collection.AddCaching();
+            collection.AddEntities();
+            collection.AddTextRegistry();
+            collection.AddServiceBehaviors();
+            collection.AddServiceHandlerFactory();
+            collection.TryAddSingleton<IRequestContext, DefaultRequestContext>();
+            return collection;
         }
 
         public static void AddAllTexts(this IServiceProvider provider,

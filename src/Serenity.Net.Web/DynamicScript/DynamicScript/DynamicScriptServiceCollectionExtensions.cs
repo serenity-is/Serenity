@@ -3,21 +3,43 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serenity.Abstractions;
-using Serenity.Extensions.DependencyInjection;
 using Serenity.PropertyGrid;
+using Serenity.Web;
 using Serenity.Web.Middleware;
 using System;
+using System.Linq;
 
-namespace Serenity.Web
+namespace Serenity.Extensions.DependencyInjection
 {
     public static class DynamicScriptServiceCollectionExtensions
     {
-        public static void AddDynamicScripts(this IServiceCollection collection)
+        public static IServiceCollection AddDynamicScriptManager(this IServiceCollection collection)
         {
             collection.AddCaching();
             collection.AddTextRegistry();
             collection.TryAddSingleton<IDynamicScriptManager, DynamicScriptManager>();
+            return collection;
+        }
+
+        public static IServiceCollection AddDynamicScripts(this IServiceCollection collection)
+        {
+            AddDynamicScriptManager(collection);
             collection.TryAddSingleton<IPropertyItemProvider, DefaultPropertyItemProvider>();
+            return collection;
+        }
+
+        public static IServiceCollection AddFileWatcherFactory(this IServiceCollection collection)
+        {
+            collection.TryAddSingleton<IFileWatcherFactory, DefaultFileWatcherFactory>();
+            return collection;
+        }
+
+        public static IServiceCollection AddContentHashCache(this IServiceCollection collection)
+        {
+            AddFileWatcherFactory(collection);
+            collection.AddOptions();
+            collection.TryAddSingleton<IContentHashCache, ContentHashCache>();
+            return collection;
         }
 
         public static void AddCssBundling(this IServiceCollection collection)
@@ -25,8 +47,8 @@ namespace Serenity.Web
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
-            collection.AddOptions();
-            collection.TryAddSingleton<IContentHashCache, ContentHashCache>();
+            collection.AddDynamicScriptManager();
+            collection.AddContentHashCache();
             collection.TryAddSingleton<ICssBundleManager, CssBundleManager>();
         }
 
@@ -40,7 +62,6 @@ namespace Serenity.Web
                 throw new ArgumentNullException(nameof(setupAction));
 
             collection.AddCssBundling();
-            collection.TryAddSingleton<IContentHashCache, ContentHashCache>();
             collection.Configure(setupAction);
         }
 
@@ -49,7 +70,8 @@ namespace Serenity.Web
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
-            collection.AddOptions();
+            collection.AddDynamicScriptManager();
+            collection.AddContentHashCache();
             collection.TryAddSingleton<IScriptBundleManager, ScriptBundleManager>();
         }
 
@@ -66,56 +88,167 @@ namespace Serenity.Web
             collection.Configure(setupAction);
         }
 
+        public static IApplicationBuilder UseDynamicScriptMiddleware(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<DynamicScriptMiddleware>();
+        }
+
         public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
 
-            var serviceProvider = builder.ApplicationServices;
+            UseDynamicScriptTypes(builder.ApplicationServices);
+            UseCssWatching(builder.ApplicationServices);
+            UseScriptWatching(builder.ApplicationServices);
+            UseTemplateScripts(builder.ApplicationServices);
+
+            return UseDynamicScriptMiddleware(builder);
+        }
+
+        public static IServiceProvider UseDynamicScriptTypes(this IServiceProvider serviceProvider)
+        {
             var scriptManager = serviceProvider.GetRequiredService<IDynamicScriptManager>();
             var propertyProvider = serviceProvider.GetRequiredService<IPropertyItemProvider>();
             var typeSource = serviceProvider.GetRequiredService<ITypeSource>();
 
-            DataScriptRegistration.RegisterDataScripts(scriptManager, 
-                typeSource, serviceProvider);
-            
-            LookupScriptRegistration.RegisterLookupScripts(scriptManager, 
-                typeSource, serviceProvider);
-            
-            DistinctValuesRegistration.RegisterDistinctValueScripts(scriptManager, 
+            DataScriptRegistration.RegisterDataScripts(scriptManager,
                 typeSource, serviceProvider);
 
-            ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager, 
+            LookupScriptRegistration.RegisterLookupScripts(scriptManager,
+                typeSource, serviceProvider);
+
+            DistinctValuesRegistration.RegisterDistinctValueScripts(scriptManager,
+                typeSource, serviceProvider);
+
+            ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager,
                 typeSource, propertyProvider, serviceProvider);
 
-            FormScriptRegistration.RegisterFormScripts(scriptManager, 
+            FormScriptRegistration.RegisterFormScripts(scriptManager,
                 typeSource, propertyProvider, serviceProvider);
 
-            var hostEnvironment = builder.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
-            new TemplateScriptRegistrar()
-                .Initialize(scriptManager, new[] 
+            return serviceProvider;
+        }
+
+        public static IServiceProvider UseCssWatching(this IServiceProvider serviceProvider)
+        {
+            var hostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
+            var CssPaths = new[] { System.IO.Path.Combine(hostEnvironment.WebRootPath, "Content") };
+            UseCssWatching(serviceProvider, CssPaths);
+            return serviceProvider;
+        }
+
+        public static IServiceProvider UseCssWatching(this IServiceProvider serviceProvider,
+            params string[] cssPaths)
+        {
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
+
+            if (cssPaths == null || cssPaths.Length == 0)
+                throw new ArgumentNullException(nameof(cssPaths));
+
+            var bundleManager = serviceProvider.GetService<ICssBundleManager>();
+            var contentHashCache = serviceProvider.GetService<IContentHashCache>();
+
+            if (bundleManager == null && contentHashCache == null)
+                throw new InvalidOperationException("CSS watching has no use when " +
+                    "there is no CSS bundle manager or content hash cache!");
+
+            foreach (var path in cssPaths)
+            {
+                var fileWatcherFactory = serviceProvider.GetRequiredService<IFileWatcherFactory>();
+                if (fileWatcherFactory.Watchers.Any(x =>
+                        x.Path == path && x.Filter == "*.css") == true)
+                    continue;
+
+                var CssWatcher = new FileWatcher(path, "*.css");
+                CssWatcher.Changed += (name) =>
                 {
-                    System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Views", "Templates"),
-                    System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Modules")
-                }, watchForChanges: true);
+                    bundleManager?.CssChanged();
+                    contentHashCache?.ScriptsChanged();
+                };
 
-            var scriptsPath = System.IO.Path.Combine(hostEnvironment.WebRootPath, "Scripts");
-            var scriptWatcher = new FileWatcher(scriptsPath, "*.js");
-            scriptWatcher.Changed += (name) =>
+                fileWatcherFactory.KeepAlive(CssWatcher);
+            }
+
+            return serviceProvider;
+        }
+
+        public static IServiceProvider UseScriptWatching(this IServiceProvider serviceProvider)
+        {
+            var hostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
+            var scriptPaths = new[] { System.IO.Path.Combine(hostEnvironment.WebRootPath, "Scripts") };
+            UseScriptWatching(serviceProvider, scriptPaths);
+            return serviceProvider;
+        }
+
+        public static IServiceProvider UseScriptWatching(this IServiceProvider serviceProvider,
+            params string[] scriptPaths)
+        {
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
+
+            if (scriptPaths == null || scriptPaths.Length == 0)
+                throw new ArgumentNullException(nameof(scriptPaths));
+
+            var bundleManager = serviceProvider.GetService<IScriptBundleManager>();
+            var contentHashCache = serviceProvider.GetService<IContentHashCache>();
+
+            if (bundleManager == null && contentHashCache == null)
+                throw new InvalidOperationException("Script watching has no use when " +
+                    "there is no script bundle manager or content hash cache!");
+
+            foreach (var path in scriptPaths)
             {
-                builder.ApplicationServices.GetService<IScriptBundleManager>()?.ScriptsChanged();
-                builder.ApplicationServices.GetService<IContentHashCache>()?.ScriptsChanged();
-            };
+                var fileWatcherFactory = serviceProvider.GetRequiredService<IFileWatcherFactory>();
+                if (fileWatcherFactory.Watchers.Any(x =>
+                        x.Path == path && x.Filter == "*.js") == true)
+                    continue;
 
-            var contentPath = System.IO.Path.Combine(hostEnvironment.WebRootPath, "Content");
-            var cssWatcher = new FileWatcher(contentPath, "*.css");
-            scriptWatcher.Changed += (name) =>
+                var scriptWatcher = new FileWatcher(path, "*.js");
+                scriptWatcher.Changed += (name) =>
+                {
+                    bundleManager?.ScriptsChanged();
+                    contentHashCache?.ScriptsChanged();
+                };
+
+                fileWatcherFactory.KeepAlive(scriptWatcher);
+            }
+
+            return serviceProvider;
+        }
+
+        public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider)
+        {
+            var hostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
+            var templateRoots = new[]
             {
-                builder.ApplicationServices.GetService<ICssBundleManager>()?.CssChanged();
-                builder.ApplicationServices.GetService<IContentHashCache>()?.ScriptsChanged();
+                System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Views", "Templates"),
+                System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Modules")
             };
+            UseTemplateScripts(serviceProvider, templateRoots);
+            return serviceProvider;
+        }
 
-            return builder.UseMiddleware<DynamicScriptMiddleware>();
+        public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider, 
+            params string[] templateRoots)
+        {
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
+
+            if (templateRoots == null || templateRoots.Length == 0)
+                throw new ArgumentNullException(nameof(templateRoots));
+
+            var scriptManager = serviceProvider.GetRequiredService<IDynamicScriptManager>();
+
+            var templateWatchers = new TemplateScriptRegistrar()
+                .Initialize(scriptManager, templateRoots, watchForChanges: true);
+
+            foreach (var templateWatcher in templateWatchers)
+                serviceProvider.GetRequiredService<IFileWatcherFactory>()
+                    .KeepAlive(templateWatcher);
+
+            return serviceProvider;
         }
     }
 }

@@ -16,12 +16,13 @@ namespace Serenity.Extensions.DependencyInjection
         /// Adds memory caching as ILocalCache implementation and a distributed cache
         /// emulator as IDistributed cache implementation.
         /// </summary>
-        /// <param name="services">The services.</param>
-        public static void AddCaching(this IServiceCollection services)
+        /// <param name="collection">The service collection.</param>
+        public static IServiceCollection AddCaching(this IServiceCollection collection)
         {
-            services.AddMemoryCache();
-            services.AddDistributedMemoryCache();
-            services.TryAddSingleton<ITwoLevelCache, TwoLevelCache>();
+            collection.AddMemoryCache();
+            collection.AddDistributedMemoryCache();
+            collection.TryAddSingleton<ITwoLevelCache, TwoLevelCache>();
+            return collection;
         }
 
         /// <summary>
