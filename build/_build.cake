@@ -5,8 +5,8 @@ using Newtonsoft.Json.Linq;
 
 var target = Argument("target", "Pack");
 if (target == "")
-	target = "Pack";
-	
+    target = "Pack";
+    
 var configuration = Argument("configuration", "Release");
 var nupkgDir = System.IO.Path.Combine(System.IO.Path.GetFullPath("."), ".nupkg");
 var root = System.IO.Path.GetFullPath(@"..");
@@ -14,7 +14,7 @@ var src = System.IO.Path.Combine(root, "src");
 
 var msBuildPath = @"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe";
 if (!System.IO.File.Exists(msBuildPath))
-	msBuildPath = null;
+    msBuildPath = null;
 
 string serenityVersion = null;
 
@@ -59,18 +59,18 @@ Func<string, JObject> loadJson = path => {
 
 Action<string, string> patchProjectVer = (csproj, version) => {
     var changed = false;
-	var csprojElement = loadCsProj(csproj);
-	var versionElement = csprojElement.Descendants("VersionPrefix").First();
-	var current = versionElement.Value;
-	
-	if (current != version)
-	{
-		versionElement.Value = version;
-		changed = true;
-	}
+    var csprojElement = loadCsProj(csproj);
+    var versionElement = csprojElement.Descendants("VersionPrefix").First();
+    var current = versionElement.Value;
+    
+    if (current != version)
+    {
+        versionElement.Value = version;
+        changed = true;
+    }
 
     if (changed)
-		System.IO.File.WriteAllText(csproj, csprojElement.ToString(SaveOptions.OmitDuplicateNamespaces), Encoding.UTF8);
+        System.IO.File.WriteAllText(csproj, csprojElement.ToString(SaveOptions.OmitDuplicateNamespaces), Encoding.UTF8);
 };
 
 Action<string> writeHeader = (header) => {
@@ -82,8 +82,8 @@ Action<string> writeHeader = (header) => {
 Action<string, string, string> myPack = (s, id, project) => {
     var prm = new Dictionary<string, string>(nuspecParams);
         
-	id = id ?? s;
-	project = project ?? s;
+    id = id ?? s;
+    project = project ?? s;
     var csproj = System.IO.Path.Combine(src, s, project + ".csproj");
     if (!System.IO.File.Exists(csproj))
         csproj = null;
@@ -145,17 +145,31 @@ Action<string, string, string> myPack = (s, id, project) => {
 };
 
 Action fixNugetCache = delegate() {
-	var nugetFeed = @"C:\Sandbox\MyNugetFeed";
-	if (!System.IO.Directory.Exists(nugetFeed))
-		nugetFeed = System.IO.Path.GetFullPath(System.IO.Path.Combine(root, "..", "MyNugetFeed"));
-	if (!System.IO.Directory.Exists(nugetFeed))
-		nugetFeed = System.IO.Path.GetFullPath(System.IO.Path.Combine(root, "..", "..", "MyNugetFeed"));
-	if (!System.IO.Directory.Exists(nugetFeed))
-		nugetFeed = System.IO.Path.GetFullPath(System.IO.Path.Combine(root, "..", "..", "..", "MyNugetFeed"));
-    if (System.IO.Directory.Exists(nugetFeed))
+    var myPackagesDir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "my-packages");
+    if (!System.IO.Directory.Exists(myPackagesDir)) 
     {
-        foreach (var package in nugetPackages)
-            System.IO.File.Copy(package, System.IO.Path.Combine(nugetFeed, System.IO.Path.GetFileName(package)), true);
+        System.IO.Directory.CreateDirectory(myPackagesDir);
+        StartProcess("nuget", new ProcessSettings 
+        {
+            Arguments = "sources add -Name MyPackages -Source \"" + myPackagesDir + "\""
+        });
+    }
+    foreach (var package in nugetPackages) 
+    {
+        var filename = System.IO.Path.ChangeExtension(System.IO.Path.GetFileName(package), null);
+        var match = System.Text.RegularExpressions.Regex.Match(filename, @"(.+?)((\.[0-9]+)+)");
+        if (match != null && match.Groups.Count >= 2)
+        {
+            var id = match.Groups[1].Value;
+            var version = match.Groups[2].Value.Substring(1);
+            var dir = System.IO.Path.Combine(myPackagesDir, id, version);
+            if (System.IO.Directory.Exists(dir))
+                System.IO.Directory.Delete(dir, true);
+        }
+    
+        NuGetPush(package, new NuGetPushSettings {
+            Source = myPackagesDir
+        });
     }
 };
 
@@ -191,25 +205,25 @@ Task("Clean")
     CleanDirectories(nupkgDir);
     CreateDirectory(nupkgDir);
     CleanDirectories(src + "/Serenity.*/**/bin/" + configuration);
-	CleanDirectories(root + "tests/**/bin/");
-	CleanDirectories(src + "/Serenity.Scripts/dist");
+    CleanDirectories(root + "tests/**/bin/");
+    CleanDirectories(src + "/Serenity.Scripts/dist");
 });
 
 Task("Restore")
     .IsDependentOn("Clean")
     .Does(context =>
 {
-	var dotnetSln = System.IO.Path.Combine(src, "Serenity.Net.sln");
-	writeHeader("dotnet restore " + dotnetSln);
-	var exitCode = StartProcess("dotnet", "restore " + dotnetSln);
-	if (exitCode > 0)
-		throw new Exception("Error while restoring " + dotnetSln);
-		
-	StartProcess("powershell", new ProcessSettings 
-	{ 
-		Arguments = "npm install", 
-		WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts") 
-	});
+    var dotnetSln = System.IO.Path.Combine(src, "Serenity.Net.sln");
+    writeHeader("dotnet restore " + dotnetSln);
+    var exitCode = StartProcess("dotnet", "restore " + dotnetSln);
+    if (exitCode > 0)
+        throw new Exception("Error while restoring " + dotnetSln);
+        
+    StartProcess("powershell", new ProcessSettings 
+    { 
+        Arguments = "npm install", 
+        WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts") 
+    });
 });
 
 Task("Compile")
@@ -217,22 +231,22 @@ Task("Compile")
     .Does(context => 
 {
 
-	StartProcess("powershell", new ProcessSettings 
-	{ 
-		Arguments = @"npx tsc -p ..\Serenity.Net.CodeGenerator\Resource\tsconfig.json", 
-		WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts") 
-	});
+    StartProcess("powershell", new ProcessSettings 
+    { 
+        Arguments = @"npx tsc -p ..\Serenity.Net.CodeGenerator\Resource\tsconfig.json", 
+        WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts") 
+    });
     var sasmi = System.IO.File.ReadAllText(System.IO.Path.Combine(src, "SharedAssemblyInfo.cs"));
     var sasmi1 = sasmi.IndexOf("AssemblyVersion(\"");
     serenityVersion = sasmi.Substring(sasmi1 + "AssemblyVersion(\"".Length).Split('"')[0];
                
-	patchProjectVer(System.IO.Path.Combine(src, "SharedProperties.xml"), serenityVersion);
+    patchProjectVer(System.IO.Path.Combine(src, "SharedProperties.xml"), serenityVersion);
 
-	writeHeader("Building Serenity.Net.sln");
+    writeHeader("Building Serenity.Net.sln");
     MSBuild(System.IO.Path.Combine(src, "Serenity.Net.sln"), s => {
         s.SetConfiguration(configuration);
-		s.ToolPath = msBuildPath;
-		s.Verbosity = Verbosity.Minimal;
+        s.ToolPath = msBuildPath;
+        s.Verbosity = Verbosity.Minimal;
     });
 });
 
@@ -240,7 +254,7 @@ Task("Test")
     .IsDependentOn("Compile")
     .Does(() =>
 {
-		var projects = GetFiles(root + "/tests/**/*.csproj");
+        var projects = GetFiles(root + "/tests/**/*.csproj");
         foreach(var project in projects)
         {
             DotNetCoreTest(
@@ -251,12 +265,12 @@ Task("Test")
                     NoBuild = true
                 });
         }
-		
-		StartProcess("powershell", new ProcessSettings 
-		{ 
-			Arguments = "npx jest", 
-			WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts") 
-		});
+        
+        StartProcess("powershell", new ProcessSettings 
+        { 
+            Arguments = "npx jest", 
+            WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts") 
+        });
 
 });
 
@@ -264,31 +278,31 @@ Task("Pack")
     .IsDependentOn("Test")
     .Does(() =>
 {   
-	// https://github.com/NuGet/Home/issues/7001
-	var dateTime = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-	foreach (var fileInfo in new System.IO.DirectoryInfo(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget")).GetFiles("*.*", System.IO.SearchOption.AllDirectories)) {
-		if (fileInfo.Exists && fileInfo.LastWriteTimeUtc < dateTime)
-		{
-			try
-			{
-				fileInfo.LastWriteTimeUtc = dateTime;
-			}
-			catch (Exception)
-			{
-				Console.WriteLine(String.Format("Could not reset {LastWriteTime} {File} in nuspec",
-					nameof(fileInfo.LastWriteTimeUtc),
-					fileInfo.FullName));
-			}
-		}
-	}
-		
+    // https://github.com/NuGet/Home/issues/7001
+    var dateTime = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+    foreach (var fileInfo in new System.IO.DirectoryInfo(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget")).GetFiles("*.*", System.IO.SearchOption.AllDirectories)) {
+        if (fileInfo.Exists && fileInfo.LastWriteTimeUtc < dateTime)
+        {
+            try
+            {
+                fileInfo.LastWriteTimeUtc = dateTime;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine(String.Format("Could not reset {LastWriteTime} {File} in nuspec",
+                    nameof(fileInfo.LastWriteTimeUtc),
+                    fileInfo.FullName));
+            }
+        }
+    }
+        
     myPack("Serenity.Net.Core", null, null);
     myPack("Serenity.Net.Data", null, null);
     myPack("Serenity.Net.Entity", null, null);
     myPack("Serenity.Net.Services", null, null);
     myPack("Serenity.Net.Web", null, null);
     myPack("Serenity.Scripts", null, null);
-	myPack("Serenity.Net.CodeGenerator", "sergen", null);
+    myPack("Serenity.Net.CodeGenerator", "sergen", null);
     
     fixNugetCache();
 });
