@@ -7,7 +7,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Authors>Volkan Ceylan</Authors>
     <Copyright>Copyright (c) Volkan Ceylan</Copyright>
-    <PackageIcon>serenity-logo-128.png</PackageIcon>
+    <PackageIcon>package-icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://github.com/volkanceylan/Serenity</PackageProjectUrl>
     <PackageTags>Serenity</PackageTags>
@@ -26,6 +26,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\tools\Images\serenity-logo-128.png" Pack="true" PackagePath="" />
+    <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 </Project>
