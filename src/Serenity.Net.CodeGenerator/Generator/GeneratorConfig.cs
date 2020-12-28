@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Serenity.CodeGenerator
 {
@@ -49,6 +50,23 @@ namespace Serenity.CodeGenerator
                 c.Tables.Sort((x, y) => string.Compare(x.Tablename, y.Tablename, StringComparison.OrdinalIgnoreCase));
 
             return JSON.StringifyIndented(this, 2);
+        }
+
+        public string GetRootNamespaceFor(string csproj)
+        {
+            if (!string.IsNullOrEmpty(RootNamespace))
+                return RootNamespace;
+
+            var rootNamespace = ProjectFileHelper.ExtractPropertyFrom(csproj,
+                xe => xe.Descendants("RootNamespace").FirstOrDefault()?.Value.TrimToNull());
+
+            if (rootNamespace == null)
+                rootNamespace = Path.ChangeExtension(Path.GetFileName(csproj), null);
+
+            if (rootNamespace.EndsWith(".Web", StringComparison.OrdinalIgnoreCase))
+                rootNamespace = rootNamespace.Substring(0, rootNamespace.Length - 4);
+
+            return rootNamespace;
         }
 
         public static GeneratorConfig LoadFromFile(string sergenJson)
@@ -114,6 +132,7 @@ namespace Serenity.CodeGenerator
 
         public class MVCConfig
         {
+            public bool? UseRootNamespace { get; set; }
             public string OutDir { get; set; }
             public string[] SearchViewPaths { get; set; }
             public string[] StripViewPaths { get; set; }

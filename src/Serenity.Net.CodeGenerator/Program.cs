@@ -14,6 +14,13 @@ namespace Serenity.CodeGenerator
             if (args.Length > 0)
                 command = args[0].ToLowerInvariant().TrimToEmpty();
 
+            string csproj = null;
+            if (command == "-p" && args.Length > 2)
+            {
+                csproj = args[1];
+                command = args.Length > 2 ? args[1] : null;
+            }
+
             if (command.IsEmptyOrNull() ||
                 command == "-?" ||
                 command == "--help")
@@ -22,44 +29,33 @@ namespace Serenity.CodeGenerator
                 Environment.Exit(1);
             }
 
-            var sergenJson = "sergen.json";
-
-            if (!File.Exists(sergenJson))
+            if (csproj == null)
             {
-                Console.Error.WriteLine("Can't find sergen.json in current directory!");
-                Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
+                var csprojs = Directory.GetFiles(".", "*.csproj");
+                if (csprojs.Length == 0)
+                {
+                    Console.Error.WriteLine("Can't find a project file in current directory!");
+                    Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
+                    Environment.Exit(1);
+                }
+
+                if (csprojs.Length > 1)
+                {
+                    Console.Error.WriteLine("Multiple project files found in current directory!");
+                    Console.Error.WriteLine("Please run Sergen in a folder that contains only one Asp.Net Core project.");
+                    Environment.Exit(1);
+                }
+
+                csproj = csprojs[0];
+            }
+
+            if (!File.Exists(csproj))
+            {
+                Console.Error.WriteLine("Can't find project named: " + csproj);
                 Environment.Exit(1);
             }
 
-            sergenJson = Path.GetFullPath(sergenJson);
-            var projectDir = Path.GetDirectoryName(sergenJson);
-
-            if (!Directory.Exists(Path.Combine(projectDir, "wwwroot")))
-            {
-                Console.Error.WriteLine("Can't find wwwroot folder in current directory!");
-                Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
-                Environment.Exit(1);
-            }
-
-            var csprojs = Directory.GetFiles(projectDir, "*.csproj");
-            if (csprojs.Length > 1)
-                csprojs = csprojs.Where(x => !x.StartsWith("Dev.", StringComparison.OrdinalIgnoreCase)).ToArray();
-
-            if (csprojs.Length == 0)
-            {
-                Console.Error.WriteLine("Can't find a project file in current directory!");
-                Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
-                Environment.Exit(1);
-            }
-
-            if (csprojs.Length > 1)
-            {
-                Console.Error.WriteLine("Multiple project files found in current directory!");
-                Console.Error.WriteLine("Please run Sergen in a folder that contains only one Asp.Net Core project.");
-                Environment.Exit(1);
-            }
-
-            var csproj = csprojs.First();
+            var projectDir = Path.GetFullPath(Path.GetDirectoryName(csproj));
 
             if ("restore".StartsWith(command, StringComparison.Ordinal))
             {

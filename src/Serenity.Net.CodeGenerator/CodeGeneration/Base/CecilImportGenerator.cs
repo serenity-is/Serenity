@@ -605,17 +605,8 @@ namespace Serenity.CodeGeneration
             string url = route == null || route.ConstructorArguments.Count == 0 || !(route.ConstructorArguments[0].Value is string) ? 
                 ("Services/HasNoRoute/" + controller.Name) : (route.ConstructorArguments[0].Value as string ?? "");
 
-#if !ASPNETMVC
             url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length), StringComparison.Ordinal);
             url = url.Replace("/[action]", "", StringComparison.Ordinal);
-#else
-            if (!url.StartsWith("~/"))
-            {
-                var routePrefix = CecilUtils.GetAttr(controller, "System.Web.Mvc", "RoutePrefixAttribute");
-                if (routePrefix != null && routePrefix.ConstructorArguments.Count > 0 && routePrefix.ConstructorArguments[0].Value is string)
-                    url = UriHelper.Combine(routePrefix.ConstructorArguments[0].Value as string, url);
-            }
-#endif
 
             if (!url.StartsWith("~/", StringComparison.Ordinal) && !url.StartsWith("/", StringComparison.Ordinal))
                 url = "~/" + url;

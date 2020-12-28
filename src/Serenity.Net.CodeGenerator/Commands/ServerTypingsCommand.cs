@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace Serenity.CodeGenerator
 {
@@ -21,24 +20,19 @@ namespace Serenity.CodeGenerator
             if (config.ServerTypings == null ||
                 config.ServerTypings.Assemblies.IsEmptyOrNull())
             {
-                var xe = XElement.Parse(File.ReadAllText(csproj));
-                var xtarget = xe.Descendants("TargetFramework").FirstOrDefault();
+                var targetFramework = ProjectFileHelper.ExtractTargetFrameworkFrom(csproj);
 
-                if (xtarget == null || string.IsNullOrEmpty(xtarget.Value))
+                if (string.IsNullOrEmpty(targetFramework))
                 {
-                    Console.Error.WriteLine("Couldn't read TargetFramework from project file for server typings generation!");
+                    Console.Error.WriteLine("Couldn't read TargetFramework from " +
+                        "project file for server typings generation!");
                     Environment.Exit(1);
                 }
 
-                string outputName;
-                var xasm = xe.Descendants("AssemblyName").FirstOrDefault();
-                if (xasm == null || string.IsNullOrEmpty(xasm.Value))
-                    outputName = Path.ChangeExtension(Path.GetFileName(csproj), null);
-                else
-                    outputName = xasm.Value;
+                string outputName = ProjectFileHelper.ExtractAssemblyNameFrom(csproj)
+                    ?? Path.ChangeExtension(Path.GetFileName(csproj), null);
 
                 var outputExtension = ".dll";
-                var targetFramework = xtarget.Value;
                 if (targetFramework.StartsWith("net", StringComparison.OrdinalIgnoreCase) &&
                     !targetFramework.StartsWith("netcoreapp", StringComparison.Ordinal) &&
                     targetFramework.IndexOf('.', StringComparison.Ordinal) < 0)
@@ -113,10 +107,7 @@ namespace Serenity.CodeGenerator
             }
 
             if (config.RootNamespace.IsEmptyOrNull())
-            {
-                Console.Error.WriteLine("Please set RootNamespace option in sergen.json file!");
-                Environment.Exit(1);
-            }
+                config.RootNamespace = config.GetRootNamespaceFor(csproj);
 
             var generator = new ServerTypingsGenerator(assemblyFiles.ToArray())
             {

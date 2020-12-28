@@ -14,8 +14,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <NewtonsoftJsonVersion>12.0.3</NewtonsoftJsonVersion>
-    <FrameworkPackageVersion>5.0</FrameworkPackageVersion>
-    <AspNetCorePackageVersion>5.0</AspNetCorePackageVersion>
+    <FrameworkPackageVersion>5.0.0</FrameworkPackageVersion>
+    <AspNetCorePackageVersion>5.0.0</AspNetCorePackageVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>

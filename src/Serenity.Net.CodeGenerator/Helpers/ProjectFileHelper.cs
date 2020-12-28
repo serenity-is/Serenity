@@ -1,118 +1,63 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Xml.Linq;
 
 namespace Serenity.CodeGenerator
 {
     public class ProjectFileHelper
     {
-        public static void AddFileToProject(string projectFile, string codeFile, string dependentUpon = null)
+        private static string TargetFrameworkExtractor(XElement xe)
         {
-            if (File.Exists(projectFile))
+            var xtarget = xe.Descendants("TargetFramework").FirstOrDefault();
+
+            if (xtarget == null || string.IsNullOrEmpty(xtarget.Value))
             {
-                XElement doc;
-                using (var sr = new StreamReader(File.OpenRead(projectFile)))
-                    doc = XElement.Parse(sr.ReadToEnd(), LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-
-                var ns = doc.GetDefaultNamespace();
-
-                Func<string, XElement> findItemGroupOf = fileName =>
-                {
-                    var lowerFileName = fileName.ToUpperInvariant();
-
-                    foreach (var group in doc.Elements(ns + "ItemGroup"))
-                    {
-                        foreach (var c in group.Elements(ns + "Compile")
-                                    .Concat(group.Elements(ns + "TypeScriptCompile"))
-                                    .Concat(group.Elements(ns + "Content"))
-                                    .Concat(group.Elements(ns + "None")))
-                        {
-                            var value = c.Attribute("Include").Value.ToUpperInvariant();
-                            if (value == lowerFileName)
-                                return group;
-
-                            if (value.Contains("*.", StringComparison.Ordinal))
-                            {
-                                var extension = Path.GetExtension(lowerFileName);
-                                if (value == Path.GetDirectoryName(lowerFileName) + @"\*" + extension)
-                                    return group;
-                            }
-                        }
-                    }
-
+                xtarget = xe.Descendants("TargetFrameworks").FirstOrDefault();
+                if (xtarget == null ||
+                    string.IsNullOrEmpty(xtarget.Value) &&
+                    xtarget.Value.Contains(";", StringComparison.OrdinalIgnoreCase))
                     return null;
-                };
-
-                if (findItemGroupOf(codeFile) != null)
-                    return;
-
-                XElement dependentGroup = null;
-                if (dependentUpon != null)
-                {
-                    dependentGroup = findItemGroupOf(dependentUpon);
-                    if (dependentGroup == null)
-                        dependentUpon = null;
-                }
-
-                string contentType;
-                if (string.Compare(Path.GetExtension(codeFile), ".cs", StringComparison.OrdinalIgnoreCase) == 0)
-                    contentType = "Compile";
-                else if (string.Compare(Path.GetExtension(codeFile), ".ts", StringComparison.OrdinalIgnoreCase) == 0)
-                    contentType = "TypeScriptCompile";
-                else
-                    contentType = "Content";
-
-                XElement targetGroup = dependentGroup;
-                if (targetGroup == null)
-                {
-                    foreach (var group in doc.Elements(ns + "ItemGroup"))
-                    {
-                        var compiles = group.Elements(ns + contentType);
-                        if (compiles.Any())
-                        {
-                            targetGroup = group;
-                            break;
-                        }
-                    }
-                }
-
-                if (targetGroup == null)
-                    return; // create a group??
-
-                var newElement = new XElement(ns + contentType, new XAttribute("Include", codeFile));
-
-                var lastElement = targetGroup.Elements().LastOrDefault();
-                XText space = null;
-                if (lastElement != null)
-                    space = lastElement.PreviousNode as XText;
-                if (lastElement != null)
-                {
-                    if (space != null)
-                        lastElement.AddAfterSelf(new XText(space.Value), newElement);
-                    else
-                        lastElement.AddAfterSelf(newElement);
-                }
-                else
-                    targetGroup.Add(newElement);
-
-                if (dependentUpon != null)
-                {
-                    newElement.Add(new XText("  "));
-                    newElement.Add(new XElement(ns + "DependentUpon", Path.GetFileName(dependentUpon)));
-                }
-
-                using (var ms = new MemoryStream())
-                using (var sw = new StreamWriter(ms, new UTF8Encoding(true)))
-                {
-                    sw.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-                    sw.Write(doc.ToString());
-                    sw.Flush();
-                    var bytes = ms.ToArray();
-                    CodeFileHelper.CheckoutAndWrite(projectFile, bytes, false);
-                }
             }
+
+            return xtarget?.Value.TrimToNull();
+        }
+
+        public static string ExtractTargetFrameworkFrom(string csproj)
+        {
+            return ExtractPropertyFrom(csproj, TargetFrameworkExtractor);
+        }
+
+        public static string ExtractAssemblyNameFrom(string csproj)
+        {
+            return ExtractPropertyFrom(csproj, xe => 
+                xe.Descendants("AssemblyName")
+                    .FirstOrDefault()?.Value.TrimToNull());
+        }
+
+        public static string ExtractPropertyFrom(string csproj, 
+            Func<XElement, string> extractor)
+        {
+            var xe = XElement.Parse(File.ReadAllText(csproj));
+            var value = extractor(xe);
+            if (value != null)
+                return value;
+            var dir = Path.GetDirectoryName(csproj);
+            while (!string.IsNullOrEmpty(dir) &&
+                Directory.Exists(dir))
+            {
+                var dirProps = Path.Combine(dir, "Directory.Build.props");
+                if (File.Exists(dirProps))
+                {
+                    value = extractor(XElement.Parse(File.ReadAllText(dirProps)));
+                    if (value != null)
+                        break;
+                }
+                dir = Path.GetDirectoryName(dir);
+            }
+
+            return value;
+
         }
     }
 }

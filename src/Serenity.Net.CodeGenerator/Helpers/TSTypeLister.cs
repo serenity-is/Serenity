@@ -17,7 +17,7 @@ namespace Serenity.CodeGenerator
 
         public TSTypeLister(string projectDir)
         {
-            this.projectDir = projectDir;
+            this.projectDir = Path.GetFullPath(projectDir);
         }
 
         private string GetEmbeddedScript(string name)
@@ -31,9 +31,15 @@ namespace Serenity.CodeGenerator
 
         public List<ExternalType> List()
         {
-            var files = Directory.GetFiles(Path.Combine(projectDir, @"Modules"), "*.ts", SearchOption.AllDirectories)
-                .Concat(Directory.GetFiles(Path.Combine(projectDir, @"Imports"), "*.ts", SearchOption.AllDirectories))
-                .Concat(Directory.GetFiles(Path.Combine(projectDir, @"typings"), "*.ts", SearchOption.AllDirectories))
+            var directories = new[]
+            {
+                Path.Combine(projectDir, @"Modules"),
+                Path.Combine(projectDir, @"Imports"),
+                Path.Combine(projectDir, @"typings")
+            }.Where(x => Directory.Exists(x));
+
+            var files = directories.SelectMany(x => 
+                Directory.GetFiles(x, "*.ts", SearchOption.AllDirectories))
                 .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) || 
                     x.Contains("Serenity", StringComparison.Ordinal)).OrderBy(x => x);
 

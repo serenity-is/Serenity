@@ -2,14 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Serenity.CodeGenerator
 {
     public class ClientTypesCommand
     {
-        private static Encoding utf8 = new System.Text.UTF8Encoding(true);
-
         public void Run(string csproj, List<ExternalType> tsTypes)
         {
             var projectDir = Path.GetDirectoryName(csproj);
@@ -18,10 +15,7 @@ namespace Serenity.CodeGenerator
             config.ClientTypes = config.ClientTypes ?? new GeneratorConfig.ClientTypesConfig();
 
             if (config.RootNamespace.IsEmptyOrNull())
-            {
-                Console.Error.WriteLine("Please set RootNamespace option in sergen.json file!");
-                Environment.Exit(1);
-            }
+                config.RootNamespace = config.GetRootNamespaceFor(csproj);
 
             var outDir = Path.Combine(projectDir, (config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes")
                 .Replace('/', Path.DirectorySeparatorChar));

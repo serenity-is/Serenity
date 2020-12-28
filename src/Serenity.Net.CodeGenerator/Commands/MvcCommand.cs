@@ -8,8 +8,6 @@ namespace Serenity.CodeGenerator
 {
     public class MvcCommand
     {
-        private static Encoding utf8 = new System.Text.UTF8Encoding(true);
-
         public void Run(string csproj)
         {
             var projectDir = Path.GetDirectoryName(csproj);
@@ -36,7 +34,10 @@ namespace Serenity.CodeGenerator
 
             IEnumerable<string> files = new List<string>();
             foreach (var path in searchViewPaths)
-                files = files.Concat(Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories));
+            {
+                if (Directory.Exists(path))
+                    files = files.Concat(Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories));
+            }
 
             Func<string, string> getName = s => {
                 var path = s.Substring(rootDir.Length);
@@ -55,9 +56,16 @@ namespace Serenity.CodeGenerator
             files = files.OrderBy(x => getName(x));
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("using System;");
             sb.AppendLine("");
-            sb.AppendLine("namespace MVC");
+            sb.Append("namespace ");
+            if (config.MVC.UseRootNamespace == true ||
+                (config.MVC.UseRootNamespace == null &&
+                 File.ReadAllText(csproj).IndexOf("Sdk=\"Microsoft.NET.Sdk.Razor\"") >= 0))
+            {
+                sb.Append(config.GetRootNamespaceFor(csproj));
+                sb.Append('.');
+            }
+            sb.AppendLine("MVC");
             sb.AppendLine("{");
             sb.AppendLine("    public static class Views");
             sb.AppendLine("    {");
