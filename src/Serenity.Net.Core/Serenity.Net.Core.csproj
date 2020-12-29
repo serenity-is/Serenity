@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Core</AssemblyName>
     <Title>Serenity Platform - Core Library</Title>

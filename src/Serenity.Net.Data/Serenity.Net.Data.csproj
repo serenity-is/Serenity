@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Data</AssemblyName>
     <Title>Serenity Platform - Data Library</Title>

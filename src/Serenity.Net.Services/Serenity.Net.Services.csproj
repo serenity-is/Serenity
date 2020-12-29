@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Services</AssemblyName>
     <Title>Serenity Platform - Services Library</Title>

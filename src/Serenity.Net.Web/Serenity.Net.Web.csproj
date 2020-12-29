@@ -1,12 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Web</AssemblyName>
     <TargetFrameworks>net5.0</TargetFrameworks>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="CodeGeneration\**\*.cs" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
   </ItemGroup>

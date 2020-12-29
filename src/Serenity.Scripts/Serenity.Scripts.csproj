@@ -16,9 +16,6 @@
     <Compile Remove="node_modules\**" />
     <EmbeddedResource Remove="node_modules\**" />
     <TypeScriptCompile Remove="node_modules\**" />
-    <ToMinimize Include="..\Serenity.Assets\Scripts\jquery-ui.js"></ToMinimize>
-    <ToMinimize Include="..\Serenity.Assets\Scripts\jquery.dialogExtendQ.js"></ToMinimize>
-    <ToMinimize Include="..\Serenity.Assets\Scripts\SlickGrid\slick.grid.js"></ToMinimize>
     <ToCompileCoreLib Include="CoreLib\**\*.ts;CoreLib\tsconfig.json;rollup.config.js"></ToCompileCoreLib>
     <ToSerenityLess Include="style\**\*.less"></ToSerenityLess>
   </ItemGroup>
@@ -33,10 +30,6 @@
   <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\terser\bin\terser') Or !Exists('node_modules\less\bin\lessc')">
     <Message Text="Installing NPM packages..." Importance="high"></Message>
     <Exec Command="npm install" />
-  </Target>
-  <Target Name="MinimizeScripts" AfterTargets="AfterBuild" Inputs="@(ToMinimize)" Outputs="@(ToMinimize->'%(RelativeDir)%(Filename).min.js')">
-    <Message Text="Minimizing %(ToMinimize.Identity)..." Importance="high"></Message>
-    <Exec Command="npx terser &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename)%(ToMinimize.Extension)&quot; -o &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename).min.js&quot; --comments --mangle -f &quot;beautify=false,max_line_len=1000&quot; " />
   </Target>
   <Target Name="CompileCoreLib" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" Outputs="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.d.ts">
     <Exec Command="npm run build" />
