@@ -190,6 +190,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
     }
 
     static CKEditorVer = "4.7.1";
+    static CKEditorPath = "~/Scripts/ckeditor/";
 
     static includeCKEditor(): void {
         if (window['CKEDITOR']) {
@@ -203,7 +204,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
 
         $('<script/>').attr('type', 'text/javascript')
             .attr('id', 'CKEditorScript')
-            .attr('src', resolveUrl('~/Scripts/ckeditor/ckeditor.js?v=' +
+            .attr('src', resolveUrl(HtmlContentEditor.CKEditorPath + 'ckeditor.js?v=' +
                 HtmlContentEditor.CKEditorVer))
             .appendTo(window.document.head);
     };
