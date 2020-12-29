@@ -1,6 +1,6 @@
 ﻿export function endsWith(s: string, suffix: string): boolean {
     if (String.prototype.endsWith)
-        return s.endsWith(s);
+        return s.endsWith(suffix);
 
     if (suffix == null)
         return false;
@@ -31,7 +31,7 @@ export function padLeft(s: string | number, len: number, ch: string = ' ') {
 
 export function startsWith(s: string, prefix: string): boolean {
     if (String.prototype.startsWith)
-        return s.startsWith(s);
+        return s.startsWith(prefix);
 
     if (prefix == null)
         return false;
