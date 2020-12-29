@@ -70,7 +70,7 @@ namespace Serenity.Web
                 }
                 else
                 {
-                    cssUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, cssUrl);
+                    cssUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootFileProvider, cssUrl);
                     cssUrl = VirtualPathUtility.ToAbsolute(context, cssUrl);
                 }
 
@@ -139,7 +139,7 @@ namespace Serenity.Web
                 }
                 else
                 {
-                    scriptUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, scriptUrl);
+                    scriptUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootFileProvider, scriptUrl);
                     scriptUrl = VirtualPathUtility.ToAbsolute(context, scriptUrl);
                 }
 

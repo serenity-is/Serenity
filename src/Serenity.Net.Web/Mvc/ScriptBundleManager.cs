@@ -5,7 +5,6 @@ using Serenity.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 
 namespace Serenity.Web
@@ -175,7 +174,7 @@ namespace Serenity.Web
                             continue;
                         }
 
-                        string sourceUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, sourceFile);
+                        string sourceUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootFileProvider, sourceFile);
                         sourceUrl = VirtualPathUtility.ToAbsolute(contextAccessor, sourceUrl);
                         var rootUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/");
 
@@ -186,9 +185,9 @@ namespace Serenity.Web
 
                         bundleParts.Add(() =>
                         {
-                            var sourcePath = PathHelper.SecureCombine(hostEnvironment.WebRootPath, 
-                                sourceUrl[rootUrl.Length..]);
-                            if (!File.Exists(sourcePath))
+                            var sourcePath = sourceUrl[rootUrl.Length..];
+                            var sourceInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
+                            if (!sourceInfo.Exists)
                                 return string.Format(CultureInfo.CurrentCulture, errorLines, string.Format(CultureInfo.CurrentCulture, 
                                     "File {0} is not found!", sourcePath));
 
@@ -198,17 +197,18 @@ namespace Serenity.Web
                             {
                                 if (settings.UseMinJS == true)
                                 {
-                                    var minPath = Path.ChangeExtension(sourcePath, ".min.js");
-                                    if (File.Exists(minPath))
+                                    var minPath = System.IO.Path.ChangeExtension(sourcePath, ".min.js");
+                                    var minInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(minPath);
+                                    if (minInfo.Exists)
                                     {
                                         sourcePath = minPath;
-                                        using StreamReader sr = new StreamReader(File.OpenRead(sourcePath));
+                                        using var sr = new System.IO.StreamReader(minInfo.CreateReadStream());
                                         return sr.ReadToEnd();
                                     }
                                 }
 
                                 string code;
-                                using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
+                                using (var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream()))
                                     code = sr.ReadToEnd();
 
                                 try
@@ -228,7 +228,7 @@ namespace Serenity.Web
                                 }
                             }
 
-                            using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
+                            using (var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream()))
                                 return sr.ReadToEnd();
                         });
                     }
@@ -325,7 +325,7 @@ namespace Serenity.Web
             }
             else
             {
-                scriptUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, scriptUrl);
+                scriptUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootFileProvider, scriptUrl);
                 scriptUrl = VirtualPathUtility.ToAbsolute(contextAccessor, scriptUrl);
 
                 if (bySrcUrl == null ||

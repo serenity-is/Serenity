@@ -5,7 +5,6 @@ using Serenity.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -177,7 +176,7 @@ namespace Serenity.Web
                             continue;
                         }
 
-                        string sourceUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, sourceFile);
+                        string sourceUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootFileProvider, sourceFile);
                         sourceUrl = VirtualPathUtility.ToAbsolute(contextAccessor, sourceUrl);
                         var rootUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/");
 
@@ -188,9 +187,9 @@ namespace Serenity.Web
 
                         bundleParts.Add(() =>
                         {
-                            var sourcePath = PathHelper.SecureCombine(hostEnvironment.WebRootPath, 
-                                sourceUrl[rootUrl.Length..]);
-                            if (!File.Exists(sourcePath))
+                            var sourcePath = sourceUrl[rootUrl.Length..];
+                            var sourceInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
+                            if (!sourceInfo.Exists)
                                 return string.Format(CultureInfo.CurrentCulture, errorLines, 
                                     string.Format(CultureInfo.CurrentCulture, "File {0} is not found!", sourcePath));
 
@@ -202,18 +201,19 @@ namespace Serenity.Web
                             {
                                 if (settings.UseMinCSS == true)
                                 {
-                                    var minPath = Path.ChangeExtension(sourcePath, ".min.css");
-                                    if (File.Exists(minPath))
+                                    var minPath = System.IO.Path.ChangeExtension(sourcePath, ".min.css");
+                                    var minInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(minPath);
+                                    if (minInfo.Exists)
                                     {
                                         sourcePath = minPath;
-                                        using StreamReader sr = new StreamReader(File.OpenRead(sourcePath));
+                                        using var sr = new System.IO.StreamReader(minInfo.CreateReadStream());
                                         code = sr.ReadToEnd();
                                     }
                                 }
 
                                 if (code == null)
                                 {
-                                    using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
+                                    using (var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream()))
                                         code = sr.ReadToEnd();
 
                                     try
@@ -233,7 +233,7 @@ namespace Serenity.Web
                             }
                             else
                             {
-                                using StreamReader sr = new StreamReader(File.OpenRead(sourcePath));
+                                using var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream());
                                 code = sr.ReadToEnd();
                             }
 
@@ -342,7 +342,7 @@ namespace Serenity.Web
                 string.IsNullOrEmpty(virtualPath))
                 return content;
 
-            var absolutePath = Path.GetDirectoryName(virtualPath)
+            var absolutePath = System.IO.Path.GetDirectoryName(virtualPath)
                 .Replace('\\', '/');
 
             if (string.IsNullOrWhiteSpace(absolutePath))
@@ -383,7 +383,7 @@ namespace Serenity.Web
             }
             else
             {
-                cssUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootPath, cssUrl);
+                cssUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootFileProvider, cssUrl);
                 cssUrl = VirtualPathUtility.ToAbsolute(contextAccessor, cssUrl);
 
                 if (bySrcUrl == null ||

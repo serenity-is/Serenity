@@ -1,10 +1,9 @@
-﻿using Serenity.Data;
+﻿using Microsoft.Extensions.FileProviders;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Serenity.Web
 {
@@ -22,59 +21,37 @@ namespace Serenity.Web
             expandVersion.Clear();
         }
 
-        public static string GetLatestVersion(string path, string mask)
+        public static string GetLatestVersion(IFileProvider fileProvider, string path, string pattern)
         {
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
-            if (mask.IsNullOrEmpty())
-                return null;
+            if (pattern == null)
+                throw new ArgumentNullException(nameof(pattern));
 
-            var idx = mask.IndexOf("*", StringComparison.Ordinal);
-            if (idx <= 0)
-                throw new ArgumentOutOfRangeException(nameof(mask));
+            var regex = new Regex(pattern);
 
-            var before = mask.Substring(0, idx);
-            var after = mask[(idx + 1)..];
-            var extension = Path.GetExtension(mask);
-
-            var files = Directory.GetFiles(path, mask)
-                .Select(x =>
-                {
-                    var filename = Path.GetFileName(x);
-                    return filename.Substring(before.Length, filename.Length - before.Length - after.Length);
-                })
-                .Where(s =>
-                {
-                    if (s.Length < 0)
-                        return false;
-                    return s.Split('.').All(x => int.TryParse(x, out int y));
-                })
-                .ToArray();
-
-            if (!files.Any())
-                return null;
-
-            Array.Sort(files, (x, y) =>
+            var files = fileProvider.GetDirectoryContents(path);
+            Version maxVersion = null;
+            string maxName = null;
+            foreach (var file in files)
             {
-                var px = x.Split('.');
-                var py = y.Split('.');
-
-                for (var i = 0; i < Math.Min(px.Length, py.Length); i++)
+                var match = regex.Match(file.Name);
+                if (match.Success &&
+                    match.Groups.Count > 1 &&
+                    match.Groups[1].Value != null &&
+                    Version.TryParse(match.Groups[1].Value, out Version v) &&
+                    (maxVersion == null || v >= maxVersion))
                 {
-                    var c = int.Parse(px[i], CultureInfo.InvariantCulture)
-                        .CompareTo(int.Parse(py[i], CultureInfo.InvariantCulture));
-                    if (c != 0)
-                        return c;
+                    maxVersion = v;
+                    maxName = file.Name;
                 }
+            }
 
-                return px.Length.CompareTo(py.Length);
-            });
-
-            return files.Last();
+            return maxName;
         }
 
-        public static string ExpandVersionVariable(string webRootPath, string scriptUrl)
+        public static string ExpandVersionVariable(IFileProvider fileProvider, string scriptUrl)
         {
             if (scriptUrl.IsNullOrEmpty())
                 return scriptUrl;
@@ -90,21 +67,22 @@ namespace Serenity.Web
 
             var before = scriptUrl.Substring(0, idx);
             var after = scriptUrl[(idx + tpl.Length)..];
-            var extension = Path.GetExtension(scriptUrl);
+            var extension = System.IO.Path.GetExtension(scriptUrl);
 
-            var path = PathHelper.SecureCombine(webRootPath, before.StartsWith("~/", StringComparison.Ordinal) ? before[2..] : before);
-            path = Path.GetDirectoryName(path);
+            var path = before.StartsWith("~/", StringComparison.Ordinal) ? before[2..] : before;
+            path = System.IO.Path.GetDirectoryName(path);
 
-            var beforeName = Path.GetFileName(before.Replace('/', Path.DirectorySeparatorChar));
+            var beforeName = System.IO.Path.GetFileName(before);
 
-            var latest = GetLatestVersion(path, beforeName + "*" + extension.Replace('/', Path.DirectorySeparatorChar));
+            var latest = GetLatestVersion(fileProvider, path, "^" + beforeName.Replace(".", "\\.") + 
+                @"([0-9]?(\.[0-9])*)" + (extension ?? "").Replace(".", "\\.") + "$");
             if (latest == null)
             {
                 expandVersion[scriptUrl] = scriptUrl;
                 return scriptUrl;
             }
 
-            result = before + latest + after;
+            result = PathHelper.ToUrl(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(before), latest));
             expandVersion[scriptUrl] = result;
             return result;
         }

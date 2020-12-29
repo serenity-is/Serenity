@@ -1,24 +1,24 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
-using Serenity.IO;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Security.Cryptography;
 
 namespace Serenity.Web
 {
     public class ContentHashCache : IContentHashCache
     {
-        private Hashtable hashByContentPath;
+        private readonly ConcurrentDictionary<string, string> hashByContentPath;
         private readonly bool cdnEnabled;
         private readonly string cdnHttp;
         private readonly string cdnHttps;
-        private readonly GlobFilter cdnFilter;
+        private readonly IO.GlobFilter cdnFilter;
         private readonly IWebHostEnvironment hostEnvironment;
         private readonly IHttpContextAccessor httpContextAccessor;
 
@@ -38,7 +38,7 @@ namespace Serenity.Web
             this.httpContextAccessor = httpContextAccessor;
 
             var cdn = cdnSettings.Value;
-            hashByContentPath = new Hashtable(StringComparer.OrdinalIgnoreCase);
+            hashByContentPath = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             cdnEnabled = cdn.Enabled == true && !string.IsNullOrEmpty(cdn.Url);
             cdnHttp = cdn.Url;
             if (string.IsNullOrEmpty(cdn.HttpsUrl))
@@ -46,19 +46,30 @@ namespace Serenity.Web
             else
                 cdnHttps = cdn.HttpsUrl;
 
-            cdnFilter = new GlobFilter(cdn.Include, cdn.Exclude);
+            cdnFilter = new IO.GlobFilter(cdn.Include, cdn.Exclude);
         }
 
         public void ScriptsChanged()
         {
-            hashByContentPath = new Hashtable(StringComparer.OrdinalIgnoreCase);
+            hashByContentPath.Clear();
         }
 
-        private static string GetFileSHA1(string filePath)
+        private static string GetFileSHA1(IFileInfo file)
         {
-            using FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 120000);
+            byte[] hash;
             var md5 = MD5.Create();
-            byte[] hash = md5.ComputeHash(fs);
+            var physicalPath = file.PhysicalPath;
+            if (physicalPath != null)
+            {
+                using System.IO.FileStream fs = new System.IO.FileStream(physicalPath,
+                    System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read, 120000);
+                hash = md5.ComputeHash(fs);
+            }
+            else
+            {
+                using var stream = file.CreateReadStream();
+                hash = md5.ComputeHash(stream);
+            }
             return WebEncoders.Base64UrlEncode(hash);
         }
 
@@ -115,20 +126,16 @@ namespace Serenity.Web
             }
             else
             {
-                var path = contentUrl;
-                path = PathHelper.SecureCombine(hostEnvironment.WebRootPath, PathHelper.ToPath(contentUrl[2..]));
+                var path = PathHelper.ToPath(contentUrl[2..]);
 
-                object hash;
-                hash = hashByContentPath[path];
-                if (hash == null)
+                var hash = hashByContentPath.GetOrAdd(path, (filePath) => 
                 {
-                    if (File.Exists(path))
-                        hash = GetFileSHA1(path);
+                    var fileInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(filePath);
+                    if (fileInfo.Exists)
+                        return GetFileSHA1(fileInfo);
                     else
-                        hash = DateTime.Now.ToString("yyyymmddhh", CultureInfo.InvariantCulture);
-
-                    Hashtable.Synchronized(hashByContentPath)[path] = hash;
-                }
+                        return DateTime.Now.ToString("yyyyMMddhh", CultureInfo.InvariantCulture);
+                });
 
                 contentUrl = VirtualPathUtility.ToAbsolute(pathBase, contentUrl) + "?v=" + (string)hash;
                 if (!cdnEnabled)
@@ -144,7 +151,7 @@ namespace Serenity.Web
             else
                 cdnMatch = cdnMatch[2..];
 
-            if (!cdnFilter.IsMatch(cdnMatch.Replace('/', Path.DirectorySeparatorChar)))
+            if (!cdnFilter.IsMatch(cdnMatch.Replace('/', System.IO.Path.DirectorySeparatorChar)))
                 return contentUrl;
 
             bool isSecureConnection = httpContextAccessor?.HttpContext?.Request?.IsHttps == true;
