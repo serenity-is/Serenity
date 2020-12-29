@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
-    <Version>5.0.16</Version>
+    <Version>5.0.17</Version>
     <StaticWebAssetBasePath>/Serenity.Assets</StaticWebAssetBasePath>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Content\**\*.*" Exclude="*.back;*.orig;*.log">
       <Pack>true</Pack>
-      <PackagePath>Content\</PackagePath>
+      <PackagePath>content\Content\</PackagePath>
       <IncludeInPackage>true</IncludeInPackage>
     </None>
     <ToMinimize Include="wwwroot\Scripts\jquery-ui.js"></ToMinimize>

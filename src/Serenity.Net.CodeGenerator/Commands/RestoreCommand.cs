@@ -18,12 +18,16 @@ namespace Serenity.CodeGenerator
             "FluentMigrator.",
             "FirebirdSql.",
             "MailKit",
+            "Mapster",
             "MySql",
             "Microsoft.",
             "Newtonsoft.",
             "NetStandard.",
             "Npgsql",
-            "System."
+            "Nuglify.",
+            "StackExchange.",
+            "System.",
+            "Serenity.Net."
         };
 
         public void Run(string csproj)
@@ -85,7 +89,16 @@ namespace Serenity.CodeGenerator
 
                 var packageFolder = Path.Combine(Path.Combine(packagesDir, id), ver);
                 if (!Directory.Exists(packageFolder))
+                {
                     packageFolder = Path.Combine(Path.Combine(packagesDir, id.ToLowerInvariant()), ver);
+                    if (!Directory.Exists(packageFolder))
+                    {
+                        var myPackagesDir = Path.Combine(packagesDir, "..", "my-packages");
+                        packageFolder = Path.Combine(myPackagesDir, id, ver);
+                        if (!Directory.Exists(packageFolder))
+                            packageFolder = Path.Combine(myPackagesDir, id.ToLowerInvariant(), ver);
+                    }
+                }
 
                 var nuspecFile = Path.Combine(packageFolder, id + ".nuspec");
                 if (!File.Exists(nuspecFile))
@@ -102,6 +115,7 @@ namespace Serenity.CodeGenerator
                 var contentRoot = Path.Combine(packageFolder, "Content/".Replace('/', Path.DirectorySeparatorChar));
                 if (!Directory.Exists(contentRoot))
                     contentRoot = Path.Combine(packageFolder, "content/".Replace('/', Path.DirectorySeparatorChar));
+
 
                 if (Directory.Exists(contentRoot))
                 {
@@ -158,19 +172,19 @@ namespace Serenity.CodeGenerator
                     }
                 }
 
-                var nuspec = XElement.Parse(File.ReadAllText(nuspecFile));
-                XNamespace ns = "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd";
-                var meta = nuspec.Element(ns + "metadata");
+                var nuspecContent = File.ReadAllText(nuspecFile);
+                var nuspec = XElement.Parse(nuspecContent);
+                var meta = nuspec.Elements().Where(x => x.Name?.LocalName == "metadata").FirstOrDefault();
                 if (meta == null)
                     continue;
 
-                var deps = meta.Element(ns + "dependencies");
+                var deps = meta.Elements().Where(x => x.Name?.LocalName == "dependencies").FirstOrDefault(); ;
                 if (deps == null)
                     continue;
 
                 var fw = dep.Item1;
 
-                var groups = deps.Elements(ns + "group");
+                var groups = deps.Elements().Where(x => x.Name?.LocalName == "group");
                 if (groups.Any())
                 {
                     foreach (var group in groups)
@@ -180,9 +194,10 @@ namespace Serenity.CodeGenerator
                             string.Compare(target, fw, StringComparison.OrdinalIgnoreCase) == 0 ||
                             target.StartsWith(".NETStandard", StringComparison.OrdinalIgnoreCase) ||
                             target.StartsWith("netstandard", StringComparison.OrdinalIgnoreCase) ||
-                            target.StartsWith("netcore", StringComparison.OrdinalIgnoreCase))
+                            target.StartsWith("netcore", StringComparison.OrdinalIgnoreCase) ||
+                            target.StartsWith("net", StringComparison.OrdinalIgnoreCase))
                         {
-                            foreach (var dep2 in group.Elements(ns + "dependency"))
+                            foreach (var dep2 in group.Elements().Where(x => x.Name?.LocalName == "dependency"))
                             {
                                 var id2 = dep2.Attribute("id").Value;
                                 if (!skipPackage(id2))
@@ -193,7 +208,7 @@ namespace Serenity.CodeGenerator
                 }
                 else
                 {
-                    foreach (var dep2 in deps.Elements(ns + "dependency"))
+                    foreach (var dep2 in deps.Elements().Where(x => x.Name?.LocalName == "dependency"))
                     {
                         var id2 = dep2.Attribute("id").Value;
                         if (!skipPackage(id2))
