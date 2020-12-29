@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
-    <Version>5.0.14</Version>
+    <Version>5.0.15</Version>
+    <StaticWebAssetBasePath>/Serenity.Assets</StaticWebAssetBasePath>
   </PropertyGroup>
   <ItemGroup>
     <ToMinimize Include="wwwroot\Scripts\jquery-ui.js"></ToMinimize>
