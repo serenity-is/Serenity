@@ -1,5 +1,11 @@
 ﻿export function endsWith(s: string, suffix: string): boolean {
-    if (suffix == null || !suffix.length)
+    if (String.prototype.endsWith)
+        return s.endsWith(s);
+
+    if (suffix == null)
+        return false;
+    
+    if (!suffix.length)
         return true;
     if (suffix.length > s.length)
         return false;
@@ -24,11 +30,17 @@ export function padLeft(s: string | number, len: number, ch: string = ' ') {
 }
 
 export function startsWith(s: string, prefix: string): boolean {
-    if (prefix == null || !prefix.length)
+    if (String.prototype.startsWith)
+        return s.startsWith(s);
+
+    if (prefix == null)
+        return false;
+
+    if (!prefix.length)
         return true;
     if (prefix.length > s.length)
         return false;
-    return (s.substr(0, prefix.length) == prefix);
+    return (s.substr(0, prefix.length) === prefix);
 }
 
 export function toSingleLine(str: string) {
