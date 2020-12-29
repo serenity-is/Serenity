@@ -1,10 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
-    <Version>5.0.15</Version>
+    <Version>5.0.16</Version>
     <StaticWebAssetBasePath>/Serenity.Assets</StaticWebAssetBasePath>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="Content\**\*.*" Exclude="*.back;*.orig;*.log">
+      <Pack>true</Pack>
+      <PackagePath>Content\</PackagePath>
+      <IncludeInPackage>true</IncludeInPackage>
+    </None>
     <ToMinimize Include="wwwroot\Scripts\jquery-ui.js"></ToMinimize>
     <ToMinimize Include="wwwroot\Scripts\jquery.dialogExtendQ.js"></ToMinimize>
     <ToMinimize Include="wwwroot\Scripts\SlickGrid\slick.grid.js"></ToMinimize>
