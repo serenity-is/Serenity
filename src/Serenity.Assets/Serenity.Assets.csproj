@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
-    <Version>5.0.17</Version>
+    <Version>5.0.19</Version>
     <StaticWebAssetBasePath>/Serenity.Assets</StaticWebAssetBasePath>
   </PropertyGroup>
   <ItemGroup>
