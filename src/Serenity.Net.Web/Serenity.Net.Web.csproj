@@ -2,6 +2,7 @@
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Web</AssemblyName>
     <TargetFrameworks>net5.0</TargetFrameworks>
+    <Title>Serenity Platform - Asp.Net Core Web Library</Title>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />

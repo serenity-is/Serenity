@@ -5,11 +5,31 @@
     <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
     <TypeScriptBuildMode>true</TypeScriptBuildMode>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <Title>Serenity Platform - Scripts</Title>
+    <Description>Contains Serenity scripts and CSS file</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="*\tsconfig.json" />
-    <Content Include="*\tsconfig.json" />
+    <None Remove="*\tsconfig.json;style\*.css;texts\**\*.json;" />
+    <Content Include="*\tsconfig.json">
+      <Pack>false</Pack>
+    </Content>
+    <None Include="style\*.css">
+      <Pack>true</Pack>
+      <PackagePath>content\Content\serenity\</PackagePath>
+    </None>
+    <Content Include="texts\**\*.json">
+      <Pack>true</Pack>
+      <PackagePath>content\Scripts\serenity\texts\</PackagePath>
+    </Content>
+    <Content Include="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.js.map;dist\Serenity.CoreLib.min.js">
+      <Pack>true</Pack>
+      <PackagePath>content\Scripts\serenity\</PackagePath>
+    </Content>
+    <Content Include="dist\Serenity.CoreLib.d.ts">
+      <Pack>true</Pack>
+      <PackagePath>content\Scripts\serenity\;content\Scripts\typings\serenity\</PackagePath>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Remove="node_modules\**" />

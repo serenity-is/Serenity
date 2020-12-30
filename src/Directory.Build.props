@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <Version>5.0.17</Version>
-	<Company>Serenity</Company>
-	<Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
+    <Company>Serenity</Company>
+    <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Authors>Volkan Ceylan</Authors>
     <Copyright>Copyright (c) Volkan Ceylan</Copyright>

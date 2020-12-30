@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>Serenity.Scripts</id>
-    <version>${version}</version>
-    <authors>${authors}</authors>
-    <owners>${owners}</owners>
-    <title>Serenity Platform - Scripts</title>
-    <description>Contains Serenity scripts and CSS file</description>
-    <language>${language}</language>
-    <iconUrl>${iconUrl}</iconUrl>
-    <license type="expression">MIT</license>
-    <projectUrl>${projectUrl}</projectUrl>
-    <copyright>${copyright}</copyright>
-    <tags>${tags}</tags>
   </metadata>
   <files>
 	<file src="style\*.css" target="content/Content/serenity" />
