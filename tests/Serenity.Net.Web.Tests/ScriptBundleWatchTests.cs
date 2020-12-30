@@ -49,7 +49,7 @@ namespace Serenity.Net.Entity.Tests
             }
         }
 
-        private class FakePermissions : IPermissionService
+        internal class FakePermissions : IPermissionService
         {
             public bool HasPermission(string permission)
             {
@@ -57,22 +57,23 @@ namespace Serenity.Net.Entity.Tests
             }
         }
 
-        private class FakeWebHostEnvironment : IWebHostEnvironment
+        internal class FakeWebHostEnvironment : IWebHostEnvironment
         {
             public FakeWebHostEnvironment(string webRootPath)
             {
                 WebRootPath = webRootPath;
+                WebRootFileProvider = new PhysicalFileProvider(webRootPath);
             }
 
             public string WebRootPath { get; set; }
-            public IFileProvider WebRootFileProvider { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+            public IFileProvider WebRootFileProvider { get; set; }
             public string ApplicationName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
             public IFileProvider ContentRootFileProvider { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
             public string ContentRootPath { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
             public string EnvironmentName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         }
 
-        private static string CreateTempDir()
+        internal static string CreateTempDir()
         {
             var tempDir = Path.Combine(Path.GetTempPath(), ".serenitytests", Path.GetRandomFileName());
             if (Directory.Exists(tempDir))
