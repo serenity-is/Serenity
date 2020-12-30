@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,6 +30,11 @@ namespace Serenity.CodeGenerator
         public bool GenerateUI { get; set; }
         [JsonIgnore]
         public bool GenerateCustom { get; set; }
+
+        public UpgradeInformation UpgradeInfo { get; set; }
+
+        [JsonExtensionData]
+        public IDictionary<string, JToken> ExtensionData { get; set; }
 
         public GeneratorConfig()
         {
@@ -136,6 +142,15 @@ namespace Serenity.CodeGenerator
             public string OutDir { get; set; }
             public string[] SearchViewPaths { get; set; }
             public string[] StripViewPaths { get; set; }
+        }
+
+        public class UpgradeInformation
+        {
+            public string InitialType { get; set; }
+            public string InitialVersion { get; set; }
+            public string[] AppliedUpgrades { get; set; }
+            [JsonExtensionData]
+            public IDictionary<string, JToken> ExtensionData { get; set; }
         }
     }
 }
