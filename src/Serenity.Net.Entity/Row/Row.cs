@@ -146,13 +146,11 @@ namespace Serenity.Data
             if (validationErrors != null)
                 RemoveValidationError(field.PropertyName ?? field.Name);
 
-            if (propertyChanged != null)
-            {
-                if (field.IndexCompare(previousValues, this) != 0)
-                {
-                    RaisePropertyChanged(field);
-                    field.Copy(this, previousValues);
-                }
+            if (propertyChanged != null &&
+                previousValues != null &&
+                field.IndexCompare(previousValues, this) != 0) { 
+                RaisePropertyChanged(field);
+                field.Copy(this, previousValues);
             }
         }
 
