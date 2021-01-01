@@ -79,7 +79,7 @@ namespace Serenity.CodeGenerator
                 };
             }
 
-            foreach (var name in config.AppSettingFiles)
+            foreach (var name in config.GetAppSettingsFiles())
             {
                 var path = Path.Combine(projectDir, name);
                 if (File.Exists(name))

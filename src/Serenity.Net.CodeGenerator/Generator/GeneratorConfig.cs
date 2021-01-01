@@ -12,16 +12,49 @@ namespace Serenity.CodeGenerator
         public string RootNamespace { get; set; }
         public ServerTypingsConfig ServerTypings { get; set; }
         public ClientTypesConfig ClientTypes { get; set; }
+        public bool ShouldSerializeClientTypes() => ClientTypes != null &&
+            !string.IsNullOrEmpty(ClientTypes.OutDir);
+
         public MVCConfig MVC { get; set; }
+        public bool ShouldSerializeMVC() => MVC != null &&
+            (!string.IsNullOrEmpty(MVC.OutDir) ||
+             MVC.UseRootNamespace != null ||
+             MVC.SearchViewPaths?.Any() == true ||
+             MVC.StripViewPaths?.Any() == true);
+
         public List<Connection> Connections { get; set; }
+        public bool ShouldSerializeConnections() => Connections != null && Connections.Count > 0;
+
         public string KDiff3Path { get; set; }
+        public bool ShouldSerializeKDiff3Path() => !string.IsNullOrEmpty(KDiff3Path);
+
         public string TSCPath { get; set; }
+        public bool ShouldSerializeTSCPath() => !string.IsNullOrEmpty(TSCPath);
+
         public List<BaseRowClass> BaseRowClasses { get; set; }
+        public bool ShouldSerializeBaseRowClasses() =>
+            BaseRowClasses != null && BaseRowClasses.Any();
+
         public List<string> RemoveForeignFields { get; set; }
+        public bool ShouldSerializeRemoveForeignFields() =>
+            RemoveForeignFields != null && RemoveForeignFields.Any();
+
+        public bool ShouldSerializeCustomTemplates() =>
+            !string.IsNullOrEmpty(CustomTemplates);
         public string CustomTemplates { get; set; }
+
         public Dictionary<string, string> CustomGenerate { get; set; }
+        public bool ShouldSerializeCustomGenerate() =>
+            CustomGenerate != null && CustomGenerate.Any();
+
         public Dictionary<string, object> CustomSettings { get; set; }
+        public bool ShouldSerializeCustomSettings() =>
+            CustomSettings != null && CustomSettings.Any();
+
         public string[] AppSettingFiles { get; set; }
+        public bool ShouldSerializeAppSettingFiles() =>
+            AppSettingFiles != null && AppSettingFiles.Any();
+
         [JsonIgnore]
         public bool GenerateRow { get; set; }
         [JsonIgnore]
@@ -46,7 +79,6 @@ namespace Serenity.CodeGenerator
             GenerateService = true;
             GenerateUI = true;
             GenerateCustom = true;
-            AppSettingFiles = new string[] { "appsettings.json", "appsettings.machine.json" };
         }
 
         public string SaveToJson()
@@ -56,6 +88,19 @@ namespace Serenity.CodeGenerator
                 c.Tables.Sort((x, y) => string.Compare(x.Tablename, y.Tablename, StringComparison.OrdinalIgnoreCase));
 
             return JSON.StringifyIndented(this, 2);
+        }
+
+        public string[] GetAppSettingsFiles()
+        {
+            if (AppSettingFiles != null &&
+                AppSettingFiles.Length != 0)
+                return AppSettingFiles;
+
+            return new string[]
+            {
+                "appsettings.json",
+                "appsettings.machine.json"
+            };
         }
 
         public string GetRootNamespaceFor(string csproj)
@@ -127,7 +172,11 @@ namespace Serenity.CodeGenerator
         public class ServerTypingsConfig
         {
             public string[] Assemblies { get; set; }
+            public bool ShouldSerializeAssemblies() => Assemblies != null && Assemblies.Length > 0;
+
             public string OutDir { get; set; }
+            public bool ShouldSerializeOutDir() => !string.IsNullOrEmpty(OutDir);
+
             public bool LocalTexts { get; set; }
         }
 
