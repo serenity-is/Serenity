@@ -1,3 +1,29 @@
+## 5.0.20 (2021-01-01)
+
+Features:
+  - Serenity.NET 5 which only supports .NET 5+
+  - Embrace dependency injection which makes testing easier, and many integrated features in .NET / ASP.NET Core itself, like caching, options etc.
+  - [Breaking Change] Due to dependency injection usage and obsoleting of Serenity specific Authentication, Dependency etc. classes there are many breaking changes, see Serenity docs and GitHub repo for upgrade notes.
+  - Prepared Stargen upgrade tool for StartSharp users
+  - Removed "Dependency" class which was a service locator abstraction, and used Dependency Injection (DI) instead (https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-5.0)
+  - Removed Config class and used Options pattern where possible (https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-5.0)
+  - There is almost no static classes / state in Serenity framework now
+  - Replaced "ILocalCache" interface with .NET Core's "IMemoryCache"
+  - Replaced Serenity specific "IDistributedCache" interface and their implementations Serenity.Caching.Redis / Serenity.Caching.Couchbase with .NET Core's "IDistributedCache"
+  - Removed "IAuthenticationService" interface and "AuthenticationService" static class, introduced an injectable "IUserAccessor" abstraction
+  - Removed Serenity specific "Log" class, and used .NET Core's own logging system
+  - Replaced ExtensibilityHelper.SelfAssemblies with a ITypeSource abstraction
+  - Replaced static SqlConnections with ISqlConnections abstraction, it is now theorically possible to use dynamic connection strings per request (multi tenancy++)
+  - Use DI with lookup scripts, data scripts etc.
+  - Introduced IRequestContext for service handlers
+  - Row base class is replaced with IRow interface, and there is a generic Row< TFields > base class with access to its Fields type
+  - Rows can theorically have different set of custom fields and attributes per request (multi tenancy++)
+  - Service behaviors rewritten for DI and they can get constructor injection
+  - Script/CSS bundling use options pattern, and bundles can be specified at runtime, also IFileProvider of .NET used so non-physical files can be included in bundles.
+  - Default sql dialect can be set per async context
+  - Redesigned upload system, opens way to use different storage providers like Azure, S3 etc.
+  - Rewrote core script library with modular typescript
+  
 ## 3.14.5 (2020-11-24)
 
 Features:
