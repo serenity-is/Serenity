@@ -1,3 +1,8 @@
+## 5.0.20 (2021-01-05)
+
+Bugfixes:
+  - TimeEditor left at Serenity.Serenity namespace due to typo
+
 ## 5.0.20 (2021-01-01)
 
 Features:
