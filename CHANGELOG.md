@@ -1,4 +1,9 @@
-## 5.0.20 (2021-01-05)
+## 5.0.22 (2021-01-05)
+
+Bugfixes:
+  - HtmlContentEditor.CKEditorBasePath had to end with a slash
+
+## 5.0.21 (2021-01-05)
 
 Bugfixes:
   - TimeEditor left at Serenity.Serenity namespace due to typo
