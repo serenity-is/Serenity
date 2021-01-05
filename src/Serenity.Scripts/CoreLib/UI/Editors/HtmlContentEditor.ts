@@ -2,7 +2,7 @@
 import { IReadOnly, IStringValue } from "../../Interfaces";
 import { text } from "../../Q/LocalText";
 import { resolveUrl } from "../../Q/Services";
-import { isEmptyOrNull, isTrimmedEmpty, trimToNull } from "../../Q/Strings";
+import { endsWith, isEmptyOrNull, isTrimmedEmpty, trimToNull } from "../../Q/Strings";
 import { LazyLoadHelper } from "../Helpers/LazyLoadHelper";
 import { Widget } from "../Widgets/Widget";
 
@@ -192,15 +192,19 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
     static CKEditorVer = "4.7.1";
     static CKEditorBasePath: string;
 
-    static getCKEditorBasePath() {
-        if (HtmlContentEditor.CKEditorBasePath != null)
-            return HtmlContentEditor.CKEditorBasePath;
-        // @ts-ignore
-        else if (typeof CKEDITOR_BASEPATH !== "undefined" && CKEDITOR_BASEPATH)
+    static getCKEditorBasePath(): string {
+        var path = HtmlContentEditor.CKEditorBasePath;
+        if (path == null) {
             // @ts-ignore
-            return CKEDITOR_BASEPATH;
-        else
-            return "~/Scripts/ckeditor/";
+            if (typeof CKEDITOR_BASEPATH !== "undefined" && CKEDITOR_BASEPATH)
+                // @ts-ignore
+                path = CKEDITOR_BASEPATH;
+            else
+                return "~/Scripts/ckeditor/";
+        }
+        if (endsWith(path, '/'))
+            return path;
+        return path + '/';
     }
 
     static includeCKEditor(): void {

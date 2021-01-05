@@ -3,7 +3,6 @@ export * from "../UI/DataGrid/ISlickFormatter";
 export * from "../Decorators";
 export * from "../Services/Criteria";
 export * from "../Types";
-export * from "../UI/Widgets/Globals";
 export * from "../UI/Widgets/PrefixedContext";
 export * from "../UI/Widgets/Widget";
 export * from "../UI/Widgets/TemplatedWidget";

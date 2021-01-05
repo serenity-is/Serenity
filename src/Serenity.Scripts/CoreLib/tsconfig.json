@@ -44,6 +44,7 @@
     "./Globals/Validate.ts",
     "./Slick/Globals.ts",
     "./Serenity/Globals.ts",
+    "./UI/Widgets/Globals.ts",
     "./CoreLib.ts"
   ],
   "exclude": ["**/*.spec.ts"]

@@ -1,5 +1,4 @@
 ﻿import { Widget } from "./Widget";
-import {} from "./Globals";
 
 export namespace WX {
     export function getWidget<TWidget>(element: JQuery, type: any) {

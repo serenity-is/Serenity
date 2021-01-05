@@ -32,6 +32,7 @@
       "@CoreLib/*": ["../CoreLib/*"],
       "@Q/*": ["../CoreLib/Q/*"]
     },
+    "isolatedModules": false,
     "suppressImplicitAnyIndexErrors": true,
     "lib": [
       "ES5",
@@ -42,6 +43,13 @@
     "jsx": "react"
   },
   "include": [
+    "../CoreLib/Globals/jQueryStatic.ts",
+    "../CoreLib/Globals/Promise.ts",
+    "../CoreLib/Globals/Select2.ts",
+    "../CoreLib/Globals/Validate.ts",
+    "../CoreLib/Slick/Globals.ts",
+    "../CoreLib/Serenity/Globals.ts",
+    "../CoreLib/UI/Widgets/Globals.ts",
     "**/*.spec.ts"
   ]
 }

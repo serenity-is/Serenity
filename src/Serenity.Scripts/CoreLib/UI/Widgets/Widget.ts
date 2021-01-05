@@ -23,25 +23,28 @@ export interface WidgetDialogClass<TOptions = object> {
 export type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
 
 export function reactPatch() {
+    // @ts-ignore check for global
+    let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
+
     // @ts-ignore
-    if (typeof React === "undefined" && typeof window !== "undefined") {
-        if (window['preact'] != null) {
-            window['React'] = window['ReactDOM'] = window['preact'];
+    if (typeof React === "undefined" && typeof globalObj !== "undefined") {
+        if (globalObj['preact'] != null) {
+            globalObj['React'] = globalObj['ReactDOM'] = globalObj['preact'];
             // @ts-ignore
             (React as any).Fragment = (React as any).Fragment ?? "x-fragment";
         }
-        else if (window['Nerv'] != null) {
-            window['React'] = window['ReactDOM'] = window['Nerv'];
+        else if (globalObj['Nerv'] != null) {
+            globalObj['React'] = globalObj['ReactDOM'] = globalObj['Nerv'];
             // @ts-ignore
             (React as any).Fragment = (React as any).Fragment ?? "x-fragment";
         }
         else {
-            window['React'] = {
+            globalObj['React'] = {
                 Component: function () { } as any,
                 Fragment: "x-fragment" as any,
                 createElement: function () { return { _reactNotLoaded: true }; } as any
             } as any
-            window['ReactDOM'] = {
+            globalObj['ReactDOM'] = {
                 render: function () { throw Error("To use React, it should be included before Serenity.CoreLib.js"); }
             }
         }
@@ -187,7 +190,7 @@ export class Widget<TOptions> extends React.Component<TOptions> {
 }
 
 if (typeof $ !== "undefined" && $.fn) {
-    $.fn.tryGetWidget = function (this: JQuery, type: any) {
+    ($.fn as any).tryGetWidget = function (this: JQuery, type: any) {
         var element = this;
         var w;
         if (isAssignableFrom(Widget, type)) {
@@ -216,7 +219,7 @@ if (typeof $ !== "undefined" && $.fn) {
         return null;
     };
 
-    $.fn.getWidget = function<TWidget>(this: JQuery, type: { new (...args: any[]): TWidget }) {
+    ($.fn as any).getWidget = function<TWidget>(this: JQuery, type: { new (...args: any[]): TWidget }) {
         if (this == null) {
             throw new ArgumentNullException('element');
         }
@@ -225,7 +228,7 @@ if (typeof $ !== "undefined" && $.fn) {
                 getTypeFullName(type), this.selector));
         }
 
-        var w = this.tryGetWidget(type);
+        var w = (this as any).tryGetWidget(type);
         if (w == null) {
             var message = format("Element has no widget of type '{0}'! If you have recently changed " +
                 "editor type of a property in a form class, or changed data type in row (which also changes " +
