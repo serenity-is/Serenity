@@ -32,6 +32,7 @@ test('getCKEditorBasePath gives priority to HtmlContentEditor.CKEditorBasePath',
     }
     finally {
         delete HtmlContentEditor.CKEditorBasePath;
+        delete global["CKEDITOR_BASEPATH"];
     }
 });
 
