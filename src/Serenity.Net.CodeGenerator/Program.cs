@@ -31,7 +31,7 @@ namespace Serenity.CodeGenerator
 
             if (csproj == null)
             {
-                var csprojs = Directory.GetFiles(".", "*.csproj");
+                var csprojs = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.csproj");
                 if (csprojs.Length == 0)
                 {
                     Console.Error.WriteLine("Can't find a project file in current directory!");
