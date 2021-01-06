@@ -1,3 +1,8 @@
+## 5.0.24 (2021-01-06)
+
+Bugfixes:
+  - fix error with sergen during new module code generation
+
 ## 5.0.22 (2021-01-05)
 
 Bugfixes:
