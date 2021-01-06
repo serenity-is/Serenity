@@ -11,7 +11,7 @@
       <IncludeInPackage>true</IncludeInPackage>
     </None>
     <ToMinimize Include="wwwroot\Scripts\jquery-ui.js"></ToMinimize>
-    <ToMinimize Include="wwwroot\Scripts\jquery.dialogExtendQ.js"></ToMinimize>
+    <ToMinimize Include="wwwroot\Scripts\jquery.dialogextendQ.js"></ToMinimize>
     <ToMinimize Include="wwwroot\Scripts\SlickGrid\slick.grid.js"></ToMinimize>
   </ItemGroup>
   <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('..\Serenity.Scripts\node_modules\terser\bin\terser')">
