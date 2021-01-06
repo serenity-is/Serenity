@@ -1,8 +1,8 @@
 using Xunit;
 
-namespace Serenity.Net.Core.Tests
+namespace Serenity.Tests.Services
 {
-    public class UnitTest1
+    public class Placeholder
     {
         [Fact]
         public void Test1()

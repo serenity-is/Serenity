@@ -1,5 +1,4 @@
 ﻿using Serenity.Abstractions;
-using System;
 using System.Security.Claims;
 using System.Security.Principal;
 using Xunit;
@@ -14,29 +13,18 @@ namespace Serenity.Tests.Authorization
             Assert.False(((IUserAccessor)null).IsLoggedIn());
         }
 
-        private class FakeUserAccessor : IUserAccessor
-        {
-            private readonly Func<ClaimsPrincipal> getUser;
-
-            public FakeUserAccessor(Func<ClaimsPrincipal> getUser)
-            {
-                this.getUser = getUser ?? throw new ArgumentNullException(nameof(getUser));
-            }
-
-            public ClaimsPrincipal User => getUser();
-        }
 
         [Fact]
         public void IsLoggedIn_Returns_False_If_UserAccessor_User_Property_IsNull()
         {
-            var userAccessor = new FakeUserAccessor(() => null);
+            var userAccessor = new MockUserAccessor(() => null);
             Assert.False(userAccessor.IsLoggedIn());
         }
 
         [Fact]
         public void IsLoggedIn_Returns_False_If_UserAccessor_User_Identity_IsNull()
         {
-            var userAccessor = new FakeUserAccessor(() => new ClaimsPrincipal());
+            var userAccessor = new MockUserAccessor(() => new ClaimsPrincipal());
             Assert.False(userAccessor.IsLoggedIn());
         }
 
@@ -45,7 +33,7 @@ namespace Serenity.Tests.Authorization
         {
             var identity = new ClaimsIdentity();
             Assert.False(identity.IsAuthenticated);
-            var userAccessor = new FakeUserAccessor(() => new ClaimsPrincipal(identity));
+            var userAccessor = new MockUserAccessor(() => new ClaimsPrincipal(identity));
             Assert.False(userAccessor.IsLoggedIn());
         }
 
@@ -54,7 +42,7 @@ namespace Serenity.Tests.Authorization
         {
             var identity = new GenericIdentity("test");
             Assert.True(identity.IsAuthenticated);
-            var userAccessor = new FakeUserAccessor(() => new ClaimsPrincipal(identity));
+            var userAccessor = new MockUserAccessor(() => new ClaimsPrincipal(identity));
             Assert.True(userAccessor.IsLoggedIn());
         }
 

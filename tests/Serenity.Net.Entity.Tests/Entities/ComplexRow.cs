@@ -2,7 +2,7 @@
 using Serenity.Data.Mapping;
 using System.ComponentModel;
 
-namespace Serenity.Net.Entity.Tests
+namespace Serenity.Tests.Entities
 {
     [TableName("ComplexTable")]
     public class ComplexRow : Row<ComplexRow.RowFields>

@@ -1,8 +1,9 @@
 using Serenity.Data;
+using Serenity.Tests.Entities;
 using System;
 using Xunit;
 
-namespace Serenity.Net.Entity.Tests
+namespace Serenity.Tests.Entity
 {
     public class RowCreationTests
     {

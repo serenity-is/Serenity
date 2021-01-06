@@ -1,6 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\TestProperties.xml" />
   <ItemGroup>
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="13.2.8" />
     <ProjectReference Include="..\..\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
+    <ProjectReference Include="..\Serenity.Net.Core.Tests\Serenity.Net.Core.Tests.csproj" />
   </ItemGroup>
 </Project>

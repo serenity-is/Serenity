@@ -161,7 +161,7 @@ namespace Serenity.Extensions.DependencyInjection
                         x.Path == path && x.Filter == "*.css") == true)
                     continue;
 
-                var CssWatcher = new FileWatcher(path, "*.css");
+                var CssWatcher = fileWatcherFactory.Create(path, "*.css");
                 CssWatcher.Changed += (name) =>
                 {
                     bundleManager?.CssChanged();
@@ -205,7 +205,7 @@ namespace Serenity.Extensions.DependencyInjection
                         x.Path == path && x.Filter == "*.js") == true)
                     continue;
 
-                var scriptWatcher = new FileWatcher(path, "*.js");
+                var scriptWatcher = fileWatcherFactory.Create(path, "*.js");
                 scriptWatcher.Changed += (name) =>
                 {
                     bundleManager?.ScriptsChanged();

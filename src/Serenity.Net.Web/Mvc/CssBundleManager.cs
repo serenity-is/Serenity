@@ -104,15 +104,16 @@ namespace Serenity.Web
                     var bundleParts = new List<Func<string>>();
                     var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                    void registerInBundle(string sourceFile)
+                    void registerInBundle(string appRelativeUrl)
                     {
-                        if (bundleKey.IndexOf('/', StringComparison.Ordinal) < 0 && !bundleKeyBySourceUrl.ContainsKey(sourceFile))
-                            bundleKeyBySourceUrl[sourceFile] = bundleKey;
+                        if (bundleKey.IndexOf('/', StringComparison.Ordinal) < 0 && 
+                            !bundleKeyBySourceUrl.ContainsKey(appRelativeUrl))
+                            bundleKeyBySourceUrl[appRelativeUrl] = bundleKey;
 
-                        if (!bundleKeysBySourceUrl.TryGetValue(sourceFile, out HashSet<string> bundleKeys))
+                        if (!bundleKeysBySourceUrl.TryGetValue(appRelativeUrl, out HashSet<string> bundleKeys))
                         {
                             bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                            bundleKeysBySourceUrl[sourceFile] = new HashSet<string>();
+                            bundleKeysBySourceUrl[appRelativeUrl] = new HashSet<string>();
                         }
 
                         bundleKeys.Add(bundleKey);
@@ -164,8 +165,7 @@ namespace Serenity.Web
                                         }
                                     }
 
-                                    var scriptUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/DynJS.axd/" + scriptName);
-                                    return RewriteUrlsToAbsolute(scriptUrl, code);
+                                    return RewriteUrls("~/DynJS.axd/" + scriptName, code, "../");
                                 }
                                 finally
                                 {
@@ -177,17 +177,14 @@ namespace Serenity.Web
                         }
 
                         string sourceUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootFileProvider, sourceFile);
-                        sourceUrl = VirtualPathUtility.ToAbsolute(contextAccessor, sourceUrl);
-                        var rootUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/");
-
-                        if (sourceUrl.IsNullOrEmpty() || !sourceUrl.StartsWith(rootUrl, StringComparison.Ordinal))
+                        if (!sourceUrl.StartsWith("~/", StringComparison.Ordinal))
                             continue;
 
                         registerInBundle(sourceUrl);
+                        var sourcePath = sourceUrl[2..];
 
                         bundleParts.Add(() =>
                         {
-                            var sourcePath = sourceUrl[rootUrl.Length..];
                             var sourceInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
                             if (!sourceInfo.Exists)
                                 return string.Format(CultureInfo.CurrentCulture, errorLines, 
@@ -237,7 +234,7 @@ namespace Serenity.Web
                                 code = sr.ReadToEnd();
                             }
 
-                            code = RewriteUrlsToAbsolute(sourceUrl, code);
+                            code = RewriteUrls(sourceUrl, code, "../");
                             return code;
                         });
                     }
@@ -313,56 +310,60 @@ namespace Serenity.Web
             }
         }
 
-        private static string UrlToAbsolute(string absolutePath, string url, string prefix, string suffix)
+        private static string RewriteUrl(string contentPath, string contentRelative, string rootPrefix)
         {
-            if (string.IsNullOrWhiteSpace(url) ||
-                (url.Contains("://", StringComparison.Ordinal)))
-                return prefix + url + suffix;
+            if (string.IsNullOrWhiteSpace(contentRelative) ||
+                (contentRelative.Contains("://", StringComparison.Ordinal)))
+                return contentRelative;
 
-            url = url.TrimStart();
-            if (string.IsNullOrWhiteSpace(url) || url[0] == '/')
-                return prefix + url + suffix;
+            contentRelative = contentRelative.TrimStart();
+            if (string.IsNullOrWhiteSpace(contentRelative) || contentRelative[0] == '/')
+                return contentRelative;
 
-            if (url.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
-                return prefix + url + suffix;
+            if (contentRelative.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+                return contentRelative;
 
-            var question = url.IndexOf('?', StringComparison.Ordinal);
+            var question = contentRelative.IndexOf('?', StringComparison.Ordinal);
+            string query = null;
             if (question >= 0)
             {
-                return prefix + new Uri("x:" + absolutePath + url.Substring(0, question)).AbsolutePath[2..]
-                    + url[question..] + suffix;
+                query = contentRelative[question..];
+                contentRelative = contentRelative.Substring(0, question);
             }
 
-            return prefix + new Uri("x:" + absolutePath + url).AbsolutePath[2..] + suffix;
+            var rewrittenUrl = new Uri("x:" + contentPath + contentRelative).AbsolutePath[2..];
+            if (question >= 0)
+                rewrittenUrl += query;
+
+            if (rootPrefix != null && rewrittenUrl.StartsWith('/'))
+                rewrittenUrl = rootPrefix + rewrittenUrl[1..];
+
+            return rewrittenUrl;
         }
 
-        private string RewriteUrlsToAbsolute(string virtualPath, string content)
+        private static string RewriteUrls(string contentPath, string content, string rootPrefix)
         {
             if (string.IsNullOrEmpty(content) ||
-                string.IsNullOrEmpty(virtualPath))
+                string.IsNullOrEmpty(contentPath))
                 return content;
 
-            var absolutePath = System.IO.Path.GetDirectoryName(virtualPath)
+            contentPath = System.IO.Path.GetDirectoryName(contentPath)
                 .Replace('\\', '/');
 
-            if (string.IsNullOrWhiteSpace(absolutePath))
+            if (string.IsNullOrWhiteSpace(contentPath))
                 return content;
 
-            if (absolutePath.StartsWith("~", StringComparison.Ordinal))
-                absolutePath = VirtualPathUtility.ToAbsolute(contextAccessor, absolutePath);
+            if (contentPath.StartsWith("~", StringComparison.Ordinal))
+                contentPath = contentPath[1..];
 
-            if (!absolutePath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
-                absolutePath += "/";
-
-            // at application start, when request is not yet available, pathbase is always /
-            if (absolutePath == "/")
-                absolutePath = "";
+            if (!contentPath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
+                contentPath += "/";
 
             var regex = new Regex("url\\((?<prefix>['\"]?)(?<url>[^)]+?)(?<suffix>['\"]?)\\)");
             return regex.Replace(content, (Match match) => "url(" +
-                UrlToAbsolute(absolutePath, match.Groups["url"].Value,
-                    match.Groups["prefix"].Value,
-                    match.Groups["suffix"].Value) + ")");
+                match.Groups["prefix"].Value +
+                RewriteUrl(contentPath, match.Groups["url"].Value, rootPrefix) +
+                match.Groups["suffix"].Value + ")");
         }
 
         public string GetCssBundle(string cssUrl)
@@ -388,7 +389,14 @@ namespace Serenity.Web
             else
             {
                 cssUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootFileProvider, cssUrl);
-                cssUrl = VirtualPathUtility.ToAbsolute(contextAccessor, cssUrl);
+                if (cssUrl.StartsWith("/", StringComparison.Ordinal))
+                {
+                    var rootUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/");
+                    if (cssUrl.StartsWith(rootUrl))
+                        cssUrl = "~" + cssUrl;
+                    else
+                        return cssUrl;
+                }
 
                 if (bySrcUrl == null ||
                     !bySrcUrl.TryGetValue(cssUrl, out bundleKey))

@@ -3,50 +3,41 @@ using Microsoft.Extensions.DependencyInjection;
 using Serenity.Abstractions;
 using Serenity.Extensions.DependencyInjection;
 using Serenity.Web;
-using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace Serenity.Net.Entity.Tests
+namespace Serenity.Tests.Web
 {
     public class CssBundleWatchTests
     {
         [Fact]
         public void When_Css_File_Changes_It_Reloads_Bundle()
         {
-            var tempDir = ScriptBundleWatchTests.CreateTempDir();
-            try
+            var env = new MockHostEnvironment();
+            var testFile = env.Path.Combine(env.WebRootPath, "test.css");
+            env.AddWebFile(testFile, "before");
+            var fileWatcherFactory = new MockFileWatcherFactory(env.FileSystem);
+            var container = new ServiceCollection();
+            container.AddSingleton<IWebHostEnvironment>(env);
+            container.AddSingleton<IPermissionService, MockPermissions>();
+            container.AddSingleton<IFileWatcherFactory>(fileWatcherFactory);
+            container.AddCssBundling(options =>
             {
-                var testFile = Path.Combine(tempDir, "test.css");
-                File.WriteAllText(testFile, "before");
-                var container = new ServiceCollection();
-                container.AddSingleton<IWebHostEnvironment>(
-                    new ScriptBundleWatchTests.FakeWebHostEnvironment(tempDir));
-                container.AddSingleton<IPermissionService, 
-                    ScriptBundleWatchTests.FakePermissions>();
-                container.AddCssBundling(options =>
+                options.Enabled = true;
+                options.Bundles["Test"] = new string[]
                 {
-                    options.Enabled = true;
-                    options.Bundles["Test"] = new string[]
-                    {
-                        "~/" + Path.GetFileName(testFile)
-                    };
-                });
-                var services = container.BuildServiceProvider();
-                services.UseCssWatching(tempDir);
-                var scriptManager = services.GetRequiredService<IDynamicScriptManager>();
-                var before = scriptManager.GetScriptText("CssBundle.Test");
-                Assert.Equal("before", before?.Replace(";", "").Trim());
-                File.WriteAllText(testFile, "after");
-                var fileWatcherFactory = services.GetRequiredService<IFileWatcherFactory>();
-                fileWatcherFactory.Watchers.Single().RaiseChanged(Path.GetFileName(testFile));
-                var after = scriptManager.GetScriptText("CssBundle.Test");
-                Assert.Equal("after", after?.Replace(";", "").Trim());
-            }
-            finally
-            {
-                Directory.Delete(tempDir, true);
-            }
+                    "~/" + env.Path.GetFileName(testFile)
+                };
+            });
+            var services = container.BuildServiceProvider();
+            services.UseCssWatching(env.Path.GetDirectoryName(testFile));
+            var scriptManager = services.GetRequiredService<IDynamicScriptManager>();
+            var before = scriptManager.GetScriptText("CssBundle.Test");
+            Assert.Equal("before", before?.Replace(";", "").Trim());
+            env.File.WriteAllText(testFile, "after");
+            fileWatcherFactory.Watchers.Single().RaiseChanged(env.Path.GetFileName(testFile));
+            var after = scriptManager.GetScriptText("CssBundle.Test");
+            Assert.Equal("after", after?.Replace(";", "").Trim());
         }
     }
 }

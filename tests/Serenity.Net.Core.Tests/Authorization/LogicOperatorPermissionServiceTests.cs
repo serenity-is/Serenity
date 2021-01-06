@@ -1,32 +1,16 @@
 ﻿using Serenity.Abstractions;
 using Serenity.Web;
-using System;
 using Xunit;
 
 namespace Serenity.Tests.Authorization
 {
     public class LogicOperatorPermissionServiceTests
     {
-        private class FakePermissionService : IPermissionService
-        {
-            private readonly Func<string, bool> hasPermission;
-
-            public FakePermissionService(Func<string, bool> hasPermission)
-            {
-                this.hasPermission = hasPermission ?? throw new ArgumentNullException(nameof(hasPermission));
-            }
-
-            public bool HasPermission(string permission)
-            {
-                return hasPermission(permission);
-            }
-        }
-
         [Fact]
         public void ShouldDelegateSimplePermissionsToUnderlyingOne()
         {
             var expected = false;
-            var ps = new FakePermissionService(p => expected);
+            var ps = new MockPermissions(p => expected);
 
             var lops = new LogicOperatorPermissionService(ps);
             Assert.False(lops.HasPermission(""));
@@ -39,15 +23,15 @@ namespace Serenity.Tests.Authorization
             Assert.True(lops.HasPermission("B:C"));
         }
 
-        private static IPermissionService FakeService()
+        private static IPermissionService TYPermissions()
         {
-            return new FakePermissionService(p => p == "T" || p == "Y");
+            return new MockPermissions(p => p == "T" || p == "Y");
         }
 
         [Fact]
         public void ReturnsFalseForOrWhenAllFalse()
         {
-            var lops = new LogicOperatorPermissionService(FakeService());
+            var lops = new LogicOperatorPermissionService(TYPermissions());
             Assert.False(lops.HasPermission("F|N"));
             Assert.False(lops.HasPermission("N|F"));
             Assert.False(lops.HasPermission("N|N|N"));
@@ -58,7 +42,7 @@ namespace Serenity.Tests.Authorization
         [Fact]
         public void ReturnsTrueForOrWhenAllTrue()
         {
-            var lops = new LogicOperatorPermissionService(FakeService());
+            var lops = new LogicOperatorPermissionService(TYPermissions());
             Assert.True(lops.HasPermission("T|Y"));
             Assert.True(lops.HasPermission("Y|T"));
             Assert.True(lops.HasPermission("Y|Y|Y"));
@@ -69,7 +53,7 @@ namespace Serenity.Tests.Authorization
         [Fact]
         public void ReturnsTrueForOrWhenSomeTrue()
         {
-            var lops = new LogicOperatorPermissionService(FakeService());
+            var lops = new LogicOperatorPermissionService(TYPermissions());
             Assert.True(lops.HasPermission("T|F"));
             Assert.True(lops.HasPermission("Y|N"));
             Assert.True(lops.HasPermission("N|Y|N"));
@@ -80,7 +64,7 @@ namespace Serenity.Tests.Authorization
         [Fact]
         public void ReturnsFalseForAndWhenAllFalse()
         {
-            var lops = new LogicOperatorPermissionService(FakeService());
+            var lops = new LogicOperatorPermissionService(TYPermissions());
             Assert.False(lops.HasPermission("F&N"));
             Assert.False(lops.HasPermission("N&F"));
             Assert.False(lops.HasPermission("N&N&N"));
@@ -91,7 +75,7 @@ namespace Serenity.Tests.Authorization
         [Fact]
         public void ReturnsTrueForAndWhenAllTrue()
         {
-            var lops = new LogicOperatorPermissionService(FakeService());
+            var lops = new LogicOperatorPermissionService(TYPermissions());
             Assert.True(lops.HasPermission("T&Y"));
             Assert.True(lops.HasPermission("Y&T"));
             Assert.True(lops.HasPermission("Y&Y&Y"));
@@ -102,7 +86,7 @@ namespace Serenity.Tests.Authorization
         [Fact]
         public void ReturnsFalseForAndWhenSomeFalse()
         {
-            var lops = new LogicOperatorPermissionService(FakeService());
+            var lops = new LogicOperatorPermissionService(TYPermissions());
             Assert.False(lops.HasPermission("T&F"));
             Assert.False(lops.HasPermission("Y&N"));
             Assert.False(lops.HasPermission("T&Y&N"));
@@ -113,7 +97,7 @@ namespace Serenity.Tests.Authorization
         [Fact]
         public void AndTakesPrecedenceOverOr()
         {
-            var lops = new LogicOperatorPermissionService(FakeService());
+            var lops = new LogicOperatorPermissionService(TYPermissions());
             Assert.False(lops.HasPermission("F|T&F"));
             Assert.False(lops.HasPermission("F|F&T"));
             Assert.True(lops.HasPermission("T|F&T"));
@@ -175,7 +159,7 @@ namespace Serenity.Tests.Authorization
         [InlineData("(!(!Module:0 | (Module:1 | !0) & !Module:1 | (!(Module:Permission:0 & Module:SubModule:0) & Module:SubModule:0)))", false)]
         public void Evaluates_Expression_As_Expected(string permission, bool expected)
         {
-            var lops = new LogicOperatorPermissionService(new FakePermissionService(p => p != null && p.IndexOf("1") >= 0));
+            var lops = new LogicOperatorPermissionService(new MockPermissions(p => p != null && p.IndexOf("1") >= 0));
             var actual = lops.HasPermission(permission);
             if (expected)
                 Assert.True(actual);
