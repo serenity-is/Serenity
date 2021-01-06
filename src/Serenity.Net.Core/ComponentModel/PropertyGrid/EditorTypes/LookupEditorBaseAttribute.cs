@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel
+namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Base class for lookup based editor types

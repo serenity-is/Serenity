@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data
+namespace Serenity.Data
 {
     /// <summary>
     /// Expected number of rows enumeration for SQL Update / Delete operation.

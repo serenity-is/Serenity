@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Data
 {
     public interface IParentIdRow : IRow

@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel
+namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Sets editor type to "MultipleImageUpload" which doesn't allow

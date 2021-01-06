@@ -1,4 +1,4 @@
-﻿using Serenity.Data;
+using Serenity.Data;
 using Xunit;
 using System.Linq;
 using System;

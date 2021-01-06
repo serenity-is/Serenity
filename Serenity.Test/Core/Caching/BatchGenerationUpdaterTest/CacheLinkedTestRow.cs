@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Test.Core.Caching.BatchGenerationUpdaterTest
 {
     using Serenity.Data;

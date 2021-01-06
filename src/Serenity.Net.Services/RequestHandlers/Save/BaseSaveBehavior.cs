@@ -1,4 +1,4 @@
-﻿using Serenity.Data;
+using Serenity.Data;
 
 namespace Serenity.Services
 {

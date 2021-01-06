@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data
+namespace Serenity.Data
 {
     internal static class SqlKeywords
     {

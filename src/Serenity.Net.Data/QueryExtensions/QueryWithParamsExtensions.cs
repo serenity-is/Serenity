@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data
+namespace Serenity.Data
 {
     /// <summary>
     ///   Extension methods for classes implementing IDbWhereParam interface.</summary>

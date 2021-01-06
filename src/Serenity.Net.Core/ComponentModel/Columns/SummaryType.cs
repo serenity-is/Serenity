@@ -1,4 +1,4 @@
-﻿namespace Serenity
+namespace Serenity
 {
     /// <summary>
     /// Enumeration of aggregate function types for a column

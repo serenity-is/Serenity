@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting
+namespace Serenity.Reporting
 {
     public interface ICellDecorator
     {

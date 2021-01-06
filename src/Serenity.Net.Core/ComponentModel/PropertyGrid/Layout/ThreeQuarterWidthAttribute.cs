@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel
+namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Marks form field with "col-lg-9" css class, which makes it allocate 

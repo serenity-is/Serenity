@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel
+namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Sets editor type as "ImageUpload" (single), while allowing non-image files.

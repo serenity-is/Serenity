@@ -1,4 +1,4 @@
-﻿using Serenity.Data;
+using Serenity.Data;
 using Serenity.Testing;
 using Serenity.Test.Testing;
 using System;

@@ -1,4 +1,4 @@
-﻿using Serenity.Reflection;
+using Serenity.Reflection;
 using System.Collections.Generic;
 using System.Text;
 

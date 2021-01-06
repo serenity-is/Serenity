@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Serenity.Abstractions;
 using Serenity.Localization;
 using System;

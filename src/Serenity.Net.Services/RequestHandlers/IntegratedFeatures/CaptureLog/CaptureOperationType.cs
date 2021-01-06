@@ -1,4 +1,4 @@
-﻿namespace Serenity
+namespace Serenity
 {
     public enum CaptureOperationType
     {

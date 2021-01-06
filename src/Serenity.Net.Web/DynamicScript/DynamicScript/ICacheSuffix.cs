@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Web
 {
     public interface ICacheSuffix

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data
+namespace Serenity.Data
 {
     /// <summary>
     /// Field object abstraction for SQL query

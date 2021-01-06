@@ -1,4 +1,4 @@
-﻿using Serenity.IO;
+using Serenity.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;

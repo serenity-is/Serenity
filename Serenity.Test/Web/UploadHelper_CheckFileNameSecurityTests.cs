@@ -1,4 +1,4 @@
-﻿using Serenity.Web;
+using Serenity.Web;
 using System;
 using Xunit;
 using MyException = System.Web.HttpException;

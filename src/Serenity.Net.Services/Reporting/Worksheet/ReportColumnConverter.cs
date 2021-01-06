@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Data.Mapping;

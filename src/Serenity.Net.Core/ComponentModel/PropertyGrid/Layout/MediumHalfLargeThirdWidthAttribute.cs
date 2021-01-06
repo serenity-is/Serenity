@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel
+namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Marks form field with "col-md-6 col-lg-4" css class, which makes it allocate half of form row

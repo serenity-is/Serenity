@@ -1,4 +1,4 @@
-﻿using Serenity.PropertyGrid;
+using Serenity.PropertyGrid;
 using System;
 
 namespace Serenity.Web

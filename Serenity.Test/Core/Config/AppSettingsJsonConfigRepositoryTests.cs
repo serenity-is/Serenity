@@ -1,4 +1,4 @@
-﻿using Serenity.Abstractions;
+using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using Serenity.Configuration;
 using Serenity.Testing;

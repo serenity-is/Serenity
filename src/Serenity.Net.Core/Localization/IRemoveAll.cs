@@ -1,4 +1,4 @@
-﻿namespace Serenity.Abstractions
+namespace Serenity.Abstractions
 {
     /// <summary>
     /// Abstraction for objects that supports clearing all items, like a cache or local text registry.

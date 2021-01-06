@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 

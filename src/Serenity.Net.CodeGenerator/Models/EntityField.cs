@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator
+namespace Serenity.CodeGenerator
 {
     public class EntityField
     {

@@ -1,4 +1,4 @@
-﻿namespace Serenity
+namespace Serenity
 {
     /// <summary>
     /// Null text localizer which returns null for all keys

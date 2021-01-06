@@ -1,4 +1,4 @@
-﻿using Serenity.Web;
+using Serenity.Web;
 using System.Web.Mvc;
 using Xunit;
 

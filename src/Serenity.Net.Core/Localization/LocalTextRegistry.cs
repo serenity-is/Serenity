@@ -1,4 +1,4 @@
-﻿using Serenity.Abstractions;
+using Serenity.Abstractions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

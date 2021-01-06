@@ -1,4 +1,4 @@
-﻿using FakeItEasy;
+using FakeItEasy;
 using Serenity.Abstractions;
 using Serenity.Logging;
 using Serenity.Testing;

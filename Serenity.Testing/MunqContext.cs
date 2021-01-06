@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Testing
 {
     using System;

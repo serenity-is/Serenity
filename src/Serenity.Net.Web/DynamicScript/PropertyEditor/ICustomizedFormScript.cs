@@ -1,4 +1,4 @@
-﻿using Serenity.ComponentModel;
+using Serenity.ComponentModel;
 using System.Collections.Generic;
 
 namespace Serenity.Web.PropertyEditor

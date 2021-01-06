@@ -1,4 +1,4 @@
-﻿using Serenity.IO;
+using Serenity.IO;
 using System.IO;
 
 namespace Serenity.Web

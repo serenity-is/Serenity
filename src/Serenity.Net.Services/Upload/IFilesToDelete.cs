@@ -1,4 +1,4 @@
-﻿namespace Serenity.Web
+namespace Serenity.Web
 {
     public interface IFilesToDelete
     {

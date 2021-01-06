@@ -1,4 +1,4 @@
-﻿using Serenity.Data.Mapping;
+using Serenity.Data.Mapping;
 using System;
 using System.Collections.Generic;
 

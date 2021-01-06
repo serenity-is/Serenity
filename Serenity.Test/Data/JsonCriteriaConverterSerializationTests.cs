@@ -1,4 +1,4 @@
-﻿using Serenity.Data;
+using Serenity.Data;
 using Xunit;
 
 namespace Serenity.Test.Data

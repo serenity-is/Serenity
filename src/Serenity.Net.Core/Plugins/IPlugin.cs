@@ -1,4 +1,4 @@
-﻿namespace Serenity.Plugins
+namespace Serenity.Plugins
 {
     /// <summary>
     /// Abstraction for plugins

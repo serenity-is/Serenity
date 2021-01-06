@@ -1,4 +1,4 @@
-﻿
+
 using System.Security.Claims;
 
 namespace Serenity.Abstractions

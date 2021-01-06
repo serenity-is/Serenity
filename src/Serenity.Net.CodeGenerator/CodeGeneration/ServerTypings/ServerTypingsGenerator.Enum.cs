@@ -1,4 +1,4 @@
-﻿using Mono.Cecil;
+using Mono.Cecil;
 using Serenity.Reflection;
 using System;
 using System.Globalization;

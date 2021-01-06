@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data
+namespace Serenity.Data
 {
     /// <summary>
     ///   Interface for objects setting values by SetTo method (like SqlInsert, SqlUpdate...)</summary>

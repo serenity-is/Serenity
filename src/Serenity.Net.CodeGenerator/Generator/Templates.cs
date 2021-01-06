@@ -1,4 +1,4 @@
-﻿using Scriban;
+using Scriban;
 using Scriban.Runtime;
 using System;
 using System.Collections.Concurrent;

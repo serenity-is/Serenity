@@ -1,4 +1,4 @@
-﻿using Serenity.Web;
+using Serenity.Web;
 using System;
 using System.Linq;
 using System.Reflection;

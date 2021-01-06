@@ -1,4 +1,4 @@
-﻿#if ASPNETMVC
+#if ASPNETMVC
 namespace Serenity.Caching
 {
     using Serenity.Abstractions;

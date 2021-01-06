@@ -1,4 +1,4 @@
-﻿namespace Serenity.Testing
+namespace Serenity.Testing
 {
     using Serenity.Abstractions;
     using System;

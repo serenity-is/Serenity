@@ -1,4 +1,4 @@
-﻿#if ASPNETMVC
+#if ASPNETMVC
 using System;
 using System.Reflection;
 using System.Web.Helpers;

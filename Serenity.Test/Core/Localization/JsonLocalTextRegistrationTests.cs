@@ -1,4 +1,4 @@
-﻿using FakeItEasy;
+using FakeItEasy;
 using Newtonsoft.Json.Linq;
 using Serenity.Abstractions;
 using Serenity.Localization;

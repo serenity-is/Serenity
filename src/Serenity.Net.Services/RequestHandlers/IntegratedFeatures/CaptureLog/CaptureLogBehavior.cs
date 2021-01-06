@@ -1,4 +1,4 @@
-﻿using Serenity.Data;
+using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data
+namespace Serenity.Data
 {
     /// <summary>
     /// Abstraction for SQL dialect, e.g. syntax for different SQL server types and connection settings.

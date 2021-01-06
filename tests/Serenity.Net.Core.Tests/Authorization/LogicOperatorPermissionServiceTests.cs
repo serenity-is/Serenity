@@ -1,4 +1,4 @@
-﻿using Serenity.Abstractions;
+using Serenity.Abstractions;
 using Serenity.Web;
 using System;
 using Xunit;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Serenity.Data;
 using Newtonsoft.Json;
 using Xunit;

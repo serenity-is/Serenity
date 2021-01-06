@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema
+namespace Serenity.Data.Schema
 {
     /// <summary>
     /// Table schema/name and view information

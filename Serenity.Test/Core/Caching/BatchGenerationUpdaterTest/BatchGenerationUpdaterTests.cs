@@ -1,4 +1,4 @@
-﻿namespace Serenity.Test.Core.Caching.BatchGenerationUpdaterTest
+namespace Serenity.Test.Core.Caching.BatchGenerationUpdaterTest
 {
     using FakeItEasy;
     using Serenity.Abstractions;

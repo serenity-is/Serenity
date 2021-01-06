@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data
+namespace Serenity.Data
 {
     /// <summary>
     ///   Interface for query classes (e.g. SqlQuery) that can return expression given column name

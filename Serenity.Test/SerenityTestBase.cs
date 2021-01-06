@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Serenity;
 using Serenity.Caching;
 using Serenity.Testing;

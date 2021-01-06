@@ -1,4 +1,4 @@
-﻿#if ASPNETMVC
+#if ASPNETMVC
 using System;
 
 namespace Serenity.Services

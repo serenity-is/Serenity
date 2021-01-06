@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data
+namespace Serenity.Data
 {
     /// <summary>
     ///   Interface for query classes (e.g. SqlSelect, SqlUpdate) having a where method to filter

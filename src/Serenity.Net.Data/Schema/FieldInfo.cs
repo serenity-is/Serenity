@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema
+namespace Serenity.Data.Schema
 {
     /// <summary>
     /// Meta data information for an SQL column

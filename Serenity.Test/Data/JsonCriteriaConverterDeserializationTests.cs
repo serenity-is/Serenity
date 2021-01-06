@@ -1,4 +1,4 @@
-﻿using Serenity.Data;
+using Serenity.Data;
 using System.Collections;
 using Xunit;
 using Xunit.Extensions;

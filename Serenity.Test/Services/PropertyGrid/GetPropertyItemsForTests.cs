@@ -1,4 +1,4 @@
-﻿using Serenity.ComponentModel;
+using Serenity.ComponentModel;
 using Serenity.PropertyGrid;
 using System.Collections.Generic;
 using Xunit;

@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration
+namespace Serenity.CodeGeneration
 {
     public enum ExternalTypeOrigin
     {

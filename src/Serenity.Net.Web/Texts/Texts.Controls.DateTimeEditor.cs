@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Web
 {
     internal static partial class Texts

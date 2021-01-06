@@ -1,4 +1,4 @@
-﻿using Serenity.Services;
+using Serenity.Services;
 using System;
 
 namespace Serenity.ComponentModel
