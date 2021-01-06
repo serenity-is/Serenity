@@ -1,3 +1,8 @@
+## 5.0.25 (2021-01-07)
+
+Features:
+  - Improve CSS relative URL rewrite handling in CssBundleManager, add tests for rewrite logic
+
 ## 5.0.24 (2021-01-06)
 
 Bugfixes:
