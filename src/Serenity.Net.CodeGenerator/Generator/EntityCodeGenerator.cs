@@ -22,7 +22,7 @@ namespace Serenity.CodeGenerator
             this.model = model;
             this.csproj = csproj;
 
-            this.rootDir = Path.GetDirectoryName(csproj);
+            this.rootDir = Path.GetDirectoryName(Path.GetFullPath(csproj));
             this.config = config;
             this.model.CustomSettings = config.CustomSettings;
 
@@ -44,8 +44,6 @@ namespace Serenity.CodeGenerator
 
         public void Run()
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(rootDir));
-
             if (config.GenerateRow)
             {
                 CreateFile(Templates.Render("Row", model), moduleClass + "Row.cs");
