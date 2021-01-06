@@ -354,6 +354,10 @@ namespace Serenity.Web
             if (!absolutePath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
                 absolutePath += "/";
 
+            // at application start, when request is not yet available, pathbase is always /
+            if (absolutePath == "/")
+                absolutePath = "";
+
             var regex = new Regex("url\\((?<prefix>['\"]?)(?<url>[^)]+?)(?<suffix>['\"]?)\\)");
             return regex.Replace(content, (Match match) => "url(" +
                 UrlToAbsolute(absolutePath, match.Groups["url"].Value,
