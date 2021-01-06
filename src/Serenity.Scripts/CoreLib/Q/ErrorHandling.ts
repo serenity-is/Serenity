@@ -1,4 +1,4 @@
-﻿import { alert } from "./Dialogs";
+import { alert } from "./Dialogs";
 import { htmlEncode } from "./Html";
 import { notifyError } from "./Notify";
 

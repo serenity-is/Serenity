@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IBooleanValue } from "../../Interfaces";
 import { Widget } from "../Widgets/Widget";
 

@@ -1,4 +1,4 @@
-﻿import { format } from "jquery";
+import { format } from "jquery";
 import { Decorators } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
 import { today } from "../../Q/System";

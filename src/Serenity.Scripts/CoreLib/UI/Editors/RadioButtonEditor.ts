@@ -1,4 +1,4 @@
-﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
+import { Decorators, EnumKeyAttribute } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
 import { tryGetText } from "../../Q/LocalText";
 import { getLookup } from "../../Q/ScriptData";

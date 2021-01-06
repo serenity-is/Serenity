@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { StringEditor } from "./StringEditor";
 
 @Decorators.registerEditor('Serenity.PasswordEditor')

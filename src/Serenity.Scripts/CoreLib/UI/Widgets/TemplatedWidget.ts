@@ -1,4 +1,4 @@
-﻿import { Widget } from "./Widget";
+import { Widget } from "./Widget";
 import { Decorators } from "../../Decorators";
 import { text } from "../../Q/LocalText";
 import { startsWith, replaceAll } from "../../Q/Strings";

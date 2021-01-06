@@ -1,4 +1,4 @@
-﻿export type Grouping<TItem> = { [key: string]: TItem[] };
+export type Grouping<TItem> = { [key: string]: TItem[] };
 
 /**
  * Tests if any of array elements matches given predicate

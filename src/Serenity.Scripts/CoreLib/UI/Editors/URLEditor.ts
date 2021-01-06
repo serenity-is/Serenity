@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IStringValue } from "../../Interfaces";
 import { trimToNull } from "../../Q/Strings";
 import { StringEditor } from "./StringEditor";

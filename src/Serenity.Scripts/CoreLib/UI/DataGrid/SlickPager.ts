@@ -1,4 +1,4 @@
-﻿import { extend } from "../../Q/System";
+import { extend } from "../../Q/System";
 import { text } from "../../Q/LocalText";
 import { Widget } from "../Widgets/Widget";
 

@@ -1,4 +1,4 @@
-﻿import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly } from "../../Interfaces"
+import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly } from "../../Interfaces"
 import { ISetEditValue, IStringValue, IValidateRequired } from "../../Interfaces"
 import { parseDecimal } from "../../Q/Formatting";
 import { text, tryGetText } from "../../Q/LocalText";

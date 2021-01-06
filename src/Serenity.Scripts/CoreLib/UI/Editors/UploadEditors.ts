@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../Interfaces";
 import { extend } from "../../Q/System";
 import { text } from "../../Q/LocalText";

@@ -1,4 +1,4 @@
-﻿import { EditorTypeRegistry } from "../Types/EditorTypeRegistry";
+import { EditorTypeRegistry } from "../Types/EditorTypeRegistry";
 import { getAttributes } from "../Q/System";
 import { ElementAttribute } from "../Decorators";
 import { ReflectionOptionsSetter } from "../UI/Widgets/ReflectionOptionsSetter";

@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { Widget } from "./Widget";
 import { LazyLoadHelper } from "../Helpers/LazyLoadHelper";
 

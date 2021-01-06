@@ -1,4 +1,4 @@
-﻿import { DataChangeInfo } from "../../Types/DataChangeInfo";
+import { DataChangeInfo } from "../../Types/DataChangeInfo";
 import { Widget } from "../Widgets/Widget";
 
 export namespace SubDialogHelper {

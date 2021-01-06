@@ -1,4 +1,4 @@
-﻿import { Flexify } from "../Widgets/Flexify";
+import { Flexify } from "../Widgets/Flexify";
 
 export namespace DialogExtensions {
 

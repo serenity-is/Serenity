@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../Interfaces";
 import { LookupEditorBase, LookupEditorOptions } from "./LookupEditor";
 

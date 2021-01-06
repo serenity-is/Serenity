@@ -1,4 +1,4 @@
-﻿import { Decorators, EntityTypeAttribute, FormKeyAttribute } from "../../Decorators";
+import { Decorators, EntityTypeAttribute, FormKeyAttribute } from "../../Decorators";
 import { IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute } from "../../Decorators";
 import { LocalTextPrefixAttribute,NamePropertyAttribute, ServiceAttribute } from "../../Decorators";
 import { any, isArray } from "../../Q/Arrays";

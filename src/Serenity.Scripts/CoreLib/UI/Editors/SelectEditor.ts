@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { isEmptyOrNull } from "../../Q/Strings";
 import { Select2CommonOptions, Select2Editor } from "./Select2Editor";
 

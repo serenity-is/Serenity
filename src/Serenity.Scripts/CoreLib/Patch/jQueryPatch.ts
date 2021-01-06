@@ -1,4 +1,4 @@
-﻿export function jQueryPatch($: any) {
+export function jQueryPatch($: any) {
     
     function applyJQueryUIFixes(): boolean {
         if (typeof $ == "undefined" || !$.ui || !$.ui.dialog || !$.ui.dialog.prototype)

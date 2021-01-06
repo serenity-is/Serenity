@@ -1,4 +1,4 @@
-﻿import { Decorators, ColumnsKeyAttribute, FilterableAttribute } from "../../Decorators";
+import { Decorators, ColumnsKeyAttribute, FilterableAttribute } from "../../Decorators";
 import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../Decorators";
 import { IReadOnly } from "../../Interfaces";
 import { FilterLine } from "../Filtering/FilterLine";

@@ -1,4 +1,4 @@
-﻿import { getInstanceType, getMembers, isInstanceOfType, MemberType } from "../../Q/System";
+import { getInstanceType, getMembers, isInstanceOfType, MemberType } from "../../Q/System";
 import { OptionAttribute, DisplayNameAttribute } from "../../Decorators";
 import { ReflectionUtils } from "../../Types/ReflectionUtils";
 

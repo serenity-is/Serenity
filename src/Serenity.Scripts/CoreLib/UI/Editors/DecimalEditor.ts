@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IDoubleValue } from "../../Interfaces";
 import { extend } from "../../Q/System";
 import { Culture, formatNumber, parseDecimal } from "../../Q/Formatting";

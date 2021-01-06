@@ -1,4 +1,4 @@
-﻿export function endsWith(s: string, suffix: string): boolean {
+export function endsWith(s: string, suffix: string): boolean {
     if (String.prototype.endsWith)
         return s.endsWith(suffix);
 

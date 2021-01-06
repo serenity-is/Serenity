@@ -1,4 +1,4 @@
-﻿declare namespace Select2 {
+declare namespace Select2 {
     namespace util {
         function stripDiacritics(input: string): string;
     }

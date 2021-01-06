@@ -1,4 +1,4 @@
-﻿export {}
+export {}
 
 export class PrefixedContext {
     constructor(public readonly idPrefix: string) {

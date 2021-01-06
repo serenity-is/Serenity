@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { startsWith } from "../../Q/Strings";
 import { SelectEditor, SelectEditorOptions } from "./SelectEditor";
 

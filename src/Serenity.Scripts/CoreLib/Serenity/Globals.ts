@@ -1,4 +1,4 @@
-﻿declare namespace Serenity {
+declare namespace Serenity {
         
     export type Constructor<T> = new (...args: any[]) => T;
 

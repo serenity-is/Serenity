@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { ArgumentNullException } from "../../Q/System";
 import { Culture } from "../../Q/Formatting";
 import { text, tryGetText } from "../../Q/LocalText";

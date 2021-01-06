@@ -1,4 +1,4 @@
-﻿import { text } from "./LocalText";
+import { text } from "./LocalText";
 import { notifyError } from "./Notify";
 import { getRemoteData } from "./ScriptData";
 import { UserDefinition } from "./UserDefinition";

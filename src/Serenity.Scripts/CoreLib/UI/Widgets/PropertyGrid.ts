@@ -1,4 +1,4 @@
-﻿import { Decorators, OptionsTypeAttribute, ElementAttribute } from "../../Decorators";
+import { Decorators, OptionsTypeAttribute, ElementAttribute } from "../../Decorators";
 import { Widget } from "./Widget";
 import { any } from "../../Q/Arrays";
 import { extend, getAttributes, getTypeName } from "../../Q/System";

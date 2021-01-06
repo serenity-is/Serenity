@@ -1,4 +1,4 @@
-﻿export interface LookupOptions<TItem> {
+export interface LookupOptions<TItem> {
     idField?: string;
     parentIdField?: string;
     textField?: string;

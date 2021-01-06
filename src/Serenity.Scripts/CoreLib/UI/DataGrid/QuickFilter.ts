@@ -1,4 +1,4 @@
-﻿import type { Widget } from "../Widgets/Widget";
+import type { Widget } from "../Widgets/Widget";
 
 export interface QuickFilterArgs<TWidget> {
     field?: string;

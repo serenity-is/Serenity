@@ -1,4 +1,4 @@
-﻿/// <reference types="react" />
+/// <reference types="react" />
 
 import { Decorators, ElementAttribute } from "../../Decorators";
 import { Config } from "../../Q/Config";

@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IDoubleValue, IReadOnly } from "../../Interfaces";
 import { toId } from "../../Q/Formatting";
 import { addOption } from "../../Q/Html";

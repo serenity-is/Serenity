@@ -1,4 +1,4 @@
-﻿export {}
+export {}
 
 export namespace TabsExtensions {
     export function setDisabled(tabs: JQuery, tabKey: string, isDisabled: boolean) {

@@ -1,4 +1,4 @@
-﻿import { extend } from "./System";
+import { extend } from "./System";
 
 export let defaultNotifyOptions: ToastrOptions = {
     timeOut: 3000,

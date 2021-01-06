@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { findElementWithRelativeId } from "../../Q/Html";
 import { notifyError } from "../../Q/Notify";
 import { isEmptyOrNull } from "../../Q/Strings";

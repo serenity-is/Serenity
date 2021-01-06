@@ -1,4 +1,4 @@
-﻿import { Decorators, FormKeyAttribute } from "../../Decorators";
+import { Decorators, FormKeyAttribute } from "../../Decorators";
 import { text } from "../../Q/LocalText";
 import { getForm } from "../../Q/ScriptData";
 import { endsWith } from "../../Q/Strings";

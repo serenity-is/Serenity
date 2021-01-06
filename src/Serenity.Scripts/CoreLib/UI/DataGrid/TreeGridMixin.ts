@@ -1,4 +1,4 @@
-﻿import { toGrouping, tryFirst } from "../../Q/Arrays";
+import { toGrouping, tryFirst } from "../../Q/Arrays";
 import { htmlEncode } from "../../Q/Html";
 import { SlickFormatting, SlickHelper, SlickTreeHelper } from "../Helpers/SlickHelpers";
 import { DataGrid } from "./DataGrid";

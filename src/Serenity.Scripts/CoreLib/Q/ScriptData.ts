@@ -1,4 +1,4 @@
-﻿import { resolveUrl } from "./Services";
+import { resolveUrl } from "./Services";
 import { startsWith } from "./Strings";
 import { blockUI, blockUndo } from "./BlockUI";
 import { alert, iframeDialog } from "./Dialogs";

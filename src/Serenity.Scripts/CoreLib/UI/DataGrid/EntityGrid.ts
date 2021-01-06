@@ -1,4 +1,4 @@
-﻿import { Decorators, DialogTypeAttribute, DisplayNameAttribute } from "../../Decorators";
+import { Decorators, DialogTypeAttribute, DisplayNameAttribute } from "../../Decorators";
 import { EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../Decorators";
 import { IEditDialog } from "../../Interfaces";
 import { Authorization } from "../../Q/Authorization";

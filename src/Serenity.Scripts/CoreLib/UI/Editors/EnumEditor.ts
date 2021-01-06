@@ -1,4 +1,4 @@
-﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
+import { Decorators, EnumKeyAttribute } from "../../Decorators";
 import { tryGetText } from "../../Q/LocalText";
 import { Enum, getAttributes } from "../../Q/System";
 import { EnumTypeRegistry } from "../../Types/EnumTypeRegistry";

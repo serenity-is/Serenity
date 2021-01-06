@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { deepClone, extend, ArgumentNullException, Exception } from "../../Q/System";
 import { Config } from "../../Q/Config";
 import { format, formatDate, parseISODateTime } from "../../Q/Formatting";

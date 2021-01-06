@@ -1,4 +1,4 @@
-﻿export {}
+export {}
 
 export interface FilterOperator {
     key?: string;

@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
 import { text } from "../../Q/LocalText";
 import { resolveUrl } from "../../Q/Services";

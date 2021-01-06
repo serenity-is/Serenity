@@ -1,4 +1,4 @@
-﻿import { Widget } from "./Widget";
+import { Widget } from "./Widget";
 import { LazyLoadHelper } from "../Helpers/LazyLoadHelper";
 
 $.fn.flexHeightOnly = function (flexY: number = 1) {

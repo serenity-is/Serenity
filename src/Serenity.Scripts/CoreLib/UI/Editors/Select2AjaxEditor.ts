@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IStringValue } from "../../Interfaces";
 import { isValue } from "../../Q/System";
 import { text } from "../../Q/LocalText";

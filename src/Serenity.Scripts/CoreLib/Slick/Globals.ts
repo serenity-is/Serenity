@@ -1,4 +1,4 @@
-﻿declare namespace Slick {
+declare namespace Slick {
     export interface AutoTooltipsOptions {
         enableForHeaderCells?: boolean;
         enableForCells?: boolean;

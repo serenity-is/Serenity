@@ -1,4 +1,4 @@
-﻿import { extend } from "./System";
+import { extend } from "./System";
 import { Config } from "./Config"
 import { ErrorHandling } from "./ErrorHandling";
 import { alert, iframeDialog } from "./Dialogs";

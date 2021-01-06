@@ -1,4 +1,4 @@
-﻿import { isEmptyOrNull, startsWith } from "./Strings";
+import { isEmptyOrNull, startsWith } from "./Strings";
 
 export function text(key: string): string {
     let t = LT.$table[key];

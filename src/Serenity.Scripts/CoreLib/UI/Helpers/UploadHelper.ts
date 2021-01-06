@@ -1,4 +1,4 @@
-﻿import { blockUI, blockUndo } from "../../Q/BlockUI";
+import { blockUI, blockUndo } from "../../Q/BlockUI";
 import { format, round } from "../../Q/Formatting";
 import { text } from "../../Q/LocalText";
 import { resolveUrl } from "../../Q/Services";

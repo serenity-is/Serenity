@@ -1,4 +1,4 @@
-﻿import { Exception } from "./System";
+import { Exception } from "./System";
 import { text } from "./LocalText";
 import { isEmptyOrNull } from "./Strings";
 

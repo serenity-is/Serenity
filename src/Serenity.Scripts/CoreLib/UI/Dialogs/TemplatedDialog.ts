@@ -1,4 +1,4 @@
-﻿import { Decorators, FlexifyAttribute, MaximizableAttribute } from "../../Decorators";
+import { Decorators, FlexifyAttribute, MaximizableAttribute } from "../../Decorators";
 import { PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../Decorators";
 import { Config } from "../../Q/Config";
 import { bsModalMarkup, closePanel, DialogButton } from "../../Q/Dialogs";

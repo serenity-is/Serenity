@@ -1,1 +1,1 @@
-﻿export { ISlickFormatter } from "../../Q/System";
+export { ISlickFormatter } from "../../Q/System";

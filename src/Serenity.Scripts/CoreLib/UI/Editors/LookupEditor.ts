@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { getLookup, getLookupAsync, reloadLookup, ScriptData } from "../../Q/ScriptData";
 import { endsWith } from "../../Q/Strings";
 import { getInstanceType, getTypeFullName } from "../../Q/System";

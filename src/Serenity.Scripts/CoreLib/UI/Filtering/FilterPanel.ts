@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { text, tryGetText } from "../../Q/LocalText";
 import { isEmptyOrNull } from "../../Q/Strings";
 import { cast } from "../../Q/System";

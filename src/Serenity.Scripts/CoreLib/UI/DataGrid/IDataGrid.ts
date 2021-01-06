@@ -1,4 +1,4 @@
-﻿import { FilterStore } from "../Filtering/FilterStore";
+import { FilterStore } from "../Filtering/FilterStore";
 
 export interface IDataGrid {
     getElement(): JQuery;

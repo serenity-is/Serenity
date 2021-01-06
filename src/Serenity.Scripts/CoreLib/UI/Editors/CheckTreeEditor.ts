@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../Interfaces";
 import { Culture } from "../../Q/Formatting";
 import { htmlEncode } from "../../Q/Html";

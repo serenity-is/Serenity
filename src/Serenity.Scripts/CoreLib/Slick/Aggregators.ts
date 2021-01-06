@@ -1,4 +1,4 @@
-﻿export {}
+export {}
 export namespace Aggregators
 {
     export function Avg(field: string): void {

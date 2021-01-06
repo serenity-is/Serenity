@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { postToService, serviceCall } from "../../Q/Services";
 import { trimToNull } from "../../Q/Strings";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";

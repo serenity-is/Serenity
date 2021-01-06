@@ -1,4 +1,4 @@
-﻿export type Dictionary<TItem> = { [key: string]: TItem };
+export type Dictionary<TItem> = { [key: string]: TItem };
 
 export function coalesce(a: any, b: any): any {
     return a != null ? a : b;

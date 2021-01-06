@@ -1,4 +1,4 @@
-﻿import { Widget } from "./Widget";
+import { Widget } from "./Widget";
 import { Decorators } from "../../Decorators";
 import { isEmptyOrNull, startsWith } from "../../Q/Strings";
 import { htmlEncode } from "../../Q/Html";

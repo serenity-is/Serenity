@@ -1,4 +1,4 @@
-﻿export function promisePatch() {
+export function promisePatch() {
     if (typeof Promise === "undefined") {
         // @ts-ignore check for global
         if (typeof (RSVP) !== "undefined") Promise = RSVP as any;

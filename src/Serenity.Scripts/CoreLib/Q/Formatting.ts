@@ -1,4 +1,4 @@
-﻿import { padLeft, startsWith, trim, trimToNull, zeroPad } from "./Strings";
+import { padLeft, startsWith, trim, trimToNull, zeroPad } from "./Strings";
 import { getInstanceType } from "./System";
 
 export interface NumberFormat {

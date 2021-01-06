@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
 import { tryGetText } from "../../Q/LocalText";
 import { isEmptyOrNull, trimToNull } from "../../Q/Strings";

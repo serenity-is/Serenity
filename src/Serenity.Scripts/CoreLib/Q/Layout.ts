@@ -1,4 +1,4 @@
-﻿import { Config } from "./Config";
+import { Config } from "./Config";
 import { Router } from "./Router";
 import { getNested, initializeTypes } from "./System";
 import { LazyLoadHelper } from "../UI/Helpers/LazyLoadHelper";

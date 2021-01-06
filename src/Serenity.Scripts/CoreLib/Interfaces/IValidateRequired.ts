@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../Decorators";
+import { Decorators } from "../Decorators";
 
 export interface IValidateRequired {
     get_required(): boolean;

@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { Authorization } from "../../Q/Authorization";
 import { Culture } from "../../Q/Formatting";
 import { attrEncode, htmlEncode } from "../../Q/Html";

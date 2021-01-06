@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { isArray } from "../../Q/Arrays";
 import { ArgumentNullException } from "../../Q/System";
 import { formatDate, parseDate, toId } from "../../Q/Formatting";

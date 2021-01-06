@@ -1,4 +1,4 @@
-﻿export * from "./IBooleanValue";
+export * from "./IBooleanValue";
 export * from "./IDoubleValue";
 export * from "./IDialog";
 export * from "./IEditDialog";

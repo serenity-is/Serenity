@@ -1,4 +1,4 @@
-﻿export {}
+export {}
 
 export const enum CaptureOperationType {
     Before = 0,

@@ -1,4 +1,4 @@
-﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
+import { Decorators, EnumKeyAttribute } from "../../Decorators";
 import { Config } from "../../Q/Config";
 import { ArgumentNullException, Exception } from "../../Q/System";
 import { Culture, format, formatDate, formatNumber, parseDecimal, parseISODateTime } from "../../Q/Formatting";

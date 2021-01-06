@@ -1,4 +1,4 @@
-﻿import { LayoutTimer } from "../../Q/LayoutTimer";
+import { LayoutTimer } from "../../Q/LayoutTimer";
 
 export namespace LazyLoadHelper {
 

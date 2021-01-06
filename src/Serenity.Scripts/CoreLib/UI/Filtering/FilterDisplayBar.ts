@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { text } from "../../Q/LocalText";
 import { trimToNull } from "../../Q/Strings";
 import { FilterDialog } from "./FilterDialog";

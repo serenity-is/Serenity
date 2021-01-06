@@ -1,4 +1,4 @@
-﻿import { isEmptyOrNull } from "../Q/Strings";
+import { isEmptyOrNull } from "../Q/Strings";
 
 export namespace ReflectionUtils {
 

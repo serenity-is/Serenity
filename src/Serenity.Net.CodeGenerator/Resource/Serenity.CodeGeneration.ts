@@ -1,4 +1,4 @@
-﻿declare namespace ts {
+declare namespace ts {
     interface Node {
         $imports?: Serenity.CodeGeneration.Imports;
     }

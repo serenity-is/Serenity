@@ -1,4 +1,4 @@
-﻿import { Config } from "./Config";
+import { Config } from "./Config";
 import { extend } from "./System";
 import { attrEncode, htmlEncode } from "./Html";
 import { startsWith } from "./Strings";

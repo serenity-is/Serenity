@@ -1,4 +1,4 @@
-﻿import { Config } from "../Q/Config";
+import { Config } from "../Q/Config";
 import { Exception, ArgumentNullException } from "../Q/System";
 import { format } from "../Q/Formatting";
 import { endsWith, isEmptyOrNull, startsWith } from "../Q/Strings";

@@ -1,4 +1,4 @@
-﻿import { Config } from "../Q/Config";
+import { Config } from "../Q/Config";
 import { Exception } from "../Q/System";
 import { IDialog } from "../Interfaces";
 import { notifyError } from "../Q/Notify";

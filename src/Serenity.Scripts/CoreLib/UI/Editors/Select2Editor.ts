@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../Decorators";
+import { Decorators } from "../../Decorators";
 import { IEditDialog, IGetEditValue, IReadOnly } from "../../Interfaces";
 import { ISetEditValue, IStringValue } from "../../Interfaces";
 import { any, isArray } from "../../Q/Arrays";

@@ -1,4 +1,4 @@
-﻿export interface UserDefinition {
+export interface UserDefinition {
     Username?: string;
     DisplayName?: string;
     IsAdmin?: boolean;
