@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Web;
 using System;
@@ -18,14 +19,17 @@ namespace Serenity.Services
         private string fileNameFormat;
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
         private readonly ITextLocalizer localizer;
+        private readonly IExceptionLogger logger;
         private readonly IUploadStorage storage;
         private StringField originalNameField;
         private Dictionary<string, Field> replaceFields;
 
-        public ImageUploadBehavior(IUploadStorage storage, ITextLocalizer localizer)
+        public ImageUploadBehavior(IUploadStorage storage, ITextLocalizer localizer, 
+            IExceptionLogger logger = null)
         {
             this.storage = storage;
             this.localizer = localizer;
+            this.logger = logger;
         }
 
         public bool ActivateFor(IRow row)
@@ -280,7 +284,7 @@ namespace Serenity.Services
         {
             var fileName = (StringField)Target;
             var newFilename = fileName[handler.Row] = fileName[handler.Row].TrimToNull();
-            CheckUploadedImageAndCreateThumbs(attr, localizer, storage, ref newFilename);
+            CheckUploadedImageAndCreateThumbs(attr, localizer, storage, ref newFilename, logger);
 
             var idField = ((IIdRow)handler.Row).IdField;
 
@@ -321,7 +325,7 @@ namespace Serenity.Services
         }
 
         public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attr, ITextLocalizer localizer,
-            IUploadStorage storage, ref string temporaryFile)
+            IUploadStorage storage, ref string temporaryFile, IExceptionLogger logger = null)
         {
             if (storage == null)
                 throw new ArgumentNullException(nameof(storage));
@@ -368,7 +372,7 @@ namespace Serenity.Services
                 }
                 else
                 {
-                    result = checker.CheckStream(fs, true, out image);
+                    result = checker.CheckStream(fs, true, out image, logger);
                 }
 
                 if (result == ImageCheckResult.InvalidImage &&

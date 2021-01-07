@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Web;
 using System;
@@ -18,11 +19,14 @@ namespace Serenity.Services
         private Dictionary<string, Field> replaceFields;
         private readonly ITextLocalizer localizer;
         private readonly IUploadStorage storage;
+        private readonly IExceptionLogger logger;
 
-        public MultipleImageUploadBehavior(ITextLocalizer localizer, IUploadStorage storage)
+        public MultipleImageUploadBehavior(ITextLocalizer localizer, IUploadStorage storage,
+            IExceptionLogger logger = null)
         {
             this.localizer = localizer;
             this.storage = storage;
+            this.logger = logger;
         }
 
         public bool ActivateFor(IRow row)
@@ -163,7 +167,7 @@ namespace Serenity.Services
                 if (!filename.StartsWith("temporary/", StringComparison.OrdinalIgnoreCase))
                     throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
-                ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, localizer, storage, ref filename);
+                ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, localizer, storage, ref filename, logger);
 
                 var idField = ((IIdRow)handler.Row).IdField;
                 var copyResult = storage.CopyTemporaryFile(new CopyTemporaryFileOptions

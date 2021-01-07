@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using System;
 using System.Drawing;
 using System.IO;
 
@@ -20,7 +21,8 @@ namespace Serenity.Web
         /// <returns>
         ///   Image validation result. One of <see cref="ImageCheckResult"/> values. If the result is one of
         ///   GIFImage, JPEGImage, PNGImage, the checking is successful. Rest of results are invalid.</returns>
-        public ImageCheckResult CheckStream(Stream inputStream, bool returnImage, out Image image)
+        public ImageCheckResult CheckStream(Stream inputStream, bool returnImage, out Image image, 
+            IExceptionLogger exLogger = null)
         {
             // store the start time of validation
             DateTime startTime = DateTime.Now;
@@ -40,8 +42,9 @@ namespace Serenity.Web
                 // set file data size to input stream length
                 DataSize = inputStream.Length;
             }
-            catch
+            catch (Exception ex)
             {
+                ex.Log(exLogger);
                 return ImageCheckResult.StreamReadError;
             }
 
@@ -59,8 +62,10 @@ namespace Serenity.Web
                 // load image validating it
                 image = Image.FromStream(inputStream, true, true);
             }
-            catch
+            catch (Exception ex)
             {
+                ex.Log(exLogger);
+
                 // couldn't load image
                 return ImageCheckResult.InvalidImage;
             }
@@ -160,9 +165,9 @@ namespace Serenity.Web
         /// <returns>
         ///   Image checking result</returns>
         /// <seealso cref="CheckStream(Stream, bool, out Image)"/>
-        public ImageCheckResult CheckStream(Stream inputStream)
+        public ImageCheckResult CheckStream(Stream inputStream, IExceptionLogger exLogger = null)
         {
-            var result = CheckStream(inputStream, false, out Image image);
+            var result = CheckStream(inputStream, false, out Image image, exLogger);
             if (image != null)
                 image.Dispose();
             return result;

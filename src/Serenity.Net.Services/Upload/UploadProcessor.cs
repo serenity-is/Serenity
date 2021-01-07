@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -9,10 +10,11 @@ namespace Serenity.Web
     {
         private readonly IUploadStorage storage;
 
-        public UploadProcessor(IUploadStorage storage)
+        public UploadProcessor(IUploadStorage storage, IExceptionLogger logger = null)
         {
             ThumbBackColor = Color.Empty;
             this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
+            Logger = logger;
         }
 
         public int ThumbWidth { get; set; }
@@ -30,6 +32,7 @@ namespace Serenity.Web
         public string TemporaryFile { get; private set; }
         public bool IsImage { get; private set; }
 
+        protected IExceptionLogger Logger { get; }
 
         private bool IsImageExtension(string extension)
         {
@@ -62,7 +65,8 @@ namespace Serenity.Web
                 extension.EndsWith(".php");
         }
 
-        public bool ProcessStream(Stream fileContent, string extension, ITextLocalizer localizer)
+        public bool ProcessStream(Stream fileContent, string extension, 
+            ITextLocalizer localizer)
         {
             extension = extension.TrimToEmpty().ToLowerInvariant();
             if (IsDangerousExtension(extension))
@@ -102,6 +106,7 @@ namespace Serenity.Web
                 catch (Exception ex)
                 {
                     ErrorMessage = ex.Message;
+                    ex.Log(Logger);
                     success = false;
                     return success;
                 }
@@ -126,7 +131,7 @@ namespace Serenity.Web
         private bool ProcessImageStream(Stream fileContent, ITextLocalizer localizer)
         {
             var imageChecker = new ImageChecker();
-            CheckResult = imageChecker.CheckStream(fileContent, true, out Image image);
+            CheckResult = imageChecker.CheckStream(fileContent, true, out Image image, Logger);
             try
             {
                 FileSize = imageChecker.DataSize;
