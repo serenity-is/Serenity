@@ -2,89 +2,62 @@
 
 ## Visual Studio Version
 
-Serene .NET Core version (ASP.NET CORE MVC) requires _Visual Studio 2017 with Update 4 (15.4.0+) and .NET CORE 2.0 SDK installed. 
+The application requires _Visual Studio 2019_ 16.8.3+ and .NET CORE 5 SDK installed. 
 
-Please make sure your version in _About Visual Studio_ dialog is something like 15.4.0+. 
-
-Serene .NET Framework version (ASP.NET MVC) requires _Visual Studio 2017_ or _Visual Studio 2015_ with **Update 3** installed. 
-
-If you have Visual Studio 2015, please make sure that you have **Update 3** installed by looking at Help => About
-
-![VS2015 Update 3](Tools/Images/install/vs2015-update-3.png)
-
-> It might be possible to work with Visual Studio 2013 as well but you'll have many intellisense errors as TypeScript 2.5.3 can't be installed in VS2013.
-
-Serene .NET Core (ASP.NET Core MVC) version only works in Visual Studio 2017. 
-
-Microsoft recently obsoleted *project.json* based projects and replaced them with a lighter version of *MsBuild* based *CSPROJ* projects. This new project system only works in Visual Studio 2017, so if you want to work with .NET Core version of Serene, either you need to use Visual Studio 2017 (with Update 4) or go lighter with Visual Studio Code / Command Line.
+Please make sure your version in _About Visual Studio_ dialog is something like 16.8.3+. 
 
 ## .NET Core SDK
 
-Please install .NET Core SDK 2.0 for your Visual Studio from:
+Please install .NET Core SDK 5.0+ for your Visual Studio from:
 
-[https://www.microsoft.com/net/download/core](https://www.microsoft.com/net/download/core)
+[https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
 
-Visual Studio 2017 also requires Update 4 to be installed.
 
-## Visual Studio TypeScript Extension
+### Visual Studio Version
 
-Currently, the recommended version of TypeScript is 2.5.3. 
+The application requires _Visual Studio 2019+_ with most recent updates installed. .NET CORE 5 SDK is also only supported in Visual Studio 2019+. 
 
-Even though Serene uses NuGet (or NPM) based TypeScript compiler on build, Visual Studio still uses its own version of TypeScript for intellisense, refactoring and compile on save etc. If you have an older version of that extension, you'll be greeted with many errors as soon as you open a Serene project.
+An alternative option is to use command line to create projects and use Visual Studio Code if you don't have access to Visual Studio 2019+.
 
-To check what version of TypeScript Visual Studio Extension you have, again see Help => About:
+Please install .NET Core 5 SDK from:
 
-![VS2015 TypeScript Extension](Tools/Images/install/vs2015-typescript-version.png)
+https://dotnet.microsoft.com/download
 
-Visual Studio 2017 comes with TypeScript 2.1.5 by default, but Visual Studio 2015 might include older versions.
+### Visual Studio TypeScript Extension
 
-If you have something lower than 2.5.3 there, you need to install TypeScript for Visual Studio 2015 / 2017 extension.
+As of writing, the recommended version of TypeScript is 4.0+ 
 
-> TypeScript version you see in Control Panel / Add Remove Programs doesn't matter at all. What matters is the one  that is enabled in Visual Studio.
+The project comes with a reference to a recent version of Microsoft.TypeScript.MsBuild package and it is supposed to be used by Visual Studio 2019+ automatically.
 
-TypeScript versions after 1.8.6 requires Visual Studio 2015 Update 3 to be installed first, so even if you try to install the extension it will raise an error, so please first install Update 3.
+You may also check https://www.typescriptlang.org/download for information on updating your TypeScript.
 
-You can get TypeScript extension for your Visual Studio version from http://www.typescriptlang.org/#download-links.
+### NodeJS / NPM
 
-Here is the link for Visual Studio 2015:
-
-[https://www.microsoft.com/en-us/download/details.aspx?id=48593](https://www.microsoft.com/en-us/download/details.aspx?id=48593)
-
-But **don't click the download button** right away. Expand **Details** section, and select the exact version you need (e.g. 2.5.3):
-
-![TypeScript Version Selection](Tools/Images/install/typescript-download-detail.png)
-
-Later versions, e.g. 2.2.2 might also work but keeping in sync with the version we currently use, can help you avoid compability problems that might come with them.
-
-## NodeJS / NPM
-
-Serene uses NodeJS / NPM for these:
+NodeJS / NPM is used for the following:
 
 - TypeScript typings (.d.ts) for libraries like jQuery, Bootstrap etc. 
 - Less compilation (lessjs)
-- T4 Code generation by parsing TypeScript sources
+- Code generation through Sergen by parsing TypeScript sources
 
-It requires NodeJS v8.7.0+ and NPM 5.4.2+
+NodeJS and NPM LTS (Long Term Support) versions are required and you may download them from [https://nodejs.org/en/](https://nodejs.org/en/)
 
-Serene will check their versions on project creation and ask for confirmation to download and install them. Anyway, please check your versions manually by opening a command prompt:
+The application will check their versions on project creation and ask for confirmation to download and install them. Anyway, please check your versions manually by opening a command prompt:
 
 ```cmd
 > npm -v
-8.7.0
+5.4.2
 ```
 
 ```cmd
 > node -v
-5.4.2
+8.7.0
 ```
 
-If you get an error, they might not be installed or not in path. Please install CURRENT version from [https://nodejs.org/en/](https://nodejs.org/en/)
-
-> Stable version might also work but is not tested.
+If you get an error, they might not be installed or not in path. Also confirm that the versions listed are higher than the ones shown above.
 
 ## Visual Studio and External Web Tool Paths
 
-Even if you have correct Node / NPM installed, Visual Studio might still be trying to use its own integrated, and older version of NodeJS.
+Even if you have correct Node / NPM installed, Visual Studio might still be trying to use its older version of NodeJS that is installed with VS itself.
 
 Click _Tools_ => _Options_, and then under _Projects and Solutions_ => _External Web Tools_ add _C:\Program Files\nodejs_ to the top of the list by clicking plus folder icon, typing _C:\Program Files\nodejs_ and using _Up Arrow_ to move it to the start:
 
@@ -94,7 +67,7 @@ Click _Tools_ => _Options_, and then under _Projects and Solutions_ => _External
 
 After you have installed prerequisites, please follow *Getting Started* section in *Serenity Guide*:
 
-https://volkanceylan.gitbooks.io/serenity-guide/content/getting_started/
+https://serenity.is/docs/getting_started/README
 
 ## Creating a Serene .NET Core Project using command line in Linux / OSX / Windows
 
@@ -184,13 +157,8 @@ Now open a browser and navigate to `http://localhost:5000`.
 
 > Actual port may vary. You'll see it on console after executing *dotnet run*.
 
-## Serene .NET Core (ASP.NET Core MVC) Version and Sergen
+## Running Sergen
 
-Currently manual only lists steps for running Full .NET Framework (ASP.NET MVC) version of Serene and its code generator *Sergen*.
-
-Please don't try to use *Sergen* with graphical UI (the one you see in guide) on a .NET Core project.
-
-.NET Core version has its own version of sergen (command line based).
 
 To use sergen, open a command prompt and CD into the project directory (one that contains *appsettings.json*) and type:
 
@@ -212,7 +180,7 @@ Again, they exact table name or use *TAB completion*.
 
 Then, you can select a Module Name, Class Identifier, Permission Key and what to generate, or just accept defaults by pressing *ENTER*.
 
-## Serene .NET Core (ASP.NET Core MVC) Version and T4 Templates
+## Serene .NET Core Version and T4 Templates
 
 Serene .NET Core version doesn't use T4 templates, but instead uses transformation through *dotnet-sergen*.
 
@@ -294,10 +262,11 @@ This will enumerate referenced packages and restore static content from them int
 
 ## Updating Serenity Packages in .NET Core Projects
 
-You can update *Serenity.Web* and *Serenity.CodeGenerator* packages as usual from package manager console. But after updating, please run 
+You can update *Serenity.Net.Web*, "*Serenity.Assets*" and "*Serenity.Scripts*" packages as usual from package manager console. But after updating, please run 
 
 ```cmd
+dotnet tool update sergen
 dotnet sergen restore
 ```
 
-so that static script files in *Serenity.Web* can be copied and updated in your *wwwroot* directory.
+so that static script files in *Serenity.Assets* and *Serenity.Scripts* can be copied and updated in your *wwwroot* directory.
