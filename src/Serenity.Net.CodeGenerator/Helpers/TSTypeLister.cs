@@ -35,13 +35,30 @@ namespace Serenity.CodeGenerator
             {
                 Path.Combine(projectDir, @"Modules"),
                 Path.Combine(projectDir, @"Imports"),
-                Path.Combine(projectDir, @"typings")
+                Path.Combine(projectDir, @"typings", "serenity"),
+                Path.Combine(projectDir, @"wwwroot", "Scripts", "serenity")
             }.Where(x => Directory.Exists(x));
 
-            var files = directories.SelectMany(x => 
+            var files = directories.SelectMany(x =>
                 Directory.GetFiles(x, "*.ts", SearchOption.AllDirectories))
-                .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) || 
-                    x.Contains("Serenity", StringComparison.Ordinal)).OrderBy(x => x);
+                .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
+                    Path.GetFileName(x).StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase) ||
+                    Path.GetFileName(x).StartsWith("Serenity-", StringComparison.OrdinalIgnoreCase));
+
+            var corelib = files.Where(x => string.Equals(Path.GetFileName(x), 
+                "Serenity.CoreLib.d.ts", StringComparison.OrdinalIgnoreCase));
+
+            Func<string, bool> corelibUnderTypings = x =>
+                x.Replace('\\', '/').EndsWith("/typings/serenity/Serenity.CoreLib.d.ts",
+                    StringComparison.OrdinalIgnoreCase);
+
+            if (corelib.Count() > 1 &&
+                corelib.Any(x => !corelibUnderTypings(x)))
+            {
+                files = files.Where(x => !corelibUnderTypings(x));
+            }
+
+            files = files.OrderBy(x => x);
 
             var tsServices = GetEmbeddedScript("Serenity.CodeGenerator.Resource.typescriptServices.js");
             var codeGeneration = GetEmbeddedScript("Serenity.CodeGenerator.Resource.Serenity.CodeGeneration.js");
