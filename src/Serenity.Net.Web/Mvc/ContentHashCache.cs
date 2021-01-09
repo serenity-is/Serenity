@@ -137,7 +137,7 @@ namespace Serenity.Web
                         return DateTime.Now.ToString("yyyyMMddhh", CultureInfo.InvariantCulture);
                 });
 
-                contentUrl = VirtualPathUtility.ToAbsolute(pathBase, contentUrl) + "?v=" + (string)hash;
+                contentUrl = VirtualPathUtility.ToAbsolute(pathBase, contentUrl) + "?v=" + hash;
                 if (!cdnEnabled)
                     return contentUrl;
             }
