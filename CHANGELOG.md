@@ -1,3 +1,13 @@
+## 5.0.26 (2021-01-09)
+
+Features:
+  - add optional exception logging to image / upload checker
+  - add localizations for image check results
+  - also include typing files under wwwroot/Scripts/serenity while scanning script types
+
+Bugfixes:
+  - add missing progress_bar.gif
+
 ## 5.0.25 (2021-01-07)
 
 Features:
