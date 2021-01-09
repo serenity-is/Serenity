@@ -1,12 +1,22 @@
 ## 5.0.26 (2021-01-09)
 
 Features:
-  - add optional exception logging to image / upload checker
-  - add localizations for image check results
-  - also include typing files under wwwroot/Scripts/serenity while scanning script types
-
+  - Add optional exception logging to image / upload checker
+  - Add localizations for image check results
+  - Also include typing files under wwwroot/Scripts/serenity while scanning script types
+  - Convert include exclude tables for Data Explorer to regex (StartSharp)
+  - Add DataProtectionKeysFolder setting (StartSharp) 
+  - Improve WkhtmlToPdf location finding, better error message (StartSharp)
+  - Add exception logging to file uploads (StartSharp)
+  
 Bugfixes:
-  - add missing progress_bar.gif
+  - Add missing progress_bar.gif
+  - Fix mail forward (StartSharp)
+  - Fix password editor in mail client (StartSharp)
+  - Fix component factory prop derived by inherited classes (StartSharp)
+  - Fix data explorer schema provider assembly (StartSharp)
+  - Hide note editor from Other Form One Tab sample (StartSharp)
+  - Remove where from Northwind Sales By Category view
 
 ## 5.0.25 (2021-01-07)
 
