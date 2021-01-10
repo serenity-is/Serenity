@@ -135,7 +135,7 @@ namespace Serenity.CodeGenerator
                 }
             }
 
-            var outDir = Path.Combine(projectDir, (config.ServerTypings.OutDir.TrimToNull() ?? "Imports/ServerTypings")
+            var outDir = Path.Combine(projectDir, (config.ServerTypings?.OutDir.TrimToNull() ?? "Imports/ServerTypings")
                 .Replace('/', Path.DirectorySeparatorChar));
 
             Console.ForegroundColor = ConsoleColor.Cyan;

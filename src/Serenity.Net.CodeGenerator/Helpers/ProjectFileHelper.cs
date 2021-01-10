@@ -46,6 +46,7 @@ namespace Serenity.CodeGenerator
             while (!string.IsNullOrEmpty(dir) &&
                 Directory.Exists(dir))
             {
+                dir = Path.GetFullPath(dir);
                 var dirProps = Path.Combine(dir, "Directory.Build.props");
                 if (File.Exists(dirProps))
                 {
