@@ -2,7 +2,6 @@
 using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using Serenity.PropertyGrid;
-using Serenity.Web.PropertyEditor;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -54,10 +53,10 @@ namespace Serenity.Web
         public string GetScript()
         {
             var items = propertyProvider.GetPropertyItemsFor(type).ToList();
-            if (typeof(ICustomizedFormScript).IsAssignableFrom(type))
+            if (typeof(ICustomizePropertyItems).IsAssignableFrom(type))
             {
                 var instance = ActivatorUtilities.CreateInstance(
-                    serviceProvider, type) as ICustomizedFormScript;
+                    serviceProvider, type) as ICustomizePropertyItems;
                 instance.Customize(items);
             }
 
