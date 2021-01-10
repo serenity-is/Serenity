@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Serenity.IO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -66,13 +67,22 @@ namespace Serenity.CodeGenerator
                 return false;
             };
 
-            var csprojElement = XElement.Parse(File.ReadAllText(csproj));
+            var projectDir = Path.GetDirectoryName(csproj);
+            var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
-            EnumerateProjectDeps(csprojElement, (fw, id, ver) =>
+            EnumerateProjectDeps(csproj, (fw, id, ver) =>
             {
                 if (!skipPackage(id) && !string.IsNullOrEmpty(ver))
                     queue.Enqueue(new Tuple<string, string, string>(fw, id, ver));
             });
+
+            GlobFilter include = null;
+            if (config.Restore?.Include.IsEmptyOrNull() == false)
+                include = new GlobFilter(config.Restore.Include);
+
+            GlobFilter exclude = null;
+            if (config.Restore?.Exclude.IsEmptyOrNull() == false)
+                exclude = new GlobFilter(config.Restore.Exclude);
 
             while (queue.Count > 0)
             {
@@ -147,6 +157,14 @@ namespace Serenity.CodeGenerator
                             relative = Path.Combine("wwwroot", relative);
                         }
 
+                        if (include != null &&
+                            !include.IsMatch(relative))
+                            continue;
+
+                        if (exclude != null &&
+                            exclude.IsMatch(relative))
+                            continue;
+
                         var target = Path.Combine(targetRoot, relative);
                         if (File.Exists(target))
                         {
@@ -218,8 +236,10 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        private static void EnumerateProjectDeps(XElement csprojElement, Action<string, string, string> dependency)
+        private static void EnumerateProjectDeps(string csproj, Action<string, string, string> dependency)
         {
+            var csprojElement = XElement.Parse(File.ReadAllText(csproj));
+
             foreach (var itemGroup in csprojElement.Descendants("ItemGroup"))
             {
                 var condition = itemGroup.Attribute("Condition");
@@ -238,7 +258,33 @@ namespace Serenity.CodeGenerator
 
                 foreach (var packageReference in itemGroup.Descendants("PackageReference"))
                 {
-                    dependency(target, packageReference.Attribute("Include").Value, packageReference.Attribute("Version")?.Value);
+                    var ver = packageReference.Attribute("Version")?.Value?.Trim();
+                    if (!string.IsNullOrEmpty(ver) &&
+                        !Version.TryParse(ver, out _) &&
+                        ver.StartsWith("$(", StringComparison.Ordinal) &&
+                        ver.EndsWith(")", StringComparison.Ordinal))
+                    {
+                        var prop = ProjectFileHelper.ExtractPropertyFrom(csproj, xel => 
+                            xel.Descendants(ver.Substring(2, ver.Length - 3))?
+                                .LastOrDefault(x => Version.TryParse(x.Value?.TrimToEmpty(), out _))
+                                .Value?.TrimToNull());
+                        if (prop != null)
+                            ver = prop;
+                    }
+
+                    dependency(target, packageReference.Attribute("Include").Value, ver);
+                }
+            }
+
+            if (!Path.GetFileName(csproj).Equals("Directory.Build.props", StringComparison.OrdinalIgnoreCase))
+            { 
+                var dir = Path.GetDirectoryName(Path.GetFullPath(csproj));
+                while (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+                {
+                    var dirProps = Path.Combine(dir, "Directory.Build.props");
+                    if (File.Exists(dirProps))
+                        EnumerateProjectDeps(dirProps, dependency);
+                    dir = Path.GetDirectoryName(dir);
                 }
             }
         }
