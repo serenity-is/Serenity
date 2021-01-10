@@ -1,10 +1,10 @@
 ﻿using Serenity.ComponentModel;
-using System.Collections.Generic;
+using System;
 
 namespace Serenity.Web.PropertyEditor
 {
-    public interface ICustomizedFormScript
+    [Obsolete("Use ICustomizePropertyItems")]
+    public interface ICustomizedFormScript : ICustomizePropertyItems
     {
-        void Customize(List<PropertyItem> input);
     }
 }
