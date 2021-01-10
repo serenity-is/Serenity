@@ -11,6 +11,7 @@ namespace Serenity.CodeGenerator
     {
         public string RootNamespace { get; set; }
         public ServerTypingsConfig ServerTypings { get; set; }
+        
         public ClientTypesConfig ClientTypes { get; set; }
         public bool ShouldSerializeClientTypes() => ClientTypes != null &&
             !string.IsNullOrEmpty(ClientTypes.OutDir);
@@ -21,6 +22,11 @@ namespace Serenity.CodeGenerator
              MVC.UseRootNamespace != null ||
              MVC.SearchViewPaths?.Any() == true ||
              MVC.StripViewPaths?.Any() == true);
+
+        public RestoreConfig Restore { get; set; }
+        public bool ShouldSerializeRestore() => Restore != null &&
+            (!Restore.Include.IsEmptyOrNull() ||
+             !Restore.Exclude.IsEmptyOrNull());
 
         public List<Connection> Connections { get; set; }
         public bool ShouldSerializeConnections() => Connections != null && Connections.Count > 0;
@@ -191,6 +197,12 @@ namespace Serenity.CodeGenerator
             public string OutDir { get; set; }
             public string[] SearchViewPaths { get; set; }
             public string[] StripViewPaths { get; set; }
+        }
+
+        public class RestoreConfig
+        {
+            public string[] Include { get; set; }
+            public string[] Exclude { get; set; }
         }
 
         public class UpgradeInformation
