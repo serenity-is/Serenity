@@ -4,7 +4,7 @@ namespace Serenity.Web
 {
     public class DefaultFileWatcherFactory : IFileWatcherFactory
     {
-        private List<IFileWatcher> watchers;
+        private readonly List<IFileWatcher> watchers;
 
         public DefaultFileWatcherFactory()
         {
