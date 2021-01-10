@@ -22,5 +22,15 @@ namespace Serenity.Services
         [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> ExcludeColumns { get; set; }
         public SortBy[] DistinctFields { get; set; }
+
+        /// <summary>
+        /// Gets or sets the set of columns to export. 
+        /// This should only be used to specify list of columns
+        /// for contexts like Excel export etc.
+        /// </summary>
+        /// <value>
+        /// The columns to export.
+        /// </value>
+        public List<string> ExportColumns { get; set; }
     }
 }

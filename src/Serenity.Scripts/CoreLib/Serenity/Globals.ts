@@ -137,6 +137,7 @@
         ColumnSelection?: ColumnSelection;
         IncludeColumns?: string[];
         ExcludeColumns?: string[];
+        ExportColumns?: string[];
         DistinctFields?: string[];
     }
         
