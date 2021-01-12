@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using Serenity.IO;
+﻿using Serenity.IO;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -33,25 +31,9 @@ namespace Serenity.CodeGenerator
 
         public void Run(string csproj)
         {
-            var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = "dotnet",
-                WorkingDirectory = Path.GetDirectoryName(csproj),
-                CreateNoWindow = true,
-                Arguments = "restore \"" + csproj + "\""
-            });
-
-            process.WaitForExit();
-            if (process.ExitCode > 0)
-            {
-                Console.Error.WriteLine("Error executing dotnet restore!");
-                Environment.Exit(process.ExitCode);
-            }
-
             var packagesDir = new PackageHelper().DeterminePackagesPath();
 
             var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var queue = new Queue<Tuple<string, string, string>>();
 
             Func<string, bool> skipPackage = id =>
             {
@@ -70,12 +52,6 @@ namespace Serenity.CodeGenerator
             var projectDir = Path.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
-            EnumerateProjectDeps(csproj, (fw, id, ver) =>
-            {
-                if (!skipPackage(id) && !string.IsNullOrEmpty(ver))
-                    queue.Enqueue(new Tuple<string, string, string>(fw, id, ver));
-            });
-
             GlobFilter include = null;
             if (config.Restore?.Include.IsEmptyOrNull() == false)
                 include = new GlobFilter(config.Restore.Include);
@@ -83,6 +59,116 @@ namespace Serenity.CodeGenerator
             GlobFilter exclude = null;
             if (config.Restore?.Exclude.IsEmptyOrNull() == false)
                 exclude = new GlobFilter(config.Restore.Exclude);
+
+            var targetRoot = Path.GetDirectoryName(csproj);
+            var restoredFromProjectReference = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            void restoreFile(string file, string relative)
+            {
+                relative = PathHelper.ToPath(relative);
+
+                if (include != null &&
+                    !include.IsMatch(relative))
+                    return;
+
+                if (exclude != null &&
+                    exclude.IsMatch(relative))
+                    return;
+
+                if (restoredFromProjectReference.Contains(relative))
+                    return;
+
+                var target = Path.Combine(targetRoot, relative);
+                if (File.Exists(target))
+                {
+                    if (!File.ReadAllBytes(target)
+                            .SequenceEqual(File.ReadAllBytes(file)))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Restoring: " + relative);
+                        Console.ResetColor();
+                        File.Copy(file, target, true);
+                    }
+                }
+                else
+                {
+                    if (!Directory.Exists(target))
+                        Directory.CreateDirectory(Path.GetDirectoryName(target));
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Restoring: " + relative);
+                    Console.ResetColor();
+                    File.Copy(file, target, false);
+                }
+            }
+
+            foreach (var reference in EnumerateProjectReferences(csproj, new HashSet<string>(StringComparer.OrdinalIgnoreCase)))
+            {
+                foreach (var root in ProjectFileHelper.EnumerateProjectAndDirectoryBuildProps(reference))
+                {
+                    foreach (var itemGroup in root.Elements("ItemGroup"))
+                    {
+                        foreach (var content in itemGroup.Elements("Content")
+                            .Concat(itemGroup.Elements("None")))
+                        {
+                            var sourceFile = content.Attribute("Include")?.Value?.Trim();
+                            if (string.IsNullOrEmpty(sourceFile))
+                                continue;
+
+                            sourceFile = sourceFile.Replace("$(ProjectDir)", 
+                                Path.GetDirectoryName(reference) + Path.DirectorySeparatorChar,
+                                StringComparison.OrdinalIgnoreCase);
+
+                            sourceFile = sourceFile.Replace("$(ProjectName.ToLowerInvariant())",
+                                Path.GetFileNameWithoutExtension(reference).ToLowerInvariant(),
+                                StringComparison.OrdinalIgnoreCase);
+
+                            sourceFile = sourceFile.Replace("$(ProjectName)",
+                                Path.GetFileNameWithoutExtension(reference),
+                                StringComparison.OrdinalIgnoreCase);
+
+                            sourceFile = Path.Combine(Path.GetDirectoryName(reference), sourceFile);
+
+                            if (!File.Exists(sourceFile))
+                                continue;
+
+                            if (string.Equals(content.Element("Pack")?.Value?.Trim(), "true"))
+                            {
+                                var packagePath = content.Element("PackagePath")?.Value?.Trim();
+                                if (!string.IsNullOrEmpty(packagePath))
+                                {
+                                    packagePath = packagePath.Replace("$(ProjectName.ToLowerInvariant())",
+                                        Path.GetFileNameWithoutExtension(reference).ToLowerInvariant(),
+                                        StringComparison.OrdinalIgnoreCase);
+
+                                    packagePath = packagePath.Replace("$(ProjectName)",
+                                        Path.GetFileNameWithoutExtension(reference),
+                                        StringComparison.OrdinalIgnoreCase);
+
+                                    foreach (var path in packagePath.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        if (path.Contains('$', StringComparison.Ordinal))
+                                            continue;
+
+                                        if (!PathHelper.ToUrl(path).StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
+                                            continue;
+
+                                        restoreFile(sourceFile, path);
+                                        restoredFromProjectReference.Add(path);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            var queue = new Queue<(string Target, string ID, string Version)>();
+            foreach (var x in EnumeratePackageReferences(csproj))
+            {
+                if (!skipPackage(x.Id) && !string.IsNullOrEmpty(x.Version))
+                    queue.Enqueue(x);
+            };
 
             while (queue.Count > 0)
             {
@@ -122,71 +208,54 @@ namespace Serenity.CodeGenerator
                 Console.WriteLine("Processing: " + id);
                 Console.ResetColor();
 
-                var contentRoot = Path.Combine(packageFolder, "Content/".Replace('/', Path.DirectorySeparatorChar));
+                var contentRoot = Path.Combine(packageFolder, "content");
                 if (!Directory.Exists(contentRoot))
-                    contentRoot = Path.Combine(packageFolder, "content/".Replace('/', Path.DirectorySeparatorChar));
-
+                    contentRoot = Path.Combine(packageFolder, "Content");
 
                 if (Directory.Exists(contentRoot))
                 {
-                    var targetRoot = Path.GetDirectoryName(csproj);
-
                     foreach (var file in Directory.GetFiles(contentRoot, "*.*", SearchOption.AllDirectories))
                     {
                         var extension = Path.GetExtension(file);
                         if (string.Compare(extension, ".transform", StringComparison.OrdinalIgnoreCase) == 0)
                             continue;
 
-                        var relative = file.Substring(contentRoot.Length);
+                        var relative = PathHelper.ToUrl(file.Substring(contentRoot.Length + 1));
 
-                        // toastr!
-                        if (relative.StartsWith("content/".Replace('/', Path.DirectorySeparatorChar), StringComparison.Ordinal))
-                            relative = "Content/".Replace('/', Path.DirectorySeparatorChar) + relative.Substring("content/".Length);
-                        else if (relative.StartsWith("scripts/", StringComparison.Ordinal))
-                            relative = "Scripts/".Replace('/', Path.DirectorySeparatorChar) + relative.Substring("content/".Length);
-                        else if (relative.StartsWith("Fonts/", StringComparison.Ordinal))
-                            relative = "fonts/".Replace('/', Path.DirectorySeparatorChar) + relative.Substring("fonts/".Length);
-
-                        if (relative.StartsWith("scripts/typings/".Replace('/', Path.DirectorySeparatorChar),
-                                StringComparison.OrdinalIgnoreCase))
+                        // normalize paths as Content, Scripts, fonts and typings (these are exact cases expected)
+                        if (relative.StartsWith("content/", StringComparison.OrdinalIgnoreCase))
+                            relative = "Content/" + relative.Substring("content/".Length);
+                        else if (relative.StartsWith("scripts/typings/", StringComparison.OrdinalIgnoreCase))
                         {
-                            relative = relative.Substring("scripts/".Length);
+                            relative = "typings/" + relative.Substring("Scripts/typings/".Length);
+                            var tsconfig = Path.Combine(projectDir, "tsconfig.json");
+                            if (!File.Exists(tsconfig) ||
+                                !File.ReadAllText(tsconfig).Contains(relative, StringComparison.OrdinalIgnoreCase))
+                                continue; // old typings only needed for users who didn't fix their tsconfig.json
                         }
-                        else
-                        {
-                            relative = Path.Combine("wwwroot", relative);
-                        }
+                        else if (relative.StartsWith("scripts/", StringComparison.OrdinalIgnoreCase))
+                            relative = "Scripts/" + relative.Substring("scripts/".Length);
+                        else if (relative.StartsWith("fonts/", StringComparison.OrdinalIgnoreCase))
+                            relative = "fonts/" + relative.Substring("fonts/".Length);
 
-                        if (include != null &&
-                            !include.IsMatch(relative))
-                            continue;
+                        // all content other than typings go under wwwroot
+                        if (!relative.StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
+                            relative = "wwwroot/" + relative;
 
-                        if (exclude != null &&
-                            exclude.IsMatch(relative))
-                            continue;
+                        restoreFile(file, relative);
+                    }
+                }
 
-                        var target = Path.Combine(targetRoot, relative);
-                        if (File.Exists(target))
-                        {
-                            if (!File.ReadAllBytes(target)
-                                    .SequenceEqual(File.ReadAllBytes(file)))
-                            {
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("Restoring: " + relative);
-                                Console.ResetColor();
-                                File.Copy(file, target, true);
-                            }
-                        }
-                        else
-                        {
-                            if (!Directory.Exists(target))
-                                Directory.CreateDirectory(Path.GetDirectoryName(target));
+                var typingsRoot = Path.Combine(packageFolder, "typings");
+                if (!Directory.Exists(typingsRoot))
+                    typingsRoot = Path.Combine(packageFolder, "Typings");
 
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Restoring: " + relative);
-                            Console.ResetColor();
-                            File.Copy(file, target, false);
-                        }
+                if (Directory.Exists(typingsRoot))
+                {
+                    foreach (var file in Directory.GetFiles(typingsRoot, "*.ts", SearchOption.AllDirectories))
+                    {
+                        var relative = "typings/" + typingsRoot.Substring(contentRoot.Length + 1);
+                        restoreFile(file, relative);
                     }
                 }
 
@@ -219,7 +288,7 @@ namespace Serenity.CodeGenerator
                             {
                                 var id2 = dep2.Attribute("id").Value;
                                 if (!skipPackage(id2))
-                                    queue.Enqueue(new Tuple<string, string, string>(fw, id2, dep2.Attribute("version").Value));
+                                    queue.Enqueue((fw, id2, dep2.Attribute("version").Value));
                             }
                         }
                     }
@@ -230,61 +299,83 @@ namespace Serenity.CodeGenerator
                     {
                         var id2 = dep2.Attribute("id").Value;
                         if (!skipPackage(id2))
-                            queue.Enqueue(new Tuple<string, string, string>(fw, id2, dep2.Attribute("version").Value));
+                            queue.Enqueue((fw, id2, dep2.Attribute("version").Value));
                     }
                 }
             }
         }
 
-        private static void EnumerateProjectDeps(string csproj, Action<string, string, string> dependency)
+        private static IEnumerable<string> EnumerateProjectReferences(string csproj, HashSet<string> visited)
         {
-            var csprojElement = XElement.Parse(File.ReadAllText(csproj));
-
-            foreach (var itemGroup in csprojElement.Descendants("ItemGroup"))
+            foreach (var csprojElement in ProjectFileHelper.EnumerateProjectAndDirectoryBuildProps(csproj))
             {
-                var condition = itemGroup.Attribute("Condition");
-                var target = "";
-                if (condition != null && !string.IsNullOrEmpty(condition.Value))
+                foreach (var itemGroup in csprojElement.Elements("ItemGroup"))
                 {
-                    const string tf = "'$(TargetFramework)' == '";
-                    var idx = condition.Value.IndexOf(tf, StringComparison.Ordinal);
-                    if (idx >= 0)
+                    foreach (var projectReference in itemGroup.Elements("ProjectReference"))
                     {
-                        var end = condition.Value.IndexOf("'", idx + tf.Length, StringComparison.Ordinal);
-                        if (end >= 0)
-                            target = condition.Value.Substring(idx + tf.Length, end - idx - tf.Length);
-                    }
-                }
+                        var path = projectReference.Attribute("Include")?.Value?.Trim();
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            path = path.Replace("$(ProjectDir)", Path.GetDirectoryName(Path.GetFullPath(csproj)) +
+                                Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
 
-                foreach (var packageReference in itemGroup.Descendants("PackageReference"))
-                {
-                    var ver = packageReference.Attribute("Version")?.Value?.Trim();
-                    if (!string.IsNullOrEmpty(ver) &&
-                        !Version.TryParse(ver, out _) &&
-                        ver.StartsWith("$(", StringComparison.Ordinal) &&
-                        ver.EndsWith(")", StringComparison.Ordinal))
-                    {
-                        var prop = ProjectFileHelper.ExtractPropertyFrom(csproj, xel => 
-                            xel.Descendants(ver.Substring(2, ver.Length - 3))?
-                                .LastOrDefault(x => Version.TryParse(x.Value?.TrimToEmpty(), out _))
-                                .Value?.TrimToNull());
-                        if (prop != null)
-                            ver = prop;
-                    }
+                            path = Path.Combine(Path.GetDirectoryName(csproj), path);
+                            if (Directory.Exists(Path.GetDirectoryName(path)))
+                                path = Path.GetFullPath(path);
+                        }
 
-                    dependency(target, packageReference.Attribute("Include").Value, ver);
+                        if ((visited == null || !visited.Contains(path)) && File.Exists(path))
+                        {
+                            visited?.Add(path);
+                            yield return path;
+
+                            if (visited != null)
+                                foreach (var subReference in EnumerateProjectReferences(path, visited))
+                                    yield return subReference;
+                        }
+                    }
                 }
             }
+        }
 
-            if (!Path.GetFileName(csproj).Equals("Directory.Build.props", StringComparison.OrdinalIgnoreCase))
-            { 
-                var dir = Path.GetDirectoryName(Path.GetFullPath(csproj));
-                while (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+        private static IEnumerable<(string Target, string Id, string Version)> EnumeratePackageReferences(string csproj)
+        {
+            foreach (var csprojElement in ProjectFileHelper.EnumerateProjectAndDirectoryBuildProps(csproj))
+            {
+                foreach (var itemGroup in csprojElement.Descendants("ItemGroup"))
                 {
-                    var dirProps = Path.Combine(dir, "Directory.Build.props");
-                    if (File.Exists(dirProps))
-                        EnumerateProjectDeps(dirProps, dependency);
-                    dir = Path.GetDirectoryName(dir);
+                    var condition = itemGroup.Attribute("Condition");
+                    var target = "";
+                    if (condition != null && !string.IsNullOrEmpty(condition.Value))
+                    {
+                        const string tf = "'$(TargetFramework)' == '";
+                        var idx = condition.Value.IndexOf(tf, StringComparison.Ordinal);
+                        if (idx >= 0)
+                        {
+                            var end = condition.Value.IndexOf("'", idx + tf.Length, StringComparison.Ordinal);
+                            if (end >= 0)
+                                target = condition.Value.Substring(idx + tf.Length, end - idx - tf.Length);
+                        }
+                    }
+
+                    foreach (var packageReference in itemGroup.Descendants("PackageReference"))
+                    {
+                        var ver = packageReference.Attribute("Version")?.Value?.Trim();
+                        if (!string.IsNullOrEmpty(ver) &&
+                            !Version.TryParse(ver, out _) &&
+                            ver.StartsWith("$(", StringComparison.Ordinal) &&
+                            ver.EndsWith(")", StringComparison.Ordinal))
+                        {
+                            var prop = ProjectFileHelper.ExtractPropertyFrom(csproj, xel =>
+                                xel.Descendants(ver.Substring(2, ver.Length - 3))?
+                                    .LastOrDefault(x => Version.TryParse(x.Value?.TrimToEmpty(), out _))?
+                                    .Value?.TrimToNull());
+                            if (prop != null)
+                                ver = prop;
+                        }
+
+                        yield return (target, packageReference.Attribute("Include").Value, ver);
+                    }
                 }
             }
         }

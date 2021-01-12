@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -35,13 +36,23 @@ namespace Serenity.CodeGenerator
                     .FirstOrDefault()?.Value.TrimToNull());
         }
 
-        public static string ExtractPropertyFrom(string csproj, 
-            Func<XElement, string> extractor)
+        public static string ExtractPropertyFrom(string csproj, Func<XElement, string> extractor)
+        {
+            foreach (var xe in EnumerateProjectAndDirectoryBuildProps(csproj))
+            {
+                var value = extractor(xe);
+                if (value != null)
+                    return value;
+            }
+
+            return null;
+        }
+
+        public static IEnumerable<XElement> EnumerateProjectAndDirectoryBuildProps(string csproj)
         {
             var xe = XElement.Parse(File.ReadAllText(csproj));
-            var value = extractor(xe);
-            if (value != null)
-                return value;
+            yield return xe;
+
             var dir = Path.GetDirectoryName(csproj);
             while (!string.IsNullOrEmpty(dir) &&
                 Directory.Exists(dir))
@@ -49,16 +60,10 @@ namespace Serenity.CodeGenerator
                 dir = Path.GetFullPath(dir);
                 var dirProps = Path.Combine(dir, "Directory.Build.props");
                 if (File.Exists(dirProps))
-                {
-                    value = extractor(XElement.Parse(File.ReadAllText(dirProps)));
-                    if (value != null)
-                        break;
-                }
+                    yield return XElement.Parse(File.ReadAllText(dirProps));
+
                 dir = Path.GetDirectoryName(dir);
             }
-
-            return value;
-
         }
     }
 }
