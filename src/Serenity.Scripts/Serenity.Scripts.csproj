@@ -28,7 +28,7 @@
     </Content>
     <Content Include="dist\Serenity.CoreLib.d.ts">
       <Pack>true</Pack>
-      <PackagePath>content\Scripts\serenity\;content\Scripts\typings\serenity\</PackagePath>
+      <PackagePath>content\Scripts\serenity\;content\Scripts\typings\serenity\;typings\serenity.corelib\index.d.ts</PackagePath>
     </Content>
   </ItemGroup>
   <ItemGroup>
