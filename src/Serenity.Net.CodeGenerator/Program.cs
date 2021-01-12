@@ -1,4 +1,5 @@
-﻿using Serenity.CodeGeneration;
+﻿using Microsoft.Build.Locator;
+using Serenity.CodeGeneration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,6 +60,7 @@ namespace Serenity.CodeGenerator
 
             if ("restore".StartsWith(command, StringComparison.Ordinal))
             {
+                MSBuildLocator.RegisterDefaults();
                 new RestoreCommand().Run(csproj);
             }
             else if (
