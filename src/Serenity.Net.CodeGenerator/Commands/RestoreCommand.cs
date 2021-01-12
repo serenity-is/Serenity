@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Microsoft.Build.Locator;
 
 namespace Serenity.CodeGenerator
 {
@@ -111,11 +110,6 @@ namespace Serenity.CodeGenerator
                     var project = new Project(reference);
                     try
                     {
-
-                        var s = string.Join("\n", project.AllEvaluatedItems.Select(x =>
-                            x.ItemType + ": " + x.EvaluatedInclude + ": " + x.MetadataCount));
-                        Console.WriteLine(s);
-
                         foreach (var item in project.AllEvaluatedItems
                             .Where(x =>
                                 string.Equals(x.ItemType, "Content",
