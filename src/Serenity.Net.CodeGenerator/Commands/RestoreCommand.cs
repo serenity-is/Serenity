@@ -27,7 +27,8 @@ namespace Serenity.CodeGenerator
             "Nuglify.",
             "StackExchange.",
             "System.",
-            "Serenity.Net."
+            "Serenity.Net.",
+            "X.PagedList"
         };
 
         public void Run(string csproj)
