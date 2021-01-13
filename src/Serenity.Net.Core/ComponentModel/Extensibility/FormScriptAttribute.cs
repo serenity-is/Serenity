@@ -14,6 +14,15 @@ namespace Serenity.ComponentModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FormScriptAttribute"/> class.
+        /// The key of the form script will be the full name of the type this is placed on.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">key</exception>
+        public FormScriptAttribute()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FormScriptAttribute"/> class.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <exception cref="ArgumentNullException">key</exception>
