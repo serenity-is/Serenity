@@ -25,11 +25,17 @@ namespace Serenity.CodeGenerator
 
             string[] stripViewPaths = config.MVC.StripViewPaths ?? new string[] {
                 "Modules/",
-                "Views/"
+                "Views/",
+                Path.GetFileNameWithoutExtension(csproj) + "/"
             };
 
             var rootDir = projectDir + Path.DirectorySeparatorChar;
-            var searchViewPaths = (config.MVC.SearchViewPaths ?? new string[] { "Modules/", "Views/" })
+            var searchViewPaths = (config.MVC.SearchViewPaths ?? 
+                new string[] { 
+                    "Modules/", 
+                    "Views/",
+                    Path.GetFileNameWithoutExtension(csproj) + "/"
+                })
                 .Select(x => Path.Combine(rootDir, x.Replace('/', Path.DirectorySeparatorChar)));
 
             IEnumerable<string> files = new List<string>();
@@ -47,6 +53,8 @@ namespace Serenity.CodeGenerator
                     if (name.StartsWith(strip, StringComparison.OrdinalIgnoreCase))
                     {
                         name = name.Substring(strip.Length);
+
+                        break;
                     }
                 }
 
@@ -86,7 +94,7 @@ namespace Serenity.CodeGenerator
                 processed.Add(name);
                 var parts = name.Split(new char[] { '/' });
 
-                if (parts.Length <= 1)
+                if (parts.Length == 0)
                     continue;
 
                 for (var i = last.Length; i > parts.Length; i--)
@@ -108,9 +116,10 @@ namespace Serenity.CodeGenerator
                 {
                     var indent = new string(' ', (i + 2) * 4);
                     var u = parts[i];
-                    if (i > 0 && parts[i - 1] == u)
+                    if (i > 0 && parts[i - 1] == u ||
+                        i == 0 && parts[i] == "Views")
                         u = u + "_";
-                    sb.AppendLine(indent + "public static class " + u);
+                    sb.AppendLine(indent + "public static class " + u.Replace(".", "_"));
                     sb.AppendLine(indent + "{");
                 }
 
