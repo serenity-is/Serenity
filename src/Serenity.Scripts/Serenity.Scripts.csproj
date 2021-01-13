@@ -1,17 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net5.0</TargetFrameworks>
     <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
     <TypeScriptBuildMode>true</TypeScriptBuildMode>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <Title>Serenity Platform - Scripts</Title>
     <Description>Contains Serenity scripts and CSS file</Description>
+    <StaticWebAssetBasePath>/Serenity.Scripts</StaticWebAssetBasePath>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="*\tsconfig.json;style\*.css;texts\**\*.json;" />
-    <Content Include="*\tsconfig.json">
+    <Content Remove="texts\**\*.json" />
+    <Content Update="*\tsconfig.json">
       <Pack>false</Pack>
     </Content>
     <None Include="style\*.css">
@@ -51,8 +53,9 @@
     <Message Text="Installing NPM packages..." Importance="high"></Message>
     <Exec Command="npm install" />
   </Target>
-  <Target Name="CompileCoreLib" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" Outputs="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.d.ts">
+  <Target Name="CompileCoreLib" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" Outputs="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.d.ts;wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts">
     <Exec Command="npm run build" />
+    <Copy SourceFiles="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.min.js;dist\Serenity.CoreLib.js.map;dist\Serenity.CoreLib.d.ts" DestinationFolder="wwwroot" />
   </Target>
   <Target Name="CompileSerenityLess" AfterTargets="AfterBuild" Inputs="@(ToSerenityLess)" Outputs="style\serenity.css">
     <Exec Command="npx lessc &quot;$(ProjectDir)style\serenity.less&quot; &gt; &quot;$(ProjectDir)style\serenity.css&quot;" />

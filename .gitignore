@@ -62,3 +62,4 @@ Serenity.TypeScript.CoreLib/Serenity.CoreLib.min.js
 /src/Serenity.Scripts/dist/**/*.tsbuildinfo
 /build/tools/Addins/
 /src/Serenity.Scripts/dist/
+/src/Serenity.Scripts/wwwroot/Serenity.CoreLib.*
