@@ -23,7 +23,8 @@ namespace Serenity.Web
             foreach (var type in typeSource.GetTypesWithAttribute(typeof(ColumnsScriptAttribute)))
             {
                 var attr = type.GetCustomAttribute<ColumnsScriptAttribute>();
-                var script = new ColumnsScript(attr.Key, type, propertyProvider, serviceProvider);
+                var key = attr.Key ?? type.FullName;
+                var script = new ColumnsScript(key, type, propertyProvider, serviceProvider);
                 scriptManager.Register(script);
                 scripts.Add(script.GetScript);
             }

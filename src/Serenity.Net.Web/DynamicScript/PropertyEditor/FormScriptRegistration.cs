@@ -26,7 +26,8 @@ namespace Serenity.Web
             foreach (var type in typeSource.GetTypesWithAttribute(typeof(FormScriptAttribute)))
             {
                 var attr = type.GetCustomAttribute<FormScriptAttribute>();
-                var script = new FormScript(attr.Key, type, propertyProvider, serviceProvider);
+                var key = attr.Key ?? type.FullName;
+                var script = new FormScript(key, type, propertyProvider, serviceProvider);
                 scriptManager.Register(script);
                 scripts.Add(script.GetScript);
             }

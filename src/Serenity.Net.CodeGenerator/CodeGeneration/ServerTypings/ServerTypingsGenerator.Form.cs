@@ -217,7 +217,11 @@ namespace Serenity.CodeGeneration
             cw.InBrace(delegate
             {
                 cw.Indented("static formKey = '");
-                sb.Append(formScriptAttribute.ConstructorArguments[0].Value as string);
+                var key = formScriptAttribute.ConstructorArguments != null &&
+                    formScriptAttribute.ConstructorArguments.Count > 0 ? formScriptAttribute.ConstructorArguments[0].Value as string : null;
+                key ??= type.FullName;
+
+                sb.Append(key);
                 sb.AppendLine("';");
 
                 if (propertyNames.Count > 0)
