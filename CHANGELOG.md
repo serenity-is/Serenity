@@ -1,3 +1,27 @@
+## 5.0.27 (2020-01-13)
+
+Features:
+  - Obsolete ICustomizedFormScript, use ICustomizePropertyItems instead
+  - Add ImplicitPermissionAttribute to Serenity.Net.Core (implementation only in StartSharp currently)  
+  - Add ExportColumns to ListRequest which will be used for Excel export column list etc instead of IncludeColumns which has a different purpose and not guranteed to be persist order as it is a hashset
+  - Add IDataReportRenderer abstraction for rendering a data only report to excel format
+  - Move IExternalReport interface to Serenity.Services
+  - Move DynamicDataReport to Serenity.Services but rename to TabularDataReport as the public interface has changed
+  - Add an IExcelExporter interface to abstract exporting data from List services to Excel
+  - Add ISqlExceptionHumanizer interface abstraction for producing user friendly exceptions from sql exceptions like FK, PK etc.
+  - Move DataAuditLogAttribute to Serenity.Net.Data
+  - Start splitting more features into Razor class libraries, like Northwind, Basic Samples etc.
+  - Improved Sergen to better work with razor class libraries
+  - Add restore option to control file patterns to include/exclude in restore
+  - Update sergen restore command to handle version variables, and Directory.Build.props
+  - Reuse typings folder which will contain index.d.ts files matching @types npm structure, restore and prefer typings in recursive project references
+  - Modify sergen TSTypeLister to get list of files directly from tsconfig.json instead of hardcoded files if possible
+  - Also produce typings\serenity.corelib\index.d.ts which is compatible with typeRoots option in tsconfig
+  - Use MsBuild.Evaluation library to resolve project references and packed typings
+  - Allow FormScript / ColumnScript without specifiying key, but use type FullName in that case (Module attribute won't be used in any case)
+  - Handle "." in folder names, allow project.name as a root dir by default for Sergen MVC command
+  - Also provide static web assets with Serenity.Scripts (for now optional)
+
 ## 5.0.26 (2021-01-09)
 
 Features:
