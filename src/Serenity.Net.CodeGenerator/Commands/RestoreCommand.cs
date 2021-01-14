@@ -218,19 +218,19 @@ namespace Serenity.CodeGenerator
 
                         // normalize paths as Content, Scripts, fonts and typings (these are exact cases expected)
                         if (relative.StartsWith("content/", StringComparison.OrdinalIgnoreCase))
-                            relative = "Content/" + relative.Substring("content/".Length);
+                            relative = "Content/" + relative["content/".Length..];
                         else if (relative.StartsWith("scripts/typings/", StringComparison.OrdinalIgnoreCase))
                         {
-                            relative = "typings/" + relative.Substring("Scripts/typings/".Length);
+                            relative = "typings/" + relative["Scripts/typings/".Length..];
                             var tsconfig = Path.Combine(projectDir, "tsconfig.json");
                             if (!File.Exists(tsconfig) ||
                                 !File.ReadAllText(tsconfig).Contains(relative, StringComparison.OrdinalIgnoreCase))
                                 continue; // old typings only needed for users who didn't fix their tsconfig.json
                         }
                         else if (relative.StartsWith("scripts/", StringComparison.OrdinalIgnoreCase))
-                            relative = "Scripts/" + relative.Substring("scripts/".Length);
+                            relative = "Scripts/" + relative["scripts/".Length..];
                         else if (relative.StartsWith("fonts/", StringComparison.OrdinalIgnoreCase))
-                            relative = "fonts/" + relative.Substring("fonts/".Length);
+                            relative = "fonts/" + relative["fonts/".Length..];
 
                         // all content other than typings go under wwwroot
                         if (!relative.StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
@@ -248,7 +248,7 @@ namespace Serenity.CodeGenerator
                 {
                     foreach (var file in Directory.GetFiles(typingsRoot, "*.ts", SearchOption.AllDirectories))
                     {
-                        var relative = "typings/" + typingsRoot.Substring(contentRoot.Length + 1);
+                        var relative = "typings/" + file[(typingsRoot.Length + 1)..];
                         restoreFile(file, relative);
                     }
                 }
