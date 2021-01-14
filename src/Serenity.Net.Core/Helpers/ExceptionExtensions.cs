@@ -29,7 +29,14 @@ namespace Serenity
         /// <param name="category">Optional category</param>
         public static void Log(this Exception exception, IExceptionLogger logger, string category = null)
         {
-            logger?.Log(exception, category);
+            try
+            {
+                logger?.Log(exception, category);
+            }
+            catch
+            {
+                // ignore errors while logging
+            }
         }
     }
 }

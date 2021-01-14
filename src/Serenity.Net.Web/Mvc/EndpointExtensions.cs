@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Serenity.Abstractions;
 using Serenity.Data;
 using System;
 using System.Data;
@@ -10,13 +11,19 @@ namespace Serenity.Services
 {
     public static class EndpointExtensions
     {
-        public static TResponse ConvertToResponse<TResponse>(this Exception exception, HttpContext context)
+        public static TResponse ConvertToResponse<TResponse>(this Exception exception, HttpContext httpContext)
+            where TResponse : ServiceResponse, new()
+        {
+            return ConvertToResponse<TResponse>(exception,
+                httpContext?.RequestServices?.GetService<IExceptionLogger>(),
+                string.Equals(httpContext?.RequestServices.GetService<IWebHostEnvironment>()?
+                    .EnvironmentName, "development", StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static TResponse ConvertToResponse<TResponse>(this Exception exception, IExceptionLogger logger, bool showDetails)
             where TResponse: ServiceResponse, new()
         {
-            //exception.Log();
-
-            bool showDetails = context != null && string.Compare(context.RequestServices.GetRequiredService<IWebHostEnvironment>()
-                .EnvironmentName, "development", StringComparison.OrdinalIgnoreCase) == 0;
+            exception.Log(logger);
 
             var response = new TResponse();
             var error = new ServiceError();
@@ -34,8 +41,8 @@ namespace Serenity.Services
 
                 if (showDetails)
                 {
-                    error.Message = exception.Message;
-                    error.Details = exception.ToString();
+                    error.Message = exception?.Message;
+                    error.Details = exception?.ToString();
                 }
                 else
                     error.Message = "An error occurred while processing your request.";
