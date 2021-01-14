@@ -1,3 +1,9 @@
+## 5.0.28 (2020-01-14)
+
+Bugfixes:
+  - Bring back exception logging in service endpoints
+  - Resolve issue while restoring typings in sergen
+
 ## 5.0.27 (2020-01-13)
 
 Features:
