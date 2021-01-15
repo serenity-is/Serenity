@@ -52,6 +52,7 @@ namespace Serenity.Extensions.DependencyInjection
             var rowTypeRegistry = provider.GetRequiredService<IRowTypeRegistry>();
             textRegistry.AddNestedTexts(typeSource);
             textRegistry.AddEnumTexts(typeSource);
+            textRegistry.AddNestedPermissions(typeSource);
             var rowInstances = rowTypeRegistry.AllRowTypes.Select(x => (IRow)Activator.CreateInstance(x));
             textRegistry.AddRowTexts(rowInstances);
             foreach (var path in jsonTextPaths)
