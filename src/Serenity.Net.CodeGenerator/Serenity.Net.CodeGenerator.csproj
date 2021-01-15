@@ -2,6 +2,8 @@
   <PropertyGroup>
     <AssemblyName>sergen</AssemblyName>
     <OutputType>Exe</OutputType>
+    <OutputPath>bin\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>Serenity.CodeGenerator</RootNamespace>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

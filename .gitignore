@@ -63,3 +63,4 @@ Serenity.TypeScript.CoreLib/Serenity.CoreLib.min.js
 /build/tools/Addins/
 /src/Serenity.Scripts/dist/
 /src/Serenity.Scripts/wwwroot/Serenity.CoreLib.*
+/src/Serenity.Net.CodeGenerator/bin/
