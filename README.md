@@ -3,11 +3,11 @@ Serenity Application Platform
 
 <img src="https://github.com/volkanceylan/Serenity/blob/master/Tools/Images/serenity-logo-128.png" />
 
-[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Core/)
+[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Net.Core/)
 
 ## What is Serenity Platform
 
-Serenity is an ASP.NET MVC / TypeScript application platform designed to simplify and shorten development of data-centric business applications with a service based architecture.
+Serenity is an ASP.NET Core / TypeScript application platform designed to simplify and shorten development of data-centric business applications with a service based architecture.
 
 It aims to make development easier while reducing maintenance costs by avoiding boiler-plate code, reducing the time spent on repetitive tasks and applying best software design practices. 
 
@@ -16,10 +16,6 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 ## Documentation and Tutorials
 
 See [Serenity Developer Guide](https://serenity.is/docs/) at https://serenity.is/docs/ for documentation, and step by step tutorials.
-
-**Translations of Serenity Developer Guide:**
-- [Chinese Simplified (thanks @WuShenghui)](https://volkanceylan.gitbooks.io/serenity-zh-cn)
-- [Türkçe Başlangıç Kılavuzu (thanks @ademc)](https://ademc.gitbooks.io/serenity-gelistirici-dokumani)
 
 **Serenity Blog:**
 - http://serenity.is/blog/
