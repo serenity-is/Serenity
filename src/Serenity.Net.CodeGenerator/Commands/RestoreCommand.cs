@@ -15,7 +15,7 @@ namespace Serenity.CodeGenerator
             "Dapper",
             "EPPlus",
             "FastMember",
-            "FluentMigrator.",
+            "FluentMigrator",
             "FirebirdSql.",
             "MailKit",
             "Mapster",
