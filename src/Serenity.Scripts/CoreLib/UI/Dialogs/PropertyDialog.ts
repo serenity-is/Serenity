@@ -149,4 +149,17 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
     }
 
     protected propertyGrid: PropertyGrid;
+
+    protected getFallbackTemplate() {
+        return `<div>
+    <div class="s-Form">
+        <form id="~_Form" action="">
+            <div class="fieldset">
+                <div id="~_PropertyGrid"></div>
+                <div class="clear"></div>
+            </div>
+        </form> 
+    </div>
+</div>`;
+    }
 }

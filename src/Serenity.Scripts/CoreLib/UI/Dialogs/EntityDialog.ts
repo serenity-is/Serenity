@@ -1130,4 +1130,19 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
     protected useViewMode() {
         return false;
     }
+
+    protected getFallbackTemplate() {
+        return `<div class="s-DialogContent">
+    <div id="~_Toolbar" class="s-DialogToolbar">
+    </div>
+    <div class="s-Form">
+        <form id="~_Form" action="">
+            <div class="fieldset">
+                <div id="~_PropertyGrid"></div>
+                <div class="clear"></div>
+            </div>
+        </form> 
+    </div>
+</div>`;
+    }
 }
