@@ -1,3 +1,8 @@
+## 5.0.30 (2020-01-15)
+
+Bugfixes:
+  - Register nested permission display names in user permissions UI
+
 ## 5.0.29 (2020-01-15)
 
 Features:
