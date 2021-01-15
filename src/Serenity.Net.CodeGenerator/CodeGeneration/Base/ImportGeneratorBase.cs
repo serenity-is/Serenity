@@ -79,14 +79,9 @@ namespace Serenity.CodeGeneration
             return null;
         }
 
-        protected bool IsGenericTypeName(string typeName)
-        {
-            return typeName.Contains("`", StringComparison.Ordinal);
-        }
-
         protected string[] SplitGenericArguments(ref string typeName)
         {
-            if (!IsGenericTypeName(typeName))
+            if (!typeName.Contains('<', StringComparison.Ordinal))
                 return System.Array.Empty<string>();
 
             var pos = typeName.IndexOf("<", StringComparison.Ordinal);
@@ -186,7 +181,21 @@ namespace Serenity.CodeGeneration
                 if (baseTypeName == typeName)
                     return true;
 
+                var ns = type.Namespace;
                 type = GetScriptType(baseTypeName);
+                if (type == null && ns != null)
+                {
+                    var nsParts = ns.Split('.');
+                    for (var i = nsParts.Length; i > 0; i--)
+                    {
+                        var prefixed = string.Join('.', nsParts.Take(i)) + '.' + baseTypeName;
+                        if (prefixed == typeName)
+                            return true;
+                        type = GetScriptType(prefixed);
+                        if (type != null)
+                            break;
+                    }
+                }
             };
 
             return false;

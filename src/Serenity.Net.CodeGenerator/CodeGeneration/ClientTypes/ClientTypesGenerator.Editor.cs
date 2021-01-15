@@ -51,11 +51,14 @@ namespace Serenity.CodeGeneration
                 type.AssemblyName.StartsWith("Serenity.", StringComparison.Ordinal))
                 return false;
 
-            return GetAttribute(type, "Serenity.EditorAttribute", inherited: true) != null ||
+            return
+                GetAttribute(type, "Serenity.EditorAttribute", inherited: true) != null ||
                 GetAttribute(type, "Serenity.ElementAttribute", inherited: true) != null ||
                 GetAttribute(type, "Serenity.Decorators.registerEditor", inherited: true) != null ||
                 GetAttribute(type, "Serenity.Decorators.editor", inherited: true) != null ||
-                GetAttribute(type, "Serenity.Decorators.element", inherited: true) != null;
+                GetAttribute(type, "Serenity.Decorators.element", inherited: true) != null ||
+                HasBaseType(type, "Serenity.Extensions.GridEditorBase") ||
+                HasBaseType(type, "Serenity.LookupEditorBase");
         }
     }
 }

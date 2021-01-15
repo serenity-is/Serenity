@@ -73,7 +73,7 @@ namespace Serenity.CodeGeneration
                             SSTypeNameToTS(part, codeNamespace, "any", leaveAsIs);
                     };
 
-                    if (IsGenericTypeName(typeName))
+                    if (typeName.Contains('`', StringComparison.Ordinal))
                     {
                         var parts = SplitGenericArguments(ref typeName);
 
