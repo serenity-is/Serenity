@@ -74,13 +74,16 @@ namespace Serenity.CodeGeneration
 
                     return;
                 }
-                else if (CecilUtils.GetAttr(type, "Serenity.ComponentModel", "ColumnsScriptAttribute") != null)
+
+                var columnsScriptAttr = CecilUtils.GetAttr(type, "Serenity.ComponentModel", "ColumnsScriptAttribute");
+                if (columnsScriptAttr != null)
                 {
-                    //GenerateColumns(type);
-                    run(EnqueueTypeMembers);
+                    run(t => GenerateColumns(t, columnsScriptAttr));
+                    EnqueueTypeMembers(type);
                     return;
                 }
-                else if (CecilUtils.GetAttr(type, "Serenity.Extensibility", "NestedPermissionKeysAttribute") != null ||
+
+                if (CecilUtils.GetAttr(type, "Serenity.Extensibility", "NestedPermissionKeysAttribute") != null ||
                     CecilUtils.GetAttr(type, "Serenity.ComponentModel", "NestedPermissionKeysAttribute") != null)
                 {
                     run(GeneratePermissionKeys);
