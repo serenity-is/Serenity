@@ -1,3 +1,10 @@
+## 5.0.29 (2020-01-15)
+
+Features:
+  - Output sergen.exe directly to bin directory, exclude Debug/Release and TargetFramework. You may need to update reference if you are using Serenity as submodule.
+  - Generate XYZColumns.columnsKey just like XYZForm.formKey
+  - use TypingsToPackage item type to determine typings that will be packaged, also use msbuild to determine package references in sergen
+
 ## 5.0.28 (2020-01-14)
 
 Bugfixes:
