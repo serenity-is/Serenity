@@ -9,10 +9,6 @@
     <CreateItem Include="$(SolutionDir)Serenity\src\Serenity.Scripts\style\**\*.less">
       <Output TaskParameter="Include" ItemName="SubmoduleCompileSerenityLessInputs" />
     </CreateItem>
-	<CreateItem Include="$(SolutionDir)Serenity\src\Serenity.Scripts\dist\*.js;$(SolutionDir)Serenity\src\Serenity.Scripts\dist\*.map;$(SolutionDir)Serenity\src\Serenity.Scripts\dist\*.ts" 
-		Exclude="$(SolutionDir)Serenity\src\Serenity.Scripts\dist\Serenity.CodeGenerator.*">
-	  <Output TaskParameter="Include" ItemName="SubmoduleSerenityScriptsDist" /> 
-	</CreateItem>
   </Target>
   <Target Name="SubmoduleCompileSerenityLess" AfterTargets="AfterBuild" Inputs="@(SubmoduleCompileSerenityLessInputs)" Outputs="$(ProjectDir)wwwroot\Content\serenity\serenity.css" >
     <Exec Command="node &quot;$(SolutionDir)Serenity\src\Serenity.Scripts\node_modules\less\bin\lessc&quot; &quot;$(SolutionDir)Serenity\src\Serenity.Scripts\style\serenity.less&quot; &gt; &quot;$(ProjectDir)wwwroot\Content\serenity\serenity.css&quot;"></Exec>
@@ -20,6 +16,5 @@
   <Target Name="SubmoduleCopySerenityFiles" AfterTargets="AfterBuild">
     <Copy SourceFiles="@(SubmoduleSerenityImages)" DestinationFolder="$(ProjectDir)wwwroot\Content\serenity\images" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(SubmoduleSerenityTexts)" DestinationFolder="$(ProjectDir)wwwroot\Scripts\serenity\texts" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(SubmoduleSerenityScriptsDist)" DestinationFolder="$(ProjectDir)wwwroot\Scripts\serenity\" SkipUnchangedFiles="true" />
   </Target>
 </Project>

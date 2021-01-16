@@ -40,7 +40,8 @@
     <None Remove="node_modules\**" />
     <Compile Remove="node_modules\**" />
     <EmbeddedResource Remove="node_modules\**" />
-    <TypeScriptCompile Remove="node_modules\**" />
+    <TypeScriptCompile Remove="dist\**;node_modules\**;test\**;wwwroot\Serenity.CoreLib.d.ts" />
+    <None Include="wwwroot\Serenity.CoreLib.d.ts" />
     <ToCompileCoreLib Include="CoreLib\**\*.ts;CoreLib\tsconfig.json;rollup.config.js"></ToCompileCoreLib>
     <ToSerenityLess Include="style\**\*.less"></ToSerenityLess>
   </ItemGroup>
@@ -51,7 +52,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\terser\bin\terser') Or !Exists('node_modules\less\bin\lessc')">
     <Message Text="Installing NPM packages..." Importance="high"></Message>
     <Exec Command="npm install" />
