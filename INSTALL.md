@@ -61,7 +61,7 @@ Even if you have correct Node / NPM installed, Visual Studio might still be tryi
 
 Click _Tools_ => _Options_, and then under _Projects and Solutions_ => _External Web Tools_ add _C:\Program Files\nodejs_ to the top of the list by clicking plus folder icon, typing _C:\Program Files\nodejs_ and using _Up Arrow_ to move it to the start:
 
-![VS External Tools Path](Tools/Images/install/vs-external-tools-path.png)
+![VS External Tools Path](build/assets/vs-external-tools.png)
 
 ## Installing Serene
 
@@ -88,7 +88,7 @@ Install our project initializer, *serin* as a global tool using NPM:
 > sudo npm install -g serin
 ```
 
-![NPM Install Serin](Tools/Images/install/linux-npm-install-serin.png)
+![NPM Install Serin](build/assets/linux-npm-install-serin.png)
 
 > Thanks to Victor (@vctor) for Linux screenshots
 
@@ -122,7 +122,7 @@ While inside an empty directory, run *serin*:
 > serin
 ```
 
-![Windows Serin MyApp](Tools/Images/install/linux-serin-myserene.png)
+![Windows Serin MyApp](build/assets/linux-serin-myserene.png)
 
 Type an application name, e.g. *MySerene* and press enter. Take a break while Serin creates 
 your project, initializates static content and restores packages etc.
@@ -164,7 +164,7 @@ To use sergen, open a command prompt and CD into the project directory (one that
 
 > dotnet sergen g
 
-![Dotnet Sergen G](Tools/Images/install/dotnet-sergen-g.png)
+![Dotnet Sergen G](build/assets/sergen-g.png)
 
 Sergen will list connections in *appsettings.json* file.
 
@@ -172,11 +172,11 @@ You can use *TAB completion*, e.g. type *D* and press *TAB* to complete *Default
 
 After pressing *Enter* you'll get a list of tables in that database:
 
-![Dotnet Sergen Tables](Tools/Images/install/dotnet-sergen-tables.png)
+![Dotnet Sergen Tables](build/assets/dotnet-sergen-tables.png)
 
 Again, they exact table name or use *TAB completion*.
 
-![Dotnet Sergen Options](Tools/Images/install/dotnet-sergen-options.png)
+![Dotnet Sergen Options](build/assets/dotnet-sergen-options.png)
 
 Then, you can select a Module Name, Class Identifier, Permission Key and what to generate, or just accept defaults by pressing *ENTER*.
 

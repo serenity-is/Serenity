@@ -1,7 +1,7 @@
 Serenity Application Platform
 =============================
 
-<img src="https://github.com/volkanceylan/Serenity/blob/master/Tools/Images/serenity-logo-128.png" />
+<img src="https://github.com/volkanceylan/Serenity/blob/master/build/assets/package-icon.png" />
 
 [![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Net.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Net.Core/)
 
