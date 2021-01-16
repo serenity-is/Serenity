@@ -11,27 +11,6 @@ namespace Serenity.CodeGenerator
 {
     public class RestoreCommand
     {
-        private static string[] skipPackages = new[]
-        {
-            "Dapper",
-            "EPPlus",
-            "FastMember",
-            "FluentMigrator",
-            "FirebirdSql.",
-            "MailKit",
-            "Mapster",
-            "MySql",
-            "Microsoft.",
-            "Newtonsoft.",
-            "NetStandard.",
-            "Npgsql",
-            "Nuglify.",
-            "StackExchange.",
-            "System.",
-            "Serenity.Net.",
-            "X.PagedList"
-        };
-
         public void Run(string csproj)
         {
             var packagesDir = new PackageHelper().DeterminePackagesPath();
@@ -43,9 +22,8 @@ namespace Serenity.CodeGenerator
                 if (visited.Contains(id))
                     return true;
 
-                foreach (var skip in skipPackages)
-                    if (id.StartsWith(skip, StringComparison.OrdinalIgnoreCase))
-                        return true;
+                if (CodeGeneration.SkipPackages.ForRestore(id))
+                    return true;
 
                 visited.Add(id);
 

@@ -128,7 +128,9 @@ namespace Serenity.CodeGeneration
 
         protected override void GenerateAll()
         {
-            foreach (var assembly in this.Assemblies)
+            var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var assembly in Assemblies)
             {
                 foreach (var module in assembly.Modules)
                 {
@@ -141,6 +143,43 @@ namespace Serenity.CodeGeneration
                     {
                         // skip assemblies that doesn't like to list its types (e.g. some SignalR reported in #2340)
                         continue;
+                    }
+
+                    if (module.HasAssemblyReferences)
+                    {
+                        foreach (var refAsm in module.AssemblyReferences)
+                        { 
+                            if (!visitedForAnnotations.Contains(refAsm.Name))
+                            {
+                                visitedForAnnotations.Add(refAsm.Name);
+
+                                if (SkipPackages.ForAnnotations(refAsm.Name))
+                                    continue;
+
+                                if (Assemblies.Any(x => string.Equals(x.Name.Name, 
+                                    refAsm.Name, StringComparison.OrdinalIgnoreCase)))
+                                    continue;
+
+                                try
+                                {
+                                    
+                                    var refDef = module.AssemblyResolver.Resolve(refAsm);
+                                    if (refDef != null)
+                                    {
+                                        foreach (var refMod in refDef.Modules)
+                                        {
+                                            foreach (var refType in refMod.GetTypes())
+                                            {
+                                                ScanAnnotationTypeAttributes(refType);
+                                            }
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                }
+                            }
+                        }
                     }
 
                     TypeDefinition[] emptyTypes = Array.Empty<TypeDefinition>();
