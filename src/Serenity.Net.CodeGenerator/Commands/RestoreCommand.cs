@@ -1,4 +1,5 @@
-﻿using Microsoft.Build.Evaluation;
+﻿using Microsoft.Build.Definition;
+using Microsoft.Build.Evaluation;
 using Serenity.IO;
 using System;
 using System.Collections.Generic;
@@ -108,45 +109,47 @@ namespace Serenity.CodeGenerator
             {
                 foreach (var reference in EnumerateProjectReferences(csproj, new HashSet<string>(StringComparer.OrdinalIgnoreCase)))
                 {
-                    var project = new Project(reference);
+                    Project project;
                     try
                     {
-                        foreach (var item in project.AllEvaluatedItems
-                            .Where(x =>
-                                string.Equals(x.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) ||
-                                string.Equals(x.ItemType, "Content", StringComparison.OrdinalIgnoreCase) ||
-                                string.Equals(x.ItemType, "None", StringComparison.OrdinalIgnoreCase) ||
-                                string.Equals(x.ItemType, "TypeScriptCompile", StringComparison.OrdinalIgnoreCase))
-                            .Where(x => x.EvaluatedInclude?.EndsWith(".d.ts", 
-                                StringComparison.OrdinalIgnoreCase) == true))
+                        project = GetProject(reference);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    foreach (var item in project.AllEvaluatedItems
+                        .Where(x =>
+                            string.Equals(x.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(x.ItemType, "Content", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(x.ItemType, "None", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(x.ItemType, "TypeScriptCompile", StringComparison.OrdinalIgnoreCase))
+                        .Where(x => x.EvaluatedInclude?.EndsWith(".d.ts", 
+                            StringComparison.OrdinalIgnoreCase) == true))
+                    {
+                        var sourceFile = Path.Combine(Path.GetDirectoryName(reference),
+                            item.EvaluatedInclude);
+
+                        if (!File.Exists(sourceFile))
+                            continue;
+
+                        if (!string.Equals(item.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) &&
+                            item.GetMetadataValue("Pack") != "true")
+                            continue;
+
+                        var packagePath = item.GetMetadataValue("PackagePath")?.Trim();
+                        if (!string.IsNullOrEmpty(packagePath))
                         {
-                            var sourceFile = Path.Combine(Path.GetDirectoryName(reference),
-                                item.EvaluatedInclude);
-
-                            if (!File.Exists(sourceFile))
-                                continue;
-
-                            if (!string.Equals(item.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) &&
-                                item.GetMetadataValue("Pack") != "true")
-                                continue;
-
-                            var packagePath = item.GetMetadataValue("PackagePath")?.Trim();
-                            if (!string.IsNullOrEmpty(packagePath))
+                            foreach (var path in packagePath.Split(';', StringSplitOptions.RemoveEmptyEntries))
                             {
-                                foreach (var path in packagePath.Split(';', StringSplitOptions.RemoveEmptyEntries))
-                                {
-                                    if (!PathHelper.ToUrl(path).StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
-                                        continue;
+                                if (!PathHelper.ToUrl(path).StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
+                                    continue;
 
-                                    restoreFile(sourceFile, path);
-                                    restoredFromProjectReference.Add(path);
-                                }
+                                restoreFile(sourceFile, path);
+                                restoredFromProjectReference.Add(path);
                             }
                         }
-                    }
-                    finally
-                    {
-                        ProjectCollection.GlobalProjectCollection.UnloadAllProjects();
                     }
                 }
             }
@@ -298,68 +301,80 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        private static Project GetProject(string csproj)
+        {
+            var project = ProjectCollection.GlobalProjectCollection.GetLoadedProjects(csproj).FirstOrDefault();
+            if (project == null)
+            {
+                project = Project.FromFile(csproj, new ProjectOptions
+                {
+                    LoadSettings = ProjectLoadSettings.IgnoreEmptyImports |
+                    ProjectLoadSettings.IgnoreEmptyImports |
+                    ProjectLoadSettings.IgnoreInvalidImports |
+                    ProjectLoadSettings.DoNotEvaluateElementsWithFalseCondition
+                });
+            }
+            return project;
+        }
+
         private static IEnumerable<string> EnumerateProjectReferences(string csproj, HashSet<string> visited, int depth = 0)
         {
             var allReferences = new List<string>();
-
             try
             {
-                var project = new Project(csproj);
-                try
+                csproj = Path.GetFullPath(csproj);
+                var project = GetProject(csproj);
+                visited?.Add(csproj);
+
+                foreach (var item in project.AllEvaluatedItems)
                 {
-                    visited?.Add(Path.GetFullPath(csproj));
-
-                    foreach (var item in project.AllEvaluatedItems)
+                    if (string.Equals(item.ItemType, "ProjectReference",
+                        StringComparison.OrdinalIgnoreCase))
                     {
-                        if (string.Equals(item.ItemType, "ProjectReference",
-                            StringComparison.OrdinalIgnoreCase))
+                        if (!string.IsNullOrEmpty(item.EvaluatedInclude))
                         {
-                            if (!string.IsNullOrEmpty(item.EvaluatedInclude))
+                            var path = Path.Combine(Path.GetDirectoryName(csproj), item.EvaluatedInclude);
+                            if (File.Exists(path) && visited?.Contains(path) != true)
                             {
-                                var path = Path.Combine(Path.GetDirectoryName(csproj), item.EvaluatedInclude);
-                                if (File.Exists(path) && visited?.Contains(path) != true)
-                                {
-                                    path = Path.GetFullPath(path);
-                                    allReferences.Add(path);
+                                path = Path.GetFullPath(path);
+                                allReferences.Add(path);
 
-                                    if (visited != null && depth < 5)
-                                    {
-                                        foreach (var subref in EnumerateProjectReferences(path, visited, depth + 1))
-                                            allReferences.Add(subref);
-                                    }
+                                if (visited != null && depth < 5)
+                                {
+                                    foreach (var subref in EnumerateProjectReferences(path, visited, depth + 1))
+                                        allReferences.Add(subref);
                                 }
                             }
                         }
                     }
-
-                    return allReferences.Distinct().ToList();
-                }
-                finally
-                {
-                    ProjectCollection.GlobalProjectCollection.UnloadAllProjects();
                 }
             }
             catch
             {
-                return allReferences;
             }
+            return allReferences.Distinct().ToList();
         }
 
         private static IEnumerable<(string Id, string Version)> EnumeratePackageReferences(string csproj)
         {
-            var project = new Project(csproj);
+            var packageReferences = new List<(string Id, string Version)>();
+
+            Project project;
             try
             {
-                foreach (var item in project.AllEvaluatedItems)
-                {
-                    if (string.Equals(item.ItemType, "PackageReference", StringComparison.OrdinalIgnoreCase) &&
-                        !string.IsNullOrEmpty(item.EvaluatedInclude))
-                        yield return (item.EvaluatedInclude, item.GetMetadataValue("Version"));
-                }
+                csproj = Path.GetFullPath(csproj);
+                project = GetProject(csproj);
             }
-            finally
+            catch
             {
-                ProjectCollection.GlobalProjectCollection.UnloadAllProjects();
+                yield break;
+            }
+
+            foreach (var item in project.AllEvaluatedItems)
+            {
+                if (string.Equals(item.ItemType, "PackageReference", StringComparison.OrdinalIgnoreCase) &&
+                    !string.IsNullOrEmpty(item.EvaluatedInclude))
+                    yield return (item.EvaluatedInclude, item.GetMetadataValue("Version"));
             }
         }
     }
