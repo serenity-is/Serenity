@@ -1,7 +1,0 @@
-﻿CREATE DATABASE [$$DbAlias$$]
- CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'$$DbAlias$$', FILENAME = N'$$DbPath$$.mdf' , SIZE = 4096KB , MAXSIZE = UNLIMITED, FILEGROWTH = 10%)
- LOG ON 
-( NAME = N'$$DbAlias$$_log', FILENAME = N'$$DbPath$$.ldf' , SIZE = 4096KB, MAXSIZE = UNLIMITED, FILEGROWTH = 10%)
-GO
