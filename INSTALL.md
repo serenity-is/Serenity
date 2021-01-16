@@ -172,19 +172,19 @@ You can use *TAB completion*, e.g. type *D* and press *TAB* to complete *Default
 
 After pressing *Enter* you'll get a list of tables in that database:
 
-![Dotnet Sergen Tables](build/assets/dotnet-sergen-tables.png)
+![Dotnet Sergen Tables](build/assets/sergen-tables.png)
 
 Again, they exact table name or use *TAB completion*.
 
-![Dotnet Sergen Options](build/assets/dotnet-sergen-options.png)
+![Dotnet Sergen Options](build/assets/sergen-options.png)
 
 Then, you can select a Module Name, Class Identifier, Permission Key and what to generate, or just accept defaults by pressing *ENTER*.
 
 ## Serene .NET Core Version and T4 Templates
 
-Serene .NET Core version doesn't use T4 templates, but instead uses transformation through *dotnet-sergen*.
+Serene .NET Core version doesn't use T4 templates, but instead uses transformation through *dotnet sergen*.
 
-*ClientTypes.tt*, *MVC.tt* and *ServerTypings.tt* are integrated into *dotnet-sergen* itself.
+*ClientTypes.tt*, *MVC.tt* and *ServerTypings.tt* are integrated into *dotnet sergen* itself.
 
 Your project is configured to automatically transform *MVC*, *ClientTypes* before build, and *ServerTypings* after build.
 
