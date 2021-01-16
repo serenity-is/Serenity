@@ -1,3 +1,9 @@
+## 5.0.32 (2021-01-16)
+
+Features:
+  - improve dotnet sergen restore performance
+  - don't copy files under wwwroot\Scripts\serenity for submodules, can now get them through static web assets
+
 ## 5.0.31 (2021-01-16)
 
 Features:
