@@ -1,8 +1,8 @@
-﻿using Microsoft.Build.Locator;
-using Serenity.CodeGeneration;
+﻿using Serenity.CodeGeneration;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 
 namespace Serenity.CodeGenerator
@@ -11,6 +11,14 @@ namespace Serenity.CodeGenerator
     {
         public static void Main(string[] args)
         {
+            Start(args, new FileSystem(), () => new MSBuild.MSBuildProjectSystem());
+        }
+
+        public static void Start(string[] args, IFileSystem fileSystem, Func<IBuildProjectSystem> projectSystemFactory)
+        {
+            if (fileSystem is null)
+                throw new ArgumentNullException(nameof(fileSystem));
+
             string command = null;
             if (args.Length > 0)
                 command = args[0].ToLowerInvariant().TrimToEmpty();
@@ -60,8 +68,7 @@ namespace Serenity.CodeGenerator
 
             if ("restore".StartsWith(command, StringComparison.Ordinal))
             {
-                MSBuildLocator.RegisterDefaults();
-                new RestoreCommand().Run(csproj);
+                new RestoreCommand(fileSystem, projectSystemFactory()).Run(csproj);
             }
             else if (
                 "transform".StartsWith(command, StringComparison.Ordinal) ||

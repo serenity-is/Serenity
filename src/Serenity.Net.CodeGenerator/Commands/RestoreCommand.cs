@@ -1,18 +1,28 @@
-﻿using Microsoft.Build.Definition;
-using Microsoft.Build.Evaluation;
-using Serenity.IO;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Xml.Linq;
+using GlobFilter = Serenity.IO.GlobFilter;
+using SearchOption = System.IO.SearchOption;
 
 namespace Serenity.CodeGenerator
 {
-    public class RestoreCommand
+    public class RestoreCommand : BaseFileSystemCommand
     {
+        protected IBuildProjectSystem ProjectSystem { get; }
+
+        public RestoreCommand(IFileSystem fileSystem, IBuildProjectSystem projectSystem)
+            : base(fileSystem)
+        {
+            ProjectSystem = projectSystem ?? throw new ArgumentNullException(nameof(projectSystem));
+        }
+
         public void Run(string csproj)
         {
+            if (csproj == null)
+                throw new ArgumentNullException(nameof(csproj));
+
             var packagesDir = new PackageHelper().DeterminePackagesPath();
 
             var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -87,10 +97,10 @@ namespace Serenity.CodeGenerator
             {
                 foreach (var reference in EnumerateProjectReferences(csproj, new HashSet<string>(StringComparer.OrdinalIgnoreCase)))
                 {
-                    Project project;
+                    IBuildProject project;
                     try
                     {
-                        project = GetProject(reference);
+                        project = ProjectSystem.LoadProject(reference);
                     }
                     catch
                     {
@@ -154,7 +164,7 @@ namespace Serenity.CodeGenerator
                     ver = ver.Substring(0, ver.Length - 2);
                 else if (ver.StartsWith("[", StringComparison.Ordinal) && ver.EndsWith("]", StringComparison.Ordinal))
                 {
-                    ver = ver.Substring(1, ver.Length - 2).Trim();
+                    ver = ver[1..^1].Trim();
                 }
 
                 var packageFolder = Path.Combine(Path.Combine(packagesDir, id), ver);
@@ -279,29 +289,13 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        private static Project GetProject(string csproj)
-        {
-            var project = ProjectCollection.GlobalProjectCollection.GetLoadedProjects(csproj).FirstOrDefault();
-            if (project == null)
-            {
-                project = Project.FromFile(csproj, new ProjectOptions
-                {
-                    LoadSettings = ProjectLoadSettings.IgnoreEmptyImports |
-                    ProjectLoadSettings.IgnoreEmptyImports |
-                    ProjectLoadSettings.IgnoreInvalidImports |
-                    ProjectLoadSettings.DoNotEvaluateElementsWithFalseCondition
-                });
-            }
-            return project;
-        }
-
-        private static IEnumerable<string> EnumerateProjectReferences(string csproj, HashSet<string> visited, int depth = 0)
+        private IEnumerable<string> EnumerateProjectReferences(string csproj, HashSet<string> visited, int depth = 0)
         {
             var allReferences = new List<string>();
             try
             {
                 csproj = Path.GetFullPath(csproj);
-                var project = GetProject(csproj);
+                var project = ProjectSystem.LoadProject(csproj);
                 visited?.Add(csproj);
 
                 foreach (var item in project.AllEvaluatedItems)
@@ -333,15 +327,13 @@ namespace Serenity.CodeGenerator
             return allReferences.Distinct().ToList();
         }
 
-        private static IEnumerable<(string Id, string Version)> EnumeratePackageReferences(string csproj)
+        private IEnumerable<(string Id, string Version)> EnumeratePackageReferences(string csproj)
         {
-            var packageReferences = new List<(string Id, string Version)>();
-
-            Project project;
+            IBuildProject project;
             try
             {
                 csproj = Path.GetFullPath(csproj);
-                project = GetProject(csproj);
+                project = ProjectSystem.LoadProject(csproj);
             }
             catch
             {
