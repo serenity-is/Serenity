@@ -1,22 +1,28 @@
-## 5.0.30 (2020-01-15)
+## 5.0.31 (2021-01-16)
+
+Features:
+  - Improve base type detection in client types generator
+  - Implement getFallbackTemplate for Entity/Property dialogs so templates under Views\Templates are no longer necessary
+
+## 5.0.30 (2021-01-15)
 
 Bugfixes:
   - Register nested permission display names in user permissions UI
 
-## 5.0.29 (2020-01-15)
+## 5.0.29 (2021-01-15)
 
 Features:
   - Output sergen.exe directly to bin directory, exclude Debug/Release and TargetFramework. You may need to update reference if you are using Serenity as submodule.
   - Generate XYZColumns.columnsKey just like XYZForm.formKey
   - use TypingsToPackage item type to determine typings that will be packaged, also use msbuild to determine package references in sergen
 
-## 5.0.28 (2020-01-14)
+## 5.0.28 (2021-01-14)
 
 Bugfixes:
   - Bring back exception logging in service endpoints
   - Resolve issue while restoring typings in sergen
 
-## 5.0.27 (2020-01-13)
+## 5.0.27 (2021-01-13)
 
 Features:
   - Obsolete ICustomizedFormScript, use ICustomizePropertyItems instead
