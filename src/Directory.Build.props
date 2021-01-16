@@ -6,7 +6,6 @@
     <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Authors>Volkan Ceylan</Authors>
-    <Copyright>Copyright (c) Volkan Ceylan</Copyright>
     <PackageIcon>package-icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://github.com/volkanceylan/Serenity</PackageProjectUrl>
