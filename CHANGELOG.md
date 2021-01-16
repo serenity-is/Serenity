@@ -1,8 +1,13 @@
+## 5.0.33 (2021-01-16)
+
+Features:
+  - Also scan for annotation types in referenced assemblies during Cecil import generation in Sergen
+
 ## 5.0.32 (2021-01-16)
 
 Features:
-  - improve dotnet sergen restore performance
-  - don't copy files under wwwroot\Scripts\serenity for submodules, can now get them through static web assets
+  - Improve dotnet sergen restore performance
+  - Don't copy files under wwwroot\Scripts\serenity for submodules, can now get them through static web assets
 
 ## 5.0.31 (2021-01-16)
 
@@ -20,7 +25,7 @@ Bugfixes:
 Features:
   - Output sergen.exe directly to bin directory, exclude Debug/Release and TargetFramework. You may need to update reference if you are using Serenity as submodule.
   - Generate XYZColumns.columnsKey just like XYZForm.formKey
-  - use TypingsToPackage item type to determine typings that will be packaged, also use msbuild to determine package references in sergen
+  - Use TypingsToPackage item type to determine typings that will be packaged, also use msbuild to determine package references in sergen
 
 ## 5.0.28 (2021-01-14)
 
