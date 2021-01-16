@@ -1,0 +1,29 @@
+﻿using Serenity.CodeGenerator;
+using System;
+using System.Collections.Generic;
+using System.IO.Abstractions;
+using System.Linq;
+using System.Xml.Linq;
+
+namespace Serenity.Tests
+{
+    public class MockBuildProject : IBuildProject
+    {
+        private readonly XElement project;
+
+        public MockBuildProject(IFileSystem fileSystem, string path)
+        {
+            if (fileSystem == null)
+                throw new ArgumentNullException(nameof(fileSystem));
+
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+
+            project = XElement.Load(fileSystem.File.ReadAllText(path));
+        }
+
+        public IEnumerable<IBuildProjectItem> AllEvaluatedItems =>
+            project.Elements("ItemGroup").SelectMany(x => x.Elements())
+                .Select(x => new MockBuildProjectItem(x));
+    }
+}

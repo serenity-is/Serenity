@@ -1,7 +1,6 @@
 ﻿using Serenity.CodeGeneration;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 
@@ -11,10 +10,14 @@ namespace Serenity.CodeGenerator
     {
         public static void Main(string[] args)
         {
-            Start(args, new FileSystem(), () => new MSBuild.MSBuildProjectSystem());
+            var exitCode = Run(args, new FileSystem(), () => new MSBuild.MSBuildProjectSystem());
+            if (exitCode != ExitCodes.Success &&
+                exitCode != ExitCodes.Help)
+                Environment.Exit((int)exitCode);
         }
 
-        public static void Start(string[] args, IFileSystem fileSystem, Func<IBuildProjectSystem> projectSystemFactory)
+        public static ExitCodes Run(string[] args, IFileSystem fileSystem, 
+            Func<IBuildProjectSystem> projectSystemFactory)
         {
             if (fileSystem is null)
                 throw new ArgumentNullException(nameof(fileSystem));
@@ -30,91 +33,103 @@ namespace Serenity.CodeGenerator
                 command = args.Length > 2 ? args[1] : null;
             }
 
-            if (command.IsEmptyOrNull() ||
-                command == "-?" ||
+            if (command.IsEmptyOrNull())
+            {
+                WriteHelp();
+                return ExitCodes.NoCommand;
+            }
+
+            if (command == "-?" ||
                 command == "--help")
             {
                 WriteHelp();
-                Environment.Exit(1);
+                return ExitCodes.Help;
             }
 
             if (csproj == null)
             {
-                var csprojs = Directory.GetFiles(".", "*.csproj");
+                var csprojs = fileSystem.Directory.GetFiles(".", "*.csproj");
                 if (csprojs.Length == 0)
                 {
                     Console.Error.WriteLine("Can't find a project file in current directory!");
                     Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
-                    Environment.Exit(1);
+                    return ExitCodes.NoProjectFiles;
                 }
 
                 if (csprojs.Length > 1)
                 {
                     Console.Error.WriteLine("Multiple project files found in current directory!");
                     Console.Error.WriteLine("Please run Sergen in a folder that contains only one Asp.Net Core project.");
-                    Environment.Exit(1);
+                    return ExitCodes.MultipleProjectFiles;
                 }
 
                 csproj = csprojs[0];
             }
 
-            if (!File.Exists(csproj))
+            if (!fileSystem.File.Exists(csproj))
+                return ExitCodes.ProjectNotFound;
+
+            var projectDir = fileSystem.Path.GetFullPath(fileSystem.Path.GetDirectoryName(csproj));
+
+            try
             {
-                Console.Error.WriteLine("Can't find project named: " + csproj);
-                Environment.Exit(1);
-            }
+                if ("restore".StartsWith(command, StringComparison.Ordinal))
+                    return new RestoreCommand(fileSystem, projectSystemFactory()).Run(csproj);
 
-            var projectDir = Path.GetFullPath(Path.GetDirectoryName(csproj));
-
-            if ("restore".StartsWith(command, StringComparison.Ordinal))
-            {
-                new RestoreCommand(fileSystem, projectSystemFactory()).Run(csproj);
-            }
-            else if (
-                "transform".StartsWith(command, StringComparison.Ordinal) ||
-                "servertypings".StartsWith(command, StringComparison.Ordinal) ||
-                "clienttypes".StartsWith(command, StringComparison.Ordinal) ||
-                "mvct".StartsWith(command, StringComparison.Ordinal))
-            {
-                string tsTypesJson = null;
-                Func<List<ExternalType>> getTsTypes = () =>
-                {
-                    if (tsTypesJson == null)
-                    {
-                        var tsTypeLister = new TSTypeLister(projectDir);
-                        var tsTypes = tsTypeLister.List();
-                        tsTypesJson = JSON.Stringify(tsTypes);
-                    }
-
-                    return JSON.Parse<List<ExternalType>>(tsTypesJson);
-                };
-
-                if ("transform".StartsWith(command, StringComparison.Ordinal) || 
+                if ("transform".StartsWith(command, StringComparison.Ordinal) ||
+                    "servertypings".StartsWith(command, StringComparison.Ordinal) ||
+                    "clienttypes".StartsWith(command, StringComparison.Ordinal) ||
                     "mvct".StartsWith(command, StringComparison.Ordinal))
                 {
-                    new MvcCommand().Run(csproj);
+                    string tsTypesJson = null;
+                    Func<List<ExternalType>> getTsTypes = () =>
+                    {
+                        if (tsTypesJson == null)
+                        {
+                            var tsTypeLister = new TSTypeLister(projectDir);
+                            var tsTypes = tsTypeLister.List();
+                            tsTypesJson = JSON.Stringify(tsTypes);
+                        }
+
+                        return JSON.Parse<List<ExternalType>>(tsTypesJson);
+                    };
+
+                    if ("transform".StartsWith(command, StringComparison.Ordinal) ||
+                        "mvct".StartsWith(command, StringComparison.Ordinal))
+                    {
+                        new MvcCommand().Run(csproj);
+                        return ExitCodes.Success;
+                    }
+
+                    if ("transform".StartsWith(command, StringComparison.Ordinal) ||
+                        "clienttypes".StartsWith(command, StringComparison.Ordinal) || command == "mvct")
+                    {
+                        new ClientTypesCommand().Run(csproj, getTsTypes());
+                        return ExitCodes.Success;
+                    }
+
+                    if ("transform".StartsWith(command, StringComparison.Ordinal) ||
+                        "servertypings".StartsWith(command, StringComparison.Ordinal))
+                    {
+                        new ServerTypingsCommand().Run(csproj, getTsTypes());
+                        return ExitCodes.Success;
+                    }
                 }
 
-                if ("transform".StartsWith(command, StringComparison.Ordinal) || 
-                    "clienttypes".StartsWith(command, StringComparison.Ordinal) || command == "mvct")
+                if ("generate".StartsWith(command, StringComparison.Ordinal))
                 {
-                    new ClientTypesCommand().Run(csproj, getTsTypes());
+                    new GenerateCommand().Run(csproj, args.Skip(1).ToArray());
+                    return ExitCodes.Success;
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+                return ExitCodes.Exception;
+            }
 
-                if ("transform".StartsWith(command, StringComparison.Ordinal) || 
-                    "servertypings".StartsWith(command, StringComparison.Ordinal))
-                {
-                    new ServerTypingsCommand().Run(csproj, getTsTypes());
-                }
-            }
-            else if ("generate".StartsWith(command, StringComparison.Ordinal))
-            {
-                new GenerateCommand().Run(csproj, args.Skip(1).ToArray());
-            }
-            else
-            {
-                WriteHelp();
-            }
+            WriteHelp();
+            return ExitCodes.InvalidCommand;
         }
 
         private static void WriteHelp()
@@ -132,7 +147,6 @@ namespace Serenity.CodeGenerator
             Console.WriteLine("    m[vc]             Generates intellisense helpers for view locations");
             Console.WriteLine("    s[ervertypings]   Imports row, form, service types from CS to TypeScript");
             Console.WriteLine("    t[ransform]       Runs clienttypes, mvc and servertypings commands at once");
-            Environment.Exit(1);
         }
     }
 }

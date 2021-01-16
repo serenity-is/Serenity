@@ -1,39 +1,22 @@
 ﻿using System;
-using System.IO;
+using System.IO.Abstractions;
 
 namespace Serenity.CodeGenerator
 {
     public class PackageHelper
     {
-        public string DeterminePackagesPath()
+        public static string DeterminePackagesPath(IFileSystem fileSystem)
         {
-            var packagesFolder = "/packages/".Replace('/', Path.DirectorySeparatorChar);
-            var packagesDir = AppContext.BaseDirectory;
-            var packagesIdx = packagesDir.IndexOf(packagesFolder, StringComparison.OrdinalIgnoreCase);
+            string userHomeDirectory = Environment.GetEnvironmentVariable("HOME");
+            if (string.IsNullOrEmpty(userHomeDirectory))
+                userHomeDirectory = Environment.GetEnvironmentVariable("USERPROFILE");
 
-            if (packagesIdx < 0)
-            {
-                string userHomeDirectory = Environment.GetEnvironmentVariable("HOME");
-                if (string.IsNullOrEmpty(userHomeDirectory))
-                    userHomeDirectory = Environment.GetEnvironmentVariable("USERPROFILE");
+            var packagesDir = fileSystem.Path.Combine(userHomeDirectory, ".nuget", "packages");
 
-                packagesDir = Path.Combine(userHomeDirectory, ".nuget/packages/"
-                    .Replace('/', Path.DirectorySeparatorChar));
-
-                packagesIdx = packagesDir.IndexOf(packagesFolder, StringComparison.OrdinalIgnoreCase);
-            }
-
-            if (packagesIdx < 0)
+            if (!fileSystem.Directory.Exists(packagesDir))
             {
                 Console.Error.WriteLine("Can't determine NuGet packages directory!");
-                Environment.Exit(1);
-            }
-
-            packagesDir = packagesDir.Substring(0, packagesIdx + packagesFolder.Length);
-            if (!Directory.Exists(packagesDir))
-            {
-                Console.Error.WriteLine("Can't determine NuGet packages directory!");
-                Environment.Exit(1);
+                return null;
             }
 
             return packagesDir;

@@ -18,12 +18,16 @@ namespace Serenity.CodeGenerator
             ProjectSystem = projectSystem ?? throw new ArgumentNullException(nameof(projectSystem));
         }
 
-        public void Run(string csproj)
+        public ExitCodes Run(string csproj)
         {
             if (csproj == null)
                 throw new ArgumentNullException(nameof(csproj));
 
-            var packagesDir = new PackageHelper().DeterminePackagesPath();
+            if (!File.Exists(csproj))
+            {
+                Console.Error.WriteLine($"Project file {csproj} is not found!");
+                return ExitCodes.ProjectNotFound;
+            }
 
             var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -145,7 +149,13 @@ namespace Serenity.CodeGenerator
             {
                 Console.Error.WriteLine(ex.Message);
             }
-                
+
+            var packagesDir = PackageHelper.DeterminePackagesPath(FileSystem);
+            if (packagesDir == null)
+            {
+                Console.Error.WriteLine("Can't determine NuGet packages directory!");
+                return ExitCodes.CantDeterminePackagesDir;
+            }
 
             var queue = new Queue<(string ID, string Version)>();
             foreach (var x in EnumeratePackageReferences(csproj))
@@ -253,7 +263,7 @@ namespace Serenity.CodeGenerator
                 if (deps == null)
                     continue;
 
-                var fw = dep.Item1;
+                var fw = dep.ID;
 
                 var groups = deps.Elements().Where(x => x.Name?.LocalName == "group");
                 if (groups.Any())
@@ -287,6 +297,8 @@ namespace Serenity.CodeGenerator
                     }
                 }
             }
+
+            return ExitCodes.Success;
         }
 
         private IEnumerable<string> EnumerateProjectReferences(string csproj, HashSet<string> visited, int depth = 0)
