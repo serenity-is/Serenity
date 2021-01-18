@@ -16,22 +16,32 @@ namespace Serenity.Services
         {
             return ConvertToResponse<TResponse>(exception,
                 httpContext?.RequestServices?.GetService<IExceptionLogger>(),
+                httpContext?.RequestServices?.GetService<ITextLocalizer>(),
                 string.Equals(httpContext?.RequestServices.GetService<IWebHostEnvironment>()?
                     .EnvironmentName, "development", StringComparison.OrdinalIgnoreCase));
         }
 
-        public static TResponse ConvertToResponse<TResponse>(this Exception exception, IExceptionLogger logger, bool showDetails)
+        public static TResponse ConvertToResponse<TResponse>(this Exception exception, IExceptionLogger logger, 
+            ITextLocalizer localizer, bool showDetails)
             where TResponse: ServiceResponse, new()
         {
             exception.Log(logger);
 
             var response = new TResponse();
-            var error = new ServiceError();
+            
+            var error = new ServiceError
+            {
+                Message = (showDetails || 
+                    (exception is IIsSensitiveMessage isSensitive && 
+                     !isSensitive.IsSensitiveMessage)) ?
+                        exception.Message : localizer?.TryGet("Services.GenericErrorMessage") ??
+                            "An error occurred while processing your request."
+            };
+
             if (exception is ValidationError ve)
             {
                 error.Code = ve.ErrorCode;
                 error.Arguments = ve.Arguments;
-                error.Message = ve.Message;
                 if (showDetails)
                     error.Details = ve.ToString();
             }
@@ -40,12 +50,7 @@ namespace Serenity.Services
                 error.Code = "Exception";
 
                 if (showDetails)
-                {
-                    error.Message = exception?.Message;
                     error.Details = exception?.ToString();
-                }
-                else
-                    error.Message = "An error occurred while processing your request.";
             }
 
             response.Error = error;

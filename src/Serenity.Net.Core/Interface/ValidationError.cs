@@ -6,7 +6,7 @@ namespace Serenity.Services
     /// Generic validation error mostly used by services.
     /// </summary>
     /// <seealso cref="Exception" />
-    public class ValidationError : Exception
+    public class ValidationError : Exception, IIsSensitiveMessage
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationError"/> class.
@@ -77,5 +77,10 @@ namespace Serenity.Services
         /// The arguments.
         /// </value>
         public string Arguments { get; set; }
+
+        /// <summary>
+        /// By default all ValidationErrors are end user exceptions (e.g. message can be shown safely to the end user)
+        /// </summary>
+        public bool IsSensitiveMessage { get; set; }
     }
 }

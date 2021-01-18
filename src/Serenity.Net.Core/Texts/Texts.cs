@@ -18,5 +18,10 @@ namespace Serenity.Core
                 public static LocalText RecordId = "ID";
             }
         }
+
+        public static partial class Services
+        {
+            public static LocalText GenericErrorMessage = "An error occurred while processing your request.";
+        }
     }
 }
