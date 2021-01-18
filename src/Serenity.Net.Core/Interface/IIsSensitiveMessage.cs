@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
     /// An interface to determine if the message of an exception might contain sensitive

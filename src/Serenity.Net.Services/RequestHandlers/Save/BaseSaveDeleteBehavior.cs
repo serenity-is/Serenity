@@ -1,8 +1,9 @@
 ﻿using Serenity.Data;
+using System;
 
 namespace Serenity.Services
 {
-    public abstract class BaseSaveDeleteBehavior : BaseSaveBehavior, IDeleteBehavior
+    public abstract class BaseSaveDeleteBehavior : BaseSaveBehavior, IDeleteBehavior, IDeleteExceptionBehavior
     {
         public virtual void OnPrepareQuery(IDeleteRequestHandler handler, SqlQuery query)
         {
@@ -25,6 +26,10 @@ namespace Serenity.Services
         }
 
         public virtual void OnReturn(IDeleteRequestHandler handler)
+        {
+        }
+
+        public virtual void OnException(IDeleteRequestHandler handler, Exception exception)
         {
         }
     }

@@ -1,8 +1,9 @@
 ﻿using Serenity.Data;
+using System;
 
 namespace Serenity.Services
 {
-    public abstract class BaseSaveBehavior : ISaveBehavior
+    public abstract class BaseSaveBehavior : ISaveBehavior, ISaveExceptionBehavior
     {
         public virtual void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query)
         {
@@ -29,6 +30,10 @@ namespace Serenity.Services
         }
 
         public virtual void OnValidateRequest(ISaveRequestHandler handler)
+        {
+        }
+
+        public virtual void OnException(ISaveRequestHandler handler, Exception exception)
         {
         }
     }

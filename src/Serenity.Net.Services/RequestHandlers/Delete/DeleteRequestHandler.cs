@@ -88,6 +88,21 @@ namespace Serenity.Services
                 throw DataValidation.EntityNotFoundError(Row, Request.EntityId, Localizer);
         }
 
+        protected virtual void InvokeDeleteAction(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception exception)
+            {
+                foreach (var behavior in behaviors.Value.OfType<IDeleteExceptionBehavior>())
+                    behavior.OnException(this, exception);
+
+                throw;
+            }
+        }
+
         protected virtual void ExecuteDelete()
         {
             var isActiveDeletedRow = Row as IIsActiveDeletedRow;
@@ -98,16 +113,19 @@ namespace Serenity.Services
 
             if (isActiveDeletedRow == null && isDeletedRow == null && deleteLogRow == null)
             {
-                if (new SqlDelete(Row.Table)
-                        .WhereEqual(idField, id)
-                        .Execute(Connection) != 1)
-                    throw DataValidation.EntityNotFoundError(Row, id, Localizer);
+                var delete = new SqlDelete(Row.Table)
+                    .WhereEqual(idField, id);
+
+                InvokeDeleteAction(() =>
+                {
+                    if (delete.Execute(Connection) != 1)
+                        throw DataValidation.EntityNotFoundError(Row, id, Localizer);
+                });
             }
             else
             {
                 if (isDeletedRow != null || isActiveDeletedRow != null)
                 {
-
                     var update = new SqlUpdate(Row.Table)
                         .WhereEqual(idField, id)
                         .Where(ServiceQueryHelper.GetNotDeletedCriteria(Row));
@@ -134,19 +152,26 @@ namespace Serenity.Services
                               .Set(updateLogRow.UpdateUserIdField, User?.GetIdentifier().TryParseID());
                     }
 
-                    if (update.Execute(Connection) != 1)
-                        throw DataValidation.EntityNotFoundError(Row, id, Localizer);
+                    InvokeDeleteAction(() =>
+                    {
+                        if (update.Execute(Connection) != 1)
+                            throw DataValidation.EntityNotFoundError(Row, id, Localizer);
+                    });
                 }
                 else //if (deleteLogRow != null)
                 {
-                    if (new SqlUpdate(Row.Table)
-                            .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
-                                        deleteLogRow.DeleteDateField.DateTimeKind))
-                            .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
-                            .WhereEqual(idField, id)
-                            .Where(new Criteria(deleteLogRow.DeleteUserIdField).IsNull())
-                            .Execute(Connection) != 1)
-                        throw DataValidation.EntityNotFoundError(Row, id, Localizer);
+                    var update = new SqlUpdate(Row.Table)
+                        .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
+                                    deleteLogRow.DeleteDateField.DateTimeKind))
+                        .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
+                        .WhereEqual(idField, id)
+                        .Where(new Criteria(deleteLogRow.DeleteUserIdField).IsNull());
+
+                    InvokeDeleteAction(() =>
+                    {
+                        if (update.Execute(Connection) != 1)
+                            throw DataValidation.EntityNotFoundError(Row, id, Localizer);
+                    });
                 }
             }
 

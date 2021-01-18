@@ -60,6 +60,21 @@ namespace Serenity.Services
                 behavior.OnAudit(this);
         }
 
+        protected virtual void InvokeSaveAction(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception exception)
+            {
+                foreach (var behavior in behaviors.Value.OfType<ISaveExceptionBehavior>())
+                    behavior.OnException(this, exception);
+
+                throw;
+            }
+        }
+
         protected virtual void ExecuteSave()
         {
             if (IsUpdate)
@@ -73,11 +88,11 @@ namespace Serenity.Services
                         var update = new SqlUpdate(Row.Table);
                         update.Set(Row);
                         update.Where(idField == new ValueCriteria(idField.AsSqlValue(Old)));
-                        update.Execute(Connection, ExpectedRows.One);
+                        InvokeSaveAction(() => update.Execute(Connection, ExpectedRows.One));
                     }
                     else
                     {
-                        Connection.UpdateById(Row);
+                        InvokeSaveAction(() => Connection.UpdateById(Row));
                     }
 
                     Response.EntityId = idField.AsObject(Row);
@@ -90,13 +105,20 @@ namespace Serenity.Services
                 if (idField is object &&
                     idField.Flags.HasFlag(FieldFlags.AutoIncrement))
                 {
-                    var entityId = Connection.InsertAndGetID(Row);
-                    Response.EntityId = entityId;
-                    Row.IdField.AsObject(Row, Row.IdField.ConvertValue(entityId, CultureInfo.InvariantCulture));
+                    InvokeSaveAction(() =>
+                    {
+                        var entityId = Connection.InsertAndGetID(Row);
+                        Response.EntityId = entityId;
+                        Row.IdField.AsObject(Row, Row.IdField.ConvertValue(entityId, CultureInfo.InvariantCulture));
+                    });
                 }
                 else
                 {
-                    Connection.Insert(Row);
+                    InvokeSaveAction(() =>
+                    {
+                        Connection.Insert(Row);
+                    });
+
                     if (idField is object)
                         Response.EntityId = idField.AsObject(Row);
                 }
