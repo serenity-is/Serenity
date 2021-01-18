@@ -886,12 +886,15 @@ button.ui-button::-moz-focus-inner {
 .ui-progressbar {
   height: 12px;
   text-align: left;
-  background: #FFF url(images/progress_bar.gif) 0 -14px repeat-x;
+  background: #fff;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
 }
 .ui-progressbar .ui-progressbar-value {
-  margin: -1px;
   height: 100%;
-  background: url(images/progress_bar.gif) 0 0 repeat-x;
+  background: rgba(128, 192, 255, 0.8);
+  border: none;
 }
 .ui-icon-newwin {
   background: url(../serenity/images/application-resize-actual.png);
