@@ -94,26 +94,27 @@ namespace Serenity.CodeGenerator
                         return JSON.Parse<List<ExternalType>>(tsTypesJson);
                     };
 
-                    if ("transform".StartsWith(command, StringComparison.Ordinal) ||
+                    bool transformAll = "transform".StartsWith(command, StringComparison.Ordinal);
+
+                    if (transformAll ||
                         "mvct".StartsWith(command, StringComparison.Ordinal))
                     {
                         new MvcCommand().Run(csproj);
-                        return ExitCodes.Success;
                     }
 
-                    if ("transform".StartsWith(command, StringComparison.Ordinal) ||
+                    if (transformAll ||
                         "clienttypes".StartsWith(command, StringComparison.Ordinal) || command == "mvct")
                     {
                         new ClientTypesCommand().Run(csproj, getTsTypes());
-                        return ExitCodes.Success;
                     }
 
-                    if ("transform".StartsWith(command, StringComparison.Ordinal) ||
+                    if (transformAll ||
                         "servertypings".StartsWith(command, StringComparison.Ordinal))
                     {
                         new ServerTypingsCommand().Run(csproj, getTsTypes());
-                        return ExitCodes.Success;
                     }
+
+                    return ExitCodes.Success;
                 }
 
                 if ("generate".StartsWith(command, StringComparison.Ordinal))
