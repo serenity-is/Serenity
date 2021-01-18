@@ -10,6 +10,7 @@
     "module": "CommonJS",
     "moduleResolution": "Node",
     "skipLibCheck": true,
+    "target": "ES5",
     "typeRoots": [
       "../node_modules/@types"
     ],
