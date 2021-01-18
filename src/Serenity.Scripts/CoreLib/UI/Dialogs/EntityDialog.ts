@@ -986,11 +986,9 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         EditorUtils.setContainerReadOnly(this.byId('Form'), false);
 
-        var isDeleted = this.isDeleted();
         var isLocalizationMode = this.isLocalizationMode();
         var hasSavePermission = this.hasSavePermission();
         var viewMode = this.isViewMode();
-        var isDeleted = this.isDeleted();
         var readOnly = this.readOnly;
 
         this.toolbar.updateInterface();
