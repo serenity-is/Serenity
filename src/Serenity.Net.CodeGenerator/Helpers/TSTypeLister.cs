@@ -58,7 +58,7 @@ namespace Serenity.CodeGenerator
                 }
                 else if (!cfg.Include.IsEmptyOrNull())
                 {
-                    var typeRoots = cfg.CompilerOptions?.TypeRoots?.IsEmptyOrNull() == true ?
+                    var typeRoots = cfg.CompilerOptions?.TypeRoots?.IsEmptyOrNull() != false ?
                         new string[] { "./node_modules/types" } : cfg.CompilerOptions.TypeRoots;
 
                     var types = new HashSet<string>(cfg.CompilerOptions?.Types ?? Array.Empty<string>(),
