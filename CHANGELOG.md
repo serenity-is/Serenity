@@ -1,3 +1,13 @@
+## 5.0.34 (2021-01-18)
+
+Features:
+  - Added IIsSensitiveMessage interface that controls if the exception message can be revealed to the end user in all environments, implement it for ValidationError
+  - Added ISaveExceptionBehavior and IDeleteExceptionBehavior which can be used to preview exception and throw different exceptions instead of database ones etc. This replaces ISqlExceptionHumanizer.
+
+Bugfixes:
+  - Sergen transform might fail if typeRoots in tsconfig.json is null
+  - Fix ui progress bar styling
+
 ## 5.0.33 (2021-01-16)
 
 Features:
