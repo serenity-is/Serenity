@@ -7,9 +7,8 @@ using System.IO;
 namespace Serenity.Data
 {
     /// <summary>
-    /// StreamField
+    /// Field with a Stream value
     /// </summary>
-    /// <seealso cref="Serenity.Data.GenericClassField{System.IO.Stream}" />
     public class StreamField : GenericClassField<Stream>
     {
         /// <summary>
@@ -29,7 +28,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Factories the specified collection.
+        /// Static factory for field, for backward compatibility, avoid using.
         /// </summary>
         /// <param name="collection">The collection.</param>
         /// <param name="name">The name.</param>
@@ -46,7 +45,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets from reader.
+        /// Gets field value from a data reader.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="index">The index.</param>
@@ -82,7 +81,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Indexes the compare.
+        /// Compares the field values for two rows for an ascending index sort
         /// </summary>
         /// <param name="row1">The row1.</param>
         /// <param name="row2">The row2.</param>
@@ -121,7 +120,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values to json.
+        /// Serializes this fields value to JSON
         /// </summary>
         /// <param name="writer">The writer.</param>
         /// <param name="row">The row.</param>
@@ -141,7 +140,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values from json.
+        /// Deserializes this fields value from JSON
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="row">The row.</param>

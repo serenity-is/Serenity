@@ -2,10 +2,13 @@
 
 namespace Serenity.PropertyGrid
 {
+    /// <summary>
+    /// Basic property processor
+    /// </summary>
     public partial class BasicPropertyProcessor : PropertyProcessor
     {
         /// <summary>
-        /// Processes the specified source.
+        /// Sets properties of a PropertyItem by analysing a property source
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="item">The item.</param>

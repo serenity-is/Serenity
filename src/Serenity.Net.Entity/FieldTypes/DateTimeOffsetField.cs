@@ -7,9 +7,8 @@ using System.Globalization;
 namespace Serenity.Data
 {
     /// <summary>
-    /// DateTimeOffsetField
+    /// Field with a DateTimeOffset value
     /// </summary>
-    /// <seealso cref="Serenity.Data.GenericValueField{System.DateTimeOffset}" />
     public sealed class DateTimeOffsetField : GenericValueField<DateTimeOffset>
     {
         /// <summary>
@@ -29,7 +28,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Factories the specified collection.
+        /// Static factory for field, for backward compatibility, avoid using.
         /// </summary>
         /// <param name="collection">The collection.</param>
         /// <param name="name">The name.</param>
@@ -46,7 +45,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets from reader.
+        /// Gets field value from a data reader.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="index">The index.</param>
@@ -77,10 +76,10 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="System.Nullable{DateTimeOffset}"/> with the specified row.
+        /// Gets or sets the value of this field with the specified row.
         /// </summary>
         /// <value>
-        /// The <see cref="System.Nullable{DateTimeOffset}"/>.
+        /// The <see cref="Nullable{DateTimeOffset}"/>.
         /// </value>
         /// <param name="row">The row.</param>
         /// <returns></returns>
@@ -102,7 +101,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Ases the object.
+        /// Gets the value of this field in specified row as object.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <returns></returns>
@@ -113,7 +112,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Ases the object.
+        /// Sets the value of this field in specified row as object.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <param name="value">The value.</param>
@@ -128,7 +127,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values to json.
+        /// Serializes this fields value to JSON
         /// </summary>
         /// <param name="writer">The writer.</param>
         /// <param name="row">The row.</param>
@@ -143,7 +142,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values from json.
+        /// Deserializes this fields value from JSON
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="row">The row.</param>

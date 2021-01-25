@@ -7,9 +7,9 @@ using System.Reflection;
 namespace Serenity.Data
 {
     /// <summary>
-    /// DefaultRowTypeRegistry
+    /// Default row type registry
     /// </summary>
-    /// <seealso cref="Serenity.Data.IRowTypeRegistry" />
+    /// <seealso cref="IRowTypeRegistry" />
     public class DefaultRowTypeRegistry : IRowTypeRegistry
     {
         private readonly IEnumerable<Type> rowTypes;

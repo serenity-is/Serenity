@@ -8,9 +8,8 @@ using System.Globalization;
 namespace Serenity.Data
 {
     /// <summary>
-    /// DateTimeField
+    /// Field with a DateTime value
     /// </summary>
-    /// <seealso cref="Serenity.Data.GenericValueField{System.DateTime}" />
     public sealed class DateTimeField : GenericValueField<DateTime>
     {
         /// <summary>
@@ -30,7 +29,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Factories the specified collection.
+        /// Static factory for field, for backward compatibility, avoid using.
         /// </summary>
         /// <param name="collection">The collection.</param>
         /// <param name="name">The name.</param>
@@ -72,7 +71,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets from reader.
+        /// Gets field value from a data reader.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="index">The index.</param>
@@ -101,10 +100,10 @@ namespace Serenity.Data
         private DateTimeKind? dateTimeKind;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [date only].
+        /// Gets or sets a value indicating whether the field is date only, e.g. no time part.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [date only]; otherwise, <c>false</c>.
+        ///   <c>true</c> if date only; otherwise, <c>false</c>.
         /// </value>
         public bool DateOnly
         {
@@ -121,6 +120,7 @@ namespace Serenity.Data
 
         /// <summary>
         /// Gets or sets the kind of the date time.
+        /// Unspecified means no date/time conversions, Local means local time zone, Utc means UTC time zone
         /// </summary>
         /// <value>
         /// The kind of the date time.
@@ -132,7 +132,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Converts to datetimekind.
+        /// Converts the value to specified DateTimeKind
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="dateTimeKind">Kind of the date time.</param>
@@ -142,14 +142,14 @@ namespace Serenity.Data
             if (dateTimeKind == null || dateTimeKind == System.DateTimeKind.Unspecified)
                 return value;
 
-            if (dateTimeKind == System.DateTimeKind.Utc)
+            if (dateTimeKind == DateTimeKind.Utc)
                 return value.ToUniversalTime();
             else
                 return value.ToLocalTime();
         }
 
         /// <summary>
-        /// Converts to datetimekind.
+        /// Converts the value to specified DateTimeKind
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="dateTimeKind">Kind of the date time.</param>
@@ -159,7 +159,7 @@ namespace Serenity.Data
             if (dateTimeKind == null || dateTimeKind == System.DateTimeKind.Unspecified)
                 return value.DateTime;
 
-            if (dateTimeKind == System.DateTimeKind.Utc)
+            if (dateTimeKind == DateTimeKind.Utc)
                 return value.UtcDateTime;
             else
                 return value.LocalDateTime;
@@ -176,13 +176,9 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="System.Nullable{DateTime}"/> with the specified row.
+        /// Gets or sets the value of this field with the specified row.
         /// </summary>
-        /// <value>
-        /// The <see cref="System.Nullable{DateTime}"/>.
-        /// </value>
         /// <param name="row">The row.</param>
-        /// <returns></returns>
         public new DateTime? this[IRow row]
         {
             get
@@ -201,10 +197,9 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Ases the object.
+        /// Gets the value of this field in specified row as object.
         /// </summary>
         /// <param name="row">The row.</param>
-        /// <returns></returns>
         public override object AsObject(IRow row)
         {
             CheckUnassignedRead(row);
@@ -212,7 +207,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Ases the object.
+        /// Sets the value of this field in specified row as object.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <param name="value">The value.</param>
@@ -227,7 +222,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values to json.
+        /// Serializes this fields value to JSON
         /// </summary>
         /// <param name="writer">The writer.</param>
         /// <param name="row">The row.</param>
@@ -250,7 +245,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values from json.
+        /// Deserializes this fields value from JSON
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="row">The row.</param>

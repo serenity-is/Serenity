@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Serenity.PropertyGrid
 {
     /// <summary>
-    /// IPropertyItemProvider
+    /// Abstraction for the provider that returns a list of property items for a given type
     /// </summary>
     public interface IPropertyItemProvider
     {
@@ -13,7 +13,6 @@ namespace Serenity.PropertyGrid
         /// Gets the property items for.
         /// </summary>
         /// <param name="type">The type.</param>
-        /// <returns></returns>
         public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type);
     }
 }

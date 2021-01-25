@@ -2,7 +2,7 @@
 namespace Serenity.Data
 {
     /// <summary>
-    ///   IEntityWithJoins
+    /// Interface for an entity with join information
     /// </summary>
     public interface IEntityWithJoins : IEntity, IHaveJoins
     {

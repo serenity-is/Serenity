@@ -7,13 +7,13 @@ using System.ComponentModel;
 namespace Serenity.Data
 {
     /// <summary>
-    /// Row
+    /// Base class for Serenity entities
     /// </summary>
     /// <typeparam name="TFields">The type of the fields.</typeparam>
-    /// <seealso cref="Serenity.Data.IRow" />
-    /// <seealso cref="Serenity.Data.IRow{TFields}" />
-    /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
-    /// <seealso cref="System.ComponentModel.IEditableObject" />
+    /// <seealso cref="IRow" />
+    /// <seealso cref="IRow{TFields}" />
+    /// <seealso cref="INotifyPropertyChanged" />
+    /// <seealso cref="IEditableObject" />
     [JsonConverter(typeof(JsonRowConverter))]
     public abstract partial class Row<TFields> : IRow, IRow<TFields>, INotifyPropertyChanged, IEditableObject
         where TFields : RowFieldsBase

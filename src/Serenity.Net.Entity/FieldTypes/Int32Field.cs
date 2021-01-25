@@ -7,7 +7,7 @@ using System.Globalization;
 namespace Serenity.Data
 {
     /// <summary>
-    /// Int32Field
+    /// Field with Int32 value
     /// </summary>
     public class Int32Field : GenericValueField<int>
     {
@@ -26,7 +26,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Factories the specified collection.
+        /// Static factory for field, for backward compatibility, avoid using.
         /// </summary>
         /// <param name="collection">The collection.</param>
         /// <param name="name">The name.</param>
@@ -43,7 +43,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets from reader.
+        /// Gets field value from a data reader.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="index">The index.</param>
@@ -66,7 +66,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values to json.
+        /// Serializes this fields value to JSON
         /// </summary>
         /// <param name="writer">The writer.</param>
         /// <param name="row">The row.</param>
@@ -114,7 +114,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values from json.
+        /// Deserializes this fields value from JSON
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="row">The row.</param>

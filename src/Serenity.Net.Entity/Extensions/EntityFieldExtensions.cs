@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    ///   Contains static extension methods for DbField and Meta objects.</summary>
+    ///   Contains static extension methods for Field objects.</summary>
     public static class EntityFieldExtensions
     {
         private const FieldFlags NonTableFieldFlags =
@@ -63,7 +63,8 @@ namespace Serenity.Data
 
 
         /// <summary>
-        /// Automatics the trim.
+        /// Automatically performs trim on field value based on the field flags
+        /// TrimToEmpty and Trim.
         /// </summary>
         /// <param name="field">The field.</param>
         /// <param name="row">The row.</param>
@@ -83,7 +84,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Ofs the join.
+        /// Returns a new field an expression with specified join alias. Avoid using.
         /// </summary>
         /// <typeparam name="TField">The type of the field.</typeparam>
         /// <param name="field">The field.</param>
@@ -113,7 +114,7 @@ namespace Serenity.Data
         /// </summary>
         /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
         /// <param name="field">The field.</param>
-        /// <returns></returns>
+        /// <returns>First attribute with specified type.</returns>
         public static TAttribute GetAttribute<TAttribute>(this Field field)
             where TAttribute : Attribute
         {
@@ -133,7 +134,7 @@ namespace Serenity.Data
         /// </summary>
         /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
         /// <param name="field">The field.</param>
-        /// <returns></returns>
+        /// <returns>Attributes with specified type.</returns>
         public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this Field field)
             where TAttribute : Attribute
         {

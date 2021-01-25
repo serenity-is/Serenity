@@ -7,21 +7,20 @@ using System.Globalization;
 namespace Serenity.Data
 {
     /// <summary>
-    /// BooleanField
+    /// Field with boolean value
     /// </summary>
-    /// <seealso cref="Serenity.Data.GenericValueField{System.Boolean}" />
     public sealed class BooleanField : GenericValueField<bool>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BooleanField"/> class.
         /// </summary>
-        /// <param name="collection">The collection.</param>
+        /// <param name="collection">The field collection.</param>
         /// <param name="name">The name.</param>
         /// <param name="caption">The caption.</param>
         /// <param name="size">The size.</param>
         /// <param name="flags">The flags.</param>
-        /// <param name="getValue">The get value.</param>
-        /// <param name="setValue">The set value.</param>
+        /// <param name="getValue">The get value callback.</param>
+        /// <param name="setValue">The set value callback.</param>
         public BooleanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, bool?> getValue = null, Action<IRow, bool?> setValue = null)
             : base(collection, FieldType.Boolean, name, caption, size, flags, getValue, setValue)
@@ -29,7 +28,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Factories the specified collection.
+        /// Static factory for field, for backward compatibility, avoid using.
         /// </summary>
         /// <param name="collection">The collection.</param>
         /// <param name="name">The name.</param>
@@ -46,7 +45,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets from reader.
+        /// Gets field value from a data reader.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="index">The index.</param>
@@ -66,7 +65,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values to json.
+        /// Converts field value to json.
         /// </summary>
         /// <param name="writer">The writer.</param>
         /// <param name="row">The row.</param>
@@ -77,12 +76,12 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values from json.
+        /// Gets field value from JSON.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="row">The row.</param>
         /// <param name="serializer">The serializer.</param>
-        /// <exception cref="ArgumentNullException">reader</exception>
+        /// <exception cref="ArgumentNullException">reader is null</exception>
         public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)

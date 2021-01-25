@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    /// ListField
+    /// Field with a list value
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     [NotMapped]

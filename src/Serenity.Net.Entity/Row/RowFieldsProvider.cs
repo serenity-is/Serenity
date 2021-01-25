@@ -5,7 +5,7 @@ using System.Threading;
 namespace Serenity.Data
 {
     /// <summary>
-    /// RowFieldsProvider
+    /// Contains extension methods and settings for row fields providers
     /// </summary>
     public static class RowFieldsProvider
     {

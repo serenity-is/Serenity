@@ -5,16 +5,15 @@ namespace Serenity.Data
     public abstract partial class Field
     {
         /// <summary>
-        /// Determines whether this instance is null.
+        /// Creates a new "the Field IS NULL" criteria
         /// </summary>
-        /// <returns></returns>
         public BaseCriteria IsNull()
         {
             return Criteria.IsNull();
         }
 
         /// <summary>
-        /// Determines whether [is not null].
+        /// Creates a new "the Field IS NOT NULL" criteria
         /// </summary>
         /// <returns></returns>
         public BaseCriteria IsNotNull()
@@ -23,7 +22,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Likes the specified mask.
+        /// Creates a new "the Field LIKE mask" criteria
         /// </summary>
         /// <param name="mask">The mask.</param>
         /// <returns></returns>
@@ -33,7 +32,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Nots the like.
+        /// Creates a new "the Field NOT LIKE mask" criteria
         /// </summary>
         /// <param name="mask">The mask.</param>
         /// <returns></returns>
@@ -43,7 +42,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Startses the with.
+        /// Creates a new "the Field STARTS WITH mask" criteria
         /// </summary>
         /// <param name="mask">The mask.</param>
         /// <returns></returns>
@@ -53,7 +52,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Endses the with.
+        /// Creates a new "the Field ENDS WITH mask" criteria
         /// </summary>
         /// <param name="mask">The mask.</param>
         /// <returns></returns>
@@ -63,7 +62,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Determines whether this instance contains the object.
+        /// Creates a new "the Field CONTAINS mask" criteria
         /// </summary>
         /// <param name="mask">The mask.</param>
         /// <returns></returns>
@@ -73,7 +72,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Nots the contains.
+        /// Creates a new "the Field NOT CONTAINS mask" criteria
         /// </summary>
         /// <param name="mask">The mask.</param>
         /// <returns></returns>
@@ -83,7 +82,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Ins the specified values.
+        /// Creates a new "the Field IN (values...)" criteria
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="values">The values.</param>
@@ -94,7 +93,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Nots the in.
+        /// Creates a new "the Field NOT IN (values...)" criteria
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="values">The values.</param>

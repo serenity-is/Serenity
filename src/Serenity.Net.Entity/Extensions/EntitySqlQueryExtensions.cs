@@ -39,7 +39,8 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Intoes the specified into.
+        /// Add the specified entity to INTO list of the query, 
+        /// and sets it as current INTO row.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="into">The into.</param>
@@ -59,6 +60,7 @@ namespace Serenity.Data
         /// The field is marked as a target at current index for future loading from a data reader.
         /// </summary>
         /// <param name="field">Field object</param>
+        /// <param name="query">The sql query</param>
         /// <returns>The query itself.</returns>
         public static SqlQuery Select(this SqlQuery query, IField field)
         {
@@ -217,7 +219,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Orders the by.
+        /// Adds fields expression to order by list
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="field">The field.</param>
@@ -233,7 +235,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Orders the by.
+        /// Adds fields expressions to order by list
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="fields">The fields.</param>
@@ -251,7 +253,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Groups the by.
+        /// Adds fields expressions to group by list
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="field">The field.</param>
@@ -266,7 +268,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Groups the by.
+        /// Adds fields expression to group by list
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="fields">The fields.</param>

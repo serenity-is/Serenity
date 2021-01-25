@@ -5,11 +5,11 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    /// 
+    /// Base class for fields with a value type value
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <seealso cref="Serenity.Data.Field" />
-    /// <seealso cref="Serenity.Data.IEnumTypeField" />
+    /// <seealso cref="Field" />
+    /// <seealso cref="IEnumTypeField" />
     public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TValue : struct, IComparable<TValue>
     {
         /// <summary>
@@ -80,13 +80,9 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="System.Nullable{TValue}"/> with the specified row.
+        /// Gets or sets the value of this field with the specified row.
         /// </summary>
-        /// <value>
-        /// The <see cref="System.Nullable{TValue}"/>.
-        /// </value>
         /// <param name="row">The row.</param>
-        /// <returns></returns>
         public TValue? this[IRow row]
         {
             get
@@ -102,17 +98,16 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Ases the object.
+        /// Gets the value of this field in specified row as object.
         /// </summary>
         /// <param name="row">The row.</param>
-        /// <returns></returns>
         public override object AsObject(IRow row)
         {
             return _getValue(row);
         }
 
         /// <summary>
-        /// Ases the object.
+        /// Sets the value of this field in specified row as object.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <param name="value">The value.</param>
@@ -137,7 +132,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets the is null.
+        /// Gets if the field value is null.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <returns></returns>
@@ -147,7 +142,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Indexes the compare.
+        /// Compares the field values for two rows for an ascending index sort
         /// </summary>
         /// <param name="row1">The row1.</param>
         /// <param name="row2">The row2.</param>

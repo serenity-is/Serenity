@@ -12,11 +12,11 @@ using System.Reflection.Emit;
 namespace Serenity.Data
 {
     /// <summary>
-    /// RowFieldsBase
+    /// Base class for row fields collection
     /// </summary>
-    /// <seealso cref="System.Collections.ObjectModel.Collection{Serenity.Data.Field}" />
-    /// <seealso cref="Serenity.Data.IAlias" />
-    /// <seealso cref="Serenity.Data.IHaveJoins" />
+    /// <seealso cref="Collection{Field}" />
+    /// <seealso cref="IAlias" />
+    /// <seealso cref="IHaveJoins" />
     public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     {
         internal Dictionary<string, Field> byName;

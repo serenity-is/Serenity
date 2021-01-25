@@ -4,7 +4,7 @@ using System.Globalization;
 namespace Serenity.Data
 {
     /// <summary>
-    /// RowExtensions
+    /// Contains extensions for row objects
     /// </summary>
     public static class RowExtensions
     {
@@ -47,7 +47,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Finds the field.
+        /// Finds the field by its name
         /// </summary>
         /// <param name="row">The row.</param>
         /// <param name="name">The name.</param>
@@ -58,7 +58,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Finds the name of the field by property.
+        /// Finds the field by property name.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <param name="name">The name.</param>

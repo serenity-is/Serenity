@@ -6,9 +6,10 @@ using System.Collections.Concurrent;
 namespace Serenity.Data
 {
     /// <summary>
-    /// DefaultRowFieldsProvider
+    /// Default row fields instance provider, that resolves row fields instances
+    /// using ActivatorUtilities.CreateInstance through a IServiceProvider.
     /// </summary>
-    /// <seealso cref="Serenity.Data.IRowFieldsProvider" />
+    /// <seealso cref="IRowFieldsProvider" />
     public class DefaultRowFieldsProvider : IRowFieldsProvider
     {
         private readonly IServiceProvider serviceProvider;

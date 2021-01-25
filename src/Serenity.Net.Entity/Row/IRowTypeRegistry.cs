@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    /// IRowTypeRegistry
+    /// Abstraction for row type registry.
     /// </summary>
     public interface IRowTypeRegistry
     {

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    /// 
+    /// Field with a RowList value
     /// </summary>
     /// <typeparam name="TForeign">The type of the foreign.</typeparam>
     [NotMapped]

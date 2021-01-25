@@ -5,10 +5,10 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    /// RowField
+    /// Field with a Row value
     /// </summary>
     /// <typeparam name="TForeign">The type of the foreign.</typeparam>
-    /// <seealso cref="Serenity.Data.CustomClassField{TForeign}" />
+    /// <seealso cref="CustomClassField{TForeign}" />
     [NotMapped]
     public class RowField<TForeign> : CustomClassField<TForeign> where TForeign : class, IRow
     {

@@ -6,9 +6,9 @@ using System.Reflection;
 namespace Serenity.PropertyGrid
 {
     /// <summary>
-    /// PropertyInfoSource
+    /// Property info source for a reflection PropertyInfo object
     /// </summary>
-    /// <seealso cref="Serenity.PropertyGrid.IPropertySource" />
+    /// <seealso cref="IPropertySource" />
     public class PropertyInfoSource : IPropertySource
     {
         /// <summary>

@@ -6,10 +6,10 @@ using System.Data;
 namespace Serenity.Data
 {
     /// <summary>
-    /// 
+    /// Base class for custom fields with reference type values
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <seealso cref="Serenity.Data.GenericClassField{TValue}" />
+    /// <seealso cref="GenericClassField{TValue}" />
     public class CustomClassField<TValue> : GenericClassField<TValue>
         where TValue : class
     {
@@ -30,7 +30,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets from reader.
+        /// Gets field value from a data reader.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="index">The index.</param>
@@ -42,7 +42,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets from reader.
+        /// Gets field value from a data reader.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="index">The index.</param>
@@ -73,7 +73,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Indexes the compare.
+        /// Compares the field values for two rows for an ascending index sort
         /// </summary>
         /// <param name="row1">The row1.</param>
         /// <param name="row2">The row2.</param>
@@ -99,7 +99,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values to json.
+        /// Serializes this fields value to JSON
         /// </summary>
         /// <param name="writer">The writer.</param>
         /// <param name="value">The value.</param>
@@ -110,7 +110,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values to json.
+        /// Serializes this fields value to JSON
         /// </summary>
         /// <param name="writer">The writer.</param>
         /// <param name="row">The row.</param>
@@ -125,7 +125,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values from json.
+        /// Deserializes this fields value from JSON
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="serializer">The serializer.</param>
@@ -136,7 +136,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values from json.
+        /// Deserializes this fields value from JSON
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="row">The row.</param>

@@ -6,7 +6,8 @@ using System.Collections.Generic;
 namespace Serenity.PropertyGrid
 {
     /// <summary>
-    /// IPropertyProcessor
+    /// Interface for property processors, which sets properties of a PropertyItem
+    /// object by analysing a IPropertySource object.
     /// </summary>
     public interface IPropertyProcessor
     {
@@ -15,7 +16,7 @@ namespace Serenity.PropertyGrid
         /// </summary>
         void Initialize();
         /// <summary>
-        /// Processes the specified source.
+        /// Sets properties of a PropertyItem by analysing a property source
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="item">The item.</param>

@@ -4,9 +4,9 @@ using System.Data;
 namespace Serenity.Services
 {
     /// <summary>
-    /// RowValidationContext
+    /// A validation context for rows
     /// </summary>
-    /// <seealso cref="Serenity.IValidationContext" />
+    /// <seealso cref="IValidationContext" />
     public class RowValidationContext : IValidationContext
     {
         private readonly IRow row;

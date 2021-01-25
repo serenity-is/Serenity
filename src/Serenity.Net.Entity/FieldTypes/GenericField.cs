@@ -4,10 +4,10 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    /// GenericField
+    /// Base generic class for fields with a value
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <seealso cref="Serenity.Data.Field" />
+    /// <seealso cref="Field" />
     public abstract class GenericField<TValue> : Field
     {
         /// <summary>
@@ -50,13 +50,9 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="TValue"/> with the specified row.
+        /// Gets or sets the value of this field with the specified row.
         /// </summary>
-        /// <value>
-        /// The <see cref="TValue"/>.
-        /// </value>
         /// <param name="row">The row.</param>
-        /// <returns></returns>
         public TValue this[IRow row]
         {
             get

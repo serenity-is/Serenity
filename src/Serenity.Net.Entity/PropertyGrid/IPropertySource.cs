@@ -6,7 +6,7 @@ using System.Reflection;
 namespace Serenity.PropertyGrid
 {
     /// <summary>
-    /// IPropertySource
+    /// Abstracts the property source that returns PropertyInfo and some other info
     /// </summary>
     public interface IPropertySource
     {

@@ -4,9 +4,10 @@ using System.Collections.Concurrent;
 namespace Serenity.Data
 {
     /// <summary>
-    /// FallbackRowFieldsProvider
+    /// Fallback row fields provider for cases where a IServiceProvider 
+    /// is not available.
     /// </summary>
-    /// <seealso cref="Serenity.Data.IRowFieldsProvider" />
+    /// <seealso cref="IRowFieldsProvider" />
     public class FallbackRowFieldsProvider : IRowFieldsProvider
     {
         /// <summary>

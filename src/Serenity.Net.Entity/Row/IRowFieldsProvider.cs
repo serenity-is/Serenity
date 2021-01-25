@@ -3,7 +3,7 @@
 namespace Serenity.Data
 {
     /// <summary>
-    /// IRowFieldsProvider
+    /// Abstraction for row fields instance providers
     /// </summary>
     public interface IRowFieldsProvider
     {

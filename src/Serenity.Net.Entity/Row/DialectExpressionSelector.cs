@@ -5,7 +5,7 @@ using System.Linq;
 namespace Serenity.Data
 {
     /// <summary>
-    /// DialectExpressionSelector
+    /// Selects field expressions based on dialect
     /// </summary>
     public class DialectExpressionSelector
     {

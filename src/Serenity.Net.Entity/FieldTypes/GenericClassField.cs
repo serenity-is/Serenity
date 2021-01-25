@@ -5,18 +5,18 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    /// GenericClassField
+    /// Base class for fields with reference type values
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <seealso cref="Serenity.Data.Field" />
+    /// <seealso cref="Field" />
     public abstract class GenericClassField<TValue> : Field where TValue : class
     {
         /// <summary>
-        /// The get value
+        /// The get value callback
         /// </summary>
         protected internal Func<IRow, TValue> _getValue;
         /// <summary>
-        /// The set value
+        /// The set value callback
         /// </summary>
         protected internal Action<IRow, TValue> _setValue;
 
@@ -40,11 +40,8 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="TValue"/> with the specified row.
+        /// Gets or sets the value of this field with the specified row.
         /// </summary>
-        /// <value>
-        /// The <see cref="TValue"/>.
-        /// </value>
         /// <param name="row">The row.</param>
         /// <returns></returns>
         public TValue this[IRow row]
@@ -84,10 +81,9 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Ases the object.
+        /// Gets the value of this field in specified row as object.
         /// </summary>
         /// <param name="row">The row.</param>
-        /// <returns></returns>
         public override object AsObject(IRow row)
         {
             CheckUnassignedRead(row);
@@ -95,7 +91,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Ases the object.
+        /// Sets the value of this field in specified row as object.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <param name="value">The value.</param>
@@ -106,7 +102,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets the is null.
+        /// Gets if the field value is null.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <returns></returns>

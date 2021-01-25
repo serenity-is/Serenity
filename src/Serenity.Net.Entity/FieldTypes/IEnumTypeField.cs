@@ -3,7 +3,7 @@
 namespace Serenity.Data
 {
     /// <summary>
-    /// IEnumTypeField
+    /// Interface for fields with an enum type property
     /// </summary>
     public interface IEnumTypeField
     {

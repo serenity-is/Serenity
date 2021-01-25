@@ -6,9 +6,9 @@ using System.Data;
 namespace Serenity.Data
 {
     /// <summary>
-    /// Field
+    /// Base Field class
     /// </summary>
-    /// <seealso cref="Serenity.Data.IFieldWithJoinInfo" />
+    /// <seealso cref="IFieldWithJoinInfo" />
     public abstract partial class Field : IFieldWithJoinInfo
     {
         private string autoTextKey;
@@ -533,14 +533,14 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Values to json.
+        /// Serializes this fields value to JSON
         /// </summary>
         /// <param name="writer">The writer.</param>
         /// <param name="row">The row.</param>
         /// <param name="serializer">The serializer.</param>
         public abstract void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer);
         /// <summary>
-        /// Values from json.
+        /// Deserializes this fields value from JSON
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="row">The row.</param>
@@ -553,7 +553,7 @@ namespace Serenity.Data
         /// <param name="target">The target.</param>
         public abstract void Copy(IRow source, IRow target);
         /// <summary>
-        /// Gets from reader.
+        /// Gets field value from a data reader.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="index">The index.</param>
@@ -574,7 +574,7 @@ namespace Serenity.Data
         /// <returns></returns>
         public abstract object ConvertValue(object source, IFormatProvider provider);
         /// <summary>
-        /// Indexes the compare.
+        /// Compares the field values for two rows for an ascending index sort
         /// </summary>
         /// <param name="row1">The row1.</param>
         /// <param name="row2">The row2.</param>
@@ -593,7 +593,7 @@ namespace Serenity.Data
         /// <param name="value">The value.</param>
         public abstract void AsObject(IRow row, object value);
         /// <summary>
-        /// Gets the is null.
+        /// Gets if the field value is null.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <returns></returns>

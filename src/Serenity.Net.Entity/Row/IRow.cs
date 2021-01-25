@@ -3,13 +3,13 @@
 namespace Serenity.Data
 {
     /// <summary>
-    /// IRow
+    /// Row interface
     /// </summary>
-    /// <seealso cref="Serenity.Data.IEntityWithJoins" />
+    /// <seealso cref="IEntityWithJoins" />
     public interface IRow : IEntityWithJoins
     {
         /// <summary>
-        /// Creates the new.
+        /// Creates a new instance of the row type.
         /// </summary>
         /// <returns></returns>
         IRow CreateNew();
@@ -26,7 +26,7 @@ namespace Serenity.Data
         /// </value>
         RowFieldsBase Fields { get; }
         /// <summary>
-        /// Fields the assigned value.
+        /// Called when field is assigned a value.
         /// </summary>
         /// <param name="field">The field.</param>
         void FieldAssignedValue(Field field);
@@ -60,31 +60,32 @@ namespace Serenity.Data
         /// <param name="value">The value.</param>
         void SetIndexedData(int index, object value);
         /// <summary>
-        /// Gets or sets a value indicating whether [track assignments].
+        /// Gets or sets a value indicating whether to track assignments to field values.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [track assignments]; otherwise, <c>false</c>.
+        ///   <c>true</c> if assignments are tracked; otherwise, <c>false</c>.
         /// </value>
         bool TrackAssignments { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether [track with checks].
+        /// Gets or sets a value indicating whether track assignments to field values,
+        /// and raise an exception if an unassigned field is tried to read.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [track with checks]; otherwise, <c>false</c>.
+        ///   <c>true</c> if track with checks; otherwise, <c>false</c>.
         /// </value>
         bool TrackWithChecks { get; set; }
         /// <summary>
-        /// Gets a value indicating whether this instance is any field assigned.
+        /// Gets a value indicating whether this row instance has any field assigned.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is any field assigned; otherwise, <c>false</c>.
+        ///   <c>true</c> if this instance has any field assigned; otherwise, <c>false</c>.
         /// </value>
         bool IsAnyFieldAssigned { get; }
         /// <summary>
         /// Gets a value indicating whether this instance is any field changed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is any field changed; otherwise, <c>false</c>.
+        ///   <c>true</c> if this instance has any field changed; otherwise, <c>false</c>.
         /// </value>
         bool IsAnyFieldChanged { get; }
         /// <summary>
@@ -115,25 +116,21 @@ namespace Serenity.Data
         /// </value>
         Field NameField { get; }
         /// <summary>
-        /// Gets or sets the <see cref="System.Object"/> with the specified field name.
+        /// Gets or sets a field value with specified name
         /// </summary>
-        /// <value>
-        /// The <see cref="System.Object"/>.
-        /// </value>
         /// <param name="fieldName">Name of the field.</param>
-        /// <returns></returns>
         object this[string fieldName] { get; set; }
     }
 
     /// <summary>
-    /// 
+    /// Base interface for Rows with a known Fields type
     /// </summary>
     /// <typeparam name="TFields">The type of the fields.</typeparam>
-    /// <seealso cref="Serenity.Data.IEntityWithJoins" />
+    /// <seealso cref="IEntityWithJoins" />
     public interface IRow<TFields> : IRow
     {
         /// <summary>
-        /// Creates the new.
+        /// Creates a new instance of the row.
         /// </summary>
         /// <returns></returns>
         public new IRow<TFields> CreateNew();

@@ -4,10 +4,9 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    /// EnumField
+    /// Field with an Enum value
     /// </summary>
     /// <typeparam name="TEnum">The type of the enum.</typeparam>
-    /// <seealso cref="Serenity.Data.Int32Field" />
     public class EnumField<TEnum> : Int32Field
         where TEnum : struct, IComparable, IFormattable, IConvertible
     {
@@ -37,11 +36,8 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="System.Nullable{TEnum}"/> with the specified row.
+        /// Gets or sets the value of this field with the specified row.
         /// </summary>
-        /// <value>
-        /// The <see cref="System.Nullable{TEnum}"/>.
-        /// </value>
         /// <param name="row">The row.</param>
         /// <returns></returns>
         public new TEnum? this[IRow row]

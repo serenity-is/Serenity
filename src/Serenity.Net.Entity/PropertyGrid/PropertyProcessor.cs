@@ -6,9 +6,10 @@ using System.Collections.Generic;
 namespace Serenity.PropertyGrid
 {
     /// <summary>
-    /// PropertyProcessor
+    /// Base class for property processors, which sets properties of a PropertyItem
+    /// object by analysing a IPropertySource object.
     /// </summary>
-    /// <seealso cref="Serenity.PropertyGrid.IPropertyProcessor" />
+    /// <seealso cref="IPropertyProcessor" />
     public abstract class PropertyProcessor : IPropertyProcessor
     {
         /// <summary>
