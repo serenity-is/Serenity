@@ -5,8 +5,18 @@ using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Contains extension methods to query entities directly
+    /// </summary>
     public static class EntitySqlHelper
     {
+        /// <summary>
+        /// Gets the first entity returned by executing the query.
+        /// The result is loaded into the loader row of the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <returns>True if any rows returned</returns>
         public static bool GetFirst(this SqlQuery query, IDbConnection connection)
         {
             using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
@@ -19,6 +29,14 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Gets the first entity returned by executing the query into the specified row.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="param">The parameter dictionary.</param>
+        /// <returns>True if any results returned from reader.</returns>
         public static bool GetFirst(this SqlQuery query, IDbConnection connection, IEntity row, Dictionary param)
         {
             using IDataReader reader = SqlHelper.ExecuteReader(connection, query, param);
@@ -31,6 +49,14 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Gets the single entity returned by executing the query. 
+        /// The values are loaded into the loader row of the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <returns>True if any results returned from data reader</returns>
+        /// <exception cref="InvalidOperationException">Query returned more than one result!</exception>
         public static bool GetSingle(this SqlQuery query, IDbConnection connection)
         {
             using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
@@ -47,6 +73,15 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Gets the single entity returned by executing the query into the specified row.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="row">The row to load data into.</param>
+        /// <param name="param">The parameter.</param>
+        /// <returns>True if one result</returns>
+        /// <exception cref="InvalidOperationException">Query returned more than one result!</exception>
         public static bool GetSingle(this SqlQuery query, IDbConnection connection, IRow row, Dictionary param)
         {
             using IDataReader reader = SqlHelper.ExecuteReader(connection, query, param);
@@ -63,6 +98,13 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Executes the specified callback for the first result returned from executing the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="callBack">The call back.</param>
+        /// <returns>True if any result returned.</returns>
         public static bool ForFirst(this SqlQuery query, IDbConnection connection,
             Action callBack)
         {
@@ -77,6 +119,13 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Executes the specified reader callback for the first result returned from executing the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="callBack">The call back.</param>
+        /// <returns></returns>
         public static bool ForFirst(this SqlQuery query, IDbConnection connection,
             ReaderCallBack callBack)
         {
@@ -91,6 +140,13 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Executes the specified callback for all rows returned from executing the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="callBack">The call back.</param>
+        /// <returns>Number of returned results.</returns>
         public static int ForEach(this SqlQuery query, IDbConnection connection,
             Action callBack)
         {
@@ -125,6 +181,13 @@ namespace Serenity.Data
             return count;
         }
 
+        /// <summary>
+        /// Executes the specified data reader callback for all rows returned from executing the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="callBack">The call back.</param>
+        /// <returns>Number of returned results</returns>
         public static int ForEach(this SqlQuery query, IDbConnection connection,
             ReaderCallBack callBack)
         {
@@ -159,6 +222,14 @@ namespace Serenity.Data
             return count;
         }
 
+        /// <summary>
+        /// Lists the rows returned from executing the query.
+        /// </summary>
+        /// <typeparam name="TRow">The type of the row.</typeparam>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="loaderRow">The loader row.</param>
+        /// <returns>List of rows</returns>
         public static List<TRow> List<TRow>(this SqlQuery query,
             IDbConnection connection, TRow loaderRow = null) where TRow : class, IRow
         {
@@ -170,6 +241,11 @@ namespace Serenity.Data
             return list;
         }
 
+        /// <summary>
+        /// Gets field values from data reader into the query loader row.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="reader">The reader.</param>
         public static void GetFromReader(this SqlQuery query, IDataReader reader)
         {
             var ext = (ISqlQueryExtensible)query;
@@ -180,6 +256,13 @@ namespace Serenity.Data
         const string FieldReadValueError = "An error occurred while loading value of the field '{0}' of '{1}' from data reader. " +
             "Please make sure the field type matches the actual data type in database.\r\n\r\nThe error message is:\r\n{2}";
 
+        /// <summary>
+        /// Gets field values from data reader into the set of specified into rows.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="reader">The reader.</param>
+        /// <param name="into">The into rows list.</param>
+        /// <exception cref="InvalidOperationException">An exception occured during conversion</exception>
         public static void GetFromReader(this SqlQuery query, IDataReader reader, IList<object> into)
         {
             var ext = (ISqlQueryExtensible)query;
@@ -205,7 +288,7 @@ namespace Serenity.Data
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception(string.Format(FieldReadValueError,
+                        throw new InvalidOperationException(string.Format(FieldReadValueError,
                             field.PropertyName ?? field.Name, row.GetType().FullName, ex.Message), ex);
                     }
                     continue;
@@ -222,7 +305,7 @@ namespace Serenity.Data
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception(string.Format(FieldReadValueError,
+                        throw new InvalidOperationException(string.Format(FieldReadValueError,
                             field.PropertyName ?? field.Name, row.GetType().FullName, ex.Message), ex);
                     }
                     continue;

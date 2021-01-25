@@ -5,6 +5,11 @@ using System.Collections.Concurrent;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Default row fields instance provider, that resolves row fields instances
+    /// using ActivatorUtilities.CreateInstance through a IServiceProvider.
+    /// </summary>
+    /// <seealso cref="IRowFieldsProvider" />
     public class DefaultRowFieldsProvider : IRowFieldsProvider
     {
         private readonly IServiceProvider serviceProvider;
@@ -12,6 +17,11 @@ namespace Serenity.Data
         private readonly ConcurrentDictionary<(Type type, string alias), 
             RowFieldsBase> byTypeAndAlias;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultRowFieldsProvider"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider.</param>
+        /// <exception cref="ArgumentNullException">serviceProvider</exception>
         public DefaultRowFieldsProvider(IServiceProvider serviceProvider)
         {
             byType = new ConcurrentDictionary<Type, RowFieldsBase>();
@@ -20,11 +30,23 @@ namespace Serenity.Data
                 throw new ArgumentNullException(nameof(serviceProvider));
         }
 
+        /// <summary>
+        /// Resolves the specified fields type.
+        /// </summary>
+        /// <param name="fieldsType">Type of the fields.</param>
+        /// <returns></returns>
         public RowFieldsBase Resolve(Type fieldsType)
         {
             return byType.GetOrAdd(fieldsType, CreateType);
         }
 
+        /// <summary>
+        /// Resolves the with alias.
+        /// </summary>
+        /// <param name="fieldsType">Type of the fields.</param>
+        /// <param name="alias">The alias.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">alias</exception>
         public RowFieldsBase ResolveWithAlias(Type fieldsType, string alias)
         {
             if (string.IsNullOrEmpty(alias))

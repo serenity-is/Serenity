@@ -4,6 +4,9 @@ using System.Threading;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Contains extension methods and settings for row fields providers
+    /// </summary>
     public static class RowFieldsProvider
     {
         private static IRowFieldsProvider defaultProvider;
@@ -75,8 +78,7 @@ namespace Serenity.Data
         /// <summary>
         /// Resolves a fields class using current row fields provider
         /// </summary>
-        /// <typeparam name="TFields"></typeparam>
-        /// <param name="fieldsProvider">Provider</param>
+        /// <typeparam name="TFields">The type of the fields.</typeparam>
         /// <returns></returns>
         public static TFields Resolve<TFields>()
             where TFields : RowFieldsBase
@@ -87,10 +89,10 @@ namespace Serenity.Data
         /// <summary>
         /// Resolves an aliased fields class using current row fields provider
         /// </summary>
-        /// <typeparam name="TFields"></typeparam>
-        /// <param name="fieldsProvider">Provider</param>
+        /// <typeparam name="TFields">The type of the fields.</typeparam>
         /// <param name="alias">Alias for fields</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">alias</exception>
         public static TFields Resolve<TFields>(string alias)
             where TFields : RowFieldsBase
         {

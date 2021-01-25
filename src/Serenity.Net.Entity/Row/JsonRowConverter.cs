@@ -7,6 +7,9 @@ namespace Serenity.Data
     ///   Serialize/deserialize a row</summary>
     public class JsonRowConverter : JsonConverter
     {
+        /// <summary>
+        /// The should serialize extension
+        /// </summary>
         public static Func<IRow, string, bool> ShouldSerializeExtension;
 
         /// <summary>

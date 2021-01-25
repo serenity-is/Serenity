@@ -6,20 +6,51 @@ using System.IO;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Field with a Stream value
+    /// </summary>
     public class StreamField : GenericClassField<Stream>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StreamField"/> class.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
         public StreamField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, Stream> getValue = null, Action<IRow, Stream> setValue = null)
             : base(collection, FieldType.Stream, name, caption, size, flags, getValue, setValue)
         {
         }
 
+        /// <summary>
+        /// Static factory for field, for backward compatibility, avoid using.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
+        /// <returns></returns>
         public static StreamField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
             Func<IRow, Stream> getValue, Action<IRow, Stream> setValue)
         {
             return new StreamField(collection, name, caption, size, flags, getValue, setValue);
         }
 
+        /// <summary>
+        /// Gets field value from a data reader.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="row">The row.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
@@ -49,11 +80,28 @@ namespace Serenity.Data
             row.FieldAssignedValue(this);
         }
 
+        /// <summary>
+        /// Compares the field values for two rows for an ascending index sort
+        /// </summary>
+        /// <param name="row1">The row1.</param>
+        /// <param name="row2">The row2.</param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public override int IndexCompare(IRow row1, IRow row2)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Copies the stream.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="dest">The dest.</param>
+        /// <exception cref="ArgumentNullException">
+        /// source
+        /// or
+        /// dest
+        /// </exception>
         public static void CopyStream(Stream source, Stream dest)
         {
             if (source == null)
@@ -71,6 +119,12 @@ namespace Serenity.Data
             } while (read != 0);
         }
 
+        /// <summary>
+        /// Serializes this fields value to JSON
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
         public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             var value = _getValue(row);
@@ -85,6 +139,13 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Deserializes this fields value from JSON
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)

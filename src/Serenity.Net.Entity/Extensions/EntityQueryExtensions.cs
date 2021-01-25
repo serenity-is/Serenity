@@ -124,10 +124,6 @@ namespace Serenity.Data
         ///   Adds foreign / calculated table fields in a row to select list of a query.</summary>
         /// <param name="query">
         ///   Query to select fields into (required).</param>
-        /// <param name="row">
-        ///   Row with fields to be selected (required).</param>
-        /// <param name="exclude">
-        ///   Fields to be excluded (optional).</param>
         public static SqlQuery SelectNonTableFields(this SqlQuery query)
         {
             if (query == null)

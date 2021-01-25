@@ -4,19 +4,21 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    ///   Contains static extension methods for DbField and Meta objects.</summary>
+    ///   Contains static extension methods for Field objects.</summary>
     public static class EntityFieldExtensions
     {
         private const FieldFlags NonTableFieldFlags =
             FieldFlags.NotMapped | FieldFlags.Foreign | FieldFlags.Calculated | FieldFlags.Reflective;
 
         /// <summary>
-        ///   Checks to see if field is an actual table field, e.g. not a foreign or calculated 
-        ///   field. This is determined by field flags and having expression.</summary>
-        /// <param name="meta">
-        ///   Field meta to check (required).</param>
+        /// Checks to see if field is an actual table field, e.g. not a foreign or calculated
+        /// field. This is determined by field flags and having expression.
+        /// </summary>
+        /// <param name="field">The field.</param>
         /// <returns>
-        ///   True if field seems to be an actual table field.</returns>
+        /// True if field seems to be an actual table field.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">field</exception>
         public static bool IsTableField(this Field field)
         {
             return field is null ? throw new ArgumentNullException(nameof(field)) : (field.Flags & NonTableFieldFlags) == 0;
@@ -60,6 +62,12 @@ namespace Serenity.Data
         }
 
 
+        /// <summary>
+        /// Automatically performs trim on field value based on the field flags
+        /// TrimToEmpty and Trim.
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <param name="row">The row.</param>
         public static void AutoTrim(this Field field, IRow row)
         {
             if (field as StringField is object &&
@@ -75,6 +83,16 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Returns a new field an expression with specified join alias. Avoid using.
+        /// </summary>
+        /// <typeparam name="TField">The type of the field.</typeparam>
+        /// <param name="field">The field.</param>
+        /// <param name="join">The join.</param>
+        /// <param name="origin">The origin.</param>
+        /// <param name="extraFlags">The extra flags.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">join</exception>
         public static TField OfJoin<TField>(this TField field, Join join, string origin, FieldFlags extraFlags = FieldFlags.Internal)
             where TField : Field
         {
@@ -91,6 +109,12 @@ namespace Serenity.Data
             return field;
         }
 
+        /// <summary>
+        /// Gets the attribute.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <param name="field">The field.</param>
+        /// <returns>First attribute with specified type.</returns>
         public static TAttribute GetAttribute<TAttribute>(this Field field)
             where TAttribute : Attribute
         {
@@ -105,6 +129,12 @@ namespace Serenity.Data
         }
 
 
+        /// <summary>
+        /// Gets the attributes.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <param name="field">The field.</param>
+        /// <returns>Attributes with specified type.</returns>
         public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this Field field)
             where TAttribute : Attribute
         {

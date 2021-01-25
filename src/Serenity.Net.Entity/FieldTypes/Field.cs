@@ -5,6 +5,10 @@ using System.Data;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Base Field class
+    /// </summary>
+    /// <seealso cref="IFieldWithJoinInfo" />
     public abstract partial class Field : IFieldWithJoinInfo
     {
         private string autoTextKey;
@@ -32,6 +36,15 @@ namespace Serenity.Data
         internal string insertPermission;
         internal string updatePermission;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Field"/> class.
+        /// </summary>
+        /// <param name="fields">The fields.</param>
+        /// <param name="type">The type.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
         protected Field(ICollection<Field> fields, FieldType type, string name, LocalText caption, int size, FieldFlags flags)
         {
             this.name = name;
@@ -48,30 +61,69 @@ namespace Serenity.Data
                 fields.Add(this);
         }
 
+        /// <summary>
+        /// Gets the fields.
+        /// </summary>
+        /// <value>
+        /// The fields.
+        /// </value>
         public RowFieldsBase Fields => fields;
 
+        /// <summary>
+        /// Gets the index.
+        /// </summary>
+        /// <value>
+        /// The index.
+        /// </value>
         public int Index
         {
             get { return index; }
             internal set { index = value; }
         }
 
+        /// <summary>
+        /// Column name
+        /// </summary>
         public string Name => name;
 
+        /// <summary>
+        /// Gets the type.
+        /// </summary>
+        /// <value>
+        /// The type.
+        /// </value>
         public FieldType Type => type;
 
+        /// <summary>
+        /// Gets or sets the caption.
+        /// </summary>
+        /// <value>
+        /// The caption.
+        /// </value>
         public LocalText Caption
         {
             get { return caption; }
             set { caption = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the default value.
+        /// </summary>
+        /// <value>
+        /// The default value.
+        /// </value>
         public object DefaultValue
         {
             get { return defaultValue; }
             set { defaultValue = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the referenced aliases.
+        /// </summary>
+        /// <value>
+        /// The referenced aliases.
+        /// </value>
         public HashSet<string> ReferencedAliases
         {
             get
@@ -84,6 +136,12 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the automatic text key.
+        /// </summary>
+        /// <value>
+        /// The automatic text key.
+        /// </value>
         public string AutoTextKey
         {
             get
@@ -95,16 +153,40 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the size.
+        /// </summary>
+        /// <value>
+        /// The size.
+        /// </value>
         public int Size => size;
 
+        /// <summary>
+        /// Gets or sets the scale.
+        /// </summary>
+        /// <value>
+        /// The scale.
+        /// </value>
         public int Scale { get; set; }
 
+        /// <summary>
+        /// Gets or sets the flags.
+        /// </summary>
+        /// <value>
+        /// The flags.
+        /// </value>
         public FieldFlags Flags
         {
             get { return flags; }
             set { flags = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the name of the property.
+        /// </summary>
+        /// <value>
+        /// The name of the property.
+        /// </value>
         public string PropertyName
         {
             get { return propertyName; }
@@ -113,6 +195,12 @@ namespace Serenity.Data
 
         internal object[] customAttributes;
 
+        /// <summary>
+        /// Gets or sets the custom attributes.
+        /// </summary>
+        /// <value>
+        /// The custom attributes.
+        /// </value>
         public object[] CustomAttributes
         {
             get { return customAttributes; }
@@ -127,17 +215,31 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Jsons the unexpected token.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <returns></returns>
+        /// <exception cref="JsonSerializationException">Unexpected token when deserializing row: " + reader.TokenType</exception>
         protected Exception JsonUnexpectedToken(JsonReader reader)
         {
             throw new JsonSerializationException("Unexpected token when deserializing row: " + reader.TokenType);
         }
 
+        /// <summary>
+        /// Copies the no assignment.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="target">The target.</param>
         public void CopyNoAssignment(IRow source, IRow target)
         {
             Copy(source, target);
             target.ClearAssignment(this);
         }
 
+        /// <summary>
+        /// The expression (can be equal to name if no expression)
+        /// </summary>
         public string Expression
         {
             get { return expression; }
@@ -216,8 +318,20 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the join alias.
+        /// </summary>
+        /// <value>
+        /// The join alias.
+        /// </value>
         public string JoinAlias => joinAlias;
 
+        /// <summary>
+        /// Gets the join.
+        /// </summary>
+        /// <value>
+        /// The join.
+        /// </value>
         public Join Join
         {
             get
@@ -233,61 +347,127 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the origin.
+        /// </summary>
+        /// <value>
+        /// The origin.
+        /// </value>
         public string Origin => origin;
 
+        /// <summary>
+        /// Gets or sets the foreign table.
+        /// </summary>
+        /// <value>
+        /// The foreign table.
+        /// </value>
         public string ForeignTable
         {
             get { return foreignTable; }
             set { foreignTable = value.TrimToNull(); }
         }
 
+        /// <summary>
+        /// Gets or sets the foreign field.
+        /// </summary>
+        /// <value>
+        /// The foreign field.
+        /// </value>
         public string ForeignField
         {
             get { return foreignField; }
             set { foreignField = value.TrimToNull(); }
         }
 
+        /// <summary>
+        /// Gets or sets the foreign join alias.
+        /// </summary>
+        /// <value>
+        /// The foreign join alias.
+        /// </value>
         public Join ForeignJoinAlias
         {
             get; set;
         }
 
+        /// <summary>
+        /// Gets or sets the insert permission.
+        /// </summary>
+        /// <value>
+        /// The insert permission.
+        /// </value>
         public string InsertPermission
         {
             get { return insertPermission; }
             set { insertPermission = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the minimum select level.
+        /// </summary>
+        /// <value>
+        /// The minimum select level.
+        /// </value>
         public SelectLevel MinSelectLevel
         {
             get { return minSelectLevel; }
             set { minSelectLevel = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the natural order.
+        /// </summary>
+        /// <value>
+        /// The natural order.
+        /// </value>
         public int NaturalOrder
         {
             get { return naturalOrder; }
             set { naturalOrder = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the read permission.
+        /// </summary>
+        /// <value>
+        /// The read permission.
+        /// </value>
         public string ReadPermission
         {
             get { return readPermission; }
             set { readPermission = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the textual field.
+        /// </summary>
+        /// <value>
+        /// The textual field.
+        /// </value>
         public string TextualField
         {
             get { return textualField; }
             set { textualField = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the update permission.
+        /// </summary>
+        /// <value>
+        /// The update permission.
+        /// </value>
         public string UpdatePermission
         {
             get { return updatePermission; }
             set { updatePermission = value; }
         }
 
+        /// <summary>
+        /// Foreigns the join.
+        /// </summary>
+        /// <param name="foreignIndex">Index of the foreign.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">ForeignTable</exception>
         public LeftJoin ForeignJoin(int? foreignIndex = null)
         {
             if (ForeignTable.IsNullOrEmpty())
@@ -320,10 +500,19 @@ namespace Serenity.Data
             return join;
         }
 
+        /// <summary>
+        /// Called when [row initialization].
+        /// </summary>
         protected internal virtual void OnRowInitialization()
         {
         }
 
+        /// <summary>
+        /// Checks the unassigned read.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <exception cref="ArgumentNullException">row</exception>
+        /// <exception cref="InvalidOperationException"></exception>
         protected void CheckUnassignedRead(IRow row)
         {
             if (row == null)
@@ -343,28 +532,102 @@ namespace Serenity.Data
                     Name, row.GetType().Name));
         }
 
+        /// <summary>
+        /// Serializes this fields value to JSON
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
         public abstract void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer);
+        /// <summary>
+        /// Deserializes this fields value from JSON
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
         public abstract void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer);
+        /// <summary>
+        /// Copies the specified source.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="target">The target.</param>
         public abstract void Copy(IRow source, IRow target);
+        /// <summary>
+        /// Gets field value from a data reader.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="row">The row.</param>
         public abstract void GetFromReader(IDataReader reader, int index, IRow row);
+        /// <summary>
+        /// Gets the type of the value.
+        /// </summary>
+        /// <value>
+        /// The type of the value.
+        /// </value>
         public abstract Type ValueType { get; }
+        /// <summary>
+        /// Converts the value.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="provider">The provider.</param>
+        /// <returns></returns>
         public abstract object ConvertValue(object source, IFormatProvider provider);
+        /// <summary>
+        /// Compares the field values for two rows for an ascending index sort
+        /// </summary>
+        /// <param name="row1">The row1.</param>
+        /// <param name="row2">The row2.</param>
+        /// <returns></returns>
         public abstract int IndexCompare(IRow row1, IRow row2);
+        /// <summary>
+        /// Ases the object.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <returns></returns>
         public abstract object AsObject(IRow row);
+        /// <summary>
+        /// Ases the object.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <param name="value">The value.</param>
         public abstract void AsObject(IRow row, object value);
+        /// <summary>
+        /// Gets if the field value is null.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <returns></returns>
         protected abstract bool GetIsNull(IRow row);
 
+        /// <summary>
+        /// Ases the SQL value.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <returns></returns>
         public virtual object AsSqlValue(IRow row)
         {
             return AsObject(row);
         }
 
+        /// <summary>
+        /// Determines whether the specified row is null.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified row is null; otherwise, <c>false</c>.
+        /// </returns>
         public bool IsNull(IRow row)
         {
             CheckUnassignedRead(row);
             return GetIsNull(row);
         }
 
+        /// <summary>
+        /// Gets the criteria.
+        /// </summary>
+        /// <value>
+        /// The criteria.
+        /// </value>
         public Criteria Criteria
         {
             get
@@ -379,8 +642,16 @@ namespace Serenity.Data
 
         IDictionary<string, Join> IFieldWithJoinInfo.Joins => fields.Joins;
 
+        /// <summary>
+        /// Select as column alias. Can be equal to property name or name.
+        /// </summary>
         public string ColumnAlias => propertyName ?? name;
 
+        /// <summary>
+        /// Gets the title.
+        /// </summary>
+        /// <param name="localizer">The localizer.</param>
+        /// <returns></returns>
         public string GetTitle(ITextLocalizer localizer)
         {
             if (caption is null)
@@ -394,6 +665,12 @@ namespace Serenity.Data
             return caption.ToString(localizer);
         }
 
+        /// <summary>
+        /// Converts to string.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public override string ToString()
         {
             return Expression;

@@ -10,11 +10,23 @@ using System.Reflection;
 
 namespace Serenity.PropertyGrid
 {
+    /// <summary>
+    /// Default property item provider
+    /// </summary>
+    /// <seealso cref="IPropertyItemProvider" />
     public partial class DefaultPropertyItemProvider : IPropertyItemProvider
     {
         private readonly IServiceProvider provider;
         private readonly IEnumerable<ObjectFactory> processorFactories;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultPropertyItemProvider"/> class.
+        /// </summary>
+        /// <param name="provider">The provider.</param>
+        /// <param name="typeSource">The type source.</param>
+        /// <exception cref="ArgumentNullException">
+        /// provider or typeSource is null
+        /// </exception>
         public DefaultPropertyItemProvider(IServiceProvider provider, ITypeSource typeSource)
         {
             this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
@@ -24,6 +36,13 @@ namespace Serenity.PropertyGrid
                 .Select(type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
         }
 
+        /// <summary>
+        /// Gets the property items for specified type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">type is null</exception>
+        /// <exception cref="InvalidProgramException">CheckNames is true and there is name mismatch</exception>
         public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type)
         {
             if (type == null)
@@ -56,7 +75,7 @@ namespace Serenity.PropertyGrid
                 {
                     if (source.BasedOnField is null)
                     {
-                        throw new Exception(string.Format(
+                        throw new InvalidProgramException(string.Format(
                             "{0} has a [BasedOnRow(typeof({2}), CheckNames = true)] attribute but its '{1}' property " +
                             "doesn't have a matching field with same property / field name in the row.\n\n" +
                             "Please check if property is named correctly.\n\n" +
@@ -70,7 +89,7 @@ namespace Serenity.PropertyGrid
                         (source.BasedOnField.PropertyName.IsEmptyOrNull() &&
                          source.BasedOnField.Name != property.Name))
                     {
-                        throw new Exception(string.Format(
+                        throw new InvalidProgramException(string.Format(
                                 "{0} has a [BasedOnRow(typeof({3}), CheckNames = true)] attribute but its '{1}' property " +
                                 "doesn't match the property/field name '{2}' in the row.\n\n" +
                                 "Property names must match case sensitively. Please change property name to '{2}'.\n\n" +
