@@ -11,6 +11,12 @@ using System.Reflection.Emit;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// RowFieldsBase
+    /// </summary>
+    /// <seealso cref="System.Collections.ObjectModel.Collection{Serenity.Data.Field}" />
+    /// <seealso cref="Serenity.Data.IAlias" />
+    /// <seealso cref="Serenity.Data.IHaveJoins" />
     public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     {
         internal Dictionary<string, Field> byName;
@@ -41,6 +47,11 @@ namespace Serenity.Data
         internal string aliasDot;
         internal bool aliasLocked;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RowFieldsBase"/> class.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="fieldPrefix">The field prefix.</param>
         protected RowFieldsBase(string tableName = null, string fieldPrefix = "")
         {
             this.tableName = tableName;
@@ -109,6 +120,13 @@ namespace Serenity.Data
             tableName = name;
         }
 
+        /// <summary>
+        /// Parses the database and schema.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="database">The database.</param>
+        /// <param name="schema">The schema.</param>
+        /// <returns></returns>
         public static string ParseDatabaseAndSchema(string tableName,
             out string database, out string schema)
         {
@@ -208,10 +226,21 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Afters the initialize.
+        /// </summary>
         protected virtual void AfterInitialize()
         {
         }
 
+        /// <summary>
+        /// Initializes the specified annotations.
+        /// </summary>
+        /// <param name="annotations">The annotations.</param>
+        /// <param name="dialect">The dialect.</param>
+        /// <exception cref="ArgumentNullException">dialect</exception>
+        /// <exception cref="InvalidProgramException">
+        /// </exception>
         public void Initialize(IAnnotatedType annotations, ISqlDialect dialect)
         {
             if (isInitialized)
@@ -552,12 +581,22 @@ namespace Serenity.Data
 
         private readonly Field[] EmptyFields = new Field[0];
 
+        /// <summary>
+        /// Gets the fields by attribute.
+        /// </summary>
+        /// <typeparam name="TAttr">The type of the attribute.</typeparam>
+        /// <returns></returns>
         public Field[] GetFieldsByAttribute<TAttr>()
             where TAttr : Attribute
         {
             return GetFieldsByAttribute(typeof(TAttr));
         }
 
+        /// <summary>
+        /// Gets the fields by attribute.
+        /// </summary>
+        /// <param name="attrType">Type of the attribute.</param>
+        /// <returns></returns>
         public Field[] GetFieldsByAttribute(Type attrType)
         {
             var byAttribute = this.byAttribute;
@@ -672,28 +711,76 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the name of the table.
+        /// </summary>
+        /// <value>
+        /// The name of the table.
+        /// </value>
         public string TableName => tableName;
 
+        /// <summary>
+        /// Gets the database.
+        /// </summary>
+        /// <value>
+        /// The database.
+        /// </value>
         public string Database => database;
 
+        /// <summary>
+        /// Gets the schema.
+        /// </summary>
+        /// <value>
+        /// The schema.
+        /// </value>
         public string Schema => schema;
 
+        /// <summary>
+        /// Gets the table only.
+        /// </summary>
+        /// <value>
+        /// The table only.
+        /// </value>
         public string TableOnly => tableOnly;
 
+        /// <summary>
+        /// Gets or sets the field prefix.
+        /// </summary>
+        /// <value>
+        /// The field prefix.
+        /// </value>
         public string FieldPrefix
         {
             get { return fieldPrefix ?? ""; }
             set { fieldPrefix = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the local text prefix.
+        /// </summary>
+        /// <value>
+        /// The local text prefix.
+        /// </value>
         public string LocalTextPrefix
         {
             get { return localTextPrefix ?? RowIdentifier; }
             set { localTextPrefix = value; }
         }
 
+        /// <summary>
+        /// Gets the module identifier.
+        /// </summary>
+        /// <value>
+        /// The module identifier.
+        /// </value>
         public string ModuleIdentifier => moduleIdentifier;
 
+        /// <summary>
+        /// Gets the row identifier.
+        /// </summary>
+        /// <value>
+        /// The row identifier.
+        /// </value>
         public string RowIdentifier
         {
             get
@@ -706,10 +793,28 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the connection key.
+        /// </summary>
+        /// <value>
+        /// The connection key.
+        /// </value>
         public string ConnectionKey => connectionKey;
 
+        /// <summary>
+        /// Gets the dialect.
+        /// </summary>
+        /// <value>
+        /// The dialect.
+        /// </value>
         public ISqlDialect Dialect => dialect;
 
+        /// <summary>
+        /// Gets or sets the generation key.
+        /// </summary>
+        /// <value>
+        /// The generation key.
+        /// </value>
         public string GenerationKey
         {
             get
@@ -726,10 +831,34 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets the identifier field.
+        /// </summary>
+        /// <value>
+        /// The identifier field.
+        /// </value>
         public Field IdField => idField;
+        /// <summary>
+        /// Gets the name field.
+        /// </summary>
+        /// <value>
+        /// The name field.
+        /// </value>
         public Field NameField => nameField;
+        /// <summary>
+        /// Gets the primary keys.
+        /// </summary>
+        /// <value>
+        /// The primary keys.
+        /// </value>
         public Field[] PrimaryKeys => primaryKeys;
 
+        /// <summary>
+        /// Gets the sort orders.
+        /// </summary>
+        /// <value>
+        /// The sort orders.
+        /// </value>
         public Tuple<Field, bool>[] SortOrders
         {
             get
@@ -755,6 +884,14 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Inserts an element into the <see cref="T:System.Collections.ObjectModel.Collection`1" /> at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which <paramref name="item" /> should be inserted.</param>
+        /// <param name="item">The object to insert. The value can be <see langword="null" /> for reference types.</param>
+        /// <exception cref="InvalidOperationException">field collection can't be modified!</exception>
+        /// <exception cref="ArgumentNullException">item</exception>
+        /// <exception cref="ArgumentOutOfRangeException">item</exception>
         protected override void InsertItem(int index, Field item)
         {
             if (isInitialized)
@@ -778,6 +915,11 @@ namespace Serenity.Data
             byName[item.Name] = item;
         }
 
+        /// <summary>
+        /// Removes the element at the specified index of the <see cref="T:System.Collections.ObjectModel.Collection`1" />.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element to remove.</param>
+        /// <exception cref="InvalidOperationException">field collection can't be modified!</exception>
         protected override void RemoveItem(int index)
         {
             if (isInitialized)
@@ -792,6 +934,14 @@ namespace Serenity.Data
                 this[i].index = i;
         }
 
+        /// <summary>
+        /// Replaces the element at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element to replace.</param>
+        /// <param name="item">The new value for the element at the specified index. The value can be <see langword="null" /> for reference types.</param>
+        /// <exception cref="InvalidOperationException">field collection can't be modified!</exception>
+        /// <exception cref="ArgumentNullException">item</exception>
+        /// <exception cref="ArgumentOutOfRangeException">item</exception>
         protected override void SetItem(int index, Field item)
         {
             if (isInitialized)
@@ -817,6 +967,11 @@ namespace Serenity.Data
             byName[item.Name] = item;
         }
 
+        /// <summary>
+        /// Finds the field.
+        /// </summary>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <returns></returns>
         public Field FindField(string fieldName)
         {
             if (byName.TryGetValue(fieldName, out Field field))
@@ -863,6 +1018,11 @@ namespace Serenity.Data
             calledRowCreated = true;
         }
 
+        /// <summary>
+        /// Finds the name of the field by property.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <returns></returns>
         public Field FindFieldByPropertyName(string propertyName)
         {
             if (byPropertyName.TryGetValue(propertyName, out Field field))
@@ -871,11 +1031,20 @@ namespace Serenity.Data
                 return null;
         }
 
+        /// <summary>
+        /// Locks the alias.
+        /// </summary>
         public void LockAlias()
         {
             aliasLocked = true;
         }
 
+        /// <summary>
+        /// Replaces the alias with.
+        /// </summary>
+        /// <param name="newAlias">The new alias.</param>
+        /// <exception cref="ArgumentNullException">newAlias</exception>
+        /// <exception cref="InvalidOperationException">Please use As() method to alias this fields object!</exception>
         public void ReplaceAliasWith(string newAlias)
         {
             if (string.IsNullOrEmpty(newAlias))
@@ -978,6 +1147,9 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// List of all joins in entity
+        /// </summary>
         public IDictionary<string, Join> Joins => joins;
 
         string IAlias.Name => alias;
@@ -986,6 +1158,12 @@ namespace Serenity.Data
 
         string IAlias.Table => tableName;
 
+        /// <summary>
+        /// Gets the name of the alias.
+        /// </summary>
+        /// <value>
+        /// The name of the alias.
+        /// </value>
         public string AliasName => alias;
     }
 }

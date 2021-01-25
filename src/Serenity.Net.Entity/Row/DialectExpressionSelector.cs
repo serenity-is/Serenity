@@ -4,11 +4,19 @@ using System.Linq;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// DialectExpressionSelector
+    /// </summary>
     public class DialectExpressionSelector
     {
         private readonly string dialectServerType;
         private readonly string dialectTypeName;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DialectExpressionSelector"/> class.
+        /// </summary>
+        /// <param name="dialect">The dialect.</param>
+        /// <exception cref="ArgumentNullException">dialect</exception>
         public DialectExpressionSelector(ISqlDialect dialect)
         {
             if (dialect == null)
@@ -23,6 +31,13 @@ namespace Serenity.Data
                 dialectTypeName.StartsWith(s, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// Gets the best match.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <param name="expressions">The expressions.</param>
+        /// <param name="getDialect">The get dialect.</param>
+        /// <returns></returns>
         public TAttribute GetBestMatch<TAttribute>(IEnumerable<TAttribute> expressions, 
             Func<TAttribute, string> getDialect)
         {

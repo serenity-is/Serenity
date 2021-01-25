@@ -5,21 +5,54 @@ using System.Data;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// JsonField<TValue>
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <seealso cref="Serenity.Data.GenericClassField{TValue}" />
     public class JsonField<TValue> : GenericClassField<TValue>
         where TValue : class
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonField{TValue}"/> class.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
         public JsonField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, TValue> getValue = null, Action<IRow, TValue> setValue = null)
             : base(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
         {
         }
 
+        /// <summary>
+        /// Factories the specified collection.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
+        /// <returns></returns>
         public static JsonField<TValue> Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
             Func<IRow, TValue> getValue, Action<IRow, TValue> setValue)
         {
             return new JsonField<TValue>(collection, name, caption, size, flags, getValue, setValue);
         }
 
+        /// <summary>
+        /// Gets from reader.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="row">The row.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
@@ -33,8 +66,19 @@ namespace Serenity.Data
             row.FieldAssignedValue(this);
         }
 
+        /// <summary>
+        /// Gets or sets the settings.
+        /// </summary>
+        /// <value>
+        /// The settings.
+        /// </value>
         public JsonSerializerSettings Settings { get; set; }
 
+        /// <summary>
+        /// Ases the SQL value.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <returns></returns>
         public override object AsSqlValue(IRow row)
         {
             var value = AsObject(row);
@@ -44,6 +88,12 @@ namespace Serenity.Data
             return JsonConvert.SerializeObject(value, Settings ?? JsonSettings.Strict);
         }
 
+        /// <summary>
+        /// Indexes the compare.
+        /// </summary>
+        /// <param name="row1">The row1.</param>
+        /// <param name="row2">The row2.</param>
+        /// <returns></returns>
         public override int IndexCompare(IRow row1, IRow row2)
         {
             var value1 = _getValue(row1);
@@ -64,11 +114,24 @@ namespace Serenity.Data
                 return value1.ToJson().CompareTo(value2.ToJson());
         }
 
+        /// <summary>
+        /// Values to json.
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
         public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             serializer.Serialize(writer, _getValue(row));
         }
 
+        /// <summary>
+        /// Values from json.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)

@@ -6,20 +6,52 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// StringField
+    /// </summary>
+    /// <seealso cref="Serenity.Data.GenericClassField{System.String}" />
     public class StringField : GenericClassField<string>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StringField"/> class.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
         public StringField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, string> getValue = null, Action<IRow, string> setValue = null)
             : base(collection, FieldType.String, name, caption, size, flags, getValue, setValue)
         {
         }
 
+        /// <summary>
+        /// Factories the specified collection.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
+        /// <returns></returns>
         public static StringField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
             Func<IRow, string> getValue, Action<IRow, string> setValue)
         {
             return new StringField(collection, name, caption, size, flags, getValue, setValue);
         }
 
+        /// <summary>
+        /// Gets from reader.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="row">The row.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
@@ -33,6 +65,12 @@ namespace Serenity.Data
             row.FieldAssignedValue(this);
         }
 
+        /// <summary>
+        /// Indexes the compare.
+        /// </summary>
+        /// <param name="row1">The row1.</param>
+        /// <param name="row2">The row2.</param>
+        /// <returns></returns>
         public override int IndexCompare(IRow row1, IRow row2)
         {
             var value1 = _getValue(row1);
@@ -53,11 +91,24 @@ namespace Serenity.Data
                 return value1.CompareTo(value2);
         }
 
+        /// <summary>
+        /// Values to json.
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
         public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             writer.WriteValue(_getValue(row));
         }
 
+        /// <summary>
+        /// Values from json.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)

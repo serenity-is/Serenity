@@ -6,11 +6,20 @@ using System.Reflection;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// DefaultRowTypeRegistry
+    /// </summary>
+    /// <seealso cref="Serenity.Data.IRowTypeRegistry" />
     public class DefaultRowTypeRegistry : IRowTypeRegistry
     {
         private readonly IEnumerable<Type> rowTypes;
         private readonly ILookup<string, Type> byConnectionKey;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultRowTypeRegistry"/> class.
+        /// </summary>
+        /// <param name="typeSource">The type source.</param>
+        /// <exception cref="ArgumentNullException">typeSource</exception>
         public DefaultRowTypeRegistry(ITypeSource typeSource)
         {
             rowTypes = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
@@ -21,8 +30,19 @@ namespace Serenity.Data
                 .ToLookup(x => x.GetCustomAttribute<ConnectionKeyAttribute>().Value);
         }
 
+        /// <summary>
+        /// Gets all row types.
+        /// </summary>
+        /// <value>
+        /// All row types.
+        /// </value>
         public IEnumerable<Type> AllRowTypes => rowTypes;
 
+        /// <summary>
+        /// Bies the connection key.
+        /// </summary>
+        /// <param name="connectionKey">The connection key.</param>
+        /// <returns></returns>
         public IEnumerable<Type> ByConnectionKey(string connectionKey)
         {
             return byConnectionKey[connectionKey];

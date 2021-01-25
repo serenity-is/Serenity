@@ -6,20 +6,49 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Int32Field
+    /// </summary>
     public class Int32Field : GenericValueField<int>
     {
+        /// <summary>Initializes a new instance of the <see cref="Int32Field" /> class.</summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
         public Int32Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, int?> getValue = null, Action<IRow, int?> setValue = null)
             : base(collection, FieldType.Int32, name, caption, size, flags, getValue, setValue)
         {
         }
 
+        /// <summary>
+        /// Factories the specified collection.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
+        /// <returns></returns>
         public static Int32Field Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
             Func<IRow, int?> getValue, Action<IRow, int?> setValue)
         {
             return new Int32Field(collection, name, caption, size, flags, getValue, setValue);
         }
 
+        /// <summary>
+        /// Gets from reader.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="row">The row.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
@@ -36,6 +65,12 @@ namespace Serenity.Data
             row.FieldAssignedValue(this);
         }
 
+        /// <summary>
+        /// Values to json.
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
         public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             var value = _getValue(row);
@@ -78,6 +113,13 @@ namespace Serenity.Data
                 throw new InvalidProgramException(string.Format("{0} is not a valid enum type!", enumType.Name));
         }
 
+        /// <summary>
+        /// Values from json.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)

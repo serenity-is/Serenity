@@ -6,20 +6,51 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Int64Field
+    /// </summary>
     public sealed class Int64Field : GenericValueField<long>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Int64Field"/> class.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
         public Int64Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, long?> getValue = null, Action<IRow, long?> setValue = null)
             : base(collection, FieldType.Int64, name, caption, size, flags, getValue, setValue)
         {
         }
 
+        /// <summary>
+        /// Factories the specified collection.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
+        /// <returns></returns>
         public static Int64Field Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
             Func<IRow, long?> getValue, Action<IRow, long?> setValue)
         {
             return new Int64Field(collection, name, caption, size, flags, getValue, setValue);
         }
 
+        /// <summary>
+        /// Gets from reader.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="row">The row.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
@@ -33,6 +64,12 @@ namespace Serenity.Data
             row.FieldAssignedValue(this);
         }
 
+        /// <summary>
+        /// Values to json.
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
         public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             var value = _getValue(row);
@@ -49,6 +86,13 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Values from json.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)

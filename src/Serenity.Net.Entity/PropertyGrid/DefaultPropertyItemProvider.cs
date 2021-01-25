@@ -10,11 +10,25 @@ using System.Reflection;
 
 namespace Serenity.PropertyGrid
 {
+    /// <summary>
+    /// DefaultPropertyItemProvider
+    /// </summary>
+    /// <seealso cref="Serenity.PropertyGrid.IPropertyItemProvider" />
     public partial class DefaultPropertyItemProvider : IPropertyItemProvider
     {
         private readonly IServiceProvider provider;
         private readonly IEnumerable<ObjectFactory> processorFactories;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultPropertyItemProvider"/> class.
+        /// </summary>
+        /// <param name="provider">The provider.</param>
+        /// <param name="typeSource">The type source.</param>
+        /// <exception cref="ArgumentNullException">
+        /// provider
+        /// or
+        /// typeSource
+        /// </exception>
         public DefaultPropertyItemProvider(IServiceProvider provider, ITypeSource typeSource)
         {
             this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
@@ -24,6 +38,14 @@ namespace Serenity.PropertyGrid
                 .Select(type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
         }
 
+        /// <summary>
+        /// Gets the property items for.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">type</exception>
+        /// <exception cref="Exception">
+        /// </exception>
         public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type)
         {
             if (type == null)

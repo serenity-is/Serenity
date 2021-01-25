@@ -5,8 +5,18 @@ using System.Reflection;
 
 namespace Serenity.PropertyGrid
 {
+    /// <summary>
+    /// PropertyInfoSource
+    /// </summary>
+    /// <seealso cref="Serenity.PropertyGrid.IPropertySource" />
     public class PropertyInfoSource : IPropertySource
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyInfoSource"/> class.
+        /// </summary>
+        /// <param name="property">The property.</param>
+        /// <param name="basedOnRow">The based on row.</param>
+        /// <exception cref="ArgumentNullException">property</exception>
         public PropertyInfoSource(PropertyInfo property, IRow basedOnRow)
         {
             Property = property ?? throw new ArgumentNullException("property");
@@ -41,6 +51,11 @@ namespace Serenity.PropertyGrid
             }
         }
 
+        /// <summary>
+        /// Gets the attribute.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <returns></returns>
         public TAttribute GetAttribute<TAttribute>()
             where TAttribute : Attribute
         {
@@ -48,6 +63,11 @@ namespace Serenity.PropertyGrid
                 BasedOnField.GetAttribute<TAttribute>();
         }
 
+        /// <summary>
+        /// Gets the attributes.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <returns></returns>
         public IEnumerable<TAttribute> GetAttributes<TAttribute>()
             where TAttribute : Attribute
         {
@@ -64,10 +84,40 @@ namespace Serenity.PropertyGrid
             return attrList;
         }
 
+        /// <summary>
+        /// Gets the property.
+        /// </summary>
+        /// <value>
+        /// The property.
+        /// </value>
         public PropertyInfo Property { get; private set; }
+        /// <summary>
+        /// Gets the type of the value.
+        /// </summary>
+        /// <value>
+        /// The type of the value.
+        /// </value>
         public Type ValueType { get; private set; }
+        /// <summary>
+        /// Gets the type of the enum.
+        /// </summary>
+        /// <value>
+        /// The type of the enum.
+        /// </value>
         public Type EnumType { get; private set; }
+        /// <summary>
+        /// Gets the based on row.
+        /// </summary>
+        /// <value>
+        /// The based on row.
+        /// </value>
         public IRow BasedOnRow { get; private set; }
+        /// <summary>
+        /// Gets the based on field.
+        /// </summary>
+        /// <value>
+        /// The based on field.
+        /// </value>
         public Field BasedOnField { get; private set; }
     }
 }

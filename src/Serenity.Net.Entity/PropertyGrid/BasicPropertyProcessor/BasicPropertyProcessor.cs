@@ -4,6 +4,11 @@ namespace Serenity.PropertyGrid
 {
     public partial class BasicPropertyProcessor : PropertyProcessor
     {
+        /// <summary>
+        /// Processes the specified source.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="item">The item.</param>
         public override void Process(IPropertySource source, PropertyItem item)
         {
             SetAlignment(source, item);
@@ -39,6 +44,12 @@ namespace Serenity.PropertyGrid
             SetWidth(source, item);
         }
 
+        /// <summary>
+        /// Gets the priority.
+        /// </summary>
+        /// <value>
+        /// The priority.
+        /// </value>
         public override int Priority => 10;
     }
 }
