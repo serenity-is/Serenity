@@ -1,3 +1,8 @@
+## 5.0.35 (2021-01-25)
+
+Features:
+  - Added documentation for Serenity.Entity
+
 ## 5.0.34 (2021-01-18)
 
 Features:
