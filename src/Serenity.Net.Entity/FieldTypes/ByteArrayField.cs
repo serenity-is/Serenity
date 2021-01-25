@@ -5,20 +5,52 @@ using System.Data;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// ByteArrayField
+    /// </summary>
+    /// <seealso cref="Serenity.Data.CustomClassField{System.Byte[]}" />
     public class ByteArrayField : CustomClassField<byte[]>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ByteArrayField"/> class.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
         public ByteArrayField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, byte[]> getValue = null, Action<IRow, byte[]> setValue = null)
             : base(collection, name, caption, size, flags, getValue, setValue)
         {
         }
 
+        /// <summary>
+        /// Factories the specified collection.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
+        /// <returns></returns>
         public static ByteArrayField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
             Func<IRow, byte[]> getValue, Action<IRow, byte[]> setValue)
         {
             return new ByteArrayField(collection, name, caption, size, flags, getValue, setValue);
         }
 
+        /// <summary>
+        /// Gets from reader.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="row">The row.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void GetFromReader(IDataReader reader, int index, IRow row)
         {
             if (reader == null)
@@ -48,6 +80,12 @@ namespace Serenity.Data
             row.FieldAssignedValue(this);
         }
 
+        /// <summary>
+        /// Compares the values.
+        /// </summary>
+        /// <param name="value1">The value1.</param>
+        /// <param name="value2">The value2.</param>
+        /// <returns></returns>
         protected override int CompareValues(byte[] value1, byte[] value2)
         {
             var length = Math.Min(value1.Length, value2.Length);
@@ -61,11 +99,22 @@ namespace Serenity.Data
             return value1.Length.CompareTo(value2.Length);
         }
 
+        /// <summary>
+        /// Clones the specified value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
         protected override byte[] Clone(byte[] value)
         {
             return (byte[])value.Clone();
         }
 
+        /// <summary>
+        /// Values to json.
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
         public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
         {
             var value = _getValue(row);
@@ -77,6 +126,13 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Values from json.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="serializer">The serializer.</param>
+        /// <exception cref="ArgumentNullException">reader</exception>
         public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
         {
             if (reader == null)

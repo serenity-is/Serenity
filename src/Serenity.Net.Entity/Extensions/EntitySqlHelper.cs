@@ -5,8 +5,17 @@ using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// EntitySqlHelper
+    /// </summary>
     public static class EntitySqlHelper
     {
+        /// <summary>
+        /// Gets the first.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <returns></returns>
         public static bool GetFirst(this SqlQuery query, IDbConnection connection)
         {
             using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
@@ -19,6 +28,14 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Gets the first.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="param">The parameter.</param>
+        /// <returns></returns>
         public static bool GetFirst(this SqlQuery query, IDbConnection connection, IEntity row, Dictionary param)
         {
             using IDataReader reader = SqlHelper.ExecuteReader(connection, query, param);
@@ -31,6 +48,13 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Gets the single.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">Query returned more than one result!</exception>
         public static bool GetSingle(this SqlQuery query, IDbConnection connection)
         {
             using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
@@ -47,6 +71,15 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Gets the single.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="param">The parameter.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">Query returned more than one result!</exception>
         public static bool GetSingle(this SqlQuery query, IDbConnection connection, IRow row, Dictionary param)
         {
             using IDataReader reader = SqlHelper.ExecuteReader(connection, query, param);
@@ -63,6 +96,13 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Fors the first.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="callBack">The call back.</param>
+        /// <returns></returns>
         public static bool ForFirst(this SqlQuery query, IDbConnection connection,
             Action callBack)
         {
@@ -77,6 +117,13 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Fors the first.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="callBack">The call back.</param>
+        /// <returns></returns>
         public static bool ForFirst(this SqlQuery query, IDbConnection connection,
             ReaderCallBack callBack)
         {
@@ -91,6 +138,13 @@ namespace Serenity.Data
                 return false;
         }
 
+        /// <summary>
+        /// Fors the each.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="callBack">The call back.</param>
+        /// <returns></returns>
         public static int ForEach(this SqlQuery query, IDbConnection connection,
             Action callBack)
         {
@@ -125,6 +179,13 @@ namespace Serenity.Data
             return count;
         }
 
+        /// <summary>
+        /// Fors the each.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="callBack">The call back.</param>
+        /// <returns></returns>
         public static int ForEach(this SqlQuery query, IDbConnection connection,
             ReaderCallBack callBack)
         {
@@ -159,6 +220,14 @@ namespace Serenity.Data
             return count;
         }
 
+        /// <summary>
+        /// Lists the specified connection.
+        /// </summary>
+        /// <typeparam name="TRow">The type of the row.</typeparam>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="loaderRow">The loader row.</param>
+        /// <returns></returns>
         public static List<TRow> List<TRow>(this SqlQuery query,
             IDbConnection connection, TRow loaderRow = null) where TRow : class, IRow
         {
@@ -170,6 +239,11 @@ namespace Serenity.Data
             return list;
         }
 
+        /// <summary>
+        /// Gets from reader.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="reader">The reader.</param>
         public static void GetFromReader(this SqlQuery query, IDataReader reader)
         {
             var ext = (ISqlQueryExtensible)query;
@@ -180,6 +254,14 @@ namespace Serenity.Data
         const string FieldReadValueError = "An error occurred while loading value of the field '{0}' of '{1}' from data reader. " +
             "Please make sure the field type matches the actual data type in database.\r\n\r\nThe error message is:\r\n{2}";
 
+        /// <summary>
+        /// Gets from reader.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="reader">The reader.</param>
+        /// <param name="into">The into.</param>
+        /// <exception cref="Exception">
+        /// </exception>
         public static void GetFromReader(this SqlQuery query, IDataReader reader, IList<object> into)
         {
             var ext = (ISqlQueryExtensible)query;

@@ -6,6 +6,12 @@ namespace Serenity.Data
     /// </summary>
     public interface IIsDeletedRow
     {
+        /// <summary>
+        /// Gets the is deleted field.
+        /// </summary>
+        /// <value>
+        /// The is deleted field.
+        /// </value>
         BooleanField IsDeletedField { get; }
     }
 }

@@ -4,9 +4,20 @@ using System.Collections.Generic;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// GenericClassField
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <seealso cref="Serenity.Data.Field" />
     public abstract class GenericClassField<TValue> : Field where TValue : class
     {
+        /// <summary>
+        /// The get value
+        /// </summary>
         protected internal Func<IRow, TValue> _getValue;
+        /// <summary>
+        /// The set value
+        /// </summary>
         protected internal Action<IRow, TValue> _setValue;
 
         internal GenericClassField(ICollection<Field> collection, FieldType type, string name, LocalText caption, int size, FieldFlags flags,
@@ -17,12 +28,25 @@ namespace Serenity.Data
             _setValue = setValue ?? ((r, v) => r.SetIndexedData(index, v));
         }
 
+        /// <summary>
+        /// Copies the specified source.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="target">The target.</param>
         public override void Copy(IRow source, IRow target)
         {
             _setValue(target, _getValue(source));
             target.FieldAssignedValue(this);
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="TValue"/> with the specified row.
+        /// </summary>
+        /// <value>
+        /// The <see cref="TValue"/>.
+        /// </value>
+        /// <param name="row">The row.</param>
+        /// <returns></returns>
         public TValue this[IRow row]
         {
             get
@@ -37,6 +61,12 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Converts the value.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="provider">The provider.</param>
+        /// <returns></returns>
         public override object ConvertValue(object source, IFormatProvider provider)
         {
             if (source is JValue jValue)
@@ -53,23 +83,44 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Ases the object.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <returns></returns>
         public override object AsObject(IRow row)
         {
             CheckUnassignedRead(row);
             return _getValue(row);
         }
 
+        /// <summary>
+        /// Ases the object.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <param name="value">The value.</param>
         public override void AsObject(IRow row, object value)
         {
             _setValue(row, (TValue)value);
             row.FieldAssignedValue(this);
         }
 
+        /// <summary>
+        /// Gets the is null.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <returns></returns>
         protected override bool GetIsNull(IRow row)
         {
             return _getValue(row) == null;
         }
 
+        /// <summary>
+        /// Gets the type of the value.
+        /// </summary>
+        /// <value>
+        /// The type of the value.
+        /// </value>
         public override Type ValueType => typeof(TValue);
     }
 }

@@ -3,9 +3,26 @@ using System.Collections.Generic;
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// EnumField
+    /// </summary>
+    /// <typeparam name="TEnum">The type of the enum.</typeparam>
+    /// <seealso cref="Serenity.Data.Int32Field" />
     public class EnumField<TEnum> : Int32Field
         where TEnum : struct, IComparable, IFormattable, IConvertible
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnumField{TEnum}"/> class.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="flags">The flags.</param>
+        /// <param name="getValue">The get value.</param>
+        /// <param name="setValue">The set value.</param>
+        /// <exception cref="InvalidProgramException">
+        /// </exception>
         public EnumField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<IRow, int?> getValue = null, Action<IRow, int?> setValue = null)
             : base(collection, name, caption, size, flags, getValue, setValue)
@@ -19,6 +36,14 @@ namespace Serenity.Data
             EnumType = typeof(TEnum);
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="System.Nullable{TEnum}"/> with the specified row.
+        /// </summary>
+        /// <value>
+        /// The <see cref="System.Nullable{TEnum}"/>.
+        /// </value>
+        /// <param name="row">The row.</param>
+        /// <returns></returns>
         public new TEnum? this[IRow row]
         {
             get

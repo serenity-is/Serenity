@@ -7,8 +7,22 @@ using System.Reflection;
 
 namespace Serenity.Localization
 {
+    /// <summary>
+    /// EntityLocalTexts
+    /// </summary>
     public static class EntityLocalTexts
     {
+        /// <summary>
+        /// Adds the row texts.
+        /// </summary>
+        /// <param name="registry">The registry.</param>
+        /// <param name="rowInstances">The row instances.</param>
+        /// <param name="languageID">The language identifier.</param>
+        /// <exception cref="ArgumentNullException">
+        /// registry
+        /// or
+        /// rowInstances
+        /// </exception>
         public static void AddRowTexts(this ILocalTextRegistry registry, IEnumerable<IRow> rowInstances,
             string languageID = LocalText.InvariantLanguageID)
         {

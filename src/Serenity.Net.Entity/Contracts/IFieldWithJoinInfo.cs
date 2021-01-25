@@ -2,6 +2,10 @@
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// IFieldWithJoinInfo
+    /// </summary>
+    /// <seealso cref="Serenity.Data.IField" />
     public interface IFieldWithJoinInfo : IField
     {
         /// <summary>
