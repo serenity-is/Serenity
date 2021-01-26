@@ -114,13 +114,17 @@ namespace Serenity.CodeGenerator
             if (!string.IsNullOrEmpty(RootNamespace))
                 return RootNamespace;
 
-            var rootNamespace = ProjectFileHelper.ExtractPropertyFrom(csproj,
-                xe => xe.Descendants("RootNamespace").FirstOrDefault()?.Value.TrimToNull());
+            string rootNamespace = null;
+
+            if (File.Exists(csproj)) {
+                 rootNamespace = ProjectFileHelper.ExtractPropertyFrom(csproj,
+                    xe => xe.Descendants("RootNamespace").FirstOrDefault()?.Value.TrimToNull());
+            }
 
             if (rootNamespace == null)
                 rootNamespace = Path.ChangeExtension(Path.GetFileName(csproj), null);
 
-            if (rootNamespace.EndsWith(".Web", StringComparison.OrdinalIgnoreCase))
+            if (rootNamespace?.EndsWith(".Web", StringComparison.OrdinalIgnoreCase) == true)
                 rootNamespace = rootNamespace.Substring(0, rootNamespace.Length - 4);
 
             return rootNamespace;
@@ -214,4 +218,4 @@ namespace Serenity.CodeGenerator
             public IDictionary<string, JToken> ExtensionData { get; set; }
         }
     }
-}
+} 
