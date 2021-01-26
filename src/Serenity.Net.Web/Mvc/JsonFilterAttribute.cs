@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Linq;
-using System.Globalization;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 
 namespace Serenity.Services
 {
-    public class JsonFilter : ActionFilterAttribute
+    public class JsonFilterAttribute : ActionFilterAttribute
     {
-        public JsonFilter()
+        public JsonFilterAttribute()
         {
             ParamName = "request";
         }
@@ -72,7 +72,7 @@ namespace Serenity.Services
                     }
                 }
             }
-            else if ((AllowGet ?? DefaultAllowGet) && 
+            else if (AllowGet && 
                 method.Equals("GET", StringComparison.OrdinalIgnoreCase))
             {
                 var req = FromFormOrQuery(request, prm.Name);
@@ -86,8 +86,8 @@ namespace Serenity.Services
 
         private string FromFormOrQuery(HttpRequest request, string name)
         {
-            var allowForm = AllowForm ?? DefaultAllowForm;
-            var allowQuery = AllowQuery ?? DefaultAllowQuery;
+            var allowForm = AllowForm;
+            var allowQuery = AllowQuery;
             if (!allowForm && !allowQuery)
                 return null;
 
@@ -117,9 +117,29 @@ namespace Serenity.Services
 
         public string ParamName { get; set; }
 
-        public bool? AllowGet { get; set; }
-        public bool? AllowQuery { get; set; }
-        public bool? AllowForm { get; set; }
+        private bool? allowGet;
+
+        public bool AllowGet
+        {
+            get => allowGet ?? DefaultAllowGet;
+            set => allowGet = value;
+        }
+
+        private bool? allowQuery;
+
+        public bool AllowQuery
+        {
+            get => allowQuery ?? DefaultAllowQuery;
+            set => allowQuery = value;
+        }
+
+        private bool? allowForm;
+
+        public bool AllowForm
+        {
+            get => allowForm ?? DefaultAllowForm;
+            set => allowForm = value;
+        }
 
         public static bool DefaultAllowGet { get; set; } = true;
         public static bool DefaultAllowQuery { get; set; } = true;

@@ -50,8 +50,8 @@ namespace Serenity.Services
                 var paramType = parameter.ParameterInfo.ParameterType;
                 if (typeof(ServiceRequest).IsAssignableFrom(typeof(ServiceRequest)))
                 {
-                    if (!action.Filters.Any(x => x is JsonFilter))
-                        action.Filters.Add(new JsonFilter());
+                    if (!action.Filters.Any(x => x is JsonFilterAttribute))
+                        action.Filters.Add(new JsonFilterAttribute());
 
                     break;
                 }
