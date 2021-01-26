@@ -197,7 +197,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
                 }
             }
         }
-        else if (isTrimmedEmpty(value.Filename))
+        else if (value != null && isTrimmedEmpty(value.Filename))
             value = null;
 
         if (value != null) {
