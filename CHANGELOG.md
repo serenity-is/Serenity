@@ -1,3 +1,8 @@
+## 5.0.36 (2021-01-26)
+
+Bugfixes:
+  - Fix null reference error while setting FileUploadEditor value to null directly
+  
 ## 5.0.35 (2021-01-25)
 
 Features:
