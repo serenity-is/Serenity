@@ -6,7 +6,13 @@ labels: waiting-for-check
 assignees: VictorTomaili
 
 ---
-
+- [ ] This isn't a feature request or a discussion topic
+- [ ] I have searched open and closed issues for duplicates
+- [ ] I am searched documents on https://serenity.is/docs/
+- [ ] I have read https://serenity.is/docs/startsharp/faq
+- [ ] I have to use descriptive issue title
+- [ ] I approve to fill in the information below
+ 
 **Describe the bug**
 A clear and concise description of what the bug is.
 
