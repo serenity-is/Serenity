@@ -1,7 +1,6 @@
 ---
 name: Bug report (For questions use Discussions tab)
 about: Create a report to help us improve
-title: "[BUG] - "
 labels: waiting-for-check
 assignees: VictorTomaili
 
