@@ -229,7 +229,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
         return this.add(QuickFilterBar.dateTimeRange(field, title)) as DateTimeEditor;
     }
 
-    public static dateTimeRange(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions> {
+    public static dateTimeRange(field: string, title?: string, options: DateTimeEditorOptions = null): QuickFilter<DateTimeEditor, DateTimeEditorOptions> {
         var end: DateTimeEditor = null;
 
         return <QuickFilter<DateTimeEditor, DateTimeEditorOptions>>{
@@ -242,7 +242,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
                     element: function (e2) {
                         e2.insertAfter(e1);
                     },
-                    options: null,
+                    options: options,
                     init: null
                 });
 
@@ -307,7 +307,8 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
                 }
                 EditorUtils.setValue(w2, state[0]);
                 EditorUtils.setValue(end, state[1]);
-            }
+            },
+            options: options
         };
     }
 
