@@ -274,14 +274,13 @@ namespace Serenity.Services
             SaveRequestType requestType = SaveRequestType.Auto)
         {
             StateBag.Clear();
-            UnitOfWork = unitOfWork ?? throw new ArgumentNullException("unitOfWork");
 
-            Request = request;
+            UnitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            Request = request ?? throw new ArgumentNullException(nameof(request));
+
             Response = new TSaveResponse();
 
-            Row = request.Entity;
-            if (Row == null)
-                throw new ArgumentNullException("Entity");
+            Row = request.Entity ?? throw new ArgumentNullException(nameof(request.Entity));
 
             if (requestType == SaveRequestType.Auto)
             {
