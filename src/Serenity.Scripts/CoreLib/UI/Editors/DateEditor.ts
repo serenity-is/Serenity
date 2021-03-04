@@ -66,7 +66,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
                 return format(text('Validation.MinDate'), formatDate(this.get_minValue(), null));
             }
 
-            if (!isEmptyOrNull(this.get_maxValue()) && Invariant.stringCompare(value, this.get_maxValue()) >= 0) {
+            if (!isEmptyOrNull(this.get_maxValue()) && Invariant.stringCompare(value, this.get_maxValue()) > 0) {
                 return format(text('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
             }
 
