@@ -4,7 +4,12 @@ namespace Serenity.Tests
 {
     public static class Normalize
     {
-        public static string Sql(this string script)
+        public static string NormalizeSql(this string script)
+        {
+            return Sql(script);
+        }
+
+        public static string Sql(string script)
         {
             if (script == null)
                 return null;
