@@ -2,9 +2,9 @@ using System.Text;
 
 namespace Serenity.Tests
 {
-    public static class NormalizationExtensions
+    public static class Normalize
     {
-        public static string NormalizeSql(this string script)
+        public static string Sql(this string script)
         {
             if (script == null)
                 return null;

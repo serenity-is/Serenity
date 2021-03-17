@@ -51,7 +51,7 @@ namespace Serenity.Tests.Entity
 T0.ID AS [ID],
 T0.Name AS [Name] 
 FROM IdName T0 
-WHERE (T0.ID = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
+WHERE (T0.ID = @p1)".Sql(), command.CommandText.Sql());
 
                     return new MockDataReader();
                 });
@@ -70,7 +70,7 @@ T0.CityId AS [CityId],
 T0.CityName AS [CityName],
 T0.CountryId AS [CountryId]
 FROM Cities T0 
-WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
+WHERE (T0.CityId = @p1)".Sql(), command.CommandText.Sql());
 
                     return new MockDataReader(new
                     {
@@ -98,7 +98,7 @@ WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
 jCountry.CountryName AS [CountryName]
 FROM Cities T0 
 LEFT JOIN Countries jCountry ON (jCountry.CountryId = T0.CountryId)
-WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
+WHERE (T0.CityId = @p1)".Sql(), command.CommandText.Sql());
 
                     return new MockDataReader(new
                     {
