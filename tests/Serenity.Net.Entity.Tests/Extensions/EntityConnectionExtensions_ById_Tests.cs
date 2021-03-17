@@ -48,11 +48,11 @@ namespace Serenity.Tests.Entity
                     Assert.Collection(command.Parameters.OfType<IDbDataParameter>(),
                         x1 => Assert.Equal(777, x1.Value));
 
-                    Assert.Equal(Normalize.Sql(@"SELECT 
+                    Assert.Equal(@"SELECT 
 T0.ID AS [ID],
 T0.Name AS [Name] 
 FROM IdName T0 
-WHERE (T0.ID = @p1)"), Normalize.Sql(command.CommandText));
+WHERE (T0.ID = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
 
                     return new MockDataReader(new
                     {
@@ -70,12 +70,12 @@ WHERE (T0.ID = @p1)"), Normalize.Sql(command.CommandText));
             using var connection = new MockDbConnection()
                 .OnExecuteReader(command =>
                 {
-                    Assert.Equal(Normalize.Sql(@"SELECT 
+                    Assert.Equal(@"SELECT 
 T0.CityId AS [CityId],
 T0.CityName AS [CityName],
 T0.CountryId AS [CountryId]
 FROM Cities T0 
-WHERE (T0.CityId = @p1)"), Normalize.Sql(command.CommandText));
+WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
 
                     return new MockDataReader(new
                     {
@@ -103,7 +103,7 @@ WHERE (T0.CityId = @p1)"), Normalize.Sql(command.CommandText));
 jCountry.CountryName AS [CountryName]
 FROM Cities T0 
 LEFT JOIN Countries jCountry ON (jCountry.CountryId = T0.CountryId)
-WHERE (T0.CityId = @p1)".Sql(), command.CommandText.Sql());
+WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
 
                     return new MockDataReader(new
                     {

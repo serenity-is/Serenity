@@ -17,7 +17,7 @@ namespace Serenity.Tests.Authorization
         [Fact]
         public void IsLoggedIn_Returns_False_If_UserAccessor_User_Property_IsNull()
         {
-            var userAccessor = new MockUserAccessor(() => null);
+            var userAccessor = new MockUserAccessor(() => (ClaimsPrincipal)null);
             Assert.False(userAccessor.IsLoggedIn());
         }
 
