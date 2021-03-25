@@ -1,3 +1,8 @@
+## 5.0.38 (2021-03-25)
+
+Features:
+  - rename JsonFilterAttribute back to JsonFilter. Please prefer [JsonRequest] attribute as JsonFilter is now obsolete
+
 ## 5.0.37 (2021-03-25)
 
 Features:
