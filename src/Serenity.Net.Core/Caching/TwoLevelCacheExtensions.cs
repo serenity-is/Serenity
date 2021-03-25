@@ -159,7 +159,7 @@ namespace Serenity
                     return groupGeneration.Value;
 
                 var bytes = distributedCache.Get(groupKey);
-                groupGeneration = (bytes == null || bytes.Length != 8) ? (ulong?)null : BitConverter.ToUInt32(bytes);
+                groupGeneration = (bytes == null || bytes.Length != 8) ? (ulong?)null : BitConverter.ToUInt64(bytes);
                 if (groupGeneration == null || groupGeneration == 0)
                 {
                     groupGeneration = RandomGeneration();
@@ -218,16 +218,16 @@ namespace Serenity
             {
                 // no item in local cache or expired, now check distributed cache
                 var bytes = distributedCache.Get(itemGenerationKey);
-                var itemGeneration = (bytes == null || bytes.Length != 8) ? (ulong?)null : BitConverter.ToUInt32(bytes);
+                var itemGeneration = (bytes == null || bytes.Length != 8) ? (ulong?)null : BitConverter.ToUInt64(bytes);
 
                 // if item has version number in distributed cache and this is equal to group version
                 if (itemGeneration != null &&
                     itemGeneration.Value == getGroupGenerationValue())
                 {
                     // get item from distributed cache
-                    var cacheObj = distributedCache.GetAutoJson<TItem>(cacheKey);
+                    cachedObj = distributedCache.GetAutoJson<TItem>(cacheKey);
                     // if item exists in distributed cache
-                    if (cacheObj != null)
+                    if (cachedObj != null)
                     {
                         localCache.Add(cacheKey, cachedObj, localExpiration);
                         localCache.Add(itemGenerationKey, getGroupGenerationValue(), localExpiration);
