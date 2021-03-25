@@ -9,9 +9,9 @@ using System.Linq;
 
 namespace Serenity.Services
 {
-    public class JsonFilterAttribute : ActionFilterAttribute
+    public class JsonRequestAttribute : ActionFilterAttribute
     {
-        public JsonFilterAttribute()
+        public JsonRequestAttribute()
         {
             ParamName = "request";
         }
@@ -36,7 +36,7 @@ namespace Serenity.Services
 
                 if (prms.Count() != 1)
                     throw new ArgumentOutOfRangeException(string.Format(CultureInfo.CurrentCulture,
-                        "Method {0} has {1} parameters. JsonFilter requires an action method with only one parameter," + 
+                        "Method {0} has {1} parameters. [JsonRequest] requires an action method with only one parameter," + 
                         "or a parameter with name '{2}'!",
                             ((ControllerActionDescriptor)filterContext.ActionDescriptor).ActionName, 
                             filterContext.ActionDescriptor.Parameters.Count,
@@ -144,5 +144,10 @@ namespace Serenity.Services
         public static bool DefaultAllowGet { get; set; } = true;
         public static bool DefaultAllowQuery { get; set; } = true;
         public static bool DefaultAllowForm { get; set; } = true;
+    }
+
+    [Obsolete("Prefer [JsonRequest] attribute")]
+    public class JsonFilter : JsonRequestAttribute
+    {
     }
 }
