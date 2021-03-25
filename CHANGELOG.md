@@ -1,3 +1,15 @@
+## 5.0.37 (2021-03-25)
+
+Features:
+  - Added tests for connection ById and TryById methods using mocks
+  - Added SqlQuery tests
+  - Added tests for MasterDetailRelationBehavior
+  - 
+
+Bugfixes:
+  - Fix TwoLevelCache.Get returns null when local cache does not have an item but distributed cache has
+  - Rename JsonFilter to JsonFilterAttribute, made AllowXYZ properties settable as attribute argument
+
 ## 5.0.36 (2021-01-26)
 
 Bugfixes:
