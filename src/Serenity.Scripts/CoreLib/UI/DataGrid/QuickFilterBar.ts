@@ -229,7 +229,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
         return this.add(QuickFilterBar.dateTimeRange(field, title)) as DateTimeEditor;
     }
 
-    public static dateTimeRange(field: string, title?: string, useUtc: boolean = null): QuickFilter<DateTimeEditor, DateTimeEditorOptions> {
+    public static dateTimeRange(field: string, title?: string, useUtc?: boolean): QuickFilter<DateTimeEditor, DateTimeEditorOptions> {
         var end: DateTimeEditor = null;
 
         return <QuickFilter<DateTimeEditor, DateTimeEditorOptions>>{
