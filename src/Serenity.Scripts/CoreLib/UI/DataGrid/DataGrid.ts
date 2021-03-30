@@ -258,7 +258,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
             quick = QuickFilterBar.dateRange(name, title);
         }
         else if (filteringType === DateTimeFiltering) {
-            quick = QuickFilterBar.dateTimeRange(name, title);
+            quick = QuickFilterBar.dateTimeRange(name, title, item.editorParams?.useUtc);
         }
         else if (filteringType === BooleanFiltering) {
             var q = item.quickFilterParams || {};
