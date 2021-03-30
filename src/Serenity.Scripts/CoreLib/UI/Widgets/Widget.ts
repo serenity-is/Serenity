@@ -107,22 +107,22 @@ export class Widget<TOptions> extends React.Component<TOptions> {
 
     protected getCssClass(): string {
         var type = getInstanceType(this);
-        var klass = 's-' + getTypeName(type);
+        var classList: string[] = [];
         var fullClass = replaceAll(getTypeFullName(type), '.', '-');
+        classList.push(fullClass);
 
         for (let k of Config.rootNamespaces) {
             if (startsWith(fullClass, k + '-')) {
-                fullClass = fullClass.substr(k.length + 1);
+                classList.push(fullClass.substr(k.length + 1));
                 break;
             }
         }
 
-        fullClass = 's-' + fullClass;
-        if (klass === fullClass) {
-            return klass;
-        }
-
-        return klass + ' ' + fullClass;
+        classList.push(getTypeName(type));
+        return classList
+            .filter((v, i, a) => a.indexOf(v) === i)
+            .map(s => 's-' + s)
+            .join(" ");
     }
 
     public static getWidgetName(type: Function): string {
