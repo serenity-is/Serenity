@@ -24,6 +24,7 @@ namespace Serenity.Data
                 take = take,
                 countRecords = countRecords,
                 distinct = distinct,
+                omitParens = omitParens,
                 into = new List<object>(into),
                 intoIndex = intoIndex,
                 forXml = forXml,

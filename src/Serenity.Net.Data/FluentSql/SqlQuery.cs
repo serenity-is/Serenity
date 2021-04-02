@@ -19,6 +19,7 @@ namespace Serenity.Data
         private List<Column> columns;
         private bool countRecords;
         private bool distinct;
+        private bool omitParens;
         private StringBuilder from;
         private StringBuilder having;
         private StringBuilder groupBy;
@@ -522,8 +523,10 @@ namespace Serenity.Data
         {
             unionQuery = Clone();
             unionQuery.countRecords = false;
+            unionQuery.omitParens = true;
             unionQuery.parent = this;
             unionQuery.parameters = null;
+
             this.unionType = unionType;
             columns = new List<Column>();
             from = new StringBuilder();
