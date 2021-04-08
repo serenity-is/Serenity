@@ -23,8 +23,12 @@ export namespace UploadHelper {
             pasteZone: options.zone,
             done: function (e: JQueryEventObject, data: any) {
                 var response = data.result;
-                if (options.fileDone != null) {
-                    options.fileDone(response, data.files[0].name, data);
+                if (response.Error != null) {
+                    Q.alert(response.Error.Message);
+                } else {
+                    if (options.fileDone != null) {
+                        options.fileDone(response, data.files[0].name, data);
+                    }
                 }
             },
             start: function () {
