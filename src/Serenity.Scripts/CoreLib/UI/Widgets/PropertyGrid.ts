@@ -9,6 +9,7 @@ import { ReflectionOptionsSetter } from "./ReflectionOptionsSetter";
 import { EditorUtils } from "../Editors/EditorUtils";
 import { Culture } from "../../Q/Formatting";
 import { Authorization } from "../../Q/Authorization";
+import { isBS3 } from "../../Q/Dialogs";
 
 @Decorators.registerClass('Serenity.PropertyGrid')
 export class PropertyGrid extends Widget<PropertyGridOptions> {
@@ -60,11 +61,15 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                     trimToEmpty(itemsWithTab[j].tab) === tab.$);
                 i = j;
 
-                var li = $("<li><a data-toggle='tab' role='tab'></a></li>")
+                var li = $(isBS3() ? '<li><a data-toggle="tab" role="tab"></a></li>' :
+                        '<li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab"></a></li>')
                     .appendTo(ul);
 
                 if (tabIndex === 0) {
-                    li.addClass('active');
+                    if (isBS3())
+                        li.addClass('active');
+                    else
+                        li.children('a').addClass('active');
                 }
 
                 var tabID = this.uniqueName + '_Tab' + tabIndex;
@@ -80,7 +85,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                     .appendTo(tc);
 
                 if (tabIndex === 0) {
-                    pane.addClass('in active');
+                    pane.addClass(isBS3() ? 'in active' : 'show active');
                 }
 
                 pane.attr('id', tabID);
