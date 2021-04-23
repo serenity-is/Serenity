@@ -24,7 +24,7 @@ export namespace UploadHelper {
             pasteZone: options.zone,
             done: function (e: JQueryEventObject, data: any) {
                 var response = data.result;
-                if (!response.Error) {
+                if (!!response.Error) {
                     notifyError(response.Error.Message);
                 } else {
                     if (options.fileDone != null) {
