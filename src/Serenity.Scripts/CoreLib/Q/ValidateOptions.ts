@@ -2,6 +2,7 @@
 import { notifyError } from "./Notify";
 import { text } from "./LocalText";
 import { baseValidateOptions, getHighlightTarget } from "./Validation";
+import { isBS3 } from "./Dialogs";
 
 let oldShowLabel: (e: HTMLElement, message: string) => void;
 
@@ -121,7 +122,7 @@ export function validateOptions(options: JQueryValidation.ValidationOptions) {
                         }).tooltip('show');
 
                         window.setTimeout(function () {
-                            $el.tooltip('destroy');
+                            $el.tooltip(isBS3() ? 'destroy' : 'dispose');
                         }, 1500);
                     }
                 }
