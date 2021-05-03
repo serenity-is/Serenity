@@ -1,10 +1,12 @@
 ---
-name: Bug report (For questions use Discussions tab)
-about: Create a report to help us improve
+name: Bug report
+about: Create a bug report to help us improve Serenity Platform
 labels: waiting-for-check
 assignees: VictorTomaili
 
 ---
+**PLEASE ENSURE ABOUT ALL FIELDS FILLED**
+
 - [ ] This isn't a feature request or a discussion topic
 - [ ] I have searched open and closed issues for duplicates
 - [ ] I am searched documents on https://serenity.is/docs/
@@ -28,6 +30,17 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Serenity Versions
+ - Serene Template Version (when reproduced on Serene Template)
+ - Sergen Version (if required)
+ - Installed Serenity Nuget Packages Versions (you can find them in csproj)
+
+**Development Environment
+ - Visual Studio Version:
+ - Nodejs Version:
+ - Database:
+ - Database Version:
+
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows, Linux, Mac]
  - Browser [e.g. chrome, safari]
@@ -38,11 +51,6 @@ If applicable, add screenshots to help explain your problem.
  - OS: [e.g. iOS8.1]
  - Browser [e.g. stock browser, safari]
  - Browser Version [e.g. 22]
- 
-**Serenity Versions
- - Serene Template Version (when reproduced on Serene Template)
- - Sergen Version (if required)
- - Installed Serenity Nuget Packages Versions (you can find them in csproj)
 
 **Additional context**
 Add any other context about the problem here.
