@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Serenity & Serene Community Support
+    url: https://github.com/serenity-is/Serenity/discussions
+    about: Please ask and answer questions here.
+  - name: Serenity Documentation
+    url: https://serenity.is/docs/
+    about: You can access documentation here.
+  - name: StartSharp Demo
+    url: https://serenity.is/demo
+    about: StartSharp demo application
+  - name: Premium Support & StartSharp
+    url: https://serenity.is/#Pricing
+    about: If you need custom support and/or StartSharp template access, please contact us. 
