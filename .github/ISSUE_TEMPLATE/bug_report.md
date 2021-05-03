@@ -38,6 +38,7 @@ If applicable, add screenshots to help explain your problem.
 **Development Environment
  - Visual Studio Version:
  - Nodejs Version:
+ - Typescript Version:
  - Database:
  - Database Version:
 
