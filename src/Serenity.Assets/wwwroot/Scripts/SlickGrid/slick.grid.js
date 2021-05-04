@@ -1850,7 +1850,7 @@ if (typeof Slick === "undefined") {
         }
 
         function createCssRules() {
-            $style = $("<style type='text/css' rel='stylesheet' />").appendTo($("head"));
+            $style = $("<style type='text/css' rel='stylesheet' data-uid='" + uid + "' />").appendTo($("head"));
             var rowHeight = (options.rowHeight - cellHeightDiff);
             var rules = [
                 "." + uid + " .slick-group-header-column { " + xLeft + ": 1000px; }",
@@ -1877,11 +1877,16 @@ if (typeof Slick === "undefined") {
 
         function getColumnCssRules(idx) {
             if (!stylesheet) {
-                var sheets = document.styleSheets;
-                for (var i = 0; i < sheets.length; i++) {
-                    if ((sheets[i].ownerNode || sheets[i].owningElement) == $style[0]) {
-                        stylesheet = sheets[i];
-                        break;
+                var stylesheetFromUid = document.querySelector("style[data-uid='" + uid + "']");
+                if (stylesheetFromUid && stylesheetFromUid.sheet) {
+                    stylesheet = stylesheetFromUid.sheet;
+                } else {
+                    var sheets = document.styleSheets;
+                    for (var i = 0; i < sheets.length; i++) {
+                        if ((sheets[i].ownerNode || sheets[i].owningElement) == $style[0]) {
+                            stylesheet = sheets[i];
+                            break;
+                        }
                     }
                 }
 
