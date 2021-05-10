@@ -1,3 +1,9 @@
+## 5.0.41 (2021-05-10)
+
+Features:
+  - ability to disable toastr dialog positioning by not including position-toast in positionClass option
+  - better atribute base class for service lookup editor derived client type
+
 ## 5.0.40 (2021-05-10)
 
 Features:
