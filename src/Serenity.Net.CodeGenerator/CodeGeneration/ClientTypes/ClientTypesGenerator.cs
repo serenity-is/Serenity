@@ -9,11 +9,17 @@ namespace Serenity.CodeGeneration
     public partial class ClientTypesGenerator : ImportGeneratorBase
     {
         static HashSet<string> lookupEditorBaseOptions;
+        static HashSet<string> serviceLookupEditorBaseOptions;
 
         static ClientTypesGenerator()
         {
             lookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             lookupEditorBaseOptions.AddRange(typeof(LookupEditorBaseAttribute)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .Select(x => x.Name));
+
+            serviceLookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            serviceLookupEditorBaseOptions.AddRange(typeof(ServiceLookupEditorAttribute)
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 .Select(x => x.Name));
         }

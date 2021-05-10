@@ -12,8 +12,12 @@ namespace Serenity.CodeGeneration
             bool isLookupEditor = HasBaseType(type, "Serenity.LookupEditorBase`1") ||
                 HasBaseType(type, "Serenity.LookupEditorBase");
 
-            sb.AppendLine(isLookupEditor ?
-                " : LookupEditorBaseAttribute" : " : CustomEditorAttribute");
+            bool isServiceLookupEditor = HasBaseType(type, "Serenity.ServiceLookupEditorBase`1") ||
+                HasBaseType(type, "Serenity.ServiceLookupEditorBase");
+
+            sb.Append(" : ");
+            sb.AppendLine(isLookupEditor ? "LookupEditorBaseAttribute" : 
+                (isServiceLookupEditor ? "ServiceLookupEditorBaseAttribute" : "CustomEditorAttribute"));
 
             cw.InBrace(delegate
             {
@@ -30,7 +34,8 @@ namespace Serenity.CodeGeneration
                 cw.IndentedLine("}");
 
                 GenerateOptionMembers(type, 
-                    skip: isLookupEditor ? lookupEditorBaseOptions : null,
+                    skip: isLookupEditor ? lookupEditorBaseOptions : 
+                        (isServiceLookupEditor ? serviceLookupEditorBaseOptions : null),
                     isWidget: true);
             });
         }
