@@ -155,7 +155,7 @@ namespace Serenity.PropertyGrid
 
         private static void SetServiceLookupParams(EditorTypeAttribute editorTypeAttr, Dictionary<string, object> editorParams)
         {
-            if (!(editorTypeAttr is ServiceLookupEditorAttribute sle) || sle.ItemType == null)
+            if (!(editorTypeAttr is ServiceLookupEditorBaseAttribute sle) || sle.ItemType == null)
                 return;
 
             if (!editorParams.ContainsKey("service"))
