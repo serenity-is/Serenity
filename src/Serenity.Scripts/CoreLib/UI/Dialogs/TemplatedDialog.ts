@@ -342,7 +342,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
             var element = this.element;
             this.destroy();
             element.remove();
-            positionToastContainer(false);
+            positionToastContainer(false, null);
         }, 0);
     }
 

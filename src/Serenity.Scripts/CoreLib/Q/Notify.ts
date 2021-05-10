@@ -5,12 +5,12 @@ export let defaultNotifyOptions: ToastrOptions = {
     showDuration: 250,
     hideDuration: 500,
     extendedTimeOut: 500,
-    positionClass: 'toast-top-full-width'
+    positionClass: 'position-toast toast-top-full-width'
 }
 
 function getToastrOptions(options: ToastrOptions) {
     options = extend(extend({}, defaultNotifyOptions), options);
-    positionToastContainer(true);
+    positionToastContainer(true, options);
     return options;
 }
 
@@ -30,23 +30,22 @@ export function notifyError(message: string, title?: string, options?: ToastrOpt
     toastr.error(message, title, getToastrOptions(options));
 }
 
-export function positionToastContainer(create: boolean) {
+export function positionToastContainer(create: boolean, options?: ToastrOptions) {
     if (typeof toastr === 'undefined') {
         return;
     }
 
-    var dialog = $(window.document.body).children('.ui-dialog:visible, .modal.in, .modal.show').last();
-    var container = toastr.getContainer(null, create);
-    if (container.length === 0) {
+    var container = toastr.getContainer(options, create);
+    if (!container.length || !container.hasClass('position-toast'))
         return;
-    }
+
+    var dialog = $(window.document.body).children('.ui-dialog:visible, .modal.in, .modal.show').last();
     if (dialog.length > 0) {
         var position = dialog.position();
-        container.addClass('positioned-toast toast-top-full-width');
+        container.addClass('positioned-toast');
         container.css({ position: 'absolute', top: position.top + 28 + 'px', left: position.left + 6 + 'px', width: dialog.width() - 12 + 'px' });
     }
     else {
-        container.addClass('toast-top-full-width');
         if (container.hasClass('positioned-toast')) {
             container.removeClass('positioned-toast');
             container.css({ position: '', top: '', left: '', width: '' });
