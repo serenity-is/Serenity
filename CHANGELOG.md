@@ -1,3 +1,9 @@
+## 5.0.40 (2021-05-10)
+
+Features:
+  - handle stylesheet issue when running slickgrid tests in jsdom environment
+  - implement similar logic to service lookup editor like lookup editor for client type base attribute type determination
+
 ## 5.0.39 (2021-04-30)
 
 Features:
