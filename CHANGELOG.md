@@ -1,3 +1,8 @@
+## 5.0.42 (2021-05-22)
+
+Features:
+  - better error handling for file uploads if server returns an error message or HTTP error
+
 ## 5.0.41 (2021-05-10)
 
 Features:
