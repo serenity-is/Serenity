@@ -1,9 +1,10 @@
-import { notifyError } from "../../Q";
+import { notifyError } from "../../Q/Notify";
 import { blockUI, blockUndo } from "../../Q/BlockUI";
 import { format, round } from "../../Q/Formatting";
 import { text } from "../../Q/LocalText";
 import { resolveUrl } from "../../Q/Services";
 import { endsWith, isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
+import { iframeDialog } from "../../Q/Dialogs";
 
 export namespace UploadHelper {
 
@@ -24,13 +25,49 @@ export namespace UploadHelper {
             pasteZone: options.zone,
             done: function (e: JQueryEventObject, data: any) {
                 var response = data.result;
-                if (!!response.Error) {
+                if (response.Error) {
                     notifyError(response.Error.Message);
-                } else {
-                    if (options.fileDone != null) {
-                        options.fileDone(response, data.files[0].name, data);
+                    return;
+                } 
+
+                if (options.fileDone != null) {
+                    options.fileDone(response, data.files[0].name, data);
+                }
+            },
+            fail: function(e: JQueryEventObject, opt: any) {
+                var xhr = opt?._response?.jqXHR;
+                if (!xhr) {
+                    notifyError('An error occured during file upload.');
+                    return;
+                }
+
+                if ((xhr.getResponseHeader('content-type') || '')
+                    .toLowerCase().indexOf('application/json') >= 0) {
+                    var json = $.parseJSON(xhr.responseText);
+                    if (json && json.Error && json.Error.Message) {
+                        notifyError(json.Error.Message);
+                        return;
                     }
                 }
+
+                var html = xhr.responseText;
+                if (html) {
+                    iframeDialog({ html: html });
+                    return;
+                }
+
+                if (!xhr.status) {
+                    if (xhr.statusText != "abort")
+                        notifyError("An unknown connection error occurred! Check browser console for details.");
+                    return;
+                }
+
+                if (xhr.status == 500) {
+                    notifyError("HTTP 500: Connection refused! Check browser console for details.");
+                    return;
+                }
+
+                notifyError("HTTP " + xhr.status + ' error! Check browser console for details.');
             },
             start: function () {
                 blockUI(null);
