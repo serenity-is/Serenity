@@ -8,18 +8,18 @@ namespace Serenity.Reflection
 {
     public static class CecilUtils
     {
-        public static bool IsOrSubClassOf(TypeDefinition childTypeDef, string ns, string name)
+        public static bool IsOrSubClassOf(TypeReference childTypeDef, string ns, string name)
         {
             return FindIsOrSubClassOf(childTypeDef, ns, name) != null;
         }
 
-        public static TypeDefinition FindIsOrSubClassOf(TypeDefinition typeDef, string ns, string name)
+        private static TypeReference FindIsOrSubClassOf(TypeReference typeRef, string ns, string name)
         {
-            if (typeDef.Namespace == ns &&
-                typeDef.Name == name)
-                return typeDef;
+            if (typeRef.Namespace == ns &&
+                typeRef.Name == name)
+                return typeRef;
 
-            return EnumerateBaseClasses(typeDef)
+            return EnumerateBaseClasses(typeRef)
                 .FirstOrDefault(b => b.Namespace == ns && b.Name == name);
         }
 
@@ -30,21 +30,21 @@ namespace Serenity.Reflection
             return type.MetadataType == MetadataType.Void;
         }
 
-        public static TypeDefinition FindIsOrSubClassOf(TypeDefinition typeDef, TypeDefinition[] baseClasses, string ns, string name)
+        public static TypeReference FindIsOrSubClassOf(TypeReference typeRef, TypeReference[] baseClasses, string ns, string name)
         {
-            if (typeDef.Namespace == ns &&
-                typeDef.Name == name)
-                return typeDef;
+            if (typeRef.Namespace == ns &&
+                typeRef.Name == name)
+                return typeRef;
 
             return baseClasses.FirstOrDefault(b => b.Namespace == ns && b.Name == name);
         }
 
-        public static bool Contains(TypeDefinition[] classes, string ns, string name)
+        public static bool Contains(TypeReference[] classes, string ns, string name)
         {
             return FindByName(classes, ns, name) != null;
         }
 
-        private static TypeDefinition FindByName(TypeDefinition[] classes, string ns, string name)
+        private static TypeReference FindByName(TypeReference[] classes, string ns, string name)
         {
             foreach (var x in classes)
                 if (x.Namespace == ns && x.Name == name)
@@ -59,13 +59,42 @@ namespace Serenity.Reflection
                 yield return td;
         }
 
-        public static IEnumerable<TypeDefinition> EnumerateBaseClasses(TypeDefinition klassType)
+
+        public static (string, string) GetCacheKey(TypeReference type)
         {
-            for (var td = klassType.BaseType; td != null; td = td.Resolve().BaseType)
-                yield return td.Resolve();
+            if (type.Scope is ModuleDefinition md)
+                return (type.FullName, md.Assembly.Name.FullName);
+            else if (type.Scope is AssemblyNameReference asm)
+                return (type.FullName, asm.FullName);
+            else
+                return (type.FullName, type.Scope.Name);
         }
 
-        public static bool IsSubclassOf(TypeDefinition type, string ns, string name)
+        private static Dictionary<(string, string), List<TypeReference>> BaseClassCache = new Dictionary<(string, string), List<TypeReference>>();
+
+        public static IEnumerable<TypeReference> EnumerateBaseClasses(TypeReference typeRef)
+        {
+            var key = GetCacheKey(typeRef);
+            if (BaseClassCache.TryGetValue(key, out var cached))
+                return cached;
+
+            var list = new List<TypeReference>();
+
+            if (!(typeRef is TypeDefinition typeDef))
+                typeDef = typeRef.Resolve();
+
+            var baseType = typeDef.BaseType;
+            if (baseType != null)
+            {
+                list.Add(typeDef.BaseType);
+                list.AddRange(EnumerateBaseClasses(typeDef.BaseType));
+            }
+
+            BaseClassCache[key] = list;
+            return list;
+        }
+
+        public static bool IsSubclassOf(TypeReference type, string ns, string name)
         {
             if (type.Namespace == ns &&
                 type.Name == name)
@@ -105,9 +134,13 @@ namespace Serenity.Reflection
                 return x;
             }).ToList();
 
-            var resolver = ICSharpCode.Decompiler.UniversalAssemblyResolver
-                .LoadMainModule(assemblyLocations.First(), inMemory: true).AssemblyResolver
-                    as ICSharpCode.Decompiler.UniversalAssemblyResolver;
+            var module = ICSharpCode.Decompiler.UniversalAssemblyResolver
+                .LoadMainModule(assemblyLocations.First(), inMemory: true);
+
+            if (assemblyLocations.Count() == 1)
+                return new[] { module.Assembly };
+
+            var resolver = module.AssemblyResolver as ICSharpCode.Decompiler.UniversalAssemblyResolver;
 
             foreach (var assembly in assemblyLocations)
                 resolver.AddSearchDirectory(Path.GetDirectoryName(assembly));
@@ -118,13 +151,14 @@ namespace Serenity.Reflection
                     assembly, new Mono.Cecil.ReaderParameters
                     {
                         AssemblyResolver = resolver,
-                        InMemory = true
+                        InMemory = true,
+                        MetadataResolver = module.MetadataResolver
                     }));
 
             return assemblyDefinitions.ToArray();
         }
 
-        public static CustomAttribute GetAttr(TypeDefinition klass, string ns, string name, TypeDefinition[] baseClasses = null)
+        public static CustomAttribute GetAttr(TypeDefinition klass, string ns, string name, TypeReference[] baseClasses = null)
         {
             CustomAttribute attr;
 
@@ -134,7 +168,8 @@ namespace Serenity.Reflection
 
             foreach (var b in baseClasses ?? EnumerateBaseClasses(klass))
             {
-                attr = FindAttr(b.CustomAttributes, ns, name);
+                var typeDef = (b as TypeDefinition) ?? b.Resolve();
+                attr = FindAttr(typeDef.CustomAttributes, ns, name);
                 if (attr != null)
                     return attr;
             }
@@ -149,7 +184,7 @@ namespace Serenity.Reflection
                 yield break;
 
             foreach (var x in attrList)
-                if (x.AttributeType != null && IsOrSubClassOf(x.AttributeType.Resolve(), ns, name))
+                if (x.AttributeType != null && IsOrSubClassOf(x.AttributeType, ns, name))
                     yield return x;
 
             if (baseClasses != null)
@@ -157,7 +192,7 @@ namespace Serenity.Reflection
                 foreach (var b in baseClasses)
                 {
                     foreach (var x in b.CustomAttributes)
-                        if (x.AttributeType != null && IsOrSubClassOf(x.AttributeType.Resolve(), ns, name))
+                        if (x.AttributeType != null && IsOrSubClassOf(x.AttributeType, ns, name))
                             yield return x;
                 }
             }
@@ -171,7 +206,7 @@ namespace Serenity.Reflection
                 return null;
 
             foreach (var x in attrList)
-                if (x.AttributeType != null && IsOrSubClassOf(x.AttributeType.Resolve(), ns, name))
+                if (x.AttributeType != null && IsOrSubClassOf(x.AttributeType, ns, name))
                     return x;
 
             return null;

@@ -27,9 +27,9 @@ namespace Serenity.CodeGeneration
                 {
                     var gp = rowType.GenericParameters.FirstOrDefault(x => 
                         x.HasConstraints &&
-                        x.Constraints.Any(c => CecilUtils.IsSubclassOf(c.ConstraintType.Resolve(), "Serenity.Data", "RowFieldsBase")));
+                        x.Constraints.Any(c => CecilUtils.IsSubclassOf(c.ConstraintType, "Serenity.Data", "RowFieldsBase")));
                     if (gp != null)
-                        fieldsType = gp.Constraints.First(c => CecilUtils.IsSubclassOf(c.ConstraintType.Resolve(), "Serenity.Data", "RowFieldsBase"))
+                        fieldsType = gp.Constraints.First(c => CecilUtils.IsSubclassOf(c.ConstraintType, "Serenity.Data", "RowFieldsBase"))
                             .ConstraintType.Resolve();
                 }
                 
@@ -86,7 +86,7 @@ namespace Serenity.CodeGeneration
                         .SelectMany(x => x.Body.Instructions.Where(z =>
                             z.OpCode == OpCodes.Ldfld &&
                             z.Operand is FieldReference &&
-                            CecilUtils.IsSubclassOf((z.Operand as FieldReference).DeclaringType.Resolve(), "Serenity.Data", "RowFieldsBase"))
+                            CecilUtils.IsSubclassOf((z.Operand as FieldReference).DeclaringType, "Serenity.Data", "RowFieldsBase"))
                             .Select(z => (z.Operand as FieldReference).Name))
                         .FirstOrDefault();
 

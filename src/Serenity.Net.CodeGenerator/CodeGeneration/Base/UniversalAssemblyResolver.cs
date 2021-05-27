@@ -49,11 +49,13 @@ namespace ICSharpCode.Decompiler
         readonly List<string> directories = new List<string>();
         HashSet<string> targetFrameworkSearchPaths;
         readonly List<string> gac_paths = GetGacPaths();
-        readonly Dictionary<AssemblyNameReference, AssemblyDefinition> cache = new Dictionary<AssemblyNameReference, AssemblyDefinition>();
+        readonly Dictionary<string, AssemblyDefinition> cache = new Dictionary<string, AssemblyDefinition>();
 
         public void AddSearchDirectory(string directory)
         {
             directories.Add(directory);
+            if (dotNetCorePathFinder != null)
+                dotNetCorePathFinder.AddSearchDirectory(directory);
         }
 
         public void RemoveSearchDirectory(string directory)
@@ -148,11 +150,15 @@ namespace ICSharpCode.Decompiler
 
         public AssemblyDefinition Resolve(AssemblyNameReference name)
         {
-            if (cache.TryGetValue(name, out var ad))
+            if (cache.TryGetValue(name.FullName, out var ad))
                 return ad;
 
-            var result = Resolve(name, new ReaderParameters());
-            cache[name] = result;
+            var result = Resolve(name, new ReaderParameters()
+            {
+                AssemblyResolver = this,
+                MetadataResolver = MetadataResolver
+            });
+            cache[name.FullName] = result;
             return result;
         }
 
@@ -627,6 +633,8 @@ namespace ICSharpCode.Decompiler
         {
         }
 
+        public IMetadataResolver MetadataResolver { get; set; }
+
         public static ModuleDefinition LoadMainModule(string mainAssemblyFileName, 
             bool throwOnError = true, bool inMemory = false)
         {
@@ -644,10 +652,53 @@ namespace ICSharpCode.Decompiler
             module = ModuleDefinition.ReadModule(mainAssemblyFileName, new ReaderParameters
             {
                 AssemblyResolver = resolver,
-                InMemory = inMemory
+                InMemory = inMemory,
+                MetadataResolver = new CachedMetadataResolver(resolver)
             });
 
+            resolver.MetadataResolver = module.MetadataResolver;
+
             return module;
+        }
+
+        public class CachedMetadataResolver : MetadataResolver
+        {
+            private Dictionary<(string, string), TypeDefinition> typeCache = new Dictionary<(string, string), TypeDefinition>();
+            private Dictionary<(string, string), MethodDefinition> methodCache = new Dictionary<(string, string), MethodDefinition>();
+
+            public CachedMetadataResolver(IAssemblyResolver assemblyResolver) 
+                : base(assemblyResolver)
+            {
+            }
+
+            public override MethodDefinition Resolve(MethodReference method)
+            {
+                var key = (method.FullName, method.Module.Assembly.FullName);
+                if (methodCache.TryGetValue(key, out var def))
+                    return def;
+                methodCache[key] = def = base.Resolve(method);
+                return def;
+            }
+
+            public override FieldDefinition Resolve(FieldReference field)
+            {
+                return base.Resolve(field);
+            }
+
+            public override TypeDefinition Resolve(TypeReference type)
+            {
+                (string, string) key;
+                if (type.Scope is ModuleDefinition md)
+                    key = (type.FullName, md.Assembly.Name.FullName);
+                else if (type.Scope is AssemblyNameReference asm)
+                    key = (type.FullName, asm.FullName);
+                else
+                    key = (type.FullName, type.Scope.Name);
+                if (typeCache.TryGetValue(key, out var def))
+                    return def;
+                typeCache[key] = def = base.Resolve(type);
+                return def;
+            }
         }
 
         #endregion

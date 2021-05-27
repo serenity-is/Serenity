@@ -289,7 +289,7 @@ namespace Serenity.CodeGeneration
         protected List<AnnotationTypeInfo> GetAnnotationTypesFor(TypeDefinition type)
         {
             var list = new List<AnnotationTypeInfo>();
-            TypeDefinition[] baseClasses = null;
+            TypeReference[] baseClasses = null;
             foreach (var annotationType in annotationTypes)
             {
                 var annotationMatch = false;
@@ -298,7 +298,7 @@ namespace Serenity.CodeGeneration
                 {
                     baseClasses = baseClasses ?? CecilUtils.EnumerateBaseClasses(type).ToArray();
 
-                    if (CecilUtils.IsOrSubClassOf(attr.AnnotatedType.Resolve(), "System", "Attribute"))
+                    if (CecilUtils.IsOrSubClassOf(attr.AnnotatedType, "System", "Attribute"))
                     {
                         if (CecilUtils.GetAttr(type, attr.AnnotatedType.Namespace, 
                             attr.AnnotatedType.Name, baseClasses) == null) 
@@ -625,8 +625,8 @@ namespace Serenity.CodeGeneration
                 responseType = (responseType as GenericInstanceType).GenericArguments[0];
                 return true;
             }
-            else if (CecilUtils.IsOrSubClassOf(responseType.Resolve(), "System.Web.Mvc", "ActionResult") ||
-                CecilUtils.IsOrSubClassOf(responseType.Resolve(), "Microsoft.AspNetCore.Mvc", "ActionResult"))
+            else if (CecilUtils.IsOrSubClassOf(responseType, "System.Web.Mvc", "ActionResult") ||
+                CecilUtils.IsOrSubClassOf(responseType, "Microsoft.AspNetCore.Mvc", "ActionResult"))
                 return false;
             else if (responseType == null || CecilUtils.IsVoid(responseType))
                 return false;

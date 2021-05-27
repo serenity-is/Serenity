@@ -81,17 +81,16 @@ namespace Serenity.CodeGenerator
                     "clienttypes".StartsWith(command, StringComparison.Ordinal) ||
                     "mvct".StartsWith(command, StringComparison.Ordinal))
                 {
-                    string tsTypesJson = null;
+                    List<ExternalType> tsTypes = null;
                     Func<List<ExternalType>> getTsTypes = () =>
                     {
-                        if (tsTypesJson == null)
+                        if (tsTypes == null)
                         {
                             var tsTypeLister = new TSTypeLister(projectDir);
-                            var tsTypes = tsTypeLister.List();
-                            tsTypesJson = JSON.Stringify(tsTypes);
+                            tsTypes = tsTypeLister.List();
                         }
 
-                        return JSON.Parse<List<ExternalType>>(tsTypesJson);
+                        return tsTypes;
                     };
 
                     bool transformAll = "transform".StartsWith(command, StringComparison.Ordinal);

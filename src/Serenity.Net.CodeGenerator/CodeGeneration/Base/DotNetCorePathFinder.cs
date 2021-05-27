@@ -52,12 +52,18 @@ namespace ICSharpCode.Decompiler
         readonly string basePath;
         readonly Version version;
         readonly string dotnetBasePath = FindDotNetExeDirectory();
+        readonly Dictionary<string, string> BasePathAssemblies = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        readonly List<string> searchPaths = new List<string>();
+        ILookup<string, string> packageLocationByName;
 
         public DotNetCorePathFinder(string parentAssemblyFileName, string targetFrameworkId, UniversalAssemblyResolver.TargetFrameworkIdentifier targetFramework, 
             Version version)
         {
             this.assemblyName = Path.GetFileNameWithoutExtension(parentAssemblyFileName);
             this.basePath = Path.GetDirectoryName(parentAssemblyFileName);
+
+            searchPaths.Add(basePath);
+
             this.version = version;
 
             if (targetFramework == UniversalAssemblyResolver.TargetFrameworkIdentifier.NETStandard)
@@ -114,21 +120,55 @@ namespace ICSharpCode.Decompiler
             }
         }
 
+        public void AddSearchDirectory(string path)
+        {
+            searchPaths.Add(path);
+            packageLocationByName = null;
+        }
+
+        public void RemoveSearchDirectory(string path)
+        {
+            searchPaths.Remove(path);
+            packageLocationByName = null;
+        }
+
+        private ILookup<string, string> PackageLocationByName
+        {
+            get
+            {
+                if (packageLocationByName != null)
+                    return packageLocationByName;
+
+                var runtimeDirs = new List<string>();
+                if (dotnetBasePath != null)
+                {
+                    var basePaths = RuntimePacks.Select(pack => Path.Combine(dotnetBasePath, "shared", pack));
+                    foreach (var basePath in basePaths)
+                    {
+                        if (!Directory.Exists(basePath))
+                            continue;
+
+                        var closestVersion = GetClosestVersionFolder(basePath, version);
+                        var path = Path.Combine(basePath, closestVersion);
+
+                        if (Directory.Exists(path))
+                            runtimeDirs.Add(path);
+                    }
+                }
+
+                packageLocationByName = packageBasePaths.Concat(searchPaths).Concat(runtimeDirs).SelectMany(x =>
+                    Directory.GetFiles(x, "*.dll")
+                        .Concat(Directory.GetFiles(x, "*.exe")))
+                    .ToLookup(x => Path.GetFileNameWithoutExtension(x), StringComparer.OrdinalIgnoreCase);
+
+                return packageLocationByName;
+            }
+        }
+
+
         public string TryResolveDotNetCore(AssemblyNameReference name)
         {
-            foreach (var basePath in packageBasePaths)
-            {
-                if (File.Exists(Path.Combine(basePath, name.Name + ".dll")))
-                {
-                    return Path.Combine(basePath, name.Name + ".dll");
-                }
-                else if (File.Exists(Path.Combine(basePath, name.Name + ".exe")))
-                {
-                    return Path.Combine(basePath, name.Name + ".exe");
-                }
-            }
-
-            return FallbackToDotNetSharedDirectory(name, version);
+            return PackageLocationByName[name.Name].FirstOrDefault();
         }
 
         internal string GetReferenceAssemblyPath(string targetFramework)
@@ -168,28 +208,6 @@ namespace ICSharpCode.Decompiler
 
                 yield return new DotNetCorePackageInfo(library.Name, type, path, runtimeInfo);
             }
-        }
-
-        string FallbackToDotNetSharedDirectory(AssemblyNameReference name, Version version)
-        {
-            if (dotnetBasePath == null) return null;
-            var basePaths = RuntimePacks.Select(pack => Path.Combine(dotnetBasePath, "shared", pack));
-            foreach (var basePath in basePaths)
-            {
-                if (!Directory.Exists(basePath))
-                    continue;
-
-                var closestVersion = GetClosestVersionFolder(basePath, version);
-                if (File.Exists(Path.Combine(basePath, closestVersion, name.Name + ".dll")))
-                {
-                    return Path.Combine(basePath, closestVersion, name.Name + ".dll");
-                }
-                else if (File.Exists(Path.Combine(basePath, closestVersion, name.Name + ".exe")))
-                {
-                    return Path.Combine(basePath, closestVersion, name.Name + ".exe");
-                }
-            }
-            return null;
         }
 
         static string GetClosestVersionFolder(string basePath, Version version)
