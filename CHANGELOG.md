@@ -1,3 +1,9 @@
+## 5.0.43 (2021-05-29)
+
+Features:
+  - updated jspdf to latest version
+  - speed up server typings command via caching and improving assembly resolving
+
 ## 5.0.42 (2021-05-22)
 
 Features:
