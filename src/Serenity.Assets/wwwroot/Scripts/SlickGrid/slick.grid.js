@@ -2542,10 +2542,11 @@ if (typeof Slick === "undefined") {
 
             var colspan, m;
             for (var i = 0, ii = columns.length; i < ii; i++) {
+                var columnData = null;
                 m = columns[i];
                 colspan = 1;
                 if (metadata && metadata.columns) {
-                    var columnData = metadata.columns[m.id] || metadata.columns[i];
+                    columnData = metadata.columns[m.id] || metadata.columns[i];
                     colspan = (columnData && columnData.colspan) || 1;
                     if (colspan === "*") {
                         colspan = ii - i;
@@ -2560,12 +2561,12 @@ if (typeof Slick === "undefined") {
                     }
 
                     if (hasFrozenColumns() && (i > options.frozenColumn)) {
-                        appendCellHtml(stringArrayR, row, i, colspan, d);
+                        appendCellHtml(stringArrayR, row, i, colspan, d, columnData);
                     } else {
-                        appendCellHtml(stringArrayL, row, i, colspan, d);
+                        appendCellHtml(stringArrayL, row, i, colspan, d, columnData);
                     }
                 } else if (hasFrozenColumns() && (i <= options.frozenColumn)) {
-                    appendCellHtml(stringArrayL, row, i, colspan, d);
+                    appendCellHtml(stringArrayL, row, i, colspan, d, columnData);
                 }
 
                 if (colspan > 1) {
@@ -2580,7 +2581,7 @@ if (typeof Slick === "undefined") {
             }
         }
 
-        function appendCellHtml(stringArray, row, cell, colspan, item) {
+        function appendCellHtml(stringArray, row, cell, colspan, item, metadata) {
             var m = columns[cell];
             var cellCss = "slick-cell l" + cell + " r" + Math.min(columns.length - 1, cell + colspan - 1) +
                 (m.cssClass ? " " + m.cssClass : "");
@@ -2590,6 +2591,10 @@ if (typeof Slick === "undefined") {
 
             if (row === activeRow && cell === activeCell)
                 cellCss += " active";
+
+            if (metadata && metadata.cssClasses) {
+                cellCss += " " + metadata.cssClasses;
+            }
 
             // TODO:  merge them together in the setter
             for (var key in cellCssClasses) {
@@ -3203,9 +3208,10 @@ if (typeof Slick === "undefined") {
                         continue;
                     }
 
+                    var columnData = null;
                     colspan = 1;
                     if (metadata) {
-                        var columnData = metadata[columns[i].id] || metadata[i];
+                        columnData = metadata[columns[i].id] || metadata[i];
                         colspan = (columnData && columnData.colspan) || 1;
                         if (colspan === "*") {
                             colspan = ii - i;
@@ -3213,7 +3219,7 @@ if (typeof Slick === "undefined") {
                     }
 
                     if (columnPosRight[Math.min(ii - 1, i + colspan - 1)] > range.leftPx) {
-                        appendCellHtml(stringArray, row, i, colspan, d);
+                        appendCellHtml(stringArray, row, i, colspan, d, columnData);
                         cellsAdded++;
                     }
 
