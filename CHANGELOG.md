@@ -1,3 +1,11 @@
+## 5.0.44 (2021-07-12)
+
+Features:
+  - allow getItemMetadata to return css class for slick cells
+  
+Bugfixes:
+  - Fix min value issue in decimal editor
+
 ## 5.0.43 (2021-05-29)
 
 Features:
