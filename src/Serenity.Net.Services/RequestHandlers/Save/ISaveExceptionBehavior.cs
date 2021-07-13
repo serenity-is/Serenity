@@ -11,7 +11,7 @@ namespace Serenity.Services
     {
         /// <summary>Called when an exception occurs during save</summary>
         /// <param name="handler">Calling save request handler</param>
-        /// <param name="exception">Exception occured</param>
+        /// <param name="exception">Exception occurred</param>
         void OnException(ISaveRequestHandler handler, Exception exception);
     }
 }

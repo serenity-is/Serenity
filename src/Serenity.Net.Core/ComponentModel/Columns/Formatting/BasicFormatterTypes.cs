@@ -27,7 +27,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the text corresponding to trueish value.
+        /// Gets or sets the text corresponding to truthy value.
         /// </summary>
         /// <value>
         /// The true text.

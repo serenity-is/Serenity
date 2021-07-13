@@ -37,7 +37,7 @@ export namespace UploadHelper {
             fail: function(e: JQueryEventObject, opt: any) {
                 var xhr = opt?._response?.jqXHR;
                 if (!xhr) {
-                    notifyError('An error occured during file upload.');
+                    notifyError('An error occurred during file upload.');
                     return;
                 }
 

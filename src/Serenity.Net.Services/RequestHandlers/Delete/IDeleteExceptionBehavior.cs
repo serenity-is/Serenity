@@ -11,7 +11,7 @@ namespace Serenity.Services
     {
         /// <summary>Called when an exception occurs during delete</summary>
         /// <param name="handler">Calling delete request handler</param>
-        /// <param name="exception">Exception occured</param>
+        /// <param name="exception">Exception occurred</param>
         void OnException(IDeleteRequestHandler handler, Exception exception);
     }
 }
