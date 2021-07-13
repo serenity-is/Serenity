@@ -66,6 +66,8 @@ namespace Serenity.CodeGenerator
                 CreateFile(Templates.Render("Dialog", model), moduleClass + "Dialog.ts");
                 CreateFile(Templates.Render("Grid", model), moduleClass + "Grid.ts");
                 CreateFile(Templates.Render("FormTyping", model), typingClass + "Form.ts", serverTypingsTT);
+                CreateFile(Templates.Render("ColumnsTyping", model), typingClass + "Columns.ts", serverTypingsTT);
+
                 GenerateNavigationLink();
                 GenerateStyle();
             }
