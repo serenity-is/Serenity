@@ -19,7 +19,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="criteria">The criteria.</param>
         /// <returns></returns>
-        /// <exception cref="Exception">Criteria type is unkown.</exception>
+        /// <exception cref="Exception">Criteria type is unknown.</exception>
         protected virtual BaseCriteria Visit(BaseCriteria criteria)
         {
             if (criteria is null)

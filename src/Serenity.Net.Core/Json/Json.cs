@@ -38,7 +38,7 @@ namespace Serenity
         /// Deserializes a JSON string to an object, using more tolerant settings.
         /// </summary>
         /// <typeparam name="T">Type to deserialize</typeparam>
-        /// <param name="input">JSON strng</param>
+        /// <param name="input">JSON string</param>
         /// <param name="includeNulls">If true, if a value is null and target property is not nullable, raises error.</param>
         /// <returns>Deserialized object</returns>
         public static T ParseTolerant<T>(string input, bool includeNulls = false)

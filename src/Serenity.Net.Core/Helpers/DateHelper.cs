@@ -98,7 +98,7 @@ namespace Serenity
         }
 
         /// <summary>
-        ///   Gets defalt date format for specified order.</summary>
+        ///   Gets default date format for specified order.</summary>
         /// <param name="order">
         ///   Order</param>
         /// <returns>
@@ -109,7 +109,7 @@ namespace Serenity
         }
 
         /// <summary>
-        ///   Gets defalt date time format for specified order.</summary>
+        ///   Gets default date time format for specified order.</summary>
         /// <param name="order">
         ///   Order</param>
         /// <returns>

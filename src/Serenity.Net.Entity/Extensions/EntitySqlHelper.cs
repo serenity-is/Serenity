@@ -262,7 +262,7 @@ namespace Serenity.Data
         /// <param name="query">The query.</param>
         /// <param name="reader">The reader.</param>
         /// <param name="into">The into rows list.</param>
-        /// <exception cref="InvalidOperationException">An exception occured during conversion</exception>
+        /// <exception cref="InvalidOperationException">An exception occurred during conversion</exception>
         public static void GetFromReader(this SqlQuery query, IDataReader reader, IList<object> into)
         {
             var ext = (ISqlQueryExtensible)query;
