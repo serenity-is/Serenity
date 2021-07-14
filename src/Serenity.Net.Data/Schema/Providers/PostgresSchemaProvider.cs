@@ -103,16 +103,17 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
         {
+            var hasSchema = string.IsNullOrEmpty(schema) == true;
             return connection.Query<string>(
-                "SELECT pg_attribute.attname " +
-                "FROM pg_index, pg_class, pg_attribute, pg_namespace " +
-                "WHERE pg_class.oid = '\"" + table + "\"'::regclass " +
-                "AND indrelid = pg_class.oid " +
-                "AND nspname = '" + schema + "' " +
-                "AND pg_class.relnamespace = pg_namespace.oid " +
-                "AND pg_attribute.attrelid = pg_class.oid " +
-                "AND pg_attribute.attnum = any(pg_index.indkey) " +
-                "AND indisprimary");
+                $@"SELECT pg_attribute.attname 
+                FROM pg_index, pg_class, pg_attribute, pg_namespace 
+                WHERE pg_class.oid = '{(hasSchema ? table : $"{schema}.\"{table}\"")}'::regclass 
+                AND indrelid = pg_class.oid 
+                {(hasSchema ? $"AND nspname = '{schema}'" : "")}
+                AND pg_class.relnamespace = pg_namespace.oid
+                AND pg_attribute.attrelid = pg_class.oid
+                AND pg_attribute.attnum = any(pg_index.indkey)
+                AND indisprimary");
         }
 
         /// <summary>
