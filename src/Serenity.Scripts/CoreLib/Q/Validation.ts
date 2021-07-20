@@ -145,12 +145,16 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
             if ((element as any).type === "radio") {
                 this.findByName((element as any).name).addClass(errorClass).removeClass(validClass);
             } else {
-                element.classList.add(errorClass);
-                element.classList.remove(validClass);
+                if (errorClass != null && errorClass.length)
+                    element.classList.add(errorClass);
+                if (validClass != null && validClass.length)
+                    element.classList.remove(validClass);
                 var hl = getHighlightTarget(element);
                 if (hl && hl.classList) {
-                    hl.classList.add(errorClass);
-                    hl.classList.remove(validClass);
+                    if (errorClass != null && errorClass.length)
+                        hl.classList.add(errorClass);
+                    if (validClass != null && validClass.length)
+                        hl.classList.remove(validClass);
                 }
             }
         },
@@ -158,12 +162,16 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
             if ((element as any).type === "radio") {
                 this.findByName((element as any).name).removeClass(errorClass).addClass(validClass);
             } else {
-                element.classList.remove(errorClass);
-                element.classList.add(validClass);
+                if (errorClass != null && errorClass.length)
+                    element.classList.remove(errorClass);
+                if (validClass != null && validClass.length)
+                    element.classList.add(validClass);
                 var hl = getHighlightTarget(element);
                 if (hl && hl.classList) {
-                    hl.classList.remove(errorClass);
-                    hl.classList.add(validClass);
+                    if (errorClass != null && errorClass.length)
+                        hl.classList.remove(errorClass);
+                    if (validClass != null && validClass.length)
+                        hl.classList.add(validClass);
                 }
             }
         },
