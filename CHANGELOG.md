@@ -1,3 +1,14 @@
+## 5.0.45 (2021-07-20)
+
+Features:
+  - sergen generates and uses columnKey on first code generation
+  
+Bugfixes:
+  - fix typos in api docs 
+  - fix FieldReadPermission ApplyToLookups option used incorrectly
+  - postgres issue with code generation when a schema other than public is used
+  - jquery validate options classList add/remove raises errors if the class is an empty string
+
 ## 5.0.44 (2021-07-12)
 
 Features:
