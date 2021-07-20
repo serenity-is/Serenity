@@ -257,7 +257,7 @@ namespace Serenity.Data
                 var rowCustomAttributes = rowType.GetCustomAttributes().ToList();
 
                 var fieldsReadPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
-                if (fieldsReadPerm != null && fieldsReadPerm.ApplyToLookups)
+                if (fieldsReadPerm != null && !fieldsReadPerm.ApplyToLookups)
                     fieldsReadPerm = null; // ignore as need to specially handle in initialize
 
                 PermissionAttributeBase fieldsModifyPerm = rowType.GetCustomAttribute<FieldModifyPermissionAttribute>();
