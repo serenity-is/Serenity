@@ -1,0 +1,6 @@
+﻿
+namespace {{RootNamespace}}{{DotModule}} {
+    export class {{ClassName}}Columns extends Serenity.PrefixedContext {
+        static columnsKey = '{{ModuleDot}}{{ClassName}}';
+    }
+}
