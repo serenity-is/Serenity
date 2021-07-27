@@ -595,7 +595,9 @@ namespace Serenity.CodeGeneration
             if (method.IsSpecialName && (method.Name.StartsWith("set_", StringComparison.Ordinal) || method.Name.StartsWith("get_", StringComparison.Ordinal)))
                 return false;
 
-            var parameters = method.Parameters.Where(x => !x.ParameterType.Resolve().IsInterface).ToArray();
+            var parameters = method.Parameters.Where(x => !x.ParameterType.Resolve().IsInterface &&
+                CecilUtils.FindAttr(x.CustomAttributes, "Microsoft.AspNetCore.Mvc", "FromServicesAttribute") == null).ToArray();
+
             if (parameters.Length > 1)
                 return false;
 
