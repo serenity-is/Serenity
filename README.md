@@ -62,6 +62,9 @@ Paid support options are available from the author and a team of Serenity profes
 
 ## Video Tutorials (thanks a lot to for these contributions)
 
+**Introduction to the Serenity Application Framework:**
+https://www.youtube.com/watch?v=fe3oIHWJWkk
+
 **Starting Point Videos (by @sayuga):**
 
 https://www.youtube.com/channel/UCHGyxXj-vI32YaRs0v3HvKw (misses captions at the moment)
