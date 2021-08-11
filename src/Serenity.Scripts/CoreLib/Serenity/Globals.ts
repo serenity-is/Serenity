@@ -71,6 +71,8 @@
         Code?: string;
         Arguments?: string;
         Message?: string;
+        Details?: string;
+        ErrorId?: string;
     }               
           
     export interface ServiceResponse {

@@ -53,6 +53,11 @@ namespace Serenity.Services
                     error.Details = exception?.ToString();
             }
 
+            if (exception != null &&
+                exception.Data != null &&
+                exception.Data.Contains(nameof(error.ErrorId)))
+                error.ErrorId = exception.Data[nameof(error.ErrorId)]?.ToString();
+
             response.Error = error;
             return response;
         }
