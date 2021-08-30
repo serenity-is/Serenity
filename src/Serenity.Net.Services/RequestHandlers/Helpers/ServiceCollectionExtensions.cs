@@ -71,7 +71,7 @@ namespace Serenity.Extensions.DependencyInjection
 
                 foreach (var intf in type.GetInterfaces())
                 {
-                    if (!typeof(IRequestHandler).IsAssignableFrom(type))
+                    if (!typeof(IRequestHandler).IsAssignableFrom(intf))
                         continue;
 
                     if (intf == typeof(IRequestHandler) ||
@@ -88,8 +88,7 @@ namespace Serenity.Extensions.DependencyInjection
                     if (intf.IsGenericType)
                     {
                         var genericBase = intf.GetGenericTypeDefinition();
-                        if (genericBase != null &&
-                            genericBase == typeof(IRequestHandler<,,>) ||
+                        if (genericBase == typeof(IRequestHandler<,,>) ||
                             genericBase == typeof(IRequestHandler<>) ||
                             genericBase == typeof(IRequestType<>) ||
                             genericBase == typeof(IResponseType<>))
@@ -122,15 +121,15 @@ namespace Serenity.Extensions.DependencyInjection
                             throw new InvalidProgramException($"There are multiple {pair.Key} request handler types ({string.Join(", ", pair.Value)}). " +
                                 "Please add [DefaultHandler] to one of them!");
 
-                        throw new InvalidProgramException($"There are multiple {pair.Key} request handler types with [DefaultHandler] attribute ({string.Join(", ", pair.Value)}). " +
+                        throw new InvalidProgramException($"There are multiple {pair.Key} request handler types with [DefaultHandler] attribute ({string.Join(", ", (IEnumerable<Type>)defaults)}). " +
                             "Please use [DefaultHandler] on only one of them!");
                     }
 
-                    collection.TryAddSingleton(pair.Key, defaults[0]);
+                    collection.AddTransient(pair.Key, defaults[0]);
                     continue;
                 }
 
-                collection.TryAddSingleton(pair.Key, pair.Value[0]);
+                collection.AddTransient(pair.Key, pair.Value[0]);
             }
 
             return collection;
