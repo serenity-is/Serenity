@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace Serenity.Services
 {
     public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDeleteRequestProcessor,
-        IRequestHandler<TRow, TDeleteRequest, TDeleteResponse>
+        IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>
         where TRow : class, IRow, IIdRow, new()
         where TDeleteRequest : DeleteRequest
         where TDeleteResponse : DeleteResponse, new()
@@ -248,6 +248,11 @@ namespace Serenity.Services
         DeleteResponse IDeleteRequestProcessor.Process(IUnitOfWork uow, DeleteRequest request)
         {
             return Process(uow, (TDeleteRequest)request);
+        }
+
+        public TDeleteResponse Delete(IUnitOfWork uow, TDeleteRequest request)
+        {
+            return Process(uow, request);
         }
 
         public ITwoLevelCache Cache => Context.Cache;

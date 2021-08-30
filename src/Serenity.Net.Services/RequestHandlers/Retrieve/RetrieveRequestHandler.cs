@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace Serenity.Services
 {
     public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestProcessor,
-        IRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse>
+        IRetrieveHandler<TRow, TRetrieveRequest, TRetrieveResponse>
         where TRow : class, IRow, new()
         where TRetrieveRequest : RetrieveRequest
         where TRetrieveResponse : RetrieveResponse<TRow>, new()
@@ -241,6 +241,11 @@ namespace Serenity.Services
         IRetrieveResponse IRetrieveRequestProcessor.Process(IDbConnection connection, RetrieveRequest request)
         {
             return Process(connection, (TRetrieveRequest)request);
+        }
+
+        public TRetrieveResponse Retrieve(IDbConnection connection, TRetrieveRequest request)
+        {
+            return Process(connection, request);
         }
 
         public IDictionary<string, object> StateBag { get; private set; }

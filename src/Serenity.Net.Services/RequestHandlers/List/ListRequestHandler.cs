@@ -14,7 +14,7 @@ using System.Security.Claims;
 namespace Serenity.Services
 {
     public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestProcessor,
-        IRequestHandler<TRow>, IRequestType<TListRequest>, IResponseType<TListResponse>
+        IListHandler<TRow, TListRequest, TListResponse>
         where TRow : class, IRow, new()
         where TListRequest : ListRequest
         where TListResponse : ListResponse<TRow>, new()
@@ -623,5 +623,10 @@ namespace Serenity.Services
         IListResponse IListRequestHandler.Response => Response;
         bool IListRequestHandler.AllowSelectField(Field field) { return AllowSelectField(field); }
         bool IListRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
+
+        public TListResponse List(IDbConnection connection, TListRequest request)
+        {
+            return Process(connection, request);
+        }
     }
 }

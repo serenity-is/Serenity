@@ -11,7 +11,8 @@ using System.Security.Claims;
 namespace Serenity.Services
 {
     public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveRequestProcessor,
-        IRequestHandler<TRow, TSaveRequest, TSaveResponse>
+        ICreateHandler<TRow, TSaveRequest, TSaveResponse>,
+        IUpdateHandler<TRow, TSaveRequest, TSaveResponse>
         where TRow : class, IRow, IIdRow, new()
         where TSaveResponse : SaveResponse, new()
         where TSaveRequest : SaveRequest<TRow>, new()
@@ -491,6 +492,16 @@ namespace Serenity.Services
         SaveResponse ISaveRequestProcessor.Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type)
         {
             return Process(uow, (TSaveRequest)request, type);
+        }
+
+        public TSaveResponse Create(IUnitOfWork uow, TSaveRequest request)
+        {
+            return Process(uow, request, SaveRequestType.Create);
+        }
+
+        public TSaveResponse Update(IUnitOfWork uow, TSaveRequest request)
+        {
+            return Process(uow, request, SaveRequestType.Update);
         }
 
         public ITwoLevelCache Cache => Context.Cache;
