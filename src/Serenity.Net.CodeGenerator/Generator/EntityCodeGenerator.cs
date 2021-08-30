@@ -13,6 +13,7 @@ namespace Serenity.CodeGenerator
         private string rootDir;
         private Encoding utf8 = new UTF8Encoding(true);
         private string csproj;
+        private string modulePath;
         private string moduleClass;
         private string typingClass;
         private string serverTypingsTT;
@@ -35,7 +36,7 @@ namespace Serenity.CodeGenerator
 
             typingClass = Path.Combine(serverTypings, model.ModuleDot + model.ClassName);
 
-            var modulePath = Path.Combine(rootDir, "Modules"); 
+            modulePath = Path.Combine(rootDir, "Modules"); 
             if (!string.IsNullOrEmpty(model.Module))
                 modulePath = Path.Combine(modulePath, model.Module);
 
@@ -52,7 +53,7 @@ namespace Serenity.CodeGenerator
 
             if (config.GenerateService)
             {
-                var handlerClass = Path.Combine(rootDir, "Modules", 
+                var handlerClass = Path.Combine(modulePath, 
                     Path.Combine(model.ClassName, "RequestHandlers", model.ClassName));
                 CreateFile(Templates.Render("DeleteHandler", model), handlerClass + "DeleteHandler.cs");
                 CreateFile(Templates.Render("ListHandler", model), handlerClass + "ListHandler.cs");
