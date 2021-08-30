@@ -26,14 +26,6 @@ namespace Serenity.Services
         }
     }
 
-    internal class RetrieveHandlerProxy<TRow, TRetrieveRequest>
-        : RetrieveHandlerProxy<TRow, TRetrieveRequest, RetrieveResponse<TRow>>, IRetrieveHandler<TRow, TRetrieveRequest>
-        where TRow : class, IRow, IIdRow, new()
-        where TRetrieveRequest : RetrieveRequest
-    {
-        public RetrieveHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
-    }
-
     internal class RetrieveHandlerProxy<TRow>
         : RetrieveHandlerProxy<TRow, RetrieveRequest, RetrieveResponse<TRow>>, IRetrieveHandler<TRow>
         where TRow : class, IRow, IIdRow, new()

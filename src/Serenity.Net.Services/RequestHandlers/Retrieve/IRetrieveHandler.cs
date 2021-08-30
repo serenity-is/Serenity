@@ -12,13 +12,6 @@ namespace Serenity.Services
         TRetrieveResponse Retrieve(IDbConnection connection, TRetrieveRequest request);
     }
 
-    public interface IRetrieveHandler<TRow, TRetrieveRequest>
-        : IRetrieveHandler<TRow, TRetrieveRequest, RetrieveResponse<TRow>>
-        where TRow : class, IRow, new()
-        where TRetrieveRequest : RetrieveRequest
-    {
-    }
-
     public interface IRetrieveHandler<TRow>
         : IRetrieveHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>
         where TRow : class, IRow, new()

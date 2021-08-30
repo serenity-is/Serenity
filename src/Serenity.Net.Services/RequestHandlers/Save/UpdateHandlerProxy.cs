@@ -25,14 +25,6 @@ namespace Serenity.Services
         }
     }
 
-    internal class UpdateHandlerProxy<TRow, TSaveRequest>
-        : UpdateHandlerProxy<TRow, TSaveRequest, SaveResponse>, IUpdateHandler<TRow, TSaveRequest>
-        where TRow : class, IRow, IIdRow, new()
-        where TSaveRequest : SaveRequest<TRow>, new()
-    {
-        public UpdateHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
-    }
-
     internal class UpdateHandlerProxy<TRow>
         : UpdateHandlerProxy<TRow, SaveRequest<TRow>, SaveResponse>, IUpdateHandler<TRow>
         where TRow : class, IRow, IIdRow, new()

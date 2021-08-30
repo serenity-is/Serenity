@@ -2,7 +2,8 @@
 
 namespace Serenity.Services
 {
-    public class RetrieveRequestHandler<TRow> : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>
+    public class RetrieveRequestHandler<TRow> : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>,
+        IRetrieveHandler<TRow>
         where TRow : class, IRow, new()
     {
         public RetrieveRequestHandler(IRequestContext context)

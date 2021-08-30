@@ -11,8 +11,7 @@ using System.Security.Claims;
 namespace Serenity.Services
 {
     public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveRequestProcessor,
-        ICreateHandler<TRow, TSaveRequest, TSaveResponse>,
-        IUpdateHandler<TRow, TSaveRequest, TSaveResponse>
+        ISaveHandler<TRow, TSaveRequest, TSaveResponse>
         where TRow : class, IRow, IIdRow, new()
         where TSaveResponse : SaveResponse, new()
         where TSaveRequest : SaveRequest<TRow>, new()

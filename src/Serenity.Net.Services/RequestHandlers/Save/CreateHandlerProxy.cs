@@ -25,14 +25,6 @@ namespace Serenity.Services
         }
     }
 
-    internal class CreateHandlerProxy<TRow, TSaveRequest>
-        : CreateHandlerProxy<TRow, TSaveRequest, SaveResponse>, ICreateHandler<TRow, TSaveRequest>
-        where TRow : class, IRow, IIdRow, new()
-        where TSaveRequest : SaveRequest<TRow>, new()
-    {
-        public CreateHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
-    }
-
     internal class CreateHandlerProxy<TRow>
         : CreateHandlerProxy<TRow, SaveRequest<TRow>, SaveResponse>, ICreateHandler<TRow>
         where TRow : class, IRow, IIdRow, new()

@@ -11,13 +11,6 @@ namespace Serenity.Services
         TDeleteResponse Delete(IUnitOfWork uow, TDeleteRequest request);
     }
 
-    public interface IDeleteHandler<TRow, TDeleteRequest>
-        : IDeleteHandler<TRow, TDeleteRequest, DeleteResponse>
-        where TRow : class, IRow, new()
-        where TDeleteRequest : DeleteRequest
-    {
-    }
-
     public interface IDeleteHandler<TRow>
         : IDeleteHandler<TRow, DeleteRequest, DeleteResponse>
         where TRow : class, IRow, new()

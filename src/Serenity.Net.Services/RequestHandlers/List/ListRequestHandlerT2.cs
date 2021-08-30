@@ -2,7 +2,8 @@
 
 namespace Serenity.Services
 {
-    public class ListRequestHandler<TRow, TListRequest> : ListRequestHandler<TRow, TListRequest, ListResponse<TRow>>
+    public class ListRequestHandler<TRow, TListRequest> : ListRequestHandler<TRow, TListRequest, ListResponse<TRow>>,
+        IListHandler<TRow, TListRequest>
         where TRow : class, IRow, new()
         where TListRequest : ListRequest
     {

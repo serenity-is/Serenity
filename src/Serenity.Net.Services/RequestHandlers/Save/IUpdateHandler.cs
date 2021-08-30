@@ -11,13 +11,6 @@ namespace Serenity.Services
         TSaveResponse Update(IUnitOfWork uow, TSaveRequest request);
     }
 
-    public interface IUpdateHandler<TRow, TSaveRequest>
-        : IUpdateHandler<TRow, TSaveRequest, SaveResponse>
-        where TRow : class, IRow, IIdRow, new()
-        where TSaveRequest : SaveRequest<TRow>, new()
-    {
-    }
-
     public interface IUpdateHandler<TRow>
         : IUpdateHandler<TRow, SaveRequest<TRow>, SaveResponse>
         where TRow : class, IRow, IIdRow, new()

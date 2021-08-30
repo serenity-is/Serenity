@@ -31,19 +31,15 @@ namespace Serenity.Extensions.DependencyInjection
         public static IServiceCollection AddProxyRequestHandlers(this IServiceCollection collection)
         {
             collection.TryAddTransient(typeof(ICreateHandler<,,>), typeof(CreateHandlerProxy<,,>));
-            collection.TryAddTransient(typeof(ICreateHandler<,>), typeof(CreateHandlerProxy<,>));
             collection.TryAddTransient(typeof(ICreateHandler<>), typeof(CreateHandlerProxy<>));
             collection.TryAddTransient(typeof(IUpdateHandler<,,>), typeof(UpdateHandlerProxy<,,>));
-            collection.TryAddTransient(typeof(IUpdateHandler<,>), typeof(UpdateHandlerProxy<,>));
             collection.TryAddTransient(typeof(IUpdateHandler<>), typeof(UpdateHandlerProxy<>));
             collection.TryAddTransient(typeof(IDeleteHandler<,,>), typeof(DeleteHandlerProxy<,,>));
-            collection.TryAddTransient(typeof(IDeleteHandler<,>), typeof(DeleteHandlerProxy<,>));
             collection.TryAddTransient(typeof(IDeleteHandler<>), typeof(DeleteHandlerProxy<>));
             collection.TryAddTransient(typeof(IListHandler<,,>), typeof(ListHandlerProxy<,,>));
             collection.TryAddTransient(typeof(IListHandler<,>), typeof(ListHandlerProxy<,>));
             collection.TryAddTransient(typeof(IListHandler<>), typeof(ListHandlerProxy<>));
             collection.TryAddTransient(typeof(IRetrieveHandler<,,>), typeof(RetrieveHandlerProxy<,,>));
-            collection.TryAddTransient(typeof(IRetrieveHandler<,>), typeof(RetrieveHandlerProxy<,>));
             collection.TryAddTransient(typeof(IRetrieveHandler<>), typeof(RetrieveHandlerProxy<>));
 
             return collection;

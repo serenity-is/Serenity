@@ -25,14 +25,6 @@ namespace Serenity.Services
         }
     }
 
-    internal class DeleteHandlerProxy<TRow, TDeleteRequest>
-        : DeleteHandlerProxy<TRow, TDeleteRequest, DeleteResponse>, IDeleteHandler<TRow, TDeleteRequest>
-        where TRow : class, IRow, IIdRow, new()
-        where TDeleteRequest : DeleteRequest
-    {
-        public DeleteHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
-    }
-
     internal class DeleteHandlerProxy<TRow>
         : DeleteHandlerProxy<TRow, DeleteRequest, DeleteResponse>, IDeleteHandler<TRow>
         where TRow : class, IRow, IIdRow, new()
