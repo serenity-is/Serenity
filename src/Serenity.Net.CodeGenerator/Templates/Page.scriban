@@ -6,7 +6,7 @@ using System.Web.Mvc;{{end}}
 namespace {{RootNamespace}}{{DotModule}}.Pages
 {
 {{if !AspNetCore}}    [RoutePrefix("{{ModuleSlash}}{{ClassName}}"), Route("{action=index}")]{{end}}
-    [PageAuthorize(typeof(Entities.{{RowClassName}}))]
+    [PageAuthorize(typeof({{RowClassName}}))]
     public class {{ClassName}}Controller : Controller
     {%{{}%}{{if AspNetCore}}
         [Route("{{ModuleSlash}}{{ClassName}}")]{{end}}

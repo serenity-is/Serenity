@@ -9,7 +9,7 @@ using System.IO;
 namespace {{RootNamespace}}{{DotModule}}.Forms
 {
     [FormScript("{{ModuleDot}}{{ClassName}}")]
-    [BasedOnRow(typeof(Entities.{{RowClassName}}), CheckNames = true)]
+    [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]
     public class {{ClassName}}Form
     {%{{}%}{{for x in Fields}}{{if x.Ident != IdField}}
         public {{x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}

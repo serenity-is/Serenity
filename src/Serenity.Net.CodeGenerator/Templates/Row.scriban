@@ -6,7 +6,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 
-namespace {{RootNamespace}}{{DotModule}}.Entities
+namespace {{RootNamespace}}{{DotModule}}
 {
     [ConnectionKey("{{ConnectionKey}}"){{if Module}}, Module("{{Module}}"){{end}}, TableName("{{SchemaAndTable}}")]
     [DisplayName("{{Title}}"), InstanceName("{{Title}}")]

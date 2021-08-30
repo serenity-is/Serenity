@@ -3,7 +3,7 @@ using Serenity.Data;
 using Serenity.Services;
 using System;
 using System.Data;
-using MyRow = {{RootNamespace}}{{DotModule}}.Entities.{{RowClassName}};
+using MyRow = {{RootNamespace}}{{DotModule}}.{{RowClassName}};
 
 namespace {{RootNamespace}}{{DotModule}}.Repositories
 {

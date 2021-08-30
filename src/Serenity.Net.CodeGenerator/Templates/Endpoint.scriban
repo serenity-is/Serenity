@@ -5,7 +5,7 @@ using System.Data;{{if AspNetCore}}
 using Microsoft.AspNetCore.Mvc;{{else}}
 using System.Web.Mvc;{{end}}
 using MyRepository = {{RootNamespace}}{{DotModule}}.Repositories.{{ClassName}}Repository;
-using MyRow = {{RootNamespace}}{{DotModule}}.Entities.{{RowClassName}};
+using MyRow = {{RootNamespace}}{{DotModule}}.{{RowClassName}};
 
 namespace {{RootNamespace}}{{DotModule}}.Endpoints
 {
