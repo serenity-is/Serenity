@@ -52,7 +52,13 @@ namespace Serenity.CodeGenerator
 
             if (config.GenerateService)
             {
-                CreateFile(Templates.Render("Repository", model), moduleClass + "Repository.cs");
+                var handlerClass = Path.Combine(rootDir, "Modules", 
+                    Path.Combine(model.ClassName, "RequestHandlers", model.ClassName));
+                CreateFile(Templates.Render("DeleteHandler", model), handlerClass + "DeleteHandler.cs");
+                CreateFile(Templates.Render("ListHandler", model), handlerClass + "ListHandler.cs");
+                CreateFile(Templates.Render("RetrieveHandler", model), handlerClass + "RetrieveHandler.cs");
+                CreateFile(Templates.Render("SaveHandler", model), handlerClass + "SaveHandler.cs");
+             
                 CreateFile(Templates.Render("Endpoint", model), moduleClass + "Endpoint.cs");
                 CreateFile(Templates.Render("ServiceTyping", model), typingClass + "Service.ts", serverTypingsTT);
             }

@@ -1,0 +1,21 @@
+﻿using Serenity;
+using Serenity.Data;
+using Serenity.Services;
+using System;
+using System.Data;
+using MyRequest = Serenity.Services.DeleteRequest;
+using MyResponse = Serenity.Services.DeleteResponse;
+using MyRow = {{RootNamespace}}{{DotModule}}.{{RowClassName}};
+
+namespace {{RootNamespace}}{{DotModule}}
+{
+    public interface I{{ClassName}}DeleteHandler : IDeleteHandler<MyRow, MyRequest, MyResponse> {}
+
+    public class {{ClassName}}DeleteHandler : DeleteRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}DeleteHandler
+    {
+        public {{ClassName}}DeleteHandler(IRequestContext context)
+             : base(context)
+        {
+        }
+    }
+}

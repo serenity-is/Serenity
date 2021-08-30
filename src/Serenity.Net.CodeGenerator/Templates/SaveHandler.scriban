@@ -1,0 +1,21 @@
+﻿using Serenity;
+using Serenity.Data;
+using Serenity.Services;
+using System;
+using System.Data;
+using MyRequest = Serenity.Services.SaveRequest<{{RootNamespace}}{{DotModule}}.{{RowClassName}}>;
+using MyResponse = Serenity.Services.SaveResponse;
+using MyRow = {{RootNamespace}}{{DotModule}}.{{RowClassName}};
+
+namespace {{RootNamespace}}{{DotModule}}
+{
+    public interface I{{ClassName}}SaveHandler : ISaveHandler<MyRow, MyRequest, MyResponse> {}
+
+    public class {{ClassName}}SaveHandler : SaveRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}SaveHandler
+    {
+        public {{ClassName}}SaveHandler(IRequestContext context)
+             : base(context)
+        {
+        }
+    }
+}

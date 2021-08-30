@@ -1,47 +1,63 @@
-﻿using Serenity;
+﻿using Microsoft.AspNetCore.Mvc;
+using Serenity;
 using Serenity.Data;
+using Serenity.Reporting;
 using Serenity.Services;
-using System.Data;{{if AspNetCore}}
-using Microsoft.AspNetCore.Mvc;{{else}}
-using System.Web.Mvc;{{end}}
-using MyRepository = {{RootNamespace}}{{DotModule}}.Repositories.{{ClassName}}Repository;
+using Serenity.Web;
+using System;
+using System.Data;
+using System.Globalization;
 using MyRow = {{RootNamespace}}{{DotModule}}.{{RowClassName}};
 
 namespace {{RootNamespace}}{{DotModule}}.Endpoints
 {
-{{if AspNetCore}}    [Route("Services/{{ModuleSlash}}{{ClassName}}/[action]")]{{else}}
-    [RoutePrefix("Services/{{ModuleSlash}}{{ClassName}}"), Route("{action}")]{{end}}
+    [Route("Services/{{ModuleSlash}}{{ClassName}}/[action]")]
     [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
     public class {{ClassName}}Controller : ServiceEndpoint
     {
         [HttpPost, AuthorizeCreate(typeof(MyRow))]
-        public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
+        public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request,
+            [FromServices] I{{ClassName}}SaveHandler handler)
         {
-            return new MyRepository({{if NET5Plus}}Context{{end}}).Create(uow, request);
+            return handler.Create(uow, request);
         }
 
         [HttpPost, AuthorizeUpdate(typeof(MyRow))]
-        public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
+        public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request,
+            [FromServices] I{{ClassName}}SaveHandler handler)
         {
-            return new MyRepository({{if NET5Plus}}Context{{end}}).Update(uow, request);
+            return handler.Update(uow, request);
         }
  
         [HttpPost, AuthorizeDelete(typeof(MyRow))]
-        public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
+        public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request,
+            [FromServices] I{{ClassName}}DeleteHandler handler)
         {
-            return new MyRepository({{if NET5Plus}}Context{{end}}).Delete(uow, request);
+            return handler.Delete(uow, request);
         }
 
         [HttpPost]
-        public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
+        public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request,
+            [FromServices] I{{ClassName}}RetrieveHandler handler)
         {
-            return new MyRepository({{if NET5Plus}}Context{{end}}).Retrieve(connection, request);
+            return handler.Retrieve(connection, request);
         }
 
         [HttpPost]
-        public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
+        public ListResponse<MyRow> List(IDbConnection connection, ListRequest request,
+            [FromServices] I{{ClassName}}ListHandler handler)
         {
-            return new MyRepository({{if NET5Plus}}Context{{end}}).List(connection, request);
+            return handler.List(connection, request);
+        }
+
+        public FileContentResult ListExcel(IDbConnection connection, ListRequest request,
+            [FromServices] I{{ClassName}}ListHandler handler,
+            [FromServices] IExcelExporter exporter)
+        {
+            var data = List(connection, request, handler).Entities;
+            var bytes = exporter.Export(data, typeof(Columns.{{ClassName}}Columns), request.ExportColumns);
+            return ExcelContentResult.Create(bytes, "{{ClassName}}List_" +
+                DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");
         }
     }
 }
