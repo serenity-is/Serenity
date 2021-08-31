@@ -1,3 +1,14 @@
+## 5.0.46 (2021-08-31)
+
+Features:
+  - add option to include an ErrorId in service errors
+  - make dependency injection for service handlers easier by implementing auto register, and optional generic classes, and get rid of repositories all together, see next commit in common-features repository CustomerEndpoint and sample handler codes
+  - update sergen to remove repository class and add request handlers instead, and update generated endpoint classes to use new DI friendly structure
+  - get rid of ".Entities" namespace suffix for generated rows, the less namespaces the better
+  
+Bugfixes:
+  - server typings generator should ignore arguments with *[FromServices]* attribute while generating code.
+
 ## 5.0.45 (2021-07-20)
 
 Features:
