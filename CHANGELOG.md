@@ -1,3 +1,8 @@
+## 5.0.48 (2021-09-02)
+
+Features:
+  - another attempt to make sourcelink debugging work again
+
 ## 5.0.47 (2021-09-02)
 
 Features:

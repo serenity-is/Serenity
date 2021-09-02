@@ -103,6 +103,13 @@ Action myPush = delegate() {
             Source = "https://www.nuget.org/api/v2/package"
         });
     }   
+    
+    foreach (var package in System.IO.Directory.GetFiles(nupkgDir, "*.snupkg"))
+    {
+        NuGetPush(package, new NuGetPushSettings {
+            Source = "https://www.nuget.org/api/v2/package"
+        });
+    } 
 };
 
 Action<Dictionary<string, string>, JObject, string> addDeps = (p, deps, fw) => {
