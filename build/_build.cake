@@ -62,7 +62,7 @@ Action<string, string, string> myPack = (s, id, project) => {
 
 	writeHeader("dotnet pack " + csproj);
 
-	var exitCode = StartProcess("dotnet", "pack " + csproj + " -c:" + configuration + " -o:" + nupkgDir);
+	var exitCode = StartProcess("dotnet", "pack " + csproj + " -p:ContinuousIntegrationBuild=true -c:" + configuration + " -o:\"" + nupkgDir + "\"");
 	if (exitCode > 0)
 		throw new Exception("Error while packing " + csproj);
 };

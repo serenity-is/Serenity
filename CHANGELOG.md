@@ -1,3 +1,11 @@
+## 5.0.47 (2021-09-02)
+
+Features:
+  - attempt to make sourcelink debugging work again, hopefully
+
+Bugfixes:
+  - handle css bundle url rewrite case when bundle key contains slashes
+
 ## 5.0.46 (2021-08-31)
 
 Features:
