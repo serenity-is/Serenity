@@ -1,7 +1,7 @@
 ﻿<Project>
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
-    <Version>5.0.48</Version>
+    <Version>5.0.49</Version>
     <Company>Serenity</Company>
     <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -17,9 +17,7 @@
     <AspNetCorePackageVersion>5.0.0</AspNetCorePackageVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
