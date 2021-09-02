@@ -8,7 +8,7 @@
     <Authors>Volkan Ceylan</Authors>
     <PackageIcon>package-icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>http://github.com/volkanceylan/Serenity</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/serenity-is/Serenity</PackageProjectUrl>
     <PackageTags>Serenity</PackageTags>
   </PropertyGroup>
   <PropertyGroup>
