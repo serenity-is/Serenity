@@ -1,3 +1,13 @@
+## 5.0.50 (2021-09-07)
+
+Features:
+  - fix dateeditor validation for min max dates using jquery format instead of Q.format
+
+## 5.0.49 (2021-09-02)
+
+Features:
+  - embed debug info inside dlls
+
 ## 5.0.48 (2021-09-02)
 
 Features:

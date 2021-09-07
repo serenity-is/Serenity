@@ -86,11 +86,11 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
                     return null;
                 }
 
-                if (!isEmptyOrNull(this.get_minValue()) && Invariant.stringCompare(formatDate(value, 'yyyy-MM-dd'), formatDate(this.get_minValue(), 'yyyy-MM-dd')) < 0) {
+                if (!isEmptyOrNull(this.get_minValue()) && Invariant.stringCompare(value, this.get_minValue()) < 0) {
                     return format(text('Validation.MinDate'), formatDate(this.get_minValue(), null));
                 }
     
-                if (!isEmptyOrNull(this.get_maxValue()) && Invariant.stringCompare(formatDate(value, 'yyyy-MM-dd'), formatDate(this.get_maxValue(), 'yyyy-MM-dd')) > 0) {
+                if (!isEmptyOrNull(this.get_maxValue()) && Invariant.stringCompare(value, this.get_maxValue()) > 0) {
                     return format(text('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
                 }
 
