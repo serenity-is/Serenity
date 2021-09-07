@@ -1,8 +1,7 @@
-﻿import { format } from "jquery";
-import { Decorators } from "../../Decorators";
+﻿import { Decorators } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
 import { today } from "../../Q/System";
-import { Culture, formatDate, Invariant, parseDate, parseISODateTime } from "../../Q/Formatting";
+import { Culture, format, formatDate, Invariant, parseDate, parseISODateTime } from "../../Q/Formatting";
 import { text } from "../../Q/LocalText";
 import { isEmptyOrNull, replaceAll } from "../../Q/Strings";
 import { addValidationRule } from "../../Q/Validation";
@@ -62,11 +61,11 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
                 return null;
             }
 
-            if (!isEmptyOrNull(this.get_minValue()) && Invariant.stringCompare(value, this.get_minValue()) < 0) {
+            if (!isEmptyOrNull(this.get_minValue()) && Invariant.stringCompare(formatDate(value, 'yyyy-MM-dd'), formatDate(this.get_minValue(), 'yyyy-MM-dd')) < 0) {
                 return format(text('Validation.MinDate'), formatDate(this.get_minValue(), null));
             }
 
-            if (!isEmptyOrNull(this.get_maxValue()) && Invariant.stringCompare(value, this.get_maxValue()) > 0) {
+            if (!isEmptyOrNull(this.get_maxValue()) && Invariant.stringCompare(formatDate(value, 'yyyy-MM-dd'), formatDate(this.get_maxValue(), 'yyyy-MM-dd')) > 0) {
                 return format(text('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
             }
 
