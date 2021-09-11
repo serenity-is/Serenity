@@ -43,8 +43,10 @@ namespace Serenity.Test.Services
 
             var masterRetrieveHandler = new MockRetrieveHandler<Int32MasterRow>();
             masterRetrieveHandler.Row.ID = 123;
-            var behavior = new MasterDetailRelationBehavior(handlerFactory);
-            behavior.Target = masterRetrieveHandler.Row.GetFields().DetailList;
+            var behavior = new MasterDetailRelationBehavior(handlerFactory)
+            {
+                Target = masterRetrieveHandler.Row.GetFields().DetailList
+            };
             behavior.ActivateFor(masterRetrieveHandler.Row);
             behavior.OnReturn(masterRetrieveHandler);
 

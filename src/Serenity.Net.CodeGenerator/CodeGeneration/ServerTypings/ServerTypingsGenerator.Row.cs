@@ -10,7 +10,7 @@ namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGenerator : CecilImportGenerator
     {
-        private IEnumerable<PropertyDefinition> EnumerateFieldProperties(TypeDefinition rowType)
+        private static IEnumerable<PropertyDefinition> EnumerateFieldProperties(TypeDefinition rowType)
         {
             do
             {
@@ -73,7 +73,7 @@ namespace Serenity.CodeGeneration
             }
         }
 
-        private string ExtractInterfacePropertyFromRow(TypeDefinition rowType, string[] interfaceTypes, 
+        private static string ExtractInterfacePropertyFromRow(TypeDefinition rowType, string[] interfaceTypes, 
             string propertyType, string propertyName, string getMethodFullName)
         {
             do
@@ -101,7 +101,7 @@ namespace Serenity.CodeGeneration
             return null;
         }
 
-        private string DetermineModuleIdentifier(TypeDefinition rowType)
+        private static string DetermineModuleIdentifier(TypeDefinition rowType)
         {
             var moduleAttr = CecilUtils.GetAttr(rowType, "Serenity.ComponentModel", "ModuleAttribute");
             if (moduleAttr != null)
@@ -110,27 +110,27 @@ namespace Serenity.CodeGeneration
             var ns = rowType.Namespace ?? "";
 
             if (ns.EndsWith(".Entities", StringComparison.Ordinal))
-                ns = ns.Substring(0, ns.Length - 9);
+                ns = ns[0..^9];
 
             var idx = ns.IndexOf(".", StringComparison.Ordinal);
             if (idx >= 0)
-                ns = ns.Substring(idx + 1);
+                ns = ns[(idx + 1)..];
 
             return ns;
         }
 
-        private string DetermineRowIdentifier(TypeDefinition rowType)
+        private static string DetermineRowIdentifier(TypeDefinition rowType)
         {
             var name = rowType.Name;
             if (name.EndsWith("Row", StringComparison.Ordinal))
-                name = name.Substring(0, name.Length - 3);
+                name = name[0..^3];
 
             var moduleIdentifier = DetermineModuleIdentifier(rowType);
             return string.IsNullOrEmpty(moduleIdentifier) ? name : 
                 moduleIdentifier + "." + name;
         }
 
-        private string DetermineLocalTextPrefix(TypeDefinition rowType)
+        private static string DetermineLocalTextPrefix(TypeDefinition rowType)
         {
             string localTextPrefix = null;
             var fieldsType = rowType.NestedTypes.FirstOrDefault(x =>
@@ -164,7 +164,7 @@ namespace Serenity.CodeGeneration
             return DetermineRowIdentifier(rowType);
         }
 
-        private string DeterminePermission(TypeDefinition rowType, params string[] attributeNames)
+        private static string DeterminePermission(TypeDefinition rowType, params string[] attributeNames)
         {
             CustomAttribute permissionAttr = null;
             foreach (var attributeName in attributeNames)
@@ -181,7 +181,7 @@ namespace Serenity.CodeGeneration
                 .Select(x => (x.Value as string) ?? (((CustomAttributeArgument)x.Value).Value.ToString())));
         }
 
-        private string AutoLookupKeyFor(TypeDefinition type)
+        private static string AutoLookupKeyFor(TypeDefinition type)
         {
             string module;
             var moduleAttr = CecilUtils.GetAttr(type,
@@ -199,22 +199,22 @@ namespace Serenity.CodeGeneration
                 module = type.Namespace ?? "";
 
                 if (module.EndsWith(".Entities", StringComparison.Ordinal))
-                    module = module.Substring(0, module.Length - 9);
+                    module = module[0..^9];
                 else if (module.EndsWith(".Scripts", StringComparison.Ordinal))
-                    module = module.Substring(0, module.Length - 8);
+                    module = module[0..^8];
                 else if (module.EndsWith(".Lookups", StringComparison.Ordinal))
-                    module = module.Substring(0, module.Length - 8);
+                    module = module[0..^8];
 
                 var idx = module.IndexOf(".", StringComparison.Ordinal);
                 if (idx >= 0)
-                    module = module.Substring(idx + 1);
+                    module = module[(idx + 1)..];
             }
 
             var name = type.Name;
             if (name.EndsWith("Row", StringComparison.Ordinal))
-                name = name.Substring(0, name.Length - 3);
+                name = name[0..^3];
             else if (name.EndsWith("Lookup", StringComparison.Ordinal))
-                name = name.Substring(0, name.Length - 6);
+                name = name[0..^6];
 
             return string.IsNullOrEmpty(module) ? name :
                 module + "." + name;
@@ -385,7 +385,7 @@ namespace Serenity.CodeGeneration
                     sb.AppendLine();
                     cw.Indented("export function getLookup(): Q.Lookup<");
                     sb.Append(rowType.Name);
-                    sb.Append(">");
+                    sb.Append('>');
                     cw.InBrace(delegate
                     {
                         cw.Indented("return Q.getLookup<");

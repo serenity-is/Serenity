@@ -42,7 +42,7 @@ namespace Serenity.Web
                 Model = model
             };
 
-            using StringWriter sw = new StringWriter();
+            using StringWriter sw = new();
             var engine = serviceProvider.GetService<ICompositeViewEngine>();
 
             var viewContext = new ViewContext(actionContext, viewEngineResult.View, viewData,

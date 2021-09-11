@@ -27,12 +27,12 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        private string GetOption(string[] args, string opt)
+        private static string GetOption(string[] args, string opt)
         {
             var dash = "-" + opt;
             var val = args.FirstOrDefault(x => x.StartsWith(dash + ":", StringComparison.Ordinal));
             if (val != null)
-                return val.Substring(dash.Length + 1);
+                return val[(dash.Length + 1)..];
 
             var idx = Array.IndexOf(args, dash);
             if (idx >= 0 && idx < args.Length - 1)
@@ -40,7 +40,7 @@ namespace Serenity.CodeGenerator
                 val = args[idx + 1];
                 if (val.StartsWith("\"", StringComparison.Ordinal) && 
                     val.EndsWith("\"", StringComparison.Ordinal))
-                    return val.Substring(1, val.Length - 2);
+                    return val[1..^1];
                 else
                     return val;
             }
@@ -48,7 +48,7 @@ namespace Serenity.CodeGenerator
             return null;
         }
 
-        public void Run(string csproj, string[] args)
+        public static void Run(string csproj, string[] args)
         {
             var projectDir = Path.GetDirectoryName(csproj);
 
@@ -206,7 +206,7 @@ namespace Serenity.CodeGenerator
             {
                 File.WriteAllText(outFile, JSON.Stringify(tableNames.Select(x =>
                 {
-                    var xct = confConnection == null ? null : confConnection.Tables.FirstOrDefault(z => string.Compare(z.Tablename, table, StringComparison.OrdinalIgnoreCase) == 0);
+                    var xct = confConnection?.Tables.FirstOrDefault(z => string.Compare(z.Tablename, table, StringComparison.OrdinalIgnoreCase) == 0);
                     return new
                     {
                         name = x.Tablename,
@@ -253,7 +253,7 @@ namespace Serenity.CodeGenerator
                 Environment.Exit(1);
             }
 
-            var confTable = confConnection == null ? null : confConnection.Tables.FirstOrDefault(x =>
+            var confTable = confConnection?.Tables.FirstOrDefault(x =>
                 string.Compare(x.Tablename, table, StringComparison.OrdinalIgnoreCase) == 0);
 
             if (module == null)
@@ -347,10 +347,10 @@ namespace Serenity.CodeGenerator
                 }
             }
 
-            config.GenerateRow = what.IndexOf("R", StringComparison.OrdinalIgnoreCase) >= 0;
-            config.GenerateService = what.IndexOf("S", StringComparison.OrdinalIgnoreCase) >= 0;
-            config.GenerateUI = what.IndexOf("U", StringComparison.OrdinalIgnoreCase) >= 0;
-            config.GenerateCustom = what.IndexOf("C", StringComparison.OrdinalIgnoreCase) >= 0;
+            config.GenerateRow = what.Contains("R", StringComparison.OrdinalIgnoreCase);
+            config.GenerateService = what.Contains("S", StringComparison.OrdinalIgnoreCase);
+            config.GenerateUI = what.Contains("U", StringComparison.OrdinalIgnoreCase);
+            config.GenerateCustom = what.Contains("C", StringComparison.OrdinalIgnoreCase);
 
             Console.ResetColor();
             Console.WriteLine();

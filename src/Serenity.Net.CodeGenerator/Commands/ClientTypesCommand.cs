@@ -7,12 +7,12 @@ namespace Serenity.CodeGenerator
 {
     public class ClientTypesCommand
     {
-        public void Run(string csproj, List<ExternalType> tsTypes)
+        public static void Run(string csproj, List<ExternalType> tsTypes)
         {
             var projectDir = Path.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
-            config.ClientTypes = config.ClientTypes ?? new GeneratorConfig.ClientTypesConfig();
+            config.ClientTypes ??= new GeneratorConfig.ClientTypesConfig();
 
             if (config.RootNamespace.IsEmptyOrNull())
                 config.RootNamespace = config.GetRootNamespaceFor(csproj);
@@ -32,7 +32,7 @@ namespace Serenity.CodeGenerator
                 generator.AddTSType(type);
 
             var codeByFilename = generator.Run();
-            new MultipleOutputHelper().WriteFiles(outDir, codeByFilename, "*.ts");
+            MultipleOutputHelper.WriteFiles(outDir, codeByFilename, "*.ts");
         }
     }
 }

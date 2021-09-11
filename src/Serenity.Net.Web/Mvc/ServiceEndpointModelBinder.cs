@@ -29,7 +29,7 @@ namespace Serenity.Services
 
     public class ServiceEndpointNullModelBinder : IModelBinder
     {
-        public static readonly ServiceEndpointNullModelBinder Instance = new ServiceEndpointNullModelBinder();
+        public static readonly ServiceEndpointNullModelBinder Instance = new();
 
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {

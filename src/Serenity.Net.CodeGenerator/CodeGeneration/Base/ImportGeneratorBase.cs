@@ -48,8 +48,7 @@ namespace Serenity.CodeGeneration
             if (scriptName != null)
                 type.Name = scriptName.Arguments[0].Value as string;
 
-            ExternalType overriding;
-            if (ssByScriptName.TryGetValue(type.FullName, out overriding) &&
+            if (ssByScriptName.TryGetValue(type.FullName, out ExternalType overriding) &&
                 type.GenericParameters.Count <= overriding.GenericParameters.Count)
             {
                 return;
@@ -66,8 +65,7 @@ namespace Serenity.CodeGeneration
 
         protected ExternalType GetScriptType(string fullName)
         {
-            ExternalType type;
-            if (tsTypes.TryGetValue(fullName, out type))
+            if (tsTypes.TryGetValue(fullName, out ExternalType type))
                 return type;
 
             if (ssByScriptName.TryGetValue(fullName, out type))
@@ -79,7 +77,7 @@ namespace Serenity.CodeGeneration
             return null;
         }
 
-        protected string[] SplitGenericArguments(ref string typeName)
+        protected static string[] SplitGenericArguments(ref string typeName)
         {
             if (!typeName.Contains('<', StringComparison.Ordinal))
                 return System.Array.Empty<string>();
@@ -116,13 +114,13 @@ namespace Serenity.CodeGeneration
             foreach (var rn in RootNamespaces)
             {
                 if (name.StartsWith(rn + ".", StringComparison.Ordinal))
-                    return name.Substring(rn.Length + 1);
+                    return name[(rn.Length + 1)..];
             }
 
             return name;
         }
 
-        protected string GetPropertyScriptName(ExternalProperty prop, bool preserveMemberCase)
+        protected static string GetPropertyScriptName(ExternalProperty prop, bool preserveMemberCase)
         {
             var scriptNameAttr = prop.Attributes.FirstOrDefault(x =>
                 x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
@@ -137,13 +135,13 @@ namespace Serenity.CodeGeneration
                     return "id";
                 else
                     return propField.Substring(0, 1).ToLowerInvariant()
-                        + propField.Substring(1);
+                        + propField[1..];
             }
             else
                 return prop.Name;
         }
 
-        protected string GetBaseTypeName(ExternalType type)
+        protected static string GetBaseTypeName(ExternalType type)
         {
             if (type.BaseType == null)
                 return null;

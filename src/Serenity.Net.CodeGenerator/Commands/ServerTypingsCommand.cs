@@ -10,7 +10,7 @@ namespace Serenity.CodeGenerator
 {
     public class ServerTypingsCommand
     {
-        public void Run(string csproj, List<ExternalType> tsTypes)
+        public static void Run(string csproj, List<ExternalType> tsTypes)
         {
             var projectDir = Path.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
@@ -83,7 +83,7 @@ namespace Serenity.CodeGenerator
                     var binDebugIdx = assemblyFile1.IndexOf("/bin/Debug/", StringComparison.OrdinalIgnoreCase);
                     string assemblyFile2 = assemblyFile1;
                     if (binDebugIdx >= 0)
-                        assemblyFile2 = assemblyFile1.Substring(0, binDebugIdx) + "/bin/Release/" + assemblyFile1.Substring(binDebugIdx + "/bin/Release".Length);
+                        assemblyFile2 = assemblyFile1.Substring(0, binDebugIdx) + "/bin/Release/" + assemblyFile1[(binDebugIdx + "/bin/Release".Length)..];
 
                     assemblyFiles[i] = assemblyFile1;
 
@@ -120,8 +120,7 @@ namespace Serenity.CodeGenerator
                 try
                 {
                     var obj = JObject.Parse(File.ReadAllText(appSettings));
-                    var packages = (obj["AppSettings"] as JObject)?["LocalTextPackages"] as JObject;
-                    if (packages != null)
+                    if ((obj["AppSettings"] as JObject)?["LocalTextPackages"] is JObject packages)
                     {
                         foreach (var p in packages.PropertyValues())
                             foreach (var x in p.Values<string>())
@@ -149,7 +148,7 @@ namespace Serenity.CodeGenerator
                 generator.AddTSType(type);
 
             var codeByFilename = generator.Run();
-            new MultipleOutputHelper().WriteFiles(outDir, codeByFilename, "*.ts");
+            MultipleOutputHelper.WriteFiles(outDir, codeByFilename, "*.ts");
         }
     }
 }

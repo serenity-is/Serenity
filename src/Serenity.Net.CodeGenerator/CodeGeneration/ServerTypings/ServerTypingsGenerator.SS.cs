@@ -92,7 +92,7 @@ namespace Serenity.CodeGeneration
                                 typeName.StartsWith("System.Func`", StringComparison.Ordinal))
                             {
                                 int k = 0;
-                                sb.Append("(");
+                                sb.Append('(');
                                 foreach (var part in parts.Take(parts.Length - 1))
                                 {
                                     if (k++ > 0)
@@ -109,7 +109,7 @@ namespace Serenity.CodeGeneration
                             else if (typeName.StartsWith("System.Action`", StringComparison.Ordinal))
                             {
                                 int k = 0;
-                                sb.Append("(");
+                                sb.Append('(');
                                 foreach (var part in parts)
                                 {
                                     if (k++ > 0)
@@ -134,13 +134,13 @@ namespace Serenity.CodeGeneration
                             if (!string.IsNullOrEmpty(ns))
                             {
                                 sb.Append(ns);
-                                sb.Append(".");
+                                sb.Append('.');
                             }
 
                             sb.Append(scriptType.Name.Split('`')[0]);
                         }
 
-                        sb.Append("<");
+                        sb.Append('<');
                         int i = 0;
                         foreach (var part in parts)
                         {
@@ -154,7 +154,7 @@ namespace Serenity.CodeGeneration
                                 SSTypeNameToTS(part, codeNamespace, "any", leaveAsIs);
                         }
 
-                        sb.Append(">");
+                        sb.Append('>');
                     }
                     else
                     {
@@ -178,7 +178,7 @@ namespace Serenity.CodeGeneration
 
                 sb.Append(arg.Name);
                 if (arg.IsOptional || arg.HasDefault)
-                    sb.Append("?");
+                    sb.Append('?');
 
                 sb.Append(": ");
 
@@ -193,7 +193,7 @@ namespace Serenity.CodeGeneration
             sb.AppendLine(");");
         }
 
-        private string GetMethodName(ExternalMethod method, bool preserveMemberCase)
+        private static string GetMethodName(ExternalMethod method, bool preserveMemberCase)
         {
             string methodName = method.Name;
 
@@ -208,7 +208,7 @@ namespace Serenity.CodeGeneration
                 if (methodName == "ID")
                     methodName = "id";
                 else methodName = methodName.Substring(0, 1).ToLowerInvariant()
-                    + methodName.Substring(1);
+                    + methodName[1..];
             }
 
             return methodName;
@@ -238,7 +238,7 @@ namespace Serenity.CodeGeneration
                 cw.Indented(methodName);
             }
 
-            sb.Append("(");
+            sb.Append('(');
             SSMethodArguments(method.Arguments, codeNamespace);
             sb.Append("): ");
 
@@ -330,7 +330,7 @@ namespace Serenity.CodeGeneration
                 if (fieldName == "ID")
                     fieldName = "id";
                 else fieldName = fieldName.Substring(0, 1).ToLowerInvariant()
-                    + fieldName.Substring(1);
+                    + fieldName[1..];
             }
 
             if (isStaticClass && field.IsStatic)
@@ -353,7 +353,7 @@ namespace Serenity.CodeGeneration
             sb.AppendLine(";");
         }
 
-        private string FixupSSGenerics(string typeName)
+        private static string FixupSSGenerics(string typeName)
         {
             if (typeName == "Serenity.TemplatedDialog")
                 typeName = "Serenity.TemplatedDialog`1<System.Object>";
@@ -362,35 +362,35 @@ namespace Serenity.CodeGeneration
             else if (typeName.StartsWith("Serenity.EntityDialog`1<", StringComparison.Ordinal))
             {
                 typeName = typeName.Replace("Serenity.EntityDialog`1<", "Serenity.EntityDialog`2<", StringComparison.Ordinal);
-                typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
+                typeName = typeName[0..^1] + ", System.Object>";
             }
             else if (typeName == "Serenity.PropertyDialog")
                 typeName = "Serenity.PropertyDialog`2<System.Object, System.Object>";
             else if (typeName.StartsWith("Serenity.PropertyDialog`1<", StringComparison.Ordinal))
             {
                 typeName = typeName.Replace("Serenity.PropertyDialog`1<", "Serenity.PropertyDialog`2<", StringComparison.Ordinal);
-                typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
+                typeName = typeName[0..^1] + ", System.Object>";
             }
             else if (typeName == "Serenity.EntityGrid")
                 typeName = "Serenity.EntityGrid`2<System.Object, System.Object>";
             else if (typeName.StartsWith("Serenity.EntityGrid`1<", StringComparison.Ordinal))
             {
                 typeName = typeName.Replace("Serenity.EntityGrid`1<", "Serenity.EntityGrid`2<", StringComparison.Ordinal);
-                typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
+                typeName = typeName[0..^1] + ", System.Object>";
             }
             else if (typeName == "Serenity.DataGrid")
                 typeName = "Serenity.DataGrid`2<System.Object, System.Object>";
             else if (typeName.StartsWith("Serenity.DataGrid`1<", StringComparison.Ordinal))
             {
                 typeName = typeName.Replace("Serenity.DataGrid`1<", "Serenity.DataGrid`2<", StringComparison.Ordinal);
-                typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
+                typeName = typeName[0..^1] + ", System.Object>";
             }
             else if (typeName == "Serenity.PropertyPanel")
                 typeName = "Serenity.PropertyPanel`2<System.Object, System.Object>";
             else if (typeName.StartsWith("Serenity.PropertyPanel`1<", StringComparison.Ordinal))
             {
                 typeName = typeName.Replace("Serenity.PropertyPanel`1<", "Serenity.PropertyPanel`2<", StringComparison.Ordinal);
-                typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
+                typeName = typeName[0..^1] + ", System.Object>";
             }
             else if (typeName == "Serenity.CheckTreeEditor")
                 typeName = "Serenity.CheckTreeEditor`2<System.Object, System.Object>";
@@ -481,7 +481,7 @@ namespace Serenity.CodeGeneration
 
                         if (isClass && type.GenericParameters.Count > 0)
                         {
-                            sb.Append("<");
+                            sb.Append('<');
 
                             var k = 0;
                             foreach (var arg in type.GenericParameters)
@@ -491,7 +491,7 @@ namespace Serenity.CodeGeneration
 
                                 sb.Append(arg.Name);
                             }
-                            sb.Append(">");
+                            sb.Append('>');
                         }
 
                         if (isClass)

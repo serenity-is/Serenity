@@ -67,11 +67,11 @@ namespace Serenity.Web
             }
             list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));
 
-            StringBuilder jwBuilder = new StringBuilder("Q.LT.add(");
+            StringBuilder jwBuilder = new("Q.LT.add(");
             JsonWriter jw = new JsonTextWriter(new StringWriter(jwBuilder));
                 
             jw.WriteStartObject();
-            List<string> stack = new List<string>();
+            List<string> stack = new();
             int stackCount = 0;
             for (int i = 0; i < list.Count; i++)
             {

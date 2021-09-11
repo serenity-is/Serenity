@@ -1,89 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Serenity.CodeGenerator
 {
     public class CodeFileHelper
     {
-        private static Encoding utf8 = new UTF8Encoding(true);
-        public static string Kdiff3Path;
-        public static string TSCPath;
-        public static bool TFSIntegration;
-        public static bool? Overwrite;
+        private static readonly Encoding utf8 = new UTF8Encoding(true);
+        public static string Kdiff3Path { get; set; }
+        public static string TSCPath { get; set; }
+        public static bool TFSIntegration { get; set; }
+        public static bool? Overwrite { get; set; }
 
         public static byte[] ToUTF8BOM(string s)
         {
             return Encoding.UTF8.GetPreamble().Concat(utf8.GetBytes(s)).ToArray();
         }
 
-        private bool InsertDefinition(string file, string type, string key, string code)
-        {
-            int insertAfter = -1;
-            int lastPermission = -1;
-            bool alreadyAdded = false;
-
-            List<string> lines = new List<string>();
-            var spaceRegex = new Regex("\\s+");
-            using (var sr = new StreamReader(File.OpenRead(file), utf8))
-            {
-                int lineNum = 0;
-                while (true)
-                {
-                    string line = sr.ReadLine();
-                    if (line == null)
-                        break;
-                    lines.Add(line);
-                    line = spaceRegex.Replace(line.TrimToEmpty(), " ");
-                    string s = " " + type + " ";
-                    var idx = line.IndexOf(s, StringComparison.Ordinal);
-                    if (idx >= 0)
-                    {
-                        var idx2 = line.IndexOf("=", StringComparison.Ordinal);
-                        if (idx2 >= 0)
-                        {
-                            var ar = line.Substring(idx + s.Length, idx2 - idx - s.Length).TrimToNull();
-                            if (ar != null)
-                            {
-                                int comp = string.CompareOrdinal(key, ar);
-                                if (comp > 0)
-                                    insertAfter = lineNum;
-                                else if (comp == 0)
-                                    alreadyAdded = true;
-                            }
-                        }
-                    }
-
-                    lineNum++;
-                }
-            }
-
-            if (alreadyAdded)
-                return true;
-
-            if (insertAfter == -1)
-                insertAfter = lastPermission;
-
-            if (insertAfter != -1)
-            {
-                lines.Insert(insertAfter + 1, code.TrimEnd());
-
-                using (var sw = new StreamWriter(File.Create(file), utf8))
-                {
-                    sw.Write(string.Join(Environment.NewLine, lines));
-                }
-                return true;
-            }
-
-            return false;
-        }
-
+#pragma warning disable IDE0060 // Remove unused parameter
         public static void ExecuteTFCommand(string file, string command)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
         }
 
@@ -162,7 +101,7 @@ namespace Serenity.CodeGenerator
             }
             else
             {
-                string answer = null;
+                string answer;
                 if (Overwrite == true)
                     answer = "y";
                 else if (Overwrite == false)
@@ -224,8 +163,10 @@ namespace Serenity.CodeGenerator
                     "set its path in CodeGenerator.config file! (TSCPath setting)", TSCPath));
             }
 
-            var psi = new ProcessStartInfo(TSCPath, arguments);
-            psi.WorkingDirectory = workingDirectory;
+            var psi = new ProcessStartInfo(TSCPath, arguments)
+            {
+                WorkingDirectory = workingDirectory
+            };
             Process.Start(psi).WaitForExit(10000);
         }
     }

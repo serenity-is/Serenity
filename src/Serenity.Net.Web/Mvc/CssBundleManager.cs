@@ -12,7 +12,7 @@ namespace Serenity.Web
 {
     public class CssBundleManager : ICssBundleManager
     {
-        private readonly object sync = new object();
+        private readonly object sync = new();
 
         private bool isEnabled;
         private Dictionary<string, string> bundleKeyBySourceUrl;

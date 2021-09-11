@@ -46,10 +46,10 @@ namespace ICSharpCode.Decompiler
         readonly bool throwOnError;
         readonly string mainAssemblyFileName;
         readonly string baseDirectory;
-        readonly List<string> directories = new List<string>();
+        readonly List<string> directories = new();
         HashSet<string> targetFrameworkSearchPaths;
         readonly List<string> gac_paths = GetGacPaths();
-        readonly Dictionary<string, AssemblyDefinition> cache = new Dictionary<string, AssemblyDefinition>();
+        readonly Dictionary<string, AssemblyDefinition> cache = new();
 
         public void AddSearchDirectory(string directory)
         {
@@ -92,34 +92,23 @@ namespace ICSharpCode.Decompiler
             this.targetFramework = targetFramework ?? string.Empty;
             targetFrameworkIdentifier = ParseTargetFramework(this.targetFramework, out targetFrameworkVersion);
             this.mainAssemblyFileName = mainAssemblyFileName;
-            this.baseDirectory = Path.GetDirectoryName(mainAssemblyFileName);
+            baseDirectory = Path.GetDirectoryName(mainAssemblyFileName);
             this.throwOnError = throwOnError;
-            if (string.IsNullOrWhiteSpace(this.baseDirectory))
-                this.baseDirectory = Environment.CurrentDirectory;
+            if (string.IsNullOrWhiteSpace(baseDirectory))
+                baseDirectory = Environment.CurrentDirectory;
             AddSearchDirectory(baseDirectory);
         }
 
         public static TargetFrameworkIdentifier ParseTargetFramework(string targetFramework, out Version version)
         {
             string[] tokens = targetFramework.Split(',');
-            TargetFrameworkIdentifier identifier;
-
-            switch (tokens[0].Trim().ToUpperInvariant())
+            var identifier = tokens[0].Trim().ToUpperInvariant() switch
             {
-                case ".NETCOREAPP":
-                    identifier = TargetFrameworkIdentifier.NETCoreApp;
-                    break;
-                case ".NETSTANDARD":
-                    identifier = TargetFrameworkIdentifier.NETStandard;
-                    break;
-                case "SILVERLIGHT":
-                    identifier = TargetFrameworkIdentifier.Silverlight;
-                    break;
-                default:
-                    identifier = TargetFrameworkIdentifier.NETFramework;
-                    break;
-            }
-
+                ".NETCOREAPP" => TargetFrameworkIdentifier.NETCoreApp,
+                ".NETSTANDARD" => TargetFrameworkIdentifier.NETStandard,
+                "SILVERLIGHT" => TargetFrameworkIdentifier.Silverlight,
+                _ => TargetFrameworkIdentifier.NETFramework,
+            };
             version = null;
 
             for (int i = 1; i < tokens.Length; i++)
@@ -144,7 +133,7 @@ namespace ICSharpCode.Decompiler
                         break;
                 }
             }
-            version = version ?? ZeroVersion;
+            version ??= ZeroVersion;
             return identifier;
         }
 
@@ -217,7 +206,7 @@ namespace ICSharpCode.Decompiler
             }
         }
 
-        string FindWindowsMetadataFile(AssemblyNameReference name)
+        static string FindWindowsMetadataFile(AssemblyNameReference name)
         {
             // Finding Windows Metadata (winmd) is currently only supported on Windows.
             if (Environment.OSVersion.Platform != PlatformID.Win32NT)
@@ -258,7 +247,7 @@ namespace ICSharpCode.Decompiler
             return file;
         }
 
-        string FindWindowsMetadataInSystemDirectory(AssemblyNameReference name)
+        static string FindWindowsMetadataInSystemDirectory(AssemblyNameReference name)
         {
             string file = Path.Combine(Environment.SystemDirectory, "WinMetadata", name.Name + ".winmd");
             if (File.Exists(file))
@@ -294,7 +283,7 @@ namespace ICSharpCode.Decompiler
             return null;
         }
 
-        string FindClosestVersionDirectory(string basePath, Version version)
+        static string FindClosestVersionDirectory(string basePath, Version version)
         {
             string path = null;
             foreach (var folder in new DirectoryInfo(basePath).GetDirectories().Select(d => DotNetCorePathFinder.ConvertToVersion(d.Name))
@@ -348,7 +337,7 @@ namespace ICSharpCode.Decompiler
         }
 
         #region .NET / mono GAC handling
-        string SearchDirectory(AssemblyNameReference name, IEnumerable<string> directories)
+        static string SearchDirectory(AssemblyNameReference name, IEnumerable<string> directories)
         {
             foreach (var directory in directories)
             {
@@ -365,7 +354,7 @@ namespace ICSharpCode.Decompiler
             return IsZeroOrAllOnes(reference.Version) || reference.IsRetargetable;
         }
 
-        string SearchDirectory(AssemblyNameReference name, string directory)
+        static string SearchDirectory(AssemblyNameReference name, string directory)
         {
             var extensions = name.IsWindowsRuntime ? new[] { ".winmd", ".dll" } : new[] { ".exe", ".dll" };
             foreach (var extension in extensions)
@@ -392,7 +381,7 @@ namespace ICSharpCode.Decompiler
                 || (version.Major == 65535 && version.Minor == 65535 && version.Build == 65535 && version.Revision == 65535);
         }
 
-        internal static Version ZeroVersion = new Version(0, 0, 0, 0);
+        internal static Version ZeroVersion = new(0, 0, 0, 0);
 
         string GetCorlib(AssemblyNameReference reference)
         {
@@ -430,7 +419,7 @@ namespace ICSharpCode.Decompiler
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
 
-            StringBuilder sb = new StringBuilder(estimatedLength * 2);
+            StringBuilder sb = new(estimatedLength * 2);
             foreach (var b in bytes)
                 sb.AppendFormat(CultureInfo.InvariantCulture, "{0:x2}", b);
             return sb.ToString();
@@ -663,8 +652,8 @@ namespace ICSharpCode.Decompiler
 
         public class CachedMetadataResolver : MetadataResolver
         {
-            private Dictionary<(string, string), TypeDefinition> typeCache = new Dictionary<(string, string), TypeDefinition>();
-            private Dictionary<(string, string), MethodDefinition> methodCache = new Dictionary<(string, string), MethodDefinition>();
+            private readonly Dictionary<(string, string), TypeDefinition> typeCache = new();
+            private readonly Dictionary<(string, string), MethodDefinition> methodCache = new();
 
             public CachedMetadataResolver(IAssemblyResolver assemblyResolver) 
                 : base(assemblyResolver)

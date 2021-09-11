@@ -12,9 +12,9 @@ namespace Serenity.CodeGenerator
     {
         private static int DeterminePrefixLength<T>(IEnumerable<T> list, Func<T, string> getName)
         {
-            if (!Enumerable.Any<T>(list))
+            if (!Enumerable.Any(list))
                 return 0;
-            string str1 = getName(Enumerable.First<T>(list));
+            string str1 = getName(Enumerable.First(list));
             int length = str1.IndexOf('_', StringComparison.Ordinal);
             if (length <= 0)
                 return 0;
@@ -45,28 +45,14 @@ namespace Serenity.CodeGenerator
 
         public static string FieldTypeToTS(string ft)
         {
-            switch (ft)
+            return ft switch
             {
-                case "Boolean":
-                    return "boolean";
-                case "String":
-                case "DateTime":
-                case "TimeSpan":
-                case "Guid":
-                    return "string";
-                case "Int32":
-                case "Int16":
-                case "Int64":
-                case "Single":
-                case "Double":
-                case "Decimal":
-                    return "number";
-                case "Stream":
-                case "ByteArray":
-                    return "number[]";
-            }
-
-            return "any";
+                "Boolean" => "boolean",
+                "String" or "DateTime" or "TimeSpan" or "Guid" => "string",
+                "Int32" or "Int16" or "Int64" or "Single" or "Double" or "Decimal" => "number",
+                "Stream" or "ByteArray" => "number[]",
+                _ => "any",
+            };
         }
 
         private static EntityField ToEntityField(FieldInfo fieldInfo, int prefixLength)
@@ -83,20 +69,19 @@ namespace Serenity.CodeGenerator
             else
                 flags = null;
 
-            string dataType;
-            var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out dataType);
-            dataType = dataType ?? fieldType;
+            var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out string dataType);
+            dataType ??= fieldType;
             return new EntityField
             {
                 FieldType = fieldType,
                 DataType = dataType,
                 IsValueType = fieldType != "String" && fieldType != "Stream" && fieldType != "ByteArray",
                 TSType = FieldTypeToTS(fieldType),
-                Ident = GenerateVariableName(fieldInfo.FieldName.Substring(prefixLength)),
-                Title = Inflector.Inflector.Titleize(fieldInfo.FieldName.Substring(prefixLength)),
+                Ident = GenerateVariableName(fieldInfo.FieldName[prefixLength..]),
+                Title = Inflector.Inflector.Titleize(fieldInfo.FieldName[prefixLength..]),
                 Flags = flags,
                 Name = fieldInfo.FieldName,
-                Size = fieldInfo.Size == 0 ? (int?)null : fieldInfo.Size,
+                Size = fieldInfo.Size == 0 ? null : fieldInfo.Size,
                 Scale = fieldInfo.Scale
             };
         }
@@ -104,8 +89,10 @@ namespace Serenity.CodeGenerator
         public static EntityModel GenerateModel(IDbConnection connection, string tableSchema, string table,
             string module, string connectionKey, string entityClass, string permission, GeneratorConfig config, bool net5Plus)
         {
-            var model = new EntityModel();
-            model.Module = module;
+            var model = new EntityModel
+            {
+                Module = module
+            };
 
             if (connection.GetDialect().ServerType.StartsWith("MySql", StringComparison.OrdinalIgnoreCase))
                 model.Schema = null;
@@ -165,18 +152,18 @@ namespace Serenity.CodeGenerator
             if (identity == null)
                 identity = fields.FirstOrDefault(f => f.IsPrimaryKey == true);
             if (identity != null)
-                model.Identity = GenerateVariableName(identity.FieldName.Substring(prefix));
+                model.Identity = GenerateVariableName(identity.FieldName[prefix..]);
             else
             {
                 identity = fields.FirstOrDefault(f => f.IsPrimaryKey == true) ??
                     fields.FirstOrDefault();
                 if (identity != null)
-                    model.Identity = GenerateVariableName(identity.FieldName.Substring(prefix));
+                    model.Identity = GenerateVariableName(identity.FieldName[prefix..]);
             }
 
             string baseRowMatch = null;
             HashSet<string> baseRowFieldset = null;
-            List<string> baseRowFieldList = new List<string>();
+            List<string> baseRowFieldList = new();
             foreach (var k in config.BaseRowClasses ?? new List<GeneratorConfig.BaseRowClass>())
             {
                 var b = k.ClassName;
@@ -186,7 +173,7 @@ namespace Serenity.CodeGenerator
                 foreach (var s in k.Fields ?? new List<string>())
                 {
                     string n = s.TrimToNull();
-                    if (n == null || !fields.Any(z => z.FieldName.Substring(prefix) == n))
+                    if (n == null || !fields.Any(z => z.FieldName[prefix..] == n))
                     {
                         skip = true;
                         break;
@@ -226,7 +213,7 @@ namespace Serenity.CodeGenerator
                 model.RowBaseFields = new List<EntityField>();
                 fields = fields.Where(f =>
                 {
-                    if (baseRowFieldset.Contains(f.FieldName.Substring(prefix)))
+                    if (baseRowFieldset.Contains(f.FieldName[prefix..]))
                     {
                         var ef = ToEntityField(f, prefix);
                         ef.Flags = null;
@@ -265,7 +252,7 @@ namespace Serenity.CodeGenerator
                 if (f.Name == className && f.FieldType == "String")
                 {
                     model.NameField = f.Name;
-                    f.ColAttributes = f.ColAttributes ?? "EditLink";
+                    f.ColAttributes ??= "EditLink";
                 }
 
                 var foreign = foreigns.Find((k) => k.FKColumn.Equals(field.FieldName, StringComparison.OrdinalIgnoreCase));
@@ -280,11 +267,13 @@ namespace Serenity.CodeGenerator
 
                     var frgfld = schemaProvider.GetFieldInfos(connection, foreign.PKSchema, foreign.PKTable).ToList();
                     int frgPrefix = DeterminePrefixLength(frgfld, z => z.FieldName);
-                    var j = new EntityJoin();
-                    j.Fields = new List<EntityField>();
-                    j.Name = GenerateVariableName(f.Name.Substring(prefix));
+                    var j = new EntityJoin
+                    {
+                        Fields = new List<EntityField>(),
+                        Name = GenerateVariableName(f.Name[prefix..])
+                    };
                     if (j.Name.EndsWith("Id", StringComparison.Ordinal) || j.Name.EndsWith("ID", StringComparison.Ordinal))
-                        j.Name = j.Name.Substring(0, j.Name.Length - 2);
+                        j.Name = j.Name[0..^2];
                     f.ForeignJoinAlias = j.Name;
                     j.SourceField = f.Ident;
 
@@ -297,7 +286,7 @@ namespace Serenity.CodeGenerator
                         
                         var k = ToEntityField(frg, frgPrefix);
                         k.Flags = null;
-                        k.Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName.Substring(frgPrefix)));
+                        k.Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName[frgPrefix..]));
                         k.Ident = JI(j.Name, k.Ident);
                         i = 0;
                         ident = k.Ident;
@@ -306,8 +295,10 @@ namespace Serenity.CodeGenerator
                         k.Ident = ident;
                         fieldByIdent[ident] = k;
 
-                        var atk = new List<string>();
-                        atk.Add("DisplayName(\"" + k.Title + "\")");
+                        var atk = new List<string>
+                        {
+                            "DisplayName(\"" + k.Title + "\")"
+                        };
                         k.Expression = "j" + j.Name + ".[" + k.Name + "]";
                         atk.Add("Expression(\"" + k.Expression + "\")");
                         k.Attributes = string.Join(", ", atk);
@@ -330,14 +321,16 @@ namespace Serenity.CodeGenerator
                 if (fld != null)
                 {
                     model.NameField = fld.Ident;
-                    fld.ColAttributes = fld.ColAttributes ?? "EditLink";
+                    fld.ColAttributes ??= "EditLink";
                 }
             }
 
             foreach (var x in model.Fields)
             {
-                var attrs = new List<string>();
-                attrs.Add("DisplayName(\"" + x.Title + "\")");
+                var attrs = new List<string>
+                {
+                    "DisplayName(\"" + x.Title + "\")"
+                };
 
                 if (x.Ident != x.Name)
                     attrs.Add("Column(\"" + x.Name + "\")");
@@ -393,9 +386,9 @@ namespace Serenity.CodeGenerator
         {
             tableName = tableName.Replace(" ", "", StringComparison.Ordinal);
             if (tableName.StartsWith("tb_", StringComparison.Ordinal))
-                tableName = tableName.Substring(3);
+                tableName = tableName[3..];
             else if (tableName.StartsWith("aspnet_", StringComparison.Ordinal))
-                tableName = "AspNet" + tableName.Substring(7);
+                tableName = "AspNet" + tableName[7..];
             return GenerateVariableName(tableName);
         }
 
@@ -404,7 +397,7 @@ namespace Serenity.CodeGenerator
             className = StringHelper.TrimToNull(className);
             if (className == null)
                 return className;
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             for (int i = 0; i < className.Length; i++)
             {
                 char c = className[i];
@@ -416,7 +409,7 @@ namespace Serenity.CodeGenerator
                     if (i > 0 &&
                         !char.IsUpper(className[i - 1]) &&
                         className[i - 1] != '_')
-                        sb.Append("_");
+                        sb.Append('_');
                     sb.Append(c);
                 }
                 else

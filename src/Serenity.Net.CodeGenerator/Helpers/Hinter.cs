@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Serenity.CodeGenerator
 {
@@ -12,12 +12,12 @@ namespace Serenity.CodeGenerator
     public class Hinter
     {
         public static string ReadHintedLine(IEnumerable<string> hintSource, 
-            string inputRegex = ".", ConsoleColor hintColor = ConsoleColor.DarkGray, string userInput = null)
+            string inputRegex = ".", string userInput = null)
         {
             Console.OutputEncoding = Encoding.UTF8;
             ConsoleKeyInfo input;
 
-            userInput = userInput ?? string.Empty;
+            userInput ??= string.Empty;
 
             if (userInput.Length > 0)
             {
@@ -39,7 +39,7 @@ namespace Serenity.CodeGenerator
                 }
                 else if (input.Key == ConsoleKey.Tab)
                 {
-                    lastUserInput = lastUserInput ?? userInput;
+                    lastUserInput ??= userInput;
                     var suggestions = hintSource
                         .Where(item => item.Length >= lastUserInput.Length &&
                             string.Compare(item.Substring(0, lastUserInput.Length), lastUserInput, StringComparison.OrdinalIgnoreCase) == 0)

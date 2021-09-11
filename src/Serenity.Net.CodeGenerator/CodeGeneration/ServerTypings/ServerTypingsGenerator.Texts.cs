@@ -34,7 +34,7 @@ namespace Serenity.CodeGeneration
             {
                 var name = nested.Name;
                 if (name.EndsWith("_", StringComparison.Ordinal))
-                    name = name.Substring(0, name.Length - 1);
+                    name = name[0..^1];
 
                 AddNestedLocalTexts(nested, prefix + name + ".");
             }
@@ -64,8 +64,8 @@ namespace Serenity.CodeGeneration
                             fb.Append('|');
                         if (!string.IsNullOrEmpty(item))
                         {
-                            if (item[0] == '^' && item[item.Length - 1] == '$')
-                                fb.Append(item.Substring(1, item.Length - 2));
+                            if (item[0] == '^' && item[^1] == '$')
+                                fb.Append(item[1..^1]);
                             else fb.Append(item.Replace(".", "\\.", StringComparison.Ordinal) + ".*");
                             append = true;
                         }
@@ -83,10 +83,12 @@ namespace Serenity.CodeGeneration
                 list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));
 
                 var jwBuilder = new StringBuilder();
-                var jw = new JsonTextWriter(new StringWriter(jwBuilder));
-                jw.QuoteName = false;
+                var jw = new JsonTextWriter(new StringWriter(jwBuilder))
+                {
+                    QuoteName = false
+                };
                 jw.WriteStartObject();
-                List<string> stack = new List<string>();
+                List<string> stack = new();
                 int stackCount = 0;
                 for (int i = 0; i < list.Count; i++)
                 {
@@ -130,7 +132,7 @@ namespace Serenity.CodeGeneration
 
                     if (same != parts.Length)
                     {
-                        string part = parts[parts.Length - 1];
+                        string part = parts[^1];
 
                         bool nextStartsWithThis = false;
                         if (i + 1 < list.Count)
@@ -179,7 +181,7 @@ namespace Serenity.CodeGeneration
                 cw.Indented(ns);
                 sb.Append(@"['Texts'] = Q.proxyTexts(Texts, '', ");
                 jw.Flush();
-                sb.Append(jwBuilder.ToString());
+                sb.Append(jwBuilder);
                 sb.AppendLine(");");
             });
 

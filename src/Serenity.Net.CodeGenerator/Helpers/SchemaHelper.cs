@@ -12,13 +12,13 @@ namespace Serenity.CodeGenerator
             var providerType = Type.GetType("Serenity.Data.Schema." + serverType + "SchemaProvider, Serenity.Net.Data") ??
                 Type.GetType("Serenity.Data.Schema." + serverType + "SchemaProvider, SerenityData");
             if (providerType == null || !typeof(ISchemaProvider).GetTypeInfo().IsAssignableFrom(providerType))
-                throw new ArgumentOutOfRangeException(nameof(serverType), (object)serverType, "Unknown server type");
+                throw new ArgumentOutOfRangeException(nameof(serverType), serverType, "Unknown server type");
 
             return (ISchemaProvider)Activator.CreateInstance(providerType);
         }
 
-        private static Dictionary<string, string> SqlTypeToFieldTypeMap = 
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, string> SqlTypeToFieldTypeMap = 
+            new(StringComparer.OrdinalIgnoreCase)
             {
                 { "bigint", "Int64" },
                 { "bit", "Boolean" },
@@ -64,7 +64,6 @@ namespace Serenity.CodeGenerator
         public static string SqlTypeNameToFieldType(string sqlTypeName, int size, out string dataType)
         {
             dataType = null;
-            string fieldType;
 
             if (string.Equals(sqlTypeName, "varbinary", StringComparison.OrdinalIgnoreCase))
             {
@@ -80,7 +79,7 @@ namespace Serenity.CodeGenerator
                 dataType = "byte[]";
                 return "ByteArray";
             }
-            else if (SqlTypeToFieldTypeMap.TryGetValue(sqlTypeName, out fieldType))
+            else if (SqlTypeToFieldTypeMap.TryGetValue(sqlTypeName, out string fieldType))
                 return fieldType;
             else
                 return "Stream";

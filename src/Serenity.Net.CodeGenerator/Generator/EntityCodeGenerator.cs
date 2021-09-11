@@ -8,22 +8,19 @@ namespace Serenity.CodeGenerator
 {
     public class EntityCodeGenerator
     {
-        private GeneratorConfig config;
-        private EntityModel model;
-        private string rootDir;
-        private Encoding utf8 = new UTF8Encoding(true);
-        private string csproj;
-        private string modulePath;
-        private string moduleClass;
-        private string typingClass;
-        private string serverTypingsTT;
+        private readonly GeneratorConfig config;
+        private readonly EntityModel model;
+        private readonly string rootDir;
+        private readonly Encoding utf8 = new UTF8Encoding(true);
+        private readonly string modulePath;
+        private readonly string moduleClass;
+        private readonly string typingClass;
 
         public EntityCodeGenerator(EntityModel model, GeneratorConfig config, string csproj)
         {
             this.model = model;
-            this.csproj = csproj;
 
-            this.rootDir = Path.GetDirectoryName(Path.GetFullPath(csproj));
+            rootDir = Path.GetDirectoryName(Path.GetFullPath(csproj));
             this.config = config;
             this.model.CustomSettings = config.CustomSettings;
 
@@ -31,8 +28,6 @@ namespace Serenity.CodeGenerator
                 .Replace('/', Path.DirectorySeparatorChar));
             if (!Directory.Exists(serverTypings))
                 serverTypings = Path.Combine(rootDir, "Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
-
-            serverTypingsTT = (serverTypings.Substring(rootDir.Length + 1) + "ServerTypings.tt").Replace('/', '\\');
 
             typingClass = Path.Combine(serverTypings, model.ModuleDot + model.ClassName);
 
@@ -48,7 +43,7 @@ namespace Serenity.CodeGenerator
             if (config.GenerateRow)
             {
                 CreateFile(Templates.Render("Row", model), moduleClass + "Row.cs");
-                CreateFile(Templates.Render("RowTyping", model), typingClass + "Row.ts", serverTypingsTT);
+                CreateFile(Templates.Render("RowTyping", model), typingClass + "Row.ts");
             }
 
             if (config.GenerateService)
@@ -59,9 +54,9 @@ namespace Serenity.CodeGenerator
                 CreateFile(Templates.Render("ListHandler", model), handlerClass + "ListHandler.cs");
                 CreateFile(Templates.Render("RetrieveHandler", model), handlerClass + "RetrieveHandler.cs");
                 CreateFile(Templates.Render("SaveHandler", model), handlerClass + "SaveHandler.cs");
-             
+
                 CreateFile(Templates.Render("Endpoint", model), moduleClass + "Endpoint.cs");
-                CreateFile(Templates.Render("ServiceTyping", model), typingClass + "Service.ts", serverTypingsTT);
+                CreateFile(Templates.Render("ServiceTyping", model), typingClass + "Service.ts");
             }
 
             if (config.GenerateUI)
@@ -72,8 +67,8 @@ namespace Serenity.CodeGenerator
                 CreateFile(Templates.Render("Form", model), moduleClass + "Form.cs");
                 CreateFile(Templates.Render("Dialog", model), moduleClass + "Dialog.ts");
                 CreateFile(Templates.Render("Grid", model), moduleClass + "Grid.ts");
-                CreateFile(Templates.Render("FormTyping", model), typingClass + "Form.ts", serverTypingsTT);
-                CreateFile(Templates.Render("ColumnsTyping", model), typingClass + "Columns.ts", serverTypingsTT);
+                CreateFile(Templates.Render("FormTyping", model), typingClass + "Form.ts");
+                CreateFile(Templates.Render("ColumnsTyping", model), typingClass + "Columns.ts");
 
                 GenerateNavigationLink();
                 GenerateStyle();
@@ -109,7 +104,7 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        private string CreateDirectoryOrBackupFile(string file)
+        private static string CreateDirectoryOrBackupFile(string file)
         {
             if (File.Exists(file))
             {
@@ -125,7 +120,7 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        private void CreateFile(string code, string file, string dependentUpon = null)
+        private static void CreateFile(string code, string file)
         {
             var backup = CreateDirectoryOrBackupFile(file);
             CodeFileHelper.CheckoutAndWrite(file, code, true);
@@ -172,29 +167,25 @@ namespace Serenity.CodeGenerator
             }
 
             string code = Templates.Render("Style", model);
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            var firstLine = code.Replace("\r", "", StringComparison.Ordinal)
+                .Split('\n').FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+            if (!string.IsNullOrWhiteSpace(firstLine))
             {
-                var firstLine = code.Replace("\r", "", StringComparison.Ordinal)
-                    .Split('\n').FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
-                if (!string.IsNullOrWhiteSpace(firstLine))
-                {
-                    var lines = File.ReadAllLines(file);
-                    // don't generate less for dialog multiple times
-                    if (lines.Any(x => x.IsTrimmedSame(firstLine)))
-                        return;
-                }
-
-                var old = File.ReadAllBytes(file);
-                if (old.Length > 0)
-                    ms.Write(old, 0, old.Length);
-                using (var sw = new StreamWriter(ms, utf8))
-                {
-                    sw.Write(code);
-                    sw.Flush();
-
-                    CodeFileHelper.CheckoutAndWrite(file, ms.ToArray(), false);
-                }
+                var lines = File.ReadAllLines(file);
+                // don't generate less for dialog multiple times
+                if (lines.Any(x => x.IsTrimmedSame(firstLine)))
+                    return;
             }
+
+            var old = File.ReadAllBytes(file);
+            if (old.Length > 0)
+                ms.Write(old, 0, old.Length);
+            using var sw = new StreamWriter(ms, utf8);
+            sw.Write(code);
+            sw.Flush();
+
+            CodeFileHelper.CheckoutAndWrite(file, ms.ToArray(), false);
         }
 
         private void GenerateNavigationLink()

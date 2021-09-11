@@ -9,7 +9,7 @@ namespace Serenity.Web
         private static readonly string[] TemplateSuffixes = new[] { ".Template.html", ".ts.html" };
 
         private ConcatenatedScript bundle;
-        private readonly Dictionary<string, TemplateScript> scriptByKey = new Dictionary<string, TemplateScript>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, TemplateScript> scriptByKey = new(StringComparer.OrdinalIgnoreCase);
 
         private static string GetKey(string rootPath, string filename)
         {

@@ -13,7 +13,7 @@ namespace Serenity.CodeGeneration
 
             cw.Indented("export namespace ");
             var identifier = GetControllerIdentifier(type);
-            this.fileIdentifier = identifier;
+            fileIdentifier = identifier;
             sb.Append(identifier);
             generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
 
@@ -28,9 +28,6 @@ namespace Serenity.CodeGeneration
                 sb.AppendLine("';");
                 sb.AppendLine();
 
-                TypeReference responseType;
-                TypeReference requestType;
-                string requestParam;
 
                 var methodNames = new List<string>();
                 foreach (var method in type.Methods)
@@ -41,7 +38,7 @@ namespace Serenity.CodeGeneration
                     if (methodNames.Contains(method.Name))
                         continue;
 
-                    if (!IsPublicServiceMethod(method, out requestType, out responseType, out requestParam))
+                    if (!IsPublicServiceMethod(method, out TypeReference requestType, out TypeReference responseType, out string requestParam))
                         continue;
 
                     methodNames.Add(method.Name);
@@ -75,9 +72,9 @@ namespace Serenity.CodeGeneration
                         cw.Indented(methodName);
                         sb.Append(" = \"");
                         sb.Append(serviceUrl);
-                        sb.Append("/");
+                        sb.Append('/');
                         sb.Append(methodName);
-                        sb.Append("\"");
+                        sb.Append('"');
 
                         inserted++;
                     }
@@ -98,7 +95,7 @@ namespace Serenity.CodeGeneration
 
                         cw.Indented("    '");
                         sb.Append(methodName);
-                        sb.Append("'");
+                        sb.Append('\'');
                     }
                     if (i > 0)
                         sb.AppendLine();

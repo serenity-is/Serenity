@@ -11,7 +11,7 @@ namespace Serenity.CodeGeneration
     public partial class ServerTypingsGenerator : CecilImportGenerator
     {
         public bool LocalTexts { get; set; }
-        public readonly HashSet<string> LocalTextFilters = new HashSet<string>();
+        public readonly HashSet<string> LocalTextFilters = new();
 
         public ServerTypingsGenerator(params Assembly[] assemblies)
             : base(assemblies)
@@ -40,7 +40,7 @@ namespace Serenity.CodeGeneration
         {
             var codeNamespace = GetNamespace(type);
 
-            Action<Action<TypeDefinition>> run = action =>
+            void run(Action<TypeDefinition> action)
             {
                 cw.Indented("namespace ");
                 sb.Append(codeNamespace);
@@ -48,7 +48,7 @@ namespace Serenity.CodeGeneration
                 {
                     action(type);
                 });
-            };
+            }
 
             if (type.IsEnum)
                 run(GenerateEnum);
@@ -66,9 +66,9 @@ namespace Serenity.CodeGeneration
                     if (CecilUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
                     {
                         AddFile(RemoveRootNamespace(codeNamespace,
-                            this.fileIdentifier + (IsTS() ? ".ts" : ".cs")));
+                            fileIdentifier + (IsTS() ? ".ts" : ".cs")));
 
-                        this.fileIdentifier = type.Name;
+                        fileIdentifier = type.Name;
                         run(GenerateBasicType);
                     }
 
@@ -116,7 +116,7 @@ namespace Serenity.CodeGeneration
                     GenerateRowMembers(type);
                 else
                 {
-                    Action<TypeReference, string, IEnumerable<CustomAttribute>> handleMember = (memberType, memberName, a) =>
+                    void handleMember(TypeReference memberType, string memberName, IEnumerable<CustomAttribute> a)
                     {
                         if (!CanHandleType(memberType.Resolve()))
                             return;
@@ -138,7 +138,7 @@ namespace Serenity.CodeGeneration
                         HandleMemberType(memberType, codeNamespace);
                         sb.Append(';');
                         sb.AppendLine();
-                    };
+                    }
 
                     var current = type;
                     do

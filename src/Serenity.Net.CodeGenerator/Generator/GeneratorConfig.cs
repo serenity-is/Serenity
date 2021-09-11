@@ -125,7 +125,7 @@ namespace Serenity.CodeGenerator
                 rootNamespace = Path.ChangeExtension(Path.GetFileName(csproj), null);
 
             if (rootNamespace?.EndsWith(".Web", StringComparison.OrdinalIgnoreCase) == true)
-                rootNamespace = rootNamespace.Substring(0, rootNamespace.Length - 4);
+                rootNamespace = rootNamespace[0..^4];
 
             return rootNamespace;
         }
@@ -141,8 +141,8 @@ namespace Serenity.CodeGenerator
         public static GeneratorConfig LoadFromJson(string json)
         {
             var config = JSON.ParseTolerant<GeneratorConfig>(json.TrimToNull() ?? "{}");
-            config.Connections = config.Connections ?? new List<GeneratorConfig.Connection>();
-            config.RemoveForeignFields = config.RemoveForeignFields ?? new List<string>();
+            config.Connections ??= new List<Connection>();
+            config.RemoveForeignFields ??= new List<string>();
             return config;
         }
 

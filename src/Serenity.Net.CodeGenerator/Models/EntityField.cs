@@ -27,27 +27,14 @@
         {
             get
             {
-                switch (FieldType)
+                return FieldType switch
                 {
-                    case "Int32":
-                    case "Int16":
-                    case "Int64":
-                        return "IntegerEditor";
-
-                    case "Single":
-                    case "Double":
-                    case "Decimal":
-                        return "DecimalEditor";
-
-                    case "DateTime":
-                        return "DateEditor";
-
-                    case "Boolean":
-                        return "BooleanEditor";
-
-                    default:
-                        return "StringEditor";
-                }
+                    "Int32" or "Int16" or "Int64" => "IntegerEditor",
+                    "Single" or "Double" or "Decimal" => "DecimalEditor",
+                    "DateTime" => "DateEditor",
+                    "Boolean" => "BooleanEditor",
+                    _ => "StringEditor",
+                };
             }
         }
 

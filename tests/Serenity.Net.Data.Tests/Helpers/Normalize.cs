@@ -16,7 +16,7 @@ namespace Serenity.Tests
 
             script = script.Trim();
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             bool insideQuote = false;
             char prior = '\0';
             foreach (var x in script)

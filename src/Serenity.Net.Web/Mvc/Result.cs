@@ -45,7 +45,7 @@ namespace Serenity.Services
             if (Data != null)
             {
 #if !ASPNETMVC
-                JsonTextWriter writer = new JsonTextWriter(new StreamWriter(response.Body)) { Formatting = Formatting };
+                JsonTextWriter writer = new(new StreamWriter(response.Body)) { Formatting = Formatting };
 #else
                 JsonTextWriter writer = new JsonTextWriter(response.Output) { Formatting = this.Formatting };
 #endif

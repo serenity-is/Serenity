@@ -50,7 +50,7 @@ namespace Serenity.CodeGeneration
             sb.Append(enumType.Name);
             sb.Append(", '");
             sb.Append(fullName);
-            sb.Append("'");
+            sb.Append('\'');
             if (enumKey != fullName)
             {
                 sb.Append(", '");

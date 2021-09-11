@@ -70,7 +70,7 @@ namespace Serenity.Reflection
                 return (type.FullName, type.Scope.Name);
         }
 
-        private static Dictionary<(string, string), List<TypeReference>> BaseClassCache = new Dictionary<(string, string), List<TypeReference>>();
+        private static readonly Dictionary<(string, string), List<TypeReference>> BaseClassCache = new();
 
         public static IEnumerable<TypeReference> EnumerateBaseClasses(TypeReference typeRef)
         {
@@ -80,7 +80,7 @@ namespace Serenity.Reflection
 
             var list = new List<TypeReference>();
 
-            if (!(typeRef is TypeDefinition typeDef))
+            if (typeRef is not TypeDefinition typeDef)
                 typeDef = typeRef.Resolve();
 
             var baseType = typeDef.BaseType;
@@ -148,7 +148,7 @@ namespace Serenity.Reflection
             var assemblyDefinitions = new List<AssemblyDefinition>();
             foreach (var assembly in assemblyLocations)
                 assemblyDefinitions.Add(AssemblyDefinition.ReadAssembly(
-                    assembly, new Mono.Cecil.ReaderParameters
+                    assembly, new ReaderParameters
                     {
                         AssemblyResolver = resolver,
                         InMemory = true,
@@ -219,7 +219,7 @@ namespace Serenity.Reflection
 
         public static bool IsAssignableFrom(string baseTypeFullName, TypeDefinition type)
         {
-            Queue<TypeDefinition> queue = new Queue<TypeDefinition>();
+            Queue<TypeDefinition> queue = new();
             queue.Enqueue(type);
 
             while (queue.Any())

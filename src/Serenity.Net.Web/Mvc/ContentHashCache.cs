@@ -61,7 +61,7 @@ namespace Serenity.Web
             var physicalPath = file.PhysicalPath;
             if (physicalPath != null)
             {
-                using System.IO.FileStream fs = new System.IO.FileStream(physicalPath,
+                using System.IO.FileStream fs = new(physicalPath,
                     System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read, 120000);
                 hash = md5.ComputeHash(fs);
             }

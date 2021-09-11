@@ -16,7 +16,7 @@ namespace Serenity.Tests.Caching
 
         public class TwoLevelCache_GetTests
         {
-            private UserDefinition GetUserByName(ITwoLevelCache cache, string username, ref int loadCount)
+            private static UserDefinition GetUserByName(ITwoLevelCache cache, string username, ref int loadCount)
             {
                 var l = loadCount;
                 var result = cache.Get("UserByName_" + username.ToLowerInvariant(),

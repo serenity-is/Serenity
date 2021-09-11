@@ -64,10 +64,12 @@ namespace Serenity.Tests
             return OnCreateCommand(command => command.OnExecuteReader(() => func(command)));
         }
 
+#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
         public virtual void Dispose()
         {
             Close();
         }
+#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
 
         public virtual void Open()
         {

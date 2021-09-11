@@ -8,9 +8,9 @@ namespace Serenity.CodeGenerator
 {
     public class MultipleOutputHelper
     {
-        private static Encoding utf8 = new System.Text.UTF8Encoding(true);
+        private static readonly Encoding utf8 = new UTF8Encoding(true);
 
-        public void WriteFiles(string outDir, SortedDictionary<string, string> codeByFilename, params string[] deleteExtraPattern)
+        public static void WriteFiles(string outDir, SortedDictionary<string, string> codeByFilename, params string[] deleteExtraPattern)
         {
             Directory.CreateDirectory(outDir);
 

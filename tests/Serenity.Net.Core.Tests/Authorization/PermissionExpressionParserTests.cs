@@ -8,7 +8,7 @@ namespace Serenity.Tests.Authorization
     {
         private bool HasPermission(string permission)
         {
-            return permission != null && permission.IndexOf("1") >= 0;
+            return permission != null && permission.Contains("1", StringComparison.CurrentCulture);
         }
 
         [Theory]

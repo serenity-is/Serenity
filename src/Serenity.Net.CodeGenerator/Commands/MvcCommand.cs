@@ -8,12 +8,12 @@ namespace Serenity.CodeGenerator
 {
     public class MvcCommand
     {
-        public void Run(string csproj)
+        public static void Run(string csproj)
         {
             var projectDir = Path.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
-            config.MVC = config.MVC ?? new GeneratorConfig.MVCConfig();
+            config.MVC ??= new GeneratorConfig.MVCConfig();
 
             var outDir = Path.Combine(projectDir, (config.MVC.OutDir.TrimToNull() ?? "Imports/MVC")
                 .Replace('/', Path.DirectorySeparatorChar));
@@ -45,30 +45,31 @@ namespace Serenity.CodeGenerator
                     files = files.Concat(Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories));
             }
 
-            Func<string, string> getName = s => {
-                var path = s.Substring(rootDir.Length);
+            string getName(string s)
+            {
+                var path = s[rootDir.Length..];
                 var name = Path.ChangeExtension(path, null).Replace('\\', '/');
                 foreach (var strip in stripViewPaths)
                 {
                     if (name.StartsWith(strip, StringComparison.OrdinalIgnoreCase))
                     {
-                        name = name.Substring(strip.Length);
+                        name = name[strip.Length..];
 
                         break;
                     }
                 }
 
                 return name;
-            };
+            }
 
             files = files.OrderBy(x => getName(x));
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.AppendLine("");
             sb.Append("namespace ");
             if (config.MVC.UseRootNamespace == true ||
                 (config.MVC.UseRootNamespace == null &&
-                 File.ReadAllText(csproj).IndexOf("Sdk=\"Microsoft.NET.Sdk.Razor\"") >= 0))
+                 File.ReadAllText(csproj).Contains("Sdk=\"Microsoft.NET.Sdk.Razor\"", StringComparison.CurrentCulture)))
             {
                 sb.Append(config.GetRootNamespaceFor(csproj));
                 sb.Append('.');
@@ -83,7 +84,7 @@ namespace Serenity.CodeGenerator
 
             foreach (var file in files)
             {
-                var path = file.Substring(rootDir.Length);
+                var path = file[rootDir.Length..];
                 var name = getName(file);
                 if (name.StartsWith("App_Code/", StringComparison.OrdinalIgnoreCase) ||
                     name.EndsWith("_ViewStart", StringComparison.OrdinalIgnoreCase) ||
@@ -118,13 +119,13 @@ namespace Serenity.CodeGenerator
                     var u = parts[i];
                     if (i > 0 && parts[i - 1] == u ||
                         i == 0 && parts[i] == "Views")
-                        u = u + "_";
+                        u += "_";
                     sb.AppendLine(indent + "public static class " + u.Replace(".", "_"));
                     sb.AppendLine(indent + "{");
                 }
 
-                var n = parts[parts.Length - 1].Replace(".", "_", StringComparison.Ordinal);
-                if (parts.Length - 1 > 0 && parts[parts.Length - 2] == n)
+                var n = parts[^1].Replace(".", "_", StringComparison.Ordinal);
+                if (parts.Length - 1 > 0 && parts[^2] == n)
                     n += "_";
 
                 sb.Append(new string(' ', (parts.Length + 1) * 4));
@@ -141,7 +142,7 @@ namespace Serenity.CodeGenerator
             sb.AppendLine("    }");
             sb.AppendLine("}");
 
-            new MultipleOutputHelper().WriteFiles(outDir, new SortedDictionary<string, string>
+            MultipleOutputHelper.WriteFiles(outDir, new SortedDictionary<string, string>
             {
                 { "MVC.cs", sb.ToString() }
             });

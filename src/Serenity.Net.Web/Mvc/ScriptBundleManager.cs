@@ -11,7 +11,7 @@ namespace Serenity.Web
 {
     public class ScriptBundleManager : IScriptBundleManager
     {
-        private static readonly object sync = new object();
+        private static readonly object sync = new();
 
         private bool isEnabled;
         private Dictionary<string, string> bundleKeyBySourceUrl;

@@ -37,7 +37,7 @@ namespace Serenity.Services
      
             if (Data != null)
             {
-                JsonTextWriter writer = new JsonTextWriter(new StreamWriter(response.Body)) { Formatting = Formatting };
+                JsonTextWriter writer = new(new StreamWriter(response.Body)) { Formatting = Formatting };
                 JsonSerializer serializer = JsonSerializer.Create(SerializerSettings);
                 serializer.Serialize(writer, Data);
                 writer.Flush();

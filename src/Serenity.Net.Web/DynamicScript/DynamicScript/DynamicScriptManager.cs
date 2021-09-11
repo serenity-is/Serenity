@@ -17,7 +17,7 @@ namespace Serenity.Web
         private readonly IPermissionService permissions;
         private readonly ITextLocalizer localizer;
 
-        private static readonly UTF8Encoding utf8Encoding = new UTF8Encoding(true);
+        private static readonly UTF8Encoding utf8Encoding = new(true);
 
         public DynamicScriptManager(ITwoLevelCache cache, IPermissionService permissions, ITextLocalizer localizer)
         {

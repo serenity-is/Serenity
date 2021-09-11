@@ -46,7 +46,7 @@ namespace Serenity.CodeGeneration
             return "String";
         }
 
-        private string GetEditorTypeKeyFrom(TypeReference propertyType, TypeReference basedOnFieldType, CustomAttribute editorTypeAttr)
+        private static string GetEditorTypeKeyFrom(TypeReference propertyType, TypeReference basedOnFieldType, CustomAttribute editorTypeAttr)
         {
             if (editorTypeAttr == null)
                 return AutoDetermineEditorType(propertyType, basedOnFieldType);
@@ -100,7 +100,7 @@ namespace Serenity.CodeGeneration
             {
                 identifier = identifier.Substring(0,
                     identifier.Length - requestSuffix.Length) + "Form";
-                this.fileIdentifier = identifier;
+                fileIdentifier = identifier;
             }
 
             cw.Indented("export interface ");
@@ -147,8 +147,7 @@ namespace Serenity.CodeGeneration
                         bool ignored = false;
                         foreach (var annotationType in rowAnnotations)
                         {
-                            PropertyDefinition annotation;
-                            if (annotationType.PropertyByName.TryGetValue(item.Name, out annotation) &&
+                            if (annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation) &&
                                 CecilUtils.FindAttr(annotation.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
                             {
                                 ignored = true;
@@ -168,8 +167,7 @@ namespace Serenity.CodeGeneration
                     {
                         foreach (var annotationType in rowAnnotations)
                         {
-                            PropertyDefinition annotation;
-                            if (!annotationType.PropertyByName.TryGetValue(item.Name, out annotation))
+                            if (!annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation))
                                 continue;
 
                             editorTypeAttr = CecilUtils.FindAttr(annotation.CustomAttributes,
@@ -179,7 +177,7 @@ namespace Serenity.CodeGeneration
                         }
                     }
 
-                    var editorType = GetEditorTypeKeyFrom(item.PropertyType, basedOnField != null ? basedOnField.PropertyType : (TypeReference)null, editorTypeAttr);
+                    var editorType = GetEditorTypeKeyFrom(item.PropertyType, basedOnField?.PropertyType, editorTypeAttr);
 
                     ExternalType scriptType = null;
 
@@ -197,7 +195,7 @@ namespace Serenity.CodeGeneration
                     var fullName = ShortenFullName(scriptType, codeNamespace);
                     var shortName = fullName;
                     if (fullName.StartsWith("Serenity.", StringComparison.Ordinal))
-                        shortName = "s." + fullName.Substring("Serenity.".Length);
+                        shortName = "s." + fullName["Serenity.".Length..];
 
                     propertyNames.Add(item.Name);
                     propertyTypes.Add(shortName);

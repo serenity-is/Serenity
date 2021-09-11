@@ -14,7 +14,7 @@ namespace Serenity.CodeGenerator
 {
     public class TSTypeLister
     {
-        private string projectDir;
+        private readonly string projectDir;
 
         public TSTypeLister(string projectDir)
         {
@@ -23,11 +23,9 @@ namespace Serenity.CodeGenerator
 
         private string GetEmbeddedScript(string name)
         {
-            using (var sr = new StreamReader(this.GetType()
-                .GetTypeInfo().Assembly.GetManifestResourceStream(name)))
-            {
-                return sr.ReadToEnd();
-            }
+            using var sr = new StreamReader(GetType()
+                .GetTypeInfo().Assembly.GetManifestResourceStream(name));
+            return sr.ReadToEnd();
         }
 
         private class TSConfig
@@ -105,8 +103,8 @@ namespace Serenity.CodeGenerator
                             !File.Exists(x.Substring(0, x.Length - ".d.ts".Length) + ".ts"));
 
                     files = files.Concat(allTsFiles.Where(x => includePatterns.Any() && 
-                        includeGlob.IsMatch(x.Substring(projectDir.Length + 1)) &&
-                        (!excludePatterns.Any() || !excludeGlob.IsMatch(x.Substring(projectDir.Length + 1)))));
+                        includeGlob.IsMatch(x[(projectDir.Length + 1)..]) &&
+                        (!excludePatterns.Any() || !excludeGlob.IsMatch(x[(projectDir.Length + 1)..]))));
 
                     files = files.Distinct();
                 }
@@ -131,7 +129,7 @@ namespace Serenity.CodeGenerator
                 var corelib = files.Where(x => string.Equals(Path.GetFileName(x),
                     "Serenity.CoreLib.d.ts", StringComparison.OrdinalIgnoreCase));
 
-                Func<string, bool> corelibUnderTypings = x =>
+                bool corelibUnderTypings(string x) =>
                     x.Replace('\\', '/').EndsWith("/typings/serenity/Serenity.CoreLib.d.ts",
                         StringComparison.OrdinalIgnoreCase);
 
@@ -147,7 +145,7 @@ namespace Serenity.CodeGenerator
             var tsServices = GetEmbeddedScript("Serenity.CodeGenerator.Resource.typescriptServices.js");
             var codeGeneration = GetEmbeddedScript("Serenity.CodeGenerator.Resource.Serenity.CodeGeneration.js");
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.AppendLine("var fs = require('fs');");
             sb.AppendLine(tsServices);
             sb.AppendLine(codeGeneration);
@@ -175,7 +173,7 @@ namespace Serenity.CodeGenerator
                 }
             }
 
-            Action<string> writeCache = (json) =>
+            void writeCache(string json)
             {
                 try
                 {
@@ -186,7 +184,7 @@ namespace Serenity.CodeGenerator
                 catch
                 {
                 }
-            };
+            }
 
             var tempDirectory = Path.ChangeExtension(Path.GetTempFileName(), null) + "__";
             Directory.CreateDirectory(tempDirectory);

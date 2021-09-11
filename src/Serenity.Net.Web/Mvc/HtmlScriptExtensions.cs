@@ -55,7 +55,7 @@ namespace Serenity.Web
             if (bundleManager.IsEnabled)
                 return Stylesheet(helper, "dynamic://CssBundle." + bundleKey);
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             foreach (var include in bundleManager.GetBundleIncludes(bundleKey))
             {
                 var cssUrl = include;
@@ -124,7 +124,7 @@ namespace Serenity.Web
             if (bundleManager.IsEnabled)
                 return Script(helper, "dynamic://Bundle." + bundleKey);
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             foreach (var include in bundleManager.GetBundleIncludes(bundleKey))
             {
                 var scriptUrl = include;
@@ -155,7 +155,7 @@ namespace Serenity.Web
         }
 
         const string IncludedScriptsAndCssKey = "HtmlScriptExtensions:IncludedScriptsAndCss";
-        static readonly Regex EndingWithVersionRegex = new Regex(@"\?v=[0-9a-zA-Z_-]*$", RegexOptions.Compiled);
+        static readonly Regex EndingWithVersionRegex = new(@"\?v=[0-9a-zA-Z_-]*$", RegexOptions.Compiled);
 
         private static bool IsAlreadyIncluded(IDictionary<object, object> contextItems, string url)
         {

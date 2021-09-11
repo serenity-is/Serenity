@@ -18,7 +18,7 @@ namespace Serenity.Tests
 
         public MockDataReader()
         {
-            values = new object[0][];
+            values = Array.Empty<object[]>();
             props = Array.Empty<string>();
         }
 

@@ -99,8 +99,8 @@ namespace Inflector
 
         private static void AddIrregular(string singular, string plural)
         {
-            AddPlural("(" + singular[0] + ")" + singular.Substring(1) + "$", "$1" + plural.Substring(1));
-            AddSingular("(" + plural[0] + ")" + plural.Substring(1) + "$", "$1" + singular.Substring(1));
+            AddPlural("(" + singular[0] + ")" + singular[1..] + "$", "$1" + plural[1..]);
+            AddSingular("(" + plural[0] + ")" + plural[1..] + "$", "$1" + singular[1..]);
         }
 
         private static void AddUncountable(string word)
@@ -118,9 +118,9 @@ namespace Inflector
             _singulars.Add(new Rule(rule, replacement));
         }
 
-        private static readonly List<Rule> _plurals = new List<Rule>();
-        private static readonly List<Rule> _singulars = new List<Rule>();
-        private static readonly List<string> _uncountables = new List<string>();
+        private static readonly List<Rule> _plurals = new();
+        private static readonly List<Rule> _singulars = new();
+        private static readonly List<string> _uncountables = new();
 
         public static string Pluralize(this string word)
         {
@@ -188,12 +188,12 @@ namespace Inflector
 
         public static string Capitalize(this string word)
         {
-            return word.Substring(0, 1).ToUpperInvariant() + word.Substring(1).ToLowerInvariant();
+            return word.Substring(0, 1).ToUpperInvariant() + word[1..].ToLowerInvariant();
         }
 
         public static string Uncapitalize(this string word)
         {
-            return word.Substring(0, 1).ToLowerInvariant() + word.Substring(1);
+            return word.Substring(0, 1).ToLowerInvariant() + word[1..];
         }
 
         public static string Ordinalize(this string numberString)
@@ -215,17 +215,13 @@ namespace Inflector
                 return numberString + "th";
             }
 
-            switch (number % 10)
+            return (number % 10) switch
             {
-                case 1:
-                    return numberString + "st";
-                case 2:
-                    return numberString + "nd";
-                case 3:
-                    return numberString + "rd";
-                default:
-                    return numberString + "th";
-            }
+                1 => numberString + "st",
+                2 => numberString + "nd",
+                3 => numberString + "rd",
+                _ => numberString + "th",
+            };
         }
 
 

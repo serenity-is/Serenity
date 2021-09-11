@@ -22,7 +22,7 @@ namespace Serenity.ComponentModel
         }
 
         public static readonly Regex EmailPattern = 
-            new Regex(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+" + 
+            new(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+" + 
                     @"@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
                 RegexOptions.ECMAScript | RegexOptions.Compiled);
 

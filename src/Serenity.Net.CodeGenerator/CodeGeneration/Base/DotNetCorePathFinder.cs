@@ -1,5 +1,4 @@
 ﻿using Mono.Cecil;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -25,11 +24,11 @@ namespace ICSharpCode.Decompiler
             public DotNetCorePackageInfo(string fullName, string type, string path, string[] runtimeComponents)
             {
                 var parts = fullName.Split('/');
-                this.Name = parts[0];
-                this.Version = parts[1];
-                this.Type = type;
-                this.Path = path;
-                this.RuntimeComponents = runtimeComponents ?? Array.Empty<string>();
+                Name = parts[0];
+                Version = parts[1];
+                Type = type;
+                Path = path;
+                RuntimeComponents = runtimeComponents ?? Array.Empty<string>();
             }
         }
 
@@ -52,15 +51,14 @@ namespace ICSharpCode.Decompiler
         readonly string basePath;
         readonly Version version;
         readonly string dotnetBasePath = FindDotNetExeDirectory();
-        readonly Dictionary<string, string> BasePathAssemblies = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        readonly List<string> searchPaths = new List<string>();
+        readonly List<string> searchPaths = new();
         ILookup<string, string> packageLocationByName;
 
         public DotNetCorePathFinder(string parentAssemblyFileName, string targetFrameworkId, UniversalAssemblyResolver.TargetFrameworkIdentifier targetFramework, 
             Version version)
         {
-            this.assemblyName = Path.GetFileNameWithoutExtension(parentAssemblyFileName);
-            this.basePath = Path.GetDirectoryName(parentAssemblyFileName);
+            assemblyName = Path.GetFileNameWithoutExtension(parentAssemblyFileName);
+            basePath = Path.GetDirectoryName(parentAssemblyFileName);
 
             searchPaths.Add(basePath);
 
@@ -274,7 +272,9 @@ namespace ICSharpCode.Decompiler
             return null;
         }
 
+#pragma warning disable CA2101 // Specify marshaling for P/Invoke string arguments
         [DllImport("libc")]
+#pragma warning restore CA2101 // Specify marshaling for P/Invoke string arguments
         static extern void realpath(string path, StringBuilder resolvedPath);
 
         public static string DetectTargetFrameworkId(AssemblyDefinition assembly)

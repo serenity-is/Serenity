@@ -8,8 +8,8 @@ namespace Serenity.CodeGeneration
 {
     public partial class ClientTypesGenerator : ImportGeneratorBase
     {
-        static HashSet<string> lookupEditorBaseOptions;
-        static HashSet<string> serviceLookupEditorBaseOptions;
+        static readonly HashSet<string> lookupEditorBaseOptions;
+        static readonly HashSet<string> serviceLookupEditorBaseOptions;
 
         static ClientTypesGenerator()
         {
@@ -32,9 +32,8 @@ namespace Serenity.CodeGeneration
             {
                 var key = type.Key;
                 var ssType = type.Value;
-                ExternalType tsType;
                 if (ssType.IsDeclaration &&
-                    tsTypes.TryGetValue(key, out tsType) &&
+                    tsTypes.TryGetValue(key, out ExternalType tsType) &&
                     !tsType.IsDeclaration)
                     continue;
 
@@ -59,7 +58,7 @@ namespace Serenity.CodeGeneration
             }
         }
 
-        private string GetNamespace(string ns)
+        private static string GetNamespace(string ns)
         {
             if (ns == "Serenity")
                 return "Serenity.ComponentModel";

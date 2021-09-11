@@ -11,13 +11,11 @@ namespace Serenity.CodeGenerator
     {
         public static string TemplatePath { get; set; }
 
-        private static ConcurrentDictionary<string, Scriban.Template> templateCache = 
-            new ConcurrentDictionary<string, Scriban.Template>();
+        private static readonly ConcurrentDictionary<string, Template> templateCache = new();
 
-        private static Scriban.Template GetTemplate(string templateKey)
+        private static Template GetTemplate(string templateKey)
         {
-            Scriban.Template t;
-            if (templateCache.TryGetValue(templateKey, out t))
+            if (templateCache.TryGetValue(templateKey, out Template t))
                 return t;
 
             string template = null;
@@ -35,10 +33,10 @@ namespace Serenity.CodeGenerator
                     .GetManifestResourceStream("Serenity.CodeGenerator.Templates." + templateKey + ".scriban");
 
                 if (stream == null)
-                    throw new System.Exception("Can't find template resource with key: " + templateKey);
+                    throw new Exception("Can't find template resource with key: " + templateKey);
 
-                using (var sr = new StreamReader(stream))
-                    template = sr.ReadToEnd();
+                using var sr = new StreamReader(stream);
+                template = sr.ReadToEnd();
             }
 
             t = Template.Parse(template);
@@ -51,10 +49,12 @@ namespace Serenity.CodeGenerator
             var template = GetTemplate(templateKey);
             try
             {
-                var context = new TemplateContext();
-                context.LoopLimit = 100000;
-                context.RecursiveLimit = 1000;
-                context.MemberRenamer = x => x.Name;
+                var context = new TemplateContext
+                {
+                    LoopLimit = 100000,
+                    RecursiveLimit = 1000,
+                    MemberRenamer = x => x.Name
+                };
                 context.CurrentGlobal.Import(model,
                     ScriptMemberImportFlags.Field | ScriptMemberImportFlags.Property,
                     null, x => x.Name);

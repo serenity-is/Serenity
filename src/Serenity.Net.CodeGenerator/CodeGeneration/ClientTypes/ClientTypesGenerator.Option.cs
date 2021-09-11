@@ -30,7 +30,7 @@ namespace Serenity.CodeGeneration
                 return "object";
 
             if (typeName.StartsWith("System.", StringComparison.Ordinal))
-                return typeName.Substring(7);
+                return typeName[7..];
 
             return typeName;
         }
@@ -54,22 +54,20 @@ namespace Serenity.CodeGeneration
                 sb.AppendLine();
                 cw.Indented("public ");
                 sb.Append(typeName);
-                sb.Append(" ");
+                sb.Append(' ');
 
                 string jsName = option.Name;
                 string optionName = option.Name;
-                var prop = option as ExternalProperty;
-                if (prop != null)
+                if (option is ExternalProperty prop)
                     jsName = GetPropertyScriptName(prop, preserveMemberCase);
                 else if (type.Origin == ExternalTypeOrigin.TS)
                 {
-                    var emo = option as ExternalMethod;
-                    if (emo != null && emo.Arguments.Count == 1)
+                    if (option is ExternalMethod emo && emo.Arguments.Count == 1)
                     {
                         if (jsName.StartsWith("set_", StringComparison.Ordinal))
                         {
-                            jsName = jsName.Substring(4);
-                            optionName = optionName.Substring(4);
+                            jsName = jsName[4..];
+                            optionName = optionName[4..];
                         }
 
                         typeName = GetOptionTypeName(emo.Arguments[0].Type);
@@ -82,7 +80,7 @@ namespace Serenity.CodeGeneration
                         optionName = "ID";
                     else
                         optionName = char.ToUpperInvariant(optionName[0]) +
-                            optionName.Substring(1);
+                            optionName[1..];
                 }
 
                 sb.AppendLine(optionName);
@@ -101,10 +99,10 @@ namespace Serenity.CodeGeneration
             }
         }
 
-        private void AddOptionMembers(SortedDictionary<string, ExternalMember> dict,
+        private static void AddOptionMembers(SortedDictionary<string, ExternalMember> dict,
             ExternalType type, bool isOptions)
         {
-            List<ExternalMember> members = new List<ExternalMember>();
+            List<ExternalMember> members = new();
 
             members.AddRange(type.Properties);
 
@@ -124,8 +122,7 @@ namespace Serenity.CodeGeneration
                     if (member.Attributes.Any(x => x.Type == "System.ComponentModel.HiddenAttribute"))
                         continue;
 
-                    var prop = member as ExternalProperty;
-                    if (prop == null)
+                    if (member is not ExternalProperty prop)
                         continue;
 
                     if (string.IsNullOrEmpty(prop.GetMethod) &&

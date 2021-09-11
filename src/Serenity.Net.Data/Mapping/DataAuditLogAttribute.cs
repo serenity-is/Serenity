@@ -6,7 +6,7 @@ namespace Serenity.Data
     /// Indicates that the entity should be audit logged.
     /// This feature is only available in premium app.
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     public class DataAuditLogAttribute : Attribute
     {
         /// <summary>

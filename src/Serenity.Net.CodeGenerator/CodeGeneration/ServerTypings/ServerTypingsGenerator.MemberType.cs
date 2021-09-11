@@ -8,7 +8,7 @@ namespace Serenity.CodeGeneration
         protected override void HandleMemberType(TypeReference memberType, string codeNamespace, 
             StringBuilder sb = null)
         {
-            sb = sb ?? this.sb;
+            sb ??= this.sb;
             bool isSystem = memberType.Namespace == "System";
 
             if (isSystem && memberType.Name == "String")

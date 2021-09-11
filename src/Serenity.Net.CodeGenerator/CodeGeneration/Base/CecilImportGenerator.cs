@@ -20,7 +20,7 @@ namespace Serenity.CodeGeneration
         protected List<AnnotationTypeInfo> annotationTypes;
 
         protected CecilImportGenerator(params Assembly[] assemblies)
-            : this(CecilUtils.ToDefinitions(assemblies == null ? (string[])null : assemblies.Select(x => x.Location)))
+            : this(CecilUtils.ToDefinitions(assemblies?.Select(x => x.Location)))
         {
         }
 
@@ -36,9 +36,9 @@ namespace Serenity.CodeGeneration
             annotationTypes = new List<AnnotationTypeInfo>();
 
             if (assemblies == null || assemblies.Length == 0)
-                throw new ArgumentNullException("assembly");
+                throw new ArgumentNullException(nameof(assemblies));
 
-            this.Assemblies = assemblies;
+            Assemblies = assemblies;
         }
 
         public AssemblyDefinition[] Assemblies { get; private set; }
@@ -108,7 +108,7 @@ namespace Serenity.CodeGeneration
             string className = controller.Name;
 
             if (className.EndsWith("Controller", StringComparison.Ordinal))
-                className = className.Substring(0, className.Length - 10);
+                className = className[0..^10];
 
             return className + "Service";
         }
@@ -117,11 +117,11 @@ namespace Serenity.CodeGeneration
         {
             base.Reset();
 
-            this.cw.BraceOnSameLine = IsTS();
-            this.generateQueue = new Queue<TypeDefinition>();
-            this.visited = new HashSet<string>();
-            this.lookupScripts = new List<TypeDefinition>();
-            this.localTextKeys = new HashSet<string>();
+            cw.BraceOnSameLine = IsTS();
+            generateQueue = new Queue<TypeDefinition>();
+            visited = new HashSet<string>();
+            lookupScripts = new List<TypeDefinition>();
+            localTextKeys = new HashSet<string>();
         }
 
         protected abstract bool IsTS();
@@ -236,15 +236,15 @@ namespace Serenity.CodeGeneration
             {
                 var typeDef = generateQueue.Dequeue();
 
-                if (!this.Assemblies.Any(x => x.FullName == typeDef.Module.Assembly.FullName))
+                if (!Assemblies.Any(x => x.FullName == typeDef.Module.Assembly.FullName))
                     continue;
 
                 var ns = GetNamespace(typeDef);
-                this.fileIdentifier = typeDef.Name;
+                fileIdentifier = typeDef.Name;
 
                 GenerateCodeFor(typeDef);
 
-                AddFile(RemoveRootNamespace(ns, this.fileIdentifier + (IsTS() ? ".ts" : ".cs")));
+                AddFile(RemoveRootNamespace(ns, fileIdentifier + (IsTS() ? ".ts" : ".cs")));
             }
         }
 
@@ -259,9 +259,8 @@ namespace Serenity.CodeGeneration
             foreach (var attr in annotationTypeAttrs)
             {
                 var attrInfo = new AnnotationTypeInfo.AttributeInfo();
-                var annotatedType = attr.ConstructorArguments?.FirstOrDefault(x =>
-                    x.Type.FullName == "System.Type").Value as TypeReference;
-                if (annotatedType == null)
+                if (attr.ConstructorArguments?.FirstOrDefault(x =>
+                    x.Type.FullName == "System.Type").Value is not TypeReference annotatedType)
                     continue;
 
                 attrInfo.AnnotatedType = annotatedType.Resolve();
@@ -296,7 +295,7 @@ namespace Serenity.CodeGeneration
 
                 foreach (var attr in annotationType.Attributes)
                 {
-                    baseClasses = baseClasses ?? CecilUtils.EnumerateBaseClasses(type).ToArray();
+                    baseClasses ??= CecilUtils.EnumerateBaseClasses(type).ToArray();
 
                     if (CecilUtils.IsOrSubClassOf(attr.AnnotatedType, "System", "Attribute"))
                     {
@@ -327,8 +326,8 @@ namespace Serenity.CodeGeneration
                                 ns.EndsWith(".*", StringComparison.OrdinalIgnoreCase) &&
                                 type.Namespace != null)
                             {
-                                if (type.Namespace == ns.Substring(0, ns.Length - 2) ||
-                                    type.Namespace.StartsWith(ns.Substring(0, ns.Length - 1), StringComparison.OrdinalIgnoreCase))
+                                if (type.Namespace == ns[0..^2] ||
+                                    type.Namespace.StartsWith(ns[0..^1], StringComparison.OrdinalIgnoreCase))
                                 {
                                     namespaceMatch = true;
                                     break;
@@ -400,7 +399,7 @@ namespace Serenity.CodeGeneration
             {
                 var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
                 if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1), StringComparison.Ordinal))
-                    return ns.Substring(idx + 1);
+                    return ns[(idx + 1)..];
             }
 
             return ns;
@@ -428,7 +427,7 @@ namespace Serenity.CodeGeneration
             {
                 var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
                 if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1), StringComparison.Ordinal))
-                    return ns.Substring(idx + 1);
+                    return ns[(idx + 1)..];
             }
 
             return ns;
@@ -436,7 +435,7 @@ namespace Serenity.CodeGeneration
 
         protected virtual string MakeFriendlyName(TypeReference type, string codeNamespace, StringBuilder sb = null)
         {
-            sb = sb ?? this.sb;
+            sb ??= this.sb;
 
             if (type.IsGenericInstance)
             {
@@ -480,7 +479,7 @@ namespace Serenity.CodeGeneration
                     sb.Append(argument.Name);
                 }
 
-                sb.Append(">");
+                sb.Append('>');
 
                 return name + "`" + type.GenericParameters.Count;
             }
@@ -493,7 +492,7 @@ namespace Serenity.CodeGeneration
 
         protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, StringBuilder sb = null)
         {
-            sb = sb ?? this.sb;
+            sb ??= this.sb;
 
             string ns;
 
@@ -540,7 +539,7 @@ namespace Serenity.CodeGeneration
                 sb.Append(type.Name);
         }
 
-        protected TypeReference GetBaseClass(TypeDefinition type)
+        protected static TypeReference GetBaseClass(TypeDefinition type)
         {
             foreach (var t in CecilUtils.SelfAndBaseClasses(type))
             {
@@ -573,7 +572,7 @@ namespace Serenity.CodeGeneration
 
         protected abstract void GenerateCodeFor(TypeDefinition type);
 
-        protected bool IsPublicServiceMethod(MethodDefinition method, out TypeReference requestType, out TypeReference responseType,
+        protected static bool IsPublicServiceMethod(MethodDefinition method, out TypeReference requestType, out TypeReference responseType,
             out string requestParam)
         {
             if (method == null)
@@ -612,7 +611,7 @@ namespace Serenity.CodeGeneration
 
             requestParam = parameters.Length == 0 ? "request" : parameters[0].Name;
 
-            responseType = method.ReturnType == null ? null : method.ReturnType;
+            responseType = method.ReturnType;
             if (responseType != null &&
                 responseType.IsGenericInstance &&
                 (responseType as GenericInstanceType).ElementType.FullName.StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal))
@@ -636,7 +635,7 @@ namespace Serenity.CodeGeneration
             return true;
         }
 
-        protected string GetServiceUrlFromRoute(TypeDefinition controller)
+        protected static string GetServiceUrlFromRoute(TypeDefinition controller)
         {
             if (controller == null)
                 throw new ArgumentNullException(nameof(controller));
@@ -662,19 +661,19 @@ namespace Serenity.CodeGeneration
                 if (idx2 <= 0)
                     break;
 
-                url = url.Substring(0, idx1) + url.Substring(idx2 + 1);
+                url = url.Substring(0, idx1) + url[(idx2 + 1)..];
             }
 
             if (url.StartsWith("~/Services/", StringComparison.OrdinalIgnoreCase))
-                url = url.Substring("~/Services/".Length);
+                url = url["~/Services/".Length..];
 
             if (url.Length > 1 && url.EndsWith("/", StringComparison.Ordinal))
-                url = url.Substring(0, url.Length - 1);
+                url = url[0..^1];
 
             return url;
         }
 
-        private string GetMethodName(ExternalMethod method, bool preserveMemberCase)
+        private static string GetMethodName(ExternalMethod method, bool preserveMemberCase)
         {
             string methodName = method.Name;
 
@@ -689,7 +688,7 @@ namespace Serenity.CodeGeneration
                 if (methodName == "ID")
                     methodName = "id";
                 else methodName = methodName.Substring(0, 1).ToLowerInvariant()
-                    + methodName.Substring(1);
+                    + methodName[1..];
             }
 
             return methodName;
@@ -707,9 +706,9 @@ namespace Serenity.CodeGeneration
 
             public AnnotationTypeInfo(TypeDefinition annotationType)
             {
-                this.AnnotationType = annotationType;
-                this.PropertyByName = new Dictionary<string, PropertyDefinition>();
-                this.Attributes = new List<AttributeInfo>();
+                AnnotationType = annotationType;
+                PropertyByName = new Dictionary<string, PropertyDefinition>();
+                Attributes = new List<AttributeInfo>();
 
                 foreach (var property in annotationType.Properties)
                     if (CecilUtils.IsPublicInstanceProperty(property))

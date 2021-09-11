@@ -82,7 +82,7 @@ namespace Serenity.CodeGenerator
                     "mvct".StartsWith(command, StringComparison.Ordinal))
                 {
                     List<ExternalType> tsTypes = null;
-                    Func<List<ExternalType>> getTsTypes = () =>
+                    List<ExternalType> getTsTypes()
                     {
                         if (tsTypes == null)
                         {
@@ -91,26 +91,26 @@ namespace Serenity.CodeGenerator
                         }
 
                         return tsTypes;
-                    };
+                    }
 
                     bool transformAll = "transform".StartsWith(command, StringComparison.Ordinal);
 
                     if (transformAll ||
                         "mvct".StartsWith(command, StringComparison.Ordinal))
                     {
-                        new MvcCommand().Run(csproj);
+                        MvcCommand.Run(csproj);
                     }
 
                     if (transformAll ||
                         "clienttypes".StartsWith(command, StringComparison.Ordinal) || command == "mvct")
                     {
-                        new ClientTypesCommand().Run(csproj, getTsTypes());
+                        ClientTypesCommand.Run(csproj, getTsTypes());
                     }
 
                     if (transformAll ||
                         "servertypings".StartsWith(command, StringComparison.Ordinal))
                     {
-                        new ServerTypingsCommand().Run(csproj, getTsTypes());
+                        ServerTypingsCommand.Run(csproj, getTsTypes());
                     }
 
                     return ExitCodes.Success;
@@ -118,7 +118,7 @@ namespace Serenity.CodeGenerator
 
                 if ("generate".StartsWith(command, StringComparison.Ordinal))
                 {
-                    new GenerateCommand().Run(csproj, args.Skip(1).ToArray());
+                    GenerateCommand.Run(csproj, args.Skip(1).ToArray());
                     return ExitCodes.Success;
                 }
             }

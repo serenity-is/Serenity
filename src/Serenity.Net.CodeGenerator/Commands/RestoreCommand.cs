@@ -31,7 +31,7 @@ namespace Serenity.CodeGenerator
 
             var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            Func<string, bool> skipPackage = id =>
+            bool skipPackage(string id)
             {
                 if (visited.Contains(id))
                     return true;
@@ -42,7 +42,7 @@ namespace Serenity.CodeGenerator
                 visited.Add(id);
 
                 return false;
-            };
+            }
 
             var projectDir = Path.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
@@ -171,7 +171,7 @@ namespace Serenity.CodeGenerator
 
                 var ver = dep.Version.Trim();
                 if (ver.EndsWith("-*", StringComparison.Ordinal))
-                    ver = ver.Substring(0, ver.Length - 2);
+                    ver = ver[0..^2];
                 else if (ver.StartsWith("[", StringComparison.Ordinal) && ver.EndsWith("]", StringComparison.Ordinal))
                 {
                     ver = ver[1..^1].Trim();
@@ -214,7 +214,7 @@ namespace Serenity.CodeGenerator
                         if (string.Compare(extension, ".transform", StringComparison.OrdinalIgnoreCase) == 0)
                             continue;
 
-                        var relative = PathHelper.ToUrl(file.Substring(contentRoot.Length + 1));
+                        var relative = PathHelper.ToUrl(file[(contentRoot.Length + 1)..]);
 
                         // normalize paths as Content, Scripts, fonts and typings (these are exact cases expected)
                         if (relative.StartsWith("content/", StringComparison.OrdinalIgnoreCase))

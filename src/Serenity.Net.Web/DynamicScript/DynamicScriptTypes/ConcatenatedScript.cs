@@ -28,7 +28,7 @@ namespace Serenity.Web
 
         public override string GetScript()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             foreach (var part in scriptParts)
             {
