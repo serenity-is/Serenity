@@ -66,6 +66,9 @@
       <Private>True</Private>
       <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Win32.Registry, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Win32.Registry.4.7.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
+    </Reference>
     <Reference Include="MsieJavaScriptEngine, Version=3.0.6.0, Culture=neutral, PublicKeyToken=a3a2846a37ac0d3e, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MsieJavaScriptEngine.3.0.6\lib\net45\MsieJavaScriptEngine.dll</HintPath>
     </Reference>
@@ -85,6 +88,12 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.4.5.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.AccessControl, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.AccessControl.4.7.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Principal.Windows.4.7.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
     </Reference>
     <Reference Include="System.Text.Encoding.CodePages, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Text.Encoding.CodePages.4.5.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
@@ -114,7 +123,7 @@
       <HintPath>..\..\packages\Selenium.WebDriver.3.141.0\lib\net45\WebDriver.dll</HintPath>
     </Reference>
     <Reference Include="WebDriverManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\WebDriverManager.2.9.3\lib\netstandard2.0\WebDriverManager.dll</HintPath>
+      <HintPath>..\..\packages\WebDriverManager.2.11.0\lib\netstandard2.0\WebDriverManager.dll</HintPath>
     </Reference>
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.3\lib\net35\xunit.abstractions.dll</HintPath>
@@ -137,6 +146,9 @@
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowLocalTextPrefix.cs" />
     <Compile Include="CodeGeneration\ServerTypingsGenerator\ServerTypingsGeneratorTests.RowLookupKey.cs" />
     <Compile Include="Core\Authorization\PermissionExpressionParserTests.cs" />
+    <Compile Include="Core\Caching\BatchGenerationUpdaterTest\BatchGenerationUpdaterTests.cs" />
+    <Compile Include="Core\Caching\BatchGenerationUpdaterTest\CacheLinkedTestRow.cs" />
+    <Compile Include="Core\Caching\BatchGenerationUpdaterTest\CacheTestRow.cs" />
     <Compile Include="Core\ComponentModel\PropertyGrid\FormWidthAttributeTests.cs" />
     <Compile Include="Core\IO\GlobFilterTests.cs" />
     <Compile Include="Core\Json\JsonSettingsTests.cs" />
@@ -307,11 +319,11 @@
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\jquery-3.4.1.intellisense.js" />
-    <Content Include="Scripts\jquery-3.4.1.js" />
-    <Content Include="Scripts\jquery-3.4.1.min.js" />
-    <Content Include="Scripts\jquery-3.4.1.slim.js" />
-    <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
+    <Content Include="Scripts\jquery-3.5.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.5.1.js" />
+    <Content Include="Scripts\jquery-3.5.1.min.js" />
+    <Content Include="Scripts\jquery-3.5.1.slim.js" />
+    <Content Include="Scripts\jquery-3.5.1.slim.min.js" />
     <Content Include="Scripts\jquery-ui-1.12.1.js" />
     <Content Include="Scripts\jquery-ui-1.12.1.min.js" />
     <Content Include="Scripts\jquery.validate-vsdoc.js" />
@@ -330,8 +342,8 @@
     <Content Include="Content\css\select2x2.png" />
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
-    <None Include="Scripts\jquery-3.4.1.min.map" />
-    <None Include="Scripts\jquery-3.4.1.slim.min.map" />
+    <None Include="Scripts\jquery-3.5.1.min.map" />
+    <None Include="Scripts\jquery-3.5.1.slim.min.map" />
     <None Include="Scripts\serenity\texts\serenity.texts.de.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.es.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.pt.json" />

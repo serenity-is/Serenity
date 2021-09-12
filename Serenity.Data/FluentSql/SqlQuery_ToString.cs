@@ -246,7 +246,7 @@ namespace Serenity.Data
                     sb.Append(", ");
 
                 if (useRowNum && orderBy == null)
-                    sb.Append("ROWNUM AS __rownum__");
+                    sb.Append("ROWNUM AS x__rownum__");
                 else
                 {
                     sb.Append("ROW_NUMBER() OVER (ORDER BY ");
@@ -263,7 +263,7 @@ namespace Serenity.Data
                     }
 
                     sb.Append(") AS ");
-                    sb.Append(useRowNum ? "__rownum__" : "__num__");
+                    sb.Append(useRowNum ? "x__rownum__" : "__num__");
                 }
             }
 
@@ -278,7 +278,7 @@ namespace Serenity.Data
 
             if (useRowNum)
             {
-                sb.Append(") WHERE __rownum__ > " + skip);
+                sb.Append(") WHERE x__rownum__ > " + skip);
                 if (take > 0)
                     sb.Append(" AND ROWNUM <= " + take);
             }

@@ -214,6 +214,10 @@ namespace Serenity.CodeGenerator
                     removeForeignFields.Add(n);
             }
 
+            removeForeignFields.Add("password");
+            removeForeignFields.Add("passwordhash");
+            removeForeignFields.Add("passwordsalt");
+
             if (baseRowFieldset != null &&
                 baseRowFieldset.Count > 0)
             {
@@ -287,7 +291,7 @@ namespace Serenity.CodeGenerator
                     {
                         if (frg.FieldName.Equals(foreign.PKColumn, StringComparison.OrdinalIgnoreCase))
                             continue;
-
+                        
                         var k = ToEntityField(frg, frgPrefix);
                         k.Flags = null;
                         k.Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName.Substring(frgPrefix)));

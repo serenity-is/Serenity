@@ -1327,11 +1327,9 @@ var Serenity;
             hidden.select2(select2Options);
             hidden.attr('type', 'text');
             // for jquery validate to work
-            hidden.on('change.' + _this.uniqueName, function (e) {
-                if (!$(e.target).hasClass('select2-change-triggered') &&
-                    hidden.closest('form').data('validator')) {
+            hidden.on('change.' + _this.uniqueName, function (e, valueSet) {
+                if (valueSet !== true && hidden.closest('form').data('validator'))
                     hidden.valid();
-                }
             });
             _this.setCascadeFrom(_this.options.cascadeFrom);
             if (_this.useInplaceAdd())
@@ -1620,8 +1618,8 @@ var Serenity;
                 var isNew = _this.isMultiple() || Q.isEmptyOrNull(_this.get_value());
                 inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
             });
-            this.element.change(function (e) {
-                if ($(e.target).hasClass('select2-change-triggered'))
+            this.element.change(function (e, valueSet) {
+                if (valueSet === true)
                     return;
                 if (_this.isMultiple()) {
                     var values = _this.get_values();
@@ -1780,7 +1778,7 @@ var Serenity;
                 el.select2('val', val);
                 el.data('select2-change-triggered', true);
                 try {
-                    el.triggerHandler('change');
+                    el.triggerHandler('change', [true]); // valueSet: true
                 }
                 finally {
                     el.data('select2-change-triggered', false);
@@ -2687,7 +2685,7 @@ var Serenity;
             }
             $('<script/>').attr('type', 'text/javascript')
                 .attr('id', 'CKEditorScript')
-                .attr('src', Q.resolveUrl('~/Scripts/CKEditor/ckeditor.js?v=' +
+                .attr('src', Q.resolveUrl('~/Scripts/ckeditor/ckeditor.js?v=' +
                 HtmlContentEditor_1.CKEditorVer))
                 .appendTo(window.document.head);
         };

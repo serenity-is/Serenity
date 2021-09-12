@@ -1,3 +1,34 @@
+## 3.14.5 (2020-11-24)
+
+Features:
+  - support ICustomQueryParameter interface of Dapper, used to control parameter type like varchar (ansi), fixed length etc.
+
+Bugfixes:
+  - try another logic similar to original one implemented for changeSelect2
+
+## 3.14.4 (2020-11-23)
+
+Bugfixes:
+  - fix changeSelect2 is raised even when value is set through .value property due to check using hasClass instead of data
+
+## 3.14.3 (2020-10-21)
+
+Bugfixes:
+  - prefix `__rownum__` alias with x as Oracle does not seem to like it
+
+## 3.14.2 (2020-10-19)
+
+Features:
+  - option to disable layout timer in datagrid
+
+Bugfixes:
+  - row number over order by does not gurantee order and might mess paging in some rare cases on SQL 2005/2008
+  - missing localization for "set to now" in date time editor
+  - datetime editor time part is not readonly when editor itself is readonly
+  - keyprefix not used properly for get in RedisDistributedCache
+  - fix infinite resizing on some cases in datagrid due to layout timer
+  - reading pathLink.href directly results in full address like localhost:6543/ instead of just /, so use getAttribute to fix Q.Config.AppPath
+
 ## 3.14.1 (2020-09-09)
 
 Bugfixes:
