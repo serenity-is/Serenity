@@ -46,7 +46,7 @@ namespace Serenity.Web
 
         private bool IsInternalFile(string path)
         {
-            return path != null && Path.GetExtension(path)?.ToLowerInvariant()?.Trim() == "meta";
+            return path != null && Path.GetExtension(path)?.ToLowerInvariant()?.Trim() == ".meta";
         }
 
         public bool FileExists(string path)
