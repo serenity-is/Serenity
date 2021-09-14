@@ -18,9 +18,9 @@ namespace Serenity.CodeGeneration
             GeneratePermissionKeysFor(type, declare: true);
         }
 
-        protected void GeneratePermissionKeysFor(TypeDefinition type, bool declare)
+        protected void GeneratePermissionKeysFor(TypeDefinition type, bool export)
         {
-            cw.Indented(declare ? "declare namespace ": "namespace ");
+            cw.Indented(export ? "export namespace ": "namespace ");
             sb.Append(type.Name);
             cw.InBrace(delegate
             {
@@ -45,7 +45,7 @@ namespace Serenity.CodeGeneration
                         continue;
 
                     sb.AppendLine();
-                    GeneratePermissionKeysFor(nested, declare: false);
+                    GeneratePermissionKeysFor(nested, export: false);
                 }
             });
         }
