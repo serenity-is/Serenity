@@ -20,7 +20,7 @@ namespace Serenity.CodeGeneration
 
         protected void GeneratePermissionKeysFor(TypeDefinition type, bool declare)
         {
-            cw.Indented(declare ? "export declare namespace ": "namespace ");
+            cw.Indented(declare ? "export namespace ": "namespace ");
             sb.Append(type.Name);
             cw.InBrace(delegate
             {
