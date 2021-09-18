@@ -1,5 +1,5 @@
 ﻿
-using System.Data.Common;
+using System;
 
 namespace Serenity.Data
 {
@@ -33,7 +33,7 @@ namespace Serenity.Data
 
                 if (!connectionKey.IsEmptyOrNull())
                 {
-                    databaseName = GetDatabaseName(connectionKey);
+                    databaseName = GetDatabaseName?.Invoke(connectionKey);
                     if (!string.IsNullOrEmpty(databaseName))
                         return databaseName;
                 }
@@ -45,30 +45,9 @@ namespace Serenity.Data
             });
         }
 
-
-        private static readonly string[] databaseNameKeys = new string[]
-                {
-            "Initial Catalog",
-            "Database"
-                };
-
         /// <summary>
-        /// Exracts database name from connection string
+        /// Temporary workaround as this class has no reference to SQL connection strings
         /// </summary>
-        /// <param name="connectionString">Connection string</param>
-        /// <returns></returns>
-        public static string GetDatabaseName(string connectionString)
-        {
-            var csb = new DbConnectionStringBuilder
-            {
-                ConnectionString = connectionString
-            };
-
-            foreach (var s in databaseNameKeys)
-                if (csb.ContainsKey(s))
-                    return csb[s] as string;
-
-            return null;
-        }
+        public static Func<string, string> GetDatabaseName { get; set; }
     }
 }
