@@ -1,3 +1,15 @@
+## 5.0.51 (2021-09-18)
+
+Features:
+  - cleanup code analysis warnings
+  - include base class properties while searching for id / name properties in server typings row generation
+  - temporary workaround for database caret references, which is a legacy feature
+  
+Bugfixes:
+  - fix extension comparison for meta files in DiskUploadStorage
+  - add export to generated permission keys namespaces, thanks @marcobisio
+  - swallow exception in TemporaryFileStorage as this may cause startup errors and result in application pool crash while trying to create temporary folder, better to ignore than crash
+
 ## 5.0.50 (2021-09-07)
 
 Features:
