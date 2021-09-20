@@ -50,10 +50,10 @@ namespace Serenity.CodeGeneration
                     if (requestType == null)
                         sb.Append(ShortenFullName(new ExternalType { Name = "ServiceRequest", Namespace = "Serenity" }, codeNamespace));
                     else
-                        MakeFriendlyReference(requestType, codeNamespace);
+                        HandleMemberType(requestType, codeNamespace);
 
                     sb.Append(", onSuccess?: (response: ");
-                    MakeFriendlyReference(responseType, codeNamespace);
+                    HandleMemberType(responseType, codeNamespace);
                     sb.AppendLine(") => void, opt?: Q.ServiceOptions<any>): JQueryXHR;");
                 }
 
