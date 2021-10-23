@@ -13,10 +13,10 @@ namespace Serenity.CodeGeneration
 
             switch (typeName)
             {
-                case "number": return "Double";
-                case "string": return "String";
+                case "number": return "double";
+                case "string": return "string";
                 case "Date": return "DateTime";
-                case "boolean": return "Boolean";
+                case "boolean": return "bool";
             }
 
             var nullablePrefix = "System.Nullable`1";
@@ -30,7 +30,7 @@ namespace Serenity.CodeGeneration
                 return "object";
 
             if (typeName.StartsWith("System.", StringComparison.Ordinal))
-                return typeName[7..];
+                return SystemTypes.ToCSKeyword(typeName[7..]);
 
             return typeName;
         }

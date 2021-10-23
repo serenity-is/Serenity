@@ -71,6 +71,7 @@ namespace Serenity.CodeGenerator
 
             var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out string dataType);
             dataType ??= fieldType;
+            dataType = CodeGeneration.SystemTypes.ToCSKeyword(dataType) ?? dataType;
             return new EntityField
             {
                 FieldType = fieldType,
