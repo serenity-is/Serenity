@@ -61,7 +61,7 @@ namespace Serenity.CodeGenerator
             if (fieldInfo.IsIdentity)
                 flags = "Identity";
             else if (fieldInfo.IsPrimaryKey)
-                flags = "PrimaryKey";
+                flags = fieldInfo.IsNullable ? "PrimaryKey" : "PrimaryKey, NotNull";
             else if (fieldInfo.DataType == "timestamp" || fieldInfo.DataType == "rowversion")
                 flags = "Insertable(false), Updatable(false), NotNull";
             else if (!fieldInfo.IsNullable)
