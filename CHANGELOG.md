@@ -1,3 +1,16 @@
+## 5.1.0 (2021-10-26)
+
+Features:
+  - better handling for custom types like dynamic, list etc. for code generation in endpoints
+  - generate c# keywords like string, int, long instead of system type names like String, Int32, Int64 for property types, closes #6026  
+  - remove unnecessary space from title for fields that start with underscore, closes #6041
+  - add ColumnsType to MasterDetailRelationAttribute that will be used instead of IncludeColumns, and IncludeColumnNames which is a string array instead of comma separated string, closes #6048
+
+Bugfixes:
+  - fix summaries not shown under groups at first when grouping changed by drag drop
+  - add NotNull attribute to generated row primary keys that are not nullable
+  - fix possible issue in rare cases with dapper query overloads that accept dynamic type params
+  
 ## 5.0.51 (2021-09-18)
 
 Features:
