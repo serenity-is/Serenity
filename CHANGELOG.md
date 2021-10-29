@@ -1,3 +1,8 @@
+## 5.1.1 (2021-10-29)
+
+Bugfixes:
+  - fix issue with tslib, corelib and rollup causing Serenity.CoreLib.js to fail
+
 ## 5.1.0 (2021-10-26)
 
 Features:
