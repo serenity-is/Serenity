@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Serenity.TypeScript.CoreLib",
   "main": "index.js",
-  "repository": "https://github.com/volkanceylan/serenity",
+  "repository": "https://github.com/serenity-is/serenity",
   "dependencies": {
     "@types/jquery": "2.0.48",
     "@types/jquery.blockui": "0.0.27",

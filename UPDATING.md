@@ -34,7 +34,7 @@ Applying latest Visual Studio patches, updating latest TypeScript / Node / NPM v
 
 We list the minimum requirements in this document:
 
-https://github.com/volkanceylan/Serenity/blob/master/INSTALL.md
+https://github.com/serenity-is/Serenity/blob/master/INSTALL.md
 
 > Versions listed there might be lower than latest TypeScript / Node versions but more recent versions would probably work.
 

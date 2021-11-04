@@ -647,7 +647,7 @@ Features:
 Bugfixes:
   - if allowNegatives is true and minValue / maxValue is not specified, minValue is set to 999999999999.99 instead of -999999999999.99 in decimal editor
   - only switch to main tab if current tab is being made disabled
-  - add / to handler paths to make them only available at root, see https://github.com/volkanceylan/Serenity/issues/4017
+  - add / to handler paths to make them only available at root, see https://github.com/serenity-is/Serenity/issues/4017
   
 ## 3.7.7 (2018-09-15)
 
