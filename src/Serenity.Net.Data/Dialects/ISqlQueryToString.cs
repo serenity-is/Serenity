@@ -10,7 +10,7 @@ namespace Serenity.Data
     public interface ISqlQueryToString
     {
         /// <summary>
-        /// The method which will call inside SqlQuery.ToString() method
+        ///    The method which will call inside SqlQuery.ToString() method
         /// </summary>
         /// <returns>
         ///   Formatted SELECT statement</returns>
