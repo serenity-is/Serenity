@@ -15,10 +15,12 @@ export function getCookie(name: string) {
 }
 
 typeof $ != 'undefined' && $.ajaxSetup && $.ajaxSetup({
-    beforeSend: function (xhr) {
-        var token = getCookie('CSRF-TOKEN');
-        if (token)
-            xhr.setRequestHeader('X-CSRF-TOKEN', token);
+    beforeSend: function (xhr, opt) {
+        if (!opt || !opt.crossDomain) {
+            var token = getCookie('CSRF-TOKEN');
+            if (token)
+                xhr.setRequestHeader('X-CSRF-TOKEN', token);
+        }
     }
 });
 
