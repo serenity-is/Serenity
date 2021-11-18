@@ -62,14 +62,27 @@ namespace Serenity.Data
                 if (!d.Contains(',', StringComparison.Ordinal))
                     return IsMatch(d) ? (attr, d.Length) : (null, 0);
 
-                return d.Split(comma, StringSplitOptions.RemoveEmptyEntries)
+                bool negate = d.StartsWith('!');
+                if (negate)
+                    d = d[1..];
+
+                var m = d.Split(comma, StringSplitOptions.RemoveEmptyEntries)
                     .Select(z => z.Trim())
-                    .Where(IsMatch)
-                    .OrderByDescending(z => z.Length)
+                    .Where(IsMatch);
+
+                if (negate)
+                {
+                    if (m.Any())
+                        return (null, 0);
+
+                    return (attr, d.Length + 1);
+                }
+
+                return m.OrderByDescending(z => z.Length)
                     .Select(z => (attr, z.Length))
                     .FirstOrDefault();
-            })
-                .Where(x => x.attr != null);
+
+            }).Where(x => x.attr != null);
 
             var count = matches.Count();
 
