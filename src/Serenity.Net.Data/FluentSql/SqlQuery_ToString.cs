@@ -334,13 +334,13 @@ namespace Serenity.Data
                 if (columns.Any())
                     sb.Append(", ");
 
-                if (useRowNum && orderBy == null)
+                if (useRowNum && orderBy.Length == 0)
                     sb.Append("ROWNUM AS x__rownum__");
                 else
                 {
                     sb.Append("ROW_NUMBER() OVER (ORDER BY ");
 
-                    if (orderBy != null)
+                    if (orderBy.Length > 0)
                     {
                         for (var i = 0; i < orderBy.Length; i++)
                         {
