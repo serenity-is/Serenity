@@ -66,7 +66,7 @@ namespace Serenity.Data
             var orderBy = query.OrderBy.ToArray();
 
             if (skip > 0 && orderBy.Length == 0 && 
-                !dialect.CanUseSkipKeyword && !dialect.UseRowNum && !dialect.CanUseOffsetFetch)
+                !dialect.CanUseSkipKeyword && !dialect.UseRowNum)
                 throw new InvalidOperationException("A query must be ordered by unique fields " +
                     "to be able to skip records!");
 
