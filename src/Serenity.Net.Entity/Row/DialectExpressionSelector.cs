@@ -25,10 +25,28 @@ namespace Serenity.Data
             dialectTypeName = dialect.GetType().Name;
         }
 
-        private bool IsMatch(string s)
+        /// <summary>
+        /// Gets if the dialect is a match, e.g. dialect server type or dialect type name starts with given name
+        /// </summary>
+        /// <param name="dialect">The dialect specifier.</param>
+        /// <returns></returns>
+        public bool IsMatch(string dialect)
         {
-            return dialectServerType.StartsWith(s, StringComparison.OrdinalIgnoreCase) ||
-                dialectTypeName.StartsWith(s, StringComparison.OrdinalIgnoreCase);
+            if (string.IsNullOrEmpty(dialect))
+                return true;
+
+            if (!dialect.Contains(',', StringComparison.Ordinal))
+                return InternalIsMatch(dialect);
+
+            return dialect.Split(comma, StringSplitOptions.RemoveEmptyEntries)
+                .Select(z => z.Trim())
+                .Any(InternalIsMatch);
+        }
+
+        private bool InternalIsMatch(string dialect)
+        {
+            return dialectServerType.StartsWith(dialect, StringComparison.OrdinalIgnoreCase) ||
+                dialectTypeName.StartsWith(dialect, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -56,12 +74,12 @@ namespace Serenity.Data
                 if (string.IsNullOrEmpty(getDialect(x)))
                     return true;
 
-                if (d.IndexOf(',') < 0)
-                    return IsMatch(d);
+                if (!d.Contains(',', StringComparison.Ordinal))
+                    return InternalIsMatch(d);
 
                 var best = d.Split(comma, StringSplitOptions.RemoveEmptyEntries)
                     .Select(z => z.Trim())
-                    .Where(z => IsMatch(z))
+                    .Where(InternalIsMatch)
                     .OrderByDescending(z => z.Length)
                     .FirstOrDefault();
 

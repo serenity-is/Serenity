@@ -55,5 +55,10 @@ namespace Serenity.Data.Mapping
         /// The type of the row.
         /// </value>
         Type RowType { get; set; }
+
+        /// <summary>
+        /// Gets the dialect.
+        /// </summary>
+        public string Dialect { get; }
     }
 }

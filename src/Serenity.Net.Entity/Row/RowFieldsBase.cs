@@ -310,10 +310,19 @@ namespace Serenity.Data
                             scale = property.GetAttribute<ScaleAttribute>();
                             selectLevel = property.GetAttribute<MinSelectLevelAttribute>();
                             foreignKey = property.GetAttribute<ForeignKeyAttribute>();
+                            
                             leftJoin = property.GetAttributes<LeftJoinAttribute>()
-                                .FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
+                                .FirstOrDefault(x => 
+                                    x.ToTable == null && 
+                                    x.OnCriteria == null &&
+                                    expressionSelector.IsMatch(x.Dialect));
+
                             innerJoin = property.GetAttributes<InnerJoinAttribute>()
-                                .FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
+                                .FirstOrDefault(x => 
+                                    x.ToTable == null && 
+                                    x.OnCriteria == null &&
+                                    expressionSelector.IsMatch(x.Dialect));
+
                             defaultValue = property.GetAttribute<DefaultValueAttribute>();
                             textualField = property.GetAttribute<TextualFieldAttribute>();
                             dateTimeKind = property.GetAttribute<DateTimeKindAttribute>();
@@ -516,12 +525,16 @@ namespace Serenity.Data
                             }
 
                             foreach (var attr in property.GetAttributes<LeftJoinAttribute>())
-                                if (attr.ToTable != null && attr.OnCriteria != null)
+                                if (attr.ToTable != null && 
+                                    attr.OnCriteria != null &&
+                                    expressionSelector.IsMatch(attr.OnCriteria))
                                     new LeftJoin(joins, attr.ToTable, attr.Alias,
                                         new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
 
                             foreach (var attr in property.GetAttributes<InnerJoinAttribute>())
-                                if (attr.ToTable != null && attr.OnCriteria != null)
+                                if (attr.ToTable != null && 
+                                    attr.OnCriteria != null &&
+                                    expressionSelector.IsMatch(attr.OnCriteria))
                                     new InnerJoin(joins, attr.ToTable, attr.Alias,
                                         new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
 
@@ -551,13 +564,17 @@ namespace Serenity.Data
                     }
                 }
 
-                foreach (var attr in rowCustomAttributes.OfType<LeftJoinAttribute>())
+                var rowJoinAttributes = rowCustomAttributes.OfType<ISqlJoin>()
+                    .Where(x => expressionSelector.IsMatch(x.Dialect))
+                    .ToArray();
+
+                foreach (var attr in rowJoinAttributes.OfType<LeftJoinAttribute>())
                     new LeftJoin(joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
-                foreach (var attr in rowCustomAttributes.OfType<InnerJoinAttribute>())
+                foreach (var attr in rowJoinAttributes.OfType<InnerJoinAttribute>())
                     new InnerJoin(joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
-                foreach (var attr in rowCustomAttributes.OfType<OuterApplyAttribute>())
+                foreach (var attr in rowJoinAttributes.OfType<OuterApplyAttribute>())
                     new OuterApply(joins, attr.InnerQuery, attr.Alias);
 
                 primaryKeys = this.Where(x => x.flags.HasFlag(FieldFlags.PrimaryKey))
