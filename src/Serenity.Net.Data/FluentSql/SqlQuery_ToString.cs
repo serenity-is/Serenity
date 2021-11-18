@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Serenity.Data
@@ -12,21 +14,59 @@ namespace Serenity.Data
         ///   Formatted SELECT statement</returns>
         public override string ToString()
         {
+            return ToString(this, dialect);
+        }
+
+        IEnumerable<Column> ISqlQuery.Columns => columns;
+        bool ISqlQuery.Distinct => distinct;
+        string ISqlQuery.ForJson => forJson;
+        string ISqlQuery.ForXml => forXml;
+        string ISqlQuery.From => from?.ToString();
+        string ISqlQuery.GroupBy => groupBy?.ToString();
+        string ISqlQuery.Having => having?.ToString();
+        bool ISqlQuery.OmitParens => omitParens;
+        IEnumerable<string> ISqlQuery.OrderBy => (IEnumerable<string>)orderBy ?? Array.Empty<string>();
+        IQueryWithParams ISqlQuery.Parent => parent;
+        int ISqlQuery.Skip => skip;
+        int ISqlQuery.Take => take;
+        ISqlQuery ISqlQuery.UnionQuery => unionQuery;
+        SqlUnionType ISqlQuery.UnionType => unionType;
+        string ISqlQuery.Where => where?.ToString();
+
+        /// <summary>
+        ///   Formats SQL Query as string. If paging is used and skip requested, multiple queries 
+        ///   might be created one after each other.</summary>
+        /// <returns>
+        ///   Formatted SELECT statement</returns>
+        public static string ToString(ISqlQuery query, ISqlDialect dialect)
+        {
+            if (query is null)
+                throw new ArgumentNullException(nameof(query));
+
+            if (dialect is ISqlQueryToString sqlQueryToString)
+                return sqlQueryToString.ToString(query);
+
             var sb = new StringBuilder();
 
-            if (unionQuery != null)
+            if (query.UnionQuery != null)
             {
-                sb.Append(unionQuery.ToString());
+                sb.Append(query.UnionQuery.ToString());
                 sb.Append("\n\n");
-                sb.Append(dialect.UnionKeyword(unionType));
+                sb.Append(dialect.UnionKeyword(query.UnionType));
                 sb.Append("\n\n");
             }
 
             // sub queries should be enclosed in paranthesis
-            if (parent != null && !omitParens)
+            if (query.Parent != null && !query.OmitParens)
                 sb.Append("(");
 
-            if (skip > 0 && orderBy == null && !dialect.CanUseSkipKeyword && !dialect.UseRowNum)
+            var skip = query.Skip;
+            var take = query.Take;
+
+            var orderBy = query.OrderBy.ToArray();
+
+            if (skip > 0 && orderBy.Length == 0 && 
+                !dialect.CanUseSkipKeyword && !dialect.UseRowNum && !dialect.CanUseOffsetFetch)
                 throw new InvalidOperationException("A query must be ordered by unique fields " +
                     "to be able to skip records!");
 
@@ -38,6 +78,55 @@ namespace Serenity.Data
             bool useRowNum = (skip > 0 || take > 0) && dialect.UseRowNum;
             bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && !useRowNum && dialect.CanUseRowNumber;
             bool useSecondQuery = skip > 0 && !useSkipKeyword && !useOffset && !useRowNumber;
+
+            void appendFromWhereOrderByGroupByHaving(string extraWhere, bool includeOrderBy)
+            {
+                if (!string.IsNullOrEmpty(query.From))
+                {
+                    sb.Append(SqlKeywords.From);
+                    sb.Append(query.From);
+                }
+
+                if (extraWhere != null || !string.IsNullOrEmpty(query.Where))
+                {
+                    sb.Append(SqlKeywords.Where);
+
+                    if (!string.IsNullOrEmpty(query.Where))
+                        sb.Append(query.Where);
+
+                    if (extraWhere != null)
+                    {
+                        if (!string.IsNullOrEmpty(query.Where))
+                            sb.Append(" AND ");
+                        sb.Append(extraWhere);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(query.GroupBy))
+                {
+                    sb.Append(SqlKeywords.GroupBy);
+                    sb.Append(query.GroupBy);
+                }
+
+                if (!string.IsNullOrEmpty(query.Having))
+                {
+                    sb.Append(SqlKeywords.Having);
+                    sb.Append(query.Having);
+                }
+
+                if (includeOrderBy && orderBy.Length > 0)
+                {
+                    sb.Append(SqlKeywords.OrderBy);
+
+                    for (int i = 0; i < orderBy.Length; i++)
+                    {
+                        if (i > 0)
+                            sb.Append(", ");
+
+                        sb.Append(orderBy[i]);
+                    }
+                }
+            }
 
             // skip requested?
             if (useRowNumber || useRowNum || useSecondQuery)
@@ -86,13 +175,13 @@ namespace Serenity.Data
                     var check = new StringBuilder();
 
                     // sorted field names minus DESC
-                    var order = new string[orderBy.Count];
+                    var order = new string[orderBy.Length];
 
                     // descending flag for sorted field names
-                    var desc = new bool[orderBy.Count];
+                    var desc = new bool[orderBy.Length];
 
                     // scan all order list
-                    for (int i = 0; i < orderBy.Count; i++)
+                    for (int i = 0; i < orderBy.Length; i++)
                     {
                         // declare a SQL_VARIANT variable for all sorted fields
                         sb.AppendFormat(DeclareCmd, i);
@@ -107,7 +196,7 @@ namespace Serenity.Data
                     }
 
                     sb.Append(SqlKeywords.Select);
-                    if (distinct)
+                    if (query.Distinct)
                         sb.Append(SqlKeywords.Distinct);
 
                     sb.Append(dialect.TakeKeyword);
@@ -123,7 +212,7 @@ namespace Serenity.Data
                         sb.AppendFormat(AssignCmd, i, order[i]);
                     }
 
-                    AppendFromWhereOrderByGroupByHaving(sb, null, true);
+                    appendFromWhereOrderByGroupByHaving(null, true);
 
                     sb.Append(";\n");
 
@@ -179,7 +268,7 @@ namespace Serenity.Data
             // actual SELECT query starts here
             sb.Append(SqlKeywords.Select);
 
-            if (distinct)
+            if (query.Distinct)
             {
                 sb.Append(SqlKeywords.Distinct);
             }
@@ -201,26 +290,27 @@ namespace Serenity.Data
             }
 
             StringBuilder selCount = null;
-            if (distinct)
+            if (query.Distinct)
                 selCount = new StringBuilder();
 
             sb.Append('\n');
 
-            // traverse selected columns
-            for (int i = 0; i < columns.Count; i++)
-            {
-                var s = columns[i];
+            var columns = query.Columns;
 
-                if (i > 0)
+            // traverse selected columns
+            int cidx = 0;
+            foreach (var s in columns)
+            {
+                if (cidx > 0)
                 {
                     sb.Append(",\n");
-                    if (distinct)
+                    if (query.Distinct)
                         selCount.Append(',');
                 }
 
                 sb.Append(s.Expression);
 
-                if (distinct)
+                if (query.Distinct)
                     selCount.Append(s.Expression);
 
                 // write alias if any
@@ -229,17 +319,19 @@ namespace Serenity.Data
                     sb.Append(SqlKeywords.As);
                     var quoted = dialect.QuoteColumnAlias(s.ColumnName);
                     sb.Append(quoted);
-                    if (distinct)
+                    if (query.Distinct)
                     {
                         selCount.Append(SqlKeywords.As);
                         selCount.Append(quoted);
                     }
                 }
+
+                cidx++;
             }
 
             if (useRowNumber || useRowNum)
             {
-                if (columns.Count > 0)
+                if (columns.Any())
                     sb.Append(", ");
 
                 if (useRowNum && orderBy == null)
@@ -250,7 +342,7 @@ namespace Serenity.Data
 
                     if (orderBy != null)
                     {
-                        for (int i = 0; i < orderBy.Count; i++)
+                        for (var i = 0; i < orderBy.Length; i++)
                         {
                             if (i > 0)
                                 sb.Append(", ");
@@ -263,9 +355,9 @@ namespace Serenity.Data
                     sb.Append(useRowNum ? "x__rownum__" : "__num__");
                 }
             }
-
+            
             // write remaining parts of the select query
-            AppendFromWhereOrderByGroupByHaving(sb, extraWhere, true);
+            appendFromWhereOrderByGroupByHaving(extraWhere, true);
 
             if (useRowNumber)
             {
@@ -296,19 +388,19 @@ namespace Serenity.Data
                     sb.Append(string.Format(dialect.OffsetFetchFormat, skip, take));
             }
 
-            if (!string.IsNullOrEmpty(forXml))
+            if (!string.IsNullOrEmpty(query.ForXml))
             {
                 sb.Append(" FOR XML ");
-                sb.Append(forXml);
+                sb.Append(query.ForXml);
             }
 
-            if (!string.IsNullOrEmpty(forJson))
+            if (!string.IsNullOrEmpty(query.ForJson))
             {
                 sb.Append(" FOR JSON ");
-                sb.Append(forJson);
+                sb.Append(query.ForJson);
             }
 
-            if (countRecords)
+            if (query.CountRecords)
             {
                 if (!dialect.MultipleResultsets)
                     sb.Append("\n---\n"); // temporary fix till we find a better solution for firebird
@@ -317,7 +409,7 @@ namespace Serenity.Data
                 sb.Append(SqlKeywords.Select);
                 sb.Append("count(*) ");
 
-                if (distinct)
+                if (query.Distinct)
                 {
                     sb.Append(SqlKeywords.From);
                     sb.Append('(');
@@ -325,7 +417,7 @@ namespace Serenity.Data
                     sb.Append(SqlKeywords.Distinct);
                     sb.Append(selCount);
                 }
-                else if (groupBy != null && groupBy.Length > 0)
+                else if (!string.IsNullOrEmpty(query.GroupBy))
                 {
                     sb.Append(SqlKeywords.From);
                     sb.Append('(');
@@ -333,69 +425,21 @@ namespace Serenity.Data
                     sb.Append(" 1 as _alias_x_ ");
                 }
 
-                AppendFromWhereOrderByGroupByHaving(sb, null, false);
+                appendFromWhereOrderByGroupByHaving(null, false);
 
-                if (distinct || (groupBy != null && groupBy.Length > 0))
+                if (query.Distinct || (!string.IsNullOrEmpty(query.GroupBy)))
                 {
                     sb.Append(") _alias_");
                 }
             }
 
             // sub queries should be enclosed in paranthesis
-            if (parent != null && !omitParens)
+            if (query.Parent != null && !query.OmitParens)
                 sb.Append(")");
 
             return sb.ToString();
         }
 
-        private void AppendFromWhereOrderByGroupByHaving(StringBuilder sb, string extraWhere,
-            bool includeOrderBy)
-        {
-            if (from.Length > 0)
-            {
-                sb.Append(SqlKeywords.From);
-                sb.Append(from.ToString());
-            }
 
-            if (extraWhere != null || where != null)
-            {
-                sb.Append(SqlKeywords.Where);
-
-                if (where != null)
-                    sb.Append(@where);
-
-                if (extraWhere != null)
-                {
-                    if (where != null)
-                        sb.Append(" AND ");
-                    sb.Append(extraWhere);
-                }
-            }
-
-            if (groupBy != null)
-            {
-                sb.Append(SqlKeywords.GroupBy);
-                sb.Append(groupBy);
-            }
-
-            if (having != null)
-            {
-                sb.Append(SqlKeywords.Having);
-                sb.Append(having);
-            }
-
-            if (includeOrderBy && orderBy != null)
-            {
-                sb.Append(SqlKeywords.OrderBy);
-
-                for (int i = 0; i < orderBy.Count; i++)
-                {
-                    if (i > 0)
-                        sb.Append(", ");
-
-                    sb.Append(orderBy[i]);
-                }
-            }
-        }
     }
 }
