@@ -86,7 +86,7 @@ namespace Serenity.Services
 
         private string FromFormOrQuery(HttpRequest request, string name)
         {
-            var allowForm = AllowForm;
+            var allowForm = AllowForm && request.HasFormContentType;
             var allowQuery = AllowQuery;
             if (!allowForm && !allowQuery)
                 return null;

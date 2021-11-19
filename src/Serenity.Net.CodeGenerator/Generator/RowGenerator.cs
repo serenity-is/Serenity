@@ -61,7 +61,7 @@ namespace Serenity.CodeGenerator
             if (fieldInfo.IsIdentity)
                 flags = "Identity";
             else if (fieldInfo.IsPrimaryKey)
-                flags = "PrimaryKey";
+                flags = fieldInfo.IsNullable ? "PrimaryKey" : "PrimaryKey, NotNull";
             else if (fieldInfo.DataType == "timestamp" || fieldInfo.DataType == "rowversion")
                 flags = "Insertable(false), Updatable(false), NotNull";
             else if (!fieldInfo.IsNullable)
@@ -71,6 +71,7 @@ namespace Serenity.CodeGenerator
 
             var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out string dataType);
             dataType ??= fieldType;
+            dataType = CodeGeneration.SystemTypes.ToCSKeyword(dataType) ?? dataType;
             return new EntityField
             {
                 FieldType = fieldType,
@@ -78,7 +79,7 @@ namespace Serenity.CodeGenerator
                 IsValueType = fieldType != "String" && fieldType != "Stream" && fieldType != "ByteArray",
                 TSType = FieldTypeToTS(fieldType),
                 Ident = GenerateVariableName(fieldInfo.FieldName[prefixLength..]),
-                Title = Inflector.Inflector.Titleize(fieldInfo.FieldName[prefixLength..]),
+                Title = Inflector.Inflector.Titleize(fieldInfo.FieldName[prefixLength..])?.Trim(),
                 Flags = flags,
                 Name = fieldInfo.FieldName,
                 Size = fieldInfo.Size == 0 ? null : fieldInfo.Size,
@@ -105,7 +106,7 @@ namespace Serenity.CodeGenerator
             var className = entityClass ?? ClassNameFromTableName(table);
             model.ClassName = className;
             model.RowClassName = className + "Row";
-            model.Title = Inflector.Inflector.Titleize(className);
+            model.Title = Inflector.Inflector.Titleize(className)?.Trim();
             model.Tablename = table;
             model.Fields = new List<EntityField>();
             model.Joins = new List<EntityJoin>();
@@ -286,7 +287,7 @@ namespace Serenity.CodeGenerator
                         
                         var k = ToEntityField(frg, frgPrefix);
                         k.Flags = null;
-                        k.Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName[frgPrefix..]));
+                        k.Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName[frgPrefix..]))?.Trim();
                         k.Ident = JI(j.Name, k.Ident);
                         i = 0;
                         ident = k.Ident;

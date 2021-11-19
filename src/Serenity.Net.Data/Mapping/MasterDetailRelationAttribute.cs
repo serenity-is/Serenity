@@ -47,12 +47,29 @@ namespace Serenity.Data.Mapping
         public ColumnSelection ColumnSelection { get; set; }
 
         /// <summary>
+        /// Gets or sets the columns type with properties to include in column selection
+        /// </summary>
+        /// <value>
+        /// The include columns type with properties to include.
+        /// </value>
+        public Type ColumnsType { get; set; }
+
+        /// <summary>
         /// Gets or sets the comma separated list of include columns.
+        /// Obsolete, please prefer IncludeColumnNames or ColumnsType
         /// </summary>
         /// <value>
         /// The include columns.
         /// </value>
         public string IncludeColumns { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of include column names as array.
+        /// </summary>
+        /// <value>
+        /// The include columns.
+        /// </value>
+        public string[] IncludeColumnNames { get; set; }
 
         /// <summary>
         /// Gets or sets the filter field.

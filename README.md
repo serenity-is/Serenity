@@ -1,9 +1,9 @@
 Serenity Application Platform
 =============================
 
-<img src="https://github.com/volkanceylan/Serenity/blob/master/build/assets/package-icon.png" />
+<img src="https://github.com/serenity-is/Serenity/blob/master/build/assets/package-icon.png" />
 
-[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Net.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Net.Core/)
+[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/serenity-is/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Net.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Net.Core/)
 
 ## What is Serenity Platform
 
@@ -11,7 +11,7 @@ Serenity is an ASP.NET Core / TypeScript application platform designed to simpli
 
 It aims to make development easier while reducing maintenance costs by avoiding boiler-plate code, reducing the time spent on repetitive tasks and applying best software design practices. 
 
-<img src="https://github.com/volkanceylan/Serene/blob/master/Template/img/SereneAnimation.gif" />
+<img src="https://github.com/serenity-is/Serene/blob/master/Template/img/SereneAnimation.gif" />
 
 ## Documentation and Tutorials
 
@@ -58,7 +58,7 @@ Visit [this blog post](http://serenity.is/blog/2017/08/08/what-is-in-premium) fo
 
 ## Commercial Support
 
-Paid support options are available from the author and a team of Serenity professionals. [Contact us](mailto:volkanceylan@gmail.com) for details.
+Paid support options are available from the author and a team of Serenity professionals. [Contact us](mailto:sales@serenity.is) for details.
 
 ## Video Tutorials (thanks a lot to for these contributions)
 

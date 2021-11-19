@@ -47,7 +47,6 @@ export class RemoteView<TEntity> {
                 );
             },
             predefinedValues: <any[]>[],
-            aggregators: <any[]>[],
             aggregateEmpty: false,
             aggregateCollapsed: false,
             aggregateChildGroups: false,

@@ -50,6 +50,19 @@ namespace Serenity.CodeGeneration
                 rowType.FullName != "Serenity.Data.Row`1");
         }
 
+        private static IEnumerable<PropertyDefinition> EnumerateProperties(TypeDefinition rowType)
+        {
+            do
+            {
+                foreach (var property in rowType.Properties.Where(x =>
+                    CecilUtils.IsPublicInstanceProperty(x)))
+                    yield return property;
+            }
+            while ((rowType = (rowType.BaseType?.Resolve())) != null &&
+                rowType.FullName != "Serenity.Data.Row" &&
+                rowType.FullName != "Serenity.Data.Row`1");
+        }
+
         private void GenerateRowMembers(TypeDefinition rowType)
         {
             var codeNamespace = GetNamespace(rowType);
@@ -283,16 +296,18 @@ namespace Serenity.CodeGeneration
                 "Serenity.Data.IIdField", "IdField", 
                 "Serenity.Data.IIdField Serenity.Data.IIdRow::get_IdField()");
 
+            var properties = EnumerateProperties(rowType).ToList();
+
             if (idProperty == null)
             {
-                idProperty = rowType.Properties.FirstOrDefault(x =>
+                idProperty = properties.FirstOrDefault(x =>
                     x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
                         "Serenity.Data", "IdPropertyAttribute") != null)?.Name;
             }
 
             if (idProperty == null)
             {
-                var identities = rowType.Properties.Where(x =>
+                var identities = properties.Where(x =>
                     x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
                         "Serenity.Data.Mapping", "IdentityAttribute") != null);
 
@@ -300,7 +315,7 @@ namespace Serenity.CodeGeneration
                     idProperty = identities.First().Name;
                 else if (!identities.Any())
                 {
-                    var primaryKeys = rowType.Properties.Where(x =>
+                    var primaryKeys = properties.Where(x =>
                         x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
                             "Serenity.Data.Mapping", "PrimaryKeyAttribute") != null);
 
@@ -315,7 +330,7 @@ namespace Serenity.CodeGeneration
 
             if (nameProperty == null)
             {
-                nameProperty = rowType.Properties.FirstOrDefault(x =>
+                nameProperty = properties.FirstOrDefault(x =>
                     x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
                         "Serenity.Data", "NamePropertyAttribute") != null)?.Name;
             }

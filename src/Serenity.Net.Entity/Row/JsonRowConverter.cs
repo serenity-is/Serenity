@@ -8,9 +8,14 @@ namespace Serenity.Data
     public class JsonRowConverter : JsonConverter
     {
         /// <summary>
-        /// The should serialize extension
+        /// Should serialize extension
         /// </summary>
         public static Func<IRow, string, bool> ShouldSerializeExtension;
+
+        /// <summary>
+        /// Should deserialize extension
+        /// </summary>
+        public static Func<IRow, string, bool> ShouldDeserializeExtension;
 
         /// <summary>
         ///   Writes the JSON representation of the object.</summary>
@@ -111,15 +116,24 @@ namespace Serenity.Data
                         if (field is null)
                             field = row.Fields.FindFieldByPropertyName(fieldName);
 
-                        if (field is null &&
+                        bool deserializeAsExtension = field is null &&
+                            !(ShouldDeserializeExtension is null) && ShouldDeserializeExtension(row, fieldName);
+
+                        if (field is null && 
+                            !deserializeAsExtension &&
                             serializer.MissingMemberHandling == MissingMemberHandling.Error)
-                            throw new JsonSerializationException(string.Format("Could not find field '{0}' on row of type '{1}'", fieldName, objectType.Name));
+                                throw new JsonSerializationException(string.Format("Could not find field '{0}' on row of type '{1}'", fieldName, objectType.Name));
 
                         while (reader.TokenType == JsonToken.Comment)
                             reader.Read();
 
                         if (field is null)
-                            reader.Skip();
+                        {
+                            if (deserializeAsExtension)
+                                row.SetDictionaryData(fieldName, reader.Value);
+                            else
+                                reader.Skip();
+                        }
                         else
                             field.ValueFromJson(reader, row, serializer);
 

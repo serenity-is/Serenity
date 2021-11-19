@@ -182,7 +182,7 @@ export default [
 			name: 'writeFinal',
 			generateBundle: function () {
 				outputs.splice(0, 0, fs.readFileSync('./node_modules/tslib/tslib.d.ts',
-					'utf8').replace(/^\uFEFF/, '').replace(/^export declare/gm, 'declare'));
+					'utf8').replace(/^\uFEFF/, '').replace(/^[ \t]*export declare/gm, 'declare'));
 
 				var src = outputs.join('\n').replace(/\r/g, '');
 				var refTypes = [];

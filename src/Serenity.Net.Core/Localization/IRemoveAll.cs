@@ -6,7 +6,7 @@
     /// <remarks>
     /// This is introduced so that we don't have to add a RemoveAll to ILocalTextRegistry 
     /// and break backward compatibility, while trying to resolve issue:
-    /// https://github.com/volkanceylan/Serenity/issues/4568
+    /// https://github.com/serenity-is/Serenity/issues/4568
     /// </remarks>
     public interface IRemoveAll
     {

@@ -1,3 +1,33 @@
+## 5.1.1 (2021-10-29)
+
+Bugfixes:
+  - fix issue with tslib, corelib and rollup causing Serenity.CoreLib.js to fail
+
+## 5.1.0 (2021-10-26)
+
+Features:
+  - better handling for custom types like dynamic, list etc. for code generation in endpoints
+  - generate c# keywords like string, int, long instead of system type names like String, Int32, Int64 for property types, closes #6026  
+  - remove unnecessary space from title for fields that start with underscore, closes #6041
+  - add ColumnsType to MasterDetailRelationAttribute that will be used instead of IncludeColumns, and IncludeColumnNames which is a string array instead of comma separated string, closes #6048
+
+Bugfixes:
+  - fix summaries not shown under groups at first when grouping changed by drag drop
+  - add NotNull attribute to generated row primary keys that are not nullable
+  - fix possible issue in rare cases with dapper query overloads that accept dynamic type params
+  
+## 5.0.51 (2021-09-18)
+
+Features:
+  - cleanup code analysis warnings
+  - include base class properties while searching for id / name properties in server typings row generation
+  - temporary workaround for database caret references, which is a legacy feature
+  
+Bugfixes:
+  - fix extension comparison for meta files in DiskUploadStorage
+  - add export to generated permission keys namespaces, thanks @marcobisio
+  - swallow exception in TemporaryFileStorage as this may cause startup errors and result in application pool crash while trying to create temporary folder, better to ignore than crash
+
 ## 5.0.50 (2021-09-07)
 
 Features:
@@ -617,7 +647,7 @@ Features:
 Bugfixes:
   - if allowNegatives is true and minValue / maxValue is not specified, minValue is set to 999999999999.99 instead of -999999999999.99 in decimal editor
   - only switch to main tab if current tab is being made disabled
-  - add / to handler paths to make them only available at root, see https://github.com/volkanceylan/Serenity/issues/4017
+  - add / to handler paths to make them only available at root, see https://github.com/serenity-is/Serenity/issues/4017
   
 ## 3.7.7 (2018-09-15)
 

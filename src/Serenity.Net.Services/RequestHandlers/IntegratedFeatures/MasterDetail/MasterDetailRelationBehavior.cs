@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 namespace Serenity.Services
 {
@@ -129,6 +130,15 @@ namespace Serenity.Services
                     if (col != null)
                         includeColumns.Add(col);
                 }
+
+            if (attr.IncludeColumnNames != null)
+                foreach (var s in attr.IncludeColumnNames)
+                    includeColumns.Add(s);
+
+            if (attr.ColumnsType != null)
+                foreach (var p in attr.ColumnsType.GetProperties(
+                    BindingFlags.Instance | BindingFlags.Public))
+                    includeColumns.Add(p.Name);
 
             return true;
         }
