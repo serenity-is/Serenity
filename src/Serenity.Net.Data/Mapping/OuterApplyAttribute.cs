@@ -63,5 +63,13 @@ namespace Serenity.Data.Mapping
 
         string ISqlJoin.OnCriteria => InnerQuery;
         string ISqlJoin.ToTable => null;
+
+        /// <summary>
+        /// Gets or sets the dialect.
+        /// </summary>
+        /// <value>
+        /// The dialect.
+        /// </value>
+        public string Dialect { get; set; }
     }
 }

@@ -96,6 +96,6 @@ namespace Serenity.Data.Mapping
         /// <value>
         /// The type of the row.
         /// </value>
-        public Type RowType { get; set; }
+        public Type RowType { get; private set; }
     }
 }

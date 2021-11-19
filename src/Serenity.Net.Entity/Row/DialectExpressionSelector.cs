@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Serenity.Data
 {
@@ -25,71 +26,82 @@ namespace Serenity.Data
             dialectTypeName = dialect.GetType().Name;
         }
 
-        private bool IsMatch(string s)
+        private bool IsMatch(string dialect)
         {
-            return dialectServerType.StartsWith(s, StringComparison.OrdinalIgnoreCase) ||
-                dialectTypeName.StartsWith(s, StringComparison.OrdinalIgnoreCase);
+            if (dialect[0] == '!')
+            {
+                dialect = dialect[1..];
+                return dialect.Length > 0 && !IsMatch(dialect);
+            }
+
+            return dialectServerType.StartsWith(dialect, StringComparison.OrdinalIgnoreCase) ||
+                dialectTypeName.StartsWith(dialect, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
         /// Gets the best match.
         /// </summary>
         /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
-        /// <param name="expressions">The expressions.</param>
+        /// <param name="attributes">The expressions.</param>
         /// <param name="getDialect">The get dialect.</param>
         /// <returns></returns>
-        public TAttribute GetBestMatch<TAttribute>(IEnumerable<TAttribute> expressions, 
+        public TAttribute GetBestMatch<TAttribute>(IEnumerable<TAttribute> attributes, 
             Func<TAttribute, string> getDialect)
+            where TAttribute: class
         {
-            if (!expressions.Any(x => !string.IsNullOrEmpty(getDialect(x))))
-                return expressions.FirstOrDefault();
-
             var st = dialectServerType;
             var tn = dialectTypeName;
 
-            Dictionary<TAttribute, int> weight = null;
-
-            var bestMatch = expressions.Where(x =>
+            var matches = attributes.Select(attr =>
             {
-                var d = getDialect(x);
+                var d = getDialect(attr);
 
-                if (string.IsNullOrEmpty(getDialect(x)))
-                    return true;
+                if (string.IsNullOrEmpty(getDialect(attr)))
+                    return (attr, 0);
 
-                if (d.IndexOf(',') < 0)
-                    return IsMatch(d);
+                if (!d.Contains(',', StringComparison.Ordinal))
+                    return IsMatch(d) ? (attr, d.Length) : (null, 0);
 
-                var best = d.Split(comma, StringSplitOptions.RemoveEmptyEntries)
+                bool negate = d.StartsWith('!');
+                if (negate)
+                    d = d[1..];
+
+                var m = d.Split(comma, StringSplitOptions.RemoveEmptyEntries)
                     .Select(z => z.Trim())
-                    .Where(z => IsMatch(z))
-                    .OrderByDescending(z => z.Length)
-                    .FirstOrDefault();
+                    .Where(IsMatch);
 
-                if (best != null)
+                if (negate)
                 {
-                    if (weight == null)
-                        weight = new Dictionary<TAttribute, int>();
+                    if (m.Any())
+                        return (null, 0);
 
-                    weight[x] = best.Length;
-                    return true;
+                    return (attr, d.Length + 1);
                 }
 
-                return false;
-            })
-            .OrderByDescending(x =>
-            {
-                var d = getDialect(x);
-                if (string.IsNullOrEmpty(d))
-                    return 0;
+                return m.OrderByDescending(z => z.Length)
+                    .Select(z => (attr, z.Length))
+                    .FirstOrDefault();
 
-                if (weight != null && weight.TryGetValue(x, out int w))
-                    return w;
+            }).Where(x => x.attr != null);
 
-                return d.Length;
-            })
-            .FirstOrDefault();
+            var count = matches.Count();
 
-            return bestMatch;
+            if (count == 0)
+                return null;
+
+            if (count == 1)
+                return matches.First().attr;
+
+            if (matches.Select(x => getDialect(x.attr)).Distinct().Count() == count)
+                return matches.OrderByDescending(x => x.Item2).First().attr;
+
+            var duplicate = matches.GroupBy(x => getDialect(x.attr))
+                .Where(x => x.Count() > 1)
+                .First();
+
+            throw new AmbiguousMatchException(string.Format(
+                "There are multiple attributes matching the dialect: {0}",
+                duplicate.Key.TrimToNull() ?? "<null>"));
         }
 
         private static readonly char[] comma = new char[] { ',' };
