@@ -22,6 +22,18 @@ namespace Serenity.Data.Mapping
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="OuterApplyAttribute"/> class.
+        /// </summary>
+        /// <param name="alias">The alias.</param>
+        /// <param name="innerQuery">The inner query.</param>
+        /// <param name="serverTypes">Dialects like <see cref="ServerType.MySql" />, <see cref="ServerType.Sqlite" />.</param>
+        public OuterApplyAttribute(string alias, string innerQuery, params ServerType[] serverTypes)
+            : this(alias, innerQuery)
+        {
+            Dialect = string.Join(",", serverTypes);
+        }
+
+        /// <summary>
         /// Gets the alias.
         /// </summary>
         /// <value>
@@ -71,5 +83,18 @@ namespace Serenity.Data.Mapping
         /// The dialect.
         /// </value>
         public string Dialect { get; set; }
+
+        /// <summary>
+        /// Gets or sets the negating of the dialect.
+        /// </summary>
+        /// <value>
+        /// The negating of the dialect.
+        /// </value>
+        public bool NegateDialect
+        {
+            get => Dialect != null && Dialect.StartsWith('!');
+            set => Dialect = value ? (!NegateDialect ? ("!" + Dialect) : Dialect) :
+                (NegateDialect ? Dialect[1..] : Dialect);
+        }
     }
 }
