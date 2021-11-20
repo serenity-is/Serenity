@@ -223,7 +223,7 @@ namespace Serenity.Data
         /// <value>
         /// The type of the server.
         /// </value>
-        public virtual string ServerType => "Firebird";
+        public virtual string ServerType => nameof(Data.ServerType.Firebird);
 
         /// <summary>
         /// Gets the skip keyword.

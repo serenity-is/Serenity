@@ -182,7 +182,7 @@ namespace Serenity.Data
         /// <value>
         /// The type of the server.
         /// </value>
-        public virtual string ServerType => "Sqlite";
+        public virtual string ServerType => nameof(Data.ServerType.Sqlite);
 
         /// <summary>
         /// Gets the skip keyword.

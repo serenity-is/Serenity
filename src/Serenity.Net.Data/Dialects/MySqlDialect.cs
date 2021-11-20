@@ -183,7 +183,7 @@ namespace Serenity.Data
         /// <value>
         /// The type of the server.
         /// </value>
-        public virtual string ServerType => "MySql";
+        public virtual string ServerType => nameof(Data.ServerType.MySql);
 
         /// <summary>
         /// Gets the skip keyword.

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Contains server type names for common dialects
@@ -9,24 +6,28 @@ namespace Serenity.Data
     public enum ServerType
     {
         /// <summary>
-        /// SqlServer
+        /// Firebird
         /// </summary>
-        SqlServer,
+        Firebird,
         /// <summary>
         /// MySql
         /// </summary>
         MySql,
         /// <summary>
-        /// Sqlite
+        /// Oracle
+        /// </summary>
+        Oracle,
+        /// <summary>
+        /// Postgres
+        /// </summary>
+        Postgres,
+        /// <summary>
+        /// SqlServer
         /// </summary>
         Sqlite,
         /// <summary>
         /// Oracle
         /// </summary>
-        Oracle,
-        /// <summary>
-        /// Firebird
-        /// </summary>
-        Firebird
+        SqlServer
     }
 }

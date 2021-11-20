@@ -183,7 +183,7 @@ namespace Serenity.Data
         /// <value>
         /// The type of the server.
         /// </value>
-        public virtual string ServerType => "Postgres";
+        public virtual string ServerType => nameof(Data.ServerType.Postgres);
 
         /// <summary>
         /// Gets the skip keyword.

@@ -214,7 +214,7 @@ namespace Serenity.Data
         /// <value>
         /// The type of the server.
         /// </value>
-        public virtual string ServerType => "Oracle";
+        public virtual string ServerType => nameof(Data.ServerType.Oracle);
 
         /// <summary>
         /// Gets the skip keyword.
