@@ -34,6 +34,31 @@ namespace Serenity.Data.Mapping
         }
 
         /// <summary>
+        /// Adds a left join on foreign key. Use this version only on properties with ForeignKey attribute.
+        /// </summary>
+        /// <param name="alias">Foreign join alias</param>
+        /// <param name="serverTypes">Dialects like <see cref="ServerType.MySql" />, <see cref="ServerType.Sqlite" />.</param>
+        public LeftJoinAttribute(string alias, params ServerType[] serverTypes)
+            : this(alias)
+        {
+            Dialect = string.Join(",", serverTypes);
+        }
+
+        /// <summary>
+        /// Adds a left join
+        /// </summary>
+        /// <param name="alias">Join alias</param>
+        /// <param name="toTable">Join table</param>
+        /// <param name="onCriteria">If the attribute is used on a property, this parameter is a field name, if used on a class,
+        /// this parameter is the ON criteria of the left join statement.</param>
+        /// <param name="serverTypes">Dialects like <see cref="ServerType.MySql" />, <see cref="ServerType.Sqlite" />.</param>
+        public LeftJoinAttribute(string alias, string toTable, string onCriteria, params ServerType[] serverTypes)
+            : this(alias, toTable, onCriteria)
+        {
+            Dialect = string.Join(",", serverTypes);
+        }
+
+        /// <summary>
         /// Gets the alias.
         /// </summary>
         /// <value>
@@ -88,5 +113,18 @@ namespace Serenity.Data.Mapping
         /// The dialect.
         /// </value>
         public string Dialect { get; set; }
+
+        /// <summary>
+        /// Gets or sets the negating of the dialect.
+        /// </summary>
+        /// <value>
+        /// The negating of the dialect.
+        /// </value>
+        public bool NegateDialect
+        {
+            get => Dialect != null && Dialect.StartsWith('!');
+            set => Dialect = value ? (!NegateDialect ? ("!" + Dialect) : Dialect) :
+                (NegateDialect ? Dialect[1..] : Dialect);
+        }
     }
 }
