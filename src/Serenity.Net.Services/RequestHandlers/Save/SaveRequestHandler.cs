@@ -280,7 +280,7 @@ namespace Serenity.Services
 
             Response = new TSaveResponse();
 
-            Row = request.Entity ?? throw new ArgumentNullException(nameof(request.Entity));
+            Row = (request.Entity ?? throw new ArgumentNullException(nameof(request.Entity))).Clone();
 
             if (requestType == SaveRequestType.Auto)
             {
