@@ -87,13 +87,10 @@ namespace Serenity.Data
                 field.Copy(this, clone);
 
             clone.tracking = tracking;
-            if (tracking)
+            if (tracking && assignedFields != null)
             {
-                if (assignedFields != null)
-                {
-                    clone.assignedFields = new bool[assignedFields.Length];
-                    Array.Copy(assignedFields, clone.assignedFields, assignedFields.Length);
-                }
+                clone.assignedFields = new bool[assignedFields.Length];
+                Array.Copy(assignedFields, clone.assignedFields, assignedFields.Length);
             }
             else
                 clone.assignedFields = null;
