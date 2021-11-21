@@ -384,10 +384,14 @@ namespace Serenity.Data
                     ISqlJoin srcJoin = propJoin.Item3;
                     var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(propJoin.Item2.Field);
 
+                    var frgTable = propJoin.Item2.Table ??
+                        expressionSelector.GetBestMatch(propJoin.Item2.RowType
+                            .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect).Name;
+
                     if (srcJoin is LeftJoinAttribute)
-                        srcJoin = new LeftJoinAttribute(newAlias, propJoin.Item2.Table, criteriax);
+                        srcJoin = new LeftJoinAttribute(newAlias, frgTable, criteriax);
                     else if (srcJoin is InnerJoinAttribute)
-                        srcJoin = new InnerJoinAttribute(newAlias, propJoin.Item2.Table, criteriax);
+                        srcJoin = new InnerJoinAttribute(newAlias, frgTable, criteriax);
                     else
                         throw new ArgumentOutOfRangeException("joinType");
 

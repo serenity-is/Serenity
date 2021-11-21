@@ -64,8 +64,6 @@ namespace Serenity.Data
             initializeLock = new object();
 
             DetermineRowType();
-            DetermineTableName();
-            DetermineDatabaseAndSchema();
             DetermineConnectionKey();
             DetermineModuleIdentifier();
             DetermineLocalTextPrefix();
@@ -93,9 +91,10 @@ namespace Serenity.Data
                 rowFactory = () => (IRow)Activator.CreateInstance(rowType);
         }
 
-        private void DetermineTableName()
+        private void DetermineTableName(DialectExpressionSelector expressionSelector)
         {
-            var attr = rowType.GetCustomAttribute<TableNameAttribute>();
+            var attr = expressionSelector.GetBestMatch(rowType.GetCustomAttributes<TableNameAttribute>(),
+                x => x.Dialect);
 
             if (tableName != null)
             {
@@ -118,6 +117,7 @@ namespace Serenity.Data
                 name = name[0..^3];
 
             tableName = name;
+            tableOnly = ParseDatabaseAndSchema(tableName, out database, out schema);
         }
 
         /// <summary>
@@ -150,11 +150,6 @@ namespace Serenity.Data
             database = tableName.Substring(0, idx1);
             schema = tableName.Substring(idx1 + 1, idx2 - idx1 - 1);
             return tableName[(idx2 + 1)..];
-        }
-
-        private void DetermineDatabaseAndSchema()
-        {
-            tableOnly = ParseDatabaseAndSchema(tableName, out database, out schema);
         }
 
         private void DetermineConnectionKey()
@@ -252,9 +247,11 @@ namespace Serenity.Data
                 GetRowFieldsAndProperties(out Dictionary<string, FieldInfo> rowFields, out Dictionary<string, IPropertyInfo> rowProperties);
 
                 this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
-
                 var expressionSelector = new DialectExpressionSelector(dialect);
+
                 var rowCustomAttributes = rowType.GetCustomAttributes().ToList();
+
+                DetermineTableName(expressionSelector);
 
                 var fieldsReadPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
                 if (fieldsReadPerm != null && !fieldsReadPerm.ApplyToLookups)
@@ -474,7 +471,9 @@ namespace Serenity.Data
 
                         if (foreignKey != null)
                         {
-                            field.ForeignTable = foreignKey.Table;
+                            field.ForeignTable = foreignKey.Table ??
+                                expressionSelector.GetBestMatch(foreignKey.RowType
+                                    .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect).Name;
                             field.ForeignField = foreignKey.Field;
                         }
 

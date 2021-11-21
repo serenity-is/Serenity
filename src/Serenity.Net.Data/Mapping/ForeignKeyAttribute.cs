@@ -34,12 +34,10 @@ namespace Serenity.Data.Mapping
             RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
 
             var attr = rowType.GetCustomAttribute<TableNameAttribute>(true);
-            if (attr == null || string.IsNullOrEmpty(attr.Name))
+            if (attr == null)
                 throw new ArgumentOutOfRangeException(nameof(rowType),
                     string.Format("Type '{0}' is specified for a ForeignKey attribute " +
                         "but it has no [TableName] attribute", rowType.FullName));
-
-            Table = attr.Name;
 
             if (string.IsNullOrEmpty(field))
             {
