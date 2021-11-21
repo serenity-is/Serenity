@@ -357,13 +357,16 @@ namespace Serenity.Data
                                             property.Name, origin, expressionSelector, "", rowCustomAttributes));
 
                                     if (display == null)
-                                        display = new DisplayNameAttribute(propertyDictionary.OriginDisplayName(property.Name, origin));
+                                        display = new DisplayNameAttribute(propertyDictionary.OriginDisplayName(
+                                            property.Name, origin, expressionSelector));
 
                                     if (size == null)
-                                        size = propertyDictionary.OriginAttribute<SizeAttribute>(property.Name);
+                                        size = propertyDictionary.OriginAttribute<SizeAttribute>(
+                                            property.Name, expressionSelector);
 
                                     if (scale == null)
-                                        scale = propertyDictionary.OriginAttribute<ScaleAttribute>(property.Name);
+                                        scale = propertyDictionary.OriginAttribute<ScaleAttribute>(
+                                            property.Name, expressionSelector);
                                 }
                                 catch (DivideByZeroException)
                                 {

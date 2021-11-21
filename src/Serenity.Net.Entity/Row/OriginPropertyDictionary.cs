@@ -12,7 +12,7 @@ namespace Serenity.Data
     {
         internal Type rowType;
         internal Dictionary<string, PropertyInfo> propertyByName;
-        internal Dictionary<string, Tuple<string, ForeignKeyAttribute, ISqlJoin>> joinPropertyByAlias;
+        internal Dictionary<string, Tuple<string, ForeignKeyAttribute[], ISqlJoin>> joinPropertyByAlias;
         internal Dictionary<string, ISqlJoin> rowJoinByAlias;
         internal Dictionary<string, OriginAttribute> origins;
         internal Dictionary<string, Tuple<PropertyInfo, Type>> originPropertyByName;
@@ -33,7 +33,7 @@ namespace Serenity.Data
 
             origins = new Dictionary<string, OriginAttribute>(StringComparer.OrdinalIgnoreCase);
 
-            joinPropertyByAlias = new Dictionary<string, Tuple<string, ForeignKeyAttribute, ISqlJoin>>();
+            joinPropertyByAlias = new Dictionary<string, Tuple<string, ForeignKeyAttribute[], ISqlJoin>>();
             foreach (var property in propertyByName.Values)
             {
                 var originAttr = property.GetCustomAttribute<OriginAttribute>();
@@ -41,9 +41,9 @@ namespace Serenity.Data
                     origins[property.Name] = originAttr;
 
                 var lj = property.GetCustomAttribute<LeftJoinAttribute>();
-                var fk = property.GetCustomAttribute<ForeignKeyAttribute>();
+                var fk = property.GetCustomAttributes<ForeignKeyAttribute>().ToArray();
                 if (lj != null && fk != null)
-                    joinPropertyByAlias[lj.Alias] = new Tuple<string, ForeignKeyAttribute, ISqlJoin>(property.Name, fk, lj);
+                    joinPropertyByAlias[lj.Alias] = new Tuple<string, ForeignKeyAttribute[], ISqlJoin>(property.Name, fk, lj);
             }
 
             foreach (var attr in rowType.GetCustomAttributes<LeftJoinAttribute>())
@@ -58,7 +58,7 @@ namespace Serenity.Data
             originByAlias = origins.ToLookup(x => x.Value.Join);
             prefixByAlias = originByAlias.ToDictionary(x => x.Key, x =>
             {
-                if (joinPropertyByAlias.TryGetValue(x.Key, out Tuple<string, ForeignKeyAttribute, ISqlJoin> joinProperty))
+                if (joinPropertyByAlias.TryGetValue(x.Key, out Tuple<string, ForeignKeyAttribute[], ISqlJoin> joinProperty))
                 {
                     if (joinProperty.Item3.PropertyPrefix != null)
                         return joinProperty.Item3.PropertyPrefix;
@@ -109,7 +109,7 @@ namespace Serenity.Data
             return dictionary;
         }
 
-        private Tuple<PropertyInfo, Type> GetOriginProperty(string name)
+        private Tuple<PropertyInfo, Type> GetOriginProperty(string name, DialectExpressionSelector expressionSelector)
         {
             Type originType;
             Tuple<PropertyInfo, Type> pi;
@@ -119,7 +119,7 @@ namespace Serenity.Data
                 d = new Dictionary<string, Tuple<PropertyInfo, Type>>
                 {
                     [name] = pi = new Tuple<PropertyInfo, Type>(GetOriginProperty(propertyByName[name],
-                    origins[name], out originType), originType)
+                    origins[name], expressionSelector, out originType), originType)
                 };
                 originPropertyByName = d;
             }
@@ -128,7 +128,7 @@ namespace Serenity.Data
                 d = new Dictionary<string, Tuple<PropertyInfo, Type>>
                 {
                     [name] = pi = new Tuple<PropertyInfo, Type>(GetOriginProperty(propertyByName[name],
-                    origins[name], out originType), originType)
+                    origins[name], expressionSelector, out originType), originType)
                 };
                 originPropertyByName = d;
             }
@@ -137,14 +137,14 @@ namespace Serenity.Data
         }
 
         private PropertyInfo GetOriginProperty(PropertyInfo property, OriginAttribute origin,
-            out Type originRowType)
+            DialectExpressionSelector expressionSelector, out Type originRowType)
         {
             var joinAlias = origin.Join;
 
-            if (joinPropertyByAlias.TryGetValue(joinAlias, out Tuple<string, ForeignKeyAttribute, ISqlJoin> joinProperty))
+            if (joinPropertyByAlias.TryGetValue(joinAlias, out Tuple<string, ForeignKeyAttribute[], ISqlJoin> joinProperty))
             {
                 var joinPropertyName = joinProperty.Item1;
-                var fk = joinProperty.Item2;
+                var fk = expressionSelector.GetBestMatch(joinProperty.Item2, x => x.Dialect);
                 var lj = joinProperty.Item3;
                 originRowType = lj.RowType ?? fk.RowType;
 
@@ -216,7 +216,7 @@ namespace Serenity.Data
             if (aliasPrefix.Length >= 1000)
                 throw new DivideByZeroException("Infinite origin recursion detected!");
 
-            var org = GetOriginProperty(propertyName);
+            var org = GetOriginProperty(propertyName, expressionSelector);
             var originProperty = org.Item1;
 
             if (aliasPrefix.Length == 0)
@@ -252,13 +252,14 @@ namespace Serenity.Data
             }
         }
 
-        public TAttr OriginAttribute<TAttr>(string propertyName, int recursion = 0)
+        public TAttr OriginAttribute<TAttr>(string propertyName, 
+            DialectExpressionSelector expressionSelector, int recursion = 0)
             where TAttr : Attribute
         {
             if (recursion++ > 1000)
                 throw new DivideByZeroException("Infinite origin recursion detected!");
 
-            var org = GetOriginProperty(propertyName);
+            var org = GetOriginProperty(propertyName, expressionSelector);
             var originProperty = org.Item1;
 
             var attr = originProperty.GetCustomAttribute(typeof(TAttr));
@@ -269,13 +270,14 @@ namespace Serenity.Data
             if (originOrigin != null)
             {
                 var originDictionary = GetPropertyDictionary(org.Item2);
-                return originDictionary.OriginAttribute<TAttr>(originProperty.Name, recursion + 1);
+                return originDictionary.OriginAttribute<TAttr>(originProperty.Name, expressionSelector, recursion + 1);
             }
 
             return null;
         }
 
-        public string OriginDisplayName(string propertyName, OriginAttribute origin, int recursion = 0)
+        public string OriginDisplayName(string propertyName, OriginAttribute origin, 
+            DialectExpressionSelector expressionSelector, int recursion = 0)
         {
             if (recursion++ > 1000)
                 throw new DivideByZeroException("Infinite origin recursion detected!");
@@ -283,7 +285,7 @@ namespace Serenity.Data
             DisplayNameAttribute attr;
             string prefix = "";
 
-            if (joinPropertyByAlias.TryGetValue(origin.Join, out Tuple<string, ForeignKeyAttribute, ISqlJoin> propJoin))
+            if (joinPropertyByAlias.TryGetValue(origin.Join, out Tuple<string, ForeignKeyAttribute[], ISqlJoin> propJoin))
             {
                 if (propJoin.Item3.TitlePrefix != null)
                     prefix = propJoin.Item3.TitlePrefix;
@@ -310,7 +312,7 @@ namespace Serenity.Data
                 return prefix + " " + s;
             }
 
-            var org = GetOriginProperty(propertyName);
+            var org = GetOriginProperty(propertyName, expressionSelector);
             var originProperty = org.Item1;
 
             attr = originProperty.GetCustomAttribute<DisplayNameAttribute>();
@@ -321,7 +323,7 @@ namespace Serenity.Data
             if (originOrigin != null)
             {
                 var originDictionary = GetPropertyDictionary(org.Item2);
-                return addPrefix(originDictionary.OriginDisplayName(originProperty.Name, originOrigin));
+                return addPrefix(originDictionary.OriginDisplayName(originProperty.Name, originOrigin, expressionSelector));
             }
 
             return addPrefix(originProperty.Name);
@@ -358,7 +360,7 @@ namespace Serenity.Data
                 if (mappedJoins.TryGetValue(x, out ISqlJoin sqlJoin))
                     return sqlJoin.Alias;
 
-                if (joinPropertyByAlias.TryGetValue(x, out Tuple<string, ForeignKeyAttribute, ISqlJoin> propJoin))
+                if (joinPropertyByAlias.TryGetValue(x, out var propJoin))
                 {
                     var propertyInfo = propertyByName[propJoin.Item1];
                     string leftExpression;
@@ -382,10 +384,11 @@ namespace Serenity.Data
                     }
 
                     ISqlJoin srcJoin = propJoin.Item3;
-                    var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(propJoin.Item2.Field);
+                    var fkAttr = expressionSelector.GetBestMatch(propJoin.Item2, x => x.Dialect);
+                    var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(fkAttr.Field);
 
-                    var frgTable = propJoin.Item2.Table ??
-                        expressionSelector.GetBestMatch(propJoin.Item2.RowType
+                    var frgTable = fkAttr.Table ??
+                        expressionSelector.GetBestMatch(fkAttr.RowType
                             .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect).Name;
 
                     if (srcJoin is LeftJoinAttribute)
@@ -395,7 +398,7 @@ namespace Serenity.Data
                     else
                         throw new ArgumentOutOfRangeException("joinType");
 
-                    srcJoin.RowType = propJoin.Item2.RowType ?? propJoin.Item3.RowType;
+                    srcJoin.RowType = fkAttr.RowType ?? propJoin.Item3.RowType;
                     mappedJoins[x] = srcJoin;
                     extraJoins.Add((Attribute)srcJoin);
                     return newAlias;

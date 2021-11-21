@@ -25,6 +25,18 @@ namespace Serenity.Data.Mapping
         /// <summary>
         /// Specifies that this property is a foreign key to another field in a primary key table.
         /// </summary>
+        /// <param name="table">Primary key table</param>
+        /// <param name="field">Matching column in primary key table</param>
+        /// <param name="serverTypes">Dialects like <see cref="ServerType.MySql" />, <see cref="ServerType.Sqlite" />.</param>
+        public ForeignKeyAttribute(string table, string field, params ServerType[] serverTypes)
+            : this(table, field)
+        {
+            Dialect = string.Join(",", serverTypes);
+        }
+
+        /// <summary>
+        /// Specifies that this property is a foreign key to another field in a primary key table.
+        /// </summary>
         /// <param name="rowType">Entity for primary key table. Row must have a [TableName] attribute.</param>
         /// <param name="field">If field parameter is not specified, the row type must have a field with 
         /// [Identity] attribute or single property with [PrimaryKey] attribute.
@@ -73,6 +85,20 @@ namespace Serenity.Data.Mapping
         }
 
         /// <summary>
+        /// Specifies that this property is a foreign key to another field in a primary key table.
+        /// </summary>
+        /// <param name="rowType">Entity for primary key table. Row must have a [TableName] attribute.</param>
+        /// <param name="field">If field parameter is not specified, the row type must have a field with 
+        /// [Identity] attribute or single property with [PrimaryKey] attribute.
+        /// (implementing IIdRow won't help)</param>
+        /// <param name="serverTypes">Dialects like <see cref="ServerType.MySql" />, <see cref="ServerType.Sqlite" />.</param>
+        public ForeignKeyAttribute(Type rowType, string field, params ServerType[] serverTypes)
+            : this(rowType, field)
+        {
+            Dialect = string.Join(",", serverTypes);
+        }
+
+        /// <summary>
         /// Gets the table.
         /// </summary>
         /// <value>
@@ -95,5 +121,26 @@ namespace Serenity.Data.Mapping
         /// The type of the row.
         /// </value>
         public Type RowType { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the dialect.
+        /// </summary>
+        /// <value>
+        /// The dialect.
+        /// </value>
+        public string Dialect { get; set; }
+
+        /// <summary>
+        /// Gets or sets the negating of the dialect.
+        /// </summary>
+        /// <value>
+        /// The negating of the dialect.
+        /// </value>
+        public bool NegateDialect
+        {
+            get => Dialect != null && Dialect.StartsWith('!');
+            set => Dialect = value ? (!NegateDialect ? ("!" + Dialect) : Dialect) :
+                (NegateDialect ? Dialect[1..] : Dialect);
+        }
     }
 }
