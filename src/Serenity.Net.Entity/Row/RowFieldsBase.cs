@@ -117,7 +117,6 @@ namespace Serenity.Data
                 name = name[0..^3];
 
             tableName = name;
-            tableOnly = ParseDatabaseAndSchema(tableName, out database, out schema);
         }
 
         /// <summary>
@@ -252,6 +251,7 @@ namespace Serenity.Data
                 var rowCustomAttributes = rowType.GetCustomAttributes().ToList();
 
                 DetermineTableName(expressionSelector);
+                tableOnly = ParseDatabaseAndSchema(tableName, out database, out schema);
 
                 var fieldsReadPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
                 if (fieldsReadPerm != null && !fieldsReadPerm.ApplyToLookups)
