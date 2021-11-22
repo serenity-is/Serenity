@@ -65,6 +65,7 @@ namespace Serenity.Data
 
             DetermineRowType();
             DetermineConnectionKey();
+            DetermineTableName(new DialectExpressionSelector(SqlSettings.DefaultDialect));
             DetermineModuleIdentifier();
             DetermineLocalTextPrefix();
         }
@@ -102,21 +103,22 @@ namespace Serenity.Data
                     throw new InvalidProgramException(string.Format(
                         "Tablename in row type {0} can't be overridden by attribute!",
                             rowType.Name));
-
-                return;
             }
-
-            if (attr != null)
+            else if (attr != null)
             {
                 tableName = attr.Name;
-                return;
+            }
+            else
+            {
+
+                var name = rowType.Name;
+                if (name.EndsWith("Row"))
+                    name = name[0..^3];
+
+                tableName = name;
             }
 
-            var name = rowType.Name;
-            if (name.EndsWith("Row"))
-                name = name[0..^3];
-
-            tableName = name;
+            tableOnly = ParseDatabaseAndSchema(tableName, out database, out schema);
         }
 
         /// <summary>
@@ -251,7 +253,6 @@ namespace Serenity.Data
                 var rowCustomAttributes = rowType.GetCustomAttributes().ToList();
 
                 DetermineTableName(expressionSelector);
-                tableOnly = ParseDatabaseAndSchema(tableName, out database, out schema);
 
                 var fieldsReadPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
                 if (fieldsReadPerm != null && !fieldsReadPerm.ApplyToLookups)
