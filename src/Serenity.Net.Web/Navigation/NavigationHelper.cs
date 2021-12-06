@@ -108,7 +108,7 @@ namespace Serenity.Navigation
                     }
                     else
                     {
-                        parent = path.Substring(0, idx);
+                        parent = path[..idx];
                         title = path[(idx + 1)..];
                     }
 

@@ -9,5 +9,10 @@ namespace Serenity.Navigation
             : base(order, title, (string)null, null, icon)
         {
         }
+
+        public NavigationMenuAttribute(string title, string icon = null)
+            : base(int.MaxValue, title, (string)null, null, icon)
+        {
+        }
     }
 }

@@ -1,13 +1,9 @@
-﻿using Serenity.Web;
+﻿using Microsoft.AspNetCore.Mvc;
+using Serenity.Web;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Globalization;
-#if !ASPNETMVC
-using Microsoft.AspNetCore.Mvc;
-#else
-using System.Web.Mvc;
-#endif
 
 namespace Serenity.Navigation
 {
@@ -26,7 +22,7 @@ namespace Serenity.Navigation
 
             if (idx >= 0)
             {
-                Category = path.Substring(0, idx);
+                Category = path[..idx];
                 Title = path[(idx + 1)..];
             }
             else
@@ -53,17 +49,20 @@ namespace Serenity.Navigation
             if (action.IsEmptyOrNull())
                 throw new ArgumentNullException(nameof(action));
 
-            var actionMethod = controller.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+            var actionMethod = controller.GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => x.Name == action)
                 .FirstOrDefault(x => x.GetAttribute<NonActionAttribute>() == null);
 
             if (actionMethod == null)
                 throw new ArgumentOutOfRangeException(nameof(action),
-                    string.Format(CultureInfo.CurrentCulture, "Controller {1} doesn't have an action with name {0}!",
+                    string.Format(CultureInfo.CurrentCulture, 
+                        "Controller {1} doesn't have an action with name {0}!",
                         action, controller.FullName));
 
-            var routeController = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
-            var routeAction = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+            var routeController = controller.GetCustomAttributes<RouteAttribute>()
+                .FirstOrDefault();
+            var routeAction = actionMethod.GetCustomAttributes<RouteAttribute>()
+                .FirstOrDefault();
 
             if (routeController == null && routeAction == null)
                 throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
@@ -72,8 +71,15 @@ namespace Serenity.Navigation
 
             string url = (routeAction ?? routeController).Template ?? "";
 
-#if !ASPNETMVC
-            if (routeAction != null && !url.StartsWith("~/", StringComparison.Ordinal) && !url.StartsWith("/", StringComparison.Ordinal) && routeController != null)
+            static bool isRooted(string url)
+            {
+                return url.StartsWith("~/", StringComparison.Ordinal) ||
+                    url.StartsWith("/", StringComparison.Ordinal);
+            }
+
+            if (routeAction != null &&
+                routeController != null &&
+                !isRooted(url))
             {
                 var tmp = routeController.Template ?? "";
                 if (url.Length > 0 && tmp.Length > 0 && tmp[^1] != '/')
@@ -83,42 +89,15 @@ namespace Serenity.Navigation
             }
 
             const string ControllerSuffix = "Controller";
+
             var controllerName = controller.Name;
             if (controllerName.EndsWith(ControllerSuffix, StringComparison.Ordinal))
-                controllerName = controllerName.Substring(0, controllerName.Length - ControllerSuffix.Length);
+                controllerName = controllerName[..^ControllerSuffix.Length];
+
             url = url.Replace("[controller]", controllerName, StringComparison.Ordinal);
             url = url.Replace("[action]", action, StringComparison.Ordinal);
-#else
-            if (!url.StartsWith("~/"))
-            {
 
-                var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
-                if (routePrefix != null)
-                    url = UriHelper.Combine(routePrefix.Prefix, url);
-            }
-
-            var act = "{action=";
-            var act1 = url.IndexOf(act, StringComparison.OrdinalIgnoreCase);
-            if (act1 >= 0)
-            {
-                var act2 = url.IndexOf("}", act1 + 1);
-                if (act2 >= 0)
-                {
-                    var defaultAction = url.Substring(act1 + act.Length, act2 - act1 - act.Length);
-                    bool isDefaultAction = String.Compare(defaultAction, action, StringComparison.OrdinalIgnoreCase) == 0;
-                    bool startsWithSlash = act1 > 0 && url[act1 - 1] == '/';
-                    url = url.Substring(0, act1) +  
-                        (startsWithSlash ? "" : "/") + 
-                        (isDefaultAction ? "" : action) + 
-                        url.Substring(act2 + 1);
-
-                    if (url.Length > 2 && url.EndsWith("/"))
-                        url = url.Substring(0, url.Length - 1);
-                }
-            }
-#endif
-
-            if (!url.StartsWith("~/", StringComparison.Ordinal) && !url.StartsWith("/", StringComparison.Ordinal))
+            if (!isRooted(url))
                 url = "~/" + url;
 
             while (true)
@@ -131,7 +110,7 @@ namespace Serenity.Navigation
                 if (idx2 <= 0)
                     break;
 
-                url = url.Substring(0, idx1) + url[(idx2 + 1)..];
+                url = url[..idx1] + url[(idx2 + 1)..];
             }
 
             return url;
@@ -156,14 +135,81 @@ namespace Serenity.Navigation
             return null;
         }
 
+        /// <summary>
+        /// Gets / sets the order (only) among its siblings.
+        /// </summary>
         public int Order { get; set; }
+
+        /// <summary>
+        /// Gets / sets the sibling items to insert this before.
+        /// Use only title, not full path of siblings.
+        /// Set "*" to insert this before all
+        /// Should be preferred to order.
+        /// </summary>
+        public string[] Before { get; set; }
+        
+        /// <summary>
+        /// Gets / sets the sibling items to insert this after.
+        /// Use only title, not full path of siblings.
+        /// Set "*" to insert this after all
+        /// Should be preferred to order.
+        /// </summary>
+        public string[] After { get; set; }
+
+        /// <summary>
+        /// Url of this navigation item, should be null for menu
+        /// </summary>
         public string Url { get; set; }
+        
+        /// <summary>
+        /// The full path to navigation item like A/B/C
+        /// This is used to generate local text key for this item
+        /// like Navigation.A/B/C
+        /// </summary>
         public string FullPath { get; set; }
+
+        /// <summary>
+        /// This is full path of its parent, e.g. A/B for A/B/C
+        /// </summary>
         public string Category { get; set; }
+
+        /// <summary>
+        /// Title of the navigation item. It is the part after last slash,
+        /// e.g. C for A/B/C
+        /// </summary>
         public string Title { get; set; }
+
+        /// <summary>
+        /// Icon class
+        /// </summary>
         public string IconClass { get; set; }
+
+        /// <summary>
+        /// Extra css class to apply to its navigation element e.g. LI
+        /// </summary>
         public string ItemClass { get; set; }
+        
+        /// <summary>
+        /// Permission required to view this navigation item
+        /// </summary>
         public string Permission { get; set; }
+
+        /// <summary>
+        /// Window target to open this link, e.g. _blank etc.
+        /// </summary>
         public string Target { get; set; }
+
+        /// <summary>
+        /// This is a list used to move items that are not normally
+        /// under this item based on path (to create groups).
+        /// For example, if this item is named A,
+        /// and want to move all menus under B/.. or C/.. to A,
+        /// the list should be ["B/", "C/"]. To move B and C themselves under A,
+        /// list should be ["B", "C"]. To specify a group that includes
+        /// all items that does not match any other groups, use ["...rest"].
+        /// To exclude something from ...rest, use ["!Something", "...rest"].
+        /// There should be only one "...rest" item at most.
+        /// </summary>
+        public string[] Include { get; set; }
     }
 }
