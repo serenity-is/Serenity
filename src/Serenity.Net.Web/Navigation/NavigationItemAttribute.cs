@@ -207,7 +207,7 @@ namespace Serenity.Navigation
         /// the list should be ["B/", "C/"]. To move B and C themselves under A,
         /// list should be ["B", "C"]. To specify a group that includes
         /// all items that does not match any other groups, use ["...rest"].
-        /// To exclude something from ...rest, use ["!Something", "...rest"].
+        /// To exclude something from ...rest, use ["Something", "...rest"].
         /// There should be only one "...rest" item at most.
         /// </summary>
         public string[] Include { get; set; }

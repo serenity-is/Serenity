@@ -25,17 +25,9 @@ namespace Serenity.Navigation
 
             var result = new List<NavigationItem>();
 
-            void processAttr(List<NavigationItem> parent, NavigationItemAttribute attr)
+            void processAttr(NavigationItem parent, NavigationItemAttribute attr)
             {
-                var item = new NavigationItem
-                {
-                    Title = (attr.Title ?? "").Replace("//", "/", StringComparison.Ordinal),
-                    FullPath = attr.FullPath,
-                    Url = (!string.IsNullOrEmpty(attr.Url) && resolveUrl != null) ? resolveUrl(attr.Url) : attr.Url,
-                    IconClass = attr.IconClass.TrimToNull(),
-                    ItemClass = attr.ItemClass.TrimToNull(),
-                    Target = attr.Target.TrimToNull()
-                };
+                var item = new NavigationItem();
 
                 bool isAuthorizedSection = !attr.Url.IsEmptyOrNull() &&
                     (attr.Permission.IsEmptyOrNull() || permissions.HasPermission(attr.Permission));
@@ -44,15 +36,25 @@ namespace Serenity.Navigation
                 path += attr.Title ?? "";
 
                 var children = attrByCategory[path];
+                var target = parent?.Children ?? result;
                 foreach (var child in children)
-                    processAttr(item.Children, child);
+                    processAttr(item, child);
 
                 if (item.Children.Count > 0 || isAuthorizedSection)
-                    parent.Add(item);
+                {
+                    item.Title = (attr.Title ?? "").Replace("//", "/", StringComparison.Ordinal);
+                    item.FullPath = attr.FullPath;
+                    item.Url = (!string.IsNullOrEmpty(attr.Url) && resolveUrl != null) ? resolveUrl(attr.Url) : attr.Url;
+                    item.IconClass = attr.IconClass.TrimToNull();
+                    item.ItemClass = attr.ItemClass.TrimToNull();
+                    item.Target = attr.Target.TrimToNull();
+                    item.Parent = parent;
+                    target.Add(item);
+                }
             }
 
             foreach (var menu in attrByCategory[""])
-                processAttr(result, menu);
+                processAttr(null, menu);
 
             return result;
         }
@@ -85,15 +87,65 @@ namespace Serenity.Navigation
             return ByCategory(list);
         }
 
+        public const string Rest = "...rest";
+
+        private static IEnumerable<NavigationItemAttribute> Sort(IEnumerable<NavigationItemAttribute> list,
+            Func<NavigationItemAttribute, string> getCategory)
+        {
+            var l = list.ToList();
+            l.Sort((a, b) =>
+            {
+                var ac = getCategory(a) ?? "";
+                var bc = getCategory(b) ?? "";
+                var r = string.Compare(ac, bc, StringComparison.OrdinalIgnoreCase);
+                if (r != 0)
+                    return r;
+
+                var abb = a.Before != null &&
+                    a.Before.Any(x => x == "*" ||
+                    string.Equals(x, b.Title, StringComparison.OrdinalIgnoreCase));
+
+                var bba = b.Before != null &&
+                    b.Before.Any(x => x == "*" ||
+                    string.Equals(x, a.Title, StringComparison.OrdinalIgnoreCase));
+
+                if (abb && !bba)
+                    return -1;
+
+                if (bba && !abb)
+                    return 1;
+
+                var aab = a.After != null &&
+                    a.After.Any(x => x == "*" ||
+                    string.Equals(x, b.Title, StringComparison.OrdinalIgnoreCase));
+
+                var baa = b.After != null &&
+                    b.After.Any(x => x == "*" ||
+                    string.Equals(x, a.Title, StringComparison.OrdinalIgnoreCase));
+
+                if (aab && !baa)
+                    return 1;
+
+                if (baa & !aab)
+                    return -1;
+
+                return a.Order.CompareTo(b.Order);
+            });
+
+            return l;
+        }
+
         public static ILookup<string, NavigationItemAttribute> ByCategory(
             IEnumerable<NavigationItemAttribute> list)
         {
-            var result = list.OrderBy(x => x.Category ?? "")
-                .ThenBy(x => x.Order)
-                .ToLookup(x => x.Category ?? "");
+            if (list is null)
+                throw new ArgumentNullException(nameof(list));
+
+            var byCategory = Sort(list, x => x.Category)
+                .ToLookup(x => x.Category ?? "", StringComparer.OrdinalIgnoreCase);
 
             var missing = new Dictionary<string, NavigationItemAttribute>();
-            foreach (var group in result)
+            foreach (var group in byCategory)
             {
                 string path = group.Key;
                 while (!string.IsNullOrEmpty(path) && !missing.ContainsKey(path))
@@ -112,7 +164,7 @@ namespace Serenity.Navigation
                         title = path[(idx + 1)..];
                     }
 
-                    if (!result[parent].Any(x => x.Title == title))
+                    if (!byCategory[parent].Any(x => x.Title == title))
                         missing.Add(path, new NavigationMenuAttribute(group.Min(x => x.Order), path));
 
                     path = parent;
@@ -120,12 +172,86 @@ namespace Serenity.Navigation
             }
 
             if (missing.Count > 0)
-                return list.Concat(missing.Values)
-                    .OrderBy(x => x.Category ?? "")
-                    .ThenBy(x => x.Order)
-                    .ToLookup(x => x.Category ?? "");
+            {
+                list = list.Concat(missing.Values);
+                byCategory = Sort(list, x => x.Category)
+                    .ToLookup(x => x.Category ?? "", StringComparer.OrdinalIgnoreCase);
+            }
 
-            return result;
+            var withIncludes = list.Where(x => x.Include != null);
+            if (!withIncludes.Any())
+                return byCategory;
+
+            var newCategory = new Dictionary<NavigationItemAttribute, string>();
+
+            foreach (var wi in withIncludes.Where(x => !x.Include.Any(l => l == Rest)))
+            {
+                foreach (var pattern in wi.Include)
+                {
+                    if (string.IsNullOrEmpty(pattern))
+                        continue;
+
+                    if (pattern.EndsWith('/'))
+                    {
+                        foreach (var child in byCategory[pattern[..^1]]
+                            .Where(x => x != wi && !newCategory.ContainsKey(x)))
+                        {
+                            newCategory[child] = wi.FullPath;
+                        }
+                    }
+                    else
+                    {
+                        var idx = pattern.LastIndexOf('/');
+                        var search = idx < 0 ? pattern : pattern[(idx + 1)..];
+                        var items = (idx < 0 ? byCategory[""] : byCategory[pattern.Substring(0, idx)])
+                            .Where(x => string.Equals(x.FullPath, pattern, StringComparison.OrdinalIgnoreCase));
+                            
+                        foreach (var item in items.Where(x => 
+                            x != wi && !newCategory.ContainsKey(x)))
+                        {
+                            newCategory[item] = wi.FullPath;
+                        }
+                    }
+                }
+            }
+
+            foreach (var wr in withIncludes.Where(x => x.Include.Any(l => l == Rest)))
+            {
+                foreach (var item in byCategory[""])
+                {
+                    if (wr == item ||
+                        newCategory.ContainsKey(item))
+                        continue;
+
+                    var isMatch = true;
+                    foreach (var pattern in wr.Include)
+                    {
+                        if (string.IsNullOrEmpty(pattern) ||
+                            pattern == Rest)
+                            continue;
+
+                        if (string.Equals(pattern, item.FullPath, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isMatch = false;
+                            break;
+                        }
+                    }
+
+                    if (isMatch)
+                        newCategory[item] = wr.FullPath;
+                }
+            }
+
+            if (!newCategory.Any())
+                return byCategory;
+
+            string getCategory(NavigationItemAttribute x)
+            {
+                return newCategory.TryGetValue(x, out var c) ? c :
+                    (x.Category ?? "");
+            }
+
+            return Sort(list, getCategory).ToLookup(getCategory, StringComparer.OrdinalIgnoreCase);
         }
     }
 }

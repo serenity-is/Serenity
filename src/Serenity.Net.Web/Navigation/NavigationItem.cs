@@ -10,6 +10,7 @@ namespace Serenity.Navigation
         public string ItemClass { get; set; }
         public string Url { get; set; }
         public string Target { get; set; }
+        public NavigationItem Parent { get; set; }
         public List<NavigationItem> Children { get; private set; }
 
         public NavigationItem()
