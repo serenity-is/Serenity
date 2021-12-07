@@ -141,22 +141,6 @@ namespace Serenity.Navigation
         public int Order { get; set; }
 
         /// <summary>
-        /// Gets / sets the sibling items to insert this before.
-        /// Use only title, not full path of siblings.
-        /// Set "*" to insert this before all
-        /// Should be preferred to order.
-        /// </summary>
-        public string[] Before { get; set; }
-        
-        /// <summary>
-        /// Gets / sets the sibling items to insert this after.
-        /// Use only title, not full path of siblings.
-        /// Set "*" to insert this after all
-        /// Should be preferred to order.
-        /// </summary>
-        public string[] After { get; set; }
-
-        /// <summary>
         /// Url of this navigation item, should be null for menu
         /// </summary>
         public string Url { get; set; }

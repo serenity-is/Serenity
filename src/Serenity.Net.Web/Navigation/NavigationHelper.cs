@@ -92,47 +92,8 @@ namespace Serenity.Navigation
         private static IEnumerable<NavigationItemAttribute> Sort(IEnumerable<NavigationItemAttribute> list,
             Func<NavigationItemAttribute, string> getCategory)
         {
-            var l = list.ToList();
-            l.Sort((a, b) =>
-            {
-                var ac = getCategory(a) ?? "";
-                var bc = getCategory(b) ?? "";
-                var r = string.Compare(ac, bc, StringComparison.OrdinalIgnoreCase);
-                if (r != 0)
-                    return r;
-
-                var abb = a.Before != null &&
-                    a.Before.Any(x => x == "*" ||
-                    string.Equals(x, b.Title, StringComparison.OrdinalIgnoreCase));
-
-                var bba = b.Before != null &&
-                    b.Before.Any(x => x == "*" ||
-                    string.Equals(x, a.Title, StringComparison.OrdinalIgnoreCase));
-
-                if (abb && !bba)
-                    return -1;
-
-                if (bba && !abb)
-                    return 1;
-
-                var aab = a.After != null &&
-                    a.After.Any(x => x == "*" ||
-                    string.Equals(x, b.Title, StringComparison.OrdinalIgnoreCase));
-
-                var baa = b.After != null &&
-                    b.After.Any(x => x == "*" ||
-                    string.Equals(x, a.Title, StringComparison.OrdinalIgnoreCase));
-
-                if (aab && !baa)
-                    return 1;
-
-                if (baa & !aab)
-                    return -1;
-
-                return a.Order.CompareTo(b.Order);
-            });
-
-            return l;
+            return list.OrderBy(x => getCategory(x) ?? "")
+                .ThenBy(x => x.Order);
         }
 
         public static ILookup<string, NavigationItemAttribute> ByCategory(
