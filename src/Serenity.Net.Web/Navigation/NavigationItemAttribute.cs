@@ -182,18 +182,5 @@ namespace Serenity.Navigation
         /// Window target to open this link, e.g. _blank etc.
         /// </summary>
         public string Target { get; set; }
-
-        /// <summary>
-        /// This is a list used to move items that are not normally
-        /// under this item based on path (to create groups).
-        /// For example, if this item is named A,
-        /// and want to move all menus under B/.. or C/.. to A,
-        /// the list should be ["B/", "C/"]. To move B and C themselves under A,
-        /// list should be ["B", "C"]. To specify a group that includes
-        /// all items that does not match any other groups, use ["...rest"].
-        /// To exclude something from ...rest, use ["Something", "...rest"].
-        /// There should be only one "...rest" item at most.
-        /// </summary>
-        public string[] Include { get; set; }
-    }
+   }
 }

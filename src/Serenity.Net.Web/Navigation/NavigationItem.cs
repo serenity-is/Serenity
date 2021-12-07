@@ -12,6 +12,7 @@ namespace Serenity.Navigation
         public string Target { get; set; }
         public NavigationItem Parent { get; set; }
         public List<NavigationItem> Children { get; private set; }
+        public bool IsSection { get; set; }
 
         public NavigationItem()
         {
