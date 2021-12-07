@@ -147,6 +147,7 @@ namespace Serenity.Navigation
 
             foreach (var wi in withIncludes.Where(x => !x.Include.Any(l => l == Rest)))
             {
+                var minOrder = int.MaxValue;
                 foreach (var pattern in wi.Include)
                 {
                     if (string.IsNullOrEmpty(pattern))
@@ -158,6 +159,8 @@ namespace Serenity.Navigation
                             .Where(x => x != wi && !newCategory.ContainsKey(x)))
                         {
                             newCategory[child] = wi.FullPath;
+                            if (child.Order < minOrder)
+                                minOrder = child.Order;
                         }
                     }
                     else
@@ -171,13 +174,20 @@ namespace Serenity.Navigation
                             x != wi && !newCategory.ContainsKey(x)))
                         {
                             newCategory[item] = wi.FullPath;
+                            if (item.Order < minOrder)
+                                minOrder = item.Order;
                         }
                     }
                 }
+
+                if (wi.Order == int.MaxValue &&
+                    minOrder < int.MaxValue)
+                    wi.Order = minOrder;
             }
 
             foreach (var wr in withIncludes.Where(x => x.Include.Any(l => l == Rest)))
             {
+                var minOrder = int.MaxValue;
                 foreach (var item in byCategory[""])
                 {
                     if (wr == item ||
@@ -199,8 +209,16 @@ namespace Serenity.Navigation
                     }
 
                     if (isMatch)
+                    {
                         newCategory[item] = wr.FullPath;
+                        if (item.Order < minOrder)
+                            minOrder = item.Order;
+                    }
                 }
+
+                if (wr.Order == int.MaxValue &&
+                    minOrder < int.MaxValue)
+                    wr.Order = minOrder;
             }
 
             if (!newCategory.Any())
