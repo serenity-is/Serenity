@@ -124,7 +124,7 @@ namespace Serenity.Data
         /// <param name="value">The value.</param>
         /// <param name="dialect">The dialect.</param>
         /// <returns>New parameter</returns>
-        public static DbParameter AddParamWithValue(this DbCommand command, string name, object value, ISqlDialect dialect)
+        public static IDbDataParameter AddParamWithValue(this IDbCommand command, string name, object value, ISqlDialect dialect)
         {
             name = dialect.ParameterPrefix != '@' &&
                 name.StartsWith("@") ? dialect.ParameterPrefix + name[1..] :
@@ -134,10 +134,10 @@ namespace Serenity.Data
             if (value is Dapper.SqlMapper.ICustomQueryParameter cqp)
             {
                 cqp.AddParameter(command, name);
-                return command.Parameters[^1];
+                return (IDbDataParameter)command.Parameters[^1];
             }
 #endif
-            DbParameter param = command.CreateParameter();
+            IDbDataParameter param = command.CreateParameter();
 
             param.ParameterName = name;
 
@@ -183,7 +183,7 @@ namespace Serenity.Data
         /// <returns>New command with specified command text and parameters</returns>
         public static IDbCommand NewCommand(IDbConnection connection, string commandText, IDictionary<string, object> param)
         {
-            var command = (DbCommand)(NewCommand(connection, commandText));
+            var command = NewCommand(connection, commandText);
 
             if (param == null || param.Count == 0)
                 return command;
@@ -261,7 +261,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("command");
 
             if (command.Connection == null)
-                throw new ArgumentNullException("command");
+                throw new ArgumentNullException("command.Connection");
 
             try
             {
