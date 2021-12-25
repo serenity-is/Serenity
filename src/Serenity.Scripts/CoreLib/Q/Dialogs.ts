@@ -230,7 +230,7 @@ export function alert(message: string, options?: AlertOptions) {
         if (options.okButton == null || options.okButton) {
             options.buttons.push({
                 text: typeof options.okButton == "boolean" ? txt('OkButton') : options.okButton,
-                cssClass: useBS ? 'btn-default' : undefined,
+                cssClass: useBS ? (isBS5Plus ? 'btn-primary' : 'btn-default') : undefined,
                 result: 'ok'
             });
         }
@@ -281,7 +281,7 @@ export function confirm(message: string, onYes: () => void, options?: ConfirmOpt
         if (options.noButton == null || options.noButton) {
             options.buttons.push({
                 text: typeof options.noButton == "boolean" ? txt('NoButton') : options.noButton,
-                cssClass: useBS ? 'btn-default' : undefined,
+                cssClass: useBS ? (isBS5Plus() ? 'btn-secondary' : 'btn-default'): undefined,
                 result: 'no',
                 click: options.onNo
             });
@@ -289,7 +289,7 @@ export function confirm(message: string, onYes: () => void, options?: ConfirmOpt
         if (options.cancelButton) {
             options.buttons.push({
                 text: typeof options.cancelButton == "boolean" ? txt('CancelButton') : options.cancelButton,
-                cssClass: useBS ? 'btn-default' : undefined,
+                cssClass: useBS ? (isBS5Plus() ? 'btn-secondary': 'btn-default') : undefined,
                 result: 'cancel',
                 click: options.onCancel
             });
