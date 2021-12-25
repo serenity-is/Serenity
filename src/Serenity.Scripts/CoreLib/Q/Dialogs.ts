@@ -83,12 +83,20 @@ function uiDialogMessage(options: CommonDialogOptions, message: string, dialogCl
 }
 
 let _isBS3: boolean;
+let _isBS5Plus: boolean;
 
 export function isBS3(): boolean {
     if (_isBS3 != null)
         return _isBS3;
     // @ts-ignore
     return (_isBS3 = !!($.fn.modal && $.fn.modal.Constructor && $.fn.modal.Constructor.VERSION && ($.fn.modal.Constructor.VERSION + "").charAt(0) == '3'));
+}
+
+export function isBS5Plus(): boolean {
+    if (_isBS5Plus != null)
+        return _isBS5Plus;
+    // @ts-ignore
+    return (_isBS5Plus = typeof bootstrap !== "undefined");
 }
 
 const defaultTxt = {
@@ -174,8 +182,11 @@ function bsModalMessage(options: CommonDialogOptions, message: string, modalClas
 
     div.modal({
         backdrop: false,
-        show: true
+        show: !isBS5Plus()
     });
+
+    if (isBS5Plus())
+        div.modal('show');
 }
 
 let _useBrowserDialogs: boolean;
