@@ -43,7 +43,7 @@ export class SlickPager extends Widget<Slick.PagerOptions> {
         $('.slick-pg-current', this.element).keydown(function (e) { if (e.keyCode == 13) self._changePage('input') });
 
         if (self.options.showRowsPerPage) {
-            var opt: string, sel = "";
+            var opt: string = "", sel = "";
             for (var nx = 0; nx < o.rowsPerPageOptions.length; nx++) {
                 if (v.rowsPerPage == o.rowsPerPageOptions[nx]) 
                     sel = 'selected="selected"'; else sel = '';
