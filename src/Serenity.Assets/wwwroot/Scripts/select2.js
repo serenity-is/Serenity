@@ -1468,6 +1468,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
             this.clearSearch();
             this.search.removeClass("select2-active");
+            this.search.parent().removeClass("select2-active");
             this.opts.element.trigger($.Event("select2-close"));
         },
 
@@ -1696,6 +1697,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
             function postRender() {
                 search.removeClass("select2-active");
+                search.parent().removeClass("select2-active");
                 self.positionDropdown();
                 if (results.find('.select2-no-results,.select2-selection-limit,.select2-searching').length) {
                     self.liveRegion.text(results.text());
@@ -1745,6 +1747,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
 
             search.addClass("select2-active");
+            search.parent().addClass("select2-active");
 
             this.removeHighlight();
 
