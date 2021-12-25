@@ -116,8 +116,8 @@ function txt(k: string) {
 }
 
 export function bsModalMarkup(title: string, body: string, modalClass?: string) {
-    var closeButton = `<button type="button" class="close" data-dismiss="modal" aria-label="${txt('CloseButton')}">` + 
-        `<span aria-hidden="true">&times;</span></button>`;
+    var closeButton = `<button type="button" class="${isBS5Plus() ? "btn-" : ""}close" data-${isBS5Plus() ? "bs-" :  ""}dismiss="modal" aria-label="${txt('CloseButton')}">` + 
+        `${isBS5Plus() ? "" : '<span aria-hidden="true">&times;</span>'}</button>`;
     return (
 `<div class="modal ${modalClass}" tabindex="-1" role="dialog">
 <div class="modal-dialog" role="document">
