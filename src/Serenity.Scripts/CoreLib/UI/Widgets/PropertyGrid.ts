@@ -9,7 +9,7 @@ import { ReflectionOptionsSetter } from "./ReflectionOptionsSetter";
 import { EditorUtils } from "../Editors/EditorUtils";
 import { Culture } from "../../Q/Formatting";
 import { Authorization } from "../../Q/Authorization";
-import { isBS3 } from "../../Q/Dialogs";
+import { isBS3, isBS5Plus } from "../../Q/Dialogs";
 
 @Decorators.registerClass('Serenity.PropertyGrid')
 export class PropertyGrid extends Widget<PropertyGridOptions> {
@@ -62,7 +62,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                 i = j;
 
                 var li = $(isBS3() ? '<li><a data-toggle="tab" role="tab"></a></li>' :
-                        '<li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab"></a></li>')
+                        `<li class="nav-item"><a class="nav-link" data-${isBS5Plus() ? "bs-" :  ""}toggle="tab" role="tab"></a></li>`)
                     .appendTo(ul);
 
                 if (tabIndex === 0) {
