@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Serenity.Data
 {
@@ -53,8 +54,9 @@ namespace Serenity.Data
             {
                 var dialectType = Type.GetType("Serenity.Data." + entry.Dialect + "Dialect") ??
                     Type.GetType("Serenity.Data." + entry.Dialect) ??
-                    Type.GetType(entry.Dialect);
-
+                    Type.GetType(entry.Dialect) ??
+                    Assembly.GetEntryAssembly().GetType(entry.Dialect);
+                
                 if (dialectType == null)
                     throw new ArgumentException($"Dialect type {entry.Dialect} specified for connection {connectionKey} is not found!");
 
