@@ -522,13 +522,14 @@ export namespace GridUtils {
 }
 
 export namespace PropertyItemSlickConverter {
+
     export function toSlickColumns(items: Serenity.PropertyItem[]): Slick.Column[] {
         var result: Slick.Column[] = [];
         if (items == null) {
             return result;
         }
         for (var i = 0; i < items.length; i++) {
-            result.push(toSlickColumn(items[i]));
+            result.push(PropertyItemSlickConverter.toSlickColumn(items[i]));
         }
         return result;
     }

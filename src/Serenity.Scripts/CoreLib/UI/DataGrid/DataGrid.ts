@@ -94,6 +94,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     public static defaultRowHeight: number;
     public static defaultHeaderHeight: number;
     public static defaultPersistanceStorage: SettingStorage;
+    public static defaultColumnWidthScale: number;
+    public static defaultColumnWidthDelta: number;
 
     private layoutTimer: number; 
 
@@ -406,7 +408,31 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
     protected postProcessColumns(columns: Slick.Column[]): Slick.Column[] {
         SlickHelper.setDefaults(columns, this.getLocalTextDbPrefix());
+
+        var delta = this.getColumnWidthDelta();
+        var scale = this.getColumnWidthScale();
+        if (scale < 0)
+            scale = 1;
+        if (delta !== 0 || scale !== 1) {
+            for (var col of columns) {
+                if (typeof col.width === "number")
+                    col.width = col.width * scale + delta;
+                if (typeof col.minWidth === "number")
+                    col.minWidth = col.minWidth * scale + delta;
+                if (typeof col.maxWidth === "number")
+                    col.maxWidth = col.maxWidth * scale + delta;
+            }
+        }
+
         return columns;
+    }
+
+    protected getColumnWidthDelta() {
+        return DataGrid.defaultColumnWidthDelta ?? 0;
+    }
+
+    protected getColumnWidthScale() {
+        return DataGrid.defaultColumnWidthScale ?? 1;
     }
 
     protected initialPopulate(): void {
@@ -449,10 +475,9 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
     protected createSlickGrid(): Slick.Grid {
 
-        var visibleColumns: Slick.Column[];
 
         this.allColumns = this.getColumns();
-        visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
+        var visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
             return x.visible !== false;
         });
 
