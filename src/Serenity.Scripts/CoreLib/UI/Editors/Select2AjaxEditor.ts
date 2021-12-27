@@ -86,7 +86,7 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
     }
 
     protected getTypeDelay(): number {
-        return 500;
+        return 200;
     }
 
     protected getSelect2Options(): Select2Options {
@@ -105,7 +105,12 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
                     window.clearTimeout(queryTimeout);
                 }
 
+                var select2 = $(this.element).data('select2');
+                select2 && select2.search && select2.search.removeClass('select2-active').parent().removeClass('select2-active');
+
                 queryTimeout = window.setTimeout(() => {
+                    select2 && select2.search.addClass('select2-active').parent().addClass('select2-active');
+
                     this.query(request, response => {
                         query.callback({
                             results: response.Entities.slice(0, this.pageSize).map(x => {

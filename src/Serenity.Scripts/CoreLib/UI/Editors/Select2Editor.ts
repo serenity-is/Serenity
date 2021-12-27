@@ -112,7 +112,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     }
 
     protected getTypeDelay() {
-        return (this.options['typeDelay'] ?? 500);
+        return (this.options['typeDelay'] ?? 200);
     }
 
     protected emptyItemText() {
@@ -200,11 +200,11 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                     clearTimeout(typeTimeout);
 
                 var select2 = $(this.element).data('select2');
-                select2 && select2.search && select2.search.removeClass('select2-active');
+                select2 && select2.search && select2.search.removeClass('select2-active').parent().removeClass('select2-active');
 
                 typeTimeout = setTimeout(() => {
                     queryPromise && queryPromise.abort && queryPromise.abort();
-                    select2 && select2.search.addClass('select2-active');
+                    select2 && select2.search.addClass('select2-active').parent().addClass('select2-active');
                     queryPromise = this.asyncSearch(searchQuery, result => {
                         queryPromise = null;
                         query.callback({
@@ -214,7 +214,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                     });
                     (queryPromise && (queryPromise.catch || queryPromise.fail)).call(queryPromise, () => {
                         queryPromise = null;
-                        select2 && select2.search && select2.search.removeClass('select2-active');
+                        select2 && select2.search && select2.search.removeClass('select2-active').parent().removeClass('select2-active');
                     });
                 }, !query.term ? 0 : this.getTypeDelay());
             }
