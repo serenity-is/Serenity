@@ -236,6 +236,9 @@ namespace Serenity.Web
                                 code = sr.ReadToEnd();
                             }
 
+                            code = new Regex(@"^\s*\/\*\s*[#@]\s?(source(?:Mapping)?URL)=\s*(\S+)\s*\*\/\s*$", RegexOptions.Multiline)
+                                .Replace(code, "");
+
                             code = RewriteUrls(sourceUrl, code, bundleRewriteRoot);
                             return code;
                         });
