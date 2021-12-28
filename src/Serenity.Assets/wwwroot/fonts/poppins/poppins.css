@@ -1,0 +1,45 @@
+/* poppins-300 - latin-ext_latin */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 300;
+  src: local(''),
+       url('poppins-300.woff2') format('woff2'),
+       url('poppins-300.woff') format('woff');
+}
+/* poppins-regular - latin-ext_latin */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  src: local(''),
+       url('poppins-400.woff2') format('woff2'),
+       url('poppins-400.woff') format('woff');
+}
+/* poppins-500 - latin-ext_latin */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  src: local(''),
+       url('poppins-500.woff2') format('woff2'),
+       url('poppins-500.woff') format('woff');
+}
+/* poppins-600 - latin-ext_latin */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  src: local(''),
+       url('poppins-600.woff2') format('woff2'),
+       url('poppins-600.woff') format('woff');
+}
+/* poppins-700 - latin-ext_latin */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  src: local(''),
+       url('poppins-700.woff2') format('woff2'),
+       url('poppins-700.woff') format('woff');
+}
