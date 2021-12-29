@@ -31,8 +31,8 @@ namespace Serenity.ComponentModel
         /// </summary>
         public int XSmall
         {
-            get { return Get("col-xs-") ?? 0; }
-            set { Set("col-xs-", value); }
+            get { return Get("col-") ?? 0; }
+            set { Set("col-", value); }
         }
 
         /// <summary>
