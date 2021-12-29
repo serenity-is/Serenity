@@ -43,7 +43,6 @@
     <TypeScriptCompile Remove="dist\**;node_modules\**;test\**;wwwroot\Serenity.CoreLib.d.ts" />
     <None Include="wwwroot\Serenity.CoreLib.d.ts" />
     <ToCompileCoreLib Include="CoreLib\**\*.ts;CoreLib\tsconfig.json;rollup.config.js"></ToCompileCoreLib>
-    <ToSerenityLess Include="style\**\*.less"></ToSerenityLess>
   </ItemGroup>
 
   <ItemGroup>
@@ -52,15 +51,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\terser\bin\terser') Or !Exists('node_modules\less\bin\lessc')">
+  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\terser\bin\terser')">
     <Message Text="Installing NPM packages..." Importance="high"></Message>
     <Exec Command="npm install" />
   </Target>
   <Target Name="CompileCoreLib" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" Outputs="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.d.ts;wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts">
     <Exec Command="npm run build" />
     <Copy SourceFiles="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.min.js;dist\Serenity.CoreLib.js.map;dist\Serenity.CoreLib.d.ts" DestinationFolder="wwwroot" />
-  </Target>
-  <Target Name="CompileSerenityLess" AfterTargets="AfterBuild" Inputs="@(ToSerenityLess)" Outputs="style\serenity.css">
-    <Exec Command="npx lessc &quot;$(ProjectDir)style\serenity.less&quot; &gt; &quot;$(ProjectDir)style\serenity.css&quot;" />
   </Target>
 </Project>
