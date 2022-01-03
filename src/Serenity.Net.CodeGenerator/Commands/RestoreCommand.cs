@@ -248,6 +248,8 @@ namespace Serenity.CodeGenerator
                 {
                     foreach (var file in Directory.GetFiles(typingsRoot, "*.ts", SearchOption.AllDirectories))
                     {
+                        Console.WriteLine(typingsRoot);
+                        Console.WriteLine(file);
                         var relative = "typings/" + file[(typingsRoot.Length + 1)..];
                         restoreFile(file, relative);
                     }
