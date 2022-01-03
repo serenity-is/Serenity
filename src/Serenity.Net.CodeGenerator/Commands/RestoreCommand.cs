@@ -209,7 +209,7 @@ namespace Serenity.CodeGenerator
                     nuspecFile = Path.Combine(packageFolder, id.ToLowerInvariant() + ".nuspec");
                     if (!File.Exists(nuspecFile))
                     {
-                        Console.WriteLine("Can't find nuspec file: " + nuspecFile)
+                        Console.WriteLine("Can't find nuspec file: " + nuspecFile);
                         continue;
                     }
                 }
