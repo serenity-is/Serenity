@@ -18,14 +18,15 @@ namespace Serenity.CodeGenerator
             ProjectSystem = projectSystem ?? throw new ArgumentNullException(nameof(projectSystem));
         }
 
-        public ExitCodes Run(string csproj)
+        public ExitCodes Run(string csproj, bool verbose = false)
         {
             if (csproj == null)
                 throw new ArgumentNullException(nameof(csproj));
 
             if (!File.Exists(csproj))
             {
-                Console.Error.WriteLine($"Project file {csproj} is not found!");
+                if (verbose)
+                    Console.Error.WriteLine($"Project file {csproj} is not found!");
                 return ExitCodes.ProjectNotFound;
             }
 
@@ -101,7 +102,8 @@ namespace Serenity.CodeGenerator
             {
                 foreach (var reference in EnumerateProjectReferences(csproj, new HashSet<string>(StringComparer.OrdinalIgnoreCase)))
                 {
-                    Console.WriteLine("Project Reference: " + reference);
+                    if (verbose)
+                        Console.WriteLine("Project Reference: " + reference);
 
                     IBuildProject project;
                     try
@@ -110,7 +112,8 @@ namespace Serenity.CodeGenerator
                     }
                     catch
                     {
-                        Console.WriteLine("Could not Load Project Reference!: " + reference);
+                        if (verbose)
+                            Console.WriteLine("Could not Load Project Reference!: " + reference);
 
                         continue;
                     }
@@ -127,15 +130,18 @@ namespace Serenity.CodeGenerator
                         var sourceFile = Path.Combine(Path.GetDirectoryName(reference),
                             item.EvaluatedInclude).Replace('\\', Path.DirectorySeparatorChar);
 
-                        Console.WriteLine("Checking source file: " + sourceFile);
+                        if (verbose)
+                            Console.WriteLine("Checking source file: " + sourceFile);
 
                         if (!File.Exists(sourceFile))
                         {
-                            Console.WriteLine("Source file does NOT exist: " + sourceFile);
+                            if (verbose)
+                                Console.WriteLine("Source file does NOT exist: " + sourceFile);
                             continue;
                         }
 
-                        Console.WriteLine("Source file exists: " + sourceFile);
+                        if (verbose)
+                            Console.WriteLine("Source file exists: " + sourceFile);
 
                         if (!string.Equals(item.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) &&
                             item.GetMetadataValue("Pack") != "true")
@@ -146,7 +152,8 @@ namespace Serenity.CodeGenerator
                         {
                             foreach (var path in packagePath.Split(';', StringSplitOptions.RemoveEmptyEntries))
                             {
-                                Console.WriteLine("Checking project package path " + path);
+                                if (verbose)
+                                    Console.WriteLine("Checking project package path " + path);
 
                                 if (!PathHelper.ToUrl(path).StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
                                     continue;
@@ -209,7 +216,8 @@ namespace Serenity.CodeGenerator
                     nuspecFile = Path.Combine(packageFolder, id.ToLowerInvariant() + ".nuspec");
                     if (!File.Exists(nuspecFile))
                     {
-                        Console.WriteLine("Can't find nuspec file: " + nuspecFile);
+                        if (verbose)
+                            Console.WriteLine("Can't find nuspec file: " + nuspecFile);
                         continue;
                     }
                 }
@@ -252,12 +260,15 @@ namespace Serenity.CodeGenerator
                         if (!relative.StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
                             relative = "wwwroot/" + relative;
 
-                        Console.WriteLine("Found a file to restore: " + relative);
+                        if (verbose)
+                            Console.WriteLine("Found a file to restore: " + relative);
                         restoreFile(file, relative);
                     }
                 }
-                else
+                else if (verbose)
+                {
                     Console.WriteLine("Can't find package content directory: " + nuspecFile);
+                }
 
                 var typingsRoot = Path.Combine(packageFolder, "typings");
                 if (!Directory.Exists(typingsRoot))
@@ -267,8 +278,11 @@ namespace Serenity.CodeGenerator
                 {
                     foreach (var file in Directory.GetFiles(typingsRoot, "*.ts", SearchOption.AllDirectories))
                     {
-                        Console.WriteLine(typingsRoot);
-                        Console.WriteLine(file);
+                        if (verbose)
+                        { 
+                            Console.WriteLine(typingsRoot);
+                            Console.WriteLine(file);
+                        }   
                         var relative = "typings/" + file[(typingsRoot.Length + 1)..];
                         restoreFile(file, relative);
                     }
