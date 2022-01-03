@@ -18,7 +18,7 @@ namespace Serenity.CodeGenerator
             ProjectSystem = projectSystem ?? throw new ArgumentNullException(nameof(projectSystem));
         }
 
-        public ExitCodes Run(string csproj, bool verbose)
+        public ExitCodes Run(string csproj)
         {
             if (csproj == null)
                 throw new ArgumentNullException(nameof(csproj));
