@@ -125,7 +125,7 @@ namespace Serenity.CodeGenerator
                             StringComparison.OrdinalIgnoreCase) == true))
                     {
                         var sourceFile = Path.Combine(Path.GetDirectoryName(reference),
-                            item.EvaluatedInclude);
+                            item.EvaluatedInclude).Replace('\\', Path.DirectorySeparatorChar);
 
                         Console.WriteLine("Checking source file: " + sourceFile);
 
