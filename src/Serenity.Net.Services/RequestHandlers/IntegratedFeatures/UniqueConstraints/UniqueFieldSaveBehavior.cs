@@ -1,5 +1,4 @@
-﻿#if TODO
-using Serenity.Data;
+﻿using Serenity.Data;
 using Serenity.Data.Mapping;
 using System;
 using System.Collections.Generic;
@@ -10,8 +9,14 @@ namespace Serenity.Services
     public class UniqueFieldSaveBehavior : BaseSaveBehavior, IImplicitBehavior, IFieldBehavior
     {
         public Field Target { get; set; }
+        public ITextLocalizer Localizer { get; }
 
         private UniqueAttribute attr;
+
+        public UniqueFieldSaveBehavior(ITextLocalizer localizer)
+        {
+            Localizer = localizer;
+        }
 
         public bool ActivateFor(IRow row)
         {
@@ -31,13 +36,13 @@ namespace Serenity.Services
 
         public override void OnBeforeSave(ISaveRequestHandler handler)
         {
-            ValidateUniqueConstraint(handler, new Field[] { Target },
+            ValidateUniqueConstraint(handler, new Field[] { Target }, Localizer,
                 attr == null ? (string)null : attr.ErrorMessage,
                 attr != null && attr.IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
         }
 
-        internal static void ValidateUniqueConstraint(ISaveRequestHandler handler, IEnumerable<Field> fields,
-            string errorMessage = null, BaseCriteria groupCriteria = null)
+        internal static void ValidateUniqueConstraint(ISaveRequestHandler handler, IEnumerable<Field> fields, 
+            ITextLocalizer localizer, string errorMessage = null, BaseCriteria groupCriteria = null)
         {
             if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old, handler.Row) != 0))
                 return;
@@ -66,11 +71,10 @@ namespace Serenity.Services
                 throw new ValidationError("UniqueViolation",
                     String.Join(", ", fields.Select(x => x.PropertyName ?? x.Name)),
                     string.Format(!string.IsNullOrEmpty(errorMessage) ?
-                        (LocalText.TryGet(errorMessage) ?? errorMessage) :
-                            LocalText.Get("Validation.UniqueConstraint"),
-                        String.Join(", ", fields.Select(x => x.Title))));
+                        (localizer.TryGet(errorMessage) ?? errorMessage) :
+                            localizer.Get("Validation.UniqueConstraint"),
+                        String.Join(", ", fields.Select(x => x.GetTitle(localizer)))));
             }
         }
     }
 }
-#endif
