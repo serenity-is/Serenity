@@ -5,6 +5,7 @@ import { endsWith } from "../../Q/Strings";
 import { getAttributes, getInstanceType, getTypeFullName } from "../../Q/System";
 import { PropertyGrid, PropertyGridOptions } from "../Widgets/PropertyGrid";
 import { TemplatedDialog } from "./TemplatedDialog";
+import { DialogButton } from "../../Q/Dialogs";
 
 @Decorators.registerClass('Serenity.PropertyDialog')
 export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
@@ -39,8 +40,10 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
     }
 
     protected getDialogButtons() {
-        return [{
+        super.getDialogButtons();
+        return <DialogButton[]>[{
             text: text('Dialogs.OkButton'),
+            cssClass: "btn btn-primary",
             click: () => this.okClick()
         }, {
             text: text('Dialogs.CancelButton'),
