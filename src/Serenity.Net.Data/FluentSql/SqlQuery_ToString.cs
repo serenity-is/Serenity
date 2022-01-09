@@ -65,19 +65,14 @@ namespace Serenity.Data
 
             var orderBy = query.OrderBy.ToArray();
 
-            if (skip > 0 && orderBy.Length == 0 && 
-                !dialect.CanUseSkipKeyword && !dialect.UseRowNum)
-                throw new InvalidOperationException("A query must be ordered by unique fields " +
-                    "to be able to skip records!");
-
-            // no extra filter yet
             string extraWhere = null;
 
             bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword;
-            bool useOffset = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch;
-            bool useRowNum = (skip > 0 || take > 0) && dialect.UseRowNum;
+            bool useOffset = (skip > 0 || (take > 0 && !dialect.CanUseSkipKeyword && dialect.UseRowNum)) && 
+                !useSkipKeyword && dialect.CanUseOffsetFetch;
+            bool useRowNum = (skip > 0 || take > 0) && !useOffset && dialect.UseRowNum;
             bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && !useRowNum && dialect.CanUseRowNumber;
-            bool useSecondQuery = skip > 0 && !useSkipKeyword && !useOffset && !useRowNumber;
+            bool useSecondQuery = skip > 0 && !useSkipKeyword && !useRowNum && !useOffset && !useRowNumber;
 
             void appendFromWhereOrderByGroupByHaving(string extraWhere, bool includeOrderBy)
             {
@@ -137,6 +132,10 @@ namespace Serenity.Data
                 }
                 else
                 {
+                    if (orderBy.Length == 0)
+                        throw new InvalidOperationException("A query must be ordered by unique fields " +
+                            "to be able to skip records!");
+
                     // this part is for servers that does not support paging at all (e.g. SQL 2000)
                     const string AssignCmd = "@Value{0} = {1}";
                     const string DeclareCmd = "DECLARE @Value{0} SQL_VARIANT;\n";

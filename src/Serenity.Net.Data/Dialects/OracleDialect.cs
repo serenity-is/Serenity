@@ -256,7 +256,7 @@ namespace Serenity.Data
                 SqlUnionType.Union => "UNION",
                 SqlUnionType.UnionAll => "UNION ALL",
                 SqlUnionType.Intersect => "INTERSECT",
-                SqlUnionType.Except => "EXCEPT",
+                SqlUnionType.Except => "MINUS",
                 _ => throw new NotImplementedException(),
             };
         }
