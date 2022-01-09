@@ -1,5 +1,4 @@
-﻿#if TODO
-using Serenity.Data;
+﻿using Serenity.Data;
 using Serenity.Data.Mapping;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,12 @@ namespace Serenity.Services
     {
         private UniqueConstraintAttribute[] attrList;
         private IEnumerable<Field>[] attrFields;
+        public ITextLocalizer Localizer { get; }
+
+        public UniqueConstraintSaveBehavior(ITextLocalizer localizer)
+        {
+            Localizer = localizer;
+        }
 
         public bool ActivateFor(IRow row)
         {
@@ -53,10 +58,9 @@ namespace Serenity.Services
                 var attr = attrList[i];
                 var fields = attrFields[i];
 
-                UniqueFieldSaveBehavior.ValidateUniqueConstraint(handler, fields, attr.ErrorMessage, 
+                UniqueFieldSaveBehavior.ValidateUniqueConstraint(handler, fields, Localizer, attr.ErrorMessage,
                     attrList[i].IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
             }
         }
     }
 }
-#endif
