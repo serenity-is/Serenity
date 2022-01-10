@@ -18,7 +18,7 @@ namespace Serenity
             DateTimeFormat = DateHelper.DefaultDateTimeFormat(order);
             DateSeparator = DateTime.MaxValue.ToString("yy/MM/dd", culture.DateTimeFormat)[2].ToString();
             DecimalSeparator = culture.NumberFormat.NumberDecimalSeparator;
-            GroupSepearator = culture.NumberFormat.NumberGroupSeparator;
+            GroupSeparator = culture.NumberFormat.NumberGroupSeparator;
         }
 
         public string DateOrder { get; set; }
@@ -26,6 +26,6 @@ namespace Serenity
         public string DateSeparator { get; set; }
         public string DateTimeFormat { get; set; }
         public string DecimalSeparator { get; set; }
-        public string GroupSepearator { get; set; }
+        public string GroupSeparator { get; set; }
     }
 }
