@@ -14,6 +14,7 @@ namespace Serenity.Web
             public static LocalText AlertTitle = "Alert";
             public static LocalText ConfirmationTitle = "Confirm";
             public static LocalText InformationTitle = "Information";
+            public static LocalText SuccessTitle = "Success";
             public static LocalText WarningTitle = "Warning";
         }
     }
