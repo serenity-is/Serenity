@@ -1028,10 +1028,6 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         this.toolbar.findButton('localization-hidden')
             .removeClass('localization-hidden').show();
 
-        this.saveAndCloseButton && this.saveAndCloseButton
-                .find('.button-inner').text(text((this.isNew() ? 'Controls.EntityDialog.SaveButton' :
-                    'Controls.EntityDialog.UpdateButton')));
-
         if (!hasSavePermission || viewMode || readOnly)
             EditorUtils.setContainerReadOnly(this.byId("Form"), true);
     }
