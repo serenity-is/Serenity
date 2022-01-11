@@ -136,7 +136,7 @@ if (typeof Slick === "undefined") {
         var $headers;
         var $headerRow, $headerRowScroller, $headerRowSpacerL, $headerRowSpacerR;
         var $footerRow, $footerRowScroller, $footerRowSpacerL, $footerRowSpacerR;
-        var $groupingPanel, $groupingPanelScroller, $groupingPanelSpacer;
+        var $groupingPanel;
         var $topPanelScroller;
         var $topPanel;
         var $viewport;
@@ -293,9 +293,6 @@ if (typeof Slick === "undefined") {
             maxSupportedCssHeight = maxSupportedCssHeight || getMaxSupportedCssHeight();
             scrollbarDimensions = scrollbarDimensions || measureScrollbar();
 
-            if ($groupingPanelSpacer)
-                $groupingPanelSpacer.css("width", getCanvasWidth() + scrollbarDimensions.width + "px");
-
             options = $.extend({}, defaults, options);
             validateAndEnforceOptions();
             columnDefaults.width = options.defaultColumnWidth;
@@ -344,14 +341,11 @@ if (typeof Slick === "undefined") {
             $focusSink = $("<div tabIndex='0' hideFocus style='position:fixed;width:0;height:0;top:0;" + xLeft + ":0;outline:0;'></div>").appendTo($container);
 
             if (options.groupingPanel) {
-                $groupingPanelScroller = $("<div class='slick-grouping-panel ui-state-default' style='overflow:hidden;position:relative;' />")
+                $groupingPanel = $("<div class='slick-grouping-panel' style='overflow:hidden; position:relative;' />")
                     .appendTo($container);
-                $groupingPanel = $("<div />").appendTo($groupingPanelScroller);
-                $groupingPanelSpacer = $("<div style='display:block;height:1px;position:absolute;top:0;left:0;'></div>")
-                  .appendTo($groupingPanelScroller);
 
                 if (!options.showGroupingPanel) {
-                    $groupingPanelScroller.hide();
+                    $groupingPanel.hide();
                 }
             }
 
@@ -542,11 +536,6 @@ if (typeof Slick === "undefined") {
 
                 $footerRowScroller
                     .bind("scroll", handleFooterRowScroll);
-
-                if (options.groupingPanel) {
-                    $groupingPanelScroller
-                        .on("scroll", handleGroupingPanelScroll);
-                }
 
                 $focusSink.add($focusSink2)
                     .bind("keydown", handleKeyDown);
@@ -748,9 +737,6 @@ if (typeof Slick === "undefined") {
             if (widthChanged || hasFrozenColumns() || hasFrozenRows) {
                 $canvasTopL.width(canvasWidthL);
 
-                if (options.groupingPanel)
-                    $groupingPanel.width(canvasWidth);
-
                 getHeadersWidth();
 
                 $headerL.width(headersWidthL);
@@ -818,9 +804,6 @@ if (typeof Slick === "undefined") {
 
             var w = canvasWidth + (viewportHasVScroll ? scrollbarDimensions.width : 0);
             
-            if (options.groupingPanel)
-                $groupingPanelSpacer.width(w);
-
             $headerRowSpacerL.width(w);
             $headerRowSpacerR.width(w);
 
@@ -2384,9 +2367,9 @@ if (typeof Slick === "undefined") {
             if (options.showGroupingPanel != visible) {
                 options.showGroupingPanel = visible;
                 if (visible) {
-                    $groupingPanelScroller.slideDown("fast", resizeCanvas);
+                    $groupingPanel.slideDown("fast", resizeCanvas);
                 } else {
-                    $groupingPanelScroller.slideUp("fast", resizeCanvas);
+                    $groupingPanel.slideUp("fast", resizeCanvas);
                 }
             }
         }
@@ -2802,7 +2785,7 @@ if (typeof Slick === "undefined") {
                   : 0;
 
                 groupPanelH = (options.groupingPanel && options.showGroupingPanel)
-                  ? options.groupingPanelHeight + getVBoxDelta($groupingPanelScroller) : 0;
+                  ? options.groupingPanelHeight + getVBoxDelta($groupingPanel) : 0;
 
                 headerRowH = (options.showHeaderRow)
                   ? options.headerRowHeight + getVBoxDelta($headerRowScroller)
@@ -3479,10 +3462,6 @@ if (typeof Slick === "undefined") {
             }
         }
 
-        function handleGroupingPanelScroll() {
-            handleElementScroll($groupingPanelScroller[0]);
-        }
-
         function handleElementScroll(element) {
             var scrollLeft = element.scrollLeft;
             if (scrollLeft != $viewport[0].scrollLeft) {
@@ -3564,11 +3543,6 @@ if (typeof Slick === "undefined") {
                     if (hasFrozenRows) {
                         $viewportTopL[0].scrollLeft = scrollLeft;
                     }
-                }
-
-                
-                if (options.groupingPanel) {
-                    $groupingPanelScroller[0].scrollLeft = scrollLeft;
                 }
             }
 
