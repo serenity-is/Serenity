@@ -2897,7 +2897,7 @@ if (typeof Slick === "undefined") {
 
             if (hasFrozenColumns()) {
                 $paneTopR.css({
-                    'top': Math.round($paneHeaderL.height()), 'height': paneTopH
+                    'top': $paneTopL.css('top'), 'height': paneTopH
                 });
 
                 $viewportTopR.height(viewportTopH);
