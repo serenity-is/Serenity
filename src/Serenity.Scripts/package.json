@@ -22,7 +22,6 @@
     "@types/jest": "27.0.2",
     "@types/node": "14.14.14",
     "jest": "27.3.1",
-    "less": "4.0.0",
     "rollup": "2.35.1",
     "rollup-plugin-dts": "2.0.1",
     "terser": "5.5.1",
