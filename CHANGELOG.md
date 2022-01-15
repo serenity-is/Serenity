@@ -1,3 +1,26 @@
+## 5.2.0 (2022-01-15)
+
+  - bootstrap 5 support (5.1.3)
+  - pro theme with simplified (1/3 size) bootstrap 5 compatible css (StartSharp)
+  - new dark theme cosmos (StartSharp)
+  - no longer use select2, slickgrid etc. css files (all in pro theme, StartSharp)
+  - completely removed AdminLTE
+  - redesigned dashboard with new charts, chat panel etc.
+  - use chartjs instead of morris
+  - use css variables for easy color scheme / theme development (StartSharp)
+  - no longer use less for css
+  - classic theme layout option via s-classic-layout on html element (header instead of a sidebar band) (StartSharp)
+  - use nprogress instead of pace (StartSharp)
+  - custom enum flags editor and sample (StartSharp)
+  - use bs5 collapsible for sidebar (StartSharp)
+  - separate templates for VS 2022 / VS 2019. required due to VS 2022 extension incompatibility / amd64 (StartSharp)
+  - bring back module selection dialog on project creation (StartSharp)
+  - abstract navigation model
+  - use line awesome instead with shims instead of font awesome 4 (StartSharp)
+  - added sample work log module (StartSharp)
+  - fix all pro-theme issues (https://github.com/serenity-is/Serenity/milestone/1?closed=1)
+  
+
 ## 5.1.3 (2022-01-15)
 
 Bugfixes:
