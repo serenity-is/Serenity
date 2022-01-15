@@ -12,8 +12,9 @@
 
   <ItemGroup>
     <None Remove="*\tsconfig.json;style\*.css;texts\**\*.json;" />
-    <Content Update="package*.json">
+    <Content Update="*.json">
       <CopyToOutputDirectory>false</CopyToOutputDirectory>
+      <Pack>false</Pack>
     </Content>
     <Content Remove="texts\**\*.json" />
     <Content Update="*\tsconfig.json">
