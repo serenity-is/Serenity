@@ -1,7 +1,7 @@
 ﻿<Project>
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1</TargetFrameworks>
-    <Version>5.1.2</Version>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>5.1.3</Version>
     <Company>Serenity</Company>
     <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
     <PlatformTarget>AnyCPU</PlatformTarget>

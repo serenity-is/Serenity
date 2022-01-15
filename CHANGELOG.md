@@ -1,3 +1,8 @@
+## 5.1.3 (2022-01-15)
+
+Bugfixes:
+  - fix missing static web assets issue in Serenity.Scripts due to target framework bug
+
 ## 5.1.2 (2022-01-14)
 
 Features:

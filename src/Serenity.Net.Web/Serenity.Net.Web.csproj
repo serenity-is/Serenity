@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Web</AssemblyName>
-    <TargetFrameworks>net5.0</TargetFrameworks>
+    <TargetFramework>net5.0</TargetFramework>
     <Title>Serenity Platform - Asp.Net Core Web Library</Title>
   </PropertyGroup>
   <ItemGroup>
