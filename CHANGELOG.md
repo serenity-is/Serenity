@@ -1,3 +1,8 @@
+## 5.2.1 (2022-01-16)
+
+Bugfixes:
+  - Serenity.Scripts contains package.json etc as content files due to a change in NET6 SDK possibly
+
 ## 5.2.0 (2022-01-15)
 
   - bootstrap 5 support (5.1.3)
