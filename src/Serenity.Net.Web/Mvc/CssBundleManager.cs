@@ -48,8 +48,6 @@ namespace Serenity.Web
                     if (bundleKeysBySourceUrl == null ||
                         !bundleKeysBySourceUrl.TryGetValue("dynamic://" + name, out bundleKeys))
                         bundleKeys = null;
-                    {
-                    }
                 }
 
                 if (bundleKeys != null)
@@ -65,6 +63,21 @@ namespace Serenity.Web
                 isEnabled = false;
                 var settings = options.Value;
                 var bundles = settings.Bundles ?? new Dictionary<string, string[]>();
+
+                foreach (var key in bundles.Keys.ToArray())
+                {
+                    var parts = bundles[key];
+                    if (parts != null &&
+                        !bundles.Keys.Contains(key + ".rtl") &&
+                        parts.Any(x => x != null &&
+                            x.Contains("{.rtl}", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        bundles[key + ".rtl"] = parts.Select(x => x
+                            .Replace("{.rtl}", ".rtl", StringComparison.OrdinalIgnoreCase)).ToArray();
+                        bundles[key] = parts.Select(x => x
+                            .Replace("{.rtl}", "", StringComparison.OrdinalIgnoreCase)).ToArray();
+                    }
+                }
 
                 bundles = bundles.Keys.ToDictionary(k => k,
                     k => (bundles[k] ?? Array.Empty<string>())
@@ -333,7 +346,7 @@ namespace Serenity.Web
             if (question >= 0)
             {
                 query = contentRelative[question..];
-                contentRelative = contentRelative.Substring(0, question);
+                contentRelative = contentRelative[..question];
             }
 
             var rewrittenUrl = new Uri("x:" + contentPath + contentRelative).AbsolutePath[2..];
