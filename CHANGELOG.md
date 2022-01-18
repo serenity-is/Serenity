@@ -1,3 +1,19 @@
+## 5.2.2 (2022-01-18)
+
+Features:
+  - add bootstrap v5.1.3 RTL versions to Serenity.Assets
+  - don't generate unused less file for apps created from recent templates
+  - removed 
+  - add support for generating a separate .rtl bundle if any bundle parts contains {.rtl} placeholder
+  - add RTL support to new pro theme (StartSharp)
+  - added rtl rules for dashboard, pro-theme and pro-extensions
+  - used rtlcss for x.rtl.css on build of pro packages
+
+Bugfixes:
+  - fix padding / alignment of multiple select
+  - fix classes and html dir generation in Layout.cshtml (StartSharp)
+  - fix worklog module class name typo in WorkLogGrid
+
 ## 5.2.1 (2022-01-16)
 
 Bugfixes:
