@@ -133,30 +133,35 @@ namespace Serenity.CodeGenerator
             string file = Path.Combine(rootDir, Path.Combine(contentSite,
                     "site" + model.DotModule.ToLowerInvariant() + ".less"));
 
-            if (!string.IsNullOrEmpty(model.Module))
+            var siteLess = Path.Combine(rootDir, Path.Combine(contentSite, "site.less"));
+
+            if (!File.Exists(siteLess) &&
+                !File.Exists(file))
             {
-                var siteLess = Path.Combine(rootDir, Path.Combine(contentSite, "site.less"));
+                // probably newer template where we don't use less
+                return;
+            }
 
-                if (File.Exists(siteLess))
+            if (!string.IsNullOrEmpty(model.Module) &&
+                File.Exists(siteLess))
+            {
+                var importLine = "@import \"site." + model.Module.ToLowerInvariant() + ".less\";";
+                var lines = File.ReadAllLines(siteLess).ToList();
+                if (!lines.Any(x => string.Compare(x ?? "", importLine, StringComparison.OrdinalIgnoreCase) == 0))
                 {
-                    var importLine = "@import \"site." + model.Module.ToLowerInvariant() + ".less\";";
-                    var lines = File.ReadAllLines(siteLess).ToList();
-                    if (!lines.Any(x => string.Compare(x ?? "", importLine, StringComparison.OrdinalIgnoreCase) == 0))
+                    var index = lines.FindLastIndex(x =>
                     {
-                        var index = lines.FindLastIndex(x =>
-                        {
-                            return x.StartsWith("@import", StringComparison.Ordinal) ||
-                                (x.StartsWith("//", StringComparison.Ordinal) && x.Contains("if:", StringComparison.Ordinal));
-                        });
+                        return x.StartsWith("@import", StringComparison.Ordinal) ||
+                            (x.StartsWith("//", StringComparison.Ordinal) && x.Contains("if:", StringComparison.Ordinal));
+                    });
 
-                        if (index < 0)
-                            index = lines.Count;
-                        else
-                            index++;
+                    if (index < 0)
+                        index = lines.Count;
+                    else
+                        index++;
 
-                        lines.Insert(index, importLine);
-                        CodeFileHelper.CheckoutAndWrite(siteLess, string.Join(Environment.NewLine, lines), false);
-                    }
+                    lines.Insert(index, importLine);
+                    CodeFileHelper.CheckoutAndWrite(siteLess, string.Join(Environment.NewLine, lines), false);
                 }
             }
 
