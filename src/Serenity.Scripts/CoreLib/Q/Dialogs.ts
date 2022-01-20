@@ -162,8 +162,14 @@ function bsModalMessage(options: CommonDialogOptions, message: string, modalClas
     if (options.onOpen)
         div.one('shown.bs.modal', options.onOpen);
 
-    if (options.onClose)
-        div.one('hidden.bs.modal', e => options.onClose(options.result));
+    div.one('hidden.bs.modal', e => {
+        try {
+            options.onClose && options.onClose(options.result);
+        }
+        finally {
+            div.remove();
+        }
+    });
 
     var footer = div.find('.modal-footer');
 
