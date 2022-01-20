@@ -20,6 +20,9 @@ function setupDummyJQueryForModal(callback) {
             appendTo: function () {
                 return this;
             },
+			one: function() {
+				return this;
+			},
             modal: function () {
                 expect(this._html).toBe(html);
                 callback(html);
