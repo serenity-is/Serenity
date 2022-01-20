@@ -8,7 +8,7 @@
             if ($(event.target).closest(".ui-dialog").length) {
                 return true;
             }
-            return !!$(event.target).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog, #support-modal").length;
+            return !!$(event.target).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog, .modal, #support-modal").length;
         };
 
         (function (orig) {
