@@ -118,7 +118,7 @@ namespace Serenity.CodeGenerator
 
                 if ("generate".StartsWith(command, StringComparison.Ordinal))
                 {
-                    GenerateCommand.Run(csproj, args.Skip(1).ToArray());
+                    GenerateCommand.Run(csproj, args.Skip(1).ToArray(), fileSystem);
                     return ExitCodes.Success;
                 }
             }

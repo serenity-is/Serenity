@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Serenity.Net.CodeGenerator.TerminalGui": {
-      "commandName": "Project",
-      "workingDirectory": "C:\\Sandbox\\StartSharp1\\StartSharp1\\StartSharp1.Web"
-    }
-  }
-}

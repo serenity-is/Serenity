@@ -4,12 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Serenity.CodeGenerator
 {
-    public class GenerateCommand
+    public partial class GenerateCommand
     {
         private class AppSettingsFormat
         {
@@ -48,9 +49,18 @@ namespace Serenity.CodeGenerator
             return null;
         }
 
-        public static void Run(string csproj, string[] args)
+        public static void Run(string csproj, string[] args, IFileSystem fileSystem)
         {
             var projectDir = Path.GetDirectoryName(csproj);
+            if (!args.Any())
+            {
+                var exitCode = new Interactive(fileSystem).Run();
+                if (exitCode != ExitCodes.Success &&
+                    exitCode != ExitCodes.Help)
+                    Environment.Exit((int)exitCode);
+
+                return;
+            }
 
             var outFile = GetOption(args, "o").TrimToNull();
             var connectionKey = GetOption(args, "c").TrimToNull();
