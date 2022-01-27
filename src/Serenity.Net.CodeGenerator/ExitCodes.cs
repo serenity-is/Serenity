@@ -10,6 +10,7 @@
         ProjectNotFound = 3,
         NoProjectFiles = 4,
         MultipleProjectFiles = 5,
-        CantDeterminePackagesDir = 6
+        CantDeterminePackagesDir = 6,
+        NoConnectionString = 7
     }
 }
