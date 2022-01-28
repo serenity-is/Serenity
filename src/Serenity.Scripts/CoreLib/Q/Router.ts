@@ -231,7 +231,8 @@ export namespace Router {
 
     let routerOrder = 1;
 
-    $(document).on("dialogopen panelopen", ".ui-dialog-content, .s-Panel", function (event, ui) {
+    typeof document !== "undefined" && typeof $ !== "undefined" &&
+        $.fn && $(document).on("dialogopen panelopen", ".ui-dialog-content, .s-Panel", function (event, ui) {
         if (!enabled)
             return;
 

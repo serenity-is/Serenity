@@ -97,7 +97,7 @@ export function isBS5Plus(): boolean {
     if (_isBS5Plus != null)
         return _isBS5Plus;
     // @ts-ignore
-    return (_isBS5Plus = typeof bootstrap !== "undefined");
+    return (_isBS5Plus = typeof bootstrap !== "undefined" && (!bootstrap.Modal || !bootstrap.Modal.VERSION || (!bootstrap.Modal.VERSION + "").charAt(0) != '4'));
 }
 
 const defaultTxt = {

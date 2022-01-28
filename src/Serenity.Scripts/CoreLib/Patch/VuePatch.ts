@@ -114,5 +114,5 @@ export function vuePatch(Vue: any) {
     }
 
     // @ts-ignore
-    !vueIntegration() && typeof $ !== "undefined" && $(vueIntegration);
+    !vueIntegration() && typeof $ !== "undefined" && $.fn && $(vueIntegration);
 }

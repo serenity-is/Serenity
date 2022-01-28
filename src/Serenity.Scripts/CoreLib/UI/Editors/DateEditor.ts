@@ -439,4 +439,4 @@ function jQueryDatepickerInitialization(): boolean {
     return true;
 };
 
-typeof $ !== "undefined" && !jQueryDatepickerInitialization() && $(jQueryDatepickerInitialization);
+typeof $ !== "undefined" && $.fn && !jQueryDatepickerInitialization() && $(jQueryDatepickerInitialization);

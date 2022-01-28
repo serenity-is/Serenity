@@ -2391,8 +2391,9 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
     -ms-flex-preferred-size: auto;
   }
 }
-body.mobile-device.modal-dialog-open {
-  overflow-y: hidden;
+body.mobile-device.modal-dialog-open,
+.mobile-device body.modal-dialog-open {
+    overflow-y: hidden;
 }
 .ui-dialog.mobile-layout {
   box-shadow: none;

@@ -13,7 +13,7 @@
 
         (function (orig) {
             $.ui.dialog.prototype._focusTabbable = function () {
-                if ($(document.body).hasClass('mobile-device')) {
+                if ($(document.documentElement).hasClass('mobile-device')) {
                     this.uiDialog && this.uiDialog.focus();
                     return;
                 }
@@ -29,9 +29,9 @@
         })($.ui.dialog.prototype._createTitlebar);
     }
 
-    !applyJQueryUIFixes() && typeof $ !== "undefined" && $(applyJQueryUIFixes);
+    !applyJQueryUIFixes() && typeof $ !== "undefined" && $.fn && $(applyJQueryUIFixes);
 
-    if (typeof $ !== "undefined") {
+    if (typeof $ !== "undefined" && $.fn) {
 
         // for backward compatibility
         if (!$.toJSON)

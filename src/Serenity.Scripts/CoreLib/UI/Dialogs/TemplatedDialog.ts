@@ -316,7 +316,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     }
 
     protected onDialogOpen(): void {
-        if (!$(document.body).hasClass('mobile-device'))
+        if (!$(document.documentElement).hasClass('mobile-device'))
             $(':input', this.element).not('button').eq(0).focus();
         this.arrange();
         this.tabs && this.tabs.tabs('option', 'active', 0);
@@ -460,7 +460,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     protected handleResponsive(): void {
         var dlg = this.element.dialog();
         var uiDialog = this.element.closest('.ui-dialog');
-        if ($(document.body).hasClass('mobile-device')) {
+        if ($(document.documentElement).hasClass('mobile-device')) {
             var data = this.element.data('responsiveData');
             if (!data) {
                 data = {};

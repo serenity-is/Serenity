@@ -1,24 +1,26 @@
 ﻿import { Widget } from "./Widget";
 import { LazyLoadHelper } from "../Helpers/LazyLoadHelper";
 
-$.fn.flexHeightOnly = function (flexY: number = 1) {
-    return this.flexWidthHeight(0, flexY);
-}
+if (typeof $ !== "undefined" && $.fn) {
+    $.fn.flexHeightOnly = function (flexY: number = 1) {
+        return this.flexWidthHeight(0, flexY);
+    }
 
-$.fn.flexWidthOnly = function (flexX: number = 1) {
-    return this.flexWidthHeight(flexX, 0);
-}
+    $.fn.flexWidthOnly = function (flexX: number = 1) {
+        return this.flexWidthHeight(flexX, 0);
+    }
 
-$.fn.flexWidthHeight = function (flexX: number = 1, flexY: number = 1) {
-    return this.addClass('flexify').data('flex-x', flexX).data('flex-y', flexY);
-}
+    $.fn.flexWidthHeight = function (flexX: number = 1, flexY: number = 1) {
+        return this.addClass('flexify').data('flex-x', flexX).data('flex-y', flexY);
+    }
 
-$.fn.flexX = function (flexX: number): JQuery {
-    return this.data('flex-x', flexX);
-}
+    $.fn.flexX = function (flexX: number): JQuery {
+        return this.data('flex-x', flexX);
+    }
 
-$.fn.flexY = function (flexY: number): JQuery {
-    return this.data('flex-y', flexY);
+    $.fn.flexY = function (flexY: number): JQuery {
+        return this.data('flex-y', flexY);
+    }
 }
 
 export class Flexify extends Widget<FlexifyOptions> {

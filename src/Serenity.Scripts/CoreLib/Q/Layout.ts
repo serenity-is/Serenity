@@ -77,14 +77,16 @@ export function setMobileDeviceMode() {
     let isMobile = navigator.userAgent.indexOf('Mobi') >= 0 ||
         (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
 
-    let body = $(document.body);
-    if (body.hasClass('mobile-device')) {
+    if (typeof document === "undefined" || !document.documentElement)
+        return;
+
+    if (document.documentElement.classList.contains('mobile-device')) {
         if (!isMobile) {
-            body.removeClass('mobile-device');
+            document.documentElement.classList.remove('mobile-device');
         }
     }
     else if (isMobile) {
-        body.addClass('mobile-device');
+        document.documentElement.classList.add('mobile-device');
     }
 }
 
