@@ -336,7 +336,17 @@ namespace Serenity.CodeGenerator
             return ExitCodes.Success;
         }
 
-        private IEnumerable<string> EnumerateProjectReferences(string csproj, HashSet<string> visited, int depth = 0)
+        private static readonly HashSet<string> IgnoreProjectRefs = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Serenity.Net.Core",
+            "Serenity.Net.Data",
+            "Serenity.Net.Entity",
+            "Serenity.Net.Services",
+            "Serenity.Net.Web"
+        };
+
+        private IEnumerable<string> EnumerateProjectReferences(string csproj, HashSet<string> visited, 
+            int depth = 0)
         {
             var allReferences = new List<string>();
             try
@@ -350,20 +360,25 @@ namespace Serenity.CodeGenerator
                     if (string.Equals(item.ItemType, "ProjectReference",
                         StringComparison.OrdinalIgnoreCase))
                     {
-                        if (!string.IsNullOrEmpty(item.EvaluatedInclude))
-                        {
-                            var path = Path.Combine(Path.GetDirectoryName(csproj), item.EvaluatedInclude);
-                            if (File.Exists(path) && visited?.Contains(path) != true)
-                            {
-                                path = Path.GetFullPath(path);
-                                allReferences.Add(path);
+                        if (string.IsNullOrEmpty(item.EvaluatedInclude))
+                            continue;
 
-                                if (visited != null && depth < 5)
-                                {
-                                    foreach (var subref in EnumerateProjectReferences(path, visited, depth + 1))
-                                        allReferences.Add(subref);
-                                }
-                            }
+                        var path = Path.Combine(Path.GetDirectoryName(csproj), item.EvaluatedInclude);
+                        if (!File.Exists(path) || visited?.Contains(path) == true)
+                            continue;
+
+                        if (IgnoreProjectRefs.Contains(Path.GetFileNameWithoutExtension(path)))
+                            continue;
+
+                        path = Path.GetFullPath(path);
+                        allReferences.Add(path);
+                        if (visited?.Contains(path) == true)
+                            continue;
+
+                        if (visited != null && depth < 5)
+                        {
+                            foreach (var subref in EnumerateProjectReferences(path, visited, depth + 1))
+                                allReferences.Add(subref);
                         }
                     }
                 }

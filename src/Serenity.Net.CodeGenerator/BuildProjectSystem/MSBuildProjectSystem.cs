@@ -2,6 +2,7 @@
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Locator;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Serenity.CodeGenerator.MSBuild
@@ -27,12 +28,20 @@ namespace Serenity.CodeGenerator.MSBuild
 
             if (project == null)
             {
+                ProjectCollection.GlobalProjectCollection.IsBuildEnabled = false;
+                ProjectCollection.GlobalProjectCollection.OnlyLogCriticalEvents = true;
+
                 project = Project.FromFile(path, new ProjectOptions
                 {
-                    LoadSettings = ProjectLoadSettings.IgnoreEmptyImports |
-                    ProjectLoadSettings.IgnoreEmptyImports |
-                    ProjectLoadSettings.IgnoreInvalidImports |
-                    ProjectLoadSettings.DoNotEvaluateElementsWithFalseCondition
+                    GlobalProperties = new Dictionary<string, string>
+                    {
+                        ["DesignTimeBuild"] = "true"
+                    },
+                    LoadSettings = 
+                        ProjectLoadSettings.IgnoreEmptyImports |
+                        ProjectLoadSettings.IgnoreInvalidImports |
+                        ProjectLoadSettings.IgnoreMissingImports |
+                        ProjectLoadSettings.DoNotEvaluateElementsWithFalseCondition
                 });
             }
 
