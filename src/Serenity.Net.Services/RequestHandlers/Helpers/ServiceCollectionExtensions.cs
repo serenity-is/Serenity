@@ -41,7 +41,6 @@ namespace Serenity.Extensions.DependencyInjection
             collection.TryAddTransient(typeof(IListHandler<>), typeof(ListHandlerProxy<>));
             collection.TryAddTransient(typeof(IRetrieveHandler<,,>), typeof(RetrieveHandlerProxy<,,>));
             collection.TryAddTransient(typeof(IRetrieveHandler<>), typeof(RetrieveHandlerProxy<>));
-
             return collection;
         }
 
@@ -142,6 +141,7 @@ namespace Serenity.Extensions.DependencyInjection
             collection.AddTextRegistry();
             collection.AddServiceBehaviors();
             collection.AddServiceHandlerFactory();
+            collection.AddServiceResolver();
             collection.AddCustomRequestHandlers(customHandlerTypeSource, customHandlerPredicate);
             collection.AddProxyRequestHandlers();
 

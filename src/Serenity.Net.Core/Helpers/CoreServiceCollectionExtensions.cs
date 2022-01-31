@@ -53,5 +53,14 @@ namespace Serenity.Extensions.DependencyInjection
         {
             services.TryAddSingleton<ITypeSource>(new DefaultTypeSource(assemblies));
         }
+
+        /// <summary>
+        /// Adds on demand service resolver to the registry.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        public static void AddServiceResolver(this IServiceCollection services)
+        {
+            services.TryAddSingleton(typeof(IServiceResolver<>), typeof(ServiceResolver<>));
+        }
     }
 }
