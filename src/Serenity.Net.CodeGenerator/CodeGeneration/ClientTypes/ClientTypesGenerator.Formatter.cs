@@ -37,10 +37,6 @@ namespace Serenity.CodeGeneration
             if (type.GenericParameters.Count > 0)
                 return false;
 
-            if (type.AssemblyName != null &&
-                type.AssemblyName.StartsWith("Serenity.", StringComparison.Ordinal))
-                return false;
-
             return type.Interfaces.Any(x =>
                 x == "Serenity.ISlickFormatter" ||
                 x == "Slick.Formatter");

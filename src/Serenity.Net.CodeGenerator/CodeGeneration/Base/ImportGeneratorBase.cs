@@ -24,47 +24,16 @@ namespace Serenity.CodeGeneration
 
         public HashSet<string> RootNamespaces { get; private set; }
 
-        public void AddSSType(ExternalType type)
-        {
-            type.Origin = ExternalTypeOrigin.SS;
-
-            var oldFullName = type.FullName;
-            ssByClassName[oldFullName] = type;
-            var ignoreNS = type.Attributes.FirstOrDefault(x =>
-                x.Type == "System.Runtime.CompilerServices.IgnoreNamespaceAttribute");
-
-            if (ignoreNS != null)
-                type.Namespace = "";
-
-            var scriptNS = type.Attributes.FirstOrDefault(x =>
-                x.Type == "System.Runtime.CompilerServices.ScriptNamespaceAttribute");
-
-            if (scriptNS != null)
-                type.Namespace = scriptNS.Arguments[0].Value as string;
-
-            var scriptName = type.Attributes.FirstOrDefault(x =>
-                x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
-
-            if (scriptName != null)
-                type.Name = scriptName.Arguments[0].Value as string;
-
-            if (ssByScriptName.TryGetValue(type.FullName, out ExternalType overriding) &&
-                type.GenericParameters.Count <= overriding.GenericParameters.Count)
-            {
-                return;
-            }
-
-            ssByScriptName[type.FullName] = type;
-        }
-
         public void AddTSType(ExternalType type)
         {
-            type.Origin = ExternalTypeOrigin.TS;
             tsTypes[type.FullName] = type;
         }
 
         protected ExternalType GetScriptType(string fullName)
         {
+            if (string.IsNullOrEmpty(fullName))
+                return null;
+
             if (tsTypes.TryGetValue(fullName, out ExternalType type))
                 return type;
 
@@ -143,7 +112,7 @@ namespace Serenity.CodeGeneration
 
         protected static string GetBaseTypeName(ExternalType type)
         {
-            if (type.BaseType == null)
+            if (string.IsNullOrEmpty(type.BaseType))
                 return null;
 
             var baseType = type.BaseType;

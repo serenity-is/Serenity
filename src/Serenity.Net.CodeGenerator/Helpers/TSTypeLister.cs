@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Serenity.CodeGeneration;
+﻿using Serenity.CodeGeneration;
 using Serenity.IO;
 using System;
 using System.Collections.Generic;
@@ -48,7 +47,11 @@ namespace Serenity.CodeGenerator
             IEnumerable<string> files = null;
             if (File.Exists(tsconfig))
             {
-                var cfg = JSON.ParseTolerant<TSConfig>(File.ReadAllText(tsconfig));
+                var cfg = System.Text.Json.JsonSerializer.Deserialize<TSConfig>(File.ReadAllText(tsconfig),
+                    new System.Text.Json.JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                    });
                 if (!cfg.Files.IsEmptyOrNull())
                 {
                     files = cfg.Files.Where(x => File.Exists(Path.Combine(projectDir, PathHelper.ToPath(x))))
@@ -149,11 +152,19 @@ namespace Serenity.CodeGenerator
             sb.AppendLine("var fs = require('fs');");
             sb.AppendLine(tsServices);
             sb.AppendLine(codeGeneration);
+
             foreach (var file in files)
                 sb.AppendLine("Serenity.CodeGeneration.addSourceFile(" +
-                    file.Replace('\\', '/').ToJson() + ", " +
-                    File.ReadAllText(file).ToJson() + ");");
-            sb.AppendLine("var types = JSON.stringify(Serenity.CodeGeneration.parseTypes());");
+                    System.Text.Json.JsonSerializer.Serialize(file.Replace('\\', '/')) + ", " +
+                    System.Text.Json.JsonSerializer.Serialize(File.ReadAllText(file)) + ");");
+            sb.AppendLine(@"var types = JSON.stringify(Serenity.CodeGeneration.parseTypes(), function(key, value) {
+                    if (value == null ||
+                        value === false ||
+                        (key === ""Type"" && (value === ""any"" || value === ""__type"" || value === """")) ||
+                        (Array.isArray(value) && !value.length))
+                        return;
+                    return value;
+                });");
             sb.AppendLine("fs.writeFileSync('./typeList.json', types);");
 
             var cacheDir = Path.Combine(Path.GetTempPath(), ".tstypecache");
@@ -166,7 +177,11 @@ namespace Serenity.CodeGenerator
             {
                 try
                 {
-                    return JSON.Parse<List<ExternalType>>(File.ReadAllText(cacheFile));
+                    return System.Text.Json.JsonSerializer.Deserialize<List<ExternalType>>(File.ReadAllText(cacheFile),
+                        new System.Text.Json.JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
                 }
                 catch
                 {
@@ -202,7 +217,12 @@ namespace Serenity.CodeGenerator
                 process.WaitForExit(60000);
                 var json = File.ReadAllText(Path.Combine(tempDirectory, "typeList.json"));
                 writeCache(json);
-                return JSON.Parse<List<ExternalType>>(json);
+                return System.Text.Json.JsonSerializer.Deserialize<List<ExternalType>>(json,
+                    new System.Text.Json.JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+                    });
             }
             finally
             {

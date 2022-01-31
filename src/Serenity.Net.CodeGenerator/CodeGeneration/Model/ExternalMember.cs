@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Serenity.CodeGeneration
 {
@@ -9,6 +10,7 @@ namespace Serenity.CodeGeneration
             Attributes = new List<ExternalAttribute>();
         }
 
+        [JsonInclude]
         public List<ExternalAttribute> Attributes { get; private set; }
         public string Name { get; set; }
         public string Type { get; set; }

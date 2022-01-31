@@ -60,7 +60,7 @@ namespace Serenity.CodeGeneration
                 string optionName = option.Name;
                 if (option is ExternalProperty prop)
                     jsName = GetPropertyScriptName(prop, preserveMemberCase);
-                else if (type.Origin == ExternalTypeOrigin.TS)
+                else 
                 {
                     if (option is ExternalMethod emo && emo.Arguments.Count == 1)
                     {
@@ -106,42 +106,18 @@ namespace Serenity.CodeGeneration
 
             members.AddRange(type.Properties);
 
-            if (type.Origin == ExternalTypeOrigin.TS)
-            {
-                members.AddRange(type.Fields);
-                members.AddRange(type.Methods.Where(x => x.Arguments.Count == 1));
-            }
+            members.AddRange(type.Fields);
+            members.AddRange(type.Methods.Where(x => x.Arguments.Count == 1));
 
             foreach (var member in members)
             {
                 if (dict.ContainsKey(member.Name))
                     continue;
 
-                if (type.Origin == ExternalTypeOrigin.SS)
-                {
-                    if (member.Attributes.Any(x => x.Type == "System.ComponentModel.HiddenAttribute"))
-                        continue;
-
-                    if (member is not ExternalProperty prop)
-                        continue;
-
-                    if (string.IsNullOrEmpty(prop.GetMethod) &&
-                        string.IsNullOrEmpty(prop.SetMethod))
-                        return;
-
-                    var getMethod = type.Methods.FirstOrDefault(x => x.Name == prop.GetMethod);
-                    var setMethod = type.Methods.FirstOrDefault(x => x.Name == prop.SetMethod);
-                    if (getMethod == null || setMethod == null || getMethod.IsProtected || setMethod.IsProtected)
-                        continue;
-                }
-                else if (type.Origin == ExternalTypeOrigin.TS)
-                {
-                }
-
-                if (member.Type.StartsWith("System.Func`", StringComparison.Ordinal) ||
-                    member.Type.StartsWith("System.Action`", StringComparison.Ordinal) ||
+                if (member.Type?.StartsWith("System.Func`", StringComparison.Ordinal) == true ||
+                    member.Type?.StartsWith("System.Action`", StringComparison.Ordinal) == true ||
                     member.Type == "System.Delegate" ||
-                    member.Type.Contains("System.TypeOption", StringComparison.Ordinal) ||
+                    member.Type?.Contains("System.TypeOption", StringComparison.Ordinal) == true ||
                     member.Type == "Function")
                     continue;
 

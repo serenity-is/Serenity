@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Serenity.CodeGeneration
 {
@@ -9,6 +10,7 @@ namespace Serenity.CodeGeneration
             Arguments = new List<ExternalArgument>();
         }
 
+        [JsonInclude]
         public List<ExternalArgument> Arguments { get; private set; }
         public bool IsConstructor { get; set; }
         public bool IsOverride { get; set; }

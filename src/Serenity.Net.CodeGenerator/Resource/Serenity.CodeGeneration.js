@@ -3,12 +3,6 @@ var Serenity;
     var CodeGeneration;
     (function (CodeGeneration) {
         var typeChecker;
-        var ExternalTypeOrigin;
-        (function (ExternalTypeOrigin) {
-            ExternalTypeOrigin[ExternalTypeOrigin["Server"] = 1] = "Server";
-            ExternalTypeOrigin[ExternalTypeOrigin["SS"] = 2] = "SS";
-            ExternalTypeOrigin[ExternalTypeOrigin["TS"] = 3] = "TS";
-        })(ExternalTypeOrigin = CodeGeneration.ExternalTypeOrigin || (CodeGeneration.ExternalTypeOrigin = {}));
         function any(arr, check) {
             if (!arr || !arr.length)
                 return false;
@@ -126,16 +120,6 @@ var Serenity;
         function hasDeclareModifier(node) {
             return any(node.modifiers, function (x) { return x.kind == ts.SyntaxKind.DeclareKeyword; });
         }
-        function isPrivateOrProtected(node) {
-            return !any(node.modifiers, function (x) { return x.kind == ts.SyntaxKind.PrivateKeyword ||
-                x.kind == ts.SyntaxKind.ProtectedKeyword; });
-        }
-        function isInterfaceOption(node) {
-            return false;
-        }
-        function isClassOption(node) {
-            return false;
-        }
         function getExpandedExpression(node) {
             if (!node)
                 return "";
@@ -146,25 +130,6 @@ var Serenity;
             catch (e) {
                 return node.getText();
             }
-        }
-        function isOptionDecorator(decorator) {
-            if (decorator.expression == null)
-                return false;
-            var pae = null;
-            if (decorator.expression.kind == ts.SyntaxKind.CallExpression) {
-                var ce = decorator.expression;
-                if (ce.expression != null &&
-                    ce.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
-                    pae = ce.expression;
-                }
-            }
-            else if (decorator.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
-                pae = decorator.expression;
-            }
-            if (!pae)
-                return;
-            var expression = getExpandedExpression(pae);
-            return expression == "Serenity.Decorators.option";
         }
         function decoratorToExternalAttribute(decorator) {
             var result = {
@@ -367,7 +332,7 @@ var Serenity;
         }
         function typeParametersToExternal(p) {
             if (p == null || p.length == 0)
-                return [];
+                return;
             var result = [];
             for (var _i = 0, p_1 = p; _i < p_1.length; _i++) {
                 var k = p_1[_i];
@@ -379,13 +344,11 @@ var Serenity;
         }
         function classToExternalType(klass) {
             var result = {
-                AssemblyName: "",
                 BaseType: getBaseType(klass),
                 GenericParameters: typeParametersToExternal(klass.typeParameters),
                 IsAbstract: any(klass.modifiers, function (x) { return x.getText() == "abstract"; }),
                 IsSealed: false,
                 IsSerializable: false,
-                Origin: 3 /* TS */,
                 Properties: [],
                 Namespace: getNamespace(klass),
                 Name: klass.name.getText(),
@@ -402,9 +365,7 @@ var Serenity;
         }
         function interfaceToExternalType(intf) {
             var result = {
-                AssemblyName: "",
                 GenericParameters: typeParametersToExternal(intf.typeParameters),
-                Origin: 3 /* TS */,
                 Properties: [],
                 Namespace: getNamespace(intf),
                 Name: intf.name.getText(),
@@ -421,9 +382,6 @@ var Serenity;
         }
         function moduleToExternalType(module) {
             var result = {
-                AssemblyName: "",
-                GenericParameters: [],
-                Origin: 3 /* TS */,
                 Properties: [],
                 Namespace: getNamespace(module),
                 Name: module.name.getText(),
@@ -583,7 +541,6 @@ var Serenity;
                     var types = extractTypes(program.getSourceFile(fileName));
                     for (var _i = 0, types_1 = types; _i < types_1.length; _i++) {
                         var k = types_1[_i];
-                        k.AssemblyName = fileName;
                         var fullName = k.Namespace ? k.Namespace + "." + k.Name : k.Name;
                         if (result[fullName])
                             continue;

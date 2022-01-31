@@ -33,7 +33,6 @@ namespace Serenity.CodeGeneration
             base.GenerateAll();
             if (LocalTexts)
                 GenerateTexts();
-            GenerateSSDeclarations();
         }
 
         protected override void GenerateCodeFor(TypeDefinition type)

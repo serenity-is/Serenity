@@ -445,7 +445,7 @@ namespace Serenity.CodeGeneration
 
                         cw.Indented(property.Name);
                         sb.Append(" = ");
-                        sb.Append(property.Name.ToJson());
+                        sb.Append(System.Text.Json.JsonSerializer.Serialize(property.Name));
 
                         inserted++;
                     }

@@ -10,7 +10,6 @@ namespace Serenity.CodeGeneration {
     export type Imports = { [key: string]: string };
 
     export interface ExternalType {
-        AssemblyName?: string;
         Namespace?: string;
         Name?: string;
         BaseType?: string;
@@ -25,7 +24,6 @@ namespace Serenity.CodeGeneration {
         IsInterface?: boolean;
         IsSealed?: boolean;
         IsSerializable?: boolean;
-        Origin?: ExternalTypeOrigin;
     }
 
     export interface ExternalMember {
@@ -66,12 +64,6 @@ namespace Serenity.CodeGeneration {
 
     export interface ExternalGenericParameter {
         Name?: string;
-    }
-
-    export const enum ExternalTypeOrigin {
-        Server = 1,
-        SS = 2,
-        TS = 3
     }
 
     function any<T>(arr: T[], check: (item: T) => boolean): boolean {
@@ -210,19 +202,6 @@ namespace Serenity.CodeGeneration {
         return any(node.modifiers, x => x.kind == ts.SyntaxKind.DeclareKeyword);
     }
 
-    function isPrivateOrProtected(node: ts.Node): boolean {
-        return !any(node.modifiers, x => x.kind == ts.SyntaxKind.PrivateKeyword ||
-            x.kind == ts.SyntaxKind.ProtectedKeyword);
-    }
-
-    function isInterfaceOption(node: ts.TypeElement): boolean {
-        return false;
-    }
-
-    function isClassOption(node: ts.TypeElement): boolean {
-        return false;
-    }
-
     function getExpandedExpression(node: ts.Node) {
         if (!node)
             return "";
@@ -234,30 +213,6 @@ namespace Serenity.CodeGeneration {
         catch (e) {
             return node.getText();
         }
-    }
-
-    function isOptionDecorator(decorator: ts.Decorator): boolean {
-        if (decorator.expression == null)
-            return false;
-
-        let pae: ts.PropertyAccessExpression = null;
-        if (decorator.expression.kind == ts.SyntaxKind.CallExpression) {
-            let ce = decorator.expression as ts.CallExpression;
-
-            if (ce.expression != null &&
-                ce.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
-                pae = ce.expression as ts.PropertyAccessExpression;
-            }
-        }
-        else if (decorator.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
-            pae = decorator.expression as ts.PropertyAccessExpression;
-        }
-
-        if (!pae)
-            return;
-
-        let expression = getExpandedExpression(pae);
-        return expression == "Serenity.Decorators.option";
     }
 
     function decoratorToExternalAttribute(decorator: ts.Decorator): ExternalAttribute {
@@ -493,7 +448,7 @@ namespace Serenity.CodeGeneration {
 
     function typeParametersToExternal(p: ts.NodeArray<ts.TypeParameterDeclaration>): ExternalArgument[] {
         if (p == null || p.length == 0)
-            return [];
+            return;
 
         let result: ExternalArgument[] = [];
 
@@ -507,13 +462,11 @@ namespace Serenity.CodeGeneration {
 
     function classToExternalType(klass: ts.ClassDeclaration): ExternalType {
         let result: ExternalType = {
-            AssemblyName: "",
             BaseType: getBaseType(klass),
             GenericParameters: typeParametersToExternal(klass.typeParameters),
             IsAbstract: any(klass.modifiers, x => x.getText() == "abstract"),
             IsSealed: false,
             IsSerializable: false,
-            Origin: ExternalTypeOrigin.TS,
             Properties: [],
             Namespace: getNamespace(klass),
             Name: klass.name.getText(),
@@ -534,9 +487,7 @@ namespace Serenity.CodeGeneration {
 
     function interfaceToExternalType(intf: ts.InterfaceDeclaration): ExternalType {
         let result: ExternalType = {
-            AssemblyName: "",
             GenericParameters: typeParametersToExternal(intf.typeParameters),
-            Origin: ExternalTypeOrigin.TS,
             Properties: [],
             Namespace: getNamespace(intf),
             Name: intf.name.getText(),
@@ -557,9 +508,6 @@ namespace Serenity.CodeGeneration {
 
     function moduleToExternalType(module: ts.ModuleDeclaration): ExternalType {
         let result: ExternalType = {
-            AssemblyName: "",
-            GenericParameters: [],
-            Origin: ExternalTypeOrigin.TS,
             Properties: [],
             Namespace: getNamespace(module),
             Name: module.name.getText(),
@@ -751,7 +699,6 @@ namespace Serenity.CodeGeneration {
                 var types = extractTypes(program.getSourceFile(fileName));
 
                 for (var k of types) {
-                    k.AssemblyName = fileName;
                     var fullName = k.Namespace ? k.Namespace + "." + k.Name : k.Name;
                     if (result[fullName])
                         continue;

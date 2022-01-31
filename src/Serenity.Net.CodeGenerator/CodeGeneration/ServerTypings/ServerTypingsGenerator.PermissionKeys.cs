@@ -1,13 +1,7 @@
 ﻿using Mono.Cecil;
-using Newtonsoft.Json;
 using Serenity.Data;
 using Serenity.Reflection;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Serenity.CodeGeneration
 {
@@ -32,7 +26,7 @@ namespace Serenity.CodeGeneration
                     cw.Indented("export const ");
                     sb.Append(fi.Name);
                     sb.Append(" = ");
-                    sb.Append((fi.Constant as string).ToJson());
+                    sb.Append(System.Text.Json.JsonSerializer.Serialize(fi.Constant as string));
                     sb.AppendLine(";");
                 }
 

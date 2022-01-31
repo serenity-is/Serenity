@@ -52,10 +52,6 @@ namespace Serenity.CodeGeneration
                 !HasBaseType(type, "Serenity.Widget<any>"))
                 return false;
 
-            if (type.AssemblyName != null &&
-                type.AssemblyName.StartsWith("Serenity.", StringComparison.Ordinal))
-                return false;
-
             return
                 GetAttribute(type, "Serenity.EditorAttribute", inherited: true) != null ||
                 GetAttribute(type, "Serenity.ElementAttribute", inherited: true) != null ||

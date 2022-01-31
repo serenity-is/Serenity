@@ -140,7 +140,11 @@ namespace Serenity.CodeGenerator
 
         public static GeneratorConfig LoadFromJson(string json)
         {
-            var config = JSON.ParseTolerant<GeneratorConfig>(json.TrimToNull() ?? "{}");
+            var config = System.Text.Json.JsonSerializer.Deserialize<GeneratorConfig>(
+                json.TrimToNull() ?? "{}", new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
             config.Connections ??= new List<Connection>();
             config.RemoveForeignFields ??= new List<string>();
             return config;

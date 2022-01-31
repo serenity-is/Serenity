@@ -136,7 +136,7 @@ namespace Serenity.CodeGenerator
             }
             else if (connectionKey == null)
             {
-                File.WriteAllText(outFile, JSON.Stringify(connectionStringOptions.Keys.OrderBy(x => x)));
+                File.WriteAllText(outFile, System.Text.Json.JsonSerializer.Serialize(connectionStringOptions.Keys.OrderBy(x => x)));
                 Environment.Exit(0);
             }
 

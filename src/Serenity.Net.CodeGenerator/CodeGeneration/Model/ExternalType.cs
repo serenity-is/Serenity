@@ -1,21 +1,26 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Serenity.CodeGeneration
 {
     public class ExternalType
     {
-        public ExternalTypeOrigin Origin { get; set; }
         public string AssemblyName { get; set; }
         public string Namespace { get; set; }
         public string Name { get; set; }
         public string BaseType { get; set; }
         public List<string> Interfaces { get; set; }
-        public List<ExternalAttribute> Attributes { get; set; }
-        public List<ExternalProperty> Properties { get; set; }
-        public List<ExternalMember> Fields { get; set; }
-        public List<ExternalMethod> Methods { get; set; }
+        [JsonInclude]
+        public List<ExternalAttribute> Attributes { get; private set; }
+        [JsonInclude]
+        public List<ExternalProperty> Properties { get; private set; }
+        [JsonInclude]
+        public List<ExternalMember> Fields { get; private set; }
+        [JsonInclude]
+        public List<ExternalMethod> Methods { get; private set; }
         public string OptionsType { get; set; }
-        public List<ExternalGenericParameter> GenericParameters { get; set; }
+        [JsonInclude]
+        public List<ExternalGenericParameter> GenericParameters { get; private set; }
         public bool IsAbstract { get; set; }
         public bool IsDeclaration { get; set; }
         public bool IsInterface { get; set; }
