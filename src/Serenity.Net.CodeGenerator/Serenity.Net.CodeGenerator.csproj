@@ -9,7 +9,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackAsTool>true</PackAsTool>
     <PackageId>sergen</PackageId>
-    <Deterministic>false</Deterministic>
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resource\tsconfig.json" />
