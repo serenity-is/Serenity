@@ -26,6 +26,14 @@ namespace Serenity.CodeGenerator
             if (args.Length > 0)
                 command = args[0].ToLowerInvariant().TrimToEmpty();
 
+            string[] prjRefs = null;
+            var prjRefsIdx = Array.FindIndex(args, x => x == "--projectrefs");
+            if (prjRefsIdx < args.Length - 1)
+            {
+                prjRefs = args[prjRefsIdx + 1].Split(';', StringSplitOptions.RemoveEmptyEntries);
+                args = args.Where((x, i) => i != prjRefsIdx && i != prjRefsIdx + 1).ToArray();
+            }
+
             string csproj = null;
             if (command == "-p" && args.Length > 2)
             {
@@ -74,7 +82,10 @@ namespace Serenity.CodeGenerator
             try
             {
                 if ("restore".StartsWith(command, StringComparison.Ordinal))
-                    return new RestoreCommand(fileSystem, projectSystemFactory()).Run(csproj);
+                {
+                    return new RestoreCommand(fileSystem, 
+                        projectSystemFactory(), prjRefs).Run(csproj);
+                }
 
                 if ("transform".StartsWith(command, StringComparison.Ordinal) ||
                     "servertypings".StartsWith(command, StringComparison.Ordinal) ||

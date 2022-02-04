@@ -11,11 +11,14 @@ namespace Serenity.CodeGenerator
     public class RestoreCommand : BaseFileSystemCommand
     {
         protected IBuildProjectSystem ProjectSystem { get; }
+        public IEnumerable<string> ProjectReferences { get; }
 
-        public RestoreCommand(IFileSystem fileSystem, IBuildProjectSystem projectSystem)
+        public RestoreCommand(IFileSystem fileSystem, IBuildProjectSystem projectSystem,
+            IEnumerable<string> projectReferences = null, IEnumerable<string> pkgDefs = null)
             : base(fileSystem)
         {
             ProjectSystem = projectSystem ?? throw new ArgumentNullException(nameof(projectSystem));
+            ProjectReferences = projectReferences;
         }
 
         public ExitCodes Run(string csproj, bool verbose = false)
@@ -100,7 +103,11 @@ namespace Serenity.CodeGenerator
 
             try
             {
-                foreach (var reference in EnumerateProjectReferences(csproj, new HashSet<string>(StringComparer.OrdinalIgnoreCase)))
+                var projectRefs = ProjectReferences?.Where(x => 
+                    !IgnoreProjectRefs.Contains(Path.GetFileNameWithoutExtension(x))) ?? 
+                        EnumerateProjectReferences(csproj, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+
+                foreach (var reference in projectRefs)
                 {
                     if (verbose)
                         Console.WriteLine("Project Reference: " + reference);
