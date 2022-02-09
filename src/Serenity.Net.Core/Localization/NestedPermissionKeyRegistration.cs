@@ -39,6 +39,8 @@ namespace Serenity.Localization
             return permissions;
         }
 
+        private static readonly char[] splitChar = new char[] { '|', '&' };
+
         private static void AddKeysFrom(HashSet<string> permissions, ILocalTextRegistry registry, 
             Type type, string languageID)
         {
@@ -50,7 +52,9 @@ namespace Serenity.Localization
                 if (member.FieldType != typeof(string))
                     continue;
 
-                if (!(member.GetValue(null) is string key))
+                if (!(member.GetValue(null) is string key) ||
+                    string.IsNullOrEmpty(key) ||
+                    key.IndexOfAny(splitChar) >= 0) // skip permissions with logical operators
                     continue;
 
                 DescriptionAttribute descr;
