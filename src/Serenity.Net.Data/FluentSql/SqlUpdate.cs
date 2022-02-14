@@ -85,7 +85,7 @@ namespace Serenity.Data
         /// <param name="value">
         ///   Field expression (required).</param>
         /// <returns>
-        ///   SqlInsert object itself.</returns>
+        ///   SqlUpdate object itself.</returns>
         public SqlUpdate SetTo(IField field, string value)
         {
             if (field == null)
