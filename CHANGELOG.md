@@ -3,7 +3,7 @@
 Bugfixes:
   - bootstrap modal dialog stays under jQuery UI dialogs (StartSharp)
   - error in console while closing a bootstrap modal when a jquery ui dialog is open
-  - inline action font style normal
+  - inline action font style should be normal
   - remove schema names from worklog tables
 
 ## 5.2.2 (2022-01-18)
