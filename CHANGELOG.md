@@ -1,3 +1,17 @@
+## 5.2.4 (2021-03-09)
+ 
+Features:
+  - a better console ui for sergen with multiple selection support
+  - added on demand service resolver interface - IServiceResolve
+  - use System.Text.Json for sergen transform
+  - allow passing project refs optionally to sergen
+  - don't register keys with logical operators in NestedPermissionKeyRegistration
+
+Bugfixes:
+  - resolve more errors with corelib when jquery not loaded, $ is not jquery, or document not initialized. fix bootstrap 5+ check (bootstrap 4 was also returning 5+)  
+  - SqlUpdate.SetTo xml comment correction (#6225)
+  
+
 ## 5.2.3 (2021-01-20)
 
 Bugfixes:
