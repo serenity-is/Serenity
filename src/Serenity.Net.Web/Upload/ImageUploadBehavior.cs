@@ -2,9 +2,10 @@
 using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Web;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -400,11 +401,11 @@ namespace Serenity.Services
                         (attr.ScaleHeight > 0 && (attr.ScaleSmaller || checker.Height > attr.ScaleHeight))))
                 {
                     using Image scaledImage = ThumbnailGenerator.Generate(
-                        image, attr.ScaleWidth, attr.ScaleHeight, attr.ScaleMode, Color.Empty);
+                        image, attr.ScaleWidth, attr.ScaleHeight, attr.ScaleMode, backgroundColor: null);
                     temporaryFile = baseFile + ".jpg";
                     fs.Close();
                     using var ms = new MemoryStream();
-                    scaledImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    scaledImage.Save(ms, new JpegEncoder { Quality = attr.ScaleQuality == 0 ? null : attr.ScaleQuality });
                     ms.Seek(0, SeekOrigin.Begin);
                     temporaryFile = storage.WriteFile(temporaryFile, ms, false);
                 }
@@ -426,10 +427,10 @@ namespace Serenity.Services
                         throw new ArgumentOutOfRangeException(nameof(attr.ThumbSizes));
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
-                    using Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, Color.Empty);
+                    using Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, backgroundColor: null);
                     string thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
                     using var ms = new MemoryStream();
-                    thumbImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    thumbImage.Save(ms, new JpegEncoder { Quality = attr.ThumbQuality == 0 ? null : attr.ThumbQuality });
                     ms.Seek(0, SeekOrigin.Begin);
                     storage.WriteFile(thumbFile, ms, false);
                 }

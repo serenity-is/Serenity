@@ -1,6 +1,7 @@
 ﻿using Serenity.Abstractions;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using System;
-using System.Drawing;
 using System.IO;
 
 namespace Serenity.Web
@@ -56,11 +57,13 @@ namespace Serenity.Web
             if (MaxDataSize != 0 && DataSize > MaxDataSize)
                 return ImageCheckResult.DataSizeTooHigh;
 
+            IImageFormat format;
+
             // try to upload image
             try
             {
                 // load image validating it
-                image = Image.FromStream(inputStream, true, true);
+                image = Image.Load(inputStream, out format);
             }
             catch (Exception ex)
             {
@@ -77,11 +80,11 @@ namespace Serenity.Web
                 ImageCheckResult checkResult;
 
                 // check image format, if not JPEG, PNG or GIF return UnsupportedFormat error
-                if (image.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Jpeg))
+                if (format is SixLabors.ImageSharp.Formats.Jpeg.JpegFormat)
                     checkResult = ImageCheckResult.JPEGImage;
-                else if (image.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Gif))
+                else if (format is SixLabors.ImageSharp.Formats.Gif.GifFormat)
                     checkResult = ImageCheckResult.GIFImage;
-                else if (image.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Png))
+                else if (format is SixLabors.ImageSharp.Formats.Png.PngFormat)
                     checkResult = ImageCheckResult.PNGImage;
                 else
                     return ImageCheckResult.UnsupportedFormat;
