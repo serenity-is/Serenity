@@ -27,6 +27,7 @@ namespace Serenity.Web
             byte[] postDataBuffer = System.Text.Encoding.ASCII.GetBytes(postData);
             var verifyUri = new Uri("https://www.google.com/recaptcha/api/siteverify", UriKind.Absolute);
 
+#pragma warning disable SYSLIB0014
             var webRequest = (HttpWebRequest)WebRequest.Create(verifyUri);
             webRequest.ContentType = "application/x-www-form-urlencoded";
             webRequest.Headers["Content-Length"] = postDataBuffer.Length.ToString(CultureInfo.InvariantCulture);
@@ -46,6 +47,7 @@ namespace Serenity.Web
             {
                 throw new ValidationError("Recaptcha", localizer.Get("Validation.Recaptcha"));
             }
+#pragma warning restore SYSLIB0014
         }
 
         private class RecaptchaResponse
