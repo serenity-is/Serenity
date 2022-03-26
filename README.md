@@ -20,6 +20,9 @@ See [Serenity Developer Guide](https://serenity.is/docs/) at https://serenity.is
 **Serenity Blog:**
 - http://serenity.is/blog/
 
+**Check out the Visual Studio Toolbox Presentation:**
+- [Building Web Apps with the Serenity Platform](https://docs.microsoft.com/en-us/shows/visual-studio-toolbox/building-web-apps-with-the-serenity-platform)
+
 **Serenity Slack Chat:**
 For join https://join.slack.com/t/serenityplatform/shared_invite/zt-puwqtfpv-3eQnXe_yTdVfB4hMhk6U_w
 - http://serenityplatform.slack.com/
