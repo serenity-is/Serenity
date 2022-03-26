@@ -1,3 +1,11 @@
+## 6.0.0 (2021-03-26)
+
+Features:
+  - moving to .NET 6 and ASP.NET Core as .NET 5 will soon be out of support
+  - will only support Visual Studio 2022 with latest updates as Visual Studio 2019 does not support .NET 6. please don't update to Serenity 6 if you still have to use VS2019.
+  - [BREAKING CHANGE] replaced System.Drawing.Common with ImageSharp, as System.Drawing.Common is only officially supported in Windows now.
+  - updated Dapper, FluentMigrator and many other packages to their latest versions
+
 ## 5.2.4 (2021-03-09)
  
 Features:

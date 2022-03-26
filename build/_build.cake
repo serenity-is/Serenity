@@ -12,7 +12,7 @@ var nupkgDir = System.IO.Path.Combine(System.IO.Path.GetFullPath("."), ".nupkg")
 var root = System.IO.Path.GetFullPath(@"..");
 var src = System.IO.Path.Combine(root, "src");
 
-var msBuildPath = @"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe";
+var msBuildPath = @"C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\msbuild.exe";
 if (!System.IO.File.Exists(msBuildPath))
     msBuildPath = null;
 

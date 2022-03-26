@@ -94,9 +94,9 @@ namespace Serenity.ComponentModel
         }
 
         /// <summary>
-        /// Quality of scaled image (not thumb), default is 0 (auto)
+        /// Quality of scaled image (not thumb), default is 80.
         /// </summary>
-        public int ScaleQuality { get; set; }
+        public int ScaleQuality { get; set; } = 80;
 
         /// <summary>
         /// What width image should be scaled to. Default value of 0 disables it.
@@ -130,9 +130,9 @@ namespace Serenity.ComponentModel
         public ImageScaleMode ThumbMode { get; set; }
 
         /// <summary>
-        /// Quality of thumbnails, default is 0 (auto)
+        /// Quality of thumbnails, default is 80.
         /// </summary>
-        public int ThumbQuality { get; set; }
+        public int ThumbQuality { get; set; } = 80;
 
         /// <summary>
         /// Only useful for MultipleImageUploadeEditor. Specifies

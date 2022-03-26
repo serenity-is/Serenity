@@ -69,11 +69,15 @@ namespace Serenity.Web
                 _ => ResizeMode.Stretch,
             };
 
-            Action<IImageProcessingContext> operation = x => x.Resize(new ResizeOptions
+            void operation(IImageProcessingContext x)
             {
-                Mode = resizeMode,
-                Size = new Size(thumbWidth, thumbHeight)
-            });
+                x.Resize(new ResizeOptions
+                {
+                    Mode = resizeMode,
+                    Size = new Size(thumbWidth, thumbHeight),
+                    PremultiplyAlpha = false
+                });
+            }
 
             if (inplace)
             {
