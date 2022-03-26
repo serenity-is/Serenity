@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Web</AssemblyName>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Title>Serenity Platform - Asp.Net Core Web Library</Title>
   </PropertyGroup>
   <ItemGroup>
@@ -11,7 +11,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NUglify" Version="1.11.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="$(FrameworkPackageVersion)" />
+    <PackageReference Include="NUglify" Version="1.19.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
   </ItemGroup>
 </Project>

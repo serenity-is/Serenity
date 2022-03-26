@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\TestProperties.xml" />
   <ItemGroup>
     <ProjectReference Include="..\..\src\Serenity.Net.Services\Serenity.Net.Services.csproj" />
     <ProjectReference Include="..\Serenity.Net.Core.Tests\Serenity.Net.Core.Tests.csproj" />
