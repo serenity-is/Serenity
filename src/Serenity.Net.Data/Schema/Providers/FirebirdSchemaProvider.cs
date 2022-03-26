@@ -20,6 +20,18 @@ namespace Serenity.Data.Schema
         /// </value>
         public string DefaultSchema => null;
 
+        private class FieldInfoSource
+        {
+            public string FIELD_NAME { get; set; }
+            public string FIELD_TYPE { get; set; }
+            public string FIELD_SUB_TYPE { get; set; }
+            public string NUMERIC_SCALE { get; set; }
+            public string NUMERIC_PRECISION { get; set; }
+            public string SIZE { get; set; }
+            public string CHARMAXLENGTH { get; set; }
+            public string COLUMN_NULLABLE { get; set; }
+        }
+
         /// <summary>
         /// Gets the field infos.
         /// </summary>
@@ -29,7 +41,7 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
         {
-            return connection.Query(@"
+            return connection.Query<FieldInfoSource>(@"
                 SELECT
                     rfr.rdb$field_name AS FIELD_NAME,
                     fld.rdb$field_type AS FIELD_TYPE,
@@ -179,6 +191,12 @@ namespace Serenity.Data.Schema
                     .Select(StringHelper.TrimToNull);
         }
 
+        private class TableNameSource
+        {
+            public string NAME { get; set; }
+            public string ISVIEW { get; set; }
+        }
+
         /// <summary>
         /// Gets the table names.
         /// </summary>
@@ -186,7 +204,7 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<TableName> GetTableNames(IDbConnection connection)
         {
-            return connection.Query(@"
+            return connection.Query<TableNameSource>(@"
                     SELECT RDB$RELATION_NAME NAME, RDB$VIEW_BLR ISVIEW
                     FROM RDB$RELATIONS  
                     WHERE (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)")

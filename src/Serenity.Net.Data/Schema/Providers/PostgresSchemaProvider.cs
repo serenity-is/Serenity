@@ -115,6 +115,15 @@ namespace Serenity.Data.Schema
                 AND indisprimary");
         }
 
+        private class TableNameSource
+        {
+#pragma warning disable IDE1006 // Naming Styles
+            public string table_schema { get; set; }
+            public string table_name { get; set; }
+            public string table_type { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
+        }
+
         /// <summary>
         /// Gets the table names.
         /// </summary>
@@ -122,7 +131,7 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<TableName> GetTableNames(IDbConnection connection)
         {
-            return connection.Query(
+            return connection.Query<TableNameSource>(
                     "SELECT table_schema, table_name, table_type " +
                     "FROM information_schema.tables " +
                     "WHERE table_schema NOT IN ('pg_catalog', 'information_schema') " +

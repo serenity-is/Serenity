@@ -20,6 +20,16 @@ namespace Serenity.Data.Schema
         /// </value>
         public string DefaultSchema => null;
 
+        private class FieldInfoSource
+        {
+#pragma warning disable IDE1006 // Naming Styles
+            public string name { get; set; }
+            public string type { get; set; }
+            public string notnull { get; set; }
+            public string pk { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
+        }
+
         /// <summary>
         /// Gets the field infos.
         /// </summary>
@@ -29,7 +39,7 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
         {
-            return connection.Query("PRAGMA table_info([" + table + "])")
+            return connection.Query<FieldInfoSource>("PRAGMA table_info([" + table + "])")
                 .Select(x => new FieldInfo
                 {
                     FieldName = x.name,
@@ -37,6 +47,16 @@ namespace Serenity.Data.Schema
                     IsNullable = Convert.ToInt32(x.notnull) != 1,
                     IsPrimaryKey = Convert.ToInt32(x.pk) == 1
                 });
+        }
+
+        private class ForeignKeySource
+        {
+#pragma warning disable IDE1006 // Naming Styles
+            public string id { get; set; }
+            public string from { get; set; }
+            public string table { get; set; }
+            public string to { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
         }
 
         /// <summary>
@@ -48,7 +68,7 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
         {
-            return connection.Query("PRAGMA foreign_key_list([" + table + "])")
+            return connection.Query<ForeignKeySource>("PRAGMA foreign_key_list([" + table + "])")
                 .Select(x => new ForeignKeyInfo
                 {
                     FKName = x.id.ToString(),
@@ -56,6 +76,15 @@ namespace Serenity.Data.Schema
                     PKTable = x.table,
                     PKColumn = x.to
                 });
+        }
+
+        private class IdentitySource
+        {
+#pragma warning disable IDE1006 // Naming Styles
+            public int pk { get; set; }
+            public string name { get; set; }
+            public string type { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
         }
 
         /// <summary>
@@ -67,7 +96,7 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
         {
-            var fields = connection.Query("PRAGMA table_info([" + table + "])")
+            var fields = connection.Query<IdentitySource>("PRAGMA table_info([" + table + "])")
                 .Where(x => (int)x.pk > 0);
 
             if (fields.Count() == 1 &&
@@ -79,6 +108,14 @@ namespace Serenity.Data.Schema
             return new List<string> { "ROWID" };
         }
 
+        private class PrimaryKeySource
+        {
+#pragma warning disable IDE1006 // Naming Styles
+            public int pk { get; set; }
+            public string name { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
+        }
+
         /// <summary>
         /// Gets the primary key fields.
         /// </summary>
@@ -88,10 +125,18 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
         {
-            return connection.Query("PRAGMA table_info([" + table + "])")
-                .Where(x => (int)x.pk > 0)
-                .OrderBy(x => (int)x.pk)
-                .Select(x => (string)x.name);
+            return connection.Query<PrimaryKeySource>("PRAGMA table_info([" + table + "])")
+                .Where(x => x.pk > 0)
+                .OrderBy(x => x.pk)
+                .Select(x => x.name);
+        }
+
+        private class TableNameSource
+        {
+#pragma warning disable IDE1006 // Naming Styles
+            public string name { get; set; }
+            public string type { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
         }
 
         /// <summary>
@@ -101,7 +146,7 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<TableName> GetTableNames(IDbConnection connection)
         {
-            return connection.Query(
+            return connection.Query<TableNameSource>(
                     "SELECT name, type FROM sqlite_master WHERE type='table' or type='view' " +
                     "ORDER BY name")
                 .Select(x => new TableName

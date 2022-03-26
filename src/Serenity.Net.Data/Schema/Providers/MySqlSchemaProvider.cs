@@ -19,6 +19,16 @@ namespace Serenity.Data.Schema
         /// </value>
         public string DefaultSchema => null;
 
+        private class FieldInfoSource
+        {
+            public string ORDINAL_POSITION { get; set; }
+            public string Field { get; set; }
+            public string Null { get; set; }
+            public string Type { get; set; }
+            public string Key { get; set; }
+            public string Extra { get; set; }
+        }
+
         /// <summary>
         /// Gets the field infos.
         /// </summary>
@@ -28,16 +38,16 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
         {
-            return connection.Query(string.Format("SHOW FULL COLUMNS FROM `{0}`", table))
+            return connection.Query<FieldInfoSource>(string.Format("SHOW FULL COLUMNS FROM `{0}`", table))
                 .OrderBy(x => Convert.ToInt32(x.ORDINAL_POSITION))
                 .Select(src =>
                 {
                     var fi = new FieldInfo
                     {
                         FieldName = src.Field,
-                        IsNullable = ((string)src.Null) != "NO"
+                        IsNullable = (src.Null) != "NO"
                     };
-                    var dataType = (string)src.Type;
+                    var dataType = src.Type;
                     var dx = dataType.IndexOf('(');
                     if (dx >= 0)
                     {
@@ -55,8 +65,8 @@ namespace Serenity.Data.Schema
                         }
                     }
                     fi.DataType = dataType;
-                    fi.IsPrimaryKey = (string)src.Key == "PRI";
-                    fi.IsIdentity = (string)src.Extra == "auto_increment";
+                    fi.IsPrimaryKey = src.Key == "PRI";
+                    fi.IsIdentity = src.Extra == "auto_increment";
                     return fi;
                 });
         }
@@ -133,6 +143,12 @@ namespace Serenity.Data.Schema
                 });
         }
 
+        private class TableNameSource
+        {
+            public string TABLE_NAME { get; set; }
+            public string TABLE_TYPE { get; set; }
+        }
+
         /// <summary>
         /// Gets the table names.
         /// </summary>
@@ -140,7 +156,7 @@ namespace Serenity.Data.Schema
         /// <returns></returns>
         public IEnumerable<TableName> GetTableNames(IDbConnection connection)
         {
-            return connection.Query(
+            return connection.Query<TableNameSource>(
                     "SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES " +
                     "WHERE TABLE_SCHEMA = Database() " +
                     "ORDER BY TABLE_SCHEMA, TABLE_NAME")

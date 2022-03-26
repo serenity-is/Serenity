@@ -155,11 +155,11 @@ namespace Serenity.Data
                 if (value != null && value != DBNull.Value)
                 {
 #pragma warning disable CS0618
-                    var mappedType = Dapper.SqlMapper.GetDbType(value);
+                    var mappedType = Dapper.SqlMapper.LookupDbType(value.GetType(), "n/a", false, out var _); ;
 #pragma warning restore CS0618
 
-                    if (mappedType != param.DbType)
-                        param.DbType = mappedType;
+                    if (mappedType != param.DbType && mappedType != null)
+                        param.DbType = mappedType.Value;
 
                     if (param.DbType == DbType.DateTime &&
                         (dialect ?? SqlSettings.DefaultDialect).UseDateTime2)

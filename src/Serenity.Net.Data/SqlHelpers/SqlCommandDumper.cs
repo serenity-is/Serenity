@@ -141,8 +141,6 @@ namespace Serenity.Data
                 }
                 else
                 {
-                    value = UnboxNullable(value);
-
                     if (value is string
                         || value is char
                         || value is char[])
@@ -217,20 +215,6 @@ namespace Serenity.Data
                 sbCommandText.AppendLine("/* Exception occurred while converting parameter: ");
                 sbCommandText.AppendLine(ex.ToString());
                 sbCommandText.AppendLine("*/");
-            }
-        }
-
-        private static object UnboxNullable(object value)
-        {
-            var typeOriginal = value.GetType();
-            if (typeOriginal.IsGenericType
-                && typeOriginal.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                return (value as dynamic).GetValueOrDefault();
-            }
-            else
-            {
-                return value;
             }
         }
 
