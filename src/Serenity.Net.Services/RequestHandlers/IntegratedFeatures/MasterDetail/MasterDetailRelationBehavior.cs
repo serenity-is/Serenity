@@ -335,6 +335,10 @@ namespace Serenity.Services
 
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
+            if (!handler.Row.IsAssigned(Target) || 
+                (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+                return;
+
             if (!(Target.AsObject(handler.Row) is IList newList))
                 return;
 
