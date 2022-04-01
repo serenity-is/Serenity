@@ -13,7 +13,7 @@ namespace {{RootNamespace}}{{DotModule}}.Columns
     public class {{ClassName}}Columns
     {%{{}%}{{for x in Fields}}{{if x.ColAttributes}}
         [{{x.ColAttributes}}]{{end}}{{if x.TextualField}}
-        public String {{x.TextualField}} { get; set; }{{else}}
+        public string {{x.TextualField}} { get; set; }{{else}}
         public {{x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}
     }
 }
