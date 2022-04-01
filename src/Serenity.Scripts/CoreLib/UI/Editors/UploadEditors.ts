@@ -36,7 +36,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
             buttons: this.getToolButtons()
         });
 
-        $('<div><div></div></div>')
+        this.progress = $('<div><div></div></div>')
             .addClass('upload-progress')
             .prependTo(this.toolbar.element);
 
@@ -282,6 +282,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
     private toolbar: Toolbar;
     private fileSymbols: JQuery;
     private uploadInput: JQuery;
+    protected progress: JQuery;
     protected hiddenInput: JQuery;
 
     constructor(div: JQuery, opt: ImageUploadEditorOptions) {
@@ -293,8 +294,10 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
         this.toolbar = new Toolbar($('<div/>').appendTo(this.element), {
             buttons: this.getToolButtons()
         });
-        var progress = $('<div><div></div></div>')
-            .addClass('upload-progress').prependTo(this.toolbar.element);
+
+        this.progress = $('<div><div></div></div>')
+            .addClass('upload-progress')
+            .prependTo(this.toolbar.element);
 
         var addFileButton = this.toolbar.findButton('add-file-button');
 
@@ -302,7 +305,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
             container: addFileButton,
             zone: this.element,
             inputName: this.uniqueName,
-            progress: progress,
+            progress: this.progress,
             fileDone: (response, name, data) => {
                 if (!UploadHelper.checkImageConstraints(response, this.options)) {
                     return;
