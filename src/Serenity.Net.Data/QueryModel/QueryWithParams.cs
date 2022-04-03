@@ -31,6 +31,8 @@ namespace Serenity.Data
         /// </summary>
         protected Dictionary parameters;
 
+        protected int nextAutoParam;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryWithParams"/> class.
         /// </summary>
@@ -138,7 +140,7 @@ namespace Serenity.Data
             if (parent != null)
                 return parent.AutoParam();
 
-            return new Parameter((ParamCount + 1).IndexParam());
+            return new Parameter((++nextAutoParam).IndexParam());
         }
 
         /// <summary>

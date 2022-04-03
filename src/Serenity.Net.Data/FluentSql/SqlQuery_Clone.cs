@@ -30,7 +30,8 @@ namespace Serenity.Data
                 forXml = forXml,
                 forJson = forJson,
                 unionQuery = unionQuery,
-                unionType = unionType
+                unionType = unionType,
+                nextAutoParam = nextAutoParam
             };
 
             Column s;
