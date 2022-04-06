@@ -3,9 +3,9 @@
 namespace Serenity.Data
 {
     /// <summary>
-    /// The dialect mapper
+    /// The sql dialect mapper
     /// </summary>
-    public interface IDialectMapper
+    public interface ISqlDialectMapper
     {
         /// <summary>
         /// Returns dialect for a dialect or provider name

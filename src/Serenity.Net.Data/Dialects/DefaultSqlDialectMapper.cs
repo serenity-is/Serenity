@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Serenity.Data
 {
     /// <summary>
-    /// Dialect mapper
+    /// Sql Dialect mapper
     /// </summary>
-    public class DefaultDialectMapper : IDialectMapper
+    public class DefaultSqlDialectMapper : ISqlDialectMapper
     {
         private static Dictionary<string, ISqlDialect> DialectByProviderName =>
            new Dictionary<string, ISqlDialect>(StringComparer.OrdinalIgnoreCase)

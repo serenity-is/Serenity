@@ -12,17 +12,17 @@ namespace Serenity.Data
     public class DefaultConnectionStrings : IConnectionStrings
     {
         private readonly IOptions<ConnectionStringOptions> options;
-        private readonly IDialectMapper dialectMapper;
+        private readonly ISqlDialectMapper sqlDialectMapper;
 
         /// <summary>
         /// Creates a new instance of DefaultConnectionStringSource
         /// </summary>
         /// <param name="options">Connection string options</param>
-        /// <param name="dialectMapper">Dialect Mapper</param>
-        public DefaultConnectionStrings(IOptions<ConnectionStringOptions> options, IDialectMapper dialectMapper = null)
+        /// <param name="sqlDialectMapper">Sql Dialect Mapper</param>
+        public DefaultConnectionStrings(IOptions<ConnectionStringOptions> options, ISqlDialectMapper sqlDialectMapper = null)
         {
             this.options = options ?? throw new ArgumentNullException(nameof(options));
-            this.dialectMapper = dialectMapper ?? new DefaultDialectMapper();
+            this.sqlDialectMapper = sqlDialectMapper ?? new DefaultSqlDialectMapper();
         }
 
         /// <summary>
@@ -38,15 +38,11 @@ namespace Serenity.Data
             if (entry.DialectInstance != null)
                 return entry.DialectInstance;
             
-            if (!string.IsNullOrEmpty(entry.Dialect))
-            {
-                var dialect = dialectMapper.TryGet(entry.Dialect);
-                if (dialect == null)
-                    throw new ArgumentException($"Dialect type {entry.Dialect} specified for connection {connectionKey} is not found!");
-                return dialect;
-            }
-
-            return dialectMapper.TryGet(entry.ProviderName) ?? SqlSettings.DefaultDialect;
+            if (string.IsNullOrEmpty(entry.Dialect))
+                return sqlDialectMapper.TryGet(entry.ProviderName) ?? SqlSettings.DefaultDialect;
+            
+            return sqlDialectMapper.TryGet(entry.Dialect) ?? 
+                throw new ArgumentException($"Dialect type {entry.Dialect} specified for connection {connectionKey} is not found!");
         }
 
         private readonly ConcurrentDictionary<string, ConnectionStringInfo> byKey = new ConcurrentDictionary<string, ConnectionStringInfo>();

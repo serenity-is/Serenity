@@ -31,6 +31,9 @@ namespace Serenity.Data
         /// </summary>
         protected Dictionary parameters;
 
+        /// <summary>
+        /// The next auto param counter
+        /// </summary>
         protected int nextAutoParam;
 
         /// <summary>
