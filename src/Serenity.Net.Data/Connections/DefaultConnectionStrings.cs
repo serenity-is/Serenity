@@ -12,29 +12,18 @@ namespace Serenity.Data
     public class DefaultConnectionStrings : IConnectionStrings
     {
         private readonly IOptions<ConnectionStringOptions> options;
+        private readonly IDialectMapper dialectMapper;
 
         /// <summary>
         /// Creates a new instance of DefaultConnectionStringSource
         /// </summary>
         /// <param name="options">Connection string options</param>
-        public DefaultConnectionStrings(IOptions<ConnectionStringOptions> options)
+        /// <param name="dialectMapper">Dialect Mapper</param>
+        public DefaultConnectionStrings(IOptions<ConnectionStringOptions> options, IDialectMapper dialectMapper = null)
         {
             this.options = options ?? throw new ArgumentNullException(nameof(options));
+            this.dialectMapper = dialectMapper ?? new DefaultDialectMapper();
         }
-
-        private static readonly Dictionary<string, ISqlDialect> dialectByProviderName =
-            new Dictionary<string, ISqlDialect>(StringComparer.OrdinalIgnoreCase)
-            {
-                { "System.Data.SqlClient", SqlServer2012Dialect.Instance },
-                { "Microsoft.Data.SqlClient", SqlServer2012Dialect.Instance },
-                { "FirebirdSql.Data.FirebirdClient", FirebirdDialect.Instance },
-                { "Npgsql", PostgresDialect.Instance },
-                { "MySql.Data.MySqlClient", MySqlDialect.Instance },
-                { "System.Data.SQLite", SqliteDialect.Instance },
-                { "Microsoft.Data.SQLite", SqliteDialect.Instance },
-                { "System.Data.OracleClient", OracleDialect.Instance },
-                { "Oracle.ManagedDataAccess.Client", OracleDialect.Instance }
-            };
 
         /// <summary>
         /// Determines dialect for a connection
@@ -48,21 +37,16 @@ namespace Serenity.Data
 
             if (entry.DialectInstance != null)
                 return entry.DialectInstance;
-
+            
             if (!string.IsNullOrEmpty(entry.Dialect))
             {
-                var dialectType = Type.GetType("Serenity.Data." + entry.Dialect + "Dialect") ??
-                    Type.GetType("Serenity.Data." + entry.Dialect) ??
-                    Type.GetType(entry.Dialect);
-
-                if (dialectType == null)
+                var dialect = dialectMapper.TryGet(entry.Dialect);
+                if (dialect == null)
                     throw new ArgumentException($"Dialect type {entry.Dialect} specified for connection {connectionKey} is not found!");
-
-                return (ISqlDialect)Activator.CreateInstance(dialectType);
+                return dialect;
             }
 
-            return dialectByProviderName.TryGetValue(entry.ProviderName, out ISqlDialect dialect) ?
-                dialect : SqlSettings.DefaultDialect;
+            return dialectMapper.TryGet(entry.ProviderName) ?? SqlSettings.DefaultDialect;
         }
 
         private readonly ConcurrentDictionary<string, ConnectionStringInfo> byKey = new ConcurrentDictionary<string, ConnectionStringInfo>();

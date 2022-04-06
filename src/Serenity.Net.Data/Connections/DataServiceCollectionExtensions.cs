@@ -20,6 +20,7 @@ namespace Serenity.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
 
             services.AddOptions();
+            services.TryAddSingleton<IDialectMapper, DefaultDialectMapper>();
             services.TryAddSingleton<IConnectionStrings, DefaultConnectionStrings>();
             services.TryAddSingleton<ISqlConnections, DefaultSqlConnections>();
         }

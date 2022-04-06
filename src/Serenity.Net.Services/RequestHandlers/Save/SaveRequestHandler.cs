@@ -295,7 +295,8 @@ namespace Serenity.Services
                 ValidateAndClearIdField();
                 Old = new TRow();
                 LoadOldEntity();
-            } else
+            }
+            else
                 Old = null;
 
             ValidateRequest();
