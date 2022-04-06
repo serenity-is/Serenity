@@ -22,11 +22,11 @@
         /// </summary>
         Postgres,
         /// <summary>
-        /// SqlServer
+        /// Sqlite
         /// </summary>
         Sqlite,
         /// <summary>
-        /// Oracle
+        /// SqlServer
         /// </summary>
         SqlServer
     }
