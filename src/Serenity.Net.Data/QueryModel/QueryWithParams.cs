@@ -31,7 +31,7 @@ namespace Serenity.Data
         /// </summary>
         protected Dictionary parameters;
 
-        private int nextAutoParam;
+        protected int nextAutoParam;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryWithParams"/> class.
