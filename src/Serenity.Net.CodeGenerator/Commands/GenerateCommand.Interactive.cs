@@ -44,7 +44,7 @@ namespace Serenity.CodeGenerator
 
                 if (connectionString.connectionKey is null)
                     return ExitCodes.NoConnectionString;
-                var confConnection = config.Connections.FirstOrDefault(x =>
+                var confConnection = config.Connections?.FirstOrDefault(x =>
                     string.Compare(x.Key, connectionString.connectionKey, StringComparison.OrdinalIgnoreCase) == 0);
 
                 var tables = SelectedTables(connectionString.sqlConnections, connectionString.connectionKey);
