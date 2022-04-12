@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace Serenity.CodeGenerator
 {
@@ -41,14 +42,65 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        private static void JsonEncode(StringBuilder sb, string str)
+        {
+            var source = str.AsSpan();
+            sb.Append('"');
+            var start = 0;
+
+            for (int i = 0; i < source.Length; i++)
+            {
+                var sourceChar = source[i];
+                switch (sourceChar)
+                {
+                    case '\\':
+                        if (i > start)
+                            sb.Append(source.Slice(start, i - start));
+
+                        sb.Append("\\\\");
+                        start = i + 1;
+                        continue;
+
+                    case '"':
+                        if (i > start)
+                            sb.Append(source.Slice(start, i - start));
+
+                        sb.Append("\\\"");
+                        start = i + 1;
+                        continue;
+
+                    case '\n':
+                        if (i > start)
+                            sb.Append(source.Slice(start, i - start));
+
+                        sb.Append("\\n");
+                        start = i + 1;
+                        continue;
+
+                    case '\r':
+                        if (i > start)
+                            sb.Append(source.Slice(start, i - start));
+
+                        sb.Append("\\r");
+                        start = i + 1;
+                        continue;
+                }
+            }
+
+            if (start < source.Length - 1)
+                sb.Append(source.Slice(start));
+
+            sb.Append('"');
+        }
+
         public List<ExternalType> List()
         {
             var tsconfig = Path.Combine(projectDir, "tsconfig.json");
             IEnumerable<string> files = null;
             if (File.Exists(tsconfig))
             {
-                var cfg = System.Text.Json.JsonSerializer.Deserialize<TSConfig>(File.ReadAllText(tsconfig),
-                    new System.Text.Json.JsonSerializerOptions
+                var cfg = JsonSerializer.Deserialize<TSConfig>(File.ReadAllText(tsconfig),
+                    new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true,
                     });
@@ -154,9 +206,14 @@ namespace Serenity.CodeGenerator
             sb.AppendLine(codeGeneration);
 
             foreach (var file in files)
-                sb.AppendLine("Serenity.CodeGeneration.addSourceFile(" +
-                    System.Text.Json.JsonSerializer.Serialize(file.Replace('\\', '/')) + ", " +
-                    System.Text.Json.JsonSerializer.Serialize(File.ReadAllText(file)) + ");");
+            {
+                sb.Append("Serenity.CodeGeneration.addSourceFile(");
+                JsonEncode(sb, file.Replace('\\', '/'));
+                sb.Append(", ");
+                JsonEncode(sb, File.ReadAllText(file));
+                sb.AppendLine(");");
+            }
+
             sb.AppendLine(@"var types = JSON.stringify(Serenity.CodeGeneration.parseTypes(), function(key, value) {
                     if (value == null ||
                         value === false ||
@@ -167,18 +224,19 @@ namespace Serenity.CodeGenerator
                 });");
             sb.AppendLine("fs.writeFileSync('./typeList.json', types);");
 
+            var genType = sb.ToString();
             var cacheDir = Path.Combine(Path.GetTempPath(), ".tstypecache");
 
             var md5 = MD5.Create();
-            var hash = BitConverter.ToString(md5.ComputeHash(Encoding.Unicode.GetBytes(sb.ToString())));
+            var hash = BitConverter.ToString(md5.ComputeHash(Encoding.Unicode.GetBytes(genType)));
             var cacheFile = Path.Combine(cacheDir, hash + ".json");
 
             if (File.Exists(cacheFile))
             {
                 try
                 {
-                    return System.Text.Json.JsonSerializer.Deserialize<List<ExternalType>>(File.ReadAllText(cacheFile),
-                        new System.Text.Json.JsonSerializerOptions
+                    return JsonSerializer.Deserialize<List<ExternalType>>(File.ReadAllText(cacheFile),
+                        new JsonSerializerOptions()
                         {
                             PropertyNameCaseInsensitive = true
                         });
@@ -187,8 +245,8 @@ namespace Serenity.CodeGenerator
                 {
                 }
             }
-
             void writeCache(string json)
+
             {
                 try
                 {
@@ -205,7 +263,7 @@ namespace Serenity.CodeGenerator
             Directory.CreateDirectory(tempDirectory);
             try
             {
-                File.WriteAllText(Path.Combine(tempDirectory, "index.js"), sb.ToString());
+                File.WriteAllText(Path.Combine(tempDirectory, "index.js"), genType);
 
                 var process = Process.Start(new ProcessStartInfo()
                 {
@@ -217,8 +275,8 @@ namespace Serenity.CodeGenerator
                 process.WaitForExit(60000);
                 var json = File.ReadAllText(Path.Combine(tempDirectory, "typeList.json"));
                 writeCache(json);
-                return System.Text.Json.JsonSerializer.Deserialize<List<ExternalType>>(json,
-                    new System.Text.Json.JsonSerializerOptions
+                return JsonSerializer.Deserialize<List<ExternalType>>(json,
+                    new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true,
                         DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
