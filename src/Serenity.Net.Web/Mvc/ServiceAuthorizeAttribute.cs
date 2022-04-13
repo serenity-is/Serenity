@@ -1,13 +1,13 @@
-﻿using Serenity.Data;
-using System;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Serenity.Abstractions;
+using Serenity.Data;
+using System;
+using System.Linq;
 
 namespace Serenity.Services
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
     public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
     {
         public void OnResourceExecuted(ResourceExecutedContext context)
@@ -16,37 +16,48 @@ namespace Serenity.Services
 
         public void OnResourceExecuting(ResourceExecutingContext context)
         {
-            if ((string.IsNullOrEmpty(Permission) &&
-                    !context.HttpContext.User.IsLoggedIn()) ||
-                (!string.IsNullOrEmpty(Permission) &&
-                    !context.HttpContext.RequestServices.GetRequiredService<IPermissionService>().HasPermission(Permission)))
+            if (string.IsNullOrEmpty(Permission))
             {
-                var localizer = context.HttpContext.RequestServices.GetRequiredService<ITextLocalizer>();
+                if (context.HttpContext.User.IsLoggedIn())
+                    return;
+            }
+            else if (context.HttpContext.RequestServices.GetRequiredService<IPermissionService>().HasPermission(Permission))
+                return;
 
-                if (!context.HttpContext.User.IsLoggedIn())
+            if (!string.IsNullOrEmpty(OrPermission) &&
+                context.HttpContext.RequestServices.GetRequiredService<IPermissionService>().HasPermission(OrPermission))
+                return;
+
+            var myIndex = context.Filters.IndexOf(this);
+            if (myIndex >= 0 && context.Filters.Skip(myIndex + 1)
+                .Any(x => x is ServiceAuthorizeAttribute a && a.Override == true))
+                return;
+
+            var localizer = context.HttpContext.RequestServices.GetRequiredService<ITextLocalizer>();
+
+            if (!context.HttpContext.User.IsLoggedIn())
+            {
+                context.Result = new Result<ServiceResponse>(new ServiceResponse
                 {
-                    context.Result = new Result<ServiceResponse>(new ServiceResponse
+                    Error = new ServiceError
                     {
-                        Error = new ServiceError
-                        {
-                            Code = "AccessDenied",
-                            Message = localizer.Get("Authorization.AccessDenied")
-                        }
-                    });
-                    context.HttpContext.Response.StatusCode = 400;
-                }
-                else
+                        Code = "AccessDenied",
+                        Message = localizer.Get("Authorization.AccessDenied")
+                    }
+                });
+                context.HttpContext.Response.StatusCode = 400;
+            }
+            else
+            {
+                context.Result = new Result<ServiceResponse>(new ServiceResponse
                 {
-                    context.Result = new Result<ServiceResponse>(new ServiceResponse
+                    Error = new ServiceError
                     {
-                        Error = new ServiceError
-                        {
-                            Code = "NotLoggedIn",
-                            Message = localizer.Get("Authorization.NotLoggedIn")
-                        }
-                    });
-                    context.HttpContext.Response.StatusCode = 400;
-                }
+                        Code = "NotLoggedIn",
+                        Message = localizer.Get("Authorization.NotLoggedIn")
+                    }
+                });
+                context.HttpContext.Response.StatusCode = 400;
             }
         }
      
@@ -110,5 +121,7 @@ namespace Serenity.Services
         }
 
         public string Permission { get; private set; }
+        protected string OrPermission { get; set; }
+        public bool Override { get; set; } = true;
     }
 }

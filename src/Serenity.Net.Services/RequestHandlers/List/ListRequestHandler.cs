@@ -25,6 +25,7 @@ namespace Serenity.Services
 
         protected HashSet<string> ignoredEqualityFilters;
         protected Lazy<IListBehavior[]> behaviors;
+        protected bool lookupAccessMode;
 
         public ListRequestHandler(IRequestContext context)
         {
@@ -58,6 +59,11 @@ namespace Serenity.Services
 
             if (field.ReadPermission != null &&
                 !Permissions.HasPermission(field.ReadPermission))
+                return false;
+
+            if (field.ReadPermission == null &&
+                lookupAccessMode &&
+                !field.IsLookup)
                 return false;
 
             return true;
@@ -346,7 +352,7 @@ namespace Serenity.Services
 
         protected virtual BaseCriteria ReplaceFieldExpressions(BaseCriteria criteria)
         {
-            return new CriteriaFieldExpressionReplacer(Row, Permissions)
+            return new CriteriaFieldExpressionReplacer(Row, Permissions, lookupAccessMode)
                 .Process(criteria);
         }
 
@@ -442,7 +448,21 @@ namespace Serenity.Services
         {
             var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
             if (readAttr != null)
-                Permissions.ValidatePermission(readAttr.Permission ?? "?", Localizer);
+            {
+                var permission = readAttr.Permission ?? "?";
+                if (!Permissions.HasPermission(permission))
+                {
+                    var lookupPermission = typeof(TRow).GetCustomAttribute<ServiceLookupPermissionAttribute>()?.Permission;
+                    if (!string.IsNullOrEmpty(lookupPermission) &&
+                        Permissions.HasPermission(lookupPermission))
+                    {
+                        lookupAccessMode = true;
+                        return;
+                    }
+
+                    Permissions.ValidatePermission(permission, Localizer);
+                }
+            }
         }
 
         protected virtual void ValidateRequest()
@@ -526,6 +546,7 @@ namespace Serenity.Services
         public TListResponse Process(IDbConnection connection, TListRequest request)
         {
             StateBag.Clear();
+            lookupAccessMode = false;
             Connection = connection ?? throw new ArgumentNullException("connection");
             Request = request;
             ValidateRequest();

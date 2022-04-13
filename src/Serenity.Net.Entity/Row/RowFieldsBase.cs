@@ -639,14 +639,20 @@ namespace Serenity.Data
                         idField = primaryKeys[0];
                 }
 
+                foreach (var field in this)
+                {
+                    if (ReferenceEquals(idField, field) ||
+                        ReferenceEquals(nameField, field) ||
+                        field.GetAttribute<LookupIncludeAttribute>() != null)
+                        field.IsLookup = true;
+                }
+
                 InferTextualFields();
                 AfterInitialize();
             }
 
             isInitialized = true;
         }
-
-        private readonly Field[] EmptyFields = new Field[0];
 
         /// <summary>
         /// Gets the fields by attribute.

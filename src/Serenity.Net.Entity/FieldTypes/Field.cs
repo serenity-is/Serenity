@@ -640,6 +640,11 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Gets if this field is one with a LookupInclude attribute or ID or Name field
+        /// </summary>
+        public bool IsLookup { get; internal set; }
+
         IDictionary<string, Join> IFieldWithJoinInfo.Joins => fields.Joins;
 
         /// <summary>
