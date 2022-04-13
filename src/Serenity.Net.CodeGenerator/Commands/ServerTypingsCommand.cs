@@ -10,6 +10,9 @@ namespace Serenity.CodeGenerator
 {
     public class ServerTypingsCommand
     {
+        private static readonly string binDebug = $"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Debug{Path.DirectorySeparatorChar}";
+        private static readonly string binRelease = $"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Release{Path.DirectorySeparatorChar}";
+
         public static void Run(string csproj, List<ExternalType> tsTypes)
         {
             var projectDir = Path.GetDirectoryName(csproj);
@@ -80,10 +83,10 @@ namespace Serenity.CodeGenerator
                 for (var i = 0; i < assemblyFiles.Length; i++)
                 {
                     var assemblyFile1 = Path.GetFullPath(assemblyFiles[i].Replace('/', Path.DirectorySeparatorChar));
-                    var binDebugIdx = assemblyFile1.IndexOf("/bin/Debug/", StringComparison.OrdinalIgnoreCase);
+                    var binDebugIdx = assemblyFile1.IndexOf(binDebug, StringComparison.OrdinalIgnoreCase);
                     string assemblyFile2 = assemblyFile1;
                     if (binDebugIdx >= 0)
-                        assemblyFile2 = assemblyFile1.Substring(0, binDebugIdx) + "/bin/Release/" + assemblyFile1[(binDebugIdx + "/bin/Release".Length)..];
+                        assemblyFile2 = assemblyFile1[..binDebugIdx] + binRelease + assemblyFile1[(binDebugIdx + binDebug.Length)..];
 
                     assemblyFiles[i] = assemblyFile1;
 
