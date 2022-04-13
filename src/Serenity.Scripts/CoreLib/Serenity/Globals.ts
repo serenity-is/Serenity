@@ -117,13 +117,19 @@
     export const enum ColumnSelection {
         List = 0,
         KeyOnly = 1,
-        Details = 2
+        Details = 2,
+        None = 3,
+        IdOnly = 4,
+        Lookup = 5
     }
         
     export const enum RetrieveColumnSelection {
         details = 0,
         keyOnly = 1,
-        list = 2
+        list = 2,
+        none = 3,
+        idOnly = 4,
+        lookup = 5
     }
         
     export interface ListRequest extends ServiceRequest {
