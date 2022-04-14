@@ -35,7 +35,7 @@ namespace Serenity.Services
 
             var localizer = context.HttpContext.RequestServices.GetRequiredService<ITextLocalizer>();
 
-            if (!context.HttpContext.User.IsLoggedIn())
+            if (context.HttpContext.User.IsLoggedIn())
             {
                 context.Result = new Result<ServiceResponse>(new ServiceResponse
                 {
