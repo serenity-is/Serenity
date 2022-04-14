@@ -43,13 +43,14 @@ namespace {{RootNamespace}}{{DotModule}}.Endpoints
             return handler.Retrieve(connection, request);
         }
 
-        [HttpPost]
+        [HttpPost, AuthorizeList(typeof(MyRow))]
         public ListResponse<MyRow> List(IDbConnection connection, ListRequest request,
             [FromServices] I{{ClassName}}ListHandler handler)
         {
             return handler.List(connection, request);
         }
 
+        [AuthorizeList(typeof(MyRow))]
         public FileContentResult ListExcel(IDbConnection connection, ListRequest request,
             [FromServices] I{{ClassName}}ListHandler handler,
             [FromServices] IExcelExporter exporter)
