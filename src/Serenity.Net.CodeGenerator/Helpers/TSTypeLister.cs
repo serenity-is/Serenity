@@ -112,12 +112,18 @@ namespace Serenity.CodeGenerator
                 else if (!cfg.Include.IsEmptyOrNull())
                 {
                     var typeRoots = cfg.CompilerOptions?.TypeRoots?.IsEmptyOrNull() != false ?
-                        new string[] { "./node_modules/types" } : cfg.CompilerOptions.TypeRoots;
+                        new string[] { "./node_modules/@types" } : cfg.CompilerOptions.TypeRoots;
 
                     var types = new HashSet<string>(cfg.CompilerOptions?.Types ?? Array.Empty<string>(),
                         StringComparer.OrdinalIgnoreCase);
 
-                    files = typeRoots.Select(typeRoot => Path.Combine(projectDir, typeRoot))
+                    files = typeRoots.Select(typeRoot => 
+                        {
+                            var s = PathHelper.ToUrl(typeRoot);
+                            if (s.StartsWith("./", StringComparison.Ordinal))
+                                s = s[2..];
+                            return Path.Combine(projectDir, PathHelper.ToPath(s));
+                        })
                         .Where(typeRoot => Directory.Exists(typeRoot))
                         .Select(typeRoot => Path.GetFullPath(typeRoot))
                         .SelectMany(typeRoot =>
@@ -205,13 +211,19 @@ namespace Serenity.CodeGenerator
             sb.AppendLine(tsServices);
             sb.AppendLine(codeGeneration);
 
+            var typeListerAST = new TSTypeListerAST();
+
             foreach (var file in files)
             {
                 sb.Append("Serenity.CodeGeneration.addSourceFile(");
-                JsonEncode(sb, file.Replace('\\', '/'));
+                var path = file.Replace('\\', '/');
+                JsonEncode(sb, path);
                 sb.Append(", ");
-                JsonEncode(sb, File.ReadAllText(file));
+                var text = File.ReadAllText(file);
+                JsonEncode(sb, text);
                 sb.AppendLine(");");
+
+                typeListerAST.AddInputFile(path, text);
             }
 
             sb.AppendLine(@"var types = JSON.stringify(Serenity.CodeGeneration.parseTypes(), function(key, value) {
@@ -230,23 +242,33 @@ namespace Serenity.CodeGenerator
             var md5 = MD5.Create();
             var hash = BitConverter.ToString(md5.ComputeHash(Encoding.Unicode.GetBytes(genType)));
             var cacheFile = Path.Combine(cacheDir, hash + ".json");
+            
+            var resultOld = Path.Combine(cacheDir, hash + "_old.json");
+            var resultNew = Path.Combine(cacheDir, hash + "_new.json");
+            File.WriteAllText(resultNew, JSON.StringifyIndented(typeListerAST.ExtractTypes().OrderBy(x => x.Namespace).ThenBy(x => x.Name)));
+
+            List<ExternalType> externalTypes;
 
             if (File.Exists(cacheFile))
             {
                 try
                 {
-                    return JsonSerializer.Deserialize<List<ExternalType>>(File.ReadAllText(cacheFile),
+                    externalTypes = JsonSerializer.Deserialize<List<ExternalType>>(File.ReadAllText(cacheFile),
                         new JsonSerializerOptions()
                         {
                             PropertyNameCaseInsensitive = true
                         });
+
+                    File.WriteAllText(resultOld, JSON.StringifyIndented(externalTypes.OrderBy(x => x.Namespace).ThenBy(x => x.Name)));
+
+                    return externalTypes;
                 }
                 catch
                 {
                 }
             }
-            void writeCache(string json)
 
+            void writeCache(string json)
             {
                 try
                 {
@@ -275,12 +297,16 @@ namespace Serenity.CodeGenerator
                 process.WaitForExit(60000);
                 var json = File.ReadAllText(Path.Combine(tempDirectory, "typeList.json"));
                 writeCache(json);
-                return JsonSerializer.Deserialize<List<ExternalType>>(json,
+                externalTypes = JsonSerializer.Deserialize<List<ExternalType>>(json,
                     new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true,
                         DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
                     });
+
+                File.WriteAllText(resultOld, JSON.StringifyIndented(externalTypes.OrderBy(x => x.Namespace).ThenBy(x => x.Name)));
+
+                return externalTypes;
             }
             finally
             {

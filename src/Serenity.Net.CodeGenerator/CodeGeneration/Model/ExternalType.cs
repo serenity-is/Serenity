@@ -11,16 +11,16 @@ namespace Serenity.CodeGeneration
         public string BaseType { get; set; }
         public List<string> Interfaces { get; set; }
         [JsonInclude]
-        public List<ExternalAttribute> Attributes { get; private set; }
+        public List<ExternalAttribute> Attributes { get; set; }
         [JsonInclude]
-        public List<ExternalProperty> Properties { get; private set; }
+        public List<ExternalProperty> Properties { get; set; }
         [JsonInclude]
-        public List<ExternalMember> Fields { get; private set; }
+        public List<ExternalMember> Fields { get; set; }
         [JsonInclude]
-        public List<ExternalMethod> Methods { get; private set; }
+        public List<ExternalMethod> Methods { get; set; }
         public string OptionsType { get; set; }
         [JsonInclude]
-        public List<ExternalGenericParameter> GenericParameters { get; private set; }
+        public List<ExternalGenericParameter> GenericParameters { get; set; }
         public bool IsAbstract { get; set; }
         public bool IsDeclaration { get; set; }
         public bool IsInterface { get; set; }
@@ -31,12 +31,6 @@ namespace Serenity.CodeGeneration
         {
             Namespace = "";
             BaseType = "";
-            Interfaces = new List<string>();
-            Properties = new List<ExternalProperty>();
-            Fields = new List<ExternalMember>();
-            Methods = new List<ExternalMethod>();
-            Attributes = new List<ExternalAttribute>();
-            GenericParameters = new List<ExternalGenericParameter>();
         }
 
         public string FullName

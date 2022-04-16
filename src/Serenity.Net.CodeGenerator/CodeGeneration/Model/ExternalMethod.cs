@@ -7,11 +7,10 @@ namespace Serenity.CodeGeneration
     {
         public ExternalMethod()
         {
-            Arguments = new List<ExternalArgument>();
         }
 
         [JsonInclude]
-        public List<ExternalArgument> Arguments { get; private set; }
+        public List<ExternalArgument> Arguments { get; set; }
         public bool IsConstructor { get; set; }
         public bool IsOverride { get; set; }
         public bool IsGetter { get; set; }

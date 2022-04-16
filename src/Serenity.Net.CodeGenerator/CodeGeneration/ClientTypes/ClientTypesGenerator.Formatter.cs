@@ -34,10 +34,10 @@ namespace Serenity.CodeGeneration
             if (type.IsAbstract)
                 return false;
 
-            if (type.GenericParameters.Count > 0)
+            if (type.GenericParameters?.Count > 0)
                 return false;
 
-            return type.Interfaces.Any(x =>
+            return type.Interfaces != null && type.Interfaces.Any(x =>
                 x == "Serenity.ISlickFormatter" ||
                 x == "Slick.Formatter");
         }

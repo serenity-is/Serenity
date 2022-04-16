@@ -38,7 +38,7 @@ namespace Serenity.CodeGeneration
         private void GenerateOptionMembers(ExternalType type,
             HashSet<string> skip, bool isWidget)
         {
-            bool preserveMemberCase = type.Attributes.Any(x =>
+            bool preserveMemberCase = type.Attributes != null && type.Attributes.Any(x =>
                 x.Type == "System.Runtime.CompilerServices.PreserveMemberCaseAttribute");
 
             var options = GetOptionMembers(type, isWidget);
@@ -62,7 +62,7 @@ namespace Serenity.CodeGeneration
                     jsName = GetPropertyScriptName(prop, preserveMemberCase);
                 else 
                 {
-                    if (option is ExternalMethod emo && emo.Arguments.Count == 1)
+                    if (option is ExternalMethod emo && emo.Arguments?.Count == 1)
                     {
                         if (jsName.StartsWith("set_", StringComparison.Ordinal))
                         {
@@ -104,10 +104,14 @@ namespace Serenity.CodeGeneration
         {
             List<ExternalMember> members = new();
 
-            members.AddRange(type.Properties);
+            if (type.Properties != null)
+                members.AddRange(type.Properties);
 
-            members.AddRange(type.Fields);
-            members.AddRange(type.Methods.Where(x => x.Arguments.Count == 1));
+            if (type.Fields != null)
+                members.AddRange(type.Fields);
+
+            if (type.Methods != null)
+                members.AddRange(type.Methods.Where(x => x.Arguments?.Count == 1));
 
             foreach (var member in members)
             {
@@ -122,11 +126,12 @@ namespace Serenity.CodeGeneration
                     continue;
 
                 if (!isOptions &&
-                    !member.Attributes.Any(x =>
+                    (member.Attributes == null ||
+                     !member.Attributes.Any(x =>
                         x.Type == "System.ComponentModel.DisplayNameAttribute" ||
                         x.Type == "Serenity.OptionAttribute" ||
                         x.Type == "Serenity.Decorators.option" ||
-                        x.Type == "Serenity.Decorators.displayName"))
+                        x.Type == "Serenity.Decorators.displayName")))
                     continue;
 
                 dict[member.Name] = member;
@@ -138,8 +143,8 @@ namespace Serenity.CodeGeneration
         {
             var result = new SortedDictionary<string, ExternalMember>();
 
-            var constructor = type.Methods.FirstOrDefault(x => x.IsConstructor && 
-                x.Arguments.Count == (isWidget ? 2 : 1));
+            var constructor = type.Methods?.FirstOrDefault(x => x.IsConstructor && 
+                x.Arguments?.Count == (isWidget ? 2 : 1));
 
             if (constructor != null)
             {

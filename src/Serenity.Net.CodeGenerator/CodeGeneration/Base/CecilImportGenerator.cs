@@ -677,13 +677,13 @@ namespace Serenity.CodeGeneration
         {
             string methodName = method.Name;
 
-            var scriptNameAttr = method.Attributes.FirstOrDefault(x =>
+            var scriptNameAttr = method.Attributes?.FirstOrDefault(x =>
                 x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
 
             if (scriptNameAttr != null)
-                methodName = scriptNameAttr.Arguments[0].Value as string;
-            else if (!preserveMemberCase && !method.Attributes.Any(x =>
-                    x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute"))
+                methodName = scriptNameAttr.Arguments?[0].Value as string;
+            else if (!preserveMemberCase && (method.Attributes == null || !method.Attributes.Any(x =>
+                    x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute")))
             {
                 if (methodName == "ID")
                     methodName = "id";

@@ -45,7 +45,7 @@ namespace Serenity.CodeGeneration
             if (type.IsAbstract)
                 return false;
 
-            if (type.GenericParameters.Count > 0)
+            if (type.GenericParameters?.Count > 0)
                 return false;
 
             if (!HasBaseType(type, "Serenity.Widget") &&

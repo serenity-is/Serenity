@@ -7,11 +7,10 @@ namespace Serenity.CodeGeneration
     {
         public ExternalMember()
         {
-            Attributes = new List<ExternalAttribute>();
         }
 
         [JsonInclude]
-        public List<ExternalAttribute> Attributes { get; private set; }
+        public List<ExternalAttribute> Attributes { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
         public bool IsDeclaration { get; set; }

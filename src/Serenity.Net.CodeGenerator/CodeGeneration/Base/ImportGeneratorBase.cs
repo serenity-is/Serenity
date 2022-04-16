@@ -91,13 +91,13 @@ namespace Serenity.CodeGeneration
 
         protected static string GetPropertyScriptName(ExternalProperty prop, bool preserveMemberCase)
         {
-            var scriptNameAttr = prop.Attributes.FirstOrDefault(x =>
+            var scriptNameAttr = prop.Attributes?.FirstOrDefault(x =>
                 x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
 
             if (scriptNameAttr != null)
-                return scriptNameAttr.Arguments[0].Value as string;
-            else if (!preserveMemberCase && !prop.Attributes.Any(x =>
-                    x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute"))
+                return scriptNameAttr.Arguments?[0].Value as string;
+            else if (!preserveMemberCase && (prop.Attributes == null || !prop.Attributes.Any(x =>
+                    x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute")))
             {
                 var propField = prop.Name;
                 if (propField == "ID")
@@ -170,7 +170,7 @@ namespace Serenity.CodeGeneration
 
         protected ExternalAttribute GetAttribute(ExternalType type, string attributeName, bool inherited)
         {
-            var attr = type.Attributes.FirstOrDefault(x => x.Type == attributeName);
+            var attr = type.Attributes?.FirstOrDefault(x => x.Type == attributeName);
             if (attr != null)
                 return attr;
 
@@ -180,7 +180,7 @@ namespace Serenity.CodeGeneration
             int loop = 0;
             while ((type = GetBaseType(type)) != null)
             {
-                attr = type.Attributes.FirstOrDefault(x => x.Type == attributeName);
+                attr = type.Attributes?.FirstOrDefault(x => x.Type == attributeName);
                 if (attr != null)
                     return attr;
 
