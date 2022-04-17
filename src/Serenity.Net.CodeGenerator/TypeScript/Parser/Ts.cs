@@ -605,9 +605,6 @@ namespace Serenity.TypeScript.TsParser
                            VisitNode(cbNode, (node as ShorthandPropertyAssignment)?.QuestionToken) ??
                            VisitNode(cbNode, (node as ShorthandPropertyAssignment)?.EqualsToken) ??
                            VisitNode(cbNode, (node as ShorthandPropertyAssignment)?.ObjectAssignmentInitializer);
-                case SyntaxKind.SpreadAssignment:
-
-                    return VisitNode(cbNode, (node as SpreadAssignment)?.Expression);
                 case SyntaxKind.Parameter:
                 case SyntaxKind.PropertyDeclaration:
                 case SyntaxKind.PropertySignature:
@@ -693,10 +690,6 @@ namespace Serenity.TypeScript.TsParser
                 case SyntaxKind.LiteralType:
 
                     return VisitNode(cbNode, (node as LiteralTypeNode)?.Literal);
-                case SyntaxKind.ObjectBindingPattern:
-                case SyntaxKind.ArrayBindingPattern:
-
-                    return visitNodes(cbNodes, ((IBindingPattern)node).Elements);
                 case SyntaxKind.ArrayLiteralExpression:
 
                     return visitNodes(cbNodes, (node as ArrayLiteralExpression)?.Elements);
@@ -708,9 +701,6 @@ namespace Serenity.TypeScript.TsParser
                     return VisitNode(cbNode, (node as PropertyAccessExpression)?.Expression) ??
                            VisitNode(cbNode, (node as PropertyAccessExpression)?.Name);
                 case SyntaxKind.ElementAccessExpression:
-
-                    return VisitNode(cbNode, (node as ElementAccessExpression)?.Expression) ??
-                           VisitNode(cbNode, (node as ElementAccessExpression)?.ArgumentExpression);
                 case SyntaxKind.CallExpression:
                 case SyntaxKind.NewExpression:
 
@@ -718,9 +708,6 @@ namespace Serenity.TypeScript.TsParser
                            visitNodes(cbNodes, (node as CallExpression)?.TypeArguments) ??
                            visitNodes(cbNodes, (node as CallExpression)?.Arguments);
                 case SyntaxKind.TaggedTemplateExpression:
-
-                    return VisitNode(cbNode, (node as TaggedTemplateExpression)?.Tag) ??
-                           VisitNode(cbNode, (node as TaggedTemplateExpression)?.Template);
                 case SyntaxKind.TypeAssertionExpression:
 
                     return VisitNode(cbNode, (node as TypeAssertion)?.Type) ??
@@ -728,50 +715,12 @@ namespace Serenity.TypeScript.TsParser
                 case SyntaxKind.ParenthesizedExpression:
 
                     return VisitNode(cbNode, (node as ParenthesizedExpression)?.Expression);
-                case SyntaxKind.DeleteExpression:
-
-                    return VisitNode(cbNode, (node as DeleteExpression)?.Expression);
-                case SyntaxKind.TypeOfExpression:
-
-                    return VisitNode(cbNode, (node as TypeOfExpression)?.Expression);
-                case SyntaxKind.VoidExpression:
-
-                    return VisitNode(cbNode, (node as VoidExpression)?.Expression);
-                case SyntaxKind.PrefixUnaryExpression:
-
-                    return VisitNode(cbNode, (node as PrefixUnaryExpression)?.Operand);
-                case SyntaxKind.YieldExpression:
-
-                    return VisitNode(cbNode, (node as YieldExpression)?.AsteriskToken) ??
-                           VisitNode(cbNode, (node as YieldExpression)?.Expression);
-                case SyntaxKind.AwaitExpression:
-
-                    return VisitNode(cbNode, (node as AwaitExpression)?.Expression);
-                case SyntaxKind.PostfixUnaryExpression:
-
-                    return VisitNode(cbNode, (node as PostfixUnaryExpression)?.Operand);
-                case SyntaxKind.BinaryExpression:
-
-                    return VisitNode(cbNode, (node as BinaryExpression)?.Left) ??
-                           VisitNode(cbNode, (node as BinaryExpression)?.OperatorToken) ??
-                           VisitNode(cbNode, (node as BinaryExpression)?.Right);
-                case SyntaxKind.AsExpression:
-
-                    return VisitNode(cbNode, (node as AsExpression)?.Expression) ??
-                           VisitNode(cbNode, (node as AsExpression)?.Type);
                 case SyntaxKind.NonNullExpression:
 
                     return VisitNode(cbNode, (node as NonNullExpression)?.Expression);
                 case SyntaxKind.MetaProperty:
 
                     return VisitNode(cbNode, (node as MetaProperty)?.Name);
-                case SyntaxKind.ConditionalExpression:
-
-                    return VisitNode(cbNode, (node as ConditionalExpression)?.Condition) ??
-                           VisitNode(cbNode, (node as ConditionalExpression)?.QuestionToken) ??
-                           VisitNode(cbNode, (node as ConditionalExpression)?.WhenTrue) ??
-                           VisitNode(cbNode, (node as ConditionalExpression)?.ColonToken) ??
-                           VisitNode(cbNode, (node as ConditionalExpression)?.WhenFalse);
                 case SyntaxKind.SpreadElement:
 
                     return VisitNode(cbNode, (node as SpreadElement)?.Expression);
@@ -783,88 +732,9 @@ namespace Serenity.TypeScript.TsParser
 
                     return visitNodes(cbNodes, (node as SourceFile)?.Statements) ??
                            VisitNode(cbNode, (node as SourceFile)?.EndOfFileToken);
-                case SyntaxKind.VariableStatement:
-
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           visitNodes(cbNodes, node.Modifiers) ??
-                           VisitNode(cbNode, (node as VariableStatement)?.DeclarationList);
-                case SyntaxKind.VariableDeclarationList:
-
-                    return visitNodes(cbNodes, (node as VariableDeclarationList)?.Declarations);
                 case SyntaxKind.ExpressionStatement:
 
                     return VisitNode(cbNode, (node as ExpressionStatement)?.Expression);
-                case SyntaxKind.IfStatement:
-
-                    return VisitNode(cbNode, (node as IfStatement)?.Expression) ??
-                           VisitNode(cbNode, (node as IfStatement)?.ThenStatement) ??
-                           VisitNode(cbNode, (node as IfStatement)?.ElseStatement);
-                case SyntaxKind.DoStatement:
-
-                    return VisitNode(cbNode, (node as DoStatement)?.Statement) ??
-                           VisitNode(cbNode, (node as DoStatement)?.Expression);
-                case SyntaxKind.WhileStatement:
-
-                    return VisitNode(cbNode, (node as WhileStatement)?.Expression) ??
-                           VisitNode(cbNode, (node as WhileStatement)?.Statement);
-                case SyntaxKind.ForStatement:
-
-                    return VisitNode(cbNode, (node as ForStatement)?.Initializer) ??
-                           VisitNode(cbNode, (node as ForStatement)?.Condition) ??
-                           VisitNode(cbNode, (node as ForStatement)?.Incrementor) ??
-                           VisitNode(cbNode, (node as ForStatement)?.Statement);
-                case SyntaxKind.ForInStatement:
-
-                    return VisitNode(cbNode, (node as ForInStatement)?.Initializer) ??
-                           VisitNode(cbNode, (node as ForInStatement)?.Expression) ??
-                           VisitNode(cbNode, (node as ForInStatement)?.Statement);
-                case SyntaxKind.ForOfStatement:
-
-                    return VisitNode(cbNode, (node as ForOfStatement)?.AwaitModifier) ??
-                           VisitNode(cbNode, (node as ForOfStatement)?.Initializer) ??
-                           VisitNode(cbNode, (node as ForOfStatement)?.Expression) ??
-                           VisitNode(cbNode, (node as ForOfStatement)?.Statement);
-                case SyntaxKind.ContinueStatement:
-                case SyntaxKind.BreakStatement:
-
-                    return VisitNode(cbNode, (node as IBreakOrContinueStatement)?.Label);
-                case SyntaxKind.ReturnStatement:
-
-                    return VisitNode(cbNode, (node as ReturnStatement)?.Expression);
-                case SyntaxKind.WithStatement:
-
-                    return VisitNode(cbNode, (node as WithStatement)?.Expression) ??
-                           VisitNode(cbNode, (node as WithStatement)?.Statement);
-                case SyntaxKind.SwitchStatement:
-
-                    return VisitNode(cbNode, (node as SwitchStatement)?.Expression) ??
-                           VisitNode(cbNode, (node as SwitchStatement)?.CaseBlock);
-                case SyntaxKind.CaseBlock:
-
-                    return visitNodes(cbNodes, (node as CaseBlock)?.Clauses);
-                case SyntaxKind.CaseClause:
-
-                    return VisitNode(cbNode, (node as CaseClause)?.Expression) ??
-                           visitNodes(cbNodes, (node as CaseClause)?.Statements);
-                case SyntaxKind.DefaultClause:
-
-                    return visitNodes(cbNodes, (node as DefaultClause)?.Statements);
-                case SyntaxKind.LabeledStatement:
-
-                    return VisitNode(cbNode, (node as LabeledStatement)?.Label) ??
-                           VisitNode(cbNode, (node as LabeledStatement)?.Statement);
-                case SyntaxKind.ThrowStatement:
-
-                    return VisitNode(cbNode, (node as ThrowStatement)?.Expression);
-                case SyntaxKind.TryStatement:
-
-                    return VisitNode(cbNode, (node as TryStatement)?.TryBlock) ??
-                           VisitNode(cbNode, (node as TryStatement)?.CatchClause) ??
-                           VisitNode(cbNode, (node as TryStatement)?.FinallyBlock);
-                case SyntaxKind.CatchClause:
-
-                    return VisitNode(cbNode, (node as CatchClause)?.VariableDeclaration) ??
-                           VisitNode(cbNode, (node as CatchClause)?.Block);
                 case SyntaxKind.Decorator:
 
                     return VisitNode(cbNode, (node as Decorator)?.Expression);
@@ -1008,90 +878,9 @@ namespace Serenity.TypeScript.TsParser
                 case SyntaxKind.JsxClosingElement:
 
                     return VisitNode(cbNode, (node as JsxClosingElement)?.TagName);
-                case SyntaxKind.JsDocTypeExpression:
-
-                    return VisitNode(cbNode, (node as JsDocTypeExpression)?.Type);
-                case SyntaxKind.JsDocUnionType:
-
-                    return visitNodes(cbNodes, (node as JsDocUnionType)?.Types);
-                case SyntaxKind.JsDocTupleType:
-
-                    return visitNodes(cbNodes, (node as JsDocTupleType)?.Types);
-                case SyntaxKind.JsDocArrayType:
-
-                    return VisitNode(cbNode, (node as JsDocArrayType)?.ElementType);
-                case SyntaxKind.JsDocNonNullableType:
-
-                    return VisitNode(cbNode, (node as JsDocNonNullableType)?.Type);
-                case SyntaxKind.JsDocNullableType:
-
-                    return VisitNode(cbNode, (node as JsDocNullableType)?.Type);
-                case SyntaxKind.JsDocRecordType:
-
-                    return VisitNode(cbNode, (node as JsDocRecordType)?.Literal);
-                case SyntaxKind.JsDocTypeReference:
-
-                    return VisitNode(cbNode, (node as JsDocTypeReference)?.Name) ??
-                           visitNodes(cbNodes, (node as JsDocTypeReference)?.TypeArguments);
-                case SyntaxKind.JsDocOptionalType:
-
-                    return VisitNode(cbNode, (node as JsDocOptionalType)?.Type);
-                case SyntaxKind.JsDocFunctionType:
-
-                    return visitNodes(cbNodes, (node as JsDocFunctionType)?.Parameters) ??
-                           VisitNode(cbNode, (node as JsDocFunctionType)?.Type);
-                case SyntaxKind.JsDocVariadicType:
-
-                    return VisitNode(cbNode, (node as JsDocVariadicType)?.Type);
-                case SyntaxKind.JsDocConstructorType:
-
-                    return VisitNode(cbNode, (node as JsDocConstructorType)?.Type);
-                case SyntaxKind.JsDocThisType:
-
-                    return VisitNode(cbNode, (node as JsDocThisType)?.Type);
-                case SyntaxKind.JsDocRecordMember:
-
-                    return VisitNode(cbNode, (node as JsDocRecordMember)?.Name) ??
-                           VisitNode(cbNode, (node as JsDocRecordMember)?.Type);
-                case SyntaxKind.JsDocComment:
-
-                    return visitNodes(cbNodes, (node as JsDoc)?.Tags);
-                case SyntaxKind.JsDocParameterTag:
-
-                    return VisitNode(cbNode, (node as JsDocParameterTag)?.PreParameterName) ??
-                           VisitNode(cbNode, (node as JsDocParameterTag)?.TypeExpression) ??
-                           VisitNode(cbNode, (node as JsDocParameterTag)?.PostParameterName);
-                case SyntaxKind.JsDocReturnTag:
-
-                    return VisitNode(cbNode, (node as JsDocReturnTag)?.TypeExpression);
-                case SyntaxKind.JsDocTypeTag:
-
-                    return VisitNode(cbNode, (node as JsDocTypeTag)?.TypeExpression);
-                case SyntaxKind.JsDocAugmentsTag:
-
-                    return VisitNode(cbNode, (node as JsDocAugmentsTag)?.TypeExpression);
-                case SyntaxKind.JsDocTemplateTag:
-
-                    return visitNodes(cbNodes, (node as JsDocTemplateTag)?.TypeParameters);
-                case SyntaxKind.JsDocTypedefTag:
-
-                    return VisitNode(cbNode, (node as JsDocTypedefTag)?.TypeExpression) ??
-                           VisitNode(cbNode, (node as JsDocTypedefTag)?.FullName) ??
-                           VisitNode(cbNode, (node as JsDocTypedefTag)?.Name) ??
-                           VisitNode(cbNode, (node as JsDocTypedefTag)?.JsDocTypeLiteral);
-                case SyntaxKind.JsDocTypeLiteral:
-
-                    return visitNodes(cbNodes, (node as JsDocTypeLiteral)?.JsDocPropertyTags);
-                case SyntaxKind.JsDocPropertyTag:
-
-                    return VisitNode(cbNode, (node as JsDocPropertyTag)?.TypeExpression) ??
-                           VisitNode(cbNode, (node as JsDocPropertyTag)?.Name);
                 case SyntaxKind.PartiallyEmittedExpression:
 
                     return VisitNode(cbNode, (node as PartiallyEmittedExpression)?.Expression);
-                case SyntaxKind.JsDocLiteralType:
-
-                    return VisitNode(cbNode, (node as JsDocLiteralType)?.Literal);
             }
             return null;
         }
