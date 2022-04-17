@@ -112,10 +112,11 @@ namespace Serenity.CodeGeneration
 
         protected static string GetBaseTypeName(ExternalType type)
         {
-            if (string.IsNullOrEmpty(type.BaseType))
+            var baseType = type.BaseType;
+
+            if (string.IsNullOrEmpty(baseType))
                 return null;
 
-            var baseType = type.BaseType;
             SplitGenericArguments(ref baseType);
             return baseType;
         }

@@ -32,9 +32,9 @@ namespace Serenity.CodeGeneration
             {
                 var key = type.Key;
                 var ssType = type.Value;
-                if (ssType.IsDeclaration &&
+                if (ssType.IsDeclaration == true &&
                     tsTypes.TryGetValue(key, out ExternalType tsType) &&
-                    !tsType.IsDeclaration)
+                    tsType.IsDeclaration != true)
                     continue;
 
                 if (!IsEditorType(ssType) &&
@@ -51,7 +51,7 @@ namespace Serenity.CodeGeneration
                 if (generatedTypes.Contains(tsType.Key))
                     continue;
 
-                if (tsType.Value.IsDeclaration)
+                if (tsType.Value.IsDeclaration == true)
                     continue;
 
                 GenerateType(tsType.Value);
@@ -88,16 +88,26 @@ namespace Serenity.CodeGeneration
             var ns = GetNamespace(type.Namespace);
             string name = type.Name + "Attribute";
 
-            cw.Indented("namespace ");
-            sb.AppendLine(ns);
+            if (!string.IsNullOrEmpty(ns))
+            {
+                cw.Indented("namespace ");
+                sb.AppendLine(ns);
 
-            cw.InBrace(delegate
+                cw.InBrace(delegate
+                {
+                    if (isEditorType)
+                        GenerateEditor(type, name);
+                    else if (isFormatterType)
+                        GenerateFormatter(type, name);
+                });
+            }
+            else
             {
                 if (isEditorType)
                     GenerateEditor(type, name);
                 else if (isFormatterType)
                     GenerateFormatter(type, name);
-            });
+            }
 
             AddFile(RemoveRootNamespace(ns, name) + ".cs");
         }

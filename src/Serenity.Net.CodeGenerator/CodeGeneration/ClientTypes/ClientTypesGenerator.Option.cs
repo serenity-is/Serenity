@@ -104,9 +104,6 @@ namespace Serenity.CodeGeneration
         {
             List<ExternalMember> members = new();
 
-            if (type.Properties != null)
-                members.AddRange(type.Properties);
-
             if (type.Fields != null)
                 members.AddRange(type.Fields);
 
@@ -143,7 +140,7 @@ namespace Serenity.CodeGeneration
         {
             var result = new SortedDictionary<string, ExternalMember>();
 
-            var constructor = type.Methods?.FirstOrDefault(x => x.IsConstructor && 
+            var constructor = type.Methods?.FirstOrDefault(x => x.IsConstructor == true && 
                 x.Arguments?.Count == (isWidget ? 2 : 1));
 
             if (constructor != null)
@@ -161,7 +158,7 @@ namespace Serenity.CodeGeneration
             int loop = 0;
             do
             {
-                if (type.Namespace.StartsWith("System", StringComparison.Ordinal))
+                if (type.Namespace?.StartsWith("System", StringComparison.Ordinal) == true)
                     break;
 
                 AddOptionMembers(result, type, isOptions: false);

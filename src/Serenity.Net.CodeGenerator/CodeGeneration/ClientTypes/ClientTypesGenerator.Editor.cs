@@ -42,7 +42,7 @@ namespace Serenity.CodeGeneration
 
         private bool IsEditorType(ExternalType type)
         {
-            if (type.IsAbstract)
+            if (type.IsAbstract == true)
                 return false;
 
             if (type.GenericParameters?.Count > 0)

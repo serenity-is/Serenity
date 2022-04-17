@@ -31,7 +31,7 @@ namespace Serenity.CodeGeneration
 
         private static bool IsFormatterType(ExternalType type)
         {
-            if (type.IsAbstract)
+            if (type.IsAbstract == true)
                 return false;
 
             if (type.GenericParameters?.Count > 0)
