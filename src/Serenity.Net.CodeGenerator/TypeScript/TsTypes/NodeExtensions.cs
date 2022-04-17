@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Sdcb.TypeScript.TsTypes
+namespace Serenity.TypeScript.TsTypes
 {
     public static class NodeExtensions
     {

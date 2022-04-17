@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Sdcb.TypeScript.TsTypes;
-using static Sdcb.TypeScript.TsParser.Core;
-using CommentKind = Sdcb.TypeScript.TsTypes.SyntaxKind;
+using Serenity.TypeScript.TsTypes;
+using static Serenity.TypeScript.TsParser.Core;
+using CommentKind = Serenity.TypeScript.TsTypes.SyntaxKind;
 
-namespace Sdcb.TypeScript.TsParser
+namespace Serenity.TypeScript.TsParser
 {
     public delegate void ErrorCallback(DiagnosticMessage message, int? length);
 

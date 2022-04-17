@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Sdcb.TypeScript.TsParser
+namespace Serenity.TypeScript.TsParser
 {
     public static class TsExtensions
     {

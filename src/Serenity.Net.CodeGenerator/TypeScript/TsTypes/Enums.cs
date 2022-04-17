@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sdcb.TypeScript.TsTypes
+namespace Serenity.TypeScript.TsTypes
 {
     [Flags]
     public enum NodeFlags

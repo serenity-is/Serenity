@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CommentKind = Sdcb.TypeScript.TsTypes.SyntaxKind;
+using CommentKind = Serenity.TypeScript.TsTypes.SyntaxKind;
 
-namespace Sdcb.TypeScript.TsTypes
+namespace Serenity.TypeScript.TsTypes
 {
     public class Map<T> : List<T>
     {

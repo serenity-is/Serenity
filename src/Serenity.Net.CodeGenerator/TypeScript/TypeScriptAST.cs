@@ -1,8 +1,8 @@
-﻿using Sdcb.TypeScript.TsParser;
-using Sdcb.TypeScript.TsTypes;
+﻿using Serenity.TypeScript.TsParser;
+using Serenity.TypeScript.TsTypes;
 using System.Collections.Generic;
 
-namespace Sdcb.TypeScript
+namespace Serenity.TypeScript
 {
     public interface ITypeScriptAST
     {
@@ -19,15 +19,20 @@ namespace Sdcb.TypeScript
         public string SourceStr { get; set; }
         public Node RootNode { get; set; }
 
-        public TypeScriptAST(string source = null, string fileName = "fileName.ts", bool setChildren = true)
+        public TypeScriptAST(string source = null, string fileName = "fileName.ts", bool setChildren = true, bool optimized = false)
         {
             if (source != null)
             {
-                MakeAST(source, fileName, setChildren);
+                MakeAST(source, fileName, setChildren, optimized);
             }
         }
 
         public void MakeAST(string source, string fileName = "fileName.ts", bool setChildren = true)
+        {
+            MakeAST(source, fileName, setChildren, false);
+        }
+
+        public void MakeAST(string source, string fileName = "fileName.ts", bool setChildren = true, bool optimized = false)
         {
             SourceStr = source;
             var parser = new Parser();
@@ -37,7 +42,10 @@ namespace Sdcb.TypeScript
             if (setChildren)
             {
                 childrenMade = true;
-                RootNode.MakeChildren(this);
+                if (optimized)
+                    RootNode.MakeChildrenOptimized(this);
+                else
+                    RootNode.MakeChildren(this);
             }
             //RootNode.GetDescendants().ToList().ForEach((n) => n.AST = this);
         }

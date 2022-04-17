@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Sdcb.TypeScript.TsTypes;
-using static Sdcb.TypeScript.TsParser.Factory;
-using static Sdcb.TypeScript.TsParser.Scanner;
-using static Sdcb.TypeScript.TsParser.Ts;
+using Serenity.TypeScript.TsTypes;
+using static Serenity.TypeScript.TsParser.Factory;
+using static Serenity.TypeScript.TsParser.Scanner;
+using static Serenity.TypeScript.TsParser.Ts;
 
-namespace Sdcb.TypeScript.TsParser
+namespace Serenity.TypeScript.TsParser
 {
     public class Utilities
     {

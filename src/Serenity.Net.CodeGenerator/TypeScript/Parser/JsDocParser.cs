@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sdcb.TypeScript.TsTypes;
-using static Sdcb.TypeScript.TsParser.Scanner;
+using Serenity.TypeScript.TsTypes;
+using static Serenity.TypeScript.TsParser.Scanner;
 
-namespace Sdcb.TypeScript.TsParser
+namespace Serenity.TypeScript.TsParser
 {
     public class JsDocParser
     {

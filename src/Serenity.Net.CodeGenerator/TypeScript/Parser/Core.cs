@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Sdcb.TypeScript.TsTypes;
+using Serenity.TypeScript.TsTypes;
 
-namespace Sdcb.TypeScript.TsParser
+namespace Serenity.TypeScript.TsParser
 {
     public static class Core
     {

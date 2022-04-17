@@ -1,6 +1,5 @@
-﻿using Sdcb.TypeScript;
-using Sdcb.TypeScript.TsParser;
-using Sdcb.TypeScript.TsTypes;
+﻿using Serenity.TypeScript;
+using Serenity.TypeScript.TsTypes;
 using Serenity.CodeGeneration;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ namespace Serenity.CodeGenerator
 
         public void AddInputFile(string path, string content)
         {
-            files.Add(new TypeScriptAST(content, path));
+            files.Add(new TypeScriptAST(content, path, optimized: true));
         }
 
         static bool HasExportModifier(INode node)
@@ -35,6 +34,34 @@ namespace Serenity.CodeGenerator
 
             while ((node = node.Parent) != null)
                 yield return node;
+        }
+
+        static IEnumerable<INode> EnumerateTypesAndModules(IEnumerable<INode> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                if (node.Kind == SyntaxKind.ModuleDeclaration)
+                {
+                    yield return node;
+
+                    var md = (node as ModuleDeclaration);
+                    while (md.Body is ModuleDeclaration smd)
+                    {
+                        yield return smd;
+                        md = smd;
+                    }
+
+                    if (md.Body is Block b)
+                    {
+                        if (b.Statements != null)
+                            foreach (var x in EnumerateTypesAndModules(b.Statements))
+                                yield return x;
+                    }
+                }
+                else if (node.Kind == SyntaxKind.ClassDeclaration ||
+                    node.Kind == SyntaxKind.InterfaceDeclaration)
+                    yield return node;
+            }
         }
 
         static string GetNamespace(INode node)
@@ -68,13 +95,9 @@ namespace Serenity.CodeGenerator
                 return null;
 
             var noGeneric = text;
-            string genericSuffix = null;
             var lt = noGeneric.IndexOf('<');
             if (lt >= 0 && noGeneric[^1] == '>')
-            {
                 noGeneric = noGeneric[..lt];
-                genericSuffix = text[lt..];
-            }
 
             var dotIndex = noGeneric.IndexOf('.', StringComparison.Ordinal);
             var beforeDot = dotIndex >= 0 ? noGeneric[..dotIndex] : null;
@@ -85,12 +108,11 @@ namespace Serenity.CodeGenerator
                 if (parent.Kind == SyntaxKind.ModuleDeclaration ||
                     parent.Kind == SyntaxKind.SourceFile)
                 {
-                    List<Node> children;
+                    IEnumerable<INode> children;
                     if (parent is ModuleDeclaration md)
-                        children = md.Body?.Children;
-
+                        children = (md.Body as ModuleBlock)?.Statements;
                     else
-                        children = parent.Children;
+                        children = ((SourceFile)parent).Statements;
 
                     if (children == null)
                         continue;
@@ -103,7 +125,7 @@ namespace Serenity.CodeGenerator
                                  (child as ClassDeclaration).Name.GetText() == noGeneric) ||
                                 (child.Kind == SyntaxKind.InterfaceDeclaration &&
                                  (child as InterfaceDeclaration).Name.GetText() == noGeneric))
-                                return PrependNamespace(noGeneric, child) + genericSuffix;
+                                return PrependNamespace(noGeneric, child);
                         }
                     }
                     else
@@ -117,7 +139,7 @@ namespace Serenity.CodeGenerator
                                     var fullName = (child as ImportEqualsDeclaration).ModuleReference.GetText() +
                                         afterDot;
                                     if (exportedTypeNames.Contains(fullName))
-                                        return fullName + genericSuffix;
+                                        return fullName;
                                 }
                             }
                         }
@@ -130,7 +152,7 @@ namespace Serenity.CodeGenerator
             {
                 var s = ns + "." + noGeneric;
                 if (exportedTypeNames.Contains(s))
-                    return s + genericSuffix;
+                    return s;
 
                 var idx = ns.LastIndexOf('.');
                 if (idx >= 0)
@@ -139,7 +161,7 @@ namespace Serenity.CodeGenerator
                     break;
             }
 
-            return text;
+            return noGeneric;
         }
 
         string GetBaseType(ClassDeclaration node)
@@ -474,7 +496,11 @@ namespace Serenity.CodeGenerator
             var result = new List<ExternalMember>();
             var used = new HashSet<string>();
 
-            foreach (var member in node.Body.Children) 
+            var statements = (node.Body as Block)?.Statements;
+            if (statements is null)
+                return result;
+
+            foreach (var member in statements) 
             {
                 if (member.Kind != SyntaxKind.MethodDeclaration &&
                     member.Kind != SyntaxKind.PropertyDeclaration)
@@ -551,11 +577,11 @@ namespace Serenity.CodeGenerator
         {
             var result = new List<ExternalType>();
 
-            INode visitNode(INode node)
-            {
-                if (node == null)
-                    return null;
+            if (sourceFile.Statements == null)
+                return result;
 
+            foreach (var node in EnumerateTypesAndModules(sourceFile.Statements))
+            {
                 switch (node.Kind)
                 {
                     case SyntaxKind.ClassDeclaration:
@@ -565,8 +591,7 @@ namespace Serenity.CodeGenerator
                             var exportedType = ClassToExternalType(klass);
                             result.Add(exportedType);
                         }
-
-                        return null;
+                        break;
 
                     case SyntaxKind.InterfaceDeclaration:
                         var intf = node as InterfaceDeclaration;
@@ -576,7 +601,7 @@ namespace Serenity.CodeGenerator
                             var exportedType = InterfaceToExternalType(intf);
                             result.Add(exportedType);
                         }
-                        return null;    
+                        break;
 
                     case SyntaxKind.ModuleDeclaration:
                         var modul = node as ModuleDeclaration;
@@ -589,22 +614,18 @@ namespace Serenity.CodeGenerator
                         }
                         break;
                 }
-
-                return Ts.ForEachChild(node, child => visitNode(child));
             }
-
-            visitNode(sourceFile);
 
             return result;
         }
 
         private static void ExtractExportedTypeNames(SourceFile sourceFile, HashSet<string> target)
         {
-            INode visitNode(INode node)
-            {
-                if (node == null)
-                    return null;
+            if (sourceFile?.Statements == null)
+                return;
 
+            foreach (var node in EnumerateTypesAndModules(sourceFile.Statements))
+            {
                 switch (node.Kind)
                 {
                     case SyntaxKind.ClassDeclaration:
@@ -613,8 +634,7 @@ namespace Serenity.CodeGenerator
                             var klass = node as ClassDeclaration;
                             target.Add(PrependNamespace(klass.Name.GetText(), klass));
                         }
-
-                        return null;
+                        break;
 
                     case SyntaxKind.InterfaceDeclaration:
                         if (sourceFile.IsDeclarationFile || HasExportModifier(node))
@@ -622,16 +642,9 @@ namespace Serenity.CodeGenerator
                             var intf = node as InterfaceDeclaration;
                             target.Add(PrependNamespace(intf.Name.GetText(), intf));
                         }
-                        return null;
-
-                    case SyntaxKind.ModuleDeclaration:
                         break;
                 }
-
-                return Ts.ForEachChild(node, child => visitNode(child));
             }
-
-            visitNode(sourceFile);
         }
 
         public List<ExternalType> ExtractTypes()

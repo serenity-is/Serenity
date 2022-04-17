@@ -1,6 +1,6 @@
-﻿using Sdcb.TypeScript.TsTypes;
+﻿using Serenity.TypeScript.TsTypes;
 
-namespace Sdcb.TypeScript.TsParser
+namespace Serenity.TypeScript.TsParser
 {
     internal class Diagnostics
     {

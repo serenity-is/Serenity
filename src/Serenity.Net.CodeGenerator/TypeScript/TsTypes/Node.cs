@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Sdcb.TypeScript.TsParser;
+using Serenity.TypeScript.TsParser;
 
-namespace Sdcb.TypeScript.TsTypes
+namespace Serenity.TypeScript.TsTypes
 {
     public class Node : TextRange, INode
     {
-        public List<Node> Children { get; set; } = new List<Node>();
+        public List<Node> Children { get; set; }
         public ITypeScriptAST Ast { get; set; }
 
         public string SourceStr
@@ -62,6 +62,24 @@ namespace Sdcb.TypeScript.TsTypes
                 if (n.Pos != null) n.NodeStart = Scanner.SkipTriviaM(SourceStr, (int)n.Pos);
                 Children.Add(n);
                 n.MakeChildren(ast);
+                return null;
+            });
+        }
+
+        public void MakeChildrenOptimized(TypeScriptAST ast)
+        {
+            Ts.ForEachChildOptimized(this, node =>
+            {
+                if (node == null)
+                    return null;
+
+                var n = (Node)node;
+                n.Ast = ast;
+                n.Depth = Depth + 1;
+                n.Parent = this;
+                if (n.Pos != null) 
+                    n.NodeStart = Scanner.SkipTriviaM(SourceStr, (int)n.Pos);
+                n.MakeChildrenOptimized(ast);
                 return null;
             });
         }

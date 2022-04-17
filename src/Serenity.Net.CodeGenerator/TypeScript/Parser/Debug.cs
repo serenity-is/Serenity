@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sdcb.TypeScript.TsParser
+namespace Serenity.TypeScript.TsParser
 {
     internal class Debug
     {

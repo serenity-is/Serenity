@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Sdcb.TypeScript.TsTypes;
+using Serenity.TypeScript.TsTypes;
 
-namespace Sdcb.TypeScript.Change
+namespace Serenity.TypeScript.Change
 {
     public class ChangeAST
     {

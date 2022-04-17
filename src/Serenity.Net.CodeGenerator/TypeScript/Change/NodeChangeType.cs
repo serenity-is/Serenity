@@ -1,4 +1,4 @@
-﻿namespace Sdcb.TypeScript.Change
+﻿namespace Serenity.TypeScript.Change
 {
     public enum NodeChangeType
     {

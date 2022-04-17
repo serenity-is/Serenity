@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sdcb.TypeScript.TsTypes;
-using static Sdcb.TypeScript.TsParser.Core;
-using static Sdcb.TypeScript.TsParser.Scanner;
-using static Sdcb.TypeScript.TsParser.Ts;
-using static Sdcb.TypeScript.TsParser.Utilities;
+using Serenity.TypeScript.TsTypes;
+using static Serenity.TypeScript.TsParser.Core;
+using static Serenity.TypeScript.TsParser.Scanner;
+using static Serenity.TypeScript.TsParser.Ts;
+using static Serenity.TypeScript.TsParser.Utilities;
 
-namespace Sdcb.TypeScript.TsParser
+namespace Serenity.TypeScript.TsParser
 {
     public class Parser
     {

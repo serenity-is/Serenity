@@ -203,29 +203,32 @@ namespace Serenity.CodeGenerator
                 files = files.OrderBy(x => x);
             }
 
-            var tsServices = GetEmbeddedScript("Serenity.CodeGenerator.Resource.typescriptServices.js");
-            var codeGeneration = GetEmbeddedScript("Serenity.CodeGenerator.Resource.Serenity.CodeGeneration.js");
+            //var tsServices = GetEmbeddedScript("Serenity.CodeGenerator.Resource.typescriptServices.js");
+            //var codeGeneration = GetEmbeddedScript("Serenity.CodeGenerator.Resource.Serenity.CodeGeneration.js");
 
-            StringBuilder sb = new();
-            sb.AppendLine("var fs = require('fs');");
-            sb.AppendLine(tsServices);
-            sb.AppendLine(codeGeneration);
+            //StringBuilder sb = new();
+            //sb.AppendLine("var fs = require('fs');");
+            //sb.AppendLine(tsServices);
+            //sb.AppendLine(codeGeneration);
 
             var typeListerAST = new TSTypeListerAST();
 
             foreach (var file in files)
             {
-                sb.Append("Serenity.CodeGeneration.addSourceFile(");
+                //sb.Append("Serenity.CodeGeneration.addSourceFile(");
                 var path = file.Replace('\\', '/');
-                JsonEncode(sb, path);
-                sb.Append(", ");
+                //JsonEncode(sb, path);
+                //sb.Append(", ");
                 var text = File.ReadAllText(file);
-                JsonEncode(sb, text);
-                sb.AppendLine(");");
+                //JsonEncode(sb, text);
+                //sb.AppendLine(");");
 
                 typeListerAST.AddInputFile(path, text);
             }
 
+            return typeListerAST.ExtractTypes();
+
+            /*
             sb.AppendLine(@"var types = JSON.stringify(Serenity.CodeGeneration.parseTypes(), function(key, value) {
                     if (value == null ||
                         value === false ||
@@ -311,7 +314,7 @@ namespace Serenity.CodeGenerator
             finally
             {
                 Directory.Delete(tempDirectory, true);
-            }
+            }*/
         }
     }
 }

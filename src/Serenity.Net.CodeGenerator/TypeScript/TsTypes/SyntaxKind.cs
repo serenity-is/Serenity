@@ -1,4 +1,4 @@
-namespace Sdcb.TypeScript.TsTypes
+namespace Serenity.TypeScript.TsTypes
 {
     public enum SyntaxKind
     {
