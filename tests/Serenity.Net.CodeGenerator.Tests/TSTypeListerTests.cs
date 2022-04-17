@@ -58,5 +58,47 @@ declare namespace Serenity.Extensions {
             var excelImportRequest = Assert.Single(types, x => x.FullName == "Serenity.Extensions.ExcelImportRequest");
             var excelImportResponse = Assert.Single(types, x => x.FullName == "Serenity.Extensions.ExcelImportResponse");
         }
+
+        [Fact]
+        public void BodySkipTest()
+        {
+            var tl = new TSTypeListerAST();
+            tl.AddInputFile("a.ts", @"namespace A {
+
+    @Serenity.Decorators.registerEditor()
+    export class B extends C {
+
+        public getSelect2Options() {
+            var selec2Options = super.getSelect2Options();
+
+            var oldFormatResult = selec2Options.formatResult;
+            var oldFormatSelection = selec2Options.formatSelection;
+
+            var isDeletedFormat = (item: Serenity.Select2Item, html: string): string => {
+                if (item?.source.IsActive == -1)
+                    return `<div class='deleted-record'>${html}</div>`;
+                return html;
+            };
+
+            selec2Options.formatResult = (item: Serenity.Select2Item, p2, p3, p4) => {
+                var formatted = oldFormatResult ? oldFormatResult(item, p2, p3, p4) : item.text;
+                return isDeletedFormat(item, formatted);
+            };
+
+            selec2Options.formatSelection = (item: Serenity.Select2Item, p2, p3) => {
+                var formatted = oldFormatSelection ? oldFormatSelection(item, p2, p3) : item?.text;
+                return isDeletedFormat(item, formatted);
+            };
+
+            return selec2Options;
+        }
+    }
+}");
+
+            var types = tl.ExtractTypes();
+            var b = Assert.Single(types, x => x.FullName == "A.B");
+            Assert.Single(b.Methods, x => x.Name == "getSelect2Options");
+        }
+
     }
 }

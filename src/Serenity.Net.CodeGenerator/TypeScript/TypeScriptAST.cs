@@ -36,6 +36,7 @@ namespace Serenity.TypeScript
         {
             SourceStr = source;
             var parser = new Parser();
+            parser.Optimized = optimized;
             var sourceFile = parser.ParseSourceFile(fileName, source, ScriptTarget, null, false, ScriptKind.Ts);
             RootNode = sourceFile;
             RootNode.Ast = this;

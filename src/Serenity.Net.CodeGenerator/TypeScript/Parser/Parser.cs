@@ -39,6 +39,8 @@ namespace Serenity.TypeScript.TsParser
         //    return JSDocParser.parseJSDocTypeExpressionForTests(content, start, length);
         //}
 
+        public bool Optimized { get; set; }
+
 
         public SourceFile ParseSourceFile(string fileName, string sourceText, ScriptTarget languageVersion, /*IncrementalParser.SyntaxCursor*/object syntaxCursor, bool setParentNodes, ScriptKind scriptKind)
         {
@@ -5081,8 +5083,11 @@ namespace Serenity.TypeScript.TsParser
         }
 
 
+        private static readonly Block EmptyBlock = new();
+
         public Block ParseFunctionBlock(bool allowYield, bool allowAwait, bool ignoreMissingOpenBrace, DiagnosticMessage diagnosticMessage = null)
         {
+
             var savedYieldContext = InYieldContext();
 
             SetYieldContext(allowYield);
@@ -5095,7 +5100,53 @@ namespace Serenity.TypeScript.TsParser
 
                 SetDecoratorContext(/*val*/ false);
             }
-            var block = ParseBlock(ignoreMissingOpenBrace, diagnosticMessage);
+
+            Block block = null;
+            if (Optimized && Token() == SyntaxKind.OpenBraceToken)
+            {
+                var node = new Block() { Pos = Scanner.GetStartPos(), Statements = new NodeArray<IStatement>() };
+
+                SyntaxKind token;
+                int openBraces = 1;
+                do
+                {
+                    token = NextToken();
+
+                    if (token == SyntaxKind.NoSubstitutionTemplateLiteral || 
+                        token == SyntaxKind.TemplateHead)
+                    {
+                        if (token == SyntaxKind.NoSubstitutionTemplateLiteral)
+                            ParseLiteralNode();
+                        else
+                            ParseTemplateExpression();
+
+                        continue;
+                    }
+
+                    if (token == SyntaxKind.OpenBraceToken)
+                        openBraces++;
+                    else if (token == SyntaxKind.CloseBraceToken)
+                    {
+                        openBraces--;
+                        if (openBraces == 0)
+                        {
+                            ParseExpected(SyntaxKind.CloseBraceToken);
+                            block = FinishNode(node);
+                            break;
+                        }
+                    }
+                }
+                while (token != SyntaxKind.EndOfFileToken);
+
+                if (block == null)
+                {
+                    ParseExpected(SyntaxKind.CloseBraceToken);
+                    block = FinishNode(node);
+                }
+            }
+            else
+                block = ParseBlock(ignoreMissingOpenBrace, diagnosticMessage);
+
             if (saveDecoratorContext)
             {
 
