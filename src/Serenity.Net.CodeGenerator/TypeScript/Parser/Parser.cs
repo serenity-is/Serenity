@@ -190,9 +190,11 @@ namespace Serenity.TypeScript.TsParser
             return SourceFile;
         }
 
-
         public T AddJsDocComment<T>(T node) where T : INode
         {
+            if (Optimized)
+                return node;
+
             var comments = GetJsDocCommentRanges(node, SourceFile.Text);
             if (comments.Any())
             {
@@ -213,7 +215,6 @@ namespace Serenity.TypeScript.TsParser
                     node.JsDoc.Add(jsDoc);
                 }
             }
-
 
             return node;
         }
@@ -1995,8 +1996,8 @@ namespace Serenity.TypeScript.TsParser
 
             FinishNode(node);
             if ((SyntaxKind)node.Kind == SyntaxKind.NumericLiteral
-                            && SourceText.charCodeAt(tokenPos) == (int)CharacterCodes._0
-                            && IsOctalDigit(SourceText.charCodeAt(tokenPos + 1)))
+                            && SourceText.CharCodeAt(tokenPos) == (int)CharacterCodes._0
+                            && IsOctalDigit(SourceText.CharCodeAt(tokenPos + 1)))
             {
 
 

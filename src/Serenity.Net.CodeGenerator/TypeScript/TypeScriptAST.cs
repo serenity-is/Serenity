@@ -9,7 +9,6 @@ namespace Serenity.TypeScript
         ScriptTarget ScriptTarget { get; set; }
         string SourceStr { get; set; }
         Node RootNode { get; set; }
-        string GetTreeString(bool withPos);
         IEnumerable<Node> GetDescendants();
         void MakeAST(string source, string fileName = "fileName.ts", bool setChildren = true);
     }
@@ -61,11 +60,6 @@ namespace Serenity.TypeScript
                 childrenMade = true;
             }
             return RootNode?.GetDescendants();
-        }
-
-        public string GetTreeString(bool withPos = true)
-        {
-            return RootNode?.GetTreeString(withPos);
         }
     }
 }

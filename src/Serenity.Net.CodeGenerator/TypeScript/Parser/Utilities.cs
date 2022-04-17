@@ -54,14 +54,14 @@ namespace Serenity.TypeScript.TsParser
                 return "";
 
 
-            return sourceText.substring(SkipTriviaM(sourceText, node.Pos ?? 0), node.End);
+            return sourceText.Substring(SkipTriviaM(sourceText, node.Pos ?? 0), node.End);
         }
 
 
         public static string EscapeIdentifier(string identifier)
         {
-            return identifier.Length >= 2 && identifier.charCodeAt(0) == (int) CharacterCodes._ &&
-                   identifier.charCodeAt(1) == (int) CharacterCodes._
+            return identifier.Length >= 2 && identifier.CharCodeAt(0) == (int) CharacterCodes._ &&
+                   identifier.CharCodeAt(1) == (int) CharacterCodes._
                 ? "_" + identifier
                 : identifier;
         }
@@ -83,9 +83,9 @@ namespace Serenity.TypeScript.TsParser
                 : GetLeadingCommentRangesOfNodeFromText(node, text);
             if (commentRanges == null) commentRanges = new List<CommentRange>();
             return commentRanges.Where(comment =>
-                    text.charCodeAt((comment.Pos ?? 0) + 1) == (int) CharacterCodes.Asterisk &&
-                    text.charCodeAt((comment.Pos ?? 0) + 2) == (int) CharacterCodes.Asterisk &&
-                    text.charCodeAt((comment.Pos ?? 0) + 3) != (int) CharacterCodes.Slash)
+                    text.CharCodeAt((comment.Pos ?? 0) + 1) == (int) CharacterCodes.Asterisk &&
+                    text.CharCodeAt((comment.Pos ?? 0) + 2) == (int) CharacterCodes.Asterisk &&
+                    text.CharCodeAt((comment.Pos ?? 0) + 3) != (int) CharacterCodes.Slash)
                 .ToList();
         }
 
@@ -147,12 +147,10 @@ namespace Serenity.TypeScript.TsParser
             return GetModifierFlags(node) != ModifierFlags.None;
         }
 
-
         public static bool HasModifier(INode node, ModifierFlags flags)
         {
             return (GetModifierFlags(node) & flags) != 0;
         }
-
 
         public static ModifierFlags GetModifierFlags(INode node)
         {

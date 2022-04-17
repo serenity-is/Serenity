@@ -100,9 +100,9 @@ namespace Serenity.TypeScript.TsParser
         }
         public static int GetRootLength(string path)
         {
-            if (path.charCodeAt(0) == (int)CharacterCodes.Slash)
+            if (path.CharCodeAt(0) == (int)CharacterCodes.Slash)
             {
-                if (path.charCodeAt(1) != (int)CharacterCodes.Slash)
+                if (path.CharCodeAt(1) != (int)CharacterCodes.Slash)
                 {
                     return 1;
                 }
@@ -118,9 +118,9 @@ namespace Serenity.TypeScript.TsParser
                 }
                 return p2 + 1;
             }
-            if (path.charCodeAt(1) == (int)CharacterCodes.Colon)
+            if (path.CharCodeAt(1) == (int)CharacterCodes.Colon)
             {
-                if (path.charCodeAt(2) == (int)CharacterCodes.Slash)
+                if (path.CharCodeAt(2) == (int)CharacterCodes.Slash)
                 {
                     return 3;
                 }
@@ -149,7 +149,7 @@ namespace Serenity.TypeScript.TsParser
                 {
                     if (part == ".." && normalized.Count > 0 && LastOrUndefined(normalized) != "..")
                     {
-                        normalized.pop();
+                        normalized.Pop();
                     }
                     else
                     {
@@ -172,7 +172,7 @@ namespace Serenity.TypeScript.TsParser
         }
         public static bool PathEndsWithDirectorySeparator(string path)
         {
-            return path.charCodeAt(path.Length - 1) == DirectorySeparatorCharCode;
+            return path.CharCodeAt(path.Length - 1) == DirectorySeparatorCharCode;
         }
         public static bool FileExtensionIs(string path, string extension)
         {

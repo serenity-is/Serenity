@@ -396,7 +396,7 @@ namespace Serenity.CodeGenerator
                     member.Kind != SyntaxKind.MethodSignature)
                     continue;
 
-                var name = member.Name.GetText();
+                var name = ((Identifier)member.Name).Text;
                 if (!used.Add(name))
                     continue;
 
@@ -423,7 +423,7 @@ namespace Serenity.CodeGenerator
                     {
                         (externalMember as ExternalMethod).Arguments.Add(new()
                         {
-                            Name = arg.Name.GetText(),
+                            Name = ((Identifier)arg.Name).Text,
                             Type = GetTypeReferenceExpression(arg.Type)
                         });
                     }

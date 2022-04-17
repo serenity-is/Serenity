@@ -758,7 +758,7 @@ namespace Serenity.TypeScript.TsParser
                 while (comments2.Any() && (comments2[comments2.Count() - 1] == "\n" || comments2[comments2.Count() - 1] == "\r"))
                 {
 
-                    comments2.pop();
+                    comments2.Pop();
                 }
             }
 
@@ -766,10 +766,10 @@ namespace Serenity.TypeScript.TsParser
             bool IsJsDocStart(string content2, int start2)
             {
 
-                return content2.charCodeAt(start2) == (int)CharacterCodes.Slash &&
-                    content2.charCodeAt(start2 + 1) == (int)CharacterCodes.Asterisk &&
-                    content2.charCodeAt(start2 + 2) == (int)CharacterCodes.Asterisk &&
-                    content2.charCodeAt(start2 + 3) != (int)CharacterCodes.Asterisk;
+                return content2.CharCodeAt(start2) == (int)CharacterCodes.Slash &&
+                    content2.CharCodeAt(start2 + 1) == (int)CharacterCodes.Asterisk &&
+                    content2.CharCodeAt(start2 + 2) == (int)CharacterCodes.Asterisk &&
+                    content2.CharCodeAt(start2 + 3) != (int)CharacterCodes.Asterisk;
             }
 
 
@@ -1471,7 +1471,7 @@ namespace Serenity.TypeScript.TsParser
                 }
                 var pos = Scanner.GetTokenPos();
                 var end2 = Scanner.GetTextPos();
-                var result9 = new Identifier {Text = content.substring(pos, end2)};
+                var result9 = new Identifier { Text = TsExtensions.Substring(content, pos, end2) };
 
 
                 FinishNode(result9, end2);
