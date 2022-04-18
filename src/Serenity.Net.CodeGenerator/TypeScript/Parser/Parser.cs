@@ -12,7 +12,7 @@ namespace Serenity.TypeScript.TsParser
     public class Parser
     {
 
-        public Scanner Scanner = new Scanner(/*skipTrivia*/ true, LanguageVariant.Standard, null, null);
+        public Scanner Scanner = new Scanner(LanguageVariant.Standard, null, null);
         public NodeFlags DisallowInAndDecoratorContext = NodeFlags.DisallowInContext | NodeFlags.DecoratorContext;
 
         public NodeFlags ContextFlags;

@@ -25,12 +25,10 @@ namespace Serenity.TypeScript.TsParser
         private int _tokenPos;
 
         private SyntaxKind _token;
-        private int TokenInt => (int)_token;
         private string _tokenValue;
         private bool _precedingLineBreak;
         private bool _hasExtendedUnicodeEscape;
         private bool _tokenIsUnterminated;
-        private bool _skipTrivia;
         public event ErrorCallback OnError;
         private LanguageVariant _languageVariant;
 
@@ -46,10 +44,9 @@ namespace Serenity.TypeScript.TsParser
         public bool IsReservedWord() => _token >= SyntaxKind.FirstReservedWord && _token <= SyntaxKind.LastReservedWord;
         public bool IsUnterminated() => _tokenIsUnterminated;
 
-        public Scanner(bool skipTrivia, LanguageVariant languageVariant, string text, ErrorCallback onError = null, int start = 0, int? length = null)
+        public Scanner(LanguageVariant languageVariant, string text, ErrorCallback onError = null, int start = 0, int? length = null)
         {
-            this._languageVariant = languageVariant;
-            this._skipTrivia = skipTrivia;
+            _languageVariant = languageVariant;
             _pos = 0;
             _end = 0;
             _startPos = start;
@@ -1200,57 +1197,21 @@ namespace Serenity.TypeScript.TsParser
                 if (ch == '#' && _pos == 0 && IsShebangTrivia(_text, _pos))
                 {
                     _pos = ScanShebangTrivia(_text, _pos);
-                    if (_skipTrivia)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        _token = SyntaxKind.ShebangTrivia;
-                        return _token;
-                    }
+                    continue;
                 }
                 switch (ch)
                 {
                     case '\n':
                     case '\r':
                         _precedingLineBreak = true;
-                        if (_skipTrivia)
-                        {
-                            _pos++;
-                            continue;
-                        }
-                        else
-                        {
-                            if (ch == '\r' && _pos + 1 < _end && _text[_pos + 1] == '\n')
-                            {
-                                _pos += 2;
-                            }
-                            else
-                            {
-                                _pos++;
-                            }
-                            _token = SyntaxKind.NewLineTrivia;
-                            return _token;
-                        }
+                        _pos++;
+                        continue;
                     case '\t':
                     case '\v':
                     case '\f':
                     case ' ':
-                        if (_skipTrivia)
-                        {
-                            _pos++;
-                            continue;
-                        }
-                        else
-                        {
-                            while (_pos < _end && IsWhiteSpaceSingleLine(_text[_pos]))
-                            {
-                                _pos++;
-                            }
-                            _token = SyntaxKind.WhitespaceTrivia;
-                            return _token;
-                        }
+                        _pos++;
+                        continue;
                     case '!':
                         if (_text[_pos + 1] == '=')
                         {
@@ -1395,15 +1356,7 @@ namespace Serenity.TypeScript.TsParser
                                 }
                                 _pos++;
                             }
-                            if (_skipTrivia)
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                _token = SyntaxKind.SingleLineCommentTrivia;
-                                return _token;
-                            }
+                            continue;
                         }
 
                         if (_text[_pos + 1] == '*')
@@ -1429,16 +1382,7 @@ namespace Serenity.TypeScript.TsParser
                             {
                                 Error(Diagnostics.Asterisk_Slash_expected);
                             }
-                            if (_skipTrivia)
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                _tokenIsUnterminated = !commentClosed;
-                                _token = SyntaxKind.MultiLineCommentTrivia;
-                                return _token;
-                            }
+                            continue;
                         }
                         if (_text[_pos + 1] == '=')
                         {
@@ -1522,15 +1466,7 @@ namespace Serenity.TypeScript.TsParser
                         if (IsConflictMarkerTrivia(_text, _pos))
                         {
                             _pos = ScanConflictMarkerTrivia(_text, _pos, Error);
-                            if (_skipTrivia)
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                _token = SyntaxKind.ConflictMarkerTrivia;
-                                return _token;
-                            }
+                            continue;
                         }
                         if (_text[_pos + 1] == '<')
                         {
@@ -1565,15 +1501,7 @@ namespace Serenity.TypeScript.TsParser
                         if (IsConflictMarkerTrivia(_text, _pos))
                         {
                             _pos = ScanConflictMarkerTrivia(_text, _pos, Error);
-                            if (_skipTrivia)
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                _token = SyntaxKind.ConflictMarkerTrivia;
-                                return _token;
-                            }
+                            continue;
                         }
                         if (_text[_pos + 1] == '=')
                         {
@@ -1600,15 +1528,7 @@ namespace Serenity.TypeScript.TsParser
                         if (IsConflictMarkerTrivia(_text, _pos))
                         {
                             _pos = ScanConflictMarkerTrivia(_text, _pos, Error);
-                            if (_skipTrivia)
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                _token = SyntaxKind.ConflictMarkerTrivia;
-                                return _token;
-                            }
+                            continue;
                         }
                         _pos++;
                         _token = SyntaxKind.GreaterThanToken;
