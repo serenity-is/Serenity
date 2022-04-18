@@ -686,7 +686,7 @@ namespace Serenity.TypeScript.TsParser
                            if (margin != null && (indent ?? 0) + whitespace.Length > margin)
                            {
 
-                               comments.Add(whitespace.slice((int)margin - (indent ?? 0) - 1));
+                               comments.Add(whitespace.Slice((int)margin - (indent ?? 0) - 1));
                            }
 
                            indent += whitespace.Length;
@@ -766,10 +766,10 @@ namespace Serenity.TypeScript.TsParser
             bool IsJsDocStart(string content2, int start2)
             {
 
-                return content2.CharCodeAt(start2) == (int)CharacterCodes.Slash &&
-                    content2.CharCodeAt(start2 + 1) == (int)CharacterCodes.Asterisk &&
-                    content2.CharCodeAt(start2 + 2) == (int)CharacterCodes.Asterisk &&
-                    content2.CharCodeAt(start2 + 3) != (int)CharacterCodes.Asterisk;
+                return content2[start2] == '/' &&
+                    content2[start2 + 1] == '*' &&
+                    content2[start2 + 2] == '*' &&
+                    content2[start2 + 3] != '*';
             }
 
 
@@ -907,7 +907,7 @@ namespace Serenity.TypeScript.TsParser
                                 if (margin != null && indent + whitespace.Length > margin)
                                 {
 
-                                    comments2.Add(whitespace.slice((int)margin - indent - 1));
+                                    comments2.Add(whitespace.Slice((int)margin - indent - 1));
                                 }
 
                                 indent += whitespace.Length;

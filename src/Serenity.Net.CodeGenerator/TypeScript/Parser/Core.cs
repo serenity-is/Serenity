@@ -100,9 +100,9 @@ namespace Serenity.TypeScript.TsParser
 
         public static int GetRootLength(string path)
         {
-            if (path.CharCodeAt(0) == (int)CharacterCodes.Slash)
+            if (path[0] == '/')
             {
-                if (path.CharCodeAt(1) != (int)CharacterCodes.Slash)
+                if (path[1] != '/')
                 {
                     return 1;
                 }
@@ -118,9 +118,9 @@ namespace Serenity.TypeScript.TsParser
                 }
                 return p2 + 1;
             }
-            if (path.CharCodeAt(1) == (int)CharacterCodes.Colon)
+            if (path[1] == ':')
             {
-                if (path.CharCodeAt(2) == (int)CharacterCodes.Slash)
+                if (path[2] == '/')
                 {
                     return 3;
                 }
@@ -138,7 +138,7 @@ namespace Serenity.TypeScript.TsParser
             return 0;
         }
         public static char DirectorySeparator = '/';
-        public static int DirectorySeparatorCharCode = (int)CharacterCodes.Slash;
+        public static int DirectorySeparatorCharCode = '/';
         public static List<string> GetNormalizedParts(string normalizedSlashedPath, int rootLength)
         {
             var parts = normalizedSlashedPath.Substring(rootLength).Split(DirectorySeparator);
@@ -172,7 +172,7 @@ namespace Serenity.TypeScript.TsParser
         }
         public static bool PathEndsWithDirectorySeparator(string path)
         {
-            return path.CharCodeAt(path.Length - 1) == DirectorySeparatorCharCode;
+            return path[path.Length - 1] == DirectorySeparatorCharCode;
         }
         public static bool FileExtensionIs(string path, string extension)
         {

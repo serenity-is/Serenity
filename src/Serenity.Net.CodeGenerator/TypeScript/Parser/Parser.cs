@@ -1996,8 +1996,8 @@ namespace Serenity.TypeScript.TsParser
 
             FinishNode(node);
             if ((SyntaxKind)node.Kind == SyntaxKind.NumericLiteral
-                            && SourceText.CharCodeAt(tokenPos) == (int)CharacterCodes._0
-                            && IsOctalDigit(SourceText.CharCodeAt(tokenPos + 1)))
+                            && SourceText[tokenPos] == '0'
+                            && IsOctalDigit(SourceText[tokenPos + 1]))
             {
 
 

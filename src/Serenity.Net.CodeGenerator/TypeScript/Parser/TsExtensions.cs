@@ -8,7 +8,6 @@ namespace Serenity.TypeScript.TsParser
 {
     public static class TsExtensions
     {
-        public static int CharCodeAt(this string str, int pos) => str[pos];
         public static string Substring(this string str, int start, int? end = null)
         {
             return end == null ? str[start..] : str[start..(int)end];
@@ -16,20 +15,8 @@ namespace Serenity.TypeScript.TsParser
         public static string[] Exec(this Regex r, string text) => r.Match(text).Captures.Cast<string>().ToArray();
         public static bool Test(this Regex r, string text) => r.IsMatch(text);
         public static void Pop<T>(this List<T> list) => list.RemoveAt(0);
-    }
-
-    public static class String
-    {
-        internal static string fromCharCode(params int[] codes)
-        {
-            var sb = new StringBuilder();
-            foreach (var c in codes)
-            {
-                sb.Append((char)c);
-            }
-            return sb.ToString();
-        }
-        public static string slice(this string str, int start, int end = int.MaxValue)
+        
+        public static string Slice(this string str, int start, int end = int.MaxValue)
         {
             if (start < 0)
                 start += str.Length;

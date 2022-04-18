@@ -269,17 +269,17 @@ namespace Serenity.TypeScript.TsParser
             var lineStart = 0;
             while (pos < text.Length)
             {
-                var ch = text.CharCodeAt(pos);
+                var ch = text[pos];
                 pos++;
                 switch (ch)
                 {
-                    case (int)CharacterCodes.CarriageReturn:
-                        if (text.CharCodeAt(pos) == (int)CharacterCodes.LineFeed)
+                    case '\r':
+                        if (text[pos] == '\n')
                         {
                             pos++;
                         }
                         goto caseLabel2;
-                    case (int)CharacterCodes.LineFeed:
+                    case '\n':
                         caseLabel2: result.Add(lineStart);
                         lineStart = pos;
                         break;
@@ -355,10 +355,10 @@ namespace Serenity.TypeScript.TsParser
         {
             // Note: nextLine is in the Zs space, and should be considered to be a whitespace.
             // It is explicitly not a line-break as it isn't in the exact set specified by EcmaScript.
-            return ch == (int)CharacterCodes.Space ||
-                ch == (int)CharacterCodes.Tab ||
-                ch == (int)CharacterCodes.VerticalTab ||
-                ch == (int)CharacterCodes.FormFeed ||
+            return ch == ' ' ||
+                ch == '\t' ||
+                ch == '\v' ||
+                ch == '\f' ||
                 ch == (int)CharacterCodes.NonBreakingSpace ||
                 ch == (int)CharacterCodes.NextLine ||
                 ch == (int)CharacterCodes.Ogham ||
@@ -383,8 +383,8 @@ namespace Serenity.TypeScript.TsParser
             // Only the characters in Table 3 are treated as line terminators. Other new line or line
             // breaking characters are treated as white space but not as line terminators.
 
-            return ch == (int)CharacterCodes.LineFeed ||
-                ch == (int)CharacterCodes.CarriageReturn ||
+            return ch == '\n' ||
+                ch == '\r' ||
                 ch == (int)CharacterCodes.LineSeparator ||
                 ch == (int)CharacterCodes.ParagraphSeparator;
         }
@@ -392,41 +392,14 @@ namespace Serenity.TypeScript.TsParser
 
         public bool IsDigit(int ch)
         {
-            return ch >= (int)CharacterCodes._0 && ch <= (int)CharacterCodes._9;
+            return ch >= '0' && ch <= '9';
         }
 
 
         public static bool IsOctalDigit(int ch)
         {
-            return ch >= (int)CharacterCodes._0 && ch <= (int)CharacterCodes._7;
+            return ch >= '0' && ch <= '7';
         }
-
-
-        public bool CouldStartTrivia(string text, int pos)
-        {
-            var ch = text.CharCodeAt(pos);
-            switch (ch)
-            {
-                case (int)CharacterCodes.CarriageReturn:
-                case (int)CharacterCodes.LineFeed:
-                case (int)CharacterCodes.Tab:
-                case (int)CharacterCodes.VerticalTab:
-                case (int)CharacterCodes.FormFeed:
-                case (int)CharacterCodes.Space:
-                case (int)CharacterCodes.Slash:
-                case (int)CharacterCodes.LessThan:
-                case (int)CharacterCodes.equals:
-                case (int)CharacterCodes.GreaterThan:
-                    // Starts of conflict marker trivia
-                    return true;
-                case (int)CharacterCodes.Hash:
-                    // Only if its the beginning can we have #! trivia
-                    return pos == 0;
-                default:
-                    return ch > (int)CharacterCodes.MaxAsciiCharacter;
-            }
-        }
-
 
         public static int SkipTriviaM(string text, int pos, bool stopAfterLineBreak = false, bool stopAtComments = false)
         {
@@ -437,41 +410,41 @@ namespace Serenity.TypeScript.TsParser
             while (true)
             {
                 if (pos >= text.Length) return pos;
-                var ch = text.CharCodeAt(pos);
+                var ch = text[pos];
                 switch (ch)
                 {
-                    case (int)CharacterCodes.CarriageReturn:
+                    case '\r':
                         if (pos + 1 >= text.Length) return pos;
-                        if (text.CharCodeAt(pos + 1) == (int)CharacterCodes.LineFeed)
+                        if (text[pos + 1] == '\n')
                         {
                             pos++;
                         }
                         goto caseLabel2;
-                    case (int)CharacterCodes.LineFeed:
+                    case '\n':
                         caseLabel2: pos++;
                         if (stopAfterLineBreak)
                         {
                             return pos;
                         }
                         continue;
-                    case (int)CharacterCodes.Tab:
-                    case (int)CharacterCodes.VerticalTab:
-                    case (int)CharacterCodes.FormFeed:
-                    case (int)CharacterCodes.Space:
+                    case '\t':
+                    case '\v':
+                    case '\f':
+                    case ' ':
                         pos++;
                         continue;
-                    case (int)CharacterCodes.Slash:
+                    case '/':
                         if (stopAtComments)
                         {
                             break;
                         }
                         if (pos + 1 >= text.Length) return pos;
-                        if (text.CharCodeAt(pos + 1) == (int)CharacterCodes.Slash)
+                        if (text[pos + 1] == '/')
                         {
                             pos += 2;
                             while (pos < text.Length)
                             {
-                                if (IsLineBreak(text.CharCodeAt(pos)))
+                                if (IsLineBreak(text[pos]))
                                 {
                                     break;
                                 }
@@ -480,13 +453,13 @@ namespace Serenity.TypeScript.TsParser
                             continue;
                         }
                         if (pos + 1 >= text.Length) return pos;
-                        if (text.CharCodeAt(pos + 1) == (int)CharacterCodes.Asterisk)
+                        if (text[pos + 1] == '*')
                         {
                             pos += 2;
                             while (pos < text.Length)
                             {
                                 if (pos + 1 >= text.Length) return pos;
-                                if (text.CharCodeAt(pos) == (int)CharacterCodes.Asterisk && text.CharCodeAt(pos + 1) == (int)CharacterCodes.Slash)
+                                if (text[pos] == '*' && text[pos + 1] == '/')
                                 {
                                     pos += 2;
                                     break;
@@ -496,16 +469,16 @@ namespace Serenity.TypeScript.TsParser
                             continue;
                         }
                         break;
-                    case (int)CharacterCodes.LessThan:
-                    case (int)CharacterCodes.equals:
-                    case (int)CharacterCodes.GreaterThan:
+                    case '<':
+                    case '=':
+                    case '>':
                         if (IsConflictMarkerTrivia(text, pos))
                         {
                             pos = ScanConflictMarkerTrivia(text, pos);
                             continue;
                         }
                         break;
-                    case (int)CharacterCodes.Hash:
+                    case '#':
                         if (pos == 0 && IsShebangTrivia(text, pos))
                         {
                             pos = ScanShebangTrivia(text, pos);
@@ -528,20 +501,20 @@ namespace Serenity.TypeScript.TsParser
         public static bool IsConflictMarkerTrivia(string text, int pos)
         {
             Debug.Assert(pos >= 0);
-            if (pos == 0 || IsLineBreak(text.CharCodeAt(pos - 1)))
+            if (pos == 0 || IsLineBreak(text[pos - 1]))
             {
-                var ch = text.CharCodeAt(pos);
+                var ch = text[pos];
                 if ((pos + _mergeConflictMarkerLength) < text.Length)
                 {
                     for (var i = 0; i < _mergeConflictMarkerLength; i++)
                     {
-                        if (text.CharCodeAt(pos + i) != ch)
+                        if (text[pos + i] != ch)
                         {
                             return false;
                         }
                     };
-                    return ch == (int)CharacterCodes.equals ||
-                                        text.CharCodeAt(pos + _mergeConflictMarkerLength) == (int)CharacterCodes.Space;
+                    return ch == '=' ||
+                                        text[pos + _mergeConflictMarkerLength] == ' ';
                 }
             }
             return false;
@@ -552,22 +525,22 @@ namespace Serenity.TypeScript.TsParser
         public static int ScanConflictMarkerTrivia(string text, int pos, Action<DiagnosticMessage, int> error = null)
         {
             error?.Invoke(Diagnostics.Merge_conflict_marker_encountered, _mergeConflictMarkerLength);
-            var ch = text.CharCodeAt(pos);
+            var ch = text[pos];
             var len = text.Length;
-            if (ch == (int)CharacterCodes.LessThan || ch == (int)CharacterCodes.GreaterThan)
+            if (ch == '<' || ch == '>')
             {
-                while (pos < len && !IsLineBreak(text.CharCodeAt(pos)))
+                while (pos < len && !IsLineBreak(text[pos]))
                 {
                     pos++;
                 }
             }
             else
             {
-                ////Debug.assert(ch ==  (int)CharacterCodes.equals);
+                ////Debug.assert(ch ==  '=');
                 while (pos < len)
                 {
-                    var ch2 = text.CharCodeAt(pos);
-                    if (ch2 == (int)CharacterCodes.GreaterThan && IsConflictMarkerTrivia(text, pos))
+                    var ch2 = text[pos];
+                    if (ch2 == '>' && IsConflictMarkerTrivia(text, pos))
                     {
                         break;
                     }
@@ -603,16 +576,16 @@ namespace Serenity.TypeScript.TsParser
             var accumulator = initial;
             while (pos >= 0 && pos < text.Length)
             {
-                var ch = text.CharCodeAt(pos);
+                var ch = text[pos];
                 switch (ch)
                 {
-                    case (int)CharacterCodes.CarriageReturn:
-                        if (text.CharCodeAt(pos + 1) == (int)CharacterCodes.LineFeed)
+                    case '\r':
+                        if (text[pos + 1] == '\n')
                         {
                             pos++;
                         }
                         goto caseLabel2;
-                    case (int)CharacterCodes.LineFeed:
+                    case '\n':
                         caseLabel2: pos++;
                         if (trailing)
                         {
@@ -624,25 +597,25 @@ namespace Serenity.TypeScript.TsParser
                             pendingHasTrailingNewLine = true;
                         }
                         continue;
-                    case (int)CharacterCodes.Tab:
-                    case (int)CharacterCodes.VerticalTab:
-                    case (int)CharacterCodes.FormFeed:
-                    case (int)CharacterCodes.Space:
+                    case '\t':
+                    case '\v':
+                    case '\f':
+                    case ' ':
                         pos++;
                         continue;
-                    case (int)CharacterCodes.Slash:
-                        var nextChar = text.CharCodeAt(pos + 1);
+                    case '/':
+                        var nextChar = text[pos + 1];
                         var hasTrailingNewLine = false;
-                        if (nextChar == (int)CharacterCodes.Slash || nextChar == (int)CharacterCodes.Asterisk)
+                        if (nextChar == '/' || nextChar == '*')
                         {
-                            var kind = nextChar == (int)CharacterCodes.Slash ? SyntaxKind.SingleLineCommentTrivia : SyntaxKind.MultiLineCommentTrivia;
+                            var kind = nextChar == '/' ? SyntaxKind.SingleLineCommentTrivia : SyntaxKind.MultiLineCommentTrivia;
                             var startPos = pos;
                             pos += 2;
-                            if (nextChar == (int)CharacterCodes.Slash)
+                            if (nextChar == '/')
                             {
                                 while (pos < text.Length)
                                 {
-                                    if (IsLineBreak(text.CharCodeAt(pos)))
+                                    if (IsLineBreak(text[pos]))
                                     {
                                         hasTrailingNewLine = true;
                                         break;
@@ -654,7 +627,7 @@ namespace Serenity.TypeScript.TsParser
                             {
                                 while (pos < text.Length)
                                 {
-                                    if (text.CharCodeAt(pos) == (int)CharacterCodes.Asterisk && text.CharCodeAt(pos + 1) == (int)CharacterCodes.Slash)
+                                    if (text[pos] == '*' && text[pos + 1] == '/')
                                     {
                                         pos += 2;
                                         break;
@@ -762,29 +735,29 @@ namespace Serenity.TypeScript.TsParser
 
         public bool IsIdentifierStart(int ch, ScriptTarget languageVersion)
         {
-            return ch >= (int)CharacterCodes.A && ch <= (int)CharacterCodes.Z || ch >= (int)CharacterCodes.a && ch <= (int)CharacterCodes.z ||
-                        ch == (int)CharacterCodes.Dollar || ch == (int)CharacterCodes._ ||
+            return ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' ||
+                        ch == '$' || ch == '_' ||
                         ch > (int)CharacterCodes.MaxAsciiCharacter && IsUnicodeIdentifierStart(ch, languageVersion);
         }
 
 
         public bool IsIdentifierPart(int ch, ScriptTarget languageVersion)
         {
-            return ch >= (int)CharacterCodes.A && ch <= (int)CharacterCodes.Z || ch >= (int)CharacterCodes.a && ch <= (int)CharacterCodes.z ||
-                        ch >= (int)CharacterCodes._0 && ch <= (int)CharacterCodes._9 || ch == (int)CharacterCodes.Dollar || ch == (int)CharacterCodes._ ||
+            return ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' ||
+                        ch >= '0' && ch <= '9' || ch == '$' || ch == '_' ||
                         ch > (int)CharacterCodes.MaxAsciiCharacter && IsUnicodeIdentifierPart(ch, languageVersion);
         }
 
 
         public bool IsIdentifierText(string name, ScriptTarget languageVersion)
         {
-            if (!IsIdentifierStart(name.CharCodeAt(0), languageVersion))
+            if (!IsIdentifierStart(name[0], languageVersion))
             {
                 return false;
             }
             for (var i = 1; i < name.Length; i++)
             {
-                if (!IsIdentifierPart(name.CharCodeAt(i), languageVersion))
+                if (!IsIdentifierPart(name[i], languageVersion))
                 {
                     return false;
                 }
@@ -806,30 +779,30 @@ namespace Serenity.TypeScript.TsParser
         public string ScanNumber()
         {
             var start = _pos;
-            while (IsDigit(_text.CharCodeAt(_pos)))
+            while (IsDigit(_text[_pos]))
             {
                 _pos++;
             }
-            if (_text.CharCodeAt(_pos) == (int)CharacterCodes.Dot)
+            if (_text[_pos] == '.')
             {
                 _pos++;
-                while (IsDigit(_text.CharCodeAt(_pos)))
+                while (IsDigit(_text[_pos]))
                 {
                     _pos++;
                 }
             }
             var end = _pos;
-            if (_text.CharCodeAt(_pos) == (int)CharacterCodes.E || _text.CharCodeAt(_pos) == (int)CharacterCodes.e)
+            if (_text[_pos] == 'E' || _text[_pos] == 'e')
             {
                 _pos++;
-                if (_text.CharCodeAt(_pos) == (int)CharacterCodes.Plus || _text.CharCodeAt(_pos) == (int)CharacterCodes.Minus)
+                if (_text[_pos] == '+' || _text[_pos] == '-')
                 {
                     _pos++;
                 }
-                if (IsDigit(_text.CharCodeAt(_pos)))
+                if (IsDigit(_text[_pos]))
                 {
                     _pos++;
-                    while (IsDigit(_text.CharCodeAt(_pos)))
+                    while (IsDigit(_text[_pos]))
                     {
                         _pos++;
                     }
@@ -847,7 +820,7 @@ namespace Serenity.TypeScript.TsParser
         public int ScanOctalDigits()
         {
             var start = _pos;
-            while (IsOctalDigit(_text.CharCodeAt(_pos)))
+            while (IsOctalDigit(_text[_pos]))
             {
                 _pos++;
             }
@@ -873,20 +846,20 @@ namespace Serenity.TypeScript.TsParser
             var value = 0;
             while (digits < minCount || scanAsManyAsPossible)
             {
-                var ch = _text.CharCodeAt(_pos);
-                if (ch >= (int)CharacterCodes._0 && ch <= (int)CharacterCodes._9)
+                var ch = _text[_pos];
+                if (ch >= '0' && ch <= '9')
                 {
-                    value = value * 16 + ch - (int)CharacterCodes._0;
+                    value = value * 16 + ch - '0';
                 }
                 else
-            if (ch >= (int)CharacterCodes.A && ch <= (int)CharacterCodes.F)
+            if (ch >= 'A' && ch <= 'f')
                 {
-                    value = value * 16 + ch - (int)CharacterCodes.A + 10;
+                    value = value * 16 + ch - 'A' + 10;
                 }
                 else
-            if (ch >= (int)CharacterCodes.a && ch <= (int)CharacterCodes.f)
+            if (ch >= 'a' && ch <= 'f')
                 {
-                    value = value * 16 + ch - (int)CharacterCodes.a + 10;
+                    value = value * 16 + ch - 'a' + 10;
                 }
                 else
                 {
@@ -905,7 +878,7 @@ namespace Serenity.TypeScript.TsParser
 
         public string ScanString(bool allowEscapes = true)
         {
-            var quote = _text.CharCodeAt(_pos);
+            var quote = _text[_pos];
             _pos++;
             var result = "";
             var start = _pos;
@@ -918,14 +891,14 @@ namespace Serenity.TypeScript.TsParser
                     Error(Diagnostics.Unterminated_string_literal);
                     break;
                 }
-                var ch = _text.CharCodeAt(_pos);
+                var ch = _text[_pos];
                 if (ch == quote)
                 {
                     result += TsExtensions.Substring(_text, start, _pos);
                     _pos++;
                     break;
                 }
-                if (ch == (int)CharacterCodes.Backslash && allowEscapes)
+                if (ch == '\\' && allowEscapes)
                 {
                     result += TsExtensions.Substring(_text, start, _pos);
                     result += ScanEscapeSequence();
@@ -947,7 +920,7 @@ namespace Serenity.TypeScript.TsParser
 
         public SyntaxKind ScanTemplateAndSetTokenValue()
         {
-            var startedWithBacktick = _text.CharCodeAt(_pos) == (int)CharacterCodes.Backtick;
+            var startedWithBacktick = _text[_pos] == '`';
             _pos++;
             var start = _pos;
             var contents = "";
@@ -962,33 +935,33 @@ namespace Serenity.TypeScript.TsParser
                     resultingToken = startedWithBacktick ? SyntaxKind.NoSubstitutionTemplateLiteral : SyntaxKind.TemplateTail;
                     break;
                 }
-                var currChar = _text.CharCodeAt(_pos);
-                if (currChar == (int)CharacterCodes.Backtick)
+                var currChar = _text[_pos];
+                if (currChar == '`')
                 {
                     contents += TsExtensions.Substring(_text, start, _pos);
                     _pos++;
                     resultingToken = startedWithBacktick ? SyntaxKind.NoSubstitutionTemplateLiteral : SyntaxKind.TemplateTail;
                     break;
                 }
-                if (currChar == (int)CharacterCodes.Dollar && _pos + 1 < _end && _text.CharCodeAt(_pos + 1) == (int)CharacterCodes.OpenBrace)
+                if (currChar == '$' && _pos + 1 < _end && _text[_pos + 1] == '{')
                 {
                     contents += TsExtensions.Substring(_text, start, _pos);
                     _pos += 2;
                     resultingToken = startedWithBacktick ? SyntaxKind.TemplateHead : SyntaxKind.TemplateMiddle;
                     break;
                 }
-                if (currChar == (int)CharacterCodes.Backslash)
+                if (currChar == '\\')
                 {
                     contents += TsExtensions.Substring(_text, start, _pos);
                     contents += ScanEscapeSequence();
                     start = _pos;
                     continue;
                 }
-                if (currChar == (int)CharacterCodes.CarriageReturn)
+                if (currChar == '\r')
                 {
                     contents += TsExtensions.Substring(_text, start, _pos);
                     _pos++;
-                    if (_pos < _end && _text.CharCodeAt(_pos) == (int)CharacterCodes.LineFeed)
+                    if (_pos < _end && _text[_pos] == '\n')
                     {
                         _pos++;
                     }
@@ -1012,30 +985,30 @@ namespace Serenity.TypeScript.TsParser
                 Error(Diagnostics.Unexpected_end_of_text);
                 return "";
             }
-            var ch = _text.CharCodeAt(_pos);
+            var ch = _text[_pos];
             _pos++;
             switch (ch)
             {
-                case (int)CharacterCodes._0:
+                case '0':
                     return "\0";
-                case (int)CharacterCodes.b:
+                case 'b':
                     return "\b";
-                case (int)CharacterCodes.t:
+                case 't':
                     return "\t";
-                case (int)CharacterCodes.n:
+                case 'n':
                     return "\n";
-                case (int)CharacterCodes.v:
+                case 'v':
                     return "\v";
-                case (int)CharacterCodes.f:
+                case 'f':
                     return "\f";
-                case (int)CharacterCodes.r:
+                case 'r':
                     return "\r";
-                case (int)CharacterCodes.SingleQuote:
-                    return "\'";
-                case (int)CharacterCodes.DoubleQuote:
+                case '\'':
+                    return "'";
+                case '"':
                     return "\"";
-                case (int)CharacterCodes.u:
-                    if (_pos < _end && _text.CharCodeAt(_pos) == (int)CharacterCodes.OpenBrace)
+                case 'u':
+                    if (_pos < _end && _text[_pos] == '{')
                     {
                         _hasExtendedUnicodeEscape = true;
                         _pos++;
@@ -1043,21 +1016,21 @@ namespace Serenity.TypeScript.TsParser
                     }
                     // '\uDDDD'
                     return ScanHexadecimalEscape(/*numDigits*/ 4);
-                case (int)CharacterCodes.x:
+                case 'x':
                     // '\xDD'
                     return ScanHexadecimalEscape(/*numDigits*/ 2);
-                case (int)CharacterCodes.CarriageReturn:
-                    if (_pos < _end && _text.CharCodeAt(_pos) == (int)CharacterCodes.LineFeed)
+                case '\r':
+                    if (_pos < _end && _text[_pos] == '\n')
                     {
                         _pos++;
                     }
-                    goto caseLabel15;
-                case (int)CharacterCodes.LineFeed:
-                case (int)CharacterCodes.LineSeparator:
-                case (int)CharacterCodes.ParagraphSeparator:
-                    caseLabel15: return "";
+                    return string.Empty;
+                case '\n':
+                case (char)CharacterCodes.LineSeparator:
+                case (char)CharacterCodes.ParagraphSeparator:
+                    return string.Empty;
                 default:
-                    return ((char)ch).ToString();
+                    return ch.ToString();
             }
         }
 
@@ -1067,7 +1040,7 @@ namespace Serenity.TypeScript.TsParser
             var escapedValue = ScanExactNumberOfHexDigits(numDigits);
             if (escapedValue >= 0)
             {
-                return String.fromCharCode(escapedValue);
+                return ((char)escapedValue).ToString();
             }
             else
             {
@@ -1098,7 +1071,7 @@ namespace Serenity.TypeScript.TsParser
                 isInvalidExtendedEscape = true;
             }
             else
-            if (_text.CharCodeAt(_pos) == (int)CharacterCodes.CloseBrace)
+            if (_text[_pos] == '}')
             {
                 // Only swallow the following character up if it's a '}'.
                 _pos++;
@@ -1121,17 +1094,17 @@ namespace Serenity.TypeScript.TsParser
             Debug.Assert(0x0 <= codePoint && codePoint <= 0x10FFFF);
             if (codePoint <= 65535)
             {
-                return String.fromCharCode(codePoint);
+                return ((char)codePoint).ToString();
             }
             var codeUnit1 = (int)Math.Floor(((double)codePoint - 65536) / 1024) + 0xD800;
             var codeUnit2 = ((codePoint - 65536) % 1024) + 0xDC00;
-            return String.fromCharCode(codeUnit1, codeUnit2);
+            return new string(new char[] { (char)codeUnit1, (char)codeUnit2 }); ;
         }
 
 
         public int PeekUnicodeEscape()
         {
-            if (_pos + 5 < _end && _text.CharCodeAt(_pos + 1) == (int)CharacterCodes.u)
+            if (_pos + 5 < _end && _text[_pos + 1] == 'u')
             {
                 var start = _pos;
                 _pos += 2;
@@ -1149,21 +1122,21 @@ namespace Serenity.TypeScript.TsParser
             var start = _pos;
             while (_pos < _end)
             {
-                var ch = _text.CharCodeAt(_pos);
+                var ch = _text[_pos];
                 if (IsIdentifierPart(ch, _languageVersion))
                 {
                     _pos++;
                 }
                 else
-                if (ch == (int)CharacterCodes.Backslash)
+                if (ch == '\\')
                 {
-                    ch = PeekUnicodeEscape();
+                    ch = (char)PeekUnicodeEscape();
                     if (!(ch >= 0 && IsIdentifierPart(ch, _languageVersion)))
                     {
                         break;
                     }
                     result += TsExtensions.Substring(_text, start, _pos);
-                    result += String.fromCharCode(ch);
+                    result += ch;
                     // Valid Unicode escape is always six characters
                     _pos += 6;
                     start = _pos;
@@ -1183,8 +1156,8 @@ namespace Serenity.TypeScript.TsParser
             var len = _tokenValue.Length;
             if (len >= 2 && len <= 11)
             {
-                var ch = _tokenValue.CharCodeAt(0);
-                if (ch >= (int)CharacterCodes.a && ch <= (int)CharacterCodes.z)
+                var ch = _tokenValue[0];
+                if (ch >= 'a' && ch <= 'z')
                 {
                     if (TextToToken.ContainsKey(_tokenValue))
                     {
@@ -1205,8 +1178,8 @@ namespace Serenity.TypeScript.TsParser
             var numberOfDigits = 0;
             while (true)
             {
-                var ch = _text.CharCodeAt(_pos);
-                var valueOfCh = ch - (int)CharacterCodes._0;
+                var ch = _text[_pos];
+                var valueOfCh = ch - '0';
                 if (!IsDigit(ch) || valueOfCh >= @base)
                 {
                     break;
@@ -1237,8 +1210,8 @@ namespace Serenity.TypeScript.TsParser
                     _token = SyntaxKind.EndOfFileToken;
                     return _token;
                 }
-                var ch = _text.CharCodeAt(_pos);
-                if (ch == (int)CharacterCodes.Hash && _pos == 0 && IsShebangTrivia(_text, _pos))
+                var ch = _text[_pos];
+                if (ch == '#' && _pos == 0 && IsShebangTrivia(_text, _pos))
                 {
                     _pos = ScanShebangTrivia(_text, _pos);
                     if (_skipTrivia)
@@ -1253,8 +1226,8 @@ namespace Serenity.TypeScript.TsParser
                 }
                 switch (ch)
                 {
-                    case (int)CharacterCodes.LineFeed:
-                    case (int)CharacterCodes.CarriageReturn:
+                    case '\n':
+                    case '\r':
                         _precedingLineBreak = true;
                         if (_skipTrivia)
                         {
@@ -1263,7 +1236,7 @@ namespace Serenity.TypeScript.TsParser
                         }
                         else
                         {
-                            if (ch == (int)CharacterCodes.CarriageReturn && _pos + 1 < _end && _text.CharCodeAt(_pos + 1) == (int)CharacterCodes.LineFeed)
+                            if (ch == '\r' && _pos + 1 < _end && _text[_pos + 1] == '\n')
                             {
                                 _pos += 2;
                             }
@@ -1274,10 +1247,10 @@ namespace Serenity.TypeScript.TsParser
                             _token = SyntaxKind.NewLineTrivia;
                             return _token;
                         }
-                    case (int)CharacterCodes.Tab:
-                    case (int)CharacterCodes.VerticalTab:
-                    case (int)CharacterCodes.FormFeed:
-                    case (int)CharacterCodes.Space:
+                    case '\t':
+                    case '\v':
+                    case '\f':
+                    case ' ':
                         if (_skipTrivia)
                         {
                             _pos++;
@@ -1285,17 +1258,17 @@ namespace Serenity.TypeScript.TsParser
                         }
                         else
                         {
-                            while (_pos < _end && IsWhiteSpaceSingleLine(_text.CharCodeAt(_pos)))
+                            while (_pos < _end && IsWhiteSpaceSingleLine(_text[_pos]))
                             {
                                 _pos++;
                             }
                             _token = SyntaxKind.WhitespaceTrivia;
                             return _token;
                         }
-                    case (int)CharacterCodes.Exclamation:
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                    case '!':
+                        if (_text[_pos + 1] == '=')
                         {
-                            if (_text.CharCodeAt(_pos + 2) == (int)CharacterCodes.equals)
+                            if (_text[_pos + 2] == '=')
                             {
                                 _pos += 3;
                                 _token = SyntaxKind.ExclamationEqualsEqualsToken;
@@ -1308,16 +1281,16 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.ExclamationToken;
                         return _token;
-                    case (int)CharacterCodes.DoubleQuote:
-                    case (int)CharacterCodes.SingleQuote:
+                    case '"':
+                    case '\'':
                         _tokenValue = ScanString();
                         _token = SyntaxKind.StringLiteral;
                         return _token;
-                    case (int)CharacterCodes.Backtick:
+                    case '`':
                         _token = ScanTemplateAndSetTokenValue();
                         return _token;
-                    case (int)CharacterCodes.Percent:
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                    case '%':
+                        if (_text[_pos + 1] == '=')
                         {
                             _pos += 2;
                             _token = SyntaxKind.PercentEqualsToken;
@@ -1326,14 +1299,14 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.PercentToken;
                         return _token;
-                    case (int)CharacterCodes.Ampersand:
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Ampersand)
+                    case '&':
+                        if (_text[_pos + 1] == '&')
                         {
                             _pos += 2;
                             _token = SyntaxKind.AmpersandAmpersandToken;
                             return _token;
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                        if (_text[_pos + 1] == '=')
                         {
                             _pos += 2;
                             _token = SyntaxKind.AmpersandEqualsToken;
@@ -1342,24 +1315,24 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.AmpersandToken;
                         return _token;
-                    case (int)CharacterCodes.OpenParen:
+                    case '(':
                         _pos++;
                         _token = SyntaxKind.OpenParenToken;
                         return _token;
-                    case (int)CharacterCodes.CloseParen:
+                    case ')':
                         _pos++;
                         _token = SyntaxKind.CloseParenToken;
                         return _token;
-                    case (int)CharacterCodes.Asterisk:
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                    case '*':
+                        if (_text[_pos + 1] == '=')
                         {
                             _pos += 2;
                             _token = SyntaxKind.AsteriskEqualsToken;
                             return _token;
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Asterisk)
+                        if (_text[_pos + 1] == '*')
                         {
-                            if (_text.CharCodeAt(_pos + 2) == (int)CharacterCodes.equals)
+                            if (_text[_pos + 2] == '=')
                             {
                                 _pos += 3;
                                 _token = SyntaxKind.AsteriskAsteriskEqualsToken;
@@ -1372,14 +1345,14 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.AsteriskToken;
                         return _token;
-                    case (int)CharacterCodes.Plus:
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Plus)
+                    case '+':
+                        if (_text[_pos + 1] == '+')
                         {
                             _pos += 2;
                             _token = SyntaxKind.PlusPlusToken;
                             return _token;
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                        if (_text[_pos + 1] == '=')
                         {
                             _pos += 2;
                             _token = SyntaxKind.PlusEqualsToken;
@@ -1388,18 +1361,18 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.PlusToken;
                         return _token;
-                    case (int)CharacterCodes.Comma:
+                    case ',':
                         _pos++;
                         _token = SyntaxKind.CommaToken;
                         return _token;
-                    case (int)CharacterCodes.Minus:
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Minus)
+                    case '-':
+                        if (_text[_pos + 1] == '-')
                         {
                             _pos += 2;
                             _token = SyntaxKind.MinusMinusToken;
                             return _token;
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                        if (_text[_pos + 1] == '=')
                         {
                             _pos += 2;
                             _token = SyntaxKind.MinusEqualsToken;
@@ -1408,14 +1381,14 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.MinusToken;
                         return _token;
-                    case (int)CharacterCodes.Dot:
-                        if (IsDigit(_text.CharCodeAt(_pos + 1)))
+                    case '.':
+                        if (IsDigit(_text[_pos + 1]))
                         {
                             _tokenValue = ScanNumber();
                             _token = SyntaxKind.NumericLiteral;
                             return _token;
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Dot && _text.CharCodeAt(_pos + 2) == (int)CharacterCodes.Dot)
+                        if (_text[_pos + 1] == '.' && _text[_pos + 2] == '.')
                         {
                             _pos += 3;
                             _token = SyntaxKind.DotDotDotToken;
@@ -1424,13 +1397,13 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.DotToken;
                         return _token;
-                    case (int)CharacterCodes.Slash:
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Slash)
+                    case '/':
+                        if (_text[_pos + 1] == '/')
                         {
                             _pos += 2;
                             while (_pos < _end)
                             {
-                                if (IsLineBreak(_text.CharCodeAt(_pos)))
+                                if (IsLineBreak(_text[_pos]))
                                 {
                                     break;
                                 }
@@ -1447,14 +1420,14 @@ namespace Serenity.TypeScript.TsParser
                             }
                         }
 
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Asterisk)
+                        if (_text[_pos + 1] == '*')
                         {
                             _pos += 2;
                             var commentClosed = false;
                             while (_pos < _end)
                             {
-                                var ch2 = _text.CharCodeAt(_pos);
-                                if (ch2 == (int)CharacterCodes.Asterisk && _text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Slash)
+                                var ch2 = _text[_pos];
+                                if (ch2 == '*' && _text[_pos + 1] == '/')
                                 {
                                     _pos += 2;
                                     commentClosed = true;
@@ -1481,7 +1454,7 @@ namespace Serenity.TypeScript.TsParser
                                 return _token;
                             }
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                        if (_text[_pos + 1] == '=')
                         {
                             _pos += 2;
                             _token = SyntaxKind.SlashEqualsToken;
@@ -1490,8 +1463,8 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.SlashToken;
                         return _token;
-                    case (int)CharacterCodes._0:
-                        if (_pos + 2 < _end && (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.X || _text.CharCodeAt(_pos + 1) == (int)CharacterCodes.x))
+                    case '0':
+                        if (_pos + 2 < _end && (_text[_pos + 1] == 'x' || _text[_pos + 1] == 'x'))
                         {
                             _pos += 2;
                             var value = ScanMinimumNumberOfHexDigits(1);
@@ -1505,7 +1478,7 @@ namespace Serenity.TypeScript.TsParser
                             return _token;
                         }
                         else
-                if (_pos + 2 < _end && (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.B || _text.CharCodeAt(_pos + 1) == (int)CharacterCodes.b))
+                if (_pos + 2 < _end && (_text[_pos + 1] == 'b' || _text[_pos + 1] == 'b'))
                         {
                             _pos += 2;
                             var value = ScanBinaryOrOctalDigits(/* base */ 2);
@@ -1519,7 +1492,7 @@ namespace Serenity.TypeScript.TsParser
                             return _token;
                         }
                         else
-                if (_pos + 2 < _end && (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.O || _text.CharCodeAt(_pos + 1) == (int)CharacterCodes.o))
+                if (_pos + 2 < _end && (_text[_pos + 1] == 'O' || _text[_pos + 1] == 'o'))
                         {
                             _pos += 2;
                             var value = ScanBinaryOrOctalDigits(/* base */ 8);
@@ -1532,34 +1505,34 @@ namespace Serenity.TypeScript.TsParser
                             _token = SyntaxKind.NumericLiteral;
                             return _token;
                         }
-                        if (_pos + 1 < _end && IsOctalDigit(_text.CharCodeAt(_pos + 1)))
+                        if (_pos + 1 < _end && IsOctalDigit(_text[_pos + 1]))
                         {
                             _tokenValue = "" + ScanOctalDigits();
                             _token = SyntaxKind.NumericLiteral;
                             return _token;
                         }
                         goto caseLabel30;
-                    case (int)CharacterCodes._1:
-                    case (int)CharacterCodes._2:
-                    case (int)CharacterCodes._3:
-                    case (int)CharacterCodes._4:
-                    case (int)CharacterCodes._5:
-                    case (int)CharacterCodes._6:
-                    case (int)CharacterCodes._7:
-                    case (int)CharacterCodes._8:
-                    case (int)CharacterCodes._9:
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
                         caseLabel30: _tokenValue = ScanNumber();
                         _token = SyntaxKind.NumericLiteral;
                         return _token;
-                    case (int)CharacterCodes.Colon:
+                    case ':':
                         _pos++;
                         _token = SyntaxKind.ColonToken;
                         return _token;
-                    case (int)CharacterCodes.Semicolon:
+                    case ';':
                         _pos++;
                         _token = SyntaxKind.SemicolonToken;
                         return _token;
-                    case (int)CharacterCodes.LessThan:
+                    case '<':
                         if (IsConflictMarkerTrivia(_text, _pos))
                         {
                             _pos = ScanConflictMarkerTrivia(_text, _pos, Error);
@@ -1573,9 +1546,9 @@ namespace Serenity.TypeScript.TsParser
                                 return _token;
                             }
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.LessThan)
+                        if (_text[_pos + 1] == '<')
                         {
-                            if (_text.CharCodeAt(_pos + 2) == (int)CharacterCodes.equals)
+                            if (_text[_pos + 2] == '=')
                             {
                                 _pos += 3;
                                 _token = SyntaxKind.LessThanLessThanEqualsToken;
@@ -1585,15 +1558,15 @@ namespace Serenity.TypeScript.TsParser
                             _token = SyntaxKind.LessThanLessThanToken;
                             return _token;
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                        if (_text[_pos + 1] == '=')
                         {
                             _pos += 2;
                             _token = SyntaxKind.LessThanEqualsToken;
                             return _token;
                         }
                         if (_languageVariant == LanguageVariant.Jsx &&
-                                                        _text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Slash &&
-                                                        _text.CharCodeAt(_pos + 2) != (int)CharacterCodes.Asterisk)
+                                                        _text[_pos + 1] == '/' &&
+                                                        _text[_pos + 2] != '*')
                         {
                             _pos += 2;
                             _token = SyntaxKind.LessThanSlashToken;
@@ -1602,7 +1575,7 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.LessThanToken;
                         return _token;
-                    case (int)CharacterCodes.equals:
+                    case '=':
                         if (IsConflictMarkerTrivia(_text, _pos))
                         {
                             _pos = ScanConflictMarkerTrivia(_text, _pos, Error);
@@ -1616,9 +1589,9 @@ namespace Serenity.TypeScript.TsParser
                                 return _token;
                             }
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                        if (_text[_pos + 1] == '=')
                         {
-                            if (_text.CharCodeAt(_pos + 2) == (int)CharacterCodes.equals)
+                            if (_text[_pos + 2] == '=')
                             {
                                 _pos += 3;
                                 _token = SyntaxKind.EqualsEqualsEqualsToken;
@@ -1628,7 +1601,7 @@ namespace Serenity.TypeScript.TsParser
                             _token = SyntaxKind.EqualsEqualsToken;
                             return _token;
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.GreaterThan)
+                        if (_text[_pos + 1] == '>')
                         {
                             _pos += 2;
                             _token = SyntaxKind.EqualsGreaterThanToken;
@@ -1637,7 +1610,7 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.EqualsToken;
                         return _token;
-                    case (int)CharacterCodes.GreaterThan:
+                    case '>':
                         if (IsConflictMarkerTrivia(_text, _pos))
                         {
                             _pos = ScanConflictMarkerTrivia(_text, _pos, Error);
@@ -1654,20 +1627,20 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.GreaterThanToken;
                         return _token;
-                    case (int)CharacterCodes.Question:
+                    case '?':
                         _pos++;
                         _token = SyntaxKind.QuestionToken;
                         return _token;
-                    case (int)CharacterCodes.OpenBracket:
+                    case '[':
                         _pos++;
                         _token = SyntaxKind.OpenBracketToken;
                         return _token;
-                    case (int)CharacterCodes.CloseBracket:
+                    case ']':
                         _pos++;
                         _token = SyntaxKind.CloseBracketToken;
                         return _token;
-                    case (int)CharacterCodes.Caret:
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                    case '^':
+                        if (_text[_pos + 1] == '=')
                         {
                             _pos += 2;
                             _token = SyntaxKind.CaretEqualsToken;
@@ -1676,18 +1649,18 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.CaretToken;
                         return _token;
-                    case (int)CharacterCodes.OpenBrace:
+                    case '{':
                         _pos++;
                         _token = SyntaxKind.OpenBraceToken;
                         return _token;
-                    case (int)CharacterCodes.Bar:
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Bar)
+                    case '|':
+                        if (_text[_pos + 1] == '|')
                         {
                             _pos += 2;
                             _token = SyntaxKind.BarBarToken;
                             return _token;
                         }
-                        if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                        if (_text[_pos + 1] == '=')
                         {
                             _pos += 2;
                             _token = SyntaxKind.BarEqualsToken;
@@ -1696,24 +1669,24 @@ namespace Serenity.TypeScript.TsParser
                         _pos++;
                         _token = SyntaxKind.BarToken;
                         return _token;
-                    case (int)CharacterCodes.CloseBrace:
+                    case '}':
                         _pos++;
                         _token = SyntaxKind.CloseBraceToken;
                         return _token;
-                    case (int)CharacterCodes.Tilde:
+                    case '~':
                         _pos++;
                         _token = SyntaxKind.TildeToken;
                         return _token;
-                    case (int)CharacterCodes.At:
+                    case '@':
                         _pos++;
                         _token = SyntaxKind.AtToken;
                         return _token;
-                    case (int)CharacterCodes.Backslash:
+                    case '\\':
                         var cookedChar = PeekUnicodeEscape();
                         if (cookedChar >= 0 && IsIdentifierStart(cookedChar, _languageVersion))
                         {
                             _pos += 6;
-                            _tokenValue = String.fromCharCode(cookedChar) + ScanIdentifierParts();
+                            _tokenValue = (char)cookedChar + ScanIdentifierParts();
                             _token = GetIdentifierToken();
                             return _token;
                         }
@@ -1725,9 +1698,9 @@ namespace Serenity.TypeScript.TsParser
                         if (IsIdentifierStart(ch, _languageVersion))
                         {
                             _pos++;
-                            while (_pos < _end && IsIdentifierPart(ch = _text.CharCodeAt(_pos), _languageVersion)) _pos++;
+                            while (_pos < _end && IsIdentifierPart(ch = _text[_pos], _languageVersion)) _pos++;
                             _tokenValue = TsExtensions.Substring(_text, _tokenPos, _pos);
-                            if (ch == (int)CharacterCodes.Backslash)
+                            if (ch == '\\')
                             {
                                 _tokenValue += ScanIdentifierParts();
                             }
@@ -1757,11 +1730,11 @@ namespace Serenity.TypeScript.TsParser
         {
             if (_token == SyntaxKind.GreaterThanToken)
             {
-                if (_text.CharCodeAt(_pos) == (int)CharacterCodes.GreaterThan)
+                if (_text[_pos] == '>')
                 {
-                    if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.GreaterThan)
+                    if (_text[_pos + 1] == '>')
                     {
-                        if (_text.CharCodeAt(_pos + 2) == (int)CharacterCodes.equals)
+                        if (_text[_pos + 2] == '=')
                         {
                             _pos += 3;
                             _token = SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken;
@@ -1771,7 +1744,7 @@ namespace Serenity.TypeScript.TsParser
                         _token = SyntaxKind.GreaterThanGreaterThanGreaterThanToken;
                         return _token;
                     }
-                    if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.equals)
+                    if (_text[_pos + 1] == '=')
                     {
                         _pos += 2;
                         _token = SyntaxKind.GreaterThanGreaterThanEqualsToken;
@@ -1781,7 +1754,7 @@ namespace Serenity.TypeScript.TsParser
                     _token = SyntaxKind.GreaterThanGreaterThanToken;
                     return _token;
                 }
-                if (_text.CharCodeAt(_pos) == (int)CharacterCodes.equals)
+                if (_text[_pos] == '=')
                 {
                     _pos++;
                     _token = SyntaxKind.GreaterThanEqualsToken;
@@ -1807,7 +1780,7 @@ namespace Serenity.TypeScript.TsParser
                         Error(Diagnostics.Unterminated_regular_expression_literal);
                         break;
                     }
-                    var ch = _text.CharCodeAt(p);
+                    var ch = _text[p];
                     if (IsLineBreak(ch))
                     {
                         _tokenIsUnterminated = true;
@@ -1821,7 +1794,7 @@ namespace Serenity.TypeScript.TsParser
                         inEscape = false;
                     }
                     else
-                    if (ch == (int)CharacterCodes.Slash && !inCharacterClass)
+                    if (ch == '/' && !inCharacterClass)
                     {
                         // A slash within a character class is permissible,
                         // but in general it signals the end of the regexp literal.
@@ -1829,23 +1802,23 @@ namespace Serenity.TypeScript.TsParser
                         break;
                     }
                     else
-                    if (ch == (int)CharacterCodes.OpenBracket)
+                    if (ch == '[')
                     {
                         inCharacterClass = true;
                     }
                     else
-                    if (ch == (int)CharacterCodes.Backslash)
+                    if (ch == '\\')
                     {
                         inEscape = true;
                     }
                     else
-                    if (ch == (int)CharacterCodes.CloseBracket)
+                    if (ch == ']')
                     {
                         inCharacterClass = false;
                     }
                     p++;
                 }
-                while (p < _end && IsIdentifierPart(_text.CharCodeAt(p), _languageVersion))
+                while (p < _end && IsIdentifierPart(_text[p], _languageVersion))
                 {
                     p++;
                 }
@@ -1882,10 +1855,10 @@ namespace Serenity.TypeScript.TsParser
                 _token = SyntaxKind.EndOfFileToken;
                 return _token;
             }
-            var @char = _text.CharCodeAt(_pos);
-            if (@char == (int)CharacterCodes.LessThan)
+            var @char = _text[_pos];
+            if (@char == '<')
             {
-                if (_text.CharCodeAt(_pos + 1) == (int)CharacterCodes.Slash)
+                if (_text[_pos + 1] == '/')
                 {
                     _pos += 2;
                     _token = SyntaxKind.LessThanSlashToken;
@@ -1895,7 +1868,7 @@ namespace Serenity.TypeScript.TsParser
                 _token = SyntaxKind.LessThanToken;
                 return _token;
             }
-            if (@char == (int)CharacterCodes.OpenBrace)
+            if (@char == '{')
             {
                 _pos++;
                 _token = SyntaxKind.OpenBraceToken;
@@ -1904,12 +1877,12 @@ namespace Serenity.TypeScript.TsParser
             while (_pos < _end)
             {
                 _pos++;
-                @char = _text.CharCodeAt(_pos);
-                if (@char == (int)CharacterCodes.OpenBrace)
+                @char = _text[_pos];
+                if (@char == '{')
                 {
                     break;
                 }
-                if (@char == (int)CharacterCodes.LessThan)
+                if (@char == '<')
                 {
                     if (IsConflictMarkerTrivia(_text, _pos))
                     {
@@ -1932,8 +1905,8 @@ namespace Serenity.TypeScript.TsParser
                 var firstCharPosition = _pos;
                 while (_pos < _end)
                 {
-                    var ch = _text.CharCodeAt(_pos);
-                    if (ch == (int)CharacterCodes.Minus || ((firstCharPosition == _pos) ? IsIdentifierStart(ch, _languageVersion) : IsIdentifierPart(ch, _languageVersion)))
+                    var ch = _text[_pos];
+                    if (ch == '-' || ((firstCharPosition == _pos) ? IsIdentifierStart(ch, _languageVersion) : IsIdentifierPart(ch, _languageVersion)))
                     {
                         _pos++;
                     }
@@ -1951,10 +1924,10 @@ namespace Serenity.TypeScript.TsParser
         public SyntaxKind ScanJsxAttributeValue()
         {
             _startPos = _pos;
-            switch (_text.CharCodeAt(_pos))
+            switch (_text[_pos])
             {
-                case (int)CharacterCodes.DoubleQuote:
-                case (int)CharacterCodes.SingleQuote:
+                case '"':
+                case '\'':
                     _tokenValue = ScanString(/*allowEscapes*/ false);
                     _token = SyntaxKind.StringLiteral;
                     return _token;
@@ -1974,57 +1947,57 @@ namespace Serenity.TypeScript.TsParser
             }
             _startPos = _pos;
             _tokenPos = _pos;
-            var ch = _text.CharCodeAt(_pos);
+            var ch = _text[_pos];
             switch (ch)
             {
-                case (int)CharacterCodes.Tab:
-                case (int)CharacterCodes.VerticalTab:
-                case (int)CharacterCodes.FormFeed:
-                case (int)CharacterCodes.Space:
-                    while (_pos < _end && IsWhiteSpaceSingleLine(_text.CharCodeAt(_pos)))
+                case '\t':
+                case '\v':
+                case '\f':
+                case ' ':
+                    while (_pos < _end && IsWhiteSpaceSingleLine(_text[_pos]))
                     {
                         _pos++;
                     }
                     _token = SyntaxKind.WhitespaceTrivia;
                     return _token;
-                case (int)CharacterCodes.At:
+                case '@':
                     _pos++;
                     _token = SyntaxKind.AtToken;
                     return _token;
-                case (int)CharacterCodes.LineFeed:
-                case (int)CharacterCodes.CarriageReturn:
+                case '\n':
+                case '\r':
                     _pos++;
                     _token = SyntaxKind.NewLineTrivia;
                     return _token;
-                case (int)CharacterCodes.Asterisk:
+                case '*':
                     _pos++;
                     _token = SyntaxKind.AsteriskToken;
                     return _token;
-                case (int)CharacterCodes.OpenBrace:
+                case '{':
                     _pos++;
                     _token = SyntaxKind.OpenBraceToken;
                     return _token;
-                case (int)CharacterCodes.CloseBrace:
+                case '}':
                     _pos++;
                     _token = SyntaxKind.CloseBraceToken;
                     return _token;
-                case (int)CharacterCodes.OpenBracket:
+                case '[':
                     _pos++;
                     _token = SyntaxKind.OpenBracketToken;
                     return _token;
-                case (int)CharacterCodes.CloseBracket:
+                case ']':
                     _pos++;
                     _token = SyntaxKind.CloseBracketToken;
                     return _token;
-                case (int)CharacterCodes.equals:
+                case '=':
                     _pos++;
                     _token = SyntaxKind.EqualsToken;
                     return _token;
-                case (int)CharacterCodes.Comma:
+                case ',':
                     _pos++;
                     _token = SyntaxKind.CommaToken;
                     return _token;
-                case (int)CharacterCodes.Dot:
+                case '.':
                     _pos++;
                     _token = SyntaxKind.DotToken;
                     return _token;
@@ -2032,7 +2005,7 @@ namespace Serenity.TypeScript.TsParser
             if (IsIdentifierStart(ch, ScriptTarget.Latest))
             {
                 _pos++;
-                while (IsIdentifierPart(_text.CharCodeAt(_pos), ScriptTarget.Latest) && _pos < _end)
+                while (IsIdentifierPart(_text[_pos], ScriptTarget.Latest) && _pos < _end)
                 {
                     _pos++;
                 }

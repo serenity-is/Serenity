@@ -60,8 +60,8 @@ namespace Serenity.TypeScript.TsParser
 
         public static string EscapeIdentifier(string identifier)
         {
-            return identifier.Length >= 2 && identifier.CharCodeAt(0) == (int) CharacterCodes._ &&
-                   identifier.CharCodeAt(1) == (int) CharacterCodes._
+            return identifier.Length >= 2 && identifier[0] == '_' &&
+                   identifier[1] == '_'
                 ? "_" + identifier
                 : identifier;
         }
@@ -83,9 +83,9 @@ namespace Serenity.TypeScript.TsParser
                 : GetLeadingCommentRangesOfNodeFromText(node, text);
             if (commentRanges == null) commentRanges = new List<CommentRange>();
             return commentRanges.Where(comment =>
-                    text.CharCodeAt((comment.Pos ?? 0) + 1) == (int) CharacterCodes.Asterisk &&
-                    text.CharCodeAt((comment.Pos ?? 0) + 2) == (int) CharacterCodes.Asterisk &&
-                    text.CharCodeAt((comment.Pos ?? 0) + 3) != (int) CharacterCodes.Slash)
+                    text[(comment.Pos ?? 0) + 1] == '*' &&
+                    text[(comment.Pos ?? 0) + 2] == '*' &&
+                    text[(comment.Pos ?? 0) + 3] != '/')
                 .ToList();
         }
 
