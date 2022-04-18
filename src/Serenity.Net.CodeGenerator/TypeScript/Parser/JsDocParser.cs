@@ -475,7 +475,7 @@ namespace Serenity.TypeScript.TsParser
             }
 
 
-            types.End = Scanner.GetStartPos();
+            types.End = Scanner.StartPos;
 
             return types;
         }
@@ -502,7 +502,7 @@ namespace Serenity.TypeScript.TsParser
 
         public   JsDocType ParseJsDocUnknownOrNullableType()
         {
-            var pos = Scanner.GetStartPos();
+            var pos = Scanner.StartPos;
 
             NextToken();
             if (Token() == SyntaxKind.CommaToken ||
@@ -637,13 +637,13 @@ namespace Serenity.TypeScript.TsParser
                            else
                            {
 
-                               PushComment(Scanner.GetTokenText());
+                               PushComment(Scanner.TokenText);
                            }
 
                            break;
                        case SyntaxKind.NewLineTrivia:
 
-                           comments.Add(Scanner.GetTokenText());
+                           comments.Add(Scanner.TokenText);
 
                            state = JSDocState.BeginningOfLine;
 
@@ -651,7 +651,7 @@ namespace Serenity.TypeScript.TsParser
 
                            break;
                        case SyntaxKind.AsteriskToken:
-                           var asterisk = Scanner.GetTokenText();
+                           var asterisk = Scanner.TokenText;
                            if (state == JSDocState.SawAsterisk || state == JSDocState.SavingComments)
                            {
 
@@ -670,13 +670,13 @@ namespace Serenity.TypeScript.TsParser
                            break;
                        case SyntaxKind.Identifier:
 
-                           PushComment(Scanner.GetTokenText());
+                           PushComment(Scanner.TokenText);
 
                            state = JSDocState.SavingComments;
 
                            break;
                        case SyntaxKind.WhitespaceTrivia:
-                           var whitespace = Scanner.GetTokenText();
+                           var whitespace = Scanner.TokenText;
                            if (state == JSDocState.SavingComments)
                            {
 
@@ -699,7 +699,7 @@ namespace Serenity.TypeScript.TsParser
 
                            state = JSDocState.SavingComments;
 
-                           PushComment(Scanner.GetTokenText());
+                           PushComment(Scanner.TokenText);
 
                            break;
                    }
@@ -801,7 +801,7 @@ namespace Serenity.TypeScript.TsParser
             {
 
                 Debug.Assert(Token() == SyntaxKind.AtToken);
-                var atToken = new AtToken {End = Scanner.GetTextPos()};
+                var atToken = new AtToken {End = Scanner.TextPos};
 
 
                 NextJsDocToken();
@@ -886,7 +886,7 @@ namespace Serenity.TypeScript.TsParser
 
                                 state = JSDocState.BeginningOfLine;
 
-                                comments2.Add(Scanner.GetTokenText());
+                                comments2.Add(Scanner.TokenText);
                             }
 
                             indent = 0;
@@ -899,11 +899,11 @@ namespace Serenity.TypeScript.TsParser
                             if (state == JSDocState.SavingComments)
                             {
 
-                                PushComment(Scanner.GetTokenText());
+                                PushComment(Scanner.TokenText);
                             }
                             else
                             {
-                                var whitespace = Scanner.GetTokenText();
+                                var whitespace = Scanner.TokenText;
                                 if (margin != null && indent + whitespace.Length > margin)
                                 {
 
@@ -920,7 +920,7 @@ namespace Serenity.TypeScript.TsParser
 
                                 state = JSDocState.SawAsterisk;
 
-                                indent += Scanner.GetTokenText().Length;
+                                indent += Scanner.TokenText.Length;
 
                                 break;
                             }
@@ -928,7 +928,7 @@ namespace Serenity.TypeScript.TsParser
                         default:
 
                             caseLabel5: state = JSDocState.SavingComments;
-                            PushComment(Scanner.GetTokenText());
+                            PushComment(Scanner.TokenText);
 
                             break;
                     }
@@ -1049,7 +1049,7 @@ namespace Serenity.TypeScript.TsParser
                 if (name == null)
                 {
 
-                    ParseErrorAtPosition(Scanner.GetStartPos(), 0, Diagnostics.Identifier_expected);
+                    ParseErrorAtPosition(Scanner.StartPos, 0, Diagnostics.Identifier_expected);
 
                     return null;
                 }
@@ -1097,7 +1097,7 @@ namespace Serenity.TypeScript.TsParser
                 if (tags.Any(t => t.Kind == SyntaxKind.JsDocReturnTag))
                 {
 
-                    ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.GetTokenPos() - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                    ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
                 }
                 var result5 = new JsDocReturnTag
                 {
@@ -1118,7 +1118,7 @@ namespace Serenity.TypeScript.TsParser
                 if (tags.Any(t => t.Kind == SyntaxKind.JsDocTypeTag))
                 {
 
-                    ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.GetTokenPos() - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                    ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
                 }
                 var result6 = new JsDocTypeTag
                 {
@@ -1145,7 +1145,7 @@ namespace Serenity.TypeScript.TsParser
                 if (name == null)
                 {
 
-                    ParseErrorAtPosition(Scanner.GetStartPos(),  0, Diagnostics.Identifier_expected);
+                    ParseErrorAtPosition(Scanner.StartPos,  0, Diagnostics.Identifier_expected);
 
                     return null;
                 }
@@ -1251,7 +1251,7 @@ namespace Serenity.TypeScript.TsParser
             JsDocTypeLiteral ScanChildTags()
             {
                 var jsDocTypeLiteral = new JsDocTypeLiteral();
-                var resumePos = Scanner.GetStartPos();
+                var resumePos = Scanner.StartPos;
                 var canParseTag = true;
                 var seenAsterisk = false;
                 var parentTagTerminated = false;
@@ -1269,7 +1269,7 @@ namespace Serenity.TypeScript.TsParser
                                 if (!parentTagTerminated)
                                 {
 
-                                    resumePos = Scanner.GetStartPos();
+                                    resumePos = Scanner.StartPos;
                                 }
                             }
 
@@ -1278,7 +1278,7 @@ namespace Serenity.TypeScript.TsParser
                             break;
                         case SyntaxKind.NewLineTrivia:
 
-                            resumePos = Scanner.GetStartPos() - 1;
+                            resumePos = Scanner.StartPos - 1;
 
                             canParseTag = true;
 
@@ -1305,7 +1305,7 @@ namespace Serenity.TypeScript.TsParser
                     }
                 }
 
-                Scanner.SetTextPos(resumePos);
+                Scanner.TextPos = resumePos;
 
                 return FinishNode(jsDocTypeLiteral);
             }
@@ -1313,7 +1313,7 @@ namespace Serenity.TypeScript.TsParser
 
             INode ParseJsDocTypeNameWithNamespace(NodeFlags flags)
             {
-                var pos = Scanner.GetTokenPos();
+                var pos = Scanner.TokenPos;
                 var typeNameOrNamespaceName = ParseJsDocIdentifierName();
                 if (typeNameOrNamespaceName != null && ParseOptional(SyntaxKind.DotToken))
                 {
@@ -1341,7 +1341,7 @@ namespace Serenity.TypeScript.TsParser
             {
 
                 Debug.Assert(Token() == SyntaxKind.AtToken);
-                var atToken = new AtToken {End = Scanner.GetTextPos()};
+                var atToken = new AtToken {End = Scanner.TextPos};
 
 
                 NextJsDocToken();
@@ -1393,7 +1393,7 @@ namespace Serenity.TypeScript.TsParser
                 if (tags.Any(t => t.Kind == SyntaxKind.JsDocTemplateTag))
                 {
 
-                    ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.GetTokenPos() - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                    ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
                 }
                 var typeParameters = CreateList<TypeParameterDeclaration>();
                 while (true)
@@ -1404,7 +1404,7 @@ namespace Serenity.TypeScript.TsParser
                     if (name == null)
                     {
 
-                        ParseErrorAtPosition(Scanner.GetStartPos(), 0, Diagnostics.Identifier_expected);
+                        ParseErrorAtPosition(Scanner.StartPos, 0, Diagnostics.Identifier_expected);
 
                         return null;
                     }
@@ -1469,8 +1469,8 @@ namespace Serenity.TypeScript.TsParser
 
                     return null;
                 }
-                var pos = Scanner.GetTokenPos();
-                var end2 = Scanner.GetTextPos();
+                var pos = Scanner.TokenPos;
+                var end2 = Scanner.TextPos;
                 var result9 = new Identifier { Text = TsExtensions.Substring(content, pos, end2) };
 
 

@@ -12,7 +12,7 @@ namespace Serenity.TypeScript.TsParser
     public class Parser
     {
 
-        public Scanner Scanner = new Scanner(LanguageVariant.Standard, null, null);
+        public Scanner Scanner = new(LanguageVariant.Standard, null);
         public NodeFlags DisallowInAndDecoratorContext = NodeFlags.DisallowInContext | NodeFlags.DecoratorContext;
 
         public NodeFlags ContextFlags;
@@ -146,32 +146,23 @@ namespace Serenity.TypeScript.TsParser
 
             SourceFile.Flags = ContextFlags;
 
-
             // Prime the scanner.
             NextToken();
-
-            ProcessReferenceComments(SourceFile);
-
 
             SourceFile.Statements = ParseList2(TsTypes.ParsingContext.SourceElements, ParseStatement);
 
             Debug.Assert(Token() == SyntaxKind.EndOfFileToken);
 
-            SourceFile.EndOfFileToken = (EndOfFileToken)ParseTokenNode<EndOfFileToken>(Token());
-
+            SourceFile.EndOfFileToken = ParseTokenNode<EndOfFileToken>(Token());
 
             SetExternalModuleIndicator(SourceFile);
-
 
             SourceFile.NodeCount = NodeCount;
 
             SourceFile.ParseDiagnostics = ParseDiagnostics;
+
             if (setParentNodes)
-            {
-
                 FixupParentReferences(SourceFile);
-            }
-
 
             return SourceFile;
         }
@@ -444,8 +435,8 @@ namespace Serenity.TypeScript.TsParser
 
         public void ParseErrorAtCurrentToken(DiagnosticMessage message, object arg0 = null)
         {
-            var start = Scanner.GetTokenPos();
-            var length = Scanner.GetTextPos() - start;
+            var start = Scanner.TokenPos;
+            var length = Scanner.TextPos - start;
 
 
             ParseErrorAtPosition(start, length, message, arg0);
@@ -470,7 +461,7 @@ namespace Serenity.TypeScript.TsParser
 
         public void ScanError(DiagnosticMessage message, int? length = null)
         {
-            var pos = Scanner.GetTextPos();
+            var pos = Scanner.TextPos;
 
             ParseErrorAtPosition(pos, length ?? 0, message);
         }
@@ -479,14 +470,14 @@ namespace Serenity.TypeScript.TsParser
         public int GetNodePos()
         {
 
-            return Scanner.GetStartPos();
+            return Scanner.StartPos;
         }
 
 
         public int GetNodeEnd()
         {
 
-            return Scanner.GetStartPos();
+            return Scanner.StartPos;
         }
 
 
@@ -685,7 +676,7 @@ namespace Serenity.TypeScript.TsParser
         public T ParseTokenNode<T>(SyntaxKind sk) where T : Node
         {
             var node = (T)Activator.CreateInstance(typeof(T));// new T();
-            node.Pos = Scanner.GetStartPos();
+            node.Pos = Scanner.StartPos;
             node.Kind = sk;
 
             NextToken();
@@ -704,7 +695,7 @@ namespace Serenity.TypeScript.TsParser
 
 
             // We can parse out an optional semicolon in ASI cases in the following cases.
-            return Token() == SyntaxKind.CloseBraceToken || Token() == SyntaxKind.EndOfFileToken || Scanner.HasPrecedingLineBreak();
+            return Token() == SyntaxKind.CloseBraceToken || Token() == SyntaxKind.EndOfFileToken || Scanner.HasPrecedingLineBreak;
         }
 
 
@@ -750,7 +741,7 @@ namespace Serenity.TypeScript.TsParser
 
         public T FinishNode<T>(T node, int? end = null) where T : INode
         {
-            node.End = end == null ? Scanner.GetStartPos() : (int)end;
+            node.End = end == null ? Scanner.StartPos : (int)end;
             if (ContextFlags != NodeFlags.None)
             {
                 node.Flags |= ContextFlags;
@@ -767,7 +758,7 @@ namespace Serenity.TypeScript.TsParser
         {
             if (reportAtCurrentPosition)
             {
-                ParseErrorAtPosition(Scanner.GetStartPos(), 0, diagnosticMessage, arg0);
+                ParseErrorAtPosition(Scanner.StartPos, 0, diagnosticMessage, arg0);
             }
             else
             {
@@ -775,7 +766,7 @@ namespace Serenity.TypeScript.TsParser
             }
             var result = (T)Activator.CreateInstance(typeof(T));
             result.Kind = SyntaxKind.MissingDeclaration;
-            result.Pos = Scanner.GetStartPos();
+            result.Pos = Scanner.StartPos;
             //var result = new MissingNode { kind = kind, pos = scanner.getStartPos(), text = "" }; // createNode(kind, scanner.getStartPos());
             //(< Identifier > result).text = ";
             return FinishNode(result);
@@ -786,14 +777,14 @@ namespace Serenity.TypeScript.TsParser
 
             if (isIdentifier)
             {
-                var node = new Identifier { Pos = Scanner.GetStartPos() };
+                var node = new Identifier { Pos = Scanner.StartPos };
                 if (Token() != SyntaxKind.Identifier)
                 {
 
                     node.OriginalKeywordKind = Token();
                 }
 
-                node.Text = EscapeIdentifier(Scanner.GetTokenValue());
+                node.Text = EscapeIdentifier(Scanner.TokenValue);
 
                 NextToken();
 
@@ -871,7 +862,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ComputedPropertyName ParseComputedPropertyName()
         {
-            var node = new ComputedPropertyName() { Pos = Scanner.GetStartPos() };
+            var node = new ComputedPropertyName() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.OpenBracketToken);
 
@@ -899,7 +890,7 @@ namespace Serenity.TypeScript.TsParser
         {
 
             NextToken();
-            if (Scanner.HasPrecedingLineBreak())
+            if (Scanner.HasPrecedingLineBreak)
             {
 
                 return false;
@@ -1419,7 +1410,7 @@ namespace Serenity.TypeScript.TsParser
         {
 
             // Move the scanner so it is after the node we just consumed.
-            Scanner.SetTextPos(node.End ?? 0);
+            Scanner.TextPos = node.End ?? 0;
 
             NextToken();
 
@@ -1723,7 +1714,7 @@ namespace Serenity.TypeScript.TsParser
 
                     result.Add(ParseListElement(kind, parseElement));
 
-                    commaStart = Scanner.GetTokenPos();
+                    commaStart = Scanner.TokenPos;
                     if (ParseOptional(SyntaxKind.CommaToken))
                     {
 
@@ -1742,7 +1733,7 @@ namespace Serenity.TypeScript.TsParser
                     // We didn't get a comma, and the list wasn't terminated, explicitly parse
                     // out a comma so we give a good error message.
                     ParseExpected(SyntaxKind.CommaToken);
-                    if (considerSemicolonAsDelimiter == true && Token() == SyntaxKind.SemicolonToken && !Scanner.HasPrecedingLineBreak())
+                    if (considerSemicolonAsDelimiter == true && Token() == SyntaxKind.SemicolonToken && !Scanner.HasPrecedingLineBreak)
                     {
 
                         NextToken();
@@ -1823,7 +1814,7 @@ namespace Serenity.TypeScript.TsParser
 
         public Identifier ParseRightSideOfDot(bool allowIdentifierNames)
         {
-            if (Scanner.HasPrecedingLineBreak() && TokenIsIdentifierOrKeyword(Token()))
+            if (Scanner.HasPrecedingLineBreak&& TokenIsIdentifierOrKeyword(Token()))
             {
                 var matchesPattern = LookAhead(NextTokenIsIdentifierOrKeywordOnSameLine);
                 if (matchesPattern)
@@ -1843,7 +1834,7 @@ namespace Serenity.TypeScript.TsParser
 
         public TemplateExpression ParseTemplateExpression()
         {
-            var template = new TemplateExpression() { Pos = Scanner.GetStartPos() };
+            var template = new TemplateExpression() { Pos = Scanner.StartPos };
 
 
             template.Head = ParseTemplateHead();
@@ -1870,7 +1861,7 @@ namespace Serenity.TypeScript.TsParser
 
         public TemplateSpan ParseTemplateSpan()
         {
-            var span = new TemplateSpan() { Pos = Scanner.GetStartPos() };
+            var span = new TemplateSpan() { Pos = Scanner.StartPos };
 
             span.Expression = AllowInAnd(ParseExpression);
             //var literal = TemplateMiddle | TemplateTail;
@@ -1943,17 +1934,17 @@ namespace Serenity.TypeScript.TsParser
 
         public ILiteralLikeNode ParseLiteralLikeNode(/*SyntaxKind kind*/ILiteralLikeNode node, bool internName)
         {
-            node.Pos = Scanner.GetStartPos();
+            node.Pos = Scanner.StartPos;
             //var node = new LiteralLikeNode { pos = scanner.getStartPos() }; // LiteralExpression();
-            var text = Scanner.GetTokenValue();
+            var text = Scanner.TokenValue;
 
             node.Text = internName ? EscapeIdentifier(text) : text;
-            if (Scanner.IsUnterminated())
+            if (Scanner.IsUnterminated)
             {
 
                 node.IsUnterminated = true;
             }
-            var tokenPos = Scanner.GetTokenPos();
+            var tokenPos = Scanner.TokenPos;
 
             NextToken();
 
@@ -1978,7 +1969,7 @@ namespace Serenity.TypeScript.TsParser
             var node = new TypeReferenceNode() { Pos = typeName.Pos };
 
             node.TypeName = typeName;
-            if (!Scanner.HasPrecedingLineBreak() && Token() == SyntaxKind.LessThanToken)
+            if (!Scanner.HasPrecedingLineBreak&& Token() == SyntaxKind.LessThanToken)
             {
 
                 node.TypeArguments = ParseBracketedList(TsTypes.ParsingContext.TypeArguments, ParseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken);
@@ -2004,7 +1995,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ThisTypeNode ParseThisTypeNode()
         {
-            var node = new ThisTypeNode { Pos = Scanner.GetStartPos() };
+            var node = new ThisTypeNode { Pos = Scanner.StartPos };
 
             NextToken();
 
@@ -2014,7 +2005,7 @@ namespace Serenity.TypeScript.TsParser
 
         public TypeQueryNode ParseTypeQuery()
         {
-            var node = new TypeQueryNode() { Pos = Scanner.GetStartPos() };
+            var node = new TypeQueryNode() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.TypeOfKeyword);
 
@@ -2026,7 +2017,7 @@ namespace Serenity.TypeScript.TsParser
 
         public TypeParameterDeclaration ParseTypeParameter()
         {
-            var node = new TypeParameterDeclaration() { Pos = Scanner.GetStartPos() };
+            var node = new TypeParameterDeclaration() { Pos = Scanner.StartPos };
 
             node.Name = ParseIdentifier();
             if (ParseOptional(SyntaxKind.ExtendsKeyword))
@@ -2093,7 +2084,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ParameterDeclaration ParseParameter()
         {
-            var node = new ParameterDeclaration() { Pos = Scanner.GetStartPos() };
+            var node = new ParameterDeclaration() { Pos = Scanner.StartPos };
             if (Token() == SyntaxKind.ThisKeyword)
             {
 
@@ -2298,7 +2289,7 @@ namespace Serenity.TypeScript.TsParser
             if (kind == SyntaxKind.ConstructSignature)
             {
 
-                var node = new ConstructSignatureDeclaration { Pos = Scanner.GetStartPos() };
+                var node = new ConstructSignatureDeclaration { Pos = Scanner.StartPos };
                 ParseExpected(SyntaxKind.NewKeyword);
                 FillSignature(SyntaxKind.ColonToken, /*yieldContext*/ false, /*awaitContext*/ false, /*requireCompleteParameterList*/ false, node);
 
@@ -2308,7 +2299,7 @@ namespace Serenity.TypeScript.TsParser
             }
             else
             {
-                var node = new CallSignatureDeclaration { Pos = Scanner.GetStartPos() };
+                var node = new CallSignatureDeclaration { Pos = Scanner.StartPos };
                 FillSignature(SyntaxKind.ColonToken, /*yieldContext*/ false, /*awaitContext*/ false, /*requireCompleteParameterList*/ false, node);
 
                 ParseTypeMemberSemicolon();
@@ -2550,7 +2541,7 @@ namespace Serenity.TypeScript.TsParser
 
         public TypeLiteralNode ParseTypeLiteral()
         {
-            var node = new TypeLiteralNode() { Pos = Scanner.GetStartPos() };
+            var node = new TypeLiteralNode() { Pos = Scanner.StartPos };
 
             node.Members = ParseObjectTypeMembers();
 
@@ -2595,7 +2586,7 @@ namespace Serenity.TypeScript.TsParser
 
         public TypeParameterDeclaration ParseMappedTypeParameter()
         {
-            var node = new TypeParameterDeclaration() { Pos = Scanner.GetStartPos() };
+            var node = new TypeParameterDeclaration() { Pos = Scanner.StartPos };
 
             node.Name = ParseIdentifier();
 
@@ -2609,7 +2600,7 @@ namespace Serenity.TypeScript.TsParser
 
         public MappedTypeNode ParseMappedType()
         {
-            var node = new MappedTypeNode() { Pos = Scanner.GetStartPos() };
+            var node = new MappedTypeNode() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.OpenBraceToken);
 
@@ -2635,7 +2626,7 @@ namespace Serenity.TypeScript.TsParser
 
         public TupleTypeNode ParseTupleType()
         {
-            var node = new TupleTypeNode() { Pos = Scanner.GetStartPos() };
+            var node = new TupleTypeNode() { Pos = Scanner.StartPos };
 
             node.ElementTypes = ParseBracketedList(TsTypes.ParsingContext.TupleElementTypes, ParseType, SyntaxKind.OpenBracketToken, SyntaxKind.CloseBracketToken);
 
@@ -2645,7 +2636,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ParenthesizedTypeNode ParseParenthesizedType()
         {
-            var node = new ParenthesizedTypeNode() { Pos = Scanner.GetStartPos() };
+            var node = new ParenthesizedTypeNode() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.OpenParenToken);
 
@@ -2665,7 +2656,7 @@ namespace Serenity.TypeScript.TsParser
                 kind == SyntaxKind.ConstructorType ?
                 new ConstructorTypeNode { Kind = SyntaxKind.ConstructorType } :
                 throw new NotSupportedException("parseFunctionOrConstructorType");
-            node.Pos = Scanner.GetStartPos();
+            node.Pos = Scanner.StartPos;
             //new FunctionOrConstructorTypeNode { kind = kind, pos = scanner.getStartPos() };
             if (kind == SyntaxKind.ConstructorType)
             {
@@ -2689,7 +2680,7 @@ namespace Serenity.TypeScript.TsParser
 
         public LiteralTypeNode ParseLiteralTypeNode()
         {
-            var node = new LiteralTypeNode() { Pos = Scanner.GetStartPos() };
+            var node = new LiteralTypeNode() { Pos = Scanner.StartPos };
 
             node.Literal = ParseSimpleUnaryExpression();
 
@@ -2737,7 +2728,7 @@ namespace Serenity.TypeScript.TsParser
                 case SyntaxKind.ThisKeyword:
                     {
                         var thisKeyword = ParseThisTypeNode();
-                        if (Token() == SyntaxKind.IsKeyword && !Scanner.HasPrecedingLineBreak())
+                        if (Token() == SyntaxKind.IsKeyword && !Scanner.HasPrecedingLineBreak)
                         {
                             return ParseThisTypePredicate(thisKeyword);
                         }
@@ -2821,7 +2812,7 @@ namespace Serenity.TypeScript.TsParser
         public ITypeNode ParseArrayTypeOrHigher()
         {
             var type = ParseNonArrayType();
-            while (!Scanner.HasPrecedingLineBreak() && ParseOptional(SyntaxKind.OpenBracketToken))
+            while (!Scanner.HasPrecedingLineBreak&& ParseOptional(SyntaxKind.OpenBracketToken))
             {
                 if (IsStartOfType())
                 {
@@ -2853,7 +2844,7 @@ namespace Serenity.TypeScript.TsParser
 
         public /*MappedTypeNode*/TypeOperatorNode ParseTypeOperator(SyntaxKind/*.KeyOfKeyword*/ @operator)
         {
-            var node = new TypeOperatorNode() { Pos = Scanner.GetStartPos() };
+            var node = new TypeOperatorNode() { Pos = Scanner.StartPos };
 
             ParseExpected(@operator);
 
@@ -3030,7 +3021,7 @@ namespace Serenity.TypeScript.TsParser
         public Identifier ParseTypePredicatePrefix()
         {
             var id = ParseIdentifier();
-            if (Token() == SyntaxKind.IsKeyword && !Scanner.HasPrecedingLineBreak())
+            if (Token() == SyntaxKind.IsKeyword && !Scanner.HasPrecedingLineBreak)
             {
 
                 NextToken();
@@ -3190,7 +3181,7 @@ namespace Serenity.TypeScript.TsParser
         {
             if (Token() != SyntaxKind.EqualsToken)
             {
-                if (Scanner.HasPrecedingLineBreak() || (inParameter && Token() == SyntaxKind.OpenBraceToken) || !IsStartOfExpression())
+                if (Scanner.HasPrecedingLineBreak|| (inParameter && Token() == SyntaxKind.OpenBraceToken) || !IsStartOfExpression())
                 {
 
                     // preceding line break, open brace in a parameter (likely a function body) or current token is not an expression -
@@ -3278,13 +3269,13 @@ namespace Serenity.TypeScript.TsParser
 
             NextToken();
 
-            return !Scanner.HasPrecedingLineBreak() && IsIdentifier();
+            return !Scanner.HasPrecedingLineBreak&& IsIdentifier();
         }
 
 
         public YieldExpression ParseYieldExpression()
         {
-            var node = new YieldExpression() { Pos = Scanner.GetStartPos() };
+            var node = new YieldExpression() { Pos = Scanner.StartPos };
 
 
             // YieldExpression[In] :
@@ -3292,7 +3283,7 @@ namespace Serenity.TypeScript.TsParser
             //      yield [no LineTerminator here] [Lexical goal InputElementRegExp]AssignmentExpression[?In, Yield]
             //      yield [no LineTerminator here] * [Lexical goal InputElementRegExp]AssignmentExpression[?In, Yield]
             NextToken();
-            if (!Scanner.HasPrecedingLineBreak() &&
+            if (!Scanner.HasPrecedingLineBreak&&
                             (Token() == SyntaxKind.AsteriskToken || IsStartOfExpression()))
             {
 
@@ -3412,7 +3403,7 @@ namespace Serenity.TypeScript.TsParser
             {
 
                 NextToken();
-                if (Scanner.HasPrecedingLineBreak())
+                if (Scanner.HasPrecedingLineBreak)
                 {
 
                     return Tristate.False;
@@ -3548,13 +3539,13 @@ namespace Serenity.TypeScript.TsParser
             {
 
                 NextToken();
-                if (Scanner.HasPrecedingLineBreak() || Token() == SyntaxKind.EqualsGreaterThanToken)
+                if (Scanner.HasPrecedingLineBreak|| Token() == SyntaxKind.EqualsGreaterThanToken)
                 {
 
                     return Tristate.False;
                 }
                 var expr = ParseBinaryExpressionOrHigher(/*precedence*/ 0);
-                if (!Scanner.HasPrecedingLineBreak() && (SyntaxKind)expr.Kind == SyntaxKind.Identifier && Token() == SyntaxKind.EqualsGreaterThanToken)
+                if (!Scanner.HasPrecedingLineBreak&& (SyntaxKind)expr.Kind == SyntaxKind.Identifier && Token() == SyntaxKind.EqualsGreaterThanToken)
                 {
 
                     return Tristate.True;
@@ -3568,7 +3559,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ArrowFunction ParseParenthesizedArrowFunctionExpressionHead(bool allowAmbiguity)
         {
-            var node = new ArrowFunction() { Pos = Scanner.GetStartPos() };
+            var node = new ArrowFunction() { Pos = Scanner.StartPos };
 
             node.Modifiers = ParseModifiersForArrowFunction();
             var isAsync = /*!!*/(GetModifierFlags(node) & ModifierFlags.Async) != 0;
@@ -3703,7 +3694,7 @@ namespace Serenity.TypeScript.TsParser
                 }
                 if (Token() == SyntaxKind.AsKeyword)
                 {
-                    if (Scanner.HasPrecedingLineBreak())
+                    if (Scanner.HasPrecedingLineBreak)
                     {
 
                         break;
@@ -3829,7 +3820,7 @@ namespace Serenity.TypeScript.TsParser
 
         public PrefixUnaryExpression ParsePrefixUnaryExpression()
         {
-            var node = new PrefixUnaryExpression() { Pos = Scanner.GetStartPos() };
+            var node = new PrefixUnaryExpression() { Pos = Scanner.StartPos };
 
             node.Operator = /*(PrefixUnaryOperator)*/Token();
 
@@ -3844,7 +3835,7 @@ namespace Serenity.TypeScript.TsParser
 
         public DeleteExpression ParseDeleteExpression()
         {
-            var node = new DeleteExpression() { Pos = Scanner.GetStartPos() };
+            var node = new DeleteExpression() { Pos = Scanner.StartPos };
 
             NextToken();
 
@@ -3856,7 +3847,7 @@ namespace Serenity.TypeScript.TsParser
 
         public TypeOfExpression ParseTypeOfExpression()
         {
-            var node = new TypeOfExpression() { Pos = Scanner.GetStartPos() };
+            var node = new TypeOfExpression() { Pos = Scanner.StartPos };
 
             NextToken();
 
@@ -3868,7 +3859,7 @@ namespace Serenity.TypeScript.TsParser
 
         public VoidExpression ParseVoidExpression()
         {
-            var node = new VoidExpression() { Pos = Scanner.GetStartPos() };
+            var node = new VoidExpression() { Pos = Scanner.StartPos };
 
             NextToken();
 
@@ -3900,7 +3891,7 @@ namespace Serenity.TypeScript.TsParser
 
         public AwaitExpression ParseAwaitExpression()
         {
-            var node = new AwaitExpression() { Pos = Scanner.GetStartPos() };
+            var node = new AwaitExpression() { Pos = Scanner.StartPos };
 
             NextToken();
 
@@ -4014,7 +4005,7 @@ namespace Serenity.TypeScript.TsParser
         {
             if (Token() == SyntaxKind.PlusPlusToken || Token() == SyntaxKind.MinusMinusToken)
             {
-                var node = new PrefixUnaryExpression() { Pos = Scanner.GetStartPos() };
+                var node = new PrefixUnaryExpression() { Pos = Scanner.StartPos };
 
                 node.Operator = /*(PrefixUnaryOperator)*/Token();
 
@@ -4035,7 +4026,7 @@ namespace Serenity.TypeScript.TsParser
 
 
             //Debug.assert(isLeftHandSideExpression(expression));
-            if ((Token() == SyntaxKind.PlusPlusToken || Token() == SyntaxKind.MinusMinusToken) && !Scanner.HasPrecedingLineBreak())
+            if ((Token() == SyntaxKind.PlusPlusToken || Token() == SyntaxKind.MinusMinusToken) && !Scanner.HasPrecedingLineBreak)
             {
                 var node = new PostfixUnaryExpression() { Pos = expression.Pos };
 
@@ -4214,7 +4205,7 @@ namespace Serenity.TypeScript.TsParser
 
         public JsxText ParseJsxText()
         {
-            var node = new JsxText() { Pos = Scanner.GetStartPos() };
+            var node = new JsxText() { Pos = Scanner.StartPos };
 
             CurrentToken = Scanner.ScanJsxToken();
 
@@ -4279,7 +4270,7 @@ namespace Serenity.TypeScript.TsParser
             }
 
 
-            result.End = Scanner.GetTokenPos();
+            result.End = Scanner.TokenPos;
 
 
             ParsingContext = saveParsingContext;
@@ -4291,7 +4282,7 @@ namespace Serenity.TypeScript.TsParser
 
         public JsxAttributes ParseJsxAttributes()
         {
-            var jsxAttributes = new JsxAttributes() { Pos = Scanner.GetStartPos() };
+            var jsxAttributes = new JsxAttributes() { Pos = Scanner.StartPos };
 
             jsxAttributes.Properties = ParseList(TsTypes.ParsingContext.JsxAttributes, ParseJsxAttribute);
 
@@ -4301,7 +4292,7 @@ namespace Serenity.TypeScript.TsParser
         //JsxOpeningElement | JsxSelfClosingElement
         public Expression ParseJsxOpeningOrSelfClosingElement(bool inExpressionContext)
         {
-            var fullStart = Scanner.GetStartPos();
+            var fullStart = Scanner.StartPos;
 
 
             ParseExpected(SyntaxKind.LessThanToken);
@@ -4399,7 +4390,7 @@ namespace Serenity.TypeScript.TsParser
 
         public JsxExpression ParseJsxExpression(bool inExpressionContext)
         {
-            var node = new JsxExpression() { Pos = Scanner.GetStartPos() };
+            var node = new JsxExpression() { Pos = Scanner.StartPos };
 
 
             ParseExpected(SyntaxKind.OpenBraceToken);
@@ -4438,7 +4429,7 @@ namespace Serenity.TypeScript.TsParser
 
 
             ScanJsxIdentifier();
-            var node = new JsxAttribute() { Pos = Scanner.GetStartPos() };
+            var node = new JsxAttribute() { Pos = Scanner.StartPos };
 
             node.Name = ParseIdentifierName();
             if (Token() == SyntaxKind.EqualsToken)
@@ -4464,7 +4455,7 @@ namespace Serenity.TypeScript.TsParser
 
         public JsxSpreadAttribute ParseJsxSpreadAttribute()
         {
-            var node = new JsxSpreadAttribute() { Pos = Scanner.GetStartPos() };
+            var node = new JsxSpreadAttribute() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.OpenBraceToken);
 
@@ -4480,7 +4471,7 @@ namespace Serenity.TypeScript.TsParser
 
         public JsxClosingElement ParseJsxClosingElement(bool inExpressionContext)
         {
-            var node = new JsxClosingElement() { Pos = Scanner.GetStartPos() };
+            var node = new JsxClosingElement() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.LessThanSlashToken);
 
@@ -4504,7 +4495,7 @@ namespace Serenity.TypeScript.TsParser
 
         public TypeAssertion ParseTypeAssertion()
         {
-            var node = new TypeAssertion() { Pos = Scanner.GetStartPos() };
+            var node = new TypeAssertion() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.LessThanToken);
 
@@ -4535,7 +4526,7 @@ namespace Serenity.TypeScript.TsParser
 
                     continue;
                 }
-                if (Token() == SyntaxKind.ExclamationToken && !Scanner.HasPrecedingLineBreak())
+                if (Token() == SyntaxKind.ExclamationToken && !Scanner.HasPrecedingLineBreak)
                 {
 
                     NextToken();
@@ -4776,7 +4767,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ParenthesizedExpression ParseParenthesizedExpression()
         {
-            var node = new ParenthesizedExpression() { Pos = Scanner.GetStartPos() };
+            var node = new ParenthesizedExpression() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.OpenParenToken);
 
@@ -4790,7 +4781,7 @@ namespace Serenity.TypeScript.TsParser
 
         public Expression ParseSpreadElement()
         {
-            var node = new SpreadElement() { Pos = Scanner.GetStartPos() };
+            var node = new SpreadElement() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.DotDotDotToken);
 
@@ -4804,7 +4795,7 @@ namespace Serenity.TypeScript.TsParser
         {
 
             return Token() == SyntaxKind.DotDotDotToken ? ParseSpreadElement() :
-                Token() == SyntaxKind.CommaToken ? (new OmittedExpression() { Pos = Scanner.GetStartPos() }) /*createNode(SyntaxKind.OmittedExpression)*/ :
+                Token() == SyntaxKind.CommaToken ? (new OmittedExpression() { Pos = Scanner.StartPos }) /*createNode(SyntaxKind.OmittedExpression)*/ :
                     ParseAssignmentExpressionOrHigher();
         }
 
@@ -4818,10 +4809,10 @@ namespace Serenity.TypeScript.TsParser
 
         public ArrayLiteralExpression ParseArrayLiteralExpression()
         {
-            var node = new ArrayLiteralExpression() { Pos = Scanner.GetStartPos() };
+            var node = new ArrayLiteralExpression() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.OpenBracketToken);
-            if (Scanner.HasPrecedingLineBreak())
+            if (Scanner.HasPrecedingLineBreak)
             {
 
                 node.MultiLine = true;
@@ -4856,7 +4847,7 @@ namespace Serenity.TypeScript.TsParser
 
         public IObjectLiteralElementLike ParseObjectLiteralElement()
         {
-            var fullStart = Scanner.GetStartPos();
+            var fullStart = Scanner.StartPos;
             var dotDotDotToken = (DotDotDotToken)ParseOptionalToken<DotDotDotToken>(SyntaxKind.DotDotDotToken);
             if (dotDotDotToken != null)
             {
@@ -4924,10 +4915,10 @@ namespace Serenity.TypeScript.TsParser
 
         public ObjectLiteralExpression ParseObjectLiteralExpression()
         {
-            var node = new ObjectLiteralExpression() { Pos = Scanner.GetStartPos() };
+            var node = new ObjectLiteralExpression() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.OpenBraceToken);
-            if (Scanner.HasPrecedingLineBreak())
+            if (Scanner.HasPrecedingLineBreak)
             {
 
                 node.MultiLine = true;
@@ -4950,7 +4941,7 @@ namespace Serenity.TypeScript.TsParser
 
                 SetDecoratorContext(/*val*/ false);
             }
-            var node = new FunctionExpression() { Pos = Scanner.GetStartPos() };
+            var node = new FunctionExpression() { Pos = Scanner.StartPos };
 
             node.Modifiers = ParseModifiers();
 
@@ -4990,7 +4981,7 @@ namespace Serenity.TypeScript.TsParser
 
         public /*NewExpression | MetaProperty*/IPrimaryExpression ParseNewExpression()
         {
-            var fullStart = Scanner.GetStartPos();
+            var fullStart = Scanner.StartPos;
 
             ParseExpected(SyntaxKind.NewKeyword);
             if (ParseOptional(SyntaxKind.DotToken))
@@ -5023,10 +5014,10 @@ namespace Serenity.TypeScript.TsParser
 
         public Block ParseBlock(bool ignoreMissingOpenBrace, DiagnosticMessage diagnosticMessage = null)
         {
-            var node = new Block() { Pos = Scanner.GetStartPos() };
+            var node = new Block() { Pos = Scanner.StartPos };
             if (ParseExpected(SyntaxKind.OpenBraceToken, diagnosticMessage) || ignoreMissingOpenBrace)
             {
-                if (Scanner.HasPrecedingLineBreak())
+                if (Scanner.HasPrecedingLineBreak)
                 {
 
                     node.MultiLine = true;
@@ -5068,7 +5059,7 @@ namespace Serenity.TypeScript.TsParser
             Block block = null;
             if (Optimized && Token() == SyntaxKind.OpenBraceToken)
             {
-                var node = new Block() { Pos = Scanner.GetStartPos(), Statements = new NodeArray<IStatement>() };
+                var node = new Block() { Pos = Scanner.StartPos, Statements = new NodeArray<IStatement>() };
 
                 SyntaxKind token;
                 int openBraces = 1;
@@ -5129,7 +5120,7 @@ namespace Serenity.TypeScript.TsParser
 
         public EmptyStatement ParseEmptyStatement()
         {
-            var node = new EmptyStatement() { Pos = Scanner.GetStartPos() };
+            var node = new EmptyStatement() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.SemicolonToken);
 
@@ -5139,7 +5130,7 @@ namespace Serenity.TypeScript.TsParser
 
         public IfStatement ParseIfStatement()
         {
-            var node = new IfStatement() { Pos = Scanner.GetStartPos() };
+            var node = new IfStatement() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.IfKeyword);
 
@@ -5159,7 +5150,7 @@ namespace Serenity.TypeScript.TsParser
 
         public DoStatement ParseDoStatement()
         {
-            var node = new DoStatement() { Pos = Scanner.GetStartPos() };
+            var node = new DoStatement() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.DoKeyword);
 
@@ -5186,7 +5177,7 @@ namespace Serenity.TypeScript.TsParser
 
         public WhileStatement ParseWhileStatement()
         {
-            var node = new WhileStatement() { Pos = Scanner.GetStartPos() };
+            var node = new WhileStatement() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.WhileKeyword);
 
@@ -5288,7 +5279,7 @@ namespace Serenity.TypeScript.TsParser
 
         public IBreakOrContinueStatement ParseBreakOrContinueStatement(SyntaxKind kind)
         {
-            var node = kind == SyntaxKind.ContinueStatement ? (IBreakOrContinueStatement)new ContinueStatement { Pos = Scanner.GetStartPos() } : kind == SyntaxKind.BreakStatement ? new BreakStatement { Pos = Scanner.GetStartPos() } : throw new NotSupportedException("parseBreakOrContinueStatement");
+            var node = kind == SyntaxKind.ContinueStatement ? (IBreakOrContinueStatement)new ContinueStatement { Pos = Scanner.StartPos } : kind == SyntaxKind.BreakStatement ? new BreakStatement { Pos = Scanner.StartPos } : throw new NotSupportedException("parseBreakOrContinueStatement");
 
 
             ParseExpected(kind == SyntaxKind.BreakStatement ? SyntaxKind.BreakKeyword : SyntaxKind.ContinueKeyword);
@@ -5307,7 +5298,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ReturnStatement ParseReturnStatement()
         {
-            var node = new ReturnStatement() { Pos = Scanner.GetStartPos() };
+            var node = new ReturnStatement() { Pos = Scanner.StartPos };
 
 
             ParseExpected(SyntaxKind.ReturnKeyword);
@@ -5326,7 +5317,7 @@ namespace Serenity.TypeScript.TsParser
 
         public WithStatement ParseWithStatement()
         {
-            var node = new WithStatement() { Pos = Scanner.GetStartPos() };
+            var node = new WithStatement() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.WithKeyword);
 
@@ -5344,7 +5335,7 @@ namespace Serenity.TypeScript.TsParser
 
         public CaseClause ParseCaseClause()
         {
-            var node = new CaseClause() { Pos = Scanner.GetStartPos() };
+            var node = new CaseClause() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.CaseKeyword);
 
@@ -5360,7 +5351,7 @@ namespace Serenity.TypeScript.TsParser
 
         public DefaultClause ParseDefaultClause()
         {
-            var node = new DefaultClause() { Pos = Scanner.GetStartPos() };
+            var node = new DefaultClause() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.DefaultKeyword);
 
@@ -5381,7 +5372,7 @@ namespace Serenity.TypeScript.TsParser
 
         public SwitchStatement ParseSwitchStatement()
         {
-            var node = new SwitchStatement() { Pos = Scanner.GetStartPos() };
+            var node = new SwitchStatement() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.SwitchKeyword);
 
@@ -5390,7 +5381,7 @@ namespace Serenity.TypeScript.TsParser
             node.Expression = AllowInAnd(ParseExpression);
 
             ParseExpected(SyntaxKind.CloseParenToken);
-            var caseBlock = new CaseBlock() { Pos = Scanner.GetStartPos() };
+            var caseBlock = new CaseBlock() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.OpenBraceToken);
 
@@ -5406,11 +5397,11 @@ namespace Serenity.TypeScript.TsParser
 
         public ThrowStatement ParseThrowStatement()
         {
-            var node = new ThrowStatement() { Pos = Scanner.GetStartPos() };
+            var node = new ThrowStatement() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.ThrowKeyword);
 
-            node.Expression = Scanner.HasPrecedingLineBreak() ? null : AllowInAnd(ParseExpression);
+            node.Expression = Scanner.HasPrecedingLineBreak? null : AllowInAnd(ParseExpression);
 
             ParseSemicolon();
 
@@ -5420,7 +5411,7 @@ namespace Serenity.TypeScript.TsParser
 
         public TryStatement ParseTryStatement()
         {
-            var node = new TryStatement() { Pos = Scanner.GetStartPos() };
+            var node = new TryStatement() { Pos = Scanner.StartPos };
 
 
             ParseExpected(SyntaxKind.TryKeyword);
@@ -5443,7 +5434,7 @@ namespace Serenity.TypeScript.TsParser
 
         public CatchClause ParseCatchClause()
         {
-            var result = new CatchClause() { Pos = Scanner.GetStartPos() };
+            var result = new CatchClause() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.CatchKeyword);
             if (ParseExpected(SyntaxKind.OpenParenToken))
@@ -5463,7 +5454,7 @@ namespace Serenity.TypeScript.TsParser
 
         public DebuggerStatement ParseDebuggerStatement()
         {
-            var node = new DebuggerStatement() { Pos = Scanner.GetStartPos() };
+            var node = new DebuggerStatement() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.DebuggerKeyword);
 
@@ -5475,7 +5466,7 @@ namespace Serenity.TypeScript.TsParser
 
         public /*ExpressionStatement | LabeledStatement*/Statement ParseExpressionOrLabeledStatement()
         {
-            var fullStart = Scanner.GetStartPos();
+            var fullStart = Scanner.StartPos;
             var expression = AllowInAnd(ParseExpression);
             if ((SyntaxKind)expression.Kind == SyntaxKind.Identifier && ParseOptional(SyntaxKind.ColonToken))
             {
@@ -5505,7 +5496,7 @@ namespace Serenity.TypeScript.TsParser
 
             NextToken();
 
-            return TokenIsIdentifierOrKeyword(Token()) && !Scanner.HasPrecedingLineBreak();
+            return TokenIsIdentifierOrKeyword(Token()) && !Scanner.HasPrecedingLineBreak;
         }
 
 
@@ -5514,7 +5505,7 @@ namespace Serenity.TypeScript.TsParser
 
             NextToken();
 
-            return Token() == SyntaxKind.FunctionKeyword && !Scanner.HasPrecedingLineBreak();
+            return Token() == SyntaxKind.FunctionKeyword && !Scanner.HasPrecedingLineBreak;
         }
 
 
@@ -5523,7 +5514,7 @@ namespace Serenity.TypeScript.TsParser
 
             NextToken();
 
-            return (TokenIsIdentifierOrKeyword(Token()) || Token() == SyntaxKind.NumericLiteral) && !Scanner.HasPrecedingLineBreak();
+            return (TokenIsIdentifierOrKeyword(Token()) || Token() == SyntaxKind.NumericLiteral) && !Scanner.HasPrecedingLineBreak;
         }
 
 
@@ -5558,7 +5549,7 @@ namespace Serenity.TypeScript.TsParser
                     case SyntaxKind.ReadonlyKeyword:
 
                         NextToken();
-                        if (Scanner.HasPrecedingLineBreak())
+                        if (Scanner.HasPrecedingLineBreak)
                         {
 
                             return false;
@@ -5697,21 +5688,21 @@ namespace Serenity.TypeScript.TsParser
                     return ParseBlock(/*ignoreMissingOpenBrace*/ false);
                 case SyntaxKind.VarKeyword:
 
-                    return ParseVariableStatement(Scanner.GetStartPos(), /*decorators*/ null, /*modifiers*/ null);
+                    return ParseVariableStatement(Scanner.StartPos, /*decorators*/ null, /*modifiers*/ null);
                 case SyntaxKind.LetKeyword:
                     if (IsLetDeclaration())
                     {
 
-                        return ParseVariableStatement(Scanner.GetStartPos(), /*decorators*/ null, /*modifiers*/ null);
+                        return ParseVariableStatement(Scanner.StartPos, /*decorators*/ null, /*modifiers*/ null);
                     }
 
                     break;
                 case SyntaxKind.FunctionKeyword:
 
-                    return ParseFunctionDeclaration(Scanner.GetStartPos(), /*decorators*/ null, /*modifiers*/ null);
+                    return ParseFunctionDeclaration(Scanner.StartPos, /*decorators*/ null, /*modifiers*/ null);
                 case SyntaxKind.ClassKeyword:
 
-                    return ParseClassDeclaration(Scanner.GetStartPos(), /*decorators*/ null, /*modifiers*/ null);
+                    return ParseClassDeclaration(Scanner.StartPos, /*decorators*/ null, /*modifiers*/ null);
                 case SyntaxKind.IfKeyword:
 
                     return ParseIfStatement();
@@ -5857,7 +5848,7 @@ namespace Serenity.TypeScript.TsParser
 
             NextToken();
 
-            return !Scanner.HasPrecedingLineBreak() && (IsIdentifier() || Token() == SyntaxKind.StringLiteral);
+            return !Scanner.HasPrecedingLineBreak&& (IsIdentifier() || Token() == SyntaxKind.StringLiteral);
         }
 
 
@@ -5881,9 +5872,9 @@ namespace Serenity.TypeScript.TsParser
             if (Token() == SyntaxKind.CommaToken)
             {
 
-                return new OmittedExpression { Pos = Scanner.GetStartPos() }; //(OmittedExpression)createNode(SyntaxKind.OmittedExpression);
+                return new OmittedExpression { Pos = Scanner.StartPos }; //(OmittedExpression)createNode(SyntaxKind.OmittedExpression);
             }
-            var node = new BindingElement() { Pos = Scanner.GetStartPos() };
+            var node = new BindingElement() { Pos = Scanner.StartPos };
 
             node.DotDotDotToken = (DotDotDotToken)ParseOptionalToken<DotDotDotToken>(SyntaxKind.DotDotDotToken);
 
@@ -5897,7 +5888,7 @@ namespace Serenity.TypeScript.TsParser
 
         public IArrayBindingElement ParseObjectBindingElement()
         {
-            var node = new BindingElement() { Pos = Scanner.GetStartPos() };
+            var node = new BindingElement() { Pos = Scanner.StartPos };
 
             node.DotDotDotToken = (DotDotDotToken)ParseOptionalToken<DotDotDotToken>(SyntaxKind.DotDotDotToken);
             var tokenIsIdentifier = IsIdentifier();
@@ -5925,7 +5916,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ObjectBindingPattern ParseObjectBindingPattern()
         {
-            var node = new ObjectBindingPattern() { Pos = Scanner.GetStartPos() };
+            var node = new ObjectBindingPattern() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.OpenBraceToken);
 
@@ -5939,7 +5930,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ArrayBindingPattern ParseArrayBindingPattern()
         {
-            var node = new ArrayBindingPattern() { Pos = Scanner.GetStartPos() };
+            var node = new ArrayBindingPattern() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.OpenBracketToken);
 
@@ -5977,7 +5968,7 @@ namespace Serenity.TypeScript.TsParser
 
         public VariableDeclaration ParseVariableDeclaration()
         {
-            var node = new VariableDeclaration() { Pos = Scanner.GetStartPos() };
+            var node = new VariableDeclaration() { Pos = Scanner.StartPos };
 
             node.Name = ParseIdentifierOrPattern();
 
@@ -5994,7 +5985,7 @@ namespace Serenity.TypeScript.TsParser
 
         public IVariableDeclarationList ParseVariableDeclarationList(bool inForStatementInitializer)
         {
-            var node = new VariableDeclarationList() { Pos = Scanner.GetStartPos() };
+            var node = new VariableDeclarationList() { Pos = Scanner.StartPos };
             switch (Token())
             {
                 case SyntaxKind.VarKeyword:
@@ -6340,7 +6331,7 @@ namespace Serenity.TypeScript.TsParser
             var modifiers = CreateList<Modifier>();
             while (true)
             {
-                var modifierStart = Scanner.GetStartPos();
+                var modifierStart = Scanner.StartPos;
                 var modifierKind = Token();
                 if (Token() == SyntaxKind.ConstKeyword && permitInvalidConstAsModifier == true)
                 {
@@ -6375,7 +6366,7 @@ namespace Serenity.TypeScript.TsParser
             if (modifiers != null)
             {
 
-                modifiers.End = Scanner.GetStartPos();
+                modifiers.End = Scanner.StartPos;
             }
 
             return modifiers;
@@ -6387,7 +6378,7 @@ namespace Serenity.TypeScript.TsParser
             NodeArray<Modifier> modifiers = null;
             if (Token() == SyntaxKind.AsyncKeyword)
             {
-                var modifierStart = Scanner.GetStartPos();
+                var modifierStart = Scanner.StartPos;
                 var modifierKind = Token();
 
                 NextToken();
@@ -6398,7 +6389,7 @@ namespace Serenity.TypeScript.TsParser
                 modifiers.Pos = modifierStart;
                 modifiers.Add(modifier);
 
-                modifiers.End = Scanner.GetStartPos();
+                modifiers.End = Scanner.StartPos;
             }
 
 
@@ -6410,7 +6401,7 @@ namespace Serenity.TypeScript.TsParser
         {
             if (Token() == SyntaxKind.SemicolonToken)
             {
-                var result = new SemicolonClassElement() { Pos = Scanner.GetStartPos() };
+                var result = new SemicolonClassElement() { Pos = Scanner.StartPos };
 
                 NextToken();
 
@@ -6461,8 +6452,8 @@ namespace Serenity.TypeScript.TsParser
 
         public ClassExpression ParseClassExpression()
         {
-            var node = new ClassExpression { Pos = Scanner.GetStartPos() };
-            node.Pos = Scanner.GetStartPos();
+            var node = new ClassExpression { Pos = Scanner.StartPos };
+            node.Pos = Scanner.StartPos;
             //node.decorators = decorators;
 
             //node.modifiers = modifiers;
@@ -6613,7 +6604,7 @@ namespace Serenity.TypeScript.TsParser
             var tok = Token();
             if (tok == SyntaxKind.ExtendsKeyword || tok == SyntaxKind.ImplementsKeyword)
             {
-                var node = new HeritageClause() { Pos = Scanner.GetStartPos() };
+                var node = new HeritageClause() { Pos = Scanner.StartPos };
 
                 node.Token = tok;
 
@@ -6631,7 +6622,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ExpressionWithTypeArguments ParseExpressionWithTypeArguments()
         {
-            var node = new ExpressionWithTypeArguments() { Pos = Scanner.GetStartPos() };
+            var node = new ExpressionWithTypeArguments() { Pos = Scanner.StartPos };
 
             node.Expression = ParseLeftHandSideExpressionOrHigher();
             if (Token() == SyntaxKind.LessThanToken)
@@ -6707,7 +6698,7 @@ namespace Serenity.TypeScript.TsParser
 
         public EnumMember ParseEnumMember()
         {
-            var node = new EnumMember() { Pos = Scanner.GetStartPos() };
+            var node = new EnumMember() { Pos = Scanner.StartPos };
 
             node.Name = ParsePropertyName();
 
@@ -6747,7 +6738,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ModuleBlock ParseModuleBlock()
         {
-            var node = new ModuleBlock() { Pos = Scanner.GetStartPos() };
+            var node = new ModuleBlock() { Pos = Scanner.StartPos };
             if (ParseExpected(SyntaxKind.OpenBraceToken))
             {
 
@@ -6901,7 +6892,7 @@ namespace Serenity.TypeScript.TsParser
         {
 
             ParseExpected(SyntaxKind.ImportKeyword);
-            var afterImportPos = Scanner.GetStartPos();
+            var afterImportPos = Scanner.StartPos;
             Identifier identifier = null;
             if (IsIdentifier())
             {
@@ -6990,7 +6981,7 @@ namespace Serenity.TypeScript.TsParser
 
         public ExternalModuleReference ParseExternalModuleReference()
         {
-            var node = new ExternalModuleReference() { Pos = Scanner.GetStartPos() };
+            var node = new ExternalModuleReference() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.RequireKeyword);
 
@@ -7027,7 +7018,7 @@ namespace Serenity.TypeScript.TsParser
 
         public NamespaceImport ParseNamespaceImport()
         {
-            var namespaceImport = new NamespaceImport() { Pos = Scanner.GetStartPos() };
+            var namespaceImport = new NamespaceImport() { Pos = Scanner.StartPos };
 
             ParseExpected(SyntaxKind.AsteriskToken);
 
@@ -7053,7 +7044,7 @@ namespace Serenity.TypeScript.TsParser
         {
             if (kind == SyntaxKind.NamedImports)
             {
-                var node = new NamedImports { Pos = Scanner.GetStartPos() };
+                var node = new NamedImports { Pos = Scanner.StartPos };
                 node.Elements = ParseBracketedList<ImportSpecifier>(TsTypes.ParsingContext.ImportOrExportSpecifiers, ParseImportSpecifier,
                    SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken);
 
@@ -7061,7 +7052,7 @@ namespace Serenity.TypeScript.TsParser
             }
             else
             {
-                var node = new NamedExports { Pos = Scanner.GetStartPos() };
+                var node = new NamedExports { Pos = Scanner.StartPos };
                 node.Elements = ParseBracketedList<ExportSpecifier>(TsTypes.ParsingContext.ImportOrExportSpecifiers, ParseExportSpecifier,
                    SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken);
 
@@ -7088,10 +7079,10 @@ namespace Serenity.TypeScript.TsParser
 
         public ExportSpecifier ParseExportSpecifier()
         {
-            var node = new ExportSpecifier { Pos = Scanner.GetStartPos() };
+            var node = new ExportSpecifier { Pos = Scanner.StartPos };
             var checkIdentifierIsKeyword = IsKeyword(Token()) && !IsIdentifier();
-            var checkIdentifierStart = Scanner.GetTokenPos();
-            var checkIdentifierEnd = Scanner.GetTextPos();
+            var checkIdentifierStart = Scanner.TokenPos;
+            var checkIdentifierEnd = Scanner.TextPos;
             var identifierName = ParseIdentifierName();
             if (Token() == SyntaxKind.AsKeyword)
             {
@@ -7102,9 +7093,9 @@ namespace Serenity.TypeScript.TsParser
 
                 checkIdentifierIsKeyword = IsKeyword(Token()) && !IsIdentifier();
 
-                checkIdentifierStart = Scanner.GetTokenPos();
+                checkIdentifierStart = Scanner.TokenPos;
 
-                checkIdentifierEnd = Scanner.GetTextPos();
+                checkIdentifierEnd = Scanner.TextPos;
 
                 node.Name = ParseIdentifierName();
             }
@@ -7121,10 +7112,10 @@ namespace Serenity.TypeScript.TsParser
 
         public ImportSpecifier ParseImportSpecifier()
         {
-            var node = new ImportSpecifier() { Pos = Scanner.GetStartPos() };
+            var node = new ImportSpecifier() { Pos = Scanner.StartPos };
             var checkIdentifierIsKeyword = IsKeyword(Token()) && !IsIdentifier();
-            var checkIdentifierStart = Scanner.GetTokenPos();
-            var checkIdentifierEnd = Scanner.GetTextPos();
+            var checkIdentifierStart = Scanner.TokenPos;
+            var checkIdentifierEnd = Scanner.TextPos;
             var identifierName = ParseIdentifierName();
             if (Token() == SyntaxKind.AsKeyword)
             {
@@ -7135,9 +7126,9 @@ namespace Serenity.TypeScript.TsParser
 
                 checkIdentifierIsKeyword = IsKeyword(Token()) && !IsIdentifier();
 
-                checkIdentifierStart = Scanner.GetTokenPos();
+                checkIdentifierStart = Scanner.TokenPos;
 
-                checkIdentifierEnd = Scanner.GetTextPos();
+                checkIdentifierEnd = Scanner.TextPos;
 
                 node.Name = ParseIdentifierName();
             }
@@ -7215,7 +7206,7 @@ namespace Serenity.TypeScript.TsParser
             {
 
                 node.ExportClause = (NamedExports)ParseNamedImportsOrExports(SyntaxKind.NamedExports);
-                if (Token() == SyntaxKind.FromKeyword || (Token() == SyntaxKind.StringLiteral && !Scanner.HasPrecedingLineBreak()))
+                if (Token() == SyntaxKind.FromKeyword || (Token() == SyntaxKind.StringLiteral && !Scanner.HasPrecedingLineBreak))
                 {
 
                     ParseExpected(SyntaxKind.FromKeyword);
@@ -7254,124 +7245,6 @@ namespace Serenity.TypeScript.TsParser
 
             return FinishNode(node);
         }
-
-
-        public void ProcessReferenceComments(SourceFile sourceFile)
-        {
-            //var triviaScanner = new Scanner(sourceFile.languageVersion, /*skipTrivia*/false, LanguageVariant.Standard, sourceText);
-            //List<FileReference> referencedFiles = new List<FileReference>();
-            //List<FileReference> typeReferenceDirectives = new List<FileReference>();
-            ////(string path, string name)[] amdDependencies =  [];
-            //List<AmdDependency> amdDependencies = new List<AmdDependency>();
-            //string amdModuleName = null;
-            //CheckJsDirective checkJsDirective = null;
-            //while (true)
-            //{
-            //    var kind = triviaScanner.scan();
-            //    if (kind != SyntaxKind.SingleLineCommentTrivia)
-            //    {
-            //        if (isTrivia(kind))
-            //        {
-
-            //            continue;
-            //        }
-            //        else
-            //        {
-
-            //            break;
-            //        }
-            //    }
-            //    var range = new
-            //    {
-            //        kind = /*(SyntaxKind.SingleLineCommentTrivia | SyntaxKind.MultiLineCommentTrivia)*/triviaScanner.getToken(),
-            //        pos = triviaScanner.getTokenPos(),
-            //        end = triviaScanner.getTextPos()
-            //    };
-            //    var comment = sourceText.substring(range.pos, range.end);
-            //    var referencePathMatchResult = getFileReferenceFromReferencePath(comment, range);
-            //    if (referencePathMatchResult)
-            //    {
-            //        var fileReference = referencePathMatchResult.fileReference;
-
-            //        sourceFile.hasNoDefaultLib = referencePathMatchResult.isNoDefaultLib;
-            //        var diagnosticMessage = referencePathMatchResult.diagnosticMessage;
-            //        if (fileReference)
-            //        {
-            //            if (referencePathMatchResult.isTypeReferenceDirective)
-            //            {
-
-            //                typeReferenceDirectives.Add(fileReference);
-            //            }
-            //            else
-            //            {
-
-            //                referencedFiles.Add(fileReference);
-            //            }
-            //        }
-            //        if (diagnosticMessage)
-            //        {
-
-            //            parseDiagnostics.Add(createFileDiagnostic(sourceFile, range.pos, range.end - range.pos, diagnosticMessage));
-            //        }
-            //    }
-            //    else
-            //    {
-            //        var amdModuleNameRegEx = new Regex(@" /^\/\/\/\s*<amd-module\s+name\s*=\s*('|"")(.+?)\1/gim");
-            //        var amdModuleNameMatchResult = amdModuleNameRegEx.exec(comment);
-            //        if (amdModuleNameMatchResult)
-            //        {
-            //            if (amdModuleName)
-            //            {
-
-            //                parseDiagnostics.Add(createFileDiagnostic(sourceFile, range.pos, range.end - range.pos, Diagnostics.An_AMD_module_cannot_have_multiple_name_assignments));
-            //            }
-
-            //            amdModuleName = amdModuleNameMatchResult[2];
-            //        }
-            //        var amdDependencyRegEx = new Regex(@" /^\/\/\/\s*<amd-dependency\s/gim");
-            //        var pathRegex = new Regex(@" /\spath\s*=\s*('|"")(.+?)\1/gim");
-            //        var nameRegex = new Regex(@" /\sname\s*=\s*('|"")(.+?)\1/gim");
-            //        var amdDependencyMatchResult = amdDependencyRegEx.exec(comment);
-            //        if (amdDependencyMatchResult.Any())
-            //        {
-            //            var pathMatchResult = pathRegex.exec(comment);
-            //            var nameMatchResult = nameRegex.exec(comment);
-            //            if (pathMatchResult.Any())
-            //            {
-            //                var amdDependency = new { path = pathMatchResult[2], name = nameMatchResult.Any() ? nameMatchResult[2] : null };
-
-            //                amdDependencies.Add(new AmdDependency { name = amdDependency.name, path = amdDependency.path });
-            //            }
-            //        }
-            //        var checkJsDirectiveRegEx = new Regex(@" /^\/\/\/?\s*(@ts-check|@ts-nocheck)\s*$/gim");
-            //        var checkJsDirectiveMatchResult = checkJsDirectiveRegEx.exec(comment);
-            //        if (checkJsDirectiveMatchResult.Any())
-            //        {
-
-            //            checkJsDirective = new CheckJsDirective
-            //            {
-
-            //                enabled = checkJsDirectiveMatchResult[1].ToLower() == @"ts-check",
-            //                //compareStrings(checkJsDirectiveMatchResult[1], "@ts-check", /*ignoreCase*/ true) == Comparison.EqualTo,
-            //                end = range.end,
-            //                pos = range.pos
-            //            };
-            //        }
-            //    }
-            //}
-
-
-            //sourceFile.referencedFiles = referencedFiles;
-
-            //sourceFile.typeReferenceDirectives = typeReferenceDirectives;
-
-            //sourceFile.amdDependencies = amdDependencies;
-
-            //sourceFile.moduleName = amdModuleName;
-
-            //sourceFile.checkJsDirective = checkJsDirective;
-        }
-
 
         public void SetExternalModuleIndicator(SourceFile sourceFile)
         {
