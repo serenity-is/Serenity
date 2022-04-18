@@ -1948,11 +1948,6 @@ namespace Serenity.TypeScript.TsParser
             var text = Scanner.GetTokenValue();
 
             node.Text = internName ? EscapeIdentifier(text) : text;
-            if (Scanner.HasExtendedUnicodeEscape())
-            {
-
-                node.HasExtendedUnicodeEscape = true;
-            }
             if (Scanner.IsUnterminated())
             {
 

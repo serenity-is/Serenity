@@ -27,7 +27,6 @@ namespace Serenity.TypeScript.TsParser
         private SyntaxKind _token;
         private string _tokenValue;
         private bool _precedingLineBreak;
-        private bool _hasExtendedUnicodeEscape;
         private bool _tokenIsUnterminated;
         public event ErrorCallback OnError;
         private LanguageVariant _languageVariant;
@@ -38,7 +37,6 @@ namespace Serenity.TypeScript.TsParser
         public int GetTokenPos() => _tokenPos;
         public string GetTokenText() => TsExtensions.Substring(_text, _tokenPos, _pos);
         public string GetTokenValue() => _tokenValue;
-        public bool HasExtendedUnicodeEscape() => _hasExtendedUnicodeEscape;
         public bool HasPrecedingLineBreak() => _precedingLineBreak;
         public bool IsIdentifier() => _token == SyntaxKind.Identifier || _token > SyntaxKind.LastReservedWord;
         public bool IsReservedWord() => _token >= SyntaxKind.FirstReservedWord && _token <= SyntaxKind.LastReservedWord;
@@ -993,7 +991,6 @@ namespace Serenity.TypeScript.TsParser
                 case 'u':
                     if (_pos < _end && _text[_pos] == '{')
                     {
-                        _hasExtendedUnicodeEscape = true;
                         _pos++;
                         return ScanExtendedUnicodeEscape();
                     }
@@ -1182,7 +1179,6 @@ namespace Serenity.TypeScript.TsParser
         public SyntaxKind Scan()
         {
             _startPos = _pos;
-            _hasExtendedUnicodeEscape = false;
             _precedingLineBreak = false;
             _tokenIsUnterminated = false;
             while (true)
@@ -1958,7 +1954,6 @@ namespace Serenity.TypeScript.TsParser
             var saveToken = _token;
             var savePrecedingLineBreak = _precedingLineBreak;
             var saveTokenValue = _tokenValue;
-            var saveHasExtendedUnicodeEscape = _hasExtendedUnicodeEscape;
             var saveTokenIsUnterminated = _tokenIsUnterminated;
             SetText(_text, start, length);
             var result = callback();
@@ -1969,7 +1964,6 @@ namespace Serenity.TypeScript.TsParser
             _token = saveToken;
             _precedingLineBreak = savePrecedingLineBreak;
             _tokenValue = saveTokenValue;
-            _hasExtendedUnicodeEscape = saveHasExtendedUnicodeEscape;
             _tokenIsUnterminated = saveTokenIsUnterminated;
             return result;
         }
@@ -2022,7 +2016,6 @@ namespace Serenity.TypeScript.TsParser
             _token = SyntaxKind.Unknown;
             _precedingLineBreak = false;
             _tokenValue = null;
-            _hasExtendedUnicodeEscape = false;
             _tokenIsUnterminated = false;
         }
 
