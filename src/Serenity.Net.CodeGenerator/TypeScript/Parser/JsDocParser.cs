@@ -1471,7 +1471,7 @@ namespace Serenity.TypeScript.TsParser
                 }
                 var pos = Scanner.TokenPos;
                 var end2 = Scanner.TextPos;
-                var result9 = new Identifier { Text = TsExtensions.Substring(content, pos, end2) };
+                var result9 = new Identifier { Text = content[pos..end2] };
 
 
                 FinishNode(result9, end2);

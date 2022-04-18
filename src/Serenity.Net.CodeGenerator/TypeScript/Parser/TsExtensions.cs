@@ -8,10 +8,6 @@ namespace Serenity.TypeScript.TsParser
 {
     public static class TsExtensions
     {
-        public static string Substring(this string str, int start, int? end = null)
-        {
-            return end == null ? str[start..] : str[start..(int)end];
-        }
         public static string[] Exec(this Regex r, string text) => r.Match(text).Captures.Cast<string>().ToArray();
         public static bool Test(this Regex r, string text) => r.IsMatch(text);
         public static void Pop<T>(this List<T> list) => list.RemoveAt(0);

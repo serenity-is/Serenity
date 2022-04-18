@@ -53,8 +53,12 @@ namespace Serenity.TypeScript.TsParser
             if (NodeIsMissing(node))
                 return "";
 
+            var start = SkipTriviaM(sourceText, node.Pos ?? 0);
 
-            return sourceText.Substring(SkipTriviaM(sourceText, node.Pos ?? 0), node.End);
+            if (node.End == null)
+                return sourceText[start..];
+
+            return sourceText[start..node.End.Value];
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Serenity.TypeScript.TsTypes;
 using static Serenity.TypeScript.TsParser.Core;
@@ -49,7 +50,7 @@ namespace Serenity.TypeScript.TsParser
         }
 
         public int TokenPos => _tokenPos;
-        public string TokenText => TsExtensions.Substring(_text, _tokenPos, _pos);
+        public string TokenText => _text[_tokenPos.._pos];
         public string TokenValue => _tokenValue;
         public bool HasPrecedingLineBreak => _precedingLineBreak;
         public bool IsUnterminated => _tokenIsUnterminated;
@@ -742,7 +743,7 @@ namespace Serenity.TypeScript.TsParser
                     Error(Diagnostics.Digit_expected);
                 }
             }
-            return "" + (TsExtensions.Substring(_text, start, end));
+            return _text[start..end];
         }
 
         public int ScanOctalDigits()
@@ -752,7 +753,7 @@ namespace Serenity.TypeScript.TsParser
             {
                 _pos++;
             }
-            return int.Parse(TsExtensions.Substring(_text, start, _pos));
+            return int.Parse(_text.AsSpan(start, _pos - start + 1));
         }
 
         public int ScanExactNumberOfHexDigits(int count)
@@ -804,13 +805,13 @@ namespace Serenity.TypeScript.TsParser
         {
             var quote = _text[_pos];
             _pos++;
-            var result = "";
+            var result = new StringBuilder();
             var start = _pos;
             while (true)
             {
                 if (_pos >= _end)
                 {
-                    result += TsExtensions.Substring(_text, start, _pos);
+                    result.Append(_text, start, _pos - start + 1);
                     _tokenIsUnterminated = true;
                     Error(Diagnostics.Unterminated_string_literal);
                     break;
@@ -818,27 +819,27 @@ namespace Serenity.TypeScript.TsParser
                 var ch = _text[_pos];
                 if (ch == quote)
                 {
-                    result += TsExtensions.Substring(_text, start, _pos);
+                    result.Append(_text, start, _pos - start + 1);
                     _pos++;
                     break;
                 }
                 if (ch == '\\' && allowEscapes)
                 {
-                    result += TsExtensions.Substring(_text, start, _pos);
-                    result += ScanEscapeSequence();
+                    result.Append(_text, start, _pos - start + 1);
+                    ScanEscapeSequence(result);
                     start = _pos;
                     continue;
                 }
                 if (IsLineBreak(ch))
                 {
-                    result += TsExtensions.Substring(_text, start, _pos);
+                    result.Append(_text, start, _pos - start + 1);
                     _tokenIsUnterminated = true;
                     Error(Diagnostics.Unterminated_string_literal);
                     break;
                 }
                 _pos++;
             }
-            return result;
+            return result.ToString();
         }
 
         public SyntaxKind ScanTemplateAndSetTokenValue()
@@ -846,13 +847,13 @@ namespace Serenity.TypeScript.TsParser
             var startedWithBacktick = _text[_pos] == '`';
             _pos++;
             var start = _pos;
-            var contents = "";
+            var contents = new StringBuilder();
             SyntaxKind resultingToken;
             while (true)
             {
                 if (_pos >= _end)
                 {
-                    contents += TsExtensions.Substring(_text, start, _pos);
+                    contents.Append(_text, start, _pos - start + 1);
                     _tokenIsUnterminated = true;
                     Error(Diagnostics.Unterminated_template_literal);
                     resultingToken = startedWithBacktick ? SyntaxKind.NoSubstitutionTemplateLiteral : SyntaxKind.TemplateTail;
@@ -861,135 +862,146 @@ namespace Serenity.TypeScript.TsParser
                 var currChar = _text[_pos];
                 if (currChar == '`')
                 {
-                    contents += TsExtensions.Substring(_text, start, _pos);
+                    contents.Append(_text, start, _pos - start + 1);
                     _pos++;
                     resultingToken = startedWithBacktick ? SyntaxKind.NoSubstitutionTemplateLiteral : SyntaxKind.TemplateTail;
                     break;
                 }
                 if (currChar == '$' && _pos + 1 < _end && _text[_pos + 1] == '{')
                 {
-                    contents += TsExtensions.Substring(_text, start, _pos);
+                    contents.Append(_text, start, _pos - start + 1);
                     _pos += 2;
                     resultingToken = startedWithBacktick ? SyntaxKind.TemplateHead : SyntaxKind.TemplateMiddle;
                     break;
                 }
                 if (currChar == '\\')
                 {
-                    contents += TsExtensions.Substring(_text, start, _pos);
-                    contents += ScanEscapeSequence();
+                    contents.Append(_text, start, _pos - start + 1);
+                    ScanEscapeSequence(contents);
                     start = _pos;
                     continue;
                 }
                 if (currChar == '\r')
                 {
-                    contents += TsExtensions.Substring(_text, start, _pos);
+                    contents.Append(_text, start, _pos - start + 1);
                     _pos++;
                     if (_pos < _end && _text[_pos] == '\n')
                     {
                         _pos++;
                     }
-                    contents += "\n";
+                    contents.Append('\n');
                     start = _pos;
                     continue;
                 }
                 _pos++;
             }
             //Debug.assert(resultingToken != null);
-            _tokenValue = contents;
+            _tokenValue = contents.ToString();
             return resultingToken;
         }
 
-        public string ScanEscapeSequence()
+        public void ScanEscapeSequence(StringBuilder sb)
         {
             _pos++;
             if (_pos >= _end)
             {
                 Error(Diagnostics.Unexpected_end_of_text);
-                return "";
             }
             var ch = _text[_pos];
             _pos++;
             switch (ch)
             {
                 case '0':
-                    return "\0";
+                    sb.Append('\0');
+                    return;
                 case 'b':
-                    return "\b";
+                    sb.Append('\b');
+                    return;
                 case 't':
-                    return "\t";
+                    sb.Append('\t');
+                    return;
                 case 'n':
-                    return "\n";
+                    sb.Append('\n');
+                    return;
                 case 'v':
-                    return "\v";
+                    sb.Append('\v');
+                    return;
                 case 'f':
-                    return "\f";
+                    sb.Append('\f');
+                    return;
                 case 'r':
-                    return "\r";
+                    sb.Append('\r');
+                    return;
                 case '\'':
-                    return "'";
+                    sb.Append('\'');
+                    return;
                 case '"':
-                    return "\"";
+                    sb.Append('"');
+                    return;
                 case 'u':
                     if (_pos < _end && _text[_pos] == '{')
                     {
                         _pos++;
-                        return ScanExtendedUnicodeEscape();
+                        ScanExtendedUnicodeEscape(sb);
+                        return;
                     }
                     // '\uDDDD'
-                    return ScanHexadecimalEscape(/*numDigits*/ 4);
+                    ScanHexadecimalEscape(sb, /*numDigits*/ 4);
+                    return;
                 case 'x':
                     // '\xDD'
-                    return ScanHexadecimalEscape(/*numDigits*/ 2);
+                    ScanHexadecimalEscape(sb, /*numDigits*/ 2);
+                    return;
                 case '\r':
                     if (_pos < _end && _text[_pos] == '\n')
                     {
                         _pos++;
                     }
-                    return string.Empty;
+                    return;
                 case '\n':
                 case (char)CharacterCodes.LineSeparator:
                 case (char)CharacterCodes.ParagraphSeparator:
-                    return string.Empty;
+                    return;
                 default:
-                    return ch.ToString();
+                    sb.Append(ch);
+                    return;
             }
         }
 
-        public string ScanHexadecimalEscape(int numDigits)
+        public void ScanHexadecimalEscape(StringBuilder sb, int numDigits)
         {
             var escapedValue = ScanExactNumberOfHexDigits(numDigits);
             if (escapedValue >= 0)
             {
-                return ((char)escapedValue).ToString();
+                sb.Append((char)escapedValue);
             }
             else
             {
                 Error(Diagnostics.Hexadecimal_digit_expected);
-                return "";
             }
         }
 
-        public string ScanExtendedUnicodeEscape()
+        public void ScanExtendedUnicodeEscape(StringBuilder sb)
         {
-            var escapedValue = ScanMinimumNumberOfHexDigits(1);
-            var isInvalidExtendedEscape = false;
-            if (escapedValue < 0)
+            var codePoint = ScanMinimumNumberOfHexDigits(1);
+            if (codePoint < 0)
             {
                 Error(Diagnostics.Hexadecimal_digit_expected);
-                isInvalidExtendedEscape = true;
+                return;
             }
-            else
-            if (escapedValue > 0x10FFFF)
+            
+            if (codePoint > 0x10FFFF)
             {
                 Error(Diagnostics.An_extended_Unicode_escape_value_must_be_between_0x0_and_0x10FFFF_inclusive);
-                isInvalidExtendedEscape = true;
+                return;
             }
+
             if (_pos >= _end)
             {
                 Error(Diagnostics.Unexpected_end_of_text);
-                isInvalidExtendedEscape = true;
+                return;
             }
-            else
+
             if (_text[_pos] == '}')
             {
                 // Only swallow the following character up if it's a '}'.
@@ -998,25 +1010,19 @@ namespace Serenity.TypeScript.TsParser
             else
             {
                 Error(Diagnostics.Unterminated_Unicode_escape_sequence);
-                isInvalidExtendedEscape = true;
+                return;
             }
-            if (isInvalidExtendedEscape)
-            {
-                return "";
-            }
-            return Utf16EncodeAsString(escapedValue);
-        }
 
-        public static string Utf16EncodeAsString(int codePoint)
-        {
-            Debug.Assert(0x0 <= codePoint && codePoint <= 0x10FFFF);
             if (codePoint <= 65535)
             {
-                return ((char)codePoint).ToString();
+                sb.Append((char)codePoint);
+                return;
             }
+
             var codeUnit1 = (int)Math.Floor(((double)codePoint - 65536) / 1024) + 0xD800;
             var codeUnit2 = ((codePoint - 65536) % 1024) + 0xDC00;
-            return new string(new char[] { (char)codeUnit1, (char)codeUnit2 }); ;
+            sb.Append((char)codeUnit1);
+            sb.Append((char)codeUnit2);
         }
 
         public int PeekUnicodeEscape()
@@ -1034,7 +1040,7 @@ namespace Serenity.TypeScript.TsParser
 
         public string ScanIdentifierParts()
         {
-            var result = "";
+            var result = new StringBuilder();
             var start = _pos;
             while (_pos < _end)
             {
@@ -1051,8 +1057,8 @@ namespace Serenity.TypeScript.TsParser
                     {
                         break;
                     }
-                    result += TsExtensions.Substring(_text, start, _pos);
-                    result += ch;
+                    result.Append(_text, start, _pos - start + 1);
+                    result.Append(ch);
                     // Valid Unicode escape is always six characters
                     _pos += 6;
                     start = _pos;
@@ -1062,8 +1068,8 @@ namespace Serenity.TypeScript.TsParser
                     break;
                 }
             }
-            result += TsExtensions.Substring(_text, start, _pos);
-            return result;
+            result.Append(_text, start, _pos - start + 1);
+            return result.ToString();
         }
 
         public SyntaxKind GetIdentifierToken()
@@ -1332,7 +1338,7 @@ namespace Serenity.TypeScript.TsParser
                                 Error(Diagnostics.Hexadecimal_digit_expected);
                                 value = 0;
                             }
-                            _tokenValue = "" + value;
+                            _tokenValue = value.ToString();
                             _token = SyntaxKind.NumericLiteral;
                             return _token;
                         }
@@ -1346,7 +1352,7 @@ namespace Serenity.TypeScript.TsParser
                                 Error(Diagnostics.Binary_digit_expected);
                                 value = 0;
                             }
-                            _tokenValue = "" + value;
+                            _tokenValue = value.ToString();
                             _token = SyntaxKind.NumericLiteral;
                             return _token;
                         }
@@ -1360,13 +1366,13 @@ namespace Serenity.TypeScript.TsParser
                                 Error(Diagnostics.Octal_digit_expected);
                                 value = 0;
                             }
-                            _tokenValue = "" + value;
+                            _tokenValue = value.ToString();
                             _token = SyntaxKind.NumericLiteral;
                             return _token;
                         }
                         if (_pos + 1 < _end && IsOctalDigit(_text[_pos + 1]))
                         {
-                            _tokenValue = "" + ScanOctalDigits();
+                            _tokenValue = ScanOctalDigits().ToString();
                             _token = SyntaxKind.NumericLiteral;
                             return _token;
                         }
@@ -1534,7 +1540,7 @@ namespace Serenity.TypeScript.TsParser
                         {
                             _pos++;
                             while (_pos < _end && IsIdentifierPart(ch = _text[_pos])) _pos++;
-                            _tokenValue = TsExtensions.Substring(_text, _tokenPos, _pos);
+                            _tokenValue = _text[_tokenPos.._pos];
                             if (ch == '\\')
                             {
                                 _tokenValue += ScanIdentifierParts();
@@ -1656,7 +1662,7 @@ namespace Serenity.TypeScript.TsParser
                     p++;
                 }
                 _pos = p;
-                _tokenValue = TsExtensions.Substring(_text, _tokenPos, _pos);
+                _tokenValue = _text[_tokenPos.._pos];
                 _token = SyntaxKind.RegularExpressionLiteral;
             }
             return _token;
@@ -1744,7 +1750,7 @@ namespace Serenity.TypeScript.TsParser
                         break;
                     }
                 }
-                _tokenValue += _text.Substring(firstCharPosition, _pos - firstCharPosition);
+                _tokenValue += _text[firstCharPosition.._pos];
             }
             return _token;
         }
