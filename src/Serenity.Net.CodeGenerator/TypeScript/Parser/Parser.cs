@@ -24,8 +24,6 @@ namespace Serenity.TypeScript.TsParser
         public SyntaxKind CurrentToken;
         public string SourceText;
         public int NodeCount;
-        public List<string> Identifiers;
-        public int IdentifierCount;
 
         public int ParsingContext; //ParsingContext
         public JsDocParser JsDocParser;
@@ -104,10 +102,6 @@ namespace Serenity.TypeScript.TsParser
 
             ParsingContext = 0;
 
-            Identifiers = new List<string>();
-
-            IdentifierCount = 0;
-
             NodeCount = 0;
 
 
@@ -141,8 +135,6 @@ namespace Serenity.TypeScript.TsParser
 
             SourceFile = null;
 
-            Identifiers = null;
-
             SyntaxCursor = null;
 
             SourceText = null;
@@ -174,10 +166,6 @@ namespace Serenity.TypeScript.TsParser
 
 
             SourceFile.NodeCount = NodeCount;
-
-            SourceFile.IdentifierCount = IdentifierCount;
-
-            SourceFile.Identifiers = Identifiers;
 
             SourceFile.ParseDiagnostics = ParseDiagnostics;
             if (setParentNodes)
@@ -797,25 +785,9 @@ namespace Serenity.TypeScript.TsParser
             return FinishNode(result);
         }
 
-        public string InternIdentifier(string text)
-        {
-
-            text = EscapeIdentifier(text);
-            //var identifier = identifiers.get(text);
-            if (!Identifiers.Contains(text))// identifier == null)
-            {
-
-                Identifiers.Add(text); //.set(text, identifier = text);
-            }
-
-            return text; // identifier;
-        }
-
-
         public Identifier CreateIdentifier(bool isIdentifier, DiagnosticMessage diagnosticMessage = null)
         {
 
-            IdentifierCount++;
             if (isIdentifier)
             {
                 var node = new Identifier { Pos = Scanner.GetStartPos() };
@@ -825,7 +797,7 @@ namespace Serenity.TypeScript.TsParser
                     node.OriginalKeywordKind = Token();
                 }
 
-                node.Text = InternIdentifier(Scanner.GetTokenValue());
+                node.Text = EscapeIdentifier(Scanner.GetTokenValue());
 
                 NextToken();
 
@@ -1979,7 +1951,7 @@ namespace Serenity.TypeScript.TsParser
             //var node = new LiteralLikeNode { pos = scanner.getStartPos() }; // LiteralExpression();
             var text = Scanner.GetTokenValue();
 
-            node.Text = internName ? InternIdentifier(text) : text;
+            node.Text = internName ? EscapeIdentifier(text) : text;
             if (Scanner.HasExtendedUnicodeEscape())
             {
 
@@ -4598,7 +4570,7 @@ namespace Serenity.TypeScript.TsParser
                         {
                             var literal = (LiteralExpression)indexedAccess.ArgumentExpression;//(LiteralExpression)
 
-                            literal.Text = InternIdentifier(literal.Text);
+                            literal.Text = EscapeIdentifier(literal.Text);
                         }
                     }
 
@@ -7047,7 +7019,7 @@ namespace Serenity.TypeScript.TsParser
             {
                 var result = ParseLiteralNode();
 
-                InternIdentifier(((LiteralExpression)result).Text);
+                EscapeIdentifier(((LiteralExpression)result).Text);
 
                 return result;
             }
