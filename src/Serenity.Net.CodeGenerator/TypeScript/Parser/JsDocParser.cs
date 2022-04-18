@@ -66,9 +66,9 @@ namespace Serenity.TypeScript.TsParser
         public static (JsDocTypeExpression res, List<Diagnostic> diagnostics) ParseJsDocTypeExpressionForTests(string content, int? start, int? length)
         {
             var dp = new JsDocParser(new Parser());
-            dp.Parser.InitializeState(content, ScriptTarget.Latest,  null, ScriptKind.Js);
+            dp.Parser.InitializeState(content, null, ScriptKind.Js);
 
-            var sourceFile = dp.Parser.CreateSourceFile("file.js", ScriptTarget.Latest, ScriptKind.Js);
+            var sourceFile = dp.Parser.CreateSourceFile("file.js", ScriptKind.Js);
 
             dp.Parser.Scanner.SetText(content, start, length);
 
@@ -529,7 +529,7 @@ namespace Serenity.TypeScript.TsParser
         public Tuple<JsDoc, List<Diagnostic>> ParseIsolatedJsDocComment(string content, int start, int length)
         {
             if (Parser == null) Parser = new Parser();
-            Parser.InitializeState(content, ScriptTarget.Latest,  null, ScriptKind.Js);
+            Parser.InitializeState(content, null, ScriptKind.Js);
 
             Parser.SourceFile = new SourceFile { LanguageVariant = LanguageVariant.Standard, Text = content };
             var jsDoc = ParseJsDocCommentWorker(start, length);

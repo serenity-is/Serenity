@@ -12,7 +12,7 @@ namespace Serenity.TypeScript.TsParser
     public class Parser
     {
 
-        public Scanner Scanner = new Scanner(ScriptTarget.Latest, /*skipTrivia*/ true, LanguageVariant.Standard, null, null);
+        public Scanner Scanner = new Scanner(/*skipTrivia*/ true, LanguageVariant.Standard, null, null);
         public NodeFlags DisallowInAndDecoratorContext = NodeFlags.DisallowInContext | NodeFlags.DecoratorContext;
 
         public NodeFlags ContextFlags;
@@ -40,14 +40,14 @@ namespace Serenity.TypeScript.TsParser
         public bool Optimized { get; set; }
 
 
-        public SourceFile ParseSourceFile(string fileName, string sourceText, ScriptTarget languageVersion, /*IncrementalParser.SyntaxCursor*/object syntaxCursor, bool setParentNodes, ScriptKind scriptKind)
+        public SourceFile ParseSourceFile(string fileName, string sourceText, /*IncrementalParser.SyntaxCursor*/object syntaxCursor, bool setParentNodes, ScriptKind scriptKind)
         {
 
             scriptKind = EnsureScriptKind(fileName, scriptKind);
 
 
-            InitializeState(sourceText, languageVersion, syntaxCursor, scriptKind);
-            var result = ParseSourceFileWorker(fileName, languageVersion, setParentNodes, scriptKind);
+            InitializeState(sourceText, syntaxCursor, scriptKind);
+            var result = ParseSourceFileWorker(fileName, setParentNodes, scriptKind);
 
 
             ClearState();
@@ -57,10 +57,10 @@ namespace Serenity.TypeScript.TsParser
         }
 
 
-        public IEntityName ParseIsolatedEntityName(string content, ScriptTarget languageVersion)
+        public IEntityName ParseIsolatedEntityName(string content)
         {
 
-            InitializeState(content, languageVersion, /*syntaxCursor*/ null, ScriptKind.Js);
+            InitializeState(content, /*syntaxCursor*/ null, ScriptKind.Js);
 
             // Prime the scanner.
             NextToken();
@@ -81,7 +81,7 @@ namespace Serenity.TypeScript.TsParser
         }
 
 
-        public void InitializeState(string _sourceText, ScriptTarget languageVersion, /*IncrementalParser.SyntaxCursor*/object _syntaxCursor, ScriptKind scriptKind)
+        public void InitializeState(string _sourceText, /*IncrementalParser.SyntaxCursor*/object _syntaxCursor, ScriptKind scriptKind)
         {
 
             //NodeConstructor = objectAllocator.getNodeConstructor();
@@ -115,8 +115,6 @@ namespace Serenity.TypeScript.TsParser
 
             Scanner.OnError += ScanError; //.setOnError(scanError);
 
-            Scanner.SetScriptTarget(languageVersion);
-
             Scanner.SetLanguageVariant(GetLanguageVariant(scriptKind));
         }
 
@@ -141,10 +139,10 @@ namespace Serenity.TypeScript.TsParser
         }
 
 
-        public SourceFile ParseSourceFileWorker(string fileName, ScriptTarget languageVersion, bool setParentNodes, ScriptKind scriptKind)
+        public SourceFile ParseSourceFileWorker(string fileName, bool setParentNodes, ScriptKind scriptKind)
         {
 
-            SourceFile = CreateSourceFile(fileName, languageVersion, scriptKind);
+            SourceFile = CreateSourceFile(fileName, scriptKind);
 
             SourceFile.Flags = ContextFlags;
 
@@ -248,7 +246,7 @@ namespace Serenity.TypeScript.TsParser
 
 
 
-        public SourceFile CreateSourceFile(string fileName, ScriptTarget languageVersion, ScriptKind scriptKind)
+        public SourceFile CreateSourceFile(string fileName, ScriptKind scriptKind)
         {
             //var sourceFile = (SourceFile)new SourceFileConstructor(SyntaxKind.SourceFile, /*pos*/ 0, /* end */ sourceText.length);
             var sourceFile = new SourceFile { Pos = 0, End = SourceText.Length };
@@ -259,8 +257,6 @@ namespace Serenity.TypeScript.TsParser
             sourceFile.Text = SourceText;
 
             sourceFile.BindDiagnostics = new List<Diagnostic>();
-
-            sourceFile.LanguageVersion = languageVersion;
 
             sourceFile.FileName = NormalizePath(fileName);
 

@@ -6,7 +6,6 @@ namespace Serenity.TypeScript
 {
     public interface ITypeScriptAST
     {
-        ScriptTarget ScriptTarget { get; set; }
         string SourceStr { get; set; }
         Node RootNode { get; set; }
         IEnumerable<Node> GetDescendants();
@@ -14,7 +13,6 @@ namespace Serenity.TypeScript
     }
     public class TypeScriptAST: ITypeScriptAST
     {
-        public ScriptTarget ScriptTarget { get; set; } = ScriptTarget.Latest; //ES6
         public string SourceStr { get; set; }
         public Node RootNode { get; set; }
 
@@ -36,7 +34,7 @@ namespace Serenity.TypeScript
             SourceStr = source;
             var parser = new Parser();
             parser.Optimized = optimized;
-            var sourceFile = parser.ParseSourceFile(fileName, source, ScriptTarget, null, false, ScriptKind.Ts);
+            var sourceFile = parser.ParseSourceFile(fileName, source, null, false, ScriptKind.Ts);
             RootNode = sourceFile;
             RootNode.Ast = this;
             if (setChildren)

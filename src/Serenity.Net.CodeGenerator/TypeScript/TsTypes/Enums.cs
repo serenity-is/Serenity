@@ -581,17 +581,6 @@ namespace Serenity.TypeScript.TsTypes
         External = 5
     }
 
-    public enum ScriptTarget
-    {
-        Es3 = 0,
-        Es5 = 1,
-        Es2015 = 2,
-        Es2016 = 3,
-        Es2017 = 4,
-        EsNext = 5,
-        Latest = EsNext
-    }
-
     public enum LanguageVariant
     {
         Standard,

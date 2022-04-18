@@ -2766,7 +2766,6 @@ namespace Serenity.TypeScript.TsTypes
         public bool IsDeclarationFile { get; set; }
         public Map<string> RenamedDependencies { get; set; }
         public bool HasNoDefaultLib { get; set; }
-        public ScriptTarget LanguageVersion { get; set; }
         public ScriptKind ScriptKind { get; set; }
         public INode ExternalModuleIndicator { get; set; }
         public Node CommonJsModuleIndicator { get; set; }
@@ -3474,7 +3473,6 @@ namespace Serenity.TypeScript.TsTypes
         public bool SuppressExcessPropertyErrors { get; set; }
         public bool SuppressImplicitAnyIndexErrors { get; set; }
         public bool SuppressOutputPathCheck { get; set; }
-        public ScriptTarget Target { get; set; }
         public bool TraceResolution { get; set; }
         public string[] Types { get; set; }
         public string[] TypeRoots { get; set; }
@@ -3654,7 +3652,6 @@ namespace Serenity.TypeScript.TsTypes
 
     public class PrinterOptions
     {
-        public ScriptTarget Target { get; set; }
         public bool RemoveComments { get; set; }
         public NewLineKind NewLine { get; set; }
         public bool SourceMap { get; set; }
