@@ -95,9 +95,9 @@ namespace Serenity.TypeScript.TsParser
         }
         public static string NormalizeSlashes(string path)
         {
-            return Regex.Replace(path, "/\\/ g", "/");
-            //return path.replace(/\\/ g, "/");
+            return path.Replace('\\', '/');
         }
+
         public static int GetRootLength(string path)
         {
             if (path.CharCodeAt(0) == (int)CharacterCodes.Slash)
