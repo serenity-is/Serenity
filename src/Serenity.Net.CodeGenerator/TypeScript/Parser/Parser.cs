@@ -102,9 +102,6 @@ namespace Serenity.TypeScript.TsParser
 
             ParsingContext = 0;
 
-            NodeCount = 0;
-
-
             ContextFlags = scriptKind == ScriptKind.Js || scriptKind == ScriptKind.Jsx ? NodeFlags.JavaScriptFile : NodeFlags.None;
 
             ParseErrorBeforeNextFinishedNode = false;
@@ -156,8 +153,6 @@ namespace Serenity.TypeScript.TsParser
             SourceFile.EndOfFileToken = ParseTokenNode<EndOfFileToken>(Token());
 
             SetExternalModuleIndicator(SourceFile);
-
-            SourceFile.NodeCount = NodeCount;
 
             SourceFile.ParseDiagnostics = ParseDiagnostics;
 
@@ -239,17 +234,13 @@ namespace Serenity.TypeScript.TsParser
 
         public SourceFile CreateSourceFile(string fileName, ScriptKind scriptKind)
         {
-            //var sourceFile = (SourceFile)new SourceFileConstructor(SyntaxKind.SourceFile, /*pos*/ 0, /* end */ sourceText.length);
             var sourceFile = new SourceFile { Pos = 0, End = SourceText.Length };
-
-            NodeCount++;
-
 
             sourceFile.Text = SourceText;
 
             sourceFile.BindDiagnostics = new List<Diagnostic>();
 
-            sourceFile.FileName = NormalizePath(fileName);
+            sourceFile.FileName = Optimized ? fileName : NormalizePath(fileName);
 
             sourceFile.LanguageVariant = GetLanguageVariant(scriptKind);
 

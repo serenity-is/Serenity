@@ -4,17 +4,25 @@ using Serenity.CodeGeneration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.IO.Abstractions;
 
 namespace Serenity.CodeGenerator
 {
     public class TSTypeListerAST
     {
-        private readonly List<ITypeScriptAST> files = new();
+        private readonly List<string> fileNames = new();
         private readonly HashSet<string> exportedTypeNames = new();
+        private readonly IFileSystem fileSystem;
 
-        public void AddInputFile(string path, string content)
+        public TSTypeListerAST(IFileSystem fileSystem)
         {
-            files.Add(new TypeScriptAST(content, path, optimized: true));
+            this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        }
+
+        public void AddInputFile(string path)
+        {
+            fileNames.Add(path);
         }
 
         static bool HasExportModifier(INode node)
@@ -649,20 +657,31 @@ namespace Serenity.CodeGenerator
 
         public List<ExternalType> ExtractTypes()
         {
-            var sourceFiles = files.Where(file => (file.RootNode as SourceFile).FileName != "/lib.d.ts")
-                .Select(x => x.RootNode as SourceFile)
+            var sourceFiles = fileNames.AsParallel()
+                .Select(fileName => (SourceFile)new TypeScriptAST(
+                    fileSystem.File.ReadAllText(fileName), 
+                        fileName, optimized: true).RootNode)
                 .ToArray();
 
             exportedTypeNames.Clear();
-            foreach (var sourceFile in sourceFiles)
-                ExtractExportedTypeNames(sourceFile, exportedTypeNames);
+            foreach (var hashset in sourceFiles.AsParallel().Select(sourceFile =>
+            {
+                var hashset = new HashSet<string>();
+                ExtractExportedTypeNames(sourceFile, hashset);
+                return hashset;
+            }).ToArray())
+            {
+                exportedTypeNames.AddRange(hashset);
+            }
 
             var result = new List<ExternalType>();
             var resultIndex = new Dictionary<string, int>();
-            foreach (var sourceFile in sourceFiles)
-            {
-                var types = ExtractTypes(sourceFile);
 
+            foreach (var types in sourceFiles.AsParallel().Select(sourceFile =>
+            {
+                return ExtractTypes(sourceFile);
+            }).ToArray())
+            {
                 foreach (var k in types)
                 {
                     var fullName = !string.IsNullOrEmpty(k.Namespace) ? k.Namespace + "." + k.Name : k.Name;

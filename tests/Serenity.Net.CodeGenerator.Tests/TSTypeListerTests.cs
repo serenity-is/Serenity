@@ -1,4 +1,6 @@
 using Serenity.CodeGenerator;
+using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
 using Xunit;
 
 namespace Serenity.Tests.CodeGenerator
@@ -8,8 +10,8 @@ namespace Serenity.Tests.CodeGenerator
         [Fact]
         public void Resolves_Type_Refs_In_Same_Namespace_Same_File()
         {
-            var tl = new TSTypeListerAST();
-            tl.AddInputFile("a.d.ts", @"
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddFile("a.d.ts", @"
 declare namespace jsPDF {
     interface AutoTableOptions {
         styles?: AutoTableStyles;
@@ -25,6 +27,8 @@ declare namespace jsPDF {
         cellPadding?: number;
     }
 }");
+            var tl = new TSTypeListerAST(fileSystem);
+            tl.AddInputFile("a.d.ts");
 
             var types = tl.ExtractTypes();
             var type = Assert.Single(types, x => x.FullName == "jsPDF.AutoTableOptions");
@@ -39,8 +43,8 @@ declare namespace jsPDF {
         [Fact]
         public void Resolve_Same_Namespace_In_One_File_Multiple()
         {
-            var tl = new TSTypeListerAST();
-            tl.AddInputFile("a.d.ts", @"
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddFile("a.d.ts", @"
 declare namespace Serenity.Extensions {
     interface ExcelImportRequest extends Serenity.ServiceRequest {
         FileName?: string;
@@ -54,6 +58,9 @@ declare namespace Serenity.Extensions {
     }
 }");
 
+            var tl = new TSTypeListerAST(fileSystem);
+            tl.AddInputFile("a.d.ts");
+
             var types = tl.ExtractTypes();
             var excelImportRequest = Assert.Single(types, x => x.FullName == "Serenity.Extensions.ExcelImportRequest");
             var excelImportResponse = Assert.Single(types, x => x.FullName == "Serenity.Extensions.ExcelImportResponse");
@@ -62,8 +69,8 @@ declare namespace Serenity.Extensions {
         [Fact]
         public void BodySkipTest()
         {
-            var tl = new TSTypeListerAST();
-            tl.AddInputFile("a.ts", @"namespace A {
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddFile("a.ts", @"namespace A {
 
     @Serenity.Decorators.registerEditor()
     export class B extends C {
@@ -94,6 +101,9 @@ declare namespace Serenity.Extensions {
         }
     }
 }");
+
+            var tl = new TSTypeListerAST(fileSystem);
+            tl.AddInputFile("a.ts");
 
             var types = tl.ExtractTypes();
             var b = Assert.Single(types, x => x.FullName == "A.B");

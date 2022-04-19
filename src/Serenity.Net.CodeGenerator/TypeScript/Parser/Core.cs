@@ -172,17 +172,14 @@ namespace Serenity.TypeScript.TsParser
         }
         public static bool PathEndsWithDirectorySeparator(string path)
         {
-            return path[path.Length - 1] == DirectorySeparatorCharCode;
+            return path[^1] == DirectorySeparatorCharCode;
         }
+
         public static bool FileExtensionIs(string path, string extension)
         {
-            return path.Length > extension.Length && EndsWith(path, extension);
+            return path.EndsWith(extension, StringComparison.Ordinal);
         }
-        public static bool EndsWith(string str, string suffix)
-        {
-            var expectedPos = str.Length - suffix.Length;
-            return expectedPos >= 0 && str.IndexOf(suffix, expectedPos, StringComparison.Ordinal) == expectedPos;
-        }
+        
         public static Diagnostic CreateFileDiagnostic(SourceFile file, int start, int length, DiagnosticMessage message, params string[] arguments)
         {
             var end = start + length;

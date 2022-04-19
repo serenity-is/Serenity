@@ -2,10 +2,8 @@
 using Serenity.IO;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -14,18 +12,20 @@ namespace Serenity.CodeGenerator
 {
     public class TSTypeLister
     {
+        private readonly IFileSystem fileSystem;
         private readonly string projectDir;
 
-        public TSTypeLister(string projectDir)
-        {
-            this.projectDir = Path.GetFullPath(projectDir);
-        }
+        private readonly IPath Path;
+        private readonly IFile File;
+        private readonly IDirectory Directory;
 
-        private string GetEmbeddedScript(string name)
+        public TSTypeLister(IFileSystem fileSystem, string projectDir)
         {
-            using var sr = new StreamReader(GetType()
-                .GetTypeInfo().Assembly.GetManifestResourceStream(name));
-            return sr.ReadToEnd();
+            this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            Path = fileSystem.Path;
+            File = fileSystem.File;
+            Directory = fileSystem.Directory;
+            this.projectDir = fileSystem.Path.GetFullPath(projectDir);
         }
 
         private class TSConfig
@@ -40,57 +40,6 @@ namespace Serenity.CodeGenerator
                 public string[] TypeRoots { get; set; }
                 public string[] Types { get; set; }
             }
-        }
-
-        private static void JsonEncode(StringBuilder sb, string str)
-        {
-            var source = str.AsSpan();
-            sb.Append('"');
-            var start = 0;
-
-            for (int i = 0; i < source.Length; i++)
-            {
-                var sourceChar = source[i];
-                switch (sourceChar)
-                {
-                    case '\\':
-                        if (i > start)
-                            sb.Append(source.Slice(start, i - start));
-
-                        sb.Append("\\\\");
-                        start = i + 1;
-                        continue;
-
-                    case '"':
-                        if (i > start)
-                            sb.Append(source.Slice(start, i - start));
-
-                        sb.Append("\\\"");
-                        start = i + 1;
-                        continue;
-
-                    case '\n':
-                        if (i > start)
-                            sb.Append(source.Slice(start, i - start));
-
-                        sb.Append("\\n");
-                        start = i + 1;
-                        continue;
-
-                    case '\r':
-                        if (i > start)
-                            sb.Append(source.Slice(start, i - start));
-
-                        sb.Append("\\r");
-                        start = i + 1;
-                        continue;
-                }
-            }
-
-            if (start < source.Length - 1)
-                sb.Append(source.Slice(start));
-
-            sb.Append('"');
         }
 
         public List<ExternalType> List()
@@ -159,7 +108,7 @@ namespace Serenity.CodeGenerator
                     var includeGlob = new GlobFilter(includePatterns);
                     var excludeGlob = new GlobFilter(excludePatterns);
 
-                    var allTsFiles = Directory.GetFiles(projectDir, "*.ts", SearchOption.AllDirectories)
+                    var allTsFiles = Directory.GetFiles(projectDir, "*.ts", System.IO.SearchOption.AllDirectories)
                         .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
                             !File.Exists(x.Substring(0, x.Length - ".d.ts".Length) + ".ts"));
 
@@ -182,7 +131,7 @@ namespace Serenity.CodeGenerator
                 }.Where(x => Directory.Exists(x));
 
                 files = directories.SelectMany(x =>
-                    Directory.GetFiles(x, "*.ts", SearchOption.AllDirectories))
+                    Directory.GetFiles(x, "*.ts", System.IO.SearchOption.AllDirectories))
                     .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
                         Path.GetFileName(x).StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase) ||
                         Path.GetFileName(x).StartsWith("Serenity-", StringComparison.OrdinalIgnoreCase));
@@ -203,25 +152,6 @@ namespace Serenity.CodeGenerator
                 files = files.OrderBy(x => x);
             }
 
-            StringBuilder sb = new();
-
-            var cacheDir = Path.Combine(Path.GetTempPath(), ".tstypecache");
-            string hash;
-            string cacheFile;
-                
-            void writeCache(string json)
-            {
-                try
-                {
-                    Directory.CreateDirectory(cacheDir);
-                    TemporaryFileHelper.PurgeDirectory(cacheDir, TimeSpan.Zero, 99, null);
-                    File.WriteAllText(cacheFile, json);
-                }
-                catch
-                {
-                }
-            }
-
             var md5 = MD5.Create();
             foreach (var file in files)
             {
@@ -231,10 +161,9 @@ namespace Serenity.CodeGenerator
                 md5.TransformBlock(lmd, 0, lmd.Length, null, 0);
             }
             md5.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-            hash = BitConverter.ToString(md5.Hash);
-            bool useTransformAST = true;
-            cacheFile = Path.Combine(cacheDir, hash + 
-                (useTransformAST ? "-ast" : "") + ".json");
+            var cacheHash = BitConverter.ToString(md5.Hash);
+            var cacheDir = Path.Combine(Path.GetTempPath(), ".tstypecache");
+            var cacheFile = Path.Combine(cacheDir, cacheHash + "-ast.json");
 
             List<ExternalType> externalTypes;
             if (File.Exists(cacheFile))
@@ -254,92 +183,27 @@ namespace Serenity.CodeGenerator
                 }
             }
 
-            TSTypeListerAST typeListerAST = null;
-            
-            if (useTransformAST)
-            {
-                typeListerAST = new TSTypeListerAST();
-            }
-            else
-            {
-                var tsServices = GetEmbeddedScript("Serenity.CodeGenerator.Resource.typescriptServices.js");
-                var codeGeneration = GetEmbeddedScript("Serenity.CodeGenerator.Resource.Serenity.CodeGeneration.js");
-
-                sb.AppendLine("var fs = require('fs');");
-                sb.AppendLine(tsServices);
-                sb.AppendLine(codeGeneration);
-            }
-
+            TSTypeListerAST typeListerAST = new(fileSystem);
             foreach (var file in files)
-            {
-                var path = file.Replace('\\', '/');
-                var text = File.ReadAllText(file);
+                typeListerAST.AddInputFile(file);
 
-                if (useTransformAST)
-                {
-                    typeListerAST.AddInputFile(path, text);
-                }
-                else
-                {
-                    sb.Append("Serenity.CodeGeneration.addSourceFile(");
-                    JsonEncode(sb, path);
-                    sb.Append(", ");
-                    JsonEncode(sb, text);
-                    sb.AppendLine(");");
-                }
-            }
+            externalTypes = typeListerAST.ExtractTypes();
 
-            string json;
-            if (useTransformAST)
+            try
             {
-                externalTypes = typeListerAST.ExtractTypes();
-                json = JsonSerializer.Serialize(externalTypes, new JsonSerializerOptions
+                var cacheJson = JsonSerializer.Serialize(externalTypes, new JsonSerializerOptions
                 {
                     DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
                 });
+
+                Directory.CreateDirectory(cacheDir);
+                TemporaryFileHelper.PurgeDirectory(cacheDir, TimeSpan.Zero, 99, null);
+                File.WriteAllText(cacheFile, cacheJson);
             }
-            else
+            catch
             {
-                sb.AppendLine(@"var types = JSON.stringify(Serenity.CodeGeneration.parseTypes(), function(key, value) {
-                        if (value == null ||
-                            value === false ||
-                            (key === ""Type"" && (value === ""any"" || value === ""__type"" || value === """")) ||
-                            (Array.isArray(value) && !value.length))
-                            return;
-                        return value;
-                    });");
-                sb.AppendLine("fs.writeFileSync('./typeList.json', types);");
-
-                var tempDirectory = Path.ChangeExtension(Path.GetTempFileName(), null) + "__";
-                Directory.CreateDirectory(tempDirectory);
-                try
-                {
-                    File.WriteAllText(Path.Combine(tempDirectory, "index.js"), sb.ToString());
-
-                    var process = Process.Start(new ProcessStartInfo()
-                    {
-                        FileName = "node",
-                        Arguments = "index.js",
-                        WorkingDirectory = tempDirectory,
-                        CreateNoWindow = true
-                    });
-                    process.WaitForExit(60000);
-                    json = File.ReadAllText(Path.Combine(tempDirectory, "typeList.json"));
-                    externalTypes = JsonSerializer.Deserialize<List<ExternalType>>(json,
-                        new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true,
-                            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
-                        });
-                }
-                finally
-                {
-                    Directory.Delete(tempDirectory, true);
-                }
-
             }
 
-            writeCache(json);
             return externalTypes;
         }
     }
