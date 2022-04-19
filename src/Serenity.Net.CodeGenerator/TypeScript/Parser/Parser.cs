@@ -648,7 +648,7 @@ namespace Serenity.TypeScript.TsParser
         //}
 
 
-        public Node ParseOptionalToken<T>(SyntaxKind t) where T : Node
+        public Node ParseOptionalToken<T>(SyntaxKind t) where T : Node, new()
         {
             if (Token() == t)
             {
@@ -665,7 +665,7 @@ namespace Serenity.TypeScript.TsParser
         //}
 
 
-        public Node ParseExpectedToken<T>(SyntaxKind t, bool reportAtCurrentPosition, DiagnosticMessage diagnosticMessage, object arg0 = null) where T : Node
+        public Node ParseExpectedToken<T>(SyntaxKind t, bool reportAtCurrentPosition, DiagnosticMessage diagnosticMessage, object arg0 = null) where T : Node, new()
         {
 
             return ParseOptionalToken<T>(t) ??
