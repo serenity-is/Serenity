@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Serenity.TypeScript.TsParser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Serenity.TypeScript.TsParser;
 
 namespace Serenity.TypeScript.TsTypes
 {
@@ -52,7 +51,7 @@ namespace Serenity.TypeScript.TsTypes
             Ts.ForEachChildOptimized(this, node =>
             {
                 if (node == null)
-                    return null;
+                    return;
 
                 var n = (Node)node;
                 n.Ast = ast;
@@ -60,7 +59,6 @@ namespace Serenity.TypeScript.TsTypes
                 if (n.Pos != null) 
                     n.NodeStart = Scanner.SkipTriviaM(SourceStr, (int)n.Pos);
                 n.MakeChildrenOptimized(ast);
-                return null;
             });
         }
 

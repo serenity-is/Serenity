@@ -570,173 +570,195 @@ namespace Serenity.TypeScript.TsParser
             return null;
         }
 
-        public static INode ForEachChildOptimized(INode node, Func<INode, INode> cbNode, Func<INode[], INode> cbNodeArray = null)
+        public static void ForEachChildOptimized(INode node, Action<INode> visitor)
         {
             if (node == null)
-                return null;
-            Func<object, IEnumerable<INode>, INode> visitNodes = (o1, o2) =>
+                return;
+
+            void visitNodes(IEnumerable<INode> nodes)
             {
-                var list = o2?.Cast<INode>().ToList();
-                if (list != null)
-                    if (cbNodeArray == null)
-                        return VisitEachNode(cbNode, list);
-                    else
-                        return cbNodeArray(list.ToArray());
-                return null;
-            };
-            var cbNodes = cbNodeArray;
+                if (nodes == null)
+                    return;
+
+                foreach (var node in nodes)
+                    visitor(node);
+            }
+
             switch (node.Kind)
             {
                 case SyntaxKind.Parameter:
                 case SyntaxKind.PropertyDeclaration:
                 case SyntaxKind.PropertySignature:
 
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           VisitNode(cbNode, (node as IVariableLikeDeclaration)?.PropertyName) ??
-                           VisitNode(cbNode, (node as IVariableLikeDeclaration)?.Name) ??
-                           VisitNode(cbNode, (node as IVariableLikeDeclaration)?.Type);
+                    visitNodes(node.Decorators);
+                    visitor((node as IVariableLikeDeclaration)?.PropertyName);
+                    visitor((node as IVariableLikeDeclaration)?.Name);
+                    visitor((node as IVariableLikeDeclaration)?.Type);
+                    break;
                 
                 case SyntaxKind.MethodDeclaration:
                 case SyntaxKind.MethodSignature:
                 case SyntaxKind.Constructor:
                 case SyntaxKind.FunctionDeclaration:
 
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           VisitNode(cbNode, (node as IFunctionLikeDeclaration)?.Name) ??
-                           visitNodes(cbNodes, (node as IFunctionLikeDeclaration)?.Parameters) ??
-                           VisitNode(cbNode, (node as IFunctionLikeDeclaration)?.Type);
+                    visitNodes(node.Decorators);
+                    visitor((node as IFunctionLikeDeclaration)?.Name);
+                    visitNodes((node as IFunctionLikeDeclaration)?.Parameters);
+                    visitor((node as IFunctionLikeDeclaration)?.Type);
+                    break;
 
                 case SyntaxKind.TypeReference:
-                    return VisitNode(cbNode, (node as TypeReferenceNode)?.TypeName);
+                    visitor((node as TypeReferenceNode)?.TypeName);
+                    break;
 
                 case SyntaxKind.PropertyAccessExpression:
-
-                    return VisitNode(cbNode, (node as PropertyAccessExpression)?.Expression) ??
-                           VisitNode(cbNode, (node as PropertyAccessExpression)?.Name);
+                    visitor((node as PropertyAccessExpression)?.Expression);
+                    visitor((node as PropertyAccessExpression)?.Name);
+                    break;
                 
                 case SyntaxKind.ElementAccessExpression:
                 case SyntaxKind.CallExpression:
-
-                    return VisitNode(cbNode, (node as CallExpression)?.Expression) ??
-                           visitNodes(cbNodes, (node as CallExpression)?.TypeArguments) ??
-                           visitNodes(cbNodes, (node as CallExpression)?.Arguments);
+                    visitor((node as CallExpression)?.Expression);
+                    visitNodes((node as CallExpression)?.TypeArguments);
+                    visitNodes((node as CallExpression)?.Arguments);
+                    break;
                 
                 case SyntaxKind.Block:
                 case SyntaxKind.ModuleBlock:
-
-                    return visitNodes(cbNodes, (node as Block)?.Statements);
+                    visitNodes((node as Block)?.Statements);
+                    break;
                 
                 case SyntaxKind.SourceFile:
-                    return visitNodes(cbNodes, (node as SourceFile)?.Statements);
+                    visitNodes((node as SourceFile)?.Statements);
+                    break;
                 
                 case SyntaxKind.Decorator:
-                    return VisitNode(cbNode, (node as Decorator)?.Expression);
+                    visitor((node as Decorator)?.Expression);
+                    break;
                 
                 case SyntaxKind.ClassDeclaration:
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           VisitNode(cbNode, (node as ClassDeclaration)?.Name) ??
-                           visitNodes(cbNodes, (node as ClassDeclaration)?.TypeParameters) ??
-                           visitNodes(cbNodes, (node as ClassDeclaration)?.HeritageClauses) ??
-                           visitNodes(cbNodes, (node as ClassDeclaration)?.Members);
+                    visitNodes(node.Decorators);
+                    visitor((node as ClassDeclaration)?.Name);
+                    visitNodes((node as ClassDeclaration)?.TypeParameters);
+                    visitNodes((node as ClassDeclaration)?.HeritageClauses);
+                    visitNodes((node as ClassDeclaration)?.Members);
+                    break;
                 
                 case SyntaxKind.InterfaceDeclaration:
-
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           visitNodes(cbNodes, node.Modifiers) ??
-                           VisitNode(cbNode, (node as InterfaceDeclaration)?.Name) ??
-                           visitNodes(cbNodes, (node as InterfaceDeclaration)?.TypeParameters) ??
-                           visitNodes(cbNodes, (node as InterfaceDeclaration)?.HeritageClauses) ??
-                           visitNodes(cbNodes, (node as InterfaceDeclaration)?.Members);
+                    visitNodes(node.Decorators);
+                    visitNodes(node.Modifiers);
+                    visitor((node as InterfaceDeclaration)?.Name);
+                    visitNodes((node as InterfaceDeclaration)?.TypeParameters);
+                    visitNodes((node as InterfaceDeclaration)?.HeritageClauses);
+                    visitNodes((node as InterfaceDeclaration)?.Members);
+                    break;
 
                 case SyntaxKind.TypeAliasDeclaration:
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           VisitNode(cbNode, (node as TypeAliasDeclaration)?.Name) ??
-                           VisitNode(cbNode, (node as TypeAliasDeclaration)?.Type);
+                    visitNodes(node.Decorators);
+                    visitor((node as TypeAliasDeclaration)?.Name);
+                    visitor((node as TypeAliasDeclaration)?.Type);
+                    break;
 
                 case SyntaxKind.EnumDeclaration:
-
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           VisitNode(cbNode, (node as EnumDeclaration)?.Name) ??
-                           visitNodes(cbNodes, (node as EnumDeclaration)?.Members);
+                    visitNodes(node.Decorators);
+                    visitor((node as EnumDeclaration)?.Name);
+                    visitNodes((node as EnumDeclaration)?.Members);
+                    break;
 
                 case SyntaxKind.EnumMember:
-                    return VisitNode(cbNode, (node as EnumMember)?.Name);
+                    visitor((node as EnumMember)?.Name);
+                    break;
 
                 case SyntaxKind.ModuleDeclaration:
-
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           VisitNode(cbNode, (node as ModuleDeclaration)?.Name) ??
-                           VisitNode(cbNode, (node as ModuleDeclaration)?.Body);
+                    visitNodes(node.Decorators);
+                    visitor((node as ModuleDeclaration)?.Name);
+                    visitor((node as ModuleDeclaration)?.Body);
+                    break;
 
                 case SyntaxKind.ImportEqualsDeclaration:
-
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           VisitNode(cbNode, (node as ImportEqualsDeclaration)?.Name) ??
-                           VisitNode(cbNode, (node as ImportEqualsDeclaration)?.ModuleReference);
+                    visitNodes(node.Decorators);
+                    visitor((node as ImportEqualsDeclaration)?.Name);
+                    visitor((node as ImportEqualsDeclaration)?.ModuleReference);
+                    break;
 
                 case SyntaxKind.ImportDeclaration:
-
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           VisitNode(cbNode, (node as ImportDeclaration)?.ImportClause) ??
-                           VisitNode(cbNode, (node as ImportDeclaration)?.ModuleSpecifier);
+                    visitNodes(node.Decorators);
+                    visitor((node as ImportDeclaration)?.ImportClause);
+                    visitor((node as ImportDeclaration)?.ModuleSpecifier);
+                    break;
 
                 case SyntaxKind.ImportClause:
-
-                    return VisitNode(cbNode, (node as ImportClause)?.Name) ??
-                           VisitNode(cbNode, (node as ImportClause)?.NamedBindings);
+                    visitor((node as ImportClause)?.Name);
+                    visitor((node as ImportClause)?.NamedBindings);
+                    break;
 
                 case SyntaxKind.NamespaceExportDeclaration:
-                    return VisitNode(cbNode, (node as NamespaceExportDeclaration)?.Name);
+                    visitor((node as NamespaceExportDeclaration)?.Name);
+                    break;
                 
                 case SyntaxKind.NamespaceImport:
-                    return VisitNode(cbNode, (node as NamespaceImport)?.Name);
+                    visitor((node as NamespaceImport)?.Name);
+                    break;
                 
                 case SyntaxKind.NamedImports:
                 case SyntaxKind.NamedExports:
-
-                    if (node is NamedImports) return visitNodes(cbNodes, (node as NamedImports)?.Elements);
-                    else return visitNodes(cbNodes, (node as NamedExports)?.Elements);
+                    if (node is NamedImports) 
+                        visitNodes((node as NamedImports)?.Elements);
+                    else 
+                        visitNodes((node as NamedExports)?.Elements);
+                    break;
                 
                 case SyntaxKind.ExportDeclaration:
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           visitNodes(cbNodes, node.Modifiers) ??
-                           VisitNode(cbNode, (node as ExportDeclaration)?.ExportClause) ??
-                           VisitNode(cbNode, (node as ExportDeclaration)?.ModuleSpecifier);
+                    visitNodes(node.Decorators);
+                    visitNodes(node.Modifiers);
+                    visitor((node as ExportDeclaration)?.ExportClause);
+                    visitor((node as ExportDeclaration)?.ModuleSpecifier);
+                    break;
                 
                 case SyntaxKind.ImportSpecifier:
                 case SyntaxKind.ExportSpecifier:
-                    return VisitNode(cbNode, (node as IMportOrExportSpecifier)?.PropertyName ??
-                                             VisitNode(cbNode, (node as IMportOrExportSpecifier)?.Name));
-                case SyntaxKind.ExportAssignment:
+                    visitor((node as IMportOrExportSpecifier)?.PropertyName);
+                    visitor((node as IMportOrExportSpecifier)?.Name);
+                    break;
 
-                    return visitNodes(cbNodes, node.Decorators) ??
-                           visitNodes(cbNodes, node.Modifiers) ??
-                           VisitNode(cbNode, (node as ExportAssignment)?.Expression);
+                case SyntaxKind.ExportAssignment:
+                    visitNodes(node.Decorators);
+                    visitNodes(node.Modifiers);
+                    visitor((node as ExportAssignment)?.Expression);
+                    break;
+
                 case SyntaxKind.TemplateExpression:
 
-                    return VisitNode(cbNode, (node as TemplateExpression)?.Head) ??
-                           visitNodes(cbNodes, (node as TemplateExpression)?.TemplateSpans);
+                    visitor((node as TemplateExpression)?.Head);
+                    visitNodes((node as TemplateExpression)?.TemplateSpans);
+                    break;
+
                 case SyntaxKind.TemplateSpan:
+                    visitor((node as TemplateSpan)?.Expression);
+                    visitor((node as TemplateSpan)?.Literal);
+                    break;
 
-                    return VisitNode(cbNode, (node as TemplateSpan)?.Expression) ??
-                           VisitNode(cbNode, (node as TemplateSpan)?.Literal);
                 case SyntaxKind.ComputedPropertyName:
+                    visitor((node as ComputedPropertyName)?.Expression);
+                    break;
 
-                    return VisitNode(cbNode, (node as ComputedPropertyName)?.Expression);
                 case SyntaxKind.HeritageClause:
+                    visitNodes((node as HeritageClause)?.Types);
+                    break;
 
-                    return visitNodes(cbNodes, (node as HeritageClause)?.Types);
                 case SyntaxKind.ExpressionWithTypeArguments:
+                    visitor((node as ExpressionWithTypeArguments)?.Expression);
+                    visitNodes((node as ExpressionWithTypeArguments)?.TypeArguments);
+                    break;
 
-                    return VisitNode(cbNode, (node as ExpressionWithTypeArguments)?.Expression) ??
-                           visitNodes(cbNodes, (node as ExpressionWithTypeArguments)?.TypeArguments);
                 case SyntaxKind.ExternalModuleReference:
+                    visitor((node as ExternalModuleReference)?.Expression);
+                    break;
 
-                    return VisitNode(cbNode, (node as ExternalModuleReference)?.Expression);
                 case SyntaxKind.MissingDeclaration:
-                    return visitNodes(cbNodes, node.Decorators);
+                    visitNodes(node.Decorators);
+                    break;
             }
-            return null;
         }
 
         private static INode VisitNodes(Func<INode[], INode> cbNodes, List<Node> list)

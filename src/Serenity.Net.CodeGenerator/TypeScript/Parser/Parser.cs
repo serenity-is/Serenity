@@ -673,11 +673,14 @@ namespace Serenity.TypeScript.TsParser
         }
 
 
-        public T ParseTokenNode<T>(SyntaxKind sk) where T : Node
+        public T ParseTokenNode<T>(SyntaxKind sk) 
+            where T : Node, new()
         {
-            var node = (T)Activator.CreateInstance(typeof(T));// new T();
-            node.Pos = Scanner.StartPos;
-            node.Kind = sk;
+            var node = new T
+            {
+                Pos = Scanner.StartPos,
+                Kind = sk
+            };
 
             NextToken();
 
