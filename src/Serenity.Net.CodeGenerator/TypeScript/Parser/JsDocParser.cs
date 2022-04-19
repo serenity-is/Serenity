@@ -31,7 +31,7 @@ namespace Serenity.TypeScript.TsParser
         private bool ParseExpected(SyntaxKind kind, DiagnosticMessage diagnosticMessage = null, bool shouldAdvance = true) => Parser.ParseExpected(kind, diagnosticMessage, shouldAdvance);
         private bool ParseOptional(SyntaxKind t) => Parser.ParseOptional(t);
         private INode ParseOptionalToken<T>(SyntaxKind t) where T : Node => Parser.ParseOptionalToken<T>(t);
-        private T ParseTokenNode<T>() where T : Node => Parser.ParseTokenNode<T>(Token());
+        private T ParseTokenNode<T>() where T : Node, new() => Parser.ParseTokenNode<T>(Token());
         private NodeArray<T> CreateList<T>(T[] elements = null, int? pos = null)      => Parser.CreateList<T>(elements, pos);
         private T FinishNode<T>(T node, int? end = null) where T : Node => Parser.FinishNode<T>(node, end);
         private Identifier ParseIdentifierName() => Parser.ParseIdentifierName();
