@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 
 namespace Serenity.CodeGenerator
@@ -139,7 +137,7 @@ namespace Serenity.CodeGenerator
                 var corelib = files.Where(x => string.Equals(Path.GetFileName(x),
                     "Serenity.CoreLib.d.ts", StringComparison.OrdinalIgnoreCase));
 
-                bool corelibUnderTypings(string x) =>
+                static bool corelibUnderTypings(string x) =>
                     x.Replace('\\', '/').EndsWith("/typings/serenity/Serenity.CoreLib.d.ts",
                         StringComparison.OrdinalIgnoreCase);
 
@@ -152,58 +150,11 @@ namespace Serenity.CodeGenerator
                 files = files.OrderBy(x => x);
             }
 
-            var md5 = MD5.Create();
-            foreach (var file in files)
-            {
-                var fileBytes = Encoding.UTF8.GetBytes(file);
-                md5.TransformBlock(fileBytes, 0, fileBytes.Length, null, 0);
-                var lmd = BitConverter.GetBytes(File.GetLastWriteTimeUtc(file).ToBinary());
-                md5.TransformBlock(lmd, 0, lmd.Length, null, 0);
-            }
-            md5.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-            var cacheHash = BitConverter.ToString(md5.Hash);
-            var cacheDir = Path.Combine(Path.GetTempPath(), ".tstypecache");
-            var cacheFile = Path.Combine(cacheDir, cacheHash + "-ast.json");
-
-            List<ExternalType> externalTypes;
-            if (File.Exists(cacheFile))
-            {
-                try
-                {
-                    externalTypes = JsonSerializer.Deserialize<List<ExternalType>>(File.ReadAllText(cacheFile),
-                        new JsonSerializerOptions()
-                        {
-                            PropertyNameCaseInsensitive = true
-                        });
-
-                    return externalTypes;
-                }
-                catch
-                {
-                }
-            }
-
             TSTypeListerAST typeListerAST = new(fileSystem);
             foreach (var file in files)
                 typeListerAST.AddInputFile(file);
 
-            externalTypes = typeListerAST.ExtractTypes();
-
-            try
-            {
-                var cacheJson = JsonSerializer.Serialize(externalTypes, new JsonSerializerOptions
-                {
-                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-                });
-
-                Directory.CreateDirectory(cacheDir);
-                TemporaryFileHelper.PurgeDirectory(cacheDir, TimeSpan.Zero, 99, null);
-                File.WriteAllText(cacheFile, cacheJson);
-            }
-            catch
-            {
-            }
-
+            var externalTypes = typeListerAST.ExtractTypes();
             return externalTypes;
         }
     }
