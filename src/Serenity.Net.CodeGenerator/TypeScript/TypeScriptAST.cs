@@ -1,6 +1,5 @@
 ﻿using Serenity.TypeScript.TsParser;
 using Serenity.TypeScript.TsTypes;
-using System.Collections.Generic;
 
 namespace Serenity.TypeScript
 {
@@ -8,7 +7,6 @@ namespace Serenity.TypeScript
     {
         string SourceStr { get; set; }
         Node RootNode { get; set; }
-        IEnumerable<Node> GetDescendants();
         void MakeAST(string source, string fileName = "fileName.ts", bool setChildren = true);
     }
     public class TypeScriptAST: ITypeScriptAST
@@ -36,28 +34,14 @@ namespace Serenity.TypeScript
             parser.Optimized = optimized;
             var sourceFile = parser.ParseSourceFile(fileName, source, null, false, ScriptKind.Ts);
             RootNode = sourceFile;
-            RootNode.Ast = this;
+            RootNode.SourceStr = SourceStr;
             if (setChildren)
             {
-                childrenMade = true;
                 if (optimized)
-                    RootNode.MakeChildrenOptimized(this);
+                    RootNode.MakeChildrenOptimized(SourceStr);
                 else
-                    RootNode.MakeChildren(this);
+                    RootNode.MakeChildren(SourceStr);
             }
-            //RootNode.GetDescendants().ToList().ForEach((n) => n.AST = this);
-        }
-
-        private bool childrenMade = false;
-        public IEnumerable<Node> OfKind(SyntaxKind kind) => RootNode?.OfKind(kind);
-        public IEnumerable<Node> GetDescendants()
-        {
-            if (!childrenMade && RootNode != null)
-            {
-                RootNode.MakeChildren(this);
-                childrenMade = true;
-            }
-            return RootNode?.GetDescendants();
         }
     }
 }

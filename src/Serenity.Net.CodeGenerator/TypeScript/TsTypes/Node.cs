@@ -8,18 +8,23 @@ namespace Serenity.TypeScript.TsTypes
     public class Node : TextRange, INode
     {
         public List<Node> Children { get; set; }
-        public ITypeScriptAST Ast { get; set; }
+        public string SourceStr { get; set; }
 
-        public string SourceStr
+        public ReadOnlySpan<char> IdentifierStr
         {
-            get => Ast.SourceStr;
-            set => Ast.SourceStr = value;
+            get
+            {
+                if (Kind == SyntaxKind.Identifier)
+                    return GetText();
+
+                var child = Children?.FirstOrDefault(v => v.Kind == SyntaxKind.Identifier);
+                if (child == null)
+                    return null;
+
+                return GetText().Trim();
+            }
         }
-
-        public string IdentifierStr => Kind == SyntaxKind.Identifier
-            ? GetText()
-            : Children.FirstOrDefault(v => v.Kind == SyntaxKind.Identifier)?.GetText().Trim();
-
+        
         public int ParentId { get; set; }
         public int NodeStart { get; set; } = -1;
         public SyntaxKind Kind { get; set; }
@@ -30,7 +35,7 @@ namespace Serenity.TypeScript.TsTypes
         public INode Parent { get; set; }
         public List<JsDoc> JsDoc { get; set; }
 
-        public void MakeChildren(TypeScriptAST ast)
+        public void MakeChildren(string sourceStr)
         {
             Children = new List<Node>();
             Ts.ForEachChild(this, node =>
@@ -38,15 +43,15 @@ namespace Serenity.TypeScript.TsTypes
                 if (node == null)
                     return null;
                 var n = (Node)node;
-                n.Ast = ast;
+                n.SourceStr = sourceStr;
                 if (n.Pos != null) n.NodeStart = Scanner.SkipTriviaM(SourceStr, (int)n.Pos);
                 Children.Add(n);
-                n.MakeChildren(ast);
+                n.MakeChildren(sourceStr);
                 return null;
             });
         }
 
-        public void MakeChildrenOptimized(TypeScriptAST ast)
+        public void MakeChildrenOptimized(string sourceStr)
         {
             Ts.ForEachChildOptimized(this, node =>
             {
@@ -54,22 +59,37 @@ namespace Serenity.TypeScript.TsTypes
                     return;
 
                 var n = (Node)node;
-                n.Ast = ast;
+                n.SourceStr = sourceStr;
                 n.Parent = this;
                 if (n.Pos != null) 
                     n.NodeStart = Scanner.SkipTriviaM(SourceStr, (int)n.Pos);
-                n.MakeChildrenOptimized(ast);
+                n.MakeChildrenOptimized(sourceStr);
             });
         }
 
-        public string GetText(string source = null)
+        public ReadOnlySpan<char> GetTextSpan()
         {
-            if (source == null) source = SourceStr;
             if (NodeStart == -1)
-                if (Pos != null && End != null) return source.Substring((int)Pos, (int)End - (int)Pos);
-                else return null;
+            {
+                if (Pos != null && End != null)
+                    return SourceStr.AsSpan(Pos.Value, End.Value - Pos.Value);
+            }
+            else if (End != null)
+                return SourceStr.AsSpan(NodeStart, End.Value - NodeStart);
 
-            if (End != null) return source.Substring(NodeStart, (int)End - NodeStart);
+            return ReadOnlySpan<char>.Empty;
+        }
+
+        public string GetText()
+        {
+            if (NodeStart == -1)
+            {
+                if (Pos != null && End != null)
+                    return SourceStr[Pos.Value..End.Value];
+            }
+            else if (End != null) 
+                return SourceStr[NodeStart..End.Value];
+
             return null;
         }
 
@@ -128,7 +148,8 @@ namespace Serenity.TypeScript.TsTypes
         List<Node> Children { get; set; }
         List<JsDoc> JsDoc { get; set; }
 
-        string GetText(string source = null);
+        string GetText();
+        ReadOnlySpan<char> GetTextSpan();
         string GetTextWithComments(string source = null);
 
         string ToString(bool withPos);

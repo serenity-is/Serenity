@@ -93,13 +93,13 @@ namespace Serenity.CodeGenerator
             if (node == null)
                 return string.Empty;
 
-            var text = node.GetText();
-            if (text == "any" || string.IsNullOrEmpty(text))
+            var text = node.GetTextSpan();
+            if (text == "any" || text == null || text.Length == 0)
                 return null;
 
             if (text[0] == '(' || 
                 text[0] == '{' || 
-                text.Contains('|', StringComparison.Ordinal))
+                text.Contains('|'))
                 return null;
 
             var noGeneric = text;
@@ -107,7 +107,7 @@ namespace Serenity.CodeGenerator
             if (lt >= 0 && noGeneric[^1] == '>')
                 noGeneric = noGeneric[..lt];
 
-            var dotIndex = noGeneric.IndexOf('.', StringComparison.Ordinal);
+            var dotIndex = noGeneric.IndexOf('.');
             var beforeDot = dotIndex >= 0 ? noGeneric[..dotIndex] : null;
             var afterDot = dotIndex >= 0 ? noGeneric[dotIndex..] : null;
             
@@ -130,10 +130,10 @@ namespace Serenity.CodeGenerator
                         foreach (var child in children)
                         {
                             if ((child.Kind == SyntaxKind.ClassDeclaration &&
-                                 (child as ClassDeclaration).Name.GetText() == noGeneric) ||
+                                 (child as ClassDeclaration).Name.GetTextSpan() == noGeneric) ||
                                 (child.Kind == SyntaxKind.InterfaceDeclaration &&
-                                 (child as InterfaceDeclaration).Name.GetText() == noGeneric))
-                                return PrependNamespace(noGeneric, child);
+                                 (child as InterfaceDeclaration).Name.GetTextSpan() == noGeneric))
+                                return PrependNamespace(noGeneric.ToString(), child);
                         }
                     }
                     else
@@ -142,10 +142,10 @@ namespace Serenity.CodeGenerator
                         {
                             if (child.Kind == SyntaxKind.ImportEqualsDeclaration)
                             {
-                                if ((child as ImportEqualsDeclaration).Name.GetText() == beforeDot)
+                                if ((child as ImportEqualsDeclaration).Name.GetTextSpan() == beforeDot)
                                 {
                                     var fullName = (child as ImportEqualsDeclaration).ModuleReference.GetText() +
-                                        afterDot;
+                                        afterDot.ToString();
                                     if (exportedTypeNames.Contains(fullName))
                                         return fullName;
                                 }
@@ -158,7 +158,7 @@ namespace Serenity.CodeGenerator
             var ns = GetNamespace(node);
             while (!string.IsNullOrEmpty(ns))
             {
-                var s = ns + "." + noGeneric;
+                var s = ns + "." + noGeneric.ToString();
                 if (exportedTypeNames.Contains(s))
                     return s;
 
@@ -169,7 +169,7 @@ namespace Serenity.CodeGenerator
                     break;
             }
 
-            return noGeneric;
+            return noGeneric.ToString();
         }
 
         string GetBaseType(ClassDeclaration node)
