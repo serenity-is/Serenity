@@ -24,10 +24,9 @@ namespace Serenity.CodeGenerator
             this.config = config;
             this.model.CustomSettings = config.CustomSettings;
 
-            var serverTypings = Path.Combine(rootDir, "Modules/Common/Imports/ServerTypings/"
-                .Replace('/', Path.DirectorySeparatorChar));
+            var serverTypings = PathHelper.ToPath(Path.Combine(rootDir, PathHelper.ToPath("Modules/Common/Imports/ServerTypings/")));
             if (!Directory.Exists(serverTypings))
-                serverTypings = Path.Combine(rootDir, "Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
+                serverTypings = Path.Combine(rootDir, PathHelper.ToPath("Imports/ServerTypings/"));
 
             typingClass = Path.Combine(serverTypings, model.ModuleDot + model.ClassName);
 
@@ -129,7 +128,7 @@ namespace Serenity.CodeGenerator
 
         private void GenerateStyle()
         {
-            string contentSite = "wwwroot/Content/site".Replace('/', Path.DirectorySeparatorChar);
+            string contentSite = PathHelper.ToPath("wwwroot/Content/site");
             string file = Path.Combine(rootDir, Path.Combine(contentSite,
                     "site" + model.DotModule.ToLowerInvariant() + ".less"));
 
@@ -198,7 +197,7 @@ namespace Serenity.CodeGenerator
             string file = Path.Combine(rootDir, string.IsNullOrEmpty(model.Module) ?
                 "Modules/Common/Navigation/NavigationItems.cs" :
                 "Modules/" + model.ModuleSlash + model.Module + "Navigation.cs");
-            file = file.Replace('/', Path.DirectorySeparatorChar);
+            file = PathHelper.ToPath(file);
 
             string code = Templates.Render("NavigationLink", model);
 

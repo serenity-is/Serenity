@@ -38,10 +38,10 @@ namespace Serenity.CodeGenerator
                     targetFramework.IndexOf('.', StringComparison.Ordinal) < 0)
                     outputExtension = ".exe";
 
-                var outputPath1 = Path.Combine(Path.GetDirectoryName(csproj), "bin/Debug/" + targetFramework + "/" + outputName + outputExtension)
-                    .Replace('/', Path.DirectorySeparatorChar);
-                var outputPath2 = Path.Combine(Path.GetDirectoryName(csproj), "bin/Release/" + targetFramework + "/" + outputName + outputExtension)
-                    .Replace('/', Path.DirectorySeparatorChar);
+                var outputPath1 = Path.Combine(Path.GetDirectoryName(csproj),
+                    PathHelper.ToPath("bin/Debug/" + targetFramework + "/" + outputName + outputExtension));
+                var outputPath2 = Path.Combine(Path.GetDirectoryName(csproj), 
+                    PathHelper.ToPath("bin/Release/" + targetFramework + "/" + outputName + outputExtension));
 
                 if (File.Exists(outputPath1))
                 {
@@ -79,11 +79,11 @@ namespace Serenity.CodeGenerator
                 assemblyFiles = config.ServerTypings.Assemblies;
                 for (var i = 0; i < assemblyFiles.Length; i++)
                 {
-                    var assemblyFile1 = Path.GetFullPath(assemblyFiles[i].Replace('/', Path.DirectorySeparatorChar));
+                    var assemblyFile1 = PathHelper.ToUrl(Path.GetFullPath(PathHelper.ToPath(assemblyFiles[i])));
                     var binDebugIdx = assemblyFile1.IndexOf("/bin/Debug/", StringComparison.OrdinalIgnoreCase);
                     string assemblyFile2 = assemblyFile1;
                     if (binDebugIdx >= 0)
-                        assemblyFile2 = assemblyFile1.Substring(0, binDebugIdx) + "/bin/Release/" + assemblyFile1[(binDebugIdx + "/bin/Release".Length)..];
+                        assemblyFile2 = string.Concat(assemblyFile1.AsSpan(0, binDebugIdx), "/bin/Release/", assemblyFile1[(binDebugIdx + "/bin/Release".Length)..]);
 
                     assemblyFiles[i] = assemblyFile1;
 
@@ -134,8 +134,7 @@ namespace Serenity.CodeGenerator
                 }
             }
 
-            var outDir = Path.Combine(projectDir, (config.ServerTypings?.OutDir.TrimToNull() ?? "Imports/ServerTypings")
-                .Replace('/', Path.DirectorySeparatorChar));
+            var outDir = Path.Combine(projectDir, PathHelper.ToPath((config.ServerTypings?.OutDir.TrimToNull() ?? "Imports/ServerTypings")));
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("Transforming ServerTypings at: ");

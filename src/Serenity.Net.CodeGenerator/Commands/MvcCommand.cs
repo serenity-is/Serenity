@@ -15,8 +15,7 @@ namespace Serenity.CodeGenerator
 
             config.MVC ??= new GeneratorConfig.MVCConfig();
 
-            var outDir = Path.Combine(projectDir, (config.MVC.OutDir.TrimToNull() ?? "Imports/MVC")
-                .Replace('/', Path.DirectorySeparatorChar));
+            var outDir = Path.Combine(projectDir, PathHelper.ToPath(config.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("Transforming MVC at: ");
@@ -36,7 +35,7 @@ namespace Serenity.CodeGenerator
                     "Views/",
                     Path.GetFileNameWithoutExtension(csproj) + "/"
                 })
-                .Select(x => Path.Combine(rootDir, x.Replace('/', Path.DirectorySeparatorChar)));
+                .Select(x => Path.Combine(rootDir, PathHelper.ToPath(x)));
 
             IEnumerable<string> files = new List<string>();
             foreach (var path in searchViewPaths)

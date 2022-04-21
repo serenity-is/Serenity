@@ -134,8 +134,8 @@ namespace Serenity.CodeGenerator
                         .Where(x => x.EvaluatedInclude?.EndsWith(".d.ts", 
                             StringComparison.OrdinalIgnoreCase) == true))
                     {
-                        var sourceFile = Path.Combine(Path.GetDirectoryName(reference),
-                            item.EvaluatedInclude).Replace('\\', Path.DirectorySeparatorChar);
+                        var sourceFile = PathHelper.ToPath(Path.Combine(Path.GetDirectoryName(reference),
+                            item.EvaluatedInclude));
 
                         if (verbose)
                             Console.WriteLine("Checking source file: " + sourceFile);

@@ -17,8 +17,7 @@ namespace Serenity.CodeGenerator
             if (config.RootNamespace.IsEmptyOrNull())
                 config.RootNamespace = config.GetRootNamespaceFor(csproj);
 
-            var outDir = Path.Combine(projectDir, (config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes")
-                .Replace('/', Path.DirectorySeparatorChar));
+            var outDir = Path.Combine(projectDir, PathHelper.ToPath(config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes"));
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("Transforming ClientTypes at: ");
