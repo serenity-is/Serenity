@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using Xunit;
-
-namespace Serenity.Tests.Data
+﻿namespace Serenity.Tests.Data
 {
     public class SqlQuery_Oracle12cDialect_Tests
     {

@@ -1,8 +1,4 @@
-﻿using Serenity.Data;
-using Serenity.Data.Mapping;
-using System;
-
-namespace Serenity.Test.Services
+﻿namespace Serenity.Tests.Services
 {
     public partial class MasterDetailRelationBehaviorTests
     {

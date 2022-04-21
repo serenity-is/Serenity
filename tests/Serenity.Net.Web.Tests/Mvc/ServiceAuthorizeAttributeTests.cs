@@ -1,21 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Serenity.Abstractions;
-using Serenity.Data;
-using Serenity.Services;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Security.Claims;
-using Xunit;
-
-namespace Serenity.Tests.Web.Mvc
+﻿namespace Serenity.Tests.Web.Mvc
 {
     public class ServiceAuthorizeAttributeTests
     {

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections;
 using System.Data.Common;
-using System.Linq;
 
 namespace Serenity.Tests
 {

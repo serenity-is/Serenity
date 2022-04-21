@@ -1,9 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Linq;
-using Xunit;
-
-namespace Serenity.Tests.Data
+﻿namespace Serenity.Tests.Data
 {
     public partial class SqlQuery_OrderBy_Tests
     {

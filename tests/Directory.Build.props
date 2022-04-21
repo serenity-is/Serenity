@@ -17,5 +17,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" Condition="'$(EnableGlobalUsings)' != 'false'">
+        <Link>Properties\GlobalUsings.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>

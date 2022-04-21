@@ -1,10 +1,4 @@
-﻿using Serenity.Data;
-using Serenity.Services;
-using Serenity.Tests.Entities;
-using System;
-using System.Data;
-using System.Linq;
-using Xunit;
+﻿using Serenity.Tests.Entities;
 
 namespace Serenity.Tests.Entity
 {

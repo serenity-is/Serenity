@@ -1,7 +1,4 @@
-﻿using Serenity.Abstractions;
-using System.Security.Claims;
-using System.Security.Principal;
-using Xunit;
+﻿using System.Security.Principal;
 
 namespace Serenity.Tests.Authorization
 {

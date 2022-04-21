@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class NullDbConnection : IDbConnection
     {

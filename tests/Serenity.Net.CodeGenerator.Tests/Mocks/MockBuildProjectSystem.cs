@@ -1,6 +1,4 @@
 ﻿using Serenity.CodeGenerator;
-using System;
-using System.IO.Abstractions;
 
 namespace Serenity.Tests
 {

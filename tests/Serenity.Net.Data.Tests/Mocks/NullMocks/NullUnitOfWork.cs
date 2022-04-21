@@ -1,8 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Data;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class NullUnitOfWork : IUnitOfWork
     {

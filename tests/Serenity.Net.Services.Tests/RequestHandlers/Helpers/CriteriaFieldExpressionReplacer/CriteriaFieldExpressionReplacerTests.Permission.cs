@@ -1,8 +1,4 @@
-﻿using Serenity.Data;
-using Serenity.Services;
-using Xunit;
-
-namespace Serenity.Tests.Services
+﻿namespace Serenity.Tests.Services
 {
     public partial class CriteriaFieldExpressionReplacerTests
     {

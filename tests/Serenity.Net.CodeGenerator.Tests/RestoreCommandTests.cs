@@ -1,8 +1,4 @@
 using Serenity.CodeGenerator;
-using System;
-using System.Collections.Generic;
-using System.IO.Abstractions.TestingHelpers;
-using Xunit;
 
 namespace Serenity.Tests.CodeGenerator
 {

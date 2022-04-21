@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.FileProviders;
-using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class MockHostEnvironment : IWebHostEnvironment
     {

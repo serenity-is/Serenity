@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using Serenity.Data.Mapping;
-
-namespace Serenity.Tests.Services;
+﻿namespace Serenity.Tests.Services;
 
 public partial class CriteriaFieldExpressionReplacerTests
 {

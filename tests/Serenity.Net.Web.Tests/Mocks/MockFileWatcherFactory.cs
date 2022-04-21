@@ -1,9 +1,4 @@
-﻿using Serenity.Web;
-using System;
-using System.Collections.Generic;
-using System.IO.Abstractions;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class MockFileWatcherFactory : IFileWatcherFactory
     {

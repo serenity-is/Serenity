@@ -1,10 +1,4 @@
-﻿using Serenity.Data;
-using Serenity.Services;
-using Serenity.Tests;
-using System;
-using Xunit;
-
-namespace Serenity.Test.Services
+﻿namespace Serenity.Tests.Services
 {
     public partial class MasterDetailRelationBehaviorTests
     {

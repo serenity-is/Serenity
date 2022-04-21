@@ -1,7 +1,4 @@
-﻿using Serenity.Abstractions;
-using System.Security.Claims;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class NullUserAccessor : IUserAccessor
     {

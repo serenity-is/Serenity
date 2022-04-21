@@ -1,10 +1,4 @@
-﻿using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Primitives;
-using System;
-using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class MockFileProvider : IFileProvider
     {

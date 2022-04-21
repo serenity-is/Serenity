@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace Serenity.Tests.Caching
+﻿namespace Serenity.Tests.Caching
 {
     public class DistributedCacheExtensionsTests
     {

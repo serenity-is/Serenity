@@ -1,8 +1,4 @@
-﻿using Serenity.Data;
-using Serenity.Data.Mapping;
-using System.ComponentModel;
-
-namespace Serenity.Tests.Entities
+﻿namespace Serenity.Tests.Entities
 {
     [TableName("ComplexTable")]
     public class ComplexRow : Row<ComplexRow.RowFields>

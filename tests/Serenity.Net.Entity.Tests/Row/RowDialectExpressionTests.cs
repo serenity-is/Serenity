@@ -1,10 +1,3 @@
-using Serenity.Data;
-using Serenity.Data.Mapping;
-using Serenity.Tests.Entities;
-using System;
-using System.Reflection;
-using Xunit;
-
 namespace Serenity.Tests.Entity
 {
     public class RowDialectExpressionTests

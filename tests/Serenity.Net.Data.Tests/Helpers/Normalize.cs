@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Serenity.Tests
 {
     public static class Normalize

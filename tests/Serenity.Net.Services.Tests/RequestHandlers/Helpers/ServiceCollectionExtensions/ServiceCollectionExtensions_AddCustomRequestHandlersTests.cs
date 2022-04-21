@@ -1,15 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Serenity.Abstractions;
-using Serenity.Data;
-using Serenity.Extensions.DependencyInjection;
-using Serenity.Services;
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace Serenity.Tests.Services
+﻿namespace Serenity.Tests.Services
 {
     public class ServiceCollectionExtensions_AddCustomRequestHandlersTests
     {

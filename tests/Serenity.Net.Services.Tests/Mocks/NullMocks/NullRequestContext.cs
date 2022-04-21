@@ -1,9 +1,4 @@
-﻿using Serenity.Abstractions;
-using Serenity.Services;
-using System;
-using System.Security.Claims;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class NullRequestContext : IRequestContext
     {

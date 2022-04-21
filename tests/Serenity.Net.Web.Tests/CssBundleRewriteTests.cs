@@ -1,10 +1,3 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Serenity.Abstractions;
-using Serenity.Extensions.DependencyInjection;
-using Serenity.Web;
-using Xunit;
-
 namespace Serenity.Tests.Web
 {
     public class CssBundleRewriteTests

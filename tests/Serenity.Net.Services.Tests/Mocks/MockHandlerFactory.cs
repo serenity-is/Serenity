@@ -1,7 +1,4 @@
-﻿using Serenity.Services;
-using System;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class MockHandlerFactory : IDefaultHandlerFactory
     {

@@ -1,8 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using Xunit;
-
-namespace Serenity.Tests.Data
+﻿namespace Serenity.Tests.Data
 {
     public class SqlQuery_Where_Tests
     {

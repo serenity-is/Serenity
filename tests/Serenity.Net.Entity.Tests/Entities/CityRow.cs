@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using Serenity.Data.Mapping;
-
-namespace Serenity.Tests.Entities
+﻿namespace Serenity.Tests.Entities
 {
     [TableName("Cities")]
     public class CityRow : Row<CityRow.RowFields>, IIdRow, INameRow

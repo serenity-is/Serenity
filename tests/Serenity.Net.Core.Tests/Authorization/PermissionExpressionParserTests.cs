@@ -1,8 +1,4 @@
-﻿using Serenity.Services;
-using System;
-using Xunit;
-
-namespace Serenity.Tests.Authorization
+﻿namespace Serenity.Tests.Authorization
 {
     public class PermissionExpressionParserTests
     {

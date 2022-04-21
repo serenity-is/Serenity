@@ -1,7 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-using System.Security.Claims;
-using System.Security.Principal;
+﻿using System.Security.Principal;
 
 namespace Serenity.Tests
 {

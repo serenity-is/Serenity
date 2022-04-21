@@ -1,7 +1,4 @@
-using Serenity.Data;
 using Serenity.Tests.Entities;
-using System;
-using Xunit;
 
 namespace Serenity.Tests.Entity
 {

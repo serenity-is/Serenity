@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.FileProviders;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
+﻿using System.Collections;
 
 namespace Serenity.Tests
 {

@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using Serenity.Services;
-using Xunit;
-
-namespace Serenity.Tests.Services;
+﻿namespace Serenity.Tests.Services;
 
 public partial class ListRequestHandlerTests
 {

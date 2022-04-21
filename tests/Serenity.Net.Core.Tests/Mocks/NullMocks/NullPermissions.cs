@@ -1,6 +1,4 @@
-﻿using Serenity.Abstractions;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class NullPermissions : IPermissionService
     {

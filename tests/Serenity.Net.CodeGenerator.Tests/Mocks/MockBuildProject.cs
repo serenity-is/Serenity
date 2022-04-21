@@ -1,8 +1,4 @@
 ﻿using Serenity.CodeGenerator;
-using System;
-using System.Collections.Generic;
-using System.IO.Abstractions;
-using System.Linq;
 using System.Xml.Linq;
 
 namespace Serenity.Tests

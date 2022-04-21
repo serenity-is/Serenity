@@ -1,7 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class MockPermissions : IPermissionService
     {

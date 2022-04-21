@@ -1,8 +1,4 @@
-﻿using Serenity.Abstractions;
-using Serenity.Web;
-using Xunit;
-
-namespace Serenity.Tests.Authorization
+﻿namespace Serenity.Tests.Authorization
 {
     public class LogicOperatorPermissionServiceTests
     {

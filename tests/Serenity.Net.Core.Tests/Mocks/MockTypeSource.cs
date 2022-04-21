@@ -1,10 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class MockTypeSource : ITypeSource
     {

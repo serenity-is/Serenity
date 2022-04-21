@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO.Abstractions;
-
-namespace Serenity.Tests
+﻿namespace Serenity.Tests
 {
     public class MockFileInfo : Microsoft.Extensions.FileProviders.IFileInfo
     {
