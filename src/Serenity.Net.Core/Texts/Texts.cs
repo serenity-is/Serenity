@@ -1,6 +1,4 @@
-﻿using Serenity.ComponentModel;
-
-namespace Serenity.Core
+﻿namespace Serenity.Core
 {
     [NestedLocalTexts]
     internal static class Texts

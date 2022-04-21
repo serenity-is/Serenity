@@ -1,8 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     internal class RetrieveHandlerProxy<TRow, TRetrieveRequest, TRetrieveResponse>
         : IRetrieveHandler<TRow, TRetrieveRequest, TRetrieveResponse>

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     [AttributeUsage(AttributeTargets.Interface, AllowMultiple = false)]
     public class GenericHandlerTypeAttribute : Attribute

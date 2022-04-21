@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     ///   Serialize/deserialize a BaseCriteria object and checks for safety of criteria expressions.</summary>

@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Serenity.Abstractions;
 using Serenity.Localization;
 using Serenity.Reflection;
-using System.Reflection;
 
 namespace Serenity.Extensions.DependencyInjection
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Binary criteria object, which has two operands and a operator.

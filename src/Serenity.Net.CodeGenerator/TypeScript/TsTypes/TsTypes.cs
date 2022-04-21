@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CommentKind = Serenity.TypeScript.TsTypes.SyntaxKind;
+﻿using CommentKind = Serenity.TypeScript.TsTypes.SyntaxKind;
 
 namespace Serenity.TypeScript.TsTypes
 {

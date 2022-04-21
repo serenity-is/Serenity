@@ -1,11 +1,4 @@
-﻿using Serenity.Abstractions;
-using Serenity.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-namespace Serenity.Reflection
+﻿namespace Serenity.Reflection
 {
     /// <summary>
     /// Default annotation type registry

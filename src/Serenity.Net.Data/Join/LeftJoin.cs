@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// LEFT JOIN type

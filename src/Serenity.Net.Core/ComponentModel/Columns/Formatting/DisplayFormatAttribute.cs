@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Sets the display format for a column.

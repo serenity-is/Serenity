@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Controls whether this field is visible on new record mode

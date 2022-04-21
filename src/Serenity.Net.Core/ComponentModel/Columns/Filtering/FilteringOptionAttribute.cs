@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Declares a new filtering option

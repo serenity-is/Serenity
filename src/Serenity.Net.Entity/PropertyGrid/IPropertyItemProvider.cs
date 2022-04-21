@@ -1,8 +1,4 @@
-﻿using Serenity.ComponentModel;
-using System;
-using System.Collections.Generic;
-
-namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid
 {
     /// <summary>
     /// Abstraction for the provider that returns a list of property items for a given type

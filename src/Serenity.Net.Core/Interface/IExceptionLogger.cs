@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Abstractions
+﻿namespace Serenity.Abstractions
 {
     /// <summary>
     /// Exception logger abstraction

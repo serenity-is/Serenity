@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.Reflection
+﻿namespace Serenity.Reflection
 {
     class VisitedGraph : Dictionary<object, object>
     {

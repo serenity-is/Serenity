@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Placed on permission keys to define an implicitly assigned 

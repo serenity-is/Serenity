@@ -1,13 +1,6 @@
 ﻿using Mono.Cecil;
-using Newtonsoft.Json;
-using Serenity.Data;
 using Serenity.Reflection;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Serenity.CodeGeneration
 {

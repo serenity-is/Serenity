@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     public abstract partial class Row<TFields>
     {

@@ -1,10 +1,4 @@
-﻿using Serenity.Abstractions;
-using Serenity.Services;
-using System;
-using System.Collections.Concurrent;
-using System.Linq;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     /// <summary>
     /// Adds AND OR operator support to any IPermissionService implementation

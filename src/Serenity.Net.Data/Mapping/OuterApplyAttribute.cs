@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Data.Mapping
+﻿namespace Serenity.Data.Mapping
 {
     /// <summary>
     /// Adds a OUTER APPLY to the row

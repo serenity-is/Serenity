@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using System;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Registers a permission key.

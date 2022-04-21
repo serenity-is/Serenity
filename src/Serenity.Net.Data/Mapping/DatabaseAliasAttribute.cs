@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Determines database alias, used for unit test database contexts.

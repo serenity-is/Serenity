@@ -1,10 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Reflection;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior
     {

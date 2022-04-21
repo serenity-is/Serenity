@@ -1,10 +1,6 @@
 ﻿using Serenity.TypeScript;
 using Serenity.TypeScript.TsTypes;
 using Serenity.CodeGeneration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.IO.Abstractions;
 
 namespace Serenity.CodeGenerator

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Serenity.Abstractions
+﻿namespace Serenity.Abstractions
 {
     /// <summary>
     /// Abstraction for type source which is used as an extensibility point

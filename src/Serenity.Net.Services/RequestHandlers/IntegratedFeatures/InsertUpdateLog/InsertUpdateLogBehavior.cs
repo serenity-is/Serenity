@@ -1,8 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Globalization;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
     {

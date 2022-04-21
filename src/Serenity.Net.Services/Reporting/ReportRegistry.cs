@@ -1,11 +1,4 @@
-﻿using Serenity.Abstractions;
-using Serenity.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
-
-namespace Serenity.Reporting
+﻿namespace Serenity.Reporting
 {
     public class ReportRegistry : IReportRegistry
     {

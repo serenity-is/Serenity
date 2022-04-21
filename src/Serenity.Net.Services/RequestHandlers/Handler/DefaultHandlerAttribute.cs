@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
     /// Specifies that the class this attribute attached to is the default handler (list, create, delete, update etc).

@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
     ///   Serialize/deserialize a IdentifierSet object as string</summary>

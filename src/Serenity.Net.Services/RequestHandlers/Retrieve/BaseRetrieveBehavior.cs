@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public abstract class BaseRetrieveBehavior : IRetrieveBehavior
     {

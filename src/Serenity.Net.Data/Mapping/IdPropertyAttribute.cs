@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Determines that the attached property is the ID field of the table.

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Abstraction for row fields instance providers

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Data.Mapping
+﻿namespace Serenity.Data.Mapping
 {
     /// <summary>
     /// Explicitly specifies the database column name for property.

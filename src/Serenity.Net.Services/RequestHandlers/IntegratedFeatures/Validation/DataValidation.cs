@@ -1,9 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public static class DataValidation
     {

@@ -1,9 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class DefaultImplicitBehaviorRegistry : IImplicitBehaviorRegistry
     {

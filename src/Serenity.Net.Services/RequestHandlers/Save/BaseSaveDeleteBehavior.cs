@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using System;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public abstract class BaseSaveDeleteBehavior : BaseSaveBehavior, IDeleteBehavior, IDeleteExceptionBehavior
     {

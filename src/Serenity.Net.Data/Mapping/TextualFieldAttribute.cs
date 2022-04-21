@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Data.Mapping
+﻿namespace Serenity.Data.Mapping
 {
     /// <summary>
     /// Determines textual field for this field. This is placed on FK's and specifies which field

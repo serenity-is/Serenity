@@ -1,8 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace Serenity.IO
+﻿namespace Serenity.IO
 {
     public class CommandLineTools
     {

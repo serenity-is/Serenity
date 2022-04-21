@@ -1,6 +1,4 @@
 ﻿using Dapper;
-using System.Collections.Generic;
-using System.Data;
 
 namespace Serenity.Data
 {

@@ -1,8 +1,4 @@
-﻿using Serenity.ComponentModel;
-using Serenity.Services;
-using System.Collections.Generic;
-
-namespace Serenity.Reporting
+﻿namespace Serenity.Reporting
 {
     public class ReportRetrieveResponse : ServiceResponse
     {

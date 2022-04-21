@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Contains helper methods for locating / replacing brackets in an SQL expression

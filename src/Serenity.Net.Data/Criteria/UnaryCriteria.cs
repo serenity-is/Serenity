@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Unary criteria with one operand and operator

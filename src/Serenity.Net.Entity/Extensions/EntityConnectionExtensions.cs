@@ -1,9 +1,4 @@
-﻿using Serenity.Services;
-using System;
-using System.Collections.Generic;
-using System.Data;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Contains extension methods to perform entity CRUD operations directly on connections.

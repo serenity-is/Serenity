@@ -1,13 +1,8 @@
 ﻿using Mono.Cecil;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace ICSharpCode.Decompiler
 {

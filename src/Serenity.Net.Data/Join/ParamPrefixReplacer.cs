@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Param prefix replacer

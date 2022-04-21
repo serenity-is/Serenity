@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
     ///   Serialize/deserialize a SortBy object as string</summary>

@@ -1,9 +1,4 @@
-﻿using Serenity.ComponentModel;
-using Serenity.Data;
-using System;
-using System.Collections.Generic;
-
-namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid
 {
     /// <summary>
     /// Base class for property processors, which sets properties of a PropertyItem

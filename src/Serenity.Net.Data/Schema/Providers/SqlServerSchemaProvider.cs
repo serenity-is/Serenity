@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-
-namespace Serenity.Data.Schema
+﻿namespace Serenity.Data.Schema
 {
     /// <summary>
     /// SQL server metadata provider

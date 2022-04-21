@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
     /// This is an extension for delete behaviors that should be called for exceptions 

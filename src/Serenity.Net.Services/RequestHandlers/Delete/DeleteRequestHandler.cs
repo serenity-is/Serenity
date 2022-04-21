@@ -1,14 +1,4 @@
-﻿using Serenity.Abstractions;
-using Serenity.Data;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Security.Claims;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDeleteRequestProcessor,
         IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>

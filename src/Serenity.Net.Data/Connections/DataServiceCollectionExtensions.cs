@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Serenity.Data;
-using System;
 
 namespace Serenity.Extensions.DependencyInjection
 {

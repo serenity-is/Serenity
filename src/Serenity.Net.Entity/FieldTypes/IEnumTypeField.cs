@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Interface for fields with an enum type property

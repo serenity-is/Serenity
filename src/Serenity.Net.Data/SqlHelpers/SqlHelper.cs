@@ -1,11 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.IO;
-using System.Text;
 using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data

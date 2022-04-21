@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Serenity.TypeScript.TsTypes;
+﻿using Serenity.TypeScript.TsTypes;
 using static Serenity.TypeScript.TsParser.Scanner;
 
 namespace Serenity.TypeScript.TsParser

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Data.Mapping
+﻿namespace Serenity.Data.Mapping
 {
     /// <summary>
     /// Determines numeric scale (decimal places) for the field.

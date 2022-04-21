@@ -1,10 +1,8 @@
 ﻿using Serenity.CodeGeneration;
 using Serenity.IO;
-using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.Linq;
 using System.Text.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Serenity.CodeGenerator
 {

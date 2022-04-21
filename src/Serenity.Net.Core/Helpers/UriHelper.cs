@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// Contains URI related helper functions.

@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace Serenity.Abstractions
+﻿namespace Serenity.Abstractions
 {
     /// <summary>
     /// Abstraction to access current user

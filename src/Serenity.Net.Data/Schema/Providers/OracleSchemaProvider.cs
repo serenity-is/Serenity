@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data;
-
-namespace Serenity.Data.Schema
+﻿namespace Serenity.Data.Schema
 {
     /// <summary>
     /// Oracle metadata provider.

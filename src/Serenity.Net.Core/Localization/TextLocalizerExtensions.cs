@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// Extensions for local text context

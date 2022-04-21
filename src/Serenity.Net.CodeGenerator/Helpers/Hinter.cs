@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace Serenity.CodeGenerator
+﻿namespace Serenity.CodeGenerator
 {
     /// <summary>
     /// Original code from https://github.com/fjunqueira/hinter

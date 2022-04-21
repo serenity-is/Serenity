@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Specifies required permission to access an object, e.g. a report

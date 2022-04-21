@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.Plugins
+﻿namespace Serenity.Plugins
 {
     /// <summary>
     /// Abstraction for plugins with navigation entries

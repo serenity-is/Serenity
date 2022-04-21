@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Serenity.Abstractions
+﻿namespace Serenity.Abstractions
 {
     /// <summary>
     /// Type source extension methods

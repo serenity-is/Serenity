@@ -1,8 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Collections.Generic;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public static class ServiceQueryHelper
     {

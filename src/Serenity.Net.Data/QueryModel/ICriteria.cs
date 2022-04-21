@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using System.Text;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// Shared criteria interface

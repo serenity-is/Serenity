@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Globalization;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     ///   Serialize/deserialize a row</summary>

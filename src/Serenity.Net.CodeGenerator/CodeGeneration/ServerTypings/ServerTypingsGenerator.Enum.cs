@@ -1,8 +1,5 @@
 ﻿using Mono.Cecil;
 using Serenity.Reflection;
-using System;
-using System.Globalization;
-using System.Linq;
 
 namespace Serenity.CodeGeneration
 {

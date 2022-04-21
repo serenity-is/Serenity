@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     public class FilesToDelete : List<string>, IDisposable, IFilesToDelete
     {

@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using System.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public interface IRetrieveHandler<TRow, TRetrieveRequest, TRetrieveResponse>
         : IRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse>

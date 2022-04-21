@@ -1,5 +1,4 @@
-﻿using System;
-using Path = System.IO.Path;
+﻿using Path = System.IO.Path;
 
 namespace Serenity.Web
 {

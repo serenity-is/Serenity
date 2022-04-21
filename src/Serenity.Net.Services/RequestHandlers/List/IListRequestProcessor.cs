@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     [GenericHandlerType(typeof(ListRequestHandler<>))]
     public interface IListRequestProcessor : IListRequestHandler

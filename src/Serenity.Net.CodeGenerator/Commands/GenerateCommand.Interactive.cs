@@ -1,13 +1,8 @@
-﻿using Serenity.Data;
-using Serenity.Data.Schema;
+﻿using Serenity.Data.Schema;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.IO.Abstractions;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Serenity.CodeGenerator
 {
@@ -25,7 +20,7 @@ namespace Serenity.CodeGenerator
             public ExitCodes Run()
             {
                 AnsiConsole.WriteLine();
-                AnsiConsole.Write(new Rule($"[bold springgreen3_1]Table Code Generation[/]")
+                AnsiConsole.Write(new Spectre.Console.Rule($"[bold springgreen3_1]Table Code Generation[/]")
                 {
                     Alignment = Justify.Left
                 });
@@ -329,7 +324,7 @@ namespace Serenity.CodeGenerator
                 }
 
                 AnsiConsole.WriteLine();
-                AnsiConsole.Write(new Rule($"[bold orange1]Please select an Asp.Net Core project file[/]")
+                AnsiConsole.Write(new Spectre.Console.Rule($"[bold orange1]Please select an Asp.Net Core project file[/]")
                 {
                     Alignment = Justify.Left
                 });

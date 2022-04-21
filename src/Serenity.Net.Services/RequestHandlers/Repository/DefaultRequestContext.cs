@@ -1,8 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-using System.Security.Claims;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class DefaultRequestContext : IRequestContext
     {

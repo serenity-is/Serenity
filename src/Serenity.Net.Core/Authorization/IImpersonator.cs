@@ -1,7 +1,4 @@
-﻿
-using System.Security.Claims;
-
-namespace Serenity.Abstractions
+﻿namespace Serenity.Abstractions
 {
     /// <summary>
     /// Interface for authorization services that supports temporary impersonating

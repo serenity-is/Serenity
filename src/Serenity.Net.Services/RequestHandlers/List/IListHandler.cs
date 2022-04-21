@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using System.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public interface IListHandler<TRow, TListRequest, TListResponse>
         : IRequestHandler<TRow, TListRequest, TListResponse>

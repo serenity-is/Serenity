@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class ListRequestHandler<TRow, TListRequest> : ListRequestHandler<TRow, TListRequest, ListResponse<TRow>>,
         IListHandler<TRow, TListRequest>

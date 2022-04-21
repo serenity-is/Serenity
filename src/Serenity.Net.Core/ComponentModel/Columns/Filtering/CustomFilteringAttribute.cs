@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Base class which other custom filtering types derive from.

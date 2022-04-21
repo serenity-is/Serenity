@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public interface IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>
         : IRequestHandler<TRow, TDeleteRequest, TDeleteResponse>

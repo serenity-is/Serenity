@@ -1,7 +1,4 @@
-﻿using System;
-using System.Data;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Unit of work implementation.

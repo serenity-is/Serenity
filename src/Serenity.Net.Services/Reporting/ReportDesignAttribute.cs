@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Reporting
+﻿namespace Serenity.Reporting
 {
     public class ReportDesignAttribute : Attribute
     {

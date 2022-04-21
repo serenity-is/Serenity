@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Serenity.Plugins
+﻿namespace Serenity.Plugins
 {
     /// <summary>
     /// Interface for plugins that has a list of background jobs

@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     [GenericHandlerType(typeof(SaveRequestHandler<>))]
     public interface ISaveRequestProcessor : ISaveRequestHandler

@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Interfaces for types that has a CurrentTransaction property of type IDbTransaction

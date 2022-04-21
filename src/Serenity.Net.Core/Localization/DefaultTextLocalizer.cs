@@ -1,9 +1,4 @@
-﻿
-using Serenity.Abstractions;
-using System;
-using System.Globalization;
-
-namespace Serenity.Localization
+﻿namespace Serenity.Localization
 {
     /// <summary>
     /// Implementation of text localizer for current ui culture name and text registry

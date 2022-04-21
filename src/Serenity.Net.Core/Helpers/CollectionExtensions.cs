@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// Basic collection extensions

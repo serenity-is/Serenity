@@ -1,12 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Serenity.Abstractions;
-using Serenity.Data;
 using Serenity.Localization;
-using Serenity.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Serenity.Extensions.DependencyInjection
 {

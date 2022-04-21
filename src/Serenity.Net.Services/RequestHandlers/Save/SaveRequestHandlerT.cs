@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class SaveRequestHandler<TRow> : SaveRequestHandler<TRow, SaveRequest<TRow>, SaveResponse>,
         ISaveHandler<TRow>

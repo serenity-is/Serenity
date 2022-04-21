@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public interface ISaveHandler<TRow, TSaveRequest, TSaveResponse>
         : ICreateHandler<TRow, TSaveRequest, TSaveResponse>, IUpdateHandler<TRow, TSaveRequest, TSaveResponse>

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Indicates that property should use lookup editor type of filtering

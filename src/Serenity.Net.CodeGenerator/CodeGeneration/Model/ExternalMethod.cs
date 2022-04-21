@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration
 {
     public class ExternalMethod : ExternalMember
     {

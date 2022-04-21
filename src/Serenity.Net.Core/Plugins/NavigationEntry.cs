@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Plugins
+﻿namespace Serenity.Plugins
 {
     /// <summary>
     /// Plugin navigation entry abstraction.

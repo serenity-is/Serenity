@@ -1,8 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-using System.Text.RegularExpressions;
-
-namespace Serenity.Localization
+﻿namespace Serenity.Localization
 {
     /// <summary>
     /// Adds key fallback to any ILocalTextSource implementation

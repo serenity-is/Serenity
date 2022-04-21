@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     /// <summary>
     ///   <see cref="ImageChecker"/>'s result codes.</summary>

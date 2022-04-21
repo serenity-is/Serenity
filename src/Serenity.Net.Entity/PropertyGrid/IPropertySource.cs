@@ -1,9 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid
 {
     /// <summary>
     /// Abstracts the property source that returns PropertyInfo and some other info

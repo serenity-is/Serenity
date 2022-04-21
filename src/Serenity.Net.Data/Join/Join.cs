@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     ///   Corresponds to an SQL JOIN (INNER, OUTER, CROSS etc.)</summary>

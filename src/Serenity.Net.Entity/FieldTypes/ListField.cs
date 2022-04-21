@@ -1,8 +1,4 @@
-﻿using Serenity.Data.Mapping;
-using System;
-using System.Collections.Generic;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Field with a list value

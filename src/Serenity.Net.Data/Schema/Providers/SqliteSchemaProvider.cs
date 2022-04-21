@@ -1,10 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-
-namespace Serenity.Data.Schema
+﻿namespace Serenity.Data.Schema
 {
     /// <summary>
     /// SQLite metadata provider

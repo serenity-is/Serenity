@@ -1,7 +1,4 @@
-﻿using Serenity.ComponentModel;
-using Serenity.Data;
-
-namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid
 {
     public partial class BasicPropertyProcessor : PropertyProcessor
     {

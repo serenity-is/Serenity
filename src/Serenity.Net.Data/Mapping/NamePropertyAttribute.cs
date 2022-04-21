@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Determines that the attached property is the name field of the table.

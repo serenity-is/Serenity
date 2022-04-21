@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public static class DefaultHandlerFactoryExtensions
     {

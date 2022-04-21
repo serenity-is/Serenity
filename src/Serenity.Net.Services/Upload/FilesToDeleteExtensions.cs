@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     public static class FilesToDeleteExtensions
     {

@@ -1,7 +1,4 @@
-﻿using Serenity.Services;
-using System;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Base class for service lookup based editor types

@@ -1,7 +1,4 @@
-﻿using Serenity.Services;
-using System.Collections.Generic;
-
-namespace Serenity.Reporting
+﻿namespace Serenity.Reporting
 {
     public class GenerateExcelFileRequest : ServiceRequest
     {

@@ -1,6 +1,4 @@
-﻿using Serenity.Services;
-
-namespace Serenity.Reporting
+﻿namespace Serenity.Reporting
 {
     public class ReportRetrieveRequest : ServiceRequest
     {

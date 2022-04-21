@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Serenity.Reflection
+﻿namespace Serenity.Reflection
 {
     /// <summary>
     /// An interface to virtualize property attribute access

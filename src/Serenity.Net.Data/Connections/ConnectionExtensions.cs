@@ -1,8 +1,4 @@
-﻿using System;
-using System.Data;
-using System.Reflection;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Contains DB connection related extensions

@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using System;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     internal class UpdateHandlerProxy<TRow, TSaveRequest, TSaveResponse>
         : IUpdateHandler<TRow, TSaveRequest, TSaveResponse>

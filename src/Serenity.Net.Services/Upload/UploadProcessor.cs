@@ -1,7 +1,5 @@
-﻿using Serenity.Abstractions;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using System;
 using System.IO;
 
 namespace Serenity.Web

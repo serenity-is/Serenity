@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
     /// A save behavior that can be used as a mixin within a SaveRequestHandler lifecycle

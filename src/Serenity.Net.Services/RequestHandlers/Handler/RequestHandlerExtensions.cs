@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public static class RequestHandlerExtensions
     {

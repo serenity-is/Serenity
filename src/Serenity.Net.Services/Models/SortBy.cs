@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     [JsonConverter(typeof(JsonSortByConverter))]
     public class SortBy

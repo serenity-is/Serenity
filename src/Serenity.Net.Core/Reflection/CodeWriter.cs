@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace Serenity.Reflection
+﻿namespace Serenity.Reflection
 {
     /// <summary>
     /// Used to write formatted code to a string builder.

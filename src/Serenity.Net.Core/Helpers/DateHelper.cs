@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// Static class with common date utilities and constants

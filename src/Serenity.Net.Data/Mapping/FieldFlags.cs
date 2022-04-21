@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
 
     /// <summary>Flags that determine basic properties of a field</summary>

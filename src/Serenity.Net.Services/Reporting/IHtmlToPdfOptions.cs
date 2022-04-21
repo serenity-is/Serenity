@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.Reporting
+﻿namespace Serenity.Reporting
 {
     public interface IHtmlToPdfOptions
     {

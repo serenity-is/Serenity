@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Helper class for replacing database caret references in format [^ConnectionKey] in SQL expressions.

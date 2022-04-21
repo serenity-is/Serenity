@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Wraps a transaction instance to add current transaction support for the wrapped connection.

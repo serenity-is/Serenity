@@ -1,12 +1,4 @@
-﻿using Serenity.Data.Mapping;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     internal class OriginPropertyDictionary
     {

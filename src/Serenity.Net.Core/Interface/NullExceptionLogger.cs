@@ -1,7 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// Null exception logger that logs nothing

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.Plugins
+﻿namespace Serenity.Plugins
 {
     /// <summary>
     /// CSS file dependencies for plugins.

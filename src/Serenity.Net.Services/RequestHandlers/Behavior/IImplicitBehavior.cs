@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
     /// An implicit behavior is a request handler behavior (save/list/retrieve/delete etc.)

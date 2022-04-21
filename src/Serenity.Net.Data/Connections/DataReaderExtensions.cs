@@ -1,7 +1,4 @@
-﻿using System;
-using System.Data;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     ///   Extension methods for IDataReader objects.</summary>

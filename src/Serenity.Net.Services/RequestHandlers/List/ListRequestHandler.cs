@@ -1,15 +1,4 @@
-﻿using Serenity.ComponentModel;
-using Serenity.Abstractions;
-using Serenity.Data;
-using Serenity.Data.Mapping;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Security.Claims;
+﻿using System.Collections;
 
 namespace Serenity.Services
 {

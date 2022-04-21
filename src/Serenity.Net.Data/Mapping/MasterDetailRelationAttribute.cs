@@ -1,7 +1,4 @@
-﻿using Serenity.Services;
-using System;
-
-namespace Serenity.Data.Mapping
+﻿namespace Serenity.Data.Mapping
 {
     /// <summary>
     /// Defines a master detail relation (1-N) between this row and another

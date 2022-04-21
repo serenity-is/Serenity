@@ -1,7 +1,4 @@
-﻿
-using System.Collections.Generic;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// OUTER APPLY join type

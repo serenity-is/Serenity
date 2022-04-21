@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class RetrieveLocalizationResponse<TEntity> : ServiceResponse
         where TEntity : class, new()

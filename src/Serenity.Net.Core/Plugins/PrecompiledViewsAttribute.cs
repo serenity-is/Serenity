@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Plugins
+﻿namespace Serenity.Plugins
 {
     /// <summary>
     /// Indicates that this plugin assembly contains precompiled views (by RazorGenerator)

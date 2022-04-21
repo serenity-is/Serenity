@@ -1,10 +1,4 @@
-﻿using Serenity.Data;
-using Serenity.Data.Mapping;
-using System;
-using System.Linq;
-using System.Reflection;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class ValidateParentBehavior : BaseSaveBehavior
     {

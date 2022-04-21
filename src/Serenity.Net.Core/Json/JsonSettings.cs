@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Serenity.Data;
+﻿using Newtonsoft.Json.Converters;
 
 namespace Serenity
 {

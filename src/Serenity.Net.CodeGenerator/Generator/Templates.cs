@@ -1,9 +1,6 @@
 ﻿using Scriban;
 using Scriban.Runtime;
-using System;
-using System.Collections.Concurrent;
 using System.IO;
-using System.Linq;
 
 namespace Serenity.CodeGenerator
 {

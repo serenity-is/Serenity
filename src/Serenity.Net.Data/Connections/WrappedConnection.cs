@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Wraps a connection to add current transaction and dialect support.

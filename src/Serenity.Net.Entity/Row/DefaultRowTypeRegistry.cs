@@ -1,10 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Default row type registry

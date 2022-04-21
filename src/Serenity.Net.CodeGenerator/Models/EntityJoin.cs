@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.CodeGenerator
+﻿namespace Serenity.CodeGenerator
 {
     public class EntityJoin
     {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Placed on rows / or custom lookup classes to denote

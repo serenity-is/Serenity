@@ -1,12 +1,7 @@
-﻿using Serenity.Data;
-using Serenity.Data.Schema;
-using System;
-using System.Collections.Generic;
+﻿using Serenity.Data.Schema;
 using System.Data.Common;
 using System.IO;
 using System.IO.Abstractions;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Serenity.CodeGenerator
 {

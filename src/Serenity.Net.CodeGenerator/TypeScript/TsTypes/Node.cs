@@ -1,7 +1,4 @@
 ﻿using Serenity.TypeScript.TsParser;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Serenity.TypeScript.TsTypes
 {

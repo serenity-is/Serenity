@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using System.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
     /// A validation context for rows

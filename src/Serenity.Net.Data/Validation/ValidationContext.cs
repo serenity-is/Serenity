@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// Validation context abstraction

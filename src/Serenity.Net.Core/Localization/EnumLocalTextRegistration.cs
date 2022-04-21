@@ -1,9 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-using System.ComponentModel;
-using System.Reflection;
-
-namespace Serenity.Localization
+﻿namespace Serenity.Localization
 {
     /// <summary>
     /// Contains initialization method for adding local text translations defined by

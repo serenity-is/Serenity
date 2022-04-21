@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Base attribute class that all other custom editor types

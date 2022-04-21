@@ -1,6 +1,4 @@
 ﻿using Serenity.Reflection;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Serenity.CodeGeneration
 {

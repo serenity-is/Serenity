@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     /// <summary>
     /// Represents a customized column / form script

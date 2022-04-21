@@ -1,8 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     internal class ListHandlerProxy<TRow, TListRequest, TListResponse>
         : IListHandler<TRow, TListRequest, TListResponse>

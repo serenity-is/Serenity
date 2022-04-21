@@ -1,8 +1,4 @@
-﻿using Serenity.Data;
-using System.Collections.Generic;
-using System.Data;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
     /// Represents a RetrieveRequestHandler. Is used with RetrieveBehavior objects.

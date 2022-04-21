@@ -1,9 +1,4 @@
-﻿
-using Newtonsoft.Json;
-using Serenity.ComponentModel;
-using System.Collections.Generic;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     public class ServiceRequest
     {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Determines the connection key used for a class

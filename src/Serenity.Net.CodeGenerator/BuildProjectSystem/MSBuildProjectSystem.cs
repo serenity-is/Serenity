@@ -1,9 +1,6 @@
 ﻿using Microsoft.Build.Definition;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Locator;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Serenity.CodeGenerator.MSBuild
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration
 {
     public partial class ClientTypesGenerator : ImportGeneratorBase
     {

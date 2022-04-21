@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using Dictionary = System.Collections.Generic.Dictionary<string, object>;
+﻿using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data
 {

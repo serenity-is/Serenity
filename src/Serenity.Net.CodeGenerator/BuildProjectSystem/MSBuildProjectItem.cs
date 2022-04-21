@@ -1,5 +1,4 @@
 ﻿using Microsoft.Build.Evaluation;
-using System;
 
 namespace Serenity.CodeGenerator.MSBuild
 {

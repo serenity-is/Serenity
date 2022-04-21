@@ -1,11 +1,4 @@
-﻿using Serenity.ComponentModel;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// Contains Enum mapping and other helper functions

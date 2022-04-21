@@ -1,9 +1,4 @@
-﻿using Serenity.Abstractions;
-using Serenity.ComponentModel;
-using System;
-using System.Reflection;
-
-namespace Serenity.Localization
+﻿namespace Serenity.Localization
 {
     /// <summary>
     /// Contains helper methods for registration of local texts in nested static classes.

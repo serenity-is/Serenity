@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Text.RegularExpressions;
-
-namespace Inflector
+﻿namespace Inflector
 {
     public static class Inflector
     {

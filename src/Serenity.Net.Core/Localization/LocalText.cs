@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// Defines a localizable text resource. Contains a local text key and has implicit conversions to and 

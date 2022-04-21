@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Serenity
+﻿namespace Serenity
 {
     /// <summary>
     /// Invariant culture related constants and formats.

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Data;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// An interface to implement unit of work pattern, e.g. a transaction.

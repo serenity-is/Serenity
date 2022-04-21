@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Serenity.Reflection
+﻿namespace Serenity.Reflection
 {
     /// <summary>
     /// Annotated type information

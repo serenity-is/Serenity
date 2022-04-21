@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Contains SQL syntax helpers.

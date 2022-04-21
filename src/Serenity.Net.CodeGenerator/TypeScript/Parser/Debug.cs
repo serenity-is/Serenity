@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.TypeScript.TsParser
+﻿namespace Serenity.TypeScript.TsParser
 {
     internal class Debug
     {

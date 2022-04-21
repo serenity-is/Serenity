@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     /// <summary>
     /// Extensible SQL query interface. Used to abstract Serenity.Data.Row dependency from SqlQuery.

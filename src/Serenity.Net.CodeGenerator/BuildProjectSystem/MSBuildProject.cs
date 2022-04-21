@@ -1,7 +1,4 @@
 ﻿using Microsoft.Build.Evaluation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Serenity.CodeGenerator.MSBuild
 {
