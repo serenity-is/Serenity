@@ -24,7 +24,7 @@
     <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-icon.png" Pack="true" PackagePath="">
         <Link>Properties\package-icon.png</Link>
     </None>
-    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" Condition="'$(EnableGlobalUsings)' != 'false'">
         <Link>Properties\GlobalUsings.cs</Link>
     </Compile>
   </ItemGroup>

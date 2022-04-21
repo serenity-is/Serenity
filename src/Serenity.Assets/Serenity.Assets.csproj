@@ -3,6 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Version>6.0.0</Version>
     <StaticWebAssetBasePath>/Serenity.Assets</StaticWebAssetBasePath>
+    <EnableGlobalUsings>false</EnableGlobalUsings>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Content\**\*.*" Exclude="*.back;*.orig;*.log">
