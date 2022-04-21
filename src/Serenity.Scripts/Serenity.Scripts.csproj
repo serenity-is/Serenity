@@ -8,6 +8,7 @@
     <Title>Serenity Platform - Scripts</Title>
     <Description>Contains Serenity scripts and CSS file</Description>
     <StaticWebAssetBasePath>/Serenity.Scripts</StaticWebAssetBasePath>
+    <EnableGlobalUsings>false</EnableGlobalUsings>
   </PropertyGroup>
 
   <ItemGroup>

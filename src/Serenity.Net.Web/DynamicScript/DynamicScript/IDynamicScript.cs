@@ -1,7 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     public interface IDynamicScript
     {

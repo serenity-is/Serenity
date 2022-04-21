@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel
 {
     public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValidator
     {

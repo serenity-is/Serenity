@@ -2,10 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Serenity.Abstractions;
-using Serenity.Data;
-using System;
-using System.Data;
 
 namespace Serenity.Services
 {

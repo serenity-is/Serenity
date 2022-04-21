@@ -1,9 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     public class ConcatenatedScript : DynamicScript
     {

@@ -1,14 +1,7 @@
-﻿using Serenity.Abstractions;
-using Serenity.ComponentModel;
-using Serenity.Data;
-using Serenity.Web;
+﻿using Serenity.Web;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 
 namespace Serenity.Services
 {

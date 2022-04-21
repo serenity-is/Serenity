@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     public class DefaultFileWatcherFactory : IFileWatcherFactory
     {

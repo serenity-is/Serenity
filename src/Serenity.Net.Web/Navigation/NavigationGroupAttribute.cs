@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Navigation
+﻿namespace Serenity.Navigation
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public class NavigationGroupAttribute : NavigationItemAttribute

@@ -1,7 +1,4 @@
-﻿using System.Globalization;
-using System;
-
-namespace Serenity
+﻿namespace Serenity
 {
     public class ScriptCulture
     {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Globalization;
-#if !ASPNETMVC
-using Microsoft.AspNetCore.Mvc;
-#else
-using System.Web.Mvc;
-#endif
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Serenity.Web
 {

@@ -1,8 +1,4 @@
-﻿#if !ASPNETMVC
-using Newtonsoft.Json;
-using System;
-using System.Text;
-using System.IO;
+﻿using System.IO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Serenity.Services
@@ -45,4 +41,3 @@ namespace Serenity.Services
         }
     }
 }
-#endif

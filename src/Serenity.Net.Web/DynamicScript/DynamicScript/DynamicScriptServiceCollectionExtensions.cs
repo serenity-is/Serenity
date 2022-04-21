@@ -2,12 +2,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Serenity.Abstractions;
 using Serenity.PropertyGrid;
 using Serenity.Web;
 using Serenity.Web.Middleware;
-using System;
-using System.Linq;
 
 namespace Serenity.Extensions.DependencyInjection
 {

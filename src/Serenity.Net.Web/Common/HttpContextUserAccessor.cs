@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Serenity.Abstractions;
-using System.Security.Claims;
 
 namespace Serenity.Web
 {

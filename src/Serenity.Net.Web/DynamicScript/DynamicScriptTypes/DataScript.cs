@@ -1,9 +1,4 @@
-﻿using Serenity.ComponentModel;
-using System;
-using System.Globalization;
-using System.Reflection;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     public class DataScript : DynamicScript, INamedDynamicScript
     {

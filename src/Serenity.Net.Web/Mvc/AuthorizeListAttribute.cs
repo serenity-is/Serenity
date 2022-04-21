@@ -1,7 +1,4 @@
-﻿using Serenity.Data;
-using System;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
     /// Authorizes a service by target type's ReadPermission or ServiceLookupPermission attributes.

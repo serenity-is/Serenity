@@ -3,13 +3,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Serenity.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Serenity.Web
 {

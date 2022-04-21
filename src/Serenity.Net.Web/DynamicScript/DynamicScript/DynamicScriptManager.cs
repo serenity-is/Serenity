@@ -1,11 +1,4 @@
-﻿using Serenity.Abstractions;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     public partial class DynamicScriptManager : IDynamicScriptManager
     {

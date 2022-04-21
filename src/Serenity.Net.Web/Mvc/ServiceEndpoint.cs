@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Serenity.Abstractions;
-using Serenity.Data;
-using System;
-using System.Data;
-using System.Linq;
-using System.Reflection;
 
 namespace Serenity.Services
 {

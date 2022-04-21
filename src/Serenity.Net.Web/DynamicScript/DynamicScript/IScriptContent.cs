@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     public interface IScriptContent
     {

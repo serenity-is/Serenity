@@ -1,7 +1,7 @@
 ﻿global using Newtonsoft.Json;
+global using Serenity;
 global using Serenity.Abstractions;
 global using Serenity.ComponentModel;
-global using Serenity;
 global using Serenity.Data;
 global using Serenity.Data.Mapping;
 global using Serenity.Services;

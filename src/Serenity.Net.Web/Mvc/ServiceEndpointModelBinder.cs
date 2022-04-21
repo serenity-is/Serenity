@@ -1,10 +1,5 @@
-﻿#if !ASPNETMVC
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Serenity.Data;
-using System;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Serenity.Services
@@ -59,4 +54,3 @@ namespace Serenity.Services
         }
     }
 }
-#endif

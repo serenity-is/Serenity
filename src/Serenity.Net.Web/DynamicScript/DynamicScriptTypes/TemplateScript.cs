@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
     public class TemplateScript : DynamicScript, INamedDynamicScript
     {
