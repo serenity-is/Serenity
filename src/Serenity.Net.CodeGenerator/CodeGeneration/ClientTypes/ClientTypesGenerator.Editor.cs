@@ -42,10 +42,10 @@ namespace Serenity.CodeGeneration
 
         private bool IsEditorType(ExternalType type)
         {
-            if (type.IsAbstract)
+            if (type.IsAbstract == true)
                 return false;
 
-            if (type.GenericParameters.Count > 0)
+            if (type.GenericParameters?.Count > 0)
                 return false;
 
             if (!HasBaseType(type, "Serenity.Widget") &&

@@ -31,13 +31,13 @@ namespace Serenity.CodeGeneration
 
         private static bool IsFormatterType(ExternalType type)
         {
-            if (type.IsAbstract)
+            if (type.IsAbstract == true)
                 return false;
 
-            if (type.GenericParameters.Count > 0)
+            if (type.GenericParameters?.Count > 0)
                 return false;
 
-            return type.Interfaces.Any(x =>
+            return type.Interfaces != null && type.Interfaces.Any(x =>
                 x == "Serenity.ISlickFormatter" ||
                 x == "Slick.Formatter");
         }
