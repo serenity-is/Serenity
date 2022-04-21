@@ -1,3 +1,19 @@
+## 6.0.1 (2021-04-21)
+
+Features:
+  - rewrote typescript parser in c# using a modified / optimized version of https://github.com/ToCSharp/TypeScriptAST
+  - increased performance of sergen client types command using new typescript parser
+  - added ServiceLookupPermissionAttribute which will simplify permission checks for service lookups
+  - sergen generates AuthorizeList attributes on top of the List and ListExcel methods in endpoints (#6364)
+  - sergen generates TextualField field type as lowercase string keyword (#6341)
+  - made AutoParam consistent after cloning SqlQuery (#6330)
+  - added ISqlDialectMapper interface
+  
+Bugfixes:
+  - upload editor progress fix
+  - setting Old property to the null to prevent a few issues while re-using a save request handler. (#6356)
+  - null check added where to sergen connections checked. (#6360)
+
 ## 6.0.0 (2021-03-26)
 
 Features:
