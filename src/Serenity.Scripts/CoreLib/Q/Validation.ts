@@ -104,6 +104,10 @@ if (typeof $ !== "undefined" && $.validator && $.validator.methods && $.validato
             $.validator.messages[m] = k + "?";
     }
 
+    $(loadValidationErrorMessages);
+}
+
+export function loadValidationErrorMessages() {
     addMsg("required", "Required");
     addMsg("email", "Email");
     addMsg("minlength", "MinLength");
