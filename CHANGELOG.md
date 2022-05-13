@@ -1,4 +1,4 @@
-## 6.0.1 (2021-04-21)
+## 6.0.1 (2022-04-21)
 
 Features:
   - rewrote typescript parser in c# using a modified / optimized version of https://github.com/ToCSharp/TypeScriptAST
@@ -14,7 +14,7 @@ Bugfixes:
   - setting Old property to the null to prevent a few issues while re-using a save request handler. (#6356)
   - null check added where to sergen connections checked. (#6360)
 
-## 6.0.0 (2021-03-26)
+## 6.0.0 (2022-03-26)
 
 Features:
   - moving to .NET 6 and ASP.NET Core as .NET 5 will soon be out of support
@@ -22,7 +22,7 @@ Features:
   - [BREAKING CHANGE] replaced System.Drawing.Common with ImageSharp, as System.Drawing.Common is only officially supported in Windows now.
   - updated Dapper, FluentMigrator and many other packages to their latest versions
 
-## 5.2.4 (2021-03-09)
+## 5.2.4 (2022-03-09)
  
 Features:
   - a better console ui for sergen with multiple selection support
@@ -36,7 +36,7 @@ Bugfixes:
   - SqlUpdate.SetTo xml comment correction (#6225)
   
 
-## 5.2.3 (2021-01-20)
+## 5.2.3 (2022-01-20)
 
 Bugfixes:
   - bootstrap modal dialog stays under jQuery UI dialogs (StartSharp)
