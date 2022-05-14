@@ -1,10 +1,12 @@
+using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
 using Serenity.SourceGenerator;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Serenity.Tests.SourceGenerator;
 
-using VerifyCS = CSharpSourceGeneratorVerifier<RowGenerator>;
+using VerifyCS = CSharpSourceGeneratorVerifier<RowSourceGenerator>;
 
 public class RowGeneratorTests
 {
@@ -40,13 +42,13 @@ namespace MyTest
     {
         public partial class RowFields : RowFieldsBase
         {
-            public readonly StringField SomeStr;
-            public readonly StringField SomeInt;
+            public readonly StringField TestStr;
+            public readonly StringField TestInt;
         
             public RowFields()
             {
-                SomeStr = new Int32Field();
-                SomeInt = new StringField();
+                TestStr = new Int32Field();
+                TestInt = new StringField();
             }
         }
 
@@ -69,7 +71,7 @@ namespace MyTest
                 Sources = { code },
                 GeneratedSources =
                 {
-                    (typeof(RowGenerator), "GeneratedFileName", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(RowSourceGenerator), "GeneratedFileName", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 }
             },
         }.RunAsync();

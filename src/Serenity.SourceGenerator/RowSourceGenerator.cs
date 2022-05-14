@@ -4,10 +4,11 @@ using Microsoft.CodeAnalysis.Text;
 namespace Serenity.SourceGenerator
 {
     [Generator]
-    public class RowGenerator : ISourceGenerator
+    public class RowSourceGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context) 
         {
+            context.RegisterForSyntaxNotifications(() => new PrivateRowFieldsSyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
