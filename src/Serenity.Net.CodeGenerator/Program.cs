@@ -25,7 +25,7 @@ namespace Serenity.CodeGenerator
 
             string[] prjRefs = null;
             var prjRefsIdx = Array.FindIndex(args, x => x == "--projectrefs");
-            if (prjRefsIdx < args.Length - 1)
+            if (prjRefsIdx >= 0 && prjRefsIdx < args.Length - 1)
             {
                 prjRefs = args[prjRefsIdx + 1].Split(';', StringSplitOptions.RemoveEmptyEntries);
                 args = args.Where((x, i) => i != prjRefsIdx && i != prjRefsIdx + 1).ToArray();
