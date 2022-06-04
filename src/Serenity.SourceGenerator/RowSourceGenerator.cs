@@ -13,7 +13,17 @@ namespace Serenity.SourceGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
-            context.AddSource("myGeneratedFile.cs", SourceText.From(@"
+            if (!(context.SyntaxReceiver is PrivateRowFieldsSyntaxReceiver receiver))
+                return;
+
+            foreach (IGrouping<INamedTypeSymbol, IFieldSymbol> group in receiver.PrivateFields.GroupBy(x => x.ContainingType,
+                SymbolEqualityComparer.Default))
+            {
+                string.Join(".", 
+                    group.Key.ContainingNamespace.ToDisplayString()
+            }
+
+            context.AddSource("myGeneratedFile", SourceText.From(@"
 namespace GeneratedNamespace
 {
     public class GeneratedClass
@@ -24,6 +34,11 @@ namespace GeneratedNamespace
         }
     }
 }", Encoding.UTF8));
+        }
+
+        private string ProcessRow(INamedTypeSymbol rowSymbol, 
+            List<IFieldSymbol> fields, ISymbol attributeSymbol, ISymbol notifySymbol, GeneratorExecutionContext context)
+        {
         }
     }
 }

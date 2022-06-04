@@ -386,5 +386,21 @@ namespace Serenity
 
             return a + separator + b;
         }
+
+        /// <summary>
+        /// Joins strings conditionally, by putting separator between if both are non empty or null
+        /// </summary>
+        public static string JoinNonNullOrEmpty(string separator, params string[] values)
+        {
+            return string.Join(separator, values.Where(x => !string.IsNullOrEmpty(x)));
+        }
+
+        /// <summary>
+        /// Joins strings conditionally, by putting separator between if both are non empty or null
+        /// </summary>
+        public static string JoinNonNullOrEmpty(string separator, IEnumerable<string> values)
+        {
+            return string.Join(separator, values.Where(x => !string.IsNullOrEmpty(x)));
+        }
     }
 }
