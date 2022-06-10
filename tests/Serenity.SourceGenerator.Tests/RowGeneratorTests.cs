@@ -71,7 +71,7 @@ namespace MyTest
                 Sources = { code },
                 GeneratedSources =
                 {
-                    (typeof(RowSourceGenerator), "GeneratedFileName", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(RowSourceGenerator), "MyTest.TestRow.generated", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 }
             },
         }.RunAsync();

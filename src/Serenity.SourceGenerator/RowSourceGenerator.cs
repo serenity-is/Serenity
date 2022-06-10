@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using Serenity.Reflection;
 
 namespace Serenity.SourceGenerator
 {
@@ -13,32 +14,34 @@ namespace Serenity.SourceGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
-            if (!(context.SyntaxReceiver is PrivateRowFieldsSyntaxReceiver receiver))
+            if (context.SyntaxContextReceiver is not PrivateRowFieldsSyntaxReceiver receiver)
                 return;
 
-            foreach (IGrouping<INamedTypeSymbol, IFieldSymbol> group in receiver.PrivateFields.GroupBy(x => x.ContainingType,
+            foreach (var group in receiver.PrivateFields.GroupBy<IFieldSymbol, INamedTypeSymbol>(
+                x => x.ContainingType,
                 SymbolEqualityComparer.Default))
             {
-                string.Join(".", 
-                    group.Key.ContainingNamespace.ToDisplayString()
+                ProcessRow(group.Key, group, context);
             }
 
-            context.AddSource("myGeneratedFile", SourceText.From(@"
-namespace GeneratedNamespace
-{
-    public class GeneratedClass
-    {
-        public static void GeneratedMethod()
-        {
-            // generated code
-        }
-    }
-}", Encoding.UTF8));
         }
 
-        private string ProcessRow(INamedTypeSymbol rowSymbol, 
-            List<IFieldSymbol> fields, ISymbol attributeSymbol, ISymbol notifySymbol, GeneratorExecutionContext context)
+        private void ProcessRow(INamedTypeSymbol rowSymbol, 
+            IEnumerable<IFieldSymbol> fields, GeneratorExecutionContext context)
         {
+            var ns = rowSymbol.ContainingNamespace.ToDisplayString();
+            var fullName = StringHelper.JoinNonEmpty(".", ns, rowSymbol.Name);
+
+            var cw = new CodeWriter(4);
+            cw.InNamespace(ns, () =>
+            {
+                cw.Builder.Append($"partial class {rowSymbol.Name}");
+                cw.InBrace(() =>
+                {
+                });
+            });
+
+            context.AddSource(fullName + ".generated", SourceText.From(cw.ToString(), Encoding.UTF8));
         }
     }
 }
