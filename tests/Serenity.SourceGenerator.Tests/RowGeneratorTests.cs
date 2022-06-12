@@ -21,7 +21,7 @@ namespace MyTest
     public partial class TestRow
     {
         private string testStr;
-        private int testInt;
+        private int? testInt;
     }
 
     public partial class Some {
@@ -32,34 +32,39 @@ namespace MyTest
 ";
 
         var expected =
-@"using Serenity;
-using Serenity.Data;
-using System;
+@"using Serenity.Data;
 
 namespace MyTest
 {
-    partial class TestRow
+    partial class TestRow : Row<TestRow.RowFields>
     {
+        public string TestStr
+        {
+            get => fields.TestStr[this];
+            set => fields.TestStr[this] = value;
+        }
+
+        public int? TestInt
+        {
+            get => fields.TestInt[this];
+            set => fields.TestInt[this] = value;
+        }
+
         public partial class RowFields : RowFieldsBase
         {
             public readonly StringField TestStr;
-            public readonly StringField TestInt;
-        
+            public readonly Int32Field TestInt;
+
             public RowFields()
             {
-                TestStr = new Int32Field();
-                TestInt = new StringField();
+                TestStr = new StringField(this, name: ""TestStr"", caption: null, size: 0, flags: FieldFlags.Default,
+                    getValue: row => ((TestRow)row).testStr,
+                    setValue: (row, value) => ((TestRow)row).testStr = value);
+
+                TestInt = new Int32Field(this, name: ""TestInt"", caption: null, size: 0, flags: FieldFlags.Default,
+                    getValue: row => ((TestRow)row).testInt,
+                    setValue: (row, value) => ((TestRow)row).testInt = value);
             }
-        }
-
-        public TestRow()
-            : base()
-        {
-        }
-
-        public TestRow(RowFields fields)
-            : base(fields)
-        {
         }
     }
 }";
@@ -71,8 +76,9 @@ namespace MyTest
                 Sources = { code },
                 GeneratedSources =
                 {
-                    (typeof(RowSourceGenerator), "MyTest.TestRow.generated", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
-                }
+                    (typeof(RowSourceGenerator), "MyTest.TestRow.generated.cs", SourceText.From(expected, Encoding.UTF8)),
+                },
+                
             },
         }.RunAsync();
     }

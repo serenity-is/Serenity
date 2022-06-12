@@ -87,7 +87,10 @@
         /// </summary>
         public void StartBrace()
         {
-            sb.Append(indent);
+            if (!BraceOnSameLine)
+                sb.Append(indent);
+            else
+                sb.Append(" ");
             sb.AppendLine("{");
             IncreaseIndent();
         }
@@ -142,14 +145,23 @@
             if (string.IsNullOrEmpty(code))
                 return;
 
-
             foreach (var line in code.Replace("\r", "")
                 .Split('\n'))
             {
-                sb.Append(indent);
+                if (line.Length > 0)
+                    sb.Append(indent);
+
                 sb.AppendLine(line);
             }
         }
+
+        /// <summary>
+        /// Whether to put opening brace on the same line.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if brace on same line; otherwise, <c>false</c>.
+        /// </value>
+        public bool BraceOnSameLine { get; set; }
 
         /// <summary>
         /// Gets tab string
@@ -204,7 +216,7 @@
         /// <summary>
         /// Gets / sets local usings hash set
         /// </summary>
-        public HashSet<string> LocalUsings { get; set; } = new HashSet<string>();
+        public HashSet<string> LocalUsings { get; private set; }
 
         /// <summary>
         /// Gets sets function that determines if a namespace is allowed to be added to the local usings
@@ -229,7 +241,7 @@
 
         /// <summary>
         /// Returns true if the namespace is in list of usings.
-        /// If AllowUsing callback is not null, this may add it to the list of local usings if function returns true.
+        /// If AllowUsing callback is null or returns true, this may add it to the list of local usings.
         /// </summary>
         /// <param name="ns"></param>
         /// <returns></returns>
@@ -238,8 +250,9 @@
             if (IsUsing(ns))
                 return true;
 
-            if (AllowUsing != null && AllowUsing(ns))
+            if (AllowUsing is null || AllowUsing(ns))
             {
+                LocalUsings ??= new();
                 LocalUsings.Add(ns);
                 return true;
             }

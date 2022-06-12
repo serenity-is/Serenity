@@ -7,6 +7,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Net.Data\Serenity.Net.Data.csproj" />
+    <ProjectReference Include="..\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />
   </ItemGroup>
 </Project>

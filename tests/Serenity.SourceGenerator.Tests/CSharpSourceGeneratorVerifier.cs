@@ -17,13 +17,12 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         {
             var asmLocations = new[]
             {
-                typeof(int),
-                typeof(Uri),
-                typeof(Dictionary<string, string>),
-                typeof(GeneratedRowAttribute)
+                typeof(GeneratedRowAttribute),
+                typeof(ISqlConnections),
+                typeof(IRow)
             }.Select(x => Path.ChangeExtension(x.Assembly.Location, null)).Distinct().ToArray();
 
-            ReferenceAssemblies = Microsoft.CodeAnalysis.Testing.ReferenceAssemblies.Default.AddAssemblies(
+            ReferenceAssemblies = Microsoft.CodeAnalysis.Testing.ReferenceAssemblies.Net.Net60.AddAssemblies(
                 ImmutableArray.Create(asmLocations));
         }
 
