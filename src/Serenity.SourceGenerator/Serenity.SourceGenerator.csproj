@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Title>Serenity Platform - Source Generator</Title>
     <Description>Contains .NET source generators</Description>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="..\GlobalUsings.cs"></Compile>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />
   </ItemGroup>
 </Project>

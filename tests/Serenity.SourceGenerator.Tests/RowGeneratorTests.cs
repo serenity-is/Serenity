@@ -1,12 +1,10 @@
-using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
 using Serenity.SourceGenerator;
-using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Serenity.Tests.SourceGenerator;
 
-using VerifyCS = CSharpSourceGeneratorVerifier<RowSourceGenerator>;
+using VerifyCS = CSharpSourceGeneratorVerifier<RowFieldsSourceGenerator>;
 
 public class RowGeneratorTests
 {
@@ -17,26 +15,8 @@ public class RowGeneratorTests
 @"
 namespace MyTest
 {
-    [Serenity.ComponentModel.GeneratedRow]
-    public partial class TestRow
-    {
-        private string testStr;
-        private int? testInt;
-    }
-
-    public partial class Some {
-        private string someStr;
-        private int someInt;
-    }
-}
-";
-
-        var expected =
-@"using Serenity.Data;
-
-namespace MyTest
-{
-    partial class TestRow : Row<TestRow.RowFields>
+    [Serenity.ComponentModel.GenerateRowFields]
+    partial class TestRow
     {
         public string TestStr
         {
@@ -49,19 +29,32 @@ namespace MyTest
             get => fields.TestInt[this];
             set => fields.TestInt[this] = value;
         }
+    }
+}
+";
+
+        var expected =
+@"using Serenity.Data;
+
+namespace MyTest
+{
+    partial class TestRow : Row<TestRow.RowFields>
+    {
+        private string testStr;
+        private int? testInt;
 
         public partial class RowFields : RowFieldsBase
         {
-            public readonly StringField TestStr;
-            public readonly Int32Field TestInt;
+            public StringField TestStr;
+            public Int32Field TestInt;
 
-            public RowFields()
+            protected override void CreateGeneratedFields()
             {
-                TestStr = new StringField(this, name: ""TestStr"", caption: null, size: 0, flags: FieldFlags.Default,
+                TestStr = new StringField(this, ""TestStr"", null, 0, FieldFlags.Default,
                     getValue: row => ((TestRow)row).testStr,
                     setValue: (row, value) => ((TestRow)row).testStr = value);
 
-                TestInt = new Int32Field(this, name: ""TestInt"", caption: null, size: 0, flags: FieldFlags.Default,
+                TestInt = new Int32Field(this, ""TestInt"", null, 0, FieldFlags.Default,
                     getValue: row => ((TestRow)row).testInt,
                     setValue: (row, value) => ((TestRow)row).testInt = value);
             }
@@ -76,7 +69,7 @@ namespace MyTest
                 Sources = { code },
                 GeneratedSources =
                 {
-                    (typeof(RowSourceGenerator), "MyTest.TestRow.generated.cs", SourceText.From(expected, Encoding.UTF8)),
+                    (typeof(RowFieldsSourceGenerator), "MyTest.TestRow.generated.cs", SourceText.From(expected, Encoding.UTF8)),
                 },
                 
             },

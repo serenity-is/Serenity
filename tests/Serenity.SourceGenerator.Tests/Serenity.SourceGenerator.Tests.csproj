@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\..\src\Serenity.SourceGenerator\Serenity.SourceGenerator.csproj" />
+    <ProjectReference Include="..\..\src\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
   </ItemGroup>

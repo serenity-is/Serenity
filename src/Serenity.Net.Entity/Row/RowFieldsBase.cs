@@ -61,6 +61,15 @@ namespace Serenity.Data
             DetermineTableName(new DialectExpressionSelector(SqlSettings.DefaultDialect));
             DetermineModuleIdentifier();
             DetermineLocalTextPrefix();
+
+            CreateGeneratedFields();
+        }
+
+        /// <summary>
+        /// Should be only used by row source generator to create field objects it generated
+        /// </summary>
+        protected virtual void CreateGeneratedFields()
+        {
         }
 
         private void DetermineRowType()

@@ -17,7 +17,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         {
             var asmLocations = new[]
             {
-                typeof(GeneratedRowAttribute),
+                typeof(GenerateRowFieldsAttribute),
                 typeof(ISqlConnections),
                 typeof(IRow)
             }.Select(x => Path.ChangeExtension(x.Assembly.Location, null)).Distinct().ToArray();

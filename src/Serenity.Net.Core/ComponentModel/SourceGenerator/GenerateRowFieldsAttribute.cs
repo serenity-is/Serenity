@@ -4,12 +4,12 @@
     /// Enables source generator for this row class
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    public class GeneratedRowAttribute : Attribute
+    public class GenerateRowFieldsAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="GeneratedRowAttribute"/> class.
+        /// Initializes a new instance of the <see cref="GenerateRowFieldsAttribute"/> class.
         /// </summary>
-        public GeneratedRowAttribute()
+        public GenerateRowFieldsAttribute()
         {
         }
     }
