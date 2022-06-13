@@ -61,6 +61,15 @@ namespace Serenity.Data
             DetermineTableName(new DialectExpressionSelector(SqlSettings.DefaultDialect));
             DetermineModuleIdentifier();
             DetermineLocalTextPrefix();
+
+            CreateGeneratedFields();
+        }
+
+        /// <summary>
+        /// Should be only used by row source generator to create field objects it generated
+        /// </summary>
+        protected virtual void CreateGeneratedFields()
+        {
         }
 
         private void DetermineRowType()
@@ -429,7 +438,7 @@ namespace Serenity.Data
                         }
                         else
                         {
-                            if (size != null)
+                            if (size != null && size.Value != field.Size)
                                 throw new InvalidProgramException(string.Format(
                                     "Field size '{0}' in type {1} can't be overridden by Size attribute!",
                                         fieldInfo.Name, rowType.FullName));
