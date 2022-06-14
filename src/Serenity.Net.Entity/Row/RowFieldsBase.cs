@@ -402,6 +402,9 @@ namespace Serenity.Data
                             updatePermission = fieldsUpdatePerm ?? fieldsUpdatePerm ?? fieldsReadPerm;
                         }
 
+                        if (fieldInfo.FieldType.GetCustomAttribute<NotMappedAttribute>() != null)
+                            addFlags |= FieldFlags.NotMapped;
+
                         if (field is null)
                         {
                             if (property == null)
@@ -417,11 +420,7 @@ namespace Serenity.Data
                             prm[2] = display != null ? new LocalText(display.DisplayName) : null;
                             prm[3] = size != null ? size.Value : 0;
 
-                            var defaultFlags = FieldFlags.Default;
-                            if (fieldInfo.FieldType.GetCustomAttribute<NotMappedAttribute>() != null)
-                                defaultFlags |= FieldFlags.NotMapped;
-
-                            prm[4] = (defaultFlags ^ removeFlags) | addFlags;
+                            prm[4] = (FieldFlags.Default ^ removeFlags) | addFlags;
                             prm[5] = null;
                             prm[6] = null;
 
