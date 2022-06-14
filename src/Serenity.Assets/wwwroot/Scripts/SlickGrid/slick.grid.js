@@ -350,7 +350,7 @@ if (typeof Slick === "undefined") {
             }
 
             // Containers used for scrolling frozen columns and rows
-            $paneHeaderL = $("<div class='slick-pane slick-pane-header slick-pane-" + xLeft + " tabIndex='0' />").appendTo($container);
+            $paneHeaderL = $("<div class='slick-pane slick-pane-header slick-pane-" + xLeft + "' tabIndex='0' />").appendTo($container);
             $paneHeaderR = $("<div class='slick-pane slick-pane-header slick-pane-" + xRight + "' tabIndex='0' />").appendTo($container);
             $paneTopL = $("<div class='slick-pane slick-pane-top slick-pane-" + xLeft + "' tabIndex='0' />").appendTo($container);
             $paneTopR = $("<div class='slick-pane slick-pane-top slick-pane-" + xRight + "' tabIndex='0' />").appendTo($container);
