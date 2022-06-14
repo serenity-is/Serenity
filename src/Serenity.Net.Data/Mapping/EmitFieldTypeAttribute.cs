@@ -5,14 +5,14 @@
     /// be of type specified.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    public class UseFieldTypeAttribute : Attribute
+    public class EmitFieldTypeAttribute : Attribute
     {
         /// <summary>
         /// Creates an instance of FieldTypeAttribute attribute
         /// </summary>
         /// <param name="fieldType">Field type to use for this property 
         /// in generated source.</param>
-        public UseFieldTypeAttribute(Type fieldType)
+        public EmitFieldTypeAttribute(Type fieldType)
         {
             FieldType = fieldType ?? throw new ArgumentNullException(nameof(fieldType));
         }
