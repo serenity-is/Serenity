@@ -1,3 +1,17 @@
+## 6.0.2 (2022-06-16)
+
+Features:
+  - add autoRename = null option to upload storage which means overwrite [Breaking Change]
+  - also apply flag to the existing generated field for notmapped field types
+  - added JoinNonEmpty methods to StringHelper (like StringHelper.Join but for arrays similar to string.Join)
+  - add ability to directly set a value without checking expiration status in TwoLevelCache
+  - use C# 10 global usings feature in Serenity source
+
+Bugfixes:
+  - fix syntax error with tabindex property in slickgrid.js
+  - fix project refs check in sergen
+  - load validation messages after page is ready (after local texts are ready). (#6389)
+
 ## 6.0.1 (2022-04-21)
 
 Features:
