@@ -89,7 +89,7 @@ namespace Serenity.Web
                 {
                     FileSize = fileContent.Length;
                     fileContent.Seek(0, System.IO.SeekOrigin.Begin);
-                    TemporaryFile = storage.WriteFile(basePath + extension, fileContent, false);
+                    TemporaryFile = storage.WriteFile(basePath + extension, fileContent, autoRename: false);
 
                     if (IsImageExtension(extension))
                     {

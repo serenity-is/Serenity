@@ -400,7 +400,7 @@ namespace Serenity.Services
                     using var ms = new MemoryStream();
                     scaledImage.Save(ms, new JpegEncoder { Quality = attr.ScaleQuality == 0 ? null : attr.ScaleQuality });
                     ms.Seek(0, SeekOrigin.Begin);
-                    temporaryFile = storage.WriteFile(temporaryFile, ms, false);
+                    temporaryFile = storage.WriteFile(temporaryFile, ms, autoRename: null); // overwrite
                 }
 
                 var thumbSizes = attr.ThumbSizes.TrimToNull();
@@ -425,7 +425,7 @@ namespace Serenity.Services
                     using var ms = new MemoryStream();
                     thumbImage.Save(ms, new JpegEncoder { Quality = attr.ThumbQuality == 0 ? null : attr.ThumbQuality });
                     ms.Seek(0, SeekOrigin.Begin);
-                    storage.WriteFile(thumbFile, ms, false);
+                    storage.WriteFile(thumbFile, ms, autoRename: null);
                 }
             }
             finally

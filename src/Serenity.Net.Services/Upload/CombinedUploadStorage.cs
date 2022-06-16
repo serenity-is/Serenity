@@ -37,7 +37,7 @@ namespace Serenity.Web
             return mainStorage.ArchiveFile(path);
         }
 
-        public string CopyFrom(IUploadStorage source, string path, string targetPath, bool autoRename)
+        public string CopyFrom(IUploadStorage source, string path, string targetPath, bool? autoRename)
         {
             if (UnderSubPath(targetPath))
                 return subPrefix + subStorage.CopyFrom(source, path, targetPath[subPrefix.Length..], autoRename);
@@ -103,7 +103,7 @@ namespace Serenity.Web
             subStorage.PurgeTemporaryFiles();
         }
 
-        public string WriteFile(string path, Stream source, bool autoRename)
+        public string WriteFile(string path, Stream source, bool? autoRename)
         {
             if (UnderSubPath(path))
                 return subPrefix + subStorage.WriteFile(path[subPrefix.Length..], source, autoRename);

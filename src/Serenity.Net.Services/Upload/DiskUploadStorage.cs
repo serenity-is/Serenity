@@ -108,7 +108,7 @@ namespace Serenity.Web
             File.WriteAllText(metaFile, JSON.StringifyIndented(metadata));
         }
 
-        public string CopyFrom(IUploadStorage store, string sourcePath, string targetPath, bool autoRename)
+        public string CopyFrom(IUploadStorage store, string sourcePath, string targetPath, bool? autoRename)
         {
             if (string.IsNullOrEmpty(sourcePath))
                 throw new ArgumentNullException(sourcePath);
@@ -138,7 +138,7 @@ namespace Serenity.Web
                 {
                     string thumbSuffix = Path.GetFileName(f)[sourceBaseName.Length..];
                     using var src = store.OpenFile(f);
-                    newFiles.Add(WriteFile(targetBasePath + thumbSuffix, src, false));
+                    newFiles.Add(WriteFile(targetBasePath + thumbSuffix, src, autoRename: null));
                 }
 
                 return targetPath;
@@ -161,7 +161,7 @@ namespace Serenity.Web
 
             string date = DateTime.UtcNow.ToString("yyyyMMdd", Invariants.DateTimeFormat);
             string dbHistoryFile = "history/" + date + "/" + Guid.NewGuid().ToString("N") + Path.GetExtension(path);
-            CopyFrom(this, path, dbHistoryFile, false);
+            CopyFrom(this, path, dbHistoryFile, autoRename: false);
             return dbHistoryFile;
         }
 
@@ -220,7 +220,7 @@ namespace Serenity.Web
         {
         }
 
-        public string WriteFile(string path, Stream source, bool autoRename)
+        public string WriteFile(string path, Stream source, bool? autoRename)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
@@ -232,10 +232,11 @@ namespace Serenity.Web
 
             if (File.Exists(targetFile))
             {
-                if (!autoRename)
+                if (autoRename == false)
                     throw new IOException($"Target file {path} exists in storage {GetType().FullName}");
 
-                path = UploadPathHelper.FindAvailableName(path, FileExists);
+                if (autoRename == true)
+                    path = UploadPathHelper.FindAvailableName(path, FileExists);
             }
 
             var targetDir = Path.GetDirectoryName(targetFile);
