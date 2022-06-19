@@ -22,24 +22,6 @@
         {
             var generatedTypes = new HashSet<string>();
 
-            foreach (var type in ssByScriptName)
-            {
-                var key = type.Key;
-                var ssType = type.Value;
-                if (ssType.IsDeclaration == true &&
-                    tsTypes.TryGetValue(key, out ExternalType tsType) &&
-                    tsType.IsDeclaration != true)
-                    continue;
-
-                if (!IsEditorType(ssType) &&
-                    !IsFormatterType(ssType))
-                    continue;
-
-                generatedTypes.Add(key);
-
-                GenerateType(ssType);
-            }
-
             foreach (var tsType in tsTypes)
             {
                 if (generatedTypes.Contains(tsType.Key))

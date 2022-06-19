@@ -2,8 +2,6 @@
 {
     public abstract class ImportGeneratorBase : CodeGeneratorBase
     {
-        protected Dictionary<string, ExternalType> ssByClassName;
-        protected Dictionary<string, ExternalType> ssByScriptName;
         protected Dictionary<string, ExternalType> tsTypes;
 
         public ImportGeneratorBase()
@@ -13,8 +11,6 @@
                 "Serenity"
             };
 
-            ssByClassName = new Dictionary<string, ExternalType>();
-            ssByScriptName = new Dictionary<string, ExternalType>();
             tsTypes = new Dictionary<string, ExternalType>();
         }
 
@@ -33,19 +29,13 @@
             if (tsTypes.TryGetValue(fullName, out ExternalType type))
                 return type;
 
-            if (ssByScriptName.TryGetValue(fullName, out type))
-                return type;
-
-            if (ssByClassName.TryGetValue(fullName, out type))
-                return type;
-
             return null;
         }
 
         protected static string[] SplitGenericArguments(ref string typeName)
         {
-            if (!typeName.Contains('<', StringComparison.Ordinal))
-                return System.Array.Empty<string>();
+            if (!typeName.Contains('<'))
+                return Array.Empty<string>();
 
             var pos = typeName.IndexOf("<", StringComparison.Ordinal);
             var last = typeName.LastIndexOf(">", StringComparison.Ordinal);
@@ -68,7 +58,7 @@
                 return new string(c).Split(new char[] { '€' });
             }
             else
-                return System.Array.Empty<string>();
+                return Array.Empty<string>();
         }
 
         protected string RemoveRootNamespace(string ns, string name)
@@ -79,7 +69,7 @@
             foreach (var rn in RootNamespaces)
             {
                 if (name.StartsWith(rn + ".", StringComparison.Ordinal))
-                    return name[(rn.Length + 1)..];
+                    return name.Substring(rn.Length + 1);
             }
 
             return name;
@@ -100,7 +90,7 @@
                     return "id";
                 else
                     return propField.Substring(0, 1).ToLowerInvariant()
-                        + propField[1..];
+                        + propField.Substring(1);
             }
             else
                 return prop.Name;
@@ -152,7 +142,7 @@
                     var nsParts = ns.Split('.');
                     for (var i = nsParts.Length; i > 0; i--)
                     {
-                        var prefixed = string.Join('.', nsParts.Take(i)) + '.' + baseTypeName;
+                        var prefixed = string.Join(".", nsParts.Take(i)) + '.' + baseTypeName;
                         if (prefixed == typeName)
                             return true;
                         type = GetScriptType(prefixed);
