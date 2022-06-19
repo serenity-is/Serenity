@@ -8,14 +8,24 @@
         static ClientTypesGenerator()
         {
             lookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            lookupEditorBaseOptions.AddRange(typeof(LookupEditorBaseAttribute)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-                .Select(x => x.Name));
+
+            var lookupEditorBaseAttr = Type.GetType("Serenity.ComponentModel.LookupEditorBaseAttribute, Serenity.Net.Core");
+            if (lookupEditorBaseAttr != null)
+            {
+                foreach (var p in lookupEditorBaseAttr
+                    .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                    lookupEditorBaseOptions.Add(p.Name);
+            }
 
             serviceLookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            serviceLookupEditorBaseOptions.AddRange(typeof(ServiceLookupEditorAttribute)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-                .Select(x => x.Name));
+
+            var serviceLookupEditorBaseAttr = Type.GetType("Serenity.ComponentModel.ServiceLookupEditorBaseAttribute, Serenity.Net.Core");
+            if (serviceLookupEditorBaseAttr != null)
+            {
+                foreach (var p in serviceLookupEditorBaseAttr
+                    .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                    serviceLookupEditorBaseOptions.Add(p.Name);
+            }
         }
 
         protected override void GenerateAll()

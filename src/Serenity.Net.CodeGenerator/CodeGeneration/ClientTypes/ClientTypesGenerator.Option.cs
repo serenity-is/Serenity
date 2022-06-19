@@ -26,7 +26,7 @@
                 return "object";
 
             if (typeName.StartsWith("System.", StringComparison.Ordinal))
-                return SystemTypes.ToCSKeyword(typeName[7..]);
+                return SystemTypes.ToCSKeyword(typeName.Substring(7));
 
             return typeName;
         }
@@ -62,8 +62,8 @@
                     {
                         if (jsName.StartsWith("set_", StringComparison.Ordinal))
                         {
-                            jsName = jsName[4..];
-                            optionName = optionName[4..];
+                            jsName = jsName.Substring(4);
+                            optionName = optionName.Substring(4);
                         }
 
                         typeName = GetOptionTypeName(emo.Arguments[0].Type);
@@ -76,7 +76,7 @@
                         optionName = "ID";
                     else
                         optionName = char.ToUpperInvariant(optionName[0]) +
-                            optionName[1..];
+                            optionName.Substring(1);
                 }
 
                 sb.AppendLine(optionName);
@@ -114,7 +114,7 @@
                 if (member.Type?.StartsWith("System.Func`", StringComparison.Ordinal) == true ||
                     member.Type?.StartsWith("System.Action`", StringComparison.Ordinal) == true ||
                     member.Type == "System.Delegate" ||
-                    member.Type?.Contains("System.TypeOption", StringComparison.Ordinal) == true ||
+                    member.Type?.IndexOf("System.TypeOption", StringComparison.Ordinal) >= 0 ||
                     member.Type == "Function")
                     continue;
 
