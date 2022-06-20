@@ -1,4 +1,10 @@
-﻿using Serenity.TypeScript.TsParser;
+﻿#if NETSTANDARD2_0
+using CharSpan = System.String;
+#else
+using CharSpan = System.ReadOnlySpan<char>;
+#endif
+
+using Serenity.TypeScript.TsParser;
 
 namespace Serenity.TypeScript.TsTypes
 {
@@ -7,7 +13,7 @@ namespace Serenity.TypeScript.TsTypes
         public List<Node> Children { get; set; }
         public string SourceStr { get; set; }
 
-        public ReadOnlySpan<char> IdentifierStr
+        public CharSpan IdentifierStr
         {
             get
             {
@@ -64,17 +70,25 @@ namespace Serenity.TypeScript.TsTypes
             });
         }
 
-        public ReadOnlySpan<char> GetTextSpan()
+        public CharSpan GetTextSpan()
         {
             if (NodeStart == -1)
             {
                 if (Pos != null && End != null)
+#if NETSTANDARD2_0
+                    return SourceStr.Substring(Pos.Value, End.Value - Pos.Value);
+#else
                     return SourceStr.AsSpan(Pos.Value, End.Value - Pos.Value);
+#endif
             }
             else if (End != null)
+#if NETSTANDARD2_0
+                return SourceStr.Substring(NodeStart, End.Value - NodeStart);
+#else
                 return SourceStr.AsSpan(NodeStart, End.Value - NodeStart);
+#endif
 
-            return ReadOnlySpan<char>.Empty;
+            return CharSpan.Empty;
         }
 
         public string GetText()
@@ -84,7 +98,7 @@ namespace Serenity.TypeScript.TsTypes
                 if (Pos != null && End != null)
                     return SourceStr[Pos.Value..End.Value];
             }
-            else if (End != null) 
+            else if (End != null)
                 return SourceStr[NodeStart..End.Value];
 
             return null;
@@ -146,7 +160,7 @@ namespace Serenity.TypeScript.TsTypes
         List<JsDoc> JsDoc { get; set; }
 
         string GetText();
-        ReadOnlySpan<char> GetTextSpan();
+        CharSpan GetTextSpan();
         string GetTextWithComments(string source = null);
 
         string ToString(bool withPos);

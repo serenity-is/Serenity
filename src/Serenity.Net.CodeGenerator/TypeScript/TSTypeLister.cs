@@ -1,8 +1,12 @@
 ﻿using Serenity.CodeGeneration;
 using Serenity.IO;
 using System.IO.Abstractions;
+#if NETSTANDARD2_0
+using Newtonsoft.Json;
+#else
 using System.Text.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+#endif
 
 namespace Serenity.CodeGenerator
 {
@@ -44,11 +48,18 @@ namespace Serenity.CodeGenerator
             IEnumerable<string> files = null;
             if (File.Exists(tsconfig))
             {
+#if NETSTANDARD2_0
+                var cfg = JsonConvert.DeserializeObject<TSConfig>(File.ReadAllText(tsconfig), new JsonSerializerSettings
+                {
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                });
+#else
                 var cfg = JsonSerializer.Deserialize<TSConfig>(File.ReadAllText(tsconfig),
                     new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true,
                     });
+#endif
                 if (!cfg.Files.IsEmptyOrNull())
                 {
                     files = cfg.Files.Where(x => File.Exists(Path.Combine(projectDir, PathHelper.ToPath(x))))
@@ -62,7 +73,7 @@ namespace Serenity.CodeGenerator
                     var types = new HashSet<string>(cfg.CompilerOptions?.Types ?? Array.Empty<string>(),
                         StringComparer.OrdinalIgnoreCase);
 
-                    files = typeRoots.Select(typeRoot => 
+                    files = typeRoots.Select(typeRoot =>
                         {
                             var s = PathHelper.ToUrl(typeRoot);
                             if (s.StartsWith("./", StringComparison.Ordinal))
@@ -108,7 +119,7 @@ namespace Serenity.CodeGenerator
                         .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
                             !File.Exists(x.Substring(0, x.Length - ".d.ts".Length) + ".ts"));
 
-                    files = files.Concat(allTsFiles.Where(x => includePatterns.Any() && 
+                    files = files.Concat(allTsFiles.Where(x => includePatterns.Any() &&
                         includeGlob.IsMatch(x[(projectDir.Length + 1)..]) &&
                         (!excludePatterns.Any() || !excludeGlob.IsMatch(x[(projectDir.Length + 1)..]))));
 

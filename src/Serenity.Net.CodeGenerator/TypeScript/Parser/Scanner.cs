@@ -1,4 +1,9 @@
 ﻿using Serenity.TypeScript.TsTypes;
+﻿#if NETSTANDARD2_0
+using CharSpan = System.String;
+#else
+using CharSpan = System.ReadOnlySpan<char>;
+#endif
 using static Serenity.TypeScript.TsParser.Core;
 
 namespace Serenity.TypeScript.TsParser
@@ -748,7 +753,11 @@ namespace Serenity.TypeScript.TsParser
             {
                 _pos++;
             }
+#if NETSTANDARD2_0
+            return int.Parse(_text.Substring(start, _pos - start + 1));
+#else
             return int.Parse(_text.AsSpan(start, _pos - start + 1));
+#endif
         }
 
         public int ScanExactNumberOfHexDigits(int count)

@@ -94,7 +94,7 @@ namespace Serenity.CodeGenerator
                 return null;
 
             if (text[0] == '(' || 
-                text[0] == '{' || 
+                text[0] == '{' ||
                 text.Contains('|'))
                 return null;
 
@@ -106,7 +106,7 @@ namespace Serenity.CodeGenerator
             var dotIndex = noGeneric.IndexOf('.');
             var beforeDot = dotIndex >= 0 ? noGeneric[..dotIndex] : null;
             var afterDot = dotIndex >= 0 ? noGeneric[dotIndex..] : null;
-            
+
             foreach (var parent in EnumerateParents(node))
             {
                 if (parent.Kind == SyntaxKind.ModuleDeclaration ||
@@ -281,7 +281,7 @@ namespace Serenity.CodeGenerator
                         case SyntaxKind.NumericLiteral:
                             result.Arguments.Add(new()
                             {
-                                Value = double.Parse((arg as LiteralExpression).Text, Invariants.NumberFormat)
+                                Value = double.Parse((arg as LiteralExpression).Text, CultureInfo.InvariantCulture.NumberFormat)
                             });
                             break;
 
@@ -667,7 +667,8 @@ namespace Serenity.CodeGenerator
                 return hashset;
             }).ToArray())
             {
-                exportedTypeNames.AddRange(hashset);
+                foreach (var x in hashset)
+                    exportedTypeNames.Add(x);
             }
 
             var result = new List<ExternalType>();
