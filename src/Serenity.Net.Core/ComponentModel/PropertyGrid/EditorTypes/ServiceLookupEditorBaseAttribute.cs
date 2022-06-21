@@ -17,7 +17,7 @@
 
         /// <summary>
         /// List service url, e.g. Northwind/Customer/List.
-        /// It can be an absolute or relative URL to ~/Services
+        /// It can be an absolute or relative URL to ~/services
         /// </summary>
         public string Service
         {
