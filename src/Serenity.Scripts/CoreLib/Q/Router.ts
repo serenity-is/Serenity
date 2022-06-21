@@ -1,6 +1,13 @@
 ﻿import { startsWith } from "./Strings";
 import { closePanel } from "./Dialogs";
 
+export interface HandleRouteEventArgs {
+    handled: boolean,
+    route: string,
+    parts: string[],
+    index: number
+}
+
 export namespace Router {
     let oldURL: string;
     let resolving: number = 0;
@@ -196,7 +203,7 @@ export namespace Router {
                         $('.route-handler').first();
                 }
 
-                handler.triggerHandler("handleroute", {
+                handler.triggerHandler("handleroute", <HandleRouteEventArgs>{
                     handled: false,
                     route: route,
                     parts: newParts,

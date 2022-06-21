@@ -4,10 +4,10 @@ import { IEditDialog } from "../../Interfaces";
 import { Authorization } from "../../Q/Authorization";
 import { format } from "../../Q/Formatting";
 import { LT, text, tryGetText } from "../../Q/LocalText";
-import { Router } from "../../Q/Router";
+import { Router, HandleRouteEventArgs } from "../../Q/Router";
 import { resolveUrl } from "../../Q/Services";
 import { endsWith, isEmptyOrNull, replaceAll } from "../../Q/Strings";
-import { cast, getInstanceType, getTypeFullName, safeCast } from "../../Q/System";
+import { getInstanceType, getTypeFullName, safeCast } from "../../Q/System";
 import { DialogTypeRegistry } from "../../Types/DialogTypeRegistry";
 import { EditorUtils } from "../Editors/EditorUtils";
 import { SubDialogHelper } from "../Helpers/SubDialogHelper";
@@ -23,34 +23,42 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         super(container, options);
 
         this.element.addClass('route-handler')
-            .on('handleroute.' + this.uniqueName, (e: JQueryEventObject, arg: any) => {
-                if (!!arg.handled)
-                    return;
+            .on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
+    }
 
-                if (!!(arg.route === 'new')) {
-                    arg.handled = true;
-                    this.addButtonClick();
-                    return;
-                }
+    protected handleRoute(args: HandleRouteEventArgs): void {
+        if (!!args.handled)
+            return;
 
-                var parts = arg.route.split('/');
-                if (!!(parts.length === 2 && parts[0] === 'edit')) {
-                    arg.handled = true;
-                    this.editItem(parts[1]);
-                    return;
-                }
+        if (!!(args.route === 'new')) {
+            args.handled = true;
+            this.addButtonClick();
+            return;
+        }
 
-                if (!!(parts.length === 2 && parts[1] === 'new')) {
-                    arg.handled = true;
-                    this.editItemOfType(cast(parts[0], String), null);
-                    return;
-                }
+        var oldRequests = jQuery["active"];
 
-                if (!!(parts.length === 3 && parts[1] === 'edit')) {
-                    arg.handled = true;
-                    this.editItemOfType(cast(parts[0], String), parts[2]);
-                }
+        var parts = args.route.split('/');
+        if (!!(parts.length === 2 && parts[0] === 'edit')) {
+            args.handled = true;
+            this.editItem(decodeURIComponent(parts[1]));
+        }
+        else if (!!(parts.length === 2 && parts[1] === 'new')) {
+            args.handled = true;
+            this.editItemOfType(parts[0], null);
+        }
+        else if (!!(parts.length === 3 && parts[1] === 'edit')) {
+            args.handled = true;
+            this.editItemOfType(parts[0], decodeURIComponent(parts[2]));
+        }
+        else
+            return;
+
+        if (jQuery["active"] > oldRequests && args.handled && args.index >= 0 && args.index < args.parts.length - 1) {
+            $(document).one('ajaxStop', () => {
+                setTimeout(() => Router.resolve('#' + args.parts.join('/+/')), 1);
             });
+        }
     }
 
     protected usePager(): boolean {
