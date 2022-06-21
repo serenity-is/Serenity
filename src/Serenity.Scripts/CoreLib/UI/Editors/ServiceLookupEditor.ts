@@ -33,8 +33,8 @@ export class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions
             return dialogTypeKey;
 
         var service = this.getService();
-        if (startsWith(service, "~/services/"))
-            service = service.substr("~/services/".length);
+        if (startsWith(service, "~/Services/"))
+            service = service.substr("~/Services/".length);
 
         if (service.split('/').length == 3)
             service = service.substr(0, service.lastIndexOf('/'));
@@ -52,7 +52,7 @@ export class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions
             throw new Error("ServiceLookupEditor requires 'service' option to be configured!");
 
         if (!startsWith(url, "~") && !startsWith(url, "/") && url.indexOf('://') < 0)
-            url = "~/services/" + url;
+            url = "~/Services/" + url;
 
         if (startsWith(url, "~"))
             url = resolveUrl(url);

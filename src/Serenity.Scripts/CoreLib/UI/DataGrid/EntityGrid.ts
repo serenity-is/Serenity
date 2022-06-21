@@ -240,7 +240,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
 
     protected getViewOptions(): Slick.RemoteViewOptions {
         var opt = super.getViewOptions();
-        opt.url = resolveUrl('~/services/' + this.getService() + '/List');
+        opt.url = resolveUrl('~/Services/' + this.getService() + '/List');
         return opt;
     }
 
