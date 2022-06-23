@@ -106,14 +106,18 @@ namespace Serenity.CodeGeneration
                 if (gi.ElementType.Namespace == "System.Collections.Generic")
                 {
                     if (gi.ElementType.Name == "List`1" ||
-                        gi.ElementType.Name == "HashSet`1")
+                        gi.ElementType.Name == "HashSet`1" ||
+                        gi.ElementType.Name == "IList`1" ||
+                        gi.ElementType.Name == "IEnumerable`1" ||
+                        gi.ElementType.Name == "ISet`1")
                     {
                         HandleMemberType(gi.GenericArguments[0], codeNamespace, sb);
                         sb.Append("[]");
                         return;
                     }
 
-                    if (gi.ElementType.Name == "Dictionary`2")
+                    if (gi.ElementType.Name == "Dictionary`2" ||
+                        gi.ElementType.Name == "IDictionary`2")
                     {
                         sb.Append("{ [key: ");
                         HandleMemberType(gi.GenericArguments[0], codeNamespace, sb);
