@@ -621,7 +621,8 @@ namespace Serenity.CodeGeneration
                 return true;
             }
             else if (CecilUtils.IsOrSubClassOf(responseType, "System.Web.Mvc", "ActionResult") ||
-                CecilUtils.IsOrSubClassOf(responseType, "Microsoft.AspNetCore.Mvc", "ActionResult"))
+                     CecilUtils.IsOrSubClassOf(responseType, "Microsoft.AspNetCore.Mvc", "ActionResult") ||
+                     CecilUtils.IsOrSubClassOf(responseType, "Microsoft.AspNetCore.Mvc", "IActionResult"))
                 return false;
             else if (responseType == null || CecilUtils.IsVoid(responseType))
                 return false;
