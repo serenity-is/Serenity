@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Serenity.Net.CodeGenerator\Serenity.Net.CodeGenerator.csproj" />
+	  <ProjectReference Include="..\..\src\Serenity.Net.CodeGenerator\Serenity.Net.CodeGenerator.csproj" />
+	  <ProjectReference Include="..\..\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
     <ProjectReference Include="..\Serenity.Net.Core.Tests\Serenity.Net.Core.Tests.csproj" />
   </ItemGroup>
 </Project>
