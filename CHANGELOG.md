@@ -1,3 +1,16 @@
+## 6.0.3 (2022-06-24)
+
+Features:
+  - remove ss type related code from import generator
+  - allow and handle IEnumerable, IList, ISet, IDictionary types in response types in addition to List, Dictionary etc. in response types for server typings generator
+  - don't generate proxy method for service actions implementing IActionResult
+  - add handleRoute method to entity grid allowing to override default route handling behavior
+  - better handling for multi part routes when restoring location hash in case the first part causes a service call
+
+Bugfixes:
+  - raise an error in FormatFileName when OriginalName passed is null
+  - pass original name to generated .jpg file when temporary file is scaled and a .jpg file is generated on upload
+
 ## 6.0.2 (2022-06-16)
 
 Features:
