@@ -163,6 +163,11 @@ namespace Serenity.Services
                 ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, localizer, storage, ref filename, logger);
 
                 var idField = ((IIdRow)handler.Row).IdField;
+
+                var originalName = storage.GetOriginalName(filename);
+                if (string.IsNullOrEmpty(originalName))
+                    originalName = System.IO.Path.GetFileName(filename);
+
                 var copyResult = storage.CopyTemporaryFile(new CopyTemporaryFileOptions
                 {
                     Format = fileNameFormat,
@@ -170,7 +175,7 @@ namespace Serenity.Services
                     TemporaryFile = filename,
                     EntityId = idField.AsObject(handler.Row),
                     FilesToDelete = filesToDelete,
-                    OriginalName = storage.GetOriginalName(filename)
+                    OriginalName = originalName
                 });
 
                 file.Filename = copyResult.Path;

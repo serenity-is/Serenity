@@ -29,6 +29,10 @@ namespace Serenity.Web
                     groupKey = s.SafeSubstring(0, 2);
             }
 
+            var originalName = options.OriginalName;
+            if (string.IsNullOrEmpty(options.OriginalName))
+                throw new ArgumentNullException(nameof(options.OriginalName));
+
             var formatted = string.Format(options.Format, identity, groupKey, 
                 TemporaryFileHelper.RandomFileCode(), DateTime.Now,
                 Path.GetFileNameWithoutExtension(options.OriginalName)) + Path.GetExtension(options.OriginalName);
