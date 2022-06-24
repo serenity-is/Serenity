@@ -396,6 +396,7 @@ namespace Serenity.Services
                     ((attr.ScaleWidth > 0 && (attr.ScaleSmaller || checker.Width > attr.ScaleWidth)) ||
                         (attr.ScaleHeight > 0 && (attr.ScaleSmaller || checker.Height > attr.ScaleHeight))))
                 {
+                    var originalName = storage.GetOriginalName(temporaryFile);
                     using Image scaledImage = ThumbnailGenerator.Generate(
                         image, attr.ScaleWidth, attr.ScaleHeight, attr.ScaleMode, backgroundColor: null);
                     temporaryFile = baseFile + ".jpg";
@@ -404,6 +405,8 @@ namespace Serenity.Services
                     scaledImage.Save(ms, new JpegEncoder { Quality = attr.ScaleQuality == 0 ? null : attr.ScaleQuality });
                     ms.Seek(0, SeekOrigin.Begin);
                     temporaryFile = storage.WriteFile(temporaryFile, ms, autoRename: null); // overwrite
+                    if (!string.IsNullOrEmpty(originalName))
+                        storage.SetOriginalName(temporaryFile, Path.ChangeExtension(originalName, ".jpg"));
                 }
 
                 var thumbSizes = attr.ThumbSizes.TrimToNull();
