@@ -1,7 +1,6 @@
 ﻿using Serenity.TypeScript;
 using Serenity.TypeScript.TsTypes;
 using Serenity.CodeGeneration;
-using System.IO.Abstractions;
 
 namespace Serenity.CodeGenerator
 {
@@ -9,9 +8,9 @@ namespace Serenity.CodeGenerator
     {
         private readonly List<string> fileNames = new();
         private readonly HashSet<string> exportedTypeNames = new();
-        private readonly IFileSystem fileSystem;
+        private readonly IGeneratorFileSystem fileSystem;
 
-        public TSTypeListerAST(IFileSystem fileSystem)
+        public TSTypeListerAST(IGeneratorFileSystem fileSystem)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         }
@@ -84,7 +83,7 @@ namespace Serenity.CodeGenerator
             return s;
         }
 
-        string GetTypeReferenceExpression(INode node)
+        string GetTypeReferenceExpression(INode node, bool isDecorator = false)
         {
             if (node == null)
                 return string.Empty;
@@ -102,6 +101,17 @@ namespace Serenity.CodeGenerator
             var lt = noGeneric.IndexOf('<');
             if (lt >= 0 && noGeneric[^1] == '>')
                 noGeneric = noGeneric[..lt];
+
+            string functionSuffix = string.Empty;
+            if (isDecorator)
+            {
+                var ldi = noGeneric.LastIndexOf('.');
+                if (ldi > 0)
+                {
+                    functionSuffix = noGeneric[ldi..].ToString();
+                    noGeneric = noGeneric[..ldi];
+                }
+            }
 
             var dotIndex = noGeneric.IndexOf('.');
             var beforeDot = dotIndex >= 0 ? noGeneric[..dotIndex] : null;
@@ -129,7 +139,7 @@ namespace Serenity.CodeGenerator
                                  (child as ClassDeclaration).Name.GetTextSpan() == noGeneric) ||
                                 (child.Kind == SyntaxKind.InterfaceDeclaration &&
                                  (child as InterfaceDeclaration).Name.GetTextSpan() == noGeneric))
-                                return PrependNamespace(noGeneric.ToString(), child);
+                                return PrependNamespace(noGeneric.ToString(), child) + functionSuffix;
                         }
                     }
                     else
@@ -143,7 +153,7 @@ namespace Serenity.CodeGenerator
                                     var fullName = (child as ImportEqualsDeclaration).ModuleReference.GetText() +
                                         afterDot.ToString();
                                     if (exportedTypeNames.Contains(fullName))
-                                        return fullName;
+                                        return fullName + functionSuffix;
                                 }
                             }
                         }
@@ -156,7 +166,7 @@ namespace Serenity.CodeGenerator
             {
                 var s = ns + "." + noGeneric.ToString();
                 if (exportedTypeNames.Contains(s))
-                    return s;
+                    return s + functionSuffix;
 
                 var idx = ns.LastIndexOf('.');
                 if (idx >= 0)
@@ -165,7 +175,7 @@ namespace Serenity.CodeGenerator
                     break;
             }
 
-            return noGeneric.ToString();
+            return noGeneric.ToString() + functionSuffix;
         }
 
         string GetBaseType(ClassDeclaration node)
@@ -260,7 +270,7 @@ namespace Serenity.CodeGenerator
                     ce.Expression.Kind == SyntaxKind.PropertyAccessExpression)
                 {
                     pae = ce.Expression as PropertyAccessExpression;
-                    result.Type = GetTypeReferenceExpression(pae);
+                    result.Type = GetTypeReferenceExpression(pae, isDecorator: true);
                 }
 
                 if (ce.Arguments != null &&
@@ -647,6 +657,16 @@ namespace Serenity.CodeGenerator
                             target.Add(PrependNamespace(intf.Name.GetText(), intf));
                         }
                         break;
+
+                    case SyntaxKind.ModuleDeclaration:
+                        if (sourceFile.IsDeclarationFile || HasExportModifier(node))
+                        {
+                            var modul = node as ModuleDeclaration;
+                            if (sourceFile.IsDeclarationFile || HasExportModifier(modul) ||
+                                (!IsUnderAmbientNamespace(modul) && !HasDeclareModifier(modul)))
+                                target.Add(PrependNamespace(modul.Name.GetText(), modul));
+                        }
+                        break;
                 }
             }
         }
@@ -655,7 +675,7 @@ namespace Serenity.CodeGenerator
         {
             var sourceFiles = fileNames.AsParallel()
                 .Select(fileName => (SourceFile)new TypeScriptAST(
-                    fileSystem.File.ReadAllText(fileName), 
+                    fileSystem.ReadAllText(fileName), 
                         fileName, optimized: true).RootNode)
                 .ToArray();
 

@@ -1,3 +1,4 @@
+using Serenity.CodeGeneration;
 using Serenity.CodeGenerator;
 
 namespace Serenity.Tests.CodeGenerator
@@ -24,7 +25,7 @@ declare namespace jsPDF {
         cellPadding?: number;
     }
 }");
-            var tl = new TSTypeListerAST(fileSystem);
+            var tl = new TSTypeListerAST(new AbstractedFileSystem(fileSystem));
             tl.AddInputFile("a.d.ts");
 
             var types = tl.ExtractTypes();
@@ -55,7 +56,7 @@ declare namespace Serenity.Extensions {
     }
 }");
 
-            var tl = new TSTypeListerAST(fileSystem);
+            var tl = new TSTypeListerAST(new AbstractedFileSystem(fileSystem));
             tl.AddInputFile("a.d.ts");
 
             var types = tl.ExtractTypes();
@@ -99,12 +100,42 @@ declare namespace Serenity.Extensions {
     }
 }");
 
-            var tl = new TSTypeListerAST(fileSystem);
+            var tl = new TSTypeListerAST(new AbstractedFileSystem(fileSystem));
             tl.AddInputFile("a.ts");
 
             var types = tl.ExtractTypes();
             var b = Assert.Single(types, x => x.FullName == "A.B");
             Assert.Single(b.Methods, x => x.Name == "getSelect2Options");
+        }
+
+        [Fact]
+        public void DecoratorsReferenceTest()
+        {
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddFile("a.ts", @"
+declare namespace Serenity {
+    export class Widget {
+    }
+
+    export namespace Decorators {
+        export function registerEditor();
+    }
+}
+
+
+namespace Serenity.Sub {
+
+    @Decorators.registerEditor()
+    export class B extends Serenity.Widget {
+    }
+}");
+
+            var tl = new TSTypeListerAST(new AbstractedFileSystem(fileSystem));
+            tl.AddInputFile("a.ts");
+
+            var types = tl.ExtractTypes();
+            var b = Assert.Single(types, x => x.FullName == "Serenity.Sub.B");
+            Assert.Single(b.Attributes, x => x.Type == "Serenity.Decorators.registerEditor");
         }
 
     }

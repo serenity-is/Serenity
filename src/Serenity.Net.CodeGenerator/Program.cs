@@ -94,7 +94,7 @@ namespace Serenity.CodeGenerator
                     {
                         if (tsTypes == null)
                         {
-                            var tsTypeLister = new TSTypeLister(fileSystem, projectDir);
+                            var tsTypeLister = new TSTypeLister(new AbstractedFileSystem(fileSystem), projectDir);
                             tsTypes = tsTypeLister.List();
                         }
 
