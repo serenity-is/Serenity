@@ -1,7 +1,7 @@
 ﻿using Serenity.CodeGeneration;
 using System.Linq;
 using Serenity.IO;
-#if NETSTANDARD2_0
+#if ISSOURCEGENERATOR
 using Newtonsoft.Json;
 #else
 using System.Text.Json;
@@ -41,7 +41,7 @@ namespace Serenity.CodeGenerator
             IEnumerable<string> files = null;
             if (fileSystem.FileExists(tsconfig))
             {
-#if NETSTANDARD2_0
+#if ISSOURCEGENERATOR
                 var cfg = JsonConvert.DeserializeObject<TSConfig>(fileSystem.ReadAllText(tsconfig), new JsonSerializerSettings
                 {
                     MissingMemberHandling = MissingMemberHandling.Ignore

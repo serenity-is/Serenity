@@ -1,5 +1,5 @@
 ﻿using Serenity.TypeScript.TsTypes;
-﻿#if NETSTANDARD2_0
+﻿#if ISSOURCEGENERATOR
 using CharSpan = System.String;
 #else
 using CharSpan = System.ReadOnlySpan<char>;
@@ -753,7 +753,7 @@ namespace Serenity.TypeScript.TsParser
             {
                 _pos++;
             }
-#if NETSTANDARD2_0
+#if ISSOURCEGENERATOR
             return int.Parse(_text.Substring(start, _pos - start + 1));
 #else
             return int.Parse(_text.AsSpan(start, _pos - start + 1));
