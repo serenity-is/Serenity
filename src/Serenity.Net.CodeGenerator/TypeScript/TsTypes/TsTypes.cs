@@ -3672,22 +3672,4 @@ namespace Serenity.TypeScript.TsTypes
         public TextSpan Span { get; set; }
         public int NewLength { get; set; }
     }
-
-    public class DiagnosticCollection
-    {
-    }
-
-    public class SyntaxList : Node
-    {
-        public SyntaxList()
-        {
-            Kind = SyntaxKind.SyntaxList;
-        }
-
-        public Node[] _children { get; set; }
-    }
-
-    public class MissingNode : Identifier
-    {
-    }
 }
