@@ -3,7 +3,7 @@ using Serenity.Reflection;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : CecilImportGenerator
+    public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         protected void GeneratePermissionKeys(TypeDefinition type)
         {
@@ -33,7 +33,7 @@ namespace Serenity.CodeGeneration
 
                 foreach (var nested in type.NestedTypes)
                 {
-                    if (CecilUtils.GetAttr(type, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+                    if (TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
                         continue;
 
                     sb.AppendLine();

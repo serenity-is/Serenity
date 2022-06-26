@@ -110,7 +110,7 @@ namespace Serenity.CodeGenerator
 
                     var allTsFiles = fileSystem.GetFiles(projectDir, "*.ts", System.IO.SearchOption.AllDirectories)
                         .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
-                            !fileSystem.FileExists(x.Substring(0, x.Length - ".d.ts".Length) + ".ts"));
+                            !fileSystem.FileExists(x[..^".d.ts".Length] + ".ts"));
 
                     files = files.Concat(allTsFiles.Where(x => includePatterns.Any() &&
                         includeGlob.IsMatch(x[(projectDir.Length + 1)..]) &&

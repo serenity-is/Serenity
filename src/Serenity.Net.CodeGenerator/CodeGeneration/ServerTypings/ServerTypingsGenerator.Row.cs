@@ -4,28 +4,28 @@ using Serenity.Reflection;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : CecilImportGenerator
+    public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         private static IEnumerable<PropertyDefinition> EnumerateFieldProperties(TypeDefinition rowType)
         {
             do
             {
                 var propertyByName = rowType.Properties.Where(x =>
-                    CecilUtils.IsPublicInstanceProperty(x) &&
+                    TypingsUtils.IsPublicInstanceProperty(x) &&
                     (!x.PropertyType.Name.EndsWith("Field", StringComparison.Ordinal) ||
                       x.PropertyType.Namespace != "Serenity.Data")).ToLookup(x => x.Name);
 
                 var fieldsType = rowType.NestedTypes.FirstOrDefault(x =>
-                    CecilUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
+                    TypingsUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
 
                 if (fieldsType == null &&
                     rowType.HasGenericParameters)
                 {
                     var gp = rowType.GenericParameters.FirstOrDefault(x => 
                         x.HasConstraints &&
-                        x.Constraints.Any(c => CecilUtils.IsSubclassOf(c.ConstraintType, "Serenity.Data", "RowFieldsBase")));
+                        x.Constraints.Any(c => TypingsUtils.IsSubclassOf(c.ConstraintType, "Serenity.Data", "RowFieldsBase")));
                     if (gp != null)
-                        fieldsType = gp.Constraints.First(c => CecilUtils.IsSubclassOf(c.ConstraintType, "Serenity.Data", "RowFieldsBase"))
+                        fieldsType = gp.Constraints.First(c => TypingsUtils.IsSubclassOf(c.ConstraintType, "Serenity.Data", "RowFieldsBase"))
                             .ConstraintType.Resolve();
                 }
                 
@@ -51,7 +51,7 @@ namespace Serenity.CodeGeneration
             do
             {
                 foreach (var property in rowType.Properties.Where(x =>
-                    CecilUtils.IsPublicInstanceProperty(x)))
+                    TypingsUtils.IsPublicInstanceProperty(x)))
                     yield return property;
             }
             while ((rowType = (rowType.BaseType?.Resolve())) != null &&
@@ -68,14 +68,14 @@ namespace Serenity.CodeGeneration
                 cw.Indented(property.Name);
                 sb.Append("?: ");
 
-                var enumType = CecilUtils.GetEnumTypeFrom(property.PropertyType);
+                var enumType = TypingsUtils.GetEnumTypeFrom(property.PropertyType);
                 if (enumType != null)
                 {
                     HandleMemberType(enumType, codeNamespace);
                 }
                 else
                 {
-                    HandleMemberType(CecilUtils.GetNullableUnderlyingType(property.PropertyType) ?? property.PropertyType, codeNamespace);
+                    HandleMemberType(TypingsUtils.GetNullableUnderlyingType(property.PropertyType) ?? property.PropertyType, codeNamespace);
                 }
 
                 sb.AppendLine(";");
@@ -95,7 +95,7 @@ namespace Serenity.CodeGeneration
                         .SelectMany(x => x.Body.Instructions.Where(z =>
                             z.OpCode == OpCodes.Ldfld &&
                             z.Operand is FieldReference &&
-                            CecilUtils.IsSubclassOf((z.Operand as FieldReference).DeclaringType, "Serenity.Data", "RowFieldsBase"))
+                            TypingsUtils.IsSubclassOf((z.Operand as FieldReference).DeclaringType, "Serenity.Data", "RowFieldsBase"))
                             .Select(z => (z.Operand as FieldReference).Name))
                         .FirstOrDefault();
 
@@ -112,7 +112,7 @@ namespace Serenity.CodeGeneration
 
         private static string DetermineModuleIdentifier(TypeDefinition rowType)
         {
-            var moduleAttr = CecilUtils.GetAttr(rowType, "Serenity.ComponentModel", "ModuleAttribute");
+            var moduleAttr = TypingsUtils.GetAttr(rowType, "Serenity.ComponentModel", "ModuleAttribute");
             if (moduleAttr != null)
                 return moduleAttr.ConstructorArguments[0].Value as string;
 
@@ -143,7 +143,7 @@ namespace Serenity.CodeGeneration
         {
             string localTextPrefix = null;
             var fieldsType = rowType.NestedTypes.FirstOrDefault(x =>
-                            CecilUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
+                            TypingsUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
 
             if (fieldsType != null)
             {
@@ -162,7 +162,7 @@ namespace Serenity.CodeGeneration
                     return localTextPrefix;
             }
             
-            var ltp = CecilUtils.GetAttr(rowType, "Serenity.ComponentModel", "LocalTextPrefixAttribute");
+            var ltp = TypingsUtils.GetAttr(rowType, "Serenity.ComponentModel", "LocalTextPrefixAttribute");
             if (ltp != null)
             {
                 localTextPrefix = ltp.ConstructorArguments[0].Value as string;
@@ -178,7 +178,7 @@ namespace Serenity.CodeGeneration
             CustomAttribute permissionAttr = null;
             foreach (var attributeName in attributeNames)
             {
-                permissionAttr = CecilUtils.GetAttr(rowType, "Serenity.Data", attributeName + "PermissionAttribute");
+                permissionAttr = TypingsUtils.GetAttr(rowType, "Serenity.Data", attributeName + "PermissionAttribute");
                 if (permissionAttr != null)
                     break;
             }
@@ -193,7 +193,7 @@ namespace Serenity.CodeGeneration
         private static string AutoLookupKeyFor(TypeDefinition type)
         {
             string module;
-            var moduleAttr = CecilUtils.GetAttr(type,
+            var moduleAttr = TypingsUtils.GetAttr(type,
                 "Serenity.ComponentModel", "ModuleAttribute");
             if (moduleAttr != null)
             {
@@ -231,7 +231,7 @@ namespace Serenity.CodeGeneration
 
         public string DetermineLookupKey(TypeDefinition rowType)
         {
-            var lookupAttr = CecilUtils.GetAttr(rowType, 
+            var lookupAttr = TypingsUtils.GetAttr(rowType, 
                 "Serenity.ComponentModel", "LookupScriptAttribute");
 
             TypeDefinition autoFrom = rowType;
@@ -246,7 +246,7 @@ namespace Serenity.CodeGeneration
 
                 if (script != null)
                 {
-                    lookupAttr = CecilUtils.GetAttr(script, "Serenity.ComponentModel",
+                    lookupAttr = TypingsUtils.GetAttr(script, "Serenity.ComponentModel",
                         "LookupScriptAttribute");
                     autoFrom = script;
                 }
@@ -255,7 +255,7 @@ namespace Serenity.CodeGeneration
                 lookupAttr.ConstructorArguments[0].Type.FullName == "System.Type")
             {
                 autoFrom = ((TypeReference)lookupAttr.ConstructorArguments[0].Value).Resolve();
-                lookupAttr = CecilUtils.GetAttr(autoFrom, 
+                lookupAttr = TypingsUtils.GetAttr(autoFrom, 
                     "Serenity.ComponentModel", "LookupScriptAttribute");
             }
 
@@ -297,14 +297,14 @@ namespace Serenity.CodeGeneration
             if (idProperty == null)
             {
                 idProperty = properties.FirstOrDefault(x =>
-                    x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
+                    x.HasCustomAttributes && TypingsUtils.FindAttr(x.CustomAttributes,
                         "Serenity.Data", "IdPropertyAttribute") != null)?.Name;
             }
 
             if (idProperty == null)
             {
                 var identities = properties.Where(x =>
-                    x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
+                    x.HasCustomAttributes && TypingsUtils.FindAttr(x.CustomAttributes,
                         "Serenity.Data.Mapping", "IdentityAttribute") != null);
 
                 if (identities.Count() == 1)
@@ -312,7 +312,7 @@ namespace Serenity.CodeGeneration
                 else if (!identities.Any())
                 {
                     var primaryKeys = properties.Where(x =>
-                        x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
+                        x.HasCustomAttributes && TypingsUtils.FindAttr(x.CustomAttributes,
                             "Serenity.Data.Mapping", "PrimaryKeyAttribute") != null);
 
                     if (primaryKeys.Count() == 1)
@@ -327,7 +327,7 @@ namespace Serenity.CodeGeneration
             if (nameProperty == null)
             {
                 nameProperty = properties.FirstOrDefault(x =>
-                    x.HasCustomAttributes && CecilUtils.FindAttr(x.CustomAttributes,
+                    x.HasCustomAttributes && TypingsUtils.FindAttr(x.CustomAttributes,
                         "Serenity.Data", "NamePropertyAttribute") != null)?.Name;
             }
 

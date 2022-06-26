@@ -4,18 +4,18 @@ using System.IO;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : CecilImportGenerator
+    public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         protected override void AddNestedLocalTexts(TypeDefinition type, string prefix)
         {
-            if (CecilUtils.FindAttr(type.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+            if (TypingsUtils.FindAttr(type.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
                 return;
 
             foreach (var fi in type.Fields.Where(x => 
                 x.IsPublic && x.IsStatic && 
                 x.DeclaringType.FullName == type.FullName &&
                 x.FieldType.FullName == "Serenity.LocalText" &&
-                CecilUtils.FindAttr(x.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute") == null))
+                TypingsUtils.FindAttr(x.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute") == null))
             {
                 localTextKeys.Add(prefix + fi.Name);
             }

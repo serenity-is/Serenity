@@ -4,20 +4,20 @@ using Serenity.Reflection;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : CecilImportGenerator
+    public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         const string requestSuffix = "Request";
 
         private static string AutoDetermineEditorType(TypeReference valueType, TypeReference basedOnFieldType)
         {
-            if (CecilUtils.GetEnumTypeFrom(valueType) != null)
+            if (TypingsUtils.GetEnumTypeFrom(valueType) != null)
                 return "Enum";
 
             if (basedOnFieldType != null &&
-                CecilUtils.GetEnumTypeFrom(basedOnFieldType) != null)
+                TypingsUtils.GetEnumTypeFrom(basedOnFieldType) != null)
                 return "Enum";
 
-            valueType = (CecilUtils.GetNullableUnderlyingType(valueType) ?? valueType).Resolve();
+            valueType = (TypingsUtils.GetNullableUnderlyingType(valueType) ?? valueType).Resolve();
 
             if (valueType.Namespace == "System")
             {
@@ -93,7 +93,7 @@ namespace Serenity.CodeGeneration
 
             var identifier = type.Name;
             if (identifier.EndsWith(requestSuffix, StringComparison.Ordinal) &&
-                CecilUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
+                TypingsUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
             {
                 identifier = identifier.Substring(0,
                     identifier.Length - requestSuffix.Length) + "Form";
@@ -107,7 +107,7 @@ namespace Serenity.CodeGeneration
             var propertyTypes = new List<string>();
 
             TypeDefinition basedOnRow = null;
-            var basedOnRowAttr = CecilUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
+            var basedOnRowAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
             if (basedOnRowAttr != null &&
                 basedOnRowAttr.ConstructorArguments.Count > 0 &&
                 basedOnRowAttr.ConstructorArguments[0].Type.FullName == "System.Type")
@@ -118,7 +118,7 @@ namespace Serenity.CodeGeneration
             ILookup<string, PropertyDefinition> basedOnByName = null;
             if (basedOnRowAttr != null)
             {
-                basedOnByName = basedOnRow.Properties.Where(x => CecilUtils.IsPublicInstanceProperty(x))
+                basedOnByName = basedOnRow.Properties.Where(x => TypingsUtils.IsPublicInstanceProperty(x))
                     .ToLookup(x => x.Name);
             }
 
@@ -126,26 +126,26 @@ namespace Serenity.CodeGeneration
             {
                 foreach (var item in type.Properties)
                 {
-                    if (!CecilUtils.IsPublicInstanceProperty(item))
+                    if (!TypingsUtils.IsPublicInstanceProperty(item))
                         continue;
 
                     PropertyDefinition basedOnField = null;
                     if (basedOnByName != null)
                         basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
-                    if (CecilUtils.FindAttr(item.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                    if (TypingsUtils.FindAttr(item.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
                         continue;
 
                     if (basedOnField != null)
                     {
-                        if (CecilUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                        if (TypingsUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
                             continue;
 
                         bool ignored = false;
                         foreach (var annotationType in rowAnnotations)
                         {
                             if (annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation) &&
-                                CecilUtils.FindAttr(annotation.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                                TypingsUtils.FindAttr(annotation.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
                             {
                                 ignored = true;
                                 break;
@@ -156,9 +156,9 @@ namespace Serenity.CodeGeneration
                             continue;
                     }
 
-                    var editorTypeAttr = CecilUtils.FindAttr(item.CustomAttributes, "Serenity.ComponentModel", "EditorTypeAttribute");
+                    var editorTypeAttr = TypingsUtils.FindAttr(item.CustomAttributes, "Serenity.ComponentModel", "EditorTypeAttribute");
                     if (editorTypeAttr == null && basedOnField != null)
-                        editorTypeAttr = CecilUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "EditorTypeAttribute");
+                        editorTypeAttr = TypingsUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "EditorTypeAttribute");
 
                     if (editorTypeAttr == null && basedOnRow != null)
                     {
@@ -167,7 +167,7 @@ namespace Serenity.CodeGeneration
                             if (!annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation))
                                 continue;
 
-                            editorTypeAttr = CecilUtils.FindAttr(annotation.CustomAttributes,
+                            editorTypeAttr = TypingsUtils.FindAttr(annotation.CustomAttributes,
                                 "Serenity.ComponentModel", "EditorTypeAttribute");
                             if (editorTypeAttr != null)
                                 break;

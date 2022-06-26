@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Serenity.Reflection
 {
-    public static class CecilUtils
+    public static class TypingsUtils
     {
         public static bool IsOrSubClassOf(TypeReference childTypeDef, string ns, string name)
         {

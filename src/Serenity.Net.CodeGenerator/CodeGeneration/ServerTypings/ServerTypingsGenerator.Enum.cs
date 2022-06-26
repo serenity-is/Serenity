@@ -3,13 +3,13 @@ using Serenity.Reflection;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : CecilImportGenerator
+    public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         private void GenerateEnum(TypeDefinition enumType)
         {
             var codeNamespace = GetNamespace(enumType);
             string enumKey = enumType.FullName;
-            var enumKeyAttr = CecilUtils.FindAttr(enumType.CustomAttributes, "Serenity.ComponentModel", "EnumKeyAttribute");
+            var enumKeyAttr = TypingsUtils.FindAttr(enumType.CustomAttributes, "Serenity.ComponentModel", "EnumKeyAttribute");
             if (enumKeyAttr != null &&
                 enumKeyAttr.ConstructorArguments.Count >= 1 &&
                 enumKeyAttr.ConstructorArguments[0].Type.FullName == "System.String")
@@ -24,7 +24,7 @@ namespace Serenity.CodeGeneration
             {
                 var fields = enumType.Fields.Where(x => x.IsStatic && !x.IsSpecialName && x.Constant != null &&
                     (!x.HasCustomAttributes ||
-                        CecilUtils.FindAttr(x.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") == null));
+                        TypingsUtils.FindAttr(x.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") == null));
 
                 fields = fields.OrderBy(x => Convert.ToInt64(x.Constant, CultureInfo.InvariantCulture));
 

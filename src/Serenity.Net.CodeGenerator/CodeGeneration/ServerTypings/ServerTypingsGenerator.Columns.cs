@@ -2,7 +2,7 @@
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : CecilImportGenerator
+    public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         private void GenerateColumns(TypeDefinition type, CustomAttribute columnsAttribute)
         {

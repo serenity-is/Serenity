@@ -2,7 +2,7 @@
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : CecilImportGenerator
+    public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         protected override void HandleMemberType(TypeReference memberType, string codeNamespace, 
             StringBuilder sb = null)

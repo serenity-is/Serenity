@@ -3,7 +3,7 @@ using Serenity.Reflection;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : CecilImportGenerator
+    public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         public bool LocalTexts { get; set; }
         public readonly HashSet<string> LocalTextFilters = new();
@@ -16,11 +16,6 @@ namespace Serenity.CodeGeneration
         public ServerTypingsGenerator(params string[] assemblyLocations)
             : base(assemblyLocations)
         {
-        }
-
-        protected override bool IsTS()
-        {
-            return true;
         }
 
         protected override void GenerateAll()
@@ -46,21 +41,21 @@ namespace Serenity.CodeGeneration
 
             if (type.IsEnum)
                 run(GenerateEnum);
-            else if (CecilUtils.IsSubclassOf(type, "Microsoft.AspNetCore.Mvc", "Controller") ||
-                CecilUtils.IsSubclassOf(type, "System.Web.Mvc", "Controller"))
+            else if (TypingsUtils.IsSubclassOf(type, "Microsoft.AspNetCore.Mvc", "Controller") ||
+                TypingsUtils.IsSubclassOf(type, "System.Web.Mvc", "Controller"))
                 run(GenerateService);
             else
             {
-                var formScriptAttr = CecilUtils.GetAttr(type, "Serenity.ComponentModel", "FormScriptAttribute");
+                var formScriptAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "FormScriptAttribute");
                 if (formScriptAttr != null)
                 {
                     run(t => GenerateForm(t, formScriptAttr));
                     EnqueueTypeMembers(type);
 
-                    if (CecilUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
+                    if (TypingsUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
                     {
                         AddFile(RemoveRootNamespace(codeNamespace,
-                            fileIdentifier + (IsTS() ? ".ts" : ".cs")));
+                            fileIdentifier + ".ts"));
 
                         fileIdentifier = type.Name;
                         run(GenerateBasicType);
@@ -69,7 +64,7 @@ namespace Serenity.CodeGeneration
                     return;
                 }
 
-                var columnsScriptAttr = CecilUtils.GetAttr(type, "Serenity.ComponentModel", "ColumnsScriptAttribute");
+                var columnsScriptAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "ColumnsScriptAttribute");
                 if (columnsScriptAttr != null)
                 {
                     run(t => GenerateColumns(t, columnsScriptAttr));
@@ -77,8 +72,8 @@ namespace Serenity.CodeGeneration
                     return;
                 }
 
-                if (CecilUtils.GetAttr(type, "Serenity.Extensibility", "NestedPermissionKeysAttribute") != null ||
-                    CecilUtils.GetAttr(type, "Serenity.ComponentModel", "NestedPermissionKeysAttribute") != null)
+                if (TypingsUtils.GetAttr(type, "Serenity.Extensibility", "NestedPermissionKeysAttribute") != null ||
+                    TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "NestedPermissionKeysAttribute") != null)
                 {
                     run(GeneratePermissionKeys);
                 }
@@ -105,8 +100,8 @@ namespace Serenity.CodeGeneration
 
             cw.InBrace(delegate
             {
-                if (CecilUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
-                    CecilUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
+                if (TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
+                    TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
                     GenerateRowMembers(type);
                 else
                 {
@@ -115,7 +110,7 @@ namespace Serenity.CodeGeneration
                         if (!CanHandleType(memberType.Resolve()))
                             return;
 
-                        var jsonProperty = a != null ? CecilUtils.FindAttr(a, "Newtonsoft.Json", "JsonPropertyAttribute") : null;
+                        var jsonProperty = a != null ? TypingsUtils.FindAttr(a, "Newtonsoft.Json", "JsonPropertyAttribute") : null;
                         if (jsonProperty != null &&
                             jsonProperty.HasConstructorArguments)
                         {
@@ -142,7 +137,7 @@ namespace Serenity.CodeGeneration
                             if (field.IsStatic | !field.IsPublic)
                                 continue;
 
-                            if (CecilUtils.FindAttr(field.CustomAttributes, "Newtonsoft.Json", "JsonIgnoreAttribute") != null)
+                            if (TypingsUtils.FindAttr(field.CustomAttributes, "Newtonsoft.Json", "JsonIgnoreAttribute") != null)
                                 continue;
 
                             handleMember(field.FieldType, field.Name, field.CustomAttributes);
@@ -150,11 +145,11 @@ namespace Serenity.CodeGeneration
 
                         foreach (var property in current.Properties)
                         {
-                            if (!CecilUtils.IsPublicInstanceProperty(property))
+                            if (!TypingsUtils.IsPublicInstanceProperty(property))
                                 continue;
 
                             if (property.HasCustomAttributes &&
-                                CecilUtils.FindAttr(property.CustomAttributes, "Newtonsoft.Json", "JsonIgnoreAttribute") != null)
+                                TypingsUtils.FindAttr(property.CustomAttributes, "Newtonsoft.Json", "JsonIgnoreAttribute") != null)
                                 continue;
 
                             handleMember(property.PropertyType, property.Name, property.CustomAttributes);
@@ -162,12 +157,12 @@ namespace Serenity.CodeGeneration
                         }
                     }
                     while ((current = current.BaseType?.Resolve()) != null && 
-                        (baseClass == null ||!CecilUtils.IsAssignableFrom(current, baseClass)));
+                        (baseClass == null ||!TypingsUtils.IsAssignableFrom(current, baseClass)));
                 }
             });
 
-            if (CecilUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
-                CecilUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
+            if (TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
+                TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
                 GenerateRowMetadata(type);
         }
     }
