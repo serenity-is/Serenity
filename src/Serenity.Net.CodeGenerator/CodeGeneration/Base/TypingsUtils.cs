@@ -37,6 +37,22 @@ namespace Serenity.Reflection
 
             return ns + "." + symbol.Name;
         }
+
+        public static IEnumerable<IFieldSymbol> GetFields(this ITypeSymbol type)
+        {
+            return type.GetMembers().OfType<IFieldSymbol>();
+        }
+
+        public static IEnumerable<IPropertySymbol> GetProperties(this ITypeSymbol type)
+        {
+            return type.GetMembers().OfType<IPropertySymbol>();
+        }
+
+        public static bool IsGenericInstance(this ITypeSymbol typeSymbol)
+        {
+            return typeSymbol is INamedTypeSymbol nt &&
+                nt.IsGenericType && nt.TypeParameters.Length == 0;
+        }
 #else
         public static string Namespace(this TypeReference symbol)
         {
@@ -46,6 +62,21 @@ namespace Serenity.Reflection
         public static string FullName(this TypeReference symbol)
         {
             return symbol.FullName;
+        }
+
+        public static IEnumerable<FieldDefinition> GetFields(this TypeDefinition type)
+        {
+            return type.Fields;
+        }
+
+        public static IEnumerable<PropertyDefinition> GetFields(this TypeDefinition type)
+        {
+            return type.Properties;
+        }
+
+        public static bool IsGenericInstance(this TypeDefinition type)
+        {
+            return type.IsGenericInstance;
         }
 #endif
 
