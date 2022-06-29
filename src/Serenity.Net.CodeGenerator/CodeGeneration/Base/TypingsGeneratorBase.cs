@@ -1,8 +1,9 @@
 ﻿#if ISSOURCEGENERATOR
 using Microsoft.CodeAnalysis;
+using MethodDefinition = Microsoft.CodeAnalysis.IMethodSymbol;
+using PropertyDefinition = Microsoft.CodeAnalysis.IPropertySymbol;
 using TypeReference = Microsoft.CodeAnalysis.ITypeSymbol;
 using TypeDefinition = Microsoft.CodeAnalysis.ITypeSymbol;
-using PropertyDefinition = Microsoft.CodeAnalysis.IPropertySymbol;
 using System.Collections.Immutable;
 using System.Threading;
 #else
@@ -657,11 +658,7 @@ namespace Serenity.CodeGeneration
 
             string ns;
 
-#if ISSOURCEGENERATOR
-            if (type is INamedTypeSymbol nt1 && nt1.IsGenericType())
-#else
-            if (type.IsGenericInstance)
-#endif
+            if (type.IsGenericInstance())
             {
                 ns = ShortenNamespace(type, codeNamespace);
 
@@ -680,7 +677,11 @@ namespace Serenity.CodeGeneration
                 sb.Append('<');
 
                 int i = 0;
+#if ISSOURCEGENERATOR
+                foreach (var argument in (type as INamedTypeSymbol).TypeArguments)
+#else
                 foreach (var argument in (type as GenericInstanceType).GenericArguments)
+#endif
                 {
                     if (i++ > 0)
                         sb.Append(", ");
@@ -709,15 +710,23 @@ namespace Serenity.CodeGeneration
             foreach (var t in TypingsUtils.SelfAndBaseClasses(type))
             {
                 if (t.BaseType != null &&
-                    t.BaseType.IsGenericInstance &&
+                    t.BaseType.IsGenericInstance() &&
+#if ISSOURCEGENERATOR
+                    t.BaseType.OriginalDefinition.Namespace() == "Serenity.Services")
+#else
                     (t.BaseType as GenericInstanceType).ElementType.Namespace == "Serenity.Services")
+#endif
                 {
+#if ISSOURCEGENERATOR
+                    var n = t.BaseType.OriginalDefinition.Name;
+#else
                     var n = (t.BaseType as GenericInstanceType).ElementType.Name;
+#endif
                     if (n == "ListResponse`1" || n == "RetrieveResponse`1" || n == "SaveRequest`1")
                         return t.BaseType;
                 }
 
-                if (t.Namespace != "Serenity.Services")
+                if (t.Namespace() != "Serenity.Services")
                     continue;
 
                 if (t.Name == "ListRequest" ||
@@ -747,28 +756,56 @@ namespace Serenity.CodeGeneration
             requestType = null;
             requestParam = null;
 
-            if ((TypingsUtils.FindAttr(method.CustomAttributes, "System.Web.Mvc", "NonActionAttribute") ??
-                 TypingsUtils.FindAttr(method.CustomAttributes, "Microsoft.AspNetCore.Mvc", "NonActionAttribute") ??
-                 TypingsUtils.FindAttr(method.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute")) != null)
+            if ((TypingsUtils.FindAttr(method.GetAttributes(), "System.Web.Mvc", "NonActionAttribute") ??
+                 TypingsUtils.FindAttr(method.GetAttributes(), "Microsoft.AspNetCore.Mvc", "NonActionAttribute") ??
+                 TypingsUtils.FindAttr(method.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute")) != null)
                 return false;
 
-            if (!TypingsUtils.IsSubclassOf(method.DeclaringType, "System.Web.Mvc", "Controller") &&
-                !TypingsUtils.IsSubclassOf(method.DeclaringType, "Microsoft.AspNetCore.Mvc", "Controller"))
+            if (!TypingsUtils.IsSubclassOf(
+#if ISSOURCEGENERATOR
+                    method.ContainingType,
+#else
+                    method.DeclaringType, 
+#endif
+                    "System.Web.Mvc", "Controller") &&
+                !TypingsUtils.IsSubclassOf(
+#if ISSOURCEGENERATOR
+                    method.ContainingType,
+#else
+                    method.DeclaringType,
+#endif
+                    "Microsoft.AspNetCore.Mvc", "Controller"))
                 return false;
 
-            if (method.IsSpecialName && (method.Name.StartsWith("set_", StringComparison.Ordinal) || method.Name.StartsWith("get_", StringComparison.Ordinal)))
+#if ISSOURCEGENERATOR
+            if ((method.MethodKind == MethodKind.PropertySet || 
+                 method.MethodKind == MethodKind.PropertyGet) &&
+#else
+            if (method.IsSpecialName && 
+#endif
+                (method.Name.StartsWith("set_", StringComparison.Ordinal) || method.Name.StartsWith("get_", StringComparison.Ordinal)))
                 return false;
 
-            var parameters = method.Parameters.Where(x => !x.ParameterType.Resolve().IsInterface &&
-                TypingsUtils.FindAttr(x.CustomAttributes, "Microsoft.AspNetCore.Mvc", "FromServicesAttribute") == null).ToArray();
+            var parameters = method.Parameters.Where(x =>
+#if ISSOURCEGENERATOR
+                x.Type.TypeKind != TypeKind.Interface &&
+#else
+                !x.ParameterType.Resolve().IsInterface &&
+#endif
+                TypingsUtils.FindAttr(x.GetAttributes(), "Microsoft.AspNetCore.Mvc", "FromServicesAttribute") == null).ToArray();
 
             if (parameters.Length > 1)
                 return false;
 
             if (parameters.Length == 1)
             {
+#if ISSOURCEGENERATOR
+                requestType = parameters[0].Type;
+                if (!CanHandleType(requestType))
+#else
                 requestType = parameters[0].ParameterType;
                 if (requestType.IsPrimitive || !CanHandleType(requestType.Resolve()))
+#endif
                     return false;
             }
             else
@@ -778,21 +815,45 @@ namespace Serenity.CodeGeneration
 
             responseType = method.ReturnType;
             if (responseType != null &&
-                responseType.IsGenericInstance &&
-                (responseType as GenericInstanceType).ElementType.FullName.StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal))
+                responseType.IsGenericInstance() &&
+#if ISSOURCEGENERATOR
+                (responseType as INamedTypeSymbol).OriginalDefinition
+#else
+                (responseType as GenericInstanceType).ElementType
+#endif
+                    .FullName().StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal))
             {
+#if ISSOURCEGENERATOR
+                responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
+#else
                 responseType = (responseType as GenericInstanceType).GenericArguments[0];
+#endif
                 return true;
             }
+#if ISSOURCEGENERATOR
+            else if (responseType.IsGenericInstance() &&
+                (responseType as INamedTypeSymbol).OriginalDefinition
+#else
             else if (responseType != null &&
                 responseType.IsGenericInstance &&
-                (responseType as GenericInstanceType).ElementType.FullName.StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
+                (responseType as GenericInstanceType).ElementType
+#endif
+                    .FullName().StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
             {
+#if ISSOURCEGENERATOR
+                responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
+#else
                 responseType = (responseType as GenericInstanceType).GenericArguments[0];
+#endif
                 return true;
             }
             else if (TypingsUtils.IsOrSubClassOf(responseType, "System.Web.Mvc", "ActionResult") ||
-                TypingsUtils.IsAssignableFrom("Microsoft.AspNetCore.Mvc.IActionResult", responseType.Resolve()))
+                TypingsUtils.IsAssignableFrom("Microsoft.AspNetCore.Mvc.IActionResult",
+#if ISSOURCEGENERATOR
+                responseType))
+#else
+                responseType.Resolve()))
+#endif
                 return false;
             else if (responseType == null || TypingsUtils.IsVoid(responseType))
                 return false;
@@ -807,11 +868,26 @@ namespace Serenity.CodeGeneration
 
             var route = TypingsUtils.GetAttr(controller, "System.Web.Mvc", "RouteAttribute") ??
                 TypingsUtils.GetAttr(controller, "Microsoft.AspNetCore.Mvc", "RouteAttribute");
-            string url = route == null || route.ConstructorArguments.Count == 0 || route.ConstructorArguments[0].Value is not string ? 
+            string url = route == null ||
+#if ISSOURCEGENERATOR
+                route.ConstructorArguments.Length == 0 || route.ConstructorArguments[0].Value is not string ?
+#else
+                route.ConstructorArguments.Count == 0 || route.ConstructorArguments[0].Value is not string ? 
+#endif
                 ("Services/HasNoRoute/" + controller.Name) : (route.ConstructorArguments[0].Value as string ?? "");
 
-            url = url.Replace("[controller]", controller.Name[..^"Controller".Length], StringComparison.Ordinal);
-            url = url.Replace("/[action]", "", StringComparison.Ordinal);
+            url = url.Replace("[controller]", controller.Name[..^"Controller".Length]
+#if ISSOURCEGENERATOR
+                );
+#else
+                , StringComparison.Ordinal);
+#endif
+            url = url.Replace("/[action]", ""
+#if ISSOURCEGENERATOR
+                );
+#else
+                , StringComparison.Ordinal);
+#endif
 
             if (!url.StartsWith("~/", StringComparison.Ordinal) && !url.StartsWith("/", StringComparison.Ordinal))
                 url = "~/" + url;
@@ -854,7 +930,7 @@ namespace Serenity.CodeGeneration
                 PropertyByName = new Dictionary<string, PropertyDefinition>();
                 Attributes = new List<AttributeInfo>();
 
-                foreach (var property in annotationType.Properties)
+                foreach (var property in annotationType.GetProperties())
                     if (TypingsUtils.IsPublicInstanceProperty(property))
                         PropertyByName[property.Name] = property;
             }

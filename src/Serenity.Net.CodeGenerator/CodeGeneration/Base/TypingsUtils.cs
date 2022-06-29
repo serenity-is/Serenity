@@ -53,6 +53,7 @@ namespace Serenity.Reflection
             return typeSymbol is INamedTypeSymbol nt &&
                 nt.IsGenericType && nt.TypeParameters.Length == 0;
         }
+
 #else
         public static string Namespace(this TypeReference symbol)
         {
@@ -77,6 +78,21 @@ namespace Serenity.Reflection
         public static bool IsGenericInstance(this TypeReference type)
         {
             return type.IsGenericInstance;
+        }
+
+        public static IEnumerable<CustomAttribute> GetAttributes(this MethodDefinition method)
+        {
+            return method.CustomAttributes;
+        }
+
+        public static IEnumerable<CustomAttribute> GetAttributes(this TypeDefinition type)
+        {
+            return type.CustomAttributes;
+        }
+
+        public static IEnumerable<CustomAttribute> GetAttributes(this ParameterDefinition pd)
+        {
+            return pd.CustomAttributes;
         }
 #endif
 
