@@ -69,12 +69,12 @@ namespace Serenity.Reflection
             return type.Fields;
         }
 
-        public static IEnumerable<PropertyDefinition> GetFields(this TypeDefinition type)
+        public static IEnumerable<PropertyDefinition> GetProperties(this TypeDefinition type)
         {
             return type.Properties;
         }
 
-        public static bool IsGenericInstance(this TypeDefinition type)
+        public static bool IsGenericInstance(this TypeReference type)
         {
             return type.IsGenericInstance;
         }

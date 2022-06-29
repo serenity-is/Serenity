@@ -21,9 +21,10 @@ namespace Serenity.CodeGeneration
         protected HashSet<string> generatedTypes;
         protected string fileIdentifier;
         protected List<AnnotationTypeInfo> annotationTypes;
-        private readonly CancellationToken cancellationToken;
 
 #if ISSOURCEGENERATOR
+        private readonly CancellationToken cancellationToken;
+
         protected TypingsGeneratorBase(Compilation compilation, CancellationToken cancellationToken)
         {
             Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
