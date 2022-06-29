@@ -96,18 +96,19 @@ if (typeof $ !== "undefined" && $.validator && $.validator.methods && $.validato
         return emailRegex.test(value);
     });
 
-    var addMsg = function(m: string, k: string) {
-        var txt = tryGetText("Validation." + k);
-        if (txt)
-            $.validator.messages[m] = txt;
-        else if (!$.validator.messages[m]) 
-            $.validator.messages[m] = k + "?";
-    }
-
     $(loadValidationErrorMessages);
 }
 
 export function loadValidationErrorMessages() {
+
+    const addMsg = (m: string, k: string) => {
+        var txt = tryGetText("Validation." + k);
+        if (txt)
+            $.validator.messages[m] = txt;
+        else if (!$.validator.messages[m])
+            $.validator.messages[m] = k + "?";
+    }
+
     addMsg("required", "Required");
     addMsg("email", "Email");
     addMsg("minlength", "MinLength");
