@@ -48,6 +48,11 @@ namespace Serenity.Reflection
             return type.GetMembers().OfType<IPropertySymbol>();
         }
 
+        public static IEnumerable<IMethodSymbol> GetMethods(this ITypeSymbol type)
+        {
+            return type.GetMembers().OfType<IMethodSymbol>();
+        }
+
         public static bool IsGenericInstance(this ITypeSymbol typeSymbol)
         {
             return typeSymbol is INamedTypeSymbol nt &&
