@@ -1,4 +1,10 @@
-﻿using Mono.Cecil;
+﻿#if ISSOURCEGENERATOR
+using Microsoft.CodeAnalysis;
+using TypeDefinition = Microsoft.CodeAnalysis.ITypeSymbol;
+using TypeReference = Microsoft.CodeAnalysis.ITypeSymbol;
+#else
+using Mono.Cecil;
+#endif
 
 namespace Serenity.CodeGeneration
 {
@@ -12,13 +18,18 @@ namespace Serenity.CodeGeneration
             var identifier = GetControllerIdentifier(type);
             fileIdentifier = identifier;
             sb.Append(identifier);
-            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
+            generatedTypes.Add((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier);
 
             cw.InBrace(delegate
             {
                 var serviceUrl = GetServiceUrlFromRoute(type);
                 if (serviceUrl == null)
-                    serviceUrl = GetNamespace(type).Replace(".", "/", StringComparison.Ordinal);
+                    serviceUrl = GetNamespace(type).Replace(".", "/"
+#if ISSOURCEGENERATOR
+                        );
+#else
+                        , StringComparison.Ordinal);
+#endif
 
                 cw.Indented("export const baseUrl = '");
                 sb.Append(serviceUrl);
@@ -27,9 +38,14 @@ namespace Serenity.CodeGeneration
 
 
                 var methodNames = new List<string>();
-                foreach (var method in type.Methods)
+                foreach (var method in type.GetMethods())
                 {
-                    if (!method.IsPublic || method.IsStatic || method.IsAbstract)
+#if ISSOURCEGENERATOR
+                    if (method.DeclaredAccessibility != Accessibility.Public ||
+#else
+                    if (!method.IsPublic || 
+#endif
+                        method.IsStatic || method.IsAbstract)
                         continue;
 
                     if (methodNames.Contains(method.Name))

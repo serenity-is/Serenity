@@ -1,4 +1,9 @@
-﻿using Mono.Cecil;
+﻿#if ISSOURCEGENERATOR
+using Microsoft.CodeAnalysis;
+using TypeDefinition = Microsoft.CodeAnalysis.ITypeSymbol;
+#else
+using Mono.Cecil;
+#endif
 using Serenity.Reflection;
 using System.IO;
 
@@ -8,22 +13,32 @@ namespace Serenity.CodeGeneration
     {
         protected override void AddNestedLocalTexts(TypeDefinition type, string prefix)
         {
-            if (TypingsUtils.FindAttr(type.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+            if (TypingsUtils.FindAttr(type.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
                 return;
 
-            foreach (var fi in type.Fields.Where(x => 
+            foreach (var fi in type.GetFields().Where(x =>
+#if ISSOURCEGENERATOR
+                x.DeclaredAccessibility == Accessibility.Public && x.IsStatic &&
+                x.ContainingType.FullName() == type.FullName() &&
+                x.Type.FullName() == "Serenity.LocalText" &&
+#else
                 x.IsPublic && x.IsStatic && 
                 x.DeclaringType.FullName == type.FullName &&
                 x.FieldType.FullName == "Serenity.LocalText" &&
-                TypingsUtils.FindAttr(x.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute") == null))
+#endif
+                TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute") == null))
             {
                 localTextKeys.Add(prefix + fi.Name);
             }
 
+#if ISSOURCEGENERATOR
+            foreach (var nested in type.GetTypeMembers())
+#else
             if (!type.HasNestedTypes)
                 return;
 
             foreach (var nested in type.NestedTypes)
+#endif
             {
                 var name = nested.Name;
                 if (name.EndsWith("_", StringComparison.Ordinal))
@@ -59,7 +74,12 @@ namespace Serenity.CodeGeneration
                         {
                             if (item[0] == '^' && item[^1] == '$')
                                 fb.Append(item[1..^1]);
-                            else fb.Append(item.Replace(".", "\\.", StringComparison.Ordinal) + ".*");
+                            else fb.Append(item.Replace(".", "\\."
+#if ISSOURCEGENERATOR
+                                ) + ".*");
+#else
+                                , StringComparison.Ordinal) + ".*");
+#endif
                             append = true;
                         }
                     }
@@ -76,7 +96,11 @@ namespace Serenity.CodeGeneration
                 list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));
 
                 var jwBuilder = new StringBuilder();
+#if ISSOURCEGENERATOR
+                var jw = new Newtonsoft.Json.JsonTextWriter(new StringWriter(jwBuilder))
+#else
                 var jw = new JsonTextWriter(new StringWriter(jwBuilder))
+#endif
                 {
                     QuoteName = false
                 };
