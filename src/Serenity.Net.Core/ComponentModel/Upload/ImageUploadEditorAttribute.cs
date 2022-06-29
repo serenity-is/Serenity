@@ -9,7 +9,7 @@ namespace Serenity.ComponentModel
     /// your files will stay in temporary directory.
     /// </summary>
     /// <seealso cref="CustomEditorAttribute" />
-    public partial class ImageUploadEditorAttribute : CustomEditorAttribute
+    public partial class ImageUploadEditorAttribute : CustomEditorAttribute, IUploadEditor, IUploadFileConstraints, IUploadFileSizeConstraints, IUploadImageOptions
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageUploadEditorAttribute"/> class.
@@ -29,7 +29,10 @@ namespace Serenity.ComponentModel
             : this("ImageUpload")
         {
         }
-
+        
+        /// <inheritdoc />
+        public bool IsMultiple => false;
+        
         /// <summary>
         /// Should non-image uploads be allowed.
         /// </summary>

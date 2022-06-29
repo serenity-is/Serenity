@@ -8,6 +8,9 @@
     {
         public AddBehaviorAttribute(Type behaviorType)
         {
+            if (behaviorType.IsAbstract || behaviorType.IsInterface)
+                throw new ArgumentException("Behavior type cannot be abstract or interface!");
+            
             Value = behaviorType;
         }
 
