@@ -1,13 +1,17 @@
-﻿using Mono.Cecil;
-using Serenity.Reflection;
-
-namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         public bool LocalTexts { get; set; }
         public readonly HashSet<string> LocalTextFilters = new();
 
+#if ISSOURCEGENERATOR
+        protected ServerTypingsGenerator(Microsoft.CodeAnalysis.Compilation compilation, 
+            System.Threading.CancellationToken cancellationToken)
+            : base(compilation, cancellationToken)
+        {
+        }
+#else
         public ServerTypingsGenerator(params Assembly[] assemblies)
             : base(assemblies)
         {
@@ -17,6 +21,7 @@ namespace Serenity.CodeGeneration
             : base(assemblyLocations)
         {
         }
+#endif
 
         protected override void GenerateAll()
         {
@@ -39,7 +44,7 @@ namespace Serenity.CodeGeneration
                 });
             }
 
-            if (type.IsEnum)
+            if (type.IsEnum())
                 run(GenerateEnum);
             else if (TypingsUtils.IsSubclassOf(type, "Microsoft.AspNetCore.Mvc", "Controller") ||
                 TypingsUtils.IsSubclassOf(type, "System.Web.Mvc", "Controller"))
@@ -89,7 +94,7 @@ namespace Serenity.CodeGeneration
             cw.Indented("export interface ");
 
             var identifier = MakeFriendlyName(type, codeNamespace);
-            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
+            generatedTypes.Add((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier);
 
             var baseClass = GetBaseClass(type);
             if (baseClass != null)
@@ -112,10 +117,10 @@ namespace Serenity.CodeGeneration
 
                         var jsonProperty = a != null ? TypingsUtils.FindAttr(a, "Newtonsoft.Json", "JsonPropertyAttribute") : null;
                         if (jsonProperty != null &&
-                            jsonProperty.HasConstructorArguments)
+                            jsonProperty.HasConstructorArguments())
                         {
                             var arg = jsonProperty.ConstructorArguments.First();
-                            if (arg.Type.FullName == "System.String" &&
+                            if (arg.Type.FullNameOf() == "System.String" &&
                                 !string.IsNullOrEmpty(arg.Value as string))
                             {
                                 memberName = arg.Value as string;
@@ -132,27 +137,27 @@ namespace Serenity.CodeGeneration
                     var current = type;
                     do
                     {
-                        foreach (var field in current.Fields)
+                        foreach (var field in current.FieldsOf())
                         {
-                            if (field.IsStatic | !field.IsPublic)
+                            if (field.IsStatic | !field.IsPublic())
                                 continue;
 
-                            if (TypingsUtils.FindAttr(field.CustomAttributes, "Newtonsoft.Json", "JsonIgnoreAttribute") != null)
+                            if (TypingsUtils.FindAttr(field.GetAttributes(), "Newtonsoft.Json", "JsonIgnoreAttribute") != null)
                                 continue;
 
-                            handleMember(field.FieldType, field.Name, field.CustomAttributes);
+                            handleMember(field.FieldType(), field.Name, field.GetAttributes());
                         }
 
-                        foreach (var property in current.Properties)
+                        foreach (var property in current.PropertiesOf())
                         {
                             if (!TypingsUtils.IsPublicInstanceProperty(property))
                                 continue;
 
-                            if (property.HasCustomAttributes &&
-                                TypingsUtils.FindAttr(property.CustomAttributes, "Newtonsoft.Json", "JsonIgnoreAttribute") != null)
+                            if (property.HasCustomAttributes() &&
+                                TypingsUtils.FindAttr(property.GetAttributes(), "Newtonsoft.Json", "JsonIgnoreAttribute") != null)
                                 continue;
 
-                            handleMember(property.PropertyType, property.Name, property.CustomAttributes);
+                            handleMember(property.PropertyType(), property.Name, property.GetAttributes());
                             continue;
                         }
                     }

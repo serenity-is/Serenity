@@ -1,6 +1,4 @@
-﻿using Mono.Cecil;
-
-namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
@@ -8,7 +6,7 @@ namespace Serenity.CodeGeneration
             StringBuilder sb = null)
         {
             sb ??= this.sb;
-            bool isSystem = memberType.Namespace == "System";
+            bool isSystem = memberType.NamespaceOf() == "System";
 
             if (isSystem && memberType.Name == "String")
             {
@@ -20,14 +18,14 @@ namespace Serenity.CodeGeneration
                 memberType.Name == "Nullable`1" &&
                 isSystem)
             {
-                memberType = (memberType as GenericInstanceType).GenericArguments[0];
-                isSystem = memberType.Namespace == "System";
+                memberType = (memberType as GenericInstanceType).GenericArguments()[0];
+                isSystem = memberType.NamespaceOf() == "System";
             }
 
             var name = memberType.Name;
 
             if (isSystem &&
-                memberType.IsPrimitive)
+                memberType.IsPrimitive())
             {
                 if (name == "Int16" ||
                     name == "Int32" ||
@@ -68,10 +66,10 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsArray)
+            if (memberType.IsArray())
             {
-                var elementType = memberType.GetElementType();
-                if (elementType.Namespace == "Serenity.Services" &&
+                var elementType = memberType.ElementType();
+                if (elementType.NamespaceOf() == "Serenity.Services" &&
                     elementType.Name == "SortBy")
                 {
                     sb.Append("string[]");
@@ -80,7 +78,7 @@ namespace Serenity.CodeGeneration
             }
 
             if (name == "Stream" &&
-                memberType.Namespace == "System.IO")
+                memberType.NamespaceOf() == "System.IO")
             {
                 sb.Append("number[]");
                 return;
@@ -93,43 +91,47 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsArray)
+            if (memberType.IsArray())
             {
-                HandleMemberType(memberType.GetElementType(), codeNamespace, sb);
+                HandleMemberType(memberType.ElementType(), codeNamespace, sb);
                 sb.Append("[]");
                 return;
             }
 
-            if (memberType.IsGenericInstance)
+            if (memberType.IsGenericInstance())
             {
                 var gi = memberType as GenericInstanceType;
-                if (gi.ElementType.Namespace == "System.Collections.Generic")
+                if (gi.ElementType().NamespaceOf() == "System.Collections.Generic")
                 {
-                    if (gi.ElementType.Name == "List`1" ||
-                        gi.ElementType.Name == "HashSet`1" ||
-                        gi.ElementType.Name == "IList`1" ||
-                        gi.ElementType.Name == "IEnumerable`1" ||
-                        gi.ElementType.Name == "ISet`1")
+                    if (gi.ElementType().Name == "List`1" ||
+                        gi.ElementType().Name == "HashSet`1" ||
+                        gi.ElementType().Name == "IList`1" ||
+                        gi.ElementType().Name == "IEnumerable`1" ||
+                        gi.ElementType().Name == "ISet`1")
                     {
-                        HandleMemberType(gi.GenericArguments[0], codeNamespace, sb);
+                        HandleMemberType(gi.GenericArguments()[0], codeNamespace, sb);
                         sb.Append("[]");
                         return;
                     }
 
-                    if (gi.ElementType.Name == "Dictionary`2" ||
-                        gi.ElementType.Name == "IDictionary`2")
+                    if (gi.ElementType().Name == "Dictionary`2" ||
+                        gi.ElementType().Name == "IDictionary`2")
                     {
                         sb.Append("{ [key: ");
-                        HandleMemberType(gi.GenericArguments[0], codeNamespace, sb);
+                        HandleMemberType(gi.GenericArguments()[0], codeNamespace, sb);
                         sb.Append("]: ");
-                        HandleMemberType(gi.GenericArguments[1], codeNamespace, sb);
+                        HandleMemberType(gi.GenericArguments()[1], codeNamespace, sb);
                         sb.Append(" }");
                         return;
                     }
                 }
             }
 
+#if ISSOURCEGENERATOR
+            if (memberType is Microsoft.CodeAnalysis.ITypeParameterSymbol)
+#else
             if (memberType.IsGenericParameter)
+#endif
             {
                 sb.Append(memberType.Name);
                 return;

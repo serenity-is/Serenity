@@ -1,6 +1,6 @@
-﻿using Mono.Cecil;
+﻿#if !ISSOURCEGENERATOR
 using Mono.Cecil.Cil;
-using Serenity.Reflection;
+#endif
 
 namespace Serenity.CodeGeneration
 {
@@ -19,7 +19,7 @@ namespace Serenity.CodeGeneration
 
             valueType = (TypingsUtils.GetNullableUnderlyingType(valueType) ?? valueType).Resolve();
 
-            if (valueType.Namespace == "System")
+            if (valueType.NamespaceOf() == "System")
             {
                 if (valueType.Name == "String")
                     return "String";
@@ -48,41 +48,45 @@ namespace Serenity.CodeGeneration
             if (editorTypeAttr == null)
                 return AutoDetermineEditorType(propertyType, basedOnFieldType);
 
-            if (editorTypeAttr.AttributeType.FullName == "Serenity.ComponentModel.EditorTypeAttribute" ||
-                editorTypeAttr.AttributeType.FullName == "Serenity.ComponentModel.CustomEditorAttribute")
+            if (editorTypeAttr.AttributeType().FullNameOf() == "Serenity.ComponentModel.EditorTypeAttribute" ||
+                editorTypeAttr.AttributeType().FullNameOf() == "Serenity.ComponentModel.CustomEditorAttribute")
             {
-                if (editorTypeAttr.ConstructorArguments.Count == 1 &&
-                    editorTypeAttr.ConstructorArguments[0].Type.FullName == "System.String" &&
+                if (editorTypeAttr.ConstructorArguments().Count == 1 &&
+                    editorTypeAttr.ConstructorArguments[0].Type.FullNameOf() == "System.String" &&
                     editorTypeAttr.ConstructorArguments[0].Value is string)
                     return editorTypeAttr.ConstructorArguments[0].Value as string;
             }
 
-            var keyConstant = editorTypeAttr.AttributeType.Resolve().Fields.FirstOrDefault(x =>
+            var keyConstant = editorTypeAttr.AttributeType().Resolve().FieldsOf().FirstOrDefault(x =>
                 x.IsStatic &&
-                x.IsPublic &&
+                x.IsPublic() &&
                 x.Name == "Key" &&
-                x.HasConstant &&
-                x.Constant is string &&
-                x.DeclaringType.FullName == editorTypeAttr.AttributeType.FullName);
+                x.HasConstant() &&
+                x.Constant() is string &&
+                x.DeclaringType().FullNameOf() == editorTypeAttr.AttributeType().FullNameOf());
             
-            if (keyConstant != null && keyConstant.Constant as string != null)
-                return keyConstant.Constant as string;
+            if (keyConstant != null && keyConstant.Constant() as string != null)
+                return keyConstant.Constant() as string;
 
-            var editorType = editorTypeAttr.AttributeType.Resolve().Methods.Where(x => x.IsConstructor)
+            string editorType;
+#if !ISSOURCEGENERATOR
+            editorType = editorTypeAttr.AttributeType().Resolve().MethodsOf()
+                .Where(x => x.IsConstructor())
                 .SelectMany(m => m.Body.Instructions
                     .Where(i => i.OpCode == OpCodes.Call &&
-                        (i.Operand is MethodReference) &&
-                        (i.Operand as MethodReference).Resolve().IsConstructor &&
+                        (i.Operand is Mono.Cecil.MethodReference) &&
+                        (i.Operand as Mono.Cecil.MethodReference).Resolve().IsConstructor &&
                         i.Previous.OpCode == OpCodes.Ldstr &&
                         i.Previous.Operand is string)
                     .Select(x => x.Previous.Operand as string)).FirstOrDefault();
 
             if (editorType != null)
                 return editorType;
+#endif
 
-            editorType = editorTypeAttr.AttributeType.FullName;
+            editorType = editorTypeAttr.AttributeType().FullNameOf();
             if (editorType.EndsWith("Attribute", StringComparison.Ordinal))
-                editorType = editorType.Substring(0, editorType.Length - "Attribute".Length);
+                editorType = editorType[..^"Attribute".Length];
 
             return editorType;
         }
@@ -95,8 +99,7 @@ namespace Serenity.CodeGeneration
             if (identifier.EndsWith(requestSuffix, StringComparison.Ordinal) &&
                 TypingsUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
             {
-                identifier = identifier.Substring(0,
-                    identifier.Length - requestSuffix.Length) + "Form";
+                identifier = identifier[..^requestSuffix.Length] + "Form";
                 fileIdentifier = identifier;
             }
 
@@ -109,8 +112,8 @@ namespace Serenity.CodeGeneration
             TypeDefinition basedOnRow = null;
             var basedOnRowAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
             if (basedOnRowAttr != null &&
-                basedOnRowAttr.ConstructorArguments.Count > 0 &&
-                basedOnRowAttr.ConstructorArguments[0].Type.FullName == "System.Type")
+                basedOnRowAttr.ConstructorArguments().Count > 0 &&
+                basedOnRowAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.Type")
                 basedOnRow = (basedOnRowAttr.ConstructorArguments[0].Value as TypeReference).Resolve();
 
             var rowAnnotations = basedOnRow != null ? GetAnnotationTypesFor(basedOnRow) : null;
@@ -118,13 +121,13 @@ namespace Serenity.CodeGeneration
             ILookup<string, PropertyDefinition> basedOnByName = null;
             if (basedOnRowAttr != null)
             {
-                basedOnByName = basedOnRow.Properties.Where(x => TypingsUtils.IsPublicInstanceProperty(x))
+                basedOnByName = basedOnRow.PropertiesOf().Where(x => TypingsUtils.IsPublicInstanceProperty(x))
                     .ToLookup(x => x.Name);
             }
 
             cw.InBrace(delegate
             {
-                foreach (var item in type.Properties)
+                foreach (var item in type.PropertiesOf())
                 {
                     if (!TypingsUtils.IsPublicInstanceProperty(item))
                         continue;
@@ -133,19 +136,19 @@ namespace Serenity.CodeGeneration
                     if (basedOnByName != null)
                         basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
-                    if (TypingsUtils.FindAttr(item.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                    if (TypingsUtils.FindAttr(item.GetAttributes(), "Serenity.ComponentModel", "IgnoreAttribute") != null)
                         continue;
 
                     if (basedOnField != null)
                     {
-                        if (TypingsUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                        if (TypingsUtils.FindAttr(basedOnField.GetAttributes(), "Serenity.ComponentModel", "IgnoreAttribute") != null)
                             continue;
 
                         bool ignored = false;
                         foreach (var annotationType in rowAnnotations)
                         {
                             if (annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation) &&
-                                TypingsUtils.FindAttr(annotation.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                                TypingsUtils.FindAttr(annotation.GetAttributes(), "Serenity.ComponentModel", "IgnoreAttribute") != null)
                             {
                                 ignored = true;
                                 break;
@@ -156,9 +159,9 @@ namespace Serenity.CodeGeneration
                             continue;
                     }
 
-                    var editorTypeAttr = TypingsUtils.FindAttr(item.CustomAttributes, "Serenity.ComponentModel", "EditorTypeAttribute");
+                    var editorTypeAttr = TypingsUtils.FindAttr(item.GetAttributes(), "Serenity.ComponentModel", "EditorTypeAttribute");
                     if (editorTypeAttr == null && basedOnField != null)
-                        editorTypeAttr = TypingsUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "EditorTypeAttribute");
+                        editorTypeAttr = TypingsUtils.FindAttr(basedOnField.GetAttributes(), "Serenity.ComponentModel", "EditorTypeAttribute");
 
                     if (editorTypeAttr == null && basedOnRow != null)
                     {
@@ -167,14 +170,14 @@ namespace Serenity.CodeGeneration
                             if (!annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation))
                                 continue;
 
-                            editorTypeAttr = TypingsUtils.FindAttr(annotation.CustomAttributes,
+                            editorTypeAttr = TypingsUtils.FindAttr(annotation.GetAttributes(),
                                 "Serenity.ComponentModel", "EditorTypeAttribute");
                             if (editorTypeAttr != null)
                                 break;
                         }
                     }
 
-                    var editorType = GetEditorTypeKeyFrom(item.PropertyType, basedOnField?.PropertyType, editorTypeAttr);
+                    var editorType = GetEditorTypeKeyFrom(item.PropertyType(), basedOnField?.PropertyType(), editorTypeAttr);
 
                     ExternalType scriptType = null;
 
@@ -212,9 +215,9 @@ namespace Serenity.CodeGeneration
             cw.InBrace(delegate
             {
                 cw.Indented("static formKey = '");
-                var key = formScriptAttribute.ConstructorArguments != null &&
-                    formScriptAttribute.ConstructorArguments.Count > 0 ? formScriptAttribute.ConstructorArguments[0].Value as string : null;
-                key ??= type.FullName;
+                var key = formScriptAttribute.ConstructorArguments() != null &&
+                    formScriptAttribute.ConstructorArguments().Count > 0 ? formScriptAttribute.ConstructorArguments[0].Value as string : null;
+                key ??= type.FullNameOf();
 
                 sb.Append(key);
                 sb.AppendLine("';");
@@ -280,7 +283,7 @@ namespace Serenity.CodeGeneration
                 }
             });
 
-            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
+            generatedTypes.Add((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier);
         }
     }
 }

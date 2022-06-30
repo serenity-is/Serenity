@@ -1,11 +1,4 @@
-﻿#if ISSOURCEGENERATOR
-using Microsoft.CodeAnalysis;
-using TypeDefinition = Microsoft.CodeAnalysis.ITypeSymbol;
-#else
-using Mono.Cecil;
-#endif
-using Serenity.Reflection;
-using System.IO;
+﻿using System.IO;
 
 namespace Serenity.CodeGeneration
 {
@@ -16,16 +9,10 @@ namespace Serenity.CodeGeneration
             if (TypingsUtils.FindAttr(type.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
                 return;
 
-            foreach (var fi in type.GetFields().Where(x =>
-#if ISSOURCEGENERATOR
-                x.DeclaredAccessibility == Accessibility.Public && x.IsStatic &&
-                x.ContainingType.FullName() == type.FullName() &&
-                x.Type.FullName() == "Serenity.LocalText" &&
-#else
-                x.IsPublic && x.IsStatic && 
-                x.DeclaringType.FullName == type.FullName &&
-                x.FieldType.FullName == "Serenity.LocalText" &&
-#endif
+            foreach (var fi in type.FieldsOf().Where(x =>
+                x.IsPublic() && x.IsStatic && 
+                x.DeclaringType().FullNameOf() == type.FullNameOf() &&
+                x.FieldType().FullNameOf() == "Serenity.LocalText" &&
                 TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute") == null))
             {
                 localTextKeys.Add(prefix + fi.Name);

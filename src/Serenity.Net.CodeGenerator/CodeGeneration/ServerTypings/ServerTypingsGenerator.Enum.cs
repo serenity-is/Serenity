@@ -1,32 +1,30 @@
-﻿using Mono.Cecil;
-using Serenity.Reflection;
-
-namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         private void GenerateEnum(TypeDefinition enumType)
         {
             var codeNamespace = GetNamespace(enumType);
-            string enumKey = enumType.FullName;
-            var enumKeyAttr = TypingsUtils.FindAttr(enumType.CustomAttributes, "Serenity.ComponentModel", "EnumKeyAttribute");
+            string enumKey = enumType.FullNameOf();
+            var enumKeyAttr = TypingsUtils.FindAttr(enumType.GetAttributes(), "Serenity.ComponentModel", "EnumKeyAttribute");
             if (enumKeyAttr != null &&
-                enumKeyAttr.ConstructorArguments.Count >= 1 &&
-                enumKeyAttr.ConstructorArguments[0].Type.FullName == "System.String")
+                enumKeyAttr.ConstructorArguments().Count >= 1 &&
+                enumKeyAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.String")
                 enumKey = enumKeyAttr.ConstructorArguments[0].Value as string;
 
             cw.Indented("export enum ");
             var identifier = MakeFriendlyName(enumType, codeNamespace);
-            var fullName = (codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier;
+            var fullName = (string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier;
             generatedTypes.Add(fullName);
 
             cw.InBrace(delegate
             {
-                var fields = enumType.Fields.Where(x => x.IsStatic && !x.IsSpecialName && x.Constant != null &&
-                    (!x.HasCustomAttributes ||
-                        TypingsUtils.FindAttr(x.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") == null));
+                var fields = enumType.FieldsOf().Where(x => x.IsStatic && 
+                    !x.IsSpecialName() && x.Constant() != null &&
+                    (!x.HasCustomAttributes() ||
+                        TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "IgnoreAttribute") == null));
 
-                fields = fields.OrderBy(x => Convert.ToInt64(x.Constant, CultureInfo.InvariantCulture));
+                fields = fields.OrderBy(x => Convert.ToInt64(x.Constant(), CultureInfo.InvariantCulture));
 
                 var inserted = 0;
                 foreach (var field in fields)
@@ -36,7 +34,7 @@ namespace Serenity.CodeGeneration
 
                     cw.Indented(field.Name);
                     sb.Append(" = ");
-                    sb.Append(Convert.ToInt64(field.Constant, CultureInfo.InvariantCulture));
+                    sb.Append(Convert.ToInt64(field.Constant(), CultureInfo.InvariantCulture));
                     inserted++;
                 }
 

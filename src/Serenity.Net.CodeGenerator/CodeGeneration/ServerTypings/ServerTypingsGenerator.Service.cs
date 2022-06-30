@@ -1,12 +1,4 @@
-﻿#if ISSOURCEGENERATOR
-using Microsoft.CodeAnalysis;
-using TypeDefinition = Microsoft.CodeAnalysis.ITypeSymbol;
-using TypeReference = Microsoft.CodeAnalysis.ITypeSymbol;
-#else
-using Mono.Cecil;
-#endif
-
-namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
@@ -24,12 +16,7 @@ namespace Serenity.CodeGeneration
             {
                 var serviceUrl = GetServiceUrlFromRoute(type);
                 if (serviceUrl == null)
-                    serviceUrl = GetNamespace(type).Replace(".", "/"
-#if ISSOURCEGENERATOR
-                        );
-#else
-                        , StringComparison.Ordinal);
-#endif
+                    serviceUrl = GetNamespace(type).Replace(".", "/", StringComparison.Ordinal);
 
                 cw.Indented("export const baseUrl = '");
                 sb.Append(serviceUrl);
@@ -38,14 +25,9 @@ namespace Serenity.CodeGeneration
 
 
                 var methodNames = new List<string>();
-                foreach (var method in type.GetMethods())
+                foreach (var method in type.MethodsOf())
                 {
-#if ISSOURCEGENERATOR
-                    if (method.DeclaredAccessibility != Accessibility.Public ||
-#else
-                    if (!method.IsPublic || 
-#endif
-                        method.IsStatic || method.IsAbstract)
+                    if (!method.IsPublic() || method.IsStatic || method.IsAbstract)
                         continue;
 
                     if (methodNames.Contains(method.Name))

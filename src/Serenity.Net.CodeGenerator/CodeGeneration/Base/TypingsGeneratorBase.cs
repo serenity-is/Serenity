@@ -1,13 +1,7 @@
 ﻿#if ISSOURCEGENERATOR
-using Microsoft.CodeAnalysis;
-using MethodDefinition = Microsoft.CodeAnalysis.IMethodSymbol;
-using PropertyDefinition = Microsoft.CodeAnalysis.IPropertySymbol;
-using TypeReference = Microsoft.CodeAnalysis.ITypeSymbol;
-using TypeDefinition = Microsoft.CodeAnalysis.ITypeSymbol;
 using System.Collections.Immutable;
 using System.Threading;
-#else
-using Mono.Cecil;
+using Microsoft.CodeAnalysis;
 #endif
 using Serenity.Reflection;
 
@@ -101,7 +95,7 @@ namespace Serenity.CodeGeneration
         {
         }
 
-        protected TypingsGeneratorBase(params AssemblyDefinition[] assemblies)
+        protected TypingsGeneratorBase(params Mono.Cecil.AssemblyDefinition[] assemblies)
             : base()
         {
             generatedTypes = new HashSet<string>();
@@ -113,15 +107,15 @@ namespace Serenity.CodeGeneration
             Assemblies = assemblies;
         }
 
-        public AssemblyDefinition[] Assemblies { get; private set; }
+        public Mono.Cecil.AssemblyDefinition[] Assemblies { get; private set; }
 #endif
 
         protected virtual bool EnqueueType(TypeDefinition type)
         {
-            if (visited.Contains(type.FullName()))
+            if (visited.Contains(type.FullNameOf()))
                 return false;
 
-            visited.Add(type.FullName());
+            visited.Add(type.FullNameOf());
             generateQueue.Enqueue(type);
             return true;
         }
@@ -138,46 +132,24 @@ namespace Serenity.CodeGeneration
 
         protected virtual void EnqueueTypeMembers(TypeDefinition type)
         {
-#if ISSOURCEGENERATOR
-            foreach (var member in type.GetMembers())
-            {
-                if (member.IsStatic ||
-                    member.DeclaredAccessibility != Accessibility.Public)
-                    continue;
+            foreach (var field in type.FieldsOf())
+                if (!field.IsStatic && field.IsPublic())
+                    EnqueueMemberType(field.FieldType());
 
-                if (member is IFieldSymbol fieldSymbol &&
-                    !fieldSymbol.IsStatic)
-                    EnqueueMemberType(fieldSymbol.Type);
-                else if (member is IPropertySymbol propertySymbol &&
-                    TypingsUtils.IsPublicInstanceProperty(propertySymbol))
-                    EnqueueMemberType(propertySymbol.Type);
-            }
-
-#else
-            foreach (var field in type.GetFields())
-                if (!field.IsStatic && field.IsPublic)
-                    EnqueueMemberType(field.FieldType);
-
-            foreach (var property in type.Properties)
+            foreach (var property in type.PropertiesOf())
             {
                 if (!TypingsUtils.IsPublicInstanceProperty(property))
                     continue;
 
-                EnqueueMemberType(property.PropertyType);
+                EnqueueMemberType(property.PropertyType());
             }
-#endif
         }
 
         protected virtual string GetNamespace(TypeReference type)
         {
-            var ns = type.Namespace() ?? "";
-#if ISSOURCEGENERATOR
-            if (string.IsNullOrEmpty(ns) && type.ContainingType != null)
-                ns = type.ContainingType.Namespace();
-#else
-            if (string.IsNullOrEmpty(ns) && type.IsNested)
-                ns = type.DeclaringType.Namespace;
-#endif
+            var ns = type.NamespaceOf() ?? "";
+            if (string.IsNullOrEmpty(ns) && type.IsNested())
+                ns = type.DeclaringType().NamespaceOf();
 
             if (ns.EndsWith(".Entities", StringComparison.Ordinal))
                 return ns[..^".Entities".Length];
@@ -319,7 +291,7 @@ namespace Serenity.CodeGeneration
                             TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "NestedPermissionKeysAttribute", emptyTypes) != null ||
                             ((TypingsUtils.Contains(baseClasses, "Microsoft.AspNetCore.Mvc", "Controller") ||
                               TypingsUtils.Contains(baseClasses, "System.Web.Mvc", "Controller")) && // backwards compability
-                             fromType.Namespace()?.EndsWith(".Endpoints", StringComparison.Ordinal) == true))
+                             fromType.NamespaceOf()?.EndsWith(".Endpoints", StringComparison.Ordinal) == true))
                         {
                             EnqueueType(fromType);
                             continue;
@@ -357,11 +329,7 @@ namespace Serenity.CodeGeneration
         private void ScanAnnotationTypeAttributes(TypeDefinition fromType)
         {
             var annotationTypeAttrs = TypingsUtils.GetAttrs(
-#if ISSOURCEGENERATOR
                 fromType.GetAttributes(),
-#else
-                fromType.CustomAttributes,
-#endif
                 "Serenity.ComponentModel", "AnnotationTypeAttribute", null);
 
             if (!annotationTypeAttrs.Any())
@@ -371,37 +339,23 @@ namespace Serenity.CodeGeneration
             foreach (var attr in annotationTypeAttrs)
             {
                 var attrInfo = new AnnotationTypeInfo.AttributeInfo();
-#if ISSOURCEGENERATOR
-                if (attr.ConstructorArguments.FirstOrDefault(x =>
-#else
-                if (attr.ConstructorArguments?.FirstOrDefault(x =>
-#endif
-                    x.Type.FullName() == "System.Type").Value is not TypeReference annotatedType)
+                if (attr.ConstructorArguments()?.FirstOrDefault(x =>
+                    x.Type.FullNameOf() == "System.Type").Value is not TypeReference annotatedType)
                     continue;
 
-#if ISSOURCEGENERATOR
-                attrInfo.AnnotatedType = annotatedType;
-#else
                 attrInfo.AnnotatedType = annotatedType.Resolve();
-#endif
 
-#if ISSOURCEGENERATOR
-                if (attr.NamedArguments.Any())
+                if (attr.HasProperties())
                 {
-                }
-#else
-                if (attr.HasProperties)
-                {
-                    attrInfo.Inherited = attr.Properties.FirstOrDefault(x =>
-                        x.Name == "Inherited").Argument.Value as bool? ?? true;
+                    attrInfo.Inherited = attr.GetProperties().FirstOrDefault(x =>
+                        x.Name() == "Inherited").ArgumentValue() as bool? ?? true;
 
-                    attrInfo.Namespaces = attr.Properties.FirstOrDefault(x =>
-                        x.Name == "Namespaces").Argument.Value as string[];
+                    attrInfo.Namespaces = attr.GetProperties().FirstOrDefault(x =>
+                        x.Name() == "Namespaces").ArgumentValue() as string[];
 
-                    attrInfo.Properties = attr.Properties.FirstOrDefault(x =>
-                        x.Name == "Properties").Argument.Value as string[];
+                    attrInfo.Properties = attr.GetProperties().FirstOrDefault(x =>
+                        x.Name() == "Properties").ArgumentValue() as string[];
                 }
-#endif
                 else
                     attrInfo.Inherited = true;
                 typeInfo.Attributes.Add(attrInfo);
@@ -425,7 +379,7 @@ namespace Serenity.CodeGeneration
 
                     if (TypingsUtils.IsOrSubClassOf(attr.AnnotatedType, "System", "Attribute"))
                     {
-                        if (TypingsUtils.GetAttr(type, attr.AnnotatedType.Namespace(), 
+                        if (TypingsUtils.GetAttr(type, attr.AnnotatedType.NamespaceOf(), 
                             attr.AnnotatedType.Name, baseClasses) == null) 
                             continue;
                     }
@@ -451,7 +405,7 @@ namespace Serenity.CodeGeneration
                         bool namespaceMatch = false;
                         foreach (var ns in attr.Namespaces)
                         {
-                            if (type.Namespace() == ns)
+                            if (type.NamespaceOf() == ns)
                             {
                                 namespaceMatch = true;
                                 break;
@@ -459,10 +413,10 @@ namespace Serenity.CodeGeneration
 
                             if (ns.Length > 2 &&
                                 ns.EndsWith(".*", StringComparison.OrdinalIgnoreCase) &&
-                                type.Namespace != null)
+                                type.NamespaceOf() != null)
                             {
-                                if (type.Namespace() == ns[0..^2] ||
-                                    type.Namespace().StartsWith(ns[0..^1], StringComparison.OrdinalIgnoreCase))
+                                if (type.NamespaceOf() == ns[0..^2] ||
+                                    type.NamespaceOf().StartsWith(ns[0..^1], StringComparison.OrdinalIgnoreCase))
                                 {
                                     namespaceMatch = true;
                                     break;
@@ -476,7 +430,7 @@ namespace Serenity.CodeGeneration
 
                     if (attr.Properties != null &&
                         attr.Properties.Length > 0 &&
-                        attr.Properties.Any(name => !type.GetProperties().Any(p =>
+                        attr.Properties.Any(name => !type.PropertiesOf().Any(p =>
                             p.Name == name && TypingsUtils.IsPublicInstanceProperty(p))))
                         continue;
 
@@ -712,7 +666,7 @@ namespace Serenity.CodeGeneration
                 if (t.BaseType != null &&
                     t.BaseType.IsGenericInstance() &&
 #if ISSOURCEGENERATOR
-                    t.BaseType.OriginalDefinition.Namespace() == "Serenity.Services")
+                    t.BaseType.OriginalDefinition.NamespaceOf() == "Serenity.Services")
 #else
                     (t.BaseType as GenericInstanceType).ElementType.Namespace == "Serenity.Services")
 #endif
@@ -726,7 +680,7 @@ namespace Serenity.CodeGeneration
                         return t.BaseType;
                 }
 
-                if (t.Namespace() != "Serenity.Services")
+                if (t.NamespaceOf() != "Serenity.Services")
                     continue;
 
                 if (t.Name == "ListRequest" ||
@@ -821,7 +775,7 @@ namespace Serenity.CodeGeneration
 #else
                 (responseType as GenericInstanceType).ElementType
 #endif
-                    .FullName().StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal))
+                    .FullNameOf().StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal))
             {
 #if ISSOURCEGENERATOR
                 responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
@@ -838,7 +792,7 @@ namespace Serenity.CodeGeneration
                 responseType.IsGenericInstance &&
                 (responseType as GenericInstanceType).ElementType
 #endif
-                    .FullName().StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
+                    .FullNameOf().StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
             {
 #if ISSOURCEGENERATOR
                 responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
@@ -869,12 +823,8 @@ namespace Serenity.CodeGeneration
             var route = TypingsUtils.GetAttr(controller, "System.Web.Mvc", "RouteAttribute") ??
                 TypingsUtils.GetAttr(controller, "Microsoft.AspNetCore.Mvc", "RouteAttribute");
             string url = route == null ||
-#if ISSOURCEGENERATOR
-                route.ConstructorArguments.Length == 0 || route.ConstructorArguments[0].Value is not string ?
-#else
-                route.ConstructorArguments.Count == 0 || route.ConstructorArguments[0].Value is not string ? 
-#endif
-                ("Services/HasNoRoute/" + controller.Name) : (route.ConstructorArguments[0].Value as string ?? "");
+                route.ConstructorArguments()?.Count == 0 || route.ConstructorArguments()[0].Value is not string ? 
+                ("Services/HasNoRoute/" + controller.Name) : (route.ConstructorArguments()[0].Value as string ?? "");
 
             url = url.Replace("[controller]", controller.Name[..^"Controller".Length]
 #if ISSOURCEGENERATOR
@@ -930,7 +880,7 @@ namespace Serenity.CodeGeneration
                 PropertyByName = new Dictionary<string, PropertyDefinition>();
                 Attributes = new List<AttributeInfo>();
 
-                foreach (var property in annotationType.GetProperties())
+                foreach (var property in annotationType.PropertiesOf())
                     if (TypingsUtils.IsPublicInstanceProperty(property))
                         PropertyByName[property.Name] = property;
             }

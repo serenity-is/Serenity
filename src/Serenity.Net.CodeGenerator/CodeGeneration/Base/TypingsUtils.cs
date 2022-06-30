@@ -1,11 +1,22 @@
-﻿#if ISSOURCEGENERATOR
+﻿global using Serenity.Reflection;
+#if ISSOURCEGENERATOR
+global using CustomAttribute = Microsoft.CodeAnalysis.AttributeData;
+global using FieldDefinition = Microsoft.CodeAnalysis.IFieldSymbol;
+global using MethodDefinition = Microsoft.CodeAnalysis.IMethodSymbol;
+global using PropertyDefinition = Microsoft.CodeAnalysis.IPropertySymbol;
+global using TypeDefinition = Microsoft.CodeAnalysis.ITypeSymbol;
+global using TypeReference = Microsoft.CodeAnalysis.ITypeSymbol;
+global using GenericInstanceType = Microsoft.CodeAnalysis.INamedTypeSymbol;
 using Microsoft.CodeAnalysis;
-using TypeReference = Microsoft.CodeAnalysis.ITypeSymbol;
-using TypeDefinition = Microsoft.CodeAnalysis.ITypeSymbol;
-using CustomAttribute = Microsoft.CodeAnalysis.AttributeData;
-using PropertyDefinition = Microsoft.CodeAnalysis.IPropertySymbol;
 #else
-using Mono.Cecil;
+global using CustomAttribute = Mono.Cecil.CustomAttribute;
+global using FieldDefinition = Mono.Cecil.FieldDefinition;
+global using MethodDefinition = Mono.Cecil.MethodDefinition;
+global using TypeReference = Mono.Cecil.TypeReference;
+global using TypeDefinition = Mono.Cecil.TypeDefinition;
+global using ParameterDefinition = Mono.Cecil.ParameterDefinition;
+global using PropertyDefinition = Mono.Cecil.PropertyDefinition;
+global using GenericInstanceType = Mono.Cecil.GenericInstanceType;
 #endif
 using System.IO;
 
@@ -14,13 +25,13 @@ namespace Serenity.Reflection
     public static class TypingsUtils
     {
 #if ISSOURCEGENERATOR
-        public static string Namespace(this ISymbol symbol)
+        public static string NamespaceOf(this ISymbol symbol)
         {
             if (symbol.ContainingNamespace == null ||
                 string.IsNullOrEmpty(symbol.ContainingNamespace.Name))
                 return null;
 
-            string restOfResult = symbol.ContainingNamespace.Namespace();
+            string restOfResult = symbol.ContainingNamespace.NamespaceOf();
             string result = symbol.ContainingNamespace.Name;
 
             if (restOfResult != null)
@@ -29,53 +40,200 @@ namespace Serenity.Reflection
             return result;
         }
 
-        public static string FullName(this ISymbol symbol)
+        public static string FullNameOf(this ISymbol symbol)
         {
-            var ns = Namespace(symbol);
+            var ns = NamespaceOf(symbol);
             if (string.IsNullOrEmpty(ns))
                 return symbol.Name;
 
             return ns + "." + symbol.Name;
         }
 
-        public static IEnumerable<IFieldSymbol> GetFields(this ITypeSymbol type)
+        public static IEnumerable<FieldDefinition> FieldsOf(this TypeDefinition type)
         {
-            return type.GetMembers().OfType<IFieldSymbol>();
+            return type.GetMembers().OfType<FieldDefinition>();
         }
 
-        public static IEnumerable<IPropertySymbol> GetProperties(this ITypeSymbol type)
+        public static IEnumerable<PropertyDefinition> PropertiesOf(this TypeDefinition type)
         {
-            return type.GetMembers().OfType<IPropertySymbol>();
+            return type.GetMembers().OfType<PropertyDefinition>();
         }
 
-        public static IEnumerable<IMethodSymbol> GetMethods(this ITypeSymbol type)
+        public static IEnumerable<IMethodSymbol> MethodsOf(this TypeDefinition type)
         {
             return type.GetMembers().OfType<IMethodSymbol>();
         }
 
-        public static bool IsGenericInstance(this ITypeSymbol typeSymbol)
+        public static bool IsGenericInstance(this TypeDefinition typeSymbol)
         {
-            return typeSymbol is INamedTypeSymbol nt &&
+            return typeSymbol is GenericInstanceType nt &&
                 nt.IsGenericType && nt.TypeParameters.Length == 0;
         }
 
+        public static TypeDefinition Resolve(this TypeDefinition typeSymbol)
+        {
+            return typeSymbol;
+        }
+
+        public static TypeDefinition PropertyType(this PropertyDefinition prop)
+        {
+            return prop.Type;
+        }
+
+        public static TypeDefinition AttributeType(this CustomAttribute attributeData)
+        {
+            return attributeData.AttributeClass;
+        }
+
+        public static IList<TypedConstant> ConstructorArguments(this CustomAttribute attributeData)
+        {
+            return attributeData.ConstructorArguments;
+        }
+
+        public static bool IsPublic(this MethodDefinition fieldSymbol)
+        {
+            return fieldSymbol.DeclaredAccessibility == Accessibility.Public;
+        }
+
+        public static bool IsPublic(this FieldDefinition fieldSymbol)
+        {
+            return fieldSymbol.DeclaredAccessibility == Accessibility.Public;
+        }
+
+        public static bool HasConstant(this FieldDefinition fieldSymbol)
+        {
+            return fieldSymbol.HasConstantValue;
+        }
+
+        public static object Constant(this FieldDefinition fieldSymbol)
+        {
+            return fieldSymbol.ConstantValue;
+        }
+
+        public static GenericInstanceType DeclaringType(this FieldDefinition fieldSymbol)
+        {
+            return fieldSymbol.ContainingType;
+        }
+
+        public static GenericInstanceType DeclaringType(this TypeDefinition typeSymbol)
+        {
+            return typeSymbol.ContainingType;
+        }
+
+        public static bool IsConstructor(this IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.MethodKind == MethodKind.Constructor;
+        }
+
+        public static bool IsNested(this TypeDefinition typeSymbol)
+        {
+            return typeSymbol.ContainingType != null;
+        }
+
+        public static TypeDefinition FieldType(this FieldDefinition field)
+        {
+            return field.Type;
+        }
+
+        public static bool HasProperties(this CustomAttribute customAttribute)
+        {
+            return customAttribute.NamedArguments.Any();
+        }
+
+        public static IList<KeyValuePair<string, TypedConstant>> GetProperties(this CustomAttribute customAttribute)
+        {
+            return customAttribute.NamedArguments;
+        }
+
+        public static string Name(this KeyValuePair<string, TypedConstant> keyValuePair)
+        {
+            return keyValuePair.Key;
+        }
+
+        public static object ArgumentValue(this KeyValuePair<string, TypedConstant> keyValuePair)
+        {
+            return keyValuePair.Value.Kind == TypedConstantKind.Array ?
+                keyValuePair.Value.Values : keyValuePair.Value.Value;
+        }
+
+        public static bool HasCustomAttributes(this IFieldSymbol field)
+        {
+            return field.GetAttributes().Any();
+        }
+
+        public static bool HasCustomAttributes(this IPropertySymbol prop)
+        {
+            return prop.GetAttributes().Any();
+        }
+
+        public static bool IsSpecialName(this IFieldSymbol field)
+        {
+            return field.IsImplicitlyDeclared;
+        }
+
+        public static bool HasNestedTypes(this TypeReference type)
+        {
+            return type.GetTypeMembers().Any();
+        }
+
+        public static IEnumerable<TypeReference> NestedTypes(this TypeReference type)
+        {
+            return type.GetTypeMembers();
+        }
+
+        public static bool IsEnum(this TypeReference type)
+        {
+            return type.TypeKind == TypeKind.Enum;
+        }
+
+        public static bool HasConstructorArguments(this CustomAttribute attr)
+        {
+            return attr.ConstructorArguments.Any();
+        }
+
+        public static IList<TypeReference> GenericArguments(this GenericInstanceType type)
+        {
+            return type.TypeArguments;
+        }
+
+        public static bool IsPrimitive(this TypeReference type)
+        {
+            return type.SpecialType >= SpecialType.System_Boolean &&
+                type.SpecialType <= SpecialType.System_UIntPtr;
+        }
+
+        public static bool IsArray(this TypeDefinition type)
+        {
+            return type.TypeKind == TypeKind.Array;
+        }
+
+        public static TypeDefinition ElementType(this TypeDefinition type)
+        {
+            if (type is IArrayTypeSymbol ats)
+                return ats.ElementType;
+            
+            if (type is GenericInstanceType git)
+                return git.OriginalDefinition;
+
+            return null;
+        }
 #else
-        public static string Namespace(this TypeReference symbol)
+        public static string NamespaceOf(this TypeReference symbol)
         {
             return symbol.Namespace;
         }
 
-        public static string FullName(this TypeReference symbol)
+        public static string FullNameOf(this TypeReference symbol)
         {
             return symbol.FullName;
         }
 
-        public static IEnumerable<FieldDefinition> GetFields(this TypeDefinition type)
+        public static IEnumerable<FieldDefinition> FieldsOf(this TypeDefinition type)
         {
             return type.Fields;
         }
 
-        public static IEnumerable<PropertyDefinition> GetProperties(this TypeDefinition type)
+        public static IEnumerable<PropertyDefinition> PropertiesOf(this TypeDefinition type)
         {
             return type.Properties;
         }
@@ -83,6 +241,16 @@ namespace Serenity.Reflection
         public static bool IsGenericInstance(this TypeReference type)
         {
             return type.IsGenericInstance;
+        }
+
+        public static IEnumerable<CustomAttribute> GetAttributes(this FieldDefinition field)
+        {
+            return field.CustomAttributes;
+        }
+
+        public static IEnumerable<CustomAttribute> GetAttributes(this PropertyDefinition prop)
+        {
+            return prop.CustomAttributes;
         }
 
         public static IEnumerable<CustomAttribute> GetAttributes(this MethodDefinition method)
@@ -99,6 +267,151 @@ namespace Serenity.Reflection
         {
             return pd.CustomAttributes;
         }
+
+        public static bool HasCustomAttributes(this FieldDefinition field)
+        {
+            return field.HasCustomAttributes;
+        }
+
+        public static bool HasCustomAttributes(this PropertyDefinition prop)
+        {
+            return prop.HasCustomAttributes;
+        }
+
+        public static bool IsSpecialName(this FieldDefinition field)
+        {
+            return field.IsSpecialName;
+        }
+
+        public static TypeReference AttributeType(this CustomAttribute attribute)
+        {
+            return attribute.AttributeType;
+        }
+
+        public static IEnumerable<MethodDefinition> MethodsOf(this TypeDefinition type)
+        {
+            return type.Methods;
+        }
+
+        public static bool IsNested(this TypeDefinition type)
+        {
+            return type.IsNested;
+        }
+
+        public static bool IsConstructor(this MethodDefinition methodDefinition)
+        {
+            return methodDefinition.IsConstructor;
+        }
+
+        public static bool IsNested(this TypeReference typeDefinition)
+        {
+            return typeDefinition.IsNested;
+        }
+
+        public static TypeReference DeclaringType(this TypeReference typeSymbol)
+        {
+            return typeSymbol.DeclaringType;
+        }
+
+        public static TypeReference DeclaringType(this FieldDefinition field)
+        {
+            return field.DeclaringType;
+        }
+
+        public static TypeReference FieldType(this FieldDefinition field)
+        {
+            return field.FieldType;
+        }
+
+        public static bool HasProperties(this CustomAttribute customAttribute)
+        {
+            return customAttribute.HasProperties;
+        }
+
+        public static string Name(this Mono.Cecil.CustomAttributeNamedArgument n)
+        {
+            return n.Name();
+        }
+
+        public static object ArgumentValue(this Mono.Cecil.CustomAttributeNamedArgument n)
+        {
+            return n.Argument.Value;
+        }
+
+        public static TypeReference PropertyType(this Mono.Cecil.PropertyDefinition n)
+        {
+            return n.PropertyType;
+        }
+
+        public static IList<Mono.Cecil.CustomAttributeNamedArgument> GetProperties(this CustomAttribute customAttribute)
+        {
+            return customAttribute.Properties;
+        }
+
+        public static IList<Mono.Cecil.CustomAttributeArgument> ConstructorArguments(this CustomAttribute attributeData)
+        {
+            return attributeData.ConstructorArguments;
+        }
+
+        public static bool IsPublic(this MethodDefinition method)
+        {
+            return method.IsPublic;
+        }
+
+        public static bool IsPublic(this FieldDefinition fieldSymbol)
+        {
+            return fieldSymbol.IsPublic;
+        }
+
+        public static bool HasConstant(this FieldDefinition fieldSymbol)
+        {
+            return fieldSymbol.HasConstant;
+        }
+
+        public static object Constant(this FieldDefinition fieldSymbol)
+        {
+            return fieldSymbol.Constant;
+        }
+
+        public static bool HasNestedTypes(this TypeDefinition type)
+        {
+            return type.HasNestedTypes;
+        }
+
+        public static IEnumerable<TypeDefinition> NestedTypes(this TypeDefinition type)
+        {
+            return type.NestedTypes;
+        }
+
+        public static bool IsEnum(this TypeDefinition type)
+        {
+            return type.IsEnum;
+        }
+
+        public static bool HasConstructorArguments(this CustomAttribute attr)
+        {
+            return attr.HasConstructorArguments;
+        }
+
+        public static IList<TypeReference> GenericArguments(this GenericInstanceType type)
+        {
+            return type.GenericArguments;
+        }
+
+        public static bool IsPrimitive(this TypeReference type)
+        {
+            return type.IsPrimitive;
+        }
+
+        public static bool IsArray(this TypeReference type)
+        {
+            return type.IsArray;
+        }
+
+        public static TypeReference ElementType(this TypeReference type)
+        {
+            return type.GetElementType();
+        }
 #endif
 
         public static bool IsOrSubClassOf(TypeReference childTypeDef, string ns, string name)
@@ -109,12 +422,12 @@ namespace Serenity.Reflection
         private static TypeReference FindIsOrSubClassOf(TypeReference typeRef, string ns, string name)
         {
             if (typeRef.Name == name &&
-                typeRef.Namespace() == ns)
+                typeRef.NamespaceOf() == ns)
                 return typeRef;
 
             return EnumerateBaseClasses(typeRef)
                 .FirstOrDefault(b => b.Name == name &&
-                    b.Namespace() == ns);
+                    b.NamespaceOf() == ns);
         }
 
         public static bool IsVoid(TypeReference type)
@@ -122,20 +435,21 @@ namespace Serenity.Reflection
 #if ISSOURCEGENERATOR
             return type.SpecialType == SpecialType.System_Void;
 #else
-            while (type is OptionalModifierType || type is RequiredModifierType)
-                type = ((TypeSpecification)type).ElementType;
-            return type.MetadataType == MetadataType.Void;
+            while (type is Mono.Cecil.OptionalModifierType || 
+                type is Mono.Cecil.RequiredModifierType)
+                type = ((Mono.Cecil.TypeSpecification)type).ElementType;
+            return type.MetadataType == Mono.Cecil.MetadataType.Void;
 #endif
         }
 
         public static TypeReference FindIsOrSubClassOf(TypeReference typeRef, TypeReference[] baseClasses, string ns, string name)
         {
             if (typeRef.Name == name &&
-                typeRef.Namespace() == ns)
+                typeRef.NamespaceOf() == ns)
                 return typeRef;
 
             return baseClasses.FirstOrDefault(b => b.Name == name &&
-                b.Namespace() == ns);
+                b.NamespaceOf() == ns);
         }
 
         public static bool Contains(TypeReference[] classes, string ns, string name)
@@ -147,7 +461,7 @@ namespace Serenity.Reflection
         {
             foreach (var x in classes)
                 if (x.Name == name &&
-                    x.Namespace() == ns)
+                    x.NamespaceOf() == ns)
                     return x;
 
             return null;
@@ -167,9 +481,9 @@ namespace Serenity.Reflection
 #if !ISSOURCEGENERATOR
         public static (string, string) GetCacheKey(TypeReference type)
         {
-            if (type.Scope is ModuleDefinition md)
+            if (type.Scope is Mono.Cecil.ModuleDefinition md)
                 return (type.FullName, md.Assembly.Name.FullName);
-            else if (type.Scope is AssemblyNameReference asm)
+            else if (type.Scope is Mono.Cecil.AssemblyNameReference asm)
                 return (type.FullName, asm.FullName);
             else
                 return (type.FullName, type.Scope.Name);
@@ -212,19 +526,19 @@ namespace Serenity.Reflection
         public static bool IsSubclassOf(TypeReference type, string ns, string name)
         {
             if (type.Name == name &&
-                type.Namespace() == ns)
+                type.NamespaceOf() == ns)
                 return false;
 
             return EnumerateBaseClasses(type).Any(b => 
                 b.Name == name &&
-                b.Namespace() == ns);
+                b.NamespaceOf() == ns);
         }
 
 #if !ISSOURCEGENERATOR
-        public static AssemblyDefinition[] ToDefinitions(IEnumerable<string> assemblyLocations)
+        public static Mono.Cecil.AssemblyDefinition[] ToDefinitions(IEnumerable<string> assemblyLocations)
         {
             if (assemblyLocations == null || !assemblyLocations.Any())
-                return System.Array.Empty<AssemblyDefinition>();
+                return System.Array.Empty<Mono.Cecil.AssemblyDefinition>();
 
             assemblyLocations = assemblyLocations.Select(x =>
             {
@@ -263,10 +577,10 @@ namespace Serenity.Reflection
             foreach (var assembly in assemblyLocations)
                 resolver.AddSearchDirectory(Path.GetDirectoryName(assembly));
 
-            var assemblyDefinitions = new List<AssemblyDefinition>();
+            var assemblyDefinitions = new List<Mono.Cecil.AssemblyDefinition>();
             foreach (var assembly in assemblyLocations)
-                assemblyDefinitions.Add(AssemblyDefinition.ReadAssembly(
-                    assembly, new ReaderParameters
+                assemblyDefinitions.Add(Mono.Cecil.AssemblyDefinition.ReadAssembly(
+                    assembly, new Mono.Cecil.ReaderParameters
                     {
                         AssemblyResolver = resolver,
                         InMemory = true,
@@ -355,7 +669,7 @@ namespace Serenity.Reflection
         public static bool IsAssignableFrom(TypeReference baseType, TypeReference type)
         {
 #if ISSOURCEGENERATOR
-            return IsAssignableFrom(baseType.FullName(), type);
+            return IsAssignableFrom(baseType.FullNameOf(), type);
 #else
             return IsAssignableFrom(baseType.FullName, type.Resolve());
 #endif
@@ -370,7 +684,7 @@ namespace Serenity.Reflection
             {
                 var current = queue.Dequeue();
 
-                if (baseTypeFullName == current.FullName())
+                if (baseTypeFullName == current.FullNameOf())
                     return true;
 
                 if (current.BaseType != null)
@@ -422,7 +736,7 @@ namespace Serenity.Reflection
         public static TypeReference GetNullableUnderlyingType(TypeReference type)
         {
 #if ISSOURCEGENERATOR
-            if (type is INamedTypeSymbol namedType &&
+            if (type is GenericInstanceType namedType &&
                 namedType.IsGenericType &&
                 namedType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
             {
