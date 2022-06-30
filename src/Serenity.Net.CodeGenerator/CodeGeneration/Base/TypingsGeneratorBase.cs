@@ -24,6 +24,8 @@ namespace Serenity.CodeGeneration
         {
             Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
             this.cancellationToken = cancellationToken;
+            generatedTypes = new HashSet<string>();
+            annotationTypes = new List<AnnotationTypeInfo>();
         }
 
         public Compilation Compilation { get; }
@@ -194,7 +196,9 @@ namespace Serenity.CodeGeneration
 #if ISSOURCEGENERATOR
             var types = Compilation.GetSymbolsWithName(s => true, SymbolFilter.Type).OfType<ITypeSymbol>();
 
-            foreach (var expType in new ExportedTypesCollector(cancellationToken).GetPublicTypes())
+            var collector = new ExportedTypesCollector(cancellationToken);
+            collector.VisitNamespace(Compilation.GlobalNamespace);
+            foreach (var expType in collector.GetPublicTypes())
                 ScanAnnotationTypeAttributes(expType);
 #else
             foreach (var assembly in Assemblies)

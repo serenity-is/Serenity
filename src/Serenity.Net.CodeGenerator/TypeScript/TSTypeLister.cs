@@ -1,9 +1,9 @@
-﻿using Serenity.CodeGeneration;
-using System.Linq;
-using Serenity.IO;
+﻿using Serenity.IO;
+using System.Threading;
 #if ISSOURCEGENERATOR
 using Newtonsoft.Json;
 #else
+using Serenity.CodeGeneration;
 using System.Text.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 #endif
@@ -13,11 +13,14 @@ namespace Serenity.CodeGenerator
     public class TSTypeLister
     {
         private readonly IGeneratorFileSystem fileSystem;
+        private readonly CancellationToken cancellationToken;
         private readonly string projectDir;
 
-        public TSTypeLister(IGeneratorFileSystem fileSystem, string projectDir)
+        public TSTypeLister(IGeneratorFileSystem fileSystem, string projectDir,
+            CancellationToken cancellationToken = default)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            this.cancellationToken = cancellationToken;
             this.projectDir = fileSystem.GetFullPath(projectDir);
         }
 
@@ -39,6 +42,8 @@ namespace Serenity.CodeGenerator
         {
             var tsconfig = System.IO.Path.Combine(projectDir, "tsconfig.json");
             IEnumerable<string> files = null;
+            cancellationToken.ThrowIfCancellationRequested();
+            
             if (fileSystem.FileExists(tsconfig))
             {
 #if ISSOURCEGENERATOR
@@ -84,12 +89,16 @@ namespace Serenity.CodeGenerator
                                 .Where(typing => fileSystem.FileExists(typing)))
                         .ToList();
 
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     var includePatterns = cfg.Include
                         .Select(x => PathHelper.ToUrl(x))
                         .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
                         .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
                             (x.StartsWith("/", StringComparison.Ordinal) ? x[1..] : x))
                         .Select(x => PathHelper.ToPath(x));
+
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     var excludePatterns = (cfg.Exclude ?? Array.Empty<string>())
                         .Select(x => PathHelper.ToUrl(x))
@@ -98,12 +107,16 @@ namespace Serenity.CodeGenerator
                             (x.StartsWith("/", StringComparison.Ordinal) ? x[1..] : x))
                         .Select(x => PathHelper.ToPath(x));
 
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     files = files.Concat(cfg.Include.Select(x => PathHelper.ToUrl(x))
                         .Where(x => x.StartsWith("../", StringComparison.Ordinal) &&
                         !x.Contains('*', StringComparison.Ordinal))
                         .Select(x => System.IO.Path.Combine(projectDir, x))
                         .Select(x => PathHelper.ToPath(x))
                         .Where(x => fileSystem.FileExists(x)));
+
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     var includeGlob = new GlobFilter(includePatterns);
                     var excludeGlob = new GlobFilter(excludePatterns);
@@ -115,6 +128,8 @@ namespace Serenity.CodeGenerator
                     files = files.Concat(allTsFiles.Where(x => includePatterns.Any() &&
                         includeGlob.IsMatch(x[(projectDir.Length + 1)..]) &&
                         (!excludePatterns.Any() || !excludeGlob.IsMatch(x[(projectDir.Length + 1)..]))));
+
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     files = files.Distinct();
                 }
@@ -130,11 +145,15 @@ namespace Serenity.CodeGenerator
                     System.IO.Path.Combine(projectDir, @"wwwroot", "Scripts", "serenity")
                 }.Where(x => fileSystem.DirectoryExists(x));
 
+                cancellationToken.ThrowIfCancellationRequested();
+
                 files = directories.SelectMany(x =>
                     fileSystem.GetFiles(x, "*.ts", System.IO.SearchOption.AllDirectories))
                     .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
                         System.IO.Path.GetFileName(x).StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase) ||
                         System.IO.Path.GetFileName(x).StartsWith("Serenity-", StringComparison.OrdinalIgnoreCase));
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 var corelib = files.Where(x => string.Equals(System.IO.Path.GetFileName(x),
                     "Serenity.CoreLib.d.ts", StringComparison.OrdinalIgnoreCase));
@@ -152,7 +171,7 @@ namespace Serenity.CodeGenerator
                 files = files.OrderBy(x => x);
             }
 
-            TSTypeListerAST typeListerAST = new(fileSystem);
+            TSTypeListerAST typeListerAST = new(fileSystem, cancellationToken);
             foreach (var file in files)
                 typeListerAST.AddInputFile(file);
 

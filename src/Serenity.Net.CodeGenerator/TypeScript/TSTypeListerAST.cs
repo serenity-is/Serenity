@@ -1,6 +1,7 @@
-﻿using Serenity.TypeScript;
+﻿using Serenity.CodeGeneration;
+using Serenity.TypeScript;
 using Serenity.TypeScript.TsTypes;
-using Serenity.CodeGeneration;
+using System.Threading;
 
 namespace Serenity.CodeGenerator
 {
@@ -9,10 +10,13 @@ namespace Serenity.CodeGenerator
         private readonly List<string> fileNames = new();
         private readonly HashSet<string> exportedTypeNames = new();
         private readonly IGeneratorFileSystem fileSystem;
+        private readonly CancellationToken cancellationToken;
 
-        public TSTypeListerAST(IGeneratorFileSystem fileSystem)
+        public TSTypeListerAST(IGeneratorFileSystem fileSystem,
+            CancellationToken cancellationToken = default)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            this.cancellationToken = cancellationToken;
         }
 
         public void AddInputFile(string path)
@@ -682,6 +686,7 @@ namespace Serenity.CodeGenerator
             exportedTypeNames.Clear();
             foreach (var hashset in sourceFiles.AsParallel().Select(sourceFile =>
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var hashset = new HashSet<string>();
                 ExtractExportedTypeNames(sourceFile, hashset);
                 return hashset;
@@ -696,6 +701,7 @@ namespace Serenity.CodeGenerator
 
             foreach (var types in sourceFiles.AsParallel().Select(sourceFile =>
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 return ExtractTypes(sourceFile);
             }).ToArray())
             {

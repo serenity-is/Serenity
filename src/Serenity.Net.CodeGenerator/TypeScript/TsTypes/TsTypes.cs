@@ -2809,10 +2809,6 @@ namespace Serenity.TypeScript.TsTypes
     {
     }
 
-    public class CancellationToken
-    {
-    }
-
     public class Program : ScriptReferenceHost
     {
         public bool StructureIsReused { get; set; }

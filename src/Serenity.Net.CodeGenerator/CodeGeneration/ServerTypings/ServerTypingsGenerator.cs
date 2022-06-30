@@ -6,7 +6,7 @@
         public readonly HashSet<string> LocalTextFilters = new();
 
 #if ISSOURCEGENERATOR
-        protected ServerTypingsGenerator(Microsoft.CodeAnalysis.Compilation compilation, 
+        public ServerTypingsGenerator(Microsoft.CodeAnalysis.Compilation compilation, 
             System.Threading.CancellationToken cancellationToken)
             : base(compilation, cancellationToken)
         {
