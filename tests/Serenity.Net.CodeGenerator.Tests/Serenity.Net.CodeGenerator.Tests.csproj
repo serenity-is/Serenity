@@ -4,4 +4,7 @@
 	  <ProjectReference Include="..\..\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
     <ProjectReference Include="..\Serenity.Net.Core.Tests\Serenity.Net.Core.Tests.csproj" />
   </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CSharpMinifier" Version="1.2.1" />
+	</ItemGroup>
 </Project>

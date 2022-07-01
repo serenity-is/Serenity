@@ -8,139 +8,99 @@ namespace Serenity.Tests.CodeGenerator
 {
     public partial class ServerTypingsGeneratorTests
     {
-        public string GetInsideOfTheNextScope(string code, int index = 0)
+        private static string NormalizeCSharp(string input)
         {
-            code = code.Substring(index);
-
-            if(code.Contains("{") == false) return "";
-
-            var startIndex = code.IndexOf("{");
-            var endIndex = code.Length;
-
-            var stack = new Stack<int>();
-            stack.Push(startIndex);
-            var searchIndex = startIndex + 1;
-
-            while(stack.Count > 0 && searchIndex < code.Length)
-            {
-                var current = code[searchIndex];
-                if(current == '{')
-                {
-                    stack.Push(searchIndex);
-                }
-                else if (current == '}')
-                {
-                    stack.Pop();
-                    if(stack.Count == 0)
-                    {
-                        endIndex = searchIndex + 1 ; 
-                    }
-                }
-                searchIndex++;
-            }
-
-            return code.Substring(startIndex, endIndex - startIndex);
+            var result = string.Join("", CSharpMinifier.Minifier.Minify(
+                input.Replace("\r", "").Replace("\n", ""),
+                CSharpMinifier.MinificationOptions.Default)).Replace("\r", "").Replace("\n", "");
+            return result;
         }
 
-        [Fact]
-        public void PermissionKeys_WithDepth1()
+        private static string NormalizeTS(string input)
+        {
+            return NormalizeCSharp(input);
+        }
+
+        [Theory]
+        [InlineData(typeof(PermissionKeysSample1Depth1), new string[]
+        {
+            nameof(PermissionKeysSample1Depth1),
+            nameof(PermissionKeysSample1Depth1.Security),
+            PermissionKeysSample1Depth1.Security,
+        })]
+        [InlineData(typeof(PermissionKeysSample2Depth1),new string[]
+        {
+            nameof(PermissionKeysSample2Depth1),
+            nameof(PermissionKeysSample2Depth1.Security),
+            PermissionKeysSample2Depth1.Security,
+            nameof(PermissionKeysSample2Depth1.PermissionKeysSample2Depth2),
+            nameof(PermissionKeysSample2Depth1.PermissionKeysSample2Depth2.Security),
+            PermissionKeysSample2Depth1.PermissionKeysSample2Depth2.Security,
+        })]
+        [InlineData(typeof(PermissionKeysSample3Depth1), new string[]
+        {
+            nameof(PermissionKeysSample3Depth1),
+            nameof(PermissionKeysSample3Depth1.Security),
+            PermissionKeysSample3Depth1.Security,
+            nameof(PermissionKeysSample3Depth1.PermissionKeysSample3Depth2),
+            nameof(PermissionKeysSample3Depth1.PermissionKeysSample3Depth2.Security),
+            PermissionKeysSample3Depth1.PermissionKeysSample3Depth2.Security,
+            nameof(PermissionKeysSample3Depth1.PermissionKeysSample3Depth2.PermissionKeysSample3Depth3),
+            nameof(PermissionKeysSample3Depth1.PermissionKeysSample3Depth2.PermissionKeysSample3Depth3.Security),
+            PermissionKeysSample3Depth1.PermissionKeysSample3Depth2.PermissionKeysSample3Depth3.Security,
+        })]
+
+        public void TestPermissionKeys(Type classType, string[] stringsToSearch)
         {
             var generator = CreateGenerator();
             var result = generator.Run();
-
-            var classType = typeof(PermissionKeysDepth1);
-            var classProperties = classType.GetFields(BindingFlags.Public | BindingFlags.Static)
-                .Where(x => x.DeclaringType == classType) // dont get inherited properties
-                .Where(x => x.IsLiteral); // only get const properties
 
             Assert.Contains($"Tests.CodeGenerator.{classType.Name}.ts", result.Keys);
 
             var code = result[$"Tests.CodeGenerator.{classType.Name}.ts"];
 
-            Assert.Contains($"namespace {classType.Name}", code);
-            
-            var index = code.IndexOf($"namespace {classType.Name}");
+            code = NormalizeTS(code);
 
-            foreach (var property in classProperties)
+            foreach (var item in stringsToSearch)
             {
-                Assert.Contains($"const {property.Name} = \"{property.GetRawConstantValue()}\";",code);
+                Assert.Contains(item, code);
+                code = code.Substring(code.IndexOf(item) + item.Length);
             }
         }
-
-        [Fact]
-        public void PermissionKeys_WithDepth2()
-        {
-            var generator = CreateGenerator();
-            var result = generator.Run();
-
-            var classType = typeof(PermissionKeysDepth2);
-            var classProperties = classType.GetFields(BindingFlags.Public | BindingFlags.Static)
-                .Where(x => x.DeclaringType == classType) // dont get inherited properties
-                .Where(x => x.IsLiteral); // only get const properties
-
-            Assert.Contains($"Tests.CodeGenerator.{classType.Name}.ts", result.Keys);
-
-            var code = result[$"Tests.CodeGenerator.{classType.Name}.ts"];
-
-            Assert.Contains($"namespace {classType.Name}", code);
-
-            var index = code.IndexOf($"namespace {classType.Name}");
-
-            foreach (var property in classProperties)
-            {
-                Assert.Contains($"const {property.Name} = \"{property.GetRawConstantValue()}\";", code);
-            }
-
-            var insideOfDepth2 = GetInsideOfTheNextScope(code, index);
-
-            var childClassType = typeof(PermissionKeysDepth2.PermissionKeysChild1);
-            var childClassProperties = childClassType.GetFields(BindingFlags.Public | BindingFlags.Static)
-                .Where(x => x.DeclaringType == classType) // dont get inherited properties
-                .Where(x => x.IsLiteral); // only get const properties
-
-            Assert.Contains($"namespace {childClassType.Name}", insideOfDepth2);
-
-            var insideOfChild = GetInsideOfTheNextScope(insideOfDepth2, insideOfDepth2.IndexOf($"namespace {childClassType.Name}"));
-
-            foreach (var property in childClassProperties)
-            {
-                Assert.Contains($"const {property.Name} = \"{property.GetRawConstantValue()}\";", insideOfChild);
-            }
-        }
-
-
+    }
+    [NestedPermissionKeys]
+    public class PermissionKeysSample1Depth1
+    {
+        public const string Security = "Administration:Security";
     }
 
     [NestedPermissionKeys]
-    [DisplayName("Administration")]
-    public class PermissionKeysDepth1
+    public class PermissionKeysSample2Depth1
     {
-        [Description("User, Role Management and Permissions")]
         public const string Security = "Administration:Security";
 
-        [Description("Languages and Translations")]
-        public const string Translation = "Administration:Translation";
+        public class PermissionKeysSample2Depth2
+        {
+            public const string Security = "Administration:Security";
+        }
     }
 
     [NestedPermissionKeys]
-    [DisplayName("Administration")]
-    public class PermissionKeysDepth2
+    public class PermissionKeysSample3Depth1
     {
-        [Description("User, Role Management and Permissions")]
         public const string Security = "Administration:Security";
 
-        [Description("Languages and Translations")]
-        public const string Translation = "Administration:Translation";
-
-        public class PermissionKeysChild1
+        public class PermissionKeysSample3Depth2
         {
-            [Description("User, Role Management and Permissions")]
-            public const string Security = "Administration:Security:2";
+            public const string Security = "Administration:Security";
 
-            [Description("Languages and Translations")]
-            public const string Translation = "Administration:Translation:2";
+            public class PermissionKeysSample3Depth3
+            {
+                public const string Security = "Administration:Security";
+            }
         }
     }
+
 }
 
 
