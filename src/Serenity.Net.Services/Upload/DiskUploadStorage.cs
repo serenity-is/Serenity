@@ -5,7 +5,7 @@ namespace Serenity.Web
 {
     public class DiskUploadStorage : IUploadStorage
     {
-        private readonly IDiskUploadFileSystem fileSystem;
+        protected readonly IDiskUploadFileSystem FileSystem;
         public string RootPath { get; private set; }
         public string RootUrl { get; private set; }
         
@@ -29,7 +29,7 @@ namespace Serenity.Web
         public DiskUploadStorage(DiskUploadStorageOptions options,
             IDiskUploadFileSystem fileSystem) : this(options)
         {
-            this.fileSystem = fileSystem ?? new PhysicalDiskUploadFileSystem();
+            this.FileSystem = fileSystem ?? new PhysicalDiskUploadFileSystem();
         }
 
         protected string FilePath(string path)
@@ -55,7 +55,7 @@ namespace Serenity.Web
 
         public bool FileExists(string path)
         {
-            return fileSystem.FileExists(FilePath(path)) && !IsInternalFile(path);
+            return FileSystem.FileExists(FilePath(path)) && !IsInternalFile(path);
         }
 
         public virtual IDictionary<string, string> GetFileMetadata(string path)
@@ -68,9 +68,9 @@ namespace Serenity.Web
 
             var filePath = FilePath(path);
             var metaFile = filePath + ".meta";
-            if (fileSystem.FileExists(metaFile))
+            if (FileSystem.FileExists(metaFile))
             {
-                var json = fileSystem.ReadAllText(metaFile);
+                var json = FileSystem.ReadAllText(metaFile);
                 if (!string.IsNullOrEmpty(json) &&
                     json[0] == '{' &&
                     json[^1] == '}')
@@ -98,13 +98,13 @@ namespace Serenity.Web
 
             if (overwriteAll && metadata.Count == 0)
             {
-                if (fileSystem.FileExists(metaFile))
-                    fileSystem.TryDeleteOrMark(metaFile);
+                if (FileSystem.FileExists(metaFile))
+                    FileSystem.TryDeleteOrMark(metaFile);
             }
             else if (metadata.Count == 0)
                 return;
             
-            if (!overwriteAll && fileSystem.FileExists(metaFile))
+            if (!overwriteAll && FileSystem.FileExists(metaFile))
             {
                 var existing = GetFileMetadata(path);
                 foreach (var x in metadata)
@@ -112,7 +112,7 @@ namespace Serenity.Web
                 metadata = existing;
             }
 
-            fileSystem.WriteAllText(metaFile, JSON.StringifyIndented(metadata));
+            FileSystem.WriteAllText(metaFile, JSON.StringifyIndented(metadata));
         }
 
         public string CopyFrom(IUploadStorage store, string sourcePath, string targetPath, bool? autoRename)
@@ -153,7 +153,7 @@ namespace Serenity.Web
             catch
             {
                 foreach (var newFile in newFiles)
-                    fileSystem.TryDeleteOrMark(FilePath(newFile));
+                    FileSystem.TryDeleteOrMark(FilePath(newFile));
                 throw;
             }
         }
@@ -183,20 +183,20 @@ namespace Serenity.Web
             var fileName = PathHelper.SecureCombine(RootPath, PathHelper.ToPath(path));
 
             var folder = Path.GetDirectoryName(fileName);
-            fileSystem.TryDeleteMarkedFiles(folder);
+            FileSystem.TryDeleteMarkedFiles(folder);
 
-            fileSystem.Delete(fileName, DeleteType.TryDeleteOrMark);
+            FileSystem.Delete(fileName, DeleteType.TryDeleteOrMark);
 
             string sourcePath = Path.GetDirectoryName(fileName);
             string sourceBase = Path.GetFileNameWithoutExtension(fileName);
 
-            foreach (var f in fileSystem.DirectoryGetFiles(sourcePath,
+            foreach (var f in FileSystem.DirectoryGetFiles(sourcePath,
                 sourceBase + "_t*.jpg", SearchOption.AllDirectories))
             {
-                fileSystem.Delete(f, DeleteType.TryDeleteOrMark);
+                FileSystem.Delete(f, DeleteType.TryDeleteOrMark);
             }
 
-            fileSystem.Delete(fileName + ".meta", DeleteType.TryDeleteOrMark);
+            FileSystem.Delete(fileName + ".meta", DeleteType.TryDeleteOrMark);
         }
 
         public long GetFileSize(string path)
@@ -207,12 +207,12 @@ namespace Serenity.Web
             if (IsInternalFile(path))
                 throw new ArgumentOutOfRangeException(nameof(path));
 
-            return fileSystem.GetFileSize(path);
+            return FileSystem.GetFileSize(path);
         }
 
         public string[] GetFiles(string path, string searchPattern)
         {
-            return fileSystem.DirectoryGetFiles(FilePath(path), searchPattern, SearchOption.AllDirectories)
+            return FileSystem.DirectoryGetFiles(FilePath(path), searchPattern, SearchOption.AllDirectories)
                 .Where(x => !IsInternalFile(x))
                 .Select(x => Path.GetRelativePath(RootPath, x))
                 .ToArray();
@@ -220,7 +220,7 @@ namespace Serenity.Web
 
         public System.IO.Stream OpenFile(string path)
         {
-            return fileSystem.FileOpenRead(FilePath(path));
+            return FileSystem.FileOpenRead(FilePath(path));
         }
 
         public virtual void PurgeTemporaryFiles()
@@ -237,7 +237,7 @@ namespace Serenity.Web
 
             var targetFile = FilePath(path);
 
-            if (fileSystem.FileExists(targetFile))
+            if (FileSystem.FileExists(targetFile))
             {
                 if (autoRename == false)
                     throw new IOException($"Target file {path} exists in storage {GetType().FullName}");
@@ -247,10 +247,10 @@ namespace Serenity.Web
             }
 
             var targetDir = Path.GetDirectoryName(targetFile);
-            if (!fileSystem.DirectoryExists(targetDir))
-                fileSystem.CreateDirectory(targetDir);
+            if (!FileSystem.DirectoryExists(targetDir))
+                FileSystem.CreateDirectory(targetDir);
 
-            fileSystem.CopyFile(source, targetFile, true);
+            FileSystem.CopyFile(source, targetFile, true);
 
             return path;
         }

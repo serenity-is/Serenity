@@ -9,8 +9,8 @@ public interface IDiskUploadFileSystem
     void CopyFile(System.IO.Stream sourceStream, string destPath, bool overwrite);
     void CreateDirectory(string path);
     void TryDeleteMarkedFiles(string folderPath);
-    void Delete(string metaFilePath, DeleteType deleteType);
-    void TryDeleteOrMark(string metaFilePath);
+    void Delete(string path, DeleteType deleteType);
+    void TryDeleteOrMark(string path);
     string ReadAllText(string path);
     void WriteAllText(string path, string content);
     string[] DirectoryGetFiles(string path, string searchPattern, System.IO.SearchOption searchOption);

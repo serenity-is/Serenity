@@ -34,14 +34,14 @@ public class PhysicalDiskUploadFileSystem : IDiskUploadFileSystem
         TemporaryFileHelper.TryDeleteMarkedFiles(folderPath);
     }
 
-    public void Delete(string metaFilePath, DeleteType deleteType)
+    public void Delete(string path, DeleteType deleteType)
     {
-        TemporaryFileHelper.Delete(metaFilePath, deleteType);
+        TemporaryFileHelper.Delete(path, deleteType);
     }
 
-    public void TryDeleteOrMark(string metaFilePath)
+    public void TryDeleteOrMark(string path)
     {
-        TemporaryFileHelper.TryDeleteOrMark(metaFilePath);
+        TemporaryFileHelper.TryDeleteOrMark(path);
     }
 
     public string ReadAllText(string path)
