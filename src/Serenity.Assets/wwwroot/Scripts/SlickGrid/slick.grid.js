@@ -2760,7 +2760,7 @@ if (typeof Slick === "undefined") {
 
                 columnIdx = columnIdx | 0;
                 var m = columns[columnIdx],
-                    node = cacheEntry.cellNodesByColumnIdx[columnIdx][0];
+                    node = cacheEntry.cellNodesByColumnIdx[columnIdx];
 
                 if (row === activeRow && columnIdx === activeCell && currentEditor) {
                     currentEditor.loadValue(d);
@@ -3078,17 +3078,16 @@ if (typeof Slick === "undefined") {
             var cacheEntry = rowsCache[row];
             if (cacheEntry) {
                 if (cacheEntry.cellRenderQueue.length) {
-                    var $lastNode = cacheEntry.rowNode.children().last();
+                    var lastChild = cacheEntry.rowNode.children().last()[0];
                     while (cacheEntry.cellRenderQueue.length) {
                         var columnIdx = cacheEntry.cellRenderQueue.pop();
 
-                        cacheEntry.cellNodesByColumnIdx[columnIdx] = $lastNode;
-                        $lastNode = $lastNode.prev();
+                        cacheEntry.cellNodesByColumnIdx[columnIdx] = lastChild;
+                        lastChild = lastChild.previousSibling;
 
                         // Hack to retrieve the frozen columns because
-                        if ($lastNode.length == 0) {
-                            $lastNode = $(cacheEntry.rowNode[0]).children().last();
-                        }
+                        if (lastChild == null)
+                            lastChild = cacheEntry.rowNode.children().last()[0];
                     }
                 }
             }
@@ -3134,7 +3133,7 @@ if (typeof Slick === "undefined") {
             var cellToRemove, node;
             postProcessgroupId++;
             while ((cellToRemove = cellsToRemove.pop()) != null) {
-                node = cacheEntry.cellNodesByColumnIdx[cellToRemove][0];
+                node = cacheEntry.cellNodesByColumnIdx[cellToRemove];
 
                 if (options.enableAsyncPostRenderCleanup && postProcessedRows[row] && postProcessedRows[row][cellToRemove]) {
                     queuePostProcessedCellForCleanup(node, cellToRemove, row);
@@ -3223,20 +3222,20 @@ if (typeof Slick === "undefined") {
             x.innerHTML = stringArray.join("");
 
             var processedRow;
-            var $node;
+            var node;
             while ((processedRow = processedRows.pop()) != null) {
                 cacheEntry = rowsCache[processedRow];
                 var columnIdx;
                 while ((columnIdx = cacheEntry.cellRenderQueue.pop()) != null) {
-                    $node = $(x).children().last();
+                    node = x.lastChild;
 
                     if (hasFrozenColumns() && (columnIdx > options.frozenColumn)) {
-                        $(cacheEntry.rowNode[1]).append($node);
+                        cacheEntry.rowNode[1].appendChild(node);
                     } else {
-                        $(cacheEntry.rowNode[0]).append($node);
+                        cacheEntry.rowNode[0].appendChild(node);
                     }
 
-                    cacheEntry.cellNodesByColumnIdx[columnIdx] = $node;
+                    cacheEntry.cellNodesByColumnIdx[columnIdx] = node;
                 }
             }
         }
