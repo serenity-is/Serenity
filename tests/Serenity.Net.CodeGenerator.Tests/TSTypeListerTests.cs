@@ -8,8 +8,8 @@ namespace Serenity.Tests.CodeGenerator
         [Fact]
         public void Resolves_Type_Refs_In_Same_Namespace_Same_File()
         {
-            var fileSystem = new MockFileSystem();
-            fileSystem.AddFile("a.d.ts", @"
+            var fileSystem = new MockGeneratorFileSystem();
+            fileSystem.WriteAllText("a.d.ts", @"
 declare namespace jsPDF {
     interface AutoTableOptions {
         styles?: AutoTableStyles;
@@ -25,7 +25,7 @@ declare namespace jsPDF {
         cellPadding?: number;
     }
 }");
-            var tl = new TSTypeListerAST(new AbstractedFileSystem(fileSystem));
+            var tl = new TSTypeListerAST(fileSystem);
             tl.AddInputFile("a.d.ts");
 
             var types = tl.ExtractTypes();
@@ -41,8 +41,8 @@ declare namespace jsPDF {
         [Fact]
         public void Resolve_Same_Namespace_In_One_File_Multiple()
         {
-            var fileSystem = new MockFileSystem();
-            fileSystem.AddFile("a.d.ts", @"
+            var fileSystem = new MockGeneratorFileSystem();
+            fileSystem.WriteAllText("a.d.ts", @"
 declare namespace Serenity.Extensions {
     interface ExcelImportRequest extends Serenity.ServiceRequest {
         FileName?: string;
@@ -56,7 +56,7 @@ declare namespace Serenity.Extensions {
     }
 }");
 
-            var tl = new TSTypeListerAST(new AbstractedFileSystem(fileSystem));
+            var tl = new TSTypeListerAST(fileSystem);
             tl.AddInputFile("a.d.ts");
 
             var types = tl.ExtractTypes();
@@ -67,8 +67,8 @@ declare namespace Serenity.Extensions {
         [Fact]
         public void BodySkipTest()
         {
-            var fileSystem = new MockFileSystem();
-            fileSystem.AddFile("a.ts", @"namespace A {
+            var fileSystem = new MockGeneratorFileSystem();
+            fileSystem.WriteAllText("a.ts", @"namespace A {
 
     @Serenity.Decorators.registerEditor()
     export class B extends C {
@@ -100,7 +100,7 @@ declare namespace Serenity.Extensions {
     }
 }");
 
-            var tl = new TSTypeListerAST(new AbstractedFileSystem(fileSystem));
+            var tl = new TSTypeListerAST(fileSystem);
             tl.AddInputFile("a.ts");
 
             var types = tl.ExtractTypes();
@@ -111,8 +111,8 @@ declare namespace Serenity.Extensions {
         [Fact]
         public void DecoratorsReferenceTest()
         {
-            var fileSystem = new MockFileSystem();
-            fileSystem.AddFile("a.ts", @"
+            var fileSystem = new MockGeneratorFileSystem();
+            fileSystem.WriteAllText("a.ts", @"
 declare namespace Serenity {
     export class Widget {
     }
@@ -130,7 +130,7 @@ namespace Serenity.Sub {
     }
 }");
 
-            var tl = new TSTypeListerAST(new AbstractedFileSystem(fileSystem));
+            var tl = new TSTypeListerAST(fileSystem);
             tl.AddInputFile("a.ts");
 
             var types = tl.ExtractTypes();

@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Serenity.IO
+﻿namespace Serenity.IO
 {
     /// <summary>
     /// A fast glob implementation, compatible with .gitignore patterns of GIT
@@ -184,10 +182,10 @@ namespace Serenity.IO
                             containsAndEndsWith = new List<Tuple<string, bool, string>>();
 
                         startsWithAndEndsWith.Add(new Tuple<string, bool, string>(
-                            s.Substring(0, starDotIndex - 3), true, s[(starDotIndex + 1)..]));
+                            s[..(starDotIndex - 3)], true, s[(starDotIndex + 1)..]));
 
                         containsAndEndsWith.Add(new Tuple<string, bool, string>(
-                            sep.ToString() + s.Substring(0, starDotIndex - 3), true, s[(starDotIndex + 1)..]));
+                            sep.ToString() + s[..(starDotIndex - 3)], true, s[(starDotIndex + 1)..]));
                     }
 
                     continue;
@@ -272,7 +270,7 @@ namespace Serenity.IO
 
             if (extensions != null)
             {
-                var extension = Path.GetExtension(path);
+                var extension = System.IO.Path.GetExtension(path);
                 if (extension != null &&
                     extensions.Contains(extension))
                     return true;

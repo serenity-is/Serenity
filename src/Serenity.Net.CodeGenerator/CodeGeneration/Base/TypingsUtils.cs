@@ -18,7 +18,6 @@ global using ParameterDefinition = Mono.Cecil.ParameterDefinition;
 global using PropertyDefinition = Mono.Cecil.PropertyDefinition;
 global using GenericInstanceType = Mono.Cecil.GenericInstanceType;
 #endif
-using System.IO;
 
 namespace Serenity.Reflection
 {
@@ -535,22 +534,23 @@ namespace Serenity.Reflection
         }
 
 #if !ISSOURCEGENERATOR
-        public static Mono.Cecil.AssemblyDefinition[] ToDefinitions(IEnumerable<string> assemblyLocations)
+        public static Mono.Cecil.AssemblyDefinition[] ToDefinitions(IGeneratorFileSystem fileSystem,
+            IEnumerable<string> assemblyLocations)
         {
             if (assemblyLocations == null || !assemblyLocations.Any())
                 return System.Array.Empty<Mono.Cecil.AssemblyDefinition>();
 
             assemblyLocations = assemblyLocations.Select(x =>
             {
-                if (!File.Exists(x))
+                if (!fileSystem.FileExists(x))
                     return x;
 
-                var path = Path.GetDirectoryName(x);
-                var asmInfo = Path.Combine(path, "__AssemblyInfo__.ini");
-                if (!File.Exists(asmInfo))
+                var path = fileSystem.GetDirectoryName(x);
+                var asmInfo = fileSystem.Combine(path, "__AssemblyInfo__.ini");
+                if (!fileSystem.FileExists(asmInfo))
                     return x;
 
-                var content = File.ReadAllText(asmInfo, System.Text.Encoding.Unicode);
+                var content = fileSystem.ReadAllText(asmInfo, System.Text.Encoding.Unicode);
                 var idx = content.LastIndexOf("\0file:///", StringComparison.Ordinal);
                 if (idx < 0)
                     return x;
@@ -560,7 +560,7 @@ namespace Serenity.Reflection
                     return x;
 
                 var location = content.Substring(idx + 9, end - idx - 9).Replace('/', '\\');
-                if (File.Exists(location))
+                if (fileSystem.FileExists(location))
                     return location;
 
                 return x;
@@ -575,7 +575,7 @@ namespace Serenity.Reflection
             var resolver = module.AssemblyResolver as ICSharpCode.Decompiler.UniversalAssemblyResolver;
 
             foreach (var assembly in assemblyLocations)
-                resolver.AddSearchDirectory(Path.GetDirectoryName(assembly));
+                resolver.AddSearchDirectory(fileSystem.GetDirectoryName(assembly));
 
             var assemblyDefinitions = new List<Mono.Cecil.AssemblyDefinition>();
             foreach (var assembly in assemblyLocations)

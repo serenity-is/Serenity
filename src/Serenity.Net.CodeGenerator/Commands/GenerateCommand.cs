@@ -1,12 +1,15 @@
 ﻿using Serenity.Data.Schema;
 using System.Data.Common;
-using System.IO;
-using System.IO.Abstractions;
 
 namespace Serenity.CodeGenerator
 {
-    public partial class GenerateCommand
+    public partial class GenerateCommand : BaseFileSystemCommand
     {
+        public GenerateCommand(IGeneratorFileSystem fileSystem) 
+            : base(fileSystem)
+        {
+        }
+
         private class AppSettingsFormat
         {
             public ConnectionStringOptions Data { get; }
@@ -44,9 +47,9 @@ namespace Serenity.CodeGenerator
             return null;
         }
 
-        public static void Run(string csproj, string[] args, IFileSystem fileSystem)
+        public void Run(string csproj, string[] args)
         {
-            var projectDir = Path.GetDirectoryName(csproj);
+            var projectDir = fileSystem.GetDirectoryName(csproj);
             if (!args.Any())
             {
                 var exitCode = new Interactive(fileSystem).Run();
@@ -64,15 +67,17 @@ namespace Serenity.CodeGenerator
             var module = GetOption(args, "m").TrimToNull();
             var identifier = GetOption(args, "i").TrimToNull();
             var permissionKey = GetOption(args, "p").TrimToNull();
+            var codeFileHelper = new CodeFileHelper(fileSystem);
             if (identifier != null)
-                CodeFileHelper.Overwrite = true;
+                codeFileHelper.NoUserInteraction = true;
 
-            var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
+            var config = GeneratorConfig.LoadFromFile(fileSystem,
+                fileSystem.Combine(projectDir, "sergen.json"));
 
             var connectionStringOptions = new ConnectionStringOptions();
 
             if (!string.IsNullOrEmpty(config.CustomTemplates))
-                Templates.TemplatePath = Path.Combine(projectDir, config.CustomTemplates);
+                Templates.TemplatePath = fileSystem.Combine(projectDir, config.CustomTemplates);
 
             foreach (var x in config.Connections.Where(x => !x.ConnectionString.IsEmptyOrNull()))
             {
@@ -86,20 +91,20 @@ namespace Serenity.CodeGenerator
 
             foreach (var name in config.GetAppSettingsFiles())
             {
-                var path = Path.Combine(projectDir, name);
-                if (File.Exists(name))
+                var path = fileSystem.Combine(projectDir, name);
+                if (fileSystem.FileExists(name))
                 {
-                    var appSettings = JSON.ParseTolerant<AppSettingsFormat>(File.ReadAllText(path).TrimToNull() ?? "{}");
+                    var appSettings = JSON.ParseTolerant<AppSettingsFormat>(fileSystem.ReadAllText(path).TrimToNull() ?? "{}");
                     if (appSettings.Data != null)
                         foreach (var data in appSettings.Data)
                         {
                             // not so nice fix for relative paths, e.g. sqlite etc.
                             if (data.Value.ConnectionString.Contains("../../..", StringComparison.Ordinal))
                                 data.Value.ConnectionString = data.Value
-                                    .ConnectionString.Replace("../../..", Path.GetDirectoryName(csproj), StringComparison.Ordinal);
+                                    .ConnectionString.Replace("../../..", fileSystem.GetDirectoryName(csproj), StringComparison.Ordinal);
                             else if (data.Value.ConnectionString.Contains(@"..\..\..\", StringComparison.Ordinal))
-                                data.Value.ConnectionString = data.Value.ConnectionString.Replace(@"..\..\..\", 
-                                    Path.GetDirectoryName(csproj), StringComparison.Ordinal);
+                                data.Value.ConnectionString = data.Value.ConnectionString.Replace(@"..\..\..\",
+                                    fileSystem.GetDirectoryName(csproj), StringComparison.Ordinal);
 
                             connectionStringOptions[data.Key] = data.Value;
                         }
@@ -131,7 +136,7 @@ namespace Serenity.CodeGenerator
             }
             else if (connectionKey == null)
             {
-                File.WriteAllText(outFile, System.Text.Json.JsonSerializer.Serialize(connectionStringOptions.Keys.OrderBy(x => x)));
+                fileSystem.WriteAllText(outFile, System.Text.Json.JsonSerializer.Serialize(connectionStringOptions.Keys.OrderBy(x => x)));
                 Environment.Exit(0);
             }
 
@@ -170,18 +175,7 @@ namespace Serenity.CodeGenerator
                 Console.WriteLine();
             }
 
-            DbProviderFactories.RegisterFactory("Microsoft.Data.SqlClient", 
-                Microsoft.Data.SqlClient.SqlClientFactory.Instance);
-            DbProviderFactories.RegisterFactory("System.Data.SqlClient",
-                Microsoft.Data.SqlClient.SqlClientFactory.Instance);
-            DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite", 
-                Microsoft.Data.Sqlite.SqliteFactory.Instance);
-            DbProviderFactories.RegisterFactory("Npgsql", 
-                Npgsql.NpgsqlFactory.Instance);
-            DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient", 
-                FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
-            DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", 
-                MySqlConnector.MySqlConnectorFactory.Instance);
+            RegisterSqlProviders();
 
             var sqlConnections = new DefaultSqlConnections(
                 new DefaultConnectionStrings(connectionStringOptions));
@@ -209,7 +203,7 @@ namespace Serenity.CodeGenerator
             }
             else if (table == null)
             {
-                File.WriteAllText(outFile, JSON.Stringify(tableNames.Select(x =>
+                fileSystem.WriteAllText(outFile, JSON.Stringify(tableNames.Select(x =>
                 {
                     var xct = confConnection?.Tables.FirstOrDefault(z => string.Compare(z.Tablename, table, StringComparison.OrdinalIgnoreCase) == 0);
                     return new
@@ -220,12 +214,12 @@ namespace Serenity.CodeGenerator
                         identifier = xct == null || xct.Identifier.IsEmptyOrNull() ? RowGenerator.ClassNameFromTableName(x.Table) : xct.Identifier,
                     };
                 })));
-                
+
                 Environment.Exit(0);
             }
 
             userInput = tables.Count == 1 ? tables[0] : null;
-            if (userInput == null && schemaProvider.DefaultSchema != null && 
+            if (userInput == null && schemaProvider.DefaultSchema != null &&
                 tables.Any(x => x.StartsWith(schemaProvider.DefaultSchema + ".", StringComparison.Ordinal)))
                 userInput = schemaProvider.DefaultSchema + ".";
 
@@ -332,7 +326,7 @@ namespace Serenity.CodeGenerator
 
 
             if (what == null)
-            { 
+            {
                 Console.WriteLine();
 
                 userInput = "RSUC";
@@ -352,10 +346,10 @@ namespace Serenity.CodeGenerator
                 }
             }
 
-            config.GenerateRow = what.Contains("R", StringComparison.OrdinalIgnoreCase);
-            config.GenerateService = what.Contains("S", StringComparison.OrdinalIgnoreCase);
-            config.GenerateUI = what.Contains("U", StringComparison.OrdinalIgnoreCase);
-            config.GenerateCustom = what.Contains("C", StringComparison.OrdinalIgnoreCase);
+            config.GenerateRow = what.Contains('R', StringComparison.OrdinalIgnoreCase);
+            config.GenerateService = what.Contains('S', StringComparison.OrdinalIgnoreCase);
+            config.GenerateUI = what.Contains('U', StringComparison.OrdinalIgnoreCase);
+            config.GenerateCustom = what.Contains('C', StringComparison.OrdinalIgnoreCase);
 
             Console.ResetColor();
             Console.WriteLine();
@@ -388,13 +382,13 @@ namespace Serenity.CodeGenerator
                 confTable.PermissionKey = permissionKey;
             }
 
-            File.WriteAllText(Path.Combine(projectDir, "sergen.json"), config.SaveToJson());
+            fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
 
             using (var connection = sqlConnections.NewByKey(connectionKey))
             {
                 connection.Open();
 
-                var csprojContent = File.ReadAllText(csproj);
+                var csprojContent = fileSystem.ReadAllText(csproj);
                 var net5Plus = !new Regex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)
                     .IsMatch(csprojContent);
 
@@ -409,11 +403,27 @@ namespace Serenity.CodeGenerator
                     config.KDiff3Path
                 };
 
-                CodeFileHelper.Kdiff3Path = kdiff3Paths.FirstOrDefault(File.Exists);
-                CodeFileHelper.TSCPath = config.TSCPath ?? "tsc";
+                codeFileHelper.Kdiff3Path = kdiff3Paths.FirstOrDefault(fileSystem.FileExists);
+                codeFileHelper.TSCPath = config.TSCPath ?? "tsc";
 
-                new EntityCodeGenerator(rowModel, config, csproj).Run();
+                new EntityCodeGenerator(fileSystem, codeFileHelper, rowModel, config, csproj).Run();
             }
+        }
+
+        private static void RegisterSqlProviders()
+        {
+            DbProviderFactories.RegisterFactory("Microsoft.Data.SqlClient",
+                Microsoft.Data.SqlClient.SqlClientFactory.Instance);
+            DbProviderFactories.RegisterFactory("System.Data.SqlClient",
+                Microsoft.Data.SqlClient.SqlClientFactory.Instance);
+            DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite",
+                Microsoft.Data.Sqlite.SqliteFactory.Instance);
+            DbProviderFactories.RegisterFactory("Npgsql",
+                Npgsql.NpgsqlFactory.Instance);
+            DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient",
+                FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
+            DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient",
+                MySqlConnector.MySqlConnectorFactory.Instance);
         }
     }
 }

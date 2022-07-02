@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
@@ -84,9 +82,10 @@ namespace Serenity.CodeGeneration
 
                 var jwBuilder = new StringBuilder();
 #if ISSOURCEGENERATOR
-                var jw = new Newtonsoft.Json.JsonTextWriter(new StringWriter(jwBuilder))
+                var jw = new Newtonsoft.Json.JsonTextWriter(
+                    new System.IO.StringWriter(jwBuilder))
 #else
-                var jw = new JsonTextWriter(new StringWriter(jwBuilder))
+                var jw = new JsonTextWriter(new System.IO.StringWriter(jwBuilder))
 #endif
                 {
                     QuoteName = false

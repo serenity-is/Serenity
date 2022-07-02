@@ -87,13 +87,13 @@ namespace Serenity.CodeGeneration
             }
         }
 #else
-        protected TypingsGeneratorBase(params Assembly[] assemblies)
-            : this(TypingsUtils.ToDefinitions(assemblies?.Select(x => x.Location)))
+        protected TypingsGeneratorBase(IGeneratorFileSystem fileSystem, params Assembly[] assemblies)
+            : this(TypingsUtils.ToDefinitions(fileSystem, assemblies?.Select(x => x.Location)))
         {
         }
 
-        protected TypingsGeneratorBase(params string[] assemblyLocations)
-            : this(TypingsUtils.ToDefinitions(assemblyLocations))
+        protected TypingsGeneratorBase(IGeneratorFileSystem fileSystem, params string[] assemblyLocations)
+            : this(TypingsUtils.ToDefinitions(fileSystem, assemblyLocations))
         {
         }
 

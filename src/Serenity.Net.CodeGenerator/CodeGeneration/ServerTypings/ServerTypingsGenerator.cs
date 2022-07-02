@@ -12,13 +12,13 @@
         {
         }
 #else
-        public ServerTypingsGenerator(params Assembly[] assemblies)
-            : base(assemblies)
+        public ServerTypingsGenerator(IGeneratorFileSystem fileSystem, params Assembly[] assemblies)
+            : base(fileSystem, assemblies)
         {
         }
 
-        public ServerTypingsGenerator(params string[] assemblyLocations)
-            : base(assemblyLocations)
+        public ServerTypingsGenerator(IGeneratorFileSystem fileSystem, params string[] assemblyLocations)
+            : base(fileSystem, assemblyLocations)
         {
         }
 #endif

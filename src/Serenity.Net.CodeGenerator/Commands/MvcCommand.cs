@@ -1,17 +1,20 @@
-﻿using System.IO;
-
-namespace Serenity.CodeGenerator
+﻿namespace Serenity.CodeGenerator
 {
-    public class MvcCommand
+    public class MvcCommand : BaseFileSystemCommand
     {
-        public static void Run(string csproj)
+        public MvcCommand(IGeneratorFileSystem fileSystem) 
+            : base(fileSystem)
         {
-            var projectDir = Path.GetDirectoryName(csproj);
-            var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
+        }
+
+        public void Run(string csproj)
+        {
+            var projectDir = fileSystem.GetDirectoryName(csproj);
+            var config = GeneratorConfig.LoadFromFile(fileSystem, fileSystem.Combine(projectDir, "sergen.json"));
 
             config.MVC ??= new GeneratorConfig.MVCConfig();
 
-            var outDir = Path.Combine(projectDir, PathHelper.ToPath(config.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
+            var outDir = fileSystem.Combine(projectDir, PathHelper.ToPath(config.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("Transforming MVC at: ");
@@ -21,29 +24,29 @@ namespace Serenity.CodeGenerator
             string[] stripViewPaths = config.MVC.StripViewPaths ?? new string[] {
                 "Modules/",
                 "Views/",
-                Path.GetFileNameWithoutExtension(csproj) + "/"
+                fileSystem.GetFileNameWithoutExtension(csproj) + "/"
             };
 
-            var rootDir = projectDir + Path.DirectorySeparatorChar;
+            var rootDir = projectDir + System.IO.Path.DirectorySeparatorChar;
             var searchViewPaths = (config.MVC.SearchViewPaths ?? 
                 new string[] { 
                     "Modules/", 
                     "Views/",
-                    Path.GetFileNameWithoutExtension(csproj) + "/"
+                    fileSystem.GetFileNameWithoutExtension(csproj) + "/"
                 })
-                .Select(x => Path.Combine(rootDir, PathHelper.ToPath(x)));
+                .Select(x => fileSystem.Combine(rootDir, PathHelper.ToPath(x)));
 
             IEnumerable<string> files = new List<string>();
             foreach (var path in searchViewPaths)
             {
-                if (Directory.Exists(path))
-                    files = files.Concat(Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories));
+                if (fileSystem.DirectoryExists(path))
+                    files = files.Concat(fileSystem.GetFiles(path, "*.cshtml", recursive: true));
             }
 
             string getName(string s)
             {
                 var path = s[rootDir.Length..];
-                var name = Path.ChangeExtension(path, null).Replace('\\', '/');
+                var name = fileSystem.ChangeExtension(path, null).Replace('\\', '/');
                 foreach (var strip in stripViewPaths)
                 {
                     if (name.StartsWith(strip, StringComparison.OrdinalIgnoreCase))
@@ -64,9 +67,9 @@ namespace Serenity.CodeGenerator
             sb.Append("namespace ");
             if (config.MVC.UseRootNamespace == true ||
                 (config.MVC.UseRootNamespace == null &&
-                 File.ReadAllText(csproj).Contains("Sdk=\"Microsoft.NET.Sdk.Razor\"", StringComparison.CurrentCulture)))
+                 fileSystem.ReadAllText(csproj).Contains("Sdk=\"Microsoft.NET.Sdk.Razor\"", StringComparison.CurrentCulture)))
             {
-                sb.Append(config.GetRootNamespaceFor(csproj));
+                sb.Append(config.GetRootNamespaceFor(fileSystem, csproj));
                 sb.Append('.');
             }
             sb.AppendLine("MVC");
@@ -137,7 +140,7 @@ namespace Serenity.CodeGenerator
             sb.AppendLine("    }");
             sb.AppendLine("}");
 
-            MultipleOutputHelper.WriteFiles(outDir, new SortedDictionary<string, string>
+            MultipleOutputHelper.WriteFiles(fileSystem, outDir, new SortedDictionary<string, string>
             {
                 { "MVC.cs", sb.ToString() }
             });

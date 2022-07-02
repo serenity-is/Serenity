@@ -1,81 +1,62 @@
 ﻿using System.Diagnostics;
-using System.IO;
 
 namespace Serenity.CodeGenerator
 {
-    public class CodeFileHelper
+    public class CodeFileHelper : ICodeFileHelper
     {
         private static readonly Encoding utf8 = new UTF8Encoding(true);
-        public static string Kdiff3Path { get; set; }
-        public static string TSCPath { get; set; }
-        public static bool TFSIntegration { get; set; }
-        public static bool? Overwrite { get; set; }
+        private readonly IGeneratorFileSystem fileSystem;
+
+        public string Kdiff3Path { get; set; }
+        public string TSCPath { get; set; }
+        public bool NoUserInteraction { get; set; }
+
+        private bool? overwriteAll;
 
         public static byte[] ToUTF8BOM(string s)
         {
             return Encoding.UTF8.GetPreamble().Concat(utf8.GetBytes(s)).ToArray();
         }
 
-#pragma warning disable IDE0060 // Remove unused parameter
-        public static void ExecuteTFCommand(string file, string command)
-#pragma warning restore IDE0060 // Remove unused parameter
+        public CodeFileHelper(IGeneratorFileSystem fileSystem)
         {
+            this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         }
 
-        public static void CheckoutAndWrite(string file, string contents, bool addToSourceControl)
+        public void CheckoutAndWrite(string file, string contents)
         {
-            CheckoutAndWrite(file, ToUTF8BOM(contents), addToSourceControl);
+            CheckoutAndWrite(file, ToUTF8BOM(contents));
         }
 
-        public static void CheckoutAndWrite(string file, byte[] contents, bool addToSourceControl)
+        public void CheckoutAndWrite(string file, byte[] contents)
         {
-            if (!File.Exists(file))
-            {
-                File.WriteAllBytes(file, contents);
-                if (addToSourceControl && TFSIntegration)
-                    ExecuteTFCommand(file, "add");
-                return;
-            }
-
-            var attr = File.GetAttributes(file);
-            if (attr.HasFlag(FileAttributes.ReadOnly) && TFSIntegration)
-            {
-                ExecuteTFCommand(file, "checkout");
-                attr = File.GetAttributes(file);
-            }
-
-            if (attr.HasFlag(FileAttributes.ReadOnly))
-            {
-                attr -= FileAttributes.ReadOnly;
-                File.SetAttributes(file, attr);
-            }
-
-            File.WriteAllBytes(file, contents);
+            fileSystem.WriteAllBytes(file, contents);
         }
 
-        public static bool FileContentsEqual(string file1, string file2)
+        public bool FileContentsEqual(string file1, string file2)
         {
-            var content1 = File.ReadAllText(file1, utf8);
-            var content2 = File.ReadAllText(file2, utf8);
-            return content1.Trim().Replace("\r", "", StringComparison.Ordinal) == content2.Trim().Replace("\r", "", StringComparison.Ordinal);
+            var content1 = fileSystem.ReadAllText(file1, utf8);
+            var content2 = fileSystem.ReadAllText(file2, utf8);
+            return content1.Trim().Replace("\r", "", StringComparison.Ordinal) ==
+                content2.Trim().Replace("\r", "", StringComparison.Ordinal);
         }
 
-        public static void MergeChanges(string backup, string file)
+        public void MergeChanges(string backup, string file)
         {
-            if (backup == null || !File.Exists(backup) || !File.Exists(file))
+            if (backup == null || !fileSystem.FileExists(backup) || !fileSystem.FileExists(file))
                 return;
 
             bool isEqual = FileContentsEqual(backup, file);
 
-            if (isEqual)
+            if (isEqual || NoUserInteraction)
             {
-                CheckoutAndWrite(file, File.ReadAllBytes(backup), true);
-                File.Delete(backup);
+                CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
+                fileSystem.DeleteFile(backup);
                 return;
             }
 
             if (!Kdiff3Path.IsEmptyOrNull() &&
-                !File.Exists(Kdiff3Path))
+                !fileSystem.FileExists(Kdiff3Path))
             {
                 if (Kdiff3Path.IsNullOrEmpty())
                     throw new InvalidOperationException(
@@ -90,24 +71,24 @@ namespace Serenity.CodeGenerator
             }
             else if (!Kdiff3Path.IsEmptyOrNull())
             {
-                var generated = Path.ChangeExtension(file, Path.GetExtension(file) + ".gen.bak");
-                CheckoutAndWrite(generated, File.ReadAllBytes(file), false);
-                CheckoutAndWrite(file, File.ReadAllBytes(backup), true);
+                var generated = fileSystem.ChangeExtension(file, fileSystem.GetExtension(file) + ".gen.bak");
+                CheckoutAndWrite(generated, fileSystem.ReadAllBytes(file));
+                CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
                 Process.Start(Kdiff3Path, "--auto \"" + file + "\" \"" + generated + "\" -o \"" + file + "\"");
             }
             else
             {
                 string answer;
-                if (Overwrite == true)
+                if (overwriteAll == true)
                     answer = "y";
-                else if (Overwrite == false)
+                else if (overwriteAll == false)
                     answer = "n";
                 else
                 {
-                    
+
                     while (true)
                     {
-                        Console.Write("Overwrite " + Path.GetFileName(file) + "? ([Y]es, [N]o, Yes to [A]ll, [S]kip All): ");
+                        Console.Write("Overwrite " + fileSystem.GetFileName(file) + "? ([Y]es, [N]o, Yes to [A]ll, [S]kip All): ");
                         answer = Console.ReadLine();
 
                         if (answer != null)
@@ -115,12 +96,12 @@ namespace Serenity.CodeGenerator
                             answer = answer.Length > 0 ? answer.ToLowerInvariant()[0].ToString() : " ";
                             if (answer == "a")
                             {
-                                Overwrite = true;
+                                overwriteAll = true;
                                 break;
                             }
                             else if (answer == "s")
                             {
-                                Overwrite = false;
+                                overwriteAll = false;
                                 break;
                             }
                             else if (answer == "y" || answer == "n")
@@ -128,24 +109,26 @@ namespace Serenity.CodeGenerator
                         }
                     }
                 }
-                    
+
                 if (answer == "y" || answer == "a")
                 {
-                    File.Delete(backup);
+                    fileSystem.DeleteFile(backup);
                 }
                 else
                 {
-                    CheckoutAndWrite(file, File.ReadAllBytes(backup), true);
-                    File.Delete(backup);
+                    CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
+                    fileSystem.DeleteFile(backup);
                 }
-                
             }
         }
 
-        public static void ExecuteTSC(string workingDirectory, string arguments)
+        public void ExecuteTSC(string workingDirectory, string arguments)
         {
+            if (NoUserInteraction)
+                return;
+
             if (TSCPath.IsNullOrEmpty() ||
-                !File.Exists(TSCPath))
+                !fileSystem.FileExists(TSCPath))
             {
                 if (TSCPath.IsNullOrEmpty())
                     throw new InvalidOperationException(

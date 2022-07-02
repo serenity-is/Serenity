@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using System.IO;
 
 namespace Serenity.CodeGenerator
 {
@@ -105,20 +104,23 @@ namespace Serenity.CodeGenerator
             };
         }
 
-        public string GetRootNamespaceFor(string csproj)
+        public string GetRootNamespaceFor(IGeneratorFileSystem fileSystem, string csproj)
         {
+            if (fileSystem is null)
+                throw new ArgumentNullException(nameof(fileSystem));
+
             if (!string.IsNullOrEmpty(RootNamespace))
                 return RootNamespace;
 
             string rootNamespace = null;
 
-            if (File.Exists(csproj)) {
-                 rootNamespace = ProjectFileHelper.ExtractPropertyFrom(csproj,
+            if (fileSystem.FileExists(csproj)) {
+                 rootNamespace = ProjectFileHelper.ExtractPropertyFrom(fileSystem, csproj,
                     xe => xe.Descendants("RootNamespace").FirstOrDefault()?.Value.TrimToNull());
             }
 
             if (rootNamespace == null)
-                rootNamespace = Path.ChangeExtension(Path.GetFileName(csproj), null);
+                rootNamespace = fileSystem.ChangeExtension(fileSystem.GetFileName(csproj), null);
 
             if (rootNamespace?.EndsWith(".Web", StringComparison.OrdinalIgnoreCase) == true)
                 rootNamespace = rootNamespace[0..^4];
@@ -126,12 +128,16 @@ namespace Serenity.CodeGenerator
             return rootNamespace;
         }
 
-        public static GeneratorConfig LoadFromFile(string sergenJson)
+        public static GeneratorConfig LoadFromFile(IGeneratorFileSystem fileSystem,
+            string sergenJson)
         {
-            if (!File.Exists(sergenJson))
+            if (fileSystem is null)
+                throw new ArgumentNullException(nameof(fileSystem));
+
+            if (!fileSystem.FileExists(sergenJson))
                 return LoadFromJson(null);
 
-            return LoadFromJson(File.ReadAllText(sergenJson));
+            return LoadFromJson(fileSystem.ReadAllText(sergenJson));
         }
 
         public static GeneratorConfig LoadFromJson(string json)
