@@ -314,7 +314,7 @@ namespace Serenity.CodeGeneration
                 var typeDef = generateQueue.Dequeue();
 
 #if ISSOURCEGENERATOR
-                if (!typeDef.Locations.Any(x => !x.IsInMetadata))
+                if (typeDef.ContainingAssembly?.Name != Compilation.AssemblyName)
                     continue;
 #else
                 if (!Assemblies.Any(x => x.FullName == typeDef.Module.Assembly.FullName))
