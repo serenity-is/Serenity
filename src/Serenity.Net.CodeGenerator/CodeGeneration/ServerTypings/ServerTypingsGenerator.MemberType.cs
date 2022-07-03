@@ -103,19 +103,19 @@
                 var gi = memberType as GenericInstanceType;
                 if (gi.ElementType().NamespaceOf() == "System.Collections.Generic")
                 {
-                    if (gi.ElementType().Name == "List`1" ||
-                        gi.ElementType().Name == "HashSet`1" ||
-                        gi.ElementType().Name == "IList`1" ||
-                        gi.ElementType().Name == "IEnumerable`1" ||
-                        gi.ElementType().Name == "ISet`1")
+                    if (gi.ElementType().MetadataName() == "List`1" ||
+                        gi.ElementType().MetadataName() == "HashSet`1" ||
+                        gi.ElementType().MetadataName() == "IList`1" ||
+                        gi.ElementType().MetadataName() == "IEnumerable`1" ||
+                        gi.ElementType().MetadataName() == "ISet`1")
                     {
                         HandleMemberType(gi.GenericArguments()[0], codeNamespace, sb);
                         sb.Append("[]");
                         return;
                     }
 
-                    if (gi.ElementType().Name == "Dictionary`2" ||
-                        gi.ElementType().Name == "IDictionary`2")
+                    if (gi.ElementType().MetadataName() == "Dictionary`2" ||
+                        gi.ElementType().MetadataName() == "IDictionary`2")
                     {
                         sb.Append("{ [key: ");
                         HandleMemberType(gi.GenericArguments()[0], codeNamespace, sb);

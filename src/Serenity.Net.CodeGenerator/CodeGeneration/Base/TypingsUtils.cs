@@ -66,7 +66,7 @@ namespace Serenity.Reflection
         public static bool IsGenericInstance(this TypeDefinition typeSymbol)
         {
             return typeSymbol is GenericInstanceType nt &&
-                nt.IsGenericType && nt.TypeParameters.Length == 0;
+                nt.IsGenericType && !nt.TypeArguments.Any(x => x.TypeKind == TypeKind.TypeParameter);
         }
 
         public static TypeDefinition Resolve(this TypeDefinition typeSymbol)
