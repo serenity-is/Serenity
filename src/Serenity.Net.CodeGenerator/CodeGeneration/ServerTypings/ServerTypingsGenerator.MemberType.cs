@@ -15,7 +15,7 @@
             }
 
             if (memberType is GenericInstanceType &&
-                memberType.Name == "Nullable`1" &&
+                memberType.MetadataName() == "Nullable`1" &&
                 isSystem)
             {
                 memberType = (memberType as GenericInstanceType).GenericArguments()[0];

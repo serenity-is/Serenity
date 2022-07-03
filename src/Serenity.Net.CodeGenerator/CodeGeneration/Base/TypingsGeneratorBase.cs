@@ -676,7 +676,7 @@ namespace Serenity.CodeGeneration
 #endif
                 {
 #if ISSOURCEGENERATOR
-                    var n = t.BaseType.OriginalDefinition.Name;
+                    var n = t.BaseType.OriginalDefinition.MetadataName();
 #else
                     var n = (t.BaseType as GenericInstanceType).ElementType.Name;
 #endif

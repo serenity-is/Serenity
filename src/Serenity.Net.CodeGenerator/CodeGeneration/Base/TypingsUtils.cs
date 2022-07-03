@@ -43,9 +43,9 @@ namespace Serenity.Reflection
         {
             var ns = NamespaceOf(symbol);
             if (string.IsNullOrEmpty(ns))
-                return symbol.Name;
+                return symbol.MetadataName;
 
-            return ns + "." + symbol.Name;
+            return ns + "." + symbol.MetadataName;
         }
 
         public static IEnumerable<FieldDefinition> FieldsOf(this TypeDefinition type)
@@ -215,6 +215,11 @@ namespace Serenity.Reflection
                 return git.OriginalDefinition;
 
             return null;
+        }
+
+        public static string MetadataName(this TypeReference type)
+        {
+            return type.MetadataName;
         }
 #else
         public static string NamespaceOf(this TypeReference symbol)
@@ -411,6 +416,11 @@ namespace Serenity.Reflection
         {
             return type.GetElementType();
         }
+
+        public static string MetadataName(this TypeReference type)
+        {
+            return type.Name;
+        }
 #endif
 
         public static bool IsOrSubClassOf(TypeReference childTypeDef, string ns, string name)
@@ -459,7 +469,7 @@ namespace Serenity.Reflection
         private static TypeReference FindByName(TypeReference[] classes, string ns, string name)
         {
             foreach (var x in classes)
-                if (x.Name == name &&
+                if (x.MetadataName() == name &&
                     x.NamespaceOf() == ns)
                     return x;
 
