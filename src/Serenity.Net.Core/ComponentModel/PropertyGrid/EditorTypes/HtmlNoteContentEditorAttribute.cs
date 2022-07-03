@@ -8,10 +8,15 @@
     public partial class HtmlNoteContentEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "HtmlNoteContent";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="HtmlNoteContentEditorAttribute"/> class.
         /// </summary>
         public HtmlNoteContentEditorAttribute()
-            : base("HtmlNoteContent")
+            : base(Key)
         {
         }
 

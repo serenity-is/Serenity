@@ -7,11 +7,16 @@
     public partial class LookupEditorAttribute : LookupEditorBaseAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "Lookup";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="LookupEditorAttribute"/> class.
         /// </summary>
         /// <param name="lookupKey">The lookup key.</param>
         public LookupEditorAttribute(string lookupKey)
-            : base("Lookup")
+            : base(Key)
         {
             SetOption("lookupKey", lookupKey);
         }
@@ -22,7 +27,7 @@
         /// on it.
         /// </summary>
         public LookupEditorAttribute(Type lookupType)
-            : base("Lookup")
+            : base(Key)
         {
             if (lookupType == null)
                 throw new ArgumentNullException("lookupType");

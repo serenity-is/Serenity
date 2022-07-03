@@ -7,10 +7,15 @@
     public partial class EnumEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "Enum";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EnumEditorAttribute"/> class.
         /// </summary>
         public EnumEditorAttribute()
-            : base("Enum")
+            : base(Key)
         {
         }
 

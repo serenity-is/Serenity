@@ -12,6 +12,11 @@ namespace Serenity.ComponentModel
     public partial class ImageUploadEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "ImageUpload";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ImageUploadEditorAttribute"/> class.
         /// </summary>
         /// <param name="editorType">Type of the editor.</param>
@@ -26,7 +31,7 @@ namespace Serenity.ComponentModel
         /// Initializes a new instance of the <see cref="ImageUploadEditorAttribute"/> class.
         /// </summary>
         public ImageUploadEditorAttribute()
-            : this("ImageUpload")
+            : this(Key)
         {
         }
 

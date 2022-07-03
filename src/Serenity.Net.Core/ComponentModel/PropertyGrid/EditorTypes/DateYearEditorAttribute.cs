@@ -7,10 +7,15 @@
     public partial class DateYearEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "DateYear";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DateYearEditorAttribute"/> class.
         /// </summary>
         public DateYearEditorAttribute()
-            : base("DateYear")
+            : base(Key)
         {
         }
 

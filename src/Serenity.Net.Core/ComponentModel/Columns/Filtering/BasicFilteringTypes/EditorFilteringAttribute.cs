@@ -8,10 +8,15 @@
     public class EditorFilteringAttribute : CustomFilteringAttribute
     {
         /// <summary>
+        /// Filtering type key
+        /// </summary>
+        public const string Key = "Editor";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EditorFilteringAttribute"/> class.
         /// </summary>
         public EditorFilteringAttribute()
-            : base("Editor")
+            : base(Key)
         {
         }
 
@@ -20,7 +25,7 @@
         /// </summary>
         /// <param name="editorType">Type of the editor.</param>
         public EditorFilteringAttribute(string editorType)
-            : base("Editor")
+            : base(Key)
         {
             EditorType = editorType;
         }
@@ -30,7 +35,7 @@
         /// </summary>
         /// <param name="editorTypeAttribute">The editor type attribute to read editor type from.</param>
         public EditorFilteringAttribute(Type editorTypeAttribute)
-            : base("Editor")
+            : base(Key)
         {
             EditorType = ((EditorTypeAttribute)Activator.CreateInstance(editorTypeAttribute)).EditorType;
         }

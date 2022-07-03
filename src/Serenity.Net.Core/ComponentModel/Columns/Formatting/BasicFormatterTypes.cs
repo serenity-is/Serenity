@@ -7,10 +7,15 @@
     public class BooleanFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
+        /// Formatter type key
+        /// </summary>
+        public const string Key = "Boolean";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BooleanFormatterAttribute"/> class.
         /// </summary>
         public BooleanFormatterAttribute()
-            : base("Boolean")
+            : base(Key)
         {
         }
 
@@ -46,10 +51,15 @@
     public class CheckboxFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
+        /// Formatter type key
+        /// </summary>
+        public const string Key = "Checkbox";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CheckboxFormatterAttribute"/> class.
         /// </summary>
         public CheckboxFormatterAttribute()
-            : base("Checkbox")
+            : base(Key)
         {
         }
     }
@@ -61,10 +71,15 @@
     public class DateFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
+        /// Formatter type key
+        /// </summary>
+        public const string Key = "Date";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DateFormatterAttribute"/> class.
         /// </summary>
         public DateFormatterAttribute()
-            : base("Date")
+            : base(Key)
         {
         }
 
@@ -88,10 +103,15 @@
     public class DateTimeFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
+        /// Formatter type key
+        /// </summary>
+        public const string Key = "DateTime";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DateTimeFormatterAttribute"/> class.
         /// </summary>
         public DateTimeFormatterAttribute()
-            : base("DateTime")
+            : base(Key)
         {
         }
 
@@ -115,10 +135,15 @@
     public class EnumFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
+        /// Formatter type key
+        /// </summary>
+        public const string Key = "Enum";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EnumFormatterAttribute"/> class.
         /// </summary>
         public EnumFormatterAttribute()
-            : base("Enum")
+            : base(Key)
         {
         }
 
@@ -144,10 +169,15 @@
     public class FileDownloadFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
+        /// Formatter type key
+        /// </summary>
+        public const string Key = "FileDownload";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="FileDownloadFormatterAttribute"/> class.
         /// </summary>
         public FileDownloadFormatterAttribute()
-            : base("FileDownload")
+            : base(Key)
         {
         }
 
@@ -184,10 +214,15 @@
     public class NumberFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
+        /// Formatter type key
+        /// </summary>
+        public const string Key = "Number";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NumberFormatterAttribute"/> class.
         /// </summary>
         public NumberFormatterAttribute()
-            : base("Number")
+            : base(Key)
         {
         }
 
@@ -211,10 +246,15 @@
     public class MinuteFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
+        /// Formatter type key
+        /// </summary>
+        public const string Key = "Serenity.MinuteFormatter";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MinuteFormatterAttribute"/> class.
         /// </summary>
         public MinuteFormatterAttribute()
-            : base("Serenity.MinuteFormatter")
+            : base(Key)
         {
         }
 
@@ -238,10 +278,15 @@
     public class UrlFormatterAttribute : CustomFormatterAttribute
     {
         /// <summary>
+        /// Formatter type key
+        /// </summary>
+        public const string Key = "Url";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="UrlFormatterAttribute"/> class.
         /// </summary>
         public UrlFormatterAttribute()
-            : base("Url")
+            : base(Key)
         {
         }
 

@@ -6,10 +6,15 @@
     public class DateTimeFilteringAttribute : CustomFilteringAttribute
     {
         /// <summary>
+        /// Filtering type key
+        /// </summary>
+        public const string Key = "DateTime";
+
+        /// <summary>
         /// Creates a new DateTimeFilteringAttribute
         /// </summary>
         public DateTimeFilteringAttribute()
-            : base("DateTime")
+            : base(Key)
         {
         }
 

@@ -7,10 +7,15 @@
     public class DateEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "Date";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DateEditorAttribute"/> class.
         /// </summary>
         public DateEditorAttribute()
-            : base("Date")
+            : base(Key)
         {
         }
 

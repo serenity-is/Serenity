@@ -7,10 +7,15 @@
     public partial class TextAreaEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "TextArea";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TextAreaEditorAttribute"/> class.
         /// </summary>
         public TextAreaEditorAttribute()
-            : base("TextArea")
+            : base(Key)
         {
         }
 

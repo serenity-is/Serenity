@@ -8,10 +8,15 @@
     public partial class MaskedEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "Masked";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MaskedEditorAttribute"/> class.
         /// </summary>
         public MaskedEditorAttribute()
-            : base("Masked")
+            : base(Key)
         {
         }
 

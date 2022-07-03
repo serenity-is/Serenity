@@ -7,10 +7,15 @@
     public partial class IntegerEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "Integer";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="IntegerEditorAttribute"/> class.
         /// </summary>
         public IntegerEditorAttribute()
-            : base("Integer")
+            : base(Key)
         {
             if (AllowNegativesByDefault)
                 AllowNegatives = true;

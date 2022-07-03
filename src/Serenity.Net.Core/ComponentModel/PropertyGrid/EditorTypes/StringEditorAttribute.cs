@@ -7,10 +7,15 @@
     public partial class StringEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "String";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="StringEditorAttribute"/> class.
         /// </summary>
         public StringEditorAttribute()
-            : base("String")
+            : base(Key)
         {
         }
     }
