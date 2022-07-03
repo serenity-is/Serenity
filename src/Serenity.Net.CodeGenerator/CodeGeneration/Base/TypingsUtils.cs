@@ -769,7 +769,7 @@ namespace Serenity.Reflection
             type = GetNullableUnderlyingType(type) ?? type;
 
 #if ISSOURCEGENERATOR
-            if (type.SpecialType == SpecialType.System_Enum)
+            if (type.TypeKind == TypeKind.Enum)
                 return type;
 #else
             if (!type.IsValueType ||
