@@ -185,7 +185,7 @@
                 sb.Append(@"['Texts'] = Q.proxyTexts(Texts, '', ");
                 jw.Flush();
                 sb.Append(jwBuilder);
-                sb.AppendLine(");");
+                sb.AppendLine(") as any;");
             });
 
             AddFile("Texts.ts");
