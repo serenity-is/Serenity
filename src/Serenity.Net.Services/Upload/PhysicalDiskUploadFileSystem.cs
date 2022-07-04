@@ -18,7 +18,7 @@ public class PhysicalDiskUploadFileSystem : IDiskUploadFileSystem
     public void CopyFile(Stream sourceStream, string destPath, bool overwrite)
     {
         if (FileExists(destPath) && !overwrite)
-            return;
+            throw new IOException($"File '{destPath}' already exists.");
 
         using var stream = File.Open(destPath, FileMode.Create);
         sourceStream.CopyTo(stream);
