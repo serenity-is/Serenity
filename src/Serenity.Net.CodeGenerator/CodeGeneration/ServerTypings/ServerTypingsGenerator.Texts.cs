@@ -125,7 +125,7 @@
                         jw.WriteStartObject();
                         sb.AppendLine();
                         if (level == 0)
-                            cw.Indented("declare namespace ");
+                            cw.Indented("export declare namespace ");
                         else
                             cw.Indented("namespace ");
                         sb.Append(part);
