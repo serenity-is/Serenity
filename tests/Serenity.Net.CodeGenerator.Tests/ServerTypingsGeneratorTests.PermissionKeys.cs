@@ -22,35 +22,17 @@ namespace Serenity.Tests.CodeGenerator
         }
 
         [Theory]
-        [InlineData(typeof(PermissionKeysSample1Depth1), new string[]
-        {
-            nameof(PermissionKeysSample1Depth1),
-            nameof(PermissionKeysSample1Depth1.Security),
-            PermissionKeysSample1Depth1.Security,
-        })]
-        [InlineData(typeof(PermissionKeysSample2Depth1),new string[]
-        {
-            nameof(PermissionKeysSample2Depth1),
-            nameof(PermissionKeysSample2Depth1.Security),
-            PermissionKeysSample2Depth1.Security,
-            nameof(PermissionKeysSample2Depth1.PermissionKeysSample2Depth2),
-            nameof(PermissionKeysSample2Depth1.PermissionKeysSample2Depth2.Security),
-            PermissionKeysSample2Depth1.PermissionKeysSample2Depth2.Security,
-        })]
-        [InlineData(typeof(PermissionKeysSample3Depth1), new string[]
-        {
-            nameof(PermissionKeysSample3Depth1),
-            nameof(PermissionKeysSample3Depth1.Security),
-            PermissionKeysSample3Depth1.Security,
-            nameof(PermissionKeysSample3Depth1.PermissionKeysSample3Depth2),
-            nameof(PermissionKeysSample3Depth1.PermissionKeysSample3Depth2.Security),
-            PermissionKeysSample3Depth1.PermissionKeysSample3Depth2.Security,
-            nameof(PermissionKeysSample3Depth1.PermissionKeysSample3Depth2.PermissionKeysSample3Depth3),
-            nameof(PermissionKeysSample3Depth1.PermissionKeysSample3Depth2.PermissionKeysSample3Depth3.Security),
-            PermissionKeysSample3Depth1.PermissionKeysSample3Depth2.PermissionKeysSample3Depth3.Security,
-        })]
+        [InlineData(
+            typeof(PermissionKeysSample1Depth1),
+            @"namespace Serenity.Tests.CodeGenerator{export namespace PermissionKeysSample1Depth1{export const Security=""Administration:Security"";}}")]
+        [InlineData(
+            typeof(PermissionKeysSample2Depth1),
+            @"namespace Serenity.Tests.CodeGenerator{export namespace PermissionKeysSample2Depth1{export const Security=""Administration:Security"";namespace PermissionKeysSample2Depth2{export const Security=""Administration:Security"";}}}")]
+        [InlineData(
+            typeof(PermissionKeysSample3Depth1),
+            @"namespace Serenity.Tests.CodeGenerator{export namespace PermissionKeysSample3Depth1{export const Security=""Administration:Security"";namespace PermissionKeysSample3Depth2{export const Security=""Administration:Security"";namespace PermissionKeysSample3Depth3{export const Security=""Administration:Security"";}}}}")]
 
-        public void TestPermissionKeys(Type classType, string[] stringsToSearch)
+        public void TestPermissionKeys(Type classType, string expected)
         {
             var generator = CreateGenerator();
             var result = generator.Run();
@@ -61,11 +43,8 @@ namespace Serenity.Tests.CodeGenerator
 
             code = NormalizeTS(code);
 
-            foreach (var item in stringsToSearch)
-            {
-                Assert.Contains(item, code);
-                code = code.Substring(code.IndexOf(item) + item.Length);
-            }
+            Assert.Equal(expected, code);
+            
         }
     }
     [NestedPermissionKeys]
