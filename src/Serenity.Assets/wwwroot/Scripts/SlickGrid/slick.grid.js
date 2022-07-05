@@ -4226,7 +4226,7 @@ if (typeof Slick === "undefined") {
                 $(activeCellNode).removeClass("editable invalid");
                 if (d) {
                     var column = columns[activeCell];
-                    activeCellNode[0].innerHTML = callFormatter(activeRow, activeCell, getDataItemValueForColumn(d, column), column, d);
+                    activeCellNode.innerHTML = callFormatter(activeRow, activeCell, getDataItemValueForColumn(d, column), column, d);
                     invalidatePostProcessingResults(activeRow);
                 }
             }
@@ -4268,13 +4268,13 @@ if (typeof Slick === "undefined") {
 
             // don't clear the cell if a custom editor is passed through
             if (!editor) {
-                activeCellNode[0].innerHTML = "";
+                activeCellNode.innerHTML = "";
             }
 
             currentEditor = new (editor || getEditor(activeRow, activeCell))({
                 grid: self,
                 gridPosition: absBox($container[0]),
-                position: absBox(activeCellNode[0]),
+                position: absBox(activeCellNode),
                 container: activeCellNode,
                 column: columnDef,
                 item: item || {},
@@ -4353,7 +4353,7 @@ if (typeof Slick === "undefined") {
         }
 
         function getActiveCellPosition() {
-            return absBox(activeCellNode[0]);
+            return absBox(activeCellNode);
         }
 
         function getGridPosition() {
