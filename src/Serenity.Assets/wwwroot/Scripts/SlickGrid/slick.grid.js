@@ -4146,7 +4146,7 @@ if (typeof Slick === "undefined") {
                 cell = getCellFromPoint($activeCellOffset[xLeft], Math.ceil($activeCellOffset.top) - rowOffset);
 
                 activeRow = cell.row;
-                activeCell = activePosX = activeCell = activePosX = getCellFromNode(activeCellNode[0]);
+                activeCell = activePosX = activeCell = activePosX = getCellFromNode(activeCellNode);
 
                 $activeCellNode.addClass("active");
                 if (rowsCache[activeRow]) {
