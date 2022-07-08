@@ -11,13 +11,12 @@
       <PackagePath>content\Content\</PackagePath>
       <IncludeInPackage>true</IncludeInPackage>
     </None>
-    <ToMinimize Include="wwwroot\Scripts\jquery-ui.js"></ToMinimize>
-    <ToMinimize Include="wwwroot\Scripts\jquery.dialogextendQ.js"></ToMinimize>
-    <ToMinimize Include="wwwroot\Scripts\SlickGrid\slick.grid.js"></ToMinimize>
-    <NpmPackageFile Include="..\Serenity.Scripts\package.json" />
+    <ToMinimize Include="wwwroot\Scripts\jquery-ui.js" />
+    <ToMinimize Include="wwwroot\Scripts\jquery.dialogextendQ.js" />
+    <ToMinimize Include="wwwroot\Scripts\SlickGrid\slick.grid.js" />
   </ItemGroup>
-  <Target Name="MinimizeScripts" AfterTargets="AfterBuild" Inputs="@(ToMinimize)" Outputs="@(ToMinimize->'%(RelativeDir)%(Filename).min.js')">
+  <Target Name="MinimizeScripts" DependsOnTargets="NpmInstall" BeforeTargets="BeforeBuild" Inputs="@(ToMinimize)" Outputs="@(ToMinimize->'%(RelativeDir)%(Filename).min.js')">
     <Message Text="Minimizing %(ToMinimize.Identity)..." Importance="high"></Message>
-    <Exec Command="npx terser &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename)%(ToMinimize.Extension)&quot; -o &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename).min.js&quot; --comments --mangle -f &quot;beautify=false,max_line_len=1000&quot;" WorkingDirectory="..\Serenity.Scripts" />
+    <Exec Command="$(Terser) &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename)%(ToMinimize.Extension)&quot; -o &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename).min.js&quot; --comments --mangle -f &quot;beautify=false,max_line_len=1000&quot;" WorkingDirectory="..\Serenity.Scripts" />
   </Target>
 </Project>

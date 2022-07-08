@@ -8,7 +8,8 @@ import dts from "rollup-plugin-dts";
 
 var globals = {
 	'jquery': '$',
-	'flatpickr': 'flatpickr'
+	'flatpickr': 'flatpickr',
+	'tslib': 'tslib'
 }
 
 function normalizePath(fileName) {
@@ -94,11 +95,15 @@ var extendGlobals = function() {
 
 				if (code && fileName.indexOf('.js') >= 0) {
 					var src = code;
+					src = fs.readFileSync('./node_modules/tslib/tslib.js',
+						'utf8').replace(/^\uFEFF/, '') + '\n' + src;
 					src = src.replace(/^(\s*)exports\.([A-Za-z_]+)\s*=\s*(.+?);/gm, function(match, grp1, grp2, grp3) {
 						if (grp2.charAt(0) == '_' && grp2.charAt(1) == '_')
 							return grp1 + "exports." + grp2 + " = exports." + grp2 + " || " + grp3 + ";";
 						return grp1 + "exports." + grp2 + " = exports." + grp2 + " || {}; extend(exports." + grp2 + ", " + grp3 + ");";
 					});
+					src = src.replace(/,\s*tslib/g, '');
+					src = src.replace(/tslib\.__/g, '__');
 					b[fileName].code = src;
 				}
 				else if (code && /(Globals\/.*|Globals)\.d\.ts$/i.test(fileName) && code.indexOf('declare global') < 0) {

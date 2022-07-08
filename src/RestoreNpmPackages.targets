@@ -3,16 +3,22 @@
     <ItemGroup>
       <NpmPackageFile>
         <StampFile>$([System.IO.Path]::Combine('%(RootDir)%(Directory)', 'node_modules', '.install-stamp'))</StampFile>
-        <WorkingDirectory>%(RootDir)%(Directory)</WorkingDirectory>
-        <NodeModulesDir>%(RootDir)%(Directory)\node_modules</NodeModulesDir>
-        <Command Condition="$(RestorePackagesWithLockFile) != 'true'">npm install</Command>
-        <Command Condition="$(RestorePackagesWithLockFile) == 'true'">npm ci</Command>
+        <WorkingDir>%(RootDir)%(Directory)</WorkingDir>
+        <NodeModulesDir>%(RootDir)%(Directory)\node_modules\</NodeModulesDir>
+        <CommandPNPM>pnpm install</CommandPNPM>
+        <CommandNPM>npm install</CommandNPM>
       </NpmPackageFile>
     </ItemGroup>
   </Target>
-  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" DependsOnTargets="ComputeNpmPackageMetadata" Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
-    <MakeDir Directories="@(NpmPackageFile->'%(NodeModulesDir)')" Condition="!Exists('%(NodeModulesDir)')" ContinueOnError="true"></MakeDir>
-    <Touch Files="@(NpmPackageFile->'%(StampFile)')" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
-    <Exec Command="@(NpmPackageFile->'%(Command)')" WorkingDirectory="%(WorkingDirectory)" ContinueOnError="true" />
+  <Target Name="NpmInstall" DependsOnTargets="ComputeNpmPackageMetadata" Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
+    <Exec Command="%(NpmPackageFile.CommandPNPM)" WorkingDirectory="%(WorkingDir)" 
+          Condition="Exists('%(NodeModulesDir).pnpm\lock.yaml') Or !Exists('%(NodeModulesDir)')" />
+    <Exec Command="%(NpmPackageFile.CommandNPM)" WorkingDirectory="%(WorkingDir)" ContinueOnError="true" 
+          Condition="!Exists('%(NodeModulesDir).pnpm\lock.yaml')" />
+    <MakeDir Directories="%(NpmPackageFile.NodeModulesDir)" Condition="!Exists('%(NodeModulesDir)')" ContinueOnError="true"></MakeDir>
+    <Touch Files="%(NpmPackageFile.StampFile)" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
   </Target>
+  <!--<Target Name="NpmCleanStampFile" AfterTargets="Clean" DependsOnTargets="ComputeNpmPackageMetadata">
+    <Delete Files="@(NpmPackageFile->'%(StampFile)')" Condition="Exists('%(StampFile)')" />
+  </Target>-->
 </Project>

@@ -11,6 +11,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/serenity-is/Serenity</PackageProjectUrl>
     <PackageTags>Serenity</PackageTags>
+    <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
+    <Terser>$(MSBuildProjectDirectory)\node_modules\.bin\terser</Terser>
   </PropertyGroup>
   <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -29,6 +31,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <NpmPackageFile Include="$(MSBuildProjectDirectory)package.json" Condition="Exists('$(MSBuildProjectDirectory)package.json')" />
+    <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
   </ItemGroup>
 </Project>

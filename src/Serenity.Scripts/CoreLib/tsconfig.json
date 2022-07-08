@@ -35,6 +35,7 @@
       "DOM"
     ],
     "noEmitHelpers": false,
+    "importHelpers": false,
     "jsx": "react"
   },
   "files": [
