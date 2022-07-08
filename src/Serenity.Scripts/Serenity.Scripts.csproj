@@ -46,28 +46,12 @@
     <None Include="wwwroot\Serenity.CoreLib.d.ts" />
     <ToCompileCoreLib Include="CoreLib\**\*.ts;CoreLib\tsconfig.json;rollup.config.js"></ToCompileCoreLib>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.1.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <NpmPackageFile Include="$(ProjectDir)package.json" Condition="Exists('$(ProjectDir)package.json')" />
   </ItemGroup>
-  <Target Name="ComputeNpmPackageMetadata">
-    <ItemGroup>
-      <NpmPackageFile>
-        <StampFile>$([System.IO.Path]::Combine('%(RootDir)%(Directory)', 'node_modules', '.install-stamp'))</StampFile>
-        <WorkingDirectory>%(RootDir)%(Directory)</WorkingDirectory>
-        <Command Condition="$(RestorePackagesWithLockFile) != 'true'">npm install</Command>
-        <Command Condition="$(RestorePackagesWithLockFile) == 'true'">npm ci</Command>
-      </NpmPackageFile>
-    </ItemGroup>
-  </Target>
-  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" DependsOnTargets="ComputeNpmPackageMetadata" Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
-    <Touch Files="@(NpmPackageFile->'%(StampFile)')" AlwaysCreate="true" Condition="Exists('%(WorkingDirectory)\node_modules')" ContinueOnError="true" />
-    <Exec Command="@(NpmPackageFile->'%(Command)')" WorkingDirectory="%(WorkingDirectory)" ContinueOnError="true" />
-  </Target>
   <Target Name="CompileCoreLib" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" Outputs="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.d.ts;wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts">
     <Exec Command="npm run build" />
     <Copy SourceFiles="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.min.js;dist\Serenity.CoreLib.js.map;dist\Serenity.CoreLib.d.ts" DestinationFolder="wwwroot" />

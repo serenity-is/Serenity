@@ -28,4 +28,7 @@
         <Link>Properties\GlobalUsings.cs</Link>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <NpmPackageFile Include="$(MSBuildProjectDirectory)package.json" Condition="Exists('$(MSBuildProjectDirectory)package.json')" />
+  </ItemGroup>
 </Project>

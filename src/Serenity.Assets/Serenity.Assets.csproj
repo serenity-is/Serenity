@@ -14,22 +14,8 @@
     <ToMinimize Include="wwwroot\Scripts\jquery-ui.js"></ToMinimize>
     <ToMinimize Include="wwwroot\Scripts\jquery.dialogextendQ.js"></ToMinimize>
     <ToMinimize Include="wwwroot\Scripts\SlickGrid\slick.grid.js"></ToMinimize>
-    <NpmPackageFile Include="$(ProjectDir)..\Serenity.Scripts\package.json" Condition="Exists('$(ProjectDir)..\Serenity.Scripts\package.json')" />
+    <NpmPackageFile Include="..\Serenity.Scripts\package.json" />
   </ItemGroup>
-  <Target Name="ComputeNpmPackageMetadata">
-    <ItemGroup>
-      <NpmPackageFile>
-        <StampFile>$([System.IO.Path]::Combine('%(RootDir)%(Directory)', 'node_modules', '.install-stamp'))</StampFile>
-        <WorkingDirectory>%(RootDir)%(Directory)</WorkingDirectory>
-        <Command Condition="$(RestorePackagesWithLockFile) != 'true'">npm install</Command>
-        <Command Condition="$(RestorePackagesWithLockFile) == 'true'">npm ci</Command>
-      </NpmPackageFile>
-    </ItemGroup>
-  </Target>
-  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" DependsOnTargets="ComputeNpmPackageMetadata" Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
-    <Touch Files="@(NpmPackageFile->'%(StampFile)')" AlwaysCreate="true" Condition="Exists('%(WorkingDirectory)\node_modules')" ContinueOnError="true" />
-    <Exec Command="@(NpmPackageFile->'%(Command)')" WorkingDirectory="%(WorkingDirectory)" ContinueOnError="true" />
-  </Target>
   <Target Name="MinimizeScripts" AfterTargets="AfterBuild" Inputs="@(ToMinimize)" Outputs="@(ToMinimize->'%(RelativeDir)%(Filename).min.js')">
     <Message Text="Minimizing %(ToMinimize.Identity)..." Importance="high"></Message>
     <Exec Command="npx terser &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename)%(ToMinimize.Extension)&quot; -o &quot;$(ProjectDir)%(ToMinimize.RelativeDir)%(ToMinimize.Filename).min.js&quot; --comments --mangle -f &quot;beautify=false,max_line_len=1000&quot;" WorkingDirectory="..\Serenity.Scripts" />
