@@ -15,10 +15,7 @@
           Condition="Exists('%(NodeModulesDir).pnpm\lock.yaml') Or !Exists('%(NodeModulesDir)')" />
     <Exec Command="%(NpmPackageFile.CommandNPM)" WorkingDirectory="%(WorkingDir)" ContinueOnError="true" 
           Condition="!Exists('%(NodeModulesDir).pnpm\lock.yaml')" />
-    <MakeDir Directories="%(NpmPackageFile.NodeModulesDir)" Condition="!Exists('%(NodeModulesDir)')" ContinueOnError="true"></MakeDir>
+    <MakeDir Directories="%(NpmPackageFile.NodeModulesDir)" Condition="!Exists('%(NodeModulesDir)')" ContinueOnError="true" />
     <Touch Files="%(NpmPackageFile.StampFile)" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
   </Target>
-  <!--<Target Name="NpmCleanStampFile" AfterTargets="Clean" DependsOnTargets="ComputeNpmPackageMetadata">
-    <Delete Files="@(NpmPackageFile->'%(StampFile)')" Condition="Exists('%(StampFile)')" />
-  </Target>-->
 </Project>
