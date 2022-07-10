@@ -16,12 +16,9 @@
     ],
     "types": [
       "jquery",
-      "jquery.blockui",
-      "jquery.cookie",
       "jquery.validation",
       "jqueryui",
       "bootstrap",
-      "sortablejs",
       "toastr",
       "react"
     ],

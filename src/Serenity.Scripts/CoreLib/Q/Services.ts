@@ -5,8 +5,8 @@ import { alert, iframeDialog } from "./Dialogs";
 import { blockUI, blockUndo } from "./BlockUI";
 
 export function getCookie(name: string) {
-    if ($.cookie)
-        return $.cookie(name);
+    if (($ as any).cookie)
+        return ($ as any).cookie(name);
 
     name += '=';
     for (var ca = document.cookie.split(/;\s*/), i = ca.length - 1; i >= 0; i--)
