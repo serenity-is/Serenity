@@ -141,12 +141,6 @@ Task("Restore")
     var exitCode = StartProcess("dotnet", "restore " + dotnetSln);
     if (exitCode > 0)
         throw new Exception("Error while restoring " + dotnetSln);
-        
-    StartProcess("powershell", new ProcessSettings 
-    { 
-        Arguments = "npm install", 
-        WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts") 
-    });
 });
 
 Task("Compile")

@@ -1,3 +1,17 @@
+## 6.0.4 (2022-07-10)
+
+Features:
+  - remove System.IO.Abstractions dependency from Serenity.CodeGenerator as preparation for source generators
+  - add key constant to all editor, foramtter, filtering attributes
+  - use pnpm if installed
+  - use libman instead of npm for typings where possible
+
+Bugfixes:
+  - fix cast error occuring in TSTypeLister in rare cases
+  - fix generated texts not accessible
+  - slick grid getCellNode should return an element not jQuery object
+  
+
 ## 6.0.3 (2022-06-24)
 
 Features:
