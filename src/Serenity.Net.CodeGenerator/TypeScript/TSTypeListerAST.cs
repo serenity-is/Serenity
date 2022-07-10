@@ -414,7 +414,8 @@ namespace Serenity.CodeGenerator
                     member.Kind != SyntaxKind.MethodSignature)
                     continue;
 
-                var name = ((Identifier)member.Name).Text;
+                var name = (member.Name as ILiteralLikeNode)?.Text ??
+                    (member.Name as Identifier).Text;
                 if (!used.Add(name))
                     continue;
 
@@ -441,7 +442,8 @@ namespace Serenity.CodeGenerator
                     {
                         (externalMember as ExternalMethod).Arguments.Add(new()
                         {
-                            Name = ((Identifier)arg.Name).Text,
+                            Name = (arg.Name as ILiteralLikeNode)?.Text ??
+                                (arg.Name as Identifier).Text,
                             Type = GetTypeReferenceExpression(arg.Type)
                         });
                     }
