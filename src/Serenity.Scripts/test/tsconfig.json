@@ -12,6 +12,7 @@
     "skipLibCheck": true,
     "target": "ES5",
     "typeRoots": [
+      "../types",
       "../node_modules/@types"
     ],
     "types": [

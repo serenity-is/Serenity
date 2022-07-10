@@ -2,17 +2,8 @@ lockfileVersion: 5.4
 
 specifiers:
   '@rollup/plugin-typescript': latest
-  '@types/bootstrap': 5.1.12
   '@types/jest': 27.0.2
-  '@types/jquery': 2.0.48
-  '@types/jquery.blockui': 0.0.29
-  '@types/jquery.cookie': 1.4.32
-  '@types/jquery.validation': 1.16.7
-  '@types/jqueryui': 1.12.16
   '@types/node': 14.14.14
-  '@types/react': 18.0.15
-  '@types/sortablejs': 1.13.0
-  '@types/toastr': 2.1.39
   flatpickr: 4.6.13
   fsevents: 2.3.2
   jest: 27.3.1
@@ -24,19 +15,6 @@ specifiers:
   tslib: 2.4.0
   typescript: 4.1.3
 
-dependencies:
-  '@types/bootstrap': 5.1.12
-  '@types/jquery': 2.0.48
-  '@types/jquery.blockui': 0.0.29
-  '@types/jquery.cookie': 1.4.32
-  '@types/jquery.validation': 1.16.7
-  '@types/jqueryui': 1.12.16
-  '@types/react': 18.0.15
-  '@types/sortablejs': 1.13.0
-  '@types/toastr': 2.1.39
-  flatpickr: 4.6.13
-  jquery: 3.6.0
-
 optionalDependencies:
   fsevents: 2.3.2
 
@@ -44,7 +22,9 @@ devDependencies:
   '@rollup/plugin-typescript': 8.3.3_jztuldv52enan4je4en37yeaqa
   '@types/jest': 27.0.2
   '@types/node': 14.14.14
+  flatpickr: 4.6.13
   jest: 27.3.1
+  jquery: 3.6.0
   rollup: 2.38.5
   rollup-plugin-dts: 2.0.1_yckvskyprgg72acy3os6leki7m
   terser: 5.5.1
@@ -622,10 +602,6 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@popperjs/core/2.11.5:
-    resolution: {integrity: sha512-9X2obfABZuDVLCgPK9aX0a/x4jaOEweTTWE2+9sr0Qqqevj2Uv5XorvusThmc9XGYpS9yI+fhh8RTafBtGposw==}
-    dev: false
-
   /@rollup/plugin-typescript/8.3.3_jztuldv52enan4je4en37yeaqa:
     resolution: {integrity: sha512-55L9SyiYu3r/JtqdjhwcwaECXP7JeJ9h1Sg1VWRJKIutla2MdZQodTgcCNybXLMCnqpNLEhS2vGENww98L1npg==}
     engines: {node: '>=8.0.0'}
@@ -702,12 +678,6 @@ packages:
       '@babel/types': 7.18.8
     dev: true
 
-  /@types/bootstrap/5.1.12:
-    resolution: {integrity: sha512-pSS5BGEgepwzdbsBGswBWFmgrnYpp7c4UfuYe1FJWwkrcjm/JVwfG4gBkOYtd92Otd3RdJK0ByBWMkBROfLEPw==}
-    dependencies:
-      '@popperjs/core': 2.11.5
-    dev: false
-
   /@types/estree/0.0.39:
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
     dev: true
@@ -741,40 +711,6 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@types/jquery.blockui/0.0.29:
-    resolution: {integrity: sha512-iSrI7fdd//PlH/yAqb5i5N++09XiVvVdgANynAQZj3Y52e2NwzPIPGSOMRQAxGHKy2JBZJt8LMq4eeVs3muTCA==}
-    dependencies:
-      '@types/jquery': 3.5.14
-    dev: false
-
-  /@types/jquery.cookie/1.4.32:
-    resolution: {integrity: sha512-DnOPaZj8UZ5Kt8ZJuzfOKA+4UK7ihjtOPfbo6U3wr/AA/rWd9Ov0b3zMSD3X+y8yeedTsw/DJ0kkX5sl5oVu1w==}
-    dependencies:
-      '@types/jquery': 3.5.14
-    dev: false
-
-  /@types/jquery.validation/1.16.7:
-    resolution: {integrity: sha512-auRrFzVUOOg7jcLMGyEhvKAC84e8/Tu27wJXDLk3NZ0XCKGZWHYm7livBEjRs3LkB4vGnMKqWXBBnRpmCO9mhQ==}
-    dependencies:
-      '@types/jquery': 3.5.14
-    dev: false
-
-  /@types/jquery/2.0.48:
-    resolution: {integrity: sha512-nNLzUrVjaRV/Ds1eHZLYTd7IZxs38cwwLSaqMJj8OTXY8xNUbxSK69bi9cMLvQ7dm/IBeQ1wHwQ0S1uYa0rd2w==}
-    dev: false
-
-  /@types/jquery/3.5.14:
-    resolution: {integrity: sha512-X1gtMRMbziVQkErhTQmSe2jFwwENA/Zr+PprCkF63vFq+Yt5PZ4AlKqgmeNlwgn7dhsXEK888eIW2520EpC+xg==}
-    dependencies:
-      '@types/sizzle': 2.3.3
-    dev: false
-
-  /@types/jqueryui/1.12.16:
-    resolution: {integrity: sha512-6huAQDpNlso9ayaUT9amBOA3kj02OCeUWs+UvDmbaJmwkHSg/HLsQOoap/D5uveN9ePwl72N45Bl+Frp5xyG1Q==}
-    dependencies:
-      '@types/jquery': 3.5.14
-    dev: false
-
   /@types/node/14.14.14:
     resolution: {integrity: sha512-UHnOPWVWV1z+VV8k6L1HhG7UbGBgIdghqF3l9Ny9ApPghbjICXkUJSd/b9gOgQfjM1r+37cipdw/HJ3F6ICEnQ==}
     dev: true
@@ -783,39 +719,9 @@ packages:
     resolution: {integrity: sha512-ymZk3LEC/fsut+/Q5qejp6R9O1rMxz3XaRHDV6kX8MrGAhOSPqVARbDi+EZvInBpw+BnCX3TD240byVkOfQsHg==}
     dev: true
 
-  /@types/prop-types/15.7.5:
-    resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
-    dev: false
-
-  /@types/react/18.0.15:
-    resolution: {integrity: sha512-iz3BtLuIYH1uWdsv6wXYdhozhqj20oD4/Hk2DNXIn1kFsmp9x8d9QB6FnPhfkbhd2PgEONt9Q1x/ebkwjfFLow==}
-    dependencies:
-      '@types/prop-types': 15.7.5
-      '@types/scheduler': 0.16.2
-      csstype: 3.1.0
-    dev: false
-
-  /@types/scheduler/0.16.2:
-    resolution: {integrity: sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==}
-    dev: false
-
-  /@types/sizzle/2.3.3:
-    resolution: {integrity: sha512-JYM8x9EGF163bEyhdJBpR2QX1R5naCJHC8ucJylJ3w9/CVBaskdQ8WqBf8MmQrd1kRvp/a4TS8HJ+bxzR7ZJYQ==}
-    dev: false
-
-  /@types/sortablejs/1.13.0:
-    resolution: {integrity: sha512-C3064MH72iEfeGCYEGCt7FCxXoAXaMPG0QPnstcxvPmbl54erpISu06d++FY37Smja64iWy5L8wOyHHBghWbJQ==}
-    dev: false
-
   /@types/stack-utils/2.0.1:
     resolution: {integrity: sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==}
     dev: true
-
-  /@types/toastr/2.1.39:
-    resolution: {integrity: sha512-jgbMLTjj7dsSY/EYYOoZXhK6OY/bR909Bn6YNnwL3Oq+f0AeFKbYa198XU/6bsmUqqCCWw5VvCi11FDN1/fetw==}
-    dependencies:
-      '@types/jquery': 3.5.14
-    dev: false
 
   /@types/yargs-parser/21.0.0:
     resolution: {integrity: sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==}
@@ -1168,10 +1074,6 @@ packages:
       cssom: 0.3.8
     dev: true
 
-  /csstype/3.1.0:
-    resolution: {integrity: sha512-uX1KG+x9h5hIJsaKR9xHUeUraxf8IODOwq9JLNPq6BwB04a/xgpq3rcx47l5BZu5zBPlgD342tdke3Hom/nJRA==}
-    dev: false
-
   /data-urls/2.0.0:
     resolution: {integrity: sha512-X5eWTSXO/BJmpdIKCRuKUgSCgAN0OwliVK3yPKbwIWU1Tdw5BRajxlzMidvh+gwko9AfQ9zIj52pzF91Q3YAvQ==}
     engines: {node: '>=10'}
@@ -1360,7 +1262,7 @@ packages:
 
   /flatpickr/4.6.13:
     resolution: {integrity: sha512-97PMG/aywoYpB4IvbvUJi0RQi8vearvU0oov1WW3k0WZPBMrTQVqekSX5CjSG/M4Q3i6A/0FKXC7RyAoAUUSPw==}
-    dev: false
+    dev: true
 
   /form-data/3.0.1:
     resolution: {integrity: sha512-RHkBKtLWUVwd7SqRIvCZMEvAMoGUp0XU+seQiZejj0COz3RI3hWP4sCv3gZWWLjJTd7rGwcsF5eKZGii0r/hbg==}
@@ -2068,7 +1970,7 @@ packages:
 
   /jquery/3.6.0:
     resolution: {integrity: sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==}
-    dev: false
+    dev: true
 
   /js-tokens/4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
