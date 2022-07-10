@@ -5,17 +5,13 @@
         <StampFile>$([System.IO.Path]::Combine('%(RootDir)%(Directory)', 'node_modules', '.install-stamp'))</StampFile>
         <WorkingDir>%(RootDir)%(Directory)</WorkingDir>
         <NodeModulesDir>%(RootDir)%(Directory)\node_modules\</NodeModulesDir>
-        <CommandPNPM>pnpm install</CommandPNPM>
-        <CommandNPM>npm install</CommandNPM>
+        <InstallCommand>npm install</InstallCommand>
+        <InstallCommand Condition="Exists('$(AppData)\npm\pnpm') Or Exists('/usr/local/bin/pnpm')">pnpm install</InstallCommand>
       </NpmPackageFile>
     </ItemGroup>
   </Target>
   <Target Name="NpmInstall" DependsOnTargets="ComputeNpmPackageMetadata" Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
-    <Exec Command="%(NpmPackageFile.CommandPNPM)" WorkingDirectory="%(WorkingDir)" 
-          Condition="Exists('%(NodeModulesDir).pnpm\lock.yaml') Or !Exists('%(NodeModulesDir)')" />
-    <Exec Command="%(NpmPackageFile.CommandNPM)" WorkingDirectory="%(WorkingDir)" ContinueOnError="true" 
-          Condition="!Exists('%(NodeModulesDir).pnpm\lock.yaml')" />
-    <MakeDir Directories="%(NpmPackageFile.NodeModulesDir)" Condition="!Exists('%(NodeModulesDir)')" ContinueOnError="true" />
+    <Exec Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)"  />
     <Touch Files="%(NpmPackageFile.StampFile)" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
   </Target>
 </Project>
