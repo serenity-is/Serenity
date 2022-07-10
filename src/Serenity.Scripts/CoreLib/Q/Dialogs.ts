@@ -187,10 +187,18 @@ function bsModalMessage(options: CommonDialogOptions, message: string, modalClas
         for (var button of options.buttons) 
             createButton(button);
 
-    div.modal({
-        backdrop: false,
-        show: !isBS5Plus()
-    });
+    if (isBS5Plus()) {
+        div.modal({
+            backdrop: false,
+        });
+        div.modal('show');
+    }
+    else {
+        div.modal({
+            backdrop: false,
+            show: true
+        } as any);
+    }
 
     if (isBS5Plus())
         div.modal('show');
@@ -431,7 +439,7 @@ export function closePanel(element: JQuery, e?: JQueryEventObject) {
     $(window).triggerHandler('resize');
     $('.require-layout:visible').triggerHandler('layout');
 
-    var e = $.Event(e as any);
+    e = $.Event(e as any);
     (e as any).type = 'panelclose';
     (e as any).target = element[0];
     element.trigger(e);
