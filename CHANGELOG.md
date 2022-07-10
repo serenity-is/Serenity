@@ -1,3 +1,8 @@
+## 6.0.5 (2022-07-11)
+
+Features:
+  - add key for EmailEditor (please prefer EmailAddressEditor)
+
 ## 6.0.4 (2022-07-10)
 
 Features:
