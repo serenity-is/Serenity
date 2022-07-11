@@ -200,12 +200,38 @@ namespace Serenity.CodeGeneration
         {
             string localTextPrefix = null;
 
-#if !ISSOURCEGENERATOR
-            var fieldsType = rowType.NestedTypes.FirstOrDefault(x =>
-                            TypingsUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
+            var fieldsType = rowType.NestedTypes().FirstOrDefault(x =>
+                    TypingsUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
 
             if (fieldsType != null)
             {
+#if ISSOURCEGENERATOR
+                foreach (var ctor in fieldsType.MethodsOf().Where(x => x.IsConstructor()))
+                {
+                    foreach (var syntaxRef in ctor.DeclaringSyntaxReferences)
+                    {
+                        var syntax = syntaxRef.GetSyntax();
+                        foreach (var assignment in syntax.DescendantNodes()
+                            .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.AssignmentExpressionSyntax>())
+                        {
+                            if (assignment.Left is not Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax idLeft ||
+                                idLeft.Identifier.Text != "LocalTextPrefix")
+                                continue;
+
+                            if (assignment.Right is not Microsoft.CodeAnalysis.CSharp.Syntax.LiteralExpressionSyntax literalExpr)
+                                continue;
+
+                            var text = literalExpr.ToString();
+                            if (text.Length < 2 &&
+                                (text[0] != '"' ||
+                                 text[^1] != '"'))
+                                continue;
+
+                            return Newtonsoft.Json.JsonConvert.DeserializeObject<string>(text);
+                        }
+                    }
+                }
+#else
                 var constructors = fieldsType.Resolve().Methods.Where(x => x.IsConstructor);
                 localTextPrefix = constructors.SelectMany(x => x.Body.Instructions.Where(z =>
                         (z.OpCode == OpCodes.Call || z.OpCode == OpCodes.Calli ||
@@ -219,9 +245,9 @@ namespace Serenity.CodeGeneration
 
                 if (localTextPrefix != null)
                     return localTextPrefix;
-            }
 #endif
-            
+            }
+
             var ltp = TypingsUtils.GetAttr(rowType, "Serenity.ComponentModel", "LocalTextPrefixAttribute");
             if (ltp != null)
             {
