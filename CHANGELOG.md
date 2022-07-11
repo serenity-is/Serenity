@@ -1,3 +1,8 @@
+## 6.0.6 (2022-07-11)
+
+Features:
+  - remove app specific texts from Serenity
+
 ## 6.0.5 (2022-07-11)
 
 Features:
