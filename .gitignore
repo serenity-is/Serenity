@@ -18,7 +18,6 @@ TestResults/
 node_modules/
 /build/tools/Addins/
 /src/Serenity.Scripts/dist/
-/src/Serenity.Scripts/package-lock.json
 /src/Serenity.Scripts/wwwroot/Serenity.CoreLib*.js
 /src/Serenity.Scripts/wwwroot/Serenity.CoreLib*.map
 /src/Serenity.Net.CodeGenerator/bin/

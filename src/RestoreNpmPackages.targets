@@ -6,7 +6,6 @@
         <WorkingDir>%(RootDir)%(Directory)</WorkingDir>
         <NodeModulesDir>%(RootDir)%(Directory)\node_modules\</NodeModulesDir>
         <InstallCommand>npm install</InstallCommand>
-        <InstallCommand Condition="Exists('$(AppData)\npm\pnpm') Or Exists('/usr/local/bin/pnpm')">pnpm install</InstallCommand>
       </NpmPackageFile>
     </ItemGroup>
   </Target>
