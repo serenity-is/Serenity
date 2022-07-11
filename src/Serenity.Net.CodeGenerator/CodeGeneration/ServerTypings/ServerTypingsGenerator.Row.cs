@@ -94,14 +94,56 @@ namespace Serenity.CodeGeneration
             }
         }
 
-#if !ISSOURCEGENERATOR
         private static string ExtractInterfacePropertyFromRow(TypeDefinition rowType, string[] interfaceTypes, 
             string propertyType, string propertyName, string getMethodFullName)
         {
             do
             {
-                if (rowType.Interfaces.Any(x => interfaceTypes.Contains(x.InterfaceType.FullName)))
+                if (rowType.Interfaces.Any(x => interfaceTypes.Contains(
+#if ISSOURCEGENERATOR
+                    x.FullNameOf()
+#else
+                    x.InterfaceType.FullName
+#endif
+                    )))
                 {
+#if ISSOURCEGENERATOR
+                    foreach (var method in rowType.MethodsOf())
+                    {
+                        if (!(method.ExplicitInterfaceImplementations.Any(intfImpl =>
+                            interfaceTypes.Any(intfType =>
+                                intfImpl.ReceiverType.FullNameOf() == intfType &&
+                                intfImpl.Name == "get_" + propertyName)) ||
+                            (method.MethodKind == Microsoft.CodeAnalysis.MethodKind.PropertyGet &&
+                             method.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Public &&
+                             method.Name == "get_" + propertyName &&
+                             method.ReturnType != null &&
+                             method.ReturnType.FullNameOf() == propertyType)))
+                        {
+                            continue;
+                        }
+
+                        foreach (var syntaxRef in method.DeclaringSyntaxReferences)
+                        {
+                            var syntax = syntaxRef.GetSyntax();
+
+                            foreach (var memberAccess in syntax.DescendantNodes()
+                                .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.MemberAccessExpressionSyntax>())
+                            {
+                                if (memberAccess.Expression is not Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax idNameLeft)
+                                    continue;
+
+                                if (idNameLeft.Identifier.Text != "fields")
+                                    continue;
+
+                                if (memberAccess.Name is not Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax idNameRight)
+                                    continue;
+
+                                return idNameRight.Identifier.Text;
+                            }
+                        }
+                    }
+#else
                     var name = rowType.Methods.Where(x =>
                             x.Overrides.Any(z => z.FullName == getMethodFullName) ||
                             (x.IsSpecialName && x.Name == "get_" + propertyName && x.ReturnType != null && x.ReturnType.FullName == propertyType))
@@ -114,15 +156,16 @@ namespace Serenity.CodeGeneration
 
                     if (name != null)
                         return name;
+#endif
                 }
             }
-            while ((rowType = (rowType.BaseType?.Resolve())) != null && 
-                rowType.FullName != "Serenity.Data.Row" &&
-                rowType.FullName != "Serenity.Data.Row`1");
 
-            return null;
+            while ((rowType = (rowType.BaseType?.Resolve())) != null && 
+                rowType.FullNameOf() != "Serenity.Data.Row" &&
+                rowType.FullNameOf() != "Serenity.Data.Row`1");
+
+                    return null;
         }
-#endif
 
         private static string DetermineModuleIdentifier(TypeDefinition rowType)
         {
@@ -367,10 +410,6 @@ namespace Serenity.CodeGeneration
                         "Serenity.Data", "NamePropertyAttribute") != null)?.Name;
             }
 
-#if ISSOURCEGENERATOR
-            string isActiveProperty = null;
-            string isDeletedProperty = null;
-#else
             var isActiveProperty = ExtractInterfacePropertyFromRow(rowType,
                 new[] { "Serenity.Data.IIsActiveRow", "Serenity.Data.IIsActiveDeletedRow" },
                 "Serenity.Data.Int16Field", "IsActiveField", 
@@ -380,7 +419,6 @@ namespace Serenity.CodeGeneration
                 new[] { "Serenity.Data.IIsDeletedRow", "Serenity.Data.IIsDeletedRow" },
                 "Serenity.Data.BooleanField", "IsDeletedField",
                 "Serenity.Data.BooleanField Serenity.Data.IIsDeletedRow::get_IsDeletedField()");
-#endif
 
             var lookupKey = DetermineLookupKey(rowType);
 
