@@ -1,3 +1,8 @@
+## 6.0.7 (2022-07-11)
+
+Bugfixes:
+  - fix utf 8 bom not written to generated files in last two versions
+
 ## 6.0.6 (2022-07-11)
 
 Features:
