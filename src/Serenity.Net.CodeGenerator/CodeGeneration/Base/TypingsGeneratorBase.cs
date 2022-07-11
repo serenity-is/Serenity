@@ -278,6 +278,9 @@ namespace Serenity.CodeGeneration
                         ScanAnnotationTypeAttributes(fromType);
 
                         if (fromType.IsAbstract ||
+#if ISSOURCEGENERATOR
+                            (fromType.ContainingType != null && fromType.DeclaredAccessibility != Accessibility.Public) ||
+#endif
                             TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
                             continue;
 
