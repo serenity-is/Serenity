@@ -81,7 +81,10 @@ namespace Serenity.CodeGeneration
         public void WriteAllText(string path, string content, Encoding encoding = null)
         {
             if (encoding != null)
+            {
                 File.WriteAllText(path, content, encoding);
+                return;
+            }
 
             File.WriteAllText(path, content);
         }
