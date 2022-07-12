@@ -1,3 +1,8 @@
+## 6.0.8 (2022-07-12)
+
+Features:
+  - add option to set background color when using padwithfill
+
 ## 6.0.7 (2022-07-11)
 
 Bugfixes:
