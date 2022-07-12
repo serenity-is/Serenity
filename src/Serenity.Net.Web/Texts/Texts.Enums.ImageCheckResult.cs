@@ -18,7 +18,7 @@ namespace Serenity.Web
                 public static LocalText WidthTooLow = "Image width must be higher than {0} pixels but it is {1} pixels!";
                 public static LocalText HeightMismatch = "Image height must be exactly {0} pixels but it is {1} pixels!";
                 public static LocalText HeightTooHigh = "Image height must be lower than {0} pixels but it is {1} pixels!";
-                public static LocalText HeightTooLow = "Image width must be higher than {0} pixels but it is {1} pixels!";
+                public static LocalText HeightTooLow = "Image height must be higher than {0} pixels but it is {1} pixels!";
             }
         }
     }
