@@ -397,8 +397,11 @@ namespace Serenity.Services
                         (attr.ScaleHeight > 0 && (attr.ScaleSmaller || checker.Height > attr.ScaleHeight))))
                 {
                     var originalName = storage.GetOriginalName(temporaryFile);
+                    var scaleBackColor = !string.IsNullOrEmpty(attr.ScaleBackColor) ?
+                        Color.Parse(attr.ScaleBackColor) : (Color?)null;
+
                     using Image scaledImage = ThumbnailGenerator.Generate(
-                        image, attr.ScaleWidth, attr.ScaleHeight, attr.ScaleMode, backgroundColor: null);
+                        image, attr.ScaleWidth, attr.ScaleHeight, attr.ScaleMode, backgroundColor: scaleBackColor);
                     temporaryFile = baseFile + ".jpg";
                     fs.Close();
                     using var ms = new MemoryStream();
@@ -413,6 +416,9 @@ namespace Serenity.Services
                 if (thumbSizes == null)
                     return;
 
+                var thumbBackColor = !string.IsNullOrEmpty(attr.ThumbBackColor) ?
+                    Color.Parse(attr.ThumbBackColor) : (Color?)null;
+
                 foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split(new char[] { ',' }))
                 {
                     var dims = sizeStr.ToUpperInvariant().Split(new char[] { 'X' });
@@ -426,7 +432,7 @@ namespace Serenity.Services
                         throw new ArgumentOutOfRangeException(nameof(attr.ThumbSizes));
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
-                    using Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, backgroundColor: null);
+                    using Image thumbImage = ThumbnailGenerator.Generate(image, w, h, attr.ThumbMode, backgroundColor: thumbBackColor);
                     string thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
                     using var ms = new MemoryStream();
                     thumbImage.Save(ms, new JpegEncoder { Quality = attr.ThumbQuality == 0 ? null : attr.ThumbQuality });
