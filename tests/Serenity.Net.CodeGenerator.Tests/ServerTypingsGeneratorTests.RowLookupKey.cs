@@ -8,7 +8,7 @@ namespace Serenity.Tests.CodeGenerator
 {
     public partial class ServerTypingsGeneratorTests
     {
-               [Fact]
+        [Fact]
         public void Determines_LookupKey_On_Row_If_Set_Explicitly()
         {
             var generator = CreateGenerator();
