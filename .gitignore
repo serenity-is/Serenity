@@ -20,4 +20,6 @@ node_modules/
 /src/Serenity.Scripts/dist/
 /src/Serenity.Scripts/wwwroot/Serenity.CoreLib*.js
 /src/Serenity.Scripts/wwwroot/Serenity.CoreLib*.map
+/src/Serenity.Scripts/SlickGrid/*.js.map
+/src/Serenity.Scripts/SlickGrid/*.js
 /src/Serenity.Net.CodeGenerator/bin/
