@@ -1874,7 +1874,7 @@ namespace Slick {
             }
         }
 
-        private getColumnCssRules(idx: number) {
+        private getColumnCssRules(idx: number): { right: any; left: any; } {
             if (!this.stylesheet) {
                 var stylesheetFromUid = document.querySelector("style[data-uid='" + this.uid + "']") as any
                 if (stylesheetFromUid && stylesheetFromUid.sheet) {
@@ -1901,10 +1901,10 @@ namespace Slick {
                 for (var i = 0; i < cssRules.length; i++) {
                     var selector = cssRules[i].selectorText;
                     if (matches = /\.l\d+/.exec(selector)) {
-                        columnIdx = parseInt(matches[0].substring(2, matches[0].length - 2), 10);
+                        columnIdx = parseInt(matches[0].substring(2, matches[0].length), 10);
                         this.columnCssRulesL[columnIdx] = cssRules[i];
                     } else if (matches = /\.r\d+/.exec(selector)) {
-                        columnIdx = parseInt(matches[0].substring(2, matches[0].length - 2), 10);
+                        columnIdx = parseInt(matches[0].substring(2, matches[0].length), 10);
                         this.columnCssRulesR[columnIdx] = cssRules[i];
                     }
                 }
