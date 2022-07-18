@@ -20,9 +20,9 @@
  */
 /// <reference types="jquery" />
 declare namespace Slick {
-    type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column, item: TItem, grid?: Grid, colMeta?: ColumnMetadata) => string;
+    type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>, colMeta?: ColumnMetadata) => string;
     type ColumnFormat<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
-    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column) => void;
+    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>) => void;
     type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
     interface FormatterContext<TItem = any> {
         row?: number;
@@ -64,20 +64,24 @@ declare namespace Slick {
         leftPx?: number;
         rightPx?: number;
     }
-    interface EditorOptions<TItem> {
-        grid: Grid<TItem>;
+    interface EditorOptions {
+        grid: Grid;
         gridPosition?: Position;
         position?: Position;
         container?: HTMLElement;
         column?: Column;
-        item?: TItem;
+        item?: any;
         commitChanges?: () => void;
         cancelChanges?: () => void;
     }
-    interface Editor<TItem = any> {
-        new (options: EditorOptions<TItem>): Editor<TItem>;
+    interface ValidationResult {
+        valid: boolean;
+        msg?: string;
+    }
+    interface Editor {
+        new (options: EditorOptions): Editor;
         destroy(): void;
-        applyValue(item: TItem, value: any): void;
+        applyValue(item: any, value: any): void;
         focus(): void;
         isValueChanged(): boolean;
         loadValue(value: any): void;
@@ -85,17 +89,15 @@ declare namespace Slick {
         position?(pos: Position): void;
         hide?(): void;
         show?(): void;
-        validate?(): {
-            valid: boolean;
-        };
+        validate?(): ValidationResult;
     }
-    interface EditorFactory<TItem = any> {
-        getEditor(column: Column<TItem>): Editor;
+    interface EditorFactory {
+        getEditor(column: Column): Editor;
     }
-    interface EditCommand<TItem = any> {
+    interface EditCommand {
         row: number;
         cell: number;
-        editor: Editor<TItem>;
+        editor: Editor;
         serializedValue: any;
         prevSerializedValue: any;
         execute: () => void;
@@ -114,40 +116,60 @@ declare namespace Slick {
         };
         formatter?: ColumnFormatter<TItem>;
     }
-    interface GridEventArgs {
+    interface ArgsGrid {
         grid?: Grid;
     }
-    interface ColNodeEventArgs extends GridEventArgs {
+    interface ArgsColumn extends ArgsGrid {
         column: Column;
+    }
+    interface ArgsColumnNode extends ArgsColumn {
         node: HTMLElement;
     }
-    type SortEventCol = {
+    type ArgsSortCol = {
         sortCol: Column;
         sortAsc: boolean;
     };
-    interface SortEventArgs extends GridEventArgs {
+    interface ArgsSort extends ArgsGrid {
         multiColumnSort: boolean;
         sortAsc?: boolean;
         sortCol?: Column;
-        sortCols?: SortEventCol[];
+        sortCols?: ArgsSortCol[];
     }
-    interface ColumnReorderEventArgs extends GridEventArgs {
+    interface ArgsColumnReorder extends ArgsGrid {
         impactedColumns: Column[];
     }
-    interface RowNumbersEventArgs extends GridEventArgs {
+    interface ArgsRowNumbers extends ArgsGrid {
         rows: number[];
     }
-    interface ScrollEventArgs extends GridEventArgs {
+    interface ArgsScroll extends ArgsGrid {
         scrollLeft: number;
         scrollTop: number;
     }
-    interface CellCssStyleEventArgs extends GridEventArgs {
+    interface ArgsCssStyle extends ArgsGrid {
         key: string;
         hash: CellStylesHash;
     }
-    interface RowCellEventArgs extends GridEventArgs {
+    interface ArgsCell extends ArgsGrid {
         row: number;
         cell: number;
+    }
+    interface ArgsCellChange extends ArgsCell {
+        item: any;
+    }
+    interface ArgsCellEdit extends ArgsCellChange {
+        column: Column;
+    }
+    interface ArgsAddNewRow extends ArgsColumn {
+        item: any;
+    }
+    interface ArgsEditorDestroy extends ArgsGrid {
+        editor: Editor;
+    }
+    interface ArgsValidationError extends ArgsCell {
+        editor: Editor;
+        column: Column;
+        cellNode: HTMLElement;
+        validationResults: ValidationResult;
     }
     type CellStylesHash = {
         [row: number]: {
@@ -167,7 +189,7 @@ declare namespace Slick {
         footerCssClass?: string;
         format?: ColumnFormat<TItem>;
         formatter?: ColumnFormatter<TItem>;
-        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid) => string;
+        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
         headerCssClass?: string;
         id?: string;
         maxWidth?: any;
@@ -179,10 +201,11 @@ declare namespace Slick {
         resizable?: boolean;
         selectable?: boolean;
         sortable?: boolean;
-        toolTip?: string;
-        width?: number;
         sortOrder?: number;
+        toolTip?: string;
+        validator?: (value: any) => ValidationResult;
         visible?: boolean;
+        width?: number;
     }
     interface GridOptions<TItem = any> {
         addNewRowCssClass?: string;
@@ -194,16 +217,16 @@ declare namespace Slick {
         autoHeight?: boolean;
         cellFlashingCssClass?: string;
         cellHighlightCssClass?: string;
-        columns?: Column[];
-        dataItemColumnValueExtractor?: (item: TItem, column: Column) => void;
+        columns?: Column<TItem>[];
+        dataItemColumnValueExtractor?: (item: TItem, column: Column<TItem>) => void;
         groupingPanel?: boolean;
         groupingPanelHeight?: number;
         setGroupingPanelVisibility?: (value: boolean) => void;
         defaultColumnWidth?: number;
-        defaultFormatter?: ColumnFormatter;
+        defaultFormatter?: ColumnFormatter<TItem>;
         editable?: boolean;
         editCommandHandler?: (item: TItem, column: Column<TItem>, command: EditCommand) => void;
-        editorFactory?: EditorFactory<TItem>;
+        editorFactory?: EditorFactory;
         editorLock?: EditorLock;
         enableAddRow?: boolean;
         enableAsyncPostCleanup?: boolean;
@@ -318,7 +341,6 @@ declare namespace Slick {
         private serializedEditorValue;
         private editController;
         private rowsCache;
-        private renderedRows;
         private numVisibleRows;
         private prevScrollTop;
         private scrollTop;
@@ -381,42 +403,42 @@ declare namespace Slick {
         private $headerScrollContainer;
         private $headerRowScrollContainer;
         private $footerRowScrollContainer;
-        readonly onScroll: Event<ScrollEventArgs, IEventData>;
-        readonly onSort: Event<SortEventArgs, IEventData>;
-        readonly onHeaderMouseEnter: Event<any>;
-        readonly onHeaderMouseLeave: Event<any>;
-        readonly onHeaderContextMenu: Event<any>;
-        readonly onHeaderClick: Event<any>;
-        readonly onHeaderCellRendered: Event<ColNodeEventArgs, IEventData>;
-        readonly onBeforeHeaderCellDestroy: Event<ColNodeEventArgs, IEventData>;
-        readonly onHeaderRowCellRendered: Event<ColNodeEventArgs, IEventData>;
-        readonly onFooterRowCellRendered: Event<ColNodeEventArgs, IEventData>;
-        readonly onBeforeHeaderRowCellDestroy: Event<ColNodeEventArgs, IEventData>;
-        readonly onBeforeFooterRowCellDestroy: Event<ColNodeEventArgs, IEventData>;
-        readonly onMouseEnter: Event<any>;
-        readonly onMouseLeave: Event<any>;
-        readonly onClick: Event<RowCellEventArgs, JQueryMouseEventObject>;
-        readonly onDblClick: Event<any>;
-        readonly onContextMenu: Event<GridEventArgs, JQueryEventObject>;
-        readonly onKeyDown: Event<RowCellEventArgs, JQueryKeyEventObject>;
-        readonly onAddNewRow: Event<any>;
-        readonly onValidationError: Event<any>;
-        readonly onViewportChanged: Event<GridEventArgs, IEventData>;
-        readonly onColumnsReordered: Event<ColumnReorderEventArgs, IEventData>;
-        readonly onColumnsResized: Event<GridEventArgs, IEventData>;
-        readonly onCellChange: Event<any>;
-        readonly onBeforeEditCell: Event<any>;
-        readonly onBeforeCellEditorDestroy: Event<any>;
-        readonly onBeforeDestroy: Event<GridEventArgs, IEventData>;
-        readonly onActiveCellChanged: Event<any>;
-        readonly onActiveCellPositionChanged: Event<any>;
-        readonly onDragInit: Event<any, JQueryEventObject>;
-        readonly onDragStart: Event<any, JQueryEventObject>;
-        readonly onDrag: Event<any, JQueryEventObject>;
-        readonly onDragEnd: Event<any, JQueryEventObject>;
-        readonly onSelectedRowsChanged: Event<RowNumbersEventArgs, IEventData>;
-        readonly onCellCssStylesChanged: Event<CellCssStyleEventArgs, IEventData>;
-        constructor(container: JQuery, data: any, columns: Column[], options: GridOptions<TItem>);
+        readonly onScroll: Event<ArgsScroll, IEventData>;
+        readonly onSort: Event<ArgsSort, IEventData>;
+        readonly onHeaderMouseEnter: Event<ArgsColumn, JQueryMouseEventObject>;
+        readonly onHeaderMouseLeave: Event<ArgsColumn, IEventData>;
+        readonly onHeaderContextMenu: Event<ArgsColumn, IEventData>;
+        readonly onHeaderClick: Event<ArgsColumn, IEventData>;
+        readonly onHeaderCellRendered: Event<ArgsColumnNode, IEventData>;
+        readonly onBeforeHeaderCellDestroy: Event<ArgsColumnNode, IEventData>;
+        readonly onHeaderRowCellRendered: Event<ArgsColumnNode, IEventData>;
+        readonly onFooterRowCellRendered: Event<ArgsColumnNode, IEventData>;
+        readonly onBeforeHeaderRowCellDestroy: Event<ArgsColumnNode, IEventData>;
+        readonly onBeforeFooterRowCellDestroy: Event<ArgsColumnNode, IEventData>;
+        readonly onMouseEnter: Event<ArgsGrid, JQueryMouseEventObject>;
+        readonly onMouseLeave: Event<ArgsGrid, JQueryMouseEventObject>;
+        readonly onClick: Event<ArgsCell, JQueryMouseEventObject>;
+        readonly onDblClick: Event<ArgsCell, JQueryMouseEventObject>;
+        readonly onContextMenu: Event<ArgsGrid, JQueryEventObject>;
+        readonly onKeyDown: Event<ArgsCell, JQueryKeyEventObject>;
+        readonly onAddNewRow: Event<ArgsAddNewRow, IEventData>;
+        readonly onValidationError: Event<ArgsValidationError, IEventData>;
+        readonly onViewportChanged: Event<ArgsGrid, IEventData>;
+        readonly onColumnsReordered: Event<ArgsColumnReorder, IEventData>;
+        readonly onColumnsResized: Event<ArgsGrid, IEventData>;
+        readonly onCellChange: Event<ArgsCellChange, IEventData>;
+        readonly onBeforeEditCell: Event<ArgsCellEdit, IEventData>;
+        readonly onBeforeCellEditorDestroy: Event<ArgsEditorDestroy, IEventData>;
+        readonly onBeforeDestroy: Event<ArgsGrid, IEventData>;
+        readonly onActiveCellChanged: Event<ArgsGrid, IEventData>;
+        readonly onActiveCellPositionChanged: Event<ArgsGrid, IEventData>;
+        readonly onDragInit: Event<ArgsGrid, JQueryEventObject>;
+        readonly onDragStart: Event<ArgsGrid, JQueryEventObject>;
+        readonly onDrag: Event<ArgsGrid, JQueryEventObject>;
+        readonly onDragEnd: Event<ArgsGrid, JQueryEventObject>;
+        readonly onSelectedRowsChanged: Event<ArgsRowNumbers, IEventData>;
+        readonly onCellCssStylesChanged: Event<ArgsCssStyle, IEventData>;
+        constructor(container: JQuery, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
         init(): void;
         private hasFrozenColumns;
         registerPlugin(plugin: Plugin): void;
@@ -596,7 +618,7 @@ declare namespace Slick {
         private getActiveCellPosition;
         getGridPosition(): Position;
         private handleActiveCellPositionChange;
-        getCellEditor(): Editor<any>;
+        getCellEditor(): Editor;
         getActiveCell(): RowCell;
         getActiveCellNode(): HTMLElement;
         scrollActiveCellIntoView(): void;

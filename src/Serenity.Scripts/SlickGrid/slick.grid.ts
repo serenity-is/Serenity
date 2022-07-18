@@ -33,9 +33,9 @@ if (typeof Slick === "undefined") {
 
 namespace Slick {
 
-    export type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column, item: TItem, grid?: Grid, colMeta?: ColumnMetadata) => string;
+    export type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>, colMeta?: ColumnMetadata) => string;
     export type ColumnFormat<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
-    export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column) => void;
+    export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>) => void;
     export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
 
     export interface FormatterContext<TItem = any> {
@@ -85,21 +85,26 @@ namespace Slick {
         rightPx?: number;
     }
 
-    export interface EditorOptions<TItem> {
-        grid: Grid<TItem>;
+    export interface EditorOptions {
+        grid: Grid;
         gridPosition?: Position;
         position?: Position;
         container?: HTMLElement;
         column?: Column;
-        item?: TItem;
+        item?: any;
         commitChanges?: () => void,
         cancelChanges?: () => void
     }
 
-    export interface Editor<TItem = any> {
-        new (options: EditorOptions<TItem>) : Editor<TItem>;
+    export interface ValidationResult {
+        valid: boolean;
+        msg?: string;
+    }
+
+    export interface Editor {
+        new (options: EditorOptions) : Editor;
         destroy(): void;
-        applyValue(item: TItem, value: any): void;
+        applyValue(item: any, value: any): void;
         focus(): void;
         isValueChanged(): boolean;
         loadValue(value: any): void;
@@ -107,17 +112,17 @@ namespace Slick {
         position?(pos: Position): void;
         hide?(): void;
         show?(): void;
-        validate?(): { valid: boolean };
+        validate?(): ValidationResult;
     }
     
-    export interface EditorFactory<TItem = any> {
-        getEditor(column: Column<TItem>): Editor;
+    export interface EditorFactory {
+        getEditor(column: Column): Editor;
     }
 
-    export interface EditCommand<TItem = any> {
+    export interface EditCommand {
         row: number;
         cell: number;
-        editor: Editor<TItem>;
+        editor: Editor;
         serializedValue: any;
         prevSerializedValue: any;
         execute: () => void;
@@ -138,48 +143,74 @@ namespace Slick {
         formatter?: ColumnFormatter<TItem>;
     }
 
-    export interface GridEventArgs {
+    export interface ArgsGrid {
         grid?: Grid;
     }
 
-    export interface ColNodeEventArgs extends GridEventArgs {
+    export interface ArgsColumn extends ArgsGrid {
         column: Column;
+    }
+
+    export interface ArgsColumnNode extends ArgsColumn {
         node: HTMLElement;
     }
 
-    export type SortEventCol = {
+    export type ArgsSortCol = {
         sortCol: Column;
         sortAsc: boolean;
     }
 
-    export interface SortEventArgs extends GridEventArgs {
+    export interface ArgsSort extends ArgsGrid {
         multiColumnSort: boolean;
         sortAsc?: boolean;
         sortCol?: Column;
-        sortCols?: SortEventCol[];
+        sortCols?: ArgsSortCol[];
     }
 
-    export interface ColumnReorderEventArgs extends GridEventArgs {
+    export interface ArgsColumnReorder extends ArgsGrid {
         impactedColumns: Column[];
     }
 
-    export interface RowNumbersEventArgs extends GridEventArgs {
+    export interface ArgsRowNumbers extends ArgsGrid {
         rows: number[];
     }
 
-    export interface ScrollEventArgs extends GridEventArgs {
+    export interface ArgsScroll extends ArgsGrid {
         scrollLeft: number;
         scrollTop: number;
     }
 
-    export interface CellCssStyleEventArgs extends GridEventArgs {
+    export interface ArgsCssStyle extends ArgsGrid {
         key: string;
         hash: CellStylesHash;
     }
 
-    export interface RowCellEventArgs extends GridEventArgs {
+    export interface ArgsCell extends ArgsGrid {
         row: number;
         cell: number;
+    }
+
+    export interface ArgsCellChange extends ArgsCell {
+        item: any;
+    }
+
+    export interface ArgsCellEdit extends ArgsCellChange {
+        column: Column;
+    }
+
+    export interface ArgsAddNewRow extends ArgsColumn {
+        item: any;
+    }
+
+    export interface ArgsEditorDestroy extends ArgsGrid {
+        editor: Editor;
+    }
+
+    export interface ArgsValidationError extends ArgsCell {
+        editor: Editor,
+        column: Column;
+        cellNode: HTMLElement;
+        validationResults: ValidationResult;
     }
 
     export type CellStylesHash = { [row: number]: { [cell: number]: string } }
@@ -197,7 +228,7 @@ namespace Slick {
         footerCssClass?: string;
         format?: ColumnFormat<TItem>;
         formatter?: ColumnFormatter<TItem>;
-        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid) => string;
+        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
         headerCssClass?: string;
         id?: string;
         maxWidth?: any;
@@ -209,10 +240,11 @@ namespace Slick {
         resizable?: boolean;
         selectable?: boolean;
         sortable?: boolean;
-        toolTip?: string;
-        width?: number;
         sortOrder?: number;
+        toolTip?: string;
+        validator?: (value: any) => ValidationResult;
         visible?: boolean;
+        width?: number;
     }
 
     export interface GridOptions<TItem = any> {
@@ -225,16 +257,16 @@ namespace Slick {
         autoHeight?: boolean;
         cellFlashingCssClass?: string;
         cellHighlightCssClass?: string;
-        columns?: Column[];
-        dataItemColumnValueExtractor?: (item: TItem, column: Column) => void;
+        columns?: Column<TItem>[];
+        dataItemColumnValueExtractor?: (item: TItem, column: Column<TItem>) => void;
         groupingPanel?: boolean,
         groupingPanelHeight?: number;
         setGroupingPanelVisibility?: (value: boolean) => void;
         defaultColumnWidth?: number;
-        defaultFormatter?: ColumnFormatter;
+        defaultFormatter?: ColumnFormatter<TItem>;
         editable?: boolean;
         editCommandHandler?: (item: TItem, column: Column<TItem>, command: EditCommand) => void;
-        editorFactory?: EditorFactory<TItem>;
+        editorFactory?: EditorFactory;
         editorLock?: EditorLock;
         enableAddRow?: boolean;
         enableAsyncPostCleanup?: boolean;
@@ -361,7 +393,6 @@ namespace Slick {
         private editController: any;
 
         private rowsCache: { [key: number]: CachedRow } = {};
-        private renderedRows: any = 0;
         private numVisibleRows: any = 0;
         private prevScrollTop: any = 0;
         private scrollTop: any = 0;
@@ -445,43 +476,43 @@ namespace Slick {
         private $headerRowScrollContainer: JQuery;
         private $footerRowScrollContainer: JQuery;
 
-        readonly onScroll = new Event<ScrollEventArgs>();
-        readonly onSort = new Event<SortEventArgs>();
-        readonly onHeaderMouseEnter: Event<any> = new Event();
-        readonly onHeaderMouseLeave: Event<any> = new Event();
-        readonly onHeaderContextMenu: Event<any> = new Event();
-        readonly onHeaderClick: Event<any> = new Event();
-        readonly onHeaderCellRendered = new Event<ColNodeEventArgs>();
-        readonly onBeforeHeaderCellDestroy = new Event<ColNodeEventArgs>();
-        readonly onHeaderRowCellRendered = new Event<ColNodeEventArgs>();
-        readonly onFooterRowCellRendered = new Event<ColNodeEventArgs>();
-        readonly onBeforeHeaderRowCellDestroy = new Event<ColNodeEventArgs>();
-        readonly onBeforeFooterRowCellDestroy = new Event<ColNodeEventArgs>();
-        readonly onMouseEnter: Event<any> = new Event();
-        readonly onMouseLeave: Event<any> = new Event();
-        readonly onClick = new Event<RowCellEventArgs, JQueryMouseEventObject>();
-        readonly onDblClick: Event<any> = new Event();
-        readonly onContextMenu = new Event<GridEventArgs, JQueryEventObject>();
-        readonly onKeyDown = new Event<RowCellEventArgs, JQueryKeyEventObject>();
-        readonly onAddNewRow: Event<any> = new Event();
-        readonly onValidationError: Event<any> = new Event();
-        readonly onViewportChanged = new Event<GridEventArgs>();
-        readonly onColumnsReordered = new Event<ColumnReorderEventArgs>();
-        readonly onColumnsResized = new Event<GridEventArgs>();
-        readonly onCellChange: Event<any> = new Event();
-        readonly onBeforeEditCell: Event<any> = new Event();
-        readonly onBeforeCellEditorDestroy: Event<any> = new Event();
-        readonly onBeforeDestroy = new Event<GridEventArgs>();
-        readonly onActiveCellChanged: Event<any> = new Event();
-        readonly onActiveCellPositionChanged: Event<any> = new Event();
-        readonly onDragInit = new Event<any, JQueryEventObject>();
-        readonly onDragStart = new Event<any, JQueryEventObject>();
-        readonly onDrag = new Event<any, JQueryEventObject>();
-        readonly onDragEnd = new Event<any, JQueryEventObject>();
-        readonly onSelectedRowsChanged = new Event<RowNumbersEventArgs>();
-        readonly onCellCssStylesChanged = new Event<CellCssStyleEventArgs>();
+        readonly onScroll = new Event<ArgsScroll>();
+        readonly onSort = new Event<ArgsSort>();
+        readonly onHeaderMouseEnter = new Event<ArgsColumn, JQueryMouseEventObject>();
+        readonly onHeaderMouseLeave = new Event<ArgsColumn>();
+        readonly onHeaderContextMenu = new Event<ArgsColumn>();
+        readonly onHeaderClick = new Event<ArgsColumn>();
+        readonly onHeaderCellRendered = new Event<ArgsColumnNode>();
+        readonly onBeforeHeaderCellDestroy = new Event<ArgsColumnNode>();
+        readonly onHeaderRowCellRendered = new Event<ArgsColumnNode>();
+        readonly onFooterRowCellRendered = new Event<ArgsColumnNode>();
+        readonly onBeforeHeaderRowCellDestroy = new Event<ArgsColumnNode>();
+        readonly onBeforeFooterRowCellDestroy = new Event<ArgsColumnNode>();
+        readonly onMouseEnter = new Event<ArgsGrid, JQueryMouseEventObject>();
+        readonly onMouseLeave = new Event<ArgsGrid, JQueryMouseEventObject>();
+        readonly onClick = new Event<ArgsCell, JQueryMouseEventObject>();
+        readonly onDblClick = new Event<ArgsCell, JQueryMouseEventObject>();
+        readonly onContextMenu = new Event<ArgsGrid, JQueryEventObject>();
+        readonly onKeyDown = new Event<ArgsCell, JQueryKeyEventObject>();
+        readonly onAddNewRow = new Event<ArgsAddNewRow>();
+        readonly onValidationError = new Event<ArgsValidationError>();
+        readonly onViewportChanged = new Event<ArgsGrid>();
+        readonly onColumnsReordered = new Event<ArgsColumnReorder>();
+        readonly onColumnsResized = new Event<ArgsGrid>();
+        readonly onCellChange = new Event<ArgsCellChange>();
+        readonly onBeforeEditCell = new Event<ArgsCellEdit>();
+        readonly onBeforeCellEditorDestroy = new Event<ArgsEditorDestroy>();
+        readonly onBeforeDestroy = new Event<ArgsGrid>();
+        readonly onActiveCellChanged = new Event<ArgsGrid>();
+        readonly onActiveCellPositionChanged = new Event<ArgsGrid>();
+        readonly onDragInit = new Event<ArgsGrid, JQueryEventObject>();
+        readonly onDragStart = new Event<ArgsGrid, JQueryEventObject>();
+        readonly onDrag = new Event<ArgsGrid, JQueryEventObject>();
+        readonly onDragEnd = new Event<ArgsGrid, JQueryEventObject>();
+        readonly onSelectedRowsChanged = new Event<ArgsRowNumbers>();
+        readonly onCellCssStylesChanged = new Event<ArgsCssStyle>();
 
-        constructor(container: JQuery, data: any, columns: Column[], options: GridOptions<TItem>) {
+        constructor(container: JQuery, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
 
             this._data = data;
 
@@ -1167,12 +1198,12 @@ namespace Slick {
             }
         }
 
-        private formatGroupTotal(total: GroupTotals, columnDef: Column): any {
+        private formatGroupTotal(total: GroupTotals, columnDef: Column<TItem>): any {
             if (columnDef.formatter != null) {
                 var item = new Slick.NonDataRow();
                 item[columnDef.field] = total;
                 try {
-                    return columnDef.formatter(-1, -1, total, columnDef, item);
+                    return columnDef.formatter(-1, -1, total, columnDef, item as any);
                 }
                 catch (e) {
                 }
@@ -1196,7 +1227,7 @@ namespace Slick {
                 return total;
         }
 
-        private groupTotalText(totals: GroupTotals, columnDef: Column, key: string): string {
+        private groupTotalText(totals: GroupTotals, columnDef: Column<TItem>, key: string): string {
             var ltKey = (key.substring(0, 1).toUpperCase() + key.substring(1));
             //@ts-ignore
             var text = (Q && Q.tryGetText && Q.tryGetText(ltKey)) || ltKey;
@@ -1209,7 +1240,7 @@ namespace Slick {
                 "</span>";
         }
 
-        private groupTotalsFormatter(totals: GroupTotals, columnDef: Column): string {
+        private groupTotalsFormatter(totals: GroupTotals, columnDef: Column<TItem>): string {
             if (!totals || !columnDef)
                 return "";
 
@@ -1333,7 +1364,7 @@ namespace Slick {
                     return;
                 }
 
-                var column = $col.data("column") as Column;
+                var column = $col.data("column") as Column<TItem>;
                 if (column.sortable) {
                     if (!this.getEditorLock().commitCurrentEdit()) {
                         return;
@@ -1489,7 +1520,7 @@ namespace Slick {
         }
 
         private setupColumnResize(): void {
-            var $col: JQuery, j: number, k: number, c: Column, pageX: number, columnElements: JQuery, minPageX: number, maxPageX: number, firstResizable: number, lastResizable: number;
+            var $col: JQuery, j: number, k: number, c: Column<TItem>, pageX: number, columnElements: JQuery, minPageX: number, maxPageX: number, firstResizable: number, lastResizable: number;
             columnElements = this.$headers.children();
             columnElements.find(".slick-resizable-handle").remove();
             columnElements.each((i) => {
@@ -1981,7 +2012,7 @@ namespace Slick {
         //////////////////////////////////////////////////////////////////////////////////////////////
         // General
 
-        private trigger<TArgs extends GridEventArgs, TEventData extends IEventData = IEventData>(
+        private trigger<TArgs extends ArgsGrid, TEventData extends IEventData = IEventData>(
             evt: Event<TArgs, TEventData>, args?: TArgs, e?: TEventData) {
             e = e || new Slick.EventData() as any;
             args = args || {} as any;
@@ -2432,7 +2463,7 @@ namespace Slick {
             }
         }
 
-        private getFormatter(row: number, column: Column): ColumnFormatter<TItem> {
+        private getFormatter(row: number, column: Column<TItem>): ColumnFormatter<TItem> {
             var itemMetadata = this._data.getItemMetadata && this._data.getItemMetadata(row) as ItemMetadata;
             var colsMetadata = itemMetadata && itemMetadata.columns;
 
@@ -2446,7 +2477,7 @@ namespace Slick {
                 this._options.defaultFormatter;
         }
 
-        private callFormatter(row: number, cell: number, value: any, m: Column, item: TItem): string {
+        private callFormatter(row: number, cell: number, value: any, m: Column<TItem>, item: TItem): string {
 
             var result: string;
 
@@ -2465,7 +2496,7 @@ namespace Slick {
             return result;
         }
 
-        private getEditor(row: number, cell: number): Editor<TItem> {
+        private getEditor(row: number, cell: number): Editor {
             var column = this._columns[cell];
             var rowMetadata = this._data.getItemMetadata && this._data.getItemMetadata(row);
             var columnMetadata = rowMetadata && rowMetadata.columns;
@@ -2480,7 +2511,7 @@ namespace Slick {
             return column.editor || (this._options.editorFactory && this._options.editorFactory.getEditor(column));
         }
 
-        private getDataItemValueForColumn(item: TItem, columnDef: Column): any {
+        private getDataItemValueForColumn(item: TItem, columnDef: Column<TItem>): any {
             if (this._options.dataItemColumnValueExtractor) {
                 return this._options.dataItemColumnValueExtractor(item, columnDef);
             }
@@ -2686,7 +2717,6 @@ namespace Slick {
 
             delete this.rowsCache[row];
             delete this.postProcessedRows[row];
-            this.renderedRows--;
         }
 
         invalidateRows(rows: number[]): void {
@@ -3244,7 +3274,6 @@ namespace Slick {
                 if (this.rowsCache[i] || (this.hasFrozenRows && this._options.frozenBottom && i == this.getDataLength())) {
                     continue;
                 }
-                this.renderedRows++;
                 rows.push(i);
 
                 // Create an entry right away so that appendRowHtml() can
@@ -3855,7 +3884,7 @@ namespace Slick {
             }
         }
 
-        private handleContextMenu(e: JQueryEventObject): void {
+        private handleContextMenu(e: JQueryMouseEventObject): void {
             var $cell = $(e.target).closest(".slick-cell", this.$canvas as any);
             if ($cell.length === 0) {
                 return;
@@ -3869,7 +3898,7 @@ namespace Slick {
             this.trigger(this.onContextMenu, {}, e);
         }
 
-        private handleDblClick(e: JQueryEventObject): void {
+        private handleDblClick(e: JQueryMouseEventObject): void {
             var cell = this.getCellFromEvent(e as any);
             if (!cell || (this.currentEditor !== null && this.activeRow == cell.row && this.activeCell == cell.cell)) {
                 return;
@@ -3885,25 +3914,25 @@ namespace Slick {
             }
         }
 
-        private handleHeaderMouseEnter(e: MouseEvent): void {
+        private handleHeaderMouseEnter(e: JQueryMouseEventObject): void {
             this.trigger(this.onHeaderMouseEnter, {
-                "column": $(e.target).data("column")
+                column: $(e.target).data("column")
             }, e);
         }
 
-        private handleHeaderMouseLeave(e: MouseEvent): void {
+        private handleHeaderMouseLeave(e: JQueryMouseEventObject): void {
             this.trigger(this.onHeaderMouseLeave, {
-                "column": $(e.target).data("column")
+                column: $(e.target).data("column")
             }, e);
         }
 
-        private handleHeaderContextMenu(e: MouseEvent): void {
+        private handleHeaderContextMenu(e: JQueryMouseEventObject): void {
             var $header = $(e.target).closest(".slick-header-column", ".slick-header-columns" as any);
             var column = $header && $header.data("column");
             this.trigger(this.onHeaderContextMenu, { column: column }, e);
         }
 
-        private handleHeaderClick(e: MouseEvent): void {
+        private handleHeaderClick(e: JQueryMouseEventObject): void {
             var $header = $(e.target).closest(".slick-header-column", ".slick-header-columns" as any);
             var column = $header && $header.data("column");
             if (column) {
@@ -3911,11 +3940,11 @@ namespace Slick {
             }
         }
 
-        private handleMouseEnter(e: MouseEvent): void {
+        private handleMouseEnter(e: JQueryMouseEventObject): void {
             this.trigger(this.onMouseEnter, {}, e);
         }
 
-        private handleMouseLeave(e: MouseEvent): void {
+        private handleMouseLeave(e: JQueryMouseEventObject): void {
             this.trigger(this.onMouseLeave, {}, e);
         }
 
@@ -4144,7 +4173,7 @@ namespace Slick {
 
             if (activeCellChanged) {
                 setTimeout(this.scrollActiveCellIntoView, 50);
-                this.trigger(this.onActiveCellChanged, this.getActiveCell());
+                this.trigger(this.onActiveCellChanged, this.getActiveCell() as ArgsCell);
             }
         }
 
@@ -4356,7 +4385,7 @@ namespace Slick {
             }
         }
 
-        getCellEditor(): Editor<any> {
+        getCellEditor(): Editor {
             return this.currentEditor;
         }
 
@@ -4841,7 +4870,7 @@ namespace Slick {
 
                     if (validationResults.valid) {
                         if (this.activeRow < this.getDataLength()) {
-                            var editCommand: EditCommand<TItem> = {
+                            var editCommand: EditCommand = {
                                 row: this.activeRow,
                                 cell: self.activeCell,
                                 editor: this.currentEditor,
@@ -4853,8 +4882,7 @@ namespace Slick {
                                     self.trigger(self.onCellChange, {
                                         row: this.activeRow,
                                         cell: self.activeCell,
-                                        item: item,
-                                        grid: self
+                                        item: item
                                     });
                                 },
                                 undo: function () {
@@ -4863,8 +4891,7 @@ namespace Slick {
                                     self.trigger(self.onCellChange, {
                                         row: this.activeRow,
                                         cell: self.activeCell,
-                                        item: item,
-                                        grid: self
+                                        item: item
                                     });
                                 }
                             };
@@ -4878,7 +4905,7 @@ namespace Slick {
                             }
 
                         } else {
-                            var newItem = {};
+                            var newItem = {} as TItem;
                             this.currentEditor.applyValue(newItem, this.currentEditor.serializeValue());
                             this.makeActiveCellNormal();
                             this.trigger(this.onAddNewRow, { item: newItem, column: column });
