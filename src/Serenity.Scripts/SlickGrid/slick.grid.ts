@@ -332,7 +332,7 @@ namespace Slick {
         private vScrollDir: number = 1;
 
         // private
-        private initialized: any = false;
+        private initialized = false;
         private $container: JQuery;
         private uid: string = "slickgrid_" + Math.round(1000000 * Math.random());
         private $focusSink: JQuery;
@@ -367,39 +367,39 @@ namespace Slick {
         private viewportHasHScroll: boolean;
         private viewportHasVScroll: boolean;
         private headerColumnWidthDiff: number = 0;
-        private cellWidthDiff: any = 0;
-        private cellHeightDiff: any = 0;
+        private cellWidthDiff: number = 0;
+        private cellHeightDiff: number = 0;
         private jQueryNewWidthBehaviour: boolean = false;
-        private absoluteColumnMinWidth: any;
-        private hasFrozenRows: any = false;
-        private frozenRowsHeight: any = 0;
-        private actualFrozenRow: any = -1;
-        private paneTopH: any = 0;
-        private paneBottomH: any = 0;
-        private viewportTopH: any = 0;
-        private topPanelH: any = 0;
-        private groupPanelH: any = 0;
-        private headerH: any = 0;
-        private headerRowH: any = 0;
-        private footerRowH: any = 0;
+        private absoluteColumnMinWidth: number;
+        private hasFrozenRows = false;
+        private frozenRowsHeight: number = 0;
+        private actualFrozenRow: number = -1;
+        private paneTopH: number = 0;
+        private paneBottomH: number = 0;
+        private viewportTopH: number = 0;
+        private topPanelH: number = 0;
+        private groupPanelH: number = 0;
+        private headerH: number = 0;
+        private headerRowH: number = 0;
+        private footerRowH: number = 0;
 
-        private tabbingDirection: any = 1;
-        private activePosX: any;
-        private activeRow: any;
-        private activeCell: any;
-        private activeCellNode: any = null;
+        private tabbingDirection: number = 1;
+        private activePosX: number;
+        private activeRow: number;
+        private activeCell: number;
+        private activeCellNode: HTMLElement = null;
         private currentEditor: Editor = null;
         private serializedEditorValue: any;
-        private editController: any;
+        private editController: EditController;
 
         private rowsCache: { [key: number]: CachedRow } = {};
-        private numVisibleRows: any = 0;
-        private prevScrollTop: any = 0;
-        private scrollTop: any = 0;
-        private lastRenderedScrollTop: any = 0;
-        private lastRenderedScrollLeft: any = 0;
-        private prevScrollLeft: any = 0;
-        private scrollLeft: any = 0;
+        private numVisibleRows: number = 0;
+        private prevScrollTop: number = 0;
+        private scrollTop: number = 0;
+        private lastRenderedScrollTop: number = 0;
+        private lastRenderedScrollLeft: number = 0;
+        private prevScrollLeft: number = 0;
+        private scrollLeft: number = 0;
 
         private selectionModel: SelectionModel;
         private selectedRows: number[] = [];
@@ -409,12 +409,12 @@ namespace Slick {
 
         private columnsById: any = {};
         private sortColumns: ColumnSort[] = [];
-        private columnPosLeft: any = [];
-        private columnPosRight: any = [];
+        private columnPosLeft: number[] = [];
+        private columnPosRight: number[] = [];
 
-        private rtl: any = false;
-        private xLeft: any = 'left';
-        private xRight: any = 'right';
+        private rtl = false;
+        private xLeft = 'left';
+        private xRight = 'right';
 
 
         // async call handles
@@ -426,7 +426,7 @@ namespace Slick {
         private postProcessToRow: any = null;
         private postProcessFromRow: any = null;
         private postProcessedCleanupQueue: PostProcessCleanupEntry[] = [];
-        private postProcessgroupId: any = 0;
+        private postProcessgroupId: number = 0;
 
         // store css attributes if display:none is active in container or parent
         private $paneHeaderL: JQuery;
@@ -4987,7 +4987,7 @@ namespace Slick {
     }
 
     interface PostProcessCleanupEntry {
-        groupId: string,
+        groupId: number,
         cellNode?: HTMLElement,
         columnIdx?: number,
         rowNode?: JQuery;
