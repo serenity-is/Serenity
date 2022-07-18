@@ -1,4 +1,5 @@
-﻿/***
+﻿declare type HtmlEvent = Event;
+/***
  * Contains core SlickGrid classes.
  * @module Core
  * @namespace Slick
@@ -8,8 +9,8 @@ declare namespace Slick {
         readonly type?: string;
         currentTarget?: EventTarget;
         target?: EventTarget;
-        originalEvent?: this;
-        defaultPrevented?: void;
+        originalEvent?: HtmlEvent;
+        defaultPrevented?: boolean;
         preventDefault?(): void;
         stopPropagation?(): void;
         stopImmediatePropagation?(): void;

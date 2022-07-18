@@ -19,7 +19,6 @@
  *     and do proper cleanup.
  */
 /// <reference types="jquery" />
-declare type HtmlEvent = Event;
 declare namespace Slick {
     type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column, item: TItem, grid?: Grid, colMeta?: ColumnMetadata) => string;
     type ColumnFormat<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
@@ -114,6 +113,41 @@ declare namespace Slick {
             [key: string]: ColumnMetadata<TItem>;
         };
         formatter?: ColumnFormatter<TItem>;
+    }
+    interface GridEventArgs {
+        grid?: Grid;
+    }
+    interface ColNodeEventArgs extends GridEventArgs {
+        column: Column;
+        node: HTMLElement;
+    }
+    type SortEventCol = {
+        sortCol: Column;
+        sortAsc: boolean;
+    };
+    interface SortEventArgs extends GridEventArgs {
+        multiColumnSort: boolean;
+        sortAsc?: boolean;
+        sortCol?: Column;
+        sortCols?: SortEventCol[];
+    }
+    interface ColumnReorderEventArgs extends GridEventArgs {
+        impactedColumns: Column[];
+    }
+    interface RowNumbersEventArgs extends GridEventArgs {
+        rows: number[];
+    }
+    interface ScrollEventArgs extends GridEventArgs {
+        scrollLeft: number;
+        scrollTop: number;
+    }
+    interface CellCssStyleEventArgs extends GridEventArgs {
+        key: string;
+        hash: CellStylesHash;
+    }
+    interface RowCellEventArgs extends GridEventArgs {
+        row: number;
+        cell: number;
     }
     type CellStylesHash = {
         [row: number]: {
@@ -347,41 +381,41 @@ declare namespace Slick {
         private $headerScrollContainer;
         private $headerRowScrollContainer;
         private $footerRowScrollContainer;
-        readonly onScroll: Event<any>;
-        readonly onSort: Event<any>;
+        readonly onScroll: Event<ScrollEventArgs, IEventData>;
+        readonly onSort: Event<SortEventArgs, IEventData>;
         readonly onHeaderMouseEnter: Event<any>;
         readonly onHeaderMouseLeave: Event<any>;
         readonly onHeaderContextMenu: Event<any>;
         readonly onHeaderClick: Event<any>;
-        readonly onHeaderCellRendered: Event<any>;
-        readonly onBeforeHeaderCellDestroy: Event<any>;
-        readonly onHeaderRowCellRendered: Event<any>;
-        readonly onFooterRowCellRendered: Event<any>;
-        readonly onBeforeHeaderRowCellDestroy: Event<any>;
-        readonly onBeforeFooterRowCellDestroy: Event<any>;
+        readonly onHeaderCellRendered: Event<ColNodeEventArgs, IEventData>;
+        readonly onBeforeHeaderCellDestroy: Event<ColNodeEventArgs, IEventData>;
+        readonly onHeaderRowCellRendered: Event<ColNodeEventArgs, IEventData>;
+        readonly onFooterRowCellRendered: Event<ColNodeEventArgs, IEventData>;
+        readonly onBeforeHeaderRowCellDestroy: Event<ColNodeEventArgs, IEventData>;
+        readonly onBeforeFooterRowCellDestroy: Event<ColNodeEventArgs, IEventData>;
         readonly onMouseEnter: Event<any>;
         readonly onMouseLeave: Event<any>;
-        readonly onClick: Event<any>;
+        readonly onClick: Event<RowCellEventArgs, JQueryMouseEventObject>;
         readonly onDblClick: Event<any>;
-        readonly onContextMenu: Event<any>;
-        readonly onKeyDown: Event<any>;
+        readonly onContextMenu: Event<GridEventArgs, JQueryEventObject>;
+        readonly onKeyDown: Event<RowCellEventArgs, JQueryKeyEventObject>;
         readonly onAddNewRow: Event<any>;
         readonly onValidationError: Event<any>;
-        readonly onViewportChanged: Event<any>;
-        readonly onColumnsReordered: Event<any>;
-        readonly onColumnsResized: Event<any>;
+        readonly onViewportChanged: Event<GridEventArgs, IEventData>;
+        readonly onColumnsReordered: Event<ColumnReorderEventArgs, IEventData>;
+        readonly onColumnsResized: Event<GridEventArgs, IEventData>;
         readonly onCellChange: Event<any>;
         readonly onBeforeEditCell: Event<any>;
         readonly onBeforeCellEditorDestroy: Event<any>;
-        readonly onBeforeDestroy: Event<any>;
+        readonly onBeforeDestroy: Event<GridEventArgs, IEventData>;
         readonly onActiveCellChanged: Event<any>;
         readonly onActiveCellPositionChanged: Event<any>;
-        readonly onDragInit: Event<any>;
-        readonly onDragStart: Event<any>;
-        readonly onDrag: Event<any>;
-        readonly onDragEnd: Event<any>;
-        readonly onSelectedRowsChanged: Event<any>;
-        readonly onCellCssStylesChanged: Event<any>;
+        readonly onDragInit: Event<any, JQueryEventObject>;
+        readonly onDragStart: Event<any, JQueryEventObject>;
+        readonly onDrag: Event<any, JQueryEventObject>;
+        readonly onDragEnd: Event<any, JQueryEventObject>;
+        readonly onSelectedRowsChanged: Event<RowNumbersEventArgs, IEventData>;
+        readonly onCellCssStylesChanged: Event<CellCssStyleEventArgs, IEventData>;
         constructor(container: JQuery, data: any, columns: Column[], options: GridOptions<TItem>);
         init(): void;
         private hasFrozenColumns;

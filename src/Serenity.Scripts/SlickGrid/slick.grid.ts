@@ -31,8 +31,6 @@ if (typeof Slick === "undefined") {
     throw "slick.core.js not loaded";
 }
 
-type HtmlEvent = Event;
-
 namespace Slick {
 
     export type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column, item: TItem, grid?: Grid, colMeta?: ColumnMetadata) => string;
@@ -138,6 +136,50 @@ namespace Slick {
     export interface ItemMetadata<TItem = any> {
         columns?: { [key: string]: ColumnMetadata<TItem> };
         formatter?: ColumnFormatter<TItem>;
+    }
+
+    export interface GridEventArgs {
+        grid?: Grid;
+    }
+
+    export interface ColNodeEventArgs extends GridEventArgs {
+        column: Column;
+        node: HTMLElement;
+    }
+
+    export type SortEventCol = {
+        sortCol: Column;
+        sortAsc: boolean;
+    }
+
+    export interface SortEventArgs extends GridEventArgs {
+        multiColumnSort: boolean;
+        sortAsc?: boolean;
+        sortCol?: Column;
+        sortCols?: SortEventCol[];
+    }
+
+    export interface ColumnReorderEventArgs extends GridEventArgs {
+        impactedColumns: Column[];
+    }
+
+    export interface RowNumbersEventArgs extends GridEventArgs {
+        rows: number[];
+    }
+
+    export interface ScrollEventArgs extends GridEventArgs {
+        scrollLeft: number;
+        scrollTop: number;
+    }
+
+    export interface CellCssStyleEventArgs extends GridEventArgs {
+        key: string;
+        hash: CellStylesHash;
+    }
+
+    export interface RowCellEventArgs extends GridEventArgs {
+        row: number;
+        cell: number;
     }
 
     export type CellStylesHash = { [row: number]: { [cell: number]: string } }
@@ -403,41 +445,41 @@ namespace Slick {
         private $headerRowScrollContainer: JQuery;
         private $footerRowScrollContainer: JQuery;
 
-        readonly onScroll: Event<any> = new Event();
-        readonly onSort: Event<any> = new Event();
+        readonly onScroll = new Event<ScrollEventArgs>();
+        readonly onSort = new Event<SortEventArgs>();
         readonly onHeaderMouseEnter: Event<any> = new Event();
         readonly onHeaderMouseLeave: Event<any> = new Event();
         readonly onHeaderContextMenu: Event<any> = new Event();
         readonly onHeaderClick: Event<any> = new Event();
-        readonly onHeaderCellRendered: Event<any> = new Event();
-        readonly onBeforeHeaderCellDestroy: Event<any> = new Event();
-        readonly onHeaderRowCellRendered: Event<any> = new Event();
-        readonly onFooterRowCellRendered: Event<any> = new Event();
-        readonly onBeforeHeaderRowCellDestroy: Event<any> = new Event();
-        readonly onBeforeFooterRowCellDestroy: Event<any> = new Event();
+        readonly onHeaderCellRendered = new Event<ColNodeEventArgs>();
+        readonly onBeforeHeaderCellDestroy = new Event<ColNodeEventArgs>();
+        readonly onHeaderRowCellRendered = new Event<ColNodeEventArgs>();
+        readonly onFooterRowCellRendered = new Event<ColNodeEventArgs>();
+        readonly onBeforeHeaderRowCellDestroy = new Event<ColNodeEventArgs>();
+        readonly onBeforeFooterRowCellDestroy = new Event<ColNodeEventArgs>();
         readonly onMouseEnter: Event<any> = new Event();
         readonly onMouseLeave: Event<any> = new Event();
-        readonly onClick: Event<any> = new Event();
+        readonly onClick = new Event<RowCellEventArgs, JQueryMouseEventObject>();
         readonly onDblClick: Event<any> = new Event();
-        readonly onContextMenu: Event<any> = new Event();
-        readonly onKeyDown: Event<any> = new Event();
+        readonly onContextMenu = new Event<GridEventArgs, JQueryEventObject>();
+        readonly onKeyDown = new Event<RowCellEventArgs, JQueryKeyEventObject>();
         readonly onAddNewRow: Event<any> = new Event();
         readonly onValidationError: Event<any> = new Event();
-        readonly onViewportChanged: Event<any> = new Event();
-        readonly onColumnsReordered: Event<any> = new Event();
-        readonly onColumnsResized: Event<any> = new Event();
+        readonly onViewportChanged = new Event<GridEventArgs>();
+        readonly onColumnsReordered = new Event<ColumnReorderEventArgs>();
+        readonly onColumnsResized = new Event<GridEventArgs>();
         readonly onCellChange: Event<any> = new Event();
         readonly onBeforeEditCell: Event<any> = new Event();
         readonly onBeforeCellEditorDestroy: Event<any> = new Event();
-        readonly onBeforeDestroy: Event<any> = new Event();
+        readonly onBeforeDestroy = new Event<GridEventArgs>();
         readonly onActiveCellChanged: Event<any> = new Event();
         readonly onActiveCellPositionChanged: Event<any> = new Event();
-        readonly onDragInit: Event<any> = new Event();
-        readonly onDragStart: Event<any> = new Event();
-        readonly onDrag: Event<any> = new Event();
-        readonly onDragEnd: Event<any> = new Event();
-        readonly onSelectedRowsChanged: Event<any> = new Event();
-        readonly onCellCssStylesChanged: Event<any> = new Event();
+        readonly onDragInit = new Event<any, JQueryEventObject>();
+        readonly onDragStart = new Event<any, JQueryEventObject>();
+        readonly onDrag = new Event<any, JQueryEventObject>();
+        readonly onDragEnd = new Event<any, JQueryEventObject>();
+        readonly onSelectedRowsChanged = new Event<RowNumbersEventArgs>();
+        readonly onCellCssStylesChanged = new Event<CellCssStyleEventArgs>();
 
         constructor(container: JQuery, data: any, columns: Column[], options: GridOptions<TItem>) {
 
@@ -1015,8 +1057,8 @@ namespace Slick {
             }
 
             this.trigger(this.onBeforeHeaderCellDestroy, {
-                "node": $header[0],
-                "column": columnDef
+                node: $header[0],
+                column: columnDef
             });
 
             $header
@@ -1024,8 +1066,8 @@ namespace Slick {
                 .children().eq(0).html(title);
 
             this.trigger(this.onHeaderCellRendered, {
-                "node": $header[0],
-                "column": columnDef
+                node: $header[0],
+                column: columnDef
             });
         }
 
@@ -1100,8 +1142,8 @@ namespace Slick {
                     var columnDef = $(self).data("column");
                     if (columnDef) {
                         self.trigger(self.onBeforeFooterRowCellDestroy, {
-                            "node": this,
-                            "column": columnDef
+                            node: this,
+                            column: columnDef
                         });
                     }
                 });
@@ -1119,8 +1161,8 @@ namespace Slick {
                     .appendTo(this.hasFrozenColumns() && (i > this._options.frozenColumn) ? this.$footerRowR : this.$footerRowL);
 
                 this.trigger(this.onFooterRowCellRendered, {
-                    "node": footerRowCell[0],
-                    "column": m
+                    node: footerRowCell[0],
+                    column: m
                 });
             }
         }
@@ -1199,8 +1241,8 @@ namespace Slick {
                     var columnDef = $(self).data("column");
                     if (columnDef) {
                         self.trigger(self.onBeforeHeaderCellDestroy, {
-                            "node": this,
-                            "column": columnDef
+                            node: this,
+                            column: columnDef
                         });
                     }
                 });
@@ -1218,8 +1260,8 @@ namespace Slick {
                     var columnDef = $(this).data("column");
                     if (columnDef) {
                         self.trigger(self.onBeforeHeaderRowCellDestroy, {
-                            "node": this,
-                            "column": columnDef
+                            node: this,
+                            column: columnDef
                         });
                     }
                 });
@@ -1255,8 +1297,8 @@ namespace Slick {
                 }
 
                 this.trigger(this.onHeaderCellRendered, {
-                    "node": header[0],
-                    "column": m
+                    node: header[0],
+                    column: m
                 });
 
                 if (this._options.showHeaderRow) {
@@ -1265,8 +1307,8 @@ namespace Slick {
                         .appendTo($headerRowTarget);
 
                     this.trigger(this.onHeaderRowCellRendered, {
-                        "node": headerRowCell[0],
-                        "column": m
+                        node: headerRowCell[0],
+                        column: m
                     });
                 }
             }
@@ -1291,7 +1333,7 @@ namespace Slick {
                     return;
                 }
 
-                var column = $col.data("column");
+                var column = $col.data("column") as Column;
                 if (column.sortable) {
                     if (!this.getEditorLock().commitCurrentEdit()) {
                         return;
@@ -1336,9 +1378,7 @@ namespace Slick {
                     } else {
                         this.trigger(this.onSort, {
                             multiColumnSort: true,
-                            sortCols: $.map(this.sortColumns, (col) => {
-                                return { sortCol: this._columns[this.getColumnIndex(col.columnId)], sortAsc: col.sortAsc };
-                            })
+                            sortCols: this.sortColumns.map(col => ({ sortCol: this._columns[this.getColumnIndex(col.columnId)], sortAsc: col.sortAsc }))
                         }, e);
                     }
                 }
@@ -1432,7 +1472,7 @@ namespace Slick {
             });
         }
 
-        private getImpactedColumns(limit?: { start: number, end: number }): Column<any>[] {
+        private getImpactedColumns(limit?: { start: number, end: number }): Column<TItem>[] {
             var impactedColumns = [];
 
             if (limit != undefined) {
@@ -1941,9 +1981,10 @@ namespace Slick {
         //////////////////////////////////////////////////////////////////////////////////////////////
         // General
 
-        private trigger(evt: any, args?: any, e?: any) {
-            e = e || new Slick.EventData();
-            args = args || {};
+        private trigger<TArgs extends GridEventArgs, TEventData extends IEventData = IEventData>(
+            evt: Event<TArgs, TEventData>, args?: TArgs, e?: TEventData) {
+            e = e || new Slick.EventData() as any;
+            args = args || {} as any;
             args.grid = this;
             return evt.notify(args, e, this);
         }
@@ -2108,7 +2149,7 @@ namespace Slick {
             return this.sortColumns;
         }
 
-        private handleSelectedRangesChanged = (e: any, ranges: Range[]): void => {
+        private handleSelectedRangesChanged = (e: IEventData, ranges: Range[]): void => {
             this.selectedRows = [];
             var hash = {};
             for (var i = 0; i < ranges.length; i++) {
@@ -3633,7 +3674,7 @@ namespace Slick {
             this.cellCssClasses[key] = hash;
             this.updateCellCssStylesOnRenderedRows(hash, null);
 
-            this.trigger(this.onCellCssStylesChanged, { "key": key, "hash": hash });
+            this.trigger(this.onCellCssStylesChanged, { key: key, hash: hash });
         }
 
         removeCellCssStyles(key: string): void {
@@ -3644,7 +3685,7 @@ namespace Slick {
             this.updateCellCssStylesOnRenderedRows(null, this.cellCssClasses[key]);
             delete this.cellCssClasses[key];
 
-            this.trigger(this.onCellCssStylesChanged, { "key": key, "hash": null });
+            this.trigger(this.onCellCssStylesChanged, { key: key, hash: null });
         }
 
         setCellCssStyles(key: string, hash: CellStylesHash): void {
@@ -3653,7 +3694,7 @@ namespace Slick {
             this.cellCssClasses[key] = hash;
             this.updateCellCssStylesOnRenderedRows(hash, prevHash);
 
-            this.trigger(this.onCellCssStylesChanged, { "key": key, "hash": hash });
+            this.trigger(this.onCellCssStylesChanged, { key: key, hash: hash });
         }
 
         getCellCssStyles(key: string): CellStylesHash {
@@ -3683,7 +3724,7 @@ namespace Slick {
         //////////////////////////////////////////////////////////////////////////////////////////////
         // Interactivity
 
-        private handleDragInit(e: any, dd: any): boolean {
+        private handleDragInit(e: JQueryEventObject, dd: any): boolean {
             var cell = this.getCellFromEvent(e);
             if (!cell || !this.cellExists(cell.row, cell.cell)) {
                 return false;
@@ -3699,7 +3740,7 @@ namespace Slick {
             return false;
         }
 
-        private handleDragStart(e: any, dd: any): boolean {
+        private handleDragStart(e: JQueryEventObject, dd: any): boolean {
             var cell = this.getCellFromEvent(e);
             if (!cell || !this.cellExists(cell.row, cell.cell)) {
                 return false;
@@ -3713,15 +3754,15 @@ namespace Slick {
             return false;
         }
 
-        private handleDrag(e: any, dd: any): any {
+        private handleDrag(e: JQueryEventObject, dd: any): any {
             return this.trigger(this.onDrag, dd, e);
         }
 
-        private handleDragEnd(e: any, dd: any): void {
+        private handleDragEnd(e: JQueryEventObject, dd: any): void {
             this.trigger(this.onDragEnd, dd, e);
         }
 
-        private handleKeyDown(e: any): void {
+        private handleKeyDown(e: JQueryKeyEventObject): void {
             this.trigger(this.onKeyDown, { row: this.activeRow, cell: this.activeCell }, e);
             var handled = e.isImmediatePropagationStopped();
             var keyCode = Slick.keyCode;
@@ -3776,7 +3817,7 @@ namespace Slick {
                 e.stopPropagation();
                 e.preventDefault();
                 try {
-                    e.originalEvent.keyCode = 0; // prevent default behaviour for special keys in IE browsers (F3, F5, etc.)
+                    (e.originalEvent as JQueryKeyEventObject).keyCode = 0; // prevent default behaviour for special keys in IE browsers (F3, F5, etc.)
                 }
                 // ignore exceptions - setting the original event's keycode throws access denied exception for "Ctrl"
                 // (hitting control key only, nothing else), "Shift" (maybe others)
@@ -3785,7 +3826,7 @@ namespace Slick {
             }
         }
 
-        private handleClick(e: JQueryEventObject): void {
+        private handleClick(e: JQueryMouseEventObject): void {
             if (!this.currentEditor) {
                 // if this click resulted in some cell child node getting focus,
                 // don't steal it back - keyboard events will still bubble up
@@ -3814,7 +3855,7 @@ namespace Slick {
             }
         }
 
-        private handleContextMenu(e: HtmlEvent): void {
+        private handleContextMenu(e: JQueryEventObject): void {
             var $cell = $(e.target).closest(".slick-cell", this.$canvas as any);
             if ($cell.length === 0) {
                 return;
