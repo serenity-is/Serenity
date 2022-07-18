@@ -22,21 +22,21 @@
 declare type HtmlEvent = Event;
 declare namespace Slick {
     type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column, item: TItem, grid?: Grid, colMeta?: ColumnMetadata) => string;
-    type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
+    type ColumnFormat<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
     type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column) => void;
-    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column) => void;
+    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
     interface FormatterContext<TItem = any> {
         row?: number;
         cell?: number;
         value?: any;
-        column?: any;
+        column?: Column<TItem>;
         item?: TItem;
     }
-    interface IPlugin {
+    interface Plugin {
         init(grid: Grid): void;
         destroy?: () => void;
     }
-    interface ISelectionModel {
+    interface SelectionModel {
         init(grid: Grid): void;
         destroy?: () => void;
         setSelectedRanges(ranges: Range[]): void;
@@ -50,7 +50,7 @@ declare namespace Slick {
         row: number;
         cell: number;
     }
-    interface PositionInfo {
+    interface Position {
         bottom?: number;
         height?: number;
         left?: number;
@@ -59,24 +59,16 @@ declare namespace Slick {
         visible?: boolean;
         width?: number;
     }
-    interface RangeInfo {
+    interface ViewRange {
         top?: number;
         bottom?: number;
         leftPx?: number;
         rightPx?: number;
     }
-    interface GroupInfo<TItem> {
-        getter?: any;
-        formatter?: (p1: Group<TItem>) => string;
-        comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
-        aggregators?: any[];
-        aggregateCollapsed?: boolean;
-        lazyTotalsCalculation?: boolean;
-    }
     interface EditorOptions<TItem> {
         grid: Grid<TItem>;
-        gridPosition?: PositionInfo;
-        position?: PositionInfo;
+        gridPosition?: Position;
+        position?: Position;
         container?: HTMLElement;
         column?: Column;
         item?: TItem;
@@ -91,7 +83,7 @@ declare namespace Slick {
         isValueChanged(): boolean;
         loadValue(value: any): void;
         serializeValue(): any;
-        position?(pos: PositionInfo): void;
+        position?(pos: Position): void;
         hide?(): void;
         show?(): void;
         validate?(): {
@@ -139,7 +131,7 @@ declare namespace Slick {
         field: string;
         focusable?: boolean;
         footerCssClass?: string;
-        format?: (ctx: FormatterContext<TItem>) => string;
+        format?: ColumnFormat<TItem>;
         formatter?: ColumnFormatter<TItem>;
         groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid) => string;
         headerCssClass?: string;
@@ -393,10 +385,10 @@ declare namespace Slick {
         constructor(container: JQuery, data: any, columns: Column[], options: GridOptions<TItem>);
         init(): void;
         private hasFrozenColumns;
-        registerPlugin(plugin: IPlugin): void;
+        registerPlugin(plugin: Plugin): void;
         private unregisterPlugin;
-        setSelectionModel(model: ISelectionModel): void;
-        getSelectionModel(): ISelectionModel;
+        setSelectionModel(model: SelectionModel): void;
+        getSelectionModel(): SelectionModel;
         getCanvasNode(): HTMLDivElement;
         getCanvasNodes(): JQuery;
         getViewportNode(): HTMLDivElement;
@@ -496,9 +488,9 @@ declare namespace Slick {
          * @param viewportLeft optional viewport left
          * @returns viewport range
          */
-        getViewport(viewportTop?: number, viewportLeft?: number): RangeInfo;
-        getVisibleRange(viewportTop?: number, viewportLeft?: number): RangeInfo;
-        getRenderedRange(viewportTop?: number, viewportLeft?: number): RangeInfo;
+        getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
+        getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
+        getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
         private ensureCellNodesInRowsCache;
         private cleanUpCells;
         private cleanUpAndRenderCells;
@@ -568,7 +560,7 @@ declare namespace Slick {
         private cancelEditAndSetFocus;
         private absBox;
         private getActiveCellPosition;
-        getGridPosition(): PositionInfo;
+        getGridPosition(): Position;
         private handleActiveCellPositionChange;
         getCellEditor(): Editor<any>;
         getActiveCell(): RowCell;

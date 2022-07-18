@@ -1,17 +1,28 @@
-﻿/// <reference types="jquery" />
-/***
+﻿/***
  * Contains core SlickGrid classes.
  * @module Core
  * @namespace Slick
  */
 declare namespace Slick {
+    interface IEventData {
+        readonly type?: string;
+        currentTarget?: EventTarget;
+        target?: EventTarget;
+        originalEvent?: this;
+        defaultPrevented?: void;
+        preventDefault?(): void;
+        stopPropagation?(): void;
+        stopImmediatePropagation?(): void;
+        isImmediatePropagationStopped?(): boolean;
+        isPropagationStopped?(): boolean;
+    }
     /***
      * An event object for passing data to event handlers and letting them control propagation.
      * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
      * @class EventData
      * @constructor
      */
-    class EventData {
+    class EventData implements IEventData {
         private _isPropagationStopped;
         private _isImmediatePropagationStopped;
         /***
@@ -37,13 +48,13 @@ declare namespace Slick {
          */
         isImmediatePropagationStopped(): boolean;
     }
-    type Handler<TArgs> = (e: JQueryEventObject, args: TArgs) => void;
+    type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
     /***
      * A simple publisher-subscriber implementation.
      * @class Event
      * @constructor
      */
-    class Event<TArgs = any> {
+    class Event<TArgs = any, TEventData extends IEventData = IEventData> {
         private _handlers;
         /***
          * Adds an event handler to be called when the event is fired.
@@ -52,13 +63,13 @@ declare namespace Slick {
          * @method subscribe
          * @param fn {Function} Event handler.
          */
-        subscribe(fn: Handler<TArgs>): void;
+        subscribe(fn: Handler<TArgs, TEventData>): void;
         /***
          * Removes an event handler added with <code>subscribe(fn)</code>.
          * @method unsubscribe
          * @param fn {Function} Event handler to be removed.
          */
-        unsubscribe(fn: Handler<TArgs>): void;
+        unsubscribe(fn: Handler<TArgs, TEventData>): void;
         /***
          * Fires an event notifying all subscribers.
          * @method notify
@@ -72,14 +83,14 @@ declare namespace Slick {
          *      The scope ("this") within which the handler will be executed.
          *      If not specified, the scope will be set to the <code>Event</code> instance.
          */
-        notify(args: any, e: EventData, scope: object): any;
-        clear(fn: Handler<TArgs>): void;
+        notify(args: any, e: TEventData, scope: object): any;
+        clear(): void;
     }
-    class EventHandler<TArgs = any> {
+    class EventHandler<TArgs = any, TEventData extends IEventData = IEventData> {
         private _handlers;
-        subscribe(event: Event<TArgs>, handler: Handler<TArgs>): EventHandler<TArgs>;
-        unsubscribe(event: Event<TArgs>, handler: Handler<TArgs>): EventHandler<TArgs>;
-        unsubscribeAll(): EventHandler<TArgs>;
+        subscribe(event: Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
+        unsubscribe(event: Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
+        unsubscribeAll(): EventHandler<TArgs, TEventData>;
     }
     /***
        * A structure containing a range of cells.

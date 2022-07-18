@@ -36,7 +36,7 @@ type HtmlEvent = Event;
 namespace Slick {
 
     export type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column, item: TItem, grid?: Grid, colMeta?: ColumnMetadata) => string;
-    export type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
+    export type ColumnFormat<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
     export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column) => void;
     export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
 
@@ -153,7 +153,7 @@ namespace Slick {
         field: string;
         focusable?: boolean;
         footerCssClass?: string;
-        format?: Format<TItem>;
+        format?: ColumnFormat<TItem>;
         formatter?: ColumnFormatter<TItem>;
         groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid) => string;
         headerCssClass?: string;
