@@ -38,22 +38,22 @@ namespace Slick {
     export type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column, item: TItem, grid?: Grid, colMeta?: ColumnMetadata) => string;
     export type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
     export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column) => void;
-    export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column) => void;
+    export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
 
     export interface FormatterContext<TItem = any> {
         row?: number;
         cell?: number;
         value?: any;
-        column?: any;
+        column?: Column<TItem>;
         item?: TItem;
     }
 
-    export interface IPlugin {
+    export interface Plugin {
         init(grid: Grid): void;
         destroy?: () => void;
     }
 
-    export interface ISelectionModel {
+    export interface SelectionModel {
         init(grid: Grid): void;
         destroy?: () => void;
         setSelectedRanges(ranges: Range[]): void;
@@ -70,7 +70,7 @@ namespace Slick {
         cell: number;
     }
         
-    export interface PositionInfo {
+    export interface Position {
         bottom?: number;
         height?: number;
         left?: number;
@@ -78,28 +78,19 @@ namespace Slick {
         top?: number;
         visible?: boolean;
         width?: number;
-    }     
+    }
            
-    export interface RangeInfo {
+    export interface ViewRange {
         top?: number;
         bottom?: number;
         leftPx?: number;
         rightPx?: number;
     }
 
-    export interface GroupInfo<TItem> {
-        getter?: any;
-        formatter?: (p1: Group<TItem>) => string;
-        comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
-        aggregators?: any[];
-        aggregateCollapsed?: boolean;
-        lazyTotalsCalculation?: boolean;
-    }    
-
     export interface EditorOptions<TItem> {
         grid: Grid<TItem>;
-        gridPosition?: PositionInfo;
-        position?: PositionInfo;
+        gridPosition?: Position;
+        position?: Position;
         container?: HTMLElement;
         column?: Column;
         item?: TItem;
@@ -115,7 +106,7 @@ namespace Slick {
         isValueChanged(): boolean;
         loadValue(value: any): void;
         serializeValue(): any;
-        position?(pos: PositionInfo): void;
+        position?(pos: Position): void;
         hide?(): void;
         show?(): void;
         validate?(): { valid: boolean };
@@ -162,7 +153,7 @@ namespace Slick {
         field: string;
         focusable?: boolean;
         footerCssClass?: string;
-        format?: (ctx: FormatterContext<TItem>) => string;
+        format?: Format<TItem>;
         formatter?: ColumnFormatter<TItem>;
         groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid) => string;
         headerCssClass?: string;
@@ -337,10 +328,10 @@ namespace Slick {
         private prevScrollLeft: any = 0;
         private scrollLeft: any = 0;
 
-        private selectionModel: ISelectionModel;
+        private selectionModel: SelectionModel;
         private selectedRows: number[] = [];
 
-        private plugins: IPlugin[] = [];
+        private plugins: Plugin[] = [];
         private cellCssClasses: CellStylesHash = {};
 
         private columnsById: any = {};
@@ -784,12 +775,12 @@ namespace Slick {
             return this._options.frozenColumn > -1;
         }
 
-        registerPlugin(plugin: IPlugin): void {
+        registerPlugin(plugin: Plugin): void {
             this.plugins.unshift(plugin);
             plugin.init(this);
         }
 
-        private unregisterPlugin(plugin: IPlugin): void {
+        private unregisterPlugin(plugin: Plugin): void {
             for (var i = this.plugins.length; i >= 0; i--) {
                 if (this.plugins[i] === plugin) {
                     if (this.plugins[i].destroy) {
@@ -801,7 +792,7 @@ namespace Slick {
             }
         }
 
-        setSelectionModel(model: ISelectionModel): void {
+        setSelectionModel(model: SelectionModel): void {
             if (this.selectionModel) {
                 this.selectionModel.onSelectedRangesChanged.unsubscribe(this.handleSelectedRangesChanged);
                 if (this.selectionModel.destroy) {
@@ -816,7 +807,7 @@ namespace Slick {
             }
         }
 
-        getSelectionModel(): ISelectionModel {
+        getSelectionModel(): SelectionModel {
             return this.selectionModel;
         }
 
@@ -2455,7 +2446,7 @@ namespace Slick {
             return item[columnDef.field];
         }
 
-        private appendRowHtml(stringArrayL: string[], stringArrayR: string[], row: number, range: RangeInfo, dataLength: number): void {
+        private appendRowHtml(stringArrayL: string[], stringArrayR: string[], row: number, range: ViewRange, dataLength: number): void {
             var d = this.getDataItem(row);
             var dataLoading = row < dataLength && !d;
             var rowCss = "slick-row" +
@@ -2563,7 +2554,7 @@ namespace Slick {
             this.rowsCache[row].cellColSpans[cell] = colspan;
         }
 
-        private cleanupRows(rangeToKeep: RangeInfo): void {
+        private cleanupRows(rangeToKeep: ViewRange): void {
             var i: number;
             for (var x in this.rowsCache) {
                 var removeFrozenRow = true;
@@ -2982,11 +2973,11 @@ namespace Slick {
          * @param viewportLeft optional viewport left
          * @returns viewport range
          */
-         getViewport(viewportTop?: number, viewportLeft?: number): RangeInfo {
+         getViewport(viewportTop?: number, viewportLeft?: number): ViewRange {
             return this.getVisibleRange(viewportTop, viewportLeft);
         }
         
-        getVisibleRange(viewportTop?: number, viewportLeft?: number): RangeInfo {
+        getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange {
             if (viewportTop == null) {
                 viewportTop = this.scrollTop;
             }
@@ -3002,7 +2993,7 @@ namespace Slick {
             };
         }
 
-        getRenderedRange(viewportTop?: number, viewportLeft?: number): RangeInfo {
+        getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange {
             var range = this.getVisibleRange(viewportTop, viewportLeft);
             var buffer = Math.round(this.viewportH / this._options.rowHeight);
             var minBuffer = this._options.minBuffer || 3;
@@ -3055,7 +3046,7 @@ namespace Slick {
             }
         }
 
-        private cleanUpCells(range: RangeInfo, row: number): void {
+        private cleanUpCells(range: ViewRange, row: number): void {
             // Ignore frozen rows
             if (this.hasFrozenRows
                 && ((this._options.frozenBottom && row > this.actualFrozenRow) // Frozen bottom rows
@@ -3111,7 +3102,7 @@ namespace Slick {
             }
         }
 
-        private cleanUpAndRenderCells(range: RangeInfo) {
+        private cleanUpAndRenderCells(range: ViewRange) {
             var cacheEntry;
             var stringArray: string[] = [];
             var processedRows = [];
@@ -3201,7 +3192,7 @@ namespace Slick {
             }
         }
 
-        private renderRows(range: RangeInfo): void {
+        private renderRows(range: ViewRange): void {
             var stringArrayL: string[] = [],
                 stringArrayR: string[] = [],
                 rows = [],
@@ -4251,8 +4242,8 @@ namespace Slick {
             }
         }
 
-        private absBox(elem: HTMLElement): PositionInfo {
-            var box: PositionInfo = {
+        private absBox(elem: HTMLElement): Position {
+            var box: Position = {
                 top: elem.offsetTop,
                 bottom: 0,
                 width: $(elem).outerWidth(),
@@ -4293,11 +4284,11 @@ namespace Slick {
             return box;
         }
 
-        private getActiveCellPosition(): PositionInfo {
+        private getActiveCellPosition(): Position {
             return this.absBox(this.activeCellNode);
         }
 
-        getGridPosition(): PositionInfo {
+        getGridPosition(): Position {
             return this.absBox(this.$container[0]);
         }
 
@@ -4888,7 +4879,7 @@ namespace Slick {
             var ranges = [];
             var lastCell = this._columns.length - 1;
             for (var i = 0; i < rows.length; i++) {
-                ranges.push(new Slick.Range(rows[i], 0, rows[i], lastCell));
+                ranges.push(new Range(rows[i], 0, rows[i], lastCell));
             }
             return ranges;
         }

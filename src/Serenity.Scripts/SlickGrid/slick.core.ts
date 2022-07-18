@@ -4,13 +4,27 @@
  * @namespace Slick
  */
 namespace Slick {
+
+    export interface IEventData {
+        readonly type?: string;
+        currentTarget?: EventTarget;
+        target?: EventTarget;
+        originalEvent?: this;
+        defaultPrevented?: void;
+        preventDefault?(): void;
+        stopPropagation?(): void;
+        stopImmediatePropagation?(): void;
+        isImmediatePropagationStopped?(): boolean;
+        isPropagationStopped?(): boolean;
+    }
+
     /***
      * An event object for passing data to event handlers and letting them control propagation.
      * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
      * @class EventData
      * @constructor
      */
-    export class EventData {
+    export class EventData implements IEventData {
         private _isPropagationStopped = false;
         private _isImmediatePropagationStopped = false;
 
@@ -49,16 +63,16 @@ namespace Slick {
         }
     }
 
-    export type Handler<TArgs> = (e: JQueryEventObject, args: TArgs) => void;
+    export type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
 
     /***
      * A simple publisher-subscriber implementation.
      * @class Event
      * @constructor
      */
-    export class Event<TArgs = any> {
+    export class Event<TArgs = any, TEventData extends IEventData = IEventData> {
 
-        private _handlers: Function[] = [];
+        private _handlers: Handler<TArgs, TEventData>[] = [];
 
         /***
          * Adds an event handler to be called when the event is fired.
@@ -67,7 +81,7 @@ namespace Slick {
          * @method subscribe
          * @param fn {Function} Event handler.
          */
-        subscribe(fn: Handler<TArgs>) {
+        subscribe(fn: Handler<TArgs, TEventData>) {
             this._handlers.push(fn);
         };
 
@@ -76,7 +90,7 @@ namespace Slick {
          * @method unsubscribe
          * @param fn {Function} Event handler to be removed.
          */
-        unsubscribe(fn: Handler<TArgs>) {
+        unsubscribe(fn: Handler<TArgs, TEventData>) {
             for (var i = this._handlers.length - 1; i >= 0; i--) {
                 if (this._handlers[i] === fn) {
                     this._handlers.splice(i, 1);
@@ -97,8 +111,8 @@ namespace Slick {
          *      The scope ("this") within which the handler will be executed.
          *      If not specified, the scope will be set to the <code>Event</code> instance.
          */
-        notify(args: any, e: EventData, scope: object) {
-            e = e || new EventData();
+        notify(args: any, e: TEventData, scope: object) {
+            e = e || new EventData() as any;
             scope = scope || this;
 
             var returnValue;
@@ -109,20 +123,20 @@ namespace Slick {
             return returnValue;
         }
 
-        clear(fn: Handler<TArgs>) {
+        clear() {
             this._handlers = [];
         }
     }
 
-    interface EventHandlerEntry<TArgs = any> {
-        event: Event<TArgs>;
-        handler: Handler<TArgs>;
+    interface EventHandlerEntry<TArgs = any, TEventData extends IEventData = IEventData> {
+        event: Event<TArgs, TEventData>;
+        handler: Handler<TArgs, TEventData>;
     }
 
-    export class EventHandler<TArgs = any>  {
-        private _handlers: EventHandlerEntry<TArgs>[] = [];
+    export class EventHandler<TArgs = any, TEventData extends IEventData = IEventData>  {
+        private _handlers: EventHandlerEntry<TArgs, TEventData>[] = [];
 
-        subscribe(event: Event<TArgs>, handler: Handler<TArgs>): EventHandler<TArgs> {
+        subscribe(event: Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this {
             this._handlers.push({
                 event: event,
                 handler: handler
@@ -132,7 +146,7 @@ namespace Slick {
             return this;  // allow chaining
         };
 
-        unsubscribe(event: Event<TArgs>, handler: Handler<TArgs>): EventHandler<TArgs> {
+        unsubscribe(event: Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this {
             var i = this._handlers.length;
             while (i--) {
                 if (this._handlers[i].event === event &&
@@ -146,7 +160,7 @@ namespace Slick {
             return this;  // allow chaining
         };
 
-        unsubscribeAll(): EventHandler<TArgs> {
+        unsubscribeAll(): EventHandler<TArgs, TEventData> {
             var i = this._handlers.length;
             while (i--) {
                 this._handlers[i].event.unsubscribe(this._handlers[i].handler);
