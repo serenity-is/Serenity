@@ -1,0 +1,42 @@
+﻿{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "preserveConstEnums": false,
+    "experimentalDecorators": true,
+    "declaration": false,
+    "emitBOM": false,
+    "noEmit": true,
+    "sourceMap": false,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "target": "ES5",
+    "typeRoots": [
+      "../../types",
+      "../../node_modules/@types"
+    ],
+    "types": [
+      "jquery",
+      "jest"
+    ],
+    "outDir": "./built",
+    "baseUrl": ".",
+    "paths": {
+      "@slick/*": ["../*"]
+    },
+    "isolatedModules": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "lib": [
+      "ES5",
+      "ES2015",
+      "DOM"
+    ],
+    "noEmitHelpers": false,
+    "jsx": "react"
+  },
+  "include": [
+    "../slick.core.ts",
+    "../slick.grid.ts",
+    "**/*.spec.ts"
+  ]
+}
