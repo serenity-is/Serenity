@@ -8,6 +8,8 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "skipLibCheck": true,
+    "outDir": "./out",
+    "declarationDir": "./dts",
     "typeRoots": [
       "../types"
     ],
