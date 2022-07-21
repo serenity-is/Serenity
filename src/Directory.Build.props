@@ -13,6 +13,7 @@
     <PackageTags>Serenity</PackageTags>
     <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
     <Terser>$(MSBuildProjectDirectory)\node_modules\.bin\terser</Terser>
+    <DefaultItemExcludes>$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;libman.json</DefaultItemExcludes>
   </PropertyGroup>
   <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -23,6 +24,11 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="$(MSBuildProjectDirectory)\*.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      <Pack>false</Pack>
+    </Content>
     <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-icon.png" Pack="true" PackagePath="">
         <Link>Properties\package-icon.png</Link>
     </None>
