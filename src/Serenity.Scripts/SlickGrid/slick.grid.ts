@@ -1888,7 +1888,7 @@ namespace Slick {
             el = $("<div class='ui-state-default slick-header-column' style='visibility:hidden'>-</div>").appendTo(this.$headers);
             this.headerColumnWidthDiff = 0;
             if (el.css("box-sizing") != "border-box" && el.css("-moz-box-sizing") != "border-box" && el.css("-webkit-box-sizing") != "border-box") {
-                $.each(h, function (n, val) {
+                $.each(h, (_, val) => {
                     this.headerColumnWidthDiff += parseFloat(el.css(val)) || 0;
                 });
             }
@@ -1898,10 +1898,10 @@ namespace Slick {
             el = $("<div class='slick-cell' id='' style='visibility:hidden'>-</div>").appendTo(r);
             this.cellWidthDiff = this.cellHeightDiff = 0;
             if (el.css("box-sizing") != "border-box" && el.css("-moz-box-sizing") != "border-box" && el.css("-webkit-box-sizing") != "border-box") {
-                $.each(h, function (n, val) {
+                $.each(h, (_, val) => {
                     this.cellWidthDiff += parseFloat(el.css(val)) || 0;
                 });
-                $.each(v, function (n, val) {
+                $.each(v, (_, val) => {
                     this.cellHeightDiff += parseFloat(el.css(val)) || 0;
                 });
             }
