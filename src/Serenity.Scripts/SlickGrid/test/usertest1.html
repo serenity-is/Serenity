@@ -1,5 +1,9 @@
-<html>
+﻿<!DOCTYPE html>
+<html lang="en">
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Test</title>
         <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
         <script src="../../../Serenity.Assets/wwwroot/Scripts/jquery.event.drag.min.js"></script>
         <!--<script src="../../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.js"></script>
@@ -11,9 +15,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>        
         <link href="../../../Serenity.Assets/wwwroot/Content/slick.grid.css" rel="stylesheet" type="text/css"/>
         <link href="../../../Serenity.Assets/wwwroot/Content/slick-default-theme.css" rel="stylesheet" type="text/css"/>
+        <style>
+            #grid { height: 400px; }
+        </style>
     </head>
     <body>
-        <div id="grid" style="height: 400px"></div>
+        <div id="grid"></div>
         <script>
             var data = [];
             for (var i = 0; i < 1000; i++) {

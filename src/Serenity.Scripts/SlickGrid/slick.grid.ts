@@ -1,16 +1,20 @@
 /**
  * @license
- * (c) 2017-2022 Serenity.is 
- * Ported to TypeScript
+ * (c) 2017-2022 Serenity.is, Volkan Ceylan, Furkan Evran, Victor Tomaili, and other Serenity contributors
+ * https://github.com/serenity-is/serenity
+ * Ported to TypeScript and heavily refactored while keeping compatibility with original SlickGrid where possible
  * 
- * (c) 2009-2013 Michael Leibman
+ * (c) 2009-2016 Michael Leibman 
  * michael{dot}leibman{at}gmail{dot}com
  * http://github.com/mleibman/slickgrid
  *
+ * (c) 2009-2019 Ben McIntyre
+ * http://github.com/6pac/slickgrid
+ * 
  * Distributed under MIT license.
  * All rights reserved.
  *
- * SlickGrid v2.2
+ * Based on SlickGrid v2.4 and 6pack/slickgrid fixes
  *
  * NOTES:
  *     Cell/row DOM manipulations are done directly bypassing jQuery's DOM manipulation methods.
@@ -63,12 +67,12 @@ namespace Slick {
         columnId: string;
         sortAsc?: boolean;
     }
-    
+
     export interface RowCell {
         row: number;
         cell: number;
     }
-        
+
     export interface Position {
         bottom?: number;
         height?: number;
@@ -78,7 +82,7 @@ namespace Slick {
         visible?: boolean;
         width?: number;
     }
-           
+
     export interface ViewRange {
         top?: number;
         bottom?: number;
@@ -103,11 +107,12 @@ namespace Slick {
     }
 
     export interface Editor {
-        new (options: EditorOptions) : Editor;
+        new(options: EditorOptions): Editor;
         destroy(): void;
         applyValue(item: any, value: any): void;
         focus(): void;
         isValueChanged(): boolean;
+        keyCaptureList?: number[];
         loadValue(value: any): void;
         serializeValue(): any;
         position?(pos: Position): void;
@@ -115,7 +120,7 @@ namespace Slick {
         show?(): void;
         validate?(): ValidationResult;
     }
-    
+
     export interface EditorFactory {
         getEditor(column: Column): Editor;
     }
@@ -208,6 +213,12 @@ namespace Slick {
         column: Column;
         cellNode: HTMLElement;
         validationResults: ValidationResult;
+    }
+
+    interface GoToResult {
+        row: number;
+        cell: number;
+        posX: number;
     }
 
     export type CellStylesHash = { [row: number]: { [cell: number]: string } }
@@ -599,7 +610,7 @@ namespace Slick {
             this._options = options;
             this.validateAndEnforceOptions();
             this._colDefaults.width = options.defaultColumnWidth;
-            
+
             adjustFrozenColumnCompat(columns, this._options);
             this.setInitialCols(columns);
 
@@ -1481,14 +1492,14 @@ namespace Slick {
                     }
 
                     ;
-                    var reorderedCols = sortToDesiredOrderAndKeepRest(this._initCols, 
+                    var reorderedCols = sortToDesiredOrderAndKeepRest(this._initCols,
                         (this.$headerL as any).sortable("toArray").map((x: string) => x.substring(this.uid.length)));
 
                     reorderedCols = sortToDesiredOrderAndKeepRest(reorderedCols,
                         (this.$headerR as any).sortable("toArray").map((x: string) => x.substring(this.uid.length)));
 
                     this.setColumns(reorderedCols);
-                    this.trigger(this.onColumnsReordered, { });
+                    this.trigger(this.onColumnsReordered, {});
                     e.stopPropagation();
                     this.setupColumnResize();
                 }
@@ -2017,7 +2028,7 @@ namespace Slick {
                 prevTotal,
                 availWidth = this.viewportHasVScroll ? this.viewportW - scrollbarDimensions.width : this.viewportW,
                 cols = this._cols;
-                
+
             for (i = 0; i < cols.length; i++) {
                 c = cols[i];
                 widths.push(c.width);
@@ -2206,7 +2217,7 @@ namespace Slick {
             var i: number, m: Column, k: string;
             for (i = 0; i < initCols.length; i++) {
                 m = initCols[i];
-                
+
                 for (k in defs) {
                     if (m[k] === undefined)
                         m[k] = this._colDefaults[k];
@@ -2237,7 +2248,7 @@ namespace Slick {
             }
 
             this._initCols = initCols;
-            this._initColById = initColById;            
+            this._initColById = initColById;
             this._cols = viewCols;
             this._colById = viewColById;
         }
@@ -2665,7 +2676,7 @@ namespace Slick {
             this._options.enableAsyncPostCleanup && this.startPostProcessingCleanup();
         }
 
-        private queuePostProcessedRowForCleanup(cacheEntry: CachedRow, postProcessedRow: { [ key: number ]: any }, rowIdx: number): void {
+        private queuePostProcessedRowForCleanup(cacheEntry: CachedRow, postProcessedRow: { [key: number]: any }, rowIdx: number): void {
             this.postProcessgroupId++;
 
             // store and detach node for later async cleanup
@@ -2949,7 +2960,7 @@ namespace Slick {
 
         private updateRowCount(): void {
             if (!this.initialized) {
-                 return; 
+                return;
             }
 
             var dataLengthIncludingAddNew = this.getDataLengthIncludingAddNew();
@@ -3042,10 +3053,10 @@ namespace Slick {
          * @param viewportLeft optional viewport left
          * @returns viewport range
          */
-         getViewport(viewportTop?: number, viewportLeft?: number): ViewRange {
+        getViewport(viewportTop?: number, viewportLeft?: number): ViewRange {
             return this.getVisibleRange(viewportTop, viewportLeft);
         }
-        
+
         getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange {
             if (viewportTop == null) {
                 viewportTop = this.scrollTop;
@@ -3799,7 +3810,41 @@ namespace Slick {
             var keyCode = Slick.keyCode;
 
             if (!handled) {
+                if (!e.shiftKey && !e.altKey) {
+                    if (this._options.editable && this.currentEditor && this.currentEditor.keyCaptureList) {
+                        if (this.currentEditor.keyCaptureList.indexOf(e.which) >= 0) {
+                            return;
+                        }
+                    }
+
+                    if (e.which == keyCode.HOME) {
+                        if (e.ctrlKey) {
+                            this.navigateTop();
+                            handled = true;
+                        }
+                        else
+                            handled = this.navigateRowStart();
+                    }
+                    else if (e.which == keyCode.END) {
+                        if (e.ctrlKey) {
+                            this.navigateBottom();
+                            handled = true;
+                        }
+                        else
+                            handled = this.navigateRowEnd();
+                    }
+                }
+            }
+
+            if (!handled) {
                 if (!e.shiftKey && !e.altKey && !e.ctrlKey) {
+
+                    if (this._options.editable && this.currentEditor && this.currentEditor.keyCaptureList) {
+                        if (this.currentEditor.keyCaptureList.indexOf(e.which) >= 0) {
+                            return;
+                        }
+                    }
+
                     if (e.which == keyCode.ESCAPE) {
                         if (!this.getEditorLock().isActive()) {
                             return; // no editing mode to cancel, allow bubbling and default processing (exit without cancelling the event)
@@ -4092,29 +4137,35 @@ namespace Slick {
         }
 
         scrollCellIntoView(row: number, cell: number, doPaging?: boolean): void {
-            // Don't scroll to frozen cells
-            if (cell < this._fixedStartCols) {
-                return;
-            }
+            this.scrollRowIntoView(row, doPaging);
 
-            if (row < this.actualFrozenRow) {
-                this.scrollRowIntoView(row, doPaging);
-            }
+            if (cell < this._fixedStartCols)
+                return;
 
             var colspan = this.getColspan(row, cell);
-            var left = this._colLeft[cell],
-                right = this._colRight[cell + (colspan > 1 ? colspan - 1 : 0)],
-                scrollRight = this.scrollLeft + Math.round(this.$viewportScrollContainerX.width());
+            this.internalScrollColumnIntoView(this._colLeft[cell], this._colRight[cell + (colspan > 1 ? colspan - 1 : 0)]);
+        }
 
-            if (left < this.scrollLeft) {
-                this.$viewportScrollContainerX.scrollLeft(left);
-                this.handleScroll();
-                this.render();
-            } else if (right > scrollRight) {
-                this.$viewportScrollContainerX.scrollLeft(Math.min(left, right - this.$viewportScrollContainerX[0].clientWidth));
-                this.handleScroll();
-                this.render();
-            }
+        scrollColumnIntoView(cell: number): void {
+            this.internalScrollColumnIntoView(this._colLeft[cell], this._colRight[cell]);
+        }
+
+        internalScrollColumnIntoView(left: number, right: number): void {
+
+            var scrollRight = this.scrollLeft + this.$viewportScrollContainerX.width() -
+                (this.viewportHasVScroll ? scrollbarDimensions.width : 0);
+
+            var target;
+            if (left < this.scrollLeft)
+                target = left;
+            else if (right > scrollRight)
+                target = Math.min(left, right - this.$viewportScrollContainerX[0].clientWidth);
+            else
+                return;
+
+            this.$viewportScrollContainerX.scrollLeft(target);
+            this.handleScroll();
+            this.render();
         }
 
         private setActiveCellInternal(newCell: HTMLElement, opt_editMode?: boolean): void {
@@ -4145,7 +4196,7 @@ namespace Slick {
                 var cell = this.getCellFromPoint($activeCellOffset[this.xLeft], Math.ceil($activeCellOffset.top) - rowOffset);
 
                 this.activeRow = cell.row;
-                var activeCell: number = this.activePosX = activeCell = this.activePosX = this.getCellFromNode(this.activeCellNode);
+                this.activeCell = this.activePosX = this.getCellFromNode(this.activeCellNode);
 
                 $activeCellNode.addClass("active");
                 if (this.rowsCache[this.activeRow]) {
@@ -4157,7 +4208,7 @@ namespace Slick {
                     opt_editMode = (this.activeRow == this.getDataLength()) || this._options.autoEdit;
                 }
 
-                if (this._options.editable && opt_editMode && this.isCellPotentiallyEditable(this.activeRow, activeCell)) {
+                if (this._options.editable && opt_editMode && this.isCellPotentiallyEditable(this.activeRow, this.activeCell)) {
                     clearTimeout(this.h_editorLoader);
 
                     if (this._options.asyncEditorLoading) {
@@ -4169,7 +4220,7 @@ namespace Slick {
                     }
                 }
             } else {
-                this.activeRow = activeCell = null;
+                this.activeRow = this.activeCell = null;
             }
 
             if (activeCellChanged) {
@@ -4480,6 +4531,47 @@ namespace Slick {
             this.scrollPage(-1);
         }
 
+        navigateTop(): void {
+            this.navigateToRow(0);
+        }
+
+        navigateBottom(): void {
+            this.navigateToRow(this.getDataLength() - 1);
+        }
+
+        navigateToRow(row: number) {
+            var dataLength = this.getDataLength();
+            if (!dataLength) {
+                return true;
+            }
+
+            if (row < 0)
+                row = 0;
+            else if (row >= dataLength)
+                row = dataLength - 1;
+
+            this.scrollCellIntoView(row, 0, true);
+
+            if (this._options.enableCellNavigation && this.activeRow != null) {
+                var cell = 0, prevCell = null;
+                var prevActivePosX = this.activePosX;
+                while (cell <= this.activePosX) {
+                    if (this.canCellBeActive(row, cell))
+                        prevCell = cell;
+                    cell += this.getColspan(row, cell);
+                }
+
+                if (prevCell !== null) {
+                    this.setActiveCellInternal(this.getCellNode(row, prevCell));
+                    this.activePosX = prevActivePosX;
+                }
+                else
+                    this.resetActiveCell();
+            }
+
+            return true;
+        }
+
         getColspan(row: number, cell: number): number {
             var itemMetadata = this._data.getItemMetadata && this._data.getItemMetadata(row) as ItemMetadata;
             if (!itemMetadata || !itemMetadata.columns) {
@@ -4498,7 +4590,7 @@ namespace Slick {
             return colspan;
         }
 
-        findFirstFocusableCell(row: number): number {
+        private findFirstFocusableCell(row: number): number {
             var cell = 0;
             var cols = this._cols;
             while (cell < cols.length) {
@@ -4510,7 +4602,7 @@ namespace Slick {
             return null;
         }
 
-        findLastFocusableCell(row: number): number {
+        private findLastFocusableCell(row: number): number {
             var cell = 0;
             var lastFocusableCell = null;
             var cols = this._cols;
@@ -4523,7 +4615,7 @@ namespace Slick {
             return lastFocusableCell;
         }
 
-        gotoRight(row?: number, cell?: number, posX?: number): { row: any; cell: any; posX: any; } {
+        private gotoRight(row?: number, cell?: number, posX?: number): GoToResult {
             var cols = this._cols;
             if (cell >= cols.length) {
                 return null;
@@ -4538,13 +4630,13 @@ namespace Slick {
                 return {
                     row: row,
                     cell: cell,
-                    posX: posX
+                    posX: cell
                 };
             }
             return null;
         }
 
-        gotoLeft(row?: number, cell?: number, posX?: number): { row: number; cell: number; posX: number; } {
+        private gotoLeft(row?: number, cell?: number, posX?: number): GoToResult {
             if (cell <= 0) {
                 return null;
             }
@@ -4572,7 +4664,7 @@ namespace Slick {
             }
         }
 
-        gotoDown(row?: number, cell?: number, posX?: number): { row: number; cell: number; posX: number; } {
+        private gotoDown(row?: number, cell?: number, posX?: number): GoToResult {
             var prevCell;
             var dataLengthIncludingAddNew = this.getDataLengthIncludingAddNew();
             while (true) {
@@ -4596,7 +4688,7 @@ namespace Slick {
             }
         }
 
-        gotoUp(row?: number, cell?: number, posX?: number): { row: number; cell: number; posX: number; } {
+        private gotoUp(row?: number, cell?: number, posX?: number): GoToResult {
             var prevCell;
             while (true) {
                 if (--row < 0) {
@@ -4611,22 +4703,22 @@ namespace Slick {
 
                 if (this.canCellBeActive(row, prevCell)) {
                     return {
-                        "row": row,
-                        "cell": prevCell,
-                        "posX": posX
+                        row: row,
+                        cell: prevCell,
+                        posX: posX
                     };
                 }
             }
         }
 
-        gotoNext(row?: number, cell?: number, posX?: number) {
+        private gotoNext(row?: number, cell?: number, posX?: number): GoToResult {
             if (row == null && cell == null) {
                 row = cell = posX = 0;
                 if (this.canCellBeActive(row, cell)) {
                     return {
-                        "row": row,
-                        "cell": cell,
-                        "posX": cell
+                        row: row,
+                        cell: cell,
+                        posX: cell
                     };
                 }
             }
@@ -4642,25 +4734,25 @@ namespace Slick {
                 firstFocusableCell = this.findFirstFocusableCell(row);
                 if (firstFocusableCell !== null) {
                     return {
-                        "row": row,
-                        "cell": firstFocusableCell,
-                        "posX": firstFocusableCell
+                        row: row,
+                        cell: firstFocusableCell,
+                        posX: firstFocusableCell
                     };
                 }
             }
             return null;
         }
 
-        gotoPrev(row?: number, cell?: number, posX?: number) {
+        private gotoPrev(row?: number, cell?: number, posX?: number): { row: number; cell: number; posX: number; } {
             var cols = this._cols;
             if (row == null && cell == null) {
                 row = this.getDataLengthIncludingAddNew() - 1;
                 cell = posX = cols.length - 1;
                 if (this.canCellBeActive(row, cell)) {
                     return {
-                        "row": row,
-                        "cell": cell,
-                        "posX": cell
+                        row: row,
+                        cell: cell,
+                        posX: cell
                     };
                 }
             }
@@ -4680,13 +4772,37 @@ namespace Slick {
                 lastSelectableCell = this.findLastFocusableCell(row);
                 if (lastSelectableCell !== null) {
                     pos = {
-                        "row": row,
-                        "cell": lastSelectableCell,
-                        "posX": lastSelectableCell
+                        row: row,
+                        cell: lastSelectableCell,
+                        posX: lastSelectableCell
                     };
                 }
             }
             return pos;
+        }
+
+        private gotoRowStart(row: number) {
+            var newCell = this.findFirstFocusableCell(row);
+            if (newCell === null)
+                return null;
+
+            return {
+                row: row,
+                cell: newCell,
+                posX: newCell
+            };
+        }
+
+        private gotoRowEnd(row: number) {
+            var newCell = this.findLastFocusableCell(row);
+            if (newCell === null)
+                return null;
+
+            return {
+                row: row,
+                cell: newCell,
+                posX: newCell
+            };
         }
 
         navigateRight(): boolean {
@@ -4713,6 +4829,14 @@ namespace Slick {
             return this.navigate("prev");
         }
 
+        navigateRowStart(): boolean {
+            return this.navigate("home");
+        }
+
+        navigateRowEnd(): boolean {
+            return this.navigate("end");
+        }
+
         /**
          * @param {string} dir Navigation direction.
          * @return {boolean} Whether navigation resulted in a change of active cell.
@@ -4732,10 +4856,12 @@ namespace Slick {
             this.setFocus();
 
             var tabbingDirections = {
-                "up": -1,
-                "down": 1,
-                "prev": -1,
-                "next": 1
+                up: -1,
+                down: 1,
+                prev: -1,
+                next: 1,
+                home: -1,
+                end: 1
             };
 
             tabbingDirections[this.xLeft] = -1;
@@ -4744,16 +4870,18 @@ namespace Slick {
             this.tabbingDirection = tabbingDirections[dir];
 
             var stepFunctions = {
-                "up": this.gotoUp,
-                "down": this.gotoDown,
-                "prev": this.gotoPrev,
-                "next": this.gotoNext
+                up: this.gotoUp,
+                down: this.gotoDown,
+                prev: this.gotoPrev,
+                next: this.gotoNext,
+                home: this.gotoRowStart,
+                end: this.gotoRowEnd
             };
 
             stepFunctions[this.xLeft] = this.gotoLeft;
             stepFunctions[this.xRight] = this.gotoRight;
 
-            var stepFn = stepFunctions[dir];
+            var stepFn = stepFunctions[dir].bind(this);
             var pos = stepFn(this.activeRow, this.activeCell, this.activePosX);
             if (pos) {
                 if (this.hasFrozenRows && this._options.frozenBottom && pos.row == this.getDataLength()) {
@@ -5023,24 +5151,8 @@ namespace Slick {
     }
 
     function getMaxSupportedCssHeight(): number {
-        var supportedHeight = 1000000;
-        // FF reports the height back but still renders blank after ~6M px
-        var testUpTo = navigator.userAgent.toLowerCase().match(/firefox/) ? 6000000 : 1000000000;
-        var div = $("<div style='display:none' />").appendTo(document.body);
-
-        while (true) {
-            var test = supportedHeight * 2;
-            div.css("height", test);
-            if (test > testUpTo || Math.round(div.height()) !== test) {
-                break;
-            } else {
-                supportedHeight = test;
-            }
-        }
-
-        div.remove();
-        return supportedHeight;
-    }    
+        return navigator.userAgent.toLowerCase().match(/gecko\//) ? 4000000 : 32000000;
+    }
 
     function adjustFrozenColumnCompat(columns: Column[], options: GridOptions) {
         if (options?.frozenColumn == null || options.frozenColumn < 0)
@@ -5071,8 +5183,8 @@ namespace Slick {
         if (idOrder.length == 0)
             return columns;
 
-        var orderById: { [key: string]: number } = {}, 
-            colIdxById : { [key: string]: number } = {}, 
+        var orderById: { [key: string]: number } = {},
+            colIdxById: { [key: string]: number } = {},
             result: Column[] = [];
 
         for (var i = 0; i < idOrder.length; i++)
@@ -5090,7 +5202,7 @@ namespace Slick {
                 colIdxById[c.id] = null;
             }
         }
-        
+
         if (orderById[columns[0].id] == null)
             takeFrom(0);
 
@@ -5110,7 +5222,4 @@ namespace Slick {
 
         return result;
     }
-
-
-
 }
