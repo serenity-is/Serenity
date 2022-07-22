@@ -1410,11 +1410,11 @@ namespace Slick {
             (this.$headers.filter(":ui-sortable") as any).sortable("destroy");
             var columnScrollTimer: number = null;
 
-            function scrollColumnsRight() {
+            var scrollColumnsRight = () => {
                 this.$viewportScrollContainerX[0].scrollLeft = this.$viewportScrollContainerX[0].scrollLeft + 10;
             }
 
-            function scrollColumnsLeft() {
+            var scrollColumnsLeft = () => {
                 this.$viewportScrollContainerX[0].scrollLeft = this.$viewportScrollContainerX[0].scrollLeft - 10;
             }
 
