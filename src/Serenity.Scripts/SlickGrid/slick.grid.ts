@@ -1480,56 +1480,14 @@ namespace Slick {
                         return;
                     }
 
-                    var reorderedCols = this._initCols.slice();
-                    var reorderedIds = (this.$headerL as any).sortable("toArray").map((x: string) => x.substring(this.uid.length));
+                    ;
+                    var reorderedCols = sortToDesiredOrderAndKeepRest(this._initCols, 
+                        (this.$headerL as any).sortable("toArray").map((x: string) => x.substring(this.uid.length)));
 
-                    function sortAsReordered() {
-                        if (reorderedIds.length == 0)
-                            return;
-                        var order = {}, colidx = {}, result: Column[] = [];
-                        for (var i = 0; i < reorderedIds.length; i++)
-                            order[reorderedIds[i]] = i;
-                        for (i = 0; i < reorderedCols.length; i++)
-                            colidx[reorderedCols[i].id] = i;
+                    reorderedCols = sortToDesiredOrderAndKeepRest(reorderedCols,
+                        (this.$headerR as any).sortable("toArray").map((x: string) => x.substring(this.uid.length)));
 
-                        function takeFrom(i: number) {
-                            for (; i < reorderedCols.length; i++) {
-                                var c = reorderedCols[i];
-                                if (order[c.id] != null)
-                                    break;
-                                result.push(c);
-                                colidx[c.id] = null;
-                            }
-                        }
-                        
-                        if (order[reorderedCols[0].id] == null)
-                            takeFrom(0);
-
-                        for (var id of reorderedIds) {
-                            i = colidx[id];
-                            if (i == null)
-                                continue;
-                            result.push(reorderedCols[i]);
-                            colidx[id] = null;
-                            takeFrom(i + 1);
-                        }
-
-                        for (i = 0; i < reorderedCols.length; i++) {
-                            var c = reorderedCols[i];
-                            if (colidx[c.id] != null) {
-                                result.push(c);
-                                colidx[c.id] = null;
-                            }
-                        }
-
-                        reorderedCols = result;
-                    }
-
-                    sortAsReordered();
-                    reorderedIds = (this.$headerR as any).sortable("toArray").map((x: string) => x.substring(this.uid.length));
-                    sortAsReordered();
                     this.setColumns(reorderedCols);
-
                     this.trigger(this.onColumnsReordered, { });
                     e.stopPropagation();
                     this.setupColumnResize();
@@ -5102,6 +5060,57 @@ namespace Slick {
 
         delete options.frozenColumn;
     }
+
+    /**
+     * Helper to sort visible cols, while keeping invisible cols sticky to 
+     * the previous visible col. For example, if columns are currently in order 
+     * A, B, C, D, E, F, G, H and desired order is G, D, F (assuming A, B, C, E 
+     * were invisible) the result is A, B, G, H, D, E, F.
+     */
+    function sortToDesiredOrderAndKeepRest(columns: Slick.Column[], idOrder: string[]): Column[] {
+        if (idOrder.length == 0)
+            return columns;
+
+        var orderById: { [key: string]: number } = {}, 
+            colIdxById : { [key: string]: number } = {}, 
+            result: Column[] = [];
+
+        for (var i = 0; i < idOrder.length; i++)
+            orderById[idOrder[i]] = i;
+
+        for (i = 0; i < columns.length; i++)
+            colIdxById[columns[i].id] = i;
+
+        function takeFrom(i: number) {
+            for (var j = i; j < columns.length; j++) {
+                var c = columns[j];
+                if (i != j && orderById[c.id] != null)
+                    break;
+                result.push(c);
+                colIdxById[c.id] = null;
+            }
+        }
+        
+        if (orderById[columns[0].id] == null)
+            takeFrom(0);
+
+        for (var id of idOrder) {
+            i = colIdxById[id];
+            if (i != null)
+                takeFrom(i);
+        }
+
+        for (i = 0; i < columns.length; i++) {
+            var c = columns[i];
+            if (colIdxById[c.id] != null) {
+                result.push(c);
+                colIdxById[c.id] = null;
+            }
+        }
+
+        return result;
+    }
+
 
 
 }
