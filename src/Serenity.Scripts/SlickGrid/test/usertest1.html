@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="../../../Serenity.Assets/wwwroot/Scripts/jquery.event.drag.min.js"></script>
+        <!--<script src="../../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.js"></script>
+        <script src="../../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.js"></script>-->
+        <script src="slick.core.js"></script>
+        <script src="slick.grid.js"></script>
+        <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" integrity="sha512-aOG0c6nPNzGk+5zjwyJaoRUgCdOrfSDhmMID2u4+OIslr0GjpLKo7Xm0Ao3xmpM4T8AmIouRkqwj1nrdVsLKEQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
+        <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.theme.min.css" integrity="sha512-9h7XRlUeUwcHUf9bNiWSTO9ovOWFELxTlViP801e5BbwNJ5ir9ua6L20tEroWZdm+HFBAWBLx2qH4l4QHHlRyg==" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>        
+        <link href="../../../Serenity.Assets/wwwroot/Content/slick.grid.css" rel="stylesheet" type="text/css"/>
+        <link href="../../../Serenity.Assets/wwwroot/Content/slick-default-theme.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <div id="grid" style="height: 400px"></div>
+        <script>
+            var data = [];
+            for (var i = 0; i < 1000; i++) {
+                var item = {};
+                item.id = i;
+                for (var c = 0; c < 100; c++) {
+                    item["c" + c] = i * 100 + c;
+                }
+                data.push(item);
+            }
+            var columns = Array.from(new Array(100)).map((x, i) => ({ id: 'c' + i, field: 'c' + i, name: 'c' + i, width: 100, visible: i % 3 != 0 }));
+            var options = {
+            };
+            
+            $(function() {
+                var grid = new Slick.Grid($('#grid'), data, columns, {
+                    enableColumnReorder: true,
+                    frozenColumn: -1
+                });
+                grid.onColumnsReordered.subscribe(() => {
+                    console.log(grid.getInitialColumns().map(x => x.id).join(', '));
+                });
+            });
+        </script>
+    </body>
+</html>
