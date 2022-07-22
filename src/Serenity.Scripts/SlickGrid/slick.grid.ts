@@ -1480,14 +1480,47 @@ namespace Slick {
                         return;
                     }
 
+                    var reorderedCols = this._initCols.slice();
                     var reorderedIds = (this.$headerL as any).sortable("toArray");
-                    reorderedIds = reorderedIds.concat((this.$headerR as any).sortable("toArray"));
 
-                    var reorderedColumns = [];
-                    for (var i = 0; i < reorderedIds.length; i++) {
-                        reorderedColumns.push(viewCols[this.getInitialColumnIndex(reorderedIds[i].replace(this.uid, ""))]);
+                    function sortAsReordered() {
+                        if (reorderedIds.length == 0)
+                            return;
+                        var order = {}, colidx = {}, result: Column[] = [];
+                        for (var i = 0; i < reorderedIds; i++)
+                            order[reorderedIds[i]] = i;
+                        for (i = 0; i < reorderedCols.length; i++)
+                            colidx[reorderedCols[i].id] = i;
+
+                        function takeFrom(i: number) {
+                            for (; i < reorderedCols.length; i++) {
+                                if (order[i] != null)
+                                    break;
+                                var c = reorderedCols[i];
+                                result.push(c);
+                                colidx[c.id] = null;
+                            }
+                        }
+                        
+                        if (order[0] == null)
+                            takeFrom(0);
+
+                        for (var id of reorderedIds) {
+                            i = colidx[id];
+                            if (i == null)
+                                continue;
+                            result.push(reorderedCols[i]);
+                            colidx[id] = null;
+                            takeFrom(i + 1);
+                        }
+
+                        reorderedCols = result;
                     }
-                    this.setColumns(reorderedColumns);
+
+                    sortAsReordered();
+                    reorderedIds = (this.$headerR as any).sortable("toArray");
+                    sortAsReordered();
+                    this.setColumns(reorderedCols);
 
                     this.trigger(this.onColumnsReordered, { });
                     e.stopPropagation();
