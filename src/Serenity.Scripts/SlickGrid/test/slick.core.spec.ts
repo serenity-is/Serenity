@@ -250,3 +250,156 @@ describe('Slick.Event', () => {
         expect(callCount).toBe(0);
     });
 });
+
+describe('Slick.EventHandler', () => {
+    it('automatically subscribes handler to the event', function () {
+        let isEventCalled = false;
+        
+        const event = new Slick.Event();
+        
+        const eventHandler = new Slick.EventHandler();
+        eventHandler.subscribe(event, () => {
+            isEventCalled = true;
+        });
+        
+        event.notify(null, null, null);
+        
+        expect(isEventCalled).toBeTruthy();
+    });
+
+    it('automatically subscribes multiple handlers to the event', function () {
+        let isEventCalled = [false, false];
+
+        const event = new Slick.Event();
+        const eventHandler = new Slick.EventHandler();
+        
+        eventHandler.subscribe(event, () => isEventCalled[0] = true);
+        eventHandler.subscribe(event, () => isEventCalled[1] = true);
+
+        event.notify(null, null, null);
+
+        expect(isEventCalled[0]).toBeTruthy();
+        expect(isEventCalled[1]).toBeTruthy();
+    });
+
+    it('unsubscribes handler from event', function () {
+        let eventCallCount = 0;
+        
+        const event = new Slick.Event();
+        const eventHandler = new Slick.EventHandler();
+        
+        const handler = () => eventCallCount++;
+        
+        eventHandler.subscribe(event, handler);
+        event.notify(null, null, null);
+        
+        expect(eventCallCount).toBe(1);
+        
+        eventHandler.unsubscribe(event, handler);
+        event.notify(null, null, null);
+
+        expect(eventCallCount).toBe(1);
+    });
+
+    it('unsubscribes all handlers of the same reference from event', function () {
+        let eventCallCount = 0;
+
+        const event = new Slick.Event();
+        const eventHandler = new Slick.EventHandler();
+
+        const handler = () => eventCallCount++;
+
+        eventHandler.subscribe(event, handler);
+        eventHandler.subscribe(event, handler);
+        eventHandler.subscribe(event, handler);
+        event.notify(null, null, null);
+
+        expect(eventCallCount).toBe(3);
+
+        eventHandler.unsubscribe(event, handler);
+        event.notify(null, null, null);
+
+        expect(eventCallCount).toBe(3);
+    });
+
+    it('unsubscribes handler from an specific event', function () {
+        let eventCallCount = 0;
+
+        const event = new Slick.Event();
+        const otherEvent = new Slick.Event();
+        
+        const eventHandler = new Slick.EventHandler();
+
+        const handler = () => eventCallCount++;
+
+        eventHandler.subscribe(event, handler);
+        eventHandler.subscribe(otherEvent, handler);
+
+        event.notify(null, null, null);
+        otherEvent.notify(null, null, null);
+
+        expect(eventCallCount).toBe(2);
+
+        eventHandler.unsubscribe(event, handler);
+        event.notify(null, null, null);
+        otherEvent.notify(null, null, null);
+
+        expect(eventCallCount).toBe(3);
+    });
+
+    it('unsubscribes all handlers of the same reference from an specific event', function () {
+        let eventCallCount = 0;
+
+        const event = new Slick.Event();
+        const otherEvent = new Slick.Event();
+
+        const eventHandler = new Slick.EventHandler();
+
+        const handler = () => eventCallCount++;
+
+        eventHandler.subscribe(event, handler);
+        eventHandler.subscribe(event, handler);
+        eventHandler.subscribe(event, handler);
+        eventHandler.subscribe(otherEvent, handler);
+
+        event.notify(null, null, null);
+        otherEvent.notify(null, null, null);
+
+        expect(eventCallCount).toBe(4);
+
+        eventHandler.unsubscribe(event, handler);
+        event.notify(null, null, null);
+        otherEvent.notify(null, null, null);
+
+        expect(eventCallCount).toBe(5);
+    });
+
+    it('unsubscribes from all event and handlers', function () {
+        let eventCallCount = 0;
+
+        const event = new Slick.Event();
+        const otherEvent = new Slick.Event();
+
+        const eventHandler = new Slick.EventHandler();
+
+        const handler = () => eventCallCount++;
+
+        eventHandler.subscribe(event, handler);
+        eventHandler.subscribe(event, handler);
+        eventHandler.subscribe(event, handler);
+        eventHandler.subscribe(otherEvent, handler);
+        eventHandler.subscribe(otherEvent, handler);
+        eventHandler.subscribe(otherEvent, handler);
+
+        event.notify(null, null, null);
+        otherEvent.notify(null, null, null);
+
+        expect(eventCallCount).toBe(6);
+
+        eventHandler.unsubscribeAll();
+        event.notify(null, null, null);
+        otherEvent.notify(null, null, null);
+
+        expect(eventCallCount).toBe(6);
+    });
+});
