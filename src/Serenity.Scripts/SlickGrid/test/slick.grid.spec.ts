@@ -18,8 +18,8 @@ describe('options.frozenColumn', () => {
             enableColumnReorder: false
         });
 
+        expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
-        expect(grid.getViewColumns().length).toBe(3);
         expect(grid.getColumns()[0].fixedTo).toBeUndefined();
     });
 
@@ -29,8 +29,8 @@ describe('options.frozenColumn', () => {
             frozenColumn: null
         });
 
+        expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
-        expect(grid.getViewColumns().length).toBe(3);
         expect(grid.getColumns()[0].fixedTo).toBeUndefined();
     });
 
@@ -40,8 +40,8 @@ describe('options.frozenColumn', () => {
             frozenColumn: -1
         });
 
+        expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
-        expect(grid.getViewColumns().length).toBe(3);
         expect(grid.getColumns()[0].fixedTo).toBeUndefined();
     });
 
@@ -51,9 +51,9 @@ describe('options.frozenColumn', () => {
             frozenColumn: 0
         });
 
+        expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
-        expect(grid.getViewColumns().length).toBe(3);
-        expect(grid.getViewColumns()[0].fixedTo).toBe('start');
+        expect(grid.getColumns()[0].fixedTo).toBe('start');
     });
 
     it('sets the first visible column to fixed start when 0', () => {
@@ -64,11 +64,11 @@ describe('options.frozenColumn', () => {
             frozenColumn: 0
         });
 
-        expect(grid.getColumns().length).toBe(3);
-        expect(grid.getViewColumns().length).toBe(2);
-        expect(grid.getViewColumns()[0].fixedTo).toBe('start');
-        expect(grid.getViewColumns()[0].id).toBe('c2');
-        expect(grid.getViewColumns()[1].fixedTo).toBeUndefined();
+        expect(grid.getInitialColumns().length).toBe(3);
+        expect(grid.getColumns().length).toBe(2);
+        expect(grid.getColumns()[0].fixedTo).toBe('start');
+        expect(grid.getColumns()[0].id).toBe('c2');
+        expect(grid.getColumns()[1].fixedTo).toBeUndefined();
     });    
 
     it('sets first two columns to fixed start when 1 and all cols are visible', () => {
@@ -77,10 +77,10 @@ describe('options.frozenColumn', () => {
             frozenColumn: 1
         });
 
+        expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
-        expect(grid.getViewColumns().length).toBe(3);
-        expect(grid.getViewColumns()[0].fixedTo).toBe('start');
-        expect(grid.getViewColumns()[1].fixedTo).toBe('start');
+        expect(grid.getColumns()[0].fixedTo).toBe('start');
+        expect(grid.getColumns()[1].fixedTo).toBe('start');
     });
 
     it('sets the first two visible column to fixed start when 1', () => {
@@ -91,12 +91,12 @@ describe('options.frozenColumn', () => {
             frozenColumn: 1
         });
 
-        expect(grid.getColumns().length).toBe(3);
-        expect(grid.getViewColumns().length).toBe(2);
-        expect(grid.getViewColumns()[0].fixedTo).toBe('start');
-        expect(grid.getViewColumns()[0].id).toBe('c2');
-        expect(grid.getViewColumns()[1].fixedTo).toBe('start');
-        expect(grid.getViewColumns()[1].id).toBe('c3');
+        expect(grid.getInitialColumns().length).toBe(3);
+        expect(grid.getColumns().length).toBe(2);
+        expect(grid.getColumns()[0].fixedTo).toBe('start');
+        expect(grid.getColumns()[0].id).toBe('c2');
+        expect(grid.getColumns()[1].fixedTo).toBe('start');
+        expect(grid.getColumns()[1].id).toBe('c3');
     });
 
     it('gets deleted from options after processing', () => {
