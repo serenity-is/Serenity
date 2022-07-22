@@ -746,52 +746,6 @@ namespace Slick {
             this.bindToData();
         }
 
-        private setColumnsInternal(columns: Column[]) {
-
-            var defs = this._colDefaults;
-            var columnsById = {};
-            var fixedStartCols: Column[] = [];
-            var viewCols: Column[] = [];
-            var viewColById: { [key: string]: number } = {};
-            var i: number, m: Column, k: string;
-            for (i = 0; i < columns.length; i++) {
-                m = columns[i];
-                
-                for (k in defs) {
-                    if (m[k] === undefined)
-                        m[k] = this._colDefaults[k];
-                }
-
-                if (m.minWidth && m.width < m.minWidth) {
-                    m.width = m.minWidth;
-                }
-
-                if (m.maxWidth && m.width > m.maxWidth) {
-                    m.width = m.maxWidth;
-                }
-
-                columnsById[m.id] = i;
-
-                if (m.visible !== false) {
-                    (m.fixedTo === "start" ? fixedStartCols : viewCols).push(m);
-                }
-            }
-
-            this._fixedStartCols = fixedStartCols.length;
-            if (fixedStartCols.length > 0)
-                viewCols = fixedStartCols.concat(viewCols);
-
-            for (i = 0; i < viewCols.length; i++) {
-                m = viewCols[i];
-                viewColById[m.id] = i;
-            }
-
-            this._columns = columns;
-            this._columnById = columnsById;            
-            this._viewCols = viewCols;
-            this._viewColById = viewColById;
-        }
-
         init(): void {
             if (this.initialized)
                 return;
@@ -2239,6 +2193,52 @@ namespace Slick {
             }
         }
 
+        private setColumnsInternal(columns: Column[]) {
+
+            var defs = this._colDefaults;
+            var columnsById = {};
+            var fixedStartCols: Column[] = [];
+            var viewCols: Column[] = [];
+            var viewColById: { [key: string]: number } = {};
+            var i: number, m: Column, k: string;
+            for (i = 0; i < columns.length; i++) {
+                m = columns[i];
+                
+                for (k in defs) {
+                    if (m[k] === undefined)
+                        m[k] = this._colDefaults[k];
+                }
+
+                if (m.minWidth && m.width < m.minWidth) {
+                    m.width = m.minWidth;
+                }
+
+                if (m.maxWidth && m.width > m.maxWidth) {
+                    m.width = m.maxWidth;
+                }
+
+                columnsById[m.id] = i;
+
+                if (m.visible !== false) {
+                    (m.fixedTo === "start" ? fixedStartCols : viewCols).push(m);
+                }
+            }
+
+            this._fixedStartCols = fixedStartCols.length;
+            if (fixedStartCols.length > 0)
+                viewCols = fixedStartCols.concat(viewCols);
+
+            for (i = 0; i < viewCols.length; i++) {
+                m = viewCols[i];
+                viewColById[m.id] = i;
+            }
+
+            this._columns = columns;
+            this._columnById = columnsById;            
+            this._viewCols = viewCols;
+            this._viewColById = viewColById;
+        }
+
         setColumns(columns: Column<TItem>[]): void {
             this.setColumnsInternal(columns);
             this.updateViewColLeftRight();
@@ -3341,7 +3341,7 @@ namespace Slick {
             if (this._options.asyncPostRenderDelay < 0) {
                 this.asyncPostProcessRows();
             } else {
-                this.h_postrender = setTimeout(this.asyncPostProcessRows, this._options.asyncPostRenderDelay);
+                this.h_postrender = setTimeout(this.asyncPostProcessRows.bind(this), this._options.asyncPostRenderDelay);
             }
         }
 
@@ -3356,7 +3356,7 @@ namespace Slick {
                 this.asyncPostProcessCleanupRows();
             }
             else {
-                this.h_postrenderCleanup = setTimeout(this.asyncPostProcessCleanupRows, this._options.asyncPostCleanupDelay);
+                this.h_postrenderCleanup = setTimeout(this.asyncPostProcessCleanupRows.bind(this), this._options.asyncPostCleanupDelay);
             }
         }
 
@@ -3580,7 +3580,7 @@ namespace Slick {
                         Math.abs(this.lastRenderedScrollLeft - this.scrollLeft) < this.viewportW)) {
                         this.render();
                     } else {
-                        this.h_render = setTimeout(this.render, 50);
+                        this.h_render = setTimeout(this.render.bind(this), 50);
                     }
 
                     this.trigger(this.onViewportChanged);
@@ -3630,7 +3630,7 @@ namespace Slick {
                 }
 
                 if (this._options.asyncPostRenderDelay >= 0) {
-                    this.h_postrender = setTimeout(this.asyncPostProcessRows, this._options.asyncPostRenderDelay);
+                    this.h_postrender = setTimeout(this.asyncPostProcessRows.bind(this), this._options.asyncPostRenderDelay);
                     return;
                 }
             }
@@ -3658,7 +3658,7 @@ namespace Slick {
 
                 // call this function again after the specified delay
                 if (this._options.asyncPostRenderDelay >= 0) {
-                    this.h_postrenderCleanup = setTimeout(this.asyncPostProcessCleanupRows, this._options.asyncPostCleanupDelay);
+                    this.h_postrenderCleanup = setTimeout(this.asyncPostProcessCleanupRows.bind(this), this._options.asyncPostCleanupDelay);
                     return;
                 }
             }
@@ -4158,7 +4158,7 @@ namespace Slick {
                     clearTimeout(this.h_editorLoader);
 
                     if (this._options.asyncEditorLoading) {
-                        this.h_editorLoader = setTimeout(function () {
+                        this.h_editorLoader = setTimeout(() => {
                             this.makeActiveCellEditable();
                         }, this._options.asyncEditorLoadDelay);
                     } else {
@@ -4170,7 +4170,7 @@ namespace Slick {
             }
 
             if (activeCellChanged) {
-                setTimeout(this.scrollActiveCellIntoView, 50);
+                setTimeout(this.scrollActiveCellIntoView.bind(this), 50);
                 this.trigger(this.onActiveCellChanged, this.getActiveCell() as ArgsCell);
             }
         }
