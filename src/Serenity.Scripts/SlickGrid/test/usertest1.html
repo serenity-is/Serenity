@@ -32,11 +32,21 @@
                 data.push(item);
             }
             var columns = Array.from(new Array(100)).map((x, i) => ({ id: 'c' + i, field: 'c' + i, name: 'c' + i, width: 100, visible: i % 3 != 0 }));
+            columns[1].formatter = function(v) {
+                return {
+                    text: (v ?? '').toString(),
+                    addClass: 'cls-' + Math.random(),
+                    addAttrs: {
+                        ['a' + Math.random()]: 'y',
+                        y: 'z'
+                    }
+                }
+            }
             var options = {
             };
             
             $(function() {
-                var grid = new Slick.Grid($('#grid'), data, columns, {
+                var grid = window.grid = new Slick.Grid($('#grid'), data, columns, {
                     enableColumnReorder: true,
                     frozenColumn: -1
                 });

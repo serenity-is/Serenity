@@ -38,8 +38,16 @@ if (typeof Slick === "undefined") {
 
 namespace Slick {
 
-    export type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>, colMeta?: ColumnMetadata) => string;
-    export type ColumnFormat<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
+    export interface FormatResult {
+        addClass?: string;
+        addAttrs?: { [key: string]: string };
+        toolTip?: string;
+        /** html */
+        text?: string;
+    }
+
+    export type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>) => string | FormatResult;
+    export type ColumnFormat<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string | FormatResult;
     export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>) => void;
     export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
 
@@ -53,6 +61,7 @@ namespace Slick {
 
     export interface Plugin {
         init(grid: Grid): void;
+        pluginName?: string;
         destroy?: () => void;
     }
 
@@ -228,6 +237,7 @@ namespace Slick {
         asyncPostCleanup?: AsyncPostCleanup<TItem>;
         behavior?: any;
         cannotTriggerInsert?: boolean;
+        cellAttrs: { [key: string]: string };
         cssClass?: string;
         defaultSortAsc?: boolean;
         editor?: Editor;
@@ -524,7 +534,7 @@ namespace Slick {
         readonly onSelectedRowsChanged = new Event<ArgsRowNumbers>();
         readonly onCellCssStylesChanged = new Event<ArgsCssStyle>();
 
-        constructor(container: JQuery, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
+        constructor(container: JQuery | HTMLElement, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
 
             this._data = data;
 
@@ -591,7 +601,11 @@ namespace Slick {
             //////////////////////////////////////////////////////////////////////////////////////////////
             // Initialization
 
-            this.$container = $(container);
+            if (container instanceof jQuery)
+                this.$container = container as any;
+            else
+                this.$container = $(container);
+
             if (this.$container.length < 1) {
                 throw new Error("SlickGrid requires a valid container, " + container + " does not exist in the DOM.");
             }
@@ -850,7 +864,7 @@ namespace Slick {
             plugin.init(this);
         }
 
-        private unregisterPlugin(plugin: Plugin): void {
+        unregisterPlugin(plugin: Plugin): void {
             for (var i = this.plugins.length; i >= 0; i--) {
                 if (this.plugins[i] === plugin) {
                     if (this.plugins[i].destroy) {
@@ -859,6 +873,13 @@ namespace Slick {
                     this.plugins.splice(i, 1);
                     break;
                 }
+            }
+        }
+
+        getPluginByName(name: string): Plugin {
+            for (var i = this.plugins.length-1; i >= 0; i--) {
+                if (this.plugins[i].pluginName === name)
+                    return this.plugins[i];
             }
         }
 
@@ -1068,7 +1089,7 @@ namespace Slick {
 
         updateColumnHeader(columnId: string, title?: string, toolTip?: string): void {
             if (!this.initialized) { return; }
-            var idx = this.getViewColumnIndex(columnId);
+            var idx = this.getColumnIndex(columnId);
             if (idx == null) {
                 return;
             }
@@ -1105,7 +1126,7 @@ namespace Slick {
         }
 
         getHeaderColumn(columnIdOrIdx: string | number): HTMLDivElement {
-            var idx = (typeof columnIdOrIdx === "number" ? columnIdOrIdx : this.getViewColumnIndex(columnIdOrIdx));
+            var idx = (typeof columnIdOrIdx === "number" ? columnIdOrIdx : this.getColumnIndex(columnIdOrIdx));
             var $rtn = this.$headers.children().eq(idx);
             return $rtn && $rtn[0] as HTMLDivElement;
         }
@@ -1119,7 +1140,7 @@ namespace Slick {
         }
 
         getHeaderRowColumn(columnId: string): HTMLElement {
-            var idx = this.getViewColumnIndex(columnId);
+            var idx = this.getColumnIndex(columnId);
             if (idx == null)
                 return;
 
@@ -1146,7 +1167,7 @@ namespace Slick {
         }
 
         getFooterRowColumn(columnId: string): HTMLElement {
-            var idx = this.getViewColumnIndex(columnId);
+            var idx = this.getColumnIndex(columnId);
             if (idx == null)
                 return null;
 
@@ -1213,7 +1234,7 @@ namespace Slick {
             }
 
             //@ts-ignore
-            if (typeof total == "number" && Q && Q.formatNumber) {
+            if (typeof total == "number" && typeof Q !== "undefined" && Q.formatNumber) {
                 if ((columnDef as any).sourceItem && (columnDef as any).sourceItem.displayFormat) {
                     //@ts-ignore
                     return Q.formatNumber(total, columnDef.sourceItem.displayFormat);
@@ -1222,12 +1243,8 @@ namespace Slick {
                     //@ts-ignore
                     return Q.formatNumber(total, "#,##0.##");
             }
-            //@ts-ignore
-            else if (Q.htmlEncode)
-                //@ts-ignore
-                return Q.htmlEncode(total);
             else
-                return total;
+                return htmlEncode(total?.toString());
         }
 
         private groupTotalText(totals: GroupTotals, columnDef: Column<TItem>, key: string): string {
@@ -2012,12 +2029,12 @@ namespace Slick {
             return this.editController;
         }
 
-        getInitialColumnIndex(id: string): number {
-            return this._initColById[id];
+        getColumnIndex(id: string): number {
+            return this._colById[id];
         }
 
-        getViewColumnIndex(id: string): number {
-            return this._colById[id];
+        getInitialColumnIndex(id: string): number {
+            return this._initColById[id];
         }
 
         autosizeColumns(): void {
@@ -2149,7 +2166,7 @@ namespace Slick {
                 if (col.sortAsc == null) {
                     col.sortAsc = true;
                 }
-                var columnIndex = this.getViewColumnIndex(col.columnId);
+                var columnIndex = this.getColumnIndex(col.columnId);
                 if (columnIndex != null) {
                     headerColumnEls.eq(columnIndex)
                         .addClass("slick-header-column-sorted")
@@ -2364,7 +2381,7 @@ namespace Slick {
             }
         }
 
-        getDataLengthIncludingAddNew(): number {
+        private getDataLengthIncludingAddNew(): number {
             return this.getDataLength() + (this._options.enableAddRow ? 1 : 0);
         }
 
@@ -2478,37 +2495,17 @@ namespace Slick {
             }
         }
 
-        private getFormatter(row: number, column: Column<TItem>): ColumnFormatter<TItem> {
-            var itemMetadata = this._data.getItemMetadata && this._data.getItemMetadata(row) as ItemMetadata;
-            var colsMetadata = itemMetadata && itemMetadata.columns;
+        getFormatter(row: number, column: Column<TItem>): ColumnFormatter<TItem> {
+            var data = this._data;
+            var rowMetadata = data.getItemMetadata && data.getItemMetadata(row) as ItemMetadata;
+            var colsMetadata = rowMetadata && rowMetadata.columns;
+            var colOverrides = colsMetadata && (colsMetadata[column.id] || colsMetadata[this.getInitialColumnIndex(column.id)]);
 
-            // look up by id, then index
-            var colMetadata = colsMetadata && (colsMetadata[column.id] || colsMetadata[this.getInitialColumnIndex(column.id)]);
-
-            return (colMetadata && colMetadata.formatter) ||
-                (itemMetadata && itemMetadata.formatter) ||
+            return (colOverrides && colOverrides.formatter) ||
+                (rowMetadata && rowMetadata.formatter) ||
                 column.formatter ||
                 (this._options.formatterFactory && this._options.formatterFactory.getFormatter(column)) ||
                 this._options.defaultFormatter;
-        }
-
-        private callFormatter(row: number, cell: number, value: any, m: Column<TItem>, item: TItem): string {
-
-            var result: string;
-
-            // pass metadata to formatter
-            var itemMetadata = this._data.getItemMetadata && this._data.getItemMetadata(row) as ItemMetadata;
-            var colsMetadata = itemMetadata && itemMetadata.columns;
-
-            if (colsMetadata) {
-                var columnData = colsMetadata[m.id] || colsMetadata[cell];
-                result = this.getFormatter(row, m)(row, cell, value, m, item, this, columnData);
-            }
-            else {
-                result = this.getFormatter(row, m)(row, cell, value, m, item, this);
-            }
-
-            return result;
         }
 
         private getEditor(row: number, cell: number): Editor {
@@ -2614,19 +2611,37 @@ namespace Slick {
                 cellCss += " " + metadata.cssClasses;
             }
 
-            // TODO:  merge them together in the setter
             for (var key in this.cellCssClasses) {
                 if (this.cellCssClasses[key][row] && this.cellCssClasses[key][row][m.id]) {
                     cellCss += (" " + this.cellCssClasses[key][row][m.id]);
                 }
             }
 
-            stringArray.push("<div class='" + cellCss + "'>");
-
             // if there is a corresponding row (if not, this is the Add New row or this data hasn't been loaded yet)
+            var fmtResult: FormatResult | string;
+            var fmtClass: string;
             if (item) {
                 var value = this.getDataItemValueForColumn(item, m);
-                stringArray.push(this.callFormatter(row, cell, value, m, item));
+                fmtResult = this.getFormatter(row, m)(row, cell, value, m, item, this);
+                var fmtClass = (fmtResult as FormatResult)?.addClass;
+                if (fmtClass != null && fmtClass.length)
+                    cellCss += (" " + fmtClass);
+            }
+
+            var fmtAttr = (fmtResult as FormatResult)?.addAttrs;
+            var toolTip = (fmtResult as FormatResult)?.toolTip;
+            stringArray.push('<div class="' + attrEncode(cellCss) + '"' + 
+                (fmtClass != null && fmtClass.length ? (' data-fmtcls="' + fmtClass + '"') : '') +
+                (toolTip != null && toolTip.length ? (' tooltip="' + attrEncode(toolTip) + '"') : '') +
+                (fmtAttr != null ? (' ' + Object.keys(fmtAttr).map(x => x + '="' + attrEncode(fmtAttr[x]) + '"').join(' ') + ' data-fmtatt="' + attrEncode(Object.keys(fmtAttr).join(',')) + '"') : '') +
+                (m.cellAttrs != null ? (' ' + Object.keys(m.cellAttrs).map(x => x + '=' + attrEncode(m.cellAttrs[x])).join(' ')) : '') + 
+                '>');
+
+            if (fmtResult != null) {
+                if (typeof fmtResult == "string")
+                    stringArray.push(fmtResult);
+                else if (fmtResult.text != null)
+                    stringArray.push(fmtResult.text);
             }
 
             stringArray.push("</div>");
@@ -2750,6 +2765,48 @@ namespace Slick {
             this.invalidateRows([row]);
         }
 
+        applyFormatResultToCellNode(fmtResult: FormatResult | string, cellNode: HTMLElement) {
+            var oldFmtCls = cellNode.dataset?.fmtcls as string;
+            if (oldFmtCls != null && oldFmtCls.length > 0) {
+                cellNode.classList.remove(...oldFmtCls.split(' '));
+                delete cellNode.dataset.fmtcls;
+            }
+
+            var oldFmtAtt = cellNode.dataset?.fmtatt as string;
+            if (oldFmtAtt != null && oldFmtAtt.length > 0) {
+                for (var k of oldFmtAtt.split(','))
+                    cellNode.removeAttribute(k);
+                delete cellNode.dataset.fmtatt;
+            }
+            
+            cellNode.removeAttribute('tooltip');
+
+            if (fmtResult == null || typeof fmtResult === "string") {
+                cellNode.innerHTML = '';
+                return;
+            }
+
+            cellNode.innerHTML = fmtResult.text;
+
+            if (fmtResult.addClass != null && fmtResult.addClass.length > 0) {
+                cellNode.classList.add(...fmtResult.addClass.split(' '));
+                cellNode.dataset.fmtcls = fmtResult.addClass;
+            }
+
+            if (fmtResult.addAttrs != null) {
+                var keys = Object.keys(fmtResult.addAttrs);
+                if (keys.length) {
+                    for (var k of keys) {
+                        cellNode.setAttribute(k, fmtResult.addAttrs[k]);
+                    }
+                    cellNode.dataset.fmtatt = keys.join(',');
+                }
+            }
+
+            if (fmtResult.toolTip != null && fmtResult.toolTip.length)
+                cellNode.setAttribute('tooltip', fmtResult.toolTip);
+        }
+
         updateCell(row: number, cell: number): void {
             var cellNode = this.getCellNode(row, cell);
             if (!cellNode) {
@@ -2760,7 +2817,8 @@ namespace Slick {
             if (this.currentEditor && this.activeRow === row && this.activeCell === cell) {
                 this.currentEditor.loadValue(d);
             } else {
-                cellNode.innerHTML = d ? this.callFormatter(row, cell, this.getDataItemValueForColumn(d, m), m, d) : "";
+                var fmtResult =  d ? this.getFormatter(row, m)(row, cell, this.getDataItemValueForColumn(d, m), m, d) : "";
+                this.applyFormatResultToCellNode(fmtResult, cellNode);
                 this.invalidatePostProcessingResults(row);
             }
         }
@@ -2774,6 +2832,7 @@ namespace Slick {
             this.ensureCellNodesInRowsCache(row);
 
             var d = this.getDataItem(row);
+            var fmtResult: FormatResult | string;
 
             for (var x in cacheEntry.cellNodesByColumnIdx) {
                 if (!cacheEntry.cellNodesByColumnIdx.hasOwnProperty(x)) {
@@ -2786,10 +2845,10 @@ namespace Slick {
 
                 if (row === this.activeRow && columnIdx === this.activeCell && this.currentEditor) {
                     this.currentEditor.loadValue(d);
-                } else if (d) {
-                    node.innerHTML = this.callFormatter(row, columnIdx, this.getDataItemValueForColumn(d, m), m, d);
-                } else {
-                    node.innerHTML = "";
+                }
+                else {
+                    fmtResult = d ? this.getFormatter(row, m)(row, columnIdx, this.getDataItemValueForColumn(d, m), m, d) : '';
+                    this.applyFormatResultToCellNode(fmtResult, node);                    
                 }
             }
 
@@ -3687,7 +3746,7 @@ namespace Slick {
                 if (removedRowHash) {
                     for (columnId in removedRowHash) {
                         if (!addedRowHash || removedRowHash[columnId] != addedRowHash[columnId]) {
-                            node = this.getCellNode(parseInt(row, 10), this.getViewColumnIndex(columnId));
+                            node = this.getCellNode(parseInt(row, 10), this.getColumnIndex(columnId));
                             if (node) {
                                 $(node).removeClass(removedRowHash[columnId]);
                             }
@@ -3698,7 +3757,7 @@ namespace Slick {
                 if (addedRowHash) {
                     for (columnId in addedRowHash) {
                         if (!removedRowHash || removedRowHash[columnId] != addedRowHash[columnId]) {
-                            node = this.getCellNode(parseInt(row, 10), this.getViewColumnIndex(columnId));
+                            node = this.getCellNode(parseInt(row, 10), this.getColumnIndex(columnId));
                             if (node) {
                                 $(node).addClass(addedRowHash[columnId]);
                             }
@@ -4276,7 +4335,9 @@ namespace Slick {
                 $(this.activeCellNode).removeClass("editable invalid");
                 if (d) {
                     var column = this._cols[this.activeCell];
-                    this.activeCellNode.innerHTML = this.callFormatter(this.activeRow, this.activeCell, this.getDataItemValueForColumn(d, column), column, d);
+                    var fmtResult =  d ? this.getFormatter(this.activeRow, column)(this.activeRow, this.activeCell, 
+                        this.getDataItemValueForColumn(d, column), column, d) : "";
+                    this.applyFormatResultToCellNode(fmtResult, this.activeCellNode);
                     this.invalidatePostProcessingResults(this.activeRow);
                 }
             }
@@ -5089,14 +5150,14 @@ namespace Slick {
             return ranges;
         }
 
-        private getSelectedRows(): number[] {
+        getSelectedRows(): number[] {
             if (!this.selectionModel) {
                 throw "Selection model is not set";
             }
             return this.selectedRows;
         }
 
-        private setSelectedRows(rows: number[]) {
+        setSelectedRows(rows: number[]) {
             if (!this.selectionModel) {
                 throw "Selection model is not set";
             }
@@ -5222,4 +5283,26 @@ namespace Slick {
 
         return result;
     }
+
+    function attrEncode(s: string) {
+        if (s == null)
+            return '';
+
+        return s
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+     }    
+
+     function htmlEncode(s: string) {
+        if (s == null)
+            return '';
+            
+        return s
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;");
+     }
 }
