@@ -42,22 +42,12 @@ namespace Slick {
         addClass?: string;
         addAttrs?: { [key: string]: string };
         toolTip?: string;
-        /** html */
         text?: string;
     }
 
     export type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>) => string | FormatResult;
-    export type ColumnFormat<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string | FormatResult;
     export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>) => void;
     export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
-
-    export interface FormatterContext<TItem = any> {
-        row?: number;
-        cell?: number;
-        value?: any;
-        column?: Column<TItem>;
-        item?: TItem;
-    }
 
     export interface Plugin {
         init(grid: Grid): void;
@@ -237,14 +227,12 @@ namespace Slick {
         asyncPostCleanup?: AsyncPostCleanup<TItem>;
         behavior?: any;
         cannotTriggerInsert?: boolean;
-        cellAttrs: { [key: string]: string };
         cssClass?: string;
         defaultSortAsc?: boolean;
         editor?: Editor;
         field: string;
         focusable?: boolean;
         footerCssClass?: string;
-        format?: ColumnFormat<TItem>;
         formatter?: ColumnFormatter<TItem>;
         fixedTo?: "start";
         groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
@@ -1250,7 +1238,7 @@ namespace Slick {
         private groupTotalText(totals: GroupTotals, columnDef: Column<TItem>, key: string): string {
             var ltKey = (key.substring(0, 1).toUpperCase() + key.substring(1));
             //@ts-ignore
-            var text = (Q && Q.tryGetText && Q.tryGetText(ltKey)) || ltKey;
+            var text = (typeof Q !== "undefined" && Q.tryGetText && Q.tryGetText(ltKey)) || ltKey;
 
             var total = totals[key][columnDef.field];
             total = this.formatGroupTotal(total, columnDef);
@@ -2596,55 +2584,66 @@ namespace Slick {
             }
         }
 
-        private appendCellHtml(stringArray: string[], row: number, cell: number, colspan: number, item: TItem, metadata: any): void {
+        private appendCellHtml(sb: string[], row: number, cell: number, colspan: number, item: TItem, metadata: any): void {
             var cols = this._cols, fixStart = this._fixedStartCols, m = cols[cell];
-            var cellCss = "slick-cell l" + cell + " r" + Math.min(cols.length - 1, cell + colspan - 1) +
+            var klass = "slick-cell l" + cell + " r" + Math.min(cols.length - 1, cell + colspan - 1) +
                 (m.cssClass ? " " + m.cssClass : "");
 
             if (cell < fixStart)
-                cellCss += ' frozen';
+                klass += ' frozen';
 
             if (row === this.activeRow && cell === this.activeCell)
-                cellCss += " active";
+                klass += " active";
 
             if (metadata && metadata.cssClasses) {
-                cellCss += " " + metadata.cssClasses;
+                klass += " " + metadata.cssClasses;
             }
 
             for (var key in this.cellCssClasses) {
                 if (this.cellCssClasses[key][row] && this.cellCssClasses[key][row][m.id]) {
-                    cellCss += (" " + this.cellCssClasses[key][row][m.id]);
+                    klass += (" " + this.cellCssClasses[key][row][m.id]);
                 }
             }
 
             // if there is a corresponding row (if not, this is the Add New row or this data hasn't been loaded yet)
             var fmtResult: FormatResult | string;
-            var fmtClass: string;
             if (item) {
                 var value = this.getDataItemValueForColumn(item, m);
                 fmtResult = this.getFormatter(row, m)(row, cell, value, m, item, this);
-                var fmtClass = (fmtResult as FormatResult)?.addClass;
-                if (fmtClass != null && fmtClass.length)
-                    cellCss += (" " + fmtClass);
             }
 
-            var fmtAttr = (fmtResult as FormatResult)?.addAttrs;
-            var toolTip = (fmtResult as FormatResult)?.toolTip;
-            stringArray.push('<div class="' + attrEncode(cellCss) + '"' + 
-                (fmtClass != null && fmtClass.length ? (' data-fmtcls="' + fmtClass + '"') : '') +
-                (toolTip != null && toolTip.length ? (' tooltip="' + attrEncode(toolTip) + '"') : '') +
-                (fmtAttr != null ? (' ' + Object.keys(fmtAttr).map(x => x + '="' + attrEncode(fmtAttr[x]) + '"').join(' ') + ' data-fmtatt="' + attrEncode(Object.keys(fmtAttr).join(',')) + '"') : '') +
-                (m.cellAttrs != null ? (' ' + Object.keys(m.cellAttrs).map(x => x + '=' + attrEncode(m.cellAttrs[x])).join(' ')) : '') + 
-                '>');
+            if (fmtResult == null)
+                sb.push('<div class="' + attrEncode(klass) + '"></div>');
+            else if (typeof fmtResult === "string")
+                sb.push('<div class="' + attrEncode(klass) + '">' + fmtResult + '</div>');
+            else {
+                if (fmtResult.addClass?.length)
+                    klass += (" " + fmtResult.addClass);
+                
+                sb.push('<div class="' + attrEncode(klass) + '"');
 
-            if (fmtResult != null) {
-                if (typeof fmtResult == "string")
-                    stringArray.push(fmtResult);
-                else if (fmtResult.text != null)
-                    stringArray.push(fmtResult.text);
+                if (fmtResult.addClass?.length)
+                    sb.push(' data-fmtcls="' + attrEncode(fmtResult.addClass) + '"');
+
+                var attrs = fmtResult.addAttrs;
+                if (attrs != null) {
+                    var ks = [];
+                    for (var k in attrs) {
+                        sb.push(k + '="' + attrEncode(attrs[k]) + '"');
+                        ks.push(k);
+                    }
+                    sb.push(' data-fmtatt="' + attrEncode(ks.join(',') + '"'));
+                }
+
+                var toolTip = fmtResult.toolTip;
+                if (toolTip != null && toolTip.length)
+                    sb.push('tooltip="' + attrEncode(toolTip) + '"');
+
+                if (fmtResult.text?.length)
+                    sb.push('>' + fmtResult.text + '</div>');
+                else
+                    sb.push('></div>');
             }
-
-            stringArray.push("</div>");
 
             this.rowsCache[row].cellRenderQueue.push(cell);
             this.rowsCache[row].cellColSpans[cell] = colspan;
@@ -2788,7 +2787,7 @@ namespace Slick {
 
             cellNode.innerHTML = fmtResult.text;
 
-            if (fmtResult.addClass != null && fmtResult.addClass.length > 0) {
+            if (fmtResult.addClass?.length) {
                 cellNode.classList.add(...fmtResult.addClass.split(' '));
                 cellNode.dataset.fmtcls = fmtResult.addClass;
             }
@@ -2803,7 +2802,7 @@ namespace Slick {
                 }
             }
 
-            if (fmtResult.toolTip != null && fmtResult.toolTip.length)
+            if (fmtResult.toolTip?.length)
                 cellNode.setAttribute('tooltip', fmtResult.toolTip);
         }
 
@@ -5292,9 +5291,8 @@ namespace Slick {
              .replace(/&/g, "&amp;")
              .replace(/</g, "&lt;")
              .replace(/>/g, "&gt;")
-             .replace(/"/g, "&quot;")
-             .replace(/'/g, "&#039;");
-     }    
+             .replace(/"/g, "&quot;");
+     }
 
      function htmlEncode(s: string) {
         if (s == null)
