@@ -105,7 +105,6 @@ describe('options.frozenColumn', () => {
             frozenColumn: 2
         });
 
-        console.log(JSON.stringify(grid.getOptions()));
         expect(grid.getOptions().frozenColumn).toBeUndefined();
     });
 
