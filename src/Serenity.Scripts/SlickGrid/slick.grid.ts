@@ -2632,7 +2632,7 @@ namespace Slick {
                         sb.push(k + '="' + attrEncode(attrs[k]) + '"');
                         ks.push(k);
                     }
-                    sb.push(' data-fmtatt="' + attrEncode(ks.join(',') + '"'));
+                    sb.push(' data-fmtatt="' + attrEncode(ks.join(',')) + '"');
                 }
 
                 var toolTip = fmtResult.toolTip;

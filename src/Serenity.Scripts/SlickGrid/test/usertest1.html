@@ -32,12 +32,12 @@
                 data.push(item);
             }
             var columns = Array.from(new Array(100)).map((x, i) => ({ id: 'c' + i, field: 'c' + i, name: 'c' + i, width: 100, visible: i % 3 != 0 }));
-            columns[1].formatter = function(v) {
+            columns[1].formatter = function(r, l, val, col, item) {
                 return {
-                    text: (v ?? '').toString(),
-                    addClass: 'cls-' + Math.random(),
+                    text: (val ?? '').toString(),
+                    addClass: 'cls-' + Math.round(Math.random() * 1000),
                     addAttrs: {
-                        ['a' + Math.random()]: 'y',
+                        ['a' + Math.round(Math.random() * 1000)]: 'y',
                         y: 'z'
                     }
                 }
