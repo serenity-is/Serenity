@@ -1,7 +1,9 @@
 module.exports = {
-    testEnvironment: "<rootDir>jest.env.mjs",
+    testEnvironment: "@happy-dom/jest-environment",
     testEnvironmentOptions: {
-        resources: "usable"
+        resources: "usable",
+        runScripts: "dangerously"
     },
+    setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
     testMatch: ['<rootDir>/test/**/*.spec.js']
 };
