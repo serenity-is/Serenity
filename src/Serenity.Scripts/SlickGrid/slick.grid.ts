@@ -38,14 +38,14 @@ if (typeof Slick === "undefined") {
 
 namespace Slick {
 
-    export interface FormatResult {
+    export interface FormatterResult {
         addClass?: string;
         addAttrs?: { [key: string]: string };
-        toolTip?: string;
         text?: string;
+        toolTip?: string;
     }
 
-    export type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>) => string | FormatResult;
+    export type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>) => string | FormatterResult;
     export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>) => void;
     export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
 
@@ -2606,7 +2606,7 @@ namespace Slick {
             }
 
             // if there is a corresponding row (if not, this is the Add New row or this data hasn't been loaded yet)
-            var fmtResult: FormatResult | string;
+            var fmtResult: FormatterResult | string;
             if (item) {
                 var value = this.getDataItemValueForColumn(item, m);
                 fmtResult = this.getFormatter(row, m)(row, cell, value, m, item, this);
@@ -2764,7 +2764,7 @@ namespace Slick {
             this.invalidateRows([row]);
         }
 
-        applyFormatResultToCellNode(fmtResult: FormatResult | string, cellNode: HTMLElement) {
+        applyFormatResultToCellNode(fmtResult: FormatterResult | string, cellNode: HTMLElement) {
             var oldFmtCls = cellNode.dataset?.fmtcls as string;
             if (oldFmtCls != null && oldFmtCls.length > 0) {
                 cellNode.classList.remove(...oldFmtCls.split(' '));
@@ -2831,7 +2831,7 @@ namespace Slick {
             this.ensureCellNodesInRowsCache(row);
 
             var d = this.getDataItem(row);
-            var fmtResult: FormatResult | string;
+            var fmtResult: FormatterResult | string;
 
             for (var x in cacheEntry.cellNodesByColumnIdx) {
                 if (!cacheEntry.cellNodesByColumnIdx.hasOwnProperty(x)) {
