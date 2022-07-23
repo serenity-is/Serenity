@@ -60,6 +60,7 @@ namespace Slick {
         destroy?: () => void;
         setSelectedRanges(ranges: Range[]): void;
         onSelectedRangesChanged: Event<Range[]>;
+        refreshSelections?(): void;
     }
 
     export interface ColumnSort {
@@ -2382,6 +2383,7 @@ namespace Slick {
                 this.updateCanvasWidth();
                 this.applyColumnWidths();
                 this.handleScroll();
+                this.getSelectionModel()?.refreshSelections();
             }
         }
 
@@ -2406,22 +2408,26 @@ namespace Slick {
 
             this._options = $.extend(this._options, args);
             this.validateAndEnforceOptions();
+            this.adjustFrozenRowOption();
 
             this.$viewport.css("overflow-y", this._options.autoHeight ? "hidden" : "auto");
-            if (!suppressRender)
-                this.render();
 
-            this.adjustFrozenRowOption();
-            this.setScroller();
             if (!suppressSetOverflow) {
                 this.setOverflow();
             }
 
             if (args.columns && !suppressColumnSet) {
                 adjustFrozenColumnCompat(args.columns, this._options);
-                this.setColumns(args.columns);
+                this.setColumns(args.columns ?? this._initCols);
             }
-
+            else if (args.frozenColumn != null) {
+                adjustFrozenColumnCompat(this._initCols, this._options);
+                this.setColumns(this._initCols);
+            }
+                
+            this.setScroller();
+            if (!suppressRender)
+                this.render();
         }
 
         private validateAndEnforceOptions(): void {
@@ -5374,7 +5380,7 @@ namespace Slick {
     }
 
     function adjustFrozenColumnCompat(columns: Column[], options: GridOptions) {
-        if (options?.frozenColumn == null || options.frozenColumn < 0)
+        if (options?.frozenColumn == null)
             return;
 
         var toFreeze = options.frozenColumn + 1;
@@ -5389,7 +5395,8 @@ namespace Slick {
                 delete col.fixedTo;
         }
 
-        delete options.frozenColumn;
+        if (options.frozenColumn != -1)
+            delete options.frozenColumn;
     }
 
     /**
