@@ -52,7 +52,7 @@ describe('Slick.Event', () => {
 
     it('can send event data to subscribers', () => {
         const event = new Slick.Event();
-        let eventArgs: { foo?: string };
+        let eventArgs;
 
         event.subscribe((eventData, args) => {
             eventArgs = args;
@@ -60,7 +60,7 @@ describe('Slick.Event', () => {
 
         event.notify({
             foo: 'bar',
-        } as typeof eventArgs, new Slick.EventData(), null)
+        }, new Slick.EventData(), null)
 
         expect(eventArgs).toBeDefined();
         expect(eventArgs.foo).toBe('bar');
@@ -159,7 +159,7 @@ describe('Slick.Event', () => {
 
     it('sends EventDate as an new instance if it is not passed', () => {
         const event = new Slick.Event();
-        let eventData: Slick.EventData;
+        let eventData;
 
         const handler = (data, _) => {
             eventData = data;

@@ -5,6 +5,7 @@
   "main": "index.js",
   "repository": "https://github.com/serenity-is/serenity",
   "devDependencies": {
+    "@happy-dom/jest-environment": "^6.0.4",
     "@rollup/plugin-typescript": "latest",
     "@types/jest": "27.0.2",
     "@types/node": "14.14.14",

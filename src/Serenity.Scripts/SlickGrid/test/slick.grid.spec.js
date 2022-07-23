@@ -1,4 +1,4 @@
-﻿function threeCols(): Slick.Column[] {
+﻿function threeCols() {
     return [{
         id: 'c1',
         field: 'c1'

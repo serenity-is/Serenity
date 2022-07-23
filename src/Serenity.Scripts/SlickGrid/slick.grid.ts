@@ -365,9 +365,9 @@ namespace Slick {
         private $topPanel: JQuery;
         private $viewport: JQuery;
         private $canvas: JQuery;
-        private $style: JQuery;
+        private _styleNode: HTMLStyleElement;
+        private _stylesheet: any;
         private $boundAncestors: JQuery;
-        private stylesheet: any;
         private columnCssRulesL: any;
         private columnCssRulesR: any;
         private viewportH: number;
@@ -1899,7 +1899,8 @@ namespace Slick {
         }
 
         private createCssRules() {
-            this.$style = $("<style type='text/css' rel='stylesheet' data-uid='" + this.uid + "' />").appendTo($("head"));
+            var el = this._styleNode = document.createElement('style');
+            el.dataset.uid = this.uid;
             var rowHeight = (this._options.rowHeight - this.cellHeightDiff);
             var rules = [
                 "." + this.uid + " .slick-group-header-column { " + this.xLeft + ": 1000px; }",
@@ -1918,36 +1919,33 @@ namespace Slick {
                 rules.push("." + this.uid + " .r" + i + " { }");
             }
 
-            if ((this.$style[0] as any).styleSheet) { // IE
-                (this.$style[0] as any).styleSheet.cssText = rules.join(" ");
-            } else {
-                this.$style[0].appendChild(document.createTextNode(rules.join(" ")));
-            }
+            el.appendChild(document.createTextNode(rules.join(" ")));
+            document.head.appendChild(el);
         }
 
         private getColumnCssRules(idx: number): { right: any; left: any; } {
-            if (!this.stylesheet) {
+            if (!this._stylesheet) {
                 var stylesheetFromUid = document.querySelector("style[data-uid='" + this.uid + "']") as any
                 if (stylesheetFromUid && stylesheetFromUid.sheet) {
-                    this.stylesheet = stylesheetFromUid.sheet;
+                    this._stylesheet = stylesheetFromUid.sheet;
                 } else {
                     var sheets = document.styleSheets;
                     for (var i = 0; i < sheets.length; i++) {
-                        if ((sheets[i].ownerNode || (sheets[i] as any).owningElement) == this.$style[0]) {
-                            this.stylesheet = sheets[i];
+                        if ((sheets[i].ownerNode || (sheets[i] as any).owningElement) == this._styleNode) {
+                            this._stylesheet = sheets[i];
                             break;
                         }
                     }
                 }
 
-                if (!this.stylesheet) {
+                if (!this._stylesheet) {
                     throw new Error("Cannot find stylesheet.");
                 }
 
                 // find and cache column CSS rules
                 this.columnCssRulesL = [];
                 this.columnCssRulesR = [];
-                var cssRules = (this.stylesheet.cssRules || this.stylesheet.rules);
+                var cssRules = (this._stylesheet.cssRules || this._stylesheet.rules);
                 var matches, columnIdx;
                 for (var i = 0; i < cssRules.length; i++) {
                     var selector = cssRules[i].selectorText;
@@ -1971,8 +1969,8 @@ namespace Slick {
         }
 
         private removeCssRules() {
-            this.$style.remove();
-            this.stylesheet = null;
+            this._styleNode.remove();
+            this._stylesheet = null;
         }
 
         destroy() {
