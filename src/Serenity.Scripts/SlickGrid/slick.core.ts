@@ -375,7 +375,7 @@ namespace Slick {
         /** 
          * Contains max
          */
-        max?: any;        
+        max?: any;
     }
 
     export interface EditController {
@@ -402,7 +402,7 @@ namespace Slick {
          * @return {Boolean}
          */
         isActive(editController?: EditController): boolean {
-            return (editController ? this.activeEditController === editController : this.activeEditController !== null);
+            return (editController ? this.activeEditController === editController : this.activeEditController != null);
         };
 
         /***
@@ -415,7 +415,7 @@ namespace Slick {
             if (editController === this.activeEditController) { // already activated?
                 return;
             }
-            if (this.activeEditController !== null) {
+            if (this.activeEditController != null) {
                 throw "SleekGrid.EditorLock.activate: an editController is still active, can't activate another editController";
             }
             if (!editController.commitCurrentEdit) {
@@ -488,4 +488,7 @@ namespace Slick {
         TAB: 9,
         UP: 38
     }
+
+    export const preClickClassName = "slick-edit-preclick";
+    export var Map = window.Map;
 }
