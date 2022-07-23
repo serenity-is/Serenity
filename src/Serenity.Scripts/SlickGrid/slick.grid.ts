@@ -280,6 +280,7 @@ namespace Slick {
         enableAsyncPostRender?: boolean;
         enableCellRangeSelection?: boolean;
         enableCellNavigation?: boolean;
+        enableTabKeyNavigation?: boolean;
         enableColumnReorder?: boolean;
         enableRowReordering?: boolean;
         enableTextSelectionOnCells?: boolean;
@@ -348,8 +349,8 @@ namespace Slick {
         private initialized = false;
         private $container: JQuery;
         private uid: string = "slickgrid_" + Math.round(1000000 * Math.random());
-        private $focusSink: JQuery;
-        private $focusSink2: JQuery;
+        private _focusSink1: HTMLDivElement;
+        private _focusSink2: HTMLDivElement;
         private $headerScroller: JQuery;
         private $headers: JQuery;
         private $headerRow: JQuery;
@@ -537,6 +538,7 @@ namespace Slick {
                 autoEdit: true,
                 enableCellNavigation: true,
                 enableColumnReorder: true,
+                enableTabKeyNavigation: true,
                 asyncEditorLoading: false,
                 asyncEditorLoadDelay: 100,
                 forceFitColumns: false,
@@ -638,8 +640,13 @@ namespace Slick {
                 this.$container.css("position", "relative");
             }
 
-            this.$focusSink = $("<div tabIndex='0' hideFocus style='position:fixed;width:0;height:0;top:0;" + this.xLeft + ":0;outline:0;'></div>").appendTo(this.$container);
-
+            this.$container.append(this._focusSink1 = H('div', {
+                class: "slick-focus-sink",
+                hideFocus: '',
+                style: 'position:fixed;width:0!important;height:0!important;top:0;left:0;outline:0!important;',
+                tabIndex: '0'
+            }));
+            
             if (options.groupingPanel) {
                 this.$groupingPanel = $("<div class='slick-grouping-panel' style='overflow:hidden; position:relative;' />")
                     .appendTo(this.$container);
@@ -750,7 +757,7 @@ namespace Slick {
                 this.$footerRowScroller.hide();
             }
 
-            this.$focusSink2 = this.$focusSink.clone().appendTo(this.$container);
+            this.$container.append(this._focusSink2 = this._focusSink1.cloneNode() as HTMLDivElement);
 
             if (!options.explicitInitialization) {
                 this.init();
@@ -822,8 +829,9 @@ namespace Slick {
             this.$footerRowScroller
                 .on("scroll", this.handleFooterRowScroll.bind(this));
 
-            this.$focusSink.add(this.$focusSink2)
+            $([this._focusSink1, this._focusSink2])
                 .on("keydown", this.handleKeyDown.bind(this));
+
             this.$canvas
                 .on("keydown", this.handleKeyDown.bind(this))
                 .on("click", this.handleClick.bind(this))
@@ -3921,7 +3929,8 @@ namespace Slick {
                     } else if (e.which == keyCode.DOWN) {
                         handled = this.navigateDown();
                     } else if (e.which == keyCode.TAB) {
-                        handled = this.navigateNext();
+                        if (this._options.enableTabKeyNavigation)
+                            handled = this.navigateNext();
                     } else if (e.which == keyCode.ENTER) {
                         if (this._options.editable) {
                             if (this.currentEditor) {
@@ -4186,9 +4195,9 @@ namespace Slick {
 
         private setFocus(): void {
             if (this.tabbingDirection == -1) {
-                this.$focusSink[0].focus();
+                this._focusSink1.focus();
             } else {
-                this.$focusSink2[0].focus();
+                this._focusSink2.focus();
             }
         }
 
@@ -5300,5 +5309,19 @@ namespace Slick {
              .replace(/&/g, "&amp;")
              .replace(/</g, "&lt;")
              .replace(/>/g, "&gt;");
+     }
+
+     function H<K extends keyof HTMLElementTagNameMap>(tag: K, attr?: { [key: string]: string }, children?: Node[]): HTMLElementTagNameMap[K] {
+        var el = document.createElement(tag);
+        if (attr) {
+            for (var k in attr) {
+                el.setAttribute(k === 'class' ? 'className' : k, attr[k]);
+            }
+        }
+        if (children) {
+            for (var c of children)
+                el.appendChild(c);
+        }
+        return el;
      }
 }
