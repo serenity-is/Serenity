@@ -3327,7 +3327,7 @@ namespace Slick {
 
                         // Hack to retrieve the frozen columns because
                         if (lastChild == null)
-                            lastChild = cacheEntry.rowNode.children().last()[0];
+                            lastChild = $(cacheEntry.rowNode[0]).children().last()[0];
                     }
                 }
             }
@@ -4307,10 +4307,10 @@ namespace Slick {
             var y2 = y1 + this._options.rowHeight - 1;
             var x1 = 0;
             for (var i = 0; i < cell; i++) {
-                if (i == fixStart) {
+                x1 += cols[i].width;
+                if (i == fixStart - 1) {
                     x1 = 0;
                 }
-                x1 += cols[i].width;
             }
             var x2 = x1 + cols[cell].width;
 
@@ -5380,23 +5380,24 @@ namespace Slick {
     }
 
     function adjustFrozenColumnCompat(columns: Column[], options: GridOptions) {
-        if (options?.frozenColumn == null)
+        if (options?.frozenColumn == null) {
+            delete options.frozenColumn;
             return;
+        }
 
         var toFreeze = options.frozenColumn + 1;
+        options.frozenColumn = -1;
         var i = 0;
         while (i < columns.length) {
             var col = columns[i++];
             if (toFreeze > 0 && col.visible !== false) {
                 col.fixedTo = "start";
+                options.frozenColumn++;
                 toFreeze--;
             }
             else if (col.fixedTo !== undefined)
                 delete col.fixedTo;
         }
-
-        if (options.frozenColumn != -1)
-            delete options.frozenColumn;
     }
 
     /**
