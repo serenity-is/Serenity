@@ -189,7 +189,7 @@ namespace Slick {
         public toRow: number;
         public toCell: number;
 
-        constructor(fromRow: number, fromCell: number, toRow: number, toCell: number) {
+        constructor(fromRow: number, fromCell: number, toRow?: number, toCell?: number) {
             if (toRow === undefined && toCell === undefined) {
                 toRow = fromRow;
                 toCell = fromCell;

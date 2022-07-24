@@ -1,4 +1,4 @@
-﻿function threeCols() {
+﻿function threeCols(): Slick.Column[] {
     return [{
         id: 'c1',
         field: 'c1'
@@ -20,7 +20,7 @@ describe('options.frozenColumn', () => {
 
         expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
-        expect(grid.getColumns()[0].fixedTo).toBeUndefined();
+        expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
 
     it('is ignored when null', () => {
@@ -31,7 +31,7 @@ describe('options.frozenColumn', () => {
 
         expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
-        expect(grid.getColumns()[0].fixedTo).toBeUndefined();
+        expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
 
     it('is ignored when less than zero', () => {
@@ -42,10 +42,10 @@ describe('options.frozenColumn', () => {
 
         expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
-        expect(grid.getColumns()[0].fixedTo).toBeUndefined();
+        expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
 
-    it('sets first column to fixed start when 0 and all cols are visible', () => {
+    it('sets first column to frozen when 0 and all cols are visible', () => {
         const grid = new Slick.Grid($('<div/>').appendTo(document.body), [], threeCols(), {
             enableColumnReorder: false,
             frozenColumn: 0
@@ -53,10 +53,10 @@ describe('options.frozenColumn', () => {
 
         expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
-        expect(grid.getColumns()[0].fixedTo).toBe('start');
+        expect(grid.getColumns()[0].frozen).toBe(true);
     });
 
-    it('sets the first visible column to fixed start when 0', () => {
+    it('sets the first visible column to frozen when 0', () => {
         var cols = threeCols();
         cols[0].visible = false;
         const grid = new Slick.Grid($('<div/>').appendTo(document.body), [], cols , {
@@ -66,12 +66,12 @@ describe('options.frozenColumn', () => {
 
         expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(2);
-        expect(grid.getColumns()[0].fixedTo).toBe('start');
+        expect(grid.getColumns()[0].frozen).toBe(true);
         expect(grid.getColumns()[0].id).toBe('c2');
-        expect(grid.getColumns()[1].fixedTo).toBeUndefined();
+        expect(grid.getColumns()[1].frozen).toBeUndefined();
     });    
 
-    it('sets first two columns to fixed start when 1 and all cols are visible', () => {
+    it('sets first two columns to frozen when 1 and all cols are visible', () => {
         const grid = new Slick.Grid($('<div/>').appendTo(document.body), [], threeCols(), {
             enableColumnReorder: false,
             frozenColumn: 1
@@ -79,11 +79,11 @@ describe('options.frozenColumn', () => {
 
         expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
-        expect(grid.getColumns()[0].fixedTo).toBe('start');
-        expect(grid.getColumns()[1].fixedTo).toBe('start');
+        expect(grid.getColumns()[0].frozen).toBe(true);
+        expect(grid.getColumns()[1].frozen).toBe(true);
     });
 
-    it('sets the first two visible column to fixed start when 1', () => {
+    it('sets the first two visible column to frozen when 1', () => {
         var cols = threeCols();
         cols[0].visible = false;
         const grid = new Slick.Grid($('<div/>').appendTo(document.body), [], cols , {
@@ -93,19 +93,20 @@ describe('options.frozenColumn', () => {
 
         expect(grid.getInitialColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(2);
-        expect(grid.getColumns()[0].fixedTo).toBe('start');
+        expect(grid.getColumns()[0].frozen).toBe(true);
         expect(grid.getColumns()[0].id).toBe('c2');
-        expect(grid.getColumns()[1].fixedTo).toBe('start');
+        expect(grid.getColumns()[1].frozen).toBe(true);
         expect(grid.getColumns()[1].id).toBe('c3');
     });
 
-    it('gets deleted from options after processing', () => {
+    it('null gets deleted from options after processing', () => {
         const grid = new Slick.Grid($('<div/>').appendTo(document.body), [], threeCols(), {
             enableColumnReorder: false,
-            frozenColumn: 2
+            frozenColumn: null
         });
 
         expect(grid.getOptions().frozenColumn).toBeUndefined();
     });
+
 
 });

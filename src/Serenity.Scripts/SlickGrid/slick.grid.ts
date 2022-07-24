@@ -239,7 +239,7 @@ namespace Slick {
         defaultSortAsc?: boolean;
         editor?: Editor;
         field: string;
-        frozen?: "start";
+        frozen?: boolean;
         focusable?: boolean;
         footerCssClass?: string;
         formatter?: ColumnFormatter<TItem>;
@@ -2317,7 +2317,7 @@ namespace Slick {
                 initColById[m.id] = i;
 
                 if (m.visible !== false) {
-                    (m.frozen === "start" ? frozenColumns : viewCols).push(m);
+                    (m.frozen ? frozenColumns : viewCols).push(m);
                 }
             }
 
@@ -5362,7 +5362,7 @@ namespace Slick {
         while (i < columns.length) {
             var col = columns[i++];
             if (toFreeze > 0 && col.visible !== false) {
-                col.frozen = "start";
+                col.frozen = true;
                 options.frozenColumn++;
                 toFreeze--;
             }
