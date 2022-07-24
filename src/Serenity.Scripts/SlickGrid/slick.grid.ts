@@ -239,10 +239,10 @@ namespace Slick {
         defaultSortAsc?: boolean;
         editor?: Editor;
         field: string;
+        frozen?: "start";
         focusable?: boolean;
         footerCssClass?: string;
         formatter?: ColumnFormatter<TItem>;
-        fixedTo?: "start";
         groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
         headerCssClass?: string;
         id?: string;
@@ -266,20 +266,16 @@ namespace Slick {
         addNewRowCssClass?: string;
         alwaysAllowHorizontalScroll?: boolean;
         alwaysShowVerticalScroll?: boolean;
-        asyncEditorLoading?: boolean;
         asyncEditorLoadDelay?: number;
-        asyncPostRenderDelay?: number;
+        asyncEditorLoading?: boolean;
         asyncPostCleanupDelay?: number;
+        asyncPostRenderDelay?: number;
         autoEdit?: boolean;
         autoHeight?: boolean;
-        suppressActiveCellChangeOnEdit?: boolean;
         cellFlashingCssClass?: string;
         cellHighlightCssClass?: string;
         columns?: Column<TItem>[];
         dataItemColumnValueExtractor?: (item: TItem, column: Column<TItem>) => void;
-        groupingPanel?: boolean,
-        groupingPanelHeight?: number;
-        setGroupingPanelVisibility?: (value: boolean) => void;
         defaultColumnWidth?: number;
         defaultFormatter?: ColumnFormatter<TItem>;
         editable?: boolean;
@@ -289,21 +285,23 @@ namespace Slick {
         enableAddRow?: boolean;
         enableAsyncPostRender?: boolean;
         enableAsyncPostRenderCleanup?: boolean;
-        enableCellRangeSelection?: boolean;
         enableCellNavigation?: boolean;
-        enableTabKeyNavigation?: boolean;
+        enableCellRangeSelection?: boolean;
         enableColumnReorder?: boolean;
         enableRowReordering?: boolean;
+        enableTabKeyNavigation?: boolean;
         enableTextSelectionOnCells?: boolean;
         explicitInitialization?: boolean;
         footerRowHeight?: number;
         forceFitColumns?: boolean;
         forceSyncScrolling?: boolean;
         formatterFactory?: FormatterFactory;
-        fullWidthRows?: boolean;
+        frozenBottom?: boolean;
         frozenColumn?: number;
         frozenRow?: number;
-        frozenBottom?: boolean;
+        fullWidthRows?: boolean;
+        groupingPanel?: boolean,
+        groupingPanelHeight?: number;
         headerRowHeight?: number;
         leaveSpaceForNewRows?: boolean;
         minBuffer?: number;
@@ -312,14 +310,17 @@ namespace Slick {
         renderAllCells?: boolean;
         rowHeight?: number;
         selectedCellCssClass?: string;
+        setGroupingPanelVisibility?: (value: boolean) => void;
         showCellSelection?: boolean;
         showColumnHeader?: boolean;
+        showFooterRow?: boolean;
         showGroupingPanel?: boolean;
         showHeaderRow?: boolean;
-        showFooterRow?: boolean;
         showTopPanel?: boolean;
+        suppressActiveCellChangeOnEdit?: boolean;
         syncColumnCellResize?: boolean;
         topPanelHeight?: number;
+        useLegacyUI?: boolean;
         viewportClass?: string;
     }
 
@@ -337,210 +338,183 @@ namespace Slick {
      **/
     export class Grid<TItem = any> {
 
-        private _colDefaults: Partial<Column>;
-        private _data: any;
-        private _cols: Column<TItem>[];
-        private _colById: { [key: string]: number };
-        private _colLeft: number[] = [];
-        private _colRight: number[] = [];
-        private _initCols: Column<TItem>[];
-        private _initColById: { [key: string]: number };
-        private _fixedStartCols: number;
-        private _options: GridOptions<TItem>;
-
-        // scroller
-        private _virtualHeight: number;
-        private _realScrollHeight: number;
-        private _pageHeight: number;   // page height
-        private _numberOfPages: number;    // number of pages
-        private _jumpinessCoefficient: number;   // "jumpiness" coefficient
-
-        private _page: number = 0;       // current page
-        private _pageOffset: number = 0;     // current page offset
-        private _vScrollDir: number = 1;
-
-        private _pagingActive: boolean = false;
-        private _pagingIsLastPage: boolean = false;
-
-        // private
-        private _initialized = false;
-        private $container: JQuery;
-        private _uid: string = "slickgrid_" + Math.round(1000000 * Math.random());
-        private _focusSink1: HTMLDivElement;
-        private _focusSink2: HTMLDivElement;
-        private $headerScroller: JQuery;
-        private $headers: JQuery;
-        private $headerRow: JQuery;
-        private $headerRowScroller: JQuery;
-        private $headerRowSpacerL: JQuery;
-        private $headerRowSpacerR: JQuery;
-        private $footerRow: JQuery;
-        private $footerRowScroller: JQuery;
-        private $footerRowSpacerL: JQuery;
-        private $footerRowSpacerR: JQuery;
-        private $groupingPanel: JQuery;
-        private $topPanelScroller: JQuery;
-        private $topPanel: JQuery;
-        private $viewport: JQuery;
-        private $canvas: JQuery;
-        private _styleNode: HTMLStyleElement;
-        private _stylesheet: any;
-        private $boundAncestors: JQuery;
-        private _columnCssRulesL: any;
-        private _columnCssRulesR: any;
-        private _viewportH: number;
-        private _viewportW: number;
+        private _absoluteColMinWidth: number;
+        private _activeCanvasNode: HTMLElement;
+        private _activeCell: number;
+        private _activeCellNode: HTMLElement = null;
+        private _activePosX: number;
+        private _activeRow: number;
+        private _activeViewportNode: HTMLElement;
+        private _actualFrozenRow: number = -1;
         private _canvasWidth: number;
         private _canvasWidthL: number;
         private _canvasWidthR: number;
+        private _cellCssClasses: CellStylesHash = {};
+        private _cellHeightDiff: number = 0;
+        private _cellWidthDiff: number = 0;
+        private _colById: { [key: string]: number };
+        private _colDefaults: Partial<Column>;
+        private _colLeft: number[] = [];
+        private _colRight: number[] = [];
+        private _cols: Column<TItem>[];
+        private _columnCssRulesL: any;
+        private _columnCssRulesR: any;
+        private _currentEditor: Editor = null;
+        private _data: any;
+        private _editController: EditController;
+        private _frozenCols: number;
+        private _footerRowH: number = 0;
+        private _frozenRowsHeight: number = 0;
+        private _groupPanelH: number = 0;
+        private _hasFrozenRows = false;
+        private _headerColumnWidthDiff: number = 0;
+        private _headerRowH: number = 0;
         private _headersWidthL: number;
         private _headersWidthR: number;
+        private _hEditorLoader: number = null;
+        private _hPostRender: number = null;
+        private _hPostRenderCleanup: number = null;
+        private _hRender: number = null;
+        private _initColById: { [key: string]: number };
+        private _initCols: Column<TItem>[];
+        private _initialized = false;
+        private _jQueryNewWidthBehaviour: boolean = false;
+        private _jumpinessCoefficient: number;
+        private _numberOfPages: number;
+        private _numVisibleRows: number = 0;
+        private _options: GridOptions<TItem>;
+        private _page: number = 0;
+        private _pageHeight: number; 
+        private _pageOffset: number = 0;
+        private _pagingActive: boolean = false;
+        private _pagingIsLastPage: boolean = false;
+        private _paneBottomH: number = 0;
+        private _paneTopH: number = 0;
+        private _plugins: Plugin[] = [];
+        private _postProcessCleanupQueue: PostProcessCleanupEntry[] = [];
+        private _postProcessedRows: any = {};
+        private _postProcessFromRow: number = null;
+        private _postProcessGroupId: number = 0;
+        private _postProcessToRow: number = null;
+        private _realScrollHeight: number;
+        private _rowsCache: { [key: number]: CachedRow } = {};
+        private _rtl = false;
+        private _rtlE = 'right';
+        private _rtlS = 'left';
+        private _scrollLeft: number = 0;
+        private _scrollLeftPrev: number = 0;
+        private _scrolLLeftRendered: number = 0;
+        private _scrollTop: number = 0;
+        private _scrollTopPrev: number = 0;
+        private _scrollTopRendered: number = 0;
+        private _selectedRows: number[] = [];
+        private _selectionModel: SelectionModel;
+        private _serializedEditorValue: any;
+        private _sortColumns: ColumnSort[] = [];
+        private _styleNode: HTMLStyleElement;
+        private _stylesheet: any;
+        private _tabbingDirection: number = 1;
+        private _topPanelH: number = 0;
+        private _uid: string = "slickgrid_" + Math.round(1000000 * Math.random());
+        private _viewportH: number;
         private _viewportHasHScroll: boolean;
         private _viewportHasVScroll: boolean;
-        private _headerColumnWidthDiff: number = 0;
-        private _cellWidthDiff: number = 0;
-        private _cellHeightDiff: number = 0;
-        private _jQueryNewWidthBehaviour: boolean = false;
-        private _absoluteColumnMinWidth: number;
-        private _hasFrozenRows = false;
-        private _frozenRowsHeight: number = 0;
-        private _actualFrozenRow: number = -1;
-        private _paneTopH: number = 0;
-        private _paneBottomH: number = 0;
         private _viewportTopH: number = 0;
-        private _topPanelH: number = 0;
-        private _groupPanelH: number = 0;
-        private _headerRowH: number = 0;
-        private _footerRowH: number = 0;
+        private _viewportW: number;
+        private _virtualHeight: number;
+        private _vScrollDir: number = 1;
 
-        private _tabbingDirection: number = 1;
-        private _activePosX: number;
-        private _activeRow: number;
-        private _activeCell: number;
-        private _activeCellNode: HTMLElement = null;
-        private _activeCanvasNode: HTMLElement;
-        private _activeViewportNode: HTMLElement;
-        private _currentEditor: Editor = null;
-        private _serializedEditorValue: any;
-        private _editController: EditController;
-
-        private _rowsCache: { [key: number]: CachedRow } = {};
-        private _numVisibleRows: number = 0;
-        private _prevScrollTop: number = 0;
-        private _scrollTop: number = 0;
-        private _lastRenderedScrollTop: number = 0;
-        private _lastRenderedScrollLeft: number = 0;
-        private _prevScrollLeft: number = 0;
-        private _scrollLeft: number = 0;
-
-        private _selectionModel: SelectionModel;
-        private _selectedRows: number[] = [];
-
-        private _plugins: Plugin[] = [];
-        private _cellCssClasses: CellStylesHash = {};
-
-        private _sortColumns: ColumnSort[] = [];
-
-        private _rtl = false;
-        private _rtlStart = 'left';
-        private _rtlEnd = 'right';
-
-        // async call handles
-        private _hEditorLoader: number = null;
-        private _hRender: number = null;
-        private _hPostrender: number = null;
-        private _hPostrenderCleanup: number = null;
-        private _postProcessedRows: any = {};
-        private _postProcessToRow: number = null;
-        private _postProcessFromRow: number = null;
-        private _postProcessedCleanupQueue: PostProcessCleanupEntry[] = [];
-        private _postProcessGroupId: number = 0;
-
-        private _paneTopL: HTMLDivElement;
-        private _paneTopR: HTMLDivElement;
-        private _paneBottomL: HTMLDivElement;
-        private _paneBottomR: HTMLDivElement;
-
-        private _viewportTopL: HTMLDivElement;
-        private _viewportTopR: HTMLDivElement;
-        private _viewportBottomL: HTMLDivElement;
-        private _viewportBottomR: HTMLDivElement;
-
-        private _canvasTopL: HTMLDivElement;
-        private _canvasTopR: HTMLDivElement;
         private _canvasBottomL: HTMLDivElement;
         private _canvasBottomR: HTMLDivElement;
+        private _canvasTopL: HTMLDivElement;
+        private _canvasTopR: HTMLDivElement;
+        private _focusSink1: HTMLDivElement;
+        private _focusSink2: HTMLDivElement;
+        private _paneBottomL: HTMLDivElement;
+        private _paneBottomR: HTMLDivElement;
+        private _paneTopL: HTMLDivElement;
+        private _paneTopR: HTMLDivElement;
+        private _scrollContainerX: HTMLDivElement;
+        private _scrollContainerY: HTMLDivElement;
+        private _viewportBottomL: HTMLDivElement;
+        private _viewportBottomR: HTMLDivElement;
+        private _viewportTopL: HTMLDivElement;
+        private _viewportTopR: HTMLDivElement;
 
-
-        // store css attributes if display:none is active in container or parent
-        private $paneHeaderL: JQuery;
-        private $paneHeaderR: JQuery;
-
-        private $headerScrollerL: JQuery;
-        private $headerScrollerR: JQuery;
-
-        private $headerL: JQuery;
-        private $headerR: JQuery;
-
-        private $headerRowScrollerL: JQuery;
-        private $headerRowScrollerR: JQuery;
-
-        private $footerRowScrollerL: JQuery;
-        private $footerRowScrollerR: JQuery;
-
-        private $headerRowL: JQuery;
-        private $headerRowR: JQuery;
-
+        private $boundAncestors: JQuery;
+        private $canvas: JQuery;
+        private $container: JQuery;
+        private $footerRow: JQuery;
         private $footerRowL: JQuery;
         private $footerRowR: JQuery;
-
-        private $topPanelScrollerL: JQuery;
-        private $topPanelScrollerR: JQuery;
-
+        private $footerRowScrollContainer: JQuery;
+        private $footerRowScroller: JQuery;
+        private $footerRowScrollerL: JQuery;
+        private $footerRowScrollerR: JQuery;
+        private $footerRowSpacerL: JQuery;
+        private $footerRowSpacerR: JQuery;
+        private $groupingPanel: JQuery;
+        private $headerL: JQuery;
+        private $headerR: JQuery;
+        private $headerRow: JQuery;
+        private $headerRowL: JQuery;
+        private $headerRowR: JQuery;
+        private $headerRowScrollContainer: JQuery;
+        private $headerRowScroller: JQuery;
+        private $headerRowScrollerL: JQuery;
+        private $headerRowScrollerR: JQuery;
+        private $headerRowSpacerL: JQuery;
+        private $headerRowSpacerR: JQuery;
+        private $headers: JQuery;
+        private $headerScrollContainer: JQuery;
+        private $headerScroller: JQuery;
+        private $headerScrollerL: JQuery;
+        private $headerScrollerR: JQuery;
+        private $paneHeaderL: JQuery;
+        private $paneHeaderR: JQuery;
+        private $topPanel: JQuery;
         private $topPanelL: JQuery;
         private $topPanelR: JQuery;
+        private $topPanelScroller: JQuery;
+        private $topPanelScrollerL: JQuery;
+        private $topPanelScrollerR: JQuery;
+        private $viewport: JQuery;
 
-        private _viewportScrollContainerX: HTMLDivElement;
-        private _viewportScrollContainerY: HTMLDivElement;
-        private $headerScrollContainer: JQuery;
-        private $headerRowScrollContainer: JQuery;
-        private $footerRowScrollContainer: JQuery;
-
-        readonly onScroll = new Event<ArgsScroll>();
-        readonly onSort = new Event<ArgsSort>();
-        readonly onHeaderMouseEnter = new Event<ArgsColumn, JQueryMouseEventObject>();
-        readonly onHeaderMouseLeave = new Event<ArgsColumn>();
-        readonly onHeaderContextMenu = new Event<ArgsColumn>();
-        readonly onHeaderClick = new Event<ArgsColumn>();
-        readonly onHeaderCellRendered = new Event<ArgsColumnNode>();
-        readonly onBeforeHeaderCellDestroy = new Event<ArgsColumnNode>();
-        readonly onHeaderRowCellRendered = new Event<ArgsColumnNode>();
-        readonly onFooterRowCellRendered = new Event<ArgsColumnNode>();
-        readonly onBeforeHeaderRowCellDestroy = new Event<ArgsColumnNode>();
-        readonly onBeforeFooterRowCellDestroy = new Event<ArgsColumnNode>();
-        readonly onMouseEnter = new Event<ArgsGrid, JQueryMouseEventObject>();
-        readonly onMouseLeave = new Event<ArgsGrid, JQueryMouseEventObject>();
-        readonly onClick = new Event<ArgsCell, JQueryMouseEventObject>();
-        readonly onDblClick = new Event<ArgsCell, JQueryMouseEventObject>();
-        readonly onContextMenu = new Event<ArgsGrid, JQueryEventObject>();
-        readonly onKeyDown = new Event<ArgsCell, JQueryKeyEventObject>();
-        readonly onAddNewRow = new Event<ArgsAddNewRow>();
-        readonly onValidationError = new Event<ArgsValidationError>();
-        readonly onViewportChanged = new Event<ArgsGrid>();
-        readonly onColumnsReordered = new Event<ArgsGrid>();
-        readonly onColumnsResized = new Event<ArgsGrid>();
-        readonly onCellChange = new Event<ArgsCellChange>();
-        readonly onBeforeEditCell = new Event<ArgsCellEdit>();
-        readonly onBeforeCellEditorDestroy = new Event<ArgsEditorDestroy>();
-        readonly onBeforeDestroy = new Event<ArgsGrid>();
         readonly onActiveCellChanged = new Event<ArgsCell>();
         readonly onActiveCellPositionChanged = new Event<ArgsGrid>();
-        readonly onDragInit = new Event<ArgsGrid, JQueryEventObject>();
-        readonly onDragStart = new Event<ArgsGrid, JQueryEventObject>();
+        readonly onAddNewRow = new Event<ArgsAddNewRow>();
+        readonly onBeforeCellEditorDestroy = new Event<ArgsEditorDestroy>();
+        readonly onBeforeDestroy = new Event<ArgsGrid>();
+        readonly onBeforeEditCell = new Event<ArgsCellEdit>();
+        readonly onBeforeFooterRowCellDestroy = new Event<ArgsColumnNode>();
+        readonly onBeforeHeaderCellDestroy = new Event<ArgsColumnNode>();
+        readonly onBeforeHeaderRowCellDestroy = new Event<ArgsColumnNode>();
+        readonly onCellChange = new Event<ArgsCellChange>();
+        readonly onCellCssStylesChanged = new Event<ArgsCssStyle>();
+        readonly onClick = new Event<ArgsCell, JQueryMouseEventObject>();
+        readonly onColumnsReordered = new Event<ArgsGrid>();
+        readonly onColumnsResized = new Event<ArgsGrid>();
+        readonly onContextMenu = new Event<ArgsGrid, JQueryEventObject>();
+        readonly onDblClick = new Event<ArgsCell, JQueryMouseEventObject>();
         readonly onDrag = new Event<ArgsGrid, JQueryEventObject>();
         readonly onDragEnd = new Event<ArgsGrid, JQueryEventObject>();
+        readonly onDragInit = new Event<ArgsGrid, JQueryEventObject>();
+        readonly onDragStart = new Event<ArgsGrid, JQueryEventObject>();
+        readonly onFooterRowCellRendered = new Event<ArgsColumnNode>();
+        readonly onHeaderCellRendered = new Event<ArgsColumnNode>();
+        readonly onHeaderClick = new Event<ArgsColumn>();
+        readonly onHeaderContextMenu = new Event<ArgsColumn>();
+        readonly onHeaderMouseEnter = new Event<ArgsColumn, JQueryMouseEventObject>();
+        readonly onHeaderMouseLeave = new Event<ArgsColumn>();
+        readonly onHeaderRowCellRendered = new Event<ArgsColumnNode>();
+        readonly onKeyDown = new Event<ArgsCell, JQueryKeyEventObject>();
+        readonly onMouseEnter = new Event<ArgsGrid, JQueryMouseEventObject>();
+        readonly onMouseLeave = new Event<ArgsGrid, JQueryMouseEventObject>();
+        readonly onScroll = new Event<ArgsScroll>();
         readonly onSelectedRowsChanged = new Event<ArgsSelectedRowsChange>();
-        readonly onCellCssStylesChanged = new Event<ArgsCssStyle>();
+        readonly onSort = new Event<ArgsSort>();
+        readonly onValidationError = new Event<ArgsValidationError>();
+        readonly onViewportChanged = new Event<ArgsGrid>();
 
         constructor(container: JQuery | HTMLElement, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
 
@@ -548,55 +522,56 @@ namespace Slick {
 
             // settings
             var defaults: Slick.GridOptions<TItem> = {
+                addNewRowCssClass: "new-row",
                 alwaysAllowHorizontalScroll: false,
                 alwaysShowVerticalScroll: false,
-                explicitInitialization: false,
-                rowHeight: 25,
-                defaultColumnWidth: 80,
-                enableAddRow: false,
-                leaveSpaceForNewRows: false,
-                editable: false,
+                asyncEditorLoadDelay: 100,
+                asyncEditorLoading: false,
+                asyncPostCleanupDelay: 40,
+                asyncPostRenderDelay: 50,
                 autoEdit: true,
-                suppressActiveCellChangeOnEdit: false,
+                autoHeight: false,
+                cellFlashingCssClass: "flashing",
+                dataItemColumnValueExtractor: null,
+                defaultColumnWidth: 80,
+                defaultFormatter: defaultFormatter,
+                editable: false,
+                editorFactory: null,
+                editorLock: Slick.GlobalEditorLock,
+                enableAddRow: false,
+                enableAsyncPostRender: false,
+                enableAsyncPostRenderCleanup: false,
                 enableCellNavigation: true,
                 enableColumnReorder: true,
                 enableTabKeyNavigation: true,
-                asyncEditorLoading: false,
-                asyncEditorLoadDelay: 100,
-                forceFitColumns: false,
-                enableAsyncPostRender: false,
-                enableAsyncPostRenderCleanup: false,
-                asyncPostRenderDelay: 50,
-                asyncPostCleanupDelay: 40,
-                autoHeight: false,
-                editorLock: Slick.GlobalEditorLock,
-                showHeaderRow: false,
-                headerRowHeight: 25,
-                showFooterRow: false,
-                footerRowHeight: 25,
-                showTopPanel: false,
-                topPanelHeight: 25,
-                groupingPanel: false,
-                showGroupingPanel: true,
-                groupingPanelHeight: 34,
-                formatterFactory: null,
-                editorFactory: null,
-                cellFlashingCssClass: "flashing",
-                selectedCellCssClass: "selected",
-                multiSelect: true,
                 enableTextSelectionOnCells: false,
-                dataItemColumnValueExtractor: null,
+                explicitInitialization: false,
+                footerRowHeight: 25,
+                forceFitColumns: false,
+                forceSyncScrolling: false,
+                formatterFactory: null,
                 frozenBottom: false,
                 frozenRow: -1,
                 fullWidthRows: false,
-                multiColumnSort: false,
-                defaultFormatter: defaultFormatter,
-                forceSyncScrolling: false,
-                addNewRowCssClass: "new-row",
+                groupingPanel: false,
+                groupingPanelHeight: 34,
+                headerRowHeight: 25,
+                leaveSpaceForNewRows: false,
+                useLegacyUI: true,
                 minBuffer: 3,
+                multiColumnSort: false,
+                multiSelect: true,
                 renderAllCells: false,
+                rowHeight: 25,
+                selectedCellCssClass: "selected",
                 showCellSelection: true,
-                showColumnHeader: true
+                showColumnHeader: true,
+                showFooterRow: false,
+                showGroupingPanel: true,
+                showHeaderRow: false,
+                showTopPanel: false,
+                suppressActiveCellChangeOnEdit: false,
+                topPanelHeight: 25
             };
 
             this._colDefaults = {
@@ -626,8 +601,8 @@ namespace Slick {
 
             this._rtl = $(document.body).hasClass('rtl') || this.$container.css('direction') == 'rtl';
             if (this._rtl) {
-                this._rtlStart = 'right';
-                this._rtlEnd = 'left';
+                this._rtlS = 'right';
+                this._rtlE = 'left';
             }
 
             // calculate these only once and share between grid instances
@@ -656,8 +631,10 @@ namespace Slick {
                 .empty()
                 .css("overflow", "hidden")
                 .css("outline", 0)
-                .addClass(this._uid)
-                .addClass("ui-widget");
+                .addClass(this._uid);
+
+            if (this._options.useLegacyUI)
+                this.$container.addClass("ui-widget");
 
             // set up a positioning container if needed
             if (!/relative|absolute|fixed/.test(this.$container.css("position"))) {
@@ -689,22 +666,24 @@ namespace Slick {
             this.$container.append(this._paneBottomL = H('div', { class: "slick-pane slick-pane-bottom slick-pane-left", tabIndex: "0" }));
             this.$container.append(this._paneBottomR = H('div', { class: "slick-pane slick-pane-bottom slick-pane-right", tabIndex: "0" }));
 
+            const uisd = this._options.useLegacyUI ? 'ui-state-default ' : '';
+
             // Append the header scroller containers
-            this.$headerScrollerL = $('<div class="ui-state-default slick-header slick-header-left" />').appendTo(this.$paneHeaderL);
-            this.$headerScrollerR = $('<div class="ui-state-default slick-header slick-header-right" />').appendTo(this.$paneHeaderR);
+            this.$headerScrollerL = $('<div class="' + uisd + 'slick-header slick-header-left" />').appendTo(this.$paneHeaderL);
+            this.$headerScrollerR = $('<div class="' + uisd + 'slick-header slick-header-right" />').appendTo(this.$paneHeaderR);
 
             // Cache the header scroller containers
             this.$headerScroller = $().add(this.$headerScrollerL).add(this.$headerScrollerR);
 
             // Append the columnn containers to the headers
-            this.$headerL = $('<div class="slick-header-columns slick-header-columns-left" style="' + this._rtlStart + ':-1000px" />').appendTo(this.$headerScrollerL);
-            this.$headerR = $('<div class="slick-header-columns slick-header-columns-right" style="' + this._rtlStart + ':-1000px" />').appendTo(this.$headerScrollerR);
+            this.$headerL = $('<div class="slick-header-columns slick-header-columns-left" style="' + this._rtlS + ':-1000px" />').appendTo(this.$headerScrollerL);
+            this.$headerR = $('<div class="slick-header-columns slick-header-columns-right" style="' + this._rtlS + ':-1000px" />').appendTo(this.$headerScrollerR);
 
             // Cache the header columns
             this.$headers = $().add(this.$headerL).add(this.$headerR);
 
-            this.$headerRowScrollerL = $('<div class="ui-state-default slick-headerrow" />').appendTo(this._paneTopL);
-            this.$headerRowScrollerR = $('<div class="ui-state-default slick-headerrow" />').appendTo(this._paneTopR);
+            this.$headerRowScrollerL = $('<div class="' + uisd + 'slick-headerrow" />').appendTo(this._paneTopL);
+            this.$headerRowScrollerR = $('<div class="' + uisd + 'slick-headerrow" />').appendTo(this._paneTopR);
 
             this.$headerRowScroller = $().add(this.$headerRowScrollerL).add(this.$headerRowScrollerR);
 
@@ -722,8 +701,8 @@ namespace Slick {
             this.$headerRow = $().add(this.$headerRowL).add(this.$headerRowR);
 
             // Append the top panel scroller
-            this.$topPanelScrollerL = $('<div class="ui-state-default slick-top-panel-scroller" />').appendTo(this._paneTopL);
-            this.$topPanelScrollerR = $('<div class="ui-state-default slick-top-panel-scroller" />').appendTo(this._paneTopR);
+            this.$topPanelScrollerL = $('<div class="' + uisd + 'slick-top-panel-scroller" />').appendTo(this._paneTopL);
+            this.$topPanelScrollerR = $('<div class="' + uisd + 'slick-top-panel-scroller" />').appendTo(this._paneTopR);
 
             this.$topPanelScroller = $().add(this.$topPanelScrollerL).add(this.$topPanelScrollerR);
 
@@ -762,8 +741,8 @@ namespace Slick {
             this.$canvas = $([this._canvasTopL, this._canvasTopR, this._canvasBottomL, this._canvasBottomR]);
 
             // footer Row
-            this.$footerRowScrollerR = $('<div class="ui-state-default slick-footerrow" />').appendTo(this._paneTopR);
-            this.$footerRowScrollerL = $('<div class="ui-state-default slick-footerrow" />').appendTo(this._paneTopL);
+            this.$footerRowScrollerR = $('<div class="' + uisd + 'slick-footerrow" />').appendTo(this._paneTopR);
+            this.$footerRowScrollerL = $('<div class="' + uisd + 'slick-footerrow" />').appendTo(this._paneTopL);
 
             this.$footerRowScroller = $().add(this.$footerRowScrollerL).add(this.$footerRowScrollerR);
 
@@ -839,7 +818,7 @@ namespace Slick {
             this.$viewport
                 .on("scroll", this.handleScroll.bind(this));
 
-            if ((jQuery.fn as any).mousewheel && (this.hasFixedColumns() || this._hasFrozenRows)) {
+            if ((jQuery.fn as any).mousewheel && (this.hasFrozenColumns() || this._hasFrozenRows)) {
                 this.$viewport
                     .on("mousewheel", this.handleMouseWheel.bind(this));
             }
@@ -878,8 +857,8 @@ namespace Slick {
             }
         }
 
-        private hasFixedColumns(): boolean {
-            return this._fixedStartCols > 0;
+        private hasFrozenColumns(): boolean {
+            return this._frozenCols > 0;
         }
 
         registerPlugin(plugin: Plugin): void {
@@ -933,7 +912,7 @@ namespace Slick {
         }
 
         getAbsoluteColumnMinWidth() {
-            return this._absoluteColumnMinWidth;
+            return this._absoluteColMinWidth;
         }        
 
         getSelectionModel(): SelectionModel {
@@ -991,18 +970,18 @@ namespace Slick {
         private calcHeaderWidths(): void {
             this._headersWidthL = this._headersWidthR = 0;
 
-            var cols = this._cols, fixStart = this._fixedStartCols;
+            var cols = this._cols, frozenCols = this._frozenCols;
             for (var i = 0, ii = cols.length; i < ii; i++) {
                 var width = cols[i].width;
 
-                if (fixStart > 0 && i >= fixStart) {
+                if (frozenCols > 0 && i >= frozenCols) {
                     this._headersWidthR += width;
                 } else {
                     this._headersWidthL += width;
                 }
             }
 
-            if (fixStart > 0) {
+            if (frozenCols > 0) {
                 this._headersWidthL = this._headersWidthL + 1000;
 
                 this._headersWidthR = Math.max(this._headersWidthR, this._viewportW) + this._headersWidthL;
@@ -1016,12 +995,12 @@ namespace Slick {
         private getCanvasWidth(): number {
             var availableWidth = this._viewportHasVScroll ? this._viewportW - scrollbarDimensions.width : this._viewportW;
 
-            var cols = this._cols, i = cols.length, fixStart = this._fixedStartCols;
+            var cols = this._cols, i = cols.length, frozenCols = this._frozenCols;
 
             this._canvasWidthL = this._canvasWidthR = 0;
 
             while (i--) {
-                if (fixStart > 0 && i >= fixStart) {
+                if (frozenCols > 0 && i >= frozenCols) {
                     this._canvasWidthR += cols[i].width;
                 } else {
                     this._canvasWidthL += cols[i].width;
@@ -1042,7 +1021,7 @@ namespace Slick {
 
             widthChanged = this._canvasWidth !== oldCanvasWidth || this._canvasWidthL !== oldCanvasWidthL || this._canvasWidthR !== oldCanvasWidthR;
 
-            if (widthChanged || this.hasFixedColumns() || this._hasFrozenRows) {
+            if (widthChanged || this.hasFrozenColumns() || this._hasFrozenRows) {
                 var canvasWidthL = this._canvasWidthL + 'px'
                 var canvasWidthR = this._canvasWidthR + 'px';
 
@@ -1052,16 +1031,16 @@ namespace Slick {
                 this.$headerL.width(this._headersWidthL);
                 this.$headerR.width(this._headersWidthR);
 
-                if (this.hasFixedColumns()) {
+                if (this.hasFrozenColumns()) {
                     var viewportMinus = (this._viewportW - this._canvasWidthL) + 'px';
 
                     this._canvasTopR.style.width = canvasWidthR;
                     this.$paneHeaderL[0].style.width = canvasWidthL;
-                    this.$paneHeaderR[0].style[this._rtlStart] = canvasWidthL;
+                    this.$paneHeaderR[0].style[this._rtlS] = canvasWidthL;
                     this.$paneHeaderR[0].style.width = viewportMinus;
 
                     this._paneTopL.style.width = canvasWidthL;
-                    this._paneTopR.style[this._rtlStart] = canvasWidthL;
+                    this._paneTopR.style[this._rtlS] = canvasWidthL;
                     this._paneTopR.style.width = viewportMinus;
 
                     this.$headerRowScrollerL[0].style.width = canvasWidthL;
@@ -1081,7 +1060,7 @@ namespace Slick {
 
                     if (this._hasFrozenRows) {
                         this._paneBottomL.style.width = canvasWidthL;
-                        this._paneBottomR.style[this._rtlStart] = canvasWidthL;
+                        this._paneBottomR.style[this._rtlS] = canvasWidthL;
 
                         this._viewportBottomL.style.width = canvasWidthL;
                         this._viewportBottomR.style.width = viewportMinus;
@@ -1200,15 +1179,15 @@ namespace Slick {
             if (idx == null)
                 return;
 
-            var $headerRowTarget, fixStart = this._fixedStartCols;
+            var $headerRowTarget, frozenCols = this._frozenCols;
 
-            if (fixStart > 0) {
-                if (idx < fixStart) {
+            if (frozenCols > 0) {
+                if (idx < frozenCols) {
                     $headerRowTarget = this.$headerRowL;
                 } else {
                     $headerRowTarget = this.$headerRowR;
 
-                    idx -= fixStart;
+                    idx -= frozenCols;
                 }
             } else {
                 $headerRowTarget = this.$headerRowL;
@@ -1227,15 +1206,15 @@ namespace Slick {
             if (idx == null)
                 return null;
 
-            var $footerRowTarget, fixStart = this._fixedStartCols;
+            var $footerRowTarget, frozenCols = this._frozenCols;
 
-            if (fixStart > 0) {
-                if (idx < fixStart) {
+            if (frozenCols > 0) {
+                if (idx < frozenCols) {
                     $footerRowTarget = this.$footerRowL;
                 } else {
                     $footerRowTarget = this.$footerRowR;
 
-                    idx -= fixStart;
+                    idx -= frozenCols;
                 }
             } else {
                 $footerRowTarget = this.$footerRowL;
@@ -1261,15 +1240,15 @@ namespace Slick {
             this.$footerRowL.empty();
             this.$footerRowR.empty();
 
-            var cols = this._cols, fixStart = this._fixedStartCols;
+            var cols = this._cols, frozenCols = this._frozenCols;
             for (var i = 0; i < cols.length; i++) {
                 var m = cols[i];
 
-                var footerRowCell = $("<div class='ui-state-default slick-footerrow-column l" + i + " r" + i + "'></div>")
+                var footerRowCell = $("<div class='" + (this._options.useLegacyUI ? 'ui-state-default ' : '') + "slick-footerrow-column l" + i + " r" + i + "'></div>")
                     .data("column", m)
                     .addClass(m.footerCssClass || m.cssClass || '')
-                    .addClass(i < fixStart ? 'frozen' : '')
-                    .appendTo(fixStart > 0 && i >= fixStart ? this.$footerRowR : this.$footerRowL);
+                    .addClass(i < frozenCols ? 'frozen' : '')
+                    .appendTo(frozenCols > 0 && i >= frozenCols ? this.$footerRowR : this.$footerRowL);
 
                 this.trigger(this.onFooterRowCellRendered, {
                     node: footerRowCell[0],
@@ -1334,14 +1313,6 @@ namespace Slick {
         }
 
         private createColumnHeaders(): void {
-            function onMouseEnter() {
-                $(this).addClass("ui-state-hover");
-            }
-
-            function onMouseLeave() {
-                $(this).removeClass("ui-state-hover");
-            }
-
             var self = this;
             this.$headers.find(".slick-header-column")
                 .each(function () {
@@ -1376,27 +1347,27 @@ namespace Slick {
             this.$headerRowL.empty();
             this.$headerRowR.empty();
 
-            var cols = this._cols, fixStart = this._fixedStartCols;
+            var cols = this._cols, frozenCols = this._frozenCols;
             for (var i = 0; i < cols.length; i++) {
                 var m = cols[i];
 
-                var $headerTarget = fixStart > 0 && i >= fixStart ? this.$headerR : this.$headerL;
-                var $headerRowTarget = fixStart > 0 && i >= fixStart ? this.$headerRowR : this.$headerRowL;
+                var $headerTarget = frozenCols > 0 && i >= frozenCols ? this.$headerR : this.$headerL;
+                var $headerRowTarget = frozenCols > 0 && i >= frozenCols ? this.$headerRowR : this.$headerRowL;
 
-                var header = $("<div class='ui-state-default slick-header-column' />")
+                var header = $("<div class='" + (this._options.useLegacyUI ? "ui-state-default " : "") + "slick-header-column' />")
                     .html("<span class='slick-column-name'>" + m.name + "</span>")
                     .width(m.width - this._headerColumnWidthDiff)
                     .attr("id", "" + this._uid + m.id)
                     .attr("title", m.toolTip || "")
                     .data("column", m)
                     .addClass(m.headerCssClass || "")
-                    .addClass(i < fixStart ? 'frozen' : '')
+                    .addClass(i < frozenCols ? 'frozen' : '')
                     .appendTo($headerTarget);
 
-                if (this._options.enableColumnReorder || m.sortable) {
+                if ((this._options.enableColumnReorder || m.sortable) && this._options.useLegacyUI) {
                     header
-                        .on('mouseenter', onMouseEnter)
-                        .on('mouseleave', onMouseLeave);
+                        .on('mouseenter', addUiStateHover)
+                        .on('mouseleave', removeUiStateHover);
                 }
 
                 if (m.sortable) {
@@ -1410,7 +1381,7 @@ namespace Slick {
                 });
 
                 if (this._options.showHeaderRow) {
-                    var headerRowCell = $("<div class='ui-state-default slick-headerrow-column l" + i + " r" + i + "'></div>")
+                    var headerRowCell = $("<div class='" + (this._options.useLegacyUI ? "ui-state-default " : "") + "slick-headerrow-column l" + i + " r" + i + "'></div>")
                         .data("column", m)
                         .appendTo($headerRowTarget);
 
@@ -1499,17 +1470,16 @@ namespace Slick {
             var columnScrollTimer: number = null;
 
             var scrollColumnsRight = () => {
-                this._viewportScrollContainerX.scrollLeft = this._viewportScrollContainerX.scrollLeft + 10;
+                this._scrollContainerX.scrollLeft = this._scrollContainerX.scrollLeft + 10;
             }
 
             var scrollColumnsLeft = () => {
-                this._viewportScrollContainerX.scrollLeft = this._viewportScrollContainerX.scrollLeft - 10;
+                this._scrollContainerX.scrollLeft = this._scrollContainerX.scrollLeft - 10;
             }
 
             var canDragScroll: boolean;
 
             var hasGrouping = this._options.groupingPanel;
-            var viewCols = this._cols;
             (this.$headers as any).sortable({
                 containment: hasGrouping ? undefined : "parent",
                 distance: 3,
@@ -1517,13 +1487,13 @@ namespace Slick {
                 cursor: "default",
                 tolerance: "intersection",
                 helper: "clone",
-                placeholder: "slick-sortable-placeholder ui-state-default slick-header-column",
+                placeholder: "slick-sortable-placeholder" + (this._options.useLegacyUI ? " ui-state-default" : "") + " slick-header-column",
                 forcePlaceholderSize: hasGrouping ? true : undefined,
                 appendTo: hasGrouping ? "body" : undefined,
                 start: (_: HtmlEvent, ui: any) => {
                     ui.placeholder.width(ui.helper.outerWidth() - this._headerColumnWidthDiff);
-                    canDragScroll = !this.hasFixedColumns() ||
-                        (ui.placeholder.offset()[this._rtlStart] + Math.round(ui.placeholder.width())) > $(this._viewportScrollContainerX).offset()[this._rtlStart];
+                    canDragScroll = !this.hasFrozenColumns() ||
+                        (ui.placeholder.offset()[this._rtlS] + Math.round(ui.placeholder.width())) > $(this._scrollContainerX).offset()[this._rtlS];
                     $(ui.helper).addClass("slick-header-column-active");
                 },
                 beforeStop: (_: HtmlEvent, ui: any) => {
@@ -1544,7 +1514,7 @@ namespace Slick {
                             columnScrollTimer = setInterval(
                                 scrollColumnsRight, 100);
                         }
-                    } else if (canDragScroll && (e.originalEvent as any).pageX < $(this._viewportScrollContainerX).offset().left) {
+                    } else if (canDragScroll && (e.originalEvent as any).pageX < $(this._scrollContainerX).offset().left) {
                         if (!(columnScrollTimer)) {
                             columnScrollTimer = setInterval(
                                 scrollColumnsLeft, 100);
@@ -1626,7 +1596,7 @@ namespace Slick {
                                             stretchLeewayOnRight = null;
                                         }
                                     }
-                                    shrinkLeewayOnRight += c.previousWidth - Math.max(c.minWidth || 0, this._absoluteColumnMinWidth);
+                                    shrinkLeewayOnRight += c.previousWidth - Math.max(c.minWidth || 0, this._absoluteColMinWidth);
                                 }
                             }
                         }
@@ -1642,7 +1612,7 @@ namespace Slick {
                                         stretchLeewayOnLeft = null;
                                     }
                                 }
-                                shrinkLeewayOnLeft += c.previousWidth - Math.max(c.minWidth || 0, this._absoluteColumnMinWidth);
+                                shrinkLeewayOnLeft += c.previousWidth - Math.max(c.minWidth || 0, this._absoluteColMinWidth);
                             }
                         }
                         if (shrinkLeewayOnRight === null) {
@@ -1670,7 +1640,7 @@ namespace Slick {
                             for (j = i; j >= 0; j--) {
                                 c = cols[j];
                                 if (c.resizable) {
-                                    actualMinWidth = Math.max(c.minWidth || 0, this._absoluteColumnMinWidth);
+                                    actualMinWidth = Math.max(c.minWidth || 0, this._absoluteColMinWidth);
                                     if (x && c.previousWidth + x < actualMinWidth) {
                                         x += c.previousWidth - actualMinWidth;
                                         c.width = actualMinWidth;
@@ -1681,12 +1651,12 @@ namespace Slick {
                                 }
                             }
 
-                            var fixStart = this._fixedStartCols;
+                            var frozenCols = this._frozenCols;
 
                             for (k = 0; k <= i; k++) {
                                 c = cols[k];
 
-                                if (fixStart > 0 && k >= fixStart) {
+                                if (frozenCols > 0 && k >= frozenCols) {
                                     newCanvasWidthR += c.width;
                                 } else {
                                     newCanvasWidthL += c.width;
@@ -1706,7 +1676,7 @@ namespace Slick {
                                             x = 0;
                                         }
 
-                                        if (fixStart > 0 && j >= fixStart) {
+                                        if (frozenCols > 0 && j >= frozenCols) {
                                             newCanvasWidthR += c.width;
                                         } else {
                                             newCanvasWidthL += c.width;
@@ -1717,7 +1687,7 @@ namespace Slick {
                                 for (j = i + 1; j < columnElements.length; j++) {
                                     c = cols[j];
 
-                                    if (fixStart >= 0 && j >= fixStart) {
+                                    if (frozenCols >= 0 && j >= frozenCols) {
                                         newCanvasWidthR += c.width;
                                     } else {
                                         newCanvasWidthL += c.width;
@@ -1745,7 +1715,7 @@ namespace Slick {
                             for (k = 0; k <= i; k++) {
                                 c = cols[k];
 
-                                if (fixStart > 0 && k >= fixStart) {
+                                if (frozenCols > 0 && k >= frozenCols) {
                                     newCanvasWidthR += c.width;
                                 } else {
                                     newCanvasWidthL += c.width;
@@ -1757,7 +1727,7 @@ namespace Slick {
                                 for (j = i + 1; j < columnElements.length; j++) {
                                     c = cols[j];
                                     if (c.resizable) {
-                                        actualMinWidth = Math.max(c.minWidth || 0, this._absoluteColumnMinWidth);
+                                        actualMinWidth = Math.max(c.minWidth || 0, this._absoluteColMinWidth);
                                         if (x && c.previousWidth + x < actualMinWidth) {
                                             x += c.previousWidth - actualMinWidth;
                                             c.width = actualMinWidth;
@@ -1766,7 +1736,7 @@ namespace Slick {
                                             x = 0;
                                         }
 
-                                        if (fixStart && j >= fixStart) {
+                                        if (frozenCols && j >= frozenCols) {
                                             newCanvasWidthR += c.width;
                                         } else {
                                             newCanvasWidthL += c.width;
@@ -1777,7 +1747,7 @@ namespace Slick {
                                 for (j = i + 1; j < columnElements.length; j++) {
                                     c = cols[j];
 
-                                    if (fixStart > 0 && j >= fixStart) {
+                                    if (frozenCols > 0 && j >= frozenCols) {
                                         newCanvasWidthR += c.width;
                                     } else {
                                         newCanvasWidthL += c.width;
@@ -1786,9 +1756,9 @@ namespace Slick {
                             }
                         }
 
-                        if (this.hasFixedColumns() && newCanvasWidthL != this._canvasWidthL) {
+                        if (this.hasFrozenColumns() && newCanvasWidthL != this._canvasWidthL) {
                             this.$headerL.width(newCanvasWidthL + 1000);
-                            this.$paneHeaderR.css(this._rtlStart, newCanvasWidthL);
+                            this.$paneHeaderR.css(this._rtlS, newCanvasWidthL);
                         }
 
                         this.applyColumnHeaderWidths();
@@ -1849,17 +1819,18 @@ namespace Slick {
         }
 
         private setPaneVisibility(): void {
-            if (this.hasFixedColumns()) {
-                this.$paneHeaderL[0].classList.add('slick-pane-frozen');
-                this.$paneHeaderL[0].insertAdjacentElement('afterend', this.$paneHeaderR[0]).classList.remove('slick-pane-frozen');
-                this._paneTopL.classList.add('slick-pane-frozen');
-                this._paneTopL.insertAdjacentElement('afterend', this._paneTopR).classList.remove('slick-pane-frozen');
+            const frozenPaneClass = 'slick-pane-frozen';
+            if (this.hasFrozenColumns()) {
+                this.$paneHeaderL[0].classList.add(frozenPaneClass);
+                this.$paneHeaderL[0].insertAdjacentElement('afterend', this.$paneHeaderR[0]).classList.remove(frozenPaneClass);
+                this._paneTopL.classList.add(frozenPaneClass);
+                this._paneTopL.insertAdjacentElement('afterend', this._paneTopR).classList.remove(frozenPaneClass);
 
                 if (this._hasFrozenRows) {
-                    this._paneTopR.classList.toggle('slick-pane-frozen', !this._options.frozenBottom);
-                    this._paneTopR.insertAdjacentElement('afterend', this._paneBottomL).classList.add('slick-pane-frozen');
-                    this._paneBottomL.classList.add('slick-pane-frozen');
-                    this._paneBottomL.insertAdjacentElement('afterend', this._paneBottomR).classList.toggle('slick-pane-frozen', !!this._options.frozenBottom);
+                    this._paneTopR.classList.toggle(frozenPaneClass, !this._options.frozenBottom);
+                    this._paneTopR.insertAdjacentElement('afterend', this._paneBottomL).classList.add(frozenPaneClass);
+                    this._paneBottomL.classList.add(frozenPaneClass);
+                    this._paneBottomL.insertAdjacentElement('afterend', this._paneBottomR).classList.toggle(frozenPaneClass, !!this._options.frozenBottom);
                 } else {
                     this._paneBottomR.remove();
                     this._paneBottomL.remove();
@@ -1870,10 +1841,10 @@ namespace Slick {
                 this._paneBottomR.remove();
 
                 if (this._hasFrozenRows) {
-                    this._paneTopL.classList.toggle('slick-pane-frozen', !this._options.frozenBottom);
-                    this._paneTopL.insertAdjacentElement('afterend', this._paneBottomL).classList.toggle('slick-pane-frozen', !!this._options.frozenBottom);
+                    this._paneTopL.classList.toggle(frozenPaneClass, !this._options.frozenBottom);
+                    this._paneTopL.insertAdjacentElement('afterend', this._paneBottomL).classList.toggle(frozenPaneClass, !!this._options.frozenBottom);
                 } else {
-                    this._paneTopL.classList.remove('slick-pane-frozen');
+                    this._paneTopL.classList.remove(frozenPaneClass);
                     this._paneBottomR.remove();
                     this._paneBottomL.remove();
                 }
@@ -1882,15 +1853,15 @@ namespace Slick {
 
         private setOverflow(): void {
 
-            var fixedRows = this._hasFrozenRows;
-            var fixedCols = this.hasFixedColumns();
+            var frozenRows = this._hasFrozenRows;
+            var frozenCols = this.hasFrozenColumns();
             var alwaysHS = this._options.alwaysAllowHorizontalScroll;
             var alwaysVS = this._options.alwaysShowVerticalScroll;
 
-            this._viewportTopL.style.overflowX = this._viewportTopR.style.overflowX = (fixedRows && !alwaysHS) ? 'hidden' : (fixedCols ? 'scroll' : 'auto');
-            this._viewportTopL.style.overflowY = this._viewportBottomL.style.overflowY = (!fixedCols && alwaysVS) ? 'scroll' : (fixedCols ? 'hidden' : (fixedRows ? 'scroll' : 'auto'));
-            this._viewportTopR.style.overflowY = (alwaysVS || fixedRows) ? 'scroll' : 'auto';
-            this._viewportBottomL.style.overflowX = this._viewportBottomR.style.overflowX = (fixedCols && !alwaysHS) ? 'scroll' : 'auto';
+            this._viewportTopL.style.overflowX = this._viewportTopR.style.overflowX = (frozenRows && !alwaysHS) ? 'hidden' : (frozenCols ? 'scroll' : 'auto');
+            this._viewportTopL.style.overflowY = this._viewportBottomL.style.overflowY = (!frozenCols && alwaysVS) ? 'scroll' : (frozenCols ? 'hidden' : (frozenRows ? 'scroll' : 'auto'));
+            this._viewportTopR.style.overflowY = (alwaysVS || frozenRows) ? 'scroll' : 'auto';
+            this._viewportBottomL.style.overflowX = this._viewportBottomR.style.overflowX = (frozenCols && !alwaysHS) ? 'scroll' : 'auto';
             this._viewportBottomR.style.overflowY = (alwaysVS) ? 'scroll' : 'auto';
 
             if (this._options.viewportClass)
@@ -1898,20 +1869,20 @@ namespace Slick {
         }
 
         private setScroller(): void {
-            if (this.hasFixedColumns()) {
+            if (this.hasFrozenColumns()) {
                 this.$headerScrollContainer = this.$headerScrollerR;
                 this.$headerRowScrollContainer = this.$headerRowScrollerR;
                 this.$footerRowScrollContainer = this.$footerRowScrollerR
 
                 if (this._hasFrozenRows) {
                     if (this._options.frozenBottom) {
-                        this._viewportScrollContainerX = this._viewportBottomR;
-                        this._viewportScrollContainerY = this._viewportTopR;
+                        this._scrollContainerX = this._viewportBottomR;
+                        this._scrollContainerY = this._viewportTopR;
                     } else {
-                        this._viewportScrollContainerX = this._viewportScrollContainerY = this._viewportBottomR;
+                        this._scrollContainerX = this._scrollContainerY = this._viewportBottomR;
                     }
                 } else {
-                    this._viewportScrollContainerX = this._viewportScrollContainerY = this._viewportTopR;
+                    this._scrollContainerX = this._scrollContainerY = this._viewportTopR;
                 }
             } else {
                 this.$headerScrollContainer = this.$headerScrollerL;
@@ -1920,13 +1891,13 @@ namespace Slick {
 
                 if (this._hasFrozenRows) {
                     if (this._options.frozenBottom) {
-                        this._viewportScrollContainerX = this._viewportBottomL;
-                        this._viewportScrollContainerY = this._viewportTopL;
+                        this._scrollContainerX = this._viewportBottomL;
+                        this._scrollContainerY = this._viewportTopL;
                     } else {
-                        this._viewportScrollContainerX = this._viewportScrollContainerY = this._viewportBottomL;
+                        this._scrollContainerX = this._scrollContainerY = this._viewportBottomL;
                     }
                 } else {
-                    this._viewportScrollContainerX = this._viewportScrollContainerY = this._viewportTopL;
+                    this._scrollContainerX = this._scrollContainerY = this._viewportTopL;
                 }
             }
         }
@@ -1942,7 +1913,7 @@ namespace Slick {
             var verArray = $.fn.jquery.split('.');
             this._jQueryNewWidthBehaviour = (verArray[0] as any == "1" && verArray[1] as any >= 8) || verArray[0] as any >= 2;
 
-            el = $("<div class='ui-state-default slick-header-column' style='visibility:hidden'>-</div>").appendTo(this.$headers);
+            el = $("<div class='" + (this._options.useLegacyUI ? "ui-state-default " : "") + "slick-header-column' style='visibility:hidden'>-</div>").appendTo(this.$headers);
             this._headerColumnWidthDiff = 0;
             if (el.css("box-sizing") != "border-box" && el.css("-moz-box-sizing") != "border-box" && el.css("-webkit-box-sizing") != "border-box") {
                 $.each(h, (_, val) => {
@@ -1964,7 +1935,7 @@ namespace Slick {
             }
             r.remove();
 
-            this._absoluteColumnMinWidth = Math.max(this._headerColumnWidthDiff, this._cellWidthDiff);
+            this._absoluteColMinWidth = Math.max(this._headerColumnWidthDiff, this._cellWidthDiff);
         }
 
         private createCssRules() {
@@ -1972,8 +1943,8 @@ namespace Slick {
             el.dataset.uid = this._uid;
             var rowHeight = (this._options.rowHeight - this._cellHeightDiff);
             var rules = [
-                "." + this._uid + " .slick-group-header-column { " + this._rtlStart + ": 1000px; }",
-                "." + this._uid + " .slick-header-column { " + this._rtlStart + ": 1000px; }",
+                "." + this._uid + " .slick-group-header-column { " + this._rtlS + ": 1000px; }",
+                "." + this._uid + " .slick-header-column { " + this._rtlS + ": 1000px; }",
                 "." + this._uid + " .slick-top-panel { height:" + this._options.topPanelHeight + "px; }",
                 "." + this._uid + " .slick-grouping-panel { height:" + this._options.groupingPanelHeight + "px; }",
                 "." + this._uid + " .slick-headerrow-columns { height:" + this._options.headerRowHeight + "px; }",
@@ -2117,7 +2088,7 @@ namespace Slick {
                 widths.push(c.width);
                 total += c.width;
                 if (c.resizable) {
-                    shrinkLeeway += c.width - Math.max(c.minWidth, this._absoluteColumnMinWidth);
+                    shrinkLeeway += c.width - Math.max(c.minWidth, this._absoluteColMinWidth);
                 }
             }
 
@@ -2128,10 +2099,10 @@ namespace Slick {
                 for (i = 0; i < cols.length && total > availWidth; i++) {
                     c = cols[i];
                     var width = widths[i];
-                    if (!c.resizable || width <= c.minWidth || width <= this._absoluteColumnMinWidth) {
+                    if (!c.resizable || width <= c.minWidth || width <= this._absoluteColMinWidth) {
                         continue;
                     }
-                    var absMinWidth = Math.max(c.minWidth, this._absoluteColumnMinWidth);
+                    var absMinWidth = Math.max(c.minWidth, this._absoluteColMinWidth);
                     var shrinkSize = Math.floor(shrinkProportion * (width - absMinWidth)) || 1;
                     shrinkSize = Math.min(shrinkSize, width - absMinWidth);
                     total -= shrinkSize;
@@ -2203,14 +2174,14 @@ namespace Slick {
         }
 
         private applyColumnWidths(): void {
-            var x = 0, w, rule, cols = this._cols, fixStart = this._fixedStartCols;
+            var x = 0, w, rule, cols = this._cols, frozenCols = this._frozenCols;
             for (var i = 0; i < cols.length; i++) {
-                if (fixStart == i)
+                if (frozenCols == i)
                     x = 0;
                 w = cols[i].width;
                 rule = this.getColumnCssRules(i);
-                rule[this._rtlStart].style[this._rtlStart] = x + "px";
-                rule[this._rtlEnd].style[this._rtlEnd] = (((fixStart > 0 && i >= fixStart) ? this._canvasWidthR : this._canvasWidthL) - x - w) + "px";
+                rule[this._rtlS].style[this._rtlS] = x + "px";
+                rule[this._rtlE].style[this._rtlE] = (((frozenCols > 0 && i >= frozenCols) ? this._canvasWidthR : this._canvasWidthL) - x - w) + "px";
                 x += w;
             }
         }
@@ -2308,9 +2279,9 @@ namespace Slick {
         private updateViewColLeftRight(): void {
             this._colLeft = [];
             this._colRight = [];
-            var x = 0, r: number, cols = this._cols, i: number, l: number = cols.length, fixStart = this._fixedStartCols;
+            var x = 0, r: number, cols = this._cols, i: number, l: number = cols.length, frozenCols = this._frozenCols;
             for (var i = 0; i < l; i++) {
-                if (fixStart === i)
+                if (frozenCols === i)
                     x = 0;
                 r = x + cols[i].width;
                 this._colLeft[i] = x;
@@ -2323,7 +2294,7 @@ namespace Slick {
 
             var defs = this._colDefaults;
             var initColById = {};
-            var fixedStartCols: Column[] = [];
+            var frozenColumns: Column[] = [];
             var viewCols: Column[] = [];
             var viewColById: { [key: string]: number } = {};
             var i: number, m: Column, k: string;
@@ -2346,13 +2317,13 @@ namespace Slick {
                 initColById[m.id] = i;
 
                 if (m.visible !== false) {
-                    (m.fixedTo === "start" ? fixedStartCols : viewCols).push(m);
+                    (m.frozen === "start" ? frozenColumns : viewCols).push(m);
                 }
             }
 
-            this._fixedStartCols = fixedStartCols.length;
-            if (fixedStartCols.length > 0)
-                viewCols = fixedStartCols.concat(viewCols);
+            this._frozenCols = frozenColumns.length;
+            if (frozenColumns.length > 0)
+                viewCols = frozenColumns.concat(viewCols);
 
             for (i = 0; i < viewCols.length; i++) {
                 m = viewCols[i];
@@ -2596,7 +2567,7 @@ namespace Slick {
 
         private scrollTo(y: number): void {
             y = Math.max(y, 0);
-            y = Math.min(y, this._virtualHeight - Math.round($(this._viewportScrollContainerY).height()) + ((this._viewportHasHScroll || this.hasFixedColumns()) ? scrollbarDimensions.height : 0));
+            y = Math.min(y, this._virtualHeight - Math.round($(this._scrollContainerY).height()) + ((this._viewportHasHScroll || this.hasFrozenColumns()) ? scrollbarDimensions.height : 0));
 
             var oldOffset = this._pageOffset;
 
@@ -2610,12 +2581,12 @@ namespace Slick {
                 this.updateRowPositions();
             }
 
-            if (this._prevScrollTop != newScrollTop) {
-                this._vScrollDir = (this._prevScrollTop + oldOffset < newScrollTop + this._pageOffset) ? 1 : -1;
+            if (this._scrollTopPrev != newScrollTop) {
+                this._vScrollDir = (this._scrollTopPrev + oldOffset < newScrollTop + this._pageOffset) ? 1 : -1;
 
-                this._lastRenderedScrollTop = (this._scrollTop = this._prevScrollTop = newScrollTop);
+                this._scrollTopRendered = (this._scrollTop = this._scrollTopPrev = newScrollTop);
 
-                if (this.hasFixedColumns()) {
+                if (this.hasFrozenColumns()) {
                     this._viewportTopL.scrollTop = newScrollTop;
                 }
 
@@ -2623,7 +2594,7 @@ namespace Slick {
                     this._viewportBottomL.scrollTop = this._viewportBottomR.scrollTop = newScrollTop;
                 }
 
-                this._viewportScrollContainerY.scrollTop = newScrollTop;
+                this._scrollContainerY.scrollTop = newScrollTop;
 
                 this.trigger(this.onViewportChanged);
             }
@@ -2685,17 +2656,17 @@ namespace Slick {
 
             var frozenRowOffset = this.getFrozenRowOffset(row);
 
-            var rowHtml = "<div class='ui-widget-content " + rowCss + "' style='top:"
+            var rowHtml = "<div class='" + (this._options.useLegacyUI ? "ui-widget-content " : "") + rowCss + "' style='top:"
                 + (this.getRowTop(row) - frozenRowOffset)
                 + "px'>";
 
             stringArrayL.push(rowHtml);
 
-            if (this.hasFixedColumns()) {
+            if (this.hasFrozenColumns()) {
                 stringArrayR.push(rowHtml);
             }
 
-            var colspan, m, cols = this._cols, fixStart = this._fixedStartCols;
+            var colspan, m, cols = this._cols, frozenCols = this._frozenCols;
             for (var i = 0, ii = cols.length; i < ii; i++) {
                 var columnData = null;
                 m = cols[i];
@@ -2715,7 +2686,7 @@ namespace Slick {
                         break;
                     }
 
-                    this.appendCellHtml(fixStart > 0 && i >= fixStart ? stringArrayR : stringArrayL, row, i, colspan, d, columnData);
+                    this.appendCellHtml(frozenCols > 0 && i >= frozenCols ? stringArrayR : stringArrayL, row, i, colspan, d, columnData);
                 }
 
                 if (colspan > 1) {
@@ -2725,17 +2696,17 @@ namespace Slick {
 
             stringArrayL.push("</div>");
 
-            if (this.hasFixedColumns()) {
+            if (this.hasFrozenColumns()) {
                 stringArrayR.push("</div>");
             }
         }
 
         private appendCellHtml(sb: string[], row: number, cell: number, colspan: number, item: TItem, metadata: any): void {
-            var cols = this._cols, fixStart = this._fixedStartCols, m = cols[cell];
+            var cols = this._cols, frozenCols = this._frozenCols, m = cols[cell];
             var klass = "slick-cell l" + cell + " r" + Math.min(cols.length - 1, cell + colspan - 1) +
                 (m.cssClass ? " " + m.cssClass : "");
 
-            if (cell < fixStart)
+            if (cell < frozenCols)
                 klass += ' frozen';
 
             if (row === this._activeRow && cell === this._activeCell)
@@ -2843,7 +2814,7 @@ namespace Slick {
             for (var x in postProcessedRow) {
                 if (postProcessedRow.hasOwnProperty(x)) {
                     var columnIdx = parseInt(x, 10);
-                    this._postProcessedCleanupQueue.push({
+                    this._postProcessCleanupQueue.push({
                         groupId: this._postProcessGroupId,
                         cellNode: cacheEntry.cellNodesByColumnIdx[columnIdx | 0],
                         columnIdx: columnIdx | 0,
@@ -2851,7 +2822,7 @@ namespace Slick {
                     });
                 }
             }
-            this._postProcessedCleanupQueue.push({
+            this._postProcessCleanupQueue.push({
                 groupId: this._postProcessGroupId,
                 rowNode: cacheEntry.rowNode
             });
@@ -2859,7 +2830,7 @@ namespace Slick {
         }
 
         private queuePostProcessedCellForCleanup(cellnode: HTMLElement, columnIdx: number, rowIdx: number): void {
-            this._postProcessedCleanupQueue.push({
+            this._postProcessCleanupQueue.push({
                 groupId: this._postProcessGroupId,
                 cellNode: cellnode,
                 columnIdx: columnIdx,
@@ -3006,7 +2977,7 @@ namespace Slick {
         }
 
         private getViewportHeight(): number {
-            if (!this._options.autoHeight || this.hasFixedColumns()) {
+            if (!this._options.autoHeight || this.hasFrozenColumns()) {
                 this._topPanelH = this._options.showTopPanel ? this._options.topPanelHeight + this.getVBoxDelta(this.$topPanelScroller) : 0;
                 this._headerRowH = this._options.showHeaderRow ? this._options.headerRowHeight + this.getVBoxDelta(this.$headerRowScroller) : 0;
                 this._footerRowH = this._options.showFooterRow ? this._options.footerRowHeight + this.getVBoxDelta(this.$footerRowScroller) : 0;
@@ -3018,7 +2989,7 @@ namespace Slick {
                 fullHeight += this._options.showFooterRow ? this._options.footerRowHeight + this.getVBoxDelta(this.$footerRowScroller) : 0;
                 fullHeight += this.getCanvasWidth() > this._viewportW ? scrollbarDimensions.height : 0;
 
-                this._viewportH = this._options.rowHeight * this.getDataLengthIncludingAddNew() + (!this.hasFixedColumns() ? fullHeight : 0);
+                this._viewportH = this._options.rowHeight * this.getDataLengthIncludingAddNew() + (!this.hasFrozenColumns() ? fullHeight : 0);
             } else {
                 var columnNamesH = (this._options.showColumnHeader) ? parseFloat(($ as any).css(this.$headerScroller[0], "height"))
                     + this.getVBoxDelta(this.$headerScroller) : 0;
@@ -3071,7 +3042,7 @@ namespace Slick {
             // The top pane includes the top panel and the header row
             this._paneTopH += this._topPanelH + this._headerRowH + this._footerRowH;
 
-            if (this.hasFixedColumns() && this._options.autoHeight) {
+            if (this.hasFrozenColumns() && this._options.autoHeight) {
                 this._paneTopH += scrollbarDimensions.height;
             }
 
@@ -3079,7 +3050,7 @@ namespace Slick {
             this._viewportTopH = this._paneTopH - this._topPanelH - this._headerRowH - this._footerRowH;
 
             if (this._options.autoHeight) {
-                if (this.hasFixedColumns()) {
+                if (this.hasFrozenColumns()) {
                     this.$container.height(
                         this._paneTopH
                         + parseFloat(($ as any).css(this.$headerScrollerL[0], "height"))
@@ -3101,7 +3072,7 @@ namespace Slick {
                 this._viewportTopL.style.height = this._viewportTopH + 'px';
             }
 
-            if (this.hasFixedColumns()) {
+            if (this.hasFrozenColumns()) {
                 this._paneTopR.style.top = this._paneTopL.style.top;
                 this._paneTopR.style.height = this._paneTopH + 'px';
 
@@ -3131,13 +3102,13 @@ namespace Slick {
                 if (this._options.frozenBottom) {
                     this._canvasBottomL.style.height = this._frozenRowsHeight + 'px';
 
-                    if (this.hasFixedColumns()) {
+                    if (this.hasFrozenColumns()) {
                         this._canvasBottomR.style.height = this._frozenRowsHeight + 'px';
                     }
                 } else {
                     this._canvasTopL.style.height = this._frozenRowsHeight + 'px';
 
-                    if (this.hasFixedColumns()) {
+                    if (this.hasFrozenColumns()) {
                         this._canvasTopR.style.height = this._frozenRowsHeight + 'px';
                     }
                 }
@@ -3156,7 +3127,7 @@ namespace Slick {
             this.updateRowCount();
             this.handleScroll();
             // Since the width has changed, force the render() to reevaluate virtually rendered cells.
-            this._lastRenderedScrollLeft = -1;
+            this._scrolLLeftRendered = -1;
             this.render();
         }
 
@@ -3180,7 +3151,7 @@ namespace Slick {
                 var numberOfRows = dataLengthIncludingAddNew + (this._options.leaveSpaceForNewRows ? this._numVisibleRows - 1 : 0);
             }
 
-            var tempViewportH = Math.round($(this._viewportScrollContainerY).height());
+            var tempViewportH = Math.round($(this._scrollContainerY).height());
             var oldViewportHasVScroll = this._viewportHasVScroll;
             // with autoHeight, we do not need to accommodate the vertical scroll bar
             this._viewportHasVScroll = !this._options.autoHeight && (numberOfRows * this._options.rowHeight > tempViewportH);
@@ -3222,7 +3193,7 @@ namespace Slick {
                 if (this._hasFrozenRows && !this._options.frozenBottom) {
                     this._canvasBottomL.style.height = this._realScrollHeight + 'px';
 
-                    if (this.hasFixedColumns()) {
+                    if (this.hasFrozenColumns()) {
                         this._canvasBottomR.style.height = this._realScrollHeight + 'px';
                     }
                 } else {
@@ -3230,7 +3201,7 @@ namespace Slick {
                     this._canvasTopR.style.height = this._realScrollHeight + 'px'
                 }
 
-                this._scrollTop = this._viewportScrollContainerY.scrollTop;
+                this._scrollTop = this._scrollContainerY.scrollTop;
             }
 
             var oldScrollTopInRange = (this._scrollTop + this._pageOffset <= this._virtualHeight - tempViewportH);
@@ -3347,7 +3318,7 @@ namespace Slick {
             var cacheEntry = this._rowsCache[row];
 
             // Remove cells outside the range.
-            var cellsToRemove = [], fixStart = this._fixedStartCols;
+            var cellsToRemove = [], frozenCols = this._frozenCols;
             for (var x in cacheEntry.cellNodesByColumnIdx) {
                 // I really hate it when people mess with Array.prototype.
                 if (!cacheEntry.cellNodesByColumnIdx.hasOwnProperty(x)) {
@@ -3357,7 +3328,7 @@ namespace Slick {
                 var i = parseInt(x, 10);
 
                 // Ignore frozen columns
-                if (i < fixStart) {
+                if (i < frozenCols) {
                     continue;
                 }
 
@@ -3462,14 +3433,14 @@ namespace Slick {
             x.innerHTML = stringArray.join("");
 
             var processedRow;
-            var node: HTMLElement, fixStart = this._fixedStartCols;
+            var node: HTMLElement, frozenCols = this._frozenCols;
             while ((processedRow = processedRows.pop()) != null) {
                 cacheEntry = this._rowsCache[processedRow];
                 var columnIdx;
                 while ((columnIdx = cacheEntry.cellRenderQueue.pop()) != null) {
                     node = x.lastChild as HTMLElement;
 
-                    if (fixStart > 0 && columnIdx >= fixStart) {
+                    if (frozenCols > 0 && columnIdx >= frozenCols) {
                         cacheEntry.rowNode[1].appendChild(node);
                     } else {
                         cacheEntry.rowNode[0].appendChild(node);
@@ -3529,7 +3500,7 @@ namespace Slick {
 
             for (var i = 0, ii = rows.length; i < ii; i++) {
                 if ((this._hasFrozenRows) && (rows[i] >= this._actualFrozenRow)) {
-                    if (this.hasFixedColumns()) {
+                    if (this.hasFrozenColumns()) {
                         this._rowsCache[rows[i]].rowNode = $()
                             .add($(x.firstChild).appendTo(this._canvasBottomL))
                             .add($(right.firstChild).appendTo(this._canvasBottomR));
@@ -3537,7 +3508,7 @@ namespace Slick {
                         this._rowsCache[rows[i]].rowNode = $()
                             .add($(x.firstChild).appendTo(this._canvasBottomL));
                     }
-                } else if (this.hasFixedColumns()) {
+                } else if (this.hasFrozenColumns()) {
                     this._rowsCache[rows[i]].rowNode = $()
                         .add($(x.firstChild).appendTo(this._canvasTopL))
                         .add($(right.firstChild).appendTo(this._canvasTopR));
@@ -3557,12 +3528,12 @@ namespace Slick {
                 return;
             }
 
-            clearTimeout(this._hPostrender);
+            clearTimeout(this._hPostRender);
 
             if (this._options.asyncPostRenderDelay < 0) {
                 this.asyncPostProcessRows();
             } else {
-                this._hPostrender = setTimeout(this.asyncPostProcessRows.bind(this), this._options.asyncPostRenderDelay);
+                this._hPostRender = setTimeout(this.asyncPostProcessRows.bind(this), this._options.asyncPostRenderDelay);
             }
         }
 
@@ -3571,13 +3542,13 @@ namespace Slick {
                 return;
             }
 
-            clearTimeout(this._hPostrenderCleanup);
+            clearTimeout(this._hPostRenderCleanup);
 
             if (this._options.asyncPostCleanupDelay < 0) {
                 this.asyncPostProcessCleanupRows();
             }
             else {
-                this._hPostrenderCleanup = setTimeout(this.asyncPostProcessCleanupRows.bind(this), this._options.asyncPostCleanupDelay);
+                this._hPostRenderCleanup = setTimeout(this.asyncPostProcessCleanupRows.bind(this), this._options.asyncPostCleanupDelay);
             }
         }
 
@@ -3637,7 +3608,7 @@ namespace Slick {
             this.cleanupRows(rendered);
 
             // add new rows & missing cells in existing rows
-            if (this._lastRenderedScrollLeft != this._scrollLeft) {
+            if (this._scrolLLeftRendered != this._scrollLeft) {
 
                 if (this._hasFrozenRows) {
 
@@ -3681,44 +3652,44 @@ namespace Slick {
             this._postProcessToRow = Math.min(this.getDataLengthIncludingAddNew() - 1, visible.bottom);
             this.startPostProcessing();
 
-            this._lastRenderedScrollTop = this._scrollTop;
-            this._lastRenderedScrollLeft = this._scrollLeft;
+            this._scrollTopRendered = this._scrollTop;
+            this._scrolLLeftRendered = this._scrollLeft;
             this._hRender = null;
         }
 
         private handleHeaderRowScroll(): void {
             var scrollLeft = this.$headerRowScrollContainer[0].scrollLeft;
-            if (scrollLeft != this._viewportScrollContainerX.scrollLeft) {
-                this._viewportScrollContainerX.scrollLeft = scrollLeft;
+            if (scrollLeft != this._scrollContainerX.scrollLeft) {
+                this._scrollContainerX.scrollLeft = scrollLeft;
             }
         }
 
         private handleFooterRowScroll(): void {
             var scrollLeft = this.$footerRowScrollContainer[0].scrollLeft;
-            if (scrollLeft != this._viewportScrollContainerX.scrollLeft) {
-                this._viewportScrollContainerX.scrollLeft = scrollLeft;
+            if (scrollLeft != this._scrollContainerX.scrollLeft) {
+                this._scrollContainerX.scrollLeft = scrollLeft;
             }
         }
 
         private handleMouseWheel(e: JQueryEventObject, delta: number, deltaX: number, deltaY: number): void {
             deltaX = (typeof deltaX == "undefined" ? (e as any).originalEvent.deltaX : deltaX) || 0;
             deltaY = (typeof deltaY == "undefined" ? (e as any).originalEvent.deltaY : deltaY) || 0;
-            this._scrollTop = Math.max(0, this._viewportScrollContainerY.scrollTop - (deltaY * this._options.rowHeight));
-            this._scrollLeft = this._viewportScrollContainerX.scrollLeft + (deltaX * 10);
+            this._scrollTop = Math.max(0, this._scrollContainerY.scrollTop - (deltaY * this._options.rowHeight));
+            this._scrollLeft = this._scrollContainerX.scrollLeft + (deltaX * 10);
             var handled = this._handleScroll(true);
             if (handled)
                 e.preventDefault();
         }
 
         private handleScroll(): boolean {
-            this._scrollTop = this._viewportScrollContainerY.scrollTop;
-            this._scrollLeft = this._viewportScrollContainerX.scrollLeft;
+            this._scrollTop = this._scrollContainerY.scrollTop;
+            this._scrollLeft = this._scrollContainerX.scrollLeft;
             return this._handleScroll(false);
         }
 
         private _handleScroll(isMouseWheel?: boolean): boolean {
-            var maxScrollDistanceY = this._viewportScrollContainerY.scrollHeight - this._viewportScrollContainerY.clientHeight;
-            var maxScrollDistanceX = this._viewportScrollContainerY.scrollWidth - this._viewportScrollContainerY.clientWidth;
+            var maxScrollDistanceY = this._scrollContainerY.scrollHeight - this._scrollContainerY.clientHeight;
+            var maxScrollDistanceX = this._scrollContainerY.scrollWidth - this._scrollContainerY.clientWidth;
 
             // Protect against erroneous clientHeight/Width greater than scrollHeight/Width.
             // Sometimes seen in Chrome.
@@ -3733,19 +3704,19 @@ namespace Slick {
                 this._scrollLeft = maxScrollDistanceX;
             }
 
-            var vScrollDist = Math.abs(this._scrollTop - this._prevScrollTop);
-            var hScrollDist = Math.abs(this._scrollLeft - this._prevScrollLeft);
+            var vScrollDist = Math.abs(this._scrollTop - this._scrollTopPrev);
+            var hScrollDist = Math.abs(this._scrollLeft - this._scrollLeftPrev);
 
             if (hScrollDist) {
-                this._prevScrollLeft = this._scrollLeft;
+                this._scrollLeftPrev = this._scrollLeft;
 
-                this._viewportScrollContainerX.scrollLeft = this._scrollLeft;
+                this._scrollContainerX.scrollLeft = this._scrollLeft;
                 this.$headerScrollContainer[0].scrollLeft = this._scrollLeft;
                 this.$topPanelScroller[0].scrollLeft = this._scrollLeft;
                 this.$headerRowScrollContainer[0].scrollLeft = this._scrollLeft;
                 this.$footerRowScrollContainer[0].scrollLeft = this._scrollLeft;
 
-                if (this.hasFixedColumns()) {
+                if (this.hasFrozenColumns()) {
                     if (this._hasFrozenRows) {
                         this._viewportTopR.scrollLeft = this._scrollLeft;
                     }
@@ -3757,14 +3728,14 @@ namespace Slick {
             }
 
             if (vScrollDist) {
-                this._vScrollDir = this._prevScrollTop < this._scrollTop ? 1 : -1;
-                this._prevScrollTop = this._scrollTop;
+                this._vScrollDir = this._scrollTopPrev < this._scrollTop ? 1 : -1;
+                this._scrollTopPrev = this._scrollTop;
 
                 if (isMouseWheel) {
-                    this._viewportScrollContainerY.scrollTop = this._scrollTop;
+                    this._scrollContainerY.scrollTop = this._scrollTop;
                 }
 
-                if (this.hasFixedColumns()) {
+                if (this.hasFrozenColumns()) {
                     if (this._hasFrozenRows && !this._options.frozenBottom) {
                         this._viewportBottomL.scrollTop = this._scrollTop;
                     } else {
@@ -3794,11 +3765,11 @@ namespace Slick {
                     clearTimeout(this._hRender);
                 }
 
-                if (Math.abs(this._lastRenderedScrollTop - this._scrollTop) > 20 ||
-                    Math.abs(this._lastRenderedScrollLeft - this._scrollLeft) > 20) {
+                if (Math.abs(this._scrollTopRendered - this._scrollTop) > 20 ||
+                    Math.abs(this._scrolLLeftRendered - this._scrollLeft) > 20) {
                     if (this._options.forceSyncScrolling || (
-                        Math.abs(this._lastRenderedScrollTop - this._scrollTop) < this._viewportH &&
-                        Math.abs(this._lastRenderedScrollLeft - this._scrollLeft) < this._viewportW)) {
+                        Math.abs(this._scrollTopRendered - this._scrollTop) < this._viewportH &&
+                        Math.abs(this._scrolLLeftRendered - this._scrollLeft) < this._viewportW)) {
                         this.render();
                     } else {
                         this._hRender = setTimeout(this.render.bind(this), 50);
@@ -3849,7 +3820,7 @@ namespace Slick {
                 }
 
                 if (this._options.asyncPostRenderDelay >= 0) {
-                    this._hPostrender = setTimeout(this.asyncPostProcessRows.bind(this), this._options.asyncPostRenderDelay);
+                    this._hPostRender = setTimeout(this.asyncPostProcessRows.bind(this), this._options.asyncPostRenderDelay);
                     return;
                 }
             }
@@ -3857,12 +3828,12 @@ namespace Slick {
 
         private asyncPostProcessCleanupRows(): void {
             var cols = this._cols;
-            while (this._postProcessedCleanupQueue.length > 0) {
-                var groupId = this._postProcessedCleanupQueue[0].groupId;
+            while (this._postProcessCleanupQueue.length > 0) {
+                var groupId = this._postProcessCleanupQueue[0].groupId;
 
                 // loop through all queue members with this groupID
-                while (this._postProcessedCleanupQueue.length > 0 && this._postProcessedCleanupQueue[0].groupId == groupId) {
-                    var entry = this._postProcessedCleanupQueue.shift();
+                while (this._postProcessCleanupQueue.length > 0 && this._postProcessCleanupQueue[0].groupId == groupId) {
+                    var entry = this._postProcessCleanupQueue.shift();
                     if (entry.rowNode != null) {
                         $(entry.rowNode).remove();
                     }
@@ -3877,7 +3848,7 @@ namespace Slick {
 
                 // call this function again after the specified delay
                 if (this._options.asyncPostRenderDelay >= 0) {
-                    this._hPostrenderCleanup = setTimeout(this.asyncPostProcessCleanupRows.bind(this), this._options.asyncPostCleanupDelay);
+                    this._hPostRenderCleanup = setTimeout(this.asyncPostProcessCleanupRows.bind(this), this._options.asyncPostCleanupDelay);
                     return;
                 }
             }
@@ -4281,7 +4252,7 @@ namespace Slick {
                     rowOffset = (this._options.frozenBottom) ? Math.round($(this._canvasTopL).height()) : this._frozenRowsHeight;
                 }
 
-                row = this.getCellFromPoint(e.clientX - c[this._rtlStart], e.clientY - c.top + rowOffset + $(document).scrollTop()).row;
+                row = this.getCellFromPoint(e.clientX - c[this._rtlS], e.clientY - c.top + rowOffset + $(document).scrollTop()).row;
             }
 
             cell = this.getCellFromNode($cell[0]);
@@ -4302,13 +4273,13 @@ namespace Slick {
             }
 
             var frozenRowOffset = this.getFrozenRowOffset(row);
-            var cols = this._cols, fixStart = this._fixedStartCols;
+            var cols = this._cols, frozenCols = this._frozenCols;
             var y1 = this.getRowTop(row) - frozenRowOffset;
             var y2 = y1 + this._options.rowHeight - 1;
             var x1 = 0;
             for (var i = 0; i < cell; i++) {
                 x1 += cols[i].width;
-                if (i == fixStart - 1) {
+                if (i == frozenCols - 1) {
                     x1 = 0;
                 }
             }
@@ -4349,7 +4320,7 @@ namespace Slick {
         scrollCellIntoView(row: number, cell: number, doPaging?: boolean): void {
             this.scrollRowIntoView(row, doPaging);
 
-            if (cell < this._fixedStartCols)
+            if (cell < this._frozenCols)
                 return;
 
             var colspan = this.getColspan(row, cell);
@@ -4362,18 +4333,18 @@ namespace Slick {
 
         internalScrollColumnIntoView(left: number, right: number): void {
 
-            var scrollRight = this._scrollLeft + $(this._viewportScrollContainerX).width() -
+            var scrollRight = this._scrollLeft + $(this._scrollContainerX).width() -
                 (this._viewportHasVScroll ? scrollbarDimensions.width : 0);
 
             var target;
             if (left < this._scrollLeft)
                 target = left;
             else if (right > scrollRight)
-                target = Math.min(left, right - this._viewportScrollContainerX.clientWidth);
+                target = Math.min(left, right - this._scrollContainerX.clientWidth);
             else
                 return;
 
-            this._viewportScrollContainerX.scrollLeft = target;
+            this._scrollContainerX.scrollLeft = target;
             this.handleScroll();
             this.render();
         }
@@ -4403,7 +4374,7 @@ namespace Slick {
                         : this._frozenRowsHeight;
                 }
 
-                var cell = this.getCellFromPoint($activeCellOffset[this._rtlStart], Math.ceil($activeCellOffset.top) - rowOffset);
+                var cell = this.getCellFromPoint($activeCellOffset[this._rtlS], Math.ceil($activeCellOffset.top) - rowOffset);
 
                 this._activeRow = cell.row;
                 this._activeCell = this._activePosX = this.getCellFromNode(this._activeCellNode);
@@ -4595,11 +4566,11 @@ namespace Slick {
                 visible: true
             };
 
-            box[this._rtlStart] = elem.offsetLeft;
-            box[this._rtlEnd] = 0;
+            box[this._rtlS] = elem.offsetLeft;
+            box[this._rtlE] = 0;
 
             box.bottom = box.top + box.height;
-            box[this._rtlEnd] = box[this._rtlStart] + box.width;
+            box[this._rtlE] = box[this._rtlS] + box.width;
 
             // walk up the tree
             var offsetParent = elem.offsetParent;
@@ -4609,10 +4580,10 @@ namespace Slick {
                 }
 
                 if (box.visible && elem.scrollWidth != elem.offsetWidth && $(elem).css("overflowX") != "visible") {
-                    box.visible = box[this._rtlEnd] > elem.scrollLeft && box[this._rtlStart] < elem.scrollLeft + elem.clientWidth;
+                    box.visible = box[this._rtlE] > elem.scrollLeft && box[this._rtlS] < elem.scrollLeft + elem.clientWidth;
                 }
 
-                box[this._rtlStart] -= elem.scrollLeft;
+                box[this._rtlS] -= elem.scrollLeft;
                 box.top -= elem.scrollTop;
 
                 if (elem === offsetParent) {
@@ -4622,7 +4593,7 @@ namespace Slick {
                 }
 
                 box.bottom = box.top + box.height;
-                box[this._rtlEnd] = box[this._rtlStart] + box.width;
+                box[this._rtlE] = box[this._rtlS] + box.width;
             }
 
             return box;
@@ -4687,7 +4658,7 @@ namespace Slick {
                 (!this._options.frozenBottom && row > this._actualFrozenRow - 1) ||
                 (this._options.frozenBottom && row < this._actualFrozenRow - 1)) {
 
-                var viewportScrollH = Math.round($(this._viewportScrollContainerY).height());
+                var viewportScrollH = Math.round($(this._scrollContainerY).height());
 
                 var rowNumber = (this._hasFrozenRows && !this._options.frozenBottom ? row - this._options.frozenRow : row);
 
@@ -5089,8 +5060,8 @@ namespace Slick {
                 end: 1
             };
 
-            tabbingDirections[this._rtlStart] = -1;
-            tabbingDirections[this._rtlEnd] = 1;
+            tabbingDirections[this._rtlS] = -1;
+            tabbingDirections[this._rtlE] = 1;
 
             this._tabbingDirection = tabbingDirections[dir];
 
@@ -5103,8 +5074,8 @@ namespace Slick {
                 end: this.gotoRowEnd
             };
 
-            stepFunctions[this._rtlStart] = this.gotoLeft;
-            stepFunctions[this._rtlEnd] = this.gotoRight;
+            stepFunctions[this._rtlS] = this.gotoLeft;
+            stepFunctions[this._rtlE] = this.gotoRight;
 
             var stepFn = stepFunctions[dir].bind(this);
             var pos = stepFn(this._activeRow, this._activeCell, this._activePosX);
@@ -5391,12 +5362,12 @@ namespace Slick {
         while (i < columns.length) {
             var col = columns[i++];
             if (toFreeze > 0 && col.visible !== false) {
-                col.fixedTo = "start";
+                col.frozen = "start";
                 options.frozenColumn++;
                 toFreeze--;
             }
-            else if (col.fixedTo !== undefined)
-                delete col.fixedTo;
+            else if (col.frozen !== undefined)
+                delete col.frozen;
         }
     }
 
@@ -5495,6 +5466,14 @@ namespace Slick {
                 return false;
         }
         return true;
+    }
+
+    function addUiStateHover() {
+        $(this).addClass("ui-state-hover");
+    }
+
+    function removeUiStateHover() {
+        $(this).removeClass("ui-state-hover");
     }
 
 }
