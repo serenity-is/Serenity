@@ -441,7 +441,7 @@ namespace Slick {
         private _viewportTopL: HTMLDivElement;
         private _viewportTopR: HTMLDivElement;
 
-        private $boundAncestors: JQuery;
+        private _boundAncestorScroll: HTMLElement[] = [];
         private $canvas: JQuery;
         private $container: JQuery;
         private $footerRow: JQuery;
@@ -1103,23 +1103,18 @@ namespace Slick {
             while ((elem = elem.parentNode as HTMLElement) != document.body && elem != null) {
                 // bind to scroll containers only
                 if (elem == this._viewportTopL || elem.scrollWidth != elem.clientWidth || elem.scrollHeight != elem.clientHeight) {
-                    var $elem = $(elem);
-                    if (!this.$boundAncestors) {
-                        this.$boundAncestors = $elem;
-                    } else {
-                        this.$boundAncestors = this.$boundAncestors.add($elem);
-                    }
-                    $elem.on("scroll." + this._uid, this.handleActiveCellPositionChange.bind(this));
+                    elem.addEventListener('scroll', this.handleActiveCellPositionChange);
+                    this._boundAncestorScroll.push(elem);
                 }
             }
         }
 
         private unbindAncestorScrollEvents(): void {
-            if (!this.$boundAncestors) {
-                return;
+            if (this._boundAncestorScroll) {
+                for (var x of this._boundAncestorScroll)
+                    x.removeEventListener('scroll', this.handleActiveCellPositionChange);
             }
-            this.$boundAncestors.off("scroll." + this._uid);
-            this.$boundAncestors = null;
+            this._boundAncestorScroll = [];
         }
 
         updateColumnHeader(columnId: string, title?: string, toolTip?: string): void {
@@ -4607,7 +4602,7 @@ namespace Slick {
             return this.absBox(this.$container[0]);
         }
 
-        private handleActiveCellPositionChange(): void {
+        private handleActiveCellPositionChange = (): void => {
             if (!this._activeCellNode) {
                 return;
             }
