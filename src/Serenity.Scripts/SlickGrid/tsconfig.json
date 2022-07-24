@@ -1,0 +1,31 @@
+﻿{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "preserveConstEnums": false,
+    "experimentalDecorators": true,
+    "declaration": true,
+    "emitBOM": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "outDir": "./out",
+    "declarationDir": "./dts",
+    "typeRoots": [
+      "../types"
+    ],
+    "types": [
+      "jquery"
+    ],
+    "suppressImplicitAnyIndexErrors": true,
+    "target": "ES6",
+    "lib": [
+      "ES2015",
+      "DOM"
+    ],
+    "noEmitHelpers": true
+  },
+  "files": [
+    "slick.core.ts",
+    "slick.grid.ts"
+  ]
+}
