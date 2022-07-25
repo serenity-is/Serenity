@@ -5,8 +5,9 @@
     "experimentalDecorators": true,
     "declaration": true,
     "emitBOM": true,
+    "noEmit": true,
     "noImplicitAny": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "skipLibCheck": true,
     "outDir": "./out",
     "declarationDir": "./dts",
@@ -17,15 +18,14 @@
       "jquery"
     ],
     "suppressImplicitAnyIndexErrors": true,
-    "target": "ES6",
+    "target": "ESNext",
     "lib": [
       "ES2015",
       "DOM"
     ],
-    "noEmitHelpers": true
+    "noEmitHelpers": false
   },
-  "files": [
-    "slick.core.ts",
-    "slick.grid.ts"
+  "include": [
+    "./*.ts"
   ]
 }
