@@ -23,7 +23,7 @@ export class EditorLock {
      */
     isActive(editController?: EditController): boolean {
         return (editController ? this.activeEditController === editController : this.activeEditController != null);
-    };
+    }
 
     /***
      * Sets the specified edit controller as the active edit controller (acquire edit lock).
@@ -45,7 +45,7 @@ export class EditorLock {
             throw "SleekGrid.EditorLock.activate: editController must implement .cancelCurrentEdit()";
         }
         this.activeEditController = editController;
-    };
+    }
 
     /***
      * Unsets the specified edit controller as the active edit controller (release edit lock).
@@ -58,7 +58,7 @@ export class EditorLock {
             throw "SleekGrid.EditorLock.deactivate: specified editController is not the currently active one";
         }
         this.activeEditController = null;
-    };
+    }
 
     /***
      * Attempts to commit the current edit by calling "commitCurrentEdit" method on the active edit
@@ -70,7 +70,7 @@ export class EditorLock {
      */
     commitCurrentEdit(): boolean {
         return (this.activeEditController ? this.activeEditController.commitCurrentEdit() : true);
-    };
+    }
 
     /***
      * Attempts to cancel the current edit by calling "cancelCurrentEdit" method on the active edit
@@ -81,7 +81,7 @@ export class EditorLock {
      */
     cancelCurrentEdit(): boolean {
         return (this.activeEditController ? this.activeEditController.cancelCurrentEdit() : true);
-    };
+    }
 }
 
 /***

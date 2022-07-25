@@ -7,7 +7,7 @@
     "emitBOM": false,
     "noEmit": true,
     "sourceMap": false,
-    "module": "CommonJS",
+    "module": "ESNext",
     "moduleResolution": "Node",
     "skipLibCheck": true,
     "target": "ES6",
@@ -19,7 +19,7 @@
       "jquery",
       "jest"
     ],
-    "outDir": "../out",
+    "outDir": "../dist",
     "baseUrl": ".",
     "paths": {
     },
@@ -34,8 +34,6 @@
     "jsx": "react"
   },
   "include": [
-    "../slick.core.ts",
-    "../slick.grid.ts",
     "**/*.spec.ts"
   ]
 }

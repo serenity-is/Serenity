@@ -6,9 +6,7 @@ const assets = path.resolve('../../Serenity.Assets/wwwroot/').replace(/\\/g, '/'
 
 for (var url of [
     "~/node_modules/jquery/dist/jquery.slim.min.js",
-    "~/Serenity.Assets/Scripts/jquery.event.drag.min.js",
-    "~/SlickGrid/out/slick.core.js",
-    "~/SlickGrid/out/slick.grid.js",
+    "~/Serenity.Assets/Scripts/jquery.event.drag.min.js"
 ]) {
 
     if (url.charAt(0) != '~')

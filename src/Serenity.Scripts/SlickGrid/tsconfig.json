@@ -4,26 +4,27 @@
     "preserveConstEnums": false,
     "experimentalDecorators": true,
     "declaration": true,
+    "declarationDir": "./dts",
     "emitBOM": true,
+    "lib": [
+      "ES2015",
+      "DOM"
+    ],
     "noEmit": true,
+    "noEmitHelpers": false,
     "noImplicitAny": true,
     "sourceMap": false,
     "skipLibCheck": true,
-    "outDir": "./out",
-    "declarationDir": "./dts",
+    "outDir": "../dist",
+    "suppressImplicitAnyIndexErrors": true,
     "typeRoots": [
       "../types"
     ],
     "types": [
       "jquery"
     ],
-    "suppressImplicitAnyIndexErrors": true,
-    "target": "ESNext",
-    "lib": [
-      "ES2015",
-      "DOM"
-    ],
-    "noEmitHelpers": false
+    "useDefineForClassFields": false,
+    "target": "ESNext"
   },
   "include": [
     "./*.ts"

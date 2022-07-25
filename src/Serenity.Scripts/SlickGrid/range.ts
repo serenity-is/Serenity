@@ -29,14 +29,14 @@ export class Range {
      */
     isSingleRow(): boolean {
         return this.fromRow == this.toRow;
-    };
+    }
 
     /***
      * Returns whether a range represents a single cell.
      */
     isSingleCell(): boolean {
         return this.fromRow == this.toRow && this.fromCell == this.toCell;
-    };
+    }
 
     /***
      * Returns whether a range contains a given cell.
@@ -44,7 +44,7 @@ export class Range {
     contains(row: number, cell: number): boolean {
         return row >= this.fromRow && row <= this.toRow &&
             cell >= this.fromCell && cell <= this.toCell;
-    };
+    }
 
     /***
      * Returns a readable representation of a range.

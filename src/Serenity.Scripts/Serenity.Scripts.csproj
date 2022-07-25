@@ -55,6 +55,5 @@
   <Target Name="CompileCoreLib" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" DependsOnTargets="NpmInstall"
           Outputs="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.d.ts;wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts">
     <Exec Command="npm run build" />
-    <Copy SourceFiles="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.min.js;dist\Serenity.CoreLib.js.map;dist\Serenity.CoreLib.d.ts" DestinationFolder="wwwroot" SkipUnchangedFiles="true" />
   </Target>
 </Project>

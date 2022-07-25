@@ -2,7 +2,7 @@ import { NonDataRow, preClickClassName } from "./base";
 import type { Column, ColumnSort, ItemMetadata } from "./column";
 import { EditController, EditorLock, GlobalEditorLock } from "./editing";
 import { EditCommand, Editor } from "./editor";
-import { SlickEvent, IEventData, EventData, keyCode } from "./event";
+import { Event, IEventData, EventData, keyCode } from "./event";
 import type { CellStylesHash, ColumnFormatter, FormatterResult } from "./formatting";
 import { addUiStateHover, adjustFrozenColumnCompat, attrEncode, CachedRow, defaultFormatter, disableSelection, getMaxSupportedCssHeight, getScrollBarDimensions, GoToResult, H, htmlEncode, PostProcessCleanupEntry, removeUiStateHover, simpleArrayEquals, sortToDesiredOrderAndKeepRest } from "./internal";
 import { IPlugin, Position, RowCell, SelectionModel, ViewRange } from "./types";
@@ -148,41 +148,41 @@ export class Grid<TItem = any> {
     private _viewportTopL: HTMLDivElement;
     private _viewportTopR: HTMLDivElement;
 
-    readonly onActiveCellChanged = new SlickEvent<ArgsCell>();
-    readonly onActiveCellPositionChanged = new SlickEvent<ArgsGrid>();
-    readonly onAddNewRow = new SlickEvent<ArgsAddNewRow>();
-    readonly onBeforeCellEditorDestroy = new SlickEvent<ArgsEditorDestroy>();
-    readonly onBeforeDestroy = new SlickEvent<ArgsGrid>();
-    readonly onBeforeEditCell = new SlickEvent<ArgsCellEdit>();
-    readonly onBeforeFooterRowCellDestroy = new SlickEvent<ArgsColumnNode>();
-    readonly onBeforeHeaderCellDestroy = new SlickEvent<ArgsColumnNode>();
-    readonly onBeforeHeaderRowCellDestroy = new SlickEvent<ArgsColumnNode>();
-    readonly onCellChange = new SlickEvent<ArgsCellChange>();
-    readonly onCellCssStylesChanged = new SlickEvent<ArgsCssStyle>();
-    readonly onClick = new SlickEvent<ArgsCell, JQueryMouseEventObject>();
-    readonly onColumnsReordered = new SlickEvent<ArgsGrid>();
-    readonly onColumnsResized = new SlickEvent<ArgsGrid>();
-    readonly onContextMenu = new SlickEvent<ArgsGrid, JQueryEventObject>();
-    readonly onDblClick = new SlickEvent<ArgsCell, JQueryMouseEventObject>();
-    readonly onDrag = new SlickEvent<ArgsGrid, JQueryEventObject>();
-    readonly onDragEnd = new SlickEvent<ArgsGrid, JQueryEventObject>();
-    readonly onDragInit = new SlickEvent<ArgsGrid, JQueryEventObject>();
-    readonly onDragStart = new SlickEvent<ArgsGrid, JQueryEventObject>();
-    readonly onFooterRowCellRendered = new SlickEvent<ArgsColumnNode>();
-    readonly onHeaderCellRendered = new SlickEvent<ArgsColumnNode>();
-    readonly onHeaderClick = new SlickEvent<ArgsColumn>();
-    readonly onHeaderContextMenu = new SlickEvent<ArgsColumn>();
-    readonly onHeaderMouseEnter = new SlickEvent<ArgsColumn, JQueryMouseEventObject>();
-    readonly onHeaderMouseLeave = new SlickEvent<ArgsColumn>();
-    readonly onHeaderRowCellRendered = new SlickEvent<ArgsColumnNode>();
-    readonly onKeyDown = new SlickEvent<ArgsCell, JQueryKeyEventObject>();
-    readonly onMouseEnter = new SlickEvent<ArgsGrid, JQueryMouseEventObject>();
-    readonly onMouseLeave = new SlickEvent<ArgsGrid, JQueryMouseEventObject>();
-    readonly onScroll = new SlickEvent<ArgsScroll>();
-    readonly onSelectedRowsChanged = new SlickEvent<ArgsSelectedRowsChange>();
-    readonly onSort = new SlickEvent<ArgsSort>();
-    readonly onValidationError = new SlickEvent<ArgsValidationError>();
-    readonly onViewportChanged = new SlickEvent<ArgsGrid>();
+    readonly onActiveCellChanged = new Event<ArgsCell>();
+    readonly onActiveCellPositionChanged = new Event<ArgsGrid>();
+    readonly onAddNewRow = new Event<ArgsAddNewRow>();
+    readonly onBeforeCellEditorDestroy = new Event<ArgsEditorDestroy>();
+    readonly onBeforeDestroy = new Event<ArgsGrid>();
+    readonly onBeforeEditCell = new Event<ArgsCellEdit>();
+    readonly onBeforeFooterRowCellDestroy = new Event<ArgsColumnNode>();
+    readonly onBeforeHeaderCellDestroy = new Event<ArgsColumnNode>();
+    readonly onBeforeHeaderRowCellDestroy = new Event<ArgsColumnNode>();
+    readonly onCellChange = new Event<ArgsCellChange>();
+    readonly onCellCssStylesChanged = new Event<ArgsCssStyle>();
+    readonly onClick = new Event<ArgsCell, JQueryMouseEventObject>();
+    readonly onColumnsReordered = new Event<ArgsGrid>();
+    readonly onColumnsResized = new Event<ArgsGrid>();
+    readonly onContextMenu = new Event<ArgsGrid, JQueryEventObject>();
+    readonly onDblClick = new Event<ArgsCell, JQueryMouseEventObject>();
+    readonly onDrag = new Event<ArgsGrid, JQueryEventObject>();
+    readonly onDragEnd = new Event<ArgsGrid, JQueryEventObject>();
+    readonly onDragInit = new Event<ArgsGrid, JQueryEventObject>();
+    readonly onDragStart = new Event<ArgsGrid, JQueryEventObject>();
+    readonly onFooterRowCellRendered = new Event<ArgsColumnNode>();
+    readonly onHeaderCellRendered = new Event<ArgsColumnNode>();
+    readonly onHeaderClick = new Event<ArgsColumn>();
+    readonly onHeaderContextMenu = new Event<ArgsColumn>();
+    readonly onHeaderMouseEnter = new Event<ArgsColumn, JQueryMouseEventObject>();
+    readonly onHeaderMouseLeave = new Event<ArgsColumn>();
+    readonly onHeaderRowCellRendered = new Event<ArgsColumnNode>();
+    readonly onKeyDown = new Event<ArgsCell, JQueryKeyEventObject>();
+    readonly onMouseEnter = new Event<ArgsGrid, JQueryMouseEventObject>();
+    readonly onMouseLeave = new Event<ArgsGrid, JQueryMouseEventObject>();
+    readonly onScroll = new Event<ArgsScroll>();
+    readonly onSelectedRowsChanged = new Event<ArgsSelectedRowsChange>();
+    readonly onSort = new Event<ArgsSort>();
+    readonly onValidationError = new Event<ArgsValidationError>();
+    readonly onViewportChanged = new Event<ArgsGrid>();
 
     constructor(container: JQuery | HTMLElement, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
 
@@ -1108,13 +1108,13 @@ export class Grid<TItem = any> {
             placeholder: "slick-sortable-placeholder" + (this._options.useLegacyUI ? " ui-state-default" : "") + " slick-header-column",
             forcePlaceholderSize: hasGrouping ? true : undefined,
             appendTo: hasGrouping ? "body" : undefined,
-            start: (_: Event, ui: any) => {
+            start: (_: any, ui: any) => {
                 ui.placeholder.width(ui.helper.outerWidth() - this._headerColumnWidthDiff);
                 canDragScroll = !this.hasFrozenColumns() ||
                     (ui.placeholder.offset()[this._rtlS] + Math.round(ui.placeholder.width())) > $(this._scrollContainerX).offset()[this._rtlS];
                 $(ui.helper).addClass("slick-header-column-active");
             },
-            beforeStop: (_: Event, ui: any) => {
+            beforeStop: (_: any, ui: any) => {
                 $(ui.helper).removeClass("slick-header-column-active");
                 if (hasGrouping) {
                     var $headerDraggableGroupBy = $(this.getGroupingPanel());
@@ -1142,7 +1142,7 @@ export class Grid<TItem = any> {
                     columnScrollTimer = null;
                 }
             },
-            stop: (e: Event) => {
+            stop: (e: any) => {
                 var cancel = false;
                 clearInterval(columnScrollTimer);
                 columnScrollTimer = null;
@@ -1384,7 +1384,7 @@ export class Grid<TItem = any> {
                         this.applyColumnWidths();
                     }
                 })
-                .on("dragend", (e: Event) => {
+                .on("dragend", (e: any) => {
                     var newWidth;
                     $(e.target).parent().removeClass("slick-header-column-active");
                     for (j = 0; j < columnElements.length; j++) {
@@ -1621,8 +1621,8 @@ export class Grid<TItem = any> {
                 continue;
             if (k.startsWith('on')) {
                 var ev: any = this[k];
-                if ((ev as SlickEvent)?.clear && (ev as SlickEvent)?.subscribe)
-                    (ev as SlickEvent)?.clear();
+                if ((ev as Event)?.clear && (ev as Event)?.subscribe)
+                    (ev as Event)?.clear();
             }
             delete this[k];
         }
@@ -1633,7 +1633,7 @@ export class Grid<TItem = any> {
     // General
 
     private trigger<TArgs extends ArgsGrid, TEventData extends IEventData = IEventData>(
-        evt: SlickEvent<TArgs, TEventData>, args?: TArgs, e?: TEventData) {
+        evt: Event<TArgs, TEventData>, args?: TArgs, e?: TEventData) {
         e = e || new EventData() as any;
         args = args || {} as any;
         args.grid = this;
@@ -2587,7 +2587,7 @@ export class Grid<TItem = any> {
         this._viewportW = parseFloat(($ as any).css(this._container, "width", true));
     }
 
-    private resizeCanvas(): void {
+    resizeCanvas(): void {
         if (!this._initialized) {
             return;
         }

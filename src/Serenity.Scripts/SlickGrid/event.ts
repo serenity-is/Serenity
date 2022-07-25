@@ -1,16 +1,15 @@
 export type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
 
-type _Event = Event;
-
 export interface IEventData {
     readonly type?: string;
     currentTarget?: EventTarget;
     target?: EventTarget;
-    originalEvent?: Event;
+    originalEvent?: any;
     defaultPrevented?: boolean;
     preventDefault?(): void;
     stopPropagation?(): void;
     stopImmediatePropagation?(): void;
+    isDefaultPrevented?(): boolean;
     isImmediatePropagationStopped?(): boolean;
     isPropagationStopped?(): boolean;
 }
@@ -65,7 +64,7 @@ export class EventData implements IEventData {
  * @class Event
  * @constructor
  */
-export class SlickEvent<TArgs = any, TEventData extends IEventData = IEventData> {
+export class Event<TArgs = any, TEventData extends IEventData = IEventData> {
 
     private _handlers: Handler<TArgs, TEventData>[] = [];
 
@@ -78,7 +77,7 @@ export class SlickEvent<TArgs = any, TEventData extends IEventData = IEventData>
      */
     subscribe(fn: Handler<TArgs, TEventData>) {
         this._handlers.push(fn);
-    };
+    }
 
     /***
      * Removes an event handler added with <code>subscribe(fn)</code>.
@@ -106,7 +105,7 @@ export class SlickEvent<TArgs = any, TEventData extends IEventData = IEventData>
      *      The scope ("this") within which the handler will be executed.
      *      If not specified, the scope will be set to the <code>Event</code> instance.
      */
-    notify(args: any, e: TEventData, scope: object) {
+    notify(args: any, e?: TEventData, scope?: object) {
         e = e || new EventData() as any;
         scope = scope || this;
 
@@ -124,14 +123,14 @@ export class SlickEvent<TArgs = any, TEventData extends IEventData = IEventData>
 }
 
 interface EventHandlerEntry<TArgs = any, TEventData extends IEventData = IEventData> {
-    event: SlickEvent<TArgs, TEventData>;
+    event: Event<TArgs, TEventData>;
     handler: Handler<TArgs, TEventData>;
 }
 
 export class EventHandler<TArgs = any, TEventData extends IEventData = IEventData>  {
     private _handlers: EventHandlerEntry<TArgs, TEventData>[] = [];
 
-    subscribe(event: SlickEvent<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this {
+    subscribe(event: Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this {
         this._handlers.push({
             event: event,
             handler: handler
@@ -139,9 +138,9 @@ export class EventHandler<TArgs = any, TEventData extends IEventData = IEventDat
         event.subscribe(handler);
 
         return this;
-    };
+    }
 
-    unsubscribe(event: SlickEvent<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this {
+    unsubscribe(event: Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this {
         var i = this._handlers.length;
         while (i--) {
             if (this._handlers[i].event === event &&
@@ -153,7 +152,7 @@ export class EventHandler<TArgs = any, TEventData extends IEventData = IEventDat
         }
 
         return this;
-    };
+    }
 
     unsubscribeAll(): EventHandler<TArgs, TEventData> {
         var i = this._handlers.length;

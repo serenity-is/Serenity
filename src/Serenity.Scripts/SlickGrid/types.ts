@@ -1,4 +1,4 @@
-import type { SlickEvent } from "./event";
+import type { Event } from "./event";
 import type { Grid } from "./grid";
 import type { Range } from "./range";
 
@@ -27,7 +27,7 @@ export interface SelectionModel {
     init(grid: Grid): void;
     destroy?: () => void;
     setSelectedRanges(ranges: Range[]): void;
-    onSelectedRangesChanged: SlickEvent<Range[]>;
+    onSelectedRangesChanged: Event<Range[]>;
     refreshSelections?(): void;
 }
 

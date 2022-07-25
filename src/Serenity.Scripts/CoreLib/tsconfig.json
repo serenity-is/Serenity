@@ -40,6 +40,7 @@
     "./Globals/Promise.ts",
     "./Globals/Select2.ts",
     "./Globals/Validate.ts",
+    "./Slick/Globals.g.ts",
     "./Slick/Globals.ts",
     "./Serenity/Globals.ts",
     "./UI/Widgets/Globals.ts",

@@ -14,8 +14,8 @@
     "flatpickr": "4.6.13",
     "jest": "27.3.1",
     "jquery": "3.6.0",
-    "rollup": "2.38.5",
-    "rollup-plugin-dts": "2.0.1",
+    "rollup": "2.77.0",
+    "rollup-plugin-dts": "4.2.2",
     "terser": "^5.14.2",
     "tslib": "2.4.0"
   },
@@ -23,10 +23,8 @@
     "fsevents": "2.3.2"
   },
   "scripts": {
-    "build": "rollup -c",
-    "slick": "npm run slick-build && npm run slick-minify",
-    "slick-build": "esbuild --bundle --minify --outdir=SlickGrid/out SlickGrid/slick.core.ts SlickGrid/slick.grid.ts --format=iife --target=ES6 --global-name=Slick._ --footer:js=\"(function(){for(var _ in Slick._)Slick[_]=Slick._[_];delete Slick._})();\"",
-    "slick-minify": "esbuild --minify SlickGrid/out/slick.core.js SlickGrid/out/slick.grid.js --outdir=SlickGrid/out --entry-names=[name].min --target=es6"
+    "build": "rollup -c && npm run slick",
+    "slick": "esbuild --bundle --outdir=../Serenity.Assets/wwwroot/Scripts/SlickGrid ./SlickGrid/slick.core.ts ./SlickGrid/slick.grid.ts --format=iife --target=ES6 --global-name=Slick._ --footer:js=\"(function(){for(var _ in Slick._)Slick[_]=Slick._[_];delete Slick._})();\""
   },
   "author": "",
   "license": "ISC",

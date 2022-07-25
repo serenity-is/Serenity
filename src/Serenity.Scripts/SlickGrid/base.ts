@@ -5,7 +5,7 @@ export class NonDataRow {
     __nonDataRow: boolean = true;
 }
 
-const map = Map;
-export { map as Map }
-
 export const preClickClassName = "slick-edit-preclick";
+
+//@ts-ignore
+typeof window !== "undefined" && window.Slick && (window.Slick.Map = Map);
