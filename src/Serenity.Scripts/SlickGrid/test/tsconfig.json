@@ -19,7 +19,7 @@
       "jquery",
       "jest"
     ],
-    "outDir": "../dist",
+    "outDir": "../../dist",
     "baseUrl": ".",
     "paths": {
     },
