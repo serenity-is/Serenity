@@ -844,7 +844,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string,
-        cssClass?: (ctx: Slick.FormatterContext) => string, encode: boolean = true): Slick.Format {
+        cssClass?: (ctx: Slick.FormatterContext) => string, encode: boolean = true): Slick.Format<TItem> {
 
         if (itemType == null) {
             itemType = this.getItemType();

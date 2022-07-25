@@ -629,7 +629,7 @@ declare namespace Slick {
          *      The scope ("this") within which the handler will be executed.
          *      If not specified, the scope will be set to the <code>Event</code> instance.
          */
-        notify(args: any, e?: TEventData, scope?: object): any;
+        notify(args?: any, e?: TEventData, scope?: object): any;
         clear(): void;
     }
     class EventHandler<TArgs = any, TEventData extends IEventData = IEventData> {
@@ -858,9 +858,7 @@ declare namespace Slick {
         row: number;
         cell: number;
     }
-    interface SelectionModel {
-        init(grid: Grid): void;
-        destroy?: () => void;
+    interface SelectionModel extends IPlugin {
         setSelectedRanges(ranges: Range[]): void;
         onSelectedRangesChanged: Event<Range[]>;
         refreshSelections?(): void;
@@ -1521,22 +1519,28 @@ declare namespace Slick {
         constructor(options: AutoTooltipsOptions);
         init(): void;
     }
-    type Format = (ctx: Slick.FormatterContext) => string;
+    type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
     interface Column<TItem = any> {
         referencedFields?: string[];
-        format?: Format;
+        format?: Format<TItem>;
     }
     interface FormatterContext<TItem = any> {
-        row?: number;
+        addAttrs?: {
+            [key: string]: string;
+        };
+        addClass?: string;
         cell?: number;
-        value?: any;
         column?: Column<TItem>;
+        grid?: Grid<TItem>;
         item?: TItem;
+        row?: number;
+        toolTip?: string;
+        value?: any;
     }
     interface Formatter {
         format(ctx: FormatterContext): string;
     }
-    interface GroupItemMetadataProvider {
+    interface GroupItemMetadataProvider extends IPlugin {
         getGroupRowMetadata(item: any): any;
         getTotalsRowMetadata(item: any): any;
     }
@@ -1562,16 +1566,22 @@ declare namespace Slick {
     class RowMoveManager implements IPlugin {
         constructor(options: RowMoveManagerOptions);
         init(): void;
-        onBeforeMoveRows: Event;
-        onMoveRows: Event;
+        onBeforeMoveRows: Slick.Event;
+        onMoveRows: Slick.Event;
     }
-    class RowSelectionModel {
+    class RowSelectionModel implements SelectionModel {
+        init(grid: Grid): void;
+        destroy?: () => void;
+        setSelectedRanges(ranges: Range[]): void;
+        onSelectedRangesChanged: Slick.Event<Range[]>;
+        refreshSelections?(): void;
     }
     namespace Data {
-        class GroupItemMetadataProvider implements GroupItemMetadataProvider {
+        class GroupItemMetadataProvider implements GroupItemMetadataProvider, IPlugin {
             constructor();
-            getGroupRowMetadata(item: any): any;
-            getTotalsRowMetadata(item: any): any;
+            init(grid: Grid): void;
+            getGroupRowMetadata(item: any): Slick.ItemMetadata;
+            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
         }
     }
 }
@@ -4157,7 +4167,7 @@ declare namespace Serenity {
     }
     namespace SlickFormatting {
         function getEnumText(enumKey: string, name: string): string;
-        function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any, formatter: Slick.Format): Slick.Format;
+        function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any, formatter: Slick.Format<TItem>): Slick.Format<TItem>;
         function date(format?: string): Slick.Format;
         function dateTime(format?: string): Slick.Format;
         function checkBox(): Slick.Format;
@@ -4165,11 +4175,11 @@ declare namespace Serenity {
         function getItemType(link: JQuery): string;
         function getItemId(link: JQuery): string;
         function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
-        function itemLink(itemType: string, idField: string, getText: Slick.Format, cssClass?: Slick.Format, encode?: boolean): Slick.Format;
+        function itemLink<TItem = any>(itemType: string, idField: string, getText: Slick.Format<TItem>, cssClass?: Slick.Format<TItem>, encode?: boolean): Slick.Format<TItem>;
     }
     namespace SlickHelper {
         function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any;
-        function convertToFormatter(format: Slick.Format): Slick.ColumnFormatter;
+        function convertToFormatter<TItem = any>(format: Slick.Format<TItem>): Slick.ColumnFormatter<TItem>;
     }
     namespace SlickTreeHelper {
         function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
@@ -4364,7 +4374,7 @@ declare namespace Serenity {
         getTitle(): string;
         setTitle(value: string): void;
         protected getItemType(): string;
-        protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Slick.Format;
+        protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Slick.Format<TItem>;
         protected getColumnsKey(): string;
         protected getPropertyItems(): Serenity.PropertyItem[];
         protected getColumns(): Slick.Column[];

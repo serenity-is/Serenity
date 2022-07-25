@@ -105,7 +105,7 @@ export class Event<TArgs = any, TEventData extends IEventData = IEventData> {
      *      The scope ("this") within which the handler will be executed.
      *      If not specified, the scope will be set to the <code>Event</code> instance.
      */
-    notify(args: any, e?: TEventData, scope?: object) {
+    notify(args?: any, e?: TEventData, scope?: object) {
         e = e || new EventData() as any;
         scope = scope || this;
 

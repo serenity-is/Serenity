@@ -23,9 +23,7 @@ export interface RowCell {
     cell: number;
 }
 
-export interface SelectionModel {
-    init(grid: Grid): void;
-    destroy?: () => void;
+export interface SelectionModel extends IPlugin {
     setSelectedRanges(ranges: Range[]): void;
     onSelectedRangesChanged: Event<Range[]>;
     refreshSelections?(): void;

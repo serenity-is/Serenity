@@ -88,7 +88,7 @@ declare namespace Slick {
          *      The scope ("this") within which the handler will be executed.
          *      If not specified, the scope will be set to the <code>Event</code> instance.
          */
-        notify(args: any, e?: TEventData, scope?: object): any;
+        notify(args?: any, e?: TEventData, scope?: object): any;
         clear(): void;
     }
     export class EventHandler<TArgs = any, TEventData extends IEventData = IEventData> {
@@ -321,9 +321,7 @@ declare namespace Slick {
         row: number;
         cell: number;
     }
-    export interface SelectionModel {
-        init(grid: Grid): void;
-        destroy?: () => void;
+    export interface SelectionModel extends IPlugin {
         setSelectedRanges(ranges: Range[]): void;
         onSelectedRangesChanged: Event<Range[]>;
         refreshSelections?(): void;

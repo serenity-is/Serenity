@@ -10,26 +10,30 @@
         init(): void;
     }
 
-    export type Format = (ctx: Slick.FormatterContext) => string;        
+    export type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;        
 
     export interface Column<TItem = any> {
         referencedFields?: string[];
-        format?: Format;
+        format?: Format<TItem>;
     }
 
     export interface FormatterContext<TItem = any> {
-        row?: number;
+        addAttrs?: { [key: string]: string; };
+        addClass?: string;
         cell?: number;
-        value?: any;
         column?: Column<TItem>;
+        grid?: Grid<TItem>;
         item?: TItem;
+        row?: number;
+        toolTip?: string;
+        value?: any;
     }
         
     export interface Formatter {
         format(ctx: FormatterContext): string;
     }
-         
-    export interface GroupItemMetadataProvider {
+        
+    export interface GroupItemMetadataProvider extends IPlugin {
         getGroupRowMetadata(item: any): any;
         getTotalsRowMetadata(item: any): any;
     }
@@ -59,18 +63,24 @@
     export class RowMoveManager implements IPlugin {
         constructor(options: RowMoveManagerOptions);
         init(): void;
-        onBeforeMoveRows: Event;
-        onMoveRows: Event;
+        onBeforeMoveRows: Slick.Event;
+        onMoveRows: Slick.Event;
     }
 
-    export class RowSelectionModel {
+    export class RowSelectionModel implements SelectionModel {
+        init(grid: Grid): void;
+        destroy?: () => void;
+        setSelectedRanges(ranges: Range[]): void;
+        onSelectedRangesChanged: Slick.Event<Range[]>;
+        refreshSelections?(): void;
     }
 
     export namespace Data {
-        export class GroupItemMetadataProvider implements GroupItemMetadataProvider {
+        export class GroupItemMetadataProvider implements GroupItemMetadataProvider, IPlugin {
             constructor();
-            getGroupRowMetadata(item: any): any;
-            getTotalsRowMetadata(item: any): any;
+            init(grid: Grid): void;
+            getGroupRowMetadata(item: any): Slick.ItemMetadata;
+            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
         }
     }
 }
