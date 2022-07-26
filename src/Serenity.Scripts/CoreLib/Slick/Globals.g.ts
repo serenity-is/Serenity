@@ -508,22 +508,15 @@ declare namespace Slick {
         showGroupingPanel?: boolean;
         showHeaderRow?: boolean;
         showTopPanel?: boolean;
+        slickCompat?: boolean;
         suppressActiveCellChangeOnEdit?: boolean;
         syncColumnCellResize?: boolean;
         topPanelHeight?: number;
         useLegacyUI?: boolean;
         viewportClass?: string;
     }
+    export const gridDefaults: GridOptions;
 
-    /**
-     * Creates a new instance of the grid.
-     * @class Grid
-     * @constructor
-     * @param {Node}              container   Container node to create the grid in.
-     * @param {Array,Object}      data        An array of objects for databinding.
-     * @param {Array}             columns     An array of column definitions.
-     * @param {Object}            options     Grid options.
-     **/
     export class Grid<TItem = any> {
         private _absoluteColMinWidth;
         private _activeCanvasNode;

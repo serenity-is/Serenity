@@ -1,5 +1,4 @@
-var Slick = Slick || {};
-Slick._ = (() => {
+var Slick = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -18,9 +17,9 @@ Slick._ = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // SlickGrid/slick.core.ts
-  var slick_core_exports = {};
-  __export(slick_core_exports, {
+  // ../../lib/SleekGrid/src/core/index.ts
+  var core_exports = {};
+  __export(core_exports, {
     EditorLock: () => EditorLock,
     Event: () => Event,
     EventData: () => EventData,
@@ -34,7 +33,7 @@ Slick._ = (() => {
     preClickClassName: () => preClickClassName
   });
 
-  // SlickGrid/base.ts
+  // ../../lib/SleekGrid/src/core/base.ts
   var NonDataRow = class {
     constructor() {
       this.__nonDataRow = true;
@@ -43,7 +42,7 @@ Slick._ = (() => {
   var preClickClassName = "slick-edit-preclick";
   typeof window !== "undefined" && window.Slick && (window.Slick.Map = Map);
 
-  // SlickGrid/event.ts
+  // ../../lib/SleekGrid/src/core/event.ts
   var EventData = class {
     constructor() {
       this._isPropagationStopped = false;
@@ -138,7 +137,7 @@ Slick._ = (() => {
     UP: 38
   };
 
-  // SlickGrid/editing.ts
+  // ../../lib/SleekGrid/src/core/editlock.ts
   var EditorLock = class {
     isActive(editController) {
       return editController ? this.activeEditController === editController : this.activeEditController != null;
@@ -173,7 +172,7 @@ Slick._ = (() => {
   };
   var GlobalEditorLock = new EditorLock();
 
-  // SlickGrid/group.ts
+  // ../../lib/SleekGrid/src/core/group.ts
   var Group = class extends NonDataRow {
     constructor() {
       super(...arguments);
@@ -192,7 +191,7 @@ Slick._ = (() => {
     }
   };
 
-  // SlickGrid/range.ts
+  // ../../lib/SleekGrid/src/core/range.ts
   var Range = class {
     constructor(fromRow, fromCell, toRow, toCell) {
       if (toRow === void 0 && toCell === void 0) {
@@ -221,6 +220,5 @@ Slick._ = (() => {
       }
     }
   };
-  return __toCommonJS(slick_core_exports);
+  return __toCommonJS(core_exports);
 })();
-(function(){for(var _ in Slick._)Slick[_]=Slick._[_];delete Slick._})();

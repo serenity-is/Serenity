@@ -4,6 +4,7 @@ import fs from 'fs';
 import pkg from "./package.json";
 import { builtinModules } from "module";
 import dts from "rollup-plugin-dts";
+import path from 'path';
 
 var globals = {
     'jquery': '$',
@@ -148,9 +149,15 @@ var writeMinJS = function () {
 
 export default [
     {
-        input: "./SlickGrid/slick.typings.ts",
+        input: "../../lib/SleekGrid/src/index.ts",
         output: [{ file: "./dist/built/Slick.typings.bundle.d.ts", format: "es" }],
-        plugins: [dts(), toGlobal('Slick', './CoreLib/Slick/Globals.g.ts', true)],
+        plugins: [dts({
+            compilerOptions: {
+                typeRoots: [
+                    path.resolve('./types')
+                ]
+            }
+        }), toGlobal('Slick', './CoreLib/Slick/Globals.g.ts', true)],
     },
     {
         input: "CoreLib/CoreLib.ts",

@@ -18,120 +18,17 @@ Slick._ = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // SlickGrid/slick.grid.ts
-  var slick_grid_exports = {};
-  __export(slick_grid_exports, {
-    Grid: () => Grid
+  // ../../lib/SleekGrid/src/grid/index.ts
+  var grid_exports = {};
+  __export(grid_exports, {
+    Grid: () => Grid,
+    gridDefaults: () => gridDefaults
   });
 
-  // SlickGrid/base.ts
-  var NonDataRow = class {
-    constructor() {
-      this.__nonDataRow = true;
-    }
-  };
-  var preClickClassName = "slick-edit-preclick";
-  typeof window !== "undefined" && window.Slick && (window.Slick.Map = Map);
+  // global-externals:_
+  var { Event, EventData, GlobalEditorLock, keyCode, NonDataRow, preClickClassName, Range } = Slick;
 
-  // SlickGrid/editing.ts
-  var EditorLock = class {
-    isActive(editController) {
-      return editController ? this.activeEditController === editController : this.activeEditController != null;
-    }
-    activate(editController) {
-      if (editController === this.activeEditController) {
-        return;
-      }
-      if (this.activeEditController != null) {
-        throw "SleekGrid.EditorLock.activate: an editController is still active, can't activate another editController";
-      }
-      if (!editController.commitCurrentEdit) {
-        throw "SleekGrid.EditorLock.activate: editController must implement .commitCurrentEdit()";
-      }
-      if (!editController.cancelCurrentEdit) {
-        throw "SleekGrid.EditorLock.activate: editController must implement .cancelCurrentEdit()";
-      }
-      this.activeEditController = editController;
-    }
-    deactivate(editController) {
-      if (this.activeEditController !== editController) {
-        throw "SleekGrid.EditorLock.deactivate: specified editController is not the currently active one";
-      }
-      this.activeEditController = null;
-    }
-    commitCurrentEdit() {
-      return this.activeEditController ? this.activeEditController.commitCurrentEdit() : true;
-    }
-    cancelCurrentEdit() {
-      return this.activeEditController ? this.activeEditController.cancelCurrentEdit() : true;
-    }
-  };
-  var GlobalEditorLock = new EditorLock();
-
-  // SlickGrid/event.ts
-  var EventData = class {
-    constructor() {
-      this._isPropagationStopped = false;
-      this._isImmediatePropagationStopped = false;
-    }
-    stopPropagation() {
-      this._isPropagationStopped = true;
-    }
-    isPropagationStopped() {
-      return this._isPropagationStopped;
-    }
-    stopImmediatePropagation() {
-      this._isImmediatePropagationStopped = true;
-    }
-    isImmediatePropagationStopped() {
-      return this._isImmediatePropagationStopped;
-    }
-  };
-  var Event = class {
-    constructor() {
-      this._handlers = [];
-    }
-    subscribe(fn) {
-      this._handlers.push(fn);
-    }
-    unsubscribe(fn) {
-      for (var i = this._handlers.length - 1; i >= 0; i--) {
-        if (this._handlers[i] === fn) {
-          this._handlers.splice(i, 1);
-        }
-      }
-    }
-    notify(args, e, scope) {
-      e = e || new EventData();
-      scope = scope || this;
-      var returnValue;
-      for (var i = 0; i < this._handlers.length && !(e.isPropagationStopped() || e.isImmediatePropagationStopped()); i++) {
-        returnValue = this._handlers[i].call(scope, e, args);
-      }
-      return returnValue;
-    }
-    clear() {
-      this._handlers = [];
-    }
-  };
-  var keyCode = {
-    BACKSPACE: 8,
-    DELETE: 46,
-    DOWN: 40,
-    END: 35,
-    ENTER: 13,
-    ESCAPE: 27,
-    HOME: 36,
-    INSERT: 45,
-    LEFT: 37,
-    PAGEDOWN: 34,
-    PAGEUP: 33,
-    RIGHT: 39,
-    TAB: 9,
-    UP: 38
-  };
-
-  // SlickGrid/internal.ts
+  // ../../lib/SleekGrid/src/internal.ts
   var maxSupportedCssHeight;
   var scrollbarDimensions;
   function adjustFrozenColumnCompat(columns, options) {
@@ -157,7 +54,7 @@ Slick._ = (() => {
       return "";
     return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
-  function defaultFormatter(row, cell, value) {
+  function defaultFormatter(_r, _c, value) {
     return htmlEncode(value);
   }
   function disableSelection($target) {
@@ -251,37 +148,61 @@ Slick._ = (() => {
     $(this).removeClass("ui-state-hover");
   }
 
-  // SlickGrid/range.ts
-  var Range = class {
-    constructor(fromRow, fromCell, toRow, toCell) {
-      if (toRow === void 0 && toCell === void 0) {
-        toRow = fromRow;
-        toCell = fromCell;
-      }
-      this.fromRow = Math.min(fromRow, toRow);
-      this.fromCell = Math.min(fromCell, toCell);
-      this.toRow = Math.max(fromRow, toRow);
-      this.toCell = Math.max(fromCell, toCell);
-    }
-    isSingleRow() {
-      return this.fromRow == this.toRow;
-    }
-    isSingleCell() {
-      return this.fromRow == this.toRow && this.fromCell == this.toCell;
-    }
-    contains(row, cell) {
-      return row >= this.fromRow && row <= this.toRow && cell >= this.fromCell && cell <= this.toCell;
-    }
-    toString() {
-      if (this.isSingleCell()) {
-        return "(" + this.fromRow + ":" + this.fromCell + ")";
-      } else {
-        return "(" + this.fromRow + ":" + this.fromCell + " - " + this.toRow + ":" + this.toCell + ")";
-      }
-    }
+  // ../../lib/SleekGrid/src/grid/gridoptions.ts
+  var gridDefaults = {
+    addNewRowCssClass: "new-row",
+    alwaysAllowHorizontalScroll: false,
+    alwaysShowVerticalScroll: false,
+    asyncEditorLoadDelay: 100,
+    asyncEditorLoading: false,
+    asyncPostCleanupDelay: 40,
+    asyncPostRenderDelay: 50,
+    autoEdit: true,
+    autoHeight: false,
+    cellFlashingCssClass: "flashing",
+    dataItemColumnValueExtractor: null,
+    defaultColumnWidth: 80,
+    defaultFormatter,
+    editable: false,
+    editorFactory: null,
+    editorLock: GlobalEditorLock,
+    enableAddRow: false,
+    enableAsyncPostRender: false,
+    enableAsyncPostRenderCleanup: false,
+    enableCellNavigation: true,
+    enableColumnReorder: true,
+    enableTabKeyNavigation: true,
+    enableTextSelectionOnCells: false,
+    explicitInitialization: false,
+    footerRowHeight: 25,
+    forceFitColumns: false,
+    forceSyncScrolling: false,
+    formatterFactory: null,
+    frozenBottom: false,
+    frozenRow: -1,
+    fullWidthRows: false,
+    groupingPanel: false,
+    groupingPanelHeight: 34,
+    headerRowHeight: 25,
+    leaveSpaceForNewRows: false,
+    useLegacyUI: true,
+    minBuffer: 3,
+    multiColumnSort: false,
+    multiSelect: true,
+    renderAllCells: false,
+    rowHeight: 25,
+    selectedCellCssClass: "selected",
+    showCellSelection: true,
+    showColumnHeader: true,
+    showFooterRow: false,
+    showGroupingPanel: true,
+    showHeaderRow: false,
+    showTopPanel: false,
+    suppressActiveCellChangeOnEdit: false,
+    topPanelHeight: 25
   };
 
-  // SlickGrid/grid.ts
+  // ../../lib/SleekGrid/src/grid/grid.ts
   var Grid = class {
     constructor(container, data, columns, options) {
       this._activeCellNode = null;
@@ -332,7 +253,7 @@ Slick._ = (() => {
       this._sortColumns = [];
       this._tabbingDirection = 1;
       this._topPanelH = 0;
-      this._uid = "slickgrid_" + Math.round(1e6 * Math.random());
+      this._uid = "sleekgrid_" + Math.round(1e6 * Math.random());
       this._viewportTopH = 0;
       this._vScrollDir = 1;
       this._boundAncestorScroll = [];
@@ -466,64 +387,12 @@ Slick._ = (() => {
         }
       };
       if (typeof jQuery === "undefined") {
-        throw "SlickGrid requires jquery module to be loaded";
+        throw "SleekGrid requires jquery module to be loaded";
       }
       if (!jQuery.fn.drag) {
-        throw "SlickGrid requires jquery.event.drag module to be loaded";
+        throw "SleekGrid requires jquery.event.drag module to be loaded";
       }
       this._data = data;
-      var defaults = {
-        addNewRowCssClass: "new-row",
-        alwaysAllowHorizontalScroll: false,
-        alwaysShowVerticalScroll: false,
-        asyncEditorLoadDelay: 100,
-        asyncEditorLoading: false,
-        asyncPostCleanupDelay: 40,
-        asyncPostRenderDelay: 50,
-        autoEdit: true,
-        autoHeight: false,
-        cellFlashingCssClass: "flashing",
-        dataItemColumnValueExtractor: null,
-        defaultColumnWidth: 80,
-        defaultFormatter,
-        editable: false,
-        editorFactory: null,
-        editorLock: GlobalEditorLock,
-        enableAddRow: false,
-        enableAsyncPostRender: false,
-        enableAsyncPostRenderCleanup: false,
-        enableCellNavigation: true,
-        enableColumnReorder: true,
-        enableTabKeyNavigation: true,
-        enableTextSelectionOnCells: false,
-        explicitInitialization: false,
-        footerRowHeight: 25,
-        forceFitColumns: false,
-        forceSyncScrolling: false,
-        formatterFactory: null,
-        frozenBottom: false,
-        frozenRow: -1,
-        fullWidthRows: false,
-        groupingPanel: false,
-        groupingPanelHeight: 34,
-        headerRowHeight: 25,
-        leaveSpaceForNewRows: false,
-        useLegacyUI: true,
-        minBuffer: 3,
-        multiColumnSort: false,
-        multiSelect: true,
-        renderAllCells: false,
-        rowHeight: 25,
-        selectedCellCssClass: "selected",
-        showCellSelection: true,
-        showColumnHeader: true,
-        showFooterRow: false,
-        showGroupingPanel: true,
-        showHeaderRow: false,
-        showTopPanel: false,
-        suppressActiveCellChangeOnEdit: false,
-        topPanelHeight: 25
-      };
       this._colDefaults = {
         name: "",
         resizable: true,
@@ -543,14 +412,14 @@ Slick._ = (() => {
       else if (typeof container === "string")
         this._container = document.querySelector(container);
       if (this._container == null) {
-        throw new Error("SlickGrid requires a valid container, " + container + " does not exist in the DOM.");
+        throw new Error("SleekGrid requires a valid container, " + container + " does not exist in the DOM.");
       }
       this._rtl = $(document.body).hasClass("rtl") || $(this._container).css("direction") == "rtl";
       if (this._rtl) {
         this._rtlS = "right";
         this._rtlE = "left";
       }
-      options = $.extend({}, defaults, options);
+      options = $.extend({}, gridDefaults, options);
       this._options = options;
       this.validateAndEnforceOptions();
       this._colDefaults.width = options.defaultColumnWidth;
@@ -711,7 +580,7 @@ Slick._ = (() => {
     }
     setActiveCanvasNode(e) {
       if (e) {
-        this._activeCanvasNode = $(e.target).closest(".grid-canvas")[0];
+        this._activeCanvasNode = e.target.closest(".grid-canvas");
       }
     }
     getViewportNode() {
@@ -726,7 +595,7 @@ Slick._ = (() => {
     }
     setActiveViewportNode(e) {
       if (e) {
-        this._activeViewportNode = $(e.target).closest(".slick-viewport")[0];
+        this._activeViewportNode = e.target.closest(".slick-viewport");
       }
     }
     calcHeaderWidths() {
@@ -3994,30 +3863,6 @@ Slick._ = (() => {
       this._selectionModel.setSelectedRanges(this.rowsToRanges(rows));
     }
   };
-  return __toCommonJS(slick_grid_exports);
+  return __toCommonJS(grid_exports);
 })();
-/**
- * @license
- * (c) 2017-2022 Serenity.is, Volkan Ceylan, Furkan Evran, Victor Tomaili, and other Serenity contributors
- * https://github.com/serenity-is/serenity
- * Ported to TypeScript and heavily refactored while keeping compatibility with original SlickGrid where possible
- * 
- * (c) 2009-2016 Michael Leibman 
- * michael{dot}leibman{at}gmail{dot}com
- * http://github.com/mleibman/slickgrid
- *
- * (c) 2009-2019 Ben McIntyre
- * http://github.com/6pac/slickgrid
- * 
- * Distributed under MIT license.
- * All rights reserved.
- *
- * Based on SlickGrid v2.4 and 6pack/slickgrid fixes
- *
- * NOTES:
- *     Cell/row DOM manipulations are done directly bypassing jQuery's DOM manipulation methods.
- *     This increases the speed dramatically, but can only be done safely because there are no event handlers
- *     or data associated with any cell/row DOM nodes.  Cell editors must make sure they implement .destroy()
- *     and do proper cleanup.
- */
-(function(){for(var _ in Slick._)Slick[_]=Slick._[_];delete Slick._})();
+Object.assign(Slick, Slick._); delete Slick._
