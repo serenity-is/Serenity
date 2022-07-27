@@ -592,11 +592,11 @@ export namespace SlickFormatting {
     }
 
     export function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any,
-        formatter: Slick.Format): Slick.Format {
-        return function (ctx: Slick.FormatterContext) {
+        formatter: Slick.Format<TItem>): Slick.Format<TItem> {
+        return function (ctx: Slick.FormatterContext<TItem>) {
             var text = formatter(ctx);
             var view = getView();
-            var indent = ctx.item._indent ?? 0;
+            var indent = (ctx.item as any)._indent ?? 0;
             var spacer = '<span class="s-TreeIndent" style="width:' + 15 * indent + 'px"></span>';
             var id = getId(ctx.item);
             var idx = view.getIdxById(id);
@@ -604,7 +604,7 @@ export namespace SlickFormatting {
             if (next != null) {
                 var nextIndent = next._indent ?? 0;
                 if (nextIndent > indent) {
-                    if (!!!!ctx.item._collapsed) {
+                    if (!!!!(ctx.item as any)._collapsed) {
                         return spacer + '<span class="s-TreeToggle s-TreeExpand"></span>' + text;
                     }
                     else {
@@ -667,11 +667,11 @@ export namespace SlickFormatting {
             (encode ? htmlEncode(text ?? '') : text ?? '') + '</a>';
     }
 
-    export function itemLink(itemType: string, idField: string, getText: Slick.Format,
-        cssClass?: Slick.Format, encode?: boolean): Slick.Format {
-        return function (ctx: Slick.FormatterContext) {
+    export function itemLink<TItem = any>(itemType: string, idField: string, getText: Slick.Format<TItem>,
+        cssClass?: Slick.Format<TItem>, encode?: boolean): Slick.Format<TItem> {
+        return function (ctx: Slick.FormatterContext<TItem>) {
             var text = (getText == null ? ctx.value : getText(ctx)) ?? '';
-            if (ctx.item?.__nonDataRow) {
+            if ((ctx.item as any)?.__nonDataRow) {
                 return encode ? htmlEncode(text) : text;
             }
 
@@ -711,19 +711,23 @@ export namespace SlickHelper {
         return columns;
     }
 
-    export function convertToFormatter(format: Slick.Format): Slick.ColumnFormatter {
+    export function convertToFormatter<TItem = any>(format: Slick.Format<TItem>): Slick.ColumnFormatter<TItem> {
         if (format == null) {
             return null;
         }
         else {
-            return function (row: number, cell: number, value: any, column: Slick.Column, item: any) {
-                return format({
-                    row: row,
-                    cell: cell,
-                    value: value,
-                    column: column,
-                    item: item
-                });
+            return function (row: number, cell: number, value: any, column: Slick.Column, item: TItem, grid: Slick.Grid) {
+                var ctx: Slick.FormatterContext<TItem> = { row, cell, value, column, item, grid };
+                var result = format(ctx);
+                if (ctx.addClass != null || ctx.addAttrs != null || ctx.toolTip != null) {
+                    return {
+                        addAttrs: ctx.addAttrs,
+                        addClass: ctx.addClass,
+                        text: result,
+                        toolTip: ctx.toolTip
+                    }
+                }
+                return result;
             }
         }
     }

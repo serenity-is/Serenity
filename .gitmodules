@@ -1,0 +1,4 @@
+[submodule "lib/SleekGrid"]
+	path = lib/SleekGrid
+	url = https://github.com/serenity-is/SleekGrid.git
+	branch = main

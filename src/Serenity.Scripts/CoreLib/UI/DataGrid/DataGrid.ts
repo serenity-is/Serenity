@@ -502,15 +502,17 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
             this.view.sortBy = Array.prototype.slice.call(sortBy);
         }
 
-        var mapped = sortBy.map(function (s) {
-            var x: Slick.ColumnSort = {};
+        var mapped = sortBy.map(function (s): Slick.ColumnSort {
+            var x: Slick.ColumnSort;
             if (s && endsWith(s.toLowerCase(), ' desc')) {
-                x.columnId = trimEnd(s.substr(0, s.length - 5));
-                x.sortAsc = false;
+                return {
+                    columnId: trimEnd(s.substr(0, s.length - 5)),
+                    sortAsc: false
+                }
             }
-            else {
-                x.columnId = s;
-                x.sortAsc = true;
+            else return {
+                columnId: s,
+                sortAsc: true
             }
             return x;
         });
@@ -842,7 +844,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string,
-        cssClass?: (ctx: Slick.FormatterContext) => string, encode: boolean = true): Slick.Format {
+        cssClass?: (ctx: Slick.FormatterContext) => string, encode: boolean = true): Slick.Format<TItem> {
 
         if (itemType == null) {
             itemType = this.getItemType();
