@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\..\src\Serenity.Net.Core\Serenity.Net.Core.csproj" />
+    <ProjectReference Include="..\..\src\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="TSQL.Parser" Version="2.4.0" />
   </ItemGroup>
 </Project>
