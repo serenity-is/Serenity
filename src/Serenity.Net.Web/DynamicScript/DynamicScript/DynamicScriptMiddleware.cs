@@ -18,7 +18,7 @@ namespace Serenity.Web.Middleware
             this.next = next;
         }
         
-        public Task Invoke(HttpContext context, IAuthorizationService authorizationService)
+        public Task Invoke(HttpContext context)
         {
             if (!context.Request.Path.Value.StartsWith(dynJSPath, StringComparison.OrdinalIgnoreCase))
                 return next.Invoke(context);
