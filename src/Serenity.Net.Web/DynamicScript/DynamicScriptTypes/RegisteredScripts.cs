@@ -14,7 +14,7 @@ namespace Serenity.Web
             this.scriptManager = scriptManager;
         }
 
-        public override string GetScript()
+        public override string GetScript(DynamicScriptResponseType responseType)
         {
             return "Q.ScriptData.setRegisteredScripts(" +
                 ToJsonFast(scriptManager.GetRegisteredScripts()) + ");";

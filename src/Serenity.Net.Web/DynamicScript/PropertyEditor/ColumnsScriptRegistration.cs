@@ -13,7 +13,7 @@ namespace Serenity.Web
             if (typeSource == null)
                 throw new ArgumentNullException(nameof(typeSource));
 
-            var scripts = new List<Func<string>>();
+            var scripts = new List<Func<DynamicScriptResponseType, string>>();
 
             foreach (var type in typeSource.GetTypesWithAttribute(typeof(ColumnsScriptAttribute)))
             {

@@ -45,7 +45,7 @@ namespace Serenity.Web
 
         public string ScriptName => scriptName;
 
-        public string GetScript()
+        public string GetScript(DynamicScriptResponseType responseType)
         {
             var items = propertyProvider.GetPropertyItemsFor(type).ToList();
             if (typeof(ICustomizePropertyItems).IsAssignableFrom(type))

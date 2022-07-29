@@ -13,12 +13,19 @@ namespace Serenity.Web
 
         protected abstract IEnumerable GetItems();
 
-        public override string GetScript()
+        public override string GetScript(DynamicScriptResponseType responseType)
         {
             IEnumerable items = GetItems();
-
-            return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, new Q.Lookup({1}, \n{2}\n));",
-                ("Lookup." + LookupKey).ToSingleQuoted(), LookupParams.ToJson(), items.ToJson());
+            switch (responseType)
+            {
+                case DynamicScriptResponseType.Json:
+                    return string.Format(CultureInfo.InvariantCulture, "{{ \"Params\": {0}, \"Items\": {1} }}", LookupParams.ToJson(), items.ToJson());
+                case DynamicScriptResponseType.JavaScript:
+                case DynamicScriptResponseType.Default:
+                default:
+                    return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, new Q.Lookup({1}, \n{2}\n));",
+                        ("Lookup." + LookupKey).ToSingleQuoted(), LookupParams.ToJson(), items.ToJson());
+            }
         }
 
         public Dictionary<string, object> LookupParams => lookupParams;

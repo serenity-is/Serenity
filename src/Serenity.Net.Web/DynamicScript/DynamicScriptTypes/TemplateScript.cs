@@ -13,7 +13,7 @@
 
         public string ScriptName => "Template." + key;
 
-        public override string GetScript()
+        public override string GetScript(DynamicScriptResponseType responseType)
         {
             string templateText = getTemplate();
 

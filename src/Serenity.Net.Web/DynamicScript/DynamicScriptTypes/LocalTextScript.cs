@@ -144,7 +144,7 @@ namespace Serenity.Web
             return jwBuilder.ToString();
         }
 
-        public override string GetScript()
+        public override string GetScript(DynamicScriptResponseType responseType)
         {
             return GetLocalTextPackageScript(registry, includes, languageId, isPending);
         }  

@@ -16,7 +16,7 @@ namespace Serenity.Web
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
 
-            var scripts = new List<Func<string>>();
+            var scripts = new List<Func<DynamicScriptResponseType, string>>();
 
             foreach (var type in typeSource.GetTypesWithAttribute(typeof(FormScriptAttribute)))
             {

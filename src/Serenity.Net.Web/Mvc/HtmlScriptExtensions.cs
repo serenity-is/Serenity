@@ -172,7 +172,7 @@ namespace Serenity.Web
             return false;
         }
 
-        public static string GetLocalTextContent(this IHtmlHelper page, string package, bool isPending = false)
+        public static string GetLocalTextContent(this IHtmlHelper page, string package, DynamicScriptResponseType responseType, bool isPending = false)
         {
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
             string scriptName = Web.LocalTextScript.GetScriptName(package, languageId, isPending);
@@ -185,7 +185,7 @@ namespace Serenity.Web
                 return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
             });
 
-            return scriptManager.GetScriptText(scriptName);
+            return scriptManager.GetScriptText(scriptName,responseType);
         }
 
         public static string GetLocalTextInclude(this IHtmlHelper page, string package, bool isPending = false)

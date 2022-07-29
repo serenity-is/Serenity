@@ -17,12 +17,20 @@
 
         public string ScriptName => "RemoteData." + key;
 
-        public override string GetScript()
+        public override string GetScript(DynamicScriptResponseType responseType)
         {
             var data = getData();
-            return string.Format(CultureInfo.CurrentCulture, "Q.ScriptData.set({0}, {1});", ScriptName.ToSingleQuoted(), data.ToJson());
+
+            switch (responseType)
+            {
+                case DynamicScriptResponseType.Json:
+                    return data.ToJson();
+                case DynamicScriptResponseType.JavaScript:
+                case DynamicScriptResponseType.Default:
+                default:
+                    return string.Format(CultureInfo.CurrentCulture, "Q.ScriptData.set({0}, {1});", ScriptName.ToSingleQuoted(), data.ToJson());
+            }
         }
-      
     }
 
     public abstract class DataScript<TData> : DataScript

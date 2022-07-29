@@ -53,7 +53,7 @@ namespace Serenity.Web
         public IEnumerable<FileWatcher> Initialize(IDynamicScriptManager manager, string[] paths, bool watchForChanges = true)
         {
             var watchers = new List<FileWatcher>();
-            var bundleList = new List<Func<string>>();
+            var bundleList = new List<Func<DynamicScriptResponseType, string>>();
 
             foreach (var p in paths)
             {

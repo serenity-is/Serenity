@@ -95,7 +95,7 @@ namespace Serenity.Web
 
                     var bundleKey = pair.Key;
                     var bundleName = "Bundle." + bundleKey;
-                    var bundleParts = new List<Func<string>>();
+                    var bundleParts = new List<Func<DynamicScriptResponseType, string>>();
                     var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                     void registerInBundle(string sourceFile)
@@ -123,7 +123,7 @@ namespace Serenity.Web
 
                             var scriptName = sourceFile[10..];
                             scriptNames.Add(scriptName);
-                            bundleParts.Add(() =>
+                            bundleParts.Add((DynamicScriptResponseType responseType) =>
                             {
                                 if (recursionCheck != null)
                                 {
@@ -138,7 +138,7 @@ namespace Serenity.Web
                                 recursionCheck.Add(scriptName);
                                 try
                                 {
-                                    var code = scriptManager.GetScriptText(scriptName);
+                                    var code = scriptManager.GetScriptText(scriptName, responseType);
                                     if (code == null)
                                         return string.Format(CultureInfo.CurrentCulture, errorLines,
                                             string.Format(CultureInfo.CurrentCulture, "Dynamic script with name '{0}' is not found!", scriptName));
@@ -178,7 +178,7 @@ namespace Serenity.Web
 
                         registerInBundle(sourceUrl);
 
-                        bundleParts.Add(() =>
+                        bundleParts.Add((DynamicScriptResponseType responseType) =>
                         {
                             var sourcePath = sourceUrl[rootUrl.Length..];
                             var sourceInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);

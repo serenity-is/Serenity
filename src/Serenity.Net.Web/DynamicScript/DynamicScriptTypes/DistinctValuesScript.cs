@@ -62,7 +62,7 @@ namespace Serenity.Web
                 query.Where(field != "");
         }
 
-        public override string GetScript()
+        public override string GetScript(DynamicScriptResponseType responseType)
         {
             return "Q.ScriptData.set(" + ("Lookup." + LookupKey).ToSingleQuoted() +
                 ", new Q.Lookup(" + LookupParams.ToJson() + ", " + GetItems().ToJson() + 

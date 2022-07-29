@@ -110,7 +110,7 @@ namespace Serenity.Web
                     var bundleName = "CssBundle." + bundleKey;
                     var bundleRewriteRoot = string.Concat(Enumerable.Repeat("../",
                         Math.Max(bundleKey.Split('/', StringSplitOptions.RemoveEmptyEntries).Length, 1)));
-                    var bundleParts = new List<Func<string>>();
+                    var bundleParts = new List<Func<DynamicScriptResponseType, string>>();
                     var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                     void registerInBundle(string appRelativeUrl)
@@ -139,7 +139,7 @@ namespace Serenity.Web
 
                             var scriptName = sourceFile[10..];
                             scriptNames.Add(scriptName);
-                            bundleParts.Add(() =>
+                            bundleParts.Add((DynamicScriptResponseType responseType) =>
                             {
                                 if (recursionCheck != null)
                                 {
@@ -154,7 +154,7 @@ namespace Serenity.Web
                                 recursionCheck.Add(scriptName);
                                 try
                                 {
-                                    var code = scriptManager.GetScriptText(scriptName);
+                                    var code = scriptManager.GetScriptText(scriptName, responseType);
                                     if (code == null)
                                         return string.Format(CultureInfo.CurrentCulture, errorLines,
                                             string.Format(CultureInfo.CurrentCulture, "Dynamic script with name '{0}' is not found!", scriptName));
@@ -192,7 +192,7 @@ namespace Serenity.Web
                         registerInBundle(sourceUrl);
                         var sourcePath = sourceUrl[2..];
 
-                        bundleParts.Add(() =>
+                        bundleParts.Add((DynamicScriptResponseType responseType) =>
                         {
                             var sourceInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
                             if (!sourceInfo.Exists)

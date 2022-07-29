@@ -112,17 +112,17 @@
             return hash;
         }
 
-        private IScriptContent EnsureScriptContent(string name, IDynamicScript script)
+        private IScriptContent EnsureScriptContent(string name, IDynamicScript script, DynamicScriptResponseType responseType)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            var cacheKey = "DynamicScript:" + name;
+            var cacheKey = "DynamicScript:" + name + responseType.ToString();
             if (script is ICacheSuffix ics)
                 cacheKey = cacheKey + ":" + ics.CacheSuffix;
 
             ScriptContent factory() {
-                var content = utf8Encoding.GetBytes(script.GetScript());
+                var content = utf8Encoding.GetBytes(script.GetScript(responseType));
                 return new ScriptContent(content, DateTime.UtcNow, content.Length > 4096);
             }
             
@@ -163,12 +163,12 @@
                 script.CheckRights(permissions, localizer);
         }
 
-        public string GetScriptText(string name)
+        public string GetScriptText(string name, DynamicScriptResponseType responseType = DynamicScriptResponseType.Default)
         {
             if (!registeredScripts.TryGetValue(name, out var script))
                 return null;
 
-            var content = EnsureScriptContent(name, script).Content;
+            var content = EnsureScriptContent(name, script, responseType).Content;
             return utf8Encoding.GetString(content);
         }
 
@@ -182,14 +182,14 @@
             return name + extension + "?v=" + hash;
         }
 
-        public IScriptContent ReadScriptContent(string name)
+        public IScriptContent ReadScriptContent(string name, DynamicScriptResponseType responseType)
         {
             if (!registeredScripts.TryGetValue(name, out var script))
                 return null;
 
             script.CheckRights(permissions, localizer);
 
-            return EnsureScriptContent(name, script);
+            return EnsureScriptContent(name, script, responseType);
         }
 
         public event Action<string> ScriptChanged

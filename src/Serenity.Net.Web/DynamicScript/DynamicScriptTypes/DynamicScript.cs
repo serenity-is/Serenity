@@ -6,7 +6,7 @@
         {
         }
 
-        public abstract string GetScript();
+        public abstract string GetScript(DynamicScriptResponseType responseType);
 
         public virtual void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
         {

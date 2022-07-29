@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Serenity.Web.Middleware
 {
@@ -15,12 +17,12 @@ namespace Serenity.Web.Middleware
         {
             this.next = next;
         }
-
-        public Task Invoke(HttpContext context)
+        
+        public Task Invoke(HttpContext context, IAuthorizationService authorizationService)
         {
             if (!context.Request.Path.Value.StartsWith(dynJSPath, StringComparison.OrdinalIgnoreCase))
                 return next.Invoke(context);
-
+                       
             var scriptKey = context.Request.Path.Value;
             scriptKey = scriptKey[dynJSPath.Length..];
 
@@ -32,6 +34,11 @@ namespace Serenity.Web.Middleware
                 contentType = "text/css";
                 scriptKey = scriptKey[0..^4];
             }
+            else if(scriptKey.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                contentType = "application/json";
+                scriptKey = scriptKey[0..^5];
+            }
 
             return ReturnScript(context, scriptKey, contentType);
         }
@@ -42,7 +49,7 @@ namespace Serenity.Web.Middleware
             try
             {
                 scriptContent = context.RequestServices.GetRequiredService<IDynamicScriptManager>()
-                    .ReadScriptContent(scriptKey);
+                    .ReadScriptContent(scriptKey, GetResponseType(contentType));
             }
             catch (ValidationError ve)
             {
@@ -130,6 +137,21 @@ namespace Serenity.Web.Middleware
 
             context.Response.GetTypedHeaders().LastModified = lastWriteTime;
             await context.Response.Body.WriteAsync(bytes.AsMemory(0, bytes.Length));
+        }
+
+        public static DynamicScriptResponseType GetResponseType(string contentType)
+        {
+            switch (contentType)
+            {
+                case "text/css":
+                    return DynamicScriptResponseType.Css;
+                case "text/javascript":
+                    return DynamicScriptResponseType.JavaScript;
+                case "application/json":
+                    return DynamicScriptResponseType.Json;
+                default:
+                    return DynamicScriptResponseType.Default;
+            }
         }
     }
 }
