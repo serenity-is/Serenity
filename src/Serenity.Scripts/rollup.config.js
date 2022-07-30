@@ -149,9 +149,10 @@ var writeMinJS = function () {
 
 export default [
     {
-        input: "../../lib/SleekGrid/src/index.ts",
+        input: "node_modules/@serenity-is/sleekgrid/src/index.ts",
         output: [{ file: "./dist/built/Slick.typings.bundle.d.ts", format: "es" }],
         plugins: [dts({
+            respectExternal: true,
             compilerOptions: {
                 typeRoots: [
                     path.resolve('./types')

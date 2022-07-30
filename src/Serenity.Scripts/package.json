@@ -23,8 +23,7 @@
     "fsevents": "2.3.2"
   },
   "scripts": {
-    "build": "rollup -c && node build && npm run minify",
-    "slick": "esbuild --bundle --outdir=../Serenity.Assets/wwwroot/Scripts/SlickGrid ../../lib/SleekGrid/core/index.ts ./SlickGrid/slick.grid.ts --format=iife --target=ES6 --global-name=Slick._ --footer:js=\"(function(){for(var _ in Slick._)Slick[_]=Slick._[_];delete Slick._})();\"",
+    "build": "rollup -c && node build.mjs && npm run minify",
     "minify": "terser ../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.js --comments --mangle -f \"beautify=false,max_line_len=1000\" -o ../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.min.js && terser ../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.js --comments --mangle -f \"beautify=false,max_line_len=1000\" -o ../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.min.js"
   },
   "author": "",
