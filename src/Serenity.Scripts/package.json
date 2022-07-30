@@ -7,6 +7,7 @@
   "devDependencies": {
     "@happy-dom/jest-environment": "^6.0.4",
     "@rollup/plugin-typescript": "latest",
+    "@serenity-is/sleekgrid": "1.0.9",
     "@types/jest": "27.0.2",
     "@types/node": "14.14.14",
     "esbuild": "^0.14.49",
