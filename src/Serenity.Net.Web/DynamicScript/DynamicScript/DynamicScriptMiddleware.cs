@@ -33,9 +33,9 @@ namespace Serenity.Web.Middleware
                 scriptKey = scriptKey[0..^4];
             }
 
-            var json = context.Request.Headers.Accept.FirstOrDefault() == "application/json";
+            var json = (string)context.Request.Headers.Accept == "application/json";
 
-            if(json)
+            if (json)
             {
                 contentType = "application/json";
             }
