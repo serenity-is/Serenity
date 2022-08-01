@@ -33,7 +33,7 @@ namespace Serenity.Web.Middleware
                 scriptKey = scriptKey[0..^4];
             }
 
-            var json = context.Request.Headers.Accept.FirstOrDefault().Split(", ").Any(x => x == "application/json");
+            var json = context.Request.Headers.Accept.FirstOrDefault() == "application/json";
 
             if(json)
             {
