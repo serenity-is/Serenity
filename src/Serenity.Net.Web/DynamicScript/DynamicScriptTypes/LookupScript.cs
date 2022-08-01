@@ -2,7 +2,7 @@
 
 namespace Serenity.Web
 {
-    public abstract class LookupScript : DynamicScript, INamedDynamicScript
+    public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScriptData
     {
         private readonly Dictionary<string, object> lookupParams;
 
@@ -12,6 +12,20 @@ namespace Serenity.Web
         }
 
         protected abstract IEnumerable GetItems();
+
+        public string GetData()
+        {
+            var result = new Dictionary<string, object>
+            {
+                { "items", GetItems() },
+            };
+            foreach (var item in LookupParams)
+            {
+                result.Add(item.Key, item.Value);
+            }
+
+            return result.ToJson();
+        }
 
         public override string GetScript()
         {

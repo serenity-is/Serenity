@@ -1,6 +1,6 @@
 ﻿namespace Serenity.Web
 {
-    public class DataScript : DynamicScript, INamedDynamicScript
+    public class DataScript : DynamicScript, INamedDynamicScript, IGetScriptData
     {
         protected string key;
         protected Func<object> getData;
@@ -16,6 +16,11 @@
         }
 
         public string ScriptName => "RemoteData." + key;
+
+        string IGetScriptData.GetData()
+        {
+            return getData().ToJson();
+        }
 
         public override string GetScript()
         {
