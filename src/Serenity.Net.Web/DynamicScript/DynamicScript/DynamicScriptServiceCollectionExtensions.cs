@@ -25,6 +25,14 @@ namespace Serenity.Extensions.DependencyInjection
             return collection;
         }
 
+        public static IServiceCollection AddDynamicScripts(this IServiceCollection collection, Action<DynamicScriptOptions> optionsBuilder)
+        {
+            AddDynamicScriptManager(collection);
+            collection.TryAddSingleton<IPropertyItemProvider, DefaultPropertyItemProvider>();
+            collection.Configure(optionsBuilder);
+            return collection;
+        }
+
         public static IServiceCollection AddFileWatcherFactory(this IServiceCollection collection)
         {
             collection.TryAddSingleton<IFileWatcherFactory, DefaultFileWatcherFactory>();

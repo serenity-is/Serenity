@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using System.Net;
 using System.Threading.Tasks;
@@ -16,10 +18,26 @@ namespace Serenity.Web.Middleware
             this.next = next;
         }
 
-        public Task Invoke(HttpContext context)
+        public Task Invoke(HttpContext context, IOptions<DynamicScriptOptions> options)
         {
             if (!context.Request.Path.Value.StartsWith(dynJSPath, StringComparison.OrdinalIgnoreCase))
                 return next.Invoke(context);
+
+            if (!String.IsNullOrEmpty(options.Value.DynamicScriptMiddlewareAuthenticationScheme))
+            {
+                var authenticateResult = context.AuthenticateAsync(options.Value.DynamicScriptMiddlewareAuthenticationScheme).GetAwaiter().GetResult();
+                if (options.Value.ShouldForceAuthenticationScheme)
+                {
+                    context.User = authenticateResult.Principal;
+                }
+                else
+                {
+                    if (authenticateResult != null && authenticateResult.Succeeded)
+                    {
+                        context.User = authenticateResult.Principal;
+                    }
+                }
+            }
 
             var scriptKey = context.Request.Path.Value;
             scriptKey = scriptKey[dynJSPath.Length..];
