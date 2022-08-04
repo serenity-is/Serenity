@@ -427,8 +427,11 @@ namespace Serenity.Services
                         (uploadImageOptions.ScaleHeight > 0 && (uploadImageOptions.ScaleSmaller || checker.Height > uploadImageOptions.ScaleHeight))))
                 {
                     var originalName = storage.GetOriginalName(temporaryFile);
+                    var scaleBackColor = !string.IsNullOrEmpty(uploadImageOptions.ScaleBackColor) ?
+                        Color.Parse(uploadImageOptions.ScaleBackColor) : (Color?)null;
+                    
                     using var scaledImage = ThumbnailGenerator.Generate(
-                        image, uploadImageOptions.ScaleWidth, uploadImageOptions.ScaleHeight, uploadImageOptions.ScaleMode, backgroundColor: null);
+                        image, uploadImageOptions.ScaleWidth, uploadImageOptions.ScaleHeight, uploadImageOptions.ScaleMode, backgroundColor: scaleBackColor);
                     temporaryFile = baseFile + ".jpg";
                     fs.Close();
                     using var ms = new MemoryStream();
@@ -442,6 +445,9 @@ namespace Serenity.Services
                 var thumbSizes = uploadImageOptions.ThumbSizes.TrimToNull();
                 if (thumbSizes == null)
                     return;
+                
+                var thumbBackColor = !string.IsNullOrEmpty(uploadImageOptions.ThumbBackColor) ?
+                    Color.Parse(uploadImageOptions.ThumbBackColor) : (Color?)null;
 
                 foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split(new[] { ',' }))
                 {
@@ -456,7 +462,7 @@ namespace Serenity.Services
                         throw new ArgumentOutOfRangeException(nameof(uploadImageOptions.ThumbSizes));
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
-                    using var thumbImage = ThumbnailGenerator.Generate(image, w, h, uploadImageOptions.ThumbMode, backgroundColor: null);
+                    using var thumbImage = ThumbnailGenerator.Generate(image, w, h, uploadImageOptions.ThumbMode, backgroundColor: thumbBackColor);
                     var thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
                     using var ms = new MemoryStream();
                     thumbImage.Save(ms, new JpegEncoder { Quality = uploadImageOptions.ThumbQuality == 0 ? null : uploadImageOptions.ThumbQuality });

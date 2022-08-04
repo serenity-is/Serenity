@@ -51,6 +51,11 @@ public interface IUploadImageOptions
     /// What kind of image scaling should be used to generate image.
     /// </summary>
     public ImageScaleMode ScaleMode { get; }
+    
+    /// <summary>
+    /// Background color to use when padding image
+    /// </summary>
+    public string ScaleBackColor { get; set; }
 
     /// <summary>
     /// List of thumbnail sizes requested. Something like
@@ -67,6 +72,11 @@ public interface IUploadImageOptions
     /// Quality of thumbnails.
     /// </summary>
     public int ThumbQuality { get; }
+    
+    /// <summary>
+    /// Background color to use when padding thumbnails
+    /// </summary>
+    public string ThumbBackColor { get; set; }
 
     /// <summary>
     /// If you want to store original name of the file uploaded,
