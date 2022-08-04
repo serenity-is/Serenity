@@ -226,7 +226,7 @@ namespace Serenity.Tests
             return values.GetEnumerator();
         }
 
-        internal static IEnumerable<string> ParseSelectFieldAliases(string commandText)
+        public static IEnumerable<string> ParseSelectFieldAliases(string commandText)
         {
             var result = new List<string>();
 
