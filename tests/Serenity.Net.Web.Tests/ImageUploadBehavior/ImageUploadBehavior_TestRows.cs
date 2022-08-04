@@ -51,6 +51,7 @@ public partial class ImageUploadBehaviorTests
         }
     }
 
+    [TableName("dbo.[Test]")]
     public class TestIIdRow : Row<TestIIdRow.RowFields>, IIdRow
     {
         [Identity]
@@ -94,6 +95,13 @@ public partial class ImageUploadBehaviorTests
             get => fields.StringFieldExpression[this];
             set => fields.StringFieldExpression[this] = value;
         }
+        
+        [Expression("(SELECT 123)")]
+        public int? IntegerFieldExpression
+        {
+            get => fields.IntegerFieldExpression[this];
+            set => fields.IntegerFieldExpression[this] = value;
+        }
 
         [ImageUploadEditor(FilenameFormat = "Test/|StringFieldExpression|")]
         public string ImageUploadEditorReplaceField
@@ -108,7 +116,7 @@ public partial class ImageUploadBehaviorTests
             get => fields.ImageUploadEditorInvalidReplaceField[this];
             set => fields.ImageUploadEditorInvalidReplaceField[this] = value;
         }
-
+        
         [ImageUploadEditor(FilenameFormat = "Test/|ThisFieldDoesntExist|")]
         public string ImageUploadEditorReplaceFieldNoField
         {
@@ -152,6 +160,7 @@ public partial class ImageUploadBehaviorTests
             public Int32Field IntegerFieldImageUploadEditor;
             public StringField ImageUploadEditorCorrectEditorType;
             public StringField StringFieldExpression;
+            public Int32Field IntegerFieldExpression;
             public StringField ImageUploadEditorReplaceField;
             public StringField ImageUploadEditorInvalidReplaceField;
             public StringField ImageUploadEditorReplaceFieldNoField;
