@@ -7,10 +7,15 @@
     public class EnumFilteringAttribute : CustomFilteringAttribute
     {
         /// <summary>
+        /// Filtering type key
+        /// </summary>
+        public const string Key = "Enum";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EnumFilteringAttribute"/> class.
         /// </summary>
         public EnumFilteringAttribute()
-            : base("Enum")
+            : base(Key)
         {
         }
 

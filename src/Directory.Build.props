@@ -1,7 +1,7 @@
 ﻿<Project>
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>6.0.3</Version>
+    <Version>6.0.8</Version>
     <LangVersion>10.0</LangVersion>
     <Company>Serenity</Company>
     <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
@@ -11,6 +11,9 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/serenity-is/Serenity</PackageProjectUrl>
     <PackageTags>Serenity</PackageTags>
+    <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
+    <Terser>$(MSBuildProjectDirectory)\node_modules\.bin\terser</Terser>
+    <DefaultItemExcludes>$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;libman.json</DefaultItemExcludes>
   </PropertyGroup>
   <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -21,11 +24,20 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="$(MSBuildProjectDirectory)\*.json" />
+    <Content Include="$(MSBuildProjectDirectory)\*.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      <Pack>false</Pack>
+    </Content>
     <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-icon.png" Pack="true" PackagePath="">
         <Link>Properties\package-icon.png</Link>
     </None>
     <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" Condition="'$(EnableGlobalUsings)' != 'false'">
         <Link>Properties\GlobalUsings.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
   </ItemGroup>
 </Project>

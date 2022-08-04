@@ -8,10 +8,15 @@
     public partial class DistinctValuesEditorAttribute : LookupEditorBaseAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "Lookup";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DistinctValuesEditorAttribute"/> class.
         /// </summary>
         public DistinctValuesEditorAttribute()
-            : base("Lookup")
+            : base(Key)
         {
         }
 
@@ -26,7 +31,7 @@
         /// propertyName
         /// </exception>
         public DistinctValuesEditorAttribute(Type rowType, string propertyName)
-            : base("Lookup")
+            : base(Key)
         {
             RowType = rowType ?? throw new ArgumentNullException("rowType");
             PropertyName = propertyName ?? throw new ArgumentNullException("propertyName");

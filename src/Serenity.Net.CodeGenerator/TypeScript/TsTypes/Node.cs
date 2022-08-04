@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0
+﻿#if ISSOURCEGENERATOR
 using CharSpan = System.String;
 #else
 using CharSpan = System.ReadOnlySpan<char>;
@@ -75,15 +75,15 @@ namespace Serenity.TypeScript.TsTypes
             if (NodeStart == -1)
             {
                 if (Pos != null && End != null)
-#if NETSTANDARD2_0
-                    return SourceStr.Substring(Pos.Value, End.Value - Pos.Value);
+#if ISSOURCEGENERATOR
+                    return SourceStr[Pos.Value..End.Value];
 #else
                     return SourceStr.AsSpan(Pos.Value, End.Value - Pos.Value);
 #endif
             }
             else if (End != null)
-#if NETSTANDARD2_0
-                return SourceStr.Substring(NodeStart, End.Value - NodeStart);
+#if ISSOURCEGENERATOR
+                return SourceStr[NodeStart..End.Value];
 #else
                 return SourceStr.AsSpan(NodeStart, End.Value - NodeStart);
 #endif
@@ -108,7 +108,7 @@ namespace Serenity.TypeScript.TsTypes
         {
             if (source == null) source = SourceStr;
             if (Pos != null && End != null)
-                return source.Substring((int)Pos, (int)End - (int)Pos);
+                return source[(int)Pos..(int)End];
             return null;
         }
 

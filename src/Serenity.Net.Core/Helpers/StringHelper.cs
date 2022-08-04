@@ -146,7 +146,7 @@ namespace Serenity
             else
                 return "...";
 
-            return str.Substring(0, maxLength) + "...";
+            return str[..maxLength] + "...";
         }
 
         /// <summary>
@@ -169,10 +169,26 @@ namespace Serenity
             if (string.IsNullOrEmpty(str))
                 return emptySingleQuote;
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             QuoteString(str, sb, false);
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Converts the string to its double quoted representation.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <returns>Double quoted string.</returns>
+        public static string ToDoubleQuoted(this string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return emptyDoubleQuote;
+
+            StringBuilder sb = new();
+            QuoteString(str, sb, true);
+            return sb.ToString();
+        }
+
 
         private const string emptySingleQuote = "''";
         private const string emptyDoubleQuote = "\"\"";

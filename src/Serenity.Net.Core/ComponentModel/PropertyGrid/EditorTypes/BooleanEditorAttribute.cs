@@ -7,10 +7,15 @@
     public partial class BooleanEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "Boolean";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BooleanEditorAttribute"/> class.
         /// </summary>
         public BooleanEditorAttribute()
-            : base("Boolean")
+            : base(Key)
         {
         }
     }

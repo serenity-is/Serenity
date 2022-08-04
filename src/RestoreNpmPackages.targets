@@ -1,0 +1,16 @@
+﻿<Project>
+  <Target Name="ComputeNpmPackageMetadata">
+    <ItemGroup>
+      <NpmPackageFile>
+        <StampFile>$([System.IO.Path]::Combine('%(RootDir)%(Directory)', 'node_modules', '.install-stamp'))</StampFile>
+        <WorkingDir>%(RootDir)%(Directory)</WorkingDir>
+        <NodeModulesDir>%(RootDir)%(Directory)\node_modules\</NodeModulesDir>
+        <InstallCommand>npm install</InstallCommand>
+      </NpmPackageFile>
+    </ItemGroup>
+  </Target>
+  <Target Name="NpmInstall" DependsOnTargets="ComputeNpmPackageMetadata" Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
+    <Exec Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)"  />
+    <Touch Files="%(NpmPackageFile.StampFile)" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
+  </Target>
+</Project>

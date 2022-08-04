@@ -43,7 +43,7 @@ namespace Serenity.Web
 
             // if image or thumb width and height is zero, return an empty image
             if (imageWidth <= 0 || imageHeight <= 0 || (thumbWidth <= 0 && thumbHeight <= 0))
-                return GenerateEmptyBitmap(imageWidth, imageHeight, backgroundColor ?? Color.White);
+                return GenerateEmptyBitmap(imageWidth, imageHeight, backgroundColor ?? Color.Black);
 
             // if thumb width is zero, thumb height is not zero
             // so calculate width by aspect ratio, do similar
@@ -74,7 +74,8 @@ namespace Serenity.Web
                 {
                     Mode = resizeMode,
                     Size = new Size(thumbWidth, thumbHeight),
-                    PremultiplyAlpha = false
+                    PremultiplyAlpha = false,
+                    PadColor = backgroundColor ?? Color.Black
                 });
             }
 

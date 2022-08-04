@@ -1,8 +1,6 @@
-﻿using Mono.Cecil;
-
-namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : CecilImportGenerator
+    public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         private void GenerateService(TypeDefinition type)
         {
@@ -12,7 +10,7 @@ namespace Serenity.CodeGeneration
             var identifier = GetControllerIdentifier(type);
             fileIdentifier = identifier;
             sb.Append(identifier);
-            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
+            generatedTypes.Add((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier);
 
             cw.InBrace(delegate
             {
@@ -27,9 +25,9 @@ namespace Serenity.CodeGeneration
 
 
                 var methodNames = new List<string>();
-                foreach (var method in type.Methods)
+                foreach (var method in type.MethodsOf())
                 {
-                    if (!method.IsPublic || method.IsStatic || method.IsAbstract)
+                    if (!method.IsPublic() || method.IsStatic || method.IsAbstract)
                         continue;
 
                     if (methodNames.Contains(method.Name))

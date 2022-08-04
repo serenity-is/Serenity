@@ -4,11 +4,16 @@
     {
         private static readonly string[] NotReferencingSerenity = new[]
         {
+            "AspNetCore",
+            "Azure",
+            "AutoMapper",
             "Dapper",
+            "DevExpress",
             "EPPlus",
             "FastMember",
             "FluentMigrator",
             "FirebirdSql.",
+            "Lucene",
             "MailKit",
             "Mapster",
             "MySql",
@@ -17,9 +22,11 @@
             "NetStandard.",
             "Npgsql",
             "Nuglify.",
+            "Serilog.",
             "StackExchange.",
             "System.",
-            "X.PagedList"
+            "X.PagedList",
+            "Yaml"
         };
 
         public static bool ForRestore(string packageId)

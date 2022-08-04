@@ -1,7 +1,7 @@
-﻿using Serenity.TypeScript;
+﻿using Serenity.CodeGeneration;
+using Serenity.TypeScript;
 using Serenity.TypeScript.TsTypes;
-using Serenity.CodeGeneration;
-using System.IO.Abstractions;
+using System.Threading;
 
 namespace Serenity.CodeGenerator
 {
@@ -9,11 +9,14 @@ namespace Serenity.CodeGenerator
     {
         private readonly List<string> fileNames = new();
         private readonly HashSet<string> exportedTypeNames = new();
-        private readonly IFileSystem fileSystem;
+        private readonly IGeneratorFileSystem fileSystem;
+        private readonly CancellationToken cancellationToken;
 
-        public TSTypeListerAST(IFileSystem fileSystem)
+        public TSTypeListerAST(IGeneratorFileSystem fileSystem,
+            CancellationToken cancellationToken = default)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            this.cancellationToken = cancellationToken;
         }
 
         public void AddInputFile(string path)
@@ -84,7 +87,7 @@ namespace Serenity.CodeGenerator
             return s;
         }
 
-        string GetTypeReferenceExpression(INode node)
+        string GetTypeReferenceExpression(INode node, bool isDecorator = false)
         {
             if (node == null)
                 return string.Empty;
@@ -102,6 +105,17 @@ namespace Serenity.CodeGenerator
             var lt = noGeneric.IndexOf('<');
             if (lt >= 0 && noGeneric[^1] == '>')
                 noGeneric = noGeneric[..lt];
+
+            string functionSuffix = string.Empty;
+            if (isDecorator)
+            {
+                var ldi = noGeneric.LastIndexOf('.');
+                if (ldi > 0)
+                {
+                    functionSuffix = noGeneric[ldi..].ToString();
+                    noGeneric = noGeneric[..ldi];
+                }
+            }
 
             var dotIndex = noGeneric.IndexOf('.');
             var beforeDot = dotIndex >= 0 ? noGeneric[..dotIndex] : null;
@@ -129,7 +143,7 @@ namespace Serenity.CodeGenerator
                                  (child as ClassDeclaration).Name.GetTextSpan() == noGeneric) ||
                                 (child.Kind == SyntaxKind.InterfaceDeclaration &&
                                  (child as InterfaceDeclaration).Name.GetTextSpan() == noGeneric))
-                                return PrependNamespace(noGeneric.ToString(), child);
+                                return PrependNamespace(noGeneric.ToString(), child) + functionSuffix;
                         }
                     }
                     else
@@ -143,7 +157,7 @@ namespace Serenity.CodeGenerator
                                     var fullName = (child as ImportEqualsDeclaration).ModuleReference.GetText() +
                                         afterDot.ToString();
                                     if (exportedTypeNames.Contains(fullName))
-                                        return fullName;
+                                        return fullName + functionSuffix;
                                 }
                             }
                         }
@@ -156,7 +170,7 @@ namespace Serenity.CodeGenerator
             {
                 var s = ns + "." + noGeneric.ToString();
                 if (exportedTypeNames.Contains(s))
-                    return s;
+                    return s + functionSuffix;
 
                 var idx = ns.LastIndexOf('.');
                 if (idx >= 0)
@@ -165,7 +179,7 @@ namespace Serenity.CodeGenerator
                     break;
             }
 
-            return noGeneric.ToString();
+            return noGeneric.ToString() + functionSuffix;
         }
 
         string GetBaseType(ClassDeclaration node)
@@ -260,7 +274,7 @@ namespace Serenity.CodeGenerator
                     ce.Expression.Kind == SyntaxKind.PropertyAccessExpression)
                 {
                     pae = ce.Expression as PropertyAccessExpression;
-                    result.Type = GetTypeReferenceExpression(pae);
+                    result.Type = GetTypeReferenceExpression(pae, isDecorator: true);
                 }
 
                 if (ce.Arguments != null &&
@@ -400,7 +414,8 @@ namespace Serenity.CodeGenerator
                     member.Kind != SyntaxKind.MethodSignature)
                     continue;
 
-                var name = ((Identifier)member.Name).Text;
+                var name = (member.Name as ILiteralLikeNode)?.Text ??
+                    (member.Name as Identifier).Text;
                 if (!used.Add(name))
                     continue;
 
@@ -427,7 +442,8 @@ namespace Serenity.CodeGenerator
                     {
                         (externalMember as ExternalMethod).Arguments.Add(new()
                         {
-                            Name = ((Identifier)arg.Name).Text,
+                            Name = (arg.Name as ILiteralLikeNode)?.Text ??
+                                (arg.Name as Identifier).Text,
                             Type = GetTypeReferenceExpression(arg.Type)
                         });
                     }
@@ -647,6 +663,16 @@ namespace Serenity.CodeGenerator
                             target.Add(PrependNamespace(intf.Name.GetText(), intf));
                         }
                         break;
+
+                    case SyntaxKind.ModuleDeclaration:
+                        if (sourceFile.IsDeclarationFile || HasExportModifier(node))
+                        {
+                            var modul = node as ModuleDeclaration;
+                            if (sourceFile.IsDeclarationFile || HasExportModifier(modul) ||
+                                (!IsUnderAmbientNamespace(modul) && !HasDeclareModifier(modul)))
+                                target.Add(PrependNamespace(modul.Name.GetText(), modul));
+                        }
+                        break;
                 }
             }
         }
@@ -655,13 +681,14 @@ namespace Serenity.CodeGenerator
         {
             var sourceFiles = fileNames.AsParallel()
                 .Select(fileName => (SourceFile)new TypeScriptAST(
-                    fileSystem.File.ReadAllText(fileName), 
+                    fileSystem.ReadAllText(fileName), 
                         fileName, optimized: true).RootNode)
                 .ToArray();
 
             exportedTypeNames.Clear();
             foreach (var hashset in sourceFiles.AsParallel().Select(sourceFile =>
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var hashset = new HashSet<string>();
                 ExtractExportedTypeNames(sourceFile, hashset);
                 return hashset;
@@ -676,6 +703,7 @@ namespace Serenity.CodeGenerator
 
             foreach (var types in sourceFiles.AsParallel().Select(sourceFile =>
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 return ExtractTypes(sourceFile);
             }).ToArray())
             {

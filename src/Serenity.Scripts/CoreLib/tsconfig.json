@@ -12,16 +12,13 @@
     "moduleResolution": "Node",
     "skipLibCheck": true,
     "typeRoots": [
-      "../node_modules/@types"
+      "../types"
     ],
     "types": [
       "jquery",
-      "jquery.blockui",
-      "jquery.cookie",
       "jquery.validation",
       "jqueryui",
       "bootstrap",
-      "sortablejs",
       "toastr",
       "react"
     ],
@@ -35,6 +32,7 @@
       "DOM"
     ],
     "noEmitHelpers": false,
+    "importHelpers": false,
     "jsx": "react"
   },
   "files": [
@@ -42,6 +40,7 @@
     "./Globals/Promise.ts",
     "./Globals/Select2.ts",
     "./Globals/Validate.ts",
+    "./Slick/Globals.g.ts",
     "./Slick/Globals.ts",
     "./Serenity/Globals.ts",
     "./UI/Widgets/Globals.ts",

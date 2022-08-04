@@ -7,10 +7,15 @@
     public class BooleanFilteringAttribute : CustomFilteringAttribute
     {
         /// <summary>
+        /// Filtering type key
+        /// </summary>
+        public const string Key = "Boolean";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BooleanFilteringAttribute"/> class.
         /// </summary>
         public BooleanFilteringAttribute()
-            : base("Boolean")
+            : base(Key)
         {
         }
 

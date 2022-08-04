@@ -12,16 +12,14 @@
     "skipLibCheck": true,
     "target": "ES5",
     "typeRoots": [
+      "../types",
       "../node_modules/@types"
     ],
     "types": [
       "jquery",
-      "jquery.blockui",
-      "jquery.cookie",
       "jquery.validation",
       "jqueryui",
       "bootstrap",
-      "sortablejs",
       "toastr",
       "react",
       "jest",
@@ -48,6 +46,7 @@
     "../CoreLib/Globals/Promise.ts",
     "../CoreLib/Globals/Select2.ts",
     "../CoreLib/Globals/Validate.ts",
+    "../CoreLib/Slick/Globals.g.ts",
     "../CoreLib/Slick/Globals.ts",
     "../CoreLib/Serenity/Globals.ts",
     "../CoreLib/UI/Widgets/Globals.ts",

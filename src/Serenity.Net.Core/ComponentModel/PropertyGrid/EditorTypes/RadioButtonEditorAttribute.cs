@@ -7,13 +7,18 @@
     public partial class RadioButtonEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "RadioButton";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RadioButtonEditorAttribute"/> class.
         /// </summary>
         /// <param name="enumOrLookupType">Type of the enum or lookup.</param>
         /// <exception cref="ArgumentNullException">enumOrLookupType</exception>
         /// <exception cref="ArgumentException">lookupType</exception>
         public RadioButtonEditorAttribute(Type enumOrLookupType)
-            : base("RadioButton")
+            : base(Key)
         {
             if (enumOrLookupType == null)
                 throw new ArgumentNullException("enumOrLookupType");
@@ -45,7 +50,7 @@
         /// Initializes a new instance of the <see cref="RadioButtonEditorAttribute"/> class.
         /// </summary>
         public RadioButtonEditorAttribute()
-            : base("RadioButton")
+            : base(Key)
         {
         }
 

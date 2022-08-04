@@ -12,6 +12,11 @@ namespace Serenity.ComponentModel
     public partial class ImageUploadEditorAttribute : CustomEditorAttribute, IUploadEditor, IUploadFileConstraints, IUploadFileSizeConstraints, IUploadImageOptions
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "ImageUpload";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ImageUploadEditorAttribute"/> class.
         /// </summary>
         /// <param name="editorType">Type of the editor.</param>
@@ -26,7 +31,7 @@ namespace Serenity.ComponentModel
         /// Initializes a new instance of the <see cref="ImageUploadEditorAttribute"/> class.
         /// </summary>
         public ImageUploadEditorAttribute()
-            : this("ImageUpload")
+            : this(Key)
         {
         }
         
@@ -122,6 +127,11 @@ namespace Serenity.ComponentModel
         public ImageScaleMode ScaleMode { get; set; }
 
         /// <summary>
+        /// Background color to use when padding image
+        /// </summary>
+        public string ScaleBackColor { get; set; }
+
+        /// <summary>
         /// List of thumbnail sizes requested. Something like
         /// "96x96;128x128;200x200"
         /// </summary>
@@ -136,6 +146,11 @@ namespace Serenity.ComponentModel
         /// Quality of thumbnails, default is 80.
         /// </summary>
         public int ThumbQuality { get; set; } = 80;
+
+        /// <summary>
+        /// Background color to use when padding thumbnails
+        /// </summary>
+        public string ThumbBackColor { get; set; }
 
         /// <summary>
         /// Only useful for MultipleImageUploadeEditor. Specifies

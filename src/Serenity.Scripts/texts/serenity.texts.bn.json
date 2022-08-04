@@ -1,4 +1,4 @@
-﻿{
+{
   "Authorization.AccessDenied": "আপনার কাছে এটি করার অনুমতি নেই!",
   "Authorization.NotLoggedIn": "আপনাকে এই কর্মের জন্য লগ ইন করতে হবে!",
   "Controls.CheckTreeEditor.SelectAll": "সবগুলো নির্বাচন করুন",
@@ -163,8 +163,6 @@
   "Validation.MinDate": "'{0}' এর পরের একটি তারিখ লিখুন।",
   "Validation.MinLength": "দয়া করে {0} অক্ষরের চেয়ে কম লিখুন।",
   "Validation.MinRequiredPasswordLength": "প্রবেশকৃত পাসওয়ার্ডে যথেষ্ট অক্ষর নেই (সর্বনিম্ন {0})!",
-  "Validation.NorthwindPhone": "ফোন নম্বর '(503) 555-9831' বিন্যাসে প্রবেশ করা উচিত।",
-  "Validation.NorthwindPhoneMultiple": "ফোন নম্বর '(503) 555-9831' বিন্যাসে প্রবেশ করা উচিত। একাধিক ফোন নাম্বার কমা (,) দ্বারা পৃথক করা যেতে পারে।",
   "Validation.PasswordConfirm": "প্রবেশ করানো পাসওয়ার্ড মেলে না।",
   "Validation.Range": "{0} এবং {1} এর মধ্যে একটি মান লিখুন।",
   "Validation.Recaptcha": "আপনি যে একটি রোবট না তা যাচাই করুন!",

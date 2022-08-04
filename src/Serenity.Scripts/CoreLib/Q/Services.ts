@@ -5,8 +5,8 @@ import { alert, iframeDialog } from "./Dialogs";
 import { blockUI, blockUndo } from "./BlockUI";
 
 export function getCookie(name: string) {
-    if ($.cookie)
-        return $.cookie(name);
+    if (($ as any).cookie)
+        return ($ as any).cookie(name);
 
     name += '=';
     for (var ca = document.cookie.split(/;\s*/), i = ca.length - 1; i >= 0; i--)
@@ -44,7 +44,7 @@ export function serviceCall<TResponse>(options: Serenity.ServiceOptions<TRespons
 
     var url = options.service;
     if (url && url.length && url.charAt(0) != '~' && url.charAt(0) != '/' && url.indexOf('://') < 0)
-        url = resolveUrl("~/services/") + url;
+        url = resolveUrl("~/Services/") + url;
 
     options = extend<Serenity.ServiceOptions<TResponse>>({
         dataType: 'json',
@@ -168,7 +168,7 @@ export function parseQueryString(s?: string): {} {
 export function postToService(options: PostToServiceOptions) {
     let form = $('<form/>')
         .attr('method', 'POST')
-        .attr('action', options.url ? (resolveUrl(options.url)) : resolveUrl('~/services/' + options.service))
+        .attr('action', options.url ? (resolveUrl(options.url)) : resolveUrl('~/Services/' + options.service))
         .appendTo(document.body);
     if (options.target)
         form.attr('target', options.target);

@@ -3,6 +3,7 @@ export namespace Aggregators
 {
     export function Avg(field: string): void {
         this.field_ = field;
+        this.type_ = "Avg";
 
         this.init = function () {
             this.count_ = 0;
@@ -31,6 +32,7 @@ export namespace Aggregators
 
     export function WeightedAvg(field: string, weightedField: string) {
         this.field_ = field;
+        this.type_ = "WeightedAvg";
         this.weightedField_ = weightedField;
 
         this.init = function () {
@@ -64,6 +66,7 @@ export namespace Aggregators
 
     export function Min(field: string): void {
         this.field_ = field;
+        this.type_ = "Min";
 
         this.init = function () {
             this.min_ = null;
@@ -88,6 +91,7 @@ export namespace Aggregators
 
     export function Max(field: string): void {
         this.field_ = field;
+        this.type_ = "Max";
 
         this.init = function () {
             this.max_ = null;
@@ -112,6 +116,7 @@ export namespace Aggregators
 
     export function Sum(field: string): void {
         this.field_ = field;
+        this.type = "_Sum";
 
         this.init = function () {
             this.sum_ = null;

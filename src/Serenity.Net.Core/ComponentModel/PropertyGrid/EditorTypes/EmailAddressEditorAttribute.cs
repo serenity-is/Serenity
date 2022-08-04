@@ -7,10 +7,15 @@
     public partial class EmailAddressEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "EmailAddress";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EmailAddressEditorAttribute"/> class.
         /// </summary>
         public EmailAddressEditorAttribute()
-            : base("EmailAddress")
+            : base(Key)
         {
         }
     }

@@ -233,18 +233,18 @@ ${ allowHide ? `<i class="js-hide" title="${ text("Controls.ColumnPickerDialog.H
             Sortable.create(this.ulVisible[0], {
                 group: this.uniqueName + "_group",
                 filter: '.js-hide',
-                onFilter: evt => {
+                onFilter: (evt: any) => {
                     $(evt.item).appendTo(this.ulHidden);
                     this.updateListStates();
                 },
-                onMove: x => {
+                onMove: (x: any) => {
                     if ($(x.dragged).hasClass('cant-hide') &&
                         x.from == this.ulVisible[0] &&
                         x.to !== x.from)
                         return false;
                     return true;
                 },
-                onEnd: evt => this.updateListStates()
+                onEnd: (evt: any) => this.updateListStates()
             });
 
             // @ts-ignore
@@ -252,11 +252,11 @@ ${ allowHide ? `<i class="js-hide" title="${ text("Controls.ColumnPickerDialog.H
                 group: this.uniqueName + "_group",
                 sort: false,
                 filter: '.js-show',
-                onFilter: evt => {
+                onFilter: (evt: any) => {
                     $(evt.item).appendTo(this.ulVisible);
                     this.updateListStates();
                 },
-                onEnd: evt => this.updateListStates()
+                onEnd: () => this.updateListStates()
             });
         }
     }

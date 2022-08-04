@@ -1,6 +1,5 @@
 ﻿using Scriban;
 using Scriban.Runtime;
-using System.IO;
 
 namespace Serenity.CodeGenerator
 {
@@ -10,7 +9,7 @@ namespace Serenity.CodeGenerator
 
         private static readonly ConcurrentDictionary<string, Template> templateCache = new();
 
-        private static Template GetTemplate(string templateKey)
+        private static Template GetTemplate(IGeneratorFileSystem fileSystem, string templateKey)
         {
             if (templateCache.TryGetValue(templateKey, out Template t))
                 return t;
@@ -19,9 +18,9 @@ namespace Serenity.CodeGenerator
 
             if (!string.IsNullOrEmpty(TemplatePath))
             {
-                var overrideFile = Path.Combine(TemplatePath, templateKey + ".scriban");
-                if (File.Exists(overrideFile))
-                    template = File.ReadAllText(overrideFile);
+                var overrideFile = fileSystem.Combine(TemplatePath, templateKey + ".scriban");
+                if (fileSystem.FileExists(overrideFile))
+                    template = fileSystem.ReadAllText(overrideFile);
             }
 
             if (template == null)
@@ -32,7 +31,7 @@ namespace Serenity.CodeGenerator
                 if (stream == null)
                     throw new Exception("Can't find template resource with key: " + templateKey);
 
-                using var sr = new StreamReader(stream);
+                using var sr = new System.IO.StreamReader(stream);
                 template = sr.ReadToEnd();
             }
 
@@ -41,9 +40,9 @@ namespace Serenity.CodeGenerator
             return t;
         }
 
-        public static string Render(string templateKey, object model)
+        public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model)
         {
-            var template = GetTemplate(templateKey);
+            var template = GetTemplate(fileSystem, templateKey);
             try
             {
                 var context = new TemplateContext

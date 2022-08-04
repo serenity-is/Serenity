@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="RestoreNpmPackages.targets" />
+</Project>

@@ -9,10 +9,15 @@
     public partial class HtmlReportContentEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "HtmlReportContent";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="HtmlReportContentEditorAttribute"/> class.
         /// </summary>
         public HtmlReportContentEditorAttribute()
-            : base("HtmlReportContent")
+            : base(Key)
         {
         }
 

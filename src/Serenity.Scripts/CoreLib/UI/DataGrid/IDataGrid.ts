@@ -9,7 +9,7 @@ export interface IDataGrid {
 
 declare global {
     namespace Slick {
-        export interface Column {
+        interface Column<TItem = any> {
             sourceItem?: Serenity.PropertyItem;
         }
     }

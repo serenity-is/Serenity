@@ -1,5 +1,5 @@
 ﻿using Serenity.TypeScript.TsTypes;
-﻿#if NETSTANDARD2_0
+﻿#if ISSOURCEGENERATOR
 using CharSpan = System.String;
 #else
 using CharSpan = System.ReadOnlySpan<char>;
@@ -753,10 +753,10 @@ namespace Serenity.TypeScript.TsParser
             {
                 _pos++;
             }
-#if NETSTANDARD2_0
-            return int.Parse(_text.Substring(start, _pos - start + 1));
+#if ISSOURCEGENERATOR
+            return int.Parse(_text[start.._pos]);
 #else
-            return int.Parse(_text.AsSpan(start, _pos - start + 1));
+            return int.Parse(_text.AsSpan(start, _pos - start));
 #endif
         }
 
@@ -815,7 +815,7 @@ namespace Serenity.TypeScript.TsParser
             {
                 if (_pos >= _end)
                 {
-                    result.Append(_text, start, _pos - start + 1);
+                    result.Append(_text, start, _pos - start);
                     _tokenIsUnterminated = true;
                     Error(Diagnostics.Unterminated_string_literal);
                     break;
@@ -823,20 +823,20 @@ namespace Serenity.TypeScript.TsParser
                 var ch = _text[_pos];
                 if (ch == quote)
                 {
-                    result.Append(_text, start, _pos - start + 1);
+                    result.Append(_text, start, _pos - start);
                     _pos++;
                     break;
                 }
                 if (ch == '\\' && allowEscapes)
                 {
-                    result.Append(_text, start, _pos - start + 1);
+                    result.Append(_text, start, _pos - start);
                     ScanEscapeSequence(result);
                     start = _pos;
                     continue;
                 }
                 if (IsLineBreak(ch))
                 {
-                    result.Append(_text, start, _pos - start + 1);
+                    result.Append(_text, start, _pos - start);
                     _tokenIsUnterminated = true;
                     Error(Diagnostics.Unterminated_string_literal);
                     break;
@@ -857,7 +857,7 @@ namespace Serenity.TypeScript.TsParser
             {
                 if (_pos >= _end)
                 {
-                    contents.Append(_text, start, _pos - start + 1);
+                    contents.Append(_text, start, _pos - start);
                     _tokenIsUnterminated = true;
                     Error(Diagnostics.Unterminated_template_literal);
                     resultingToken = startedWithBacktick ? SyntaxKind.NoSubstitutionTemplateLiteral : SyntaxKind.TemplateTail;
@@ -866,28 +866,28 @@ namespace Serenity.TypeScript.TsParser
                 var currChar = _text[_pos];
                 if (currChar == '`')
                 {
-                    contents.Append(_text, start, _pos - start + 1);
+                    contents.Append(_text, start, _pos - start);
                     _pos++;
                     resultingToken = startedWithBacktick ? SyntaxKind.NoSubstitutionTemplateLiteral : SyntaxKind.TemplateTail;
                     break;
                 }
                 if (currChar == '$' && _pos + 1 < _end && _text[_pos + 1] == '{')
                 {
-                    contents.Append(_text, start, _pos - start + 1);
+                    contents.Append(_text, start, _pos - start);
                     _pos += 2;
                     resultingToken = startedWithBacktick ? SyntaxKind.TemplateHead : SyntaxKind.TemplateMiddle;
                     break;
                 }
                 if (currChar == '\\')
                 {
-                    contents.Append(_text, start, _pos - start + 1);
+                    contents.Append(_text, start, _pos - start);
                     ScanEscapeSequence(contents);
                     start = _pos;
                     continue;
                 }
                 if (currChar == '\r')
                 {
-                    contents.Append(_text, start, _pos - start + 1);
+                    contents.Append(_text, start, _pos - start);
                     _pos++;
                     if (_pos < _end && _text[_pos] == '\n')
                     {
@@ -1061,7 +1061,7 @@ namespace Serenity.TypeScript.TsParser
                     {
                         break;
                     }
-                    result.Append(_text, start, _pos - start + 1);
+                    result.Append(_text, start, _pos - start);
                     result.Append(ch);
                     // Valid Unicode escape is always six characters
                     _pos += 6;
@@ -1072,7 +1072,7 @@ namespace Serenity.TypeScript.TsParser
                     break;
                 }
             }
-            result.Append(_text, start, _pos - start + 1);
+            result.Append(_text, start, _pos - start);
             return result.ToString();
         }
 

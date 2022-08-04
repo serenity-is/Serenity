@@ -7,10 +7,15 @@
     public class MultipleFileUploadEditorAttribute : ImageUploadEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public new const string Key = "MultipleImageUpload";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MultipleFileUploadEditorAttribute"/> class.
         /// </summary>
         public MultipleFileUploadEditorAttribute()
-            : base("MultipleImageUpload")
+            : base(Key)
         {
             AllowNonImage = true;
             JsonEncodeValue = true;

@@ -6,9 +6,14 @@
     /// <seealso cref="CustomFilteringAttribute" />
     public class DateFilteringAttribute : CustomFilteringAttribute
     {
+        /// <summary>
+        /// Filtering type key
+        /// </summary>
+        public const string Key = "Date";
+
         /// <summary>Initializes a new instance of the <see cref="DateFilteringAttribute"/> class.</summary>
         public DateFilteringAttribute()
-            : base("Date")
+            : base(Key)
         {
         }
 

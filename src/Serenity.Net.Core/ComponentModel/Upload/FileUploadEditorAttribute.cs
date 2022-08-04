@@ -7,10 +7,15 @@
     public class FileUploadEditorAttribute : ImageUploadEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public new const string Key = "ImageUpload";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="FileUploadEditorAttribute"/> class.
         /// </summary>
         public FileUploadEditorAttribute()
-            : base("ImageUpload")
+            : base(Key)
         {
             AllowNonImage = true;
         }

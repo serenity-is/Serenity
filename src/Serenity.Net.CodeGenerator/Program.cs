@@ -1,5 +1,4 @@
 ﻿using Serenity.CodeGeneration;
-using System.IO.Abstractions;
 
 namespace Serenity.CodeGenerator
 {
@@ -7,13 +6,13 @@ namespace Serenity.CodeGenerator
     {
         public static void Main(string[] args)
         {
-            var exitCode = Run(args, new FileSystem(), () => new MSBuild.MSBuildProjectSystem());
+            var exitCode = Run(args, new PhysicalGeneratorFileSystem(), () => new MSBuild.MSBuildProjectSystem());
             if (exitCode != ExitCodes.Success &&
                 exitCode != ExitCodes.Help)
                 Environment.Exit((int)exitCode);
         }
 
-        public static ExitCodes Run(string[] args, IFileSystem fileSystem, 
+        public static ExitCodes Run(string[] args, IGeneratorFileSystem fileSystem, 
             Func<IBuildProjectSystem> projectSystemFactory)
         {
             if (fileSystem is null)
@@ -53,7 +52,7 @@ namespace Serenity.CodeGenerator
 
             if (csproj == null)
             {
-                var csprojs = fileSystem.Directory.GetFiles(".", "*.csproj");
+                var csprojs = fileSystem.GetFiles(".", "*.csproj");
                 if (csprojs.Length == 0)
                 {
                     Console.Error.WriteLine("Can't find a project file in current directory!");
@@ -71,10 +70,10 @@ namespace Serenity.CodeGenerator
                 csproj = csprojs[0];
             }
 
-            if (!fileSystem.File.Exists(csproj))
+            if (!fileSystem.FileExists(csproj))
                 return ExitCodes.ProjectNotFound;
 
-            var projectDir = fileSystem.Path.GetFullPath(fileSystem.Path.GetDirectoryName(csproj));
+            var projectDir = fileSystem.GetFullPath(fileSystem.GetDirectoryName(csproj));
 
             try
             {
@@ -106,19 +105,19 @@ namespace Serenity.CodeGenerator
                     if (transformAll ||
                         "mvct".StartsWith(command, StringComparison.Ordinal))
                     {
-                        MvcCommand.Run(csproj);
+                        new MvcCommand(fileSystem).Run(csproj);
                     }
 
                     if (transformAll ||
                         "clienttypes".StartsWith(command, StringComparison.Ordinal) || command == "mvct")
                     {
-                        ClientTypesCommand.Run(csproj, getTsTypes());
+                        new ClientTypesCommand(fileSystem).Run(csproj, getTsTypes());
                     }
 
                     if (transformAll ||
                         "servertypings".StartsWith(command, StringComparison.Ordinal))
                     {
-                        ServerTypingsCommand.Run(csproj, getTsTypes());
+                        new ServerTypingsCommand(fileSystem).Run(csproj, getTsTypes());
                     }
 
                     return ExitCodes.Success;
@@ -126,7 +125,7 @@ namespace Serenity.CodeGenerator
 
                 if ("generate".StartsWith(command, StringComparison.Ordinal))
                 {
-                    GenerateCommand.Run(csproj, args.Skip(1).ToArray(), fileSystem);
+                    new GenerateCommand(fileSystem).Run(csproj, args.Skip(1).ToArray());
                     return ExitCodes.Success;
                 }
             }
@@ -143,7 +142,7 @@ namespace Serenity.CodeGenerator
         private static void WriteHelp()
         {
             Console.WriteLine("Serenity Code Generator " +
-                System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
+                Assembly.GetEntryAssembly().GetName().Version);
             Console.WriteLine();
             Console.WriteLine("Usage: sergen [command]");
             Console.WriteLine();

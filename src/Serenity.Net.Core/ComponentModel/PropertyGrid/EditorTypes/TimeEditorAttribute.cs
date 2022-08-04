@@ -7,10 +7,15 @@
     public partial class TimeEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "Time";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TimeEditorAttribute"/> class.
         /// </summary>
         public TimeEditorAttribute()
-            : base("Time")
+            : base(Key)
         {
         }
 

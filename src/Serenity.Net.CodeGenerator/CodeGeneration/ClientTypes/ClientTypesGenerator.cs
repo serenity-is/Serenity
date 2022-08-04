@@ -7,7 +7,23 @@
 
         static ClientTypesGenerator()
         {
-            lookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            lookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "Async",
+                "AutoComplete",
+                "CascadeField",
+                "CascadeValue",
+                "Delimited",
+                "DialogType",
+                "FilterField",
+                "FilterValue",
+                "InplaceAdd",
+                "InplaceAddPermission",
+                "LookupKey",
+                "MinimumResultsForSearch",
+                "Multiple",
+                "OpenDialogAsPanel"
+            };
 
             var lookupEditorBaseAttr = Type.GetType("Serenity.ComponentModel.LookupEditorBaseAttribute, Serenity.Net.Core");
             if (lookupEditorBaseAttr != null)
@@ -17,7 +33,31 @@
                     lookupEditorBaseOptions.Add(p.Name);
             }
 
-            serviceLookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            serviceLookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "AutoComplete",
+                "CascadeField",
+                "CascadeValue",
+                "ColumnSelection",
+                "Delimited",
+                "DialogType",
+                "ExcludeColumns",
+                "FilterField",
+                "FilterValue",
+                "IdField",
+                "TextField",
+                "IncludeColumns",
+                "IncludeDeleted",
+                "InplaceAdd",
+                "InplaceAddPermission",
+                "ItemType",
+                "MinimumResultsForSearch",
+                "Multiple",
+                "OpenDialogAsPanel",
+                "PageSize",
+                "Service",
+                "Sort"
+            };
 
             var serviceLookupEditorBaseAttr = Type.GetType("Serenity.ComponentModel.ServiceLookupEditorBaseAttribute, Serenity.Net.Core");
             if (serviceLookupEditorBaseAttr != null)

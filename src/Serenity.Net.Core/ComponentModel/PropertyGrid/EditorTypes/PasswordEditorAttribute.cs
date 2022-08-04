@@ -7,10 +7,15 @@
     public partial class PasswordEditorAttribute : CustomEditorAttribute
     {
         /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "Password";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PasswordEditorAttribute"/> class.
         /// </summary>
         public PasswordEditorAttribute()
-            : base("Password")
+            : base(Key)
         {
         }
     }

@@ -1,3 +1,37 @@
+## 6.0.8 (2022-07-12)
+
+Features:
+  - add option to set background color when using padwithfill
+
+## 6.0.7 (2022-07-11)
+
+Bugfixes:
+  - fix utf 8 bom not written to generated files in last two versions
+
+## 6.0.6 (2022-07-11)
+
+Features:
+  - remove app specific texts from Serenity
+
+## 6.0.5 (2022-07-11)
+
+Features:
+  - add key for EmailEditor (please prefer EmailAddressEditor)
+
+## 6.0.4 (2022-07-10)
+
+Features:
+  - remove System.IO.Abstractions dependency from Serenity.CodeGenerator as preparation for source generators
+  - add key constant to all editor, foramtter, filtering attributes
+  - use pnpm if installed
+  - use libman instead of npm for typings where possible
+
+Bugfixes:
+  - fix cast error occuring in TSTypeLister in rare cases
+  - fix generated texts not accessible
+  - slick grid getCellNode should return an element not jQuery object
+  
+
 ## 6.0.3 (2022-06-24)
 
 Features:

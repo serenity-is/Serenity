@@ -1,10 +1,10 @@
-﻿using System.IO;
-
-namespace Serenity.CodeGenerator
+﻿namespace Serenity.CodeGenerator
 {
     public class EntityCodeGenerator
     {
         private readonly GeneratorConfig config;
+        private readonly IGeneratorFileSystem fileSystem;
+        private readonly ICodeFileHelper codeFileHelper;
         private readonly EntityModel model;
         private readonly string rootDir;
         private readonly Encoding utf8 = new UTF8Encoding(true);
@@ -12,58 +12,60 @@ namespace Serenity.CodeGenerator
         private readonly string moduleClass;
         private readonly string typingClass;
 
-        public EntityCodeGenerator(EntityModel model, GeneratorConfig config, string csproj)
+        public EntityCodeGenerator(IGeneratorFileSystem fileSystem, ICodeFileHelper codeFileHelper, EntityModel model, GeneratorConfig config, string csproj)
         {
+            this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            this.codeFileHelper = codeFileHelper ?? throw new ArgumentNullException(nameof(codeFileHelper));
             this.model = model;
 
-            rootDir = Path.GetDirectoryName(Path.GetFullPath(csproj));
+            rootDir = fileSystem.GetDirectoryName(fileSystem.GetFullPath(csproj));
             this.config = config;
             this.model.CustomSettings = config.CustomSettings;
 
-            var serverTypings = PathHelper.ToPath(Path.Combine(rootDir, PathHelper.ToPath("Modules/Common/Imports/ServerTypings/")));
-            if (!Directory.Exists(serverTypings))
-                serverTypings = Path.Combine(rootDir, PathHelper.ToPath("Imports/ServerTypings/"));
+            var serverTypings = PathHelper.ToPath(fileSystem.Combine(rootDir, PathHelper.ToPath("Modules/Common/Imports/ServerTypings/")));
+            if (!fileSystem.DirectoryExists(serverTypings))
+                serverTypings = fileSystem.Combine(rootDir, PathHelper.ToPath("Imports/ServerTypings/"));
 
-            typingClass = Path.Combine(serverTypings, model.ModuleDot + model.ClassName);
+            typingClass = fileSystem.Combine(serverTypings, model.ModuleDot + model.ClassName);
 
-            modulePath = Path.Combine(rootDir, "Modules"); 
+            modulePath = fileSystem.Combine(rootDir, "Modules"); 
             if (!string.IsNullOrEmpty(model.Module))
-                modulePath = Path.Combine(modulePath, model.Module);
+                modulePath = fileSystem.Combine(modulePath, model.Module);
 
-            moduleClass = Path.Combine(modulePath, Path.Combine(model.ClassName, model.ClassName));
+            moduleClass = fileSystem.Combine(modulePath, fileSystem.Combine(model.ClassName, model.ClassName));
         }
 
         public void Run()
         {
             if (config.GenerateRow)
             {
-                CreateFile(Templates.Render("Row", model), moduleClass + "Row.cs");
-                CreateFile(Templates.Render("RowTyping", model), typingClass + "Row.ts");
+                CreateFile(Templates.Render(fileSystem, "Row", model), moduleClass + "Row.cs");
+                CreateFile(Templates.Render(fileSystem, "RowTyping", model), typingClass + "Row.ts");
             }
 
             if (config.GenerateService)
             {
-                var handlerClass = Path.Combine(modulePath, 
-                    Path.Combine(model.ClassName, "RequestHandlers", model.ClassName));
-                CreateFile(Templates.Render("DeleteHandler", model), handlerClass + "DeleteHandler.cs");
-                CreateFile(Templates.Render("ListHandler", model), handlerClass + "ListHandler.cs");
-                CreateFile(Templates.Render("RetrieveHandler", model), handlerClass + "RetrieveHandler.cs");
-                CreateFile(Templates.Render("SaveHandler", model), handlerClass + "SaveHandler.cs");
+                var handlerClass = fileSystem.Combine(modulePath, 
+                    fileSystem.Combine(model.ClassName, "RequestHandlers", model.ClassName));
+                CreateFile(Templates.Render(fileSystem, "DeleteHandler", model), handlerClass + "DeleteHandler.cs");
+                CreateFile(Templates.Render(fileSystem, "ListHandler", model), handlerClass + "ListHandler.cs");
+                CreateFile(Templates.Render(fileSystem, "RetrieveHandler", model), handlerClass + "RetrieveHandler.cs");
+                CreateFile(Templates.Render(fileSystem, "SaveHandler", model), handlerClass + "SaveHandler.cs");
 
-                CreateFile(Templates.Render("Endpoint", model), moduleClass + "Endpoint.cs");
-                CreateFile(Templates.Render("ServiceTyping", model), typingClass + "Service.ts");
+                CreateFile(Templates.Render(fileSystem, "Endpoint", model), moduleClass + "Endpoint.cs");
+                CreateFile(Templates.Render(fileSystem, "ServiceTyping", model), typingClass + "Service.ts");
             }
 
             if (config.GenerateUI)
             {
-                CreateFile(Templates.Render("Page", model), moduleClass + "Page.cs");
-                CreateFile(Templates.Render("IndexView", model), moduleClass + "Index.cshtml");
-                CreateFile(Templates.Render("Columns", model), moduleClass + "Columns.cs");
-                CreateFile(Templates.Render("Form", model), moduleClass + "Form.cs");
-                CreateFile(Templates.Render("Dialog", model), moduleClass + "Dialog.ts");
-                CreateFile(Templates.Render("Grid", model), moduleClass + "Grid.ts");
-                CreateFile(Templates.Render("FormTyping", model), typingClass + "Form.ts");
-                CreateFile(Templates.Render("ColumnsTyping", model), typingClass + "Columns.ts");
+                CreateFile(Templates.Render(fileSystem, "Page", model), moduleClass + "Page.cs");
+                CreateFile(Templates.Render(fileSystem, "IndexView", model), moduleClass + "Index.cshtml");
+                CreateFile(Templates.Render(fileSystem, "Columns", model), moduleClass + "Columns.cs");
+                CreateFile(Templates.Render(fileSystem, "Form", model), moduleClass + "Form.cs");
+                CreateFile(Templates.Render(fileSystem, "Dialog", model), moduleClass + "Dialog.ts");
+                CreateFile(Templates.Render(fileSystem, "Grid", model), moduleClass + "Grid.ts");
+                CreateFile(Templates.Render(fileSystem, "FormTyping", model), typingClass + "Form.ts");
+                CreateFile(Templates.Render(fileSystem, "ColumnsTyping", model), typingClass + "Columns.ts");
 
                 GenerateNavigationLink();
                 GenerateStyle();
@@ -90,58 +92,59 @@ namespace Serenity.CodeGenerator
                         throw new ArgumentOutOfRangeException("outputFile");
 
                     outputFile = string.Format(CultureInfo.InvariantCulture, outputFile, model.ClassName, model.Module, 
-                        Path.GetDirectoryName(moduleClass), Path.GetDirectoryName(typingClass), rootDir);
+                        fileSystem.GetDirectoryName(moduleClass), fileSystem.GetDirectoryName(typingClass), rootDir);
 
-                    var content = Templates.Render(templateKey, model);
+                    var content = Templates.Render(fileSystem, templateKey, model);
                     if (!string.IsNullOrWhiteSpace(content))
                         CreateFile(content, outputFile);
                 }
             }
         }
 
-        private static string CreateDirectoryOrBackupFile(string file)
+        private string CreateDirectoryOrBackupFile(string file)
         {
-            if (File.Exists(file))
+            if (fileSystem.FileExists(file))
             {
                 var backupFile = string.Format(CultureInfo.InvariantCulture, "{0}.{1}.bak", file, 
                     DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture));
-                CodeFileHelper.CheckoutAndWrite(backupFile, File.ReadAllBytes(file), false);
+                codeFileHelper.CheckoutAndWrite(backupFile, fileSystem.ReadAllBytes(file));
                 return backupFile;
             }
             else
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                fileSystem.CreateDirectory(fileSystem.GetDirectoryName(file));
                 return null;
             }
         }
 
-        private static void CreateFile(string code, string file)
+        private void CreateFile(string code, string file)
         {
             var backup = CreateDirectoryOrBackupFile(file);
-            CodeFileHelper.CheckoutAndWrite(file, code, true);
-            CodeFileHelper.MergeChanges(backup, file);
+            codeFileHelper.CheckoutAndWrite(file, code);
+            codeFileHelper.MergeChanges(backup, file);
         }
 
         private void GenerateStyle()
         {
             string contentSite = PathHelper.ToPath("wwwroot/Content/site");
-            string file = Path.Combine(rootDir, Path.Combine(contentSite,
+            string file = fileSystem.Combine(rootDir, fileSystem.Combine(contentSite,
                     "site" + model.DotModule.ToLowerInvariant() + ".less"));
 
-            var siteLess = Path.Combine(rootDir, Path.Combine(contentSite, "site.less"));
+            var siteLess = fileSystem.Combine(rootDir, fileSystem.Combine(contentSite, "site.less"));
 
-            if (!File.Exists(siteLess) &&
-                !File.Exists(file))
+            if (!fileSystem.FileExists(siteLess) &&
+                !fileSystem.FileExists(file))
             {
                 // probably newer template where we don't use less
                 return;
             }
 
             if (!string.IsNullOrEmpty(model.Module) &&
-                File.Exists(siteLess))
+                fileSystem.FileExists(siteLess))
             {
                 var importLine = "@import \"site." + model.Module.ToLowerInvariant() + ".less\";";
-                var lines = File.ReadAllLines(siteLess).ToList();
+                var lines = fileSystem.ReadAllText(siteLess)
+                    .Replace("\r", "", StringComparison.Ordinal).Split('\n').ToList();
                 if (!lines.Any(x => string.Compare(x ?? "", importLine, StringComparison.OrdinalIgnoreCase) == 0))
                 {
                     var index = lines.FindLastIndex(x =>
@@ -156,55 +159,55 @@ namespace Serenity.CodeGenerator
                         index++;
 
                     lines.Insert(index, importLine);
-                    CodeFileHelper.CheckoutAndWrite(siteLess, string.Join(Environment.NewLine, lines), false);
+                    codeFileHelper.CheckoutAndWrite(siteLess, string.Join(Environment.NewLine, lines));
                 }
             }
 
-            if (!File.Exists(file))
+            if (!fileSystem.FileExists(file))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                fileSystem.CreateDirectory(fileSystem.GetDirectoryName(file));
                 CreateFile("@import \"site.mixins.less\";" + Environment.NewLine, file);
             }
 
-            string code = Templates.Render("Style", model);
-            using var ms = new MemoryStream();
+            string code = Templates.Render(fileSystem, "Style", model);
+            using var ms = new System.IO.MemoryStream();
             var firstLine = code.Replace("\r", "", StringComparison.Ordinal)
                 .Split('\n').FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
             if (!string.IsNullOrWhiteSpace(firstLine))
             {
-                var lines = File.ReadAllLines(file);
+                var lines = fileSystem.ReadAllText(file).Replace("\r", "").Split('\n');
                 // don't generate less for dialog multiple times
                 if (lines.Any(x => x.IsTrimmedSame(firstLine)))
                     return;
             }
 
-            var old = File.ReadAllBytes(file);
+            var old = fileSystem.ReadAllBytes(file);
             if (old.Length > 0)
                 ms.Write(old, 0, old.Length);
-            using var sw = new StreamWriter(ms, utf8);
+            using var sw = new System.IO.StreamWriter(ms, utf8);
             sw.Write(code);
             sw.Flush();
 
-            CodeFileHelper.CheckoutAndWrite(file, ms.ToArray(), false);
+            codeFileHelper.CheckoutAndWrite(file, ms.ToArray());
         }
 
         private void GenerateNavigationLink()
         {
-            string file = Path.Combine(rootDir, string.IsNullOrEmpty(model.Module) ?
+            string file = fileSystem.Combine(rootDir, string.IsNullOrEmpty(model.Module) ?
                 "Modules/Common/Navigation/NavigationItems.cs" :
                 "Modules/" + model.ModuleSlash + model.Module + "Navigation.cs");
             file = PathHelper.ToPath(file);
 
-            string code = Templates.Render("NavigationLink", model);
+            string code = Templates.Render(fileSystem, "NavigationLink", model);
 
-            if (!File.Exists(file))
+            if (!fileSystem.FileExists(file))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                fileSystem.CreateDirectory(fileSystem.GetDirectoryName(file));
                 CreateFile(code, file);
             }
             else
             {
-                var lines = File.ReadAllLines(file).ToList();
+                var lines = fileSystem.ReadAllText(file).Replace("\r", "").Split('\n').ToList();
                 var toInsert = code.Replace("\r", "", StringComparison.Ordinal).Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 var usingIndex = lines.FindLastIndex(x => x.TrimToEmpty().StartsWith("using ", StringComparison.Ordinal));
                 if (usingIndex < 0)
@@ -228,7 +231,7 @@ namespace Serenity.CodeGenerator
                         lines.Insert(insertIndex, z);
                 }
 
-                CodeFileHelper.CheckoutAndWrite(file, string.Join(Environment.NewLine, lines), false);
+                codeFileHelper.CheckoutAndWrite(file, string.Join(Environment.NewLine, lines));
             }
         }
     }

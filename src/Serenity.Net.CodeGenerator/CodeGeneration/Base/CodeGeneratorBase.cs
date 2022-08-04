@@ -1,6 +1,4 @@
-﻿using Serenity.Reflection;
-
-namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration
 {
     public abstract class CodeGeneratorBase
     {

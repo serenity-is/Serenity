@@ -1,9 +1,13 @@
-﻿using Mono.Cecil;
+﻿#if ISSOURCEGENERATOR
+using System.Collections.Immutable;
+using System.Threading;
+using Microsoft.CodeAnalysis;
+#endif
 using Serenity.Reflection;
 
 namespace Serenity.CodeGeneration
 {
-    public abstract class CecilImportGenerator : ImportGeneratorBase
+    public abstract class TypingsGeneratorBase : ImportGeneratorBase
     {
         private HashSet<string> visited;
         private Queue<TypeDefinition> generateQueue;
@@ -13,17 +17,87 @@ namespace Serenity.CodeGeneration
         protected string fileIdentifier;
         protected List<AnnotationTypeInfo> annotationTypes;
 
-        protected CecilImportGenerator(params Assembly[] assemblies)
-            : this(CecilUtils.ToDefinitions(assemblies?.Select(x => x.Location)))
+#if ISSOURCEGENERATOR
+        private readonly CancellationToken cancellationToken;
+
+        protected TypingsGeneratorBase(Compilation compilation, CancellationToken cancellationToken)
+        {
+            Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
+            this.cancellationToken = cancellationToken;
+            generatedTypes = new HashSet<string>();
+            annotationTypes = new List<AnnotationTypeInfo>();
+        }
+
+        public Compilation Compilation { get; }
+
+        internal class ExportedTypesCollector : SymbolVisitor
+        {
+            private readonly CancellationToken _cancellationToken;
+            private readonly HashSet<INamedTypeSymbol> _exportedTypes;
+
+            public ExportedTypesCollector(CancellationToken cancellation)
+            {
+                _cancellationToken = cancellation;
+                _exportedTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+            }
+
+            public ImmutableArray<INamedTypeSymbol> GetPublicTypes() => _exportedTypes.ToImmutableArray();
+
+            public override void VisitAssembly(IAssemblySymbol symbol)
+            {
+                _cancellationToken.ThrowIfCancellationRequested();
+                symbol.GlobalNamespace.Accept(this);
+            }
+
+            public override void VisitNamespace(INamespaceSymbol symbol)
+            {
+                foreach (INamespaceOrTypeSymbol namespaceOrType in symbol.GetMembers())
+                {
+                    _cancellationToken.ThrowIfCancellationRequested();
+                    namespaceOrType.Accept(this);
+                }
+            }
+
+            public static bool IsAccessibleOutsideOfAssembly(ISymbol symbol) =>
+                symbol.DeclaredAccessibility switch
+                {
+                    Accessibility.Protected => true,
+                    Accessibility.ProtectedOrInternal => true,
+                    Accessibility.Public => true,
+                    _ => false
+                };
+
+            public override void VisitNamedType(INamedTypeSymbol type)
+            {
+                _cancellationToken.ThrowIfCancellationRequested();
+
+                if (!IsAccessibleOutsideOfAssembly(type) || !_exportedTypes.Add(type))
+                    return;
+
+                var nestedTypes = type.GetTypeMembers();
+
+                if (nestedTypes.IsDefaultOrEmpty)
+                    return;
+
+                foreach (INamedTypeSymbol nestedType in nestedTypes)
+                {
+                    _cancellationToken.ThrowIfCancellationRequested();
+                    nestedType.Accept(this);
+                }
+            }
+        }
+#else
+        protected TypingsGeneratorBase(IGeneratorFileSystem fileSystem, params Assembly[] assemblies)
+            : this(TypingsUtils.ToDefinitions(fileSystem, assemblies?.Select(x => x.Location)))
         {
         }
 
-        protected CecilImportGenerator(params string[] assemblyLocations)
-            : this(CecilUtils.ToDefinitions(assemblyLocations))
+        protected TypingsGeneratorBase(IGeneratorFileSystem fileSystem, params string[] assemblyLocations)
+            : this(TypingsUtils.ToDefinitions(fileSystem, assemblyLocations))
         {
         }
 
-        protected CecilImportGenerator(params AssemblyDefinition[] assemblies)
+        protected TypingsGeneratorBase(params Mono.Cecil.AssemblyDefinition[] assemblies)
             : base()
         {
             generatedTypes = new HashSet<string>();
@@ -35,14 +109,15 @@ namespace Serenity.CodeGeneration
             Assemblies = assemblies;
         }
 
-        public AssemblyDefinition[] Assemblies { get; private set; }
+        public Mono.Cecil.AssemblyDefinition[] Assemblies { get; private set; }
+#endif
 
         protected virtual bool EnqueueType(TypeDefinition type)
         {
-            if (visited.Contains(type.FullName))
+            if (visited.Contains(type.FullNameOf()))
                 return false;
 
-            visited.Add(type.FullName);
+            visited.Add(type.FullNameOf());
             generateQueue.Enqueue(type);
             return true;
         }
@@ -52,47 +127,43 @@ namespace Serenity.CodeGeneration
             if (memberType == null)
                 return;
 
-            var enumType = CecilUtils.GetEnumTypeFrom(memberType);
+            var enumType = TypingsUtils.GetEnumTypeFrom(memberType);
             if (enumType != null)
                 EnqueueType(enumType);
         }
 
         protected virtual void EnqueueTypeMembers(TypeDefinition type)
         {
-            foreach (var field in type.Fields)
+            foreach (var field in type.FieldsOf())
+                if (!field.IsStatic && field.IsPublic())
+                    EnqueueMemberType(field.FieldType());
+
+            foreach (var property in type.PropertiesOf())
             {
-                if (field.IsStatic | !field.IsPublic)
+                if (!TypingsUtils.IsPublicInstanceProperty(property))
                     continue;
 
-                EnqueueMemberType(field.FieldType);
-            }
-
-            foreach (var property in type.Properties)
-            {
-                if (!CecilUtils.IsPublicInstanceProperty(property))
-                    continue;
-
-                EnqueueMemberType(property.PropertyType);
+                EnqueueMemberType(property.PropertyType());
             }
         }
 
         protected virtual string GetNamespace(TypeReference type)
         {
-            var ns = type.Namespace ?? "";
-            if (string.IsNullOrEmpty(ns) && type.IsNested)
-                ns = type.DeclaringType.Namespace;
+            var ns = type.NamespaceOf() ?? "";
+            if (string.IsNullOrEmpty(ns) && type.IsNested())
+                ns = type.DeclaringType().NamespaceOf();
 
             if (ns.EndsWith(".Entities", StringComparison.Ordinal))
-                return ns.Substring(0, ns.Length - ".Entities".Length);
+                return ns[..^".Entities".Length];
 
             if (ns.EndsWith(".Endpoints", StringComparison.Ordinal))
-                return ns.Substring(0, ns.Length - ".Endpoints".Length);
+                return ns[..^".Endpoints".Length];
 
             if (ns.EndsWith(".Forms", StringComparison.Ordinal))
-                return ns.Substring(0, ns.Length - ".Forms".Length);
+                return ns[..^".Forms".Length];
 
             if (ns.EndsWith(".Columns", StringComparison.Ordinal))
-                return ns.Substring(0, ns.Length - ".Columns".Length);
+                return ns[..^".Columns".Length];
 
             return ns;
         }
@@ -111,19 +182,25 @@ namespace Serenity.CodeGeneration
         {
             base.Reset();
 
-            cw.BraceOnSameLine = IsTS();
+            cw.BraceOnSameLine = true;
             generateQueue = new Queue<TypeDefinition>();
             visited = new HashSet<string>();
             lookupScripts = new List<TypeDefinition>();
             localTextKeys = new HashSet<string>();
         }
 
-        protected abstract bool IsTS();
-
         protected override void GenerateAll()
         {
             var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+#if ISSOURCEGENERATOR
+            var types = Compilation.GetSymbolsWithName(s => true, SymbolFilter.Type).OfType<ITypeSymbol>();
+
+            var collector = new ExportedTypesCollector(cancellationToken);
+            collector.VisitNamespace(Compilation.GlobalNamespace);
+            foreach (var expType in collector.GetPublicTypes())
+                ScanAnnotationTypeAttributes(expType);
+#else
             foreach (var assembly in Assemblies)
             {
                 foreach (var module in assembly.Modules)
@@ -175,20 +252,25 @@ namespace Serenity.CodeGeneration
                             }
                         }
                     }
+#endif
 
                     TypeDefinition[] emptyTypes = Array.Empty<TypeDefinition>();
 
                     foreach (var fromType in types)
                     {
-                        var nestedLocalTexts = CecilUtils.GetAttr(fromType, "Serenity.Extensibility",
+                        var nestedLocalTexts = TypingsUtils.GetAttr(fromType, "Serenity.Extensibility",
                             "NestedLocalTextsAttribute", emptyTypes) ??
-                            CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", 
+                            TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", 
                                 "NestedLocalTextsAttribute", emptyTypes);
                         if (nestedLocalTexts != null)
                         {
                             string prefix = null;
+#if ISSOURCEGENERATOR
+                            prefix = nestedLocalTexts.NamedArguments.FirstOrDefault(x => x.Key == "Prefix").Value.Value as string;
+#else
                             if (nestedLocalTexts.HasProperties)
                                 prefix = nestedLocalTexts.Properties.FirstOrDefault(x => x.Name == "Prefix").Argument.Value as string;
+#endif
 
                             AddNestedLocalTexts(fromType, prefix ?? "");
                         }
@@ -196,56 +278,67 @@ namespace Serenity.CodeGeneration
                         ScanAnnotationTypeAttributes(fromType);
 
                         if (fromType.IsAbstract ||
-                            CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+#if ISSOURCEGENERATOR
+                            (fromType.ContainingType != null && fromType.DeclaredAccessibility != Accessibility.Public) ||
+#endif
+                            TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
                             continue;
 
-                        var baseClasses = CecilUtils.EnumerateBaseClasses(fromType).ToArray();
+                        var baseClasses = TypingsUtils.EnumerateBaseClasses(fromType).ToArray();
 
-                        if (CecilUtils.Contains(baseClasses, "Serenity.Services", "ServiceRequest") ||
-                            CecilUtils.Contains(baseClasses, "Serenity.Services", "ServiceResponse") ||
-                            CecilUtils.Contains(baseClasses, "Serenity.Data", "Row") ||
-                            CecilUtils.Contains(baseClasses, "Serenity.Data", "Row`1") ||
-                            CecilUtils.Contains(baseClasses, "Serenity.Services", "ServiceEndpoint") ||
-                            CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "ScriptIncludeAttribute", baseClasses) != null ||
-                            CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "FormScriptAttribute", baseClasses) != null ||
-                            CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "ColumnsScriptAttribute", baseClasses) != null ||
-                            CecilUtils.GetAttr(fromType, "Serenity.Extensibility", "NestedPermissionKeysAttribute", emptyTypes) != null ||
-                            CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "NestedPermissionKeysAttribute", emptyTypes) != null ||
-                            ((CecilUtils.Contains(baseClasses, "Microsoft.AspNetCore.Mvc", "Controller") ||
-                              CecilUtils.Contains(baseClasses, "System.Web.Mvc", "Controller")) && // backwards compability
-                             fromType.Namespace != null &&
-                             fromType.Namespace.EndsWith(".Endpoints", StringComparison.Ordinal)))
+                        if (TypingsUtils.Contains(baseClasses, "Serenity.Services", "ServiceRequest") ||
+                            TypingsUtils.Contains(baseClasses, "Serenity.Services", "ServiceResponse") ||
+                            TypingsUtils.Contains(baseClasses, "Serenity.Data", "Row") ||
+                            TypingsUtils.Contains(baseClasses, "Serenity.Data", "Row`1") ||
+                            TypingsUtils.Contains(baseClasses, "Serenity.Services", "ServiceEndpoint") ||
+                            TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "ScriptIncludeAttribute", baseClasses) != null ||
+                            TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "FormScriptAttribute", baseClasses) != null ||
+                            TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "ColumnsScriptAttribute", baseClasses) != null ||
+                            TypingsUtils.GetAttr(fromType, "Serenity.Extensibility", "NestedPermissionKeysAttribute", emptyTypes) != null ||
+                            TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "NestedPermissionKeysAttribute", emptyTypes) != null ||
+                            ((TypingsUtils.Contains(baseClasses, "Microsoft.AspNetCore.Mvc", "Controller") ||
+                              TypingsUtils.Contains(baseClasses, "System.Web.Mvc", "Controller")) && // backwards compability
+                             fromType.NamespaceOf()?.EndsWith(".Endpoints", StringComparison.Ordinal) == true))
                         {
                             EnqueueType(fromType);
                             continue;
                         }
 
-                        if (CecilUtils.GetAttr(fromType, "Serenity.ComponentModel", "LookupScriptAttribute", baseClasses) != null)
+                        if (TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "LookupScriptAttribute", baseClasses) != null)
                             lookupScripts.Add(fromType);
                     }
-                }
+#if !ISSOURCEGENERATOR
+        }
             }
+#endif
 
             while (generateQueue.Count > 0)
             {
                 var typeDef = generateQueue.Dequeue();
 
+#if ISSOURCEGENERATOR
+                if (typeDef.ContainingAssembly?.Name != Compilation.AssemblyName)
+                    continue;
+#else
                 if (!Assemblies.Any(x => x.FullName == typeDef.Module.Assembly.FullName))
                     continue;
+#endif
 
                 var ns = GetNamespace(typeDef);
                 fileIdentifier = typeDef.Name;
 
                 GenerateCodeFor(typeDef);
 
-                AddFile(RemoveRootNamespace(ns, fileIdentifier + (IsTS() ? ".ts" : ".cs")));
+                AddFile(RemoveRootNamespace(ns, fileIdentifier + ".ts"));
             }
         }
 
         private void ScanAnnotationTypeAttributes(TypeDefinition fromType)
         {
-            var annotationTypeAttrs = CecilUtils.GetAttrs(fromType.CustomAttributes,
-                                        "Serenity.ComponentModel", "AnnotationTypeAttribute", null);
+            var annotationTypeAttrs = TypingsUtils.GetAttrs(
+                fromType.GetAttributes(),
+                "Serenity.ComponentModel", "AnnotationTypeAttribute", null);
+
             if (!annotationTypeAttrs.Any())
                 return;
 
@@ -253,22 +346,22 @@ namespace Serenity.CodeGeneration
             foreach (var attr in annotationTypeAttrs)
             {
                 var attrInfo = new AnnotationTypeInfo.AttributeInfo();
-                if (attr.ConstructorArguments?.FirstOrDefault(x =>
-                    x.Type.FullName == "System.Type").Value is not TypeReference annotatedType)
+                if (attr.ConstructorArguments()?.FirstOrDefault(x =>
+                    x.Type.FullNameOf() == "System.Type").Value is not TypeReference annotatedType)
                     continue;
 
                 attrInfo.AnnotatedType = annotatedType.Resolve();
 
-                if (attr.HasProperties)
+                if (attr.HasProperties())
                 {
-                    attrInfo.Inherited = attr.Properties.FirstOrDefault(x =>
-                        x.Name == "Inherited").Argument.Value as bool? ?? true;
+                    attrInfo.Inherited = attr.GetProperties().FirstOrDefault(x =>
+                        x.Name() == "Inherited").ArgumentValue() as bool? ?? true;
 
-                    attrInfo.Namespaces = attr.Properties.FirstOrDefault(x =>
-                        x.Name == "Namespaces").Argument.Value as string[];
+                    attrInfo.Namespaces = attr.GetProperties().FirstOrDefault(x =>
+                        x.Name() == "Namespaces").ArgumentValue() as string[];
 
-                    attrInfo.Properties = attr.Properties.FirstOrDefault(x =>
-                        x.Name == "Properties").Argument.Value as string[];
+                    attrInfo.Properties = attr.GetProperties().FirstOrDefault(x =>
+                        x.Name() == "Properties").ArgumentValue() as string[];
                 }
                 else
                     attrInfo.Inherited = true;
@@ -289,20 +382,29 @@ namespace Serenity.CodeGeneration
 
                 foreach (var attr in annotationType.Attributes)
                 {
-                    baseClasses ??= CecilUtils.EnumerateBaseClasses(type).ToArray();
+                    baseClasses ??= TypingsUtils.EnumerateBaseClasses(type).ToArray();
 
-                    if (CecilUtils.IsOrSubClassOf(attr.AnnotatedType, "System", "Attribute"))
+                    if (TypingsUtils.IsOrSubClassOf(attr.AnnotatedType, "System", "Attribute"))
                     {
-                        if (CecilUtils.GetAttr(type, attr.AnnotatedType.Namespace, 
+                        if (TypingsUtils.GetAttr(type, attr.AnnotatedType.NamespaceOf(), 
                             attr.AnnotatedType.Name, baseClasses) == null) 
                             continue;
                     }
-                    else if (attr.Inherited || attr.AnnotatedType.IsInterface)
+                    else if (attr.Inherited ||
+#if ISSOURCEGENERATOR
+                        attr.AnnotatedType.TypeKind == TypeKind.Interface)
+#else
+                        attr.AnnotatedType.IsInterface)
+#endif
                     {
-                        if (!CecilUtils.IsAssignableFrom(attr.AnnotatedType, type))
+                        if (!TypingsUtils.IsAssignableFrom(attr.AnnotatedType, type))
                             continue;
                     }
+#if ISSOURCEGENERATOR
+                    else if (!type.Equals(attr.AnnotatedType, SymbolEqualityComparer.Default))
+#else
                     else if (type != attr.AnnotatedType)
+#endif
                         continue;
 
                     if (attr.Namespaces != null && attr.Namespaces.Length > 0)
@@ -310,7 +412,7 @@ namespace Serenity.CodeGeneration
                         bool namespaceMatch = false;
                         foreach (var ns in attr.Namespaces)
                         {
-                            if (type.Namespace == ns)
+                            if (type.NamespaceOf() == ns)
                             {
                                 namespaceMatch = true;
                                 break;
@@ -318,10 +420,10 @@ namespace Serenity.CodeGeneration
 
                             if (ns.Length > 2 &&
                                 ns.EndsWith(".*", StringComparison.OrdinalIgnoreCase) &&
-                                type.Namespace != null)
+                                type.NamespaceOf() != null)
                             {
-                                if (type.Namespace == ns[0..^2] ||
-                                    type.Namespace.StartsWith(ns[0..^1], StringComparison.OrdinalIgnoreCase))
+                                if (type.NamespaceOf() == ns[0..^2] ||
+                                    type.NamespaceOf().StartsWith(ns[0..^1], StringComparison.OrdinalIgnoreCase))
                                 {
                                     namespaceMatch = true;
                                     break;
@@ -335,8 +437,8 @@ namespace Serenity.CodeGeneration
 
                     if (attr.Properties != null &&
                         attr.Properties.Length > 0 &&
-                        attr.Properties.Any(name => !type.Properties.Any(p => 
-                            p.Name == name && CecilUtils.IsPublicInstanceProperty(p))))
+                        attr.Properties.Any(name => !type.PropertiesOf().Any(p =>
+                            p.Name == name && TypingsUtils.IsPublicInstanceProperty(p))))
                         continue;
 
                     annotationMatch = true;
@@ -355,13 +457,17 @@ namespace Serenity.CodeGeneration
 
         public static bool CanHandleType(TypeDefinition memberType)
         {
+#if ISSOURCEGENERATOR
+            if (memberType.TypeKind == TypeKind.Interface)
+#else
             if (memberType.IsInterface)
+#endif
                 return false;
 
             if (memberType.IsAbstract)
                 return false;
 
-            if (CecilUtils.IsOrSubClassOf(memberType, "System", "Delegate"))
+            if (TypingsUtils.IsOrSubClassOf(memberType, "System", "Delegate"))
                 return false;
 
             return true;
@@ -392,7 +498,7 @@ namespace Serenity.CodeGeneration
             if (codeNamespace != null)
             {
                 var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
-                if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1), StringComparison.Ordinal))
+                if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
                     return ns[(idx + 1)..];
             }
 
@@ -420,7 +526,7 @@ namespace Serenity.CodeGeneration
             if (codeNamespace != null)
             {
                 var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
-                if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1), StringComparison.Ordinal))
+                if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
                     return ns[(idx + 1)..];
             }
 
@@ -431,18 +537,23 @@ namespace Serenity.CodeGeneration
         {
             sb ??= this.sb;
 
-            if (type.IsGenericInstance)
+            if (type.IsGenericInstance())
             {
                 var name = type.Name;
                 var idx = name.IndexOf('`', StringComparison.Ordinal);
                 if (idx >= 0)
-                    name = name.Substring(0, idx);
+                    name = name[..idx];
 
                 sb.Append(name);
                 sb.Append('<');
 
                 int i = 0;
+#if ISSOURCEGENERATOR
+                var nt = (INamedTypeSymbol)type;
+                foreach (var argument in nt.TypeArguments)
+#else
                 foreach (var argument in (type as GenericInstanceType).GenericArguments)
+#endif
                 {
                     if (i++ > 0)
                         sb.Append(", ");
@@ -452,20 +563,33 @@ namespace Serenity.CodeGeneration
 
                 sb.Append('>');
 
-                return name + "`" + (type as GenericInstanceType).GenericArguments.Count;
+                return name + "`" +
+#if ISSOURCEGENERATOR
+                    nt.TypeArguments.Length;
+#else
+                    (type as GenericInstanceType).GenericArguments.Count;
+#endif
             }
+#if ISSOURCEGENERATOR
+            else if (type is INamedTypeSymbol nt2 && nt2.TypeParameters.Length > 0)
+#else
             else if (type.HasGenericParameters)
+#endif
             {
                 var name = type.Name;
                 var idx = name.IndexOf('`', StringComparison.Ordinal);
                 if (idx >= 0)
-                    name = name.Substring(0, idx);
+                    name = name[..idx];
 
                 sb.Append(name);
                 sb.Append('<');
 
                 int i = 0;
+#if ISSOURCEGENERATOR
+                foreach (var argument in nt2.TypeParameters)
+#else
                 foreach (var argument in type.GenericParameters)
+#endif
                 {
                     if (i++ > 0)
                         sb.Append(", ");
@@ -475,7 +599,12 @@ namespace Serenity.CodeGeneration
 
                 sb.Append('>');
 
-                return name + "`" + type.GenericParameters.Count;
+                return name + "`" +
+#if ISSOURCEGENERATOR
+                    nt2.TypeParameters.Length;
+#else
+                    type.GenericParameters.Count;
+#endif
             }
             else
             {
@@ -490,7 +619,7 @@ namespace Serenity.CodeGeneration
 
             string ns;
 
-            if (type.IsGenericInstance)
+            if (type.IsGenericInstance())
             {
                 ns = ShortenNamespace(type, codeNamespace);
 
@@ -503,13 +632,17 @@ namespace Serenity.CodeGeneration
                 var name = type.Name;
                 var idx = name.IndexOf('`', StringComparison.Ordinal);
                 if (idx >= 0)
-                    name = name.Substring(0, idx);
+                    name = name[..idx];
 
                 sb.Append(name);
                 sb.Append('<');
 
                 int i = 0;
+#if ISSOURCEGENERATOR
+                foreach (var argument in (type as INamedTypeSymbol).TypeArguments)
+#else
                 foreach (var argument in (type as GenericInstanceType).GenericArguments)
+#endif
                 {
                     if (i++ > 0)
                         sb.Append(", ");
@@ -535,18 +668,26 @@ namespace Serenity.CodeGeneration
 
         protected static TypeReference GetBaseClass(TypeDefinition type)
         {
-            foreach (var t in CecilUtils.SelfAndBaseClasses(type))
+            foreach (var t in TypingsUtils.SelfAndBaseClasses(type))
             {
                 if (t.BaseType != null &&
-                    t.BaseType.IsGenericInstance &&
+                    t.BaseType.IsGenericInstance() &&
+#if ISSOURCEGENERATOR
+                    t.BaseType.OriginalDefinition.NamespaceOf() == "Serenity.Services")
+#else
                     (t.BaseType as GenericInstanceType).ElementType.Namespace == "Serenity.Services")
+#endif
                 {
+#if ISSOURCEGENERATOR
+                    var n = t.BaseType.OriginalDefinition.MetadataName();
+#else
                     var n = (t.BaseType as GenericInstanceType).ElementType.Name;
+#endif
                     if (n == "ListResponse`1" || n == "RetrieveResponse`1" || n == "SaveRequest`1")
                         return t.BaseType;
                 }
 
-                if (t.Namespace != "Serenity.Services")
+                if (t.NamespaceOf() != "Serenity.Services")
                     continue;
 
                 if (t.Name == "ListRequest" ||
@@ -576,28 +717,56 @@ namespace Serenity.CodeGeneration
             requestType = null;
             requestParam = null;
 
-            if ((CecilUtils.FindAttr(method.CustomAttributes, "System.Web.Mvc", "NonActionAttribute") ??
-                 CecilUtils.FindAttr(method.CustomAttributes, "Microsoft.AspNetCore.Mvc", "NonActionAttribute") ??
-                 CecilUtils.FindAttr(method.CustomAttributes, "Serenity.ComponentModel", "ScriptSkipAttribute")) != null)
+            if ((TypingsUtils.FindAttr(method.GetAttributes(), "System.Web.Mvc", "NonActionAttribute") ??
+                 TypingsUtils.FindAttr(method.GetAttributes(), "Microsoft.AspNetCore.Mvc", "NonActionAttribute") ??
+                 TypingsUtils.FindAttr(method.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute")) != null)
                 return false;
 
-            if (!CecilUtils.IsSubclassOf(method.DeclaringType, "System.Web.Mvc", "Controller") &&
-                !CecilUtils.IsSubclassOf(method.DeclaringType, "Microsoft.AspNetCore.Mvc", "Controller"))
+            if (!TypingsUtils.IsSubclassOf(
+#if ISSOURCEGENERATOR
+                    method.ContainingType,
+#else
+                    method.DeclaringType, 
+#endif
+                    "System.Web.Mvc", "Controller") &&
+                !TypingsUtils.IsSubclassOf(
+#if ISSOURCEGENERATOR
+                    method.ContainingType,
+#else
+                    method.DeclaringType,
+#endif
+                    "Microsoft.AspNetCore.Mvc", "Controller"))
                 return false;
 
-            if (method.IsSpecialName && (method.Name.StartsWith("set_", StringComparison.Ordinal) || method.Name.StartsWith("get_", StringComparison.Ordinal)))
+#if ISSOURCEGENERATOR
+            if ((method.MethodKind == MethodKind.PropertySet || 
+                 method.MethodKind == MethodKind.PropertyGet) &&
+#else
+            if (method.IsSpecialName && 
+#endif
+                (method.Name.StartsWith("set_", StringComparison.Ordinal) || method.Name.StartsWith("get_", StringComparison.Ordinal)))
                 return false;
 
-            var parameters = method.Parameters.Where(x => !x.ParameterType.Resolve().IsInterface &&
-                CecilUtils.FindAttr(x.CustomAttributes, "Microsoft.AspNetCore.Mvc", "FromServicesAttribute") == null).ToArray();
+            var parameters = method.Parameters.Where(x =>
+#if ISSOURCEGENERATOR
+                x.Type.TypeKind != TypeKind.Interface &&
+#else
+                !x.ParameterType.Resolve().IsInterface &&
+#endif
+                TypingsUtils.FindAttr(x.GetAttributes(), "Microsoft.AspNetCore.Mvc", "FromServicesAttribute") == null).ToArray();
 
             if (parameters.Length > 1)
                 return false;
 
             if (parameters.Length == 1)
             {
+#if ISSOURCEGENERATOR
+                requestType = parameters[0].Type;
+                if (!CanHandleType(requestType))
+#else
                 requestType = parameters[0].ParameterType;
                 if (requestType.IsPrimitive || !CanHandleType(requestType.Resolve()))
+#endif
                     return false;
             }
             else
@@ -607,23 +776,47 @@ namespace Serenity.CodeGeneration
 
             responseType = method.ReturnType;
             if (responseType != null &&
-                responseType.IsGenericInstance &&
-                (responseType as GenericInstanceType).ElementType.FullName.StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal))
+                responseType.IsGenericInstance() &&
+#if ISSOURCEGENERATOR
+                (responseType as INamedTypeSymbol).OriginalDefinition
+#else
+                (responseType as GenericInstanceType).ElementType
+#endif
+                    .FullNameOf().StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal))
             {
+#if ISSOURCEGENERATOR
+                responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
+#else
                 responseType = (responseType as GenericInstanceType).GenericArguments[0];
+#endif
                 return true;
             }
+#if ISSOURCEGENERATOR
+            else if (responseType.IsGenericInstance() &&
+                (responseType as INamedTypeSymbol).OriginalDefinition
+#else
             else if (responseType != null &&
                 responseType.IsGenericInstance &&
-                (responseType as GenericInstanceType).ElementType.FullName.StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
+                (responseType as GenericInstanceType).ElementType
+#endif
+                    .FullNameOf().StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
             {
+#if ISSOURCEGENERATOR
+                responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
+#else
                 responseType = (responseType as GenericInstanceType).GenericArguments[0];
+#endif
                 return true;
             }
-            else if (CecilUtils.IsOrSubClassOf(responseType, "System.Web.Mvc", "ActionResult") ||
-                CecilUtils.IsAssignableFrom("Microsoft.AspNetCore.Mvc.IActionResult", responseType.Resolve()))
+            else if (TypingsUtils.IsOrSubClassOf(responseType, "System.Web.Mvc", "ActionResult") ||
+                TypingsUtils.IsAssignableFrom("Microsoft.AspNetCore.Mvc.IActionResult",
+#if ISSOURCEGENERATOR
+                responseType))
+#else
+                responseType.Resolve()))
+#endif
                 return false;
-            else if (responseType == null || CecilUtils.IsVoid(responseType))
+            else if (responseType == null || TypingsUtils.IsVoid(responseType))
                 return false;
 
             return true;
@@ -634,13 +827,24 @@ namespace Serenity.CodeGeneration
             if (controller == null)
                 throw new ArgumentNullException(nameof(controller));
 
-            var route = CecilUtils.GetAttr(controller, "System.Web.Mvc", "RouteAttribute") ??
-                CecilUtils.GetAttr(controller, "Microsoft.AspNetCore.Mvc", "RouteAttribute");
-            string url = route == null || route.ConstructorArguments.Count == 0 || !(route.ConstructorArguments[0].Value is string) ? 
-                ("Services/HasNoRoute/" + controller.Name) : (route.ConstructorArguments[0].Value as string ?? "");
+            var route = TypingsUtils.GetAttr(controller, "System.Web.Mvc", "RouteAttribute") ??
+                TypingsUtils.GetAttr(controller, "Microsoft.AspNetCore.Mvc", "RouteAttribute");
+            string url = route == null ||
+                route.ConstructorArguments()?.Count == 0 || route.ConstructorArguments()[0].Value is not string ? 
+                ("Services/HasNoRoute/" + controller.Name) : (route.ConstructorArguments()[0].Value as string ?? "");
 
-            url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length), StringComparison.Ordinal);
-            url = url.Replace("/[action]", "", StringComparison.Ordinal);
+            url = url.Replace("[controller]", controller.Name[..^"Controller".Length]
+#if ISSOURCEGENERATOR
+                );
+#else
+                , StringComparison.Ordinal);
+#endif
+            url = url.Replace("/[action]", ""
+#if ISSOURCEGENERATOR
+                );
+#else
+                , StringComparison.Ordinal);
+#endif
 
             if (!url.StartsWith("~/", StringComparison.Ordinal) && !url.StartsWith("/", StringComparison.Ordinal))
                 url = "~/" + url;
@@ -655,7 +859,7 @@ namespace Serenity.CodeGeneration
                 if (idx2 <= 0)
                     break;
 
-                url = url.Substring(0, idx1) + url[(idx2 + 1)..];
+                url = url[..idx1] + url[(idx2 + 1)..];
             }
 
             if (url.StartsWith("~/Services/", StringComparison.OrdinalIgnoreCase))
@@ -683,8 +887,8 @@ namespace Serenity.CodeGeneration
                 PropertyByName = new Dictionary<string, PropertyDefinition>();
                 Attributes = new List<AttributeInfo>();
 
-                foreach (var property in annotationType.Properties)
-                    if (CecilUtils.IsPublicInstanceProperty(property))
+                foreach (var property in annotationType.PropertiesOf())
+                    if (TypingsUtils.IsPublicInstanceProperty(property))
                         PropertyByName[property.Name] = property;
             }
 

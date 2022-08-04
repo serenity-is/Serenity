@@ -2,8 +2,13 @@
 {
     public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValidator
     {
+        /// <summary>
+        /// Editor type key
+        /// </summary>
+        public const string Key = "Email";
+
         public EmailEditorAttribute()
-            : base("Email")
+            : base(Key)
         {
         }
 

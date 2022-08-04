@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Serenity.TypeScript.TsTypes;
+﻿using Serenity.TypeScript.TsTypes;
 
 namespace Serenity.TypeScript.TsParser
 {
@@ -57,7 +56,7 @@ namespace Serenity.TypeScript.TsParser
         public static ScriptKind GetScriptKindFromFileName(string fileName)
         {
             //var ext = fileName.substr(fileName.LastIndexOf("."));
-            var ext = Path.GetExtension(fileName);
+            var ext = System.IO.Path.GetExtension(fileName);
             switch (ext?.ToLower())
             {
                 case ".js":

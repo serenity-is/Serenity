@@ -1,14 +1,16 @@
-﻿using System.IO;
-
-namespace Serenity.CodeGenerator
+﻿namespace Serenity.CodeGenerator
 {
     public class MultipleOutputHelper
     {
         private static readonly Encoding utf8 = new UTF8Encoding(true);
 
-        public static void WriteFiles(string outDir, SortedDictionary<string, string> codeByFilename, params string[] deleteExtraPattern)
+        public static void WriteFiles(IGeneratorFileSystem fileSystem,
+            string outDir, SortedDictionary<string, string> codeByFilename, params string[] deleteExtraPattern)
         {
-            Directory.CreateDirectory(outDir);
+            if (fileSystem is null)
+                throw new ArgumentNullException(nameof(fileSystem));
+
+            fileSystem.CreateDirectory(outDir);
 
             var generated = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -16,40 +18,43 @@ namespace Serenity.CodeGenerator
             {
                 generated.Add(pair.Key);
 
-                var outFile = Path.Combine(outDir, pair.Key);
-                bool exists = File.Exists(outFile);
+                var outFile = fileSystem.Combine(outDir, pair.Key);
+                bool exists = fileSystem.FileExists(outFile);
                 if (exists)
                 {
-                    var content = File.ReadAllText(outFile, utf8);
+                    var content = fileSystem.ReadAllText(outFile, utf8);
                     if (content.Trim().Replace("\r", "", StringComparison.Ordinal) ==
                         pair.Value.Trim().Replace("\r", "", StringComparison.Ordinal))
                         continue;
                 }
 
+#if !ISSOURCEGENERATOR
                 Console.ForegroundColor = exists ? ConsoleColor.Magenta : ConsoleColor.Green;
                 Console.Write(exists ? "Overwriting: " : "New File: ");
                 Console.ResetColor();
-                Console.WriteLine(Path.GetFileName(outFile));
+                Console.WriteLine(fileSystem.GetFileName(outFile));
+#endif
 
-                File.WriteAllText(outFile, pair.Value, utf8);
+                fileSystem.WriteAllText(outFile, pair.Value, utf8);
             }
 
             if (deleteExtraPattern.Length == 0)
                 return;
 
             var filesToDelete = deleteExtraPattern.SelectMany(
-                    x => Directory.GetFiles(outDir, x))
+                    x => fileSystem.GetFiles(outDir, x))
                 .Distinct();
 
             foreach (var file in filesToDelete)
-                if (!generated.Contains(Path.GetFileName(file)))
+                if (!generated.Contains(fileSystem.GetFileName(file)))
                 {
+#if !ISSOURCEGENERATOR
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write("Deleting: ");
                     Console.ResetColor();
-                    Console.WriteLine(Path.GetFileName(file));
-
-                    File.Delete(file);
+                    Console.WriteLine(fileSystem.GetFileName(file));
+#endif
+                    fileSystem.DeleteFile(file);
                 }
         }
     }
