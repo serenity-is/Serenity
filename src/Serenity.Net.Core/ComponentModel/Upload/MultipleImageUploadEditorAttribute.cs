@@ -11,6 +11,9 @@
         /// Editor type key
         /// </summary>
         public new const string Key = "MultipleImageUpload";
+        
+        /// <inheritdoc />
+        public override bool IsMultiple => true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleImageUploadEditorAttribute"/> class.

@@ -36,7 +36,7 @@ namespace Serenity.ComponentModel
         }
         
         /// <inheritdoc />
-        public bool IsMultiple => false;
+        public virtual bool IsMultiple => false;
         
         /// <summary>
         /// Should non-image uploads be allowed.

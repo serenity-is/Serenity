@@ -55,7 +55,7 @@ namespace Serenity.Services
                 }
             }
 
-            if (uploadEditor is null || uploadFileConstraints is null || uploadImageOptions is {DisableDefaultBehavior: true})
+            if (uploadEditor is null or {IsMultiple: true} || uploadFileConstraints is null || uploadImageOptions is {DisableDefaultBehavior: true})
                 return false;
 
             if (Target is not StringField)
