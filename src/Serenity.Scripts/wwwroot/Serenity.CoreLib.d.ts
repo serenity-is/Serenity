@@ -549,6 +549,8 @@ declare namespace Slick {
         __nonDataRow: boolean;
     }
     const preClickClassName = "slick-edit-preclick";
+    function attrEncode(s: any): string;
+    function htmlEncode(s: any): string;
     type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
     interface IEventData {
         readonly type?: string;
@@ -654,6 +656,7 @@ declare namespace Slick {
         TAB: number;
         UP: number;
     };
+    function patchEvent(e: IEventData): IEventData;
     interface EditController {
         commitCurrentEdit(): boolean;
         cancelCurrentEdit(): boolean;
@@ -775,6 +778,13 @@ declare namespace Slick {
          * @type {Object}
          */
         groupingKey: string;
+        /***
+         * Compares two Group instances.
+         * @method equals
+         * @return {Boolean}
+         * @param group {Group} Group instance to compare to.
+         */
+        equals(group: Group): boolean;
     }
     /***
      * Information about group totals.
@@ -920,6 +930,7 @@ declare namespace Slick {
         addAttrs?: {
             [key: string]: string;
         };
+        html?: string;
         text?: string;
         toolTip?: string;
     }
@@ -931,6 +942,7 @@ declare namespace Slick {
             [cell: number]: string;
         };
     };
+    function defaultFormatter(_r: number, _c: number, value: any): string;
     interface ArgsGrid {
         grid?: Grid;
     }
@@ -1000,6 +1012,7 @@ declare namespace Slick {
         cellFlashingCssClass?: string;
         cellHighlightCssClass?: string;
         columns?: Column<TItem>[];
+        createPreHeaderPanel?: boolean;
         dataItemColumnValueExtractor?: (item: TItem, column: Column<TItem>) => void;
         defaultColumnWidth?: number;
         defaultFormatter?: ColumnFormatter<TItem>;
@@ -1032,6 +1045,7 @@ declare namespace Slick {
         minBuffer?: number;
         multiColumnSort?: boolean;
         multiSelect?: boolean;
+        preHeaderPanelHeight?: number;
         renderAllCells?: boolean;
         rowHeight?: number;
         selectedCellCssClass?: string;
@@ -1040,6 +1054,7 @@ declare namespace Slick {
         showFooterRow?: boolean;
         showGroupingPanel?: boolean;
         showHeaderRow?: boolean;
+        showPreHeaderPanel?: boolean;
         showTopPanel?: boolean;
         slickCompat?: boolean;
         suppressActiveCellChangeOnEdit?: boolean;
@@ -1091,7 +1106,6 @@ declare namespace Slick {
         private _initColById;
         private _initCols;
         private _initialized;
-        private _jQueryNewWidthBehaviour;
         private _jumpinessCoefficient;
         private _numberOfPages;
         private _numVisibleRows;
@@ -1153,7 +1167,7 @@ declare namespace Slick {
         private _headerRowSpacerL;
         private _headerRowSpacerR;
         private _footerRowColsL;
-        private _footerRowR;
+        private _footerRowColsR;
         private _footerRowSpacerL;
         private _footerRowSpacerR;
         private _paneBottomL;
@@ -1194,12 +1208,12 @@ declare namespace Slick {
         readonly onHeaderCellRendered: Event<ArgsColumnNode, IEventData>;
         readonly onHeaderClick: Event<ArgsColumn, IEventData>;
         readonly onHeaderContextMenu: Event<ArgsColumn, IEventData>;
-        readonly onHeaderMouseEnter: Event<ArgsColumn, JQueryMouseEventObject>;
-        readonly onHeaderMouseLeave: Event<ArgsColumn, IEventData>;
+        readonly onHeaderMouseEnter: Event<ArgsColumn, MouseEvent>;
+        readonly onHeaderMouseLeave: Event<ArgsColumn, MouseEvent>;
         readonly onHeaderRowCellRendered: Event<ArgsColumnNode, IEventData>;
         readonly onKeyDown: Event<ArgsCell, JQueryKeyEventObject>;
-        readonly onMouseEnter: Event<ArgsGrid, JQueryMouseEventObject>;
-        readonly onMouseLeave: Event<ArgsGrid, JQueryMouseEventObject>;
+        readonly onMouseEnter: Event<ArgsGrid, MouseEvent>;
+        readonly onMouseLeave: Event<ArgsGrid, MouseEvent>;
         readonly onScroll: Event<ArgsScroll, IEventData>;
         readonly onSelectedRowsChanged: Event<ArgsSelectedRowsChange, IEventData>;
         readonly onSort: Event<ArgsSort, IEventData>;
@@ -1239,6 +1253,7 @@ declare namespace Slick {
         getHeader(): HTMLDivElement;
         getHeaderColumn(columnIdOrIdx: string | number): HTMLDivElement;
         getGroupingPanel(): HTMLDivElement;
+        getPreHeaderPanel(): HTMLDivElement;
         getHeaderRow(): HTMLDivElement;
         getHeaderRowColumn(columnId: string): HTMLElement;
         getFooterRow(): HTMLDivElement;
@@ -1296,6 +1311,7 @@ declare namespace Slick {
         setColumnHeaderVisibility(visible: boolean, animate?: boolean): void;
         setFooterRowVisibility(visible: boolean): void;
         setGroupingPanelVisibility(visible: boolean): void;
+        setPreHeaderPanelVisibility(visible: boolean): void;
         setHeaderRowVisibility(visible: boolean): void;
         getContainerNode(): HTMLElement;
         getUID(): string;
@@ -1320,7 +1336,7 @@ declare namespace Slick {
         updateRow(row: number): void;
         private getViewportHeight;
         private getViewportWidth;
-        resizeCanvas(): void;
+        resizeCanvas: () => void;
         updatePagingStatusFromView(pagingInfo: {
             pageSize: number;
             pageNum: number;
@@ -1377,8 +1393,9 @@ declare namespace Slick {
             row: number;
             cell: number;
         };
-        getCellFromNode(cellNode: HTMLElement): number;
-        getRowFromNode(rowNode: HTMLElement): number;
+        getCellFromNode(cellNode: Element): number;
+        getColumnFromNode(cellNode: Element): Column<TItem>;
+        getRowFromNode(rowNode: Element): number;
         private getFrozenRowOffset;
         getCellFromEvent(e: any): {
             row: number;
@@ -1474,6 +1491,7 @@ declare namespace Slick {
         maxWidth?: any;
         minWidth?: number;
         name?: string;
+        nameIsHtml?: boolean;
         previousWidth?: number;
         referencedFields?: string[];
         rerenderOnResize?: boolean;
@@ -1486,6 +1504,7 @@ declare namespace Slick {
         visible?: boolean;
         width?: number;
     }
+    const columnDefaults: Partial<Column>;
     interface ColumnMetadata<TItem = any> {
         colspan: number | '*';
         formatter?: ColumnFormatter<TItem>;

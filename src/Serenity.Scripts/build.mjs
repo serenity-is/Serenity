@@ -1,12 +1,12 @@
 import esbuild from "esbuild";
-import { slickCoreBuildOptions, slickGridBuildOptions } from "../../lib/SleekGrid/config/esbuildOptions.mjs";
+import { compatCore, compatGrid } from "@serenity-is/sleekgrid/build/defines.js";
 
-const src = '../../lib/SleekGrid/src';
+const src = 'node_modules/@serenity-is/sleekgrid/src';
 const out = '../Serenity.Assets/wwwroot/Scripts/SlickGrid';
 
 for (var esmOpt of [
-    { ...slickCoreBuildOptions, entryPoints: [`${src}/core/index.ts`], outfile: `${out}/slick.core.js` },
-    { ...slickGridBuildOptions, entryPoints: [`${src}/grid/index.ts`], outfile: `${out}/slick.grid.js` }
+    { ...compatCore, entryPoints: [`${src}/core/index.ts`], outfile: `${out}/slick.core.js`, sourcemap: false },
+    { ...compatGrid, entryPoints: [`${src}/grid/index.ts`], outfile: `${out}/slick.grid.js`, sourcemap: false }
 ]) {
     esbuild.build(esmOpt).catch(() => process.exit());
 }

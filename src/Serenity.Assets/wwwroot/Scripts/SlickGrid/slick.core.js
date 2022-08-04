@@ -1,4 +1,5 @@
-var Slick = (() => {
+var Slick = Slick || {};
+Slick._ = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -17,7 +18,7 @@ var Slick = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // ../../lib/SleekGrid/src/core/index.ts
+  // node_modules/@serenity-is/sleekgrid/src/core/index.ts
   var core_exports = {};
   __export(core_exports, {
     EditorLock: () => EditorLock,
@@ -29,11 +30,14 @@ var Slick = (() => {
     GroupTotals: () => GroupTotals,
     NonDataRow: () => NonDataRow,
     Range: () => Range,
+    attrEncode: () => attrEncode,
+    htmlEncode: () => htmlEncode,
     keyCode: () => keyCode,
+    patchEvent: () => patchEvent,
     preClickClassName: () => preClickClassName
   });
 
-  // ../../lib/SleekGrid/src/core/base.ts
+  // node_modules/@serenity-is/sleekgrid/src/core/base.ts
   var NonDataRow = class {
     constructor() {
       this.__nonDataRow = true;
@@ -42,7 +46,17 @@ var Slick = (() => {
   var preClickClassName = "slick-edit-preclick";
   typeof window !== "undefined" && window.Slick && (window.Slick.Map = Map);
 
-  // ../../lib/SleekGrid/src/core/event.ts
+  // node_modules/@serenity-is/sleekgrid/src/core/encode.ts
+  function attrEncode(s) {
+    if (s == null)
+      return "";
+    return (s + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function htmlEncode(s) {
+    return (s + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // node_modules/@serenity-is/sleekgrid/src/core/event.ts
   var EventData = class {
     constructor() {
       this._isPropagationStopped = false;
@@ -76,7 +90,7 @@ var Slick = (() => {
       }
     }
     notify(args, e, scope) {
-      e = e || new EventData();
+      e = patchEvent(e) || new EventData();
       scope = scope || this;
       var returnValue;
       for (var i = 0; i < this._handlers.length && !(e.isPropagationStopped() || e.isImmediatePropagationStopped()); i++) {
@@ -136,8 +150,38 @@ var Slick = (() => {
     TAB: 9,
     UP: 38
   };
+  function returnTrue() {
+    return true;
+  }
+  function returnFalse() {
+    return false;
+  }
+  function patchEvent(e) {
+    if (e == null)
+      return e;
+    if (!e.isDefaultPrevented && e.preventDefault)
+      e.isDefaultPrevented = function() {
+        return this.defaultPrevented;
+      };
+    var org1, org2;
+    if (!e.isImmediatePropagationStopped && (org1 = e.stopImmediatePropagation)) {
+      e.isImmediatePropagationStopped = returnFalse;
+      e.stopImmediatePropagation = function() {
+        this.isImmediatePropagationStopped = returnTrue;
+        org1.call(this);
+      };
+    }
+    if (!e.isPropagationStopped && (org2 = e.stopPropagation)) {
+      e.isPropagationStopped = returnFalse;
+      e.stopPropagation = function() {
+        this.isPropagationStopped = returnTrue;
+        org2.call(this);
+      };
+    }
+    return e;
+  }
 
-  // ../../lib/SleekGrid/src/core/editlock.ts
+  // node_modules/@serenity-is/sleekgrid/src/core/editlock.ts
   var EditorLock = class {
     isActive(editController) {
       return editController ? this.activeEditController === editController : this.activeEditController != null;
@@ -172,7 +216,7 @@ var Slick = (() => {
   };
   var GlobalEditorLock = new EditorLock();
 
-  // ../../lib/SleekGrid/src/core/group.ts
+  // node_modules/@serenity-is/sleekgrid/src/core/group.ts
   var Group = class extends NonDataRow {
     constructor() {
       super(...arguments);
@@ -181,6 +225,9 @@ var Slick = (() => {
       this.count = 0;
       this.collapsed = false;
       this.rows = [];
+    }
+    equals(group) {
+      return this.value === group.value && this.count === group.count && this.collapsed === group.collapsed && this.title === group.title;
     }
   };
   var GroupTotals = class extends NonDataRow {
@@ -191,7 +238,7 @@ var Slick = (() => {
     }
   };
 
-  // ../../lib/SleekGrid/src/core/range.ts
+  // node_modules/@serenity-is/sleekgrid/src/core/range.ts
   var Range = class {
     constructor(fromRow, fromCell, toRow, toCell) {
       if (toRow === void 0 && toCell === void 0) {
@@ -222,3 +269,4 @@ var Slick = (() => {
   };
   return __toCommonJS(core_exports);
 })();
+["Plugins", "Formatters", "Editors"].forEach(ns => Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns] || {})); Object.assign(Slick, Slick._); delete Slick._;
