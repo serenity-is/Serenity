@@ -143,7 +143,7 @@
             MultipleOutputHelper.WriteFiles(fileSystem, outDir, new SortedDictionary<string, string>
             {
                 { "MVC.cs", sb.ToString() }
-            });
+            }, deleteExtraPattern: null, endOfLine: config.EndOfLine);
         }
     }
 }

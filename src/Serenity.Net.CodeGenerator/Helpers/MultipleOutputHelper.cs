@@ -5,7 +5,9 @@
         private static readonly Encoding utf8 = new UTF8Encoding(true);
 
         public static void WriteFiles(IGeneratorFileSystem fileSystem,
-            string outDir, SortedDictionary<string, string> codeByFilename, params string[] deleteExtraPattern)
+            string outDir, SortedDictionary<string, string> codeByFilename, 
+            string[] deleteExtraPattern,
+            string endOfLine)
         {
             if (fileSystem is null)
                 throw new ArgumentNullException(nameof(fileSystem));
@@ -35,10 +37,16 @@
                 Console.WriteLine(fileSystem.GetFileName(outFile));
 #endif
 
-                fileSystem.WriteAllText(outFile, pair.Value, utf8);
+                string text = pair.Value;
+                if (string.Equals(endOfLine, "lf", StringComparison.OrdinalIgnoreCase))
+                    text = text.Replace("\r", "");
+                else if (string.Equals(endOfLine, "crlf", StringComparison.OrdinalIgnoreCase))
+                    text = text.Replace("\r", "").Replace("\n", "\r\n");
+
+                fileSystem.WriteAllText(outFile, text, utf8);
             }
 
-            if (deleteExtraPattern.Length == 0)
+            if (deleteExtraPattern?.Length is null or 0)
                 return;
 
             var filesToDelete = deleteExtraPattern.SelectMany(

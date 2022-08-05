@@ -6,7 +6,10 @@ namespace Serenity.CodeGenerator
     {
         public string RootNamespace { get; set; }
         public ServerTypingsConfig ServerTypings { get; set; }
-        
+
+        public string EndOfLine { get; set; }
+        public bool ShouldSerializeEndOfLine() => EndOfLine != null;
+
         public ClientTypesConfig ClientTypes { get; set; }
         public bool ShouldSerializeClientTypes() => ClientTypes != null &&
             !string.IsNullOrEmpty(ClientTypes.OutDir);
