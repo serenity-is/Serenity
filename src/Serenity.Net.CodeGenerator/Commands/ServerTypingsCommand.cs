@@ -5,9 +5,12 @@ namespace Serenity.CodeGenerator
 {
     public class ServerTypingsCommand : BaseFileSystemCommand
     {
-        public ServerTypingsCommand(IGeneratorFileSystem fileSystem) 
+        private readonly TSConfig tsConfig;
+
+        public ServerTypingsCommand(IGeneratorFileSystem fileSystem, TSConfig tsConfig) 
             : base(fileSystem)
         {
+            this.tsConfig = tsConfig;
         }
 
         public void Run(string csproj, List<ExternalType> tsTypes)
@@ -142,6 +145,9 @@ namespace Serenity.CodeGenerator
             Console.WriteLine(outDir);
 
             generator.RootNamespaces.Add(config.RootNamespace);
+            generator.NamespaceExports = config.ServerTypings?.NamespaceExports ??
+                (!string.IsNullOrEmpty(tsConfig?.CompilerOptions?.Module) &&
+                 !string.Equals(tsConfig?.CompilerOptions?.Module, "none", StringComparison.OrdinalIgnoreCase));
 
             foreach (var type in tsTypes)
                 generator.AddTSType(type);

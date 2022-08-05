@@ -3,6 +3,7 @@
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         public bool LocalTexts { get; set; }
+        public bool NamespaceExports { get; set; }
         public readonly HashSet<string> LocalTextFilters = new();
 
 #if ISSOURCEGENERATOR
@@ -28,6 +29,8 @@
             base.GenerateAll();
             if (LocalTexts)
                 GenerateTexts();
+            if (NamespaceExports)
+                GenerateNamespaceExports();
         }
 
         protected override void GenerateCodeFor(TypeDefinition type)

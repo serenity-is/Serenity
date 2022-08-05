@@ -194,6 +194,12 @@ namespace Serenity.CodeGenerator
             public bool ShouldSerializeOutDir() => !string.IsNullOrEmpty(OutDir);
 
             public bool LocalTexts { get; set; }
+
+            public bool? NamespaceExports { get; set; }
+            public bool ShouldSerializeNamespaceExports() => NamespaceExports != null;
+
+            public bool? SourceGenerator { get; set; }
+            public bool ShouldSerializeSourceGenerator() => SourceGenerator != null;
         }
 
         public class ClientTypesConfig
