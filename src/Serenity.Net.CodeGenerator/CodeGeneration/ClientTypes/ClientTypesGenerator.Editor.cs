@@ -2,7 +2,7 @@
 {
     public partial class ClientTypesGenerator : ImportGeneratorBase
     {
-        private void GenerateEditor(ExternalType type, string name)
+        private void GenerateEditor(ExternalType type, string name, string key)
         {
             cw.Indented("public partial class ");
             sb.Append(name);
@@ -20,7 +20,7 @@
             cw.InBrace(delegate
             {
                 cw.Indented("public const string Key = \"");
-                sb.Append(type.FullName);
+                sb.Append(key ?? type.FullName);
                 sb.AppendLine("\";");
                 sb.AppendLine();
 
