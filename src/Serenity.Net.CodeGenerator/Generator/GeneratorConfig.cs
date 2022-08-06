@@ -198,8 +198,8 @@ namespace Serenity.CodeGenerator
 
             public bool LocalTexts { get; set; }
 
-            public bool? NamespaceExports { get; set; }
-            public bool ShouldSerializeNamespaceExports() => NamespaceExports != null;
+            public bool? NamespaceImports { get; set; }
+            public bool ShouldSerializeNamespaceImports() => NamespaceImports != null;
 
             public bool? SourceGenerator { get; set; }
             public bool ShouldSerializeSourceGenerator() => SourceGenerator != null;

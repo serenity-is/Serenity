@@ -145,7 +145,7 @@ namespace Serenity.CodeGenerator
             Console.WriteLine(outDir);
 
             generator.RootNamespaces.Add(config.RootNamespace);
-            generator.NamespaceExports = config.ServerTypings?.NamespaceExports ?? isMixedModules;
+            generator.NamespaceImports = config.ServerTypings?.NamespaceImports ?? isMixedModules;
 
             foreach (var type in tsTypes)
                 generator.AddTSType(type);
@@ -162,7 +162,7 @@ namespace Serenity.CodeGenerator
             }
 
             if (isMixedModules)
-                writeFiles(fileSystem.Combine(projectDir, "Modules", "Imports", "ServerTypings"), 
+                writeFiles(fileSystem.Combine(projectDir, "Modules", "NamespaceImports"),
                     x => x.Module);
 
             writeFiles(outDir, 
