@@ -162,7 +162,7 @@ namespace Serenity.CodeGenerator
             }
 
             if (isMixedModules)
-                writeFiles(fileSystem.Combine(projectDir, "Modules", "NamespaceImports"),
+                writeFiles(fileSystem.Combine(projectDir, "Modules", "ServerTypings"),
                     x => x.Module);
 
             writeFiles(outDir, 
