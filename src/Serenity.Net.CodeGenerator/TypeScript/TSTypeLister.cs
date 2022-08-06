@@ -1,11 +1,6 @@
-﻿using Serenity.IO;
-using System.Threading;
-#if ISSOURCEGENERATOR
-using Newtonsoft.Json;
-#else
+﻿using System.Threading;
+#if !ISSOURCEGENERATOR
 using Serenity.CodeGeneration;
-using System.Text.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 #endif
 
 namespace Serenity.CodeGenerator
@@ -24,107 +19,33 @@ namespace Serenity.CodeGenerator
             this.projectDir = fileSystem.GetFullPath(projectDir);
         }
 
-        public TSConfig Config { get; private set; }
-
-        public List<ExternalType> List()
+        public List<ExternalType> List(out bool isMixedModules)
         {
-            var tsconfig = fileSystem.Combine(projectDir, "tsconfig.json");
-            IEnumerable<string> files = null;
             cancellationToken.ThrowIfCancellationRequested();
-            
-            if (fileSystem.FileExists(tsconfig))
+
+            isMixedModules = false;
+            IEnumerable<string> files = null;
+            var rootConfig = TSConfigHelper.Read(fileSystem, fileSystem.Combine(projectDir, "tsconfig.json"));
+            if (rootConfig is not null)
             {
-#if ISSOURCEGENERATOR
-                Config = JsonConvert.DeserializeObject<TSConfig>(fileSystem.ReadAllText(tsconfig), new JsonSerializerSettings
+                files = TSConfigHelper.ListFiles(rootConfig, fileSystem, projectDir, cancellationToken);
+                if (rootConfig.CompilerOptions?.Module is null or "none")
                 {
-                    MissingMemberHandling = MissingMemberHandling.Ignore
-                });
-#else
-                Config = JsonSerializer.Deserialize<TSConfig>(fileSystem.ReadAllText(tsconfig),
-                    new JsonSerializerOptions
+                    var modularConfigPath = fileSystem.Combine(projectDir, "Modules", "tsconfig.json");
+                    var modularConfig = TSConfigHelper.Read(fileSystem, modularConfigPath);
+                    if (modularConfig is not null && modularConfig.CompilerOptions?.Module is not null or "none")
                     {
-                        PropertyNameCaseInsensitive = true,
-                    });
-#endif
-                if (!Config.Files.IsEmptyOrNull())
-                {
-                    files = Config.Files.Where(x => fileSystem.FileExists(fileSystem.Combine(projectDir, PathHelper.ToPath(x))))
-                        .Select(x => fileSystem.GetFullPath(fileSystem.Combine(projectDir, PathHelper.ToPath(x))));
-                }
-                else if (!Config.Include.IsEmptyOrNull())
-                {
-                    var typeRoots = Config.CompilerOptions?.TypeRoots?.IsEmptyOrNull() != false ?
-                        new string[] { "./node_modules/@types" } : Config.CompilerOptions.TypeRoots;
-
-                    var types = new HashSet<string>(Config.CompilerOptions?.Types ?? Array.Empty<string>(),
-                        StringComparer.OrdinalIgnoreCase);
-
-                    files = typeRoots.Select(typeRoot =>
-                        {
-                            var s = PathHelper.ToUrl(typeRoot);
-                            if (s.StartsWith("./", StringComparison.Ordinal))
-                                s = s[2..];
-                            return fileSystem.Combine(projectDir, PathHelper.ToPath(s));
-                        })
-                        .Where(typeRoot => fileSystem.DirectoryExists(typeRoot))
-                        .Select(typeRoot => fileSystem.GetFullPath(typeRoot))
-                        .SelectMany(typeRoot =>
-                            fileSystem.GetDirectories(typeRoot)
-                                .Where(typing => (Config.CompilerOptions?.Types == null) || types.Contains(fileSystem.GetDirectoryName(typing)))
-                                .Where(typing => fileSystem.GetFileName(typing).Contains("serenity", StringComparison.OrdinalIgnoreCase) ||
-                                    !PathHelper.ToUrl(typing).Contains("/node_modules/", StringComparison.OrdinalIgnoreCase))
-                                .Select(typing => fileSystem.Combine(typing, "index.d.ts"))
-                                .Where(typing => fileSystem.FileExists(typing)))
-                        .ToList();
-
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    var includePatterns = Config.Include
-                        .Select(x => PathHelper.ToUrl(x))
-                        .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
-                        .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
-                            (x.StartsWith("/", StringComparison.Ordinal) ? x[1..] : x))
-                        .Select(x => PathHelper.ToPath(x));
-
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    var excludePatterns = (Config.Exclude ?? Array.Empty<string>())
-                        .Select(x => PathHelper.ToUrl(x))
-                        .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
-                        .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
-                            (x.StartsWith("/", StringComparison.Ordinal) ? x[1..] : x))
-                        .Select(x => PathHelper.ToPath(x));
-
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    files = files.Concat(Config.Include.Select(x => PathHelper.ToUrl(x))
-                        .Where(x => x.StartsWith("../", StringComparison.Ordinal) &&
-                        !x.Contains('*', StringComparison.Ordinal))
-                        .Select(x => fileSystem.Combine(projectDir, x))
-                        .Select(x => PathHelper.ToPath(x))
-                        .Where(x => fileSystem.FileExists(x)));
-
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    var includeGlob = new GlobFilter(includePatterns);
-                    var excludeGlob = new GlobFilter(excludePatterns);
-
-                    var allTsFiles = fileSystem.GetFiles(projectDir, "*.ts", recursive: true)
-                        .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
-                            !fileSystem.FileExists(x[..^".d.ts".Length] + ".ts"));
-
-                    files = files.Concat(allTsFiles.Where(x => includePatterns.Any() &&
-                        includeGlob.IsMatch(x[(projectDir.Length + 1)..]) &&
-                        (!excludePatterns.Any() || !excludeGlob.IsMatch(x[(projectDir.Length + 1)..]))));
-
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    files = files.Distinct();
+                        files = (files ?? Array.Empty<string>()).Concat(
+                                TSConfigHelper.ListFiles(modularConfig, fileSystem, projectDir, cancellationToken))
+                            .Distinct();
+                        isMixedModules = true;
+                    }
                 }
             }
 
             if (files == null || !files.Any())
             {
+                // legacy apps
                 var directories = new[]
                 {
                     fileSystem.Combine(projectDir, @"Modules"),

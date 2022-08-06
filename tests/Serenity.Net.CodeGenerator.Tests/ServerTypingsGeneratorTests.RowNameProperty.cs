@@ -13,7 +13,7 @@ namespace Serenity.Tests.CodeGenerator
             var generator = CreateGenerator();
             var result = generator.Run();
             Assert.Contains("SomeModule.WithNamePropertyRow.ts", result.Keys);
-            var code = result["SomeModule.WithNamePropertyRow.ts"];
+            var code = result["SomeModule.WithNamePropertyRow.ts"].Text;
             Assert.Contains("nameProperty = 'WithNameProp'", code);
         }
     }

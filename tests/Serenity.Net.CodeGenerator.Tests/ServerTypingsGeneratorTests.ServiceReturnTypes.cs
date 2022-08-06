@@ -13,7 +13,7 @@ namespace Serenity.Tests.CodeGenerator
             var result = generator.Run();
             var filename = "Tests.CodeGenerator." + nameof(ResponseTypesThatShouldBeGenerated) + "Service.ts";
             Assert.Contains(filename, result.Keys);
-            var code = result[filename];
+            var code = result[filename].Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
             {
@@ -29,7 +29,7 @@ namespace Serenity.Tests.CodeGenerator
             var result = generator.Run();
             var filename = "Tests.CodeGenerator." + nameof(ResponseTypesThatShouldNotBeGenerated) + "Service.ts";
             Assert.Contains(filename, result.Keys);
-            var code = result[filename];
+            var code = result[filename].Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
             {
@@ -45,7 +45,7 @@ namespace Serenity.Tests.CodeGenerator
             var filename = "Tests.CodeGenerator." + nameof(ResponseTypesThatShouldBeGeneratedAsKeyValue) + "Service.ts";
             var result = generator.Run();
             Assert.Contains(filename, result.Keys);
-            var code = result[filename];
+            var code = result[filename].Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
             {
@@ -61,7 +61,7 @@ namespace Serenity.Tests.CodeGenerator
             var result = generator.Run();
             var filename = "Tests.CodeGenerator." + nameof(ResponseTypesThatShouldBeGeneratedAsList) + "Service.ts";
             Assert.Contains(filename, result.Keys);
-            var code = result[filename];
+            var code = result[filename].Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
             {

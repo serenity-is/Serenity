@@ -39,7 +39,7 @@ namespace Serenity.Tests.CodeGenerator
 
             Assert.Contains($"Tests.CodeGenerator.{classType.Name}.ts", result.Keys);
 
-            var code = result[$"Tests.CodeGenerator.{classType.Name}.ts"];
+            var code = result[$"Tests.CodeGenerator.{classType.Name}.ts"].Text;
 
             code = NormalizeTS(code);
 

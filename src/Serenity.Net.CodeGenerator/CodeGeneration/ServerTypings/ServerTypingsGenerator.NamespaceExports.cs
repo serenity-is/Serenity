@@ -41,7 +41,7 @@
 
                 if (sb.Length > 0)
                 {
-                    AddFile(ns.Key + ".ts");
+                    AddFile(ns.Key + ".ts", module: true);
                     sb.Clear();
                 }
             }

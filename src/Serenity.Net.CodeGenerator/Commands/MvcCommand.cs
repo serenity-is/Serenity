@@ -1,4 +1,6 @@
-﻿namespace Serenity.CodeGenerator
+﻿using Serenity.CodeGeneration;
+
+namespace Serenity.CodeGenerator
 {
     public class MvcCommand : BaseFileSystemCommand
     {
@@ -140,9 +142,9 @@
             sb.AppendLine("    }");
             sb.AppendLine("}");
 
-            MultipleOutputHelper.WriteFiles(fileSystem, outDir, new SortedDictionary<string, string>
+            MultipleOutputHelper.WriteFiles(fileSystem, outDir, new[]
             {
-                { "MVC.cs", sb.ToString() }
+                ("MVC.cs", sb.ToString())
             }, deleteExtraPattern: null, endOfLine: config.EndOfLine);
         }
     }

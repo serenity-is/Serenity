@@ -5,12 +5,12 @@ namespace Serenity.CodeGenerator
 {
     public class ServerTypingsCommand : BaseFileSystemCommand
     {
-        private readonly TSConfig tsConfig;
+        private readonly bool isMixedModules;
 
-        public ServerTypingsCommand(IGeneratorFileSystem fileSystem, TSConfig tsConfig) 
+        public ServerTypingsCommand(IGeneratorFileSystem fileSystem, bool isMixedModules) 
             : base(fileSystem)
         {
-            this.tsConfig = tsConfig;
+            this.isMixedModules = isMixedModules;
         }
 
         public void Run(string csproj, List<ExternalType> tsTypes)
@@ -145,17 +145,28 @@ namespace Serenity.CodeGenerator
             Console.WriteLine(outDir);
 
             generator.RootNamespaces.Add(config.RootNamespace);
-            generator.NamespaceExports = config.ServerTypings?.NamespaceExports ??
-                (!string.IsNullOrEmpty(tsConfig?.CompilerOptions?.Module) &&
-                 !string.Equals(tsConfig?.CompilerOptions?.Module, "none", StringComparison.OrdinalIgnoreCase));
+            generator.NamespaceExports = config.ServerTypings?.NamespaceExports ?? isMixedModules;
 
             foreach (var type in tsTypes)
                 generator.AddTSType(type);
 
             var codeByFilename = generator.Run();
-            MultipleOutputHelper.WriteFiles(fileSystem, outDir, codeByFilename, 
-                deleteExtraPattern: new[] { "*.ts" },
-                endOfLine: config.EndOfLine);
+
+            void writeFiles(string outDir, Func<GeneratedSource, bool> predicate)
+            {
+                MultipleOutputHelper.WriteFiles(fileSystem, outDir,
+                    codeByFilename.Where(x => predicate(x.Value))
+                        .Select(x => (x.Key, x.Value.Text)),
+                    deleteExtraPattern: new[] { "*.ts" },
+                    endOfLine: config.EndOfLine);
+            }
+
+            if (isMixedModules)
+                writeFiles(fileSystem.Combine(projectDir, "Modules", "Imports", "ServerTypings"), 
+                    x => x.Module);
+
+            writeFiles(outDir, 
+                x => !isMixedModules || !x.Module);
         }
     }
 }

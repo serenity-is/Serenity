@@ -1,11 +1,13 @@
-﻿namespace Serenity.CodeGenerator
+﻿using Serenity.CodeGeneration;
+
+namespace Serenity.CodeGenerator
 {
     public class MultipleOutputHelper
     {
         private static readonly Encoding utf8 = new UTF8Encoding(true);
 
         public static void WriteFiles(IGeneratorFileSystem fileSystem,
-            string outDir, SortedDictionary<string, string> codeByFilename, 
+            string outDir, IEnumerable<(string Path, string Text)> filesToWrite,
             string[] deleteExtraPattern,
             string endOfLine)
         {
@@ -16,17 +18,17 @@
 
             var generated = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var pair in codeByFilename)
+            foreach (var file in filesToWrite)
             {
-                generated.Add(pair.Key);
+                generated.Add(file.Path);
 
-                var outFile = fileSystem.Combine(outDir, pair.Key);
+                var outFile = fileSystem.Combine(outDir, file.Path);
                 bool exists = fileSystem.FileExists(outFile);
                 if (exists)
                 {
                     var content = fileSystem.ReadAllText(outFile, utf8);
                     if (content.Trim().Replace("\r", "", StringComparison.Ordinal) ==
-                        pair.Value.Trim().Replace("\r", "", StringComparison.Ordinal))
+                        (file.Text ?? "").Trim().Replace("\r", "", StringComparison.Ordinal))
                         continue;
                 }
 
@@ -37,7 +39,7 @@
                 Console.WriteLine(fileSystem.GetFileName(outFile));
 #endif
 
-                string text = pair.Value;
+                string text = file.Text ?? "";
                 if (string.Equals(endOfLine, "lf", StringComparison.OrdinalIgnoreCase))
                     text = text.Replace("\r", "");
                 else if (string.Equals(endOfLine, "crlf", StringComparison.OrdinalIgnoreCase))

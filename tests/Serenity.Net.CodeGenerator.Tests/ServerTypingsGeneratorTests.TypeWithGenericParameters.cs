@@ -16,7 +16,7 @@ namespace Serenity.Tests.CodeGenerator
             var result = generator.Run();
             var expectedFile = "Tests.CodeGenerator.TypeWithOneGenericParameter`1.ts";
             Assert.Contains(expectedFile, result.Keys);
-            var code = result[expectedFile];
+            var code = result[expectedFile].Text;
             Assert.Contains("namespace Serenity.Tests.CodeGenerator {", code);
             Assert.Contains("export interface TypeWithOneGenericParameter<T> extends Serenity.ServiceRequest", code);
             Assert.Contains("SomeList?: T[];", code);
@@ -31,7 +31,7 @@ namespace Serenity.Tests.CodeGenerator
             var result = generator.Run();
             var expectedFile = "Tests.CodeGenerator.TypeWithOneGenericAndBase`1.ts";
             Assert.Contains(expectedFile, result.Keys);
-            var code = result[expectedFile];
+            var code = result[expectedFile].Text;
             Assert.Contains("namespace Serenity.Tests.CodeGenerator {", code);
             Assert.Contains("export interface TypeWithOneGenericAndBase<T> extends Serenity.RetrieveResponse<string>", code);
             Assert.Contains("SomeList?: T[];", code);
@@ -46,7 +46,7 @@ namespace Serenity.Tests.CodeGenerator
             var result = generator.Run();
             var expectedFile = "Tests.CodeGenerator.TypeWithTwoGenericParameters`2.ts";
             Assert.Contains(expectedFile, result.Keys);
-            var code = result[expectedFile];
+            var code = result[expectedFile].Text;
             Assert.Contains("namespace Serenity.Tests.CodeGenerator {", code);
             Assert.Contains("export interface TypeWithTwoGenericParameters<T1, T2> extends Serenity.ServiceRequest", code);
             Assert.Contains("SomeList1?: T1[];", code);
