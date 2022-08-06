@@ -52,16 +52,16 @@
                 CreateFile(Templates.Render(fileSystem, "RetrieveHandler", model), handlerClass + "RetrieveHandler.cs");
                 CreateFile(Templates.Render(fileSystem, "SaveHandler", model), handlerClass + "SaveHandler.cs");
 
-                CreateFile(Templates.Render(fileSystem, "Endpoint", model), moduleClass + "Endpoint.cs");
+                CreateFile(Templates.Render(fileSystem, "Endpoint", model, "EndPoints"), moduleClass + "Endpoint.cs");
                 CreateFile(Templates.Render(fileSystem, "ServiceTyping", model), typingClass + "Service.ts");
             }
 
             if (config.GenerateUI)
             {
-                CreateFile(Templates.Render(fileSystem, "Page", model), moduleClass + "Page.cs");
+                CreateFile(Templates.Render(fileSystem, "Page", model, "Pages"), moduleClass + "Page.cs");
                 CreateFile(Templates.Render(fileSystem, "IndexView", model), moduleClass + "Index.cshtml");
-                CreateFile(Templates.Render(fileSystem, "Columns", model), moduleClass + "Columns.cs");
-                CreateFile(Templates.Render(fileSystem, "Form", model), moduleClass + "Form.cs");
+                CreateFile(Templates.Render(fileSystem, "Columns", model, "Columns"), moduleClass + "Columns.cs");
+                CreateFile(Templates.Render(fileSystem, "Form", model, "Forms"), moduleClass + "Form.cs");
                 CreateFile(Templates.Render(fileSystem, "Dialog", model), moduleClass + "Dialog.ts");
                 CreateFile(Templates.Render(fileSystem, "Grid", model), moduleClass + "Grid.ts");
                 CreateFile(Templates.Render(fileSystem, "FormTyping", model), typingClass + "Form.ts");

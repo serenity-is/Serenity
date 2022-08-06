@@ -6,21 +6,21 @@
         {
             return dataType switch
             {
-                "String" => "string",
-                "Boolean" => "bool",
-                "Byte" => "byte",
-                "Char" => "char",
-                "Decimal" => "decimal",
-                "Double" => "double",
-                "Int16" => "short",
-                "Int32" => "int",
-                "Int64" => "long",
-                "Object" => "object",
-                "SByte" => "sbyte",
-                "Single" => "float",
-                "UInt16" => "ushort",
-                "UInt32" => "uint",
-                "UInt64" => "ulong",
+                "System.String" => "string",
+                "System.Boolean" => "bool",
+                "System.Byte" => "byte",
+                "System.Char" => "char",
+                "System.Decimal" => "decimal",
+                "System.Double" => "double",
+                "System.Int16" => "short",
+                "System.Int32" => "int",
+                "System.Int64" => "long",
+                "System.Object" => "object",
+                "System.SByte" => "sbyte",
+                "System.Single" => "float",
+                "System.UInt16" => "ushort",
+                "System.UInt32" => "uint",
+                "System.UInt64" => "ulong",
                 _ => null
             };
         }

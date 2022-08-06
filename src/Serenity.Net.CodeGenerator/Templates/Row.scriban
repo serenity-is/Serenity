@@ -1,10 +1,7 @@
-﻿using Serenity;
-using Serenity.ComponentModel;
-using Serenity.Data;
-using Serenity.Data.Mapping;
-using System;
-using System.ComponentModel;
-using System.IO;
+﻿{{USING "Serenity.ComponentModel" }}
+{{USING "Serenity.Data" }}
+{{USING "Serenity.Data.Mapping" }}
+{{USING "System.ComponentModel" }}
 
 namespace {{RootNamespace}}{{DotModule}}
 {
@@ -12,11 +9,11 @@ namespace {{RootNamespace}}{{DotModule}}
     [DisplayName("{{Title}}"), InstanceName("{{Title}}")]
     [ReadPermission("{{Permission}}")]
     [ModifyPermission("{{Permission}}")]
-    public sealed class {{RowClassName}} : {{RowBaseClassAndInterfaces}}
+    public sealed class {{RowClassName}} : {{ATTRREF RowBaseClassAndInterfaces}}
     {
 {{-for x in Fields}}
-        [{{x.Attributes}}]
-        public {{x.PropertyType}} {{x.Ident}}
+        [{{ATTRREF x.Attributes}}]
+        public {{TYPEREF x.PropertyType}} {{x.Ident}}
         {
             get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this];
             set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this] = value;
@@ -24,8 +21,8 @@ namespace {{RootNamespace}}{{DotModule}}
 {{end}}
 {{-for j in Joins}}
 {{-for k in j.Fields}}
-        [{{k.Attributes}}]
-        public {{k.PropertyType}} {{k.Ident}}
+        [{{ATTRREF k.Attributes}}]
+        public {{TYPEREF k.PropertyType}} {{k.Ident}}
         {
             get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this];
             set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this] = value;
@@ -57,14 +54,14 @@ namespace {{RootNamespace}}{{DotModule}}
         }
 {{end}}
 
-        public class RowFields : {{FieldsBaseClass}}
+        public class RowFields : {{ATTRREF FieldsBaseClass}}
         {
 {{-for x in Fields}}
-            public {{x.FieldType}}Field {{x.Ident}};
+            public {{REMOVENS x.FieldType}}Field {{x.Ident}};
 {{-end}}
 {{-for j in Joins}}
 {{for k in j.Fields}}
-            public {{k.FieldType}}Field {{k.Ident}};
+            public {{REMOVENS k.FieldType}}Field {{k.Ident}};
 {{-end}}
 {{-end}}
         }

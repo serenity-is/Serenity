@@ -1,17 +1,9 @@
-﻿using Serenity;
-using Serenity.ComponentModel;
-using Serenity.Data;
-using System;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.IO;
-
-namespace {{RootNamespace}}{{DotModule}}.Forms
+﻿namespace {{RootNamespace}}{{DotModule}}.Forms
 {
-    [FormScript("{{ModuleDot}}{{ClassName}}")]
-    [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]
+    [{{TYPEREF "Serenity.Web.FormScript"}}("{{ModuleDot}}{{ClassName}}")]
+    [{{TYPEREF "Serenity.ComponentModel.BasedOnRow"}}(typeof({{RowClassName}}), CheckNames = true)]
     public class {{ClassName}}Form
     {%{{}%}{{for x in Fields}}{{if x.Ident != IdField}}
-        public {{x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}
+        public {{TYPEREF x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}
     }
 }

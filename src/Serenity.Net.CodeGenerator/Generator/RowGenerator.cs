@@ -70,7 +70,7 @@ namespace Serenity.CodeGenerator
             {
                 FieldType = fieldType,
                 DataType = dataType,
-                IsValueType = fieldType != "String" && fieldType != "Stream" && fieldType != "ByteArray",
+                IsValueType = fieldType != "System.String" && fieldType != "System.IO.Stream" && fieldType != "ByteArray",
                 TSType = FieldTypeToTS(fieldType),
                 Ident = GenerateVariableName(fieldInfo.FieldName[prefixLength..]),
                 Title = Inflector.Inflector.Titleize(fieldInfo.FieldName[prefixLength..])?.Trim(),
@@ -220,9 +220,9 @@ namespace Serenity.CodeGenerator
             }
             else
             {
-                model.RowBaseClass = "Row";
+                model.RowBaseClass = "Serenity.Data.Row";
                 model.RowBaseFields = new List<EntityField>();
-                model.FieldsBaseClass = "RowFieldsBase";
+                model.FieldsBaseClass = "Serenity.Data.RowFieldsBase";
             }
 
             if (net5Plus)
@@ -235,7 +235,7 @@ namespace Serenity.CodeGenerator
                 var f = ToEntityField(field, prefix);
 
                 if (f.Ident == model.IdField)
-                    f.ColAttributes = "EditLink, DisplayName(\"Db.Shared.RecordId\"), AlignRight";
+                    f.ColAttributes = "Serenity.ComponentModel.EditLink, System.ComponentModel.DisplayName(\"Db.Shared.RecordId\"), Serenity.ComponentModel.AlignRight";
 
                 int i = 0;
                 string ident = f.Ident;
@@ -244,10 +244,10 @@ namespace Serenity.CodeGenerator
                 f.Ident = ident;
                 fieldByIdent[ident] = f;
 
-                if (f.Name == className && f.FieldType == "String")
+                if (f.Name == className && f.FieldType == "System.String")
                 {
                     model.NameField = f.Name;
-                    f.ColAttributes ??= "EditLink";
+                    f.ColAttributes ??= " Serenity.ComponentModel.EditLink";
                 }
 
                 var foreign = foreigns.Find((k) => k.FKColumn.Equals(field.FieldName, StringComparison.OrdinalIgnoreCase));
@@ -292,13 +292,13 @@ namespace Serenity.CodeGenerator
 
                         var atk = new List<string>
                         {
-                            "DisplayName(\"" + k.Title + "\")"
+                            "System.ComponentModel.DisplayName(\"" + k.Title + "\")"
                         };
                         k.Expression = "j" + j.Name + ".[" + k.Name + "]";
-                        atk.Add("Expression(\"" + k.Expression + "\")");
+                        atk.Add("Serenity.Data.Mapping.Expression(\"" + k.Expression + "\")");
                         k.Attributes = string.Join(", ", atk);
 
-                        if (f.TextualField == null && k.FieldType == "String")
+                        if (f.TextualField == null && k.FieldType == "System.String")
                             f.TextualField = k.Ident;
 
                         j.Fields.Add(k);
@@ -312,11 +312,11 @@ namespace Serenity.CodeGenerator
 
             if (model.NameField == null)
             {
-                var fld = model.Fields.FirstOrDefault(z => z.FieldType == "String");
+                var fld = model.Fields.FirstOrDefault(z => z.FieldType == "System.String");
                 if (fld != null)
                 {
                     model.NameField = fld.Ident;
-                    fld.ColAttributes ??= "EditLink";
+                    fld.ColAttributes ??= " Serenity.ComponentModel.EditLink";
                 }
             }
 
@@ -324,39 +324,39 @@ namespace Serenity.CodeGenerator
             {
                 var attrs = new List<string>
                 {
-                    "DisplayName(\"" + x.Title + "\")"
+                    "System.ComponentModel.DisplayName(\"" + x.Title + "\")"
                 };
 
                 if (x.Ident != x.Name)
-                    attrs.Add("Column(\"" + x.Name + "\")");
+                    attrs.Add("Serenity.Data.Mapping.Column(\"" + x.Name + "\")");
 
                 if ((x.Size ?? 0) > 0)
-                    attrs.Add("Size(" + x.Size + ")");
+                    attrs.Add("Serenity.Data.Mapping.Size(" + x.Size + ")");
 
                 if (x.Scale > 0)
-                    attrs.Add("Scale(" + x.Scale + ")");
+                    attrs.Add("Serenity.Data.Mapping.Scale(" + x.Scale + ")");
 
                 if (!string.IsNullOrEmpty(x.Flags))
                     attrs.Add(x.Flags);
 
                 if (!string.IsNullOrEmpty(x.PKTable))
                 {
-                    attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
-                    attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
+                    attrs.Add("Serenity.Data.Mapping.ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
+                    attrs.Add("Serenity.Data.Mapping.LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
                 }
 
                 if (model.IdField == x.Ident && net5Plus)
-                    attrs.Add("IdProperty");
+                    attrs.Add(" Serenity.Data.IdProperty");
 
                 if (model.NameField == x.Ident)
                 {
-                    attrs.Add("QuickSearch");
+                    attrs.Add("Serenity.Data.Mapping.QuickSearch");
                     if (net5Plus)
-                        attrs.Add("NameProperty");
+                        attrs.Add("Serenity.Data.NameProperty");
                 }
 
                 if (x.TextualField != null)
-                    attrs.Add("TextualField(\"" + x.TextualField + "\")");
+                    attrs.Add("Serenity.Data.Mapping.TextualField(\"" + x.TextualField + "\")");
 
                 x.Attributes = string.Join(", ", attrs.ToArray());
             }

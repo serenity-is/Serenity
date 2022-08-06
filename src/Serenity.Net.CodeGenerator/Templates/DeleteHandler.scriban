@@ -1,11 +1,7 @@
-﻿using Serenity;
-using Serenity.Data;
-using Serenity.Services;
-using System;
-using System.Data;
-using MyRequest = Serenity.Services.DeleteRequest;
-using MyResponse = Serenity.Services.DeleteResponse;
-using MyRow = {{RootNamespace}}{{DotModule}}.{{RowClassName}};
+﻿{{USING "Serenity.Services"}}
+{{USING "MyRequest = Serenity.Services.DeleteRequest"}}
+{{USING "MyResponse = Serenity.Services.DeleteResponse"}}
+{{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName }}
 
 namespace {{RootNamespace}}{{DotModule}}
 {

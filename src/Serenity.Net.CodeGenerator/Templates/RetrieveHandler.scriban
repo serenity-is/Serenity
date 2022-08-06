@@ -1,11 +1,7 @@
-﻿using Serenity;
-using Serenity.Data;
-using Serenity.Services;
-using System;
-using System.Data;
-using MyRequest = Serenity.Services.RetrieveRequest;
-using MyResponse = Serenity.Services.RetrieveResponse<{{RootNamespace}}{{DotModule}}.{{RowClassName}}>;
-using MyRow = {{RootNamespace}}{{DotModule}}.{{RowClassName}};
+﻿{{USING "Serenity.Services"}}
+{{USING "MyRequest = Serenity.Services.RetrieveRequest"}}
+{{USING "MyResponse = Serenity.Services.RetrieveResponse<" + RootNamespace + DotModule + "." + RowClassName + ">"}}
+{{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
 
 namespace {{RootNamespace}}{{DotModule}}
 {

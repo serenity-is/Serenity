@@ -1,5 +1,4 @@
-﻿using Serenity;
-using Serenity.Web;{{if AspNetCore}}
+﻿using Serenity.Web;{{if AspNetCore}}
 using Microsoft.AspNetCore.Mvc;{{else}}
 using System.Web.Mvc;{{end}}
 

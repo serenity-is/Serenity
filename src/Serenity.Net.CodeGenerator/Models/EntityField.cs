@@ -29,10 +29,10 @@
             {
                 return FieldType switch
                 {
-                    "Int32" or "Int16" or "Int64" => "IntegerEditor",
-                    "Single" or "Double" or "Decimal" => "DecimalEditor",
-                    "DateTime" => "DateEditor",
-                    "Boolean" => "BooleanEditor",
+                    "System.Int32" or "System.Int16" or "System.Int64" => "IntegerEditor",
+                    "System.Single" or "System.Double" or "System.Decimal" => "DecimalEditor",
+                    "System.DateTime" => "DateEditor",
+                    "System.Boolean" => "BooleanEditor",
                     _ => "StringEditor",
                 };
             }

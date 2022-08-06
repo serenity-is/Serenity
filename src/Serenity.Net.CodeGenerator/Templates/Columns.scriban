@@ -1,10 +1,4 @@
-﻿using Serenity;
-using Serenity.ComponentModel;
-using Serenity.Data;
-using System;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.IO;
+﻿{{USING "Serenity.ComponentModel"}}
 
 namespace {{RootNamespace}}{{DotModule}}.Columns
 {
@@ -12,8 +6,8 @@ namespace {{RootNamespace}}{{DotModule}}.Columns
     [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]
     public class {{ClassName}}Columns
     {%{{}%}{{for x in Fields}}{{if x.ColAttributes}}
-        [{{x.ColAttributes}}]{{end}}{{if x.TextualField}}
+        [{{ATTRREF x.ColAttributes}}]{{end}}{{if x.TextualField}}
         public string {{x.TextualField}} { get; set; }{{else}}
-        public {{x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}
+        public {{TYPEREF x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}
     }
 }
