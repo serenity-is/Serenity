@@ -2,13 +2,11 @@
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
-        private void GenerateService(TypeDefinition type)
+        private void GenerateService(TypeDefinition type, string identifier, bool module)
         {
             var codeNamespace = GetNamespace(type);
 
             cw.Indented("export namespace ");
-            var identifier = GetControllerIdentifier(type);
-            fileIdentifier = identifier;
             sb.Append(identifier);
             generatedTypes.Add((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier);
 

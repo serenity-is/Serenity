@@ -17,9 +17,10 @@
             generatedCode = new SortedDictionary<string, GeneratedSource>();
         }
 
-        protected void AddFile(string filename, bool module = false)
+        protected virtual void AddFile(string filename, bool module = false)
         {
-            generatedCode[filename] = new GeneratedSource(sb.ToString(), module);
+            var text = sb.ToString();
+            generatedCode[filename] = new GeneratedSource(text, module);
             sb.Clear();
         }
 

@@ -91,17 +91,10 @@ namespace Serenity.CodeGeneration
             return editorType;
         }
 
-        private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute)
+        private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute,
+            string identifier)
         {
             var codeNamespace = GetNamespace(type);
-
-            var identifier = type.Name;
-            if (identifier.EndsWith(requestSuffix, StringComparison.Ordinal) &&
-                TypingsUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
-            {
-                identifier = identifier[..^requestSuffix.Length] + "Form";
-                fileIdentifier = identifier;
-            }
 
             cw.Indented("export interface ");
             sb.Append(identifier);

@@ -2,9 +2,9 @@
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
-        protected void GenerateBasicType(TypeDefinition type)
+        protected void GenerateBasicType(TypeDefinition type, bool module)
         {
-            var codeNamespace = GetNamespace(type);
+            var codeNamespace = module ? null : GetNamespace(type);
 
             cw.Indented("export interface ");
 

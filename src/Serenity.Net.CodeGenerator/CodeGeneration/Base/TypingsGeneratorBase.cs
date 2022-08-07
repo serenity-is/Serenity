@@ -2,8 +2,8 @@
 using System.Collections.Immutable;
 using System.Threading;
 using Microsoft.CodeAnalysis;
-#endif
 using Serenity.Reflection;
+#endif
 
 namespace Serenity.CodeGeneration
 {
@@ -14,7 +14,6 @@ namespace Serenity.CodeGeneration
         protected List<TypeDefinition> lookupScripts;
         protected HashSet<string> localTextKeys;
         protected HashSet<string> generatedTypes;
-        protected string fileIdentifier;
         protected List<AnnotationTypeInfo> annotationTypes;
 
 #if ISSOURCEGENERATOR
@@ -324,12 +323,7 @@ namespace Serenity.CodeGeneration
                     continue;
 #endif
 
-                var ns = GetNamespace(typeDef);
-                fileIdentifier = typeDef.Name;
-
                 GenerateCodeFor(typeDef);
-
-                AddFile(RemoveRootNamespace(ns, fileIdentifier + ".ts"));
             }
         }
 
@@ -453,7 +447,7 @@ namespace Serenity.CodeGeneration
         }
 
 
-        protected abstract void HandleMemberType(TypeReference memberType, string codeNamespace, StringBuilder sb = null);
+        protected abstract void HandleMemberType(TypeReference memberType, string codeNamespace);
 
         public static bool CanHandleType(TypeDefinition memberType)
         {
@@ -558,7 +552,7 @@ namespace Serenity.CodeGeneration
                     if (i++ > 0)
                         sb.Append(", ");
 
-                    HandleMemberType(argument, codeNamespace, sb);
+                    HandleMemberType(argument, codeNamespace);
                 }
 
                 sb.Append('>');
@@ -613,10 +607,8 @@ namespace Serenity.CodeGeneration
             }
         }
 
-        protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, StringBuilder sb = null)
+        protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace)
         {
-            sb ??= this.sb;
-
             string ns;
 
             if (type.IsGenericInstance())
@@ -900,5 +892,72 @@ namespace Serenity.CodeGeneration
                 public string[] Properties { get; set; }
             }
         }
+
+        private readonly List<ModuleImport> moduleImports = new();
+        private readonly HashSet<string> moduleImportAliases = new();
+
+        protected class ModuleImport
+        {
+            public string Name { get; set; }
+            public string Alias { get; set; }
+            public string From { get; set; }
+        }
+
+        protected void ClearImports()
+        {
+            moduleImports.Clear();
+        }
+
+        protected override void AddFile(string filename, bool module = false)
+        {
+            if (moduleImports.Any())
+            {
+                if (module)
+                {
+                    sb.Insert(0, string.Join(Environment.NewLine,
+                        moduleImports.ToLookup(x => x.From)
+                            .Select(from =>
+                            {
+                                var importList = string.Join(", ", from.Select(p =>
+                                    p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
+
+                                return $"import {{ {importList} }} from \"{from.Key}\";";
+                            })) + Environment.NewLine);
+                }
+
+                moduleImports.Clear();
+                moduleImportAliases.Clear();
+            }
+
+            base.AddFile(filename, module);
+        }
+
+        protected string AddModuleImport(string from, string name)
+        {
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
+
+            if (from is null)
+                throw new ArgumentNullException(nameof(from));
+
+            var existing = moduleImports.FirstOrDefault(x => x.From == from && x.Name == name);
+            if (existing != null)
+                return existing.Alias;
+
+            var i = 0; string alias;
+            while (moduleImportAliases.Contains(alias = i == 0 ? name : (name + "_" + i)))
+                i++;
+
+            moduleImportAliases.Add(alias);
+            moduleImports.Add(new ModuleImport
+            {
+                From = from,
+                Name = name,
+                Alias = alias
+            });
+
+            return alias;
+        }
+
     }
 }

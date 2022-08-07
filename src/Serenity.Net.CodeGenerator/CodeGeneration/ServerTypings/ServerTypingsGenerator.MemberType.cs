@@ -2,10 +2,8 @@
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
-        protected override void HandleMemberType(TypeReference memberType, string codeNamespace, 
-            StringBuilder sb = null)
+        protected override void HandleMemberType(TypeReference memberType, string codeNamespace)
         {
-            sb ??= this.sb;
             bool isSystem = memberType.NamespaceOf() == "System";
 
             if (isSystem && memberType.Name == "String")
@@ -93,7 +91,7 @@
 
             if (memberType.IsArray())
             {
-                HandleMemberType(memberType.ElementType(), codeNamespace, sb);
+                HandleMemberType(memberType.ElementType(), codeNamespace);
                 sb.Append("[]");
                 return;
             }
@@ -109,7 +107,7 @@
                         gi.ElementType().MetadataName() == "IEnumerable`1" ||
                         gi.ElementType().MetadataName() == "ISet`1")
                     {
-                        HandleMemberType(gi.GenericArguments()[0], codeNamespace, sb);
+                        HandleMemberType(gi.GenericArguments()[0], codeNamespace);
                         sb.Append("[]");
                         return;
                     }
@@ -118,9 +116,9 @@
                         gi.ElementType().MetadataName() == "IDictionary`2")
                     {
                         sb.Append("{ [key: ");
-                        HandleMemberType(gi.GenericArguments()[0], codeNamespace, sb);
+                        HandleMemberType(gi.GenericArguments()[0], codeNamespace);
                         sb.Append("]: ");
-                        HandleMemberType(gi.GenericArguments()[1], codeNamespace, sb);
+                        HandleMemberType(gi.GenericArguments()[1], codeNamespace);
                         sb.Append(" }");
                         return;
                     }
