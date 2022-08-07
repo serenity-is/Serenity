@@ -7,10 +7,12 @@
             var rootNamespace = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
 
             var byNamespace = generatedTypes
-                .Where(x => !x.Value)
-                .Select(x => x.Key)
-                .ToLookup(fullName =>
+                .Where(x => !x.Module)
+                .ToLookup(type =>
                 {
+                    string fullName = string.IsNullOrEmpty(type.Namespace) ? type.Name :
+                        (type.Namespace + "." + type.Name);
+
                     if (string.IsNullOrEmpty(fullName))
                         return null;
 
@@ -24,15 +26,23 @@
                     return fullName[(rootNamespace.Length + 1)..idx];
                 }).Where(x => x.Key != null);
 
-            foreach (var ns in byNamespace)
+            foreach (var types in byNamespace)
             {
-                foreach (var fullName in ns.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+                foreach (var type in types.OrderBy(x => x.TypeOnly)
+                    .ThenBy(x => x.Namespace, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(x => x.Name))
                 {
-                    cw.Indented("export import ");
+                    string fullName = string.IsNullOrEmpty(type.Namespace) ? type.Name :
+                        (type.Namespace + "." + type.Name);
+
+                    if (type.TypeOnly)
+                        cw.Indented("export type ");
+                    else
+                        cw.Indented("export import ");
 
                     var shortName = fullName;
-                    if (shortName.StartsWith(rootNamespace + "." + ns.Key + ".", StringComparison.OrdinalIgnoreCase))
-                        shortName = shortName[(rootNamespace.Length + ns.Key.Length + 2)..];
+                    if (shortName.StartsWith(rootNamespace + "." + types.Key + ".", StringComparison.OrdinalIgnoreCase))
+                        shortName = shortName[(rootNamespace.Length + types.Key.Length + 2)..];
                     else if (shortName.StartsWith(rootNamespace + ".", StringComparison.OrdinalIgnoreCase))
                         shortName = shortName[(rootNamespace.Length + 1)..];
 
@@ -44,7 +54,7 @@
 
                 if (sb.Length > 0)
                 {
-                    AddFile(ns.Key + ".ts", module: true);
+                    AddFile(types.Key + ".ts", module: true);
                     sb.Clear();
                 }
             }

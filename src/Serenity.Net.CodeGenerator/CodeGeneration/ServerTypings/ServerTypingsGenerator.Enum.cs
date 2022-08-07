@@ -15,7 +15,7 @@
             cw.Indented("export enum ");
             var identifier = MakeFriendlyName(enumType, codeNamespace, module);
             var fullName = (string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier;
-            RegisterGeneratedType(fullName, module);
+            RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);
 
             cw.InBrace(delegate
             {

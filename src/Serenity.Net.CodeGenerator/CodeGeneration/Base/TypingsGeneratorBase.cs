@@ -9,12 +9,12 @@ namespace Serenity.CodeGeneration
 {
     public abstract class TypingsGeneratorBase : ImportGeneratorBase
     {
-        private HashSet<string> visited;
+        private readonly HashSet<string> visited = new();
         private Queue<TypeDefinition> generateQueue;
-        protected List<TypeDefinition> lookupScripts;
-        protected HashSet<string> localTextKeys;
-        protected Dictionary<string, bool> generatedTypes;
-        protected List<AnnotationTypeInfo> annotationTypes;
+        protected List<TypeDefinition> lookupScripts = new();
+        protected HashSet<string> localTextKeys = new();
+        protected List<GeneratedTypeInfo> generatedTypes = new();
+        protected List<AnnotationTypeInfo> annotationTypes = new();
 
 #if ISSOURCEGENERATOR
         private readonly CancellationToken cancellationToken;
@@ -23,8 +23,6 @@ namespace Serenity.CodeGeneration
         {
             Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
             this.cancellationToken = cancellationToken;
-            generatedTypes = new HashSet<string>();
-            annotationTypes = new List<AnnotationTypeInfo>();
         }
 
         public Compilation Compilation { get; }
@@ -99,9 +97,6 @@ namespace Serenity.CodeGeneration
         protected TypingsGeneratorBase(params Mono.Cecil.AssemblyDefinition[] assemblies)
             : base()
         {
-            generatedTypes = new();
-            annotationTypes = new List<AnnotationTypeInfo>();
-
             if (assemblies == null || assemblies.Length == 0)
                 throw new ArgumentNullException(nameof(assemblies));
 
@@ -183,9 +178,11 @@ namespace Serenity.CodeGeneration
 
             cw.BraceOnSameLine = true;
             generateQueue = new Queue<TypeDefinition>();
-            visited = new HashSet<string>();
-            lookupScripts = new List<TypeDefinition>();
-            localTextKeys = new HashSet<string>();
+            visited.Clear();
+            lookupScripts.Clear();
+            localTextKeys.Clear();
+            generatedTypes.Clear();
+            annotationTypes.Clear();
         }
 
         protected override void GenerateAll()
@@ -891,6 +888,14 @@ namespace Serenity.CodeGeneration
             }
         }
 
+        protected class GeneratedTypeInfo
+        {
+            public string Namespace { get; set; }
+            public string Name { get; set; }
+            public bool Module { get; set; }
+            public bool TypeOnly { get; set; }
+        }
+
         private readonly List<ModuleImport> moduleImports = new();
         private readonly HashSet<string> moduleImportAliases = new();
 
@@ -957,9 +962,15 @@ namespace Serenity.CodeGeneration
             return alias;
         }
 
-        protected void RegisterGeneratedType(string name, bool module)
+        protected void RegisterGeneratedType(string ns, string name, bool module, bool typeOnly)
         {
-            generatedTypes.Add(name, module);
+            generatedTypes.Add(new GeneratedTypeInfo 
+            { 
+                Namespace = ns, 
+                Name = name, 
+                Module = module, 
+                TypeOnly = typeOnly 
+            });
         }
 
     }

@@ -22,7 +22,7 @@
                 sb.AppendLine("';");
             });
 
-            RegisterGeneratedType((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier, module);
+            RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);
         }
     }
 }

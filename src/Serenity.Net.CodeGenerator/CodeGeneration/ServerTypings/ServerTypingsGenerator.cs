@@ -84,7 +84,7 @@
                 EnqueueTypeMembers(type);
 
                 if (isServiceRequest)
-                    add(GenerateBasicType);
+                    add((t, m) => GenerateBasicType(t, m));
 
                 return;
             }
@@ -103,7 +103,21 @@
                 add(GeneratePermissionKeys);
                 return;
             }
-            
+
+            if (TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
+                TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
+            {
+                var metadata = ExtractRowMetadata(type);
+                
+                add((t, m) =>
+                {
+                    GenerateRowType(t, m);
+                    GenerateRowMetadata(t, metadata, m);
+                });
+                
+                return;
+            }
+
             add(GenerateBasicType);
         }
     }

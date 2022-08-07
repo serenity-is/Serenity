@@ -71,10 +71,24 @@ namespace Serenity.CodeGeneration
                     not "Serenity.Data.Row`1");
         }
 
-        private void GenerateRowMembers(TypeDefinition rowType, bool module)
+        protected void GenerateRowType(TypeDefinition type, bool module)
         {
-            var codeNamespace = GetNamespace(rowType);
+            var codeNamespace = module ? null : GetNamespace(type);
 
+            cw.Indented("export interface ");
+
+            var identifier = MakeFriendlyName(type, codeNamespace, module);
+
+            RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: module);
+
+            cw.InBrace(() =>
+            {
+                GenerateRowMembers(type, codeNamespace, module);
+            });
+        }
+
+        private void GenerateRowMembers(TypeDefinition rowType, string codeNamespace, bool module)
+        {
             foreach (var property in EnumerateFieldProperties(rowType))
             {
                 cw.Indented(property.Name);
@@ -159,12 +173,11 @@ namespace Serenity.CodeGeneration
 #endif
                 }
             }
-
             while ((rowType = (rowType.BaseType?.Resolve())) != null && 
                 rowType.FullNameOf() != "Serenity.Data.Row" &&
                 rowType.FullNameOf() != "Serenity.Data.Row`1");
 
-                    return null;
+            return null;
         }
 
         private static string DetermineModuleIdentifier(TypeDefinition rowType)
@@ -384,32 +397,46 @@ namespace Serenity.CodeGeneration
             return null;
         }
 
-        private void GenerateRowMetadata(TypeDefinition rowType)
+        protected class RowMetadata
         {
-            string idProperty = null;
-#if !ISSOURCEGENERATOR
-            idProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.IIdRow" }, 
-                "Serenity.Data.IIdField", "IdField", 
-                "Serenity.Data.IIdField Serenity.Data.IIdRow::get_IdField()");
-#endif
+            public string IdProperty { get; set; }
+            public string NameProperty { get; set; }
+            public string IsActiveProperty { get; set; }
+            public string IsDeletedProperty { get; set; }
+            public string LocalTextPrefix { get; set; }
+            public string LookupKey { get; set; }
+            public string ReadPermission { get; set; }
+            public string DeletePermission { get; set; }
+            public string InsertPermission { get; set; }
+            public string UpdatePermission { get; set; }
+        }
+
+        protected RowMetadata ExtractRowMetadata(TypeDefinition rowType)
+        {
+            var metadata = new RowMetadata
+            {
+                IdProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.IIdRow" },
+                    "Serenity.Data.IIdField", "IdField",
+                    "Serenity.Data.IIdField Serenity.Data.IIdRow::get_IdField()")
+            };
 
             var properties = EnumerateProperties(rowType).ToList();
 
-            if (idProperty == null)
+            if (metadata.IdProperty == null)
             {
-                idProperty = properties.FirstOrDefault(x =>
+                metadata.IdProperty = properties.FirstOrDefault(x =>
                     x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributes(),
                         "Serenity.Data", "IdPropertyAttribute") != null)?.Name;
             }
 
-            if (idProperty == null)
+            if (metadata.IdProperty == null)
             {
                 var identities = properties.Where(x =>
                     x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributes(),
                         "Serenity.Data.Mapping", "IdentityAttribute") != null);
 
                 if (identities.Count() == 1)
-                    idProperty = identities.First().Name;
+                    metadata.IdProperty = identities.First().Name;
                 else if (!identities.Any())
                 {
                     var primaryKeys = properties.Where(x =>
@@ -417,132 +444,124 @@ namespace Serenity.CodeGeneration
                             "Serenity.Data.Mapping", "PrimaryKeyAttribute") != null);
 
                     if (primaryKeys.Count() == 1)
-                        idProperty = primaryKeys.First().Name;
+                        metadata.IdProperty = primaryKeys.First().Name;
                 }
             }
 
-#if ISSOURCEGENERATOR
-            string nameProperty = null;
-#else
-            var nameProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.INameRow" },
+            metadata.NameProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.INameRow" },
                     "Serenity.Data.StringField", "NameField",
                     "Serenity.Data.StringField Serenity.Data.INameRow::get_NameField()");
-#endif
 
-            if (nameProperty == null)
+            if (metadata.NameProperty == null)
             {
-                nameProperty = properties.FirstOrDefault(x =>
+                metadata.NameProperty = properties.FirstOrDefault(x =>
                     x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributes(),
                         "Serenity.Data", "NamePropertyAttribute") != null)?.Name;
             }
 
-            var isActiveProperty = ExtractInterfacePropertyFromRow(rowType,
+            metadata.IsActiveProperty = ExtractInterfacePropertyFromRow(rowType,
                 new[] { "Serenity.Data.IIsActiveRow", "Serenity.Data.IIsActiveDeletedRow" },
-                "Serenity.Data.Int16Field", "IsActiveField", 
+                "Serenity.Data.Int16Field", "IsActiveField",
                 "Serenity.Data.Int16Field Serenity.Data.IIsActiveRow::get_IsActiveField()");
 
-            var isDeletedProperty = ExtractInterfacePropertyFromRow(rowType,
+            metadata.IsDeletedProperty = ExtractInterfacePropertyFromRow(rowType,
                 new[] { "Serenity.Data.IIsDeletedRow", "Serenity.Data.IIsDeletedRow" },
                 "Serenity.Data.BooleanField", "IsDeletedField",
                 "Serenity.Data.BooleanField Serenity.Data.IIsDeletedRow::get_IsDeletedField()");
 
-            var lookupKey = DetermineLookupKey(rowType);
+            metadata.LookupKey = DetermineLookupKey(rowType);
 
-            var deletePermission = DeterminePermission(rowType, "Delete", "Modify", "Read");
-            var insertPermission = DeterminePermission(rowType, "Insert", "Modify", "Read");
-            var readPermission = DeterminePermission(rowType, "Read") ?? "";
-            var updatePermission = DeterminePermission(rowType, "Update", "Modify", "Read");
+            metadata.DeletePermission = DeterminePermission(rowType, "Delete", "Modify", "Read");
+            metadata.InsertPermission = DeterminePermission(rowType, "Insert", "Modify", "Read");
+            metadata.ReadPermission = DeterminePermission(rowType, "Read") ?? "";
+            metadata.UpdatePermission = DeterminePermission(rowType, "Update", "Modify", "Read");
+            metadata.LocalTextPrefix = DetermineLocalTextPrefix(rowType);
 
+            AddRowTexts(rowType, "Db." + (string.IsNullOrEmpty(metadata.LocalTextPrefix) ? "" : 
+                (metadata.LocalTextPrefix + ".")));
+
+            return metadata;
+        }
+
+        protected void GenerateRowMetadata(TypeDefinition rowType, RowMetadata metadata, bool module)
+        { 
             sb.AppendLine();
             cw.Indented("export namespace ");
             sb.Append(rowType.Name);
 
-            var localTextPrefix = DetermineLocalTextPrefix(rowType);
-            AddRowTexts(rowType, "Db." + (string.IsNullOrEmpty(localTextPrefix) ? "" : (localTextPrefix + ".")));
-
-            void appendMetadataConsts()
-            {
-                if (idProperty != null)
-                {
-                    cw.Indented("export const idProperty = ");
-                    sb.Append(idProperty.ToSingleQuoted());
-                    sb.AppendLine(";");
-                }
-
-                if (isActiveProperty != null)
-                {
-                    cw.Indented("export const isActiveProperty = ");
-                    sb.Append(isActiveProperty.ToSingleQuoted());
-                    sb.AppendLine(";");
-                }
-
-                if (isDeletedProperty != null)
-                {
-                    cw.Indented("export const isDeletedProperty = ");
-                    sb.Append(isDeletedProperty.ToSingleQuoted());
-                    sb.AppendLine(";");
-                }
-
-                if (nameProperty != null)
-                {
-                    cw.Indented("export const nameProperty = ");
-                    sb.Append(nameProperty.ToSingleQuoted());
-                    sb.AppendLine(";");
-                }
-
-                if (!string.IsNullOrEmpty(localTextPrefix))
-                {
-                    cw.Indented("export const localTextPrefix = ");
-                    sb.Append(localTextPrefix.ToSingleQuoted());
-                    sb.AppendLine(";");
-                }
-            }
-
-            void appendPermissions()
-            {
-                cw.Indented("export const deletePermission = ");
-                sb.Append(deletePermission == null ? "null" : deletePermission.ToSingleQuoted());
-                sb.AppendLine(";");
-
-                cw.Indented("export const insertPermission = ");
-                sb.Append(insertPermission == null ? "null" : insertPermission.ToSingleQuoted());
-                sb.AppendLine(";");
-
-                cw.Indented("export const readPermission = ");
-                sb.Append(readPermission == null ? "null" : readPermission.ToSingleQuoted());
-                sb.AppendLine(";");
-
-                cw.Indented("export const updatePermission = ");
-                sb.Append(updatePermission == null ? "null" : updatePermission.ToSingleQuoted());
-                sb.AppendLine(";");
-                sb.AppendLine();
-            }
-
             cw.InBrace(delegate
             {
-                appendMetadataConsts();
+                if (metadata.IdProperty != null)
+                {
+                    cw.Indented("export const idProperty = ");
+                    sb.Append(metadata.IdProperty.ToSingleQuoted());
+                    sb.AppendLine(";");
+                }
 
-                if (!string.IsNullOrEmpty(lookupKey))
+                if (metadata.IsActiveProperty != null)
+                {
+                    cw.Indented("export const isActiveProperty = ");
+                    sb.Append(metadata.IsActiveProperty.ToSingleQuoted());
+                    sb.AppendLine(";");
+                }
+
+                if (metadata.IsDeletedProperty != null)
+                {
+                    cw.Indented("export const isDeletedProperty = ");
+                    sb.Append(metadata.IsDeletedProperty.ToSingleQuoted());
+                    sb.AppendLine(";");
+                }
+
+                if (metadata.NameProperty != null)
+                {
+                    cw.Indented("export const nameProperty = ");
+                    sb.Append(metadata.NameProperty.ToSingleQuoted());
+                    sb.AppendLine(";");
+                }
+
+                if (!string.IsNullOrEmpty(metadata.LocalTextPrefix))
+                {
+                    cw.Indented("export const localTextPrefix = ");
+                    sb.Append(metadata.LocalTextPrefix.ToSingleQuoted());
+                    sb.AppendLine(";");
+                }
+
+                if (!string.IsNullOrEmpty(metadata.LookupKey))
                 {
                     cw.Indented("export const lookupKey = ");
-                    sb.Append(lookupKey.ToSingleQuoted());
+                    sb.Append(metadata.LookupKey.ToSingleQuoted());
                     sb.AppendLine(";");
 
                     sb.AppendLine();
-                    cw.Indented("export function getLookup(): Q.Lookup<");
+                    cw.Indented($"export {(module ? "async " : "")}function getLookup{(module ? "Async " : "")}(): Q.Lookup<");
                     sb.Append(rowType.Name);
                     sb.Append('>');
                     cw.InBrace(delegate
                     {
-                        cw.Indented("return Q.getLookup<");
+                        cw.Indented($"return Q.getLookup{(module ? "Async" : "")}<");
                         sb.Append(rowType.Name);
                         sb.Append(">(");
-                        sb.Append(lookupKey.ToSingleQuoted());
+                        sb.Append(metadata.LookupKey.ToSingleQuoted());
                         sb.AppendLine(");");
                     });
                 }
 
-                appendPermissions();
+                cw.Indented("export const deletePermission = ");
+                sb.Append(metadata.DeletePermission == null ? "null" : metadata.DeletePermission.ToSingleQuoted());
+                sb.AppendLine(";");
+
+                cw.Indented("export const insertPermission = ");
+                sb.Append(metadata.InsertPermission == null ? "null" : metadata.InsertPermission.ToSingleQuoted());
+                sb.AppendLine(";");
+
+                cw.Indented("export const readPermission = ");
+                sb.Append(metadata.ReadPermission == null ? "null" : metadata.ReadPermission.ToSingleQuoted());
+                sb.AppendLine(";");
+
+                cw.Indented("export const updatePermission = ");
+                sb.Append(metadata.UpdatePermission == null ? "null" : metadata.UpdatePermission.ToSingleQuoted());
+                sb.AppendLine(";");
+                sb.AppendLine();
 
                 cw.Indented("export declare const enum ");
                 sb.Append("Fields");

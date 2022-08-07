@@ -8,7 +8,7 @@
 
             cw.Indented("export namespace ");
             sb.Append(identifier);
-            RegisterGeneratedType((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier, module);
+            RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);
 
             cw.InBrace(delegate
             {
