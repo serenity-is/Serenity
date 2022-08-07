@@ -2,7 +2,7 @@
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
-        private void GenerateColumns(TypeDefinition type, CustomAttribute columnsAttribute)
+        private void GenerateColumns(TypeDefinition type, CustomAttribute columnsAttribute, bool module)
         {
             var codeNamespace = GetNamespace(type);
 
@@ -22,7 +22,7 @@
                 sb.AppendLine("';");
             });
 
-            generatedTypes.Add((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier);
+            RegisterGeneratedType((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier, module);
         }
     }
 }

@@ -8,21 +8,21 @@
 
             cw.Indented("export interface ");
 
-            var identifier = MakeFriendlyName(type, codeNamespace);
-            generatedTypes.Add((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier);
+            var identifier = MakeFriendlyName(type, codeNamespace, module);
+            generatedTypes[(string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier] = module;
 
             var baseClass = GetBaseClass(type);
             if (baseClass != null)
             {
                 sb.Append(" extends ");
-                MakeFriendlyReference(baseClass, GetNamespace(type));
+                MakeFriendlyReference(baseClass, GetNamespace(type), module);
             }
 
             cw.InBrace(delegate
             {
                 if (TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
                     TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
-                    GenerateRowMembers(type);
+                    GenerateRowMembers(type, module);
                 else
                 {
                     void handleMember(TypeReference memberType, string memberName, IEnumerable<CustomAttribute> a)
@@ -44,7 +44,7 @@
 
                         cw.Indented(memberName);
                         sb.Append("?: ");
-                        HandleMemberType(memberType, codeNamespace);
+                        HandleMemberType(memberType, codeNamespace, module);
                         sb.Append(';');
                         sb.AppendLine();
                     }

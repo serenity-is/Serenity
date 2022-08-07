@@ -2,7 +2,7 @@
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
-        private void GenerateEnum(TypeDefinition enumType)
+        private void GenerateEnum(TypeDefinition enumType, bool module)
         {
             var codeNamespace = GetNamespace(enumType);
             string enumKey = enumType.FullNameOf();
@@ -13,9 +13,9 @@
                 enumKey = enumKeyAttr.ConstructorArguments[0].Value as string;
 
             cw.Indented("export enum ");
-            var identifier = MakeFriendlyName(enumType, codeNamespace);
+            var identifier = MakeFriendlyName(enumType, codeNamespace, module);
             var fullName = (string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier;
-            generatedTypes.Add(fullName);
+            RegisterGeneratedType(fullName, module);
 
             cw.InBrace(delegate
             {

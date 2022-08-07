@@ -8,7 +8,7 @@
 
             cw.Indented("export namespace ");
             sb.Append(identifier);
-            generatedTypes.Add((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier);
+            RegisterGeneratedType((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier, module);
 
             cw.InBrace(delegate
             {
@@ -43,10 +43,10 @@
                     if (requestType == null)
                         sb.Append(ShortenFullName(new ExternalType { Name = "ServiceRequest", Namespace = "Serenity" }, codeNamespace));
                     else
-                        HandleMemberType(requestType, codeNamespace);
+                        HandleMemberType(requestType, codeNamespace, module);
 
                     sb.Append(", onSuccess?: (response: ");
-                    HandleMemberType(responseType, codeNamespace);
+                    HandleMemberType(responseType, codeNamespace, module);
                     sb.AppendLine(") => void, opt?: Q.ServiceOptions<any>): JQueryXHR;");
                 }
 

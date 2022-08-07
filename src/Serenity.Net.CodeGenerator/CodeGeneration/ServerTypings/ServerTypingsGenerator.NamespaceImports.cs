@@ -6,20 +6,23 @@
         {
             var rootNamespace = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
 
-            var byNamespace = generatedTypes.ToLookup(fullName =>
-            {
-                if (string.IsNullOrEmpty(fullName))
-                    return null;
+            var byNamespace = generatedTypes
+                .Where(x => !x.Value)
+                .Select(x => x.Key)
+                .ToLookup(fullName =>
+                {
+                    if (string.IsNullOrEmpty(fullName))
+                        return null;
 
-                if (!fullName.StartsWith(rootNamespace + ".", StringComparison.OrdinalIgnoreCase))
-                    return null;
+                    if (!fullName.StartsWith(rootNamespace + ".", StringComparison.OrdinalIgnoreCase))
+                        return null;
 
-                var idx = fullName.IndexOf('.', rootNamespace.Length + 1);
-                if (idx < 0)
-                    return rootNamespace;
+                    var idx = fullName.IndexOf('.', rootNamespace.Length + 1);
+                    if (idx < 0)
+                        return rootNamespace;
 
-                return fullName[(rootNamespace.Length + 1)..idx];
-            }).Where(x => x.Key != null);
+                    return fullName[(rootNamespace.Length + 1)..idx];
+                }).Where(x => x.Key != null);
 
             foreach (var ns in byNamespace)
             {

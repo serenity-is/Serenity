@@ -2,7 +2,7 @@
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
-        protected override void HandleMemberType(TypeReference memberType, string codeNamespace)
+        protected override void HandleMemberType(TypeReference memberType, string codeNamespace, bool module)
         {
             bool isSystem = memberType.NamespaceOf() == "System";
 
@@ -91,7 +91,7 @@
 
             if (memberType.IsArray())
             {
-                HandleMemberType(memberType.ElementType(), codeNamespace);
+                HandleMemberType(memberType.ElementType(), codeNamespace, module);
                 sb.Append("[]");
                 return;
             }
@@ -107,7 +107,7 @@
                         gi.ElementType().MetadataName() == "IEnumerable`1" ||
                         gi.ElementType().MetadataName() == "ISet`1")
                     {
-                        HandleMemberType(gi.GenericArguments()[0], codeNamespace);
+                        HandleMemberType(gi.GenericArguments()[0], codeNamespace, module);
                         sb.Append("[]");
                         return;
                     }
@@ -116,9 +116,9 @@
                         gi.ElementType().MetadataName() == "IDictionary`2")
                     {
                         sb.Append("{ [key: ");
-                        HandleMemberType(gi.GenericArguments()[0], codeNamespace);
+                        HandleMemberType(gi.GenericArguments()[0], codeNamespace, module);
                         sb.Append("]: ");
-                        HandleMemberType(gi.GenericArguments()[1], codeNamespace);
+                        HandleMemberType(gi.GenericArguments()[1], codeNamespace, module);
                         sb.Append(" }");
                         return;
                     }
@@ -136,7 +136,7 @@
             }
 
             EnqueueType(memberType.Resolve());
-            MakeFriendlyReference(memberType, codeNamespace);
+            MakeFriendlyReference(memberType, codeNamespace, module);
         }
 
         protected string ShortenFullName(ExternalType type, string codeNamespace)

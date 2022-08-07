@@ -38,21 +38,28 @@
 
         protected override void GenerateCodeFor(TypeDefinition type)
         {
-            void addNamespaceTyping(Action<TypeDefinition> action, string fileIdentifier = null)
+            void add(Action<TypeDefinition, bool> action, string fileIdentifier = null)
             {
-                cw.Indented("namespace ");
-                var codeNamespace = GetNamespace(type);
-                sb.Append(codeNamespace);
-                cw.InBrace(delegate
+                if (NamespaceTypings)
                 {
-                    action(type);
-                });
-                AddFile(RemoveRootNamespace(codeNamespace, (fileIdentifier ?? type.Name) + ".ts"));
+                    cw.Indented("namespace ");
+                    var codeNamespace = GetNamespace(type);
+                    sb.Append(codeNamespace);
+                    cw.InBrace(delegate
+                    {
+                        action(type, false);
+                    });
+                    AddFile(RemoveRootNamespace(codeNamespace, (fileIdentifier ?? type.Name) + ".ts"), false);
+                }
+
+                if (ModuleTypings)
+                {
+                }
             }
 
             if (type.IsEnum())
             {
-                addNamespaceTyping(GenerateEnum);
+                add(GenerateEnum);
                 return;
             }
 
@@ -60,7 +67,7 @@
                 TypingsUtils.IsSubclassOf(type, "System.Web.Mvc", "Controller"))
             {
                 var controllerIdentifier = GetControllerIdentifier(type);
-                addNamespaceTyping(t => GenerateService(t, controllerIdentifier, false), controllerIdentifier);
+                add((t, m) => GenerateService(t, controllerIdentifier, m), controllerIdentifier);
                 return;
             }
 
@@ -72,12 +79,12 @@
                 if (formIdentifier.EndsWith(requestSuffix, StringComparison.Ordinal) && isServiceRequest)
                     formIdentifier = formIdentifier[..^requestSuffix.Length] + "Form";
 
-                addNamespaceTyping(t => GenerateForm(t, formScriptAttr, formIdentifier), formIdentifier);
+                add((t, m) => GenerateForm(t, formScriptAttr, formIdentifier, m), formIdentifier);
 
                 EnqueueTypeMembers(type);
 
                 if (isServiceRequest)
-                    addNamespaceTyping(type => GenerateBasicType(type, false));
+                    add(GenerateBasicType);
 
                 return;
             }
@@ -85,7 +92,7 @@
             var columnsScriptAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "ColumnsScriptAttribute");
             if (columnsScriptAttr != null)
             {
-                addNamespaceTyping(t => GenerateColumns(t, columnsScriptAttr));
+                add((t, m) => GenerateColumns(t, columnsScriptAttr, m));
                 EnqueueTypeMembers(type);
                 return;
             }
@@ -93,11 +100,11 @@
             if (TypingsUtils.GetAttr(type, "Serenity.Extensibility", "NestedPermissionKeysAttribute") != null ||
                 TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "NestedPermissionKeysAttribute") != null)
             {
-                addNamespaceTyping(GeneratePermissionKeys);
+                add(GeneratePermissionKeys);
                 return;
             }
             
-            addNamespaceTyping(t => GenerateBasicType(t, false));
+            add(GenerateBasicType);
         }
     }
 }

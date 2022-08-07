@@ -92,7 +92,7 @@ namespace Serenity.CodeGeneration
         }
 
         private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute,
-            string identifier)
+            string identifier, bool module)
         {
             var codeNamespace = GetNamespace(type);
 
@@ -276,7 +276,7 @@ namespace Serenity.CodeGeneration
                 }
             });
 
-            generatedTypes.Add((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier);
+            RegisterGeneratedType((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier, module);
         }
     }
 }

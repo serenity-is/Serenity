@@ -13,7 +13,7 @@ namespace Serenity.CodeGeneration
         private Queue<TypeDefinition> generateQueue;
         protected List<TypeDefinition> lookupScripts;
         protected HashSet<string> localTextKeys;
-        protected HashSet<string> generatedTypes;
+        protected Dictionary<string, bool> generatedTypes;
         protected List<AnnotationTypeInfo> annotationTypes;
 
 #if ISSOURCEGENERATOR
@@ -99,7 +99,7 @@ namespace Serenity.CodeGeneration
         protected TypingsGeneratorBase(params Mono.Cecil.AssemblyDefinition[] assemblies)
             : base()
         {
-            generatedTypes = new HashSet<string>();
+            generatedTypes = new();
             annotationTypes = new List<AnnotationTypeInfo>();
 
             if (assemblies == null || assemblies.Length == 0)
@@ -447,7 +447,7 @@ namespace Serenity.CodeGeneration
         }
 
 
-        protected abstract void HandleMemberType(TypeReference memberType, string codeNamespace);
+        protected abstract void HandleMemberType(TypeReference memberType, string codeNamespace, bool module);
 
         public static bool CanHandleType(TypeDefinition memberType)
         {
@@ -527,10 +527,8 @@ namespace Serenity.CodeGeneration
             return ns;
         }
 
-        protected virtual string MakeFriendlyName(TypeReference type, string codeNamespace, StringBuilder sb = null)
+        protected virtual string MakeFriendlyName(TypeReference type, string codeNamespace, bool module)
         {
-            sb ??= this.sb;
-
             if (type.IsGenericInstance())
             {
                 var name = type.Name;
@@ -552,7 +550,7 @@ namespace Serenity.CodeGeneration
                     if (i++ > 0)
                         sb.Append(", ");
 
-                    HandleMemberType(argument, codeNamespace);
+                    HandleMemberType(argument, codeNamespace, module);
                 }
 
                 sb.Append('>');
@@ -607,7 +605,7 @@ namespace Serenity.CodeGeneration
             }
         }
 
-        protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace)
+        protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, bool module)
         {
             string ns;
 
@@ -639,7 +637,7 @@ namespace Serenity.CodeGeneration
                     if (i++ > 0)
                         sb.Append(", ");
 
-                    HandleMemberType(argument, codeNamespace);
+                    HandleMemberType(argument, codeNamespace, module);
                 }
 
                 sb.Append('>');
@@ -957,6 +955,11 @@ namespace Serenity.CodeGeneration
             });
 
             return alias;
+        }
+
+        protected void RegisterGeneratedType(string name, bool module)
+        {
+            generatedTypes.Add(name, module);
         }
 
     }

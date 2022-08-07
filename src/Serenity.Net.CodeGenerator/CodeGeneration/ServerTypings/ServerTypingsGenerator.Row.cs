@@ -71,7 +71,7 @@ namespace Serenity.CodeGeneration
                     not "Serenity.Data.Row`1");
         }
 
-        private void GenerateRowMembers(TypeDefinition rowType)
+        private void GenerateRowMembers(TypeDefinition rowType, bool module)
         {
             var codeNamespace = GetNamespace(rowType);
 
@@ -83,11 +83,11 @@ namespace Serenity.CodeGeneration
                 var enumType = TypingsUtils.GetEnumTypeFrom(property.PropertyType());
                 if (enumType != null)
                 {
-                    HandleMemberType(enumType, codeNamespace);
+                    HandleMemberType(enumType, codeNamespace, module);
                 }
                 else
                 {
-                    HandleMemberType(TypingsUtils.GetNullableUnderlyingType(property.PropertyType()) ?? property.PropertyType(), codeNamespace);
+                    HandleMemberType(TypingsUtils.GetNullableUnderlyingType(property.PropertyType()) ?? property.PropertyType(), codeNamespace, module);
                 }
 
                 sb.AppendLine(";");
@@ -448,11 +448,19 @@ namespace Serenity.CodeGeneration
 
             var lookupKey = DetermineLookupKey(rowType);
 
+            var deletePermission = DeterminePermission(rowType, "Delete", "Modify", "Read");
+            var insertPermission = DeterminePermission(rowType, "Insert", "Modify", "Read");
+            var readPermission = DeterminePermission(rowType, "Read") ?? "";
+            var updatePermission = DeterminePermission(rowType, "Update", "Modify", "Read");
+
             sb.AppendLine();
             cw.Indented("export namespace ");
             sb.Append(rowType.Name);
 
-            cw.InBrace(delegate
+            var localTextPrefix = DetermineLocalTextPrefix(rowType);
+            AddRowTexts(rowType, "Db." + (string.IsNullOrEmpty(localTextPrefix) ? "" : (localTextPrefix + ".")));
+
+            void appendMetadataConsts()
             {
                 if (idProperty != null)
                 {
@@ -482,15 +490,37 @@ namespace Serenity.CodeGeneration
                     sb.AppendLine(";");
                 }
 
-                var localTextPrefix = DetermineLocalTextPrefix(rowType);
                 if (!string.IsNullOrEmpty(localTextPrefix))
                 {
                     cw.Indented("export const localTextPrefix = ");
                     sb.Append(localTextPrefix.ToSingleQuoted());
                     sb.AppendLine(";");
                 }
+            }
 
-                AddRowTexts(rowType, "Db." + (string.IsNullOrEmpty(localTextPrefix) ? "" : (localTextPrefix + ".")));
+            void appendPermissions()
+            {
+                cw.Indented("export const deletePermission = ");
+                sb.Append(deletePermission == null ? "null" : deletePermission.ToSingleQuoted());
+                sb.AppendLine(";");
+
+                cw.Indented("export const insertPermission = ");
+                sb.Append(insertPermission == null ? "null" : insertPermission.ToSingleQuoted());
+                sb.AppendLine(";");
+
+                cw.Indented("export const readPermission = ");
+                sb.Append(readPermission == null ? "null" : readPermission.ToSingleQuoted());
+                sb.AppendLine(";");
+
+                cw.Indented("export const updatePermission = ");
+                sb.Append(updatePermission == null ? "null" : updatePermission.ToSingleQuoted());
+                sb.AppendLine(";");
+                sb.AppendLine();
+            }
+
+            cw.InBrace(delegate
+            {
+                appendMetadataConsts();
 
                 if (!string.IsNullOrEmpty(lookupKey))
                 {
@@ -512,26 +542,7 @@ namespace Serenity.CodeGeneration
                     });
                 }
 
-                var deletePermission = DeterminePermission(rowType, "Delete", "Modify", "Read");
-                cw.Indented("export const deletePermission = ");
-                sb.Append(deletePermission == null ? "null" : deletePermission.ToSingleQuoted());
-                sb.AppendLine(";");
-
-                var insertPermission = DeterminePermission(rowType, "Insert", "Modify", "Read");
-                cw.Indented("export const insertPermission = ");
-                sb.Append(insertPermission == null ? "null" : insertPermission.ToSingleQuoted());
-                sb.AppendLine(";");
-
-                var readPermission = DeterminePermission(rowType, "Read") ?? "";
-                cw.Indented("export const readPermission = ");
-                sb.Append(readPermission == null ? "null" : readPermission.ToSingleQuoted());
-                sb.AppendLine(";");
-
-                var updatePermission = DeterminePermission(rowType, "Update", "Modify", "Read");
-                cw.Indented("export const updatePermission = ");
-                sb.Append(updatePermission == null ? "null" : updatePermission.ToSingleQuoted());
-                sb.AppendLine(";");
-                sb.AppendLine();
+                appendPermissions();
 
                 cw.Indented("export declare const enum ");
                 sb.Append("Fields");
