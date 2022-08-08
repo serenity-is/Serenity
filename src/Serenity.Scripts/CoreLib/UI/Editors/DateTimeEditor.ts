@@ -1,11 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
-import { today } from "../../Q/System";
-import { Culture, format, formatDate, formatISODateTimeUTC, Invariant, parseDate, parseISODateTime, round, trunc } from "../../Q/Formatting";
-import { addOption } from "../../Q/Html";
-import { text, tryGetText } from "../../Q/LocalText";
-import { isEmptyOrNull } from "../../Q/Strings";
-import { addValidationRule } from "../../Q/Validation";
+import { addOption, addValidationRule, Culture, format, formatDate, formatISODateTimeUTC, Invariant, isEmptyOrNull, parseDate, parseISODateTime, round, text, today, trunc, tryGetText } from "../../Q";
 import { Widget } from "../Widgets/Widget";
 import { DateEditor } from "./DateEditor";
 import { EditorUtils } from "./EditorUtils";

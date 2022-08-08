@@ -403,11 +403,6 @@ declare function __classPrivateFieldIn(
  */
 declare function __createBinding(object: object, target: object, key: PropertyKey, objectKey?: PropertyKey): void;
 
-declare interface JQueryStatic {
-    extend<T>(target: T, object1?: T, ...objectN: T[]): T;
-    toJSON(obj: any): string;
-}
-
 /**
  * Represents the completion of an asynchronous operation
  */
@@ -538,6 +533,302 @@ interface JQuery {
 declare namespace JQueryValidation {
     interface ValidationOptions {
         normalizer?: (v: string) => string;
+    }
+}
+
+declare interface JQueryStatic {
+    extend<T>(target: T, object1?: T, ...objectN: T[]): T;
+    toJSON(obj: any): string;
+}
+
+declare namespace Serenity {
+    type Constructor<T> = new (...args: any[]) => T;
+    interface PropertyItem {
+        name?: string;
+        title?: string;
+        hint?: string;
+        placeholder?: string;
+        editorType?: string;
+        editorParams?: any;
+        category?: string;
+        collapsible?: boolean;
+        collapsed?: boolean;
+        tab?: string;
+        cssClass?: string;
+        headerCssClass?: string;
+        formCssClass?: string;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        insertPermission?: string;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        updatePermission?: string;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        readPermission?: string;
+        oneWay?: boolean;
+        defaultValue?: any;
+        localizable?: boolean;
+        visible?: boolean;
+        allowHide?: boolean;
+        formatterType?: string;
+        formatterParams?: any;
+        displayFormat?: string;
+        alignment?: string;
+        width?: number;
+        widthSet?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        labelWidth?: string;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        groupOrder?: number;
+        summaryType?: SummaryType;
+        editLink?: boolean;
+        editLinkItemType?: string;
+        editLinkIdField?: string;
+        editLinkCssClass?: string;
+        filteringType?: string;
+        filteringParams?: any;
+        filteringIdField?: string;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
+        quickFilterCssClass?: string;
+    }
+    interface Select2Item {
+        id: string;
+        text: string;
+        source?: any;
+        disabled?: boolean;
+    }
+    interface ServiceError {
+        Code?: string;
+        Arguments?: string;
+        Message?: string;
+        Details?: string;
+        ErrorId?: string;
+    }
+    interface ServiceResponse {
+        Error?: Serenity.ServiceError;
+    }
+    interface ServiceRequest {
+    }
+    interface SaveRequest<TEntity> extends ServiceRequest {
+        EntityId?: any;
+        Entity?: TEntity;
+        Localizations?: any;
+    }
+    interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
+        Attachments?: any[];
+    }
+    interface SaveResponse extends ServiceResponse {
+        EntityId?: any;
+    }
+    interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
+        Localizations?: {
+            [key: string]: TEntity;
+        };
+    }
+    interface DeleteRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+    interface DeleteResponse extends ServiceResponse {
+    }
+    interface UndeleteRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+    interface UndeleteResponse extends ServiceResponse {
+    }
+    const enum ColumnSelection {
+        List = 0,
+        KeyOnly = 1,
+        Details = 2,
+        None = 3,
+        IdOnly = 4,
+        Lookup = 5
+    }
+    const enum RetrieveColumnSelection {
+        details = 0,
+        keyOnly = 1,
+        list = 2,
+        none = 3,
+        idOnly = 4,
+        lookup = 5
+    }
+    interface ListRequest extends ServiceRequest {
+        Skip?: number;
+        Take?: number;
+        Sort?: string[];
+        ContainsText?: string;
+        ContainsField?: string;
+        Criteria?: any[];
+        EqualityFilter?: any;
+        IncludeDeleted?: boolean;
+        ExcludeTotalCount?: boolean;
+        ColumnSelection?: ColumnSelection;
+        IncludeColumns?: string[];
+        ExcludeColumns?: string[];
+        ExportColumns?: string[];
+        DistinctFields?: string[];
+    }
+    interface ListResponse<TEntity> extends ServiceResponse {
+        Entities?: TEntity[];
+        Values?: any[];
+        TotalCount?: number;
+        Skip?: number;
+        Take?: number;
+    }
+    interface RetrieveRequest extends ServiceRequest {
+        EntityId?: any;
+        ColumnSelection?: RetrieveColumnSelection;
+        IncludeColumns?: string[];
+        ExcludeColumns?: string[];
+    }
+    interface RetrieveResponse<TEntity> extends ServiceResponse {
+        Entity?: TEntity;
+    }
+    interface RetrieveLocalizationRequest extends RetrieveRequest {
+    }
+    interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
+        Entities?: {
+            [key: string]: TEntity;
+        };
+    }
+    interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
+        request?: any;
+        service?: string;
+        blockUI?: boolean;
+        onError?(response: TResponse): void;
+        onSuccess?(response: TResponse): void;
+        onCleanup?(): void;
+    }
+    const enum SummaryType {
+        Disabled = -1,
+        None = 0,
+        Sum = 1,
+        Avg = 2,
+        Min = 3,
+        Max = 4
+    }
+}
+declare namespace Slick {
+    type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
+    type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
+    type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
+    type RemoteViewProcessCallback<TEntity> = (data: Serenity.ListResponse<TEntity>, view: RemoteView<TEntity>) => Serenity.ListResponse<TEntity>;
+    interface SummaryOptions {
+        aggregators: any[];
+    }
+    interface PagingOptions {
+        rowsPerPage?: number;
+        page?: number;
+    }
+    interface PagingInfo {
+        rowsPerPage: number;
+        page: number;
+        totalCount: number;
+        loading: boolean;
+        error: string;
+        dataView: RemoteView<any>;
+    }
+    interface RemoteViewOptions {
+        autoLoad?: boolean;
+        idField?: string;
+        contentType?: string;
+        dataType?: string;
+        filter?: any;
+        params?: any;
+        onSubmit?: CancellableViewCallback<any>;
+        url?: string;
+        localSort?: boolean;
+        sortBy?: any;
+        rowsPerPage?: number;
+        seekToPage?: number;
+        onProcessData?: RemoteViewProcessCallback<any>;
+        method?: string;
+        inlineFilters?: boolean;
+        groupItemMetadataProvider?: Data.GroupItemMetadataProvider;
+        onAjaxCall?: RemoteViewAjaxCallback<any>;
+        getItemMetadata?: (p1?: any, p2?: number) => any;
+        errorMsg?: string;
+    }
+    interface RemoteView<TEntity> {
+        onSubmit: CancellableViewCallback<TEntity>;
+        onDataChanged: Slick.Event;
+        onDataLoading: Slick.Event;
+        onDataLoaded: Slick.Event;
+        onPagingInfoChanged: Slick.Event;
+        onRowCountChanged: Slick.Event;
+        onRowsChanged: Slick.Event;
+        onRowsOrCountChanged: Slick.Event;
+        getPagingInfo(): PagingInfo;
+        onGroupExpanded: Event;
+        onGroupCollapsed: Event;
+        onAjaxCall: RemoteViewAjaxCallback<TEntity>;
+        onProcessData: RemoteViewProcessCallback<TEntity>;
+        addData(data: Serenity.ListResponse<TEntity>): void;
+        beginUpdate(): void;
+        endUpdate(): void;
+        deleteItem(id: any): void;
+        getItems(): TEntity[];
+        setFilter(filter: RemoteViewFilter<TEntity>): void;
+        getFilter(): RemoteViewFilter<TEntity>;
+        getFilteredItems(): any;
+        fastSort: any;
+        setItems(items: any[], newIdProperty?: boolean | string): void;
+        getIdPropertyName(): string;
+        getItemById(id: any): TEntity;
+        getGrandTotals(): any;
+        getGrouping(): GroupInfo<TEntity>[];
+        getGroups(): any[];
+        getRowById(id: any): number;
+        getRowByItem(item: any): number;
+        getRows(): any[];
+        mapItemsToRows(itemArray: any[]): any[];
+        mapRowsToIds(rowArray: number[]): any[];
+        mapIdsToRows(idAray: any[]): number[];
+        setFilterArgs(args: any): void;
+        setRefreshHints(hints: any[]): void;
+        insertItem(insertBefore: number, item: any): void;
+        sortedAddItem(item: any): void;
+        sortedUpdateItem(id: any, item: any): void;
+        syncGridSelection(grid: any, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): void;
+        syncGridCellCssStyles(grid: any, key: string): void;
+        getItemMetadata(i: number): any;
+        updateItem(id: any, item: TEntity): void;
+        addItem(item: TEntity): void;
+        getIdxById(id: any): any;
+        getItemByIdx(index: number): any;
+        setGrouping(groupInfo: Slick.GroupInfo<TEntity>[]): void;
+        collapseAllGroups(level: number): void;
+        expandAllGroups(level: number): void;
+        expandGroup(keys: any[]): void;
+        collapseGroup(keys: any[]): void;
+        setSummaryOptions(options: SummaryOptions): void;
+        setPagingOptions(options: PagingOptions): void;
+        refresh(): void;
+        populate(): void;
+        populateLock(): void;
+        populateUnlock(): void;
+        getItem(row: number): any;
+        getLength(): number;
+        rowsPerPage: number;
+        errormsg: string;
+        params: any;
+        getLocalSort(): boolean;
+        setLocalSort(value: boolean): void;
+        sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
+        reSort(): void;
+        sortBy: string[];
+        url: string;
+        method: string;
+        idField: string;
+        seekToPage?: number;
     }
 }
 
@@ -1598,297 +1889,6 @@ declare namespace Slick {
     }
 }
 
-declare namespace Serenity {
-    type Constructor<T> = new (...args: any[]) => T;
-    interface PropertyItem {
-        name?: string;
-        title?: string;
-        hint?: string;
-        placeholder?: string;
-        editorType?: string;
-        editorParams?: any;
-        category?: string;
-        collapsible?: boolean;
-        collapsed?: boolean;
-        tab?: string;
-        cssClass?: string;
-        headerCssClass?: string;
-        formCssClass?: string;
-        maxLength?: number;
-        required?: boolean;
-        insertable?: boolean;
-        insertPermission?: string;
-        hideOnInsert?: boolean;
-        updatable?: boolean;
-        updatePermission?: string;
-        hideOnUpdate?: boolean;
-        readOnly?: boolean;
-        readPermission?: string;
-        oneWay?: boolean;
-        defaultValue?: any;
-        localizable?: boolean;
-        visible?: boolean;
-        allowHide?: boolean;
-        formatterType?: string;
-        formatterParams?: any;
-        displayFormat?: string;
-        alignment?: string;
-        width?: number;
-        widthSet?: boolean;
-        minWidth?: number;
-        maxWidth?: number;
-        labelWidth?: string;
-        resizable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        groupOrder?: number;
-        summaryType?: SummaryType;
-        editLink?: boolean;
-        editLinkItemType?: string;
-        editLinkIdField?: string;
-        editLinkCssClass?: string;
-        filteringType?: string;
-        filteringParams?: any;
-        filteringIdField?: string;
-        notFilterable?: boolean;
-        filterOnly?: boolean;
-        quickFilter?: boolean;
-        quickFilterParams?: any;
-        quickFilterSeparator?: boolean;
-        quickFilterCssClass?: string;
-    }
-    interface Select2Item {
-        id: string;
-        text: string;
-        source?: any;
-        disabled?: boolean;
-    }
-    interface ServiceError {
-        Code?: string;
-        Arguments?: string;
-        Message?: string;
-        Details?: string;
-        ErrorId?: string;
-    }
-    interface ServiceResponse {
-        Error?: Serenity.ServiceError;
-    }
-    interface ServiceRequest {
-    }
-    interface SaveRequest<TEntity> extends ServiceRequest {
-        EntityId?: any;
-        Entity?: TEntity;
-        Localizations?: any;
-    }
-    interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
-        Attachments?: any[];
-    }
-    interface SaveResponse extends ServiceResponse {
-        EntityId?: any;
-    }
-    interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
-        Localizations?: {
-            [key: string]: TEntity;
-        };
-    }
-    interface DeleteRequest extends ServiceRequest {
-        EntityId?: any;
-    }
-    interface DeleteResponse extends ServiceResponse {
-    }
-    interface UndeleteRequest extends ServiceRequest {
-        EntityId?: any;
-    }
-    interface UndeleteResponse extends ServiceResponse {
-    }
-    const enum ColumnSelection {
-        List = 0,
-        KeyOnly = 1,
-        Details = 2,
-        None = 3,
-        IdOnly = 4,
-        Lookup = 5
-    }
-    const enum RetrieveColumnSelection {
-        details = 0,
-        keyOnly = 1,
-        list = 2,
-        none = 3,
-        idOnly = 4,
-        lookup = 5
-    }
-    interface ListRequest extends ServiceRequest {
-        Skip?: number;
-        Take?: number;
-        Sort?: string[];
-        ContainsText?: string;
-        ContainsField?: string;
-        Criteria?: any[];
-        EqualityFilter?: any;
-        IncludeDeleted?: boolean;
-        ExcludeTotalCount?: boolean;
-        ColumnSelection?: ColumnSelection;
-        IncludeColumns?: string[];
-        ExcludeColumns?: string[];
-        ExportColumns?: string[];
-        DistinctFields?: string[];
-    }
-    interface ListResponse<TEntity> extends ServiceResponse {
-        Entities?: TEntity[];
-        Values?: any[];
-        TotalCount?: number;
-        Skip?: number;
-        Take?: number;
-    }
-    interface RetrieveRequest extends ServiceRequest {
-        EntityId?: any;
-        ColumnSelection?: RetrieveColumnSelection;
-        IncludeColumns?: string[];
-        ExcludeColumns?: string[];
-    }
-    interface RetrieveResponse<TEntity> extends ServiceResponse {
-        Entity?: TEntity;
-    }
-    interface RetrieveLocalizationRequest extends RetrieveRequest {
-    }
-    interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
-        Entities?: {
-            [key: string]: TEntity;
-        };
-    }
-    interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
-        request?: any;
-        service?: string;
-        blockUI?: boolean;
-        onError?(response: TResponse): void;
-        onSuccess?(response: TResponse): void;
-        onCleanup?(): void;
-    }
-    const enum SummaryType {
-        Disabled = -1,
-        None = 0,
-        Sum = 1,
-        Avg = 2,
-        Min = 3,
-        Max = 4
-    }
-}
-declare namespace Slick {
-    type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
-    type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
-    type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
-    type RemoteViewProcessCallback<TEntity> = (data: Serenity.ListResponse<TEntity>, view: RemoteView<TEntity>) => Serenity.ListResponse<TEntity>;
-    interface SummaryOptions {
-        aggregators: any[];
-    }
-    interface PagingOptions {
-        rowsPerPage?: number;
-        page?: number;
-    }
-    interface PagingInfo {
-        rowsPerPage: number;
-        page: number;
-        totalCount: number;
-        loading: boolean;
-        error: string;
-        dataView: RemoteView<any>;
-    }
-    interface RemoteViewOptions {
-        autoLoad?: boolean;
-        idField?: string;
-        contentType?: string;
-        dataType?: string;
-        filter?: any;
-        params?: any;
-        onSubmit?: CancellableViewCallback<any>;
-        url?: string;
-        localSort?: boolean;
-        sortBy?: any;
-        rowsPerPage?: number;
-        seekToPage?: number;
-        onProcessData?: RemoteViewProcessCallback<any>;
-        method?: string;
-        inlineFilters?: boolean;
-        groupItemMetadataProvider?: Data.GroupItemMetadataProvider;
-        onAjaxCall?: RemoteViewAjaxCallback<any>;
-        getItemMetadata?: (p1?: any, p2?: number) => any;
-        errorMsg?: string;
-    }
-    interface RemoteView<TEntity> {
-        onSubmit: CancellableViewCallback<TEntity>;
-        onDataChanged: Slick.Event;
-        onDataLoading: Slick.Event;
-        onDataLoaded: Slick.Event;
-        onPagingInfoChanged: Slick.Event;
-        onRowCountChanged: Slick.Event;
-        onRowsChanged: Slick.Event;
-        onRowsOrCountChanged: Slick.Event;
-        getPagingInfo(): PagingInfo;
-        onGroupExpanded: Event;
-        onGroupCollapsed: Event;
-        onAjaxCall: RemoteViewAjaxCallback<TEntity>;
-        onProcessData: RemoteViewProcessCallback<TEntity>;
-        addData(data: Serenity.ListResponse<TEntity>): void;
-        beginUpdate(): void;
-        endUpdate(): void;
-        deleteItem(id: any): void;
-        getItems(): TEntity[];
-        setFilter(filter: RemoteViewFilter<TEntity>): void;
-        getFilter(): RemoteViewFilter<TEntity>;
-        getFilteredItems(): any;
-        fastSort: any;
-        setItems(items: any[], newIdProperty?: boolean | string): void;
-        getIdPropertyName(): string;
-        getItemById(id: any): TEntity;
-        getGrandTotals(): any;
-        getGrouping(): GroupInfo<TEntity>[];
-        getGroups(): any[];
-        getRowById(id: any): number;
-        getRowByItem(item: any): number;
-        getRows(): any[];
-        mapItemsToRows(itemArray: any[]): any[];
-        mapRowsToIds(rowArray: number[]): any[];
-        mapIdsToRows(idAray: any[]): number[];
-        setFilterArgs(args: any): void;
-        setRefreshHints(hints: any[]): void;
-        insertItem(insertBefore: number, item: any): void;
-        sortedAddItem(item: any): void;
-        sortedUpdateItem(id: any, item: any): void;
-        syncGridSelection(grid: any, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): void;
-        syncGridCellCssStyles(grid: any, key: string): void;
-        getItemMetadata(i: number): any;
-        updateItem(id: any, item: TEntity): void;
-        addItem(item: TEntity): void;
-        getIdxById(id: any): any;
-        getItemByIdx(index: number): any;
-        setGrouping(groupInfo: Slick.GroupInfo<TEntity>[]): void;
-        collapseAllGroups(level: number): void;
-        expandAllGroups(level: number): void;
-        expandGroup(keys: any[]): void;
-        collapseGroup(keys: any[]): void;
-        setSummaryOptions(options: SummaryOptions): void;
-        setPagingOptions(options: PagingOptions): void;
-        refresh(): void;
-        populate(): void;
-        populateLock(): void;
-        populateUnlock(): void;
-        getItem(row: number): any;
-        getLength(): number;
-        rowsPerPage: number;
-        errormsg: string;
-        params: any;
-        getLocalSort(): boolean;
-        setLocalSort(value: boolean): void;
-        sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
-        reSort(): void;
-        sortBy: string[];
-        url: string;
-        method: string;
-        idField: string;
-        seekToPage?: number;
-    }
-}
-
 declare interface JQuery {
     getWidget<TWidget>(widgetType: {
         new (...args: any[]): TWidget;
@@ -2170,6 +2170,14 @@ declare namespace Q {
     function newBodyDiv(): JQuery;
     function outerHtml(element: JQuery): string;
 
+    function autoFullHeight(element: JQuery): void;
+    function initFullHeightGridPage(gridDiv: JQuery): void;
+    function layoutFillHeightValue(element: JQuery): number;
+    function layoutFillHeight(element: JQuery): void;
+    function setMobileDeviceMode(): void;
+    function triggerLayoutOnShow(element: JQuery): void;
+    function centerDialog(el: JQuery): void;
+
     namespace LayoutTimer {
         function store(key: number): void;
         function trigger(key: number): void;
@@ -2234,6 +2242,21 @@ declare namespace Q {
     function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
     function notifyError(message: string, title?: string, options?: ToastrOptions): void;
     function positionToastContainer(create: boolean, options?: ToastrOptions): void;
+
+    interface HandleRouteEventArgs {
+        handled: boolean;
+        route: string;
+        parts: string[];
+        index: number;
+    }
+    namespace Router {
+        let enabled: boolean;
+        function navigate(hash: string, tryBack?: boolean, silent?: boolean): void;
+        function replace(hash: string, tryBack?: boolean): void;
+        function replaceLast(hash: string, tryBack?: boolean): void;
+        function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
+        function resolve(hash?: string): void;
+    }
 
     namespace ScriptData {
         function bindToChange(name: string, regClass: string, onChange: () => void): void;
@@ -2372,29 +2395,6 @@ declare namespace Q {
     function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
     function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
     function removeValidationRule(element: JQuery, eventClass: string): JQuery;
-
-    function autoFullHeight(element: JQuery): void;
-    function initFullHeightGridPage(gridDiv: JQuery): void;
-    function layoutFillHeightValue(element: JQuery): number;
-    function layoutFillHeight(element: JQuery): void;
-    function setMobileDeviceMode(): void;
-    function triggerLayoutOnShow(element: JQuery): void;
-    function centerDialog(el: JQuery): void;
-
-    interface HandleRouteEventArgs {
-        handled: boolean;
-        route: string;
-        parts: string[];
-        index: number;
-    }
-    namespace Router {
-        let enabled: boolean;
-        function navigate(hash: string, tryBack?: boolean, silent?: boolean): void;
-        function replace(hash: string, tryBack?: boolean): void;
-        function replaceLast(hash: string, tryBack?: boolean): void;
-        function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
-        function resolve(hash?: string): void;
-    }
 
     interface ServiceOptions<TResponse extends Serenity.ServiceResponse> extends Serenity.ServiceOptions<TResponse> {
     }
@@ -2715,6 +2715,11 @@ declare namespace Serenity {
         function get(key: string): Function;
     }
 
+    namespace LazyLoadHelper {
+        function executeOnceWhenShown(element: JQuery, callback: Function): void;
+        function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
+    }
+
     class PrefixedContext {
         readonly idPrefix: string;
         constructor(idPrefix: string);
@@ -2798,61 +2803,6 @@ declare namespace Serenity {
         protected getTemplate(): string;
     }
 
-    namespace LazyLoadHelper {
-        function executeOnceWhenShown(element: JQuery, callback: Function): void;
-        function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
-    }
-
-    namespace SubDialogHelper {
-        function bindToDataChange(dialog: any, owner: Widget<any>, dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any;
-        function triggerDataChange(dialog: Widget<any>): any;
-        function triggerDataChanged(element: JQuery): JQuery;
-        function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any;
-        function cascade(cascadedDialog: any, ofElement: JQuery): any;
-        function cascadedDialogOffset(element: JQuery): any;
-    }
-
-    namespace UploadHelper {
-        function addUploadInput(options: UploadInputOptions): JQuery;
-        function checkImageConstraints(file: UploadResponse, opt: FileUploadConstraints): boolean;
-        function fileNameSizeDisplay(name: string, bytes: number): string;
-        function fileSizeDisplay(bytes: number): string;
-        function hasImageExtension(filename: string): boolean;
-        function thumbFileName(filename: string): string;
-        function dbFileUrl(filename: string): string;
-        function colorBox(link: JQuery, options: any): void;
-        function populateFileSymbols(container: JQuery, items: UploadedFile[], displayOriginalName?: boolean, urlPrefix?: string): void;
-    }
-    interface UploadedFile {
-        Filename?: string;
-        OriginalName?: string;
-    }
-    interface UploadInputOptions {
-        container?: JQuery;
-        zone?: JQuery;
-        progress?: JQuery;
-        inputName?: string;
-        allowMultiple?: boolean;
-        fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
-    }
-    interface UploadResponse {
-        TemporaryFile: string;
-        Size: number;
-        IsImage: boolean;
-        Width: number;
-        Height: number;
-    }
-    interface FileUploadConstraints {
-        minWidth?: number;
-        maxWidth?: number;
-        minHeight?: number;
-        maxHeight?: number;
-        minSize?: number;
-        maxSize?: number;
-        allowNonImage?: boolean;
-        originalNameProperty?: string;
-    }
-
     interface ToolButton {
         title?: string;
         hint?: string;
@@ -2893,18 +2843,6 @@ declare namespace Serenity {
         protected createButton(container: JQuery, b: ToolButton): void;
         findButton(className: string): JQuery;
         updateInterface(): void;
-    }
-
-    namespace EditorUtils {
-        function getDisplayText(editor: Widget<any>): string;
-        function getValue(editor: Widget<any>): any;
-        function saveValue(editor: Widget<any>, item: Serenity.PropertyItem, target: any): void;
-        function setValue(editor: Widget<any>, value: any): void;
-        function loadValue(editor: Widget<any>, item: Serenity.PropertyItem, source: any): void;
-        function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
-        function setReadOnly(widget: Widget<any>, isReadOnly: boolean): void;
-        function setRequired(widget: Widget<any>, isRequired: boolean): void;
-        function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
     }
 
     class CascadedWidgetLink<TParent extends Widget<any>> {
@@ -3024,6 +2962,18 @@ declare namespace Serenity {
         protected set_entityId(value: any): void;
         protected validateBeforeSave(): boolean;
         protected propertyGrid: PropertyGrid;
+    }
+
+    namespace EditorUtils {
+        function getDisplayText(editor: Widget<any>): string;
+        function getValue(editor: Widget<any>): any;
+        function saveValue(editor: Widget<any>, item: Serenity.PropertyItem, target: any): void;
+        function setValue(editor: Widget<any>, value: any): void;
+        function loadValue(editor: Widget<any>, item: Serenity.PropertyItem, source: any): void;
+        function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
+        function setReadOnly(widget: Widget<any>, isReadOnly: boolean): void;
+        function setRequired(widget: Widget<any>, isRequired: boolean): void;
+        function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
     }
 
     class StringEditor extends Widget<any> {
@@ -3516,6 +3466,47 @@ declare namespace Serenity {
         set_value(value: string): void;
     }
 
+    namespace UploadHelper {
+        function addUploadInput(options: UploadInputOptions): JQuery;
+        function checkImageConstraints(file: UploadResponse, opt: FileUploadConstraints): boolean;
+        function fileNameSizeDisplay(name: string, bytes: number): string;
+        function fileSizeDisplay(bytes: number): string;
+        function hasImageExtension(filename: string): boolean;
+        function thumbFileName(filename: string): string;
+        function dbFileUrl(filename: string): string;
+        function colorBox(link: JQuery, options: any): void;
+        function populateFileSymbols(container: JQuery, items: UploadedFile[], displayOriginalName?: boolean, urlPrefix?: string): void;
+    }
+    interface UploadedFile {
+        Filename?: string;
+        OriginalName?: string;
+    }
+    interface UploadInputOptions {
+        container?: JQuery;
+        zone?: JQuery;
+        progress?: JQuery;
+        inputName?: string;
+        allowMultiple?: boolean;
+        fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
+    }
+    interface UploadResponse {
+        TemporaryFile: string;
+        Size: number;
+        IsImage: boolean;
+        Width: number;
+        Height: number;
+    }
+    interface FileUploadConstraints {
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+        minSize?: number;
+        maxSize?: number;
+        allowNonImage?: boolean;
+        originalNameProperty?: string;
+    }
+
     interface FileUploadEditorOptions extends FileUploadConstraints {
         displayFileName?: boolean;
         urlPrefix?: string;
@@ -3657,6 +3648,15 @@ declare namespace Serenity {
         protected searchNow(value: string): void;
     }
 
+    namespace SubDialogHelper {
+        function bindToDataChange(dialog: any, owner: Widget<any>, dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any;
+        function triggerDataChange(dialog: Widget<any>): any;
+        function triggerDataChanged(element: JQuery): JQuery;
+        function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any;
+        function cascade(cascadedDialog: any, ofElement: JQuery): any;
+        function cascadedDialogOffset(element: JQuery): any;
+    }
+
     namespace DialogExtensions {
         function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery;
         function dialogMaximizable(dialog: JQuery): JQuery;
@@ -3671,6 +3671,15 @@ declare namespace Serenity {
         cssClass?: string;
         htmlEncode?: boolean;
         result?: string;
+    }
+
+
+
+    interface HandleRouteEventArgs {
+        handled: boolean;
+        route: string;
+        parts: string[];
+        index: number;
     }
 
     class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
@@ -4462,13 +4471,6 @@ declare namespace Serenity {
         protected getTemplate(): string;
     }
 
-    interface HandleRouteEventArgs {
-        handled: boolean;
-        route: string;
-        parts: string[];
-        index: number;
-    }
-
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         constructor(container: JQuery, options?: TOptions);
         protected handleRoute(args: HandleRouteEventArgs): void;
@@ -4756,6 +4758,18 @@ declare namespace Serenity {
         get value(): string;
         set_value(value: string): void;
         set value(v: string);
+    }
+}
+declare namespace Q {
+    interface Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        textFormatter: (item: TItem) => string;
     }
 }
 declare namespace Slick {

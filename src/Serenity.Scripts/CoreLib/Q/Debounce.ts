@@ -8,7 +8,7 @@
  * @source underscore.js
  */
 export function debounce(func: Function, wait?: number, immediate?: boolean) {
-    var timeout: number, args: IArguments, context: any, timestamp: number, result: any;
+    var timeout: any, args: IArguments, context: any, timestamp: number, result: any;
     if (null == wait) wait = 100;
 
     function later() {

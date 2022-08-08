@@ -1,8 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IStringValue } from "../../Interfaces";
-import { text } from "../../Q/LocalText";
-import { isEmptyOrNull } from "../../Q/Strings";
-import { addValidationRule } from "../../Q/Validation";
+import { addValidationRule, isEmptyOrNull, text } from "../../Q";
 import { Widget } from "../Widgets/Widget";
 
 export interface RecaptchaOptions {

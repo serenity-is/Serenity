@@ -1,8 +1,8 @@
-﻿import { EditorTypeRegistry } from "../Types/EditorTypeRegistry";
-import { getAttributes } from "../Q/System";
-import { ElementAttribute } from "../Decorators";
-import { ReflectionOptionsSetter } from "../UI/Widgets/ReflectionOptionsSetter";
+﻿import { ElementAttribute } from "../Decorators";
+import { getAttributes } from "../Q";
+import { EditorTypeRegistry } from "../Types/EditorTypeRegistry";
 import { EditorUtils } from "../UI/Editors/EditorUtils";
+import { ReflectionOptionsSetter } from "../UI/Widgets/ReflectionOptionsSetter";
 
 export function vuePatch(Vue: any) {
     function vueIntegration() {

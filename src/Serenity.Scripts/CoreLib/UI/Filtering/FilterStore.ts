@@ -1,10 +1,7 @@
 ﻿import { Decorators } from "../../Decorators";
-import { ArgumentNullException } from "../../Q/System";
-import { Culture } from "../../Q/Formatting";
-import { text, tryGetText } from "../../Q/LocalText";
-import { FilterLine } from "./FilterLine";
+import { ArgumentNullException, Culture, delegateCombine, delegateRemove, text, tryGetText } from "../../Q";
 import { Criteria } from "../../Services/Criteria";
-import { delegateCombine, delegateRemove } from "../../Q/System";
+import { FilterLine } from "./FilterLine";
 
 @Decorators.registerClass('FilterStore')
 export class FilterStore {

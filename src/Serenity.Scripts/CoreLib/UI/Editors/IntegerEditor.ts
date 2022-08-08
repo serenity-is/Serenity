@@ -1,8 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IDoubleValue } from "../../Interfaces";
-import { extend } from "../../Q/System";
-import { formatNumber, parseInteger } from "../../Q/Formatting";
-import { isTrimmedEmpty, trimToNull } from "../../Q/Strings";
+import { extend, formatNumber, isTrimmedEmpty, parseInteger, trimToNull } from "../../Q";
 import { Widget } from "../Widgets/Widget";
 import { DecimalEditor } from "./DecimalEditor";
 

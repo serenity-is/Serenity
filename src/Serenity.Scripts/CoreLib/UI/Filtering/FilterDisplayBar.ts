@@ -1,6 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { text } from "../../Q/LocalText";
-import { trimToNull } from "../../Q/Strings";
+import { text, trimToNull } from "../../Q";
 import { FilterDialog } from "./FilterDialog";
 import { FilterWidgetBase } from "./FilterWidgetBase";
 

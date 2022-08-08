@@ -1,11 +1,7 @@
 ﻿import { Decorators, FormKeyAttribute } from "../../Decorators";
-import { text } from "../../Q/LocalText";
-import { getForm } from "../../Q/ScriptData";
-import { endsWith } from "../../Q/Strings";
-import { getAttributes, getInstanceType, getTypeFullName } from "../../Q/System";
+import { DialogButton, endsWith, getAttributes, getForm, getInstanceType, getTypeFullName, text } from "../../Q";
 import { PropertyGrid, PropertyGridOptions } from "../Widgets/PropertyGrid";
 import { TemplatedDialog } from "./TemplatedDialog";
-import { DialogButton } from "../../Q/Dialogs";
 
 @Decorators.registerClass('Serenity.PropertyDialog')
 export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {

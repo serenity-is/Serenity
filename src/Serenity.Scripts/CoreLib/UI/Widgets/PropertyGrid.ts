@@ -1,15 +1,9 @@
-﻿import { Decorators, OptionsTypeAttribute, ElementAttribute } from "../../Decorators";
-import { Widget } from "./Widget";
-import { any } from "../../Q/Arrays";
-import { extend, getAttributes, getTypeName } from "../../Q/System";
-import { isEmptyOrNull, startsWith, trimToEmpty, trimToNull } from "../../Q/Strings";
-import { text, tryGetText } from "../../Q/LocalText";
+﻿import { Decorators, ElementAttribute, OptionsTypeAttribute } from "../../Decorators";
+import { any, Authorization, Culture, extend, getAttributes, getTypeName, isBS3, isBS5Plus, isEmptyOrNull, startsWith, text, trimToEmpty, trimToNull, tryGetText } from "../../Q";
 import { EditorTypeRegistry } from "../../Types/EditorTypeRegistry";
-import { ReflectionOptionsSetter } from "./ReflectionOptionsSetter";
 import { EditorUtils } from "../Editors/EditorUtils";
-import { Culture } from "../../Q/Formatting";
-import { Authorization } from "../../Q/Authorization";
-import { isBS3, isBS5Plus } from "../../Q/Dialogs";
+import { ReflectionOptionsSetter } from "./ReflectionOptionsSetter";
+import { Widget } from "./Widget";
 
 @Decorators.registerClass('Serenity.PropertyGrid')
 export class PropertyGrid extends Widget<PropertyGridOptions> {

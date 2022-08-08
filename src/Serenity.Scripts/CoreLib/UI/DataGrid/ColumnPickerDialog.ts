@@ -1,15 +1,9 @@
 ﻿import { Decorators } from "../../Decorators";
-import { Authorization } from "../../Q/Authorization";
-import { Culture } from "../../Q/Formatting";
-import { htmlEncode } from "../../Q/Html";
-import { text } from "../../Q/LocalText";
-import { trimToNull } from "../../Q/Strings";
-import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
+import { Authorization, centerDialog, Culture, htmlEncode, Router, text, trimToNull } from "../../Q";
 import { QuickSearchInput } from "../DataGrid/QuickSearchInput";
+import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
 import { ToolButton } from "../Widgets/Toolbar";
 import { IDataGrid } from "./IDataGrid";
-import { Router } from "../../Q/Router";
-import { centerDialog } from "../../Q/Layout";
 
 @Decorators.registerClass()
 @Decorators.resizable()

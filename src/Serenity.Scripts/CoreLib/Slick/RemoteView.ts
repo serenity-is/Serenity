@@ -1,6 +1,4 @@
-﻿import { deepClone, extend } from "../Q/System";
-import { notifyError } from "../Q/Notify";
-import { text } from "../Q/LocalText";
+﻿import { deepClone, extend, notifyError, text } from "../Q";
 
 export namespace Data {
     export interface GroupItemMetadataProvider {

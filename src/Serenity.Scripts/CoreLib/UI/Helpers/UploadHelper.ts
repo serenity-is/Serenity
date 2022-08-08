@@ -1,10 +1,4 @@
-import { notifyError } from "../../Q/Notify";
-import { blockUI, blockUndo } from "../../Q/BlockUI";
-import { format, round } from "../../Q/Formatting";
-import { text } from "../../Q/LocalText";
-import { resolveUrl } from "../../Q/Services";
-import { endsWith, isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
-import { iframeDialog } from "../../Q/Dialogs";
+import { blockUI, blockUndo, endsWith, format, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, round, startsWith, text } from "../../Q";
 
 export namespace UploadHelper {
 

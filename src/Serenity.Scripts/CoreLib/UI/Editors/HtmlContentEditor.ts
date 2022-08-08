@@ -1,8 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
-import { text } from "../../Q/LocalText";
-import { resolveUrl } from "../../Q/Services";
-import { endsWith, isEmptyOrNull, isTrimmedEmpty, trimToNull } from "../../Q/Strings";
+import { endsWith, isEmptyOrNull, isTrimmedEmpty, resolveUrl, text, trimToNull } from "../../Q";
 import { LazyLoadHelper } from "../Helpers/LazyLoadHelper";
 import { Widget } from "../Widgets/Widget";
 

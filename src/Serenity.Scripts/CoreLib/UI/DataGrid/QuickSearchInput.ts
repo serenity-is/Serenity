@@ -1,6 +1,4 @@
-﻿import { isValue } from "../../Q/System";
-import { text } from "../../Q/LocalText";
-import { isEmptyOrNull, trim } from "../../Q/Strings";
+﻿import { isEmptyOrNull, isValue, text, trim } from "../../Q";
 import { PopupMenuButton } from "../Widgets/Toolbar";
 import { Widget } from "../Widgets/Widget";
 

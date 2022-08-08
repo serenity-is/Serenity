@@ -84,7 +84,7 @@ export function compareStringFactory(order: string): ((a: string, b: string) => 
         }
         return a.localeCompare(b);
     }
-}   
+}       
 
 export let Culture: Locale = {
     decimalSeparator: '.',

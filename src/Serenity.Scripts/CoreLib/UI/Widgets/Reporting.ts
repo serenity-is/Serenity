@@ -1,10 +1,9 @@
 ﻿import { Decorators } from "../../Decorators";
-import { postToService, serviceCall } from "../../Q/Services";
-import { trimToNull } from "../../Q/Strings";
+import { postToService, serviceCall, trimToNull } from "../../Q";
+import { QuickSearchInput } from "../DataGrid/QuickSearchInput";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
 import { PropertyGrid } from "./PropertyGrid";
 import { Widget } from "./Widget";
-import { QuickSearchInput } from "../DataGrid/QuickSearchInput";
 
 export namespace Reporting {
     export interface ReportDialogOptions {

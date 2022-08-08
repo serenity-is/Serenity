@@ -65,14 +65,16 @@ export declare namespace Authorization {
 Object.defineProperty(Authorization, "userDefinition", {
     get: function () {
         return getRemoteData("UserData");
-    }
+    },
+    configurable: true
 });
 
 Object.defineProperty(Authorization, "isLoggedIn", {
     get: function () {
         var ud = Authorization.userDefinition;
         return ud && !!ud.Username;
-    }
+    },
+    configurable: true
 });
 
 Object.defineProperty(Authorization, "username", {
@@ -82,5 +84,6 @@ Object.defineProperty(Authorization, "username", {
             return ud.Username;
 
         return null;
-    }
+    },
+    configurable: true
 });

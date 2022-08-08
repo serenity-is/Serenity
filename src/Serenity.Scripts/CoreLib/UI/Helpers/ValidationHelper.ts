@@ -1,5 +1,4 @@
-﻿import { Exception } from "../../Q/System";
-import { validatorAbortHandler } from "../../Q/ValidateOptions";
+﻿import { Exception, validatorAbortHandler } from "../../Q";
 import { Widget } from "../Widgets/Widget";
 
 export namespace ValidationHelper {

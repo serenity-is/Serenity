@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { isEmptyOrNull } from "../../Q/Strings";
+import { isEmptyOrNull } from "../../Q";
 import { Select2CommonOptions, Select2Editor } from "./Select2Editor";
 
 @Decorators.registerClass('Serenity.SelectEditor')

@@ -1,10 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IStringValue } from "../../Interfaces";
-import { isValue } from "../../Q/System";
-import { text } from "../../Q/LocalText";
-import { serviceCall } from "../../Q/Services";
-import { isEmptyOrNull, trimToNull } from "../../Q/Strings";
-import { safeCast } from "../../Q/System";
+import { isEmptyOrNull, isValue, safeCast, serviceCall, text, trimToNull } from "../../Q";
 import { ValidationHelper } from "../Helpers/ValidationHelper";
 import { Widget } from "../Widgets/Widget";
 import { WX } from "../Widgets/WX";

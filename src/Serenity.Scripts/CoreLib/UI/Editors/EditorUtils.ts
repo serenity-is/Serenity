@@ -1,9 +1,5 @@
-﻿import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly } from "../../Interfaces"
-import { ISetEditValue, IStringValue, IValidateRequired } from "../../Interfaces"
-import { parseDecimal } from "../../Q/Formatting";
-import { text, tryGetText } from "../../Q/LocalText";
-import { isTrimmedEmpty } from "../../Q/Strings";
-import { cast, isInstanceOfType, safeCast } from "../../Q/System";
+﻿import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../Interfaces";
+import { cast, isInstanceOfType, isTrimmedEmpty, parseDecimal, safeCast, text, tryGetText } from "../../Q";
 import { Widget } from "../Widgets/Widget";
 
 export namespace EditorUtils {

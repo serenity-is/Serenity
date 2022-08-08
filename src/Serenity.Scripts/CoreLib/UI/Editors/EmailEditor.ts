@@ -1,7 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
-import { tryGetText } from "../../Q/LocalText";
-import { isEmptyOrNull, trimToNull } from "../../Q/Strings";
+import { isEmptyOrNull, trimToNull, tryGetText } from "../../Q";
 import { Widget } from "../Widgets/Widget";
 
 export interface EmailEditorOptions {

@@ -1,6 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { resolveUrl, serviceCall } from "../../Q/Services";
-import { isEmptyOrNull, startsWith } from "../../Q/Strings";
+import { isEmptyOrNull, resolveUrl, serviceCall, startsWith } from "../../Q";
 import { Criteria } from "../../Services/Criteria";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./Select2Editor";
 

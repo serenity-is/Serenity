@@ -1,7 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IDoubleValue } from "../../Interfaces";
-import { extend } from "../../Q/System";
-import { Culture, formatNumber, parseDecimal } from "../../Q/Formatting";
+import { Culture, extend, formatNumber, parseDecimal } from "../../Q";
 import { Widget } from "../Widgets/Widget";
 
 export interface DecimalEditorOptions {

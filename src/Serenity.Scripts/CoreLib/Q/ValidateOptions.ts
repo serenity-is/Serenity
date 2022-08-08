@@ -20,6 +20,10 @@ function validateShowLabel(element: HTMLElement, message: string) {
 
 function jQueryValidationInitialization() {
 
+    if (typeof $ === "undefined" ||
+        !$.validator)
+        return;
+
     let p: any = $.validator;
     p = p.prototype;
     oldShowLabel = p.showLabel;
@@ -134,8 +138,15 @@ export function validateOptions(options: JQueryValidation.ValidationOptions) {
     }), options);
 };
 
-if ($.validator)
-    jQueryValidationInitialization()
-else $(function () {
-    $.validator && jQueryValidationInitialization();
-});
+if (typeof $ !== "undefined") {
+    if ($.validator)
+        jQueryValidationInitialization();
+    else
+        $(jQueryValidationInitialization);
+}
+else if (typeof document !== "undefined") {
+    if (document.readyState === 'loading')
+        document.addEventListener('DOMContentLoaded', jQueryValidationInitialization);
+    else
+        setTimeout(jQueryValidationInitialization, 100);
+}

@@ -1,7 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IDoubleValue, IReadOnly } from "../../Interfaces";
-import { toId } from "../../Q/Formatting";
-import { addOption } from "../../Q/Html";
+import { addOption, toId } from "../../Q";
 import { Widget } from "../Widgets/Widget";
 import { EditorUtils } from "./EditorUtils";
 

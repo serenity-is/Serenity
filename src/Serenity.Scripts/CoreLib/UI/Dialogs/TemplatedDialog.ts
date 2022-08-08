@@ -1,16 +1,6 @@
-﻿import { Decorators, FlexifyAttribute, MaximizableAttribute } from "../../Decorators";
-import { PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../Decorators";
-import { Config } from "../../Q/Config";
-import { bsModalMarkup, closePanel, DialogButton } from "../../Q/Dialogs";
-import { dialogButtonToBS, dialogButtonToUI } from "../../Q/Dialogs";
-import { parseInteger } from "../../Q/Formatting";
-import { newBodyDiv } from "../../Q/Html";
-import { layoutFillHeight } from "../../Q/Layout";
-import { positionToastContainer } from "../../Q/Notify";
-import { endsWith, isEmptyOrNull } from "../../Q/Strings";
-import { getAttributes, getInstanceType } from "../../Q/System";
-import { validateOptions } from "../../Q/ValidateOptions";
+﻿import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../Decorators";
 import { IDialog } from "../../Interfaces";
+import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, getInstanceType, isEmptyOrNull, layoutFillHeight, newBodyDiv, parseInteger, positionToastContainer, validateOptions } from "../../Q";
 import { TemplatedWidget } from "../Widgets/TemplatedWidget";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { DialogExtensions } from "./DialogExtensions";

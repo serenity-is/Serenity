@@ -1,9 +1,6 @@
 ﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
-import { tryGetText } from "../../Q/LocalText";
-import { getLookup } from "../../Q/ScriptData";
-import { isEmptyOrNull } from "../../Q/Strings";
-import { Enum, getAttributes } from "../../Q/System";
+import { Enum, getAttributes, getLookup, isEmptyOrNull, tryGetText } from "../../Q";
 import { EnumTypeRegistry } from "../../Types/EnumTypeRegistry";
 import { Widget } from "../Widgets/Widget";
 

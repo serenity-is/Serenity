@@ -1,27 +1,14 @@
-﻿import { Decorators, EntityTypeAttribute, FormKeyAttribute } from "../../Decorators";
-import { IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute } from "../../Decorators";
-import { LocalTextPrefixAttribute,NamePropertyAttribute, ServiceAttribute } from "../../Decorators";
-import { any, isArray } from "../../Q/Arrays";
-import { extend, Exception } from "../../Q/System";
-import { format } from "../../Q/Formatting";
-import { LT, text, tryGetText } from "../../Q/LocalText";
-import { notifySuccess } from "../../Q/Notify";
-import { getForm } from "../../Q/ScriptData";
-import { serviceCall } from "../../Q/Services";
-import { endsWith, isEmptyOrNull, replaceAll, startsWith } from "../../Q/Strings";
-import { getAttributes, getInstanceType, getTypeFullName, safeCast } from "../../Q/System";
-import { validatorAbortHandler } from "../../Q/ValidateOptions";
+﻿import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../Decorators";
 import { IEditDialog, IReadOnly } from "../../Interfaces";
+import { any, Authorization, confirm, endsWith, Exception, extend, format, getAttributes, getForm, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, replaceAll, safeCast, serviceCall, startsWith, text, tryGetText, validatorAbortHandler } from "../../Q";
 import { EditorUtils } from "../Editors/EditorUtils";
+import { SubDialogHelper } from "../Helpers/SubDialogHelper";
+import { TabsExtensions } from "../Helpers/TabsExtensions";
 import { ValidationHelper } from "../Helpers/ValidationHelper";
 import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../Widgets/PropertyGrid";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { Widget } from "../Widgets/Widget";
 import { TemplatedDialog } from "./TemplatedDialog";
-import { confirm } from "../../Q/Dialogs";
-import { SubDialogHelper } from "../Helpers/SubDialogHelper";
-import { TabsExtensions } from "../Helpers/TabsExtensions";
-import { Authorization } from "../../Q/Authorization";
 
 @Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
 export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {

@@ -1,12 +1,8 @@
 ﻿import { Decorators } from "../../Decorators";
-import { deepClone, extend, ArgumentNullException, Exception } from "../../Q/System";
-import { Config } from "../../Q/Config";
-import { format, formatDate, parseISODateTime } from "../../Q/Formatting";
-import { text, tryGetText } from "../../Q/LocalText";
-import { endsWith, isEmptyOrNull, startsWith } from "../../Q/Strings";
-import { getInstanceType, getTypeFullName, getTypeName, getTypes, isAssignableFrom } from "../../Q/System";
+import { ArgumentNullException, Config, deepClone, endsWith, Exception, extend, format, formatDate, getInstanceType, getTypeFullName, getTypeName, getTypes, isAssignableFrom, isEmptyOrNull, parseISODateTime, startsWith, text, tryGetText } from "../../Q";
 import { Criteria } from "../../Services/Criteria";
 import { EditorTypeRegistry } from "../../Types/EditorTypeRegistry";
+import { QuickFilter } from "../DataGrid/QuickFilter";
 import { DateEditor } from "../Editors/DateEditor";
 import { DateTimeEditor } from "../Editors/DateTimeEditor";
 import { DecimalEditor } from "../Editors/DecimalEditor";
@@ -18,7 +14,6 @@ import { ServiceLookupEditor } from "../Editors/ServiceLookupEditor";
 import { StringEditor } from "../Editors/StringEditor";
 import { Widget } from "../Widgets/Widget";
 import { FilterOperator, FilterOperators } from "./FilterOperator";
-import { QuickFilter } from "../DataGrid/QuickFilter";
 
 export interface IFiltering {
     createEditor(): void;

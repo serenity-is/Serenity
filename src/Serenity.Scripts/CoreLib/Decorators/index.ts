@@ -1,6 +1,8 @@
-import { addAttribute, addTypeMember, isEnum, MemberType, ISlickFormatter } from "../Q/System";
-import { registerClass as regClass, registerInterface as regIntf, registerEnum as regEnum } from "../Q/System";
-import { startsWith } from "../Q/Strings";
+import {
+    addAttribute, addTypeMember, isEnum, MemberType, ISlickFormatter,
+    registerClass as regClass, registerInterface as regIntf, registerEnum as regEnum,
+    startsWith
+} from "../Q";
 
 function Attr(name: string) {
     return function (target: Function) {

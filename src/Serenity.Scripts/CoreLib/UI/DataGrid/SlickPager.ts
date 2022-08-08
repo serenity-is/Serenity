@@ -1,5 +1,4 @@
-﻿import { extend } from "../../Q/System";
-import { text } from "../../Q/LocalText";
+﻿import { extend, text } from "../../Q";
 import { Widget } from "../Widgets/Widget";
 
 export class SlickPager extends Widget<Slick.PagerOptions> {

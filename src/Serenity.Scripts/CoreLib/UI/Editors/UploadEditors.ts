@@ -1,9 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../Interfaces";
-import { extend } from "../../Q/System";
-import { text } from "../../Q/LocalText";
-import { endsWith, isEmptyOrNull, isTrimmedEmpty, replaceAll, startsWith, trimToNull } from "../../Q/Strings";
-import { isInstanceOfType } from "../../Q/System";
+import { endsWith, extend, isEmptyOrNull, isInstanceOfType, isTrimmedEmpty, replaceAll, startsWith, text, trimToNull } from "../../Q";
 import { FileUploadConstraints, UploadedFile, UploadHelper, UploadInputOptions } from "../Helpers/UploadHelper";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { Widget } from "../Widgets/Widget";

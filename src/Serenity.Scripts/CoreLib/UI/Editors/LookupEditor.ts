@@ -1,7 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { getLookup, getLookupAsync, reloadLookup, ScriptData } from "../../Q/ScriptData";
-import { endsWith } from "../../Q/Strings";
-import { getInstanceType, getTypeFullName } from "../../Q/System";
+import { endsWith, getInstanceType, getLookup, getLookupAsync, getTypeFullName, reloadLookup, ScriptData } from "../../Q";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./Select2Editor";
 
 export interface LookupEditorOptions extends Select2EditorOptions {

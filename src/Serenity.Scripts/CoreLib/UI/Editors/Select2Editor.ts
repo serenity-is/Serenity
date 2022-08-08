@@ -1,10 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
-import { IEditDialog, IGetEditValue, IReadOnly } from "../../Interfaces";
-import { ISetEditValue, IStringValue } from "../../Interfaces";
-import { any, isArray } from "../../Q/Arrays";
-import { Authorization } from "../../Q/Authorization";
-import { text } from "../../Q/LocalText";
-import { isEmptyOrNull, isTrimmedEmpty, startsWith, trimToEmpty, trimToNull } from "../../Q/Strings";
+import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../Interfaces";
+import { any, Authorization, isArray, isEmptyOrNull, isTrimmedEmpty, startsWith, text, trimToEmpty, trimToNull } from "../../Q";
 import { DialogTypeRegistry } from "../../Types/DialogTypeRegistry";
 import { ReflectionUtils } from "../../Types/ReflectionUtils";
 import { SubDialogHelper } from "../Helpers/SubDialogHelper";

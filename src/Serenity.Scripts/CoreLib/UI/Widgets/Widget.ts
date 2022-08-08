@@ -1,14 +1,9 @@
 ﻿/// <reference types="react" />
 
+import { jQueryPatch } from "../../Patch/jQueryPatch";
 import { Decorators, ElementAttribute } from "../../Decorators";
-import { Config } from "../../Q/Config";
-import { Exception, ArgumentNullException } from "../../Q/System";
-import { format } from "../../Q/Formatting";
-import { replaceAll, startsWith } from "../../Q/Strings";
-import { getAttributes, getInstanceType, getTypeName, getTypeFullName, isAssignableFrom  } from "../../Q/System";
 import { IDialog } from "../../Interfaces";
-import { addValidationRule as addValRule } from "../../Q/Validation";
-import { notifyError } from "../../Q/Notify";
+import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, format, getAttributes, getInstanceType, getTypeFullName, getTypeName, isAssignableFrom, notifyError, replaceAll, startsWith } from "../../Q";
 
 export interface WidgetClass<TOptions = object> {
     new(element: JQuery, options?: TOptions): Widget<TOptions>;
@@ -260,4 +255,8 @@ export interface WidgetComponentProps<W extends Widget<any>> {
 export declare interface Widget<TOptions> {
     change(handler: (e: JQueryEventObject) => void): void;
     changeSelect2(handler: (e: JQueryEventObject) => void): void;
+}
+
+if (typeof jQuery === "function") {
+    jQueryPatch(jQuery);
 }

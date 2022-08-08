@@ -94,7 +94,8 @@ export function setMobileDeviceMode() {
 let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
 
 setMobileDeviceMode();
-$(function() {
+
+function initOnLoad() {
     if (globalObj && Config.rootNamespaces) {
         for (var ns of Config.rootNamespaces) {
             var obj = getNested(globalObj, ns);
@@ -103,10 +104,20 @@ $(function() {
         }
     }
 
-    globalObj && $(globalObj).bind('resize', function () {
-        setMobileDeviceMode();
-    });
-});
+    if (typeof window !== "undefined") {
+        if (typeof $ !== "undefined")
+            $(window).bind('resize', setMobileDeviceMode);
+        else
+            window.addEventListener('resize', setMobileDeviceMode);
+    }
+}
+
+if (typeof $ !== "undefined")
+    $(initOnLoad);
+else if (typeof document !== "undefined" && document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', initOnLoad);
+else
+    initOnLoad();
 
 export function triggerLayoutOnShow(element: JQuery) {
     LazyLoadHelper.executeEverytimeWhenShown(element, function () {

@@ -1,7 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { text, tryGetText } from "../../Q/LocalText";
-import { isEmptyOrNull } from "../../Q/Strings";
-import { cast } from "../../Q/System";
+import { cast, isEmptyOrNull, text, tryGetText } from "../../Q";
 import { Select2Editor } from "../Editors/Select2Editor";
 import { ReflectionOptionsSetter } from "../Widgets/ReflectionOptionsSetter";
 import { FilteringTypeRegistry, IFiltering } from "./Filtering";

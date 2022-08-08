@@ -4,6 +4,7 @@
   "description": "Serenity.TypeScript.CoreLib",
   "main": "index.js",
   "repository": "https://github.com/serenity-is/serenity",
+  "type": "module",
   "devDependencies": {
     "@happy-dom/jest-environment": "^6.0.4",
     "@rollup/plugin-typescript": "latest",
@@ -24,7 +25,7 @@
     "fsevents": "2.3.2"
   },
   "scripts": {
-    "build": "rollup -c && node build.mjs && npm run minify",
+    "build": "rollup -c && node build && npm run minify",
     "minify": "terser ../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.js --comments --mangle -f \"beautify=false,max_line_len=1000\" -o ../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.min.js && terser ../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.js --comments --mangle -f \"beautify=false,max_line_len=1000\" -o ../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.min.js"
   },
   "author": "",

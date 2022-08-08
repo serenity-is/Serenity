@@ -1,6 +1,6 @@
 const esbuildOptions = {}
 
-module.exports = {
+export default {
     testEnvironment: 'node',
     testMatch: ['<rootDir>/test/**/*.spec.ts'],
     moduleNameMapper: {

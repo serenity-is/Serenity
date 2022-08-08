@@ -1,9 +1,5 @@
-﻿import { Config } from "../Q/Config";
-import { Exception, ArgumentNullException } from "../Q/System";
-import { format } from "../Q/Formatting";
-import { endsWith, isEmptyOrNull, startsWith } from "../Q/Strings";
-import { getAttributes, getType, getTypes, getTypeFullName } from "../Q/System";
-import { EditorAttribute } from "../Decorators";
+﻿import { EditorAttribute } from "../Decorators";
+import { ArgumentNullException, Config, endsWith, Exception, format, getAttributes, getType, getTypeFullName, getTypes, isEmptyOrNull, startsWith } from "../Q";
 
 // @ts-ignore
 let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));

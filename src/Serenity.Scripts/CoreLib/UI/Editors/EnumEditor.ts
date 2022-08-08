@@ -1,6 +1,5 @@
 ﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
-import { tryGetText } from "../../Q/LocalText";
-import { Enum, getAttributes } from "../../Q/System";
+import { Enum, getAttributes, tryGetText } from "../../Q";
 import { EnumTypeRegistry } from "../../Types/EnumTypeRegistry";
 import { Select2CommonOptions, Select2Editor } from "./Select2Editor";
 

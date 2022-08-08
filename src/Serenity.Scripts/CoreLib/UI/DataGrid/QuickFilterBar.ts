@@ -1,11 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { isArray } from "../../Q/Arrays";
-import { ArgumentNullException } from "../../Q/System";
-import { formatDate, parseDate, toId } from "../../Q/Formatting";
-import { text, tryGetText } from "../../Q/LocalText";
-import { notifyWarning } from "../../Q/Notify";
-import { isEmptyOrNull, isTrimmedEmpty } from "../../Q/Strings";
-import { delegateCombine, delegateRemove } from "../../Q/System";
+import { ArgumentNullException, delegateCombine, delegateRemove, formatDate, isArray, isEmptyOrNull, isTrimmedEmpty, notifyWarning, parseDate, text, toId, tryGetText } from "../../Q";
 import { Criteria } from "../../Services/Criteria";
 import { DateEditor } from "../Editors/DateEditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../Editors/DateTimeEditor";

@@ -1,6 +1,6 @@
-﻿import { TemplatedWidget } from "./TemplatedWidget";
+﻿import { validateOptions } from "../../Q";
+import { TemplatedWidget } from "./TemplatedWidget";
 import { Toolbar, ToolButton } from "./Toolbar";
-import { validateOptions } from "../../Q/ValidateOptions";
 
 export class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
     constructor(container: JQuery, options?: TOptions) {

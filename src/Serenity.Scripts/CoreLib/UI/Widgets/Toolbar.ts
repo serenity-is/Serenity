@@ -1,7 +1,6 @@
-﻿import { Widget } from "./Widget";
-import { Decorators } from "../../Decorators";
-import { isEmptyOrNull, startsWith } from "../../Q/Strings";
-import { htmlEncode } from "../../Q/Html";
+﻿import { Decorators } from "../../Decorators";
+import { htmlEncode, isEmptyOrNull, startsWith } from "../../Q";
+import { Widget } from "./Widget";
 
 export interface ToolButton {
     title?: string;

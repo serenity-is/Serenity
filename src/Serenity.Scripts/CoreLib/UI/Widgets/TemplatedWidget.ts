@@ -1,11 +1,6 @@
-﻿import { Widget } from "./Widget";
-import { Decorators } from "../../Decorators";
-import { text } from "../../Q/LocalText";
-import { startsWith, replaceAll } from "../../Q/Strings";
-import { format } from "../../Q/Formatting";
-import { getBaseType, getInstanceType, getTypeName, getTypeFullName } from "../../Q/System";
-import { Config } from "../../Q/Config";
-import { canLoadScriptData, getTemplate } from "../../Q/ScriptData";
+﻿import { Decorators } from "../../Decorators";
+import { canLoadScriptData, Config, format, getBaseType, getInstanceType, getTemplate, getTypeFullName, getTypeName, replaceAll, startsWith, text } from "../../Q";
+import { Widget } from "./Widget";
 
 @Decorators.registerClass("Serenity.TemplatedWidget")
 export class TemplatedWidget<TOptions> extends Widget<TOptions> {

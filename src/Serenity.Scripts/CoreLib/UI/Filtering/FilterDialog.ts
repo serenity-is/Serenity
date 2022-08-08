@@ -1,6 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { text } from "../../Q/LocalText";
-import { notifyError } from "../../Q/Notify";
+import { notifyError, text } from "../../Q";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
 import { FilterPanel } from "./FilterPanel";
 
