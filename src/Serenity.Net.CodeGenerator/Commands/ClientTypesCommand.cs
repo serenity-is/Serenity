@@ -33,9 +33,9 @@ namespace Serenity.CodeGenerator
             foreach (var type in tsTypes)
                 generator.AddTSType(type);
 
-            var codeByFilename = generator.Run();
+            var generatedSources = generator.Run();
             MultipleOutputHelper.WriteFiles(fileSystem, outDir, 
-                codeByFilename.Select(x => (x.Key, x.Value.Text)), 
+                generatedSources.Select(x => (x.Filename, x.Text)), 
                 deleteExtraPattern: null,
                 endOfLine: config.EndOfLine);
         }

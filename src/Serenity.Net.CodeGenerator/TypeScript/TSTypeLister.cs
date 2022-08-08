@@ -19,29 +19,38 @@ namespace Serenity.CodeGenerator
             this.projectDir = fileSystem.GetFullPath(projectDir);
         }
 
-        public List<ExternalType> List(out bool isMixedModules)
+        public List<ExternalType> List(out bool hasModules, out bool hasNamespaces)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            isMixedModules = false;
+            hasNamespaces = false;
+            hasModules = false;
             IEnumerable<string> files = null;
             var rootConfig = TSConfigHelper.Read(fileSystem, fileSystem.Combine(projectDir, "tsconfig.json"));
             if (rootConfig is not null)
             {
+                hasNamespaces = hasNamespaces || rootConfig.CompilerOptions?.Module is null or "none";
+                hasModules = hasModules || rootConfig.CompilerOptions?.Module is not null or "none";
+
                 files = TSConfigHelper.ListFiles(rootConfig, fileSystem, projectDir, cancellationToken);
                 if (rootConfig.CompilerOptions?.Module is null or "none")
                 {
-                    var modularConfigPath = fileSystem.Combine(projectDir, "Modules", "tsconfig.json");
-                    var modularConfig = TSConfigHelper.Read(fileSystem, modularConfigPath);
-                    if (modularConfig is not null && modularConfig.CompilerOptions?.Module is not null or "none")
+                    var modulesConfigPath = fileSystem.Combine(projectDir, "Modules", "tsconfig.json");
+                    var modulesConfig = TSConfigHelper.Read(fileSystem, modulesConfigPath);
+                    if (modulesConfig is not null)
                     {
+                        hasModules = hasModules || modulesConfig.CompilerOptions?.Module is not null or "none";
+                        hasNamespaces = hasNamespaces || modulesConfig.CompilerOptions?.Module is null or "none";
+                     
                         files = (files ?? Array.Empty<string>()).Concat(
-                                TSConfigHelper.ListFiles(modularConfig, fileSystem, projectDir, cancellationToken))
+                                TSConfigHelper.ListFiles(modulesConfig, fileSystem, projectDir, cancellationToken))
                             .Distinct();
-                        isMixedModules = true;
                     }
                 }
             }
+
+            if (!hasModules)
+                hasNamespaces = true;
 
             if (files == null || !files.Any())
             {

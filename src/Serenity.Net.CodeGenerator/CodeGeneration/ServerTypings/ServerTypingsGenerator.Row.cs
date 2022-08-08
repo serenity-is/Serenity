@@ -7,6 +7,43 @@ namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
+        protected void GenerateRowType(TypeDefinition type, bool module)
+        {
+            var codeNamespace = module ? null : GetNamespace(type);
+
+            cw.Indented("export interface ");
+
+            var identifier = MakeFriendlyName(type, codeNamespace, module);
+
+            RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: module);
+
+            cw.InBrace(() =>
+            {
+                GenerateRowMembers(type, codeNamespace, module);
+            });
+        }
+
+        private void GenerateRowMembers(TypeDefinition rowType, string codeNamespace, bool module)
+        {
+            foreach (var property in EnumerateFieldProperties(rowType))
+            {
+                cw.Indented(property.Name);
+                sb.Append("?: ");
+
+                var enumType = TypingsUtils.GetEnumTypeFrom(property.PropertyType());
+                if (enumType != null)
+                {
+                    HandleMemberType(enumType, codeNamespace, module);
+                }
+                else
+                {
+                    HandleMemberType(TypingsUtils.GetNullableUnderlyingType(property.PropertyType()) ?? property.PropertyType(), codeNamespace, module);
+                }
+
+                sb.AppendLine(";");
+            }
+        }
+
         private static IEnumerable<PropertyDefinition> EnumerateFieldProperties(TypeDefinition rowType)
         {
             do
@@ -69,43 +106,6 @@ namespace Serenity.CodeGeneration
             while ((rowType = (rowType.BaseType?.Resolve())) != null &&
                 rowType.FullNameOf() is not "Serenity.Data.Row" and
                     not "Serenity.Data.Row`1");
-        }
-
-        protected void GenerateRowType(TypeDefinition type, bool module)
-        {
-            var codeNamespace = module ? null : GetNamespace(type);
-
-            cw.Indented("export interface ");
-
-            var identifier = MakeFriendlyName(type, codeNamespace, module);
-
-            RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: module);
-
-            cw.InBrace(() =>
-            {
-                GenerateRowMembers(type, codeNamespace, module);
-            });
-        }
-
-        private void GenerateRowMembers(TypeDefinition rowType, string codeNamespace, bool module)
-        {
-            foreach (var property in EnumerateFieldProperties(rowType))
-            {
-                cw.Indented(property.Name);
-                sb.Append("?: ");
-
-                var enumType = TypingsUtils.GetEnumTypeFrom(property.PropertyType());
-                if (enumType != null)
-                {
-                    HandleMemberType(enumType, codeNamespace, module);
-                }
-                else
-                {
-                    HandleMemberType(TypingsUtils.GetNullableUnderlyingType(property.PropertyType()) ?? property.PropertyType(), codeNamespace, module);
-                }
-
-                sb.AppendLine(";");
-            }
         }
 
         private static string ExtractInterfacePropertyFromRow(TypeDefinition rowType, string[] interfaceTypes, 
@@ -483,88 +483,61 @@ namespace Serenity.CodeGeneration
             return metadata;
         }
 
-        protected void GenerateRowMetadata(TypeDefinition rowType, RowMetadata metadata, bool module)
+        protected void GenerateRowMetadata(TypeDefinition rowType, RowMetadata meta, bool module)
         { 
             sb.AppendLine();
-            cw.Indented("export namespace ");
+            cw.Indented($"export {(module ? "abstract class " : "namespace ")}");
             sb.Append(rowType.Name);
+
+            string export = module ? "static readonly " : "export const ";
+
+            static string sq(string s) => s == null ? "null" : s.ToSingleQuoted();
+            string dq(string s) => s == null ? "null" : module ? s.ToSingleQuoted() : s.ToDoubleQuoted();
 
             cw.InBrace(delegate
             {
-                if (metadata.IdProperty != null)
-                {
-                    cw.Indented("export const idProperty = ");
-                    sb.Append(metadata.IdProperty.ToSingleQuoted());
-                    sb.AppendLine(";");
-                }
+                if (meta.IdProperty != null)
+                    cw.IndentedLine($"{export}idProperty = {sq(meta.IdProperty)};");
 
-                if (metadata.IsActiveProperty != null)
-                {
-                    cw.Indented("export const isActiveProperty = ");
-                    sb.Append(metadata.IsActiveProperty.ToSingleQuoted());
-                    sb.AppendLine(";");
-                }
+                if (meta.IsActiveProperty != null)
+                    cw.IndentedLine($"{export}isActiveProperty = {sq(meta.IsActiveProperty)};");
 
-                if (metadata.IsDeletedProperty != null)
-                {
-                    cw.Indented("export const isDeletedProperty = ");
-                    sb.Append(metadata.IsDeletedProperty.ToSingleQuoted());
-                    sb.AppendLine(";");
-                }
+                if (meta.IsDeletedProperty != null)
+                    cw.IndentedLine($"{export}isDeletedProperty = {sq(meta.IsDeletedProperty)};");
 
-                if (metadata.NameProperty != null)
-                {
-                    cw.Indented("export const nameProperty = ");
-                    sb.Append(metadata.NameProperty.ToSingleQuoted());
-                    sb.AppendLine(";");
-                }
+                if (meta.NameProperty != null)
+                    cw.IndentedLine($"{export}nameProperty = {sq(meta.NameProperty)};");
 
-                if (!string.IsNullOrEmpty(metadata.LocalTextPrefix))
-                {
-                    cw.Indented("export const localTextPrefix = ");
-                    sb.Append(metadata.LocalTextPrefix.ToSingleQuoted());
-                    sb.AppendLine(";");
-                }
+                if (!string.IsNullOrEmpty(meta.LocalTextPrefix))
+                    cw.IndentedLine($"{export}localTextPrefix = {sq(meta.LocalTextPrefix)};");
 
-                if (!string.IsNullOrEmpty(metadata.LookupKey))
+                if (!string.IsNullOrEmpty(meta.LookupKey))
                 {
-                    cw.Indented("export const lookupKey = ");
-                    sb.Append(metadata.LookupKey.ToSingleQuoted());
-                    sb.AppendLine(";");
-
+                    cw.IndentedLine($"{export}lookupKey = {sq(meta.LookupKey)};");
                     sb.AppendLine();
-                    cw.Indented($"export {(module ? "async " : "")}function getLookup{(module ? "Async " : "")}(): Q.Lookup<");
-                    sb.Append(rowType.Name);
-                    sb.Append('>');
-                    cw.InBrace(delegate
+
+                    if (module)
                     {
-                        cw.Indented($"return Q.getLookup{(module ? "Async" : "")}<");
-                        sb.Append(rowType.Name);
-                        sb.Append(">(");
-                        sb.Append(metadata.LookupKey.ToSingleQuoted());
-                        sb.AppendLine(");");
-                    });
+                        cw.IndentedLine("/** @deprecated use getLookupAsync instead */");
+                        cw.IndentedLine($"static getLookup() {{ return Q.getLookup<{rowType.Name}>({sq(meta.LookupKey)}) }}");
+                        cw.IndentedLine($"static async getLookupAsync() {{ return Q.getLookupAsync<{rowType.Name}>({sq(meta.LookupKey)}) }}");
+                        sb.AppendLine();
+                    }
+                    else
+                    {
+                        cw.Indented($"export function getLookup(): Q.Lookup<{rowType.Name}>");
+                        cw.InBrace(() => cw.IndentedLine(
+                            $"return Q.getLookup<{rowType.Name}>({sq(meta.LookupKey)});"));
+                    }
                 }
 
-                cw.Indented("export const deletePermission = ");
-                sb.Append(metadata.DeletePermission == null ? "null" : metadata.DeletePermission.ToSingleQuoted());
-                sb.AppendLine(";");
-
-                cw.Indented("export const insertPermission = ");
-                sb.Append(metadata.InsertPermission == null ? "null" : metadata.InsertPermission.ToSingleQuoted());
-                sb.AppendLine(";");
-
-                cw.Indented("export const readPermission = ");
-                sb.Append(metadata.ReadPermission == null ? "null" : metadata.ReadPermission.ToSingleQuoted());
-                sb.AppendLine(";");
-
-                cw.Indented("export const updatePermission = ");
-                sb.Append(metadata.UpdatePermission == null ? "null" : metadata.UpdatePermission.ToSingleQuoted());
-                sb.AppendLine(";");
+                cw.IndentedLine($"{export}deletePermission = {sq(meta.DeletePermission)};");
+                cw.IndentedLine($"{export}insertPermission = {sq(meta.InsertPermission)};");
+                cw.IndentedLine($"{export}readPermission = {sq(meta.ReadPermission)};");
+                cw.IndentedLine($"{export}updatePermission = {sq(meta.UpdatePermission)};");
                 sb.AppendLine();
 
-                cw.Indented("export declare const enum ");
-                sb.Append("Fields");
+                cw.Indented(module ? "static readonly Fields =" : "export declare const enum Fields");
 
                 cw.InBrace(delegate
                 {
@@ -574,15 +547,20 @@ namespace Serenity.CodeGeneration
                         if (inserted > 0)
                             sb.AppendLine(",");
 
-                        cw.Indented(property.Name);
-                        sb.Append(" = ");
-                        sb.Append(property.Name.ToDoubleQuoted());
+                        cw.Indented($"{property.Name}{(module ? ": " : " = ")}{dq(property.Name)}");
 
                         inserted++;
                     }
 
                     sb.AppendLine();
                 });
+
+                if (module)
+                {
+                    var s = sb.ToString().TrimEnd();
+                    sb.Clear();
+                    sb.AppendLine(s + " as const");
+                }
             });
         }
     }

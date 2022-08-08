@@ -2,7 +2,7 @@
 {
     public abstract class CodeGeneratorBase
     {
-        private SortedDictionary<string, GeneratedSource> generatedCode;
+        private List<GeneratedSource> generatedCode;
         protected StringBuilder sb;
         protected CodeWriter cw;
 
@@ -14,19 +14,19 @@
         {
             sb = new StringBuilder(4096);
             cw = new CodeWriter(sb, 4);
-            generatedCode = new SortedDictionary<string, GeneratedSource>();
+            generatedCode = new();
         }
 
         protected virtual void AddFile(string filename, bool module = false)
         {
             var text = sb.ToString();
-            generatedCode[filename] = new GeneratedSource(text, module);
+            generatedCode.Add(new GeneratedSource(filename, text, module));
             sb.Clear();
         }
 
         protected abstract void GenerateAll();
 
-        public SortedDictionary<string, GeneratedSource> Run()
+        public List<GeneratedSource> Run()
         {
             Reset();
             GenerateAll();

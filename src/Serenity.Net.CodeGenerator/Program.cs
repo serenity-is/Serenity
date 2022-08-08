@@ -88,14 +88,15 @@ namespace Serenity.CodeGenerator
                     "clienttypes".StartsWith(command, StringComparison.Ordinal) ||
                     "mvct".StartsWith(command, StringComparison.Ordinal))
                 {
-                    bool isMixedModules = false;
+                    bool hasNamespaces = true;
+                    bool hasModules = false;
                     List<ExternalType> tsTypes = null;
                     void ensureTSTypes()
                     {
                         if (tsTypes == null)
                         {
                             var tsTypeLister = new TSTypeLister(fileSystem, projectDir);
-                            tsTypes = tsTypeLister.List(out isMixedModules);
+                            tsTypes = tsTypeLister.List(out hasModules, out hasNamespaces);
                         }
                     }
 
@@ -118,7 +119,7 @@ namespace Serenity.CodeGenerator
                         "servertypings".StartsWith(command, StringComparison.Ordinal))
                     {
                         ensureTSTypes();
-                        new ServerTypingsCommand(fileSystem, isMixedModules).Run(csproj, tsTypes);
+                        new ServerTypingsCommand(fileSystem, hasModules, hasNamespaces).Run(csproj, tsTypes);
                     }
 
                     return ExitCodes.Success;

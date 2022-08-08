@@ -5,12 +5,14 @@ namespace Serenity.CodeGenerator
 {
     public class ServerTypingsCommand : BaseFileSystemCommand
     {
-        private readonly bool isMixedModules;
+        private readonly bool hasModules;
+        private readonly bool hasNamespaces;
 
-        public ServerTypingsCommand(IGeneratorFileSystem fileSystem, bool isMixedModules) 
+        public ServerTypingsCommand(IGeneratorFileSystem fileSystem, bool hasModules, bool hasNamespaces) 
             : base(fileSystem)
         {
-            this.isMixedModules = isMixedModules;
+            this.hasModules = hasModules;
+            this.hasNamespaces = hasNamespaces;
         }
 
         public void Run(string csproj, List<ExternalType> tsTypes)
@@ -145,28 +147,31 @@ namespace Serenity.CodeGenerator
             Console.WriteLine(outDir);
 
             generator.RootNamespaces.Add(config.RootNamespace);
-            generator.NamespaceImports = config.ServerTypings?.NamespaceImports ?? isMixedModules;
+            generator.ModuleTypings = config.ServerTypings?.ModuleTypings ?? hasModules;
+            generator.NamespaceTypings = config.ServerTypings?.NamespaceTypings ?? hasNamespaces;
+            generator.NamespaceImports = config.ServerTypings?.NamespaceImports ?? (hasModules && hasNamespaces);
 
             foreach (var type in tsTypes)
                 generator.AddTSType(type);
 
-            var codeByFilename = generator.Run();
+            var generatedSources = generator.Run();
 
             void writeFiles(string outDir, Func<GeneratedSource, bool> predicate)
             {
                 MultipleOutputHelper.WriteFiles(fileSystem, outDir,
-                    codeByFilename.Where(x => predicate(x.Value))
-                        .Select(x => (x.Key, x.Value.Text)),
+                    generatedSources.Where(x => predicate(x))
+                        .Select(x => (x.Filename, x.Text)),
                     deleteExtraPattern: new[] { "*.ts" },
                     endOfLine: config.EndOfLine);
             }
+
+            bool isMixedModules = generator.ModuleTypings && generator.NamespaceTypings;
 
             if (isMixedModules)
                 writeFiles(fileSystem.Combine(projectDir, "Modules", "ServerTypings"),
                     x => x.Module);
 
-            writeFiles(outDir, 
-                x => !isMixedModules || !x.Module);
+            writeFiles(outDir, x => !isMixedModules || !x.Module);
         }
     }
 }

@@ -3,9 +3,9 @@
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         public bool LocalTexts { get; set; }
+        public bool ModuleTypings { get; set; } = false;
         public bool NamespaceImports { get; set; }
         public bool NamespaceTypings { get; set; } = true;
-        public bool ModuleTypings { get; set; } = false;
 
         public readonly HashSet<string> LocalTextFilters = new();
 
@@ -40,20 +40,24 @@
         {
             void add(Action<TypeDefinition, bool> action, string fileIdentifier = null)
             {
+                var typeNamespace = GetNamespace(type);
+                var fileName = RemoveRootNamespace(typeNamespace, (fileIdentifier ?? type.Name) + ".ts");
+
                 if (NamespaceTypings)
                 {
                     cw.Indented("namespace ");
-                    var codeNamespace = GetNamespace(type);
-                    sb.Append(codeNamespace);
+                    sb.Append(typeNamespace);
                     cw.InBrace(delegate
                     {
                         action(type, false);
                     });
-                    AddFile(RemoveRootNamespace(codeNamespace, (fileIdentifier ?? type.Name) + ".ts"), false);
+                    AddFile(fileName, module: false);
                 }
 
                 if (ModuleTypings)
                 {
+                    action(type, true);
+                    AddFile(fileName, module: true);
                 }
             }
 
