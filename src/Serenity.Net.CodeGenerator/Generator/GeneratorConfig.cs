@@ -201,9 +201,6 @@ namespace Serenity.CodeGenerator
             public bool? ModuleTypings { get; set; }
             public bool ShouldSerializeModuleTypings() => ModuleTypings != null;
 
-            public bool? NamespaceImports { get; set; }
-            public bool ShouldSerializeNamespaceImports() => NamespaceImports != null;
-
             public bool? NamespaceTypings { get; set; }
             public bool ShouldSerializeNamespaceTypings() => NamespaceTypings != null;
 

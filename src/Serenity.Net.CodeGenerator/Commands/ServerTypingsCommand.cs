@@ -149,7 +149,6 @@ namespace Serenity.CodeGenerator
             generator.RootNamespaces.Add(config.RootNamespace);
             generator.ModuleTypings = config.ServerTypings?.ModuleTypings ?? hasModules;
             generator.NamespaceTypings = config.ServerTypings?.NamespaceTypings ?? hasNamespaces;
-            generator.NamespaceImports = config.ServerTypings?.NamespaceImports ?? (hasModules && hasNamespaces);
 
             foreach (var type in tsTypes)
                 generator.AddTSType(type);

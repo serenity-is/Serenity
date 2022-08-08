@@ -464,64 +464,61 @@ namespace Serenity.CodeGeneration
             return true;
         }
 
-        public virtual string ShortenNamespace(TypeReference type, string codeNamespace)
+        protected string GetFileNameFor(string ns, string name, bool module)
         {
-            string ns = GetNamespace(type);
+            var filename = RemoveRootNamespace(ns, name);
+            if (module)
+            {
+                var idx = filename.IndexOf('.');
+                if (idx >= 0)
+                    filename = filename[..idx] + '/' + filename[(idx + 1)..];
+            }
 
+            return filename;
+        }
+
+        public virtual string ShortenFullName(string ns, string name, string codeNamespace, bool module, 
+            string sourceFile)
+        {
             if (ns == "Serenity.Services" ||
                 ns == "Serenity.ComponentModel")
             {
                 if (IsUsingNamespace("Serenity"))
-                    return "";
+                    ns = "";
                 else
-                    return "Serenity";
+                    ns = "Serenity";
             }
-
-            if ((codeNamespace != null && (ns == codeNamespace)) ||
-                (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)))
+            else if (module)
             {
-                return "";
+                if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
+                {
+                    var from = GetFileNameFor(ns, name, module);
+                    name = AddModuleImport(from, name);
+                    ns = "";
+                }
+            }
+            else 
+            { 
+                if ((codeNamespace != null && (ns == codeNamespace)) ||
+                    (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)) ||
+                    IsUsingNamespace(ns))
+                {
+                    ns = "";
+                }
+                else if (codeNamespace != null)
+                {
+                    var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
+                    if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
+                        ns = ns[(idx + 1)..];
+                }
             }
 
-            if (IsUsingNamespace(ns))
-                return "";
-
-            if (codeNamespace != null)
-            {
-                var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
-                if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
-                    return ns[(idx + 1)..];
-            }
-
-            return ns;
+            return !string.IsNullOrEmpty(ns) ? (ns + "." + name) : name;
         }
 
         protected virtual bool IsUsingNamespace(string ns)
         {
             return false;
-        }
-
-        protected virtual string ShortenNamespace(ExternalType type, string codeNamespace)
-        {
-            string ns = type.Namespace ?? "";
-
-            if ((codeNamespace != null && (ns == codeNamespace)) ||
-                (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)))
-            {
-                return "";
-            }
-
-            if (IsUsingNamespace(ns))
-                return "";
-
-            if (codeNamespace != null)
-            {
-                var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
-                if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
-                    return ns[(idx + 1)..];
-            }
-
-            return ns;
         }
 
         protected virtual string MakeFriendlyName(TypeReference type, string codeNamespace, bool module)
@@ -604,24 +601,15 @@ namespace Serenity.CodeGeneration
 
         protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, bool module)
         {
-            string ns;
+            var fullName = ShortenFullName(type.Namespace, type.Name, codeNamespace, module, null);
 
             if (type.IsGenericInstance())
             {
-                ns = ShortenNamespace(type, codeNamespace);
-
-                if (!string.IsNullOrEmpty(ns))
-                {
-                    sb.Append(ns);
-                    sb.Append('.');
-                }
-
-                var name = type.Name;
-                var idx = name.IndexOf('`', StringComparison.Ordinal);
+                var idx = fullName.IndexOf('`', StringComparison.Ordinal);
                 if (idx >= 0)
-                    name = name[..idx];
+                    fullName = fullName[..idx];
 
-                sb.Append(name);
+                sb.Append(fullName);
                 sb.Append('<');
 
                 int i = 0;
@@ -641,16 +629,7 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (codeNamespace != null)
-            {
-                ns = ShortenNamespace(type, codeNamespace);
-                if (!string.IsNullOrEmpty(ns))
-                    sb.Append(ns + "." + type.Name);
-                else
-                    sb.Append(type.Name);
-            }
-            else
-                sb.Append(type.Name);
+            sb.Append(fullName);
         }
 
         protected static TypeReference GetBaseClass(TypeDefinition type)
@@ -921,11 +900,18 @@ namespace Serenity.CodeGeneration
                         moduleImports.ToLookup(x => x.From)
                             .Select(from =>
                             {
+                                var path = from.Key;
+                                if (System.IO.Path.GetDirectoryName(filename) ==
+                                    System.IO.Path.GetDirectoryName(path))
+                                    path = "./" + System.IO.Path.GetFileName(path);
+                                else
+                                    path = "../" + path;
+
                                 var importList = string.Join(", ", from.Select(p =>
                                     p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
 
-                                return $"import {{ {importList} }} from \"{from.Key}\";";
-                            })) + Environment.NewLine);
+                                return $"import {{ {importList} }} from \"{path}\";";
+                            })) + Environment.NewLine + Environment.NewLine);
                 }
 
                 moduleImports.Clear();

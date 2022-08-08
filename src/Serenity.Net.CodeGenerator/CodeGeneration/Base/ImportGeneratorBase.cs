@@ -69,7 +69,7 @@
             foreach (var rn in RootNamespaces)
             {
                 if (name.StartsWith(rn + ".", StringComparison.Ordinal))
-                    return name.Substring(rn.Length + 1);
+                    return name[(rn.Length + 1)..];
             }
 
             return name;

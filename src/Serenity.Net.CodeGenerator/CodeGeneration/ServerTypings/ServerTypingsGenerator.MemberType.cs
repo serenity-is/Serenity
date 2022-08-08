@@ -139,7 +139,7 @@
             MakeFriendlyReference(memberType, codeNamespace, module);
         }
 
-        protected string ShortenFullName(ExternalType type, string codeNamespace)
+        protected string ShortenFullName(ExternalType type, string codeNamespace, bool module)
         {
             if (type.FullName == "Serenity.Widget")
                 return "Serenity.Widget<any>";
@@ -147,11 +147,7 @@
             if (type.FullName == "Serenity.CheckTreeItem")
                 return "Serenity.CheckTreeItem<any>";
 
-            var ns = ShortenNamespace(type, codeNamespace);
-            if (!string.IsNullOrEmpty(ns))
-                return ns + "." + type.Name;
-            else
-                return type.Name;
+            return ShortenFullName(type.Namespace, type.Name, codeNamespace, module, type.SourceFile);
         }
     }
 }

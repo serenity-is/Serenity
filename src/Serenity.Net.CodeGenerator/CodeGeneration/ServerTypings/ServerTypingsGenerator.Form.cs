@@ -185,7 +185,7 @@ namespace Serenity.CodeGeneration
                         (scriptType = (GetScriptType(editorType) ?? GetScriptType(editorType + "Editor"))) == null)
                         continue;
 
-                    var fullName = ShortenFullName(scriptType, codeNamespace);
+                    var fullName = ShortenFullName(scriptType, codeNamespace, module);
                     var shortName = fullName;
                     if (fullName.StartsWith("Serenity.", StringComparison.Ordinal))
                         shortName = "s." + fullName["Serenity.".Length..];

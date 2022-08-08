@@ -1,6 +1,4 @@
-﻿using Serenity.CodeGeneration;
-
-namespace Serenity.CodeGenerator
+﻿namespace Serenity.CodeGenerator
 {
     public class MultipleOutputHelper
     {
@@ -14,13 +12,14 @@ namespace Serenity.CodeGenerator
             if (fileSystem is null)
                 throw new ArgumentNullException(nameof(fileSystem));
 
+            outDir = fileSystem.GetFullPath(outDir);
             fileSystem.CreateDirectory(outDir);
 
             var generated = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var file in filesToWrite)
             {
-                generated.Add(file.Path);
+                generated.Add(PathHelper.ToUrl(file.Path));
 
                 var outFile = fileSystem.Combine(outDir, file.Path);
                 bool exists = fileSystem.FileExists(outFile);
@@ -31,6 +30,8 @@ namespace Serenity.CodeGenerator
                         (file.Text ?? "").Trim().Replace("\r", "", StringComparison.Ordinal))
                         continue;
                 }
+                else if (!fileSystem.DirectoryExists(fileSystem.GetDirectoryName(outFile)))
+                    fileSystem.CreateDirectory(fileSystem.GetDirectoryName(outFile));
 
 #if !ISSOURCEGENERATOR
                 Console.ForegroundColor = exists ? ConsoleColor.Magenta : ConsoleColor.Green;
@@ -52,11 +53,13 @@ namespace Serenity.CodeGenerator
                 return;
 
             var filesToDelete = deleteExtraPattern.SelectMany(
-                    x => fileSystem.GetFiles(outDir, x))
+                    x => fileSystem.GetFiles(outDir, x, recursive: true))
                 .Distinct();
 
+            var outRoot = PathHelper.ToUrl(outDir).TrimEnd('/') + '/';
             foreach (var file in filesToDelete)
-                if (!generated.Contains(fileSystem.GetFileName(file)))
+                if (PathHelper.ToUrl(file).StartsWith(outRoot) &&
+                    !generated.Contains(PathHelper.ToUrl(file)[outRoot.Length..]))
                 {
 #if !ISSOURCEGENERATOR
                     Console.ForegroundColor = ConsoleColor.Yellow;

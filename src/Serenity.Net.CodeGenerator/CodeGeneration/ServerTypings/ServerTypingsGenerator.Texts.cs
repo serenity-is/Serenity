@@ -39,7 +39,7 @@
                 localTextKeys.Add(prefix + prop.Name);
         }
 
-        protected void GenerateTexts()
+        protected void GenerateTexts(bool module)
         {
             cw.Indented("namespace ");
             var ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
@@ -188,7 +188,13 @@
                 sb.AppendLine(") as any;");
             });
 
-            AddFile("Texts.ts");
+            if (module)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"export const Texts = {ns}.Texts;");
+            }
+
+            AddFile("Texts.ts", module);
         }
     }
 }

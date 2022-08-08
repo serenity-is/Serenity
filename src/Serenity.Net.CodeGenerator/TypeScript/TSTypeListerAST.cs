@@ -681,7 +681,7 @@ namespace Serenity.CodeGenerator
         {
             var sourceFiles = fileNames.AsParallel()
                 .Select(fileName => (SourceFile)new TypeScriptAST(
-                    fileSystem.ReadAllText(fileName), 
+                    fileSystem.ReadAllText(fileName),
                         fileName, optimized: true).RootNode)
                 .ToArray();
 
@@ -704,7 +704,10 @@ namespace Serenity.CodeGenerator
             foreach (var types in sourceFiles.AsParallel().Select(sourceFile =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                return ExtractTypes(sourceFile);
+                var result = ExtractTypes(sourceFile);
+                foreach (var r in result)
+                    r.SourceFile = sourceFile.FileName;
+                return result;
             }).ToArray())
             {
                 foreach (var k in types)

@@ -4,7 +4,6 @@
     {
         public bool LocalTexts { get; set; }
         public bool ModuleTypings { get; set; } = false;
-        public bool NamespaceImports { get; set; }
         public bool NamespaceTypings { get; set; } = true;
 
         public readonly HashSet<string> LocalTextFilters = new();
@@ -30,10 +29,15 @@
         protected override void GenerateAll()
         {
             base.GenerateAll();
-            if (LocalTexts)
-                GenerateTexts();
-            if (NamespaceImports)
-                GenerateNamespaceImports();
+
+            if (LocalTexts && NamespaceTypings)
+                GenerateTexts(module: false);
+
+            if (LocalTexts && ModuleTypings)
+                GenerateTexts(module: true);
+
+            if (ModuleTypings)
+                GenerateModuleIndexes();
         }
 
         protected override void GenerateCodeFor(TypeDefinition type)
@@ -41,7 +45,6 @@
             void add(Action<TypeDefinition, bool> action, string fileIdentifier = null)
             {
                 var typeNamespace = GetNamespace(type);
-                var fileName = RemoveRootNamespace(typeNamespace, (fileIdentifier ?? type.Name) + ".ts");
 
                 if (NamespaceTypings)
                 {
@@ -51,12 +54,15 @@
                     {
                         action(type, false);
                     });
+
+                    var fileName = GetFileNameFor(typeNamespace, fileIdentifier ?? type.Name, module: false) + ".ts";
                     AddFile(fileName, module: false);
                 }
 
                 if (ModuleTypings)
                 {
                     action(type, true);
+                    var fileName = GetFileNameFor(typeNamespace, fileIdentifier ?? type.Name, module: true) + ".ts";
                     AddFile(fileName, module: true);
                 }
             }

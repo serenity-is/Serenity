@@ -2,7 +2,7 @@
 {
     public class ExternalType
     {
-        public string AssemblyName { get; set; }
+        public string SourceFile { get; set; }
         public string Namespace { get; set; }
         public string Name { get; set; }
         public string BaseType { get; set; }

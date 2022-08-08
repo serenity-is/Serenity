@@ -2,7 +2,7 @@
 {
     public abstract class CodeGeneratorBase
     {
-        private List<GeneratedSource> generatedCode;
+        protected List<GeneratedSource> generatedCode;
         protected StringBuilder sb;
         protected CodeWriter cw;
 

@@ -16,7 +16,7 @@
             if (baseClass != null)
             {
                 sb.Append(" extends ");
-                MakeFriendlyReference(baseClass, GetNamespace(type), module);
+                MakeFriendlyReference(baseClass, codeNamespace, module);
             }
 
             cw.InBrace(delegate
