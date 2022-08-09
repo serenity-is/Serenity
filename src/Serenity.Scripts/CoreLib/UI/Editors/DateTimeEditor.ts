@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
-import { addOption, addValidationRule, Culture, format, formatDate, formatISODateTimeUTC, Invariant, isEmptyOrNull, parseDate, parseISODateTime, round, text, today, trunc, tryGetText } from "../../Q";
+import { addOption, addValidationRule, Culture, format, formatDate, formatISODateTimeUTC, Invariant, isEmptyOrNull, parseDate, parseISODateTime, round, text, today, trunc, tryGetText } from "../../q";
 import { Widget } from "../Widgets/Widget";
 import { DateEditor } from "./DateEditor";
 import { EditorUtils } from "./EditorUtils";

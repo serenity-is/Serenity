@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../Interfaces";
-import { Culture, getLookup, htmlEncode, isEmptyOrNull, ScriptData, trimToNull, tryGetText } from "../../Q";
+import { Culture, getLookup, htmlEncode, isEmptyOrNull, ScriptData, trimToNull, tryGetText } from "../../q";
 import { ReflectionUtils } from "../../Types/ReflectionUtils";
 import { DataGrid } from "../DataGrid/DataGrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../Helpers/SlickHelpers";

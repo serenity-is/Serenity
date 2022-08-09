@@ -1,5 +1,5 @@
 ﻿import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../Interfaces";
-import { cast, isInstanceOfType, isTrimmedEmpty, parseDecimal, safeCast, text, tryGetText } from "../../Q";
+import { cast, isInstanceOfType, isTrimmedEmpty, parseDecimal, safeCast, text, tryGetText } from "../../q";
 import { Widget } from "../Widgets/Widget";
 
 export namespace EditorUtils {

@@ -2,7 +2,7 @@ import {
     addAttribute, addTypeMember, isEnum, MemberType, ISlickFormatter,
     registerClass as regClass, registerInterface as regIntf, registerEnum as regEnum,
     startsWith
-} from "../Q";
+} from "../q";
 
 function Attr(name: string) {
     return function (target: Function) {

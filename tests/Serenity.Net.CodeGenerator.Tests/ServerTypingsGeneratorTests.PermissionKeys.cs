@@ -36,10 +36,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator();
             var result = generator.Run();
-
-            Assert.Contains($"Tests.CodeGenerator.{classType.Name}.ts", result.Keys);
-
-            var code = result[$"Tests.CodeGenerator.{classType.Name}.ts"].Text;
+            var code = Assert.Single(result, x => x.Filename == $"Tests.CodeGenerator.{classType.Name}.ts").Text;
 
             code = NormalizeTS(code);
 

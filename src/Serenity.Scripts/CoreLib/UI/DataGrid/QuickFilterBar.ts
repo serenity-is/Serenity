@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { ArgumentNullException, delegateCombine, delegateRemove, formatDate, isArray, isEmptyOrNull, isTrimmedEmpty, notifyWarning, parseDate, text, toId, tryGetText } from "../../Q";
+import { ArgumentNullException, delegateCombine, delegateRemove, formatDate, isArray, isEmptyOrNull, isTrimmedEmpty, notifyWarning, parseDate, text, toId, tryGetText } from "../../q";
 import { Criteria } from "../../Services/Criteria";
 import { DateEditor } from "../Editors/DateEditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../Editors/DateTimeEditor";

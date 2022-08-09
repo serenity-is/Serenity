@@ -2187,6 +2187,8 @@ declare namespace Q {
         function onShown(element: () => HTMLElement, handler: () => void): number;
         function off(key: number): number;
     }
+    function executeOnceWhenShown(element: JQuery, callback: Function): void;
+    function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
 
     function text(key: string): string;
     function dbText(prefix: string): ((key: string) => string);
@@ -2395,6 +2397,35 @@ declare namespace Q {
     function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
     function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
     function removeValidationRule(element: JQuery, eventClass: string): JQuery;
+
+    function Criteria(field: string): any[];
+    namespace Criteria {
+        function isEmpty(c: any[]): boolean;
+        function join(c1: any[], op: string, c2: any[]): any[];
+        function paren(c: any[]): any[];
+        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
+        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
+        const enum Operator {
+            paren = "()",
+            not = "not",
+            isNull = "is null",
+            isNotNull = "is not null",
+            exists = "exists",
+            and = "and",
+            or = "or",
+            xor = "xor",
+            eq = "=",
+            ne = "!=",
+            gt = ">",
+            ge = ">=",
+            lt = "<",
+            le = "<=",
+            in = "in",
+            notIn = "not in",
+            like = "like",
+            notLike = "not like"
+        }
+    }
 
     interface ServiceOptions<TResponse extends Serenity.ServiceResponse> extends Serenity.ServiceOptions<TResponse> {
     }
@@ -2681,43 +2712,31 @@ declare namespace Serenity {
         }
     }
 
-    const enum CaptureOperationType {
-        Before = 0,
-        Delete = 1,
-        Insert = 2,
-        Update = 3
+    interface DialogButton {
+        text?: string;
+        hint?: string;
+        icon?: string;
+        click?: (e: JQueryEventObject) => void;
+        cssClass?: string;
+        htmlEncode?: boolean;
+        result?: string;
     }
 
-    interface DataChangeInfo {
-        type: string;
-        entityId: any;
-        entity: any;
-    }
+    function executeOnceWhenShown(element: JQuery, callback: Function): void;
+    function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
 
-    namespace ReflectionUtils {
-        function getPropertyValue(o: any, property: string): any;
-        function setPropertyValue(o: any, property: string, value: any): void;
-        function makeCamelCase(s: string): string;
-    }
 
-    namespace DialogTypeRegistry {
-        function tryGet(key: string): any;
-        function get(key: string): any;
-    }
 
-    namespace EditorTypeRegistry {
-        function get(key: string): any;
-        function reset(): void;
-    }
-
-    namespace EnumTypeRegistry {
-        function tryGet(key: string): Function;
-        function get(key: string): Function;
+    interface HandleRouteEventArgs {
+        handled: boolean;
+        route: string;
+        parts: string[];
+        index: number;
     }
 
     namespace LazyLoadHelper {
-        function executeOnceWhenShown(element: JQuery, callback: Function): void;
-        function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
+        const executeOnceWhenShown: typeof executeOnceWhenShown;
+        const executeEverytimeWhenShown: typeof executeEverytimeWhenShown;
     }
 
     class PrefixedContext {
@@ -2790,19 +2809,6 @@ declare namespace Serenity {
         changeSelect2(handler: (e: JQueryEventObject) => void): void;
     }
 
-    class TemplatedWidget<TOptions> extends Widget<TOptions> {
-        protected idPrefix: string;
-        private static templateNames;
-        constructor(container: JQuery, options?: TOptions);
-        protected byId(id: string): JQuery;
-        private byID;
-        private static noGeneric;
-        private getDefaultTemplateName;
-        protected getTemplateName(): string;
-        protected getFallbackTemplate(): string;
-        protected getTemplate(): string;
-    }
-
     interface ToolButton {
         title?: string;
         hint?: string;
@@ -2845,29 +2851,63 @@ declare namespace Serenity {
         updateInterface(): void;
     }
 
-    class CascadedWidgetLink<TParent extends Widget<any>> {
-        private parentType;
-        private widget;
-        private parentChange;
-        constructor(parentType: {
-            new (...args: any[]): TParent;
-        }, widget: Widget<any>, parentChange: (p1: TParent) => void);
-        private _parentID;
-        bind(): TParent;
-        unbind(): TParent;
-        get_parentID(): string;
-        set_parentID(value: string): void;
+    class TemplatedWidget<TOptions> extends Widget<TOptions> {
+        protected idPrefix: string;
+        private static templateNames;
+        constructor(container: JQuery, options?: TOptions);
+        protected byId(id: string): JQuery;
+        private byID;
+        private static noGeneric;
+        private getDefaultTemplateName;
+        protected getTemplateName(): string;
+        protected getFallbackTemplate(): string;
+        protected getTemplate(): string;
     }
 
-    namespace ValidationHelper {
-        function asyncSubmit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
-        function submit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
-        function getValidator(element: JQuery): JQueryValidation.Validator;
+    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+        protected tabs: JQuery;
+        protected toolbar: Toolbar;
+        protected validator: JQueryValidation.Validator;
+        constructor(options?: TOptions);
+        private get isMarkedAsPanel();
+        private get isResponsive();
+        private static getCssSize;
+        private static applyCssSizes;
+        destroy(): void;
+        protected initDialog(): void;
+        protected getModalOptions(): ModalOptions;
+        protected initModal(): void;
+        protected initToolbar(): void;
+        protected getToolbarButtons(): ToolButton[];
+        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
+        protected initValidator(): void;
+        protected resetValidation(): void;
+        protected validateForm(): boolean;
+        dialogOpen(asPanel?: boolean): void;
+        private useBSModal;
+        static bootstrapModal: boolean;
+        static openPanel(element: JQuery, uniqueName: string): void;
+        static closePanel(element: JQuery, e?: JQueryEventObject): void;
+        protected onDialogOpen(): void;
+        protected arrange(): void;
+        protected onDialogClose(): void;
+        protected addCssClass(): void;
+        protected getDialogButtons(): DialogButton[];
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogTitle(): string;
+        dialogClose(): void;
+        get dialogTitle(): string;
+        private setupPanelTitle;
+        set dialogTitle(value: string);
+        set_dialogTitle(value: string): void;
+        protected initTabs(): void;
+        protected handleResponsive(): void;
     }
-    namespace VX {
-        function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        function removeValidationRule(element: JQuery, eventClass: string): JQuery;
-        function validateElement(validator: JQueryValidation.Validator, widget: Widget<any>): boolean;
+    interface ModalOptions {
+        backdrop?: boolean | 'static';
+        keyboard?: boolean;
+        size?: 'lg' | 'sm';
+        modalClass?: string;
     }
 
     class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
@@ -2886,6 +2926,31 @@ declare namespace Serenity {
         protected initValidator(): void;
         protected resetValidation(): void;
         protected validateForm(): boolean;
+    }
+
+    namespace ValidationHelper {
+        function asyncSubmit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
+        function submit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
+        function getValidator(element: JQuery): JQueryValidation.Validator;
+    }
+    namespace VX {
+        function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        function removeValidationRule(element: JQuery, eventClass: string): JQuery;
+        function validateElement(validator: JQueryValidation.Validator, widget: Widget<any>): boolean;
+    }
+
+    class CascadedWidgetLink<TParent extends Widget<any>> {
+        private parentType;
+        private widget;
+        private parentChange;
+        constructor(parentType: {
+            new (...args: any[]): TParent;
+        }, widget: Widget<any>, parentChange: (p1: TParent) => void);
+        private _parentID;
+        bind(): TParent;
+        unbind(): TParent;
+        get_parentID(): string;
+        set_parentID(value: string): void;
     }
 
     namespace TabsExtensions {
@@ -2962,6 +3027,53 @@ declare namespace Serenity {
         protected set_entityId(value: any): void;
         protected validateBeforeSave(): boolean;
         protected propertyGrid: PropertyGrid;
+    }
+
+    interface DataChangeInfo {
+        type: string;
+        entityId: any;
+        entity: any;
+    }
+
+    namespace SubDialogHelper {
+        function bindToDataChange(dialog: any, owner: Widget<any>, dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any;
+        function triggerDataChange(dialog: Widget<any>): any;
+        function triggerDataChanged(element: JQuery): JQuery;
+        function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any;
+        function cascade(cascadedDialog: any, ofElement: JQuery): any;
+        function cascadedDialogOffset(element: JQuery): any;
+    }
+
+    namespace DialogExtensions {
+        function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery;
+        function dialogMaximizable(dialog: JQuery): JQuery;
+        function dialogFlexify(dialog: JQuery): JQuery;
+    }
+
+    class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        protected _entity: TItem;
+        protected _entityId: any;
+        constructor(opt?: TOptions);
+        destroy(): void;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogButtons(): DialogButton[];
+        protected okClick(): void;
+        protected okClickValidated(): void;
+        protected cancelClick(): void;
+        protected initPropertyGrid(): void;
+        protected getFormKey(): string;
+        protected getPropertyGridOptions(): PropertyGridOptions;
+        protected getPropertyItems(): Serenity.PropertyItem[];
+        protected getSaveEntity(): TItem;
+        protected loadInitialEntity(): void;
+        protected get_entity(): TItem;
+        protected set_entity(value: TItem): void;
+        protected get_entityId(): any;
+        protected set_entityId(value: any): void;
+        protected validateBeforeSave(): boolean;
+        protected updateTitle(): void;
+        protected propertyGrid: PropertyGrid;
+        protected getFallbackTemplate(): string;
     }
 
     namespace EditorUtils {
@@ -3648,229 +3760,6 @@ declare namespace Serenity {
         protected searchNow(value: string): void;
     }
 
-    namespace SubDialogHelper {
-        function bindToDataChange(dialog: any, owner: Widget<any>, dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any;
-        function triggerDataChange(dialog: Widget<any>): any;
-        function triggerDataChanged(element: JQuery): JQuery;
-        function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any;
-        function cascade(cascadedDialog: any, ofElement: JQuery): any;
-        function cascadedDialogOffset(element: JQuery): any;
-    }
-
-    namespace DialogExtensions {
-        function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery;
-        function dialogMaximizable(dialog: JQuery): JQuery;
-        function dialogFlexify(dialog: JQuery): JQuery;
-    }
-
-    interface DialogButton {
-        text?: string;
-        hint?: string;
-        icon?: string;
-        click?: (e: JQueryEventObject) => void;
-        cssClass?: string;
-        htmlEncode?: boolean;
-        result?: string;
-    }
-
-
-
-    interface HandleRouteEventArgs {
-        handled: boolean;
-        route: string;
-        parts: string[];
-        index: number;
-    }
-
-    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
-        protected tabs: JQuery;
-        protected toolbar: Toolbar;
-        protected validator: JQueryValidation.Validator;
-        constructor(options?: TOptions);
-        private get isMarkedAsPanel();
-        private get isResponsive();
-        private static getCssSize;
-        private static applyCssSizes;
-        destroy(): void;
-        protected initDialog(): void;
-        protected getModalOptions(): ModalOptions;
-        protected initModal(): void;
-        protected initToolbar(): void;
-        protected getToolbarButtons(): ToolButton[];
-        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected initValidator(): void;
-        protected resetValidation(): void;
-        protected validateForm(): boolean;
-        dialogOpen(asPanel?: boolean): void;
-        private useBSModal;
-        static bootstrapModal: boolean;
-        static openPanel(element: JQuery, uniqueName: string): void;
-        static closePanel(element: JQuery, e?: JQueryEventObject): void;
-        protected onDialogOpen(): void;
-        protected arrange(): void;
-        protected onDialogClose(): void;
-        protected addCssClass(): void;
-        protected getDialogButtons(): DialogButton[];
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getDialogTitle(): string;
-        dialogClose(): void;
-        get dialogTitle(): string;
-        private setupPanelTitle;
-        set dialogTitle(value: string);
-        set_dialogTitle(value: string): void;
-        protected initTabs(): void;
-        protected handleResponsive(): void;
-    }
-    interface ModalOptions {
-        backdrop?: boolean | 'static';
-        keyboard?: boolean;
-        size?: 'lg' | 'sm';
-        modalClass?: string;
-    }
-
-    class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
-        protected _entity: TItem;
-        protected _entityId: any;
-        constructor(opt?: TOptions);
-        destroy(): void;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getDialogButtons(): DialogButton[];
-        protected okClick(): void;
-        protected okClickValidated(): void;
-        protected cancelClick(): void;
-        protected initPropertyGrid(): void;
-        protected getFormKey(): string;
-        protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyItems(): Serenity.PropertyItem[];
-        protected getSaveEntity(): TItem;
-        protected loadInitialEntity(): void;
-        protected get_entity(): TItem;
-        protected set_entity(value: TItem): void;
-        protected get_entityId(): any;
-        protected set_entityId(value: any): void;
-        protected validateBeforeSave(): boolean;
-        protected updateTitle(): void;
-        protected propertyGrid: PropertyGrid;
-        protected getFallbackTemplate(): string;
-    }
-
-    class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
-        protected entity: TItem;
-        protected entityId: any;
-        protected propertyGrid: PropertyGrid;
-        protected toolbar: Toolbar;
-        protected saveAndCloseButton: JQuery;
-        protected applyChangesButton: JQuery;
-        protected deleteButton: JQuery;
-        protected undeleteButton: JQuery;
-        protected cloneButton: JQuery;
-        protected editButton: JQuery;
-        protected localizationGrid: PropertyGrid;
-        protected localizationButton: JQuery;
-        protected localizationPendingValue: any;
-        protected localizationLastValue: any;
-        static defaultLanguageList: () => string[][];
-        constructor(opt?: TOptions);
-        destroy(): void;
-        protected get_entity(): TItem;
-        protected set_entity(entity: any): void;
-        protected get_entityId(): any;
-        protected set_entityId(value: any): void;
-        protected getEntityNameFieldValue(): any;
-        protected getEntityTitle(): string;
-        protected updateTitle(): void;
-        protected isCloneMode(): boolean;
-        protected isEditMode(): boolean;
-        protected isDeleted(): boolean;
-        protected isNew(): boolean;
-        protected isNewOrDeleted(): boolean;
-        protected getDeleteOptions(callback: (response: Serenity.DeleteResponse) => void): Serenity.ServiceOptions<Serenity.DeleteResponse>;
-        protected deleteHandler(options: Serenity.ServiceOptions<Serenity.DeleteResponse>, callback: (response: Serenity.DeleteResponse) => void): void;
-        protected doDelete(callback: (response: Serenity.DeleteResponse) => void): void;
-        protected onDeleteSuccess(response: Serenity.DeleteResponse): void;
-        protected attrs<TAttr>(attrType: {
-            new (...args: any[]): TAttr;
-        }): TAttr[];
-        private entityType;
-        protected getEntityType(): string;
-        private formKey;
-        protected getFormKey(): string;
-        private localTextDbPrefix;
-        protected getLocalTextDbPrefix(): string;
-        protected getLocalTextPrefix(): string;
-        private entitySingular;
-        protected getEntitySingular(): string;
-        private nameProperty;
-        protected getNameProperty(): string;
-        private idProperty;
-        protected getIdProperty(): string;
-        protected isActiveProperty: string;
-        protected getIsActiveProperty(): string;
-        protected getIsDeletedProperty(): string;
-        protected service: string;
-        protected getService(): string;
-        load(entityOrId: any, done: () => void, fail: (ex: Exception) => void): void;
-        loadNewAndOpenDialog(asPanel?: boolean): void;
-        loadEntityAndOpenDialog(entity: TItem, asPanel?: boolean): void;
-        protected loadResponse(data: any): void;
-        protected loadEntity(entity: TItem): void;
-        protected beforeLoadEntity(entity: TItem): void;
-        protected afterLoadEntity(): void;
-        loadByIdAndOpenDialog(entityId: any, asPanel?: boolean): void;
-        protected onLoadingData(data: Serenity.RetrieveResponse<TItem>): void;
-        protected getLoadByIdOptions(id: any, callback: (response: Serenity.RetrieveResponse<TItem>) => void): Serenity.ServiceOptions<Serenity.RetrieveResponse<TItem>>;
-        protected getLoadByIdRequest(id: any): Serenity.RetrieveRequest;
-        protected reloadById(): void;
-        loadById(id: any, callback?: (response: Serenity.RetrieveResponse<TItem>) => void, fail?: () => void): void;
-        protected loadByIdHandler(options: Serenity.ServiceOptions<Serenity.RetrieveResponse<TItem>>, callback: (response: Serenity.RetrieveResponse<TItem>) => void, fail: () => void): void;
-        protected initLocalizationGrid(): void;
-        protected initLocalizationGridCommon(pgOptions: PropertyGridOptions): void;
-        protected isLocalizationMode(): boolean;
-        protected isLocalizationModeAndChanged(): boolean;
-        protected localizationButtonClick(): void;
-        protected getLanguages(): any[];
-        private getLangs;
-        protected loadLocalization(): void;
-        protected setLocalizationGridCurrentValues(): void;
-        protected getLocalizationGridValue(): any;
-        protected getPendingLocalizations(): any;
-        protected initPropertyGrid(): void;
-        protected getPropertyItems(): Serenity.PropertyItem[];
-        protected getPropertyGridOptions(): PropertyGridOptions;
-        protected validateBeforeSave(): boolean;
-        protected getSaveOptions(callback: (response: Serenity.SaveResponse) => void): Serenity.ServiceOptions<Serenity.SaveResponse>;
-        protected getSaveEntity(): TItem;
-        protected getSaveRequest(): Serenity.SaveRequest<TItem>;
-        protected onSaveSuccess(response: Serenity.SaveResponse): void;
-        protected save_submitHandler(callback: (response: Serenity.SaveResponse) => void): void;
-        protected save(callback?: (response: Serenity.SaveResponse) => void): void | boolean;
-        protected saveHandler(options: Serenity.ServiceOptions<Serenity.SaveResponse>, callback: (response: Serenity.SaveResponse) => void): void;
-        protected initToolbar(): void;
-        protected showSaveSuccessMessage(response: Serenity.SaveResponse): void;
-        protected getToolbarButtons(): ToolButton[];
-        protected getCloningEntity(): TItem;
-        protected updateInterface(): void;
-        protected getUndeleteOptions(callback?: (response: Serenity.UndeleteResponse) => void): Serenity.ServiceOptions<Serenity.UndeleteResponse>;
-        protected undeleteHandler(options: Serenity.ServiceOptions<Serenity.UndeleteResponse>, callback: (response: Serenity.UndeleteResponse) => void): void;
-        protected undelete(callback?: (response: Serenity.UndeleteResponse) => void): void;
-        private _readonly;
-        get readOnly(): boolean;
-        set readOnly(value: boolean);
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-        protected getInsertPermission(): string;
-        protected getUpdatePermission(): string;
-        protected getDeletePermission(): string;
-        protected hasDeletePermission(): boolean;
-        protected hasInsertPermission(): boolean;
-        protected hasUpdatePermission(): boolean;
-        protected hasSavePermission(): boolean;
-        protected editClicked: boolean;
-        protected isViewMode(): boolean;
-        protected useViewMode(): boolean;
-        protected getFallbackTemplate(): string;
-    }
-
     interface FilterOperator {
         key?: string;
         title?: string;
@@ -4471,47 +4360,6 @@ declare namespace Serenity {
         protected getTemplate(): string;
     }
 
-    class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
-        constructor(container: JQuery, options?: TOptions);
-        protected handleRoute(args: HandleRouteEventArgs): void;
-        protected usePager(): boolean;
-        protected createToolbarExtensions(): void;
-        protected getInitialTitle(): string;
-        protected getLocalTextPrefix(): string;
-        private entityType;
-        protected getEntityType(): string;
-        private displayName;
-        protected getDisplayName(): string;
-        private itemName;
-        protected getItemName(): string;
-        protected getAddButtonCaption(): string;
-        protected getButtons(): ToolButton[];
-        protected newRefreshButton(noText?: boolean): ToolButton;
-        protected addButtonClick(): void;
-        protected editItem(entityOrId: any): void;
-        protected editItemOfType(itemType: string, entityOrId: any): void;
-        private service;
-        protected getService(): string;
-        protected getViewOptions(): Slick.RemoteViewOptions;
-        protected getItemType(): string;
-        protected routeDialog(itemType: string, dialog: Widget<any>): void;
-        protected getInsertPermission(): string;
-        protected hasInsertPermission(): boolean;
-        protected transferDialogReadOnly(dialog: Widget<any>): void;
-        protected initDialog(dialog: Widget<any>): void;
-        protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
-        protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getDialogOptionsFor(itemType: string): JQueryUI.DialogOptions;
-        protected getDialogTypeFor(itemType: string): {
-            new (...args: any[]): Widget<any>;
-        };
-        private dialogType;
-        protected getDialogType(): {
-            new (...args: any[]): Widget<any>;
-        };
-    }
-
     /**
      * A mixin that can be applied to a DataGrid for tree functionality
      */
@@ -4640,6 +4488,164 @@ declare namespace Serenity {
         get filterValue(): any;
         protected set_filterValue(value: any): void;
         set filterValue(value: any);
+    }
+
+    class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
+        constructor(container: JQuery, options?: TOptions);
+        protected handleRoute(args: HandleRouteEventArgs): void;
+        protected usePager(): boolean;
+        protected createToolbarExtensions(): void;
+        protected getInitialTitle(): string;
+        protected getLocalTextPrefix(): string;
+        private entityType;
+        protected getEntityType(): string;
+        private displayName;
+        protected getDisplayName(): string;
+        private itemName;
+        protected getItemName(): string;
+        protected getAddButtonCaption(): string;
+        protected getButtons(): ToolButton[];
+        protected newRefreshButton(noText?: boolean): ToolButton;
+        protected addButtonClick(): void;
+        protected editItem(entityOrId: any): void;
+        protected editItemOfType(itemType: string, entityOrId: any): void;
+        private service;
+        protected getService(): string;
+        protected getViewOptions(): Slick.RemoteViewOptions;
+        protected getItemType(): string;
+        protected routeDialog(itemType: string, dialog: Widget<any>): void;
+        protected getInsertPermission(): string;
+        protected hasInsertPermission(): boolean;
+        protected transferDialogReadOnly(dialog: Widget<any>): void;
+        protected initDialog(dialog: Widget<any>): void;
+        protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
+        protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogOptionsFor(itemType: string): JQueryUI.DialogOptions;
+        protected getDialogTypeFor(itemType: string): {
+            new (...args: any[]): Widget<any>;
+        };
+        private dialogType;
+        protected getDialogType(): {
+            new (...args: any[]): Widget<any>;
+        };
+    }
+
+    class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
+        protected entity: TItem;
+        protected entityId: any;
+        protected propertyGrid: PropertyGrid;
+        protected toolbar: Toolbar;
+        protected saveAndCloseButton: JQuery;
+        protected applyChangesButton: JQuery;
+        protected deleteButton: JQuery;
+        protected undeleteButton: JQuery;
+        protected cloneButton: JQuery;
+        protected editButton: JQuery;
+        protected localizationGrid: PropertyGrid;
+        protected localizationButton: JQuery;
+        protected localizationPendingValue: any;
+        protected localizationLastValue: any;
+        static defaultLanguageList: () => string[][];
+        constructor(opt?: TOptions);
+        destroy(): void;
+        protected get_entity(): TItem;
+        protected set_entity(entity: any): void;
+        protected get_entityId(): any;
+        protected set_entityId(value: any): void;
+        protected getEntityNameFieldValue(): any;
+        protected getEntityTitle(): string;
+        protected updateTitle(): void;
+        protected isCloneMode(): boolean;
+        protected isEditMode(): boolean;
+        protected isDeleted(): boolean;
+        protected isNew(): boolean;
+        protected isNewOrDeleted(): boolean;
+        protected getDeleteOptions(callback: (response: Serenity.DeleteResponse) => void): Serenity.ServiceOptions<Serenity.DeleteResponse>;
+        protected deleteHandler(options: Serenity.ServiceOptions<Serenity.DeleteResponse>, callback: (response: Serenity.DeleteResponse) => void): void;
+        protected doDelete(callback: (response: Serenity.DeleteResponse) => void): void;
+        protected onDeleteSuccess(response: Serenity.DeleteResponse): void;
+        protected attrs<TAttr>(attrType: {
+            new (...args: any[]): TAttr;
+        }): TAttr[];
+        private entityType;
+        protected getEntityType(): string;
+        private formKey;
+        protected getFormKey(): string;
+        private localTextDbPrefix;
+        protected getLocalTextDbPrefix(): string;
+        protected getLocalTextPrefix(): string;
+        private entitySingular;
+        protected getEntitySingular(): string;
+        private nameProperty;
+        protected getNameProperty(): string;
+        private idProperty;
+        protected getIdProperty(): string;
+        protected isActiveProperty: string;
+        protected getIsActiveProperty(): string;
+        protected getIsDeletedProperty(): string;
+        protected service: string;
+        protected getService(): string;
+        load(entityOrId: any, done: () => void, fail: (ex: Exception) => void): void;
+        loadNewAndOpenDialog(asPanel?: boolean): void;
+        loadEntityAndOpenDialog(entity: TItem, asPanel?: boolean): void;
+        protected loadResponse(data: any): void;
+        protected loadEntity(entity: TItem): void;
+        protected beforeLoadEntity(entity: TItem): void;
+        protected afterLoadEntity(): void;
+        loadByIdAndOpenDialog(entityId: any, asPanel?: boolean): void;
+        protected onLoadingData(data: Serenity.RetrieveResponse<TItem>): void;
+        protected getLoadByIdOptions(id: any, callback: (response: Serenity.RetrieveResponse<TItem>) => void): Serenity.ServiceOptions<Serenity.RetrieveResponse<TItem>>;
+        protected getLoadByIdRequest(id: any): Serenity.RetrieveRequest;
+        protected reloadById(): void;
+        loadById(id: any, callback?: (response: Serenity.RetrieveResponse<TItem>) => void, fail?: () => void): void;
+        protected loadByIdHandler(options: Serenity.ServiceOptions<Serenity.RetrieveResponse<TItem>>, callback: (response: Serenity.RetrieveResponse<TItem>) => void, fail: () => void): void;
+        protected initLocalizationGrid(): void;
+        protected initLocalizationGridCommon(pgOptions: PropertyGridOptions): void;
+        protected isLocalizationMode(): boolean;
+        protected isLocalizationModeAndChanged(): boolean;
+        protected localizationButtonClick(): void;
+        protected getLanguages(): any[];
+        private getLangs;
+        protected loadLocalization(): void;
+        protected setLocalizationGridCurrentValues(): void;
+        protected getLocalizationGridValue(): any;
+        protected getPendingLocalizations(): any;
+        protected initPropertyGrid(): void;
+        protected getPropertyItems(): Serenity.PropertyItem[];
+        protected getPropertyGridOptions(): PropertyGridOptions;
+        protected validateBeforeSave(): boolean;
+        protected getSaveOptions(callback: (response: Serenity.SaveResponse) => void): Serenity.ServiceOptions<Serenity.SaveResponse>;
+        protected getSaveEntity(): TItem;
+        protected getSaveRequest(): Serenity.SaveRequest<TItem>;
+        protected onSaveSuccess(response: Serenity.SaveResponse): void;
+        protected save_submitHandler(callback: (response: Serenity.SaveResponse) => void): void;
+        protected save(callback?: (response: Serenity.SaveResponse) => void): void | boolean;
+        protected saveHandler(options: Serenity.ServiceOptions<Serenity.SaveResponse>, callback: (response: Serenity.SaveResponse) => void): void;
+        protected initToolbar(): void;
+        protected showSaveSuccessMessage(response: Serenity.SaveResponse): void;
+        protected getToolbarButtons(): ToolButton[];
+        protected getCloningEntity(): TItem;
+        protected updateInterface(): void;
+        protected getUndeleteOptions(callback?: (response: Serenity.UndeleteResponse) => void): Serenity.ServiceOptions<Serenity.UndeleteResponse>;
+        protected undeleteHandler(options: Serenity.ServiceOptions<Serenity.UndeleteResponse>, callback: (response: Serenity.UndeleteResponse) => void): void;
+        protected undelete(callback?: (response: Serenity.UndeleteResponse) => void): void;
+        private _readonly;
+        get readOnly(): boolean;
+        set readOnly(value: boolean);
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+        protected getInsertPermission(): string;
+        protected getUpdatePermission(): string;
+        protected getDeletePermission(): string;
+        protected hasDeletePermission(): boolean;
+        protected hasInsertPermission(): boolean;
+        protected hasUpdatePermission(): boolean;
+        protected hasSavePermission(): boolean;
+        protected editClicked: boolean;
+        protected isViewMode(): boolean;
+        protected useViewMode(): boolean;
+        protected getFallbackTemplate(): string;
     }
 
     namespace Reporting {

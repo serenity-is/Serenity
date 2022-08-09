@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { ArgumentNullException, Culture, delegateCombine, delegateRemove, text, tryGetText } from "../../Q";
+import { ArgumentNullException, Culture, delegateCombine, delegateRemove, text, tryGetText } from "../../q";
 import { Criteria } from "../../Services/Criteria";
 import { FilterLine } from "./FilterLine";
 

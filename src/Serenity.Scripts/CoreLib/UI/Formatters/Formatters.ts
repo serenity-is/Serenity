@@ -1,6 +1,6 @@
 ﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
 import { ArgumentNullException, attrEncode, Config, Culture, endsWith, Enum, Exception, format, formatDate, formatNumber, getAttributes, getTypeFullName, getTypes, htmlEncode, 
-    isAssignableFrom, isEmptyOrNull, ISlickFormatter, parseDecimal, parseISODateTime, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "../../Q";
+    isAssignableFrom, isEmptyOrNull, ISlickFormatter, parseDecimal, parseISODateTime, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "../../q";
 import { EnumTypeRegistry } from "../../Types/EnumTypeRegistry";
 
 export interface IInitializeColumn {

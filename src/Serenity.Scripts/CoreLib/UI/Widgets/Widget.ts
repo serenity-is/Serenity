@@ -3,7 +3,7 @@
 import { jQueryPatch } from "../../Patch/jQueryPatch";
 import { Decorators, ElementAttribute } from "../../Decorators";
 import { IDialog } from "../../Interfaces";
-import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, format, getAttributes, getInstanceType, getTypeFullName, getTypeName, isAssignableFrom, notifyError, replaceAll, startsWith } from "../../Q";
+import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, format, getAttributes, getInstanceType, getTypeFullName, getTypeName, isAssignableFrom, notifyError, replaceAll, startsWith } from "../../q";
 
 export interface WidgetClass<TOptions = object> {
     new(element: JQuery, options?: TOptions): Widget<TOptions>;

@@ -1,8 +1,8 @@
 ﻿import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../Decorators";
 import { IReadOnly } from "../../Interfaces";
-import { Authorization, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getInstanceType, getTypeFullName, getTypeName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../Q";
+import { Authorization, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getInstanceType, getTypeFullName, getTypeName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
 import { Criteria } from "../../Services/Criteria";
-import { RemoteView } from "../../Slick/RemoteView";
+import { RemoteView } from "../../slick";
 import { DateEditor } from "../Editors/DateEditor";
 import { EditorUtils } from "../Editors/EditorUtils";
 import { SelectEditor } from "../Editors/SelectEditor";
@@ -16,7 +16,7 @@ import { GridUtils, PropertyItemSlickConverter, SlickFormatting, SlickHelper } f
 import { ReflectionOptionsSetter } from "../Widgets/ReflectionOptionsSetter";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { Widget } from "../Widgets/Widget";
-import { QuickFilterBar } from ".//QuickFilterBar";
+import { QuickFilterBar } from "./QuickFilterBar";
 import { IDataGrid } from "./IDataGrid";
 import { QuickFilter } from "./QuickFilter";
 import { QuickSearchField, QuickSearchInput } from "./QuickSearchInput";

@@ -1,4 +1,4 @@
-﻿import { htmlEncode, toGrouping, tryFirst } from "../../Q";
+﻿import { htmlEncode, toGrouping, tryFirst } from "../../q";
 import { SlickFormatting, SlickHelper, SlickTreeHelper } from "../Helpers/SlickHelpers";
 import { DataGrid } from "./DataGrid";
 

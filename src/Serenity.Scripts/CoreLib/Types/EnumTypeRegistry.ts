@@ -1,5 +1,5 @@
 ﻿import { EnumKeyAttribute } from "../Decorators";
-import { Config, Exception, format, getAttributes, getTypeFullName, getTypes, isEnum, notifyError, startsWith } from "../Q";
+import { Config, Exception, format, getAttributes, getTypeFullName, getTypes, isEnum, notifyError, startsWith } from "../q";
 
 export namespace EnumTypeRegistry {
 

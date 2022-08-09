@@ -12,12 +12,12 @@ for (var esmOpt of [
     esbuild.build(esmOpt).catch(() => process.exit());
 }
 
-let localImport = function (filter) {
+let localImport = function (filter, pkg) {
     return {
         name: 'import-local',
         setup(build) {
             build.onResolve({ filter: filter }, args => {
-                return { path: "Q", external: true }
+                return { path: pkg, external: true }
             })
         }
     }
@@ -31,7 +31,7 @@ var coreLibBase = {
     format: 'esm',
     logLevel: 'info',
     outbase: ".",
-    outdir: resolve('./dist/esm/'),
+    outdir: resolve('./dist'),
     sourcemap: true,
     splitting: false,
     target: 'es6'
@@ -40,20 +40,12 @@ var coreLibBase = {
 await esbuild.build({
     ...coreLibBase,
     entryPoints: [
-        'Q/index.ts',
-        'Slick/index.ts',
-        'Serenity/core.ts',
-        'Serenity/widget.ts',
-        'Serenity/forms.ts',
-        'Serenity/editors.ts',
-        'Serenity/quickfilter.ts',
-        'Serenity/dialogs.ts',
-        'Serenity/filterpanel.ts',
-        'Serenity/grids.ts',
-        'Serenity/index.ts'
+        'q.ts',
+        'slick.ts',
+        'index.ts'
     ],
-    plugins: [localImport(/\.\.\/Q(\/.*|)?$/)],
-    splitting: true,
+    plugins: [localImport(/.\/q$/, './q.js'), localImport(/.\/slick$/, './slick.js')],
+    splitting: false,
     minify: true
 });
 

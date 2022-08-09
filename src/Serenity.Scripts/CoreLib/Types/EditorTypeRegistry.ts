@@ -1,5 +1,5 @@
 ﻿import { EditorAttribute } from "../Decorators";
-import { ArgumentNullException, Config, endsWith, Exception, format, getAttributes, getType, getTypeFullName, getTypes, isEmptyOrNull, startsWith } from "../Q";
+import { ArgumentNullException, Config, endsWith, Exception, format, getAttributes, getType, getTypeFullName, getTypes, isEmptyOrNull, startsWith } from "../q";
 
 // @ts-ignore
 let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));

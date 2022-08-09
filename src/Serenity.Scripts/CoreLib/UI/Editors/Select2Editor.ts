@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../Interfaces";
-import { any, Authorization, isArray, isEmptyOrNull, isTrimmedEmpty, startsWith, text, trimToEmpty, trimToNull } from "../../Q";
+import { any, Authorization, isArray, isEmptyOrNull, isTrimmedEmpty, startsWith, text, trimToEmpty, trimToNull } from "../../q";
 import { DialogTypeRegistry } from "../../Types/DialogTypeRegistry";
 import { ReflectionUtils } from "../../Types/ReflectionUtils";
 import { SubDialogHelper } from "../Helpers/SubDialogHelper";

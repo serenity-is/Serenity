@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { startsWith } from "../../Q";
+import { startsWith } from "../../q";
 import { SelectEditor, SelectEditorOptions } from "./SelectEditor";
 
 @Decorators.registerEditor('Serenity.DateYearEditor')

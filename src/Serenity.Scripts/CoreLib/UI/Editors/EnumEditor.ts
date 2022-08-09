@@ -1,5 +1,5 @@
 ﻿import { Decorators, EnumKeyAttribute } from "../../Decorators";
-import { Enum, getAttributes, tryGetText } from "../../Q";
+import { Enum, getAttributes, tryGetText } from "../../q";
 import { EnumTypeRegistry } from "../../Types/EnumTypeRegistry";
 import { Select2CommonOptions, Select2Editor } from "./Select2Editor";
 

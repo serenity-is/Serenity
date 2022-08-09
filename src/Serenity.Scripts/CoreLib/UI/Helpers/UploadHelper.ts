@@ -1,4 +1,4 @@
-import { blockUI, blockUndo, endsWith, format, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, round, startsWith, text } from "../../Q";
+import { blockUI, blockUndo, endsWith, format, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, round, startsWith, text } from "../../q";
 
 export namespace UploadHelper {
 

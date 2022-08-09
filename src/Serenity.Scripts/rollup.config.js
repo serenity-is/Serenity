@@ -189,8 +189,8 @@ export default [
         ]
     },
     {
-        input: "./dist/built/Q/indexAll.d.ts",
-        output: [{ file: "./dist/built/Q/indexAll.bundle.d.ts", format: "es" }],
+        input: "./dist/built/q.d.ts",
+        output: [{ file: "./dist/built/q.bundle.d.ts", format: "es" }],
         plugins: [dts(), toGlobal('Q')],
     },
     {
@@ -199,8 +199,8 @@ export default [
         plugins: [dts(), toGlobal('Serenity')],
     },
     {
-        input: "./dist/built/Slick/index.d.ts",
-        output: [{ file: "./dist/built/Slick/index.bundle.d.ts", format: "es" }],
+        input: "./dist/built/slick.d.ts",
+        output: [{ file: "./dist/built/slick.bundle.d.ts", format: "es" }],
         plugins: [dts(), toGlobal('Slick'), {
             name: 'writeFinal',
             generateBundle: function () {

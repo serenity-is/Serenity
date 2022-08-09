@@ -1,13 +1,6 @@
-﻿export * as Q from './Q/indexAll';
-export * as Serenity from './Serenity';
-export * as Slick from "./Slick";
-import { jQueryPatch } from './Patch/jQueryPatch'
+﻿export * from "./index"
 import { promisePatch } from './Patch/PromisePatch'
 import { vuePatch } from './Patch/VuePatch'
-
-if (typeof jQuery === "function") {
-    jQueryPatch(jQuery);
-}
 
 promisePatch();
 

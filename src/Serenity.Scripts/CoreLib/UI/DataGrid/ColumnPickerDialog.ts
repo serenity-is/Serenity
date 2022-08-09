@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { Authorization, centerDialog, Culture, htmlEncode, Router, text, trimToNull } from "../../Q";
+import { Authorization, centerDialog, Culture, htmlEncode, Router, text, trimToNull } from "../../q";
 import { QuickSearchInput } from "../DataGrid/QuickSearchInput";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
 import { ToolButton } from "../Widgets/Toolbar";

@@ -1,6 +1,6 @@
 ﻿import { Decorators, DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../Decorators";
 import { IEditDialog } from "../../Interfaces";
-import { Authorization, endsWith, format, getInstanceType, getTypeFullName, HandleRouteEventArgs, isEmptyOrNull, LT, replaceAll, resolveUrl, Router, safeCast, text, tryGetText } from "../../Q";
+import { Authorization, endsWith, format, getInstanceType, getTypeFullName, HandleRouteEventArgs, isEmptyOrNull, LT, replaceAll, resolveUrl, Router, safeCast, text, tryGetText } from "../../q";
 import { DialogTypeRegistry } from "../../Types/DialogTypeRegistry";
 import { EditorUtils } from "../Editors/EditorUtils";
 import { SubDialogHelper } from "../Helpers/SubDialogHelper";

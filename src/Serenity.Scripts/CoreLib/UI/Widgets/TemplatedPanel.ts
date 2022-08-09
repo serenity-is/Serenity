@@ -1,4 +1,4 @@
-﻿import { validateOptions } from "../../Q";
+﻿import { validateOptions } from "../../q";
 import { TemplatedWidget } from "./TemplatedWidget";
 import { Toolbar, ToolButton } from "./Toolbar";
 

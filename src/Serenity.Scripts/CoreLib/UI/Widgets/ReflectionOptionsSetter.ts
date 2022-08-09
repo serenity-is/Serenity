@@ -1,5 +1,5 @@
 ﻿import { DisplayNameAttribute, OptionAttribute } from "../../Decorators";
-import { getInstanceType, getMembers, isInstanceOfType, MemberType } from "../../Q";
+import { getInstanceType, getMembers, isInstanceOfType, MemberType } from "../../q";
 import { ReflectionUtils } from "../../Types/ReflectionUtils";
 
 export namespace ReflectionOptionsSetter {

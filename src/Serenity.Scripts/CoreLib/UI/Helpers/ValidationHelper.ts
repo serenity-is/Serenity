@@ -1,4 +1,4 @@
-﻿import { Exception, validatorAbortHandler } from "../../Q";
+﻿import { Exception, validatorAbortHandler } from "../../q";
 import { Widget } from "../Widgets/Widget";
 
 export namespace ValidationHelper {

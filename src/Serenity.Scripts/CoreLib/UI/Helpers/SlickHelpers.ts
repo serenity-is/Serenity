@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { attrEncode, Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, replaceAll, safeCast, serviceCall, startsWith, text, tryGetText } from "../../Q";
+import { attrEncode, Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, replaceAll, safeCast, serviceCall, startsWith, text, tryGetText } from "../../q";
 import { IDataGrid } from "../DataGrid/IDataGrid";
 import { QuickSearchField, QuickSearchInput } from "../DataGrid/QuickSearchInput";
 import { DateFormatter, EnumFormatter, FormatterTypeRegistry, IInitializeColumn, NumberFormatter } from "../Formatters/Formatters";

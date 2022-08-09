@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IStringValue } from "../../Interfaces";
-import { isEmptyOrNull, isValue, safeCast, serviceCall, text, trimToNull } from "../../Q";
+import { isEmptyOrNull, isValue, safeCast, serviceCall, text, trimToNull } from "../../q";
 import { ValidationHelper } from "../Helpers/ValidationHelper";
 import { Widget } from "../Widgets/Widget";
 import { WX } from "../Widgets/WX";

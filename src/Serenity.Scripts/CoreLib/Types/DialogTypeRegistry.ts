@@ -1,4 +1,4 @@
-﻿import { Config, Exception, notifyError, endsWith, getType, isAssignableFrom } from "../Q";
+﻿import { Config, Exception, notifyError, endsWith, getType, isAssignableFrom } from "../q";
 import { IDialog } from "../Interfaces";
 
 export namespace DialogTypeRegistry {

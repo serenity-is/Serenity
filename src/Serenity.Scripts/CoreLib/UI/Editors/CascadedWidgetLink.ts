@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { findElementWithRelativeId, isEmptyOrNull, notifyError } from "../../Q";
+import { findElementWithRelativeId, isEmptyOrNull, notifyError } from "../../q";
 import { Widget } from "../Widgets/Widget";
 
 @Decorators.registerClass('Serenity.CascadedWidgetLink')

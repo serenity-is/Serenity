@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../Interfaces";
-import { endsWith, extend, isEmptyOrNull, isInstanceOfType, isTrimmedEmpty, replaceAll, startsWith, text, trimToNull } from "../../Q";
+import { endsWith, extend, isEmptyOrNull, isInstanceOfType, isTrimmedEmpty, replaceAll, startsWith, text, trimToNull } from "../../q";
 import { FileUploadConstraints, UploadedFile, UploadHelper, UploadInputOptions } from "../Helpers/UploadHelper";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { Widget } from "../Widgets/Widget";

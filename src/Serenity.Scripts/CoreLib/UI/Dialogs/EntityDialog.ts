@@ -1,6 +1,6 @@
 ﻿import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../Decorators";
 import { IEditDialog, IReadOnly } from "../../Interfaces";
-import { any, Authorization, confirm, endsWith, Exception, extend, format, getAttributes, getForm, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, replaceAll, safeCast, serviceCall, startsWith, text, tryGetText, validatorAbortHandler } from "../../Q";
+import { any, Authorization, confirm, endsWith, Exception, extend, format, getAttributes, getForm, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, replaceAll, safeCast, serviceCall, startsWith, text, tryGetText, validatorAbortHandler } from "../../q";
 import { EditorUtils } from "../Editors/EditorUtils";
 import { SubDialogHelper } from "../Helpers/SubDialogHelper";
 import { TabsExtensions } from "../Helpers/TabsExtensions";

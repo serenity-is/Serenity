@@ -1,7 +1,7 @@
 ﻿import { Config } from "./Config";
+import { executeEverytimeWhenShown } from "./LayoutTimer";
 import { Router } from "./Router";
 import { getNested, initializeTypes } from "./System";
-import { LazyLoadHelper } from "../UI/Helpers/LazyLoadHelper";
 
 export function autoFullHeight(element: JQuery) {
     element.css('height', '100%');
@@ -120,7 +120,7 @@ else
     initOnLoad();
 
 export function triggerLayoutOnShow(element: JQuery) {
-    LazyLoadHelper.executeEverytimeWhenShown(element, function () {
+    executeEverytimeWhenShown(element, function () {
         element.triggerHandler('layout');
     }, true);
 }

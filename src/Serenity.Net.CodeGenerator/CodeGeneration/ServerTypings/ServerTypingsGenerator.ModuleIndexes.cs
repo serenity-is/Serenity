@@ -22,12 +22,12 @@
                 foreach (var file in files.OrderBy(x => x.Filename))
                 {
                     var name = System.IO.Path.GetFileNameWithoutExtension(file.Filename);
-                    sb.AppendLine($"export * from \"./{name}\"");
+                    sb.AppendLine($"export * from \"./{files.Key}/{name}\"");
                 }
 
                 if (sb.Length > 0)
                 {
-                    AddFile(files.Key + "/" + "index.ts", module: true);
+                    AddFile(files.Key + ".ts", module: true);
                 }
             }
 

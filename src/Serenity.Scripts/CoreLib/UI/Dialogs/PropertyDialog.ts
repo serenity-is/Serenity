@@ -1,5 +1,5 @@
 ﻿import { Decorators, FormKeyAttribute } from "../../Decorators";
-import { DialogButton, endsWith, getAttributes, getForm, getInstanceType, getTypeFullName, text } from "../../Q";
+import { DialogButton, endsWith, getAttributes, getForm, getInstanceType, getTypeFullName, text } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../Widgets/PropertyGrid";
 import { TemplatedDialog } from "./TemplatedDialog";
 

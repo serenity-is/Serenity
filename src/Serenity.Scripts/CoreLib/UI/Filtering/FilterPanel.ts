@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { cast, isEmptyOrNull, text, tryGetText } from "../../Q";
+import { cast, isEmptyOrNull, text, tryGetText } from "../../q";
 import { Select2Editor } from "../Editors/Select2Editor";
 import { ReflectionOptionsSetter } from "../Widgets/ReflectionOptionsSetter";
 import { FilteringTypeRegistry, IFiltering } from "./Filtering";

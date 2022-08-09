@@ -1,5 +1,5 @@
 ﻿import { Decorators, ElementAttribute, OptionsTypeAttribute } from "../../Decorators";
-import { any, Authorization, Culture, extend, getAttributes, getTypeName, isBS3, isBS5Plus, isEmptyOrNull, startsWith, text, trimToEmpty, trimToNull, tryGetText } from "../../Q";
+import { any, Authorization, Culture, extend, getAttributes, getTypeName, isBS3, isBS5Plus, isEmptyOrNull, startsWith, text, trimToEmpty, trimToNull, tryGetText } from "../../q";
 import { EditorTypeRegistry } from "../../Types/EditorTypeRegistry";
 import { EditorUtils } from "../Editors/EditorUtils";
 import { ReflectionOptionsSetter } from "./ReflectionOptionsSetter";

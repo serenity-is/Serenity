@@ -1,4 +1,4 @@
-﻿import { deepClone, extend, notifyError, text } from "../Q";
+﻿import { deepClone, extend, notifyError, text } from "../q";
 
 export namespace Data {
     export interface GroupItemMetadataProvider {

@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { postToService, serviceCall, trimToNull } from "../../Q";
+import { postToService, serviceCall, trimToNull } from "../../q";
 import { QuickSearchInput } from "../DataGrid/QuickSearchInput";
 import { TemplatedDialog } from "../Dialogs/TemplatedDialog";
 import { PropertyGrid } from "./PropertyGrid";

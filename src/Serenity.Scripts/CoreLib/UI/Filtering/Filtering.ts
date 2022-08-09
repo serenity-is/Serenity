@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { ArgumentNullException, Config, deepClone, endsWith, Exception, extend, format, formatDate, getInstanceType, getTypeFullName, getTypeName, getTypes, isAssignableFrom, isEmptyOrNull, parseISODateTime, startsWith, text, tryGetText } from "../../Q";
+import { ArgumentNullException, Config, deepClone, endsWith, Exception, extend, format, formatDate, getInstanceType, getTypeFullName, getTypeName, getTypes, isAssignableFrom, isEmptyOrNull, parseISODateTime, startsWith, text, tryGetText } from "../../q";
 import { Criteria } from "../../Services/Criteria";
 import { EditorTypeRegistry } from "../../Types/EditorTypeRegistry";
 import { QuickFilter } from "../DataGrid/QuickFilter";

@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../Decorators";
 import { IReadOnly, IStringValue } from "../../Interfaces";
-import { endsWith, isEmptyOrNull, isTrimmedEmpty, resolveUrl, text, trimToNull } from "../../Q";
+import { endsWith, isEmptyOrNull, isTrimmedEmpty, resolveUrl, text, trimToNull } from "../../q";
 import { LazyLoadHelper } from "../Helpers/LazyLoadHelper";
 import { Widget } from "../Widgets/Widget";
 

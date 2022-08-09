@@ -1,4 +1,4 @@
-﻿import { isEmptyOrNull, isValue, text, trim } from "../../Q";
+﻿import { isEmptyOrNull, isValue, text, trim } from "../../q";
 import { PopupMenuButton } from "../Widgets/Toolbar";
 import { Widget } from "../Widgets/Widget";
 

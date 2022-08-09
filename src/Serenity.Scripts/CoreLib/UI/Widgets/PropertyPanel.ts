@@ -1,5 +1,5 @@
 ﻿import { Decorators, FormKeyAttribute } from "../../Decorators";
-import { endsWith, getAttributes, getForm, getInstanceType, getTypeFullName } from "../../Q";
+import { endsWith, getAttributes, getForm, getInstanceType, getTypeFullName } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "./PropertyGrid";
 import { TemplatedPanel } from "./TemplatedPanel";
 

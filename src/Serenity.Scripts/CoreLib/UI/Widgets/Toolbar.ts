@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../Decorators";
-import { htmlEncode, isEmptyOrNull, startsWith } from "../../Q";
+import { htmlEncode, isEmptyOrNull, startsWith } from "../../q";
 import { Widget } from "./Widget";
 
 export interface ToolButton {

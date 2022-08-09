@@ -10,7 +10,7 @@
         init(): void;
     }
 
-    export type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;        
+    export type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
 
     export interface Column<TItem = any> {
         referencedFields?: string[];

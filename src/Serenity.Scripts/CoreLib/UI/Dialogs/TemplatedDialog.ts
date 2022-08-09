@@ -1,6 +1,6 @@
 ﻿import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../Decorators";
 import { IDialog } from "../../Interfaces";
-import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, getInstanceType, isEmptyOrNull, layoutFillHeight, newBodyDiv, parseInteger, positionToastContainer, validateOptions } from "../../Q";
+import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, getInstanceType, isEmptyOrNull, layoutFillHeight, newBodyDiv, parseInteger, positionToastContainer, validateOptions } from "../../q";
 import { TemplatedWidget } from "../Widgets/TemplatedWidget";
 import { Toolbar, ToolButton } from "../Widgets/Toolbar";
 import { DialogExtensions } from "./DialogExtensions";
