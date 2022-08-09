@@ -1,7 +1,10 @@
-﻿namespace {{RootNamespace}}{{DotModule}}.Forms
+﻿{{USING "Serenity.Web"}}
+{{USING "Serenity.ComponentModel"}}
+
+namespace {{RootNamespace}}{{DotModule}}.Forms
 {
-    [{{TYPEREF "Serenity.Web.FormScript"}}("{{ModuleDot}}{{ClassName}}")]
-    [{{TYPEREF "Serenity.ComponentModel.BasedOnRow"}}(typeof({{RowClassName}}), CheckNames = true)]
+    [FormScript("{{ModuleDot}}{{ClassName}}")]
+    [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]
     public class {{ClassName}}Form
     {%{{}%}{{for x in Fields}}{{if x.Ident != IdField}}
         public {{TYPEREF x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}

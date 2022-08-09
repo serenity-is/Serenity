@@ -24,5 +24,28 @@
                 _ => null
             };
         }
+
+        public static bool IsCSKeyword(string dataType)
+        {
+            return dataType switch
+            {
+                "string" => true,
+                "bool" => true,
+                "byte" => true,
+                "char" => true,
+                "decimal" => true,
+                "double" => true,
+                "short" => true,
+                "int" => true,
+                "long" => true,
+                "object" => true,
+                "sbyte" => true,
+                "float" => true,
+                "ushort" => true,
+                "uint" => true,
+                "ulong" => true,
+                _ => false
+            };
+        }
     }
 }

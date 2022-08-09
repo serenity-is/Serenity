@@ -6,7 +6,7 @@ namespace {{RootNamespace}}{{DotModule}}.Columns
     [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]
     public class {{ClassName}}Columns
     {%{{}%}{{for x in Fields}}{{if x.ColAttributes}}
-        [{{ATTRREF x.ColAttributes}}]{{end}}{{if x.TextualField}}
+        [{{TYPEREFLIST x.ColAttributeList}}]{{end}}{{if x.TextualField}}
         public string {{x.TextualField}} { get; set; }{{else}}
         public {{TYPEREF x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}
     }

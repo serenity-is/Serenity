@@ -329,7 +329,9 @@
                 LocalUsings.Any())
             {
                 nsb.AppendLine(string.Join(Environment.NewLine,
-                    LocalUsings.OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
+                    LocalUsings
+                        .OrderBy(x => x.Contains("="))
+                        .ThenBy(x => x, StringComparer.OrdinalIgnoreCase)
                         .Select(x => "using " + x + ";")));
                 
                 nsb.AppendLine();

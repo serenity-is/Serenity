@@ -1,6 +1,6 @@
-﻿using Serenity.Web;{{if AspNetCore}}
-using Microsoft.AspNetCore.Mvc;{{else}}
-using System.Web.Mvc;{{end}}
+﻿{{USING "Serenity.Web"}}{{if AspNetCore}}
+{{USING "Microsoft.AspNetCore.Mvc"}}{{else}}
+{{USING "System.Web.Mvc"}}{{end}}
 
 namespace {{RootNamespace}}{{DotModule}}.Pages
 {

@@ -51,15 +51,15 @@ namespace Serenity.CodeGenerator
 
         private static EntityField ToEntityField(FieldInfo fieldInfo, int prefixLength)
         {
-            string flags;
+            List<string> flags;
             if (fieldInfo.IsIdentity)
-                flags = "Identity";
+                flags = new List<string> { "Serenity.Data.Mapping.Identity" };
             else if (fieldInfo.IsPrimaryKey)
-                flags = fieldInfo.IsNullable ? "PrimaryKey" : "PrimaryKey, NotNull";
+                flags = fieldInfo.IsNullable ? new List<string> { "Serenity.Data.Mapping.PrimaryKey" } : new List<string> { "Serenity.Data.Mapping.PrimaryKey", "Serenity.Data.Mapping.NotNull" };
             else if (fieldInfo.DataType == "timestamp" || fieldInfo.DataType == "rowversion")
-                flags = "Insertable(false), Updatable(false), NotNull";
+                flags = new List<string> { "Serenity.ComponentModel.Insertable(false)", "Serenity.ComponentModel.Updatable(false)", "Serenity.Data.Mapping.NotNull" };
             else if (!fieldInfo.IsNullable)
-                flags = "NotNull";
+                flags = new List<string> { "Serenity.Data.Mapping.NotNull" };
             else
                 flags = null;
 
@@ -70,11 +70,11 @@ namespace Serenity.CodeGenerator
             {
                 FieldType = fieldType,
                 DataType = dataType,
-                IsValueType = fieldType != "System.String" && fieldType != "System.IO.Stream" && fieldType != "ByteArray",
+                IsValueType = fieldType != "String" && fieldType != "Stream" && fieldType != "ByteArray",
                 TSType = FieldTypeToTS(fieldType),
                 Ident = GenerateVariableName(fieldInfo.FieldName[prefixLength..]),
                 Title = Inflector.Inflector.Titleize(fieldInfo.FieldName[prefixLength..])?.Trim(),
-                Flags = flags,
+                FlagList = flags,
                 Name = fieldInfo.FieldName,
                 Size = fieldInfo.Size == 0 ? null : fieldInfo.Size,
                 Scale = fieldInfo.Scale
@@ -211,7 +211,7 @@ namespace Serenity.CodeGenerator
                     if (baseRowFieldset.Contains(f.FieldName[prefix..]))
                     {
                         var ef = ToEntityField(f, prefix);
-                        ef.Flags = null;
+                        ef.FlagList = null;
                         model.RowBaseFields.Add(ef);
                         return false;
                     }
@@ -235,7 +235,7 @@ namespace Serenity.CodeGenerator
                 var f = ToEntityField(field, prefix);
 
                 if (f.Ident == model.IdField)
-                    f.ColAttributes = "Serenity.ComponentModel.EditLink, System.ComponentModel.DisplayName(\"Db.Shared.RecordId\"), Serenity.ComponentModel.AlignRight";
+                    f.ColAttributeList = new List<string> { "Serenity.ComponentModel.EditLink", "System.ComponentModel.DisplayName(\"Db.Shared.RecordId\")", "Serenity.ComponentModel.AlignRight" };
 
                 int i = 0;
                 string ident = f.Ident;
@@ -244,10 +244,10 @@ namespace Serenity.CodeGenerator
                 f.Ident = ident;
                 fieldByIdent[ident] = f;
 
-                if (f.Name == className && f.FieldType == "System.String")
+                if (f.Name == className && f.FieldType == "String")
                 {
                     model.NameField = f.Name;
-                    f.ColAttributes ??= " Serenity.ComponentModel.EditLink";
+                    f.ColAttributeList ??= new List<string> { "Serenity.ComponentModel.EditLink" };
                 }
 
                 var foreign = foreigns.Find((k) => k.FKColumn.Equals(field.FieldName, StringComparison.OrdinalIgnoreCase));
@@ -280,7 +280,7 @@ namespace Serenity.CodeGenerator
                             continue;
                         
                         var k = ToEntityField(frg, frgPrefix);
-                        k.Flags = null;
+                        k.FlagList = null;
                         k.Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName[frgPrefix..]))?.Trim();
                         k.Ident = JI(j.Name, k.Ident);
                         i = 0;
@@ -296,9 +296,9 @@ namespace Serenity.CodeGenerator
                         };
                         k.Expression = "j" + j.Name + ".[" + k.Name + "]";
                         atk.Add("Serenity.Data.Mapping.Expression(\"" + k.Expression + "\")");
-                        k.Attributes = string.Join(", ", atk);
+                        k.AttributeList = atk;
 
-                        if (f.TextualField == null && k.FieldType == "System.String")
+                        if (f.TextualField == null && k.FieldType == "String")
                             f.TextualField = k.Ident;
 
                         j.Fields.Add(k);
@@ -312,11 +312,11 @@ namespace Serenity.CodeGenerator
 
             if (model.NameField == null)
             {
-                var fld = model.Fields.FirstOrDefault(z => z.FieldType == "System.String");
+                var fld = model.Fields.FirstOrDefault(z => z.FieldType == "String");
                 if (fld != null)
                 {
                     model.NameField = fld.Ident;
-                    fld.ColAttributes ??= " Serenity.ComponentModel.EditLink";
+                    fld.ColAttributeList ??= new List<string> { "Serenity.ComponentModel.EditLink" };
                 }
             }
 
@@ -336,8 +336,8 @@ namespace Serenity.CodeGenerator
                 if (x.Scale > 0)
                     attrs.Add("Serenity.Data.Mapping.Scale(" + x.Scale + ")");
 
-                if (!string.IsNullOrEmpty(x.Flags))
-                    attrs.Add(x.Flags);
+                if (x.FlagList != null)
+                    attrs.AddRange(x.FlagList);
 
                 if (!string.IsNullOrEmpty(x.PKTable))
                 {
@@ -346,7 +346,7 @@ namespace Serenity.CodeGenerator
                 }
 
                 if (model.IdField == x.Ident && net5Plus)
-                    attrs.Add(" Serenity.Data.IdProperty");
+                    attrs.Add("Serenity.Data.IdProperty");
 
                 if (model.NameField == x.Ident)
                 {
@@ -358,7 +358,7 @@ namespace Serenity.CodeGenerator
                 if (x.TextualField != null)
                     attrs.Add("Serenity.Data.Mapping.TextualField(\"" + x.TextualField + "\")");
 
-                x.Attributes = string.Join(", ", attrs.ToArray());
+                x.AttributeList = attrs;
             }
 
             return model;

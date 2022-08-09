@@ -1,5 +1,6 @@
 ﻿using Scriban;
 using Scriban.Runtime;
+using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator
 {
@@ -41,26 +42,51 @@ namespace Serenity.CodeGenerator
         }
 
         delegate string TypeDelegate(string key);
+        delegate string TypeListDelegate(List<string> key);
         delegate void UsingDelegate(string key);
 
         public static string ShortTypeName(this CodeWriter cw, string fullName)
         {
-            if (fullName.IndexOf(".") < 0)
-                return fullName;
+            fullName = fullName.Trim();
 
+            // checks for nullable and normal system types
+            if (SystemTypes.IsCSKeyword(fullName) || SystemTypes.IsCSKeyword(fullName[..^1]))
+                return fullName;
+                        
+            if (fullName.IndexOf(".") < 0)
+            {
+                if (fullName == "Stream")
+                    fullName = "System.IO.Stream";
+                else
+                {
+                    var isNullable = fullName.EndsWith("?");
+
+                    var type = Type.GetType("System." + fullName.Replace("?", ""));
+
+                    if (type != null)
+                    {
+                        fullName = type.FullName;
+                        if (isNullable)
+                            fullName += "?";
+                    }
+                    else
+                        return fullName;
+                }
+            }
+            
             var typeFullName = fullName.Trim();
             
-            var functionPart = typeFullName.IndexOf("(") == -1 ? "" : typeFullName[typeFullName.IndexOf("(")..];
+            var functionPart = typeFullName.IndexOf("(") < 0 ? "" : typeFullName[typeFullName.IndexOf("(")..];
 
-            typeFullName = typeFullName.IndexOf("(") == -1 ? typeFullName : typeFullName[..typeFullName.IndexOf("(")];
+            typeFullName = typeFullName.IndexOf("(") < 0 ? typeFullName : typeFullName[..typeFullName.IndexOf("(")];
 
-            var genericPart = typeFullName.IndexOf("<") == -1 ? "" : typeFullName[typeFullName.IndexOf("<")..];
+            var genericPart = typeFullName.IndexOf("<") < 0 ? "" : typeFullName[typeFullName.IndexOf("<")..];
 
-            typeFullName = typeFullName.IndexOf("<") == -1 ? typeFullName : typeFullName[..typeFullName.IndexOf("<")];
-
-            var typeName = typeFullName[(typeFullName.LastIndexOf(".") + 1)..];
+            typeFullName = typeFullName.IndexOf("<") < 0 ? typeFullName : typeFullName[..typeFullName.IndexOf("<")];
 
             var nameSpace = typeFullName[..typeFullName.LastIndexOf(".")];
+            
+            var typeName = typeFullName[(typeFullName.LastIndexOf(".") + 1)..];
 
             return ShortTypeName(nameSpace, cw.CurrentNamespace, cw.Using) + typeName + genericPart + functionPart;
         }
@@ -113,7 +139,7 @@ namespace Serenity.CodeGenerator
                       ns == "System.Collections.Generic"
                 };
                 
-                if (model is EntityModel em)
+                if (model is EntityModel em && !string.IsNullOrEmpty(em.RootNamespace) && !string.IsNullOrEmpty(em.DotModule) && !string.IsNullOrEmpty(subNamespacePath))
                 {
                     cw.CurrentNamespace = em.RootNamespace + em.DotModule + subNamespacePath;
                 }
@@ -123,23 +149,16 @@ namespace Serenity.CodeGenerator
                 {
                     return ShortTypeName(cw, fullName);
                 }));
-                scriptObject.Import("REMOVENS", new TypeDelegate((fullName) =>
+
+                scriptObject.Import("TYPEREFLIST", new TypeListDelegate((fullNames) =>
                 {
-                    if (fullName.LastIndexOf('.') == -1) 
-                        return fullName;
+                    if (fullNames == null)
+                        return "";
                     
-                    return fullName[(fullName.LastIndexOf('.') + 1)..];
-                }));
-                scriptObject.Import("ATTRREF", new TypeDelegate((fullNames) =>
-                {
                     HashSet<string> result = new();
-                    var parts = fullNames.Split(", ");
 
-                    foreach (var fullName in parts)
+                    foreach (var fullName in fullNames)
                     {
-                        if (fullName == "Stream")
-                            result.Add(ShortTypeName(cw, "System.Stream"));
-
                         result.Add(ShortTypeName(cw, fullName));
                     }
 

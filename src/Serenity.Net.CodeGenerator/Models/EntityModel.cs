@@ -64,13 +64,19 @@
 
         public string RowBaseClassAndInterfaces
         {
+            get => string.Join(", ", RowBaseClassAndInterfaceList);
+        }
+
+        public List<string> RowBaseClassAndInterfaceList
+        {
             get
             {
-                var result = RowBaseClass ?? "Row";
+                var result = new List<string> { RowBaseClass ?? "Serenity.Data.Row" };
+
                 if (!string.IsNullOrEmpty(Identity))
-                    result += ", IIdRow";
+                    result.Add("Serenity.Data.IIdRow");
                 if (!string.IsNullOrEmpty(NameField))
-                    result += ", INameRow";
+                    result.Add("Serenity.Data.INameRow");
 
                 return result;
             }

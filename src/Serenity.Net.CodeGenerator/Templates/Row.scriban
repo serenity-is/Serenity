@@ -9,10 +9,10 @@ namespace {{RootNamespace}}{{DotModule}}
     [DisplayName("{{Title}}"), InstanceName("{{Title}}")]
     [ReadPermission("{{Permission}}")]
     [ModifyPermission("{{Permission}}")]
-    public sealed class {{RowClassName}} : {{ATTRREF RowBaseClassAndInterfaces}}
+    public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
     {
 {{-for x in Fields}}
-        [{{ATTRREF x.Attributes}}]
+        [{{TYPEREFLIST x.AttributeList}}]
         public {{TYPEREF x.PropertyType}} {{x.Ident}}
         {
             get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this];
@@ -21,7 +21,7 @@ namespace {{RootNamespace}}{{DotModule}}
 {{end}}
 {{-for j in Joins}}
 {{-for k in j.Fields}}
-        [{{ATTRREF k.Attributes}}]
+        [{{TYPEREFLIST k.AttributeList}}]
         public {{TYPEREF k.PropertyType}} {{k.Ident}}
         {
             get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this];
@@ -54,14 +54,14 @@ namespace {{RootNamespace}}{{DotModule}}
         }
 {{end}}
 
-        public class RowFields : {{ATTRREF FieldsBaseClass}}
+        public class RowFields : {{TYPEREF FieldsBaseClass}}
         {
 {{-for x in Fields}}
-            public {{REMOVENS x.FieldType}}Field {{x.Ident}};
+            public {{x.FieldType}}Field {{x.Ident}};
 {{-end}}
 {{-for j in Joins}}
 {{for k in j.Fields}}
-            public {{REMOVENS k.FieldType}}Field {{k.Ident}};
+            public {{k.FieldType}}Field {{k.Ident}};
 {{-end}}
 {{-end}}
         }
