@@ -164,13 +164,13 @@ namespace Serenity.CodeGenerator
                     endOfLine: config.EndOfLine);
             }
 
-            bool isMixedModules = generator.ModuleTypings && generator.NamespaceTypings;
-
-            if (isMixedModules)
-                writeFiles(fileSystem.Combine(projectDir, "Modules", "ServerTypings"),
+            if (generator.ModuleTypings)
+                writeFiles(fileSystem.Combine(projectDir, "Modules", "ServerTypes"),
                     x => x.Module);
 
-            writeFiles(outDir, x => !isMixedModules || !x.Module);
+            if (generator.NamespaceTypings)
+                writeFiles(fileSystem.Combine(projectDir, "Imports", "ServerTypings"),
+                    x => !x.Module);
         }
     }
 }
