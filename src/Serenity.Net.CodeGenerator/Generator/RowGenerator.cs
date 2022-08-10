@@ -336,7 +336,7 @@ namespace Serenity.CodeGenerator
                 if (x.Scale > 0)
                     attrs.Add("Serenity.Data.Mapping.Scale(" + x.Scale + ")");
 
-                if (x.FlagList != null)
+                if (x.FlagList.IsEmptyOrNull())
                     attrs.AddRange(x.FlagList);
 
                 if (!string.IsNullOrEmpty(x.PKTable))

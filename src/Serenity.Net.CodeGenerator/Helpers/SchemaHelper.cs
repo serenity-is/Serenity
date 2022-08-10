@@ -17,45 +17,45 @@ namespace Serenity.CodeGenerator
         private static readonly Dictionary<string, string> SqlTypeToFieldTypeMap = 
             new(StringComparer.OrdinalIgnoreCase)
             {
-                { "bigint", "System.Int64" },
-                { "bit", "System.Boolean" },
-                { "blob sub_type 1", "System.String" },
-                { "char", "System.String" },
-                { "character varying", "System.String" },
-                { "character", "System.String" },
-                { "date", "System.DateTime" },
-                { "datetime", "System.DateTime" },
-                { "datetime2", "System.DateTime" },
-                { "datetimeoffset", "System.DateTimeOffset" },
-                { "decimal", "System.Decimal" },
-                { "double", "System.Double" },
-                { "doubleprecision", "System.Double" },
-                { "float", "System.Double" },
-                { "guid", "System.Guid" },
-                { "int", "System.Int32" },
-                { "int4", "System.Int32" },
-                { "int8", "System.Int64" },
-                { "integer", "System.Int32" },
-                { "money", "System.Decimal" },
-                { "nchar", "System.String" },
-                { "ntext", "System.String" },
-                { "numeric", "System.Decimal" },
-                { "nvarchar", "System.String" },
-                { "nvarchar2", "System.String" },
-                { "real", "System.Single" },
+                { "bigint", "Int64" },
+                { "bit", "Boolean" },
+                { "blob sub_type 1", "String" },
+                { "char", "String" },
+                { "character varying", "String" },
+                { "character", "String" },
+                { "date", "DateTime" },
+                { "datetime", "DateTime" },
+                { "datetime2", "DateTime" },
+                { "datetimeoffset", "DateTimeOffset" },
+                { "decimal", "Decimal" },
+                { "double", "Double" },
+                { "doubleprecision", "Double" },
+                { "float", "Double" },
+                { "guid", "Guid" },
+                { "int", "Int32" },
+                { "int4", "Int32" },
+                { "int8", "Int64" },
+                { "integer", "Int32" },
+                { "money", "Decimal" },
+                { "nchar", "String" },
+                { "ntext", "String" },
+                { "numeric", "Decimal" },
+                { "nvarchar", "String" },
+                { "nvarchar2", "String" },
+                { "real", "Single" },
                 { "rowversion", "ByteArray" },
-                { "smalldatetime", "System.DateTime" },
-                { "smallint", "System.Int16" },
-                { "text", "System.String" },
+                { "smalldatetime", "DateTime" },
+                { "smallint", "Int16" },
+                { "text", "String" },
                 { "time", "TimeSpan" },
-                { "timestamp", "System.DateTime" },
-                { "timestamp without time zone", "System.DateTime" },
-                { "timestamp with time zone", "System.DateTimeOffset" },
-                { "tinyint", "System.Int16" },
-                { "uniqueidentifier", "System.Guid" },
-                { "varbinary", "System.IO.Stream" },
-                { "varchar", "System.String" },
-                { "varchar2", "System.String" }
+                { "timestamp", "DateTime" },
+                { "timestamp without time zone", "DateTime" },
+                { "timestamp with time zone", "DateTimeOffset" },
+                { "tinyint", "Int16" },
+                { "uniqueidentifier", "Guid" },
+                { "varbinary", "Stream" },
+                { "varchar", "String" },
+                { "varchar2", "String" }
             };
 
         public static string SqlTypeNameToFieldType(string sqlTypeName, int size, out string dataType)
@@ -65,7 +65,7 @@ namespace Serenity.CodeGenerator
             if (string.Equals(sqlTypeName, "varbinary", StringComparison.OrdinalIgnoreCase))
             {
                 if (size == 0 || size > 256)
-                    return "System.IO.Stream";
+                    return "Stream";
 
                 dataType = "byte[]";
                 return "ByteArray";
@@ -79,7 +79,7 @@ namespace Serenity.CodeGenerator
             else if (SqlTypeToFieldTypeMap.TryGetValue(sqlTypeName, out string fieldType))
                 return fieldType;
             else
-                return "System.IO.Stream";
+                return "Stream";
         }
     }
 }
