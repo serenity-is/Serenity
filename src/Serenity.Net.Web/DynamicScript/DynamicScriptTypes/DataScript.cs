@@ -17,9 +17,9 @@
 
         public string ScriptName => "RemoteData." + key;
 
-        string IGetScriptData.GetData()
+        public object GetScriptData()
         {
-            return getData().ToJson();
+            return getData();
         }
 
         public override string GetScript()
@@ -27,7 +27,6 @@
             var data = getData();
             return string.Format(CultureInfo.CurrentCulture, "Q.ScriptData.set({0}, {1});", ScriptName.ToSingleQuoted(), data.ToJson());
         }
-      
     }
 
     public abstract class DataScript<TData> : DataScript

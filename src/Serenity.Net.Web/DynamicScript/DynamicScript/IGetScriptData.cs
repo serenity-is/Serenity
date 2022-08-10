@@ -2,6 +2,6 @@
 {
     public interface IGetScriptData
     {
-        public string GetData();
+        public object GetScriptData();
     }
 }

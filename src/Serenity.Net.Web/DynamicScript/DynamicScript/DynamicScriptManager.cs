@@ -117,16 +117,18 @@
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            var cacheKey = (json ? "DynamicData:" : "DynamicScript:" ) + name;
+            var cacheKey = (json ? "DynamicData:" : "DynamicScript:") + name;
             if (script is ICacheSuffix ics)
                 cacheKey = cacheKey + ":" + ics.CacheSuffix;
 
-            ScriptContent factory() {
+            ScriptContent factory() 
+            {
                 byte[] content;
+                
                 if (json) {
                     if(script is IGetScriptData scriptData)
                     {
-                        content = utf8Encoding.GetBytes(scriptData.GetData()); 
+                        content = utf8Encoding.GetBytes(scriptData.GetScriptData().ToJson()); 
                     }
                     else
                     {

@@ -14,9 +14,9 @@ namespace Serenity.Web
             this.scriptManager = scriptManager;
         }
 
-        public string GetData()
+        public object GetScriptData()
         {
-            return ToJsonFast(scriptManager.GetRegisteredScripts());
+            return scriptManager.GetRegisteredScripts();
         }
 
         public override string GetScript()

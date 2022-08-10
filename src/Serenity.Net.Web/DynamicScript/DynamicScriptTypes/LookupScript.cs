@@ -6,6 +6,8 @@ namespace Serenity.Web
     {
         private readonly Dictionary<string, object> lookupParams;
 
+        public record LookupScriptData(IEnumerable Items, Dictionary<string, object> Params);
+
         protected LookupScript()
         {
             lookupParams = new Dictionary<string, object>();
@@ -13,18 +15,9 @@ namespace Serenity.Web
 
         protected abstract IEnumerable GetItems();
 
-        public string GetData()
+        public object GetScriptData()
         {
-            var result = new Dictionary<string, object>
-            {
-                { "items", GetItems() },
-            };
-            foreach (var item in LookupParams)
-            {
-                result.Add(item.Key, item.Value);
-            }
-
-            return result.ToJson();
+            return new LookupScriptData(GetItems(), LookupParams);
         }
 
         public override string GetScript()
