@@ -64,8 +64,8 @@ body:
   - type: input
     id: template-version
     attributes:
-      label: Template version
-      description: What is the current version of the template?
+      label: Serene template version
+      description: What is the current version of the serene template?
       placeholder: "1.0.0"
       value: "1.0.0"
   - type: input
