@@ -155,7 +155,7 @@ body:
     attributes:
       value: |
         # Additional information
-  - type: input
+  - type: textarea
     id: additional-information
     attributes:
       label: Additional information
