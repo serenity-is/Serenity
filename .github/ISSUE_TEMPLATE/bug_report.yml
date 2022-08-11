@@ -1,5 +1,5 @@
 name: Bug report
-about: Create a bug report to help us improve Serenity Platform
+description: Create a bug report to help us improve Serenity Platform
 title: "[Bug report]: <Short description of the bug>"
 labels: waiting-for-check
 assignees: VictorTomaili
