@@ -31,7 +31,6 @@ body:
       label: What happened?
       description: Also tell us, what did you expect to happen (included images if possible)?
       placeholder: Tell us what you see!
-      value: "A bug happened!"
     validations:
       required: true
   - type: textarea
@@ -48,7 +47,6 @@ body:
       label: How to reporoduce?
       description: Also tell us, we can reproduce?
       placeholder: Tell us how we can reproduce!
-      value: "Steps to reproduce the behavior!"
     validations:
       required: true
   - type: textarea
@@ -67,20 +65,17 @@ body:
       label: Serene template version
       description: What is the current version of the serene template?
       placeholder: "1.0.0"
-      value: "1.0.0"
   - type: input
     id: sergen-version
     attributes:
       label: Sergen version
       description: What is the current version of Sergen?
       placeholder: "1.0.0"
-      value: "1.0.0"
   - type: input
     id: serenity-versions
     attributes:
-      label: What Serenity Nuget Versions are you seeing the problem on?
-      placeholder: Serenity Versions (separated by comma)
-      value: "Serenity.Scripts 1.0.0, Serenity.Assets 1.0.0, Serenity.Net.Web 1.0.0..."
+      label: What Serenity Nuget Versions are you seeing the problem on? (separated by comma)
+      placeholder: Serenity.Scripts 1.0.0
     validations:
       required: true
   - type: input
@@ -88,36 +83,31 @@ body:
     attributes:
       label: Code editor
       description: What code editor are you using? And which version?
-      placeholder: "Visual Studio XXXX, version 1.0.0"
-      value: "Visual Studio XXXX, version 1.0.0"
+      placeholder: "Visual Studio 2022, version 1.0.0"
   - type: input
     id: operating-system
     attributes:
       label: Operating System
       description: What is the current version of the operating system?
       placeholder: "Windows 11"
-      value: "Windows 11"
   - type: input
     id: nodejs-version
     attributes:
       label: Node.js version
       description: What is the current version of Node.js?
       placeholder: "v1.0.0"
-      value: "v1.0.0"
   - type: input
     id: typescript-version
     attributes:
       label: TypeScript version
       description: What is the current version of TypeScript?
       placeholder: "1.0.0"
-      value: "1.0.0"
   - type: input
     id: database-type
     attributes:
       label: Database type and version
       description: What is the current type of database and version?
-      placeholder: "Sql Server, version 1.0.0 or MySql, version 1.0.0"
-      value: "Sql Server"
+      placeholder: "Sql Server, version 1.0.0"
   - type: markdown
     attributes:
       value: |
@@ -127,13 +117,11 @@ body:
     attributes:
       label: What device are you seeing the problem on?
       placeholder: "Desktop, Laptop, Tablet, Phone, etc."
-      value: "Desktop"
   - type: input
     id: device-os
     attributes:
       label: What operating system are you seeing the problem on?
       placeholder: "Windows, Mac, Linux, IOS, Android etc."
-      value: "Windows"
   - type: dropdown
     id: browsers
     attributes:
@@ -150,7 +138,6 @@ body:
     attributes:
       label: What version of the browser are you seeing the problem on?
       placeholder: Version number of the browser
-      value: "1.0.0"
   - type: markdown
     attributes:
       value: |
@@ -161,4 +148,3 @@ body:
       label: Additional information
       description: Additional information that may help us with the bug report.
       placeholder: "Additional information"
-      value: "Additional information"
