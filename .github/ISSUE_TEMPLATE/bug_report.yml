@@ -60,7 +60,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### Development environment details
+        # Development environment details
   - type: input
     id: template-version
     attributes:
@@ -121,7 +121,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### Client details
+        # Client details
   - type: input
     id: device
     attributes:
@@ -154,7 +154,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### Additional information
+        # Additional information
   - type: input
     id: additional-information
     attributes:
