@@ -154,11 +154,11 @@ body:
   - type: markdown
     attributes:
       value: |
-        # Additional information
+        # Extra details
   - type: textarea
     id: additional-information
     attributes:
       label: Additional information
-      description: Any additional information you would like to add.
+      description: Additional information that may help us with the bug report.
       placeholder: "Additional information"
       value: "Additional information"
