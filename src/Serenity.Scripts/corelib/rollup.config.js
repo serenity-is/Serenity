@@ -9,7 +9,7 @@ var globals = {
     'jquery': '$',
     'flatpickr': 'flatpickr',
     'tslib': 'tslib',
-    '@serenity-is/sleekgrid': 'Slick'
+    '@serenity-is/sleekgrid': 'this.Slick = this.Slick || {}'
 }
 
 var dtsOutputs = [];

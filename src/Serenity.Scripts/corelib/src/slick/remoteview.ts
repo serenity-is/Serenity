@@ -1,6 +1,7 @@
-﻿import { deepClone, extend, ListRequest, ListResponse, notifyError, PropertyItem, ServiceResponse, text } from "../q";
+﻿import { deepClone, extend, ListRequest, ListResponse, notifyError, ServiceResponse, text, tryGetText } from "../q";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
-import { Event, EventData, Grid, Group, GroupTotals, IPlugin, ItemMetadata } from "@serenity-is/sleekgrid";
+import { Event, EventData, Grid, gridDefaults, Group, GroupTotals } from "@serenity-is/sleekgrid";
+import { AggregateFormatting } from "./aggregators";
 
 export interface RemoteViewOptions {
     autoLoad?: boolean;
@@ -37,7 +38,7 @@ export type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => bo
 export type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
 export type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
 export type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
-    
+
 export interface RemoteView<TEntity> {
     onSubmit: CancellableViewCallback<TEntity>;
     onDataChanged: Event;
@@ -116,11 +117,9 @@ export class RemoteView<TEntity> {
     constructor(options: RemoteViewOptions) {
         var self = this;
 
-        var defaults = {
-            groupItemMetadataProvider: <any>null,
-            inlineFilters: false
-        }
-
+        if (gridDefaults != null && gridDefaults.groupTotalsFormatter === void 0)
+            gridDefaults.groupTotalsFormatter = AggregateFormatting.groupTotalsFormatter;
+        
         var idProperty: string;
         var items: any[] = [];
         var rows: any[] = [];

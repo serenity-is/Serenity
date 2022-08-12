@@ -1,6 +1,8 @@
-﻿import { Column, gridDefaults, GroupTotals } from "@serenity-is/sleekgrid";
+﻿import { Column, GroupTotals, NonDataRow } from "@serenity-is/sleekgrid";
+import { formatNumber, htmlEncode, tryGetText } from "../q";
 
 export {}
+
 export namespace Aggregators
 {
     export function Avg(field: string): void {
@@ -140,35 +142,60 @@ export namespace Aggregators
     }
 }
 
-export function groupTotalText<TItem = any>(totals: GroupTotals, columnDef: Column<TItem>, key: string): string {
-    var ltKey = (key.substring(0, 1).toUpperCase() + key.substring(1));
-    //@ts-ignore
-    var text = (typeof Q !== "undefined" && Q.tryGetText && Q.tryGetText(ltKey)) || ltKey;
+export namespace AggregateFormatting {
+    export function formatMarkup<TItem = any>(totals: GroupTotals, column: Column<TItem>, aggType: string): string {
+        var textKey = (aggType.substring(0, 1).toUpperCase() + aggType.substring(1));
+        var text = tryGetText(textKey);
+    
+        var value = totals[aggType][column.field];
+        var formattedValue = formatValue(column, value);
+    
+        return "<span class='aggregate agg-" + aggType + "'  title='" + text + "'>" +
+            formattedValue +
+            "</span>";
+    }
 
-    var total = totals[key][columnDef.field];
-    total = this.formatGroupTotal(total, columnDef);
-
-    return "<span class='aggregate agg-" + key + "'  title='" + text + "'>" +
-        total +
-        "</span>";
-}
-
-export function groupTotalsFormatter<TItem = any>(totals: GroupTotals, columnDef: Column<TItem>): string {
-    if (!totals || !columnDef)
-        return "";
-
-    var text: string = null;
-    var self = this;
-
-    ["sum", "avg", "min", "max", "cnt"].forEach(function (key) {
-        if (text == null && totals[key] && totals[key][columnDef.field] != null) {
-            text = self.groupTotalText(totals, columnDef, key);
-            return false;
+    export function formatValue(column: Column, value: number): string {
+        if (column.formatter != null) {
+            var item = new NonDataRow();
+            item[column.field] = value;
+            try {
+                var fmtResult = column.formatter(-1, -1, value, column, item);
+                if (fmtResult == null)
+                    return '';
+                if (typeof fmtResult === "string")
+                    return fmtResult;
+                if (typeof fmtResult.html !== "undefined")
+                    return fmtResult.html;
+                if (typeof fmtResult.text !== "undefined")
+                    return htmlEncode(fmtResult.text);
+                return "" + fmtResult;
+            }
+            catch (e) {
+            }
         }
-    });
 
-    return text || "";
+        if (typeof value === "number") {
+            var format = column.sourceItem?.displayFormat ?? "#,##0.##";
+            return htmlEncode(formatNumber(value, format));
+        }
+        else
+            return htmlEncode("" + value);
+    }
+
+    export function groupTotalsFormatter<TItem = any>(totals: GroupTotals, column: Column<TItem>): string {
+        if (!totals || !column)
+            return "";
+    
+        var text: string = null;
+    
+        ["sum", "avg", "min", "max", "cnt"].forEach(function (aggType) {
+            if (text == null && totals[aggType] && totals[aggType][column.field] != null) {
+                text = formatMarkup(totals, column, aggType);
+                return false;
+            }
+        });
+    
+        return text || "";
+    }       
 }
-
-if (gridDefaults.groupTotalsFormatter === void 0)
-    gridDefaults.groupTotalsFormatter = groupTotalsFormatter;

@@ -2157,8 +2157,11 @@ declare namespace Slick {
         function Max(field: string): void;
         function Sum(field: string): void;
     }
-    function groupTotalText<TItem = any>(totals: GroupTotals, columnDef: Column<TItem>, key: string): string;
-    function groupTotalsFormatter<TItem = any>(totals: GroupTotals, columnDef: Column<TItem>): string;
+    namespace AggregateFormatting {
+        function formatMarkup<TItem = any>(totals: GroupTotals, column: Column<TItem>, aggType: string): string;
+        function formatValue(column: Column, value: number): string;
+        function groupTotalsFormatter<TItem = any>(totals: GroupTotals, column: Column<TItem>): string;
+    }
 
     type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
 
