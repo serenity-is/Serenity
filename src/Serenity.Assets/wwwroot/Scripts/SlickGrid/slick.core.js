@@ -28,13 +28,18 @@ Slick._ = (() => {
     GlobalEditorLock: () => GlobalEditorLock,
     Group: () => Group,
     GroupTotals: () => GroupTotals,
+    H: () => H,
     NonDataRow: () => NonDataRow,
     Range: () => Range,
+    addClass: () => addClass,
     attrEncode: () => attrEncode,
+    disableSelection: () => disableSelection,
     htmlEncode: () => htmlEncode,
     keyCode: () => keyCode,
     patchEvent: () => patchEvent,
-    preClickClassName: () => preClickClassName
+    preClickClassName: () => preClickClassName,
+    removeClass: () => removeClass,
+    spacerDiv: () => spacerDiv
   });
 
   // node_modules/@serenity-is/sleekgrid/src/core/base.ts
@@ -45,16 +50,6 @@ Slick._ = (() => {
   };
   var preClickClassName = "slick-edit-preclick";
   typeof window !== "undefined" && window.Slick && (window.Slick.Map = Map);
-
-  // node_modules/@serenity-is/sleekgrid/src/core/encode.ts
-  function attrEncode(s) {
-    if (s == null)
-      return "";
-    return (s + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  }
-  function htmlEncode(s) {
-    return (s + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
 
   // node_modules/@serenity-is/sleekgrid/src/core/event.ts
   var EventData = class {
@@ -267,6 +262,64 @@ Slick._ = (() => {
       }
     }
   };
+
+  // node_modules/@serenity-is/sleekgrid/src/core/util.ts
+  function addClass(el, cls) {
+    if (cls == null || !cls.length)
+      return;
+    if (cls.indexOf(" ") >= 0) {
+      var arr = cls.split(" ").map((x) => x.trim()).filter((x) => x.length);
+      for (var a of arr)
+        el.classList.add(a);
+    } else
+      el.classList.add(cls);
+  }
+  function attrEncode(s) {
+    if (s == null)
+      return "";
+    return (s + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function disableSelection(target) {
+    if (target) {
+      target.setAttribute("unselectable", "on");
+      target.style.userSelect = "none";
+      target.addEventListener("selectstart", () => false);
+    }
+  }
+  function removeClass(el, cls) {
+    if (cls == null || !cls.length)
+      return;
+    if (cls.indexOf(" ") >= 0) {
+      var arr = cls.split(" ").map((x) => x.trim()).filter((x) => x.length);
+      for (var a of arr)
+        el.classList.remove(a);
+    } else
+      el.classList.remove(cls);
+  }
+  function H(tag, attr, ...children) {
+    var el = document.createElement(tag);
+    var k, v, c;
+    if (attr) {
+      for (k in attr) {
+        v = attr[k];
+        if (v != null && v !== false)
+          el.setAttribute(k, v === true ? "" : v);
+      }
+    }
+    if (children) {
+      for (c of children)
+        el.appendChild(c);
+    }
+    return el;
+  }
+  function htmlEncode(s) {
+    if (s == null)
+      return "";
+    return (s + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function spacerDiv(width) {
+    return H("div", { style: "display:block;height:1px;position:absolute;top:0;left:0;", width });
+  }
   return __toCommonJS(core_exports);
 })();
 ["Plugins", "Formatters", "Editors"].forEach(ns => Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns] || {})); Object.assign(Slick, Slick._); delete Slick._;

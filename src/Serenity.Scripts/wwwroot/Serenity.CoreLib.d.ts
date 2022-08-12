@@ -403,1506 +403,6 @@ declare function __classPrivateFieldIn(
  */
 declare function __createBinding(object: object, target: object, key: PropertyKey, objectKey?: PropertyKey): void;
 
-/**
- * Represents the completion of an asynchronous operation
- */
-declare interface PromiseConstructor {
-    /**
-     * Creates a new Promise.
-     * @param executor A callback used to initialize the promise. This callback is passed two arguments:
-     * a resolve callback used resolve the promise with a value or the result of another promise,
-     * and a reject callback used to reject the promise with a provided reason or error.
-     */
-    new <T>(executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void): PromiseLike<T>;
-    /**
-     * Creates a new rejected promise for the provided reason.
-     * @param reason The reason the promise was rejected.
-     * @returns A new rejected Promise.
-     */
-    reject(reason: any): PromiseLike<never>;
-    /**
-     * Creates a new rejected promise for the provided reason.
-     * @param reason The reason the promise was rejected.
-     * @returns A new rejected Promise.
-     */
-    reject<T>(reason: any): PromiseLike<T>;
-    /**
-     * Creates a new resolved promise for the provided value.
-     * @param value A promise.
-     * @returns A promise whose internal state matches the provided promise.
-     */
-    resolve<T>(value: T | PromiseLike<T>): PromiseLike<T>;
-    /**
-     * Creates a new resolved promise .
-     * @returns A resolved promise.
-     */
-    resolve(): PromiseLike<void>;
-}
-declare var Promise: PromiseConstructor;
-
-declare namespace Select2 {
-    namespace util {
-        function stripDiacritics(input: string): string;
-    }
-}
-interface Select2QueryOptions {
-    element?: JQuery;
-    term?: string;
-    page?: number;
-    context?: any;
-    callback?: (p1: Select2Result) => void;
-}
-interface Select2Item {
-    id: string;
-    text: string;
-    source?: any;
-    disabled?: boolean;
-}
-interface Select2Result {
-    results: any;
-    more: boolean;
-    context?: any;
-}
-interface Select2AjaxOptions {
-    transport?: any;
-    url?: any;
-    dataType?: string;
-    quietMillis?: number;
-    cache?: boolean;
-    jsonpCallback?: any;
-    data?: (p1: string, p2: number, p3: any) => any;
-    results?: (p1: any, p2: number, p3: any) => any;
-    params?: any;
-}
-interface Select2Options {
-    width?: any;
-    minimumInputLength?: number;
-    maximumInputLength?: number;
-    minimumResultsForSearch?: number;
-    maximumSelectionSize?: any;
-    placeHolder?: string;
-    placeHolderOption?: any;
-    separator?: string;
-    allowClear?: boolean;
-    multiple?: boolean;
-    closeOnSelect?: boolean;
-    openOnEnter?: boolean;
-    id?: (p1: any) => string;
-    matcher?: (p1: string, p2: string, p3: JQuery) => boolean;
-    sortResults?: (p1: any, p2: JQuery, p3: any) => any;
-    formatSelection?: (p1: any, p2: JQuery, p3: (p1: string) => string) => string;
-    formatResult?: (p1: any, p2: JQuery, p3: any, p4: (p1: string) => string) => string;
-    formatResultCssClass?: (p1: any) => string;
-    formatNoMatches?: (p1: string) => string;
-    formatSearching?: () => string;
-    formatInputTooShort?: (p1: string, p2: number) => string;
-    formatSelectionTooBig?: (p1: string) => string;
-    createSearchChoice?: (p1: string) => any;
-    createSearchChoicePosition?: string;
-    initSelection?: (p1: JQuery, p2: (p1: any) => void) => void;
-    tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
-    tokenSeparators?: any;
-    query?: (p1: Select2QueryOptions) => void;
-    ajax?: Select2AjaxOptions;
-    data?: any;
-    tags?: any;
-    containerCss?: any;
-    containerCssClass?: any;
-    dropdownCss?: any;
-    dropdownCssClass?: any;
-    dropdownAutoWidth?: boolean;
-    adaptContainerCssClass?: (p1: string) => string;
-    adaptDropdownCssClass?: (p1: string) => string;
-    escapeMarkup?: (p1: string) => string;
-    selectOnBlur?: boolean;
-    loadMorePadding?: number;
-    nextSearchTerm?: (p1: any, p2: string) => string;
-}
-interface Select2Data {
-    text?: string;
-}
-interface JQuery {
-    select2(options: Select2Options): JQuery;
-    select2(cmd: 'focus' | 'open'): JQuery;
-    select2(cmd: 'destroy'): void;
-    select2(cmd: 'val'): any;
-    select2(cmd: 'val', value: string | string[]): JQuery;
-    select2(cmd: 'data'): Select2Data;
-}
-
-declare namespace JQueryValidation {
-    interface ValidationOptions {
-        normalizer?: (v: string) => string;
-    }
-}
-
-declare interface JQueryStatic {
-    extend<T>(target: T, object1?: T, ...objectN: T[]): T;
-    toJSON(obj: any): string;
-}
-
-declare namespace Serenity {
-    type Constructor<T> = new (...args: any[]) => T;
-    interface PropertyItem {
-        name?: string;
-        title?: string;
-        hint?: string;
-        placeholder?: string;
-        editorType?: string;
-        editorParams?: any;
-        category?: string;
-        collapsible?: boolean;
-        collapsed?: boolean;
-        tab?: string;
-        cssClass?: string;
-        headerCssClass?: string;
-        formCssClass?: string;
-        maxLength?: number;
-        required?: boolean;
-        insertable?: boolean;
-        insertPermission?: string;
-        hideOnInsert?: boolean;
-        updatable?: boolean;
-        updatePermission?: string;
-        hideOnUpdate?: boolean;
-        readOnly?: boolean;
-        readPermission?: string;
-        oneWay?: boolean;
-        defaultValue?: any;
-        localizable?: boolean;
-        visible?: boolean;
-        allowHide?: boolean;
-        formatterType?: string;
-        formatterParams?: any;
-        displayFormat?: string;
-        alignment?: string;
-        width?: number;
-        widthSet?: boolean;
-        minWidth?: number;
-        maxWidth?: number;
-        labelWidth?: string;
-        resizable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        groupOrder?: number;
-        summaryType?: SummaryType;
-        editLink?: boolean;
-        editLinkItemType?: string;
-        editLinkIdField?: string;
-        editLinkCssClass?: string;
-        filteringType?: string;
-        filteringParams?: any;
-        filteringIdField?: string;
-        notFilterable?: boolean;
-        filterOnly?: boolean;
-        quickFilter?: boolean;
-        quickFilterParams?: any;
-        quickFilterSeparator?: boolean;
-        quickFilterCssClass?: string;
-    }
-    interface Select2Item {
-        id: string;
-        text: string;
-        source?: any;
-        disabled?: boolean;
-    }
-    interface ServiceError {
-        Code?: string;
-        Arguments?: string;
-        Message?: string;
-        Details?: string;
-        ErrorId?: string;
-    }
-    interface ServiceResponse {
-        Error?: Serenity.ServiceError;
-    }
-    interface ServiceRequest {
-    }
-    interface SaveRequest<TEntity> extends ServiceRequest {
-        EntityId?: any;
-        Entity?: TEntity;
-        Localizations?: any;
-    }
-    interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
-        Attachments?: any[];
-    }
-    interface SaveResponse extends ServiceResponse {
-        EntityId?: any;
-    }
-    interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
-        Localizations?: {
-            [key: string]: TEntity;
-        };
-    }
-    interface DeleteRequest extends ServiceRequest {
-        EntityId?: any;
-    }
-    interface DeleteResponse extends ServiceResponse {
-    }
-    interface UndeleteRequest extends ServiceRequest {
-        EntityId?: any;
-    }
-    interface UndeleteResponse extends ServiceResponse {
-    }
-    const enum ColumnSelection {
-        List = 0,
-        KeyOnly = 1,
-        Details = 2,
-        None = 3,
-        IdOnly = 4,
-        Lookup = 5
-    }
-    const enum RetrieveColumnSelection {
-        details = 0,
-        keyOnly = 1,
-        list = 2,
-        none = 3,
-        idOnly = 4,
-        lookup = 5
-    }
-    interface ListRequest extends ServiceRequest {
-        Skip?: number;
-        Take?: number;
-        Sort?: string[];
-        ContainsText?: string;
-        ContainsField?: string;
-        Criteria?: any[];
-        EqualityFilter?: any;
-        IncludeDeleted?: boolean;
-        ExcludeTotalCount?: boolean;
-        ColumnSelection?: ColumnSelection;
-        IncludeColumns?: string[];
-        ExcludeColumns?: string[];
-        ExportColumns?: string[];
-        DistinctFields?: string[];
-    }
-    interface ListResponse<TEntity> extends ServiceResponse {
-        Entities?: TEntity[];
-        Values?: any[];
-        TotalCount?: number;
-        Skip?: number;
-        Take?: number;
-    }
-    interface RetrieveRequest extends ServiceRequest {
-        EntityId?: any;
-        ColumnSelection?: RetrieveColumnSelection;
-        IncludeColumns?: string[];
-        ExcludeColumns?: string[];
-    }
-    interface RetrieveResponse<TEntity> extends ServiceResponse {
-        Entity?: TEntity;
-    }
-    interface RetrieveLocalizationRequest extends RetrieveRequest {
-    }
-    interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
-        Entities?: {
-            [key: string]: TEntity;
-        };
-    }
-    interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
-        request?: any;
-        service?: string;
-        blockUI?: boolean;
-        onError?(response: TResponse): void;
-        onSuccess?(response: TResponse): void;
-        onCleanup?(): void;
-    }
-    const enum SummaryType {
-        Disabled = -1,
-        None = 0,
-        Sum = 1,
-        Avg = 2,
-        Min = 3,
-        Max = 4
-    }
-}
-declare namespace Slick {
-    type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
-    type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
-    type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
-    type RemoteViewProcessCallback<TEntity> = (data: Serenity.ListResponse<TEntity>, view: RemoteView<TEntity>) => Serenity.ListResponse<TEntity>;
-    interface SummaryOptions {
-        aggregators: any[];
-    }
-    interface PagingOptions {
-        rowsPerPage?: number;
-        page?: number;
-    }
-    interface PagingInfo {
-        rowsPerPage: number;
-        page: number;
-        totalCount: number;
-        loading: boolean;
-        error: string;
-        dataView: RemoteView<any>;
-    }
-    interface RemoteViewOptions {
-        autoLoad?: boolean;
-        idField?: string;
-        contentType?: string;
-        dataType?: string;
-        filter?: any;
-        params?: any;
-        onSubmit?: CancellableViewCallback<any>;
-        url?: string;
-        localSort?: boolean;
-        sortBy?: any;
-        rowsPerPage?: number;
-        seekToPage?: number;
-        onProcessData?: RemoteViewProcessCallback<any>;
-        method?: string;
-        inlineFilters?: boolean;
-        groupItemMetadataProvider?: Data.GroupItemMetadataProvider;
-        onAjaxCall?: RemoteViewAjaxCallback<any>;
-        getItemMetadata?: (p1?: any, p2?: number) => any;
-        errorMsg?: string;
-    }
-    interface RemoteView<TEntity> {
-        onSubmit: CancellableViewCallback<TEntity>;
-        onDataChanged: Slick.Event;
-        onDataLoading: Slick.Event;
-        onDataLoaded: Slick.Event;
-        onPagingInfoChanged: Slick.Event;
-        onRowCountChanged: Slick.Event;
-        onRowsChanged: Slick.Event;
-        onRowsOrCountChanged: Slick.Event;
-        getPagingInfo(): PagingInfo;
-        onGroupExpanded: Event;
-        onGroupCollapsed: Event;
-        onAjaxCall: RemoteViewAjaxCallback<TEntity>;
-        onProcessData: RemoteViewProcessCallback<TEntity>;
-        addData(data: Serenity.ListResponse<TEntity>): void;
-        beginUpdate(): void;
-        endUpdate(): void;
-        deleteItem(id: any): void;
-        getItems(): TEntity[];
-        setFilter(filter: RemoteViewFilter<TEntity>): void;
-        getFilter(): RemoteViewFilter<TEntity>;
-        getFilteredItems(): any;
-        fastSort: any;
-        setItems(items: any[], newIdProperty?: boolean | string): void;
-        getIdPropertyName(): string;
-        getItemById(id: any): TEntity;
-        getGrandTotals(): any;
-        getGrouping(): GroupInfo<TEntity>[];
-        getGroups(): any[];
-        getRowById(id: any): number;
-        getRowByItem(item: any): number;
-        getRows(): any[];
-        mapItemsToRows(itemArray: any[]): any[];
-        mapRowsToIds(rowArray: number[]): any[];
-        mapIdsToRows(idAray: any[]): number[];
-        setFilterArgs(args: any): void;
-        setRefreshHints(hints: any[]): void;
-        insertItem(insertBefore: number, item: any): void;
-        sortedAddItem(item: any): void;
-        sortedUpdateItem(id: any, item: any): void;
-        syncGridSelection(grid: any, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): void;
-        syncGridCellCssStyles(grid: any, key: string): void;
-        getItemMetadata(i: number): any;
-        updateItem(id: any, item: TEntity): void;
-        addItem(item: TEntity): void;
-        getIdxById(id: any): any;
-        getItemByIdx(index: number): any;
-        setGrouping(groupInfo: Slick.GroupInfo<TEntity>[]): void;
-        collapseAllGroups(level: number): void;
-        expandAllGroups(level: number): void;
-        expandGroup(keys: any[]): void;
-        collapseGroup(keys: any[]): void;
-        setSummaryOptions(options: SummaryOptions): void;
-        setPagingOptions(options: PagingOptions): void;
-        refresh(): void;
-        populate(): void;
-        populateLock(): void;
-        populateUnlock(): void;
-        getItem(row: number): any;
-        getLength(): number;
-        rowsPerPage: number;
-        errormsg: string;
-        params: any;
-        getLocalSort(): boolean;
-        setLocalSort(value: boolean): void;
-        sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
-        reSort(): void;
-        sortBy: string[];
-        url: string;
-        method: string;
-        idField: string;
-        seekToPage?: number;
-    }
-}
-
-declare namespace Slick {
-    /***
-     * A base class that all special / non-data rows (like Group and GroupTotals) derive from.
-     */
-    class NonDataRow {
-        __nonDataRow: boolean;
-    }
-    const preClickClassName = "slick-edit-preclick";
-    function attrEncode(s: any): string;
-    function htmlEncode(s: any): string;
-    type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
-    interface IEventData {
-        readonly type?: string;
-        currentTarget?: EventTarget;
-        target?: EventTarget;
-        originalEvent?: any;
-        defaultPrevented?: boolean;
-        preventDefault?(): void;
-        stopPropagation?(): void;
-        stopImmediatePropagation?(): void;
-        isDefaultPrevented?(): boolean;
-        isImmediatePropagationStopped?(): boolean;
-        isPropagationStopped?(): boolean;
-    }
-    /***
-     * An event object for passing data to event handlers and letting them control propagation.
-     * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
-     * @class EventData
-     * @constructor
-     */
-    class EventData implements IEventData {
-        private _isPropagationStopped;
-        private _isImmediatePropagationStopped;
-        /***
-         * Stops event from propagating up the DOM tree.
-         * @method stopPropagation
-         */
-        stopPropagation(): void;
-        /***
-         * Returns whether stopPropagation was called on this event object.
-         * @method isPropagationStopped
-         * @return {Boolean}
-         */
-        isPropagationStopped(): boolean;
-        /***
-         * Prevents the rest of the handlers from being executed.
-         * @method stopImmediatePropagation
-         */
-        stopImmediatePropagation(): void;
-        /***
-         * Returns whether stopImmediatePropagation was called on this event object.\
-         * @method isImmediatePropagationStopped
-         * @return {Boolean}
-         */
-        isImmediatePropagationStopped(): boolean;
-    }
-    /***
-     * A simple publisher-subscriber implementation.
-     * @class Event
-     * @constructor
-     */
-    class Event<TArgs = any, TEventData extends IEventData = IEventData> {
-        private _handlers;
-        /***
-         * Adds an event handler to be called when the event is fired.
-         * <p>Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
-         * object the event was fired with.<p>
-         * @method subscribe
-         * @param fn {Function} Event handler.
-         */
-        subscribe(fn: Handler<TArgs, TEventData>): void;
-        /***
-         * Removes an event handler added with <code>subscribe(fn)</code>.
-         * @method unsubscribe
-         * @param fn {Function} Event handler to be removed.
-         */
-        unsubscribe(fn: Handler<TArgs, TEventData>): void;
-        /***
-         * Fires an event notifying all subscribers.
-         * @method notify
-         * @param args {Object} Additional data object to be passed to all handlers.
-         * @param e {EventData}
-         *      Optional.
-         *      An <code>EventData</code> object to be passed to all handlers.
-         *      For DOM events, an existing W3C/jQuery event object can be passed in.
-         * @param scope {Object}
-         *      Optional.
-         *      The scope ("this") within which the handler will be executed.
-         *      If not specified, the scope will be set to the <code>Event</code> instance.
-         */
-        notify(args?: any, e?: TEventData, scope?: object): any;
-        clear(): void;
-    }
-    class EventHandler<TArgs = any, TEventData extends IEventData = IEventData> {
-        private _handlers;
-        subscribe(event: Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
-        unsubscribe(event: Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
-        unsubscribeAll(): EventHandler<TArgs, TEventData>;
-    }
-    const keyCode: {
-        BACKSPACE: number;
-        DELETE: number;
-        DOWN: number;
-        END: number;
-        ENTER: number;
-        ESCAPE: number;
-        HOME: number;
-        INSERT: number;
-        LEFT: number;
-        PAGEDOWN: number;
-        PAGEUP: number;
-        RIGHT: number;
-        TAB: number;
-        UP: number;
-    };
-    function patchEvent(e: IEventData): IEventData;
-    interface EditController {
-        commitCurrentEdit(): boolean;
-        cancelCurrentEdit(): boolean;
-    }
-    /***
-     * A locking helper to track the active edit controller and ensure that only a single controller
-     * can be active at a time.  This prevents a whole class of state and validation synchronization
-     * issues.  An edit controller (such as SleekGrid) can query if an active edit is in progress
-     * and attempt a commit or cancel before proceeding.
-     * @class EditorLock
-     * @constructor
-     */
-    class EditorLock {
-        private activeEditController;
-        /***
-         * Returns true if a specified edit controller is active (has the edit lock).
-         * If the parameter is not specified, returns true if any edit controller is active.
-         * @method isActive
-         * @param editController {EditController}
-         * @return {Boolean}
-         */
-        isActive(editController?: EditController): boolean;
-        /***
-         * Sets the specified edit controller as the active edit controller (acquire edit lock).
-         * If another edit controller is already active, and exception will be thrown.
-         * @method activate
-         * @param editController {EditController} edit controller acquiring the lock
-         */
-        activate(editController: EditController): void;
-        /***
-         * Unsets the specified edit controller as the active edit controller (release edit lock).
-         * If the specified edit controller is not the active one, an exception will be thrown.
-         * @method deactivate
-         * @param editController {EditController} edit controller releasing the lock
-         */
-        deactivate(editController: EditController): void;
-        /***
-         * Attempts to commit the current edit by calling "commitCurrentEdit" method on the active edit
-         * controller and returns whether the commit attempt was successful (commit may fail due to validation
-         * errors, etc.).  Edit controller's "commitCurrentEdit" must return true if the commit has succeeded
-         * and false otherwise.  If no edit controller is active, returns true.
-         * @method commitCurrentEdit
-         * @return {Boolean}
-         */
-        commitCurrentEdit(): boolean;
-        /***
-         * Attempts to cancel the current edit by calling "cancelCurrentEdit" method on the active edit
-         * controller and returns whether the edit was successfully cancelled.  If no edit controller is
-         * active, returns true.
-         * @method cancelCurrentEdit
-         * @return {Boolean}
-         */
-        cancelCurrentEdit(): boolean;
-    }
-    /***
-     * A global singleton editor lock.
-     * @class GlobalEditorLock
-     * @static
-     * @constructor
-     */
-    const GlobalEditorLock: EditorLock;
-    /***
-     * Information about a group of rows.
-     */
-    class Group<TEntity = any> extends NonDataRow {
-        readonly __group = true;
-        /**
-         * Grouping level, starting with 0.
-         * @property level
-         * @type {Number}
-         */
-        level: number;
-        /***
-         * Number of rows in the group.
-         * @property count
-         * @type {Integer}
-         */
-        count: number;
-        /***
-         * Grouping value.
-         * @property value
-         * @type {Object}
-         */
-        value: any;
-        /***
-         * Formatted display value of the group.
-         * @property title
-         * @type {String}
-         */
-        title: string;
-        /***
-         * Whether a group is collapsed.
-         * @property collapsed
-         * @type {Boolean}
-         */
-        collapsed: boolean;
-        /***
-         * GroupTotals, if any.
-         * @property totals
-         * @type {GroupTotals}
-         */
-        totals: GroupTotals<TEntity>;
-        /**
-         * Rows that are part of the group.
-         * @property rows
-         * @type {Array}
-         */
-        rows: TEntity[];
-        /**
-         * Sub-groups that are part of the group.
-         * @property groups
-         * @type {Array}
-         */
-        groups: Group<TEntity>[];
-        /**
-         * A unique key used to identify the group.  This key can be used in calls to DataView
-         * collapseGroup() or expandGroup().
-         * @property groupingKey
-         * @type {Object}
-         */
-        groupingKey: string;
-        /***
-         * Compares two Group instances.
-         * @method equals
-         * @return {Boolean}
-         * @param group {Group} Group instance to compare to.
-         */
-        equals(group: Group): boolean;
-    }
-    /***
-     * Information about group totals.
-     * An instance of GroupTotals will be created for each totals row and passed to the aggregators
-     * so that they can store arbitrary data in it.  That data can later be accessed by group totals
-     * formatters during the display.
-     * @class GroupTotals
-     * @extends Sleek.NonDataRow
-     * @constructor
-     */
-    class GroupTotals<TEntity = any> extends NonDataRow {
-        readonly __groupTotals = true;
-        /***
-         * Parent Group.
-         * @param group
-         * @type {Group}
-         */
-        group: Group<TEntity>;
-        /***
-         * Whether the totals have been fully initialized / calculated.
-         * Will be set to false for lazy-calculated group totals.
-         * @param initialized
-         * @type {Boolean}
-         */
-        initialized: boolean;
-        /**
-         * Contains sum
-         */
-        sum?: number;
-        /**
-         * Contains avg
-         */
-        avg?: number;
-        /**
-         * Contains min
-         */
-        min?: any;
-        /**
-         * Contains max
-         */
-        max?: any;
-    }
-    class Range {
-        fromRow: number;
-        fromCell: number;
-        toRow: number;
-        toCell: number;
-        constructor(fromRow: number, fromCell: number, toRow?: number, toCell?: number);
-        /***
-         * Returns whether a range represents a single row.
-         */
-        isSingleRow(): boolean;
-        /***
-         * Returns whether a range represents a single cell.
-         */
-        isSingleCell(): boolean;
-        /***
-         * Returns whether a range contains a given cell.
-         */
-        contains(row: number, cell: number): boolean;
-        /***
-         * Returns a readable representation of a range.
-         */
-        toString(): string;
-    }
-    interface IPlugin {
-        init(grid: Grid): void;
-        pluginName?: string;
-        destroy?: () => void;
-    }
-    interface Position {
-        bottom?: number;
-        height?: number;
-        left?: number;
-        right?: number;
-        top?: number;
-        visible?: boolean;
-        width?: number;
-    }
-    interface RowCell {
-        row: number;
-        cell: number;
-    }
-    interface SelectionModel extends IPlugin {
-        setSelectedRanges(ranges: Range[]): void;
-        onSelectedRangesChanged: Event<Range[]>;
-        refreshSelections?(): void;
-    }
-    interface ViewRange {
-        top?: number;
-        bottom?: number;
-        leftPx?: number;
-        rightPx?: number;
-    }
-    interface EditorOptions {
-        grid: Grid;
-        gridPosition?: Position;
-        position?: Position;
-        column?: Column;
-        container?: HTMLElement;
-        item?: any;
-        event: IEventData;
-        commitChanges?: () => void;
-        cancelChanges?: () => void;
-    }
-    interface Editor {
-        new (options: EditorOptions): Editor;
-        destroy(): void;
-        applyValue(item: any, value: any): void;
-        focus(): void;
-        isValueChanged(): boolean;
-        keyCaptureList?: number[];
-        loadValue(value: any): void;
-        serializeValue(): any;
-        position?(pos: Position): void;
-        preClick?(): void;
-        hide?(): void;
-        show?(): void;
-        suppressClearOnEdit?: boolean;
-        validate?(): ValidationResult;
-    }
-    interface EditorFactory {
-        getEditor(column: Column): Editor;
-    }
-    interface EditCommand {
-        row: number;
-        cell: number;
-        editor: Editor;
-        serializedValue: any;
-        prevSerializedValue: any;
-        execute: () => void;
-        undo: () => void;
-    }
-    interface ValidationResult {
-        valid: boolean;
-        msg?: string;
-    }
-    interface FormatterFactory<TItem = any> {
-        getFormatter(column: Column<TItem>): ColumnFormatter<TItem>;
-    }
-    interface FormatterResult {
-        addClass?: string;
-        addAttrs?: {
-            [key: string]: string;
-        };
-        html?: string;
-        text?: string;
-        toolTip?: string;
-    }
-    type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>) => string | FormatterResult;
-    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
-    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
-    type CellStylesHash = {
-        [row: number]: {
-            [cell: number]: string;
-        };
-    };
-    function defaultFormatter(_r: number, _c: number, value: any): string;
-    interface ArgsGrid {
-        grid?: Grid;
-    }
-    interface ArgsColumn extends ArgsGrid {
-        column: Column;
-    }
-    interface ArgsColumnNode extends ArgsColumn {
-        node: HTMLElement;
-    }
-    type ArgsSortCol = {
-        sortCol: Column;
-        sortAsc: boolean;
-    };
-    interface ArgsSort extends ArgsGrid {
-        multiColumnSort: boolean;
-        sortAsc?: boolean;
-        sortCol?: Column;
-        sortCols?: ArgsSortCol[];
-    }
-    interface ArgsSelectedRowsChange extends ArgsGrid {
-        rows: number[];
-        changedSelectedRows?: number[];
-        changedUnselectedRows?: number[];
-        previousSelectedRows?: number[];
-        caller: any;
-    }
-    interface ArgsScroll extends ArgsGrid {
-        scrollLeft: number;
-        scrollTop: number;
-    }
-    interface ArgsCssStyle extends ArgsGrid {
-        key: string;
-        hash: CellStylesHash;
-    }
-    interface ArgsCell extends ArgsGrid {
-        row: number;
-        cell: number;
-    }
-    interface ArgsCellChange extends ArgsCell {
-        item: any;
-    }
-    interface ArgsCellEdit extends ArgsCellChange {
-        column: Column;
-    }
-    interface ArgsAddNewRow extends ArgsColumn {
-        item: any;
-    }
-    interface ArgsEditorDestroy extends ArgsGrid {
-        editor: Editor;
-    }
-    interface ArgsValidationError extends ArgsCell {
-        editor: Editor;
-        column: Column;
-        cellNode: HTMLElement;
-        validationResults: ValidationResult;
-    }
-    interface GridOptions<TItem = any> {
-        addNewRowCssClass?: string;
-        alwaysAllowHorizontalScroll?: boolean;
-        alwaysShowVerticalScroll?: boolean;
-        asyncEditorLoadDelay?: number;
-        asyncEditorLoading?: boolean;
-        asyncPostCleanupDelay?: number;
-        asyncPostRenderDelay?: number;
-        autoEdit?: boolean;
-        autoHeight?: boolean;
-        cellFlashingCssClass?: string;
-        cellHighlightCssClass?: string;
-        columns?: Column<TItem>[];
-        createPreHeaderPanel?: boolean;
-        dataItemColumnValueExtractor?: (item: TItem, column: Column<TItem>) => void;
-        defaultColumnWidth?: number;
-        defaultFormatter?: ColumnFormatter<TItem>;
-        editable?: boolean;
-        editCommandHandler?: (item: TItem, column: Column<TItem>, command: EditCommand) => void;
-        editorFactory?: EditorFactory;
-        editorLock?: EditorLock;
-        enableAddRow?: boolean;
-        enableAsyncPostRender?: boolean;
-        enableAsyncPostRenderCleanup?: boolean;
-        enableCellNavigation?: boolean;
-        enableCellRangeSelection?: boolean;
-        enableColumnReorder?: boolean;
-        enableRowReordering?: boolean;
-        enableTabKeyNavigation?: boolean;
-        enableTextSelectionOnCells?: boolean;
-        explicitInitialization?: boolean;
-        footerRowHeight?: number;
-        forceFitColumns?: boolean;
-        forceSyncScrolling?: boolean;
-        formatterFactory?: FormatterFactory;
-        frozenBottom?: boolean;
-        frozenColumn?: number;
-        frozenRow?: number;
-        fullWidthRows?: boolean;
-        groupingPanel?: boolean;
-        groupingPanelHeight?: number;
-        headerRowHeight?: number;
-        leaveSpaceForNewRows?: boolean;
-        minBuffer?: number;
-        multiColumnSort?: boolean;
-        multiSelect?: boolean;
-        preHeaderPanelHeight?: number;
-        renderAllCells?: boolean;
-        rowHeight?: number;
-        selectedCellCssClass?: string;
-        showCellSelection?: boolean;
-        showColumnHeader?: boolean;
-        showFooterRow?: boolean;
-        showGroupingPanel?: boolean;
-        showHeaderRow?: boolean;
-        showPreHeaderPanel?: boolean;
-        showTopPanel?: boolean;
-        slickCompat?: boolean;
-        suppressActiveCellChangeOnEdit?: boolean;
-        syncColumnCellResize?: boolean;
-        topPanelHeight?: number;
-        useLegacyUI?: boolean;
-        viewportClass?: string;
-    }
-    const gridDefaults: GridOptions;
-    class Grid<TItem = any> {
-        private _absoluteColMinWidth;
-        private _activeCanvasNode;
-        private _activeCell;
-        private _activeCellNode;
-        private _activePosX;
-        private _activeRow;
-        private _activeViewportNode;
-        private _actualFrozenRow;
-        private _canvasWidth;
-        private _canvasWidthL;
-        private _canvasWidthR;
-        private _cellCssClasses;
-        private _cellHeightDiff;
-        private _cellWidthDiff;
-        private _colById;
-        private _colDefaults;
-        private _colLeft;
-        private _colRight;
-        private _cols;
-        private _columnCssRulesL;
-        private _columnCssRulesR;
-        private _currentEditor;
-        private _data;
-        private _editController;
-        private _frozenCols;
-        private _footerRowH;
-        private _frozenRowsHeight;
-        private _groupingPanelH;
-        private _hasFrozenRows;
-        private _headerColumnWidthDiff;
-        private _headerRowH;
-        private _headersWidthL;
-        private _headersWidthR;
-        private _hEditorLoader;
-        private _hPostRender;
-        private _hPostRenderCleanup;
-        private _hRender;
-        private _ignoreScrollUntil;
-        private _initColById;
-        private _initCols;
-        private _initialized;
-        private _jumpinessCoefficient;
-        private _numberOfPages;
-        private _numVisibleRows;
-        private _options;
-        private _page;
-        private _pageHeight;
-        private _pageOffset;
-        private _pagingActive;
-        private _pagingIsLastPage;
-        private _paneBottomH;
-        private _paneTopH;
-        private _plugins;
-        private _postProcessCleanupQueue;
-        private _postProcessedRows;
-        private _postProcessFromRow;
-        private _postProcessGroupId;
-        private _postProcessToRow;
-        private _realScrollHeight;
-        private _rowsCache;
-        private _rtl;
-        private _rtlE;
-        private _rtlS;
-        private _scrollDims;
-        private _scrollLeft;
-        private _scrollLeftPrev;
-        private _scrolLLeftRendered;
-        private _scrollTop;
-        private _scrollTopPrev;
-        private _scrollTopRendered;
-        private _selectedRows;
-        private _selectionModel;
-        private _serializedEditorValue;
-        private _sortColumns;
-        private _styleNode;
-        private _stylesheet;
-        private _tabbingDirection;
-        private _topPanelH;
-        private _uid;
-        private _viewportH;
-        private _viewportHasHScroll;
-        private _viewportHasVScroll;
-        private _viewportTopH;
-        private _viewportW;
-        private _virtualHeight;
-        private _vScrollDir;
-        private _boundAncestorScroll;
-        private _canvasBottomL;
-        private _canvasBottomR;
-        private _canvasTopL;
-        private _canvasTopR;
-        private _container;
-        private _focusSink1;
-        private _focusSink2;
-        private _groupingPanel;
-        private _headerColsL;
-        private _headerColsR;
-        private _headerRowColsL;
-        private _headerRowColsR;
-        private _headerRowSpacerL;
-        private _headerRowSpacerR;
-        private _footerRowColsL;
-        private _footerRowColsR;
-        private _footerRowSpacerL;
-        private _footerRowSpacerR;
-        private _paneBottomL;
-        private _paneBottomR;
-        private _paneHeaderL;
-        private _paneHeaderR;
-        private _paneTopL;
-        private _paneTopR;
-        private _scrollContainerX;
-        private _scrollContainerY;
-        private _topPanelL;
-        private _topPanelR;
-        private _viewportBottomL;
-        private _viewportBottomR;
-        private _viewportTopL;
-        private _viewportTopR;
-        readonly onActiveCellChanged: Event<ArgsCell, IEventData>;
-        readonly onActiveCellPositionChanged: Event<ArgsGrid, IEventData>;
-        readonly onAddNewRow: Event<ArgsAddNewRow, IEventData>;
-        readonly onBeforeCellEditorDestroy: Event<ArgsEditorDestroy, IEventData>;
-        readonly onBeforeDestroy: Event<ArgsGrid, IEventData>;
-        readonly onBeforeEditCell: Event<ArgsCellEdit, IEventData>;
-        readonly onBeforeFooterRowCellDestroy: Event<ArgsColumnNode, IEventData>;
-        readonly onBeforeHeaderCellDestroy: Event<ArgsColumnNode, IEventData>;
-        readonly onBeforeHeaderRowCellDestroy: Event<ArgsColumnNode, IEventData>;
-        readonly onCellChange: Event<ArgsCellChange, IEventData>;
-        readonly onCellCssStylesChanged: Event<ArgsCssStyle, IEventData>;
-        readonly onClick: Event<ArgsCell, JQueryMouseEventObject>;
-        readonly onColumnsReordered: Event<ArgsGrid, IEventData>;
-        readonly onColumnsResized: Event<ArgsGrid, IEventData>;
-        readonly onContextMenu: Event<ArgsGrid, JQueryEventObject>;
-        readonly onDblClick: Event<ArgsCell, JQueryMouseEventObject>;
-        readonly onDrag: Event<ArgsGrid, JQueryEventObject>;
-        readonly onDragEnd: Event<ArgsGrid, JQueryEventObject>;
-        readonly onDragInit: Event<ArgsGrid, JQueryEventObject>;
-        readonly onDragStart: Event<ArgsGrid, JQueryEventObject>;
-        readonly onFooterRowCellRendered: Event<ArgsColumnNode, IEventData>;
-        readonly onHeaderCellRendered: Event<ArgsColumnNode, IEventData>;
-        readonly onHeaderClick: Event<ArgsColumn, IEventData>;
-        readonly onHeaderContextMenu: Event<ArgsColumn, IEventData>;
-        readonly onHeaderMouseEnter: Event<ArgsColumn, MouseEvent>;
-        readonly onHeaderMouseLeave: Event<ArgsColumn, MouseEvent>;
-        readonly onHeaderRowCellRendered: Event<ArgsColumnNode, IEventData>;
-        readonly onKeyDown: Event<ArgsCell, JQueryKeyEventObject>;
-        readonly onMouseEnter: Event<ArgsGrid, MouseEvent>;
-        readonly onMouseLeave: Event<ArgsGrid, MouseEvent>;
-        readonly onScroll: Event<ArgsScroll, IEventData>;
-        readonly onSelectedRowsChanged: Event<ArgsSelectedRowsChange, IEventData>;
-        readonly onSort: Event<ArgsSort, IEventData>;
-        readonly onValidationError: Event<ArgsValidationError, IEventData>;
-        readonly onViewportChanged: Event<ArgsGrid, IEventData>;
-        constructor(container: JQuery | HTMLElement, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
-        init(): void;
-        private hasFrozenColumns;
-        registerPlugin(plugin: IPlugin): void;
-        unregisterPlugin(plugin: IPlugin): void;
-        getPluginByName(name: string): IPlugin;
-        setSelectionModel(model: SelectionModel): void;
-        getScrollBarDimensions(): {
-            width: number;
-            height: number;
-        };
-        getDisplayedScrollbarDimensions(): {
-            width: number;
-            height: number;
-        };
-        getAbsoluteColumnMinWidth(): number;
-        getSelectionModel(): SelectionModel;
-        getCanvasNode(): HTMLDivElement;
-        getCanvases(): JQuery;
-        getActiveCanvasNode(e?: IEventData): HTMLElement;
-        setActiveCanvasNode(e?: IEventData): void;
-        getViewportNode(): HTMLDivElement;
-        private getViewports;
-        getActiveViewportNode(e?: IEventData): HTMLElement;
-        setActiveViewportNode(e?: IEventData): void;
-        private calcHeaderWidths;
-        private getCanvasWidth;
-        private updateCanvasWidth;
-        private bindAncestorScrollEvents;
-        private unbindAncestorScrollEvents;
-        updateColumnHeader(columnId: string, title?: string, toolTip?: string): void;
-        getHeader(): HTMLDivElement;
-        getHeaderColumn(columnIdOrIdx: string | number): HTMLDivElement;
-        getGroupingPanel(): HTMLDivElement;
-        getPreHeaderPanel(): HTMLDivElement;
-        getHeaderRow(): HTMLDivElement;
-        getHeaderRowColumn(columnId: string): HTMLElement;
-        getFooterRow(): HTMLDivElement;
-        getFooterRowColumn(columnId: string): HTMLElement;
-        private createColumnFooters;
-        private formatGroupTotal;
-        private groupTotalText;
-        private groupTotalsFormatter;
-        private createColumnHeaders;
-        private setupColumnSort;
-        private setupColumnReorder;
-        private setupColumnResize;
-        private getVBoxDelta;
-        private adjustFrozenRowOption;
-        private setPaneVisibility;
-        private setOverflow;
-        private setScroller;
-        private measureCellPaddingAndBorder;
-        private createCssRules;
-        private getColumnCssRules;
-        private removeCssRules;
-        destroy(): void;
-        private trigger;
-        getEditorLock(): EditorLock;
-        getEditController(): EditController;
-        getColumnIndex(id: string): number;
-        getInitialColumnIndex(id: string): number;
-        autosizeColumns(): void;
-        private applyColumnHeaderWidths;
-        private applyColumnWidths;
-        setSortColumn(columnId: string, ascending: boolean): void;
-        setSortColumns(cols: ColumnSort[]): void;
-        getSortColumns(): ColumnSort[];
-        private handleSelectedRangesChanged;
-        getColumns(): Column<TItem>[];
-        getInitialColumns(): Column<TItem>[];
-        private updateViewColLeftRight;
-        private setInitialCols;
-        setColumns(columns: Column<TItem>[]): void;
-        getOptions(): GridOptions<TItem>;
-        setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void;
-        private validateAndEnforceOptions;
-        private viewOnRowCountChanged;
-        private viewOnRowsChanged;
-        private viewOnDataChanged;
-        private bindToData;
-        private unbindFromData;
-        setData(newData: any, scrollToTop?: boolean): void;
-        getData(): any;
-        getDataLength(): number;
-        private getDataLengthIncludingAddNew;
-        getDataItem(i: number): TItem;
-        getTopPanel(): HTMLDivElement;
-        setTopPanelVisibility(visible: boolean): void;
-        setColumnHeaderVisibility(visible: boolean, animate?: boolean): void;
-        setFooterRowVisibility(visible: boolean): void;
-        setGroupingPanelVisibility(visible: boolean): void;
-        setPreHeaderPanelVisibility(visible: boolean): void;
-        setHeaderRowVisibility(visible: boolean): void;
-        getContainerNode(): HTMLElement;
-        getUID(): string;
-        private getRowTop;
-        private getRowFromPosition;
-        private scrollTo;
-        getFormatter(row: number, column: Column<TItem>): ColumnFormatter<TItem>;
-        private getEditor;
-        private getDataItemValueForColumn;
-        private appendRowHtml;
-        private appendCellHtml;
-        private cleanupRows;
-        invalidate(): void;
-        invalidateAllRows(): void;
-        private queuePostProcessedRowForCleanup;
-        private queuePostProcessedCellForCleanup;
-        private removeRowFromCache;
-        invalidateRows(rows: number[]): void;
-        invalidateRow(row: number): void;
-        applyFormatResultToCellNode(fmtResult: FormatterResult | string, cellNode: HTMLElement): void;
-        updateCell(row: number, cell: number): void;
-        updateRow(row: number): void;
-        private getViewportHeight;
-        private getViewportWidth;
-        resizeCanvas: () => void;
-        updatePagingStatusFromView(pagingInfo: {
-            pageSize: number;
-            pageNum: number;
-            totalPages: number;
-        }): void;
-        private updateRowCount;
-        /**
-         * @param viewportTop optional viewport top
-         * @param viewportLeft optional viewport left
-         * @returns viewport range
-         */
-        getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
-        getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
-        getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
-        private ensureCellNodesInRowsCache;
-        private cleanUpCells;
-        private cleanUpAndRenderCells;
-        private renderRows;
-        private startPostProcessing;
-        private startPostProcessingCleanup;
-        private invalidatePostProcessingResults;
-        private updateRowPositions;
-        private updateFooterTotals;
-        private render;
-        private handleHeaderRowScroll;
-        private handleFooterRowScroll;
-        private handleMouseWheel;
-        private handleScroll;
-        private _handleScroll;
-        private asyncPostProcessRows;
-        private asyncPostProcessCleanupRows;
-        private updateCellCssStylesOnRenderedRows;
-        addCellCssStyles(key: string, hash: CellStylesHash): void;
-        removeCellCssStyles(key: string): void;
-        setCellCssStyles(key: string, hash: CellStylesHash): void;
-        getCellCssStyles(key: string): CellStylesHash;
-        flashCell(row: number, cell: number, speed?: number): void;
-        private handleDragInit;
-        private handleDragStart;
-        private handleDrag;
-        private handleDragEnd;
-        private handleKeyDown;
-        private handleClick;
-        private handleContextMenu;
-        private handleDblClick;
-        private handleHeaderMouseEnter;
-        private handleHeaderMouseLeave;
-        private handleHeaderContextMenu;
-        private handleHeaderClick;
-        private handleMouseEnter;
-        private handleMouseLeave;
-        private cellExists;
-        getCellFromPoint(x: number, y: number): {
-            row: number;
-            cell: number;
-        };
-        getCellFromNode(cellNode: Element): number;
-        getColumnFromNode(cellNode: Element): Column<TItem>;
-        getRowFromNode(rowNode: Element): number;
-        private getFrozenRowOffset;
-        getCellFromEvent(e: any): {
-            row: number;
-            cell: number;
-        };
-        getCellNodeBox(row: number, cell: number): {
-            top: number;
-            right: number;
-            bottom: number;
-            left: number;
-        };
-        resetActiveCell(): void;
-        focus(): void;
-        private setFocus;
-        scrollCellIntoView(row: number, cell: number, doPaging?: boolean): void;
-        scrollColumnIntoView(cell: number): void;
-        internalScrollColumnIntoView(left: number, right: number): void;
-        private setActiveCellInternal;
-        clearTextSelection(): void;
-        private isCellPotentiallyEditable;
-        private makeActiveCellNormal;
-        editActiveCell(editor?: Editor): void;
-        private makeActiveCellEditable;
-        private commitEditAndSetFocus;
-        private cancelEditAndSetFocus;
-        private absBox;
-        private getActiveCellPosition;
-        getGridPosition(): Position;
-        private handleActiveCellPositionChange;
-        getCellEditor(): Editor;
-        getActiveCell(): RowCell;
-        getActiveCellNode(): HTMLElement;
-        scrollActiveCellIntoView(): void;
-        scrollRowIntoView(row: number, doPaging?: boolean): void;
-        scrollRowToTop(row: number): void;
-        private scrollPage;
-        navigatePageDown(): void;
-        navigatePageUp(): void;
-        navigateTop(): void;
-        navigateBottom(): void;
-        navigateToRow(row: number): boolean;
-        getColspan(row: number, cell: number): number;
-        private findFirstFocusableCell;
-        private findLastFocusableCell;
-        private gotoRight;
-        private gotoLeft;
-        private gotoDown;
-        private gotoUp;
-        private gotoNext;
-        private gotoPrev;
-        private gotoRowStart;
-        private gotoRowEnd;
-        navigateRight(): boolean;
-        navigateLeft(): boolean;
-        navigateDown(): boolean;
-        navigateUp(): boolean;
-        navigateNext(): boolean;
-        navigatePrev(): boolean;
-        navigateRowStart(): boolean;
-        navigateRowEnd(): boolean;
-        /**
-         * @param {string} dir Navigation direction.
-         * @return {boolean} Whether navigation resulted in a change of active cell.
-         */
-        navigate(dir: string): boolean;
-        getCellNode(row: number, cell: number): HTMLElement;
-        setActiveCell(row: number, cell: number): void;
-        private canCellBeActive;
-        canCellBeSelected(row: number, cell: number): any;
-        gotoCell(row: number, cell: number, forceEdit?: boolean): void;
-        commitCurrentEdit(): boolean;
-        private cancelCurrentEdit;
-        private rowsToRanges;
-        getSelectedRows(): number[];
-        setSelectedRows(rows: number[]): void;
-    }
-    interface Column<TItem = any> {
-        asyncPostRender?: AsyncPostRender<TItem>;
-        asyncPostRenderCleanup?: AsyncPostCleanup<TItem>;
-        behavior?: any;
-        cannotTriggerInsert?: boolean;
-        cssClass?: string;
-        defaultSortAsc?: boolean;
-        editor?: Editor;
-        field: string;
-        frozen?: boolean;
-        focusable?: boolean;
-        footerCssClass?: string;
-        formatter?: ColumnFormatter<TItem>;
-        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
-        headerCssClass?: string;
-        id?: string;
-        maxWidth?: any;
-        minWidth?: number;
-        name?: string;
-        nameIsHtml?: boolean;
-        previousWidth?: number;
-        referencedFields?: string[];
-        rerenderOnResize?: boolean;
-        resizable?: boolean;
-        selectable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        toolTip?: string;
-        validator?: (value: any) => ValidationResult;
-        visible?: boolean;
-        width?: number;
-    }
-    const columnDefaults: Partial<Column>;
-    interface ColumnMetadata<TItem = any> {
-        colspan: number | '*';
-        formatter?: ColumnFormatter<TItem>;
-    }
-    interface ColumnSort {
-        columnId: string;
-        sortAsc?: boolean;
-    }
-    interface ItemMetadata<TItem = any> {
-        columns?: {
-            [key: string]: ColumnMetadata<TItem>;
-        };
-        formatter?: ColumnFormatter<TItem>;
-    }
-}
-
-declare namespace Slick {
-    interface AutoTooltipsOptions {
-        enableForHeaderCells?: boolean;
-        enableForCells?: boolean;
-        maxToolTipLength?: number;
-    }
-    class AutoTooltips {
-        constructor(options: AutoTooltipsOptions);
-        init(): void;
-    }
-    type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
-    interface Column<TItem = any> {
-        referencedFields?: string[];
-        format?: Format<TItem>;
-    }
-    interface FormatterContext<TItem = any> {
-        addAttrs?: {
-            [key: string]: string;
-        };
-        addClass?: string;
-        cell?: number;
-        column?: Column<TItem>;
-        grid?: Grid<TItem>;
-        item?: TItem;
-        row?: number;
-        toolTip?: string;
-        value?: any;
-    }
-    interface Formatter {
-        format(ctx: FormatterContext): string;
-    }
-    interface GroupItemMetadataProvider extends IPlugin {
-        getGroupRowMetadata(item: any): any;
-        getTotalsRowMetadata(item: any): any;
-    }
-    interface GroupInfo<TItem> {
-        getter?: any;
-        formatter?: (p1: Group<TItem>) => string;
-        comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
-        aggregators?: any[];
-        aggregateCollapsed?: boolean;
-        lazyTotalsCalculation?: boolean;
-    }
-    interface PagerOptions {
-        view?: any;
-        showRowsPerPage?: boolean;
-        rowsPerPage?: number;
-        rowsPerPageOptions?: number[];
-        onChangePage?: (newPage: number) => void;
-        onRowsPerPageChange?: (n: number) => void;
-    }
-    interface RowMoveManagerOptions {
-        cancelEditOnDrag: boolean;
-    }
-    class RowMoveManager implements IPlugin {
-        constructor(options: RowMoveManagerOptions);
-        init(): void;
-        onBeforeMoveRows: Slick.Event;
-        onMoveRows: Slick.Event;
-    }
-    class RowSelectionModel implements SelectionModel {
-        init(grid: Grid): void;
-        destroy?: () => void;
-        setSelectedRanges(ranges: Range[]): void;
-        onSelectedRangesChanged: Slick.Event<Range[]>;
-        refreshSelections?(): void;
-    }
-    namespace Data {
-        class GroupItemMetadataProvider implements GroupItemMetadataProvider, IPlugin {
-            constructor();
-            init(grid: Grid): void;
-            getGroupRowMetadata(item: any): Slick.ItemMetadata;
-            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
-        }
-    }
-}
-
-declare interface JQuery {
-    getWidget<TWidget>(widgetType: {
-        new (...args: any[]): TWidget;
-    }): TWidget;
-    tryGetWidget<TWidget>(widgetType: {
-        new (...args: any[]): TWidget;
-    }): TWidget;
-    flexHeightOnly(flexY?: number): JQuery;
-    flexWidthOnly(flexX?: number): JQuery;
-    flexWidthHeight(flexX: number, flexY: number): JQuery;
-    flexX(flexX: number): JQuery;
-    flexY(flexY: number): JQuery;
-}
-
 
 declare namespace Q {
     type Grouping<TItem> = {
@@ -2095,8 +595,110 @@ declare namespace Q {
     function warning(message: string, options?: AlertOptions): void;
     function closePanel(element: JQuery, e?: JQueryEventObject): void;
 
+    interface ServiceError {
+        Code?: string;
+        Arguments?: string;
+        Message?: string;
+        Details?: string;
+        ErrorId?: string;
+    }
+    interface ServiceResponse {
+        Error?: ServiceError;
+    }
+    interface ServiceRequest {
+    }
+    interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
+        request?: any;
+        service?: string;
+        blockUI?: boolean;
+        onError?(response: TResponse): void;
+        onSuccess?(response: TResponse): void;
+        onCleanup?(): void;
+    }
+    interface SaveRequest<TEntity> extends ServiceRequest {
+        EntityId?: any;
+        Entity?: TEntity;
+        Localizations?: any;
+    }
+    interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
+        Attachments?: any[];
+    }
+    interface SaveResponse extends ServiceResponse {
+        EntityId?: any;
+    }
+    interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
+        Localizations?: {
+            [key: string]: TEntity;
+        };
+    }
+    interface DeleteRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+    interface DeleteResponse extends ServiceResponse {
+    }
+    interface UndeleteRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+    interface UndeleteResponse extends ServiceResponse {
+    }
+    enum ColumnSelection {
+        List = 0,
+        KeyOnly = 1,
+        Details = 2,
+        None = 3,
+        IdOnly = 4,
+        Lookup = 5
+    }
+    enum RetrieveColumnSelection {
+        details = 0,
+        keyOnly = 1,
+        list = 2,
+        none = 3,
+        idOnly = 4,
+        lookup = 5
+    }
+    interface ListRequest extends ServiceRequest {
+        Skip?: number;
+        Take?: number;
+        Sort?: string[];
+        ContainsText?: string;
+        ContainsField?: string;
+        Criteria?: any[];
+        EqualityFilter?: any;
+        IncludeDeleted?: boolean;
+        ExcludeTotalCount?: boolean;
+        ColumnSelection?: ColumnSelection;
+        IncludeColumns?: string[];
+        ExcludeColumns?: string[];
+        ExportColumns?: string[];
+        DistinctFields?: string[];
+    }
+    interface ListResponse<TEntity> extends ServiceResponse {
+        Entities?: TEntity[];
+        Values?: any[];
+        TotalCount?: number;
+        Skip?: number;
+        Take?: number;
+    }
+    interface RetrieveRequest extends ServiceRequest {
+        EntityId?: any;
+        ColumnSelection?: RetrieveColumnSelection;
+        IncludeColumns?: string[];
+        ExcludeColumns?: string[];
+    }
+    interface RetrieveResponse<TEntity> extends ServiceResponse {
+        Entity?: TEntity;
+    }
+    interface RetrieveLocalizationRequest extends RetrieveRequest {
+    }
+    interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
+        Entities?: {
+            [key: string]: TEntity;
+        };
+    }
+
     namespace ErrorHandling {
-        function showServiceError(error: Serenity.ServiceError): void;
+        function showServiceError(error: ServiceError): void;
         function runtimeErrorHandler(message: string, filename?: string, lineno?: number, colno?: number, error?: Error): void;
     }
 
@@ -2245,6 +847,72 @@ declare namespace Q {
     function notifyError(message: string, title?: string, options?: ToastrOptions): void;
     function positionToastContainer(create: boolean, options?: ToastrOptions): void;
 
+    interface PropertyItem {
+        name?: string;
+        title?: string;
+        hint?: string;
+        placeholder?: string;
+        editorType?: string;
+        editorParams?: any;
+        category?: string;
+        collapsible?: boolean;
+        collapsed?: boolean;
+        tab?: string;
+        cssClass?: string;
+        headerCssClass?: string;
+        formCssClass?: string;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        insertPermission?: string;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        updatePermission?: string;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        readPermission?: string;
+        oneWay?: boolean;
+        defaultValue?: any;
+        localizable?: boolean;
+        visible?: boolean;
+        allowHide?: boolean;
+        formatterType?: string;
+        formatterParams?: any;
+        displayFormat?: string;
+        alignment?: string;
+        width?: number;
+        widthSet?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        labelWidth?: string;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        groupOrder?: number;
+        summaryType?: SummaryType;
+        editLink?: boolean;
+        editLinkItemType?: string;
+        editLinkIdField?: string;
+        editLinkCssClass?: string;
+        filteringType?: string;
+        filteringParams?: any;
+        filteringIdField?: string;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
+        quickFilterCssClass?: string;
+    }
+    enum SummaryType {
+        Disabled = -1,
+        None = 0,
+        Sum = 1,
+        Avg = 2,
+        Min = 3,
+        Max = 4
+    }
+
     interface HandleRouteEventArgs {
         handled: boolean;
         route: string;
@@ -2278,18 +946,18 @@ declare namespace Q {
     function getLookupAsync<TItem>(key: string): PromiseLike<Q.Lookup<TItem>>;
     function reloadLookup(key: string): void;
     function reloadLookupAsync(key: string): PromiseLike<any>;
-    function getColumns(key: string): Serenity.PropertyItem[];
-    function getColumnsAsync(key: string): PromiseLike<Serenity.PropertyItem[]>;
-    function getForm(key: string): Serenity.PropertyItem[];
-    function getFormAsync(key: string): PromiseLike<Serenity.PropertyItem[]>;
+    function getColumns(key: string): PropertyItem[];
+    function getColumnsAsync(key: string): PromiseLike<PropertyItem[]>;
+    function getForm(key: string): PropertyItem[];
+    function getFormAsync(key: string): PromiseLike<PropertyItem[]>;
     function getTemplate(key: string): string;
     function getTemplateAsync(key: string): PromiseLike<string>;
     function canLoadScriptData(name: string): boolean;
 
     function getCookie(name: string): any;
-    function serviceCall<TResponse>(options: Serenity.ServiceOptions<TResponse>): JQueryXHR;
-    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: Serenity.ServiceOptions<TResponse>): JQueryXHR;
-    function setEquality(request: Serenity.ListRequest, field: string, value: any): void;
+    function serviceCall<TResponse>(options: ServiceOptions<TResponse>): JQueryXHR;
+    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): JQueryXHR;
+    function setEquality(request: ListRequest, field: string, value: any): void;
     interface PostToServiceOptions {
         url?: string;
         service?: string;
@@ -2347,7 +1015,7 @@ declare namespace Q {
     function cast(instance: any, type: Type): any;
     function getBaseType(type: any): any;
     function getAttributes(type: any, attrType: any, inherit?: boolean): any[];
-    const enum MemberType {
+    enum MemberType {
         field = 4,
         property = 16
     }
@@ -2405,7 +1073,1409 @@ declare namespace Q {
         function paren(c: any[]): any[];
         function and(c1: any[], c2: any[], ...rest: any[][]): any[];
         function or(c1: any[], c2: any[], ...rest: any[][]): any[];
-        const enum Operator {
+        enum Operator {
+            paren = "()",
+            not = "not",
+            isNull = "is null",
+            isNotNull = "is not null",
+            exists = "exists",
+            and = "and",
+            or = "or",
+            xor = "xor",
+            eq = "=",
+            ne = "!=",
+            gt = ">",
+            ge = ">=",
+            lt = "<",
+            le = "<=",
+            in = "in",
+            notIn = "not in",
+            like = "like",
+            notLike = "not like"
+        }
+    }
+}
+declare namespace Q {
+    interface Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        textFormatter: (item: TItem) => string;
+    }
+}
+
+declare namespace Slick {
+    /***
+     * A base class that all special / non-data rows (like Group and GroupTotals) derive from.
+     */
+    class NonDataRow {
+        __nonDataRow: boolean;
+    }
+    const preClickClassName = "slick-edit-preclick";
+
+    type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
+    interface IEventData {
+        readonly type?: string;
+        currentTarget?: EventTarget;
+        target?: EventTarget;
+        originalEvent?: any;
+        defaultPrevented?: boolean;
+        preventDefault?(): void;
+        stopPropagation?(): void;
+        stopImmediatePropagation?(): void;
+        isDefaultPrevented?(): boolean;
+        isImmediatePropagationStopped?(): boolean;
+        isPropagationStopped?(): boolean;
+    }
+    /***
+     * An event object for passing data to event handlers and letting them control propagation.
+     * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
+     * @class EventData
+     * @constructor
+     */
+    class EventData implements IEventData {
+        private _isPropagationStopped;
+        private _isImmediatePropagationStopped;
+        /***
+         * Stops event from propagating up the DOM tree.
+         * @method stopPropagation
+         */
+        stopPropagation(): void;
+        /***
+         * Returns whether stopPropagation was called on this event object.
+         * @method isPropagationStopped
+         * @return {Boolean}
+         */
+        isPropagationStopped(): boolean;
+        /***
+         * Prevents the rest of the handlers from being executed.
+         * @method stopImmediatePropagation
+         */
+        stopImmediatePropagation(): void;
+        /***
+         * Returns whether stopImmediatePropagation was called on this event object.\
+         * @method isImmediatePropagationStopped
+         * @return {Boolean}
+         */
+        isImmediatePropagationStopped(): boolean;
+    }
+    /***
+     * A simple publisher-subscriber implementation.
+     * @class Event
+     * @constructor
+     */
+    class Event<TArgs = any, TEventData extends IEventData = IEventData> {
+        private _handlers;
+        /***
+         * Adds an event handler to be called when the event is fired.
+         * <p> Slick.Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
+         * object the event was fired with.<p>
+         * @method subscribe
+         * @param fn {Function} Event handler.
+         */
+        subscribe(fn: Handler<TArgs, TEventData>): void;
+        /***
+         * Removes an event handler added with <code>subscribe(fn)</code>.
+         * @method unsubscribe
+         * @param fn {Function} Event handler to be removed.
+         */
+        unsubscribe(fn: Handler<TArgs, TEventData>): void;
+        /***
+         * Fires an event notifying all subscribers.
+         * @method notify
+         * @param args {Object} Additional data object to be passed to all handlers.
+         * @param e {EventData}
+         *      Optional.
+         *      An <code>EventData</code> object to be passed to all handlers.
+         *      For DOM events, an existing W3C/jQuery event object can be passed in.
+         * @param scope {Object}
+         *      Optional.
+         *      The scope ("this") within which the handler will be executed.
+         *      If not specified, the scope will be set to the <code> Slick.Event</code> instance.
+         */
+        notify(args?: any, e?: TEventData, scope?: object): any;
+        clear(): void;
+    }
+    class EventHandler<TArgs = any, TEventData extends IEventData = IEventData> {
+        private _handlers;
+        subscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
+        unsubscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
+        unsubscribeAll(): EventHandler<TArgs, TEventData>;
+    }
+    const keyCode: {
+        BACKSPACE: number;
+        DELETE: number;
+        DOWN: number;
+        END: number;
+        ENTER: number;
+        ESCAPE: number;
+        HOME: number;
+        INSERT: number;
+        LEFT: number;
+        PAGEDOWN: number;
+        PAGEUP: number;
+        RIGHT: number;
+        TAB: number;
+        UP: number;
+    };
+    function patchEvent(e: IEventData): IEventData;
+
+    interface EditController {
+        commitCurrentEdit(): boolean;
+        cancelCurrentEdit(): boolean;
+    }
+    /***
+     * A locking helper to track the active edit controller and ensure that only a single controller
+     * can be active at a time.  This prevents a whole class of state and validation synchronization
+     * issues.  An edit controller (such as SleekGrid) can query if an active edit is in progress
+     * and attempt a commit or cancel before proceeding.
+     * @class EditorLock
+     * @constructor
+     */
+    class EditorLock {
+        private activeEditController;
+        /***
+         * Returns true if a specified edit controller is active (has the edit lock).
+         * If the parameter is not specified, returns true if any edit controller is active.
+         * @method isActive
+         * @param editController {EditController}
+         * @return {Boolean}
+         */
+        isActive(editController?: EditController): boolean;
+        /***
+         * Sets the specified edit controller as the active edit controller (acquire edit lock).
+         * If another edit controller is already active, and exception will be thrown.
+         * @method activate
+         * @param editController {EditController} edit controller acquiring the lock
+         */
+        activate(editController: EditController): void;
+        /***
+         * Unsets the specified edit controller as the active edit controller (release edit lock).
+         * If the specified edit controller is not the active one, an exception will be thrown.
+         * @method deactivate
+         * @param editController {EditController} edit controller releasing the lock
+         */
+        deactivate(editController: EditController): void;
+        /***
+         * Attempts to commit the current edit by calling "commitCurrentEdit" method on the active edit
+         * controller and returns whether the commit attempt was successful (commit may fail due to validation
+         * errors, etc.).  Edit controller's "commitCurrentEdit" must return true if the commit has succeeded
+         * and false otherwise.  If no edit controller is active, returns true.
+         * @method commitCurrentEdit
+         * @return {Boolean}
+         */
+        commitCurrentEdit(): boolean;
+        /***
+         * Attempts to cancel the current edit by calling "cancelCurrentEdit" method on the active edit
+         * controller and returns whether the edit was successfully cancelled.  If no edit controller is
+         * active, returns true.
+         * @method cancelCurrentEdit
+         * @return {Boolean}
+         */
+        cancelCurrentEdit(): boolean;
+    }
+    /***
+     * A global singleton editor lock.
+     * @class GlobalEditorLock
+     * @static
+     * @constructor
+     */
+    const GlobalEditorLock: EditorLock;
+
+    /***
+     * Information about a group of rows.
+     */
+    class Group<TEntity = any> extends NonDataRow {
+        readonly __group = true;
+        /**
+         * Grouping level, starting with 0.
+         * @property level
+         * @type {Number}
+         */
+        level: number;
+        /***
+         * Number of rows in the group.
+         * @property count
+         * @type {Number}
+         */
+        count: number;
+        /***
+         * Grouping value.
+         * @property value
+         * @type {Object}
+         */
+        value: any;
+        /***
+         * Formatted display value of the group.
+         * @property title
+         * @type {String}
+         */
+        title: string;
+        /***
+         * Whether a group is collapsed.
+         * @property collapsed
+         * @type {Boolean}
+         */
+        collapsed: boolean;
+        /***
+         * GroupTotals, if any.
+         * @property totals
+         * @type {GroupTotals}
+         */
+        totals: GroupTotals<TEntity>;
+        /**
+         * Rows that are part of the group.
+         * @property rows
+         * @type {Array}
+         */
+        rows: TEntity[];
+        /**
+         * Sub-groups that are part of the group.
+         * @property groups
+         * @type {Array}
+         */
+        groups: Group<TEntity>[];
+        /**
+         * A unique key used to identify the group.  This key can be used in calls to DataView
+         * collapseGroup() or expandGroup().
+         * @property groupingKey
+         * @type {Object}
+         */
+        groupingKey: string;
+        /***
+         * Compares two Group instances.
+         * @method equals
+         * @return {Boolean}
+         * @param group {Group} Group instance to compare to.
+         */
+        equals(group: Group): boolean;
+    }
+    /***
+     * Information about group totals.
+     * An instance of GroupTotals will be created for each totals row and passed to the aggregators
+     * so that they can store arbitrary data in it.  That data can later be accessed by group totals
+     * formatters during the display.
+     * @class GroupTotals
+     * @extends NonDataRow
+     * @constructor
+     */
+    class GroupTotals<TEntity = any> extends NonDataRow {
+        readonly __groupTotals = true;
+        /***
+         * Parent Group.
+         * @param group
+         * @type {Group}
+         */
+        group: Group<TEntity>;
+        /***
+         * Whether the totals have been fully initialized / calculated.
+         * Will be set to false for lazy-calculated group totals.
+         * @param initialized
+         * @type {Boolean}
+         */
+        initialized: boolean;
+        /**
+         * Contains sum
+         */
+        sum?: number;
+        /**
+         * Contains avg
+         */
+        avg?: number;
+        /**
+         * Contains min
+         */
+        min?: any;
+        /**
+         * Contains max
+         */
+        max?: any;
+    }
+
+    class Range {
+        fromRow: number;
+        fromCell: number;
+        toRow: number;
+        toCell: number;
+        constructor(fromRow: number, fromCell: number, toRow?: number, toCell?: number);
+        /***
+         * Returns whether a range represents a single row.
+         */
+        isSingleRow(): boolean;
+        /***
+         * Returns whether a range represents a single cell.
+         */
+        isSingleCell(): boolean;
+        /***
+         * Returns whether a range contains a given cell.
+         */
+        contains(row: number, cell: number): boolean;
+        /***
+         * Returns a readable representation of a range.
+         */
+        toString(): string;
+    }
+
+    function addClass(el: Element, cls: string): void;
+    function attrEncode(s: any): string;
+    function disableSelection(target: HTMLElement): void;
+    function removeClass(el: Element, cls: string): void;
+    function H<K extends keyof HTMLElementTagNameMap>(tag: K, attr?: {
+        [key: string]: (string | boolean);
+    }, ...children: Node[]): HTMLElementTagNameMap[K];
+    function htmlEncode(s: any): string;
+    function spacerDiv(width: string): HTMLDivElement;
+
+    interface IPlugin {
+        init(grid: Grid): void;
+        pluginName?: string;
+        destroy?: () => void;
+    }
+    interface Position {
+        bottom?: number;
+        height?: number;
+        left?: number;
+        right?: number;
+        top?: number;
+        visible?: boolean;
+        width?: number;
+    }
+    interface ViewportInfo {
+        height: number;
+        width: number;
+        hasVScroll: boolean;
+        hasHScroll: boolean;
+        headerHeight: number;
+        groupingPanelHeight: number;
+        virtualHeight: number;
+        realScrollHeight: number;
+        topPanelHeight: number;
+        headerRowHeight: number;
+        footerRowHeight: number;
+        numVisibleRows: number;
+    }
+    interface RowCell {
+        row: number;
+        cell: number;
+    }
+    interface SelectionModel extends IPlugin {
+        setSelectedRanges(ranges: Range[]): void;
+        onSelectedRangesChanged: Slick.Event<Range[]>;
+        refreshSelections?(): void;
+    }
+    interface ViewRange {
+        top?: number;
+        bottom?: number;
+        leftPx?: number;
+        rightPx?: number;
+    }
+
+    interface EditorOptions {
+        grid: Grid;
+        gridPosition?: Position;
+        position?: Position;
+        column?: Column;
+        columnMetaData?: ColumnMetadata<any>;
+        container?: HTMLElement;
+        item?: any;
+        event: IEventData;
+        commitChanges?: () => void;
+        cancelChanges?: () => void;
+    }
+    interface Editor {
+        new (options: EditorOptions): Editor;
+        destroy(): void;
+        applyValue(item: any, value: any): void;
+        focus(): void;
+        isValueChanged(): boolean;
+        keyCaptureList?: number[];
+        loadValue(value: any): void;
+        serializeValue(): any;
+        position?(pos: Position): void;
+        preClick?(): void;
+        hide?(): void;
+        show?(): void;
+        suppressClearOnEdit?: boolean;
+        validate?(): ValidationResult;
+    }
+    interface EditorFactory {
+        getEditor(column: Column): Editor;
+    }
+    interface EditCommand {
+        row: number;
+        cell: number;
+        editor: Editor;
+        serializedValue: any;
+        prevSerializedValue: any;
+        execute: () => void;
+        undo: () => void;
+    }
+    interface ValidationResult {
+        valid: boolean;
+        msg?: string;
+    }
+
+    interface FormatterFactory<TItem = any> {
+        getFormatter(column: Column<TItem>): ColumnFormatter<TItem>;
+    }
+    interface FormatterResult {
+        addClass?: string;
+        addAttrs?: {
+            [key: string]: string;
+        };
+        html?: string;
+        text?: string;
+        toolTip?: string;
+    }
+    type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>) => string | FormatterResult;
+    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
+    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
+    type CellStylesHash = {
+        [row: number]: {
+            [cell: number]: string;
+        };
+    };
+    function defaultFormatter(_r: number, _c: number, value: any): string;
+    function applyFormatterResultToCellNode(fmtResult: FormatterResult | string, cellNode: HTMLElement): void;
+
+    interface ArgsGrid {
+        grid?: Grid;
+    }
+    interface ArgsColumn extends ArgsGrid {
+        column: Column;
+    }
+    interface ArgsColumnNode extends ArgsColumn {
+        node: HTMLElement;
+    }
+    type ArgsSortCol = {
+        sortCol: Column;
+        sortAsc: boolean;
+    };
+    interface ArgsSort extends ArgsGrid {
+        multiColumnSort: boolean;
+        sortAsc?: boolean;
+        sortCol?: Column;
+        sortCols?: ArgsSortCol[];
+    }
+    interface ArgsSelectedRowsChange extends ArgsGrid {
+        rows: number[];
+        changedSelectedRows?: number[];
+        changedUnselectedRows?: number[];
+        previousSelectedRows?: number[];
+        caller: any;
+    }
+    interface ArgsScroll extends ArgsGrid {
+        scrollLeft: number;
+        scrollTop: number;
+    }
+    interface ArgsCssStyle extends ArgsGrid {
+        key: string;
+        hash: CellStylesHash;
+    }
+    interface ArgsCell extends ArgsGrid {
+        row: number;
+        cell: number;
+    }
+    interface ArgsCellChange extends ArgsCell {
+        item: any;
+    }
+    interface ArgsCellEdit extends ArgsCellChange {
+        column: Column;
+    }
+    interface ArgsAddNewRow extends ArgsColumn {
+        item: any;
+    }
+    interface ArgsEditorDestroy extends ArgsGrid {
+        editor: Editor;
+    }
+    interface ArgsValidationError extends ArgsCell {
+        editor: Editor;
+        column: Column;
+        cellNode: HTMLElement;
+        validationResults: ValidationResult;
+    }
+
+    interface LayoutHost {
+        bindAncestorScroll(el: HTMLElement): void;
+        cleanUpAndRenderCells(range: ViewRange): void;
+        getAvailableWidth(): number;
+        getCellFromPoint(x: number, y: number): RowCell;
+        getColumnCssRules(idx: number): {
+            right: any;
+            left: any;
+        };
+        getColumns(): Column[];
+        getContainerNode(): HTMLElement;
+        getDataLength(): number;
+        getOptions(): GridOptions;
+        getRowFromNode(rowNode: HTMLElement): number;
+        getScrollDims(): {
+            width: number;
+            height: number;
+        };
+        getScrollLeft(): number;
+        getScrollTop(): number;
+        getViewportInfo(): ViewportInfo;
+        renderRows(range: ViewRange): void;
+    }
+    interface LayoutEngine {
+        appendCachedRow(row: number, rowNodeL: HTMLElement, rowNodeR: HTMLElement): void;
+        afterHeaderColumnDrag(): void;
+        afterSetOptions(args: GridOptions): void;
+        applyColumnWidths(): void;
+        beforeCleanupAndRenderCells(rendered: ViewRange): void;
+        afterRenderRows(rendered: ViewRange): void;
+        bindAncestorScrollEvents(): void;
+        calcCanvasWidth(): number;
+        updateHeadersWidth(): void;
+        isFrozenRow(row: number): boolean;
+        destroy(): void;
+        getCanvasNodeFor(cell: number, row: number): HTMLElement;
+        getCanvasNodes(): HTMLElement[];
+        getCanvasWidth(): number;
+        getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number;
+        getFooterRowCols(): HTMLElement[];
+        getFooterRowColsFor(cell: number): HTMLElement;
+        getFooterRowColumn(cell: number): HTMLElement;
+        getFrozenCols(): number;
+        getFrozenRowOffset(row: number): number;
+        getFrozenRows(): number;
+        getHeaderCols(): HTMLElement[];
+        getHeaderColsFor(cell: number): HTMLElement;
+        getHeaderColumn(cell: number): HTMLElement;
+        getHeaderRowCols(): HTMLElement[];
+        getHeaderRowColsFor(cell: number): HTMLElement;
+        getHeaderRowColumn(cell: number): HTMLElement;
+        getScrollCanvasY(): HTMLElement;
+        getScrollContainerX(): HTMLElement;
+        getScrollContainerY(): HTMLElement;
+        getTopPanelFor(arg0: number): HTMLElement;
+        getTopPanelNodes(): HTMLElement[];
+        getViewportNodeFor(cell: number, row: number): HTMLElement;
+        getViewportNodes(): HTMLElement[];
+        handleScrollH(): void;
+        handleScrollV(): void;
+        init(host: LayoutHost): void;
+        layoutName: string;
+        realScrollHeightChange(): void;
+        /** this might be called before init, chicken egg situation */
+        reorderViewColumns(viewCols: Column[], options?: GridOptions): Column[];
+        resizeCanvas(): void;
+        setPaneVisibility(): void;
+        setScroller(): void;
+        setOverflow(): void;
+        updateCanvasWidth(): boolean;
+    }
+
+    interface GridOptions<TItem = any> {
+        addNewRowCssClass?: string;
+        alwaysAllowHorizontalScroll?: boolean;
+        alwaysShowVerticalScroll?: boolean;
+        asyncEditorLoadDelay?: number;
+        asyncEditorLoading?: boolean;
+        asyncPostCleanupDelay?: number;
+        asyncPostRenderDelay?: number;
+        autoEdit?: boolean;
+        autoHeight?: boolean;
+        cellFlashingCssClass?: string;
+        cellHighlightCssClass?: string;
+        columns?: Column<TItem>[];
+        createPreHeaderPanel?: boolean;
+        dataItemColumnValueExtractor?: (item: TItem, column: Column<TItem>) => void;
+        defaultColumnWidth?: number;
+        defaultFormatter?: ColumnFormatter<TItem>;
+        editable?: boolean;
+        editCommandHandler?: (item: TItem, column: Column<TItem>, command: EditCommand) => void;
+        editorFactory?: EditorFactory;
+        editorLock?: EditorLock;
+        enableAddRow?: boolean;
+        enableAsyncPostRender?: boolean;
+        enableAsyncPostRenderCleanup?: boolean;
+        enableCellNavigation?: boolean;
+        enableCellRangeSelection?: boolean;
+        enableColumnReorder?: boolean;
+        enableRowReordering?: boolean;
+        enableTabKeyNavigation?: boolean;
+        enableTextSelectionOnCells?: boolean;
+        explicitInitialization?: boolean;
+        footerRowHeight?: number;
+        forceFitColumns?: boolean;
+        forceSyncScrolling?: boolean;
+        forceSyncScrollInterval?: number;
+        formatterFactory?: FormatterFactory;
+        frozenBottom?: boolean;
+        frozenColumns?: number;
+        frozenRows?: number;
+        fullWidthRows?: boolean;
+        groupingPanel?: boolean;
+        groupingPanelHeight?: number;
+        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
+        headerRowHeight?: number;
+        jQuery?: JQueryStatic;
+        leaveSpaceForNewRows?: boolean;
+        layoutEngine?: LayoutEngine;
+        minBuffer?: number;
+        multiColumnSort?: boolean;
+        multiSelect?: boolean;
+        preHeaderPanelHeight?: number;
+        renderAllCells?: boolean;
+        rowHeight?: number;
+        rtl?: boolean;
+        selectedCellCssClass?: string;
+        showCellSelection?: boolean;
+        showColumnHeader?: boolean;
+        showFooterRow?: boolean;
+        showGroupingPanel?: boolean;
+        showHeaderRow?: boolean;
+        showPreHeaderPanel?: boolean;
+        showTopPanel?: boolean;
+        slickCompat?: boolean;
+        suppressActiveCellChangeOnEdit?: boolean;
+        syncColumnCellResize?: boolean;
+        topPanelHeight?: number;
+        useLegacyUI?: boolean;
+        viewportClass?: string;
+    }
+    const gridDefaults: GridOptions;
+
+    class Grid<TItem = any> {
+        private _absoluteColMinWidth;
+        private _activeCanvasNode;
+        private _activeCell;
+        private _activeCellNode;
+        private _activePosX;
+        private _activeRow;
+        private _activeViewportNode;
+        private _cellCssClasses;
+        private _cellHeightDiff;
+        private _cellWidthDiff;
+        private _cellNavigator;
+        private _colById;
+        private _colDefaults;
+        private _colLeft;
+        private _colRight;
+        private _cols;
+        private _columnCssRulesL;
+        private _columnCssRulesR;
+        private _currentEditor;
+        private _data;
+        private _editController;
+        private _headerColumnWidthDiff;
+        private _hEditorLoader;
+        private _hPostRender;
+        private _hPostRenderCleanup;
+        private _hRender;
+        private _ignoreScrollUntil;
+        private _initColById;
+        private _initCols;
+        private _initialized;
+        private _jQuery;
+        private _jumpinessCoefficient;
+        private _lastRenderTime;
+        private _layout;
+        private _numberOfPages;
+        private _options;
+        private _page;
+        private _pageHeight;
+        private _pageOffset;
+        private _pagingActive;
+        private _pagingIsLastPage;
+        private _plugins;
+        private _postProcessCleanupQueue;
+        private _postProcessedRows;
+        private _postProcessFromRow;
+        private _postProcessGroupId;
+        private _postProcessToRow;
+        private _rowsCache;
+        private _scrollDims;
+        private _scrollLeft;
+        private _scrollLeftPrev;
+        private _scrollLeftRendered;
+        private _scrollTop;
+        private _scrollTopPrev;
+        private _scrollTopRendered;
+        private _selectedRows;
+        private _selectionModel;
+        private _serializedEditorValue;
+        private _sortColumns;
+        private _styleNode;
+        private _stylesheet;
+        private _tabbingDirection;
+        private _uid;
+        private _viewportInfo;
+        private _vScrollDir;
+        private _boundAncestorScroll;
+        private _container;
+        private _focusSink1;
+        private _focusSink2;
+        private _groupingPanel;
+        readonly onActiveCellChanged: Slick.Event<ArgsCell, IEventData>;
+        readonly onActiveCellPositionChanged: Slick.Event<ArgsGrid, IEventData>;
+        readonly onAddNewRow: Slick.Event<ArgsAddNewRow, IEventData>;
+        readonly onBeforeCellEditorDestroy: Slick.Event<ArgsEditorDestroy, IEventData>;
+        readonly onBeforeDestroy: Slick.Event<ArgsGrid, IEventData>;
+        readonly onBeforeEditCell: Slick.Event<ArgsCellEdit, IEventData>;
+        readonly onBeforeFooterRowCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
+        readonly onBeforeHeaderCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
+        readonly onBeforeHeaderRowCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
+        readonly onCellChange: Slick.Event<ArgsCellChange, IEventData>;
+        readonly onCellCssStylesChanged: Slick.Event<ArgsCssStyle, IEventData>;
+        readonly onClick: Slick.Event<ArgsCell, JQueryMouseEventObject>;
+        readonly onColumnsReordered: Slick.Event<ArgsGrid, IEventData>;
+        readonly onColumnsResized: Slick.Event<ArgsGrid, IEventData>;
+        readonly onCompositeEditorChange: Slick.Event<ArgsGrid, IEventData>;
+        readonly onContextMenu: Slick.Event<ArgsGrid, JQueryEventObject>;
+        readonly onDblClick: Slick.Event<ArgsCell, JQueryMouseEventObject>;
+        readonly onDrag: Slick.Event<ArgsGrid, JQueryEventObject>;
+        readonly onDragEnd: Slick.Event<ArgsGrid, JQueryEventObject>;
+        readonly onDragInit: Slick.Event<ArgsGrid, JQueryEventObject>;
+        readonly onDragStart: Slick.Event<ArgsGrid, JQueryEventObject>;
+        readonly onFooterRowCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
+        readonly onHeaderCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
+        readonly onHeaderClick: Slick.Event<ArgsColumn, IEventData>;
+        readonly onHeaderContextMenu: Slick.Event<ArgsColumn, IEventData>;
+        readonly onHeaderMouseEnter: Slick.Event<ArgsColumn, MouseEvent>;
+        readonly onHeaderMouseLeave: Slick.Event<ArgsColumn, MouseEvent>;
+        readonly onHeaderRowCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
+        readonly onKeyDown: Slick.Event<ArgsCell, JQueryKeyEventObject>;
+        readonly onMouseEnter: Slick.Event<ArgsGrid, MouseEvent>;
+        readonly onMouseLeave: Slick.Event<ArgsGrid, MouseEvent>;
+        readonly onScroll: Slick.Event<ArgsScroll, IEventData>;
+        readonly onSelectedRowsChanged: Slick.Event<ArgsSelectedRowsChange, IEventData>;
+        readonly onSort: Slick.Event<ArgsSort, IEventData>;
+        readonly onValidationError: Slick.Event<ArgsValidationError, IEventData>;
+        readonly onViewportChanged: Slick.Event<ArgsGrid, IEventData>;
+        constructor(container: JQuery | HTMLElement, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
+        private bindAncestorScroll;
+        init(): void;
+        private hasFrozenColumns;
+        private hasFrozenRows;
+        registerPlugin(plugin: IPlugin): void;
+        unregisterPlugin(plugin: IPlugin): void;
+        getPluginByName(name: string): IPlugin;
+        setSelectionModel(model: SelectionModel): void;
+        getScrollBarDimensions(): {
+            width: number;
+            height: number;
+        };
+        getDisplayedScrollbarDimensions(): {
+            width: number;
+            height: number;
+        };
+        getAbsoluteColumnMinWidth(): number;
+        getSelectionModel(): SelectionModel;
+        private colIdOrIdxToCell;
+        getCanvasNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+        getCanvases(): JQuery | HTMLElement[];
+        getActiveCanvasNode(e?: IEventData): HTMLElement;
+        setActiveCanvasNode(e?: IEventData): void;
+        getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+        private getViewports;
+        getActiveViewportNode(e?: IEventData): HTMLElement;
+        setActiveViewportNode(e?: IEventData): void;
+        private getAvailableWidth;
+        private updateCanvasWidth;
+        private unbindAncestorScrollEvents;
+        updateColumnHeader(columnId: string, title?: string, toolTip?: string): void;
+        getHeader(): HTMLElement;
+        getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
+        getGroupingPanel(): HTMLElement;
+        getPreHeaderPanel(): HTMLElement;
+        getHeaderRow(): HTMLElement;
+        getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
+        getFooterRow(): HTMLElement;
+        getFooterRowColumn(columnIdOrIdx: string | number): HTMLElement;
+        private createColumnFooters;
+        private formatGroupTotal;
+        private createColumnHeaders;
+        private setupColumnSort;
+        private setupColumnReorder;
+        private setupColumnResize;
+        private setOverflow;
+        private measureCellPaddingAndBorder;
+        private createCssRules;
+        private getColumnCssRules;
+        private removeCssRules;
+        destroy(): void;
+        private trigger;
+        getEditorLock(): EditorLock;
+        getEditController(): EditController;
+        getColumnIndex(id: string): number;
+        getInitialColumnIndex(id: string): number;
+        autosizeColumns(): void;
+        private applyColumnHeaderWidths;
+        setSortColumn(columnId: string, ascending: boolean): void;
+        setSortColumns(cols: ColumnSort[]): void;
+        getSortColumns(): ColumnSort[];
+        private handleSelectedRangesChanged;
+        getColumns(): Column<TItem>[];
+        getInitialColumns(): Column<TItem>[];
+        private updateViewColLeftRight;
+        private setInitialCols;
+        setColumns(columns: Column<TItem>[]): void;
+        getOptions(): GridOptions<TItem>;
+        setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void;
+        private validateAndEnforceOptions;
+        private viewOnRowCountChanged;
+        private viewOnRowsChanged;
+        private viewOnDataChanged;
+        private bindToData;
+        private unbindFromData;
+        setData(newData: any, scrollToTop?: boolean): void;
+        getData(): any;
+        getDataLength(): number;
+        private getDataLengthIncludingAddNew;
+        getDataItem(i: number): TItem;
+        getTopPanel(): HTMLElement;
+        setTopPanelVisibility(visible: boolean): void;
+        setColumnHeaderVisibility(visible: boolean, animate?: boolean): void;
+        setFooterRowVisibility(visible: boolean): void;
+        setGroupingPanelVisibility(visible: boolean): void;
+        setPreHeaderPanelVisibility(visible: boolean): void;
+        setHeaderRowVisibility(visible: boolean): void;
+        getContainerNode(): HTMLElement;
+        getUID(): string;
+        private getRowTop;
+        private getRowFromPosition;
+        private scrollTo;
+        getFormatter(row: number, column: Column<TItem>): ColumnFormatter<TItem>;
+        private getEditor;
+        private getDataItemValueForColumn;
+        private appendRowHtml;
+        private appendCellHtml;
+        private cleanupRows;
+        invalidate(): void;
+        invalidateAllRows(): void;
+        private queuePostProcessedRowForCleanup;
+        private queuePostProcessedCellForCleanup;
+        private removeRowFromCache;
+        invalidateRows(rows: number[]): void;
+        invalidateRow(row: number): void;
+        updateCell(row: number, cell: number): void;
+        updateRow(row: number): void;
+        private calcViewportSize;
+        resizeCanvas: () => void;
+        updatePagingStatusFromView(pagingInfo: {
+            pageSize: number;
+            pageNum: number;
+            totalPages: number;
+        }): void;
+        private updateRowCount;
+        /**
+         * @param viewportTop optional viewport top
+         * @param viewportLeft optional viewport left
+         * @returns viewport range
+         */
+        getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
+        getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
+        getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
+        private ensureCellNodesInRowsCache;
+        private cleanUpCells;
+        private cleanUpAndRenderCells;
+        private renderRows;
+        private startPostProcessing;
+        private startPostProcessingCleanup;
+        private invalidatePostProcessingResults;
+        private updateRowPositions;
+        private updateGrandTotals;
+        private render;
+        private handleHeaderRowScroll;
+        private handleFooterRowScroll;
+        private handleMouseWheel;
+        private handleScroll;
+        private asyncPostProcessRows;
+        private asyncPostProcessCleanupRows;
+        private updateCellCssStylesOnRenderedRows;
+        addCellCssStyles(key: string, hash: CellStylesHash): void;
+        removeCellCssStyles(key: string): void;
+        setCellCssStyles(key: string, hash: CellStylesHash): void;
+        getCellCssStyles(key: string): CellStylesHash;
+        flashCell(row: number, cell: number, speed?: number): void;
+        private handleDragInit;
+        private handleDragStart;
+        private handleDrag;
+        private handleDragEnd;
+        private handleKeyDown;
+        private handleClick;
+        private handleContextMenu;
+        private handleDblClick;
+        private handleHeaderMouseEnter;
+        private handleHeaderMouseLeave;
+        private handleHeaderContextMenu;
+        private handleHeaderClick;
+        private handleMouseEnter;
+        private handleMouseLeave;
+        private cellExists;
+        getCellFromPoint(x: number, y: number): {
+            row: number;
+            cell: number;
+        };
+        getCellFromNode(cellNode: Element): number;
+        getColumnFromNode(cellNode: Element): Column<TItem>;
+        getRowFromNode(rowNode: Element): number;
+        getCellFromEvent(e: any): {
+            row: number;
+            cell: number;
+        };
+        getCellNodeBox(row: number, cell: number): {
+            top: number;
+            right: number;
+            bottom: number;
+            left: number;
+        };
+        resetActiveCell(): void;
+        focus(): void;
+        private setFocus;
+        scrollCellIntoView(row: number, cell: number, doPaging?: boolean): void;
+        scrollColumnIntoView(cell: number): void;
+        internalScrollColumnIntoView(left: number, right: number): void;
+        private setActiveCellInternal;
+        clearTextSelection(): void;
+        private isCellPotentiallyEditable;
+        private makeActiveCellNormal;
+        editActiveCell(editor?: Editor): void;
+        private makeActiveCellEditable;
+        private commitEditAndSetFocus;
+        private cancelEditAndSetFocus;
+        private getActiveCellPosition;
+        getGridPosition(): Position;
+        private handleActiveCellPositionChange;
+        getCellEditor(): Editor;
+        getActiveCell(): RowCell;
+        getActiveCellNode(): HTMLElement;
+        scrollActiveCellIntoView(): void;
+        scrollRowIntoView(row: number, doPaging?: boolean): void;
+        scrollRowToTop(row: number): void;
+        private scrollPage;
+        navigatePageDown(): void;
+        navigatePageUp(): void;
+        navigateTop(): void;
+        navigateBottom(): void;
+        navigateToRow(row: number): boolean;
+        getColspan(row: number, cell: number): number;
+        navigateRight(): boolean;
+        navigateLeft(): boolean;
+        navigateDown(): boolean;
+        navigateUp(): boolean;
+        navigateNext(): boolean;
+        navigatePrev(): boolean;
+        navigateRowStart(): boolean;
+        navigateRowEnd(): boolean;
+        /**
+         * @param {string} dir Navigation direction.
+         * @return {boolean} Whether navigation resulted in a change of active cell.
+         */
+        navigate(dir: string): boolean;
+        getCellNode(row: number, cell: number): HTMLElement;
+        setActiveCell(row: number, cell: number): void;
+        setActiveRow(row: number, cell: number, suppressScrollIntoView?: boolean): void;
+        private canCellBeActive;
+        canCellBeSelected(row: number, cell: number): any;
+        gotoCell(row: number, cell: number, forceEdit?: boolean): void;
+        commitCurrentEdit(): boolean;
+        private cancelCurrentEdit;
+        private rowsToRanges;
+        getSelectedRows(): number[];
+        setSelectedRows(rows: number[]): void;
+    }
+
+    interface Column<TItem = any> {
+        asyncPostRender?: AsyncPostRender<TItem>;
+        asyncPostRenderCleanup?: AsyncPostCleanup<TItem>;
+        behavior?: any;
+        cannotTriggerInsert?: boolean;
+        cssClass?: string;
+        defaultSortAsc?: boolean;
+        editor?: Editor;
+        field: string;
+        frozen?: boolean;
+        focusable?: boolean;
+        footerCssClass?: string;
+        formatter?: ColumnFormatter<TItem>;
+        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
+        headerCssClass?: string;
+        id?: string;
+        maxWidth?: any;
+        minWidth?: number;
+        name?: string;
+        nameIsHtml?: boolean;
+        previousWidth?: number;
+        referencedFields?: string[];
+        rerenderOnResize?: boolean;
+        resizable?: boolean;
+        selectable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        toolTip?: string;
+        validator?: (value: any) => ValidationResult;
+        visible?: boolean;
+        width?: number;
+    }
+    const columnDefaults: Partial<Column>;
+    interface ColumnMetadata<TItem = any> {
+        colspan: number | '*';
+        formatter?: ColumnFormatter<TItem>;
+    }
+    interface ColumnSort {
+        columnId: string;
+        sortAsc?: boolean;
+    }
+    interface ItemMetadata<TItem = any> {
+        columns?: {
+            [key: string]: ColumnMetadata<TItem>;
+        };
+        formatter?: ColumnFormatter<TItem>;
+    }
+
+    const BasicLayout: {
+        new (): LayoutEngine;
+    };
+
+    const FrozenLayout: {
+        new (): LayoutEngine;
+    };
+}
+
+
+declare namespace Slick {
+    interface Column<TItem = any> {
+        referencedFields?: string[];
+        format?: Format<TItem>;
+        sourceItem?: Q.PropertyItem;
+    }
+}
+
+declare namespace Slick {
+    namespace Aggregators {
+        function Avg(field: string): void;
+        function WeightedAvg(field: string, weightedField: string): void;
+        function Min(field: string): void;
+        function Max(field: string): void;
+        function Sum(field: string): void;
+    }
+    function groupTotalText<TItem = any>(totals: GroupTotals, columnDef: Column<TItem>, key: string): string;
+    function groupTotalsFormatter<TItem = any>(totals: GroupTotals, columnDef: Column<TItem>): string;
+
+    type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+
+    interface FormatterContext<TItem = any> {
+        addAttrs?: {
+            [key: string]: string;
+        };
+        addClass?: string;
+        cell?: number;
+        column?: Column<TItem>;
+        grid?: Grid<TItem>;
+        item?: TItem;
+        row?: number;
+        toolTip?: string;
+        value?: any;
+    }
+    interface Formatter {
+        format(ctx: FormatterContext): string;
+    }
+    interface GroupInfo<TItem> {
+        getter?: any;
+        formatter?: (p1: Group<TItem>) => string;
+        comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
+        aggregators?: any[];
+        aggregateCollapsed?: boolean;
+        lazyTotalsCalculation?: boolean;
+    }
+    interface PagerOptions {
+        view?: any;
+        showRowsPerPage?: boolean;
+        rowsPerPage?: number;
+        rowsPerPageOptions?: number[];
+        onChangePage?: (newPage: number) => void;
+        onRowsPerPageChange?: (n: number) => void;
+    }
+    class RowSelectionModel implements SelectionModel {
+        init(grid: Grid): void;
+        destroy?: () => void;
+        setSelectedRanges(ranges: Range[]): void;
+        onSelectedRangesChanged: Slick.Event<Range[]>;
+        refreshSelections?(): void;
+    }
+    interface SummaryOptions {
+        aggregators: any[];
+    }
+    interface PagingOptions {
+        rowsPerPage?: number;
+        page?: number;
+    }
+
+    interface RemoteViewOptions {
+        autoLoad?: boolean;
+        idField?: string;
+        contentType?: string;
+        dataType?: string;
+        filter?: any;
+        params?: any;
+        onSubmit?: CancellableViewCallback<any>;
+        url?: string;
+        localSort?: boolean;
+        sortBy?: any;
+        rowsPerPage?: number;
+        seekToPage?: number;
+        onProcessData?: RemoteViewProcessCallback<any>;
+        method?: string;
+        inlineFilters?: boolean;
+        groupItemMetadataProvider?: Slick.Data.GroupItemMetadataProvider;
+        onAjaxCall?: RemoteViewAjaxCallback<any>;
+        getItemMetadata?: (p1?: any, p2?: number) => any;
+        errorMsg?: string;
+    }
+    interface PagingInfo {
+        rowsPerPage: number;
+        page: number;
+        totalCount: number;
+        loading: boolean;
+        error: string;
+        dataView: RemoteView<any>;
+    }
+    type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
+    type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
+    type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
+    type RemoteViewProcessCallback<TEntity> = (data: Q.ListResponse<TEntity>, view: RemoteView<TEntity>) => Q.ListResponse<TEntity>;
+    interface RemoteView<TEntity> {
+        onSubmit: CancellableViewCallback<TEntity>;
+        onDataChanged: Slick.Event;
+        onDataLoading: Slick.Event;
+        onDataLoaded: Slick.Event;
+        onPagingInfoChanged: Slick.Event;
+        onRowCountChanged: Slick.Event;
+        onRowsChanged: Slick.Event;
+        onRowsOrCountChanged: Slick.Event;
+        getPagingInfo(): PagingInfo;
+        onGroupExpanded: Slick.Event;
+        onGroupCollapsed: Slick.Event;
+        onAjaxCall: RemoteViewAjaxCallback<TEntity>;
+        onProcessData: RemoteViewProcessCallback<TEntity>;
+        addData(data: Q.ListResponse<TEntity>): void;
+        beginUpdate(): void;
+        endUpdate(): void;
+        deleteItem(id: any): void;
+        getItems(): TEntity[];
+        setFilter(filter: RemoteViewFilter<TEntity>): void;
+        getFilter(): RemoteViewFilter<TEntity>;
+        getFilteredItems(): any;
+        fastSort: any;
+        setItems(items: any[], newIdProperty?: boolean | string): void;
+        getIdPropertyName(): string;
+        getItemById(id: any): TEntity;
+        getGrandTotals(): any;
+        getGrouping(): GroupInfo<TEntity>[];
+        getGroups(): any[];
+        getRowById(id: any): number;
+        getRowByItem(item: any): number;
+        getRows(): any[];
+        mapItemsToRows(itemArray: any[]): any[];
+        mapRowsToIds(rowArray: number[]): any[];
+        mapIdsToRows(idAray: any[]): number[];
+        setFilterArgs(args: any): void;
+        setRefreshHints(hints: any[]): void;
+        insertItem(insertBefore: number, item: any): void;
+        sortedAddItem(item: any): void;
+        sortedUpdateItem(id: any, item: any): void;
+        syncGridSelection(grid: any, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): void;
+        syncGridCellCssStyles(grid: any, key: string): void;
+        getItemMetadata(i: number): any;
+        updateItem(id: any, item: TEntity): void;
+        addItem(item: TEntity): void;
+        getIdxById(id: any): any;
+        getItemByIdx(index: number): any;
+        setGrouping(groupInfo: GroupInfo<TEntity>[]): void;
+        collapseAllGroups(level: number): void;
+        expandAllGroups(level: number): void;
+        expandGroup(keys: any[]): void;
+        collapseGroup(keys: any[]): void;
+        setSummaryOptions(options: SummaryOptions): void;
+        setPagingOptions(options: PagingOptions): void;
+        refresh(): void;
+        populate(): void;
+        populateLock(): void;
+        populateUnlock(): void;
+        getItem(row: number): any;
+        getLength(): number;
+        rowsPerPage: number;
+        errormsg: string;
+        params: any;
+        getLocalSort(): boolean;
+        setLocalSort(value: boolean): void;
+        sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
+        reSort(): void;
+        sortBy: string[];
+        url: string;
+        method: string;
+        idField: string;
+        seekToPage?: number;
+    }
+    class RemoteView<TEntity> {
+        constructor(options: RemoteViewOptions);
+    }
+}
+declare namespace Slick {
+    interface AutoTooltipsOptions {
+        enableForHeaderCells?: boolean;
+        enableForCells?: boolean;
+        maxToolTipLength?: number;
+    }
+    namespace Data {
+        interface GroupItemMetadataProvider {
+            getGroupRowMetadata(item: any): ItemMetadata;
+            getTotalsRowMetadata(item: any): ItemMetadata;
+        }
+        class GroupItemMetadataProvider implements GroupItemMetadataProvider, IPlugin {
+            constructor();
+            init(grid: Grid): void;
+            getGroupRowMetadata(item: any): ItemMetadata;
+            getTotalsRowMetadata(item: any): ItemMetadata;
+        }
+    }
+    interface RowMoveManagerOptions {
+        cancelEditOnDrag: boolean;
+    }
+    class RowMoveManager implements IPlugin {
+        constructor(options: RowMoveManagerOptions);
+        init(): void;
+        onBeforeMoveRows: Slick.Event;
+        onMoveRows: Slick.Event;
+    }
+    interface AutoTooltipsOptions {
+        enableForHeaderCells?: boolean;
+        enableForCells?: boolean;
+        maxToolTipLength?: number;
+    }
+    class AutoTooltips {
+        constructor(options: AutoTooltipsOptions);
+        init(): void;
+    }
+}
+
+declare namespace Slick {
+    interface Column<TItem = any> {
+        referencedFields?: string[];
+        format?: Format<TItem>;
+        sourceItem?: Q.PropertyItem;
+    }
+}
+
+declare namespace Serenity {
+    interface ServiceError {
+        Code?: string;
+        Arguments?: string;
+        Message?: string;
+        Details?: string;
+        ErrorId?: string;
+    }
+    interface ServiceResponse {
+        Error?: ServiceError;
+    }
+    interface ServiceRequest {
+    }
+    interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
+        request?: any;
+        service?: string;
+        blockUI?: boolean;
+        onError?(response: TResponse): void;
+        onSuccess?(response: TResponse): void;
+        onCleanup?(): void;
+    }
+    interface SaveRequest<TEntity> extends ServiceRequest {
+        EntityId?: any;
+        Entity?: TEntity;
+        Localizations?: any;
+    }
+    interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
+        Attachments?: any[];
+    }
+    interface SaveResponse extends ServiceResponse {
+        EntityId?: any;
+    }
+    interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
+        Localizations?: {
+            [key: string]: TEntity;
+        };
+    }
+    interface DeleteRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+    interface DeleteResponse extends ServiceResponse {
+    }
+    interface UndeleteRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+    interface UndeleteResponse extends ServiceResponse {
+    }
+    enum ColumnSelection {
+        List = 0,
+        KeyOnly = 1,
+        Details = 2,
+        None = 3,
+        IdOnly = 4,
+        Lookup = 5
+    }
+    enum RetrieveColumnSelection {
+        details = 0,
+        keyOnly = 1,
+        list = 2,
+        none = 3,
+        idOnly = 4,
+        lookup = 5
+    }
+    interface ListRequest extends ServiceRequest {
+        Skip?: number;
+        Take?: number;
+        Sort?: string[];
+        ContainsText?: string;
+        ContainsField?: string;
+        Criteria?: any[];
+        EqualityFilter?: any;
+        IncludeDeleted?: boolean;
+        ExcludeTotalCount?: boolean;
+        ColumnSelection?: ColumnSelection;
+        IncludeColumns?: string[];
+        ExcludeColumns?: string[];
+        ExportColumns?: string[];
+        DistinctFields?: string[];
+    }
+    interface ListResponse<TEntity> extends ServiceResponse {
+        Entities?: TEntity[];
+        Values?: any[];
+        TotalCount?: number;
+        Skip?: number;
+        Take?: number;
+    }
+    interface RetrieveRequest extends ServiceRequest {
+        EntityId?: any;
+        ColumnSelection?: RetrieveColumnSelection;
+        IncludeColumns?: string[];
+        ExcludeColumns?: string[];
+    }
+    interface RetrieveResponse<TEntity> extends ServiceResponse {
+        Entity?: TEntity;
+    }
+    interface RetrieveLocalizationRequest extends RetrieveRequest {
+    }
+    interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
+        Entities?: {
+            [key: string]: TEntity;
+        };
+    }
+
+    function Criteria(field: string): any[];
+    namespace Criteria {
+        function isEmpty(c: any[]): boolean;
+        function join(c1: any[], op: string, c2: any[]): any[];
+        function paren(c: any[]): any[];
+        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
+        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
+        enum Operator {
             paren = "()",
             not = "not",
             isNull = "is null",
@@ -2427,23 +2497,6 @@ declare namespace Q {
         }
     }
 
-    interface ServiceOptions<TResponse extends Serenity.ServiceResponse> extends Serenity.ServiceOptions<TResponse> {
-    }
-}
-declare namespace Q {
-    interface Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-        textFormatter: (item: TItem) => string;
-    }
-}
-
-declare namespace Serenity {
     class IBooleanValue {
     }
     interface IBooleanValue {
@@ -2473,7 +2526,7 @@ declare namespace Serenity {
     class IGetEditValue {
     }
     interface IGetEditValue {
-        getEditValue(property: Serenity.PropertyItem, target: any): void;
+        getEditValue(property: Q.PropertyItem, target: any): void;
     }
 
     interface IReadOnly {
@@ -2486,7 +2539,7 @@ declare namespace Serenity {
     class ISetEditValue {
     }
     interface ISetEditValue {
-        setEditValue(source: any, property: Serenity.PropertyItem): void;
+        setEditValue(source: any, property: Q.PropertyItem): void;
     }
 
     class IStringValue {
@@ -2501,6 +2554,126 @@ declare namespace Serenity {
         set_required(value: boolean): void;
     }
     class IValidateRequired {
+    }
+
+    const enum CaptureOperationType {
+        Before = 0,
+        Delete = 1,
+        Insert = 2,
+        Update = 3
+    }
+
+    interface DataChangeInfo {
+        type: string;
+        entityId: any;
+        entity: any;
+    }
+
+    namespace ReflectionUtils {
+        function getPropertyValue(o: any, property: string): any;
+        function setPropertyValue(o: any, property: string, value: any): void;
+        function makeCamelCase(s: string): string;
+    }
+
+    namespace DialogTypeRegistry {
+        function tryGet(key: string): any;
+        function get(key: string): any;
+    }
+
+    namespace EditorTypeRegistry {
+        function get(key: string): any;
+        function reset(): void;
+    }
+
+    namespace EnumTypeRegistry {
+        function tryGet(key: string): Function;
+        function get(key: string): Function;
+    }
+
+    interface DialogButton {
+        text?: string;
+        hint?: string;
+        icon?: string;
+        click?: (e: JQueryEventObject) => void;
+        cssClass?: string;
+        htmlEncode?: boolean;
+        result?: string;
+    }
+
+    function executeOnceWhenShown(element: JQuery, callback: Function): void;
+    function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
+
+    interface PropertyItem {
+        name?: string;
+        title?: string;
+        hint?: string;
+        placeholder?: string;
+        editorType?: string;
+        editorParams?: any;
+        category?: string;
+        collapsible?: boolean;
+        collapsed?: boolean;
+        tab?: string;
+        cssClass?: string;
+        headerCssClass?: string;
+        formCssClass?: string;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        insertPermission?: string;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        updatePermission?: string;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        readPermission?: string;
+        oneWay?: boolean;
+        defaultValue?: any;
+        localizable?: boolean;
+        visible?: boolean;
+        allowHide?: boolean;
+        formatterType?: string;
+        formatterParams?: any;
+        displayFormat?: string;
+        alignment?: string;
+        width?: number;
+        widthSet?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        labelWidth?: string;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        groupOrder?: number;
+        summaryType?: SummaryType;
+        editLink?: boolean;
+        editLinkItemType?: string;
+        editLinkIdField?: string;
+        editLinkCssClass?: string;
+        filteringType?: string;
+        filteringParams?: any;
+        filteringIdField?: string;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
+        quickFilterCssClass?: string;
+    }
+    enum SummaryType {
+        Disabled = -1,
+        None = 0,
+        Sum = 1,
+        Avg = 2,
+        Min = 3,
+        Max = 4
+    }
+
+    interface HandleRouteEventArgs {
+        handled: boolean;
+        route: string;
+        parts: string[];
+        index: number;
     }
 
     class ISlickFormatter {
@@ -2681,57 +2854,6 @@ declare namespace Serenity {
         function resizable(value?: boolean): (target: Function) => void;
         function responsive(value?: boolean): (target: Function) => void;
         function service(value: string): (target: Function) => void;
-    }
-
-    function Criteria(field: string): any[];
-    namespace Criteria {
-        function isEmpty(c: any[]): boolean;
-        function join(c1: any[], op: string, c2: any[]): any[];
-        function paren(c: any[]): any[];
-        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
-        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
-        const enum Operator {
-            paren = "()",
-            not = "not",
-            isNull = "is null",
-            isNotNull = "is not null",
-            exists = "exists",
-            and = "and",
-            or = "or",
-            xor = "xor",
-            eq = "=",
-            ne = "!=",
-            gt = ">",
-            ge = ">=",
-            lt = "<",
-            le = "<=",
-            in = "in",
-            notIn = "not in",
-            like = "like",
-            notLike = "not like"
-        }
-    }
-
-    interface DialogButton {
-        text?: string;
-        hint?: string;
-        icon?: string;
-        click?: (e: JQueryEventObject) => void;
-        cssClass?: string;
-        htmlEncode?: boolean;
-        result?: string;
-    }
-
-    function executeOnceWhenShown(element: JQuery, callback: Function): void;
-    function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
-
-
-
-    interface HandleRouteEventArgs {
-        handled: boolean;
-        route: string;
-        parts: string[];
-        index: number;
     }
 
     namespace LazyLoadHelper {
@@ -2978,12 +3100,12 @@ declare namespace Serenity {
         private getCategoryOrder;
         private createCategoryLinks;
         get_editors(): Widget<any>[];
-        get_items(): Serenity.PropertyItem[];
+        get_items(): PropertyItem[];
         get_idPrefix(): string;
         get_mode(): PropertyGridMode;
         set_mode(value: PropertyGridMode): void;
-        static loadEditorValue(editor: Widget<any>, item: Serenity.PropertyItem, source: any): void;
-        static saveEditorValue(editor: Widget<any>, item: Serenity.PropertyItem, target: any): void;
+        static loadEditorValue(editor: Widget<any>, item: PropertyItem, source: any): void;
+        static saveEditorValue(editor: Widget<any>, item: PropertyItem, target: any): void;
         private static setReadOnly;
         private static setReadonly;
         private static setRequired;
@@ -2994,7 +3116,7 @@ declare namespace Serenity {
         set value(val: any);
         private canModifyItem;
         updateInterface(): void;
-        enumerateItems(callback: (p1: Serenity.PropertyItem, p2: Widget<any>) => void): void;
+        enumerateItems(callback: (p1: PropertyItem, p2: Widget<any>) => void): void;
     }
     const enum PropertyGridMode {
         insert = 1,
@@ -3002,7 +3124,7 @@ declare namespace Serenity {
     }
     interface PropertyGridOptions {
         idPrefix?: string;
-        items?: Serenity.PropertyItem[];
+        items?: PropertyItem[];
         useCategories?: boolean;
         categoryOrder?: string;
         defaultCategory?: string;
@@ -3019,7 +3141,7 @@ declare namespace Serenity {
         protected loadInitialEntity(): void;
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyItems(): Serenity.PropertyItem[];
+        protected getPropertyItems(): PropertyItem[];
         protected getSaveEntity(): TItem;
         protected get_entity(): TItem;
         protected get_entityId(): any;
@@ -3027,12 +3149,6 @@ declare namespace Serenity {
         protected set_entityId(value: any): void;
         protected validateBeforeSave(): boolean;
         protected propertyGrid: PropertyGrid;
-    }
-
-    interface DataChangeInfo {
-        type: string;
-        entityId: any;
-        entity: any;
     }
 
     namespace SubDialogHelper {
@@ -3063,7 +3179,7 @@ declare namespace Serenity {
         protected initPropertyGrid(): void;
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyItems(): Serenity.PropertyItem[];
+        protected getPropertyItems(): PropertyItem[];
         protected getSaveEntity(): TItem;
         protected loadInitialEntity(): void;
         protected get_entity(): TItem;
@@ -3079,9 +3195,9 @@ declare namespace Serenity {
     namespace EditorUtils {
         function getDisplayText(editor: Widget<any>): string;
         function getValue(editor: Widget<any>): any;
-        function saveValue(editor: Widget<any>, item: Serenity.PropertyItem, target: any): void;
+        function saveValue(editor: Widget<any>, item: PropertyItem, target: any): void;
         function setValue(editor: Widget<any>, value: any): void;
-        function loadValue(editor: Widget<any>, item: Serenity.PropertyItem, source: any): void;
+        function loadValue(editor: Widget<any>, item: PropertyItem, source: any): void;
         function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
         function setReadOnly(widget: Widget<any>, isReadOnly: boolean): void;
         function setRequired(widget: Widget<any>, isRequired: boolean): void;
@@ -3367,8 +3483,8 @@ declare namespace Serenity {
             id: string;
             text: string;
         };
-        setEditValue(source: any, property: Serenity.PropertyItem): void;
-        getEditValue(property: Serenity.PropertyItem, target: any): void;
+        setEditValue(source: any, property: PropertyItem): void;
+        getEditValue(property: PropertyItem, target: any): void;
         protected get_select2Container(): JQuery;
         protected get_items(): Select2Item[];
         protected get_itemByKey(): {
@@ -3494,7 +3610,7 @@ declare namespace Serenity {
         pageSize?: number;
         minimumResultsForSearch?: any;
         sort: string[];
-        columnSelection?: Serenity.ColumnSelection;
+        columnSelection?: ColumnSelection;
         includeColumns?: string[];
         excludeColumns?: string[];
         includeDeleted?: boolean;
@@ -3513,8 +3629,8 @@ declare namespace Serenity {
         protected getFilterCriteria(): any[];
         protected getIdListCriteria(idList: any[]): any[];
         protected getCriteria(query: Select2SearchQuery): any[];
-        protected getListRequest(query: Select2SearchQuery): Serenity.ListRequest;
-        protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Serenity.ServiceOptions<Serenity.ListResponse<TItem>>;
+        protected getListRequest(query: Select2SearchQuery): ListRequest;
+        protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): ServiceOptions<ListResponse<TItem>>;
         protected hasAsyncSource(): boolean;
         protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
     }
@@ -3640,8 +3756,8 @@ declare namespace Serenity {
         get value(): UploadedFile;
         set_value(value: UploadedFile): void;
         set value(v: UploadedFile);
-        getEditValue(property: Serenity.PropertyItem, target: any): void;
-        setEditValue(source: any, property: Serenity.PropertyItem): void;
+        getEditValue(property: PropertyItem, target: any): void;
+        setEditValue(source: any, property: PropertyItem): void;
         protected entity: UploadedFile;
         protected toolbar: Toolbar;
         protected progress: JQuery;
@@ -3672,8 +3788,8 @@ declare namespace Serenity {
         get value(): UploadedFile[];
         set_value(value: UploadedFile[]): void;
         set value(v: UploadedFile[]);
-        getEditValue(property: Serenity.PropertyItem, target: any): void;
-        setEditValue(source: any, property: Serenity.PropertyItem): void;
+        getEditValue(property: PropertyItem, target: any): void;
+        setEditValue(source: any, property: PropertyItem): void;
         jsonEncodeValue: boolean;
     }
     class MultipleImageUploadEditor extends MultipleFileUploadEditor {
@@ -3683,7 +3799,7 @@ declare namespace Serenity {
     interface QuickFilterArgs<TWidget> {
         field?: string;
         widget?: TWidget;
-        request?: Serenity.ListRequest;
+        request?: ListRequest;
         equalityFilter?: any;
         value?: any;
         active?: boolean;
@@ -3722,9 +3838,9 @@ declare namespace Serenity {
         onChange: (e: JQueryEventObject) => void;
         private submitHandlers;
         destroy(): void;
-        onSubmit(request: Serenity.ListRequest): void;
-        protected add_submitHandlers(action: (request: Serenity.ListRequest) => void): void;
-        protected remove_submitHandlers(action: (request: Serenity.ListRequest) => void): void;
+        onSubmit(request: ListRequest): void;
+        protected add_submitHandlers(action: (request: ListRequest) => void): void;
+        protected remove_submitHandlers(action: (request: ListRequest) => void): void;
         protected clear_submitHandlers(): void;
         find<TWidget>(type: {
             new (...args: any[]): TWidget;
@@ -3798,7 +3914,7 @@ declare namespace Serenity {
     }
 
     class FilterStore {
-        constructor(fields: Serenity.PropertyItem[]);
+        constructor(fields: PropertyItem[]);
         static getCriteriaFor(items: FilterLine[]): any[];
         static getDisplayTextFor(items: FilterLine[]): string;
         private changed;
@@ -3806,9 +3922,9 @@ declare namespace Serenity {
         private fields;
         private fieldByName;
         private items;
-        get_fields(): Serenity.PropertyItem[];
+        get_fields(): PropertyItem[];
         get_fieldByName(): {
-            [key: string]: Serenity.PropertyItem;
+            [key: string]: PropertyItem;
         };
         get_items(): FilterLine[];
         raiseChanged(): void;
@@ -3824,8 +3940,8 @@ declare namespace Serenity {
         getOperators(): FilterOperator[];
         loadState(state: any): void;
         saveState(): any;
-        get_field(): Serenity.PropertyItem;
-        set_field(value: Serenity.PropertyItem): void;
+        get_field(): PropertyItem;
+        set_field(value: PropertyItem): void;
         get_container(): JQuery;
         set_container(value: JQuery): void;
         get_operator(): FilterOperator;
@@ -3844,8 +3960,8 @@ declare namespace Serenity {
     }
     abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         private field;
-        get_field(): Serenity.PropertyItem;
-        set_field(value: Serenity.PropertyItem): void;
+        get_field(): PropertyItem;
+        set_field(value: PropertyItem): void;
         private container;
         get_container(): JQuery;
         set_container(value: JQuery): void;
@@ -3858,7 +3974,7 @@ declare namespace Serenity {
         protected isNullable(): boolean;
         createEditor(): void;
         protected operatorFormat(op: FilterOperator): string;
-        protected getTitle(field: Serenity.PropertyItem): string;
+        protected getTitle(field: PropertyItem): string;
         protected displayText(op: FilterOperator, values?: any[]): string;
         protected getCriteriaField(): string;
         getCriteria(): CriteriaWithText;
@@ -3979,7 +4095,7 @@ declare namespace Serenity {
         protected rowFieldChange(row: JQuery): void;
         protected removeFiltering(row: JQuery): void;
         protected populateOperatorList(row: JQuery): void;
-        protected getFieldFor(row: JQuery): Serenity.PropertyItem;
+        protected getFieldFor(row: JQuery): PropertyItem;
         protected getFilteringFor(row: JQuery): IFiltering;
         protected onRowOperatorChange(e: JQueryEventObject): void;
         protected rowOperatorChange(row: JQuery): void;
@@ -4007,8 +4123,157 @@ declare namespace Serenity {
         protected getTemplate(): string;
     }
 
-    class SlickPager extends Widget<Slick.PagerOptions> {
-        constructor(div: JQuery, o: Slick.PagerOptions);
+    type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+
+    interface FormatterContext<TItem = any> {
+        addAttrs?: {
+            [key: string]: string;
+        };
+        addClass?: string;
+        cell?: number;
+        column?: Slick.Column<TItem>;
+        grid?: Slick.Grid<TItem>;
+        item?: TItem;
+        row?: number;
+        toolTip?: string;
+        value?: any;
+    }
+    interface GroupInfo<TItem> {
+        getter?: any;
+        formatter?: (p1: Slick.Group<TItem>) => string;
+        comparer?: (a: Slick.Group<TItem>, b: Slick.Group<TItem>) => number;
+        aggregators?: any[];
+        aggregateCollapsed?: boolean;
+        lazyTotalsCalculation?: boolean;
+    }
+    interface PagerOptions {
+        view?: any;
+        showRowsPerPage?: boolean;
+        rowsPerPage?: number;
+        rowsPerPageOptions?: number[];
+        onChangePage?: (newPage: number) => void;
+        onRowsPerPageChange?: (n: number) => void;
+    }
+    interface SummaryOptions {
+        aggregators: any[];
+    }
+    interface PagingOptions {
+        rowsPerPage?: number;
+        page?: number;
+    }
+
+    interface RemoteViewOptions {
+        autoLoad?: boolean;
+        idField?: string;
+        contentType?: string;
+        dataType?: string;
+        filter?: any;
+        params?: any;
+        onSubmit?: CancellableViewCallback<any>;
+        url?: string;
+        localSort?: boolean;
+        sortBy?: any;
+        rowsPerPage?: number;
+        seekToPage?: number;
+        onProcessData?: RemoteViewProcessCallback<any>;
+        method?: string;
+        inlineFilters?: boolean;
+        groupItemMetadataProvider?: Slick.Data.GroupItemMetadataProvider;
+        onAjaxCall?: RemoteViewAjaxCallback<any>;
+        getItemMetadata?: (p1?: any, p2?: number) => any;
+        errorMsg?: string;
+    }
+    interface PagingInfo {
+        rowsPerPage: number;
+        page: number;
+        totalCount: number;
+        loading: boolean;
+        error: string;
+        dataView: RemoteView<any>;
+    }
+    type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
+    type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
+    type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
+    type RemoteViewProcessCallback<TEntity> = (data: Q.ListResponse<TEntity>, view: RemoteView<TEntity>) => Q.ListResponse<TEntity>;
+    interface RemoteView<TEntity> {
+        onSubmit: CancellableViewCallback<TEntity>;
+        onDataChanged: Slick.Event;
+        onDataLoading: Slick.Event;
+        onDataLoaded: Slick.Event;
+        onPagingInfoChanged: Slick.Event;
+        onRowCountChanged: Slick.Event;
+        onRowsChanged: Slick.Event;
+        onRowsOrCountChanged: Slick.Event;
+        getPagingInfo(): PagingInfo;
+        onGroupExpanded: Slick.Event;
+        onGroupCollapsed: Slick.Event;
+        onAjaxCall: RemoteViewAjaxCallback<TEntity>;
+        onProcessData: RemoteViewProcessCallback<TEntity>;
+        addData(data: Q.ListResponse<TEntity>): void;
+        beginUpdate(): void;
+        endUpdate(): void;
+        deleteItem(id: any): void;
+        getItems(): TEntity[];
+        setFilter(filter: RemoteViewFilter<TEntity>): void;
+        getFilter(): RemoteViewFilter<TEntity>;
+        getFilteredItems(): any;
+        fastSort: any;
+        setItems(items: any[], newIdProperty?: boolean | string): void;
+        getIdPropertyName(): string;
+        getItemById(id: any): TEntity;
+        getGrandTotals(): any;
+        getGrouping(): GroupInfo<TEntity>[];
+        getGroups(): any[];
+        getRowById(id: any): number;
+        getRowByItem(item: any): number;
+        getRows(): any[];
+        mapItemsToRows(itemArray: any[]): any[];
+        mapRowsToIds(rowArray: number[]): any[];
+        mapIdsToRows(idAray: any[]): number[];
+        setFilterArgs(args: any): void;
+        setRefreshHints(hints: any[]): void;
+        insertItem(insertBefore: number, item: any): void;
+        sortedAddItem(item: any): void;
+        sortedUpdateItem(id: any, item: any): void;
+        syncGridSelection(grid: any, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): void;
+        syncGridCellCssStyles(grid: any, key: string): void;
+        getItemMetadata(i: number): any;
+        updateItem(id: any, item: TEntity): void;
+        addItem(item: TEntity): void;
+        getIdxById(id: any): any;
+        getItemByIdx(index: number): any;
+        setGrouping(groupInfo: GroupInfo<TEntity>[]): void;
+        collapseAllGroups(level: number): void;
+        expandAllGroups(level: number): void;
+        expandGroup(keys: any[]): void;
+        collapseGroup(keys: any[]): void;
+        setSummaryOptions(options: SummaryOptions): void;
+        setPagingOptions(options: PagingOptions): void;
+        refresh(): void;
+        populate(): void;
+        populateLock(): void;
+        populateUnlock(): void;
+        getItem(row: number): any;
+        getLength(): number;
+        rowsPerPage: number;
+        errormsg: string;
+        params: any;
+        getLocalSort(): boolean;
+        setLocalSort(value: boolean): void;
+        sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
+        reSort(): void;
+        sortBy: string[];
+        url: string;
+        method: string;
+        idField: string;
+        seekToPage?: number;
+    }
+    class RemoteView<TEntity> {
+        constructor(options: RemoteViewOptions);
+    }
+
+    class SlickPager extends Widget<PagerOptions> {
+        constructor(div: JQuery, o: PagerOptions);
         _changePage(ctype: string): boolean;
         _updatePager(): void;
     }
@@ -4016,10 +4281,9 @@ declare namespace Serenity {
     interface IDataGrid {
         getElement(): JQuery;
         getGrid(): Slick.Grid;
-        getView(): Slick.RemoteView<any>;
+        getView(): RemoteView<any>;
         getFilterStore(): FilterStore;
     }
-
 
     interface GridRowSelectionMixinOptions {
         selectable?: (item: any) => boolean;
@@ -4065,39 +4329,39 @@ declare namespace Serenity {
     }
     namespace GridUtils {
         function addToggleButton(toolDiv: JQuery, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
-        function addIncludeDeletedToggle(toolDiv: JQuery, view: Slick.RemoteView<any>, hint?: string, initial?: boolean): void;
-        function addQuickSearchInput(toolDiv: JQuery, view: Slick.RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void;
+        function addIncludeDeletedToggle(toolDiv: JQuery, view: RemoteView<any>, hint?: string, initial?: boolean): void;
+        function addQuickSearchInput(toolDiv: JQuery, view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void;
         function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
         function makeOrderable(grid: Slick.Grid, handleMove: (p1: any, p2: number) => void): void;
-        function makeOrderableWithUpdateRequest(grid: IDataGrid, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => Serenity.SaveRequest<any>): void;
+        function makeOrderableWithUpdateRequest(grid: IDataGrid, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
     }
     namespace PropertyItemSlickConverter {
-        function toSlickColumns(items: Serenity.PropertyItem[]): Slick.Column[];
-        function toSlickColumn(item: Serenity.PropertyItem): Slick.Column;
+        function toSlickColumns(items: PropertyItem[]): Slick.Column[];
+        function toSlickColumn(item: PropertyItem): Slick.Column;
     }
     namespace SlickFormatting {
         function getEnumText(enumKey: string, name: string): string;
-        function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any, formatter: Slick.Format<TItem>): Slick.Format<TItem>;
-        function date(format?: string): Slick.Format;
-        function dateTime(format?: string): Slick.Format;
-        function checkBox(): Slick.Format;
-        function number(format: string): Slick.Format;
+        function treeToggle<TItem>(getView: () => RemoteView<TItem>, getId: (x: TItem) => any, formatter: Format<TItem>): Format<TItem>;
+        function date(format?: string): Format;
+        function dateTime(format?: string): Format;
+        function checkBox(): Format;
+        function number(format: string): Format;
         function getItemType(link: JQuery): string;
         function getItemId(link: JQuery): string;
         function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
-        function itemLink<TItem = any>(itemType: string, idField: string, getText: Slick.Format<TItem>, cssClass?: Slick.Format<TItem>, encode?: boolean): Slick.Format<TItem>;
+        function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: Format<TItem>, encode?: boolean): Format<TItem>;
     }
     namespace SlickHelper {
         function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any;
-        function convertToFormatter<TItem = any>(format: Slick.Format<TItem>): Slick.ColumnFormatter<TItem>;
+        function convertToFormatter<TItem = any>(format: Format<TItem>): Slick.ColumnFormatter<TItem>;
     }
     namespace SlickTreeHelper {
         function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
-        function filterById<TItem>(item: TItem, view: Slick.RemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
+        function filterById<TItem>(item: TItem, view: RemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
         function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
         function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
         function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
-        function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void;
+        function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: RemoteView<TItem>, getId: (x: TItem) => any): void;
     }
 
     interface IInitializeColumn {
@@ -4105,48 +4369,49 @@ declare namespace Serenity {
     }
     class IInitializeColumn {
     }
-    class BooleanFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext): string;
+    function Formatter(name: string, intf?: any[]): (target: Function) => void;
+    class BooleanFormatter implements Formatter {
+        format(ctx: FormatterContext): string;
         falseText: string;
         trueText: string;
     }
-    class CheckboxFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext): string;
+    class CheckboxFormatter implements Formatter {
+        format(ctx: FormatterContext): string;
     }
-    class DateFormatter implements Slick.Formatter {
+    class DateFormatter implements Formatter {
         constructor();
         static format(value: any, format?: string): any;
         displayFormat: string;
-        format(ctx: Slick.FormatterContext): string;
+        format(ctx: FormatterContext): string;
     }
     class DateTimeFormatter extends DateFormatter {
         constructor();
     }
-    class EnumFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext): string;
+    class EnumFormatter implements Formatter {
+        format(ctx: FormatterContext): string;
         enumKey: string;
         static format(enumType: any, value: any): string;
         static getText(enumKey: string, name: string): string;
         static getName(enumType: any, value: any): string;
     }
-    class FileDownloadFormatter implements Slick.Formatter, IInitializeColumn {
-        format(ctx: Slick.FormatterContext): string;
+    class FileDownloadFormatter implements Formatter, IInitializeColumn {
+        format(ctx: FormatterContext): string;
         static dbFileUrl(filename: string): string;
         initializeColumn(column: Slick.Column): void;
         displayFormat: string;
         originalNameProperty: string;
     }
-    class MinuteFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext): string;
+    class MinuteFormatter implements Formatter {
+        format(ctx: FormatterContext): string;
         static format(value: number): string;
     }
     class NumberFormatter {
-        format(ctx: Slick.FormatterContext): string;
+        format(ctx: FormatterContext): string;
         static format(value: any, format?: string): string;
         displayFormat: string;
     }
-    class UrlFormatter implements Slick.Formatter, IInitializeColumn {
-        format(ctx: Slick.FormatterContext): string;
+    class UrlFormatter implements Formatter, IInitializeColumn {
+        format(ctx: FormatterContext): string;
         initializeColumn(column: Slick.Column): void;
         displayProperty: string;
         displayFormat: string;
@@ -4207,7 +4472,7 @@ declare namespace Serenity {
         private rows;
         private slickGridOnSort;
         private slickGridOnClick;
-        view: Slick.RemoteView<TItem>;
+        view: RemoteView<TItem>;
         slickGrid: Slick.Grid;
         openDialogsAsPanel: boolean;
         static defaultRowHeight: number;
@@ -4227,7 +4492,7 @@ declare namespace Serenity {
         protected ensureQuickFilterBar(): QuickFilterBar;
         protected createQuickFilters(filters?: QuickFilter<Widget<any>, any>[]): void;
         protected getQuickFilters(): QuickFilter<Widget<any>, any>[];
-        static propertyItemToQuickFilter(item: Serenity.PropertyItem): any;
+        static propertyItemToQuickFilter(item: PropertyItem): any;
         protected findQuickFilter<TWidget>(type: {
             new (...args: any[]): TWidget;
         }, field: string): TWidget;
@@ -4260,7 +4525,7 @@ declare namespace Serenity {
         protected onClick(e: JQueryEventObject, row: number, cell: number): void;
         protected viewDataChanged(e: any, rows: TItem[]): void;
         protected bindToViewEvents(): void;
-        protected onViewProcessData(response: Serenity.ListResponse<TItem>): Serenity.ListResponse<TItem>;
+        protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
         protected onViewFilter(item: TItem): boolean;
         protected getIncludeColumns(include: {
             [key: string]: boolean;
@@ -4271,24 +4536,24 @@ declare namespace Serenity {
         protected onViewSubmit(): boolean;
         protected markupReady(): void;
         protected createSlickContainer(): JQuery;
-        protected createView(): Slick.RemoteView<TItem>;
+        protected createView(): RemoteView<TItem>;
         protected getDefaultSortBy(): any[];
         protected usePager(): boolean;
         protected enableFiltering(): boolean;
         protected populateWhenVisible(): boolean;
         protected createFilterBar(): void;
-        protected getPagerOptions(): Slick.PagerOptions;
+        protected getPagerOptions(): PagerOptions;
         protected createPager(): void;
-        protected getViewOptions(): Slick.RemoteViewOptions;
+        protected getViewOptions(): RemoteViewOptions;
         protected createToolbar(buttons: ToolButton[]): void;
         getTitle(): string;
         setTitle(value: string): void;
         protected getItemType(): string;
-        protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Slick.Format<TItem>;
+        protected itemLink(itemType?: string, idField?: string, text?: (ctx: FormatterContext) => string, cssClass?: (ctx: FormatterContext) => string, encode?: boolean): Format<TItem>;
         protected getColumnsKey(): string;
-        protected getPropertyItems(): Serenity.PropertyItem[];
+        protected getPropertyItems(): PropertyItem[];
         protected getColumns(): Slick.Column[];
-        protected propertyItemsToSlickColumns(propertyItems: Serenity.PropertyItem[]): Slick.Column[];
+        protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Slick.Column[];
         protected getSlickOptions(): Slick.GridOptions;
         protected populateLock(): void;
         protected populateUnlock(): void;
@@ -4332,7 +4597,7 @@ declare namespace Serenity {
         protected getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
         getElement(): JQuery;
         getGrid(): Slick.Grid;
-        getView(): Slick.RemoteView<TItem>;
+        getView(): RemoteView<TItem>;
         getFilterStore(): FilterStore;
     }
 
@@ -4406,8 +4671,8 @@ declare namespace Serenity {
         protected getIdProperty(): string;
         protected getTreeItems(): TItem[];
         protected updateItems(): void;
-        getEditValue(property: Serenity.PropertyItem, target: any): void;
-        setEditValue(source: any, property: Serenity.PropertyItem): void;
+        getEditValue(property: PropertyItem, target: any): void;
+        setEditValue(source: any, property: PropertyItem): void;
         protected getButtons(): ToolButton[];
         protected itemSelectedChanged(item: TItem): void;
         protected getSelectAllText(): string;
@@ -4415,7 +4680,7 @@ declare namespace Serenity {
         protected createSlickGrid(): Slick.Grid;
         protected onViewFilter(item: TItem): boolean;
         protected getInitialCollapse(): boolean;
-        protected onViewProcessData(response: Serenity.ListResponse<TItem>): Serenity.ListResponse<TItem>;
+        protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
         protected onClick(e: JQueryEventObject, row: number, cell: number): void;
         protected updateSelectAll(): void;
         protected updateFlags(): void;
@@ -4426,7 +4691,7 @@ declare namespace Serenity {
         protected getDelimited(): boolean;
         protected anyDescendantsSelected(item: TItem): boolean;
         protected getColumns(): Slick.Column[];
-        protected getItemText(ctx: Slick.FormatterContext): string;
+        protected getItemText(ctx: FormatterContext): string;
         protected getSlickOptions(): Slick.GridOptions;
         protected sortItems(): void;
         protected moveSelectedUp(): boolean;
@@ -4511,7 +4776,7 @@ declare namespace Serenity {
         protected editItemOfType(itemType: string, entityOrId: any): void;
         private service;
         protected getService(): string;
-        protected getViewOptions(): Slick.RemoteViewOptions;
+        protected getViewOptions(): RemoteViewOptions;
         protected getItemType(): string;
         protected routeDialog(itemType: string, dialog: Widget<any>): void;
         protected getInsertPermission(): string;
@@ -4530,6 +4795,8 @@ declare namespace Serenity {
             new (...args: any[]): Widget<any>;
         };
     }
+
+
 
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
         protected entity: TItem;
@@ -4561,10 +4828,10 @@ declare namespace Serenity {
         protected isDeleted(): boolean;
         protected isNew(): boolean;
         protected isNewOrDeleted(): boolean;
-        protected getDeleteOptions(callback: (response: Serenity.DeleteResponse) => void): Serenity.ServiceOptions<Serenity.DeleteResponse>;
-        protected deleteHandler(options: Serenity.ServiceOptions<Serenity.DeleteResponse>, callback: (response: Serenity.DeleteResponse) => void): void;
-        protected doDelete(callback: (response: Serenity.DeleteResponse) => void): void;
-        protected onDeleteSuccess(response: Serenity.DeleteResponse): void;
+        protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse>;
+        protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
+        protected doDelete(callback: (response: DeleteResponse) => void): void;
+        protected onDeleteSuccess(response: DeleteResponse): void;
         protected attrs<TAttr>(attrType: {
             new (...args: any[]): TAttr;
         }): TAttr[];
@@ -4594,12 +4861,12 @@ declare namespace Serenity {
         protected beforeLoadEntity(entity: TItem): void;
         protected afterLoadEntity(): void;
         loadByIdAndOpenDialog(entityId: any, asPanel?: boolean): void;
-        protected onLoadingData(data: Serenity.RetrieveResponse<TItem>): void;
-        protected getLoadByIdOptions(id: any, callback: (response: Serenity.RetrieveResponse<TItem>) => void): Serenity.ServiceOptions<Serenity.RetrieveResponse<TItem>>;
-        protected getLoadByIdRequest(id: any): Serenity.RetrieveRequest;
+        protected onLoadingData(data: RetrieveResponse<TItem>): void;
+        protected getLoadByIdOptions(id: any, callback: (response: RetrieveResponse<TItem>) => void): ServiceOptions<RetrieveResponse<TItem>>;
+        protected getLoadByIdRequest(id: any): RetrieveRequest;
         protected reloadById(): void;
-        loadById(id: any, callback?: (response: Serenity.RetrieveResponse<TItem>) => void, fail?: () => void): void;
-        protected loadByIdHandler(options: Serenity.ServiceOptions<Serenity.RetrieveResponse<TItem>>, callback: (response: Serenity.RetrieveResponse<TItem>) => void, fail: () => void): void;
+        loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
+        protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
         protected initLocalizationGrid(): void;
         protected initLocalizationGridCommon(pgOptions: PropertyGridOptions): void;
         protected isLocalizationMode(): boolean;
@@ -4612,24 +4879,24 @@ declare namespace Serenity {
         protected getLocalizationGridValue(): any;
         protected getPendingLocalizations(): any;
         protected initPropertyGrid(): void;
-        protected getPropertyItems(): Serenity.PropertyItem[];
+        protected getPropertyItems(): PropertyItem[];
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected validateBeforeSave(): boolean;
-        protected getSaveOptions(callback: (response: Serenity.SaveResponse) => void): Serenity.ServiceOptions<Serenity.SaveResponse>;
+        protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse>;
         protected getSaveEntity(): TItem;
-        protected getSaveRequest(): Serenity.SaveRequest<TItem>;
-        protected onSaveSuccess(response: Serenity.SaveResponse): void;
-        protected save_submitHandler(callback: (response: Serenity.SaveResponse) => void): void;
-        protected save(callback?: (response: Serenity.SaveResponse) => void): void | boolean;
-        protected saveHandler(options: Serenity.ServiceOptions<Serenity.SaveResponse>, callback: (response: Serenity.SaveResponse) => void): void;
+        protected getSaveRequest(): SaveRequest<TItem>;
+        protected onSaveSuccess(response: SaveResponse): void;
+        protected save_submitHandler(callback: (response: SaveResponse) => void): void;
+        protected save(callback?: (response: SaveResponse) => void): void | boolean;
+        protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
         protected initToolbar(): void;
-        protected showSaveSuccessMessage(response: Serenity.SaveResponse): void;
+        protected showSaveSuccessMessage(response: SaveResponse): void;
         protected getToolbarButtons(): ToolButton[];
         protected getCloningEntity(): TItem;
         protected updateInterface(): void;
-        protected getUndeleteOptions(callback?: (response: Serenity.UndeleteResponse) => void): Serenity.ServiceOptions<Serenity.UndeleteResponse>;
-        protected undeleteHandler(options: Serenity.ServiceOptions<Serenity.UndeleteResponse>, callback: (response: Serenity.UndeleteResponse) => void): void;
-        protected undelete(callback?: (response: Serenity.UndeleteResponse) => void): void;
+        protected getUndeleteOptions(callback?: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse>;
+        protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void;
+        protected undelete(callback?: (response: UndeleteResponse) => void): void;
         private _readonly;
         get readOnly(): boolean;
         set readOnly(value: boolean);
@@ -4655,7 +4922,7 @@ declare namespace Serenity {
         class ReportDialog extends TemplatedDialog<ReportDialogOptions> {
             constructor(opt: ReportDialogOptions);
             protected propertyGrid: PropertyGrid;
-            protected propertyItems: Serenity.PropertyItem[];
+            protected propertyItems: PropertyItem[];
             protected reportKey: string;
             protected createPropertyGrid(): void;
             loadReport(reportKey: string): void;
@@ -4666,7 +4933,7 @@ declare namespace Serenity {
                 onClick: () => void;
             }[];
         }
-        interface ReportExecuteRequest extends Serenity.ServiceRequest {
+        interface ReportExecuteRequest extends ServiceRequest {
             ExportType?: string;
             ReportKey?: string;
             DesignId?: string;
@@ -4678,12 +4945,12 @@ declare namespace Serenity {
             protected categoryClick(e: JQueryEventObject): void;
             protected reportLinkClick(e: JQueryEventObject): void;
         }
-        interface ReportRetrieveRequest extends Serenity.ServiceRequest {
+        interface ReportRetrieveRequest extends ServiceRequest {
             ReportKey?: string;
         }
-        interface ReportRetrieveResponse extends Serenity.ServiceResponse {
+        interface ReportRetrieveResponse extends ServiceResponse {
             ReportKey?: string;
-            Properties?: Serenity.PropertyItem[];
+            Properties?: PropertyItem[];
             Title?: string;
             InitialSettings?: any;
             IsDataOnlyReport?: boolean;
@@ -4749,10 +5016,10 @@ declare namespace Serenity {
         constructor(hidden: JQuery, opt: TOptions);
         protected emptyItemText(): string;
         protected getService(): string;
-        protected query(request: Serenity.ListRequest, callback: (p1: Serenity.ListResponse<any>) => void): void;
-        protected executeQuery(options: Serenity.ServiceOptions<Serenity.ListResponse<any>>): void;
+        protected query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void;
+        protected executeQuery(options: ServiceOptions<ListResponse<any>>): void;
         protected queryByKey(key: string, callback: (p1: any) => void): void;
-        protected executeQueryByKey(options: Serenity.ServiceOptions<Serenity.RetrieveResponse<any>>): void;
+        protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void;
         protected getItemKey(item: any): string;
         protected getItemText(item: any): string;
         protected getTypeDelay(): number;
@@ -4765,6 +5032,8 @@ declare namespace Serenity {
         set_value(value: string): void;
         set value(v: string);
     }
+
+    type Constructor<T> = new (...args: any[]) => T;
 }
 declare namespace Q {
     interface Lookup<TItem> {
@@ -4778,28 +5047,187 @@ declare namespace Q {
         textFormatter: (item: TItem) => string;
     }
 }
-declare namespace Slick {
-    interface Column<TItem = any> {
-        sourceItem?: Serenity.PropertyItem;
-    }
+interface JQuery {
+    getWidget<TWidget>(widgetType: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
+    tryGetWidget<TWidget>(widgetType: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
+    flexHeightOnly(flexY?: number): JQuery;
+    flexWidthOnly(flexX?: number): JQuery;
+    flexWidthHeight(flexX: number, flexY: number): JQuery;
+    flexX(flexX: number): JQuery;
+    flexY(flexY: number): JQuery;
 }
-
 declare namespace Slick {
-    namespace Aggregators {
-        function Avg(field: string): void;
-        function WeightedAvg(field: string, weightedField: string): void;
-        function Min(field: string): void;
-        function Max(field: string): void;
-        function Sum(field: string): void;
+    interface AutoTooltipsOptions {
+        enableForHeaderCells?: boolean;
+        enableForCells?: boolean;
+        maxToolTipLength?: number;
     }
-
     namespace Data {
         interface GroupItemMetadataProvider {
-            getGroupRowMetadata(item: any): any;
-            getTotalsRowMetadata(item: any): any;
+            getGroupRowMetadata(item: any): Slick.ItemMetadata;
+            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
+        }
+        class GroupItemMetadataProvider implements GroupItemMetadataProvider, Slick.IPlugin {
+            constructor();
+            init(grid: Slick.Grid): void;
+            getGroupRowMetadata(item: any): Slick.ItemMetadata;
+            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
         }
     }
-    class RemoteView<TEntity> {
-        constructor(options: Slick.RemoteViewOptions);
+    interface RowMoveManagerOptions {
+        cancelEditOnDrag: boolean;
+    }
+    class RowMoveManager implements IPlugin {
+        constructor(options: RowMoveManagerOptions);
+        init(): void;
+        onBeforeMoveRows: Slick.Event;
+        onMoveRows: Slick.Event;
+    }
+    interface AutoTooltipsOptions {
+        enableForHeaderCells?: boolean;
+        enableForCells?: boolean;
+        maxToolTipLength?: number;
+    }
+    class AutoTooltips {
+        constructor(options: AutoTooltipsOptions);
+        init(): void;
+    }
+}
+/**
+ * Represents the completion of an asynchronous operation
+ */
+interface PromiseConstructor {
+    /**
+     * Creates a new Promise.
+     * @param executor A callback used to initialize the promise. This callback is passed two arguments:
+     * a resolve callback used resolve the promise with a value or the result of another promise,
+     * and a reject callback used to reject the promise with a provided reason or error.
+     */
+    new <T>(executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void): PromiseLike<T>;
+    /**
+     * Creates a new rejected promise for the provided reason.
+     * @param reason The reason the promise was rejected.
+     * @returns A new rejected Promise.
+     */
+    reject(reason: any): PromiseLike<never>;
+    /**
+     * Creates a new rejected promise for the provided reason.
+     * @param reason The reason the promise was rejected.
+     * @returns A new rejected Promise.
+     */
+    reject<T>(reason: any): PromiseLike<T>;
+    /**
+     * Creates a new resolved promise for the provided value.
+     * @param value A promise.
+     * @returns A promise whose internal state matches the provided promise.
+     */
+    resolve<T>(value: T | PromiseLike<T>): PromiseLike<T>;
+    /**
+     * Creates a new resolved promise .
+     * @returns A resolved promise.
+     */
+    resolve(): PromiseLike<void>;
+}
+var Promise: PromiseConstructor;
+declare namespace Select2 {
+    namespace util {
+        function stripDiacritics(input: string): string;
+    }
+}
+interface Select2QueryOptions {
+    element?: JQuery;
+    term?: string;
+    page?: number;
+    context?: any;
+    callback?: (p1: Select2Result) => void;
+}
+interface Select2Item {
+    id: string;
+    text: string;
+    source?: any;
+    disabled?: boolean;
+}
+interface Select2Result {
+    results: any;
+    more: boolean;
+    context?: any;
+}
+interface Select2AjaxOptions {
+    transport?: any;
+    url?: any;
+    dataType?: string;
+    quietMillis?: number;
+    cache?: boolean;
+    jsonpCallback?: any;
+    data?: (p1: string, p2: number, p3: any) => any;
+    results?: (p1: any, p2: number, p3: any) => any;
+    params?: any;
+}
+interface Select2Options {
+    width?: any;
+    minimumInputLength?: number;
+    maximumInputLength?: number;
+    minimumResultsForSearch?: number;
+    maximumSelectionSize?: any;
+    placeHolder?: string;
+    placeHolderOption?: any;
+    separator?: string;
+    allowClear?: boolean;
+    multiple?: boolean;
+    closeOnSelect?: boolean;
+    openOnEnter?: boolean;
+    id?: (p1: any) => string;
+    matcher?: (p1: string, p2: string, p3: JQuery) => boolean;
+    sortResults?: (p1: any, p2: JQuery, p3: any) => any;
+    formatSelection?: (p1: any, p2: JQuery, p3: (p1: string) => string) => string;
+    formatResult?: (p1: any, p2: JQuery, p3: any, p4: (p1: string) => string) => string;
+    formatResultCssClass?: (p1: any) => string;
+    formatNoMatches?: (p1: string) => string;
+    formatSearching?: () => string;
+    formatInputTooShort?: (p1: string, p2: number) => string;
+    formatSelectionTooBig?: (p1: string) => string;
+    createSearchChoice?: (p1: string) => any;
+    createSearchChoicePosition?: string;
+    initSelection?: (p1: JQuery, p2: (p1: any) => void) => void;
+    tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
+    tokenSeparators?: any;
+    query?: (p1: Select2QueryOptions) => void;
+    ajax?: Select2AjaxOptions;
+    data?: any;
+    tags?: any;
+    containerCss?: any;
+    containerCssClass?: any;
+    dropdownCss?: any;
+    dropdownCssClass?: any;
+    dropdownAutoWidth?: boolean;
+    adaptContainerCssClass?: (p1: string) => string;
+    adaptDropdownCssClass?: (p1: string) => string;
+    escapeMarkup?: (p1: string) => string;
+    selectOnBlur?: boolean;
+    loadMorePadding?: number;
+    nextSearchTerm?: (p1: any, p2: string) => string;
+}
+interface Select2Data {
+    text?: string;
+}
+interface JQuery {
+    select2(options: Select2Options): JQuery;
+    select2(cmd: 'focus' | 'open'): JQuery;
+    select2(cmd: 'destroy'): void;
+    select2(cmd: 'val'): any;
+    select2(cmd: 'val', value: string | string[]): JQuery;
+    select2(cmd: 'data'): Select2Data;
+}
+interface JQueryStatic {
+    extend<T>(target: T, object1?: T, ...objectN: T[]): T;
+    toJSON(obj: any): string;
+}
+declare namespace JQueryValidation {
+    interface ValidationOptions {
+        normalizer?: (v: string) => string;
     }
 }

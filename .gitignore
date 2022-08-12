@@ -21,3 +21,4 @@ node_modules/
 /src/Serenity.Scripts/wwwroot/**/*.js
 /src/Serenity.Scripts/wwwroot/**/*.map
 /src/Serenity.Net.CodeGenerator/bin/
+/src/Serenity.Scripts/corelib/dist/
