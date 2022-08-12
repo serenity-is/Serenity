@@ -1032,6 +1032,8 @@ declare namespace Q {
     let isEnum: (type: any) => boolean;
     function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function prop(type: any, name: string, getter?: string, setter?: string): void;
+    const FieldsProxy: any;
+    function keyOf<T>(prop: keyof T): keyof T;
     function registerClass(type: any, name: string, intf?: any[]): void;
     function registerEnum(type: any, name: string): void;
     function registerInterface(type: any, name: string, intf?: any[]): void;

@@ -5,14 +5,12 @@ namespace Serenity.CodeGenerator
 {
     public class ServerTypingsCommand : BaseFileSystemCommand
     {
-        private readonly bool hasModules;
-        private readonly bool hasNamespaces;
+        private readonly bool modules;
 
-        public ServerTypingsCommand(IGeneratorFileSystem fileSystem, bool hasModules, bool hasNamespaces) 
+        public ServerTypingsCommand(IGeneratorFileSystem fileSystem, bool modules) 
             : base(fileSystem)
         {
-            this.hasModules = hasModules;
-            this.hasNamespaces = hasNamespaces;
+            this.modules = modules;
         }
 
         public void Run(string csproj, List<ExternalType> tsTypes)
@@ -139,16 +137,18 @@ namespace Serenity.CodeGenerator
                 }
             }
 
-            var outDir = fileSystem.Combine(projectDir, PathHelper.ToPath((config.ServerTypings?.OutDir.TrimToNull() ?? "Imports/ServerTypings")));
+            var outDir = fileSystem.Combine(projectDir, 
+                PathHelper.ToPath((config.ServerTypings?.OutDir.TrimToNull() ?? 
+                    (modules ? "Modules/ServerTypes" : "Imports/ServerTypings"))));
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write("Transforming ServerTypings at: ");
+            Console.Write("Transforming " + (modules ? "ServerTypes" : "ServerTypings") + " at: ");
             Console.ResetColor();
             Console.WriteLine(outDir);
 
             generator.RootNamespaces.Add(config.RootNamespace);
-            generator.ModuleTypings = config.ServerTypings?.ModuleTypings ?? hasModules;
-            generator.NamespaceTypings = config.ServerTypings?.NamespaceTypings ?? hasNamespaces;
+            generator.ModuleTypings = modules && config?.ServerTypings?.ModuleTypings != false;
+            generator.NamespaceTypings = !modules && config?.ServerTypings?.NamespaceTypings != false;
 
             foreach (var type in tsTypes)
                 generator.AddTSType(type);

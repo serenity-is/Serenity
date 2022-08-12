@@ -492,8 +492,8 @@ namespace Serenity.CodeGeneration
             {
                 if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
                 {
-                    var from = GetFileNameFor(ns, name, module);
-                    name = AddModuleImport(from, name);
+                    var filename = GetFileNameFor(ns, name, module);
+                    name = AddModuleImport(filename, name, external: false);
                     ns = "";
                 }
             }
@@ -883,6 +883,7 @@ namespace Serenity.CodeGeneration
             public string Name { get; set; }
             public string Alias { get; set; }
             public string From { get; set; }
+            public bool External { get; set; }
         }
 
         protected void ClearImports()
@@ -897,20 +898,25 @@ namespace Serenity.CodeGeneration
                 if (module)
                 {
                     sb.Insert(0, string.Join(Environment.NewLine,
-                        moduleImports.ToLookup(x => x.From)
-                            .Select(from =>
+                        moduleImports.ToLookup(x => (x.From, x.External))
+                            .Select(z =>
                             {
-                                var path = from.Key;
-                                if (System.IO.Path.GetDirectoryName(filename) ==
-                                    System.IO.Path.GetDirectoryName(path))
-                                    path = "./" + System.IO.Path.GetFileName(path);
-                                else
-                                    path = "../" + path;
+                                var from = z.Key.From;
+                                if (!z.Key.External && 
+                                    !from.StartsWith('/') &&
+                                    !from.StartsWith('.'))
+                                {
+                                    if (System.IO.Path.GetDirectoryName(filename) ==
+                                        System.IO.Path.GetDirectoryName(from))
+                                        from = "./" + System.IO.Path.GetFileName(from);
+                                    else
+                                        from = "../" + from;
+                                }
 
-                                var importList = string.Join(", ", from.Select(p =>
+                                var importList = string.Join(", ", z.Select(p =>
                                     p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
 
-                                return $"import {{ {importList} }} from \"{path}\";";
+                                return $"import {{ {importList} }} from \"{from}\";";
                             })) + Environment.NewLine + Environment.NewLine);
                 }
 
@@ -921,7 +927,21 @@ namespace Serenity.CodeGeneration
             base.AddFile(filename, module);
         }
 
-        protected string AddModuleImport(string from, string name)
+        protected string ImportFromQ(string name)
+        {
+            return AddExternalImport("@serenity-is/corelib/q", name);
+        }
+        protected string ImportFromCorelib(string name)
+        {
+            return AddExternalImport("@serenity-is/corelib", name);
+        }
+
+        protected string AddExternalImport(string from, string name)
+        {
+            return AddModuleImport(from, name, external: true);
+        }
+
+        protected string AddModuleImport(string from, string name, bool external = false)
         {
             if (name is null)
                 throw new ArgumentNullException(nameof(name));
@@ -929,7 +949,7 @@ namespace Serenity.CodeGeneration
             if (from is null)
                 throw new ArgumentNullException(nameof(from));
 
-            var existing = moduleImports.FirstOrDefault(x => x.From == from && x.Name == name);
+            var existing = moduleImports.FirstOrDefault(x => x.From == from && x.Name == name && x.External == external);
             if (existing != null)
                 return existing.Alias;
 

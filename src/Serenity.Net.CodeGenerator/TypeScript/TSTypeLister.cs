@@ -9,52 +9,29 @@ namespace Serenity.CodeGenerator
     {
         private readonly IGeneratorFileSystem fileSystem;
         private readonly CancellationToken cancellationToken;
-        private readonly string projectDir;
+        private readonly string tsConfigPath;
 
-        public TSTypeLister(IGeneratorFileSystem fileSystem, string projectDir,
+        public TSTypeLister(IGeneratorFileSystem fileSystem, string tsConfigPath,
             CancellationToken cancellationToken = default)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             this.cancellationToken = cancellationToken;
-            this.projectDir = fileSystem.GetFullPath(projectDir);
+            if (tsConfigPath is null)
+                throw new ArgumentNullException(nameof(tsConfigPath));
+
+            this.tsConfigPath = fileSystem.GetFullPath(tsConfigPath);
         }
 
-        public List<ExternalType> List(out bool hasModules, out bool hasNamespaces)
+        public List<ExternalType> List()
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            hasNamespaces = false;
-            hasModules = false;
-            IEnumerable<string> files = null;
-            var rootConfig = TSConfigHelper.Read(fileSystem, fileSystem.Combine(projectDir, "tsconfig.json"));
-            if (rootConfig is not null)
-            {
-                hasNamespaces = hasNamespaces || rootConfig.CompilerOptions?.Module is null or "none";
-                hasModules = hasModules || rootConfig.CompilerOptions?.Module is not null or "none";
-
-                files = TSConfigHelper.ListFiles(rootConfig, fileSystem, projectDir, cancellationToken);
-                if (rootConfig.CompilerOptions?.Module is null or "none")
-                {
-                    var modulesConfigPath = fileSystem.Combine(projectDir, "Modules", "tsconfig.json");
-                    var modulesConfig = TSConfigHelper.Read(fileSystem, modulesConfigPath);
-                    if (modulesConfig is not null)
-                    {
-                        hasModules = hasModules || modulesConfig.CompilerOptions?.Module is not null or "none";
-                        hasNamespaces = hasNamespaces || modulesConfig.CompilerOptions?.Module is null or "none";
-                     
-                        files = (files ?? Array.Empty<string>()).Concat(
-                                TSConfigHelper.ListFiles(modulesConfig, fileSystem, projectDir, cancellationToken))
-                            .Distinct();
-                    }
-                }
-            }
-
-            if (!hasModules)
-                hasNamespaces = true;
+            var files = TSConfigHelper.ListFiles(fileSystem, tsConfigPath, cancellationToken);
 
             if (files == null || !files.Any())
             {
                 // legacy apps
+                var projectDir = fileSystem.GetDirectoryName(tsConfigPath);
                 var directories = new[]
                 {
                     fileSystem.Combine(projectDir, @"Modules"),

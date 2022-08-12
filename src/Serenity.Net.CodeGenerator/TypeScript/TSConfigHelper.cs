@@ -139,5 +139,33 @@ namespace Serenity.CodeGenerator
                 });
 #endif
         }
+
+        public static void LocateTSConfigFiles(IGeneratorFileSystem fileSystem,
+            string projectDir, out string modulesPath, out string namespacesPath)
+        {
+            namespacesPath = null;
+            modulesPath = null;
+
+            foreach (var configPath in new[]
+            {
+                fileSystem.Combine(projectDir, "tsconfig.json"),
+                fileSystem.Combine(projectDir, "Namespaces", "tsconfig.json"),
+                fileSystem.Combine(projectDir, "Modules", "tsconfig.json")
+            })
+            {
+                var config = TSConfigHelper.Read(fileSystem, configPath);
+                if (config is null)
+                    continue;
+
+                if (config.CompilerOptions?.Module is not (null or "none"))
+                    modulesPath ??= configPath;
+                else
+                    namespacesPath ??= configPath;
+
+                if (modulesPath is not null &&
+                    namespacesPath is not null)
+                    break;
+            }
+        }
     }
 }

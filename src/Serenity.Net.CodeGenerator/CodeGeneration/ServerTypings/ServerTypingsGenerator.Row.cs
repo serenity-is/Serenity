@@ -518,9 +518,11 @@ namespace Serenity.CodeGeneration
 
                     if (module)
                     {
+                        var getLookup = ImportFromQ("getLookup");
+                        var getLookupAsync = ImportFromQ("getLookupAsync");
                         cw.IndentedLine("/** @deprecated use getLookupAsync instead */");
-                        cw.IndentedLine($"static getLookup() {{ return Q.getLookup<{rowType.Name}>({sq(meta.LookupKey)}) }}");
-                        cw.IndentedLine($"static async getLookupAsync() {{ return Q.getLookupAsync<{rowType.Name}>({sq(meta.LookupKey)}) }}");
+                        cw.IndentedLine($"static getLookup() {{ return {getLookup}<{rowType.Name}>({sq(meta.LookupKey)}) }}");
+                        cw.IndentedLine($"static async getLookupAsync() {{ return {getLookupAsync}<{rowType.Name}>({sq(meta.LookupKey)}) }}");
                         sb.AppendLine();
                     }
                     else
@@ -537,29 +539,30 @@ namespace Serenity.CodeGeneration
                 cw.IndentedLine($"{export}updatePermission = {sq(meta.UpdatePermission)};");
                 sb.AppendLine();
 
-                cw.Indented(module ? "static readonly Fields =" : "export declare const enum Fields");
-
-                cw.InBrace(delegate
-                {
-                    var inserted = 0;
-                    foreach (var property in EnumerateFieldProperties(rowType))
-                    {
-                        if (inserted > 0)
-                            sb.AppendLine(",");
-
-                        cw.Indented($"{property.Name}{(module ? ": " : " = ")}{dq(property.Name)}");
-
-                        inserted++;
-                    }
-
-                    sb.AppendLine();
-                });
-
                 if (module)
                 {
-                    var s = sb.ToString().TrimEnd();
-                    sb.Clear();
-                    sb.AppendLine(s + " as const");
+                    ImportFromQ("FieldsProxy");
+                    cw.IndentedLine($"static readonly Fields: Readonly<Record<keyof {rowType.Name}, string>> = FieldsProxy");
+                }
+                else
+                {
+                    cw.Indented(module ? "static readonly Fields =" : "export declare const enum Fields");
+
+                    cw.InBrace(delegate
+                    {
+                        var inserted = 0;
+                        foreach (var property in EnumerateFieldProperties(rowType))
+                        {
+                            if (inserted > 0)
+                                sb.AppendLine(",");
+
+                            cw.Indented($"{property.Name}{(module ? ": " : " = ")}{dq(property.Name)}");
+
+                            inserted++;
+                        }
+
+                        sb.AppendLine();
+                    });
                 }
             });
         }

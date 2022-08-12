@@ -88,15 +88,32 @@ namespace Serenity.CodeGenerator
                     "clienttypes".StartsWith(command, StringComparison.Ordinal) ||
                     "mvct".StartsWith(command, StringComparison.Ordinal))
                 {
-                    bool hasNamespaces = true;
-                    bool hasModules = false;
-                    List<ExternalType> tsTypes = null;
+                    List<ExternalType> tsTypesNamespaces = null;
+                    List<ExternalType> tsTypesModules = null;
+
                     void ensureTSTypes()
                     {
-                        if (tsTypes == null)
+                        if (tsTypesNamespaces is null &&
+                            tsTypesModules is null)
                         {
-                            var tsTypeLister = new TSTypeLister(fileSystem, projectDir);
-                            tsTypes = tsTypeLister.List(out hasModules, out hasNamespaces);
+                            TSConfigHelper.LocateTSConfigFiles(fileSystem, projectDir,
+                                out string modulesPath, out string namespacesPath);
+
+                            if (modulesPath is null &&
+                                namespacesPath is null)
+                                namespacesPath = fileSystem.Combine(projectDir, "tsconfig.json");
+
+                            if (namespacesPath is not null)
+                            {
+                                var nsLister = new TSTypeLister(fileSystem, namespacesPath);
+                                tsTypesNamespaces = nsLister.List();
+                            }
+
+                            if (modulesPath is not null)
+                            {
+                                var mdLister = new TSTypeLister(fileSystem, modulesPath);
+                                tsTypesModules = mdLister.List();
+                            }
                         }
                     }
 
@@ -112,14 +129,23 @@ namespace Serenity.CodeGenerator
                         "clienttypes".StartsWith(command, StringComparison.Ordinal) || command == "mvct")
                     {
                         ensureTSTypes();
-                        new ClientTypesCommand(fileSystem).Run(csproj, tsTypes);
+                        new ClientTypesCommand(fileSystem).Run(csproj,
+                            (tsTypesNamespaces ?? new List<ExternalType>())
+                            .Concat(tsTypesModules ?? new List<ExternalType>()).ToList());
                     }
 
                     if (transformAll ||
                         "servertypings".StartsWith(command, StringComparison.Ordinal))
                     {
                         ensureTSTypes();
-                        new ServerTypingsCommand(fileSystem, hasModules, hasNamespaces).Run(csproj, tsTypes);
+
+                        if (tsTypesNamespaces is not null)
+                            new ServerTypingsCommand(fileSystem, modules: false)
+                                .Run(csproj, tsTypesNamespaces);
+
+                        if (tsTypesModules is not null)
+                            new ServerTypingsCommand(fileSystem, modules: true)
+                                .Run(csproj, tsTypesModules);
                     }
 
                     return ExitCodes.Success;
