@@ -962,7 +962,8 @@ namespace Serenity.CodeGeneration
             {
                 From = from,
                 Name = name,
-                Alias = alias
+                Alias = alias,
+                External = external
             });
 
             return alias;
