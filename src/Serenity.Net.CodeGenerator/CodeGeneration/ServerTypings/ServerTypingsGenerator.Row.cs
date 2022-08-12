@@ -541,8 +541,8 @@ namespace Serenity.CodeGeneration
 
                 if (module)
                 {
-                    ImportFromQ("FieldsProxy");
-                    cw.IndentedLine($"static readonly Fields: Readonly<Record<keyof {rowType.Name}, string>> = FieldsProxy");
+                    var fieldsProxy = ImportFromQ("fieldsProxy");
+                    cw.IndentedLine($"static readonly Fields = {fieldsProxy}<{rowType.Name}>();");
                 }
                 else
                 {

@@ -466,7 +466,11 @@ function distinct(arr: any[]) {
     return arr.filter((item, pos) => arr.indexOf(item) === pos);
 }
 
-export const FieldsProxy: any = new Proxy({}, { get: (_, p) => p });
+const _fieldsProxy = new Proxy({}, { get: (_, p) => p }) as any;
+
+export function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>> {
+    return _fieldsProxy
+}
 
 export function keyOf<T>(prop: keyof T) {
     return prop;
