@@ -4,7 +4,6 @@ import fs from 'fs';
 import pkg from "./package.json";
 import { builtinModules } from "module";
 import dts from "rollup-plugin-dts";
-import { debug } from 'console';
 
 var globals = {
     'jquery': '$',
@@ -19,7 +18,6 @@ var rxNamespace = /^namespace\s?/;
 var rxExport = /^export\s?/;
 var rxDeclare = /^declare\s?/;
 var rxClassTypeIntfEnum = /^(class|type|interface|enum)\s?/;
-var rxClassIntfEnumBlock = /^(declare\s+)?(class|interface|enum)\s+([A-Za-z_0-9]+)([^\n\r:]*)\s+\{\r?\n((^\s+.*\r?\n)*)?\}/gm;
 var rxDeclareGlobal = /^(declare\s+global.*\s*\{\r?\n)((^\s+.*\r?\n)*)?\}/gm;
 var rxRemoveExports = /^export\s*\{[^\}]*\}\s*\;\s*\r?\n/gm;
 var rxRemoveImports = /^\s*import\s*\{([\sA-Za-z0-9_,\$]*)\}\s*from\s*['"](.*)['"]\s*\;\s*\r?\n/gm;
