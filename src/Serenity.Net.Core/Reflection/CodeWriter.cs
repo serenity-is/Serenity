@@ -302,6 +302,39 @@
         }
 
         /// <summary>
+        /// Tries to add namespace
+        /// </summary>
+        /// <param name="nameSpace"></param>
+        /// <param name="typeName"></param>
+        /// <returns>if succeeds returns only typeName if fails returns fullName</returns>
+        public string ShortTypeName(string nameSpace, string typeName)
+        {
+            if (string.IsNullOrEmpty(typeName))
+                return string.Empty;
+
+            if (string.IsNullOrEmpty(nameSpace))
+                return typeName;
+
+            if (Using(nameSpace))
+                return typeName;
+            else
+                return nameSpace + "." + typeName;
+        }
+
+        /// <summary>
+        /// Tries to add namespace
+        /// </summary>
+        /// <returns>if succeeds returns only typeName if fails returns fullName</returns>
+        public string ShortTypeName(string fullName)
+        {
+            var idx = fullName.LastIndexOf('.');
+            if (idx < 0)
+                return fullName;
+
+            return ShortTypeName(fullName[..idx], fullName[(idx + 1)..]);
+        }
+
+        /// <summary>
         /// Appends a char to internal string builder
         /// </summary>
         /// <param name="c">Char</param>

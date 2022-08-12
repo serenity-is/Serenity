@@ -12,7 +12,7 @@ namespace {{RootNamespace}}{{DotModule}}
     public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
     {
 {{-for x in Fields}}
-        [{{TYPEREFLIST x.AttributeList}}]
+        [{{TYPEREFMODELLIST x.AttributeList}}]
         public {{TYPEREF x.PropertyType}} {{x.Ident}}
         {
             get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this];
@@ -21,7 +21,7 @@ namespace {{RootNamespace}}{{DotModule}}
 {{end}}
 {{-for j in Joins}}
 {{-for k in j.Fields}}
-        [{{TYPEREFLIST k.AttributeList}}]
+        [{{TYPEREFMODELLIST k.AttributeList}}]
         public {{TYPEREF k.PropertyType}} {{k.Ident}}
         {
             get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this];

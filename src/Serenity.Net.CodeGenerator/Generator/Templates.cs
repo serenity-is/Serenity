@@ -43,72 +43,51 @@ namespace Serenity.CodeGenerator
 
         delegate string TypeDelegate(string key);
         delegate string TypeListDelegate(List<string> key);
+        delegate string TypeModelListDelegate(List<TypeRefModel> key);
         delegate void UsingDelegate(string key);
 
-        public static string ShortTypeName(this CodeWriter cw, string fullName)
+        public static string ShortTypeName(CodeWriter cw, string fullName)
         {
             fullName = fullName.Trim();
 
-            // checks for nullable and normal system types
-            if (SystemTypes.IsCSKeyword(fullName) || SystemTypes.IsCSKeyword(fullName[..^1]))
-                return fullName;
-                        
-            if (fullName.IndexOf(".") < 0)
+            if (string.IsNullOrEmpty(fullName))
+                return string.Empty;
+            
+            var nullableText = "";
+            if (fullName.EndsWith('?'))
+            {
+                fullName = fullName[..^1];
+                nullableText = "?";
+            }
+
+            if (SystemTypes.IsCSKeyword(fullName))
+                return fullName + nullableText;
+
+            if (fullName.IndexOf('.', StringComparison.OrdinalIgnoreCase) < 0)
             {
                 if (fullName == "Stream")
                     fullName = "System.IO.Stream";
                 else
                 {
-                    var isNullable = fullName.EndsWith("?");
-
-                    var type = Type.GetType("System." + fullName.Replace("?", ""));
+                    var type = Type.GetType("System." + fullName);
 
                     if (type != null)
                     {
                         fullName = type.FullName;
-                        if (isNullable)
-                            fullName += "?";
                     }
                     else
-                        return fullName;
+                        return fullName + nullableText;
                 }
             }
-            
-            var typeFullName = fullName.Trim();
-            
-            var functionPart = typeFullName.IndexOf("(") < 0 ? "" : typeFullName[typeFullName.IndexOf("(")..];
 
-            typeFullName = typeFullName.IndexOf("(") < 0 ? typeFullName : typeFullName[..typeFullName.IndexOf("(")];
-
-            var genericPart = typeFullName.IndexOf("<") < 0 ? "" : typeFullName[typeFullName.IndexOf("<")..];
-
-            typeFullName = typeFullName.IndexOf("<") < 0 ? typeFullName : typeFullName[..typeFullName.IndexOf("<")];
-
-            var nameSpace = typeFullName[..typeFullName.LastIndexOf(".")];
-            
-            var typeName = typeFullName[(typeFullName.LastIndexOf(".") + 1)..];
-
-            return ShortTypeName(nameSpace, cw.CurrentNamespace, cw.Using) + typeName + genericPart + functionPart;
-        }
-
-        public static string ShortTypeName(this string ns, string nsCode,
-        Func<string, bool> uses = null)
-        {
-            if (string.IsNullOrEmpty(ns) ||
-                (!string.IsNullOrEmpty(nsCode) &&
-                 (nsCode == ns ||
-                  nsCode.StartsWith(ns + ".", StringComparison.Ordinal))) ||
-                (uses != null && uses(ns)))
-                return string.Empty;
-
-            if (!string.IsNullOrEmpty(nsCode))
+            if (fullName.EndsWith('>'))
             {
-                var idx = nsCode.IndexOf('.');
-                if (idx >= 0 && ns.StartsWith(nsCode.Substring(0, idx + 1), StringComparison.Ordinal))
-                    return ns.Substring(idx + 1) + ".";
+                var idx = fullName.IndexOf('<', StringComparison.OrdinalIgnoreCase);
+                if (idx >= 0)
+                    return cw.ShortTypeName(fullName[..idx]) + '<' + ShortTypeName(cw, fullName[(idx + 1)..^1]) + '>' + nullableText;
             }
 
-            return ns + ".";
+            return cw.ShortTypeName(fullName) + nullableText;
         }
 
         public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model, string subNamespacePath = "")
@@ -138,12 +117,12 @@ namespace Serenity.CodeGenerator
                       ns == "System.ComponentModel" ||
                       ns == "System.Collections.Generic"
                 };
-                
+
                 if (model is EntityModel em && !string.IsNullOrEmpty(em.RootNamespace) && !string.IsNullOrEmpty(em.DotModule) && !string.IsNullOrEmpty(subNamespacePath))
                 {
                     cw.CurrentNamespace = em.RootNamespace + em.DotModule + subNamespacePath;
                 }
-                
+
                 var scriptObject = new ScriptObject();
                 scriptObject.Import("TYPEREF", new TypeDelegate((fullName) =>
                 {
@@ -154,12 +133,27 @@ namespace Serenity.CodeGenerator
                 {
                     if (fullNames == null)
                         return "";
-                    
+
                     HashSet<string> result = new();
 
                     foreach (var fullName in fullNames)
                     {
                         result.Add(ShortTypeName(cw, fullName));
+                    }
+
+                    return string.Join(", ", result);
+                }));
+
+                scriptObject.Import("TYPEREFMODELLIST", new TypeModelListDelegate((models) =>
+                {
+                    if (models == null)
+                        return "";
+
+                    HashSet<string> result = new();
+
+                    foreach (var model in models)
+                    {
+                        result.Add(ShortTypeName(cw, model.TypeName) + model.ArgumentPart);
                     }
 
                     return string.Join(", ", result);
