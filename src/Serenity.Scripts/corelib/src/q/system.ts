@@ -466,6 +466,12 @@ function distinct(arr: any[]) {
     return arr.filter((item, pos) => arr.indexOf(item) === pos);
 }
 
+export const FieldsProxy = new Proxy({}, { get: (_, p) => p });
+
+export function keyOf<T>(prop: keyof T) {
+    return prop;
+}
+
 function merge(arr1: any[], arr2: any[]) {
     if (!arr1 || !arr2)
         return (arr1 || arr2 || []).slice();
