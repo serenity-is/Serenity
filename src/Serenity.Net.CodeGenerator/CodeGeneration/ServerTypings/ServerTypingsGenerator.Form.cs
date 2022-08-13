@@ -204,7 +204,15 @@ namespace Serenity.CodeGeneration
             cw.Indented("export class ");
             sb.Append(identifier);
 
-            sb.Append(" extends Serenity.PrefixedContext");
+            if (module)
+            {
+                var prefixedContext = ImportFromSerenity("PrefixedContext");
+                sb.Append($" extends {prefixedContext}");
+            }
+            else
+            {
+                sb.Append(" extends Serenity.PrefixedContext");
+            }
             cw.InBrace(delegate
             {
                 cw.Indented("static formKey = '");

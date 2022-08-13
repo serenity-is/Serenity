@@ -931,9 +931,20 @@ namespace Serenity.CodeGeneration
         {
             return AddExternalImport("@serenity-is/corelib/q", name);
         }
+
         protected string ImportFromCorelib(string name)
         {
             return AddExternalImport("@serenity-is/corelib", name);
+        }
+
+        protected string ImportFromSerenity(string name)
+        {
+            return AddExternalImport("@serenity-is/corelib/serenity", name);
+        }
+
+        protected string ImportFromSlick(string name)
+        {
+            return AddExternalImport("@serenity-is/corelib/slick", name);
         }
 
         protected string AddExternalImport(string from, string name)

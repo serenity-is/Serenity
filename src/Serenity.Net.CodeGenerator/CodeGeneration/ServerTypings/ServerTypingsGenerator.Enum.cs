@@ -41,7 +41,15 @@
                 sb.AppendLine();
             });
 
-            cw.Indented("Serenity.Decorators.registerEnumType(");
+            if (module)
+            {
+                var decorators = ImportFromSerenity("Decorators");
+                cw.Indented($"{decorators}.registerEnumType(");
+            }
+            else
+            {
+                cw.Indented("Serenity.Decorators.registerEnumType(");
+            }
             sb.Append(enumType.Name);
             sb.Append(", '");
             sb.Append(fullName);
