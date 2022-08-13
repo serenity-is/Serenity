@@ -3,6 +3,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "noEmit": true,
+    "emitDeclarationOnly": false,
     "sourceMap": false,
     "module": "CommonJS",
     "skipLibCheck": true,
@@ -32,7 +33,6 @@
     "jsx": "react"
   },
   "include": [
-    "../src/**/*",
     "**/*.spec.ts"
   ]
 }
