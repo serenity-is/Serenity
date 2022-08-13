@@ -505,7 +505,10 @@ Slick._ = (() => {
       while (i--) {
         rowWidth += cols[i].width;
       }
-      return host.getOptions().fullWidthRows ? Math.max(rowWidth, host.getAvailableWidth()) : rowWidth;
+      return host.getOptions().fullWidthRows ? Math.max(
+        rowWidth,
+        host.getAvailableWidth()
+      ) : rowWidth;
     }
     function updateHeadersWidth() {
       headersWidth = 0;
@@ -1666,11 +1669,17 @@ Slick._ = (() => {
         sort: (e) => {
           if (canDragScroll && e.originalEvent.pageX > this._container.clientWidth) {
             if (!columnScrollTimer) {
-              columnScrollTimer = setInterval(scrollColumnsRight, 100);
+              columnScrollTimer = setInterval(
+                scrollColumnsRight,
+                100
+              );
             }
           } else if (canDragScroll && e.originalEvent.pageX < this._jQuery(this._layout.getScrollContainerX()).offset().left) {
             if (!columnScrollTimer) {
-              columnScrollTimer = setInterval(scrollColumnsLeft, 100);
+              columnScrollTimer = setInterval(
+                scrollColumnsLeft,
+                100
+              );
             }
           } else {
             clearInterval(columnScrollTimer);
@@ -1686,7 +1695,10 @@ Slick._ = (() => {
             return;
           }
           var reorderedCols;
-          this._layout.getHeaderCols().forEach((el) => reorderedCols = sortToDesiredOrderAndKeepRest(this._initCols, this._jQuery(el).sortable("toArray").map((x) => x.substring(this._uid.length))));
+          this._layout.getHeaderCols().forEach((el) => reorderedCols = sortToDesiredOrderAndKeepRest(
+            this._initCols,
+            this._jQuery(el).sortable("toArray").map((x) => x.substring(this._uid.length))
+          ));
           this.setColumns(reorderedCols);
           this.trigger(this.onColumnsReordered, {});
           e.stopPropagation();
@@ -1803,7 +1815,11 @@ Slick._ = (() => {
       if (cs.boxSizing != "border-box")
         h.forEach((val) => this._headerColumnWidthDiff += parseFloat(cs.getPropertyValue(val)) || 0);
       el.remove();
-      var r = this._layout.getCanvasNodeFor(0, 0).appendChild(H("div", { class: "slick-row" }, el = H("div", { class: "slick-cell", id: "", style: "visibility: hidden" })));
+      var r = this._layout.getCanvasNodeFor(0, 0).appendChild(H(
+        "div",
+        { class: "slick-row" },
+        el = H("div", { class: "slick-cell", id: "", style: "visibility: hidden" })
+      ));
       el.innerHTML = "-";
       this._cellWidthDiff = this._cellHeightDiff = 0;
       cs = getComputedStyle(el);
@@ -3420,7 +3436,13 @@ Slick._ = (() => {
         this._activeCellNode.classList.remove("editable", "invalid");
         if (d) {
           var column = this._cols[this._activeCell];
-          var fmtResult = d ? this.getFormatter(this._activeRow, column)(this._activeRow, this._activeCell, this.getDataItemValueForColumn(d, column), column, d) : "";
+          var fmtResult = d ? this.getFormatter(this._activeRow, column)(
+            this._activeRow,
+            this._activeCell,
+            this.getDataItemValueForColumn(d, column),
+            column,
+            d
+          ) : "";
           applyFormatterResultToCellNode(fmtResult, this._activeCellNode);
           this.invalidatePostProcessingResults(this._activeRow);
         }

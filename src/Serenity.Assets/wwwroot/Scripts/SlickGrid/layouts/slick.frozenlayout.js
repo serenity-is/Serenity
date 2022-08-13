@@ -97,9 +97,17 @@ Slick._ = (() => {
       const options = host.getOptions();
       const uisd = options.useLegacyUI ? " ui-state-default" : "";
       headerColsL = H("div", { class: "slick-header-columns slick-header-columns-left", style: (options.rtl ? "right" : "left") + ":-1000px" });
-      paneHeaderL = H("div", { class: "slick-pane slick-pane-header slick-pane-left", tabIndex: "0" }, H("div", { class: "slick-header slick-header-left" + uisd, style: !options.showColumnHeader && "display: none" }, headerColsL));
+      paneHeaderL = H(
+        "div",
+        { class: "slick-pane slick-pane-header slick-pane-left", tabIndex: "0" },
+        H("div", { class: "slick-header slick-header-left" + uisd, style: !options.showColumnHeader && "display: none" }, headerColsL)
+      );
       headerColsR = H("div", { class: "slick-header-columns slick-header-columns-right", style: (options.rtl ? "right" : "left") + ":-1000px" });
-      paneHeaderR = H("div", { class: "slick-pane slick-pane-header slick-pane-right", tabIndex: "0" }, H("div", { class: "slick-header slick-header-right" + uisd, style: !options.showColumnHeader && "display: none" }, headerColsR));
+      paneHeaderR = H(
+        "div",
+        { class: "slick-pane slick-pane-header slick-pane-right", tabIndex: "0" },
+        H("div", { class: "slick-header slick-header-right" + uisd, style: !options.showColumnHeader && "display: none" }, headerColsR)
+      );
       headerRowColsL = H("div", { class: "slick-headerrow-columns slick-headerrow-columns-left" });
       headerRowSpacerL = spacerDiv(spacerW);
       var headerRowL = H("div", { class: "slick-headerrow" + uisd, style: !options.showHeaderRow && "display: none" }, headerRowColsL, headerRowSpacerL);
@@ -128,7 +136,14 @@ Slick._ = (() => {
       canvasBottomR = H("div", { class: "grid-canvas grid-canvas-bottom grid-canvas-right", tabIndex: "0", hideFocus: "" });
       viewportBottomR = H("div", { class: "slick-viewport slick-viewport-bottom slick-viewport-right", tabIndex: "0", hideFocus: "" });
       paneBottomR = H("div", { class: "slick-pane slick-pane-bottom slick-pane-right", tabIndex: "0" }, viewportBottomR);
-      host.getContainerNode().append(paneHeaderL, paneHeaderR, paneTopL, paneTopR, paneBottomL, paneBottomR);
+      host.getContainerNode().append(
+        paneHeaderL,
+        paneHeaderR,
+        paneTopL,
+        paneTopR,
+        paneBottomL,
+        paneBottomR
+      );
       disableSelection(headerColsL);
       disableSelection(headerColsR);
       adjustFrozenRowOption();
