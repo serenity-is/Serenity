@@ -8,7 +8,10 @@
         private readonly StringBuilder sb;
         private readonly string tab;
         private string indent;
-
+        /// <summary>
+        /// Is CodeWriter running for C#
+        /// </summary>
+        public bool IsCSharp { get; set; }
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeWriter"/> class.
         /// </summary>
@@ -67,6 +70,120 @@
             IncreaseIndent();
             insideBlock();
             DecreaseIndent();
+        }
+
+        /// <summary>
+        /// Converts primitive class to C# keyword if given class is not a primitive class returns null.
+        /// </summary>
+        /// <param name="dataType"></param>
+        /// <returns></returns>
+
+        public static string ToCSKeyword(string dataType)
+        {
+            return dataType switch
+            {
+                "String" => "string",
+                "Boolean" => "bool",
+                "Byte" => "byte",
+                "Char" => "char",
+                "Decimal" => "decimal",
+                "Double" => "double",
+                "Int16" => "short",
+                "Int32" => "int",
+                "Int64" => "long",
+                "Object" => "object",
+                "SByte" => "sbyte",
+                "Single" => "float",
+                "UInt16" => "ushort",
+                "UInt32" => "uint",
+                "UInt64" => "ulong",
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Determines is Type is a C# primitive keyword
+        /// </summary>
+        /// <param name="dataType"></param>
+        /// <returns></returns>
+
+        public static bool IsCSKeyword(string dataType)
+        {
+            return dataType switch
+            {
+                "string" => true,
+                "bool" => true,
+                "byte" => true,
+                "char" => true,
+                "decimal" => true,
+                "double" => true,
+                "short" => true,
+                "int" => true,
+                "long" => true,
+                "object" => true,
+                "sbyte" => true,
+                "float" => true,
+                "ushort" => true,
+                "uint" => true,
+                "ulong" => true,
+                _ => false
+            };
+        }
+
+        /// <summary>
+        /// Converts datatype with a namespace to datatype without namespace if its namespace is in the allowed usings else returns fullname.
+        /// <para>
+        /// Please see <see cref="IsCSharp"/> if you are using this for C#
+        /// </para>
+        /// </summary>
+        /// <param name="cw"></param>
+        /// <param name="fullName"></param>
+        /// <returns></returns>
+        public string ShortTypeName(CodeWriter cw, string fullName)
+        {
+            fullName = fullName.Trim();
+
+            if (string.IsNullOrEmpty(fullName))
+                return string.Empty;
+
+            var nullableText = "";
+            if (fullName.EndsWith('?'))
+            {
+                fullName = fullName[..^1];
+                nullableText = "?";
+            }
+
+            if (IsCSharp)
+            {
+                if (IsCSKeyword(fullName))
+                    return fullName + nullableText;
+
+                if (fullName.IndexOf('.', StringComparison.OrdinalIgnoreCase) < 0)
+                {
+                    if (fullName == "Stream")
+                        fullName = "System.IO.Stream";
+                    else
+                    {
+                        var type = Type.GetType("System." + fullName);
+
+                        if (type != null)
+                        {
+                            fullName = type.FullName;
+                        }
+                        else
+                            return fullName + nullableText;
+                    }
+                }
+
+                if (fullName.EndsWith('>'))
+                {
+                    var idx = fullName.IndexOf('<', StringComparison.OrdinalIgnoreCase);
+                    if (idx >= 0)
+                        return cw.ShortTypeName(fullName[..idx]) + '<' + ShortTypeName(cw, fullName[(idx + 1)..^1]) + '>' + nullableText;
+                }
+            }
+
+            return cw.ShortTypeName(fullName) + nullableText;
         }
 
 

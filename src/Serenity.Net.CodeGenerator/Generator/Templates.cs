@@ -45,51 +45,7 @@ namespace Serenity.CodeGenerator
         delegate string TypeListDelegate(List<string> key);
         delegate string TypeModelListDelegate(List<TypeRefModel> key);
         delegate void UsingDelegate(string key);
-
-        public static string ShortTypeName(CodeWriter cw, string fullName)
-        {
-            fullName = fullName.Trim();
-
-            if (string.IsNullOrEmpty(fullName))
-                return string.Empty;
-            
-            var nullableText = "";
-            if (fullName.EndsWith('?'))
-            {
-                fullName = fullName[..^1];
-                nullableText = "?";
-            }
-
-            if (SystemTypes.IsCSKeyword(fullName))
-                return fullName + nullableText;
-
-            if (fullName.IndexOf('.', StringComparison.OrdinalIgnoreCase) < 0)
-            {
-                if (fullName == "Stream")
-                    fullName = "System.IO.Stream";
-                else
-                {
-                    var type = Type.GetType("System." + fullName);
-
-                    if (type != null)
-                    {
-                        fullName = type.FullName;
-                    }
-                    else
-                        return fullName + nullableText;
-                }
-            }
-
-            if (fullName.EndsWith('>'))
-            {
-                var idx = fullName.IndexOf('<', StringComparison.OrdinalIgnoreCase);
-                if (idx >= 0)
-                    return cw.ShortTypeName(fullName[..idx]) + '<' + ShortTypeName(cw, fullName[(idx + 1)..^1]) + '>' + nullableText;
-            }
-
-            return cw.ShortTypeName(fullName) + nullableText;
-        }
-
+        
         public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model, string subNamespacePath = "")
         {
             var template = GetTemplate(fileSystem, templateKey);
@@ -115,7 +71,9 @@ namespace Serenity.CodeGenerator
                       ns == "System" ||
                       ns == "System.IO" ||
                       ns == "System.ComponentModel" ||
-                      ns == "System.Collections.Generic"
+                      ns == "System.Collections.Generic",
+                    IsCSharp = true
+                    
                 };
 
                 if (model is EntityModel em && !string.IsNullOrEmpty(em.RootNamespace) && !string.IsNullOrEmpty(em.DotModule) && !string.IsNullOrEmpty(subNamespacePath))
@@ -126,7 +84,7 @@ namespace Serenity.CodeGenerator
                 var scriptObject = new ScriptObject();
                 scriptObject.Import("TYPEREF", new TypeDelegate((fullName) =>
                 {
-                    return ShortTypeName(cw, fullName);
+                    return cw.ShortTypeName(cw, fullName);
                 }));
 
                 scriptObject.Import("TYPEREFLIST", new TypeListDelegate((fullNames) =>
@@ -138,7 +96,7 @@ namespace Serenity.CodeGenerator
 
                     foreach (var fullName in fullNames)
                     {
-                        result.Add(ShortTypeName(cw, fullName));
+                        result.Add(cw.ShortTypeName(cw, fullName));
                     }
 
                     return string.Join(", ", result);
@@ -153,7 +111,7 @@ namespace Serenity.CodeGenerator
 
                     foreach (var model in models)
                     {
-                        result.Add(ShortTypeName(cw, model.TypeName) + model.ArgumentPart);
+                        result.Add(cw.ShortTypeName(cw, model.TypeName) + model.ArgumentPart);
                     }
 
                     return string.Join(", ", result);
