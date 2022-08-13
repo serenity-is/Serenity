@@ -23,20 +23,31 @@
   "exports": {
     ".": {
       "types": "./src/index.ts",
-      "module": "./dist/index.js"
+      "import": "./dist/index.js"
     },
     "./q": {
       "types": "./src/q/index.ts",
-      "module": "./dist/q/index.js"
+      "import": "./dist/q/index.js"
+    },
+    "./serenity": {
+      "types": "./src/serenity/index.ts",
+      "import": "./dist/serenity/index.js"
     },
     "./slick": {
       "types": "./src/slick/index.ts",
-      "module": "./dist/slick/index.js"
+      "import": "./dist/q/index.js"
     }
   },
   "main": "dist/index.js",
-  "module": "dist/index.js",
+  "import": "dist/index.js",
   "types": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      "q": [ "src/q/index.ts" ],
+      "serenity": [ "src/serenity/index.ts" ],
+      "slick": [ "src/slick/index.ts" ]
+    }
+  },
   "files": [
     "dist/**/*.css",
     "dist/**/*.js",
