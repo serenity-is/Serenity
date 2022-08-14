@@ -1,5 +1,9 @@
-﻿using Serenity;
+﻿#if ISSOURCEGENERATOR
+using System.Collections.Concurrent;
+#else
+using Serenity;
 using Serenity.CodeGeneration;
+#endif
 using Serenity.TypeScript;
 using Serenity.TypeScript.TsTypes;
 using System.Threading;
@@ -720,7 +724,8 @@ namespace Serenity.CodeGenerator
                                 sourceFile.ResolvedModules[sl.Text] = new ResolvedModuleFull
                                 {
                                     ResolvedFileName = resolvedModuleName,
-                                    IsExternalLibraryImport = !resolvedModuleName.StartsWith('/')
+                                    IsExternalLibraryImport = !resolvedModuleName.StartsWith("/", 
+                                        StringComparison.Ordinal)
                                 };
                             }
                         }
@@ -773,7 +778,8 @@ namespace Serenity.CodeGenerator
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var currentQueue = processFileQueue.ToArray();
-                processFileQueue.Clear();
+                while (!processFileQueue.IsEmpty)
+                    processFileQueue.TryDequeue(out _);
                 sourceFiles = sourceFiles.Concat(currentQueue.AsParallel()
                     .Select(x => parseFile(x.fullPath, x.moduleName)))
                     .ToArray();

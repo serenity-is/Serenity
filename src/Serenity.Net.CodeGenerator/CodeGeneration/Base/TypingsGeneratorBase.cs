@@ -903,8 +903,8 @@ namespace Serenity.CodeGeneration
                             {
                                 var from = z.Key.From;
                                 if (!z.Key.External && 
-                                    !from.StartsWith('/') &&
-                                    !from.StartsWith('.'))
+                                    !from.StartsWith("/", StringComparison.Ordinal) &&
+                                    !from.StartsWith(".", StringComparison.Ordinal))
                                 {
                                     if (System.IO.Path.GetDirectoryName(filename) ==
                                         System.IO.Path.GetDirectoryName(from))

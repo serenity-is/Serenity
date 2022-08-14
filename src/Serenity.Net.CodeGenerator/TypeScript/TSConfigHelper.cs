@@ -133,7 +133,7 @@ namespace Serenity.CodeGenerator
                 var text = fileSystem.ReadAllText(path);
 
 #if ISSOURCEGENERATOR
-                return JsonConvert.DeserializeObject<TSConfig>(text, 
+                return JsonConvert.DeserializeObject<T>(text, 
                     new JsonSerializerSettings
                     {
                         MissingMemberHandling = MissingMemberHandling.Ignore

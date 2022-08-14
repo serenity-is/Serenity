@@ -52,12 +52,12 @@
                 if (!fileSystem.FileExists(resolvedPath))
                     return null;
             }
-            else if (fileNameOrModule.StartsWith('.') ||
-                fileNameOrModule.StartsWith('/'))
+            else if (fileNameOrModule.StartsWith(".", StringComparison.Ordinal) ||
+                fileNameOrModule.StartsWith("/", StringComparison.Ordinal))
             {
                 string relative = removeMultiSlash.Replace(PathHelper.ToUrl(fileNameOrModule), "/");
 
-                var searchBase = fileNameOrModule.StartsWith('/') ?
+                var searchBase = fileNameOrModule.StartsWith("/", StringComparison.Ordinal) ?
                     tsBasePath : fileSystem.GetDirectoryName(referencedFrom);
 
                 if (fileNameOrModule.StartsWith("./", StringComparison.Ordinal))
@@ -65,12 +65,14 @@
                 else
                     relative = relative[1..];
 
-                var withoutSlash = relative.EndsWith('/') ? relative[..^1] : relative;
+                var withoutSlash = relative.EndsWith("/", StringComparison.Ordinal) ? 
+                    relative[..^1] : relative;
 
                 if (!string.IsNullOrEmpty(withoutSlash))
                     searchBase = fileSystem.Combine(searchBase, withoutSlash);
 
-                if (fileNameOrModule == "." || fileNameOrModule.EndsWith('/'))
+                if (fileNameOrModule == "." || 
+                    fileNameOrModule.EndsWith("/", StringComparison.Ordinal))
                     resolvedPath = extensions
                         .Select(ext => fileSystem.Combine(searchBase, "index" + ext))
                         .FirstOrDefault(fileSystem.FileExists);
@@ -163,7 +165,7 @@
                                     if (toCombine.StartsWith("./"))
                                         toCombine = toCombine[2..];
 
-                                    if (toCombine.StartsWith('/'))
+                                    if (toCombine.StartsWith("/", StringComparison.Ordinal))
                                         continue; // not supported?
 
                                     toCombine = toCombine.Replace("*", replaceWith);
