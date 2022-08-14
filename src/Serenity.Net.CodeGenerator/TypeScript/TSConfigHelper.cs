@@ -1,5 +1,4 @@
 ﻿using Serenity.IO;
-using System;
 using System.Threading;
 #if ISSOURCEGENERATOR
 using Newtonsoft.Json;
@@ -153,7 +152,7 @@ namespace Serenity.CodeGenerator
                 fileSystem.Combine(projectDir, "Modules", "tsconfig.json")
             })
             {
-                var config = TSConfigHelper.Read(fileSystem, configPath);
+                var config = Read(fileSystem, configPath);
                 if (config is null)
                     continue;
 
