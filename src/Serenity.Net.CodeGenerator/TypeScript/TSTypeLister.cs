@@ -26,9 +26,10 @@ namespace Serenity.CodeGenerator
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var files = TSConfigHelper.ListFiles(fileSystem, tsConfigPath, cancellationToken);
+            var files = TSConfigHelper.ListFiles(fileSystem, tsConfigPath, 
+                out var tsConfig, cancellationToken);
 
-            if (files == null || !files.Any())
+            if (files == null)
             {
                 // legacy apps
                 var projectDir = fileSystem.GetDirectoryName(tsConfigPath);
@@ -66,7 +67,10 @@ namespace Serenity.CodeGenerator
                 files = files.OrderBy(x => x);
             }
 
-            TSTypeListerAST typeListerAST = new(fileSystem, cancellationToken);
+            TSTypeListerAST typeListerAST = new(fileSystem, 
+                tsConfigDir: fileSystem.GetDirectoryName(tsConfigPath), tsConfig: tsConfig,
+                cancellationToken);
+
             foreach (var file in files)
                 typeListerAST.AddInputFile(file);
 

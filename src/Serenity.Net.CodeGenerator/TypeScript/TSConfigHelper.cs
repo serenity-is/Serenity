@@ -12,24 +12,24 @@ namespace Serenity.CodeGenerator
     public static class TSConfigHelper
     {
         public static IEnumerable<string> ListFiles(
-            IGeneratorFileSystem fileSystem, string configPath,
+            IGeneratorFileSystem fileSystem, string configPath, out TSConfig tsConfig,
             CancellationToken cancellationToken = default)
         {
-            var config = Read(fileSystem, configPath);
-            if (config is null)
+            tsConfig = Read(fileSystem, configPath);
+            if (tsConfig is null)
                 return null;
 
-            return ListFiles(config, fileSystem, fileSystem.GetDirectoryName(configPath), cancellationToken);
+            return ListFiles(tsConfig, fileSystem, fileSystem.GetDirectoryName(configPath), cancellationToken);
         }
 
         public static IEnumerable<string> ListFiles(TSConfig config,
-            IGeneratorFileSystem fileSystem, string rootDir, 
+            IGeneratorFileSystem fileSystem, string rootDir,
             CancellationToken cancellationToken = default)
         {
             if (config is null)
                 throw new ArgumentNullException(nameof(config));
 
-            if (!config.Files.IsEmptyOrNull())
+            if (config.Files != null)
             {
                 return config.Files.Where(x => fileSystem.FileExists(
                         fileSystem.Combine(rootDir, PathHelper.ToPath(x))))
@@ -49,7 +49,7 @@ namespace Serenity.CodeGenerator
             var typeRoots = config.CompilerOptions?.TypeRoots?.IsEmptyOrNull() != false ?
                 new string[] { "./node_modules/@types" } : config.CompilerOptions.TypeRoots;
 
-            var types = new HashSet<string>(config.CompilerOptions?.Types ?? 
+            var types = new HashSet<string>(config.CompilerOptions?.Types ??
                 Array.Empty<string>(), StringComparer.OrdinalIgnoreCase);
 
             IEnumerable<string> files = typeRoots.Select(typeRoot =>
@@ -117,26 +117,39 @@ namespace Serenity.CodeGenerator
 
         public static TSConfig Read(IGeneratorFileSystem fileSystem, string path)
         {
+            return TryParseJsonFile<TSConfig>(fileSystem, path);
+        }
+
+        public static T TryParseJsonFile<T>(IGeneratorFileSystem fileSystem, string path) where T: class
+        {
             if (path is null)
                 throw new ArgumentNullException(nameof(path));
 
-            if (!fileSystem.FileExists(path))
-                return null;
+            try
+            {
+                if (!fileSystem.FileExists(path))
+                    return null;
 
-            var text = fileSystem.ReadAllText(path);
+                var text = fileSystem.ReadAllText(path);
 
 #if ISSOURCEGENERATOR
-            return JsonConvert.DeserializeObject<TSConfig>(text, new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Ignore
-            });
+                return JsonConvert.DeserializeObject<TSConfig>(text, 
+                    new JsonSerializerSettings
+                    {
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    });
 #else
-            return JsonSerializer.Deserialize<TSConfig>(text,
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                });
+                return JsonSerializer.Deserialize<T>(text,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                    });
 #endif
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public static void LocateTSConfigFiles(IGeneratorFileSystem fileSystem,

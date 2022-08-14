@@ -45,6 +45,11 @@ namespace Serenity.CodeGeneration
             return Path.GetFullPath(path);
         }
 
+        public string GetRelativePath(string relativeTo, string path)
+        {
+            return Path.GetRelativePath(relativeTo, path);
+        }
+
         public DateTime GetLastWriteTime(string path)
         {
             return File.GetLastWriteTime(path);

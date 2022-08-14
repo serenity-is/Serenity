@@ -2,11 +2,11 @@
 
 namespace Serenity.TypeScript.TsTypes
 {
-    public class Map<T> : List<T>
+    public class Map<T> : Dictionary<string, T>
     {
     }
 
-    public class MapLike<T> : List<T>
+    public class MapLike<T> : Dictionary<string, T>
     {
     }
 

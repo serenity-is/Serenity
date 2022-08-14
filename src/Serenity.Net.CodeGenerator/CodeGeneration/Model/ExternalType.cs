@@ -3,6 +3,7 @@
     public class ExternalType
     {
         public string SourceFile { get; set; }
+        public string Module { get; set; }
         public string Namespace { get; set; }
         public string Name { get; set; }
         public string BaseType { get; set; }
@@ -19,8 +20,8 @@
         {
             get
             {
-                return string.IsNullOrEmpty(Namespace) ? Name :
-                    Namespace + "." + Name;
+                return (string.IsNullOrEmpty(Module) ? "" : (Module + ":")) +
+                    (string.IsNullOrEmpty(Namespace) ? Name : Namespace + "." + Name);
             }
         }
 

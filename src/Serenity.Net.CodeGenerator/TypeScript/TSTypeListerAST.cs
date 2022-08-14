@@ -1,4 +1,5 @@
-﻿using Serenity.CodeGeneration;
+﻿using Serenity;
+using Serenity.CodeGeneration;
 using Serenity.TypeScript;
 using Serenity.TypeScript.TsTypes;
 using System.Threading;
@@ -10,12 +11,17 @@ namespace Serenity.CodeGenerator
         private readonly List<string> fileNames = new();
         private readonly HashSet<string> exportedTypeNames = new();
         private readonly IGeneratorFileSystem fileSystem;
+        private readonly TSModuleResolver moduleResolver;
         private readonly CancellationToken cancellationToken;
 
-        public TSTypeListerAST(IGeneratorFileSystem fileSystem,
-            CancellationToken cancellationToken = default)
+        public TSTypeListerAST(IGeneratorFileSystem fileSystem, string tsConfigDir,
+            TSConfig tsConfig, CancellationToken cancellationToken = default)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            if (tsConfigDir is null || tsConfigDir is "")
+                throw new ArgumentNullException(nameof(tsConfigDir));
+
+            moduleResolver = new TSModuleResolver(fileSystem, tsConfigDir, tsConfig);
             this.cancellationToken = cancellationToken;
         }
 
@@ -679,11 +685,99 @@ namespace Serenity.CodeGenerator
 
         public List<ExternalType> ExtractTypes()
         {
-            var sourceFiles = fileNames.AsParallel()
-                .Select(fileName => (SourceFile)new TypeScriptAST(
-                    fileSystem.ReadAllText(fileName),
-                        fileName, optimized: true).RootNode)
+            ConcurrentQueue<(string fullPath, string moduleName)> processFileQueue = new();
+            ConcurrentDictionary<string, Lazy<string>> processByFullPath = new();
+            ConcurrentDictionary<string, (string fullPath, string moduleName)> resolvedExternals = new();
+
+            SourceFile parseFile(string fileFullPath, string moduleName)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var sourceFile = (SourceFile)new TypeScriptAST(
+                    fileSystem.ReadAllText(fileFullPath), 
+                    fileFullPath, optimized: true).RootNode;
+
+                if (sourceFile.ExternalModuleIndicator is not null)
+                {
+                    sourceFile.ModuleName = moduleName;
+                    sourceFile.ResolvedModules ??= new();
+
+                    foreach (var node in sourceFile.Statements)
+                    {
+                        if (node.Kind == SyntaxKind.ImportEqualsDeclaration &&
+                            node is ImportEqualsDeclaration ied &&
+                            ied.ModuleReference?.Kind == SyntaxKind.ExternalModuleReference)
+                        {
+                        }
+                        else if (node.Kind == SyntaxKind.ImportDeclaration &&
+                            node is ImportDeclaration id &&
+                            id.ModuleSpecifier is StringLiteral sl)
+                        {
+                            var resolvedModuleName = resolveModule(sl.Text, fileFullPath);
+                            if (!string.IsNullOrEmpty(resolvedModuleName) &&
+                                !sourceFile.ResolvedModules.ContainsKey(sl.Text))
+                            {
+                                sourceFile.ResolvedModules[sl.Text] = new ResolvedModuleFull
+                                {
+                                    ResolvedFileName = resolvedModuleName,
+                                    IsExternalLibraryImport = !resolvedModuleName.StartsWith('/')
+                                };
+                            }
+                        }
+                    }
+                }
+
+                return sourceFile;
+            }
+
+            string resolveModule(string fileNameOrModule, string referencedFrom)
+            {
+                string resolvedModuleName;
+                string resolvedFullPath;
+
+                bool nonRelative = fileNameOrModule is not null &&
+                    fileNameOrModule.Length > 0 &&
+                    fileNameOrModule[0] != '.';
+
+                if (nonRelative &&
+                    resolvedExternals.TryGetValue(fileNameOrModule, out var resolved))
+                {
+                    resolvedModuleName = resolved.moduleName;
+                    resolvedFullPath = resolved.fullPath;
+                }
+                else
+                {
+                    resolvedFullPath = moduleResolver.Resolve(fileNameOrModule, referencedFrom,
+                        out resolvedModuleName);
+
+                    if (resolvedFullPath is not null && nonRelative)
+                        resolvedExternals.TryAdd(fileNameOrModule, (resolvedFullPath, resolvedModuleName));
+                }
+
+                if (resolvedFullPath is null)
+                    return null;
+
+                return processByFullPath.GetOrAdd(resolvedFullPath, x => new Lazy<string>(() =>
+                {
+                    processFileQueue.Enqueue((resolvedFullPath, resolvedModuleName));
+                    return resolvedModuleName;
+                })).Value;
+            }
+
+            fileNames.AsParallel()
+                .Select(x => resolveModule(x, referencedFrom: null))
                 .ToArray();
+
+            SourceFile[] sourceFiles = Array.Empty<SourceFile>();
+            while (!processFileQueue.IsEmpty)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var currentQueue = processFileQueue.ToArray();
+                processFileQueue.Clear();
+                sourceFiles = sourceFiles.Concat(currentQueue.AsParallel()
+                    .Select(x => parseFile(x.fullPath, x.moduleName)))
+                    .ToArray();
+            }
 
             exportedTypeNames.Clear();
             foreach (var hashset in sourceFiles.AsParallel().Select(sourceFile =>
@@ -706,20 +800,22 @@ namespace Serenity.CodeGenerator
                 cancellationToken.ThrowIfCancellationRequested();
                 var result = ExtractTypes(sourceFile);
                 foreach (var r in result)
+                {
                     r.SourceFile = sourceFile.FileName;
+                    r.Module = sourceFile.ModuleName;
+                }
                 return result;
             }).ToArray())
             {
                 foreach (var k in types)
                 {
-                    var fullName = !string.IsNullOrEmpty(k.Namespace) ? k.Namespace + "." + k.Name : k.Name;
-                    if (resultIndex.TryGetValue(fullName, out int index))
+                    if (resultIndex.TryGetValue(k.FullName, out int index))
                     {
                         continue;
                     }
                     else
                     {
-                        resultIndex[fullName] = result.Count;
+                        resultIndex[k.FullName] = result.Count;
                         result.Add(k);
                     }
                 }

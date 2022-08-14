@@ -56,6 +56,11 @@ namespace Serenity.Tests.CodeGenerator
             return fileSystem.File.GetLastWriteTime(path);
         }
 
+        public string GetRelativePath(string relativeTo, string path)
+        {
+            return fileSystem.Path.GetRelativePath(relativeTo, path);
+        }
+
         public byte[] ReadAllBytes(string path)
         {
             return fileSystem.File.ReadAllBytes(path);

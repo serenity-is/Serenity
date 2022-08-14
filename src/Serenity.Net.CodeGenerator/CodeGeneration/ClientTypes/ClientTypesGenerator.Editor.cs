@@ -38,6 +38,55 @@
             });
         }
 
+        static readonly string[] editorAttributeNames = new[]
+        {
+            "Serenity.EditorAttribute",
+            "@serenity-is/corelib/serenity:EditorAttribute",
+            "@serenity-is/corelib:Serenity.EditorAttribute",
+            "Serenity.ElementAttribute",
+            "@serenity-is/corelib/serenity:ElementAttribute",
+            "@serenity-is/corelib:Serenity.ElementAttribute",
+            "Serenity.Decorators.registerEditor",
+            "@serenity-is/corelib/serenity:Decorators.registerEditor",
+            "@serenity-is/corelib:Serenity.Decorators.registerEditor",
+            "Decorators.registerEditor",
+            "registerEditor",
+            "Serenity.Decorators.element",
+            "@serenity-is/corelib/serenity:Decorators.element",
+            "@serenity-is/corelib:Serenity.Decorators.element",
+            "Decorators.element"
+        };
+
+        static readonly string[] editorBaseClasses = new[]
+        {
+            "Serenity.Extensions.GridEditorBase",
+            "GridEditorBase",
+            "@serenity-is/extensions:GridEditorBase",
+            "Serenity.LookupEditorBase",
+            "LookupEditorBase",
+            "@serenity-is/corelib/serenity:LookupEditorBase",
+            "@serenity-is/corelib:Serenity.LookupEditorBase",
+            "LookupEditor",
+            "@serenity-is/corelib/serenity:LookupEditor",
+            "@serenity-is/corelib:Serenity.LookupEditor",
+            "ServiceLookupEditor",
+            "@serenity-is/corelib/serenity:ServiceLookupEditor",
+            "@serenity-is/corelib:Serenity.ServiceLookupEditor",
+            "ServiceLookupEditorBase",
+            "@serenity-is/corelib/serenity:ServiceLookupEditorBase",
+            "@serenity-is/corelib:Serenity.ServiceLookupEditorBase",
+        };
+
+        static readonly string[] widgetBaseClasses = new[]
+        {
+            "Serenity.Widget",
+            "Serenity.Widget<any>",
+            "@serenity-is/corelib/serenity:Widget",
+            "@serenity-is/corelib/serenity:Widget<any>",
+            "@serenity-is/corelib:Serenity.Widget",
+            "@serenity-is/corelib:Serenity.Widget<any>"
+        };
+
         private bool IsEditorType(ExternalType type)
         {
             if (type.IsAbstract == true)
@@ -46,18 +95,12 @@
             if (type.GenericParameters?.Count > 0)
                 return false;
 
-            if (!HasBaseType(type, "Serenity.Widget") &&
-                !HasBaseType(type, "Serenity.Widget<any>"))
+            if (!HasBaseType(type, widgetBaseClasses))
                 return false;
 
             return
-                GetAttribute(type, "Serenity.EditorAttribute", inherited: true) != null ||
-                GetAttribute(type, "Serenity.ElementAttribute", inherited: true) != null ||
-                GetAttribute(type, "Serenity.Decorators.registerEditor", inherited: true) != null ||
-                GetAttribute(type, "Serenity.Decorators.editor", inherited: true) != null ||
-                GetAttribute(type, "Serenity.Decorators.element", inherited: true) != null ||
-                HasBaseType(type, "Serenity.Extensions.GridEditorBase") ||
-                HasBaseType(type, "Serenity.LookupEditorBase");
+                GetAttribute(type, inherited: true, attributeNames: editorAttributeNames) != null ||
+                HasBaseType(type, editorBaseClasses);
         }
     }
 }

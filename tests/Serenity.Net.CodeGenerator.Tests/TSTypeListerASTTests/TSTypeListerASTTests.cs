@@ -3,7 +3,7 @@ using Serenity.CodeGenerator;
 
 namespace Serenity.Tests.CodeGenerator
 {
-    public class TSTypeListerTests
+    public partial class TSTypeListerASTTests
     {
         [Fact]
         public void Resolves_Type_Refs_In_Same_Namespace_Same_File()
@@ -25,7 +25,7 @@ declare namespace jsPDF {
         cellPadding?: number;
     }
 }");
-            var tl = new TSTypeListerAST(fileSystem);
+            var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", null);
             tl.AddInputFile("a.d.ts");
 
             var types = tl.ExtractTypes();
@@ -56,7 +56,7 @@ declare namespace Serenity.Extensions {
     }
 }");
 
-            var tl = new TSTypeListerAST(fileSystem);
+            var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: null);
             tl.AddInputFile("a.d.ts");
 
             var types = tl.ExtractTypes();
@@ -100,7 +100,7 @@ declare namespace Serenity.Extensions {
     }
 }");
 
-            var tl = new TSTypeListerAST(fileSystem);
+            var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: null);
             tl.AddInputFile("a.ts");
 
             var types = tl.ExtractTypes();
@@ -130,7 +130,7 @@ namespace Serenity.Sub {
     }
 }");
 
-            var tl = new TSTypeListerAST(fileSystem);
+            var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: null);
             tl.AddInputFile("a.ts");
 
             var types = tl.ExtractTypes();
