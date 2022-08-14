@@ -174,18 +174,34 @@ namespace Serenity.CodeGeneration
 
                     ExternalType scriptType = null;
 
-                    foreach (var rootNamespace in RootNamespaces)
+                    if (module)
                     {
-                        string wn = rootNamespace + "." + editorType;
-                        if ((scriptType = (GetScriptType(wn) ?? GetScriptType(wn + "Editor"))) != null)
-                            break;
+                        scriptType = 
+                            editorTypeByKey[editorType].FirstOrDefault(x =>
+                                !string.IsNullOrEmpty(x.Module)) ??
+                            editorTypeByKey[editorType + "Editor"].FirstOrDefault(x =>
+                                !string.IsNullOrEmpty(x.Module)) ??
+                            editorTypeByKey["Serenity." + editorType].FirstOrDefault(x =>
+                                !string.IsNullOrEmpty(x.Module)) ??
+                            editorTypeByKey["Serenity." + editorType + "Editor"].FirstOrDefault(x =>
+                                !string.IsNullOrEmpty(x.Module));
+                    }
+
+                    if (scriptType is null)
+                    {
+                        foreach (var rootNamespace in RootNamespaces)
+                        {
+                            string wn = rootNamespace + "." + editorType;
+                            if ((scriptType = (GetScriptType(wn) ?? GetScriptType(wn + "Editor"))) != null)
+                                break;
+                        }
                     }
 
                     if (scriptType == null &&
                         (scriptType = (GetScriptType(editorType) ?? GetScriptType(editorType + "Editor"))) == null)
                         continue;
 
-                    var fullName = ShortenFullName(scriptType, codeNamespace, module);
+                    var fullName = ReferenceScriptType(scriptType, codeNamespace, module);
                     var shortName = fullName;
                     if (fullName.StartsWith("Serenity.", StringComparison.Ordinal))
                         shortName = "s." + fullName["Serenity.".Length..];

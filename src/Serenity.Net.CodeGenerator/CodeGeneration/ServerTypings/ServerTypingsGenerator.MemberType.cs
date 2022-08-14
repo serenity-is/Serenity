@@ -139,7 +139,7 @@
             MakeFriendlyReference(memberType, codeNamespace, module);
         }
 
-        protected string ShortenFullName(ExternalType type, string codeNamespace, bool module)
+        protected string ReferenceScriptType(ExternalType type, string codeNamespace, bool module)
         {
             if (type.FullName == "Serenity.Widget")
                 return "Serenity.Widget<any>";
@@ -147,7 +147,42 @@
             if (type.FullName == "Serenity.CheckTreeItem")
                 return "Serenity.CheckTreeItem<any>";
 
-            return ShortenFullName(type.Namespace, type.Name, codeNamespace, module, type.SourceFile);
+            var ns = type.Namespace;
+            var name = type.Name;
+            var sourceFile = type.SourceFile;
+
+            if (module)
+            {
+                if (!string.IsNullOrEmpty(type.Module))
+                {
+                    return AddModuleImport(type.Module, type.Name, external:
+                        !type.Module.StartsWith("/", StringComparison.Ordinal) &&
+                        !type.Module.StartsWith(".", StringComparison.Ordinal));
+                }
+                else if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
+                {
+                    var filename = GetFileNameFor(ns, name, module);
+                    name = AddModuleImport(filename, name, external: false);
+                    ns = "";
+                }
+            }
+            else
+            {
+                if ((codeNamespace != null && (ns == codeNamespace)) ||
+                    (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)) ||
+                    IsUsingNamespace(ns))
+                {
+                    ns = "";
+                }
+                else if (codeNamespace != null)
+                {
+                    var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
+                    if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
+                        ns = ns[(idx + 1)..];
+                }
+            }
+
+            return !string.IsNullOrEmpty(ns) ? (ns + "." + name) : name;
         }
     }
 }

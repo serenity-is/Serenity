@@ -38,7 +38,7 @@
             });
         }
 
-        static readonly string[] editorAttributeNames = new[]
+        static readonly string[] EditorAttributeNames = new[]
         {
             "Serenity.EditorAttribute",
             "@serenity-is/corelib/serenity:EditorAttribute",
@@ -57,7 +57,7 @@
             "Decorators.element"
         };
 
-        static readonly string[] editorBaseClasses = new[]
+        static readonly string[] EditorBaseClasses = new[]
         {
             "Serenity.Extensions.GridEditorBase",
             "GridEditorBase",
@@ -77,15 +77,15 @@
             "@serenity-is/corelib:Serenity.ServiceLookupEditorBase",
         };
 
-        static readonly string[] widgetBaseClasses = new[]
-        {
-            "Serenity.Widget",
-            "Serenity.Widget<any>",
-            "@serenity-is/corelib/serenity:Widget",
-            "@serenity-is/corelib/serenity:Widget<any>",
-            "@serenity-is/corelib:Serenity.Widget",
-            "@serenity-is/corelib:Serenity.Widget<any>"
-        };
+        //static readonly string[] widgetBaseClasses = new[]
+        //{
+        //    "Serenity.Widget",
+        //    "Serenity.Widget<any>",
+        //    "@serenity-is/corelib/serenity:Widget",
+        //    "@serenity-is/corelib/serenity:Widget<any>",
+        //    "@serenity-is/corelib:Serenity.Widget",
+        //    "@serenity-is/corelib:Serenity.Widget<any>"
+        //};
 
         private bool IsEditorType(ExternalType type)
         {
@@ -95,12 +95,13 @@
             if (type.GenericParameters?.Count > 0)
                 return false;
 
-            if (!HasBaseType(type, widgetBaseClasses))
-                return false;
+            if (HasBaseType(type, EditorBaseClasses))
+                return true;
 
-            return
-                GetAttribute(type, inherited: true, attributeNames: editorAttributeNames) != null ||
-                HasBaseType(type, editorBaseClasses);
+            if (GetAttribute(type, inherited: true, attributeNames: EditorAttributeNames) != null)
+                return true;
+
+            return false;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿#if ISSOURCEGENERATOR
 using System.Collections.Concurrent;
 #else
-using Serenity;
 using Serenity.CodeGeneration;
 #endif
 using Serenity.TypeScript;
@@ -102,8 +101,8 @@ namespace Serenity.CodeGenerator
             if (node == null)
                 return string.Empty;
 
-            var text = node.GetTextSpan();
-            if (text == "any" || text == null || text.Length == 0)
+            var text = node.GetText();
+            if (text is null || text.Length == 0 || text == "any")
                 return null;
 
             if (text[0] == '(' || 
@@ -115,6 +114,9 @@ namespace Serenity.CodeGenerator
             var lt = noGeneric.IndexOf('<');
             if (lt >= 0 && noGeneric[^1] == '>')
                 noGeneric = noGeneric[..lt];
+
+            if (noGeneric == "number" || noGeneric == "string" || noGeneric == "boolean")
+                return noGeneric;
 
             string functionSuffix = string.Empty;
             if (isDecorator)
@@ -131,7 +133,9 @@ namespace Serenity.CodeGenerator
             var beforeDot = dotIndex >= 0 ? noGeneric[..dotIndex] : null;
             var afterDot = dotIndex >= 0 ? noGeneric[dotIndex..] : null;
 
-            foreach (var parent in EnumerateParents(node))
+            var parents = EnumerateParents(node).ToArray();
+
+            foreach (var parent in parents)
             {
                 if (parent.Kind == SyntaxKind.ModuleDeclaration ||
                     parent.Kind == SyntaxKind.SourceFile)
@@ -145,14 +149,41 @@ namespace Serenity.CodeGenerator
                     if (children == null)
                         continue;
 
+                    if (parent is SourceFile sourceFile &&
+                        sourceFile.ExternalModuleIndicator is not null)
+                    {
+                        foreach (var import in children.OfType<ImportDeclaration>())
+                        {
+                            if (import.ModuleSpecifier is not StringLiteral id)
+                                continue;
+
+                            if (import.ImportClause.Name is Identifier name &&
+                                name.Text == noGeneric)
+                                return id.Text + ":" + name.Text + functionSuffix;
+
+                            var elements = (import.ImportClause?.NamedBindings as NamedImports)?.Elements;
+                            if (elements is null)
+                                continue;
+
+                            foreach (var element in elements)
+                            {
+                                if (element.Name is Identifier nameIdentifier &&
+                                    nameIdentifier.Text == noGeneric)
+                                {
+                                    return id.Text + ":" + nameIdentifier.Text + functionSuffix;
+                                }
+                            }
+                        }
+                    }
+
                     if (dotIndex < 0)
                     {
                         foreach (var child in children)
                         {
                             if ((child.Kind == SyntaxKind.ClassDeclaration &&
-                                 (child as ClassDeclaration).Name.GetTextSpan() == noGeneric) ||
+                                 (child as ClassDeclaration).Name.GetText() == noGeneric) ||
                                 (child.Kind == SyntaxKind.InterfaceDeclaration &&
-                                 (child as InterfaceDeclaration).Name.GetTextSpan() == noGeneric))
+                                 (child as InterfaceDeclaration).Name.GetText() == noGeneric))
                                 return PrependNamespace(noGeneric.ToString(), child) + functionSuffix;
                         }
                     }
@@ -162,7 +193,7 @@ namespace Serenity.CodeGenerator
                         {
                             if (child.Kind == SyntaxKind.ImportEqualsDeclaration)
                             {
-                                if ((child as ImportEqualsDeclaration).Name.GetTextSpan() == beforeDot)
+                                if ((child as ImportEqualsDeclaration).Name.GetText() == beforeDot)
                                 {
                                     var fullName = (child as ImportEqualsDeclaration).ModuleReference.GetText() +
                                         afterDot.ToString();
@@ -603,12 +634,95 @@ namespace Serenity.CodeGenerator
             return result;
         }
 
-        List<ExternalType> ExtractTypes(SourceFile sourceFile) 
+        List<ExternalType> ExtractTypes(SourceFile sourceFile, HashSet<string> visited)
         {
             var result = new List<ExternalType>();
 
             if (sourceFile.Statements == null)
                 return result;
+
+            if (sourceFile.ExternalModuleIndicator is not null)
+            {
+                foreach (var exportDeclaration in sourceFile
+                    .Statements.OfType<ExportDeclaration>())
+                {
+                    string identifier;
+                    if (exportDeclaration.ModuleSpecifier is not Identifier ms)
+                    {
+                        if (exportDeclaration.ModuleSpecifier is not StringLiteral sl)
+                            continue;
+                        identifier = sl.Text;
+                    }
+                    else
+                        identifier = ms.Text;
+
+                    if (string.IsNullOrEmpty(identifier))
+                        continue;
+
+                    var resolvedSub = ResolveModule(identifier, sourceFile.FileName, false);
+                    if (resolvedSub.fullPath is null ||
+                        visited.Contains(resolvedSub.fullPath))
+                        continue;
+
+                    visited.Add(resolvedSub.fullPath);
+                    var subFile = ParseFile(resolvedSub.fullPath, sourceFile.ModuleName, true);
+                    if (subFile is null)
+                        continue;
+
+                    var subTypes = ExtractTypes(subFile, visited);
+
+                    void addSubType(ExternalType type)
+                    {
+                        type.Module = sourceFile.ModuleName;
+                        type.Namespace = null;
+
+                        if (sourceFile.ModuleName != null &&
+                            !sourceFile.ModuleName.StartsWith("/") &&
+                            !sourceFile.ModuleName.StartsWith("."))
+                        {
+                            if (type.BaseType != null &&
+                                type.BaseType.Contains(':') &&
+                                type.BaseType.StartsWith("."))
+                                type.BaseType = sourceFile.ModuleName + ":" + type.BaseType.Split(':').Last();
+
+                            if (type.Attributes != null)
+                            {
+                                foreach (var attr in type.Attributes)
+                                {
+                                    if (attr.Type != null &&
+                                        attr.Type.Contains(":", StringComparison.Ordinal) &&
+                                        attr.Type.StartsWith(".", StringComparison.Ordinal))
+                                        attr.Type = sourceFile.ModuleName + ":" + attr.Type.Split(':').Last();
+                                }
+                            }
+                        }
+
+                        result.Add(type);
+                    }
+
+                    if (exportDeclaration.ExportClause is not NamedExports namedExports)
+                    {
+                        foreach (var type in subTypes.Where(x => string.IsNullOrEmpty(x.Namespace)))
+                        {
+                            addSubType(type);
+                        }
+                    }
+                    else if (namedExports.Elements is not null)
+                    {
+                        foreach (var element in namedExports.Elements)
+                        {
+                            if (element.Name is Identifier nameIdentifier)
+                            {
+                                foreach (var type in subTypes.Where(x => string.IsNullOrEmpty(x.Namespace) &&
+                                    x.Name == (element.PropertyName?.Text ?? nameIdentifier.Text)))
+                                {
+                                    addSubType(type);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             foreach (var node in EnumerateTypesAndModules(sourceFile.Statements))
             {
@@ -651,7 +765,8 @@ namespace Serenity.CodeGenerator
 
         private static void ExtractExportedTypeNames(SourceFile sourceFile, HashSet<string> target)
         {
-            if (sourceFile?.Statements == null)
+            if (sourceFile?.Statements == null ||
+                sourceFile?.ExternalModuleIndicator is not null)
                 return;
 
             foreach (var node in EnumerateTypesAndModules(sourceFile.Statements))
@@ -687,18 +802,19 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        public List<ExternalType> ExtractTypes()
+        readonly ConcurrentQueue<(string fullPath, string moduleName)> processFileQueue = new();
+        readonly ConcurrentDictionary<string, Lazy<string>> processByFullPath = new();
+        readonly ConcurrentDictionary<string, (string fullPath, string moduleName)> resolvedExternals = new();
+        readonly ConcurrentDictionary<string, SourceFile> parsedFiles = new();
+
+        SourceFile ParseFile(string fileFullPath, string moduleName, bool extractExportsOnly)
         {
-            ConcurrentQueue<(string fullPath, string moduleName)> processFileQueue = new();
-            ConcurrentDictionary<string, Lazy<string>> processByFullPath = new();
-            ConcurrentDictionary<string, (string fullPath, string moduleName)> resolvedExternals = new();
+            cancellationToken.ThrowIfCancellationRequested();
 
-            SourceFile parseFile(string fileFullPath, string moduleName)
+            return parsedFiles.GetOrAdd(fileFullPath, (fileFullPath) =>
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
                 var sourceFile = (SourceFile)new TypeScriptAST(
-                    fileSystem.ReadAllText(fileFullPath), 
+                    fileSystem.ReadAllText(fileFullPath),
                     fileFullPath, optimized: true).RootNode;
 
                 if (sourceFile.ExternalModuleIndicator is not null)
@@ -717,14 +833,16 @@ namespace Serenity.CodeGenerator
                             node is ImportDeclaration id &&
                             id.ModuleSpecifier is StringLiteral sl)
                         {
-                            var resolvedModuleName = resolveModule(sl.Text, fileFullPath);
-                            if (!string.IsNullOrEmpty(resolvedModuleName) &&
+                            var resolved = ResolveModule(sl.Text, fileFullPath,
+                                enqueue: !extractExportsOnly);
+
+                            if (!string.IsNullOrEmpty(resolved.fullPath) &&
                                 !sourceFile.ResolvedModules.ContainsKey(sl.Text))
                             {
                                 sourceFile.ResolvedModules[sl.Text] = new ResolvedModuleFull
                                 {
-                                    ResolvedFileName = resolvedModuleName,
-                                    IsExternalLibraryImport = !resolvedModuleName.StartsWith("/", 
+                                    ResolvedFileName = resolved.fullPath,
+                                    IsExternalLibraryImport = !resolved.moduleName.StartsWith("/",
                                         StringComparison.Ordinal)
                                 };
                             }
@@ -733,44 +851,52 @@ namespace Serenity.CodeGenerator
                 }
 
                 return sourceFile;
+            });
+        }
+
+        (string moduleName, string fullPath) ResolveModule(string fileNameOrModule, string referencedFrom, bool enqueue)
+        {
+            string resolvedModuleName;
+            string resolvedFullPath;
+
+            bool nonRelative = fileNameOrModule is not null &&
+                fileNameOrModule.Length > 0 &&
+                fileNameOrModule[0] != '.';
+
+            if (nonRelative &&
+                resolvedExternals.TryGetValue(fileNameOrModule, out var resolved))
+            {
+                resolvedModuleName = resolved.moduleName;
+                resolvedFullPath = resolved.fullPath;
+            }
+            else
+            {
+                resolvedFullPath = moduleResolver.Resolve(fileNameOrModule, referencedFrom,
+                    out resolvedModuleName);
+
+                if (resolvedFullPath is not null && nonRelative)
+                    resolvedExternals.TryAdd(fileNameOrModule, (resolvedFullPath, resolvedModuleName));
             }
 
-            string resolveModule(string fileNameOrModule, string referencedFrom)
+            if (resolvedFullPath is null)
+                return (null, null);
+
+            if (enqueue)
             {
-                string resolvedModuleName;
-                string resolvedFullPath;
-
-                bool nonRelative = fileNameOrModule is not null &&
-                    fileNameOrModule.Length > 0 &&
-                    fileNameOrModule[0] != '.';
-
-                if (nonRelative &&
-                    resolvedExternals.TryGetValue(fileNameOrModule, out var resolved))
-                {
-                    resolvedModuleName = resolved.moduleName;
-                    resolvedFullPath = resolved.fullPath;
-                }
-                else
-                {
-                    resolvedFullPath = moduleResolver.Resolve(fileNameOrModule, referencedFrom,
-                        out resolvedModuleName);
-
-                    if (resolvedFullPath is not null && nonRelative)
-                        resolvedExternals.TryAdd(fileNameOrModule, (resolvedFullPath, resolvedModuleName));
-                }
-
-                if (resolvedFullPath is null)
-                    return null;
-
-                return processByFullPath.GetOrAdd(resolvedFullPath, x => new Lazy<string>(() =>
+                return (processByFullPath.GetOrAdd(resolvedFullPath, x => new Lazy<string>(() =>
                 {
                     processFileQueue.Enqueue((resolvedFullPath, resolvedModuleName));
                     return resolvedModuleName;
-                })).Value;
+                })).Value, resolvedFullPath);
             }
+            else
+                return (resolvedModuleName, resolvedFullPath);
+        }
 
+        public List<ExternalType> ExtractTypes()
+        {
             fileNames.AsParallel()
-                .Select(x => resolveModule(x, referencedFrom: null))
+                .Select(x => ResolveModule(x, referencedFrom: null, enqueue: true))
                 .ToArray();
 
             SourceFile[] sourceFiles = Array.Empty<SourceFile>();
@@ -781,7 +907,7 @@ namespace Serenity.CodeGenerator
                 while (!processFileQueue.IsEmpty)
                     processFileQueue.TryDequeue(out _);
                 sourceFiles = sourceFiles.Concat(currentQueue.AsParallel()
-                    .Select(x => parseFile(x.fullPath, x.moduleName)))
+                    .Select(x => ParseFile(x.fullPath, x.moduleName, extractExportsOnly: false)))
                     .ToArray();
             }
 
@@ -804,7 +930,7 @@ namespace Serenity.CodeGenerator
             foreach (var types in sourceFiles.AsParallel().Select(sourceFile =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var result = ExtractTypes(sourceFile);
+                var result = ExtractTypes(sourceFile, new HashSet<string>());
                 foreach (var r in result)
                 {
                     r.SourceFile = sourceFile.FileName;

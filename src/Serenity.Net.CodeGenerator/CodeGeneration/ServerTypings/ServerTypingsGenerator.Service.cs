@@ -41,7 +41,7 @@
 
                     sb.Append("(request: ");
                     if (requestType == null)
-                        sb.Append(ShortenFullName(new ExternalType { Name = "ServiceRequest", Namespace = "Serenity", SourceFile = "serenity.corelib/index.d.ts" }, codeNamespace, module));
+                        sb.Append(ShortenFullName("Serenity", "ServiceRequest", codeNamespace,module, "serenity.corelib/index.d.ts"));
                     else
                         HandleMemberType(requestType, codeNamespace, module);
 

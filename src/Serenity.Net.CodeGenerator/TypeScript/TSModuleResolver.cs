@@ -62,7 +62,7 @@
 
                 if (fileNameOrModule.StartsWith("./", StringComparison.Ordinal))
                     relative = relative[2..];
-                else
+                else if (!fileNameOrModule.StartsWith("../", StringComparison.Ordinal))
                     relative = relative[1..];
 
                 var withoutSlash = relative.EndsWith("/", StringComparison.Ordinal) ? 
@@ -123,7 +123,7 @@
 
                         if (resolvedPath is not null)
                             moduleName = (packageJson.Name ?? fileSystem.GetFileName(parentDir)) + 
-                                packageJson.Name + "/" + fileSystem.GetFileName(path);
+                                "/" + fileSystem.GetFileName(path);
                     }
                 }
 

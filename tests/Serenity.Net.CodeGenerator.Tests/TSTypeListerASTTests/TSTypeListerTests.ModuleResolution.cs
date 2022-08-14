@@ -1,4 +1,3 @@
-using Serenity.CodeGeneration;
 using Serenity.CodeGenerator;
 
 namespace Serenity.Tests.CodeGenerator

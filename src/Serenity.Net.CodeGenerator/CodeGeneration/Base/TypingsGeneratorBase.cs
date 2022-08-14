@@ -5,6 +5,8 @@ using Microsoft.CodeAnalysis;
 using Serenity.Reflection;
 #endif
 
+using System.Linq;
+
 namespace Serenity.CodeGeneration
 {
     public abstract class TypingsGeneratorBase : ImportGeneratorBase
@@ -15,6 +17,7 @@ namespace Serenity.CodeGeneration
         protected HashSet<string> localTextKeys = new();
         protected List<GeneratedTypeInfo> generatedTypes = new();
         protected List<AnnotationTypeInfo> annotationTypes = new();
+        protected ILookup<string, ExternalType> editorTypeByKey;
 
 #if ISSOURCEGENERATOR
         private readonly CancellationToken cancellationToken;
@@ -188,6 +191,27 @@ namespace Serenity.CodeGeneration
         protected override void GenerateAll()
         {
             var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            editorTypeByKey = tsTypes.Values.Select(type =>
+            {
+                if (type.IsAbstract != false &&
+                    type.IsInterface != false &&
+                    type.Attributes != null)
+                {
+                    foreach (var attr in type.Attributes)
+                    {
+                        if (attr.Type is not null &&
+                            (attr.Type == "registerEditor" ||
+                             attr.Type.EndsWith(".registerEditor", StringComparison.Ordinal)) &&
+                            attr.Arguments?.Count > 0 &&
+                            attr.Arguments[0]?.Value is string s &&
+                            !string.IsNullOrEmpty(s))
+                            return (s, type);
+                    }
+                }
+
+                return ((string)null, type);
+            }).Where(x => x.Item1 != null)
+            .ToLookup(x => x.Item1, x => x.type);
 
 #if ISSOURCEGENERATOR
             var types = Compilation.GetSymbolsWithName(s => true, SymbolFilter.Type).OfType<ITypeSymbol>();

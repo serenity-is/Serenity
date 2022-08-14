@@ -18,6 +18,12 @@ namespace Serenity.CodeGenerator
             var projectDir = fileSystem.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(fileSystem, fileSystem.Combine(projectDir, "sergen.json"));
 
+            if (modules && config.ServerTypings?.ModuleTypings == false)
+                return;
+
+            if (!modules && config.ServerTypings?.NamespaceTypings == false)
+                return;
+
             string[] assemblyFiles = null;
 
             if (config.ServerTypings == null ||
