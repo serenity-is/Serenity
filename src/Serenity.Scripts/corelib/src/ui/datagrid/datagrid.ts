@@ -1,6 +1,6 @@
 ﻿import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
-import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getInstanceType, getTypeFullName, getTypeName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
+import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getColumnsAsync, getInstanceType, getTypeFullName, getTypeName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
 import { Format, FormatterContext, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -66,13 +66,13 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     protected quickFiltersBar: QuickFilterBar;
     protected slickContainer: JQuery;
     protected allColumns: Column[];
+    protected propertyItems: PropertyItem[];
     protected initialSettings: PersistedGridSettings;
     protected restoringSettings: number = 0;
     private idProperty: string;
     private isActiveProperty: string;
     private localTextDbPrefix: string;
     private isDisabled: boolean;
-    private rows: any;
     private slickGridOnSort: any;
     private slickGridOnClick: any;
     public view: RemoteView<TItem>;
@@ -115,6 +115,14 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         this.slickContainer = this.createSlickContainer();
         this.view = this.createView();
 
+        if (this.useAsync())
+            this.initAsync();
+        else 
+            this.initSync();
+    }
+
+    protected internalInit() {
+        this.allColumns = this.allColumns ?? this.getColumns();
         this.slickGrid = this.createSlickGrid();
 
         if (this.enableFiltering()) {
@@ -127,7 +135,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         this.bindToSlickEvents();
         this.bindToViewEvents();
 
-        if (buttons != null) {
+        if (this.toolbar) {
             this.createToolbarExtensions();
         }
 
@@ -138,7 +146,27 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
         this.initialSettings = this.getCurrentSettings(null);
         this.restoreSettings(null, null);
-        window.setTimeout(() => this.initialPopulate(), 0);
+
+        window.setTimeout(() => this.initialPopulate(), 0);   
+    }
+
+    protected initSync() {
+        this.propertyItems = this.getPropertyItems();
+        this.internalInit();
+        this.afterInit();
+    }
+
+    protected async initAsync() {
+        this.propertyItems = await this.getPropertyItemsAsync();
+        this.internalInit();
+        this.afterInit();
+    }
+
+    protected afterInit() {
+    }
+
+    protected useAsync() {
+        return false;
     }
 
     protected useLayoutTimer() {
@@ -150,7 +178,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected layout(): void {
-        if (!this.element || !this.element.is(':visible') || this.slickContainer == null)
+        if (!this.element || !this.element.is(':visible') || !this.slickContainer || !this.slickGrid)
             return;
 
         var responsiveHeight = this.element.hasClass('responsive-height');
@@ -463,8 +491,6 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
     protected createSlickGrid(): Grid {
 
-
-        this.allColumns = this.getColumns();
         var visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
             return x.visible !== false;
         });
@@ -476,7 +502,6 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }));
 
         this.slickGrid = grid;
-        this.rows = this.slickGrid;
         
         this.setInitialSortOrder();
 
@@ -855,8 +880,6 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected getPropertyItems(): PropertyItem[] {
-        var attr = this.attrs(ColumnsKeyAttribute);
-
         var columnsKey = this.getColumnsKey();
         if (!isEmptyOrNull(columnsKey)) {
             return getColumns(columnsKey);
@@ -865,9 +888,17 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return [];
     }
 
+    protected async getPropertyItemsAsync(): Promise<PropertyItem[]> {
+        var columnsKey = this.getColumnsKey();
+        if (!isEmptyOrNull(columnsKey)) {
+            return await getColumnsAsync(columnsKey);
+        }
+
+        return [];
+    }
+
     protected getColumns(): Column[] {
-        var propertyItems = this.getPropertyItems();
-        return this.propertyItemsToSlickColumns(propertyItems);
+        return this.propertyItemsToSlickColumns(this.propertyItems ?? []);
     }
 
     protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[] {
@@ -1040,7 +1071,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected resizeCanvas(): void {
-        this.slickGrid.resizeCanvas();
+        this.slickGrid?.resizeCanvas();
     }
 
     protected subDialogDataChange(): void {

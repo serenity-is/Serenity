@@ -12,7 +12,7 @@ namespace Serenity.Tests.CodeGenerator
             string myDialog = root + "Modules/Test/MyDialog.ts";
             fileSystem.CreateDirectory(fileSystem.GetDirectoryName(myDialog));
             fileSystem.WriteAllText(myDialog, @"
-import { EntityDialog } from '@serenity-is/corelib/serenity';
+import { EntityDialog } from '@serenity-is/corelib';
 
 export class MyDialog extends EntityDialog {
 }
@@ -43,7 +43,7 @@ export class Dummy {
             var types = tl.ExtractTypes();
 
             var myDialogType = Assert.Single(types, x => x.FullName == "/Modules/Test/MyDialog:MyDialog");
-            Assert.Equal("@serenity-is/corelib/serenity:EntityDialog", myDialogType.BaseType);
+            Assert.Equal("@serenity-is/corelib:EntityDialog", myDialogType.BaseType);
         }
     }
 }

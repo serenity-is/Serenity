@@ -1,4 +1,9 @@
-﻿export * from "../q/servicetypes";
+﻿export * from "../globals/promise";
+export * from "../globals/select2";
+export * from "../globals/jquerystatic";
+export * from "../globals/validate";
+
+export * from "../q/servicetypes";
 export * from "../q/criteria";
 
 export * from "../interfaces";

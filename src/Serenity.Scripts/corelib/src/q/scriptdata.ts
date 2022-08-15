@@ -1,5 +1,5 @@
 ﻿import { resolveUrl } from "./services";
-import { startsWith } from "./strings";
+import { startsWith, trimToNull } from "./strings";
 import { blockUI, blockUndo } from "./blockui";
 import { alert, iframeDialog } from "./dialogs";
 import { notifyError } from "./notify";
@@ -7,8 +7,28 @@ import { format } from "./formatting";
 import { PropertyItem } from "./propertyitem";
 
 export namespace ScriptData {
-    let registered: { [key: string]: any } = {};
+    let _hash: { [key: string]: string };
     let loadedData: { [key: string]: any } = {};
+
+    function getHash(key: string, reload?: boolean): string {
+        let k: string;
+        
+        if (_hash == null &&
+            typeof document !== "undefined" && 
+            (k = trimToNull((document.querySelector('script#RegisteredScripts') || {}).innerHTML)) != null &&
+            k.charAt(0) == '{') {
+            var regs = JSON.parse(k);
+            setRegisteredScripts(regs);
+        }
+
+        if (_hash == null && reload)
+            _hash = {};
+
+        if (reload)
+            return (_hash[key] = new Date().getTime().toString());
+
+        return _hash[key];
+    }
 
     export function bindToChange(name: string, regClass: string, onChange: () => void) {
         ($(document.body) as any).bind('scriptdatachange.' + regClass, function (e: any, s: string) {
@@ -31,7 +51,7 @@ export namespace ScriptData {
             async: async,
             cache: true,
             type: 'GET',
-            url: resolveUrl('~/DynJS.axd/') + name + '.js?' + registered[name],
+            url: resolveUrl('~/DynJS.axd/') + name + '.js?' + getHash(name),
             data: null,
             dataType: 'text',
             converters: {
@@ -90,21 +110,29 @@ export namespace ScriptData {
     }
 
     function loadScriptData(name: string) {
-        if (registered[name] == null) {
-            throw new Error(format('Script data {0} is not found in registered script list!', name));
-        }
-
         $.ajax(loadOptions(name, false));
     }
 
     function loadScriptDataAsync(name: string): PromiseLike<any> {
         return Promise.resolve().then(function () {
-            if (registered[name] == null) {
-                throw new Error(format('Script data {0} is not found in registered script list!', name));
-            }
-
             return loadScriptAsync(name);
         }, null);
+    }
+
+    function loadError(name: string) {
+        var message;
+
+        if (name != null &&
+            name.startsWith('Lookup.')) {
+            message = 'No lookup with key "' + name.substring(7) + '" is registered. Please make sure you have a' +
+                ' [LookupScript("' + name.substring(7) + '")] attribute in server side code on top of a row / custom lookup and ' +
+                ' its key is exactly the same.';
+        } else {
+            message = format("Can't load script data: {0}!", name);
+        }
+
+        notifyError(message);
+        throw new Error(message);
     }
 
     export function ensure(name: string) {
@@ -115,8 +143,8 @@ export namespace ScriptData {
 
         data = loadedData[name];
 
-        if (data == null)
-            throw new Error(format("Can't load script data: {0}!", name));
+        if (data == null) 
+            loadError(name);
 
         return data;
     }
@@ -130,19 +158,15 @@ export namespace ScriptData {
 
             return loadScriptDataAsync(name).then(function () {
                 data = loadedData[name];
-                if (data == null) {
-                    throw new Error(format("Can't load script data: {0}!", name));
-                }
+                if (data == null)
+                    loadError(name);
                 return data;
             }, null);
         }, null);
     }
 
     export function reload(name: string) {
-        if (registered[name] == null) {
-            throw new Error(format('Script data {0} is not found in registered script list!', name));
-        }
-        registered[name] = (new Date()).getTime().toString();
+        getHash(name, true);
         loadScriptData(name);
         var data = loadedData[name];
         return data;
@@ -150,10 +174,7 @@ export namespace ScriptData {
 
     export function reloadAsync(name: string) {
         return Promise.resolve().then(function () {
-            if (registered[name] == null) {
-                throw new Error(format('Script data {0} is not found in registered script list!', name));
-            }
-            registered[name] = (new Date()).getTime().toString();
+            getHash(name, true);
             return loadScriptDataAsync(name).then(function () {
                 return loadedData[name];
             }, null);
@@ -161,14 +182,14 @@ export namespace ScriptData {
     }
 
     export function canLoad(name: string) {
-        return (loadedData[name] != null || registered[name] != null);
+        return loadedData[name] != null || (_hash != null && _hash[name] != null);
     }
 
     export function setRegisteredScripts(scripts: any[]) {
-        registered = {};
-        var t = new Date().getTime();
+        _hash = {};
+        var t = new Date().getTime().toString();
         for (var k in scripts) {
-            registered[k] = scripts[k] || t;
+            _hash[k] = scripts[k] || t;
         }
     }
 
@@ -188,13 +209,6 @@ export function getRemoteDataAsync(key: string) {
 
 export function getLookup<TItem>(key: string): Q.Lookup<TItem> {
     var name = 'Lookup.' + key;
-    if (!ScriptData.canLoad(name)) {
-        var message = 'No lookup with key "' + key + '" is registered. Please make sure you have a' +
-            ' [LookupScript("' + key + '")] attribute in server side code on top of a row / custom lookup and ' +
-            ' its key is exactly the same.';
-        notifyError(message);
-        throw new Error(message);
-    }
     return ScriptData.ensure('Lookup.' + key);
 }
 

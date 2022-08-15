@@ -222,7 +222,7 @@ const mergeRefTypes = (src) => {
 
 export default [
     {
-        input: "src/index.ts",
+        input: "src/corelib.ts",
         output: [
             {
                 file: '../dist/Serenity.CoreLib.js',

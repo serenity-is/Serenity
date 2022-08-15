@@ -41,13 +41,23 @@
 
                     sb.Append("(request: ");
                     if (requestType == null)
-                        sb.Append(ShortenFullName("Serenity", "ServiceRequest", codeNamespace,module, "serenity.corelib/index.d.ts"));
+                    {
+                        if (module) 
+                        {
+                            var serviceRequest = ImportFromQ("ServiceRequest");
+                            sb.Append(serviceRequest);
+                        }
+                        else
+                            sb.Append(ShortenFullName("Serenity", "ServiceRequest", codeNamespace, module, "serenity.corelib/index.d.ts"));
+                    }
                     else
                         HandleMemberType(requestType, codeNamespace, module);
 
                     sb.Append(", onSuccess?: (response: ");
                     HandleMemberType(responseType, codeNamespace, module);
-                    sb.AppendLine(") => void, opt?: Q.ServiceOptions<any>): JQueryXHR;");
+                    var serviceOptions = module ? ImportFromQ("ServiceOptions") : "Q.ServiceOptions";
+
+                    sb.AppendLine($") => void, opt?: {serviceOptions}<any>): JQueryXHR;");
                 }
 
                 sb.AppendLine();
@@ -98,7 +108,13 @@
                         cw.Indented("(<any>");
                         sb.Append(identifier);
                         sb.AppendLine(")[x] = function (r, s, o) {");
-                        cw.IndentedLine("    return Q.serviceRequest(baseUrl + '/' + x, r, s, o);");
+                        if (module)
+                        {
+                            var serviceRequest = ImportFromQ("serviceRequest");
+                            cw.IndentedLine($"    return {serviceRequest}(baseUrl + '/' + x, r, s, o);");
+                        }
+                        else
+                            cw.IndentedLine("    return Q.serviceRequest(baseUrl + '/' + x, r, s, o);");
                         cw.IndentedLine("};");
                     });
                     cw.IndentedLine("});");

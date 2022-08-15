@@ -47,10 +47,9 @@ await esbuild.build({
     ...coreLibBase,
     entryPoints: [
         'q/index.ts',
-        'slick/index.ts',
-        'serenity/index.ts'
+        'slick/index.ts'
     ],
-    external: ['../q', '../serenity', '../slick'],
+    external: ['../q', '../slick'],
     minify: true
 });
 
@@ -59,6 +58,6 @@ await esbuild.build({
     entryPoints: [
         'index.ts'
     ],
-    external: ['./q', './serenity', './slick'],
+    external: ['./q', './slick'],
     minify: true
 });

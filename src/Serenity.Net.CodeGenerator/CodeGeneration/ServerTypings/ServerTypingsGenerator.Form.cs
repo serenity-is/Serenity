@@ -203,7 +203,8 @@ namespace Serenity.CodeGeneration
 
                     var fullName = ReferenceScriptType(scriptType, codeNamespace, module);
                     var shortName = fullName;
-                    if (fullName.StartsWith("Serenity.", StringComparison.Ordinal))
+                    
+                    if (!module && fullName.StartsWith("Serenity.", StringComparison.Ordinal))
                         shortName = "s." + fullName["Serenity.".Length..];
 
                     propertyNames.Add(item.Name);
@@ -259,7 +260,9 @@ namespace Serenity.CodeGeneration
                             sb.AppendLine(".init = true;");
                             sb.AppendLine();
 
-                            cw.IndentedLine("var s = Serenity;");
+                            if (!module)
+                                cw.IndentedLine("var s = Serenity;");
+
                             var typeNumber = new Dictionary<string, int>();
                             foreach (var s in propertyTypes)
                             {
@@ -275,7 +278,15 @@ namespace Serenity.CodeGeneration
                             }
                             sb.AppendLine();
 
-                            cw.Indented("Q.initFormType(");
+                            if (module)
+                            {
+                                var initFormType = ImportFromQ("initFormType");
+                                cw.Indented($"{initFormType}(");
+                            }
+                            else
+                            {
+                                cw.Indented("Q.initFormType(");
+                            }
                             sb.Append(identifier);
                             sb.AppendLine(", [");
                             cw.Block(delegate

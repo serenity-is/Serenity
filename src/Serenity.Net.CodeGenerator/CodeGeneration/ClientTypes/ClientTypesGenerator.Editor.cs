@@ -41,19 +41,15 @@
         static readonly string[] EditorAttributeNames = new[]
         {
             "Serenity.EditorAttribute",
-            "@serenity-is/corelib/serenity:EditorAttribute",
-            "@serenity-is/corelib:Serenity.EditorAttribute",
+            "@serenity-is/corelib:EditorAttribute",
             "Serenity.ElementAttribute",
-            "@serenity-is/corelib/serenity:ElementAttribute",
-            "@serenity-is/corelib:Serenity.ElementAttribute",
+            "@serenity-is/corelib:ElementAttribute",
             "Serenity.Decorators.registerEditor",
-            "@serenity-is/corelib/serenity:Decorators.registerEditor",
-            "@serenity-is/corelib:Serenity.Decorators.registerEditor",
+            "@serenity-is/corelib:Decorators.registerEditor",
             "Decorators.registerEditor",
             "registerEditor",
             "Serenity.Decorators.element",
-            "@serenity-is/corelib/serenity:Decorators.element",
-            "@serenity-is/corelib:Serenity.Decorators.element",
+            "@serenity-is/corelib:Decorators.element",
             "Decorators.element"
         };
 
@@ -64,27 +60,21 @@
             "@serenity-is/extensions:GridEditorBase",
             "Serenity.LookupEditorBase",
             "LookupEditorBase",
-            "@serenity-is/corelib/serenity:LookupEditorBase",
-            "@serenity-is/corelib:Serenity.LookupEditorBase",
+            "@serenity-is/corelib:LookupEditorBase",
             "LookupEditor",
-            "@serenity-is/corelib/serenity:LookupEditor",
-            "@serenity-is/corelib:Serenity.LookupEditor",
+            "@serenity-is/corelib:LookupEditor",
             "ServiceLookupEditor",
-            "@serenity-is/corelib/serenity:ServiceLookupEditor",
-            "@serenity-is/corelib:Serenity.ServiceLookupEditor",
+            "@serenity-is/corelib:ServiceLookupEditor",
             "ServiceLookupEditorBase",
-            "@serenity-is/corelib/serenity:ServiceLookupEditorBase",
-            "@serenity-is/corelib:Serenity.ServiceLookupEditorBase",
+            "@serenity-is/corelib:ServiceLookupEditorBase",
         };
 
         //static readonly string[] widgetBaseClasses = new[]
         //{
         //    "Serenity.Widget",
         //    "Serenity.Widget<any>",
-        //    "@serenity-is/corelib/serenity:Widget",
-        //    "@serenity-is/corelib/serenity:Widget<any>",
-        //    "@serenity-is/corelib:Serenity.Widget",
-        //    "@serenity-is/corelib:Serenity.Widget<any>"
+        //    "@serenity-is/corelib:Widget",
+        //    "@serenity-is/corelib:Widget<any>"
         //};
 
         private bool IsEditorType(ExternalType type)

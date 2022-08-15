@@ -102,8 +102,8 @@ export let Culture: Locale = {
         if (Culture[k] === undefined && Object.prototype.hasOwnProperty.call(Invariant, k))
             Culture[k] = Invariant[k];
 
-    if (typeof $ != "undefined" && (k = trimToNull((document.querySelector('script#ScriptCulture') || {}).innerHTML)) != null) {
-        var sc = $.parseJSON(k);
+    if ((k = trimToNull((document.querySelector('script#ScriptCulture') || {}).innerHTML)) != null) {
+        var sc = JSON.parse(k);
         if (sc.DecimalSeparator != null)
             Culture.decimalSeparator = sc.DecimalSeparator;
         if (sc.GroupSeparator != null && sc.GroupSeparator != Culture.decimalSeparator)

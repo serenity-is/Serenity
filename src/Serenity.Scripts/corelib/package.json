@@ -41,10 +41,6 @@
       "types": "./src/q/index.ts",
       "import": "./dist/q/index.js"
     },
-    "./serenity": {
-      "types": "./src/serenity/index.ts",
-      "import": "./dist/serenity/index.js"
-    },
     "./slick": {
       "types": "./src/slick/index.ts",
       "import": "./dist/q/index.js"
@@ -56,7 +52,6 @@
   "typesVersions": {
     "*": {
       "q": [ "src/q/index.ts" ],
-      "serenity": [ "src/serenity/index.ts" ],
       "slick": [ "src/slick/index.ts" ]
     }
   },

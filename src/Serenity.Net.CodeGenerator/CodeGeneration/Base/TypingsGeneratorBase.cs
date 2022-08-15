@@ -504,7 +504,29 @@ namespace Serenity.CodeGeneration
         public virtual string ShortenFullName(string ns, string name, string codeNamespace, bool module, 
             string sourceFile)
         {
-            if (ns == "Serenity.Services" ||
+            if (module)
+            {
+                if (ns == "Serenity.Services" ||
+                    ns == "Serenity.ComponentModel")
+                {
+                    var importName = name;
+                    var idx = importName.IndexOf('`', StringComparison.Ordinal);
+                    if (idx >= 0)
+                        importName = importName[..idx];
+
+                    name = ImportFromSerenity(importName) +
+                        (idx >= 0 ? name[idx..] : "");
+                    ns = "";
+                }
+                else if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
+                {
+                    var filename = GetFileNameFor(ns, name, module);
+                    name = AddModuleImport(filename, name, external: false);
+                    ns = "";
+                }
+            }
+            else if (
+                ns == "Serenity.Services" ||
                 ns == "Serenity.ComponentModel")
             {
                 if (IsUsingNamespace("Serenity"))
@@ -512,29 +534,18 @@ namespace Serenity.CodeGeneration
                 else
                     ns = "Serenity";
             }
-            else if (module)
+            
+            if ((codeNamespace != null && (ns == codeNamespace)) ||
+                (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)) ||
+                IsUsingNamespace(ns))
             {
-                if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
-                {
-                    var filename = GetFileNameFor(ns, name, module);
-                    name = AddModuleImport(filename, name, external: false);
-                    ns = "";
-                }
+                ns = "";
             }
-            else 
-            { 
-                if ((codeNamespace != null && (ns == codeNamespace)) ||
-                    (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)) ||
-                    IsUsingNamespace(ns))
-                {
-                    ns = "";
-                }
-                else if (codeNamespace != null)
-                {
-                    var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
-                    if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
-                        ns = ns[(idx + 1)..];
-                }
+            else if (codeNamespace != null)
+            {
+                var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
+                if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
+                    ns = ns[(idx + 1)..];
             }
 
             return !string.IsNullOrEmpty(ns) ? (ns + "." + name) : name;
@@ -963,7 +974,7 @@ namespace Serenity.CodeGeneration
 
         protected string ImportFromSerenity(string name)
         {
-            return AddExternalImport("@serenity-is/corelib/serenity", name);
+            return AddExternalImport("@serenity-is/corelib", name);
         }
 
         protected string ImportFromSlick(string name)

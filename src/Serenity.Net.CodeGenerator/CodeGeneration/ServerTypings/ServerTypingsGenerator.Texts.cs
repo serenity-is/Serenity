@@ -182,7 +182,13 @@
                 jw.WriteEndObject();
 
                 cw.Indented(ns);
-                sb.Append(@"['Texts'] = Q.proxyTexts(Texts, '', ");
+                if (module)
+                {
+                    var proxyTexts = ImportFromQ("proxyTexts");
+                    sb.Append($"['Texts'] = {proxyTexts}(Texts, '', ");
+                }
+                else
+                    sb.Append(@"['Texts'] = Q.proxyTexts(Texts, '', ");
                 jw.Flush();
                 sb.Append(jwBuilder);
                 sb.AppendLine(") as any;");

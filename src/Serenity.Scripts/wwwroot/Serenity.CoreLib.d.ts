@@ -2371,6 +2371,8 @@ declare namespace Slick {
 }
 
 declare namespace Serenity {
+
+
     interface ServiceError {
         Code?: string;
         Arguments?: string;
@@ -4468,13 +4470,13 @@ declare namespace Serenity {
         protected quickFiltersBar: QuickFilterBar;
         protected slickContainer: JQuery;
         protected allColumns: Slick.Column[];
+        protected propertyItems: PropertyItem[];
         protected initialSettings: PersistedGridSettings;
         protected restoringSettings: number;
         private idProperty;
         private isActiveProperty;
         private localTextDbPrefix;
         private isDisabled;
-        private rows;
         private slickGridOnSort;
         private slickGridOnClick;
         view: RemoteView<TItem>;
@@ -4487,6 +4489,11 @@ declare namespace Serenity {
         static defaultColumnWidthDelta: number;
         private layoutTimer;
         constructor(container: JQuery, options?: TOptions);
+        protected internalInit(): void;
+        protected initSync(): void;
+        protected initAsync(): Promise<void>;
+        protected afterInit(): void;
+        protected useAsync(): boolean;
         protected useLayoutTimer(): boolean;
         protected attrs<TAttr>(attrType: {
             new (...args: any[]): TAttr;
@@ -4557,6 +4564,7 @@ declare namespace Serenity {
         protected itemLink(itemType?: string, idField?: string, text?: (ctx: FormatterContext) => string, cssClass?: (ctx: FormatterContext) => string, encode?: boolean): Format<TItem>;
         protected getColumnsKey(): string;
         protected getPropertyItems(): PropertyItem[];
+        protected getPropertyItemsAsync(): Promise<PropertyItem[]>;
         protected getColumns(): Slick.Column[];
         protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Slick.Column[];
         protected getSlickOptions(): Slick.GridOptions;
@@ -4801,8 +4809,6 @@ declare namespace Serenity {
         };
     }
 
-
-
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
         protected entity: TItem;
         protected entityId: any;
@@ -5040,68 +5046,6 @@ declare namespace Serenity {
 
     type Constructor<T> = new (...args: any[]) => T;
 }
-declare namespace Q {
-    interface Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-        textFormatter: (item: TItem) => string;
-    }
-}
-interface JQuery {
-    getWidget<TWidget>(widgetType: {
-        new (...args: any[]): TWidget;
-    }): TWidget;
-    tryGetWidget<TWidget>(widgetType: {
-        new (...args: any[]): TWidget;
-    }): TWidget;
-    flexHeightOnly(flexY?: number): JQuery;
-    flexWidthOnly(flexX?: number): JQuery;
-    flexWidthHeight(flexX: number, flexY: number): JQuery;
-    flexX(flexX: number): JQuery;
-    flexY(flexY: number): JQuery;
-}
-declare namespace Slick {
-    interface AutoTooltipsOptions {
-        enableForHeaderCells?: boolean;
-        enableForCells?: boolean;
-        maxToolTipLength?: number;
-    }
-    namespace Data {
-        interface GroupItemMetadataProvider {
-            getGroupRowMetadata(item: any): Slick.ItemMetadata;
-            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
-        }
-        class GroupItemMetadataProvider implements GroupItemMetadataProvider, Slick.IPlugin {
-            constructor();
-            init(grid: Slick.Grid): void;
-            getGroupRowMetadata(item: any): Slick.ItemMetadata;
-            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
-        }
-    }
-    interface RowMoveManagerOptions {
-        cancelEditOnDrag: boolean;
-    }
-    class RowMoveManager implements IPlugin {
-        constructor(options: RowMoveManagerOptions);
-        init(): void;
-        onBeforeMoveRows: Slick.Event;
-        onMoveRows: Slick.Event;
-    }
-    interface AutoTooltipsOptions {
-        enableForHeaderCells?: boolean;
-        enableForCells?: boolean;
-        maxToolTipLength?: number;
-    }
-    class AutoTooltips {
-        constructor(options: AutoTooltipsOptions);
-        init(): void;
-    }
-}
 /**
  * Represents the completion of an asynchronous operation
  */
@@ -5234,5 +5178,67 @@ interface JQueryStatic {
 declare namespace JQueryValidation {
     interface ValidationOptions {
         normalizer?: (v: string) => string;
+    }
+}
+declare namespace Q {
+    interface Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        textFormatter: (item: TItem) => string;
+    }
+}
+interface JQuery {
+    getWidget<TWidget>(widgetType: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
+    tryGetWidget<TWidget>(widgetType: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
+    flexHeightOnly(flexY?: number): JQuery;
+    flexWidthOnly(flexX?: number): JQuery;
+    flexWidthHeight(flexX: number, flexY: number): JQuery;
+    flexX(flexX: number): JQuery;
+    flexY(flexY: number): JQuery;
+}
+declare namespace Slick {
+    interface AutoTooltipsOptions {
+        enableForHeaderCells?: boolean;
+        enableForCells?: boolean;
+        maxToolTipLength?: number;
+    }
+    namespace Data {
+        interface GroupItemMetadataProvider {
+            getGroupRowMetadata(item: any): Slick.ItemMetadata;
+            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
+        }
+        class GroupItemMetadataProvider implements GroupItemMetadataProvider, Slick.IPlugin {
+            constructor();
+            init(grid: Slick.Grid): void;
+            getGroupRowMetadata(item: any): Slick.ItemMetadata;
+            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
+        }
+    }
+    interface RowMoveManagerOptions {
+        cancelEditOnDrag: boolean;
+    }
+    class RowMoveManager implements IPlugin {
+        constructor(options: RowMoveManagerOptions);
+        init(): void;
+        onBeforeMoveRows: Slick.Event;
+        onMoveRows: Slick.Event;
+    }
+    interface AutoTooltipsOptions {
+        enableForHeaderCells?: boolean;
+        enableForCells?: boolean;
+        maxToolTipLength?: number;
+    }
+    class AutoTooltips {
+        constructor(options: AutoTooltipsOptions);
+        init(): void;
     }
 }

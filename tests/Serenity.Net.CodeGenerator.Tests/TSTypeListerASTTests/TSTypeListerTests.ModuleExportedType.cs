@@ -12,7 +12,7 @@ namespace Serenity.Tests.CodeGenerator
             string myDialog = root + "Modules/Test/MyDialog.ts";
             fileSystem.CreateDirectory(fileSystem.GetDirectoryName(myDialog));
             fileSystem.WriteAllText(myDialog, @"
-import { EntityDialog } from '@serenity-is/corelib/serenity';
+import { EntityDialog } from '@serenity-is/corelib';
 
 export class MyDialog extends EntityDialog {
 }
@@ -58,22 +58,22 @@ export class PasswordEditor extends StringEditor {
 
             var types = tl.ExtractTypes();
 
-            var stringEditor = Assert.Single(types, x => x.FullName == "@serenity-is/corelib/serenity:StringEditor");
+            var stringEditor = Assert.Single(types, x => x.FullName == "@serenity-is/corelib/StringEditor");
             Assert.Collection(stringEditor.Attributes,
                 attr =>
                 {
-                    Assert.Equal("@serenity-is/corelib/serenity:Decorators.registerEditor", attr.Type);
+                    Assert.Equal("@serenity-is/corelib:Decorators.registerEditor", attr.Type);
                     Assert.Collection(attr.Arguments, arg1 =>
                     {
                         Assert.Equal("Serenity.StringEditor", arg1.Value);
                     }, arg2 => { });
                 });
 
-            var passwordEditor = Assert.Single(types, x => x.FullName == "@serenity-is/corelib/serenity:PasswordEditor");
+            var passwordEditor = Assert.Single(types, x => x.FullName == "@serenity-is/corelib:PasswordEditor");
             Assert.Collection(passwordEditor.Attributes,
                 attr =>
                 {
-                    Assert.Equal("@serenity-is/corelib/serenity:Decorators.registerEditor", attr.Type);
+                    Assert.Equal("@serenity-is/corelib:Decorators.registerEditor", attr.Type);
                     Assert.Collection(attr.Arguments, arg1 =>
                     {
                         Assert.Equal("Serenity.PasswordEditor", arg1.Value);
