@@ -125,8 +125,9 @@
             {
                 byte[] content;
                 
-                if (json) {
-                    if(script is IGetScriptData scriptData)
+                if (json) 
+                {
+                    if (script is IGetScriptData scriptData)
                     {
                         content = utf8Encoding.GetBytes(scriptData.GetScriptData().ToJson()); 
                     }
