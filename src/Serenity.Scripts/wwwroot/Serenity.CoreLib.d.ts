@@ -2,7 +2,6 @@
 /// <reference types="jqueryui" />
 /// <reference types="toastr" />
 /// <reference types="jquery.validation" />
-/// <reference types="react" />
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -789,8 +788,8 @@ declare namespace Q {
         function onShown(element: () => HTMLElement, handler: () => void): number;
         function off(key: number): number;
     }
-    function executeOnceWhenShown(element: JQuery, callback: Function): void;
-    function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
+    function executeOnceWhenVisible(element: JQuery, callback: Function): void;
+    function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
 
     function text(key: string): string;
     function dbText(prefix: string): ((key: string) => string);
@@ -800,9 +799,6 @@ declare namespace Q {
     function proxyTexts(o: Object, p: string, t: Object): Object;
     class LT {
         private key;
-        static $table: {
-            [key: string]: string;
-        };
         static empty: LT;
         constructor(key: string);
         static add(obj: any, pre?: string): void;
@@ -933,25 +929,25 @@ declare namespace Q {
         function triggerChange(name: string): void;
         function unbindFromChange(regClass: string): void;
         function ensure(name: string): any;
-        function ensureAsync(name: string): PromiseLike<any>;
+        function ensureAsync(name: string): Promise<any>;
         function reload(name: string): any;
-        function reloadAsync(name: string): PromiseLike<any>;
+        function reloadAsync(name: string): Promise<any>;
         function canLoad(name: string): boolean;
         function setRegisteredScripts(scripts: any[]): void;
         function set(name: string, value: any): void;
     }
     function getRemoteData(key: string): any;
-    function getRemoteDataAsync(key: string): PromiseLike<any>;
+    function getRemoteDataAsync(key: string): Promise<any>;
     function getLookup<TItem>(key: string): Q.Lookup<TItem>;
-    function getLookupAsync<TItem>(key: string): PromiseLike<Q.Lookup<TItem>>;
+    function getLookupAsync<TItem>(key: string): Promise<Q.Lookup<TItem>>;
     function reloadLookup(key: string): void;
-    function reloadLookupAsync(key: string): PromiseLike<any>;
+    function reloadLookupAsync(key: string): Promise<any>;
     function getColumns(key: string): PropertyItem[];
-    function getColumnsAsync(key: string): PromiseLike<PropertyItem[]>;
+    function getColumnsAsync(key: string): Promise<PropertyItem[]>;
     function getForm(key: string): PropertyItem[];
-    function getFormAsync(key: string): PromiseLike<PropertyItem[]>;
+    function getFormAsync(key: string): Promise<PropertyItem[]>;
     function getTemplate(key: string): string;
-    function getTemplateAsync(key: string): PromiseLike<string>;
+    function getTemplateAsync(key: string): Promise<string>;
     function canLoadScriptData(name: string): boolean;
 
     function getCookie(name: string): any;
@@ -1024,6 +1020,7 @@ declare namespace Q {
     function getTypes(from?: any): any[];
     function clearKeys(d: any): void;
     function delegateCombine(delegate1: any, delegate2: any): any;
+    function getStateStore(): any;
     namespace Enum {
         let toString: (enumType: any, value: number) => string;
         let getValues: (enumType: any) => any[];
@@ -2607,8 +2604,8 @@ declare namespace Serenity {
         result?: string;
     }
 
-    function executeOnceWhenShown(element: JQuery, callback: Function): void;
-    function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
+    function executeOnceWhenVisible(element: JQuery, callback: Function): void;
+    function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
 
     interface PropertyItem {
         name?: string;
@@ -2864,8 +2861,8 @@ declare namespace Serenity {
     }
 
     namespace LazyLoadHelper {
-        const executeOnceWhenShown: typeof executeOnceWhenShown;
-        const executeEverytimeWhenShown: typeof executeEverytimeWhenShown;
+        const executeOnceWhenShown: typeof executeOnceWhenVisible;
+        const executeEverytimeWhenShown: typeof executeEverytimeWhenVisible;
     }
 
     class PrefixedContext {
@@ -2909,7 +2906,7 @@ declare namespace Serenity {
         value?: any;
         defaultValue?: any;
     }
-    class Widget<TOptions> extends React.Component<TOptions> {
+    class Widget<TOptions> {
         private static nextWidgetNumber;
         element: JQuery;
         protected options: TOptions;
@@ -2929,9 +2926,6 @@ declare namespace Serenity {
         initialize(): void;
         init(action?: (widget: any) => void): this;
         private static __isWidgetType;
-        props: Readonly<{
-            children?: React.ReactNode;
-        }> & Readonly<TOptions> & WidgetComponentProps<this>;
     }
     interface Widget<TOptions> {
         change(handler: (e: JQueryEventObject) => void): void;
@@ -4145,6 +4139,9 @@ declare namespace Serenity {
         toolTip?: string;
         value?: any;
     }
+    interface Formatter {
+        format(ctx: FormatterContext): string;
+    }
     interface GroupInfo<TItem> {
         getter?: any;
         formatter?: (p1: Slick.Group<TItem>) => string;
@@ -4376,7 +4373,6 @@ declare namespace Serenity {
     }
     class IInitializeColumn {
     }
-    function Formatter(name: string, intf?: any[]): (target: Function) => void;
     class BooleanFormatter implements Formatter {
         format(ctx: FormatterContext): string;
         falseText: string;

@@ -5,31 +5,49 @@ import { alert, iframeDialog } from "./dialogs";
 import { notifyError } from "./notify";
 import { format } from "./formatting";
 import { PropertyItem } from "./propertyitem";
+import { getStateStore } from "./system";
 
-export namespace ScriptData {
-    let _hash: { [key: string]: string };
-    let loadedData: { [key: string]: any } = {};
+function getHash(key: string, reload?: boolean): string {
+    let k: string;
 
-    function getHash(key: string, reload?: boolean): string {
-        let k: string;
-        
-        if (_hash == null &&
-            typeof document !== "undefined" && 
-            (k = trimToNull((document.querySelector('script#RegisteredScripts') || {}).innerHTML)) != null &&
-            k.charAt(0) == '{') {
-            var regs = JSON.parse(k);
-            setRegisteredScripts(regs);
-        }
-
-        if (_hash == null && reload)
-            _hash = {};
-
-        if (reload)
-            return (_hash[key] = new Date().getTime().toString());
-
-        return _hash[key];
+    const stateStore = getStateStore();
+    if (stateStore.__hash == null &&
+        typeof document !== "undefined" && 
+        (k = trimToNull((document.querySelector('script#RegisteredScripts') || {}).innerHTML)) != null &&
+        k.charAt(0) == '{') {
+        var regs = JSON.parse(k);
+        stateStore.setRegisteredScripts(regs);
     }
 
+    if (stateStore.__hash == null && reload)
+        stateStore.__hash = {};
+
+    if (reload)
+        return (stateStore.__hash[key] = new Date().getTime().toString());
+
+    return stateStore.__hash[key];
+}
+
+function setHash(key: string, value: string): void {
+    const stateStore = getStateStore();
+    stateStore.__hash = stateStore.__hash || (stateStore.__hash = {});
+    stateStore.__hash[key] = value;
+}
+
+function getLoadedData(name: string): any {
+    const stateStore = getStateStore();
+    const loadedData = stateStore.__data || (stateStore.__data = {} );
+    return loadedData[name];
+}
+
+function setLoadedData(name: string, value: any): void {
+    const stateStore = getStateStore();
+    const loadedData = stateStore.__data || ( stateStore.__data = {} );
+    loadedData[name] = value;
+}
+
+export namespace ScriptData {
+    
     export function bindToChange(name: string, regClass: string, onChange: () => void) {
         ($(document.body) as any).bind('scriptdatachange.' + regClass, function (e: any, s: string) {
             if (s == name) {
@@ -98,25 +116,21 @@ export namespace ScriptData {
         }
     }
 
-    function loadScriptAsync(name: string) {
-        return Promise.resolve().then(function () {
-            blockUI(null);
-            return Promise.resolve(
-                $.ajax(loadOptions(name, true))
-                    .always(function () {
-                        blockUndo();
-                    }));
-        }, null);
+    async function loadScriptAsync(name: string): Promise<any> {
+        blockUI(null);
+        return await Promise.resolve(
+            $.ajax(loadOptions(name, true))
+                .always(function () {
+                    blockUndo();
+                }));
     }
 
     function loadScriptData(name: string) {
         $.ajax(loadOptions(name, false));
     }
 
-    function loadScriptDataAsync(name: string): PromiseLike<any> {
-        return Promise.resolve().then(function () {
-            return loadScriptAsync(name);
-        }, null);
+    async function loadScriptDataAsync(name: string): Promise<any> {
+        return await loadScriptAsync(name);
     }
 
     function loadError(name: string) {
@@ -136,12 +150,12 @@ export namespace ScriptData {
     }
 
     export function ensure(name: string) {
-        var data = loadedData[name];
+        var data = getLoadedData(name);
         if (data == null) {
             loadScriptData(name);
         }
 
-        data = loadedData[name];
+        data = getLoadedData(name);
 
         if (data == null) 
             loadError(name);
@@ -149,52 +163,43 @@ export namespace ScriptData {
         return data;
     }
 
-    export function ensureAsync(name: string): PromiseLike<any> {
-        return Promise.resolve().then(function () {
-            var data = loadedData[name];
-            if (data != null) {
-                return Promise.resolve(data);
-            }
-
-            return loadScriptDataAsync(name).then(function () {
-                data = loadedData[name];
-                if (data == null)
-                    loadError(name);
-                return data;
-            }, null);
-        }, null);
+    export async function ensureAsync(name: string): Promise<any> {
+        var data = getLoadedData(name);
+        if (data != null)
+            return data;
+        await loadScriptDataAsync(name);
+        data = getLoadedData(name);
+        if (data == null)
+            loadError(name);
+        return data;
     }
 
     export function reload(name: string) {
         getHash(name, true);
         loadScriptData(name);
-        var data = loadedData[name];
+        var data = getLoadedData(name);
         return data;
     }
 
-    export function reloadAsync(name: string) {
-        return Promise.resolve().then(function () {
-            getHash(name, true);
-            return loadScriptDataAsync(name).then(function () {
-                return loadedData[name];
-            }, null);
-        }, null);
+    export async function reloadAsync(name: string) {
+        getHash(name, true);
+        await loadScriptDataAsync(name);
+        return getLoadedData(name);
     }
 
     export function canLoad(name: string) {
-        return loadedData[name] != null || (_hash != null && _hash[name] != null);
+        return getLoadedData(name) != null || getHash(name) != null;
     }
 
     export function setRegisteredScripts(scripts: any[]) {
-        _hash = {};
         var t = new Date().getTime().toString();
         for (var k in scripts) {
-            _hash[k] = scripts[k] || t;
+            setHash(k, scripts[k] || t);
         }
     }
 
     export function set(name: string, value: any) {
-        loadedData[name] = value;
+        setLoadedData(name, value);
         triggerChange(name);
     }
 }
@@ -203,51 +208,74 @@ export function getRemoteData(key: string) {
     return ScriptData.ensure('RemoteData.' + key);
 }
 
-export function getRemoteDataAsync(key: string) {
-    return ScriptData.ensureAsync('RemoteData.' + key);
+export async function getRemoteDataAsync(key: string): Promise<any> {
+    return await ScriptData.ensureAsync('RemoteData.' + key);
 }
 
 export function getLookup<TItem>(key: string): Q.Lookup<TItem> {
-    var name = 'Lookup.' + key;
     return ScriptData.ensure('Lookup.' + key);
 }
 
-export function getLookupAsync<TItem>(key: string): PromiseLike<Q.Lookup<TItem>> {
-    return ScriptData.ensureAsync('Lookup.' + key);
+export async function getLookupAsync<TItem>(key: string): Promise<Q.Lookup<TItem>> {
+    return await ScriptData.ensureAsync('Lookup.' + key);
 }
 
 export function reloadLookup(key: string) {
     ScriptData.reload('Lookup.' + key);
 }
 
-export function reloadLookupAsync(key: string) {
-    return ScriptData.reloadAsync('Lookup.' + key);
+export async function reloadLookupAsync(key: string): Promise<any> {
+    return await ScriptData.reloadAsync('Lookup.' + key);
 }
 
 export function getColumns(key: string): PropertyItem[] {
     return ScriptData.ensure('Columns.' + key);
 }
 
-export function getColumnsAsync(key: string): PromiseLike<PropertyItem[]> {
-    return ScriptData.ensureAsync('Columns.' + key);
+export async function getColumnsAsync(key: string): Promise<PropertyItem[]> {
+    return await ScriptData.ensureAsync('Columns.' + key);
 }
 
 export function getForm(key: string): PropertyItem[] {
     return ScriptData.ensure('Form.' + key);
 }
 
-export function getFormAsync(key: string): PromiseLike<PropertyItem[]> {
-    return ScriptData.ensureAsync('Form.' + key);
+export async function getFormAsync(key: string): Promise<PropertyItem[]> {
+    return await ScriptData.ensureAsync('Form.' + key);
 }
 
 export function getTemplate(key: string): string {
     return ScriptData.ensure('Template.' + key);
 }
 
-export function getTemplateAsync(key: string): PromiseLike<string> {
-    return ScriptData.ensureAsync('Template.' + key);
+export async function getTemplateAsync(key: string): Promise<string> {
+    return await ScriptData.ensureAsync('Template.' + key);
 }
 
 export function canLoadScriptData(name: string): boolean {
     return ScriptData.canLoad(name);
+}
+
+var exported = {
+    canLoadScriptData,
+    getColumns,
+    getColumnsAsync,
+    getForm,
+    getFormAsync,
+    getLookup,
+    getLookupAsync,
+    getRemoteData, 
+    getRemoteDataAsync,
+    getTemplate,
+    getTemplateAsync,
+    reloadLookup,
+    reloadLookupAsync,
+    ScriptData
+}
+
+if (typeof globalThis !== "undefined") {
+    const Q = (globalThis as any).Q || ((globalThis as any).Q = {});
+    for (var i in exported)
+        if (Q[i] == null)
+            Q[i] = exported[i];
 }

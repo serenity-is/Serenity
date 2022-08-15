@@ -1,7 +1,8 @@
-﻿import { isEmptyOrNull, startsWith } from "./strings";
+﻿import { getStateStore } from "./system";
+import { isEmptyOrNull, startsWith } from "./strings";
 
 export function text(key: string): string {
-    let t = LT.$table[key];
+    let t = getTable()[key];
     if (t == null) {
         t = key || '';
     }
@@ -12,6 +13,13 @@ export function dbText(prefix: string): ((key: string) => string) {
     return function (key: string) {
         return text("Db." + prefix + "." + key);
     }
+}
+
+function getTable(): { [key: string]: string } {
+    let store = getStateStore()._lt;
+    if (!store) 
+        return (getStateStore()._lt = {});
+    return store;
 }
 
 export function prefixedText(prefix: string) {
@@ -42,7 +50,7 @@ export function prefixedText(prefix: string) {
 }
 
 export function tryGetText(key: string): string {
-    return LT.$table[key];
+    return getTable()[key];
 }
 
 export function dbTryText(prefix: string): ((key: string) => string) {
@@ -85,7 +93,6 @@ export function proxyTexts(o: Object, p: string, t: Object): Object {
 }
 
 export class LT {
-    static $table: { [key: string]: string } = {};
     static empty: LT = new LT('');
 
     constructor(private key: string) {
@@ -95,6 +102,9 @@ export class LT {
         if (!obj) {
             return;
         }
+        
+        let table = getTable();
+
         pre = pre || '';
         for (let k of Object.keys(obj)) {
             let actual = pre + k;
@@ -103,13 +113,13 @@ export class LT {
                 LT.add(o, actual + '.');
             }
             else {
-                LT.$table[actual] = o;
+                table[actual] = o;
             }
         }
     }
 
     get() {
-        var t = LT.$table[this.key];
+        var t = getTable()[this.key];
         if (t == null) {
             t = this.key || '';
         }
@@ -117,7 +127,7 @@ export class LT {
     }
 
     toString() {
-        var t = LT.$table[this.key];
+        var t = getTable()[this.key];
         if (t == null) {
             t = this.key || '';
         }
@@ -126,20 +136,21 @@ export class LT {
 
     static initializeTextClass = function (type: any, prefix: string) {
         var $t1 = Object.keys(type).slice();
+        var table = getTable();
         for (var $t2 = 0; $t2 < $t1.length; $t2++) {
             var member = $t1[$t2];
             var value = type[member];
             if (value instanceof LT) {
                 var lt = value;
                 var key = prefix + member;
-                LT.$table[key] = lt.key;
+                table[key] = lt.key;
                 type[member] = new LT(key);
             }
         }
     }
 
     static getDefault = function (key: string, defaultText: string) {
-        var t = LT.$table[key];
+        var t = getTable()[key];
         if (t == null) {
             t = defaultText;
             if (t == null) {
@@ -148,4 +159,10 @@ export class LT {
         }
         return t;
     }
+}
+
+if (typeof globalThis !== "undefined") {
+    const Q = (globalThis as any).Q || ((globalThis as any).Q = {});
+    if (Q.LT == null)
+        Q.LT = LT;
 }

@@ -13,11 +13,7 @@ export interface IInitializeColumn {
 export class IInitializeColumn {
 }
 
-function Formatter(name: string, intf?: any[]) {
-    return Decorators.registerFormatter('Serenity.' + name + 'Formatter', intf)
-}
-
-@Formatter('Boolean')
+@Decorators.registerFormatter('Serenity.BooleanFormatter')
 export class BooleanFormatter implements Formatter {
     format(ctx: FormatterContext) {
 
@@ -55,14 +51,14 @@ export class BooleanFormatter implements Formatter {
     public trueText: string;
 }
 
-@Formatter('Checkbox')
+@Decorators.registerFormatter('Serenity.CheckboxFormatter')
 export class CheckboxFormatter implements Formatter {
     format(ctx: FormatterContext) {
         return '<span class="check-box no-float readonly ' + (!!ctx.value ? ' checked' : '') + '"></span>';
     }
 }
 
-@Formatter('Date')
+@Decorators.registerFormatter('Serenity.DateFormatter')
 export class DateFormatter implements Formatter {
     constructor() {
         this.displayFormat = Culture.dateFormat;
@@ -100,7 +96,7 @@ export class DateFormatter implements Formatter {
     }
 }
 
-@Formatter('DateTime')
+@Decorators.registerFormatter('Serenity.DateTimeFormatter')
 export class DateTimeFormatter extends DateFormatter {
     constructor() {
         super();
@@ -108,7 +104,7 @@ export class DateTimeFormatter extends DateFormatter {
     }
 }
 
-@Formatter('Enum')
+@Decorators.registerFormatter('Serenity.EnumFormatter')
 export class EnumFormatter implements Formatter {
 
     format(ctx: FormatterContext): string {
@@ -146,7 +142,7 @@ export class EnumFormatter implements Formatter {
     }
 }
 
-@Formatter('FileDownload', [ISlickFormatter, IInitializeColumn])
+@Decorators.registerFormatter('Serenity.FileDownloadFormatter', [ISlickFormatter, IInitializeColumn])
 export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 
     format(ctx: FormatterContext): string {
@@ -187,7 +183,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
     originalNameProperty: string;
 }
 
-@Formatter('Minute')
+@Decorators.registerFormatter('Serenity.MinuteFormatter')
 export class MinuteFormatter implements Formatter {
 
     format(ctx: FormatterContext) {
@@ -216,7 +212,7 @@ export class MinuteFormatter implements Formatter {
     }
 }
 
-@Formatter('Number')
+@Decorators.registerFormatter('Serenity.NumberFormatter')
 export class NumberFormatter {
     format(ctx: FormatterContext): string {
         return NumberFormatter.format(ctx.value, this.displayFormat);
@@ -245,7 +241,7 @@ export class NumberFormatter {
     displayFormat: string;
 }
 
-@Formatter('Url', [ISlickFormatter, IInitializeColumn])
+@Decorators.registerFormatter('Serenity.UrlFormatter', [ISlickFormatter, IInitializeColumn])
 export class UrlFormatter implements Formatter, IInitializeColumn {
 
     format(ctx: FormatterContext): string {

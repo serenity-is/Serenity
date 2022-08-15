@@ -313,6 +313,24 @@ export function delegateCombine(delegate1: any, delegate2: any) {
     return _mkdel(targets1.concat(targets2));
 };
 
+const fallbackStore: any = {};
+
+export function getStateStore(): any {
+
+    if (typeof globalThis !== "undefined") {
+        if (!((globalThis as any).Q))
+            (globalThis as any).Q = {};
+
+        var store = (globalThis as any).Q.__stateStore;
+        if (!store)
+            return ((globalThis as any).Q.__stateStore = {});
+
+        return store;
+    }
+
+    return fallbackStore;
+}
+
 export namespace Enum {
     export let toString = (enumType: any, value: number): string => {
         var values = enumType;

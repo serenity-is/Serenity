@@ -295,6 +295,28 @@ export default [
         external: ['../q', ...external]
     },
     {
+        input: "../dist/slick/index.d.ts",
+        output: [{ 
+            file: "./dist/slick/index.d.ts",
+            format: "es"
+        }],
+        plugins: [
+            dts()
+        ],
+        external: [...external]
+    },
+    {
+        input: "../dist/serenity/index.d.ts",
+        output: [{ 
+            file: "./dist/serenity/index.d.ts",
+            format: "es"
+        }],
+        plugins: [
+            dts()
+        ],
+        external: ['../q', '../slick', ...external]
+    },
+    {
         input: "../dist/serenity/index.d.ts",
         output: [{ 
             file: "../dist/serenity/index.bundle.d.ts", 
@@ -311,12 +333,14 @@ export default [
 
                     var src = dtsOutputs.join('\n').replace(/\r/g, '');
                     src = mergeRefTypes(src);
-
+                   
                     fs.writeFileSync('../dist/Serenity.CoreLib.d.ts', src);
                     fs.copyFileSync('../dist/Serenity.CoreLib.d.ts', '../wwwroot/Serenity.CoreLib.d.ts');
                     fs.copyFileSync('../dist/Serenity.CoreLib.js', '../wwwroot/Serenity.CoreLib.js');
                     fs.copyFileSync('../dist/Serenity.CoreLib.js.map', '../wwwroot/Serenity.CoreLib.js.map');
                     fs.copyFileSync('../dist/Serenity.CoreLib.min.js', '../wwwroot/Serenity.CoreLib.min.js');
+                    fs.copyFileSync('../dist/q/index.bundle.d.ts', './dist/q/index.d.ts');
+                    fs.copyFileSync('./src/index.ts', './dist/index.d.ts');
                 }
             }
         ],

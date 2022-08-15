@@ -1,11 +1,11 @@
 {
   "name": "@serenity-is/corelib",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity CoreLib including Q, Serenity and Slick namespaces",
   "dependencies": {
-    "@serenity-is/sleekgrid": "1.2.7",
+    "@serenity-is/sleekgrid": "1.2.8",
     "@types/jquery": "2.0.48",
     "@types/jqueryui": "1.12.6",
     "@types/jquery.validation": "1.16.7",
@@ -32,29 +32,30 @@
   }, 
   "exports": {
     ".": {
-      "types": "./src/index.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./q": {
-      "types": "./src/q/index.ts",
+      "types": "./dist/q/index.d.ts",
       "import": "./dist/q/index.js"
     },
     "./slick": {
-      "types": "./src/slick/index.ts",
-      "import": "./dist/q/index.js"
+      "types": "./dist/slick/index.d.ts",
+      "import": "./dist/slick/index.js"
     }
   },
   "main": "dist/index.js",
   "import": "dist/index.js",
-  "types": "src/index.ts",
+  "types": "dist/index.d.ts",
   "typesVersions": {
     "*": {
-      "q": [ "src/q/index.ts" ],
-      "slick": [ "src/slick/index.ts" ]
+      "q": [ "dist/q/index.d.ts" ],
+      "slick": [ "dist/slick/index.d.ts" ]
     }
   },
   "files": [
     "dist/**/*.css",
+    "dist/**/*.d.ts",
     "dist/**/*.js",
     "dist/**/*.map",
     "css/**/*.css",

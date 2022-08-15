@@ -135,7 +135,7 @@ export namespace LayoutTimer {
     }
 }
 
-export function executeOnceWhenShown(element: JQuery, callback: Function) {
+export function executeOnceWhenVisible(element: JQuery, callback: Function): void {
     var el = element && element[0];
     if (!el)
         return;
@@ -151,7 +151,7 @@ export function executeOnceWhenShown(element: JQuery, callback: Function) {
     });
 }
 
-export function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean) {
+export function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void {
     var el = element && element[0];
     if (!el)
         return;

@@ -1,5 +1,5 @@
 ﻿import { Config } from "./config";
-import { executeEverytimeWhenShown } from "./layouttimer";
+import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
 import { getNested, initializeTypes } from "./system";
 
@@ -120,7 +120,7 @@ else
     initOnLoad();
 
 export function triggerLayoutOnShow(element: JQuery) {
-    executeEverytimeWhenShown(element, function () {
+    executeEverytimeWhenVisible(element, function () {
         element.triggerHandler('layout');
     }, true);
 }

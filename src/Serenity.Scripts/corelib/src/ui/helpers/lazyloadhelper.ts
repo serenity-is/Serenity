@@ -1,6 +1,6 @@
-﻿import { executeOnceWhenShown as once, executeEverytimeWhenShown as every } from "../../q";
+﻿import { executeOnceWhenVisible, executeEverytimeWhenVisible } from "../../q";
 
 export namespace LazyLoadHelper {
-    export const executeOnceWhenShown = once;
-    export const executeEverytimeWhenShown = every;
+    export const executeOnceWhenShown = executeOnceWhenVisible 
+    export const executeEverytimeWhenShown = executeEverytimeWhenVisible;
 }
