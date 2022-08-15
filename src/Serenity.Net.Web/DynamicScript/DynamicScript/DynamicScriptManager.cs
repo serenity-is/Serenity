@@ -112,17 +112,33 @@
             return hash;
         }
 
-        private IScriptContent EnsureScriptContent(string name, IDynamicScript script)
+        private IScriptContent EnsureScriptContent(string name, IDynamicScript script, bool json)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            var cacheKey = "DynamicScript:" + name;
+            var cacheKey = (json ? "DynamicData:" : "DynamicScript:") + name;
             if (script is ICacheSuffix ics)
                 cacheKey = cacheKey + ":" + ics.CacheSuffix;
 
-            ScriptContent factory() {
-                var content = utf8Encoding.GetBytes(script.GetScript());
+            ScriptContent factory() 
+            {
+                byte[] content;
+                
+                if (json) {
+                    if(script is IGetScriptData scriptData)
+                    {
+                        content = utf8Encoding.GetBytes(scriptData.GetScriptData().ToJson()); 
+                    }
+                    else
+                    {
+                        throw new ValidationError(script.GetType().Name + " Doesn't implement " + nameof(IGetScriptData));
+                    }
+                }
+                else
+                {
+                    content = utf8Encoding.GetBytes(script.GetScript());
+                }
                 return new ScriptContent(content, DateTime.UtcNow, content.Length > 4096);
             }
             
@@ -163,12 +179,12 @@
                 script.CheckRights(permissions, localizer);
         }
 
-        public string GetScriptText(string name)
+        public string GetScriptText(string name, bool json)
         {
             if (!registeredScripts.TryGetValue(name, out var script))
                 return null;
 
-            var content = EnsureScriptContent(name, script).Content;
+            var content = EnsureScriptContent(name, script, json).Content;
             return utf8Encoding.GetString(content);
         }
 
@@ -182,14 +198,14 @@
             return name + extension + "?v=" + hash;
         }
 
-        public IScriptContent ReadScriptContent(string name)
+        public IScriptContent ReadScriptContent(string name, bool json)
         {
             if (!registeredScripts.TryGetValue(name, out var script))
                 return null;
 
             script.CheckRights(permissions, localizer);
 
-            return EnsureScriptContent(name, script);
+            return EnsureScriptContent(name, script, json);
         }
 
         public event Action<string> ScriptChanged
