@@ -18,9 +18,7 @@
       "jquery",
       "jquery.validation",
       "jqueryui",
-      "bootstrap",
-      "toastr",
-      "react"
+      "toastr"
     ],
     "outDir": "../../dist",
     "suppressImplicitAnyIndexErrors": true,

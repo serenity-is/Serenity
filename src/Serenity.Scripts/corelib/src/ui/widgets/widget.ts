@@ -1,6 +1,4 @@
-﻿/// <reference types="react" />
-
-import { jQueryPatch } from "../../patch/jquerypatch";
+﻿import { jQueryPatch } from "../../patch/jquerypatch";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
 import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, format, getAttributes, getInstanceType, getTypeFullName, getTypeName, isAssignableFrom, notifyError, replaceAll, startsWith } from "../../q";
@@ -57,8 +55,7 @@ export interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> 
 }
 
 @Decorators.registerClass()
-// @ts-ignore
-export class Widget<TOptions> extends React.Component<TOptions> {
+export class Widget<TOptions> {
     private static nextWidgetNumber = 0;
     public element: JQuery;
     protected options: TOptions;
@@ -66,7 +63,6 @@ export class Widget<TOptions> extends React.Component<TOptions> {
     protected uniqueName: string;
 
     constructor(element: JQuery, options?: TOptions) {
-        super(options);
 
         this.element = element;
         this.options = options || ({} as TOptions);
@@ -181,7 +177,6 @@ export class Widget<TOptions> extends React.Component<TOptions> {
     }
 
     private static __isWidgetType = true;
-    props: Readonly<{ children?: React.ReactNode }> & Readonly<TOptions> & WidgetComponentProps<this>;
 }
 
 if (typeof $ !== "undefined" && $.fn) {

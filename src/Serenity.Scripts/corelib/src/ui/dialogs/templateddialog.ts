@@ -194,7 +194,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         else
             footer.hide();
 
-        modal.modal(opt);
+        (modal as any).modal(opt);
         modal.find('.modal-body').replaceWith(this.element.removeClass('hidden').addClass('modal-body'));
         $(window).on('resize.' + this.uniqueName, this.arrange.bind(this));
     }
@@ -258,7 +258,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         }
         else if (this.useBSModal()) {
             this.initModal();
-            this.element.closest('.modal').modal('show');
+            (this.element.closest('.modal') as any).modal('show');
         }
         else {
             this.initDialog();
@@ -375,7 +375,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         if (this.element.hasClass('ui-dialog-content'))
             this.element.dialog().dialog('close');
         else if (this.element.hasClass('modal-body'))
-            this.element.closest('.modal').modal('hide');
+            (this.element.closest('.modal') as any).modal('hide');
         else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
             TemplatedDialog.closePanel(this.element);
         }

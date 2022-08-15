@@ -178,7 +178,7 @@ function bsModalMessage(options: CommonDialogOptions, message: string, modalClas
             .appendTo(footer)
             .click(e => {
                 options.result = x.result;
-                div.modal('hide');
+                (div as any).modal('hide');
                 x.click && x.click.call(this, e);       
             });
     }
@@ -188,26 +188,26 @@ function bsModalMessage(options: CommonDialogOptions, message: string, modalClas
             createButton(button);
 
     if (isBS5Plus()) {
-        div.modal({
+        (div as any).modal({
             backdrop: false,
         });
-        div.modal('show');
+        (div as any).modal('show');
     }
     else {
-        div.modal({
+        (div as any).modal({
             backdrop: false,
             show: true
         } as any);
     }
 
     if (isBS5Plus())
-        div.modal('show');
+        (div as any).modal('show');
 }
 
 let _useBrowserDialogs: boolean;
 function useBrowserDialogs() {
     if (_useBrowserDialogs == null) {
-        _useBrowserDialogs = typeof $ === 'undefined' || ((!$.ui || !$.ui.dialog) && (!$.fn || !$.fn.modal));
+        _useBrowserDialogs = typeof $ === 'undefined' || ((!$.ui || !$.ui.dialog) && (!$.fn || !(($.fn as any).modal)));
     }
     return _useBrowserDialogs;
 }
