@@ -306,7 +306,7 @@ Features:
 ## 5.0.39 (2021-04-30)
 
 Features:
-  - add extra plugin interfaces for configure servies / background jobs
+  - add extra plugin interfaces for configure services / background jobs
   - handle bootstrap 4 nav tab markup
   - use dispose instead of destroy for bootstrap 4
   - added full namespaced class name for widgets
