@@ -1119,8 +1119,8 @@ declare namespace Slick {
     type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
     interface IEventData {
         readonly type?: string;
-        currentTarget?: EventTarget;
-        target?: EventTarget;
+        currentTarget?: EventTarget | null;
+        target?: EventTarget | null;
         originalEvent?: any;
         defaultPrevented?: boolean;
         preventDefault?(): void;

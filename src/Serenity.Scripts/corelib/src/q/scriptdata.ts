@@ -16,7 +16,7 @@ function getHash(key: string, reload?: boolean): string {
         (k = trimToNull((document.querySelector('script#RegisteredScripts') || {}).innerHTML)) != null &&
         k.charAt(0) == '{') {
         var regs = JSON.parse(k);
-        stateStore.setRegisteredScripts(regs);
+        ScriptData.setRegisteredScripts(regs);
     }
 
     if (stateStore.__hash == null && reload)
