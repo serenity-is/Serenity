@@ -1,5 +1,4 @@
 ﻿import { Column, Grid, GridOptions } from "@serenity-is/sleekgrid"
-import { Slick } from "../..";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
 import { Culture, getLookup, htmlEncode, isEmptyOrNull, ListResponse, PropertyItem, ScriptData, trimToNull, tryGetText } from "../../q";
