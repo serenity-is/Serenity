@@ -3,10 +3,11 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "declaration": true,
-    "declarationDir": "../../dist",
+    "declarationDir": "../out",
     "emitBOM": true,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
+    "inlineSources": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
@@ -20,7 +21,7 @@
       "jqueryui",
       "toastr"
     ],
-    "outDir": "../../dist",
+    "outDir": "../out",
     "suppressImplicitAnyIndexErrors": true,
     "target": "ES5",
     "lib": [

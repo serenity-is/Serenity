@@ -4,7 +4,7 @@
   "compilerOptions": {
     "noEmit": true,
     "emitDeclarationOnly": false,
-    "sourceMap": false,
+    "sourceMap": true,
     "module": "CommonJS",
     "skipLibCheck": true,
     "types": [

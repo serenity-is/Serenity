@@ -4,6 +4,7 @@ import fs from 'fs';
 import pkg from "./package.json";
 import { builtinModules } from "module";
 import dts from "rollup-plugin-dts";
+import { basename, resolve } from "path";
 
 var globals = {
     'jquery': '$',
@@ -72,8 +73,6 @@ var toGlobal = function (ns, outFile, isTS) {
                     for (var k in imports) {
                         if (k != ns) {
                             for (var i of imports[k]) {
-                                if (i.alias.indexOf('$') >= 0)
-                                    debugger;
                                 src = replaceTypeRef(src, i.alias, k + '.' + i.name);
                             }
                         }
@@ -175,31 +174,21 @@ var extendGlobals = function () {
     }
 }
 
-var writeMinJS = function () {
-    return {
-        name: 'writeMinJS',
-        generateBundle: async function (o, b) {
-            var self = this;
-            Object.keys(b).forEach(async function (fileName) {
-                if (b[fileName].code && /\.js$/i.test(fileName) >= 0) {
-                    var src = b[fileName].code;
-                    var minified = await minify(src, {
-                        mangle: true,
-                        format: {
-                            beautify: false,
-                            max_line_len: 1000
-                        }
-                    });
-                    var toEmit = {
-                        type: 'asset',
-                        fileName: fileName.replace(/\.js$/, '.min.js'),
-                        source: minified.code
-                    };
-                    self.emitFile(toEmit);
-                }
-            });
+async function minifyScript(fileName) {
+    var minified = await minify({ [basename(fileName)]: fs.readFileSync(fileName, 'utf8') }, {
+        mangle: true,
+        sourceMap: {
+            content: fs.existsSync(fileName + '.map') ? fs.readFileSync(fileName + '.map', 'utf8') : undefined,
+            filename: fileName.replace(/\.js$/, '.min.js'),
+            url: fileName.replace(/\.js$/, '.min.js.map'),
+        },
+        format: {
+            beautify: false,
+            max_line_len: 1000
         }
-    }
+    });
+    fs.writeFileSync(fileName.replace(/\.js$/, '.min.js'), minified.code);
+    fs.writeFileSync(fileName.replace(/\.js$/, '.min.js.map'), minified.map);
 }
 
 const external = [
@@ -225,9 +214,10 @@ export default [
         input: "src/corelib.ts",
         output: [
             {
-                file: '../dist/Serenity.CoreLib.js',
+                file: './out/Serenity.CoreLib.js',
                 format: "iife",
                 sourcemap: true,
+                sourcemapExcludeSources: false,
                 name: "window",
                 extend: true,
                 freeze: false,
@@ -237,17 +227,17 @@ export default [
         plugins: [
             typescript({
                 tsconfig: 'src/tsconfig.json',
-                outDir: '../dist'
+                outDir: './out',
+                sourceRoot: resolve('./corelib')
             }),
-            extendGlobals(),
-            writeMinJS()
+            extendGlobals()
         ],
         external
     },
     {
-        input: "../dist/q/index.d.ts",
+        input: "./out/q/index.d.ts",
         output: [{
-            file: "../dist/q/index.bundle.d.ts"
+            file: "./out/q/index.bundle.d.ts"
         }],
         plugins: [
             dts(), 
@@ -257,7 +247,7 @@ export default [
     {
         input: "./node_modules/@serenity-is/sleekgrid/src/index.ts",
         output: [{ 
-            file: "../dist/sleekgrid/index.js",
+            file: "./out/sleekgrid/index.js",
             format: "iife",
             name: "Slick",
             extend: true,
@@ -267,14 +257,14 @@ export default [
         plugins: [
             typescript({
                 tsconfig: './node_modules/@serenity-is/sleekgrid/src/tsconfig.json',
-                outDir: '../dist/sleekgrid'
+                outDir: './out/sleekgrid'
             })
         ]
     },
     {
-        input: "../dist/sleekgrid/index.d.ts",
+        input: "./out/sleekgrid/index.d.ts",
         output: [{ 
-            file: "../dist/sleekgrid/index.bundle.d.ts", 
+            file: "./out/sleekgrid/index.bundle.d.ts", 
             format: "es"
         }],
         plugins: [
@@ -283,9 +273,9 @@ export default [
         ]
     },    
     {
-        input: "../dist/slick/index.d.ts",
+        input: "./out/slick/index.d.ts",
         output: [{ 
-            file: "../dist/slick/index.bundle.d.ts",
+            file: "./out/slick/index.bundle.d.ts",
             format: "es"
         }],
         plugins: [
@@ -295,7 +285,7 @@ export default [
         external: ['../q', ...external]
     },
     {
-        input: "../dist/slick/index.d.ts",
+        input: "./out/slick/index.d.ts",
         output: [{ 
             file: "./dist/slick/index.d.ts",
             format: "es"
@@ -306,7 +296,7 @@ export default [
         external: [...external]
     },
     {
-        input: "../dist/serenity/index.d.ts",
+        input: "./out/serenity/index.d.ts",
         output: [{ 
             file: "./dist/serenity/index.d.ts",
             format: "es"
@@ -317,9 +307,9 @@ export default [
         external: ['../q', '../slick', ...external]
     },
     {
-        input: "../dist/serenity/index.d.ts",
+        input: "./out/serenity/index.d.ts",
         output: [{ 
-            file: "../dist/serenity/index.bundle.d.ts", 
+            file: "./out/serenity/index.bundle.d.ts", 
             format: "es"
         }],
         plugins: [
@@ -327,20 +317,22 @@ export default [
             toGlobal('Serenity'),
             {
                 name: 'writeFinal',
-                generateBundle: function () {
+                generateBundle: async function () {
                     dtsOutputs.splice(0, 0, fs.readFileSync('./node_modules/tslib/tslib.d.ts',
                         'utf8').replace(/^\uFEFF/, '').replace(/^[ \t]*export declare/gm, 'declare'));
 
                     var src = dtsOutputs.join('\n').replace(/\r/g, '');
                     src = mergeRefTypes(src);
                    
-                    fs.writeFileSync('../dist/Serenity.CoreLib.d.ts', src);
-                    fs.copyFileSync('../dist/Serenity.CoreLib.d.ts', '../wwwroot/Serenity.CoreLib.d.ts');
-                    fs.copyFileSync('../dist/Serenity.CoreLib.js', '../wwwroot/Serenity.CoreLib.js');
-                    fs.copyFileSync('../dist/Serenity.CoreLib.js.map', '../wwwroot/Serenity.CoreLib.js.map');
-                    fs.copyFileSync('../dist/Serenity.CoreLib.min.js', '../wwwroot/Serenity.CoreLib.min.js');
-                    fs.copyFileSync('../dist/q/index.bundle.d.ts', './dist/q/index.d.ts');
+                    fs.writeFileSync('./out/Serenity.CoreLib.d.ts', src);
+                    await minifyScript('./out/Serenity.CoreLib.js');
+                    fs.copyFileSync('./out/q/index.bundle.d.ts', './dist/q/index.d.ts');
                     fs.copyFileSync('./src/index.ts', './dist/index.d.ts');
+
+                    fs.copyFileSync('./out/Serenity.CoreLib.min.js', '../wwwroot/Serenity.CoreLib.min.js');
+                    fs.copyFileSync('./out/Serenity.CoreLib.d.ts', '../wwwroot/Serenity.CoreLib.d.ts');
+                    fs.copyFileSync('./out/Serenity.CoreLib.js', '../wwwroot/Serenity.CoreLib.js');
+                    fs.copyFileSync('./out/Serenity.CoreLib.js.map', '../wwwroot/Serenity.CoreLib.js.map');
                 }
             }
         ],
