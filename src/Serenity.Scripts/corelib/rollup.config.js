@@ -327,7 +327,7 @@ export default [
                     fs.writeFileSync('./out/Serenity.CoreLib.d.ts', src);
                     await minifyScript('./out/Serenity.CoreLib.js');
                     fs.copyFileSync('./out/q/index.bundle.d.ts', './dist/q/index.d.ts');
-                    fs.copyFileSync('./src/index.ts', './dist/index.d.ts');
+                    fs.writeFileSync('./dist/index.d.ts', 'export * from "./serenity/index";');
 
                     fs.copyFileSync('./out/Serenity.CoreLib.min.js', '../wwwroot/Serenity.CoreLib.min.js');
                     fs.copyFileSync('./out/Serenity.CoreLib.d.ts', '../wwwroot/Serenity.CoreLib.d.ts');
@@ -336,6 +336,6 @@ export default [
                 }
             }
         ],
-        external: ['../q', ...external]
+        external: ['../q', '../slick', ...external]
     }
 ];

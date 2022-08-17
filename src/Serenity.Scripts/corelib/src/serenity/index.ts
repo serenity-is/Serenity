@@ -1,5 +1,4 @@
-﻿export * from "../globals/promise";
-export * from "../globals/select2";
+﻿export * from "../globals/select2";
 export * from "../globals/jquerystatic";
 export * from "../globals/validate";
 

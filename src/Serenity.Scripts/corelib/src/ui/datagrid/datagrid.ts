@@ -20,7 +20,48 @@ import { IDataGrid } from "./idatagrid";
 import { QuickFilter } from "./quickfilter";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
-import { Column, ColumnSort, Grid, GridOptions } from "@serenity-is/sleekgrid";
+import { Column, ColumnSort, Event, Grid, GridOptions, IPlugin, ItemMetadata } from "@serenity-is/sleekgrid";
+
+declare global {
+    namespace Slick {
+        interface AutoTooltipsOptions {
+            enableForHeaderCells?: boolean;
+            enableForCells?: boolean;
+            maxToolTipLength?: number;
+        }
+        
+        class AutoTooltips {
+            constructor(options: AutoTooltipsOptions);
+            init(): void;
+        }
+   
+        namespace Data {
+    
+            interface GroupItemMetadataProvider {
+                getGroupRowMetadata(item: any): ItemMetadata;
+                getTotalsRowMetadata(item: any): ItemMetadata;
+            }
+
+            class GroupItemMetadataProvider implements GroupItemMetadataProvider, IPlugin {
+                constructor();
+                init(grid: Grid): void;
+                getGroupRowMetadata(item: any): ItemMetadata;
+                getTotalsRowMetadata(item: any): ItemMetadata;
+            }
+        }
+
+        interface RowMoveManagerOptions {
+            cancelEditOnDrag: boolean;
+        }
+    
+        class RowMoveManager implements IPlugin {
+            constructor(options: RowMoveManagerOptions);
+            init(): void;
+            onBeforeMoveRows: Event;
+            onMoveRows: Event;
+        }
+    }
+}
 
 export interface SettingStorage {
     getItem(key: string): string;

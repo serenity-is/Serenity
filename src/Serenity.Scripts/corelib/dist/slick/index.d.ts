@@ -1,5 +1,5 @@
 /// <reference types="jquery" />
-import { GroupTotals, Column, ItemMetadata, IPlugin, Grid, Event, Group, SelectionModel, Range } from '@serenity-is/sleekgrid';
+import { GroupTotals, Column, Grid, Group, SelectionModel, Range, Event } from '@serenity-is/sleekgrid';
 
 declare namespace Aggregators {
     function Avg(field: string): void;
@@ -114,45 +114,6 @@ declare enum SummaryType {
 }
 
 declare type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
-declare global {
-    namespace Slick {
-        interface AutoTooltipsOptions {
-            enableForHeaderCells?: boolean;
-            enableForCells?: boolean;
-            maxToolTipLength?: number;
-        }
-        namespace Data {
-            interface GroupItemMetadataProvider {
-                getGroupRowMetadata(item: any): ItemMetadata;
-                getTotalsRowMetadata(item: any): ItemMetadata;
-            }
-            class GroupItemMetadataProvider implements GroupItemMetadataProvider, IPlugin {
-                constructor();
-                init(grid: Grid): void;
-                getGroupRowMetadata(item: any): ItemMetadata;
-                getTotalsRowMetadata(item: any): ItemMetadata;
-            }
-        }
-        interface RowMoveManagerOptions {
-            cancelEditOnDrag: boolean;
-        }
-        class RowMoveManager implements IPlugin {
-            constructor(options: RowMoveManagerOptions);
-            init(): void;
-            onBeforeMoveRows: Event;
-            onMoveRows: Event;
-        }
-        interface AutoTooltipsOptions {
-            enableForHeaderCells?: boolean;
-            enableForCells?: boolean;
-            maxToolTipLength?: number;
-        }
-        class AutoTooltips {
-            constructor(options: AutoTooltipsOptions);
-            init(): void;
-        }
-    }
-}
 declare module "@serenity-is/sleekgrid" {
     interface Column<TItem = any> {
         referencedFields?: string[];

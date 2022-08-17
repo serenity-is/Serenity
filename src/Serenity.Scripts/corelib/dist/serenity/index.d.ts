@@ -2,46 +2,7 @@
 /// <reference types="jqueryui" />
 /// <reference types="jquery.validation" />
 import { PropertyItem as PropertyItem$1, ListResponse as ListResponse$1 } from '../q';
-import { ItemMetadata, IPlugin, Grid, Event, Column, Group, ColumnFormatter, GridOptions } from '@serenity-is/sleekgrid';
-
-declare global {
-    /**
-     * Represents the completion of an asynchronous operation
-     */
-    interface PromiseConstructor {
-        /**
-         * Creates a new Promise.
-         * @param executor A callback used to initialize the promise. This callback is passed two arguments:
-         * a resolve callback used resolve the promise with a value or the result of another promise,
-         * and a reject callback used to reject the promise with a provided reason or error.
-         */
-        new <T>(executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void): PromiseLike<T>;
-        /**
-         * Creates a new rejected promise for the provided reason.
-         * @param reason The reason the promise was rejected.
-         * @returns A new rejected Promise.
-         */
-        reject(reason: any): PromiseLike<never>;
-        /**
-         * Creates a new rejected promise for the provided reason.
-         * @param reason The reason the promise was rejected.
-         * @returns A new rejected Promise.
-         */
-        reject<T>(reason: any): PromiseLike<T>;
-        /**
-         * Creates a new resolved promise for the provided value.
-         * @param value A promise.
-         * @returns A promise whose internal state matches the provided promise.
-         */
-        resolve<T>(value: T | PromiseLike<T>): PromiseLike<T>;
-        /**
-         * Creates a new resolved promise .
-         * @returns A resolved promise.
-         */
-        resolve(): PromiseLike<void>;
-    }
-    var Promise: PromiseConstructor;
-}
+import { Column, Grid, Group, Event, ColumnFormatter, ItemMetadata, IPlugin, GridOptions } from '@serenity-is/sleekgrid';
 
 declare global {
     namespace Select2 {
@@ -1936,45 +1897,6 @@ declare class FilterDisplayBar extends FilterWidgetBase<any> {
 }
 
 declare type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
-declare global {
-    namespace Slick {
-        interface AutoTooltipsOptions {
-            enableForHeaderCells?: boolean;
-            enableForCells?: boolean;
-            maxToolTipLength?: number;
-        }
-        namespace Data {
-            interface GroupItemMetadataProvider {
-                getGroupRowMetadata(item: any): ItemMetadata;
-                getTotalsRowMetadata(item: any): ItemMetadata;
-            }
-            class GroupItemMetadataProvider implements GroupItemMetadataProvider, IPlugin {
-                constructor();
-                init(grid: Grid): void;
-                getGroupRowMetadata(item: any): ItemMetadata;
-                getTotalsRowMetadata(item: any): ItemMetadata;
-            }
-        }
-        interface RowMoveManagerOptions {
-            cancelEditOnDrag: boolean;
-        }
-        class RowMoveManager implements IPlugin {
-            constructor(options: RowMoveManagerOptions);
-            init(): void;
-            onBeforeMoveRows: Event;
-            onMoveRows: Event;
-        }
-        interface AutoTooltipsOptions {
-            enableForHeaderCells?: boolean;
-            enableForCells?: boolean;
-            maxToolTipLength?: number;
-        }
-        class AutoTooltips {
-            constructor(options: AutoTooltipsOptions);
-            init(): void;
-        }
-    }
-}
 declare module "@serenity-is/sleekgrid" {
     interface Column<TItem = any> {
         referencedFields?: string[];
@@ -2283,6 +2205,40 @@ declare namespace FormatterTypeRegistry {
     function reset(): void;
 }
 
+declare global {
+    namespace Slick {
+        interface AutoTooltipsOptions {
+            enableForHeaderCells?: boolean;
+            enableForCells?: boolean;
+            maxToolTipLength?: number;
+        }
+        class AutoTooltips {
+            constructor(options: AutoTooltipsOptions);
+            init(): void;
+        }
+        namespace Data {
+            interface GroupItemMetadataProvider {
+                getGroupRowMetadata(item: any): ItemMetadata;
+                getTotalsRowMetadata(item: any): ItemMetadata;
+            }
+            class GroupItemMetadataProvider implements GroupItemMetadataProvider, IPlugin {
+                constructor();
+                init(grid: Grid): void;
+                getGroupRowMetadata(item: any): ItemMetadata;
+                getTotalsRowMetadata(item: any): ItemMetadata;
+            }
+        }
+        interface RowMoveManagerOptions {
+            cancelEditOnDrag: boolean;
+        }
+        class RowMoveManager implements IPlugin {
+            constructor(options: RowMoveManagerOptions);
+            init(): void;
+            onBeforeMoveRows: Event;
+            onMoveRows: Event;
+        }
+    }
+}
 interface SettingStorage {
     getItem(key: string): string;
     setItem(key: string, value: string): void;
