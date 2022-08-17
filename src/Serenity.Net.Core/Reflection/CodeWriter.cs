@@ -58,7 +58,7 @@
         public void DecreaseIndent()
         {
             if (indent.Length >= tab.Length)
-                indent = indent.Substring(0, indent.Length - tab.Length);
+                indent = indent[..^tab.Length];
         }
 
         /// <summary>
@@ -147,7 +147,7 @@
                 return string.Empty;
 
             var nullableText = "";
-            if (fullName.EndsWith('?'))
+            if (fullName.EndsWith("?"))
             {
                 fullName = fullName[..^1];
                 nullableText = "?";
@@ -175,7 +175,7 @@
                     }
                 }
 
-                if (fullName.EndsWith('>'))
+                if (fullName.EndsWith(">"))
                 {
                     var idx = fullName.IndexOf('<', StringComparison.OrdinalIgnoreCase);
                     if (idx >= 0)
