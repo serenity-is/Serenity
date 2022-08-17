@@ -69,7 +69,7 @@
             foreach (var rn in RootNamespaces)
             {
                 if (name.StartsWith(rn + ".", StringComparison.Ordinal))
-                    return name.Substring(rn.Length + 1);
+                    return name[(rn.Length + 1)..];
             }
 
             return name;
@@ -122,7 +122,7 @@
             }
         }
 
-        protected bool HasBaseType(ExternalType type, string typeName)
+        protected bool HasBaseType(ExternalType type, params string[] typeNames)
         {
             int loop = 0;
 
@@ -132,7 +132,7 @@
                     break;
 
                 var baseTypeName = GetBaseTypeName(type);
-                if (baseTypeName == typeName)
+                if (typeNames.Contains(baseTypeName, StringComparer.Ordinal))
                     return true;
 
                 var ns = type.Namespace;
@@ -143,7 +143,7 @@
                     for (var i = nsParts.Length; i > 0; i--)
                     {
                         var prefixed = string.Join(".", nsParts.Take(i)) + '.' + baseTypeName;
-                        if (prefixed == typeName)
+                        if (typeNames.Contains(prefixed, StringComparer.Ordinal))
                             return true;
                         type = GetScriptType(prefixed);
                         if (type != null)
@@ -155,9 +155,9 @@
             return false;
         }
 
-        protected ExternalAttribute GetAttribute(ExternalType type, string attributeName, bool inherited)
+        protected ExternalAttribute GetAttribute(ExternalType type, bool inherited, params string[] attributeNames)
         {
-            var attr = type.Attributes?.FirstOrDefault(x => x.Type == attributeName);
+            var attr = type.Attributes?.FirstOrDefault(x => attributeNames.Contains(x.Type, StringComparer.Ordinal));
             if (attr != null)
                 return attr;
 
@@ -167,7 +167,7 @@
             int loop = 0;
             while ((type = GetBaseType(type)) != null)
             {
-                attr = type.Attributes?.FirstOrDefault(x => x.Type == attributeName);
+                attr = type.Attributes?.FirstOrDefault(x => attributeNames.Contains(x.Type, StringComparer.Ordinal));
                 if (attr != null)
                     return attr;
 

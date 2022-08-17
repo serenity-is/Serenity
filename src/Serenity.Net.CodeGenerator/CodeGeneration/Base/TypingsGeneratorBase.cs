@@ -2,20 +2,22 @@
 using System.Collections.Immutable;
 using System.Threading;
 using Microsoft.CodeAnalysis;
-#endif
 using Serenity.Reflection;
+#endif
+
+using System.Linq;
 
 namespace Serenity.CodeGeneration
 {
     public abstract class TypingsGeneratorBase : ImportGeneratorBase
     {
-        private HashSet<string> visited;
+        private readonly HashSet<string> visited = new();
         private Queue<TypeDefinition> generateQueue;
-        protected List<TypeDefinition> lookupScripts;
-        protected HashSet<string> localTextKeys;
-        protected HashSet<string> generatedTypes;
-        protected string fileIdentifier;
-        protected List<AnnotationTypeInfo> annotationTypes;
+        protected List<TypeDefinition> lookupScripts = new();
+        protected HashSet<string> localTextKeys = new();
+        protected List<GeneratedTypeInfo> generatedTypes = new();
+        protected List<AnnotationTypeInfo> annotationTypes = new();
+        protected ILookup<string, ExternalType> editorTypeByKey;
 
 #if ISSOURCEGENERATOR
         private readonly CancellationToken cancellationToken;
@@ -24,8 +26,6 @@ namespace Serenity.CodeGeneration
         {
             Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
             this.cancellationToken = cancellationToken;
-            generatedTypes = new HashSet<string>();
-            annotationTypes = new List<AnnotationTypeInfo>();
         }
 
         public Compilation Compilation { get; }
@@ -100,9 +100,6 @@ namespace Serenity.CodeGeneration
         protected TypingsGeneratorBase(params Mono.Cecil.AssemblyDefinition[] assemblies)
             : base()
         {
-            generatedTypes = new HashSet<string>();
-            annotationTypes = new List<AnnotationTypeInfo>();
-
             if (assemblies == null || assemblies.Length == 0)
                 throw new ArgumentNullException(nameof(assemblies));
 
@@ -184,14 +181,37 @@ namespace Serenity.CodeGeneration
 
             cw.BraceOnSameLine = true;
             generateQueue = new Queue<TypeDefinition>();
-            visited = new HashSet<string>();
-            lookupScripts = new List<TypeDefinition>();
-            localTextKeys = new HashSet<string>();
+            visited.Clear();
+            lookupScripts.Clear();
+            localTextKeys.Clear();
+            generatedTypes.Clear();
+            annotationTypes.Clear();
         }
 
         protected override void GenerateAll()
         {
             var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            editorTypeByKey = tsTypes.Values.Select(type =>
+            {
+                if (type.IsAbstract != false &&
+                    type.IsInterface != false &&
+                    type.Attributes != null)
+                {
+                    foreach (var attr in type.Attributes)
+                    {
+                        if (attr.Type is not null &&
+                            (attr.Type == "registerEditor" ||
+                             attr.Type.EndsWith(".registerEditor", StringComparison.Ordinal)) &&
+                            attr.Arguments?.Count > 0 &&
+                            attr.Arguments[0]?.Value is string s &&
+                            !string.IsNullOrEmpty(s))
+                            return (s, type);
+                    }
+                }
+
+                return ((string)null, type);
+            }).Where(x => x.Item1 != null)
+            .ToLookup(x => x.Item1, x => x.type);
 
 #if ISSOURCEGENERATOR
             var types = Compilation.GetSymbolsWithName(s => true, SymbolFilter.Type).OfType<ITypeSymbol>();
@@ -324,12 +344,7 @@ namespace Serenity.CodeGeneration
                     continue;
 #endif
 
-                var ns = GetNamespace(typeDef);
-                fileIdentifier = typeDef.Name;
-
                 GenerateCodeFor(typeDef);
-
-                AddFile(RemoveRootNamespace(ns, fileIdentifier + ".ts"));
             }
         }
 
@@ -453,7 +468,7 @@ namespace Serenity.CodeGeneration
         }
 
 
-        protected abstract void HandleMemberType(TypeReference memberType, string codeNamespace, StringBuilder sb = null);
+        protected abstract void HandleMemberType(TypeReference memberType, string codeNamespace, bool module);
 
         public static bool CanHandleType(TypeDefinition memberType)
         {
@@ -473,36 +488,67 @@ namespace Serenity.CodeGeneration
             return true;
         }
 
-        public virtual string ShortenNamespace(TypeReference type, string codeNamespace)
+        protected string GetFileNameFor(string ns, string name, bool module)
         {
-            string ns = GetNamespace(type);
+            var filename = RemoveRootNamespace(ns, name);
+            if (module)
+            {
+                var idx = filename.IndexOf('.');
+                if (idx >= 0)
+                    filename = filename[..idx] + '/' + filename[(idx + 1)..];
+            }
 
-            if (ns == "Serenity.Services" ||
+            return filename;
+        }
+
+        public virtual string ShortenFullName(string ns, string name, string codeNamespace, bool module, 
+            string sourceFile)
+        {
+            if (module)
+            {
+                if (ns == "Serenity.Services" ||
+                    ns == "Serenity.ComponentModel")
+                {
+                    var importName = name;
+                    var idx = importName.IndexOf('`', StringComparison.Ordinal);
+                    if (idx >= 0)
+                        importName = importName[..idx];
+
+                    name = ImportFromSerenity(importName) +
+                        (idx >= 0 ? name[idx..] : "");
+                    ns = "";
+                }
+                else if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
+                {
+                    var filename = GetFileNameFor(ns, name, module);
+                    name = AddModuleImport(filename, name, external: false);
+                    ns = "";
+                }
+            }
+            else if (
+                ns == "Serenity.Services" ||
                 ns == "Serenity.ComponentModel")
             {
                 if (IsUsingNamespace("Serenity"))
-                    return "";
+                    ns = "";
                 else
-                    return "Serenity";
+                    ns = "Serenity";
             }
-
+            
             if ((codeNamespace != null && (ns == codeNamespace)) ||
-                (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)))
+                (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)) ||
+                IsUsingNamespace(ns))
             {
-                return "";
+                ns = "";
             }
-
-            if (IsUsingNamespace(ns))
-                return "";
-
-            if (codeNamespace != null)
+            else if (codeNamespace != null)
             {
                 var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
                 if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
-                    return ns[(idx + 1)..];
+                    ns = ns[(idx + 1)..];
             }
 
-            return ns;
+            return !string.IsNullOrEmpty(ns) ? (ns + "." + name) : name;
         }
 
         protected virtual bool IsUsingNamespace(string ns)
@@ -510,33 +556,8 @@ namespace Serenity.CodeGeneration
             return false;
         }
 
-        protected virtual string ShortenNamespace(ExternalType type, string codeNamespace)
+        protected virtual string MakeFriendlyName(TypeReference type, string codeNamespace, bool module)
         {
-            string ns = type.Namespace ?? "";
-
-            if ((codeNamespace != null && (ns == codeNamespace)) ||
-                (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)))
-            {
-                return "";
-            }
-
-            if (IsUsingNamespace(ns))
-                return "";
-
-            if (codeNamespace != null)
-            {
-                var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
-                if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
-                    return ns[(idx + 1)..];
-            }
-
-            return ns;
-        }
-
-        protected virtual string MakeFriendlyName(TypeReference type, string codeNamespace, StringBuilder sb = null)
-        {
-            sb ??= this.sb;
-
             if (type.IsGenericInstance())
             {
                 var name = type.Name;
@@ -558,7 +579,7 @@ namespace Serenity.CodeGeneration
                     if (i++ > 0)
                         sb.Append(", ");
 
-                    HandleMemberType(argument, codeNamespace, sb);
+                    HandleMemberType(argument, codeNamespace, module);
                 }
 
                 sb.Append('>');
@@ -613,28 +634,17 @@ namespace Serenity.CodeGeneration
             }
         }
 
-        protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, StringBuilder sb = null)
+        protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, bool module)
         {
-            sb ??= this.sb;
-
-            string ns;
+            var fullName = ShortenFullName(type.NamespaceOf(), type.Name, codeNamespace, module, null);
 
             if (type.IsGenericInstance())
             {
-                ns = ShortenNamespace(type, codeNamespace);
-
-                if (!string.IsNullOrEmpty(ns))
-                {
-                    sb.Append(ns);
-                    sb.Append('.');
-                }
-
-                var name = type.Name;
-                var idx = name.IndexOf('`', StringComparison.Ordinal);
+                var idx = fullName.IndexOf('`', StringComparison.Ordinal);
                 if (idx >= 0)
-                    name = name[..idx];
+                    fullName = fullName[..idx];
 
-                sb.Append(name);
+                sb.Append(fullName);
                 sb.Append('<');
 
                 int i = 0;
@@ -647,23 +657,14 @@ namespace Serenity.CodeGeneration
                     if (i++ > 0)
                         sb.Append(", ");
 
-                    HandleMemberType(argument, codeNamespace);
+                    HandleMemberType(argument, codeNamespace, module);
                 }
 
                 sb.Append('>');
                 return;
             }
 
-            if (codeNamespace != null)
-            {
-                ns = ShortenNamespace(type, codeNamespace);
-                if (!string.IsNullOrEmpty(ns))
-                    sb.Append(ns + "." + type.Name);
-                else
-                    sb.Append(type.Name);
-            }
-            else
-                sb.Append(type.Name);
+            sb.Append(fullName);
         }
 
         protected static TypeReference GetBaseClass(TypeDefinition type)
@@ -900,5 +901,130 @@ namespace Serenity.CodeGeneration
                 public string[] Properties { get; set; }
             }
         }
+
+        protected class GeneratedTypeInfo
+        {
+            public string Namespace { get; set; }
+            public string Name { get; set; }
+            public bool Module { get; set; }
+            public bool TypeOnly { get; set; }
+        }
+
+        private readonly List<ModuleImport> moduleImports = new();
+        private readonly HashSet<string> moduleImportAliases = new();
+
+        protected class ModuleImport
+        {
+            public string Name { get; set; }
+            public string Alias { get; set; }
+            public string From { get; set; }
+            public bool External { get; set; }
+        }
+
+        protected void ClearImports()
+        {
+            moduleImports.Clear();
+        }
+
+        protected override void AddFile(string filename, bool module = false)
+        {
+            if (moduleImports.Any())
+            {
+                if (module)
+                {
+                    sb.Insert(0, string.Join(Environment.NewLine,
+                        moduleImports.ToLookup(x => (x.From, x.External))
+                            .Select(z =>
+                            {
+                                var from = z.Key.From;
+                                if (!z.Key.External && 
+                                    !from.StartsWith("/", StringComparison.Ordinal) &&
+                                    !from.StartsWith(".", StringComparison.Ordinal))
+                                {
+                                    if (System.IO.Path.GetDirectoryName(filename) ==
+                                        System.IO.Path.GetDirectoryName(from))
+                                        from = "./" + System.IO.Path.GetFileName(from);
+                                    else
+                                        from = "../" + from;
+                                }
+
+                                var importList = string.Join(", ", z.Select(p =>
+                                    p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
+
+                                return $"import {{ {importList} }} from \"{from}\";";
+                            })) + Environment.NewLine + Environment.NewLine);
+                }
+
+                moduleImports.Clear();
+                moduleImportAliases.Clear();
+            }
+
+            base.AddFile(filename, module);
+        }
+
+        protected string ImportFromQ(string name)
+        {
+            return AddExternalImport("@serenity-is/corelib/q", name);
+        }
+
+        protected string ImportFromCorelib(string name)
+        {
+            return AddExternalImport("@serenity-is/corelib", name);
+        }
+
+        protected string ImportFromSerenity(string name)
+        {
+            return AddExternalImport("@serenity-is/corelib", name);
+        }
+
+        protected string ImportFromSlick(string name)
+        {
+            return AddExternalImport("@serenity-is/corelib/slick", name);
+        }
+
+        protected string AddExternalImport(string from, string name)
+        {
+            return AddModuleImport(from, name, external: true);
+        }
+
+        protected string AddModuleImport(string from, string name, bool external = false)
+        {
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
+
+            if (from is null)
+                throw new ArgumentNullException(nameof(from));
+
+            var existing = moduleImports.FirstOrDefault(x => x.From == from && x.Name == name && x.External == external);
+            if (existing != null)
+                return existing.Alias;
+
+            var i = 0; string alias;
+            while (moduleImportAliases.Contains(alias = i == 0 ? name : (name + "_" + i)))
+                i++;
+
+            moduleImportAliases.Add(alias);
+            moduleImports.Add(new ModuleImport
+            {
+                From = from,
+                Name = name,
+                Alias = alias,
+                External = external
+            });
+
+            return alias;
+        }
+
+        protected void RegisterGeneratedType(string ns, string name, bool module, bool typeOnly)
+        {
+            generatedTypes.Add(new GeneratedTypeInfo 
+            { 
+                Namespace = ns, 
+                Name = name, 
+                Module = module, 
+                TypeOnly = typeOnly 
+            });
+        }
+
     }
 }
