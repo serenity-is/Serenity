@@ -5,15 +5,24 @@ namespace Serenity.CodeGenerator
 {
     public class ServerTypingsCommand : BaseFileSystemCommand
     {
-        public ServerTypingsCommand(IGeneratorFileSystem fileSystem) 
+        private readonly bool modules;
+
+        public ServerTypingsCommand(IGeneratorFileSystem fileSystem, bool modules) 
             : base(fileSystem)
         {
+            this.modules = modules;
         }
 
         public void Run(string csproj, List<ExternalType> tsTypes)
         {
             var projectDir = fileSystem.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(fileSystem, fileSystem.Combine(projectDir, "sergen.json"));
+
+            if (modules && config.ServerTypings?.ModuleTypings == false)
+                return;
+
+            if (!modules && config.ServerTypings?.NamespaceTypings == false)
+                return;
 
             string[] assemblyFiles = null;
 
@@ -134,20 +143,40 @@ namespace Serenity.CodeGenerator
                 }
             }
 
-            var outDir = fileSystem.Combine(projectDir, PathHelper.ToPath((config.ServerTypings?.OutDir.TrimToNull() ?? "Imports/ServerTypings")));
+            var outDir = fileSystem.Combine(projectDir, 
+                PathHelper.ToPath((config.ServerTypings?.OutDir.TrimToNull() ?? 
+                    (modules ? "Modules/ServerTypes" : "Imports/ServerTypings"))));
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write("Transforming ServerTypings at: ");
+            Console.Write("Transforming " + (modules ? "ServerTypes" : "ServerTypings") + " at: ");
             Console.ResetColor();
             Console.WriteLine(outDir);
 
             generator.RootNamespaces.Add(config.RootNamespace);
+            generator.ModuleTypings = modules && config?.ServerTypings?.ModuleTypings != false;
+            generator.NamespaceTypings = !modules && config?.ServerTypings?.NamespaceTypings != false;
 
             foreach (var type in tsTypes)
                 generator.AddTSType(type);
 
-            var codeByFilename = generator.Run();
-            MultipleOutputHelper.WriteFiles(fileSystem, outDir, codeByFilename, "*.ts");
+            var generatedSources = generator.Run();
+
+            void writeFiles(string outDir, Func<GeneratedSource, bool> predicate)
+            {
+                MultipleOutputHelper.WriteFiles(fileSystem, outDir,
+                    generatedSources.Where(x => predicate(x))
+                        .Select(x => (x.Filename, x.Text)),
+                    deleteExtraPattern: new[] { "*.ts" },
+                    endOfLine: config.EndOfLine);
+            }
+
+            if (generator.ModuleTypings)
+                writeFiles(fileSystem.Combine(projectDir, "Modules", "ServerTypes"),
+                    x => x.Module);
+
+            if (generator.NamespaceTypings)
+                writeFiles(fileSystem.Combine(projectDir, "Imports", "ServerTypings"),
+                    x => !x.Module);
         }
     }
 }

@@ -11,6 +11,7 @@
         string[] GetDirectories(string path);
         DateTime GetLastWriteTime(string path);
         string GetFullPath(string path);
+        string GetRelativePath(string relativeTo, string path);
         string ReadAllText(string path, Encoding encoding = null);
         byte[] ReadAllBytes(string path);
         void WriteAllText(string path, string content, Encoding encoding = null);

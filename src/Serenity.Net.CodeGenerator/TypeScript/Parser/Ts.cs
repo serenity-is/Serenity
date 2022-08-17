@@ -420,8 +420,8 @@ namespace Serenity.TypeScript.TsParser
                            VisitNode(cbNode, (node as ExportDeclaration)?.ModuleSpecifier);
                 case SyntaxKind.ImportSpecifier:
                 case SyntaxKind.ExportSpecifier:
-                    return VisitNode(cbNode, (node as IMportOrExportSpecifier)?.PropertyName ??
-                                             VisitNode(cbNode, (node as IMportOrExportSpecifier)?.Name));
+                    return VisitNode(cbNode, (node as IImportOrExportSpecifier)?.PropertyName ??
+                                             VisitNode(cbNode, (node as IImportOrExportSpecifier)?.Name));
                 case SyntaxKind.ExportAssignment:
 
                     return visitNodes(cbNodes, node.Decorators) ??
@@ -714,8 +714,8 @@ namespace Serenity.TypeScript.TsParser
                 
                 case SyntaxKind.ImportSpecifier:
                 case SyntaxKind.ExportSpecifier:
-                    visitor((node as IMportOrExportSpecifier)?.PropertyName);
-                    visitor((node as IMportOrExportSpecifier)?.Name);
+                    visitor((node as IImportOrExportSpecifier)?.PropertyName);
+                    visitor((node as IImportOrExportSpecifier)?.Name);
                     break;
 
                 case SyntaxKind.ExportAssignment:

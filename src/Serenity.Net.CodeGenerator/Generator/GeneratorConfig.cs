@@ -6,7 +6,10 @@ namespace Serenity.CodeGenerator
     {
         public string RootNamespace { get; set; }
         public ServerTypingsConfig ServerTypings { get; set; }
-        
+
+        public string EndOfLine { get; set; }
+        public bool ShouldSerializeEndOfLine() => EndOfLine != null;
+
         public ClientTypesConfig ClientTypes { get; set; }
         public bool ShouldSerializeClientTypes() => ClientTypes != null &&
             !string.IsNullOrEmpty(ClientTypes.OutDir);
@@ -194,6 +197,15 @@ namespace Serenity.CodeGenerator
             public bool ShouldSerializeOutDir() => !string.IsNullOrEmpty(OutDir);
 
             public bool LocalTexts { get; set; }
+
+            public bool? ModuleTypings { get; set; }
+            public bool ShouldSerializeModuleTypings() => ModuleTypings != null;
+
+            public bool? NamespaceTypings { get; set; }
+            public bool ShouldSerializeNamespaceTypings() => NamespaceTypings != null;
+
+            public bool? SourceGenerator { get; set; }
+            public bool ShouldSerializeSourceGenerator() => SourceGenerator != null;
         }
 
         public class ClientTypesConfig

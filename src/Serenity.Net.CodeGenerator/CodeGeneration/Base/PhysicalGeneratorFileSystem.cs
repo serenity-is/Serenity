@@ -45,6 +45,46 @@ namespace Serenity.CodeGeneration
             return Path.GetFullPath(path);
         }
 
+#if ISSOURCEGENERATOR
+        // https://stackoverflow.com/questions/275689/how-to-get-relative-path-from-absolute-path/32113484#32113484
+        public string GetRelativePath(string fromPath, string toPath)
+        {
+            if (string.IsNullOrEmpty(fromPath))
+                throw new ArgumentNullException("fromPath");
+
+            if (string.IsNullOrEmpty(toPath))
+                throw new ArgumentNullException("toPath");
+
+            Uri fromUri = new(AppendDirectorySeparatorChar(fromPath));
+            Uri toUri = new(AppendDirectorySeparatorChar(toPath));
+
+            if (fromUri.Scheme != toUri.Scheme)
+                return toPath;
+
+            Uri relativeUri = fromUri.MakeRelativeUri(toUri);
+            string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+            if (string.Equals(toUri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase))
+                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+            return relativePath;
+        }
+
+        private static string AppendDirectorySeparatorChar(string path)
+        {
+            if (!Path.HasExtension(path) &&
+                !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                return path + Path.DirectorySeparatorChar;
+
+            return path;
+        }
+#else
+        public string GetRelativePath(string relativeTo, string path)
+        {
+            return Path.GetRelativePath(relativeTo, path);
+        }
+#endif
+
         public DateTime GetLastWriteTime(string path)
         {
             return File.GetLastWriteTime(path);

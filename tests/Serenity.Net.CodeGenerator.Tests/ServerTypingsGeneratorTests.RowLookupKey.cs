@@ -1,8 +1,4 @@
-﻿using Serenity.CodeGeneration;
-using Serenity.ComponentModel;
-using Serenity.Data;
-using Serenity.Web;
-using Xunit;
+﻿using Serenity.ComponentModel;
 
 namespace Serenity.Tests.CodeGenerator
 {
@@ -13,8 +9,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator();
             var result = generator.Run();
-            Assert.Contains("SomeModule.RowWithExplicitLookupKeyRow.ts", result.Keys);
-            var code = result["SomeModule.RowWithExplicitLookupKeyRow.ts"];
+            var code = Assert.Single(result, x => x.Filename == "SomeModule.RowWithExplicitLookupKeyRow.ts").Text;
             Assert.Contains("lookupKey = 'Some.ExplicitKey'", code);
         }
 
@@ -23,8 +18,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator();
             var result = generator.Run();
-            Assert.Contains("SomeModule.RowWithNoLookupKeyRow.ts", result.Keys);
-            var code = result["SomeModule.RowWithNoLookupKeyRow.ts"];
+            var code = Assert.Single(result, x => x.Filename == "SomeModule.RowWithNoLookupKeyRow.ts").Text;
             Assert.Contains("lookupKey = 'SomeModule.RowWithNoLookupKey'", code);
         }
 
@@ -33,8 +27,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator();
             var result = generator.Run();
-            Assert.Contains("SomeModule.RowWithNoLookupKeyNoRowSuffix.ts", result.Keys);
-            var code = result["SomeModule.RowWithNoLookupKeyNoRowSuffix.ts"];
+            var code = Assert.Single(result, x => x.Filename == "SomeModule.RowWithNoLookupKeyNoRowSuffix.ts").Text;
             Assert.Contains("lookupKey = 'SomeModule.RowWithNoLookupKeyNoRowSuffix'", code);
         }
 
@@ -43,8 +36,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator();
             var result = generator.Run();
-            Assert.Contains("SomeModule.RowWithExternalLookupWithExplicitKeyRow.ts", result.Keys);
-            var code = result["SomeModule.RowWithExternalLookupWithExplicitKeyRow.ts"];
+            var code = Assert.Single(result, x => x.Filename == "SomeModule.RowWithExternalLookupWithExplicitKeyRow.ts").Text;
             Assert.Contains("lookupKey = 'AModule.ExternalLookupKey'", code);
         }
 
@@ -53,8 +45,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator();
             var result = generator.Run();
-            Assert.Contains("SomeModule.RowWithExternalLookupWithAutoKeyRow.ts", result.Keys);
-            var code = result["SomeModule.RowWithExternalLookupWithAutoKeyRow.ts"];
+            var code = Assert.Single(result, x => x.Filename == "SomeModule.RowWithExternalLookupWithAutoKeyRow.ts").Text;
             Assert.Contains("lookupKey = 'SomeModule.ExternalWithAutoKey'", code);
         }
 
@@ -63,8 +54,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator();
             var result = generator.Run();
-            Assert.Contains("SomeModule.RowWithModuleRow.ts", result.Keys);
-            var code = result["SomeModule.RowWithModuleRow.ts"];
+            var code = Assert.Single(result, x => x.Filename == "SomeModule.RowWithModuleRow.ts").Text;
             Assert.Contains("lookupKey = 'AnotherModule.RowWithModule'", code);
         }
     }

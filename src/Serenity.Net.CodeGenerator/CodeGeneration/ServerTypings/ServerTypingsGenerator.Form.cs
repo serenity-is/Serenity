@@ -91,17 +91,10 @@ namespace Serenity.CodeGeneration
             return editorType;
         }
 
-        private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute)
+        private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute,
+            string identifier, bool module)
         {
             var codeNamespace = GetNamespace(type);
-
-            var identifier = type.Name;
-            if (identifier.EndsWith(requestSuffix, StringComparison.Ordinal) &&
-                TypingsUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
-            {
-                identifier = identifier[..^requestSuffix.Length] + "Form";
-                fileIdentifier = identifier;
-            }
 
             cw.Indented("export interface ");
             sb.Append(identifier);
@@ -181,20 +174,37 @@ namespace Serenity.CodeGeneration
 
                     ExternalType scriptType = null;
 
-                    foreach (var rootNamespace in RootNamespaces)
+                    if (module)
                     {
-                        string wn = rootNamespace + "." + editorType;
-                        if ((scriptType = (GetScriptType(wn) ?? GetScriptType(wn + "Editor"))) != null)
-                            break;
+                        scriptType = 
+                            editorTypeByKey[editorType].FirstOrDefault(x =>
+                                !string.IsNullOrEmpty(x.Module)) ??
+                            editorTypeByKey[editorType + "Editor"].FirstOrDefault(x =>
+                                !string.IsNullOrEmpty(x.Module)) ??
+                            editorTypeByKey["Serenity." + editorType].FirstOrDefault(x =>
+                                !string.IsNullOrEmpty(x.Module)) ??
+                            editorTypeByKey["Serenity." + editorType + "Editor"].FirstOrDefault(x =>
+                                !string.IsNullOrEmpty(x.Module));
+                    }
+
+                    if (scriptType is null)
+                    {
+                        foreach (var rootNamespace in RootNamespaces)
+                        {
+                            string wn = rootNamespace + "." + editorType;
+                            if ((scriptType = (GetScriptType(wn) ?? GetScriptType(wn + "Editor"))) != null)
+                                break;
+                        }
                     }
 
                     if (scriptType == null &&
                         (scriptType = (GetScriptType(editorType) ?? GetScriptType(editorType + "Editor"))) == null)
                         continue;
 
-                    var fullName = ShortenFullName(scriptType, codeNamespace);
+                    var fullName = ReferenceScriptType(scriptType, codeNamespace, module);
                     var shortName = fullName;
-                    if (fullName.StartsWith("Serenity.", StringComparison.Ordinal))
+                    
+                    if (!module && fullName.StartsWith("Serenity.", StringComparison.Ordinal))
                         shortName = "s." + fullName["Serenity.".Length..];
 
                     propertyNames.Add(item.Name);
@@ -211,7 +221,15 @@ namespace Serenity.CodeGeneration
             cw.Indented("export class ");
             sb.Append(identifier);
 
-            sb.Append(" extends Serenity.PrefixedContext");
+            if (module)
+            {
+                var prefixedContext = ImportFromSerenity("PrefixedContext");
+                sb.Append($" extends {prefixedContext}");
+            }
+            else
+            {
+                sb.Append(" extends Serenity.PrefixedContext");
+            }
             cw.InBrace(delegate
             {
                 cw.Indented("static formKey = '");
@@ -242,7 +260,9 @@ namespace Serenity.CodeGeneration
                             sb.AppendLine(".init = true;");
                             sb.AppendLine();
 
-                            cw.IndentedLine("var s = Serenity;");
+                            if (!module)
+                                cw.IndentedLine("var s = Serenity;");
+
                             var typeNumber = new Dictionary<string, int>();
                             foreach (var s in propertyTypes)
                             {
@@ -258,7 +278,15 @@ namespace Serenity.CodeGeneration
                             }
                             sb.AppendLine();
 
-                            cw.Indented("Q.initFormType(");
+                            if (module)
+                            {
+                                var initFormType = ImportFromQ("initFormType");
+                                cw.Indented($"{initFormType}(");
+                            }
+                            else
+                            {
+                                cw.Indented("Q.initFormType(");
+                            }
                             sb.Append(identifier);
                             sb.AppendLine(", [");
                             cw.Block(delegate
@@ -283,7 +311,7 @@ namespace Serenity.CodeGeneration
                 }
             });
 
-            generatedTypes.Add((string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier);
+            RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);
         }
     }
 }

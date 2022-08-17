@@ -2,7 +2,7 @@
 
 namespace Serenity.Web
 {
-    public class RegisteredScripts : DynamicScript, INamedDynamicScript
+    public class RegisteredScripts : DynamicScript, INamedDynamicScript, IGetScriptData
     {
         private readonly IDynamicScriptManager scriptManager;
 
@@ -12,6 +12,11 @@ namespace Serenity.Web
         {
             Expiration = TimeSpan.FromDays(-1);
             this.scriptManager = scriptManager;
+        }
+
+        public object GetScriptData()
+        {
+            return scriptManager.GetRegisteredScripts();
         }
 
         public override string GetScript()

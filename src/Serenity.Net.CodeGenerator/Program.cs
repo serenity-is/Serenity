@@ -88,16 +88,33 @@ namespace Serenity.CodeGenerator
                     "clienttypes".StartsWith(command, StringComparison.Ordinal) ||
                     "mvct".StartsWith(command, StringComparison.Ordinal))
                 {
-                    List<ExternalType> tsTypes = null;
-                    List<ExternalType> getTsTypes()
-                    {
-                        if (tsTypes == null)
-                        {
-                            var tsTypeLister = new TSTypeLister(fileSystem, projectDir);
-                            tsTypes = tsTypeLister.List();
-                        }
+                    List<ExternalType> tsTypesNamespaces = null;
+                    List<ExternalType> tsTypesModules = null;
 
-                        return tsTypes;
+                    void ensureTSTypes()
+                    {
+                        if (tsTypesNamespaces is null &&
+                            tsTypesModules is null)
+                        {
+                            TSConfigHelper.LocateTSConfigFiles(fileSystem, projectDir,
+                                out string modulesPath, out string namespacesPath);
+
+                            if (modulesPath is null &&
+                                namespacesPath is null)
+                                namespacesPath = fileSystem.Combine(projectDir, "tsconfig.json");
+
+                            //if (namespacesPath is not null)
+                            //{
+                                //var nsLister = new TSTypeLister(fileSystem, namespacesPath);
+                                //tsTypesNamespaces = nsLister.List();
+                            //}
+
+                            if (modulesPath is not null)
+                            {
+                                var mdLister = new TSTypeLister(fileSystem, modulesPath);
+                                tsTypesModules = mdLister.List();
+                            }
+                        }
                     }
 
                     bool transformAll = "transform".StartsWith(command, StringComparison.Ordinal);
@@ -111,13 +128,24 @@ namespace Serenity.CodeGenerator
                     if (transformAll ||
                         "clienttypes".StartsWith(command, StringComparison.Ordinal) || command == "mvct")
                     {
-                        new ClientTypesCommand(fileSystem).Run(csproj, getTsTypes());
+                        ensureTSTypes();
+                        new ClientTypesCommand(fileSystem).Run(csproj,
+                            (tsTypesNamespaces ?? new List<ExternalType>())
+                            .Concat(tsTypesModules ?? new List<ExternalType>()).ToList());
                     }
 
                     if (transformAll ||
                         "servertypings".StartsWith(command, StringComparison.Ordinal))
                     {
-                        new ServerTypingsCommand(fileSystem).Run(csproj, getTsTypes());
+                        ensureTSTypes();
+
+                        if (tsTypesNamespaces is not null)
+                            new ServerTypingsCommand(fileSystem, modules: false)
+                                .Run(csproj, tsTypesNamespaces);
+
+                        if (tsTypesModules is not null)
+                            new ServerTypingsCommand(fileSystem, modules: true)
+                                .Run(csproj, tsTypesModules);
                     }
 
                     return ExitCodes.Success;
