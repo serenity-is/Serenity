@@ -49,16 +49,23 @@ body:
       placeholder: Tell us how we can reproduce!
     validations:
       required: true
+  - type: input
+    id: serenity-versions
+    attributes:
+      label: What Serenity Nuget Versions are you seeing the problem on? (separated by comma)
+      placeholder: Serenity.Scripts 1.0.0
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        # Development environment details
   - type: textarea
     id: logs
     attributes:
       label: Relevant log output
       description: Please copy and paste any relevant log output.
       render: console
-  - type: markdown
-    attributes:
-      value: |
-        # Development environment details
   - type: input
     id: template-version
     attributes:
@@ -71,13 +78,6 @@ body:
       label: Sergen version
       description: What version of the Sergen do you use?
       placeholder: "1.0.0"
-  - type: input
-    id: serenity-versions
-    attributes:
-      label: What Serenity Nuget Versions are you seeing the problem on? (separated by comma)
-      placeholder: Serenity.Scripts 1.0.0
-    validations:
-      required: true
   - type: input
     id: code-editor
     attributes:
