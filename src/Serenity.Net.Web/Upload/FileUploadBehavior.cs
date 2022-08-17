@@ -38,21 +38,14 @@ namespace Serenity.Services
 
             foreach (var attribute in Target.CustomAttributes)
             {
-                switch (attribute)
-                {
-                    case IUploadEditor editorOptions:
-                        uploadEditor = editorOptions;
-                        break;
-                    case IUploadImageOptions imageOptions:
-                        uploadImageOptions = imageOptions;
-                        break;
-                    case IUploadFileConstraints fileConstraints:
-                        uploadFileConstraints = fileConstraints;
-                        break;
-                    case IUploadFileSizeConstraints fileSizeConstraints:
-                        uploadFileSizeConstraints = fileSizeConstraints;
-                        break;
-                }
+                if (attribute is IUploadEditor editorOptions)
+                    uploadEditor = editorOptions;
+                if (attribute is IUploadImageOptions imageOptions)
+                    uploadImageOptions = imageOptions;
+                if (attribute is IUploadFileConstraints fileConstraints)
+                    uploadFileConstraints = fileConstraints;
+                if (attribute is IUploadFileSizeConstraints fileSizeConstraints)
+                    uploadFileSizeConstraints = fileSizeConstraints;
             }
 
             if (uploadEditor is null or {IsMultiple: true} || uploadFileConstraints is null || uploadImageOptions is {DisableDefaultBehavior: true})
@@ -339,13 +332,13 @@ namespace Serenity.Services
             filename[handler.Row] = copyResult.Path;
         }
 
-        public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attribute,
+        public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attr,
             ITextLocalizer localizer,
             IUploadStorage storage, ref string temporaryFile, IExceptionLogger logger = null)
         {
-            CheckUploadedImageAndCreateThumbs(attribute,
-                attribute,
-                attribute,
+            CheckUploadedImageAndCreateThumbs(attr,
+                attr,
+                attr,
                 localizer,
                 storage,
                 ref temporaryFile,

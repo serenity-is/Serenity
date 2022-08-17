@@ -34,21 +34,14 @@ namespace Serenity.Services
 
             foreach (var attribute in Target.CustomAttributes)
             {
-                switch (attribute)
-                {
-                    case IUploadEditor editorOptions:
-                        uploadEditor = editorOptions;
-                        break;
-                    case IUploadImageOptions imageOptions:
-                        uploadImageOptions = imageOptions;
-                        break;
-                    case IUploadFileConstraints fileConstraints:
-                        uploadFileConstraints = fileConstraints;
-                        break;
-                    case IUploadFileSizeConstraints fileSizeConstraints:
-                        uploadFileSizeConstraints = fileSizeConstraints;
-                        break;
-                }
+                if (attribute is IUploadEditor editorOptions)
+                    uploadEditor = editorOptions;
+                if (attribute is IUploadImageOptions imageOptions)
+                    uploadImageOptions = imageOptions;
+                if (attribute is IUploadFileConstraints fileConstraints)
+                    uploadFileConstraints = fileConstraints;
+                if (attribute is IUploadFileSizeConstraints fileSizeConstraints)
+                    uploadFileSizeConstraints = fileSizeConstraints;
             }
             
             if (uploadEditor is null or {IsMultiple: false} || uploadFileConstraints is null || uploadImageOptions is {DisableDefaultBehavior: true})

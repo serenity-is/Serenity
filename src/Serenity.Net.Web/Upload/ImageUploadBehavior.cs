@@ -1,11 +1,11 @@
 ﻿using Serenity.Web;
 
-namespace Serenity.Net.Web.Upload;
+namespace Serenity.Services;
 
 [Obsolete("Use Serenity.Services.FileUploadBehavior")]
-public abstract class ImageUploadBehavior : FileUploadBehavior
+public class ImageUploadBehavior : FileUploadBehavior
 {
-    protected ImageUploadBehavior(IUploadStorage storage, ITextLocalizer localizer, IExceptionLogger logger = null)
+    public ImageUploadBehavior(IUploadStorage storage, ITextLocalizer localizer, IExceptionLogger logger = null)
         : base(storage, localizer, logger)
     {
     }

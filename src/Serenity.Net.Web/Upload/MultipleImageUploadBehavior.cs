@@ -1,11 +1,11 @@
 ﻿using Serenity.Web;
 
-namespace Serenity.Net.Web.Upload;
+namespace Serenity.Services;
 
 [Obsolete("Use Serenity.Services.MultipleFileUploadBehavior")]
-public abstract class MultipleImageUploadBehavior : MultipleFileUploadBehavior
+public class MultipleImageUploadBehavior : MultipleFileUploadBehavior
 {
-    protected MultipleImageUploadBehavior(ITextLocalizer localizer, IUploadStorage storage, IExceptionLogger logger = null)
+    public MultipleImageUploadBehavior(ITextLocalizer localizer, IUploadStorage storage, IExceptionLogger logger = null)
         : base(storage, localizer, logger)
     {
     }
