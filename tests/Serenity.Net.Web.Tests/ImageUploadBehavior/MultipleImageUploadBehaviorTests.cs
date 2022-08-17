@@ -13,7 +13,7 @@ public partial class MultipleImageUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenRowIsNull()
     {
-        var sut = new MultipleImageUploadBehavior(localizer, MockUploadStorage.Create());
+        var sut = new MultipleFileUploadBehavior(MockUploadStorage.Create(), localizer);
         var result = sut.ActivateFor(null);
 
         Assert.False(result);
@@ -22,7 +22,7 @@ public partial class MultipleImageUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenTargetDoesntHave_MultipleImageUploadEditorAttribute()
     {
-        var sut = new MultipleImageUploadBehavior(localizer, MockUploadStorage.Create())
+        var sut = new MultipleFileUploadBehavior(MockUploadStorage.Create(), localizer)
         {
             Target = MultipleTestRow.Fields.Id
         };
@@ -34,7 +34,7 @@ public partial class MultipleImageUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenTargetImageUploadEditorAttribute_DisableDefaultBehaviour_IsTrue()
     {
-        var sut = new MultipleImageUploadBehavior(localizer, MockUploadStorage.Create())
+        var sut = new MultipleFileUploadBehavior(MockUploadStorage.Create(), localizer)
         {
             Target = MultipleTestRow.Fields.ImageUploadEditorDisableDefaultBehavior
         };
@@ -47,7 +47,7 @@ public partial class MultipleImageUploadBehaviorTests
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenTargetType_IsNotStringField()
     {
-        var sut = new MultipleImageUploadBehavior(localizer, MockUploadStorage.Create())
+        var sut = new MultipleFileUploadBehavior(MockUploadStorage.Create(), localizer)
         {
             Target = MultipleTestIIdRow.Fields.IntegerFieldImageUploadEditor
         };
@@ -59,7 +59,7 @@ public partial class MultipleImageUploadBehaviorTests
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenTargetType_IsNotStringFieldAndPropertyNameIsNull()
     {
-        var sut = new MultipleImageUploadBehavior(localizer, MockUploadStorage.Create())
+        var sut = new MultipleFileUploadBehavior(MockUploadStorage.Create(), localizer)
         {
             Target = MultipleTestIIdRow.Fields.IntegerFieldImageUploadEditor
         };
@@ -74,7 +74,7 @@ public partial class MultipleImageUploadBehaviorTests
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenRow_DoesNotInherits_IIdRow()
     {
-        var sut = new MultipleImageUploadBehavior(localizer, MockUploadStorage.Create())
+        var sut = new MultipleFileUploadBehavior(MockUploadStorage.Create(), localizer)
         {
             Target = MultipleTestRow.Fields.StringFieldImageUploadEditor
         };
@@ -86,7 +86,7 @@ public partial class MultipleImageUploadBehaviorTests
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenRow_DoesNotInherits_IIdRowAndPropertyNameIsNull()
     {
-        var sut = new MultipleImageUploadBehavior(localizer, MockUploadStorage.Create())
+        var sut = new MultipleFileUploadBehavior(MockUploadStorage.Create(), localizer)
         {
             Target = MultipleTestRow.Fields.StringFieldImageUploadEditor
         };
@@ -100,7 +100,7 @@ public partial class MultipleImageUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsTrue_WhenTargetImageUploadEditorAttribute_EditorTypeIs_ImageUpload()
     {
-        var sut = new MultipleImageUploadBehavior(localizer, MockUploadStorage.Create())
+        var sut = new MultipleFileUploadBehavior(MockUploadStorage.Create(), localizer)
         {
             Target = MultipleTestIIdRow.Fields.ImageUploadEditorCorrectEditorType
         };
@@ -112,7 +112,7 @@ public partial class MultipleImageUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsTrue_WhenTargetImageUploadEditorAttribute_OriginalName_IsStringField()
     {
-        var sut = new MultipleImageUploadBehavior(localizer, MockUploadStorage.Create())
+        var sut = new MultipleFileUploadBehavior(MockUploadStorage.Create(), localizer)
         {
             Target = MultipleTestIIdRow.Fields.ImageUploadEditorOriginalName
         };
@@ -128,9 +128,8 @@ public partial class MultipleImageUploadBehaviorTests
     public void OnBeforeSave_InvalidJson(string newFile)
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -161,9 +160,8 @@ public partial class MultipleImageUploadBehaviorTests
     public void OnBeforeSave_ClearField()
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -198,9 +196,8 @@ public partial class MultipleImageUploadBehaviorTests
     public void OnBeforeSave_DoesNothing_WhenFieldIsNotAssigned()
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -234,9 +231,8 @@ public partial class MultipleImageUploadBehaviorTests
     public void OnAfterSave_DoesNothing_WhenFieldIsNotAssigned()
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -267,9 +263,8 @@ public partial class MultipleImageUploadBehaviorTests
     public void OnAfterSave_DoesNothing_WhenFieldIsEmpty()
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -301,9 +296,8 @@ public partial class MultipleImageUploadBehaviorTests
     public void OnAfterSave_ClearField()
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -343,7 +337,7 @@ public partial class MultipleImageUploadBehaviorTests
 
         mockFileSystem.AddFile("temporary/new.jpg", new MockFileData(CreateImage(1000, 1000)));
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -383,7 +377,7 @@ public partial class MultipleImageUploadBehaviorTests
 
         mockFileSystem.AddFile("temporary/new.jpg", new MockFileData(CreateImage(1000, 1000)));
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -423,7 +417,7 @@ public partial class MultipleImageUploadBehaviorTests
 
         mockFileSystem.AddFile("temporary/new.jpg", new MockFileData(CreateImage(1000, 1000)));
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -461,7 +455,7 @@ public partial class MultipleImageUploadBehaviorTests
 
         mockFileSystem.AddFile("temporary/new.jpg", new MockFileData(CreateImage(1000, 1000)));
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -498,7 +492,7 @@ public partial class MultipleImageUploadBehaviorTests
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.ImageUploadEditorReplaceField
         };
@@ -525,7 +519,7 @@ public partial class MultipleImageUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -576,7 +570,7 @@ public partial class MultipleImageUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -611,7 +605,7 @@ public partial class MultipleImageUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -646,7 +640,7 @@ public partial class MultipleImageUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIIsDeletedRow.Fields.StringFieldImageUploadEditor
         };
@@ -681,7 +675,7 @@ public partial class MultipleImageUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new MultipleImageUploadBehavior(localizer, mockUploadStorage)
+        var sut = new MultipleFileUploadBehavior(mockUploadStorage, localizer)
         {
             Target = MultipleTestIDeleteLogRow.Fields.StringFieldImageUploadEditor
         };

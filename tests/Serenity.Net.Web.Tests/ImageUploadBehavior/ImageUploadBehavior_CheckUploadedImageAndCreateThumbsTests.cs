@@ -14,7 +14,7 @@ public partial class ImageUploadBehaviorTests
         var attr = new ImageUploadEditorAttribute();
         var temporaryFile = "temporary/test.jpg";
 
-        Assert.Throws<ArgumentNullException>("storage", () => ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        Assert.Throws<ArgumentNullException>("storage", () => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: null,
             temporaryFile: ref temporaryFile,
@@ -57,7 +57,7 @@ public partial class ImageUploadBehaviorTests
         var attr = new ImageUploadEditorAttribute();
         var mockStorage = MockUploadStorage.Create();
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        Assert.Throws<ArgumentOutOfRangeException>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -92,7 +92,7 @@ public partial class ImageUploadBehaviorTests
                 var fileName = testFileName;
                 mockFileSystem.AddFile(testFileName, string.Empty);
 
-                Assert.Throws<ArgumentOutOfRangeException>(() => ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+                Assert.Throws<ArgumentOutOfRangeException>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
                     localizer: localizer,
                     storage: mockStorage,
                     temporaryFile: ref fileName,
@@ -114,7 +114,7 @@ public partial class ImageUploadBehaviorTests
         };
         mockFileSystem.AddFile(fileName, string.Empty);
 
-        var ex = Assert.Throws<ValidationError>(() => ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        var ex = Assert.Throws<ValidationError>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -136,7 +136,7 @@ public partial class ImageUploadBehaviorTests
         };
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(1, 1)));
 
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -153,7 +153,7 @@ public partial class ImageUploadBehaviorTests
         var attr = new ImageUploadEditorAttribute();
         mockFileSystem.AddFile(fileName, "\0");
 
-        var ex = Assert.Throws<ValidationError>(() => ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        var ex = Assert.Throws<ValidationError>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -175,7 +175,7 @@ public partial class ImageUploadBehaviorTests
         };
         mockFileSystem.AddFile(fileName, "\0");
 
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -196,7 +196,7 @@ public partial class ImageUploadBehaviorTests
         };
         mockFileSystem.AddFile(fileName, "\0");
 
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -224,7 +224,7 @@ public partial class ImageUploadBehaviorTests
 
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(width, height)));
 
-        var ex = Assert.Throws<ValidationError>(() => ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        var ex = Assert.Throws<ValidationError>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -249,7 +249,7 @@ public partial class ImageUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(2, 2)));
         using var originalImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
 
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -281,7 +281,7 @@ public partial class ImageUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(2, 2)));
         using var originalImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
 
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -313,7 +313,7 @@ public partial class ImageUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(2, 2)));
         using var originalImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
 
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -348,7 +348,7 @@ public partial class ImageUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(1, 1, format: JpegFormat.Instance, color: Rgba32.ParseHex("#000000"))));
         using var originalImage = Image.Load<Rgb24>(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
     
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -392,7 +392,7 @@ public partial class ImageUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(1, 1, format: JpegFormat.Instance, color: Rgba32.ParseHex("#FFFFFF"))));
         using var originalImage = (Image<Rgb24>)Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
     
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -447,7 +447,7 @@ public partial class ImageUploadBehaviorTests
         var originalFile = mockFileSystem.AllFiles.Single();
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
-        Assert.Throws<ArgumentOutOfRangeException>(() => ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        Assert.Throws<ArgumentOutOfRangeException>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -475,7 +475,7 @@ public partial class ImageUploadBehaviorTests
         var originalFile = mockFileSystem.AllFiles.Single();
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -502,7 +502,7 @@ public partial class ImageUploadBehaviorTests
         var originalFile = mockFileSystem.AllFiles.Single();
         
     
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -533,7 +533,7 @@ public partial class ImageUploadBehaviorTests
         var originalFile = mockFileSystem.AllFiles.Single();
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
@@ -580,7 +580,7 @@ public partial class ImageUploadBehaviorTests
         var originalFile = mockFileSystem.AllFiles.Single();
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
-        ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
+        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
             localizer: localizer,
             storage: mockStorage,
             temporaryFile: ref fileName,
