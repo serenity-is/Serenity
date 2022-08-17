@@ -42,18 +42,7 @@ public partial class MultipleImageUploadBehaviorTests
 
         Assert.False(result);
     }
-
-    [Fact]
-    public void ActivateFor_ReturnsFalse_WhenTargetImageUploadEditorAttribute_EditorType_IsNotImageUpload()
-    {
-        var sut = new MultipleImageUploadBehavior(localizer, MockUploadStorage.Create())
-        {
-            Target = MultipleTestRow.Fields.ImageUploadEditorDifferentEditorType
-        };
-        var result = sut.ActivateFor(new MultipleTestRow());
-
-        Assert.False(result);
-    }
+    
 
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenTargetType_IsNotStringField()

@@ -26,28 +26,12 @@ public partial class ImageUploadBehaviorTests
             get => fields.ImageUploadEditorDisableDefaultBehavior[this];
             set => fields.ImageUploadEditorDisableDefaultBehavior[this] = value;
         }
-
-        [CustomEditorImageUploadEditor("NotImageUpload")]
-        public string ImageUploadEditorDifferentEditorType
-        {
-            get => fields.ImageUploadEditorDifferentEditorType[this];
-            set => fields.ImageUploadEditorDifferentEditorType[this] = value;
-        }
-
+        
         public class RowFields : RowFieldsBase
         {
             public Int32Field Id;
             public StringField StringFieldImageUploadEditor;
             public StringField ImageUploadEditorDisableDefaultBehavior;
-            public StringField ImageUploadEditorDifferentEditorType;
-        }
-    }
-
-    class CustomEditorImageUploadEditorAttribute : ImageUploadEditorAttribute
-    {
-        public CustomEditorImageUploadEditorAttribute(string editorType)
-            : base(editorType)
-        {
         }
     }
 
@@ -80,13 +64,6 @@ public partial class ImageUploadBehaviorTests
         {
             get => fields.IntegerFieldImageUploadEditor[this];
             set => fields.IntegerFieldImageUploadEditor[this] = value;
-        }
-
-        [CustomEditorImageUploadEditor("ImageUpload")]
-        public string ImageUploadEditorCorrectEditorType
-        {
-            get => fields.ImageUploadEditorCorrectEditorType[this];
-            set => fields.ImageUploadEditorCorrectEditorType[this] = value;
         }
 
         [Expression("(SELECT 'TEST')")]
@@ -158,7 +135,6 @@ public partial class ImageUploadBehaviorTests
             public StringField Name;
             public StringField StringFieldImageUploadEditor;
             public Int32Field IntegerFieldImageUploadEditor;
-            public StringField ImageUploadEditorCorrectEditorType;
             public StringField StringFieldExpression;
             public Int32Field IntegerFieldExpression;
             public StringField ImageUploadEditorReplaceField;

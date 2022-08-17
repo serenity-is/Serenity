@@ -45,18 +45,6 @@ public partial class ImageUploadBehaviorTests
     }
 
     [Fact]
-    public void ActivateFor_ReturnsFalse_WhenTargetImageUploadEditorAttribute_EditorType_IsNotImageUpload()
-    {
-        var sut = new ImageUploadBehavior(MockUploadStorage.Create(), localizer)
-        {
-            Target = TestRow.Fields.ImageUploadEditorDifferentEditorType
-        };
-        var result = sut.ActivateFor(new TestRow());
-
-        Assert.False(result);
-    }
-
-    [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenTargetType_IsNotStringField()
     {
         var sut = new ImageUploadBehavior(MockUploadStorage.Create(), localizer)
@@ -78,18 +66,6 @@ public partial class ImageUploadBehaviorTests
 
         var exception = Assert.Throws<ArgumentException>(() => sut.ActivateFor(new TestRow()));
         Assert.Contains("iidrow", Normalize(exception.Message));
-    }
-
-    [Fact]
-    public void ActivateFor_ReturnsTrue_WhenTargetImageUploadEditorAttribute_EditorTypeIs_ImageUpload()
-    {
-        var sut = new ImageUploadBehavior(MockUploadStorage.Create(), localizer)
-        {
-            Target = TestIIdRow.Fields.ImageUploadEditorCorrectEditorType
-        };
-        var result = sut.ActivateFor(new TestIIdRow());
-
-        Assert.True(result);
     }
 
     [Fact]
@@ -420,7 +396,6 @@ public partial class ImageUploadBehaviorTests
     public void OnBeforeSave_SetsOriginalFileNameField_ToNull_WhenEditorField_IsNull()
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new ImageUploadBehavior(mockUploadStorage, localizer)
         {

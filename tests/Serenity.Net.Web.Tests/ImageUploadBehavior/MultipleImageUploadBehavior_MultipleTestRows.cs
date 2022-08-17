@@ -27,24 +27,18 @@ public partial class MultipleImageUploadBehaviorTests
             set => fields.ImageUploadEditorDisableDefaultBehavior[this] = value;
         }
 
-        [MultipleCustomEditorImageUploadEditor("NotImageUpload")]
-        public string ImageUploadEditorDifferentEditorType
-        {
-            get => fields.ImageUploadEditorDifferentEditorType[this];
-            set => fields.ImageUploadEditorDifferentEditorType[this] = value;
-        }
-
         public class RowFields : RowFieldsBase
         {
             public Int32Field Id;
             public StringField StringFieldImageUploadEditor;
             public StringField ImageUploadEditorDisableDefaultBehavior;
-            public StringField ImageUploadEditorDifferentEditorType;
         }
     }
 
     class MultipleCustomEditorImageUploadEditorAttribute : ImageUploadEditorAttribute
     {
+        public override bool IsMultiple => true;
+
         public MultipleCustomEditorImageUploadEditorAttribute(string editorType)
             : base(editorType)
         {
