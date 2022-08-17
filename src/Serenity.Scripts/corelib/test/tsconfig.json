@@ -1,0 +1,38 @@
+﻿{
+  "extends": "../src/tsconfig.json",
+  "compileOnSave": false,
+  "compilerOptions": {
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "sourceMap": true,
+    "module": "CommonJS",
+    "skipLibCheck": true,
+    "types": [
+      "jquery",
+      "jquery.validation",
+      "jqueryui",
+      "bootstrap",
+      "toastr",
+      "react",
+      "jest",
+      "node"
+    ],
+    "outDir": "../../dist/test",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [ "../src/*" ]
+    },
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "lib": [
+      "ES5",
+      "ES2015",
+      "DOM"
+    ],
+    "noEmitHelpers": false,
+    "jsx": "react"
+  },
+  "include": [
+    "**/*.spec.ts"
+  ]
+}

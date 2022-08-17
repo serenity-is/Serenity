@@ -2,12 +2,12 @@
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
-        protected void GeneratePermissionKeys(TypeDefinition type)
+        protected void GeneratePermissionKeys(TypeDefinition type, bool module)
         {
-            GeneratePermissionKeysFor(type, declare: true);
+            GeneratePermissionKeysFor(type, declare: true, module: module);
         }
 
-        protected void GeneratePermissionKeysFor(TypeDefinition type, bool declare)
+        protected void GeneratePermissionKeysFor(TypeDefinition type, bool declare, bool module)
         {
             cw.Indented(declare ? "export namespace ": "namespace ");
             sb.Append(type.Name);
@@ -34,7 +34,7 @@
                         continue;
 
                     sb.AppendLine();
-                    GeneratePermissionKeysFor(nested, declare: false);
+                    GeneratePermissionKeysFor(nested, declare: false, module);
                 }
             });
         }

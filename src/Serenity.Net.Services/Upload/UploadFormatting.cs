@@ -30,12 +30,12 @@ namespace Serenity.Web
             }
 
             var originalName = options.OriginalName;
-            if (string.IsNullOrEmpty(options.OriginalName))
-                throw new ArgumentNullException(nameof(options.OriginalName));
+            if (string.IsNullOrEmpty(originalName))
+                throw new ArgumentNullException(nameof(originalName));
 
             var formatted = string.Format(options.Format, identity, groupKey, 
                 TemporaryFileHelper.RandomFileCode(), DateTime.Now,
-                Path.GetFileNameWithoutExtension(options.OriginalName)) + Path.GetExtension(options.OriginalName);
+                Path.GetFileNameWithoutExtension(originalName)) + Path.GetExtension(options.OriginalName);
 
             if (options.PostFormat != null)
                 formatted = options.PostFormat(formatted);

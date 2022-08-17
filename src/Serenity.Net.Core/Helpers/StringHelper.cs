@@ -237,21 +237,18 @@ namespace Serenity
                         break;
                     case '\'':
                         if (!doubleQuote)
-                            sb.Append(@"\'"); // IE doesn't understand \' in double quoted strings!!!
+                            sb.Append(@"\'");
                         else
                             sb.Append(c);
                         break;
                     case '\"':
-                        if (doubleQuote) // IE doesn't understand \" in single quoted strings!!!
+                        if (doubleQuote)
                             sb.Append(@"\""");
                         else
                             sb.Append(c);
                         break;
                     case '\\':
                         sb.Append(@"\\");
-                        break;
-                    case '/':
-                        sb.Append(@"\/");
                         break;
                     default:
                         if (c < ' ')

@@ -22,8 +22,8 @@ namespace Serenity
             return !(trim == null ||
                 trim == "." ||
                 trim == ".." ||
-                relativePath.IndexOf("../") >= 0 ||
-                relativePath.IndexOf("..\\") >= 0 ||
+                relativePath.IndexOf("../", StringComparison.Ordinal) >= 0 ||
+                relativePath.IndexOf("..\\", StringComparison.Ordinal) >= 0 ||
                 relativePath.IndexOf(':') >= 0 ||
                 trim.StartsWith("/") ||
                 trim.StartsWith("\\") ||

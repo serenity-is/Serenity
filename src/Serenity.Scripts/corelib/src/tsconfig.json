@@ -1,0 +1,37 @@
+﻿{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "declaration": true,
+    "declarationDir": "../out",
+    "emitBOM": true,
+    "emitDeclarationOnly": true,
+    "esModuleInterop": true,
+    "inlineSources": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "module": "ES2015",
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "types": [
+      "jquery",
+      "jquery.validation",
+      "jqueryui",
+      "toastr"
+    ],
+    "outDir": "../out",
+    "suppressImplicitAnyIndexErrors": true,
+    "target": "ES5",
+    "lib": [
+      "ES5",
+      "ES2015",
+      "DOM"
+    ],
+    "noEmitHelpers": false,
+    "importHelpers": false,
+    "jsx": "react"
+  },
+  "exclude": ["**/*.spec.ts"]
+}

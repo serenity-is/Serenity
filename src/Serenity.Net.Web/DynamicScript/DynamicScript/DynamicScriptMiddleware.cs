@@ -33,16 +33,23 @@ namespace Serenity.Web.Middleware
                 scriptKey = scriptKey[0..^4];
             }
 
-            return ReturnScript(context, scriptKey, contentType);
+            var json = (string)context.Request.Headers.Accept == "application/json";
+
+            if (json)
+            {
+                contentType = "application/json";
+            }
+
+            return ReturnScript(context, scriptKey, contentType, json);
         }
 
-        public async static Task ReturnScript(HttpContext context, string scriptKey, string contentType)
+        public async static Task ReturnScript(HttpContext context, string scriptKey, string contentType, bool json)
         {
             IScriptContent scriptContent;
             try
             {
                 scriptContent = context.RequestServices.GetRequiredService<IDynamicScriptManager>()
-                    .ReadScriptContent(scriptKey);
+                    .ReadScriptContent(scriptKey, json);
             }
             catch (ValidationError ve)
             {

@@ -18,6 +18,9 @@ TestResults/
 node_modules/
 /build/tools/Addins/
 /src/Serenity.Scripts/dist/
-/src/Serenity.Scripts/wwwroot/Serenity.CoreLib*.js
-/src/Serenity.Scripts/wwwroot/Serenity.CoreLib*.map
+/src/Serenity.Scripts/wwwroot/**/*.js
+/src/Serenity.Scripts/wwwroot/**/*.map
 /src/Serenity.Net.CodeGenerator/bin/
+/src/Serenity.Scripts/corelib/out/
+/src/Serenity.Scripts/corelib/dist/**/*.js
+/src/Serenity.Scripts/corelib/dist/**/*.map

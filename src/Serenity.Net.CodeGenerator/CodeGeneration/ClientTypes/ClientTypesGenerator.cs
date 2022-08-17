@@ -112,6 +112,29 @@
             sb.AppendLine();
 
             var ns = GetNamespace(type.Namespace);
+
+            var key = type.Attributes?.FirstOrDefault(x =>
+                x.Arguments?.Count > 0 &&
+                !string.IsNullOrEmpty(x.Arguments[0]?.Value as string) &&
+                (x.Type == "Serenity.Decorators.registerClass" ||
+                    x.Type == "Serenity.Decorators.registerEditor" ||
+                    x.Type == "Serenity.Decorators.registerFormatter"))?.Arguments[0].Value as string;
+
+            if (string.IsNullOrEmpty(ns))
+            {
+                if (key != null)
+                {
+                    var idx = key.LastIndexOf('.');
+                    if (idx > 0)
+                        ns = key[..idx];
+                }
+
+                if (string.IsNullOrEmpty(ns))
+                    ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
+            }
+            else
+                key = null;
+
             string name = type.Name + "Attribute";
 
             if (!string.IsNullOrEmpty(ns))
@@ -122,17 +145,17 @@
                 cw.InBrace(delegate
                 {
                     if (isEditorType)
-                        GenerateEditor(type, name);
+                        GenerateEditor(type, name, key);
                     else if (isFormatterType)
-                        GenerateFormatter(type, name);
+                        GenerateFormatter(type, name, key);
                 });
             }
             else
             {
                 if (isEditorType)
-                    GenerateEditor(type, name);
+                    GenerateEditor(type, name, key);
                 else if (isFormatterType)
-                    GenerateFormatter(type, name);
+                    GenerateFormatter(type, name, key);
             }
 
             AddFile(RemoveRootNamespace(ns, name) + ".cs");

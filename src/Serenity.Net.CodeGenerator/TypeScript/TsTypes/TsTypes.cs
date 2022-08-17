@@ -2,11 +2,11 @@
 
 namespace Serenity.TypeScript.TsTypes
 {
-    public class Map<T> : List<T>
+    public class Map<T> : Dictionary<string, T>
     {
     }
 
-    public class MapLike<T> : List<T>
+    public class MapLike<T> : Dictionary<string, T>
     {
     }
 
@@ -294,7 +294,7 @@ namespace Serenity.TypeScript.TsTypes
     {
     }
 
-    public interface IMportOrExportSpecifier : IDeclaration
+    public interface IImportOrExportSpecifier : IDeclaration
     {
         Identifier PropertyName { get; set; }
     }
@@ -2295,7 +2295,7 @@ namespace Serenity.TypeScript.TsTypes
         public NodeArray<ExportSpecifier> Elements { get; set; }
     }
 
-    public class ImportSpecifier : Declaration, IMportOrExportSpecifier
+    public class ImportSpecifier : Declaration, IImportOrExportSpecifier
     {
         public ImportSpecifier()
         {
@@ -2305,7 +2305,7 @@ namespace Serenity.TypeScript.TsTypes
         public Identifier PropertyName { get; set; }
     }
 
-    public class ExportSpecifier : Declaration, IMportOrExportSpecifier
+    public class ExportSpecifier : Declaration, IImportOrExportSpecifier
     {
         public ExportSpecifier()
         {
