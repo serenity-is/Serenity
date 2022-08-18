@@ -51,15 +51,15 @@ namespace Serenity.CodeGenerator
 
         private static EntityField ToEntityField(FieldInfo fieldInfo, int prefixLength)
         {
-            List<TypeRefModel> flags;
+            List<AttributeTypeRef> flags;
             if (fieldInfo.IsIdentity)
-                flags = new List<TypeRefModel> { new TypeRefModel { TypeName = "Serenity.Data.Mapping.Identity" } };
+                flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.Identity") };
             else if (fieldInfo.IsPrimaryKey)
-                flags = fieldInfo.IsNullable ? new List<TypeRefModel> { new TypeRefModel { TypeName = "Serenity.Data.Mapping.PrimaryKey" } } : new List<TypeRefModel> { new TypeRefModel { TypeName = "Serenity.Data.Mapping.PrimaryKey" }, new TypeRefModel { TypeName = "Serenity.Data.Mapping.NotNull" } };
+                flags = fieldInfo.IsNullable ? new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.PrimaryKey") } : new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.PrimaryKey"), new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
             else if (fieldInfo.DataType == "timestamp" || fieldInfo.DataType == "rowversion")
-                flags = new List<TypeRefModel> { new TypeRefModel { TypeName = "Serenity.ComponentModel.Insertable", Arguments = "false" }, new TypeRefModel { TypeName = "Serenity.ComponentModel.Updatable", Arguments = "false" }, new TypeRefModel { TypeName = "Serenity.Data.Mapping.NotNull" } };
+                flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.ComponentModel.Insertable", "false"), new AttributeTypeRef("Serenity.ComponentModel.Updatable", "false"), new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
             else if (!fieldInfo.IsNullable)
-                flags = new List<TypeRefModel> { new TypeRefModel { TypeName = "Serenity.Data.Mapping.NotNull" } };
+                flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
             else
                 flags = null;
 
@@ -235,7 +235,7 @@ namespace Serenity.CodeGenerator
                 var f = ToEntityField(field, prefix);
 
                 if (f.Ident == model.IdField)
-                    f.ColAttributeList = new List<TypeRefModel> { new TypeRefModel { TypeName = "Serenity.ComponentModel.EditLink" } , new TypeRefModel { TypeName = "System.ComponentModel.DisplayName", Arguments = "\"Db.Shared.RecordId\"" }, new TypeRefModel { TypeName = "Serenity.ComponentModel.AlignRight" } };
+                    f.ColAttributeList = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.ComponentModel.EditLink") , new AttributeTypeRef("System.ComponentModel.DisplayName", "\"Db.Shared.RecordId\""), new AttributeTypeRef("Serenity.ComponentModel.AlignRight") };
                 
                 int i = 0;
                 string ident = f.Ident;
@@ -247,7 +247,7 @@ namespace Serenity.CodeGenerator
                 if (f.Name == className && f.FieldType == "String")
                 {
                     model.NameField = f.Name;
-                    f.ColAttributeList ??= new List<TypeRefModel> { new TypeRefModel { TypeName = "Serenity.ComponentModel.EditLink" } };
+                    f.ColAttributeList ??= new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.ComponentModel.EditLink") };
                 }
 
                 var foreign = foreigns.Find((k) => k.FKColumn.Equals(field.FieldName, StringComparison.OrdinalIgnoreCase));
@@ -290,12 +290,12 @@ namespace Serenity.CodeGenerator
                         k.Ident = ident;
                         fieldByIdent[ident] = k;
 
-                        var atk = new List<TypeRefModel>
+                        var atk = new List<AttributeTypeRef>
                         {
-                            new TypeRefModel { TypeName = "System.ComponentModel.DisplayName", Arguments = "\"" + k.Title + "\"" }
+                            new AttributeTypeRef("System.ComponentModel.DisplayName", "\"" + k.Title + "\"")
                         };
                         k.Expression = "j" + j.Name + ".[" + k.Name + "]";
-                        atk.Add(new TypeRefModel { TypeName = "Serenity.Data.Mapping.Expression", Arguments =  "\"" + k.Expression + "\"" } );
+                        atk.Add(new AttributeTypeRef("Serenity.Data.Mapping.Expression", "\"" + k.Expression + "\"") );
                         k.AttributeList = atk;
 
                         if (f.TextualField == null && k.FieldType == "String")
@@ -316,47 +316,47 @@ namespace Serenity.CodeGenerator
                 if (fld != null)
                 {
                     model.NameField = fld.Ident;
-                    fld.ColAttributeList ??= new List<TypeRefModel> { new TypeRefModel { TypeName = "Serenity.ComponentModel.EditLink" } };
+                    fld.ColAttributeList ??= new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.ComponentModel.EditLink") };
                 }
             }
 
             foreach (var x in model.Fields)
             {
-                var attrs = new List<TypeRefModel>
+                var attrs = new List<AttributeTypeRef>
                 {
-                    new TypeRefModel { TypeName = "System.ComponentModel.DisplayName", Arguments = "\"" + x.Title + "\"" }
+                    new AttributeTypeRef("System.ComponentModel.DisplayName", "\"" + x.Title + "\"")
                 };
 
                 if (x.Ident != x.Name)
-                    attrs.Add(new TypeRefModel { TypeName = "Serenity.Data.Mapping.Column", Arguments = "\"" + x.Name + "\""});
+                    attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.Column", "\"" + x.Name + "\"" ));
 
                 if ((x.Size ?? 0) > 0)
-                    attrs.Add(new TypeRefModel { TypeName = "Serenity.Data.Mapping.Size", Arguments = x.Size.ToString() });
+                    attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.Size", x.Size.ToString()));
 
                 if (x.Scale > 0)
-                    attrs.Add(new TypeRefModel { TypeName = "Serenity.Data.Mapping.Scale", Arguments = x.Scale.ToString() });
+                    attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.Scale", x.Scale.ToString()));
 
                 if (!x.FlagList.IsEmptyOrNull())
                     attrs.AddRange(x.FlagList);
 
                 if (!string.IsNullOrEmpty(x.PKTable))
                 {
-                    attrs.Add(new TypeRefModel { TypeName = "Serenity.Data.Mapping.ForeignKey", Arguments = "\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\"" });
-                    attrs.Add(new TypeRefModel { TypeName = "Serenity.Data.Mapping.LeftJoin", Arguments = "\"j" + x.ForeignJoinAlias + "\"" });
+                    attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.ForeignKey", "\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\""));
+                    attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.LeftJoin", "\"j" + x.ForeignJoinAlias + "\""));
                 }
 
                 if (model.IdField == x.Ident && net5Plus)
-                    attrs.Add(new TypeRefModel { TypeName = "Serenity.Data.IdProperty" });
+                    attrs.Add(new AttributeTypeRef("Serenity.Data.IdProperty"));
 
                 if (model.NameField == x.Ident)
                 {
-                    attrs.Add(new TypeRefModel { TypeName = "Serenity.Data.Mapping.QuickSearch" });
+                    attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.QuickSearch"));
                     if (net5Plus)
-                        attrs.Add(new TypeRefModel { TypeName = "Serenity.Data.NameProperty" });
+                        attrs.Add(new AttributeTypeRef("Serenity.Data.NameProperty"));
                 }
 
                 if (x.TextualField != null)
-                    attrs.Add(new TypeRefModel { TypeName = "Serenity.Data.Mapping.TextualField", Arguments = "\"" + x.TextualField + "\"" });
+                    attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.TextualField", "\"" + x.TextualField + "\""));
 
                 x.AttributeList = attrs;
             }

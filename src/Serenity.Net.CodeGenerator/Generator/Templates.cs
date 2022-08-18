@@ -42,11 +42,12 @@ namespace Serenity.CodeGenerator
         }
 
         delegate string TypeDelegate(string key);
+        delegate string NamespaceDelegate(string key);
         delegate string TypeListDelegate(List<string> key);
-        delegate string TypeModelListDelegate(List<TypeRefModel> key);
+        delegate string TypeModelListDelegate(List<AttributeTypeRef> key);
         delegate void UsingDelegate(string key);
         
-        public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model, string subNamespacePath = "")
+        public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model)
         {
             var template = GetTemplate(fileSystem, templateKey);
             try
@@ -76,11 +77,6 @@ namespace Serenity.CodeGenerator
                     
                 };
 
-                if (model is EntityModel em && !string.IsNullOrEmpty(em.RootNamespace) && !string.IsNullOrEmpty(em.DotModule) && !string.IsNullOrEmpty(subNamespacePath))
-                {
-                    cw.CurrentNamespace = em.RootNamespace + em.DotModule + subNamespacePath;
-                }
-
                 var scriptObject = new ScriptObject();
                 scriptObject.Import("TYPEREF", new TypeDelegate((fullName) =>
                 {
@@ -102,7 +98,7 @@ namespace Serenity.CodeGenerator
                     return string.Join(", ", result);
                 }));
 
-                scriptObject.Import("TYPEREFMODELLIST", new TypeModelListDelegate((models) =>
+                scriptObject.Import("ATTRREF", new TypeModelListDelegate((models) =>
                 {
                     if (models == null)
                         return "";
@@ -111,7 +107,7 @@ namespace Serenity.CodeGenerator
 
                     foreach (var model in models)
                     {
-                        result.Add(cw.ShortTypeName(cw, model.TypeName) + model.ArgumentPart);
+                        result.Add(cw.ShortTypeName(cw, model.TypeName) + (string.IsNullOrEmpty(model.Arguments) ? "" : "(" + model.Arguments + ")"));
                     }
 
                     return string.Join(", ", result);
@@ -120,6 +116,12 @@ namespace Serenity.CodeGenerator
                 scriptObject.Import("USING", new UsingDelegate((requestedNamespace) =>
                 {
                     cw.Using(requestedNamespace, true);
+                }));
+
+                scriptObject.Import("NAMESPACE", new NamespaceDelegate((requestedNamespace) =>
+                {
+                    cw.CurrentNamespace = requestedNamespace;
+                    return requestedNamespace;
                 }));
 
                 context.PushGlobal(scriptObject);

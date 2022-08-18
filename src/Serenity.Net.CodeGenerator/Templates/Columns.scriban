@@ -1,12 +1,12 @@
 ﻿{{USING "Serenity.ComponentModel"}}
 
-namespace {{RootNamespace}}{{DotModule}}.Columns
+namespace {{NAMESPACE RootNamespaceDotModuleDot + "Columns"}}
 {
     [ColumnsScript("{{ModuleDot}}{{ClassName}}")]
     [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]
     public class {{ClassName}}Columns
     {%{{}%}{{for x in Fields}}{{if x.ColAttributes}}
-        [{{TYPEREFMODELLIST x.ColAttributeList}}]{{end}}{{if x.TextualField}}
+        [{{ATTRREF x.ColAttributeList}}]{{end}}{{if x.TextualField}}
         public string {{x.TextualField}} { get; set; }{{else}}
         public {{TYPEREF x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}
     }

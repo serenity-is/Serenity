@@ -3,7 +3,7 @@
 {{USING "MyResponse = Serenity.Services.SaveResponse"}}
 {{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
 
-namespace {{RootNamespace}}{{DotModule}}
+namespace {{NAMESPACE RootNamespaceDotModule}}
 {
     public interface I{{ClassName}}SaveHandler : ISaveHandler<MyRow, MyRequest, MyResponse> {}
 

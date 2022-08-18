@@ -52,6 +52,21 @@
             get { return string.IsNullOrEmpty(Schema) ? "" : Schema + "."; }
         }
 
+        public string RootNamespaceDot
+        {
+            get { return string.IsNullOrEmpty(RootNamespace) ? "" : RootNamespace + "."; }
+        }
+
+        public string RootNamespaceDotModule
+        {
+            get { return RootNamespaceDot + (string.IsNullOrEmpty(Module) ? "" : Module); }
+        }
+
+        public string RootNamespaceDotModuleDot
+        {
+            get { return (string.IsNullOrEmpty(RootNamespaceDotModule) ? "" : RootNamespaceDotModule + "."); }
+        }
+
         public string NavigationCategory
         {
             get { return Module; }

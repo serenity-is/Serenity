@@ -3,7 +3,7 @@
 {{USING "MyResponse = Serenity.Services.DeleteResponse"}}
 {{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName }}
 
-namespace {{RootNamespace}}{{DotModule}}
+namespace {{NAMESPACE RootNamespaceDotModule}}
 {
     public interface I{{ClassName}}DeleteHandler : IDeleteHandler<MyRow, MyRequest, MyResponse> {}
 
