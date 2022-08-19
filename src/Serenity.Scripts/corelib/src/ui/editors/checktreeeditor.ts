@@ -1,8 +1,7 @@
-﻿import { Column, Grid, GridOptions } from "@serenity-is/sleekgrid"
+﻿import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid"
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
 import { Culture, getLookup, htmlEncode, isEmptyOrNull, ListResponse, PropertyItem, ScriptData, trimToNull, tryGetText } from "../../q";
-import { FormatterContext } from "../../slick";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";

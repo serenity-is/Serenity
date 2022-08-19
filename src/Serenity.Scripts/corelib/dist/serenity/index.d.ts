@@ -2,7 +2,7 @@
 /// <reference types="jqueryui" />
 /// <reference types="jquery.validation" />
 import { PropertyItem as PropertyItem$1, ListResponse as ListResponse$1 } from '../q';
-import { Column, Grid, Group, Event, ColumnFormatter, ItemMetadata, IPlugin, GridOptions } from '@serenity-is/sleekgrid';
+import { FormatterContext, Group, Event, Grid, Column, ItemMetadata, IPlugin, GridOptions } from '@serenity-is/sleekgrid';
 
 declare global {
     namespace Select2 {
@@ -1900,22 +1900,8 @@ declare type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
 declare module "@serenity-is/sleekgrid" {
     interface Column<TItem = any> {
         referencedFields?: string[];
-        format?: Format<TItem>;
         sourceItem?: PropertyItem$1;
     }
-}
-interface FormatterContext<TItem = any> {
-    addAttrs?: {
-        [key: string]: string;
-    };
-    addClass?: string;
-    cell?: number;
-    column?: Column<TItem>;
-    grid?: Grid<TItem>;
-    item?: TItem;
-    row?: number;
-    toolTip?: string;
-    value?: any;
 }
 interface Formatter {
     format(ctx: FormatterContext): string;
@@ -2123,7 +2109,7 @@ declare namespace PropertyItemSlickConverter {
 }
 declare namespace SlickFormatting {
     function getEnumText(enumKey: string, name: string): string;
-    function treeToggle<TItem>(getView: () => RemoteView<TItem>, getId: (x: TItem) => any, formatter: Format<TItem>): Format<TItem>;
+    function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any, formatter: Format): Format;
     function date(format?: string): Format;
     function dateTime(format?: string): Format;
     function checkBox(): Format;
@@ -2135,7 +2121,6 @@ declare namespace SlickFormatting {
 }
 declare namespace SlickHelper {
     function setDefaults(columns: Column[], localTextPrefix?: string): any;
-    function convertToFormatter<TItem = any>(format: Format<TItem>): ColumnFormatter<TItem>;
 }
 declare namespace SlickTreeHelper {
     function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;

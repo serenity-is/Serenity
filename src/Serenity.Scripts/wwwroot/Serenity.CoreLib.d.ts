@@ -1116,174 +1116,40 @@ declare namespace Slick {
     }
     const preClickClassName = "slick-edit-preclick";
 
-    type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
-    interface IEventData {
-        readonly type?: string;
-        currentTarget?: EventTarget | null;
-        target?: EventTarget | null;
-        originalEvent?: any;
-        defaultPrevented?: boolean;
-        preventDefault?(): void;
-        stopPropagation?(): void;
-        stopImmediatePropagation?(): void;
-        isDefaultPrevented?(): boolean;
-        isImmediatePropagationStopped?(): boolean;
-        isPropagationStopped?(): boolean;
+    interface FormatterContext<TItem = any> {
+        addAttrs?: {
+            [key: string]: string;
+        };
+        addClass?: string;
+        cell?: number;
+        column?: Column<TItem>;
+        grid?: any;
+        item?: TItem;
+        row?: number;
+        tooltip?: string;
+        value?: any;
     }
-    /***
-     * An event object for passing data to event handlers and letting them control propagation.
-     * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
-     * @class EventData
-     * @constructor
-     */
-    class EventData implements IEventData {
-        private _isPropagationStopped;
-        private _isImmediatePropagationStopped;
-        /***
-         * Stops event from propagating up the DOM tree.
-         * @method stopPropagation
-         */
-        stopPropagation(): void;
-        /***
-         * Returns whether stopPropagation was called on this event object.
-         * @method isPropagationStopped
-         * @return {Boolean}
-         */
-        isPropagationStopped(): boolean;
-        /***
-         * Prevents the rest of the handlers from being executed.
-         * @method stopImmediatePropagation
-         */
-        stopImmediatePropagation(): void;
-        /***
-         * Returns whether stopImmediatePropagation was called on this event object.\
-         * @method isImmediatePropagationStopped
-         * @return {Boolean}
-         */
-        isImmediatePropagationStopped(): boolean;
+    type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+    interface CompatFormatterResult {
+        addClasses?: string;
+        text?: string;
+        toolTip?: string;
     }
-    /***
-     * A simple publisher-subscriber implementation.
-     * @class Event
-     * @constructor
-     */
-    class Event<TArgs = any, TEventData extends IEventData = IEventData> {
-        private _handlers;
-        /***
-         * Adds an event handler to be called when the event is fired.
-         * <p> Slick.Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
-         * object the event was fired with.<p>
-         * @method subscribe
-         * @param fn {Function} Event handler.
-         */
-        subscribe(fn: Handler<TArgs, TEventData>): void;
-        /***
-         * Removes an event handler added with <code>subscribe(fn)</code>.
-         * @method unsubscribe
-         * @param fn {Function} Event handler to be removed.
-         */
-        unsubscribe(fn: Handler<TArgs, TEventData>): void;
-        /***
-         * Fires an event notifying all subscribers.
-         * @method notify
-         * @param args {Object} Additional data object to be passed to all handlers.
-         * @param e {EventData}
-         *      Optional.
-         *      An <code>EventData</code> object to be passed to all handlers.
-         *      For DOM events, an existing W3C/jQuery event object can be passed in.
-         * @param scope {Object}
-         *      Optional.
-         *      The scope ("this") within which the handler will be executed.
-         *      If not specified, the scope will be set to the <code> Slick.Event</code> instance.
-         */
-        notify(args?: any, e?: TEventData, scope?: object): any;
-        clear(): void;
+    type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
+    interface FormatterFactory<TItem = any> {
+        getFormat?(column: Column<TItem>): ColumnFormat<TItem>;
+        getFormatter?(column: Column<TItem>): CompatFormatter<TItem>;
     }
-    class EventHandler<TArgs = any, TEventData extends IEventData = IEventData> {
-        private _handlers;
-        subscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
-        unsubscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
-        unsubscribeAll(): EventHandler<TArgs, TEventData>;
-    }
-    const keyCode: {
-        BACKSPACE: number;
-        DELETE: number;
-        DOWN: number;
-        END: number;
-        ENTER: number;
-        ESCAPE: number;
-        HOME: number;
-        INSERT: number;
-        LEFT: number;
-        PAGEDOWN: number;
-        PAGEUP: number;
-        RIGHT: number;
-        TAB: number;
-        UP: number;
+    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
+    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
+    type CellStylesHash = {
+        [row: number]: {
+            [cell: number]: string;
+        };
     };
-    function patchEvent(e: IEventData): IEventData;
-
-    interface EditController {
-        commitCurrentEdit(): boolean;
-        cancelCurrentEdit(): boolean;
-    }
-    /***
-     * A locking helper to track the active edit controller and ensure that only a single controller
-     * can be active at a time.  This prevents a whole class of state and validation synchronization
-     * issues.  An edit controller (such as SleekGrid) can query if an active edit is in progress
-     * and attempt a commit or cancel before proceeding.
-     * @class EditorLock
-     * @constructor
-     */
-    class EditorLock {
-        private activeEditController;
-        /***
-         * Returns true if a specified edit controller is active (has the edit lock).
-         * If the parameter is not specified, returns true if any edit controller is active.
-         * @method isActive
-         * @param editController {EditController}
-         * @return {Boolean}
-         */
-        isActive(editController?: EditController): boolean;
-        /***
-         * Sets the specified edit controller as the active edit controller (acquire edit lock).
-         * If another edit controller is already active, and exception will be thrown.
-         * @method activate
-         * @param editController {EditController} edit controller acquiring the lock
-         */
-        activate(editController: EditController): void;
-        /***
-         * Unsets the specified edit controller as the active edit controller (release edit lock).
-         * If the specified edit controller is not the active one, an exception will be thrown.
-         * @method deactivate
-         * @param editController {EditController} edit controller releasing the lock
-         */
-        deactivate(editController: EditController): void;
-        /***
-         * Attempts to commit the current edit by calling "commitCurrentEdit" method on the active edit
-         * controller and returns whether the commit attempt was successful (commit may fail due to validation
-         * errors, etc.).  Edit controller's "commitCurrentEdit" must return true if the commit has succeeded
-         * and false otherwise.  If no edit controller is active, returns true.
-         * @method commitCurrentEdit
-         * @return {Boolean}
-         */
-        commitCurrentEdit(): boolean;
-        /***
-         * Attempts to cancel the current edit by calling "cancelCurrentEdit" method on the active edit
-         * controller and returns whether the edit was successfully cancelled.  If no edit controller is
-         * active, returns true.
-         * @method cancelCurrentEdit
-         * @return {Boolean}
-         */
-        cancelCurrentEdit(): boolean;
-    }
-    /***
-     * A global singleton editor lock.
-     * @class GlobalEditorLock
-     * @static
-     * @constructor
-     */
-    const GlobalEditorLock: EditorLock;
+    function defaultColumnFormat(ctx: FormatterContext): string;
+    function convertCompatFormatter(compatFormatter: CompatFormatter): ColumnFormat;
+    function applyFormatterResultToCellNode(ctx: FormatterContext, html: string, node: HTMLElement): void;
 
     /***
      * Information about a group of rows.
@@ -1395,6 +1261,279 @@ declare namespace Slick {
         max?: any;
     }
 
+    type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
+    interface IEventData {
+        readonly type?: string;
+        currentTarget?: EventTarget | null;
+        target?: EventTarget | null;
+        originalEvent?: any;
+        defaultPrevented?: boolean;
+        preventDefault?(): void;
+        stopPropagation?(): void;
+        stopImmediatePropagation?(): void;
+        isDefaultPrevented?(): boolean;
+        isImmediatePropagationStopped?(): boolean;
+        isPropagationStopped?(): boolean;
+    }
+    /***
+     * An event object for passing data to event handlers and letting them control propagation.
+     * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
+     * @class EventData
+     * @constructor
+     */
+    class EventData implements IEventData {
+        private _isPropagationStopped;
+        private _isImmediatePropagationStopped;
+        /***
+         * Stops event from propagating up the DOM tree.
+         * @method stopPropagation
+         */
+        stopPropagation(): void;
+        /***
+         * Returns whether stopPropagation was called on this event object.
+         * @method isPropagationStopped
+         * @return {Boolean}
+         */
+        isPropagationStopped(): boolean;
+        /***
+         * Prevents the rest of the handlers from being executed.
+         * @method stopImmediatePropagation
+         */
+        stopImmediatePropagation(): void;
+        /***
+         * Returns whether stopImmediatePropagation was called on this event object.\
+         * @method isImmediatePropagationStopped
+         * @return {Boolean}
+         */
+        isImmediatePropagationStopped(): boolean;
+    }
+    /***
+     * A simple publisher-subscriber implementation.
+     * @class Event
+     * @constructor
+     */
+    class Event<TArgs = any, TEventData extends IEventData = IEventData> {
+        private _handlers;
+        /***
+         * Adds an event handler to be called when the event is fired.
+         * <p> Slick.Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
+         * object the event was fired with.<p>
+         * @method subscribe
+         * @param fn {Function} Event handler.
+         */
+        subscribe(fn: Handler<TArgs, TEventData>): void;
+        /***
+         * Removes an event handler added with <code>subscribe(fn)</code>.
+         * @method unsubscribe
+         * @param fn {Function} Event handler to be removed.
+         */
+        unsubscribe(fn: Handler<TArgs, TEventData>): void;
+        /***
+         * Fires an event notifying all subscribers.
+         * @method notify
+         * @param args {Object} Additional data object to be passed to all handlers.
+         * @param e {EventData}
+         *      Optional.
+         *      An <code>EventData</code> object to be passed to all handlers.
+         *      For DOM events, an existing W3C/jQuery event object can be passed in.
+         * @param scope {Object}
+         *      Optional.
+         *      The scope ("this") within which the handler will be executed.
+         *      If not specified, the scope will be set to the <code> Slick.Event</code> instance.
+         */
+        notify(args?: any, e?: TEventData, scope?: object): any;
+        clear(): void;
+    }
+    class EventHandler<TArgs = any, TEventData extends IEventData = IEventData> {
+        private _handlers;
+        subscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
+        unsubscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
+        unsubscribeAll(): EventHandler<TArgs, TEventData>;
+    }
+    const keyCode: {
+        BACKSPACE: number;
+        DELETE: number;
+        DOWN: number;
+        END: number;
+        ENTER: number;
+        ESCAPE: number;
+        HOME: number;
+        INSERT: number;
+        LEFT: number;
+        PAGEDOWN: number;
+        PAGEUP: number;
+        RIGHT: number;
+        TAB: number;
+        UP: number;
+    };
+    function patchEvent(e: IEventData): IEventData;
+
+    interface Position {
+        bottom?: number;
+        height?: number;
+        left?: number;
+        right?: number;
+        top?: number;
+        visible?: boolean;
+        width?: number;
+    }
+    interface ValidationResult {
+        valid: boolean;
+        msg?: string;
+    }
+    interface EditorOptions {
+        grid: unknown;
+        gridPosition?: Position;
+        position?: Position;
+        column?: Column;
+        columnMetaData?: ColumnMetadata<any>;
+        container?: HTMLElement;
+        item?: any;
+        event?: IEventData;
+        commitChanges?: () => void;
+        cancelChanges?: () => void;
+    }
+    interface EditorFactory {
+        getEditor(column: Column): Editor;
+    }
+    interface EditCommand {
+        row: number;
+        cell: number;
+        editor: Editor;
+        serializedValue: any;
+        prevSerializedValue: any;
+        execute: () => void;
+        undo: () => void;
+    }
+    interface Editor {
+        new (options: EditorOptions): Editor;
+        destroy(): void;
+        applyValue(item: any, value: any): void;
+        focus(): void;
+        isValueChanged(): boolean;
+        keyCaptureList?: number[];
+        loadValue(value: any): void;
+        serializeValue(): any;
+        position?(pos: Position): void;
+        preClick?(): void;
+        hide?(): void;
+        show?(): void;
+        suppressClearOnEdit?: boolean;
+        validate?(): ValidationResult;
+    }
+    interface EditController {
+        commitCurrentEdit(): boolean;
+        cancelCurrentEdit(): boolean;
+    }
+    /***
+     * A locking helper to track the active edit controller and ensure that only a single controller
+     * can be active at a time.  This prevents a whole class of state and validation synchronization
+     * issues.  An edit controller (such as SleekGrid) can query if an active edit is in progress
+     * and attempt a commit or cancel before proceeding.
+     * @class EditorLock
+     * @constructor
+     */
+    class EditorLock {
+        private activeEditController;
+        /***
+         * Returns true if a specified edit controller is active (has the edit lock).
+         * If the parameter is not specified, returns true if any edit controller is active.
+         * @method isActive
+         * @param editController {EditController}
+         * @return {Boolean}
+         */
+        isActive(editController?: EditController): boolean;
+        /***
+         * Sets the specified edit controller as the active edit controller (acquire edit lock).
+         * If another edit controller is already active, and exception will be thrown.
+         * @method activate
+         * @param editController {EditController} edit controller acquiring the lock
+         */
+        activate(editController: EditController): void;
+        /***
+         * Unsets the specified edit controller as the active edit controller (release edit lock).
+         * If the specified edit controller is not the active one, an exception will be thrown.
+         * @method deactivate
+         * @param editController {EditController} edit controller releasing the lock
+         */
+        deactivate(editController: EditController): void;
+        /***
+         * Attempts to commit the current edit by calling "commitCurrentEdit" method on the active edit
+         * controller and returns whether the commit attempt was successful (commit may fail due to validation
+         * errors, etc.).  Edit controller's "commitCurrentEdit" must return true if the commit has succeeded
+         * and false otherwise.  If no edit controller is active, returns true.
+         * @method commitCurrentEdit
+         * @return {Boolean}
+         */
+        commitCurrentEdit(): boolean;
+        /***
+         * Attempts to cancel the current edit by calling "cancelCurrentEdit" method on the active edit
+         * controller and returns whether the edit was successfully cancelled.  If no edit controller is
+         * active, returns true.
+         * @method cancelCurrentEdit
+         * @return {Boolean}
+         */
+        cancelCurrentEdit(): boolean;
+    }
+    /***
+     * A global singleton editor lock.
+     * @class GlobalEditorLock
+     * @static
+     * @constructor
+     */
+    const GlobalEditorLock: EditorLock;
+
+    interface Column<TItem = any> {
+        asyncPostRender?: AsyncPostRender<TItem>;
+        asyncPostRenderCleanup?: AsyncPostCleanup<TItem>;
+        behavior?: any;
+        cannotTriggerInsert?: boolean;
+        cssClass?: string;
+        defaultSortAsc?: boolean;
+        editor?: Editor;
+        field: string;
+        frozen?: boolean;
+        focusable?: boolean;
+        footerCssClass?: string;
+        format?: ColumnFormat<TItem>;
+        formatter?: CompatFormatter<TItem>;
+        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: unknown) => string;
+        headerCssClass?: string;
+        id?: string;
+        maxWidth?: any;
+        minWidth?: number;
+        name?: string;
+        nameIsHtml?: boolean;
+        previousWidth?: number;
+        referencedFields?: string[];
+        rerenderOnResize?: boolean;
+        resizable?: boolean;
+        selectable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        toolTip?: string;
+        validator?: (value: any) => ValidationResult;
+        visible?: boolean;
+        width?: number;
+    }
+    const columnDefaults: Partial<Column>;
+    interface ColumnMetadata<TItem = any> {
+        colspan: number | '*';
+        format?: ColumnFormat<TItem>;
+        formatter?: CompatFormatter<TItem>;
+    }
+    interface ColumnSort {
+        columnId: string;
+        sortAsc?: boolean;
+    }
+    interface ItemMetadata<TItem = any> {
+        columns?: {
+            [key: string]: ColumnMetadata<TItem>;
+        };
+        format?: ColumnFormat<TItem>;
+        formatter?: CompatFormatter<TItem>;
+    }
+
     class Range {
         fromRow: number;
         fromCell: number;
@@ -1434,15 +1573,6 @@ declare namespace Slick {
         pluginName?: string;
         destroy?: () => void;
     }
-    interface Position {
-        bottom?: number;
-        height?: number;
-        left?: number;
-        right?: number;
-        top?: number;
-        visible?: boolean;
-        width?: number;
-    }
     interface ViewportInfo {
         height: number;
         width: number;
@@ -1471,131 +1601,6 @@ declare namespace Slick {
         bottom?: number;
         leftPx?: number;
         rightPx?: number;
-    }
-
-    interface EditorOptions {
-        grid: Grid;
-        gridPosition?: Position;
-        position?: Position;
-        column?: Column;
-        columnMetaData?: ColumnMetadata<any>;
-        container?: HTMLElement;
-        item?: any;
-        event: IEventData;
-        commitChanges?: () => void;
-        cancelChanges?: () => void;
-    }
-    interface Editor {
-        new (options: EditorOptions): Editor;
-        destroy(): void;
-        applyValue(item: any, value: any): void;
-        focus(): void;
-        isValueChanged(): boolean;
-        keyCaptureList?: number[];
-        loadValue(value: any): void;
-        serializeValue(): any;
-        position?(pos: Position): void;
-        preClick?(): void;
-        hide?(): void;
-        show?(): void;
-        suppressClearOnEdit?: boolean;
-        validate?(): ValidationResult;
-    }
-    interface EditorFactory {
-        getEditor(column: Column): Editor;
-    }
-    interface EditCommand {
-        row: number;
-        cell: number;
-        editor: Editor;
-        serializedValue: any;
-        prevSerializedValue: any;
-        execute: () => void;
-        undo: () => void;
-    }
-    interface ValidationResult {
-        valid: boolean;
-        msg?: string;
-    }
-
-    interface FormatterFactory<TItem = any> {
-        getFormatter(column: Column<TItem>): ColumnFormatter<TItem>;
-    }
-    interface FormatterResult {
-        addClass?: string;
-        addAttrs?: {
-            [key: string]: string;
-        };
-        html?: string;
-        text?: string;
-        toolTip?: string;
-    }
-    type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>) => string | FormatterResult;
-    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
-    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
-    type CellStylesHash = {
-        [row: number]: {
-            [cell: number]: string;
-        };
-    };
-    function defaultFormatter(_r: number, _c: number, value: any): string;
-    function applyFormatterResultToCellNode(fmtResult: FormatterResult | string, cellNode: HTMLElement): void;
-
-    interface ArgsGrid {
-        grid?: Grid;
-    }
-    interface ArgsColumn extends ArgsGrid {
-        column: Column;
-    }
-    interface ArgsColumnNode extends ArgsColumn {
-        node: HTMLElement;
-    }
-    type ArgsSortCol = {
-        sortCol: Column;
-        sortAsc: boolean;
-    };
-    interface ArgsSort extends ArgsGrid {
-        multiColumnSort: boolean;
-        sortAsc?: boolean;
-        sortCol?: Column;
-        sortCols?: ArgsSortCol[];
-    }
-    interface ArgsSelectedRowsChange extends ArgsGrid {
-        rows: number[];
-        changedSelectedRows?: number[];
-        changedUnselectedRows?: number[];
-        previousSelectedRows?: number[];
-        caller: any;
-    }
-    interface ArgsScroll extends ArgsGrid {
-        scrollLeft: number;
-        scrollTop: number;
-    }
-    interface ArgsCssStyle extends ArgsGrid {
-        key: string;
-        hash: CellStylesHash;
-    }
-    interface ArgsCell extends ArgsGrid {
-        row: number;
-        cell: number;
-    }
-    interface ArgsCellChange extends ArgsCell {
-        item: any;
-    }
-    interface ArgsCellEdit extends ArgsCellChange {
-        column: Column;
-    }
-    interface ArgsAddNewRow extends ArgsColumn {
-        item: any;
-    }
-    interface ArgsEditorDestroy extends ArgsGrid {
-        editor: Editor;
-    }
-    interface ArgsValidationError extends ArgsCell {
-        editor: Editor;
-        column: Column;
-        cellNode: HTMLElement;
-        validationResults: ValidationResult;
     }
 
     interface LayoutHost {
@@ -1686,7 +1691,8 @@ declare namespace Slick {
         createPreHeaderPanel?: boolean;
         dataItemColumnValueExtractor?: (item: TItem, column: Column<TItem>) => void;
         defaultColumnWidth?: number;
-        defaultFormatter?: ColumnFormatter<TItem>;
+        defaultFormat?: ColumnFormat<TItem>;
+        defaultFormatter?: CompatFormatter<TItem>;
         editable?: boolean;
         editCommandHandler?: (item: TItem, column: Column<TItem>, command: EditCommand) => void;
         editorFactory?: EditorFactory;
@@ -1712,7 +1718,7 @@ declare namespace Slick {
         fullWidthRows?: boolean;
         groupingPanel?: boolean;
         groupingPanelHeight?: number;
-        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
+        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: any) => string;
         headerRowHeight?: number;
         jQuery?: JQueryStatic;
         leaveSpaceForNewRows?: boolean;
@@ -1889,7 +1895,6 @@ declare namespace Slick {
         getFooterRow(): HTMLElement;
         getFooterRowColumn(columnIdOrIdx: string | number): HTMLElement;
         private createColumnFooters;
-        private formatGroupTotal;
         private createColumnHeaders;
         private setupColumnSort;
         private setupColumnReorder;
@@ -1941,9 +1946,10 @@ declare namespace Slick {
         private getRowTop;
         private getRowFromPosition;
         private scrollTo;
-        getFormatter(row: number, column: Column<TItem>): ColumnFormatter<TItem>;
+        getFormatter(row: number, column: Column<TItem>): ColumnFormat<TItem>;
+        getFormatterContext(row: number, cell: number): FormatterContext;
         private getEditor;
-        private getDataItemValueForColumn;
+        getDataItemValueForColumn(item: TItem, columnDef: Column<TItem>): any;
         private appendRowHtml;
         private appendCellHtml;
         private cleanupRows;
@@ -1955,6 +1961,7 @@ declare namespace Slick {
         invalidateRows(rows: number[]): void;
         invalidateRow(row: number): void;
         updateCell(row: number, cell: number): void;
+        private updateCellWithFormatter;
         updateRow(row: number): void;
         private calcViewportSize;
         resizeCanvas: () => void;
@@ -2082,52 +2089,61 @@ declare namespace Slick {
         setSelectedRows(rows: number[]): void;
     }
 
-    interface Column<TItem = any> {
-        asyncPostRender?: AsyncPostRender<TItem>;
-        asyncPostRenderCleanup?: AsyncPostCleanup<TItem>;
-        behavior?: any;
-        cannotTriggerInsert?: boolean;
-        cssClass?: string;
-        defaultSortAsc?: boolean;
-        editor?: Editor;
-        field: string;
-        frozen?: boolean;
-        focusable?: boolean;
-        footerCssClass?: string;
-        formatter?: ColumnFormatter<TItem>;
-        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
-        headerCssClass?: string;
-        id?: string;
-        maxWidth?: any;
-        minWidth?: number;
-        name?: string;
-        nameIsHtml?: boolean;
-        previousWidth?: number;
-        referencedFields?: string[];
-        rerenderOnResize?: boolean;
-        resizable?: boolean;
-        selectable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        toolTip?: string;
-        validator?: (value: any) => ValidationResult;
-        visible?: boolean;
-        width?: number;
+    interface ArgsGrid {
+        grid?: Grid;
     }
-    const columnDefaults: Partial<Column>;
-    interface ColumnMetadata<TItem = any> {
-        colspan: number | '*';
-        formatter?: ColumnFormatter<TItem>;
+    interface ArgsColumn extends ArgsGrid {
+        column: Column;
     }
-    interface ColumnSort {
-        columnId: string;
+    interface ArgsColumnNode extends ArgsColumn {
+        node: HTMLElement;
+    }
+    type ArgsSortCol = {
+        sortCol: Column;
+        sortAsc: boolean;
+    };
+    interface ArgsSort extends ArgsGrid {
+        multiColumnSort: boolean;
         sortAsc?: boolean;
+        sortCol?: Column;
+        sortCols?: ArgsSortCol[];
     }
-    interface ItemMetadata<TItem = any> {
-        columns?: {
-            [key: string]: ColumnMetadata<TItem>;
-        };
-        formatter?: ColumnFormatter<TItem>;
+    interface ArgsSelectedRowsChange extends ArgsGrid {
+        rows: number[];
+        changedSelectedRows?: number[];
+        changedUnselectedRows?: number[];
+        previousSelectedRows?: number[];
+        caller: any;
+    }
+    interface ArgsScroll extends ArgsGrid {
+        scrollLeft: number;
+        scrollTop: number;
+    }
+    interface ArgsCssStyle extends ArgsGrid {
+        key: string;
+        hash: CellStylesHash;
+    }
+    interface ArgsCell extends ArgsGrid {
+        row: number;
+        cell: number;
+    }
+    interface ArgsCellChange extends ArgsCell {
+        item: any;
+    }
+    interface ArgsCellEdit extends ArgsCellChange {
+        column: Column;
+    }
+    interface ArgsAddNewRow extends ArgsColumn {
+        item: any;
+    }
+    interface ArgsEditorDestroy extends ArgsGrid {
+        editor: Editor;
+    }
+    interface ArgsValidationError extends ArgsCell {
+        editor: Editor;
+        column: Column;
+        cellNode: HTMLElement;
+        validationResults: ValidationResult;
     }
 
     const BasicLayout: {
@@ -2143,7 +2159,6 @@ declare namespace Slick {
 declare namespace Slick {
     interface Column<TItem = any> {
         referencedFields?: string[];
-        format?: Format<TItem>;
         sourceItem?: Q.PropertyItem;
     }
 }
@@ -2164,19 +2179,6 @@ declare namespace Slick {
 
     type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
 
-    interface FormatterContext<TItem = any> {
-        addAttrs?: {
-            [key: string]: string;
-        };
-        addClass?: string;
-        cell?: number;
-        column?: Column<TItem>;
-        grid?: Grid<TItem>;
-        item?: TItem;
-        row?: number;
-        toolTip?: string;
-        value?: any;
-    }
     interface Formatter {
         format(ctx: FormatterContext): string;
     }
@@ -2326,7 +2328,6 @@ declare namespace Slick {
 declare namespace Slick {
     interface Column<TItem = any> {
         referencedFields?: string[];
-        format?: Format<TItem>;
         sourceItem?: Q.PropertyItem;
     }
 }
@@ -4088,23 +4089,10 @@ declare namespace Serenity {
         protected getTemplate(): string;
     }
 
-    type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+    type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
 
-    interface FormatterContext<TItem = any> {
-        addAttrs?: {
-            [key: string]: string;
-        };
-        addClass?: string;
-        cell?: number;
-        column?: Slick.Column<TItem>;
-        grid?: Slick.Grid<TItem>;
-        item?: TItem;
-        row?: number;
-        toolTip?: string;
-        value?: any;
-    }
     interface Formatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
     }
     interface GroupInfo<TItem> {
         getter?: any;
@@ -4309,7 +4297,7 @@ declare namespace Serenity {
     }
     namespace SlickFormatting {
         function getEnumText(enumKey: string, name: string): string;
-        function treeToggle<TItem>(getView: () => RemoteView<TItem>, getId: (x: TItem) => any, formatter: Format<TItem>): Format<TItem>;
+        function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any, formatter: Format): Format;
         function date(format?: string): Format;
         function dateTime(format?: string): Format;
         function checkBox(): Format;
@@ -4321,7 +4309,6 @@ declare namespace Serenity {
     }
     namespace SlickHelper {
         function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any;
-        function convertToFormatter<TItem = any>(format: Format<TItem>): Slick.ColumnFormatter<TItem>;
     }
     namespace SlickTreeHelper {
         function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
@@ -4338,47 +4325,47 @@ declare namespace Serenity {
     class IInitializeColumn {
     }
     class BooleanFormatter implements Formatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         falseText: string;
         trueText: string;
     }
     class CheckboxFormatter implements Formatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
     }
     class DateFormatter implements Formatter {
         constructor();
         static format(value: any, format?: string): any;
         displayFormat: string;
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
     }
     class DateTimeFormatter extends DateFormatter {
         constructor();
     }
     class EnumFormatter implements Formatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         enumKey: string;
         static format(enumType: any, value: any): string;
         static getText(enumKey: string, name: string): string;
         static getName(enumType: any, value: any): string;
     }
     class FileDownloadFormatter implements Formatter, IInitializeColumn {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         static dbFileUrl(filename: string): string;
         initializeColumn(column: Slick.Column): void;
         displayFormat: string;
         originalNameProperty: string;
     }
     class MinuteFormatter implements Formatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         static format(value: number): string;
     }
     class NumberFormatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         static format(value: any, format?: string): string;
         displayFormat: string;
     }
     class UrlFormatter implements Formatter, IInitializeColumn {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         initializeColumn(column: Slick.Column): void;
         displayProperty: string;
         displayFormat: string;
@@ -4521,7 +4508,7 @@ declare namespace Serenity {
         getTitle(): string;
         setTitle(value: string): void;
         protected getItemType(): string;
-        protected itemLink(itemType?: string, idField?: string, text?: (ctx: FormatterContext) => string, cssClass?: (ctx: FormatterContext) => string, encode?: boolean): Format<TItem>;
+        protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Format<TItem>;
         protected getColumnsKey(): string;
         protected getPropertyItems(): PropertyItem[];
         protected getPropertyItemsAsync(): Promise<PropertyItem[]>;
@@ -4664,7 +4651,7 @@ declare namespace Serenity {
         protected getDelimited(): boolean;
         protected anyDescendantsSelected(item: TItem): boolean;
         protected getColumns(): Slick.Column[];
-        protected getItemText(ctx: FormatterContext): string;
+        protected getItemText(ctx: Slick.FormatterContext): string;
         protected getSlickOptions(): Slick.GridOptions;
         protected sortItems(): void;
         protected moveSelectedUp(): boolean;
