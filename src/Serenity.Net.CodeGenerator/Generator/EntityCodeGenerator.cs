@@ -81,12 +81,12 @@
 
             if (config.GenerateUI)
             {
-                CreateFile(Templates.Render(fileSystem, "Page", model), moduleClass + "Page.cs");
-                CreateFile(Templates.Render(fileSystem, "IndexView", model), moduleClass + "Index.cshtml");
                 CreateFile(Templates.Render(fileSystem, "Columns", model), moduleClass + "Columns.cs");
                 CreateFile(Templates.Render(fileSystem, "Form", model), moduleClass + "Form.cs");
                 if (isModularTS)
                 {
+                    CreateFile(Templates.Render(fileSystem, "PageModular", model), moduleClass + "Page.cs");
+                    CreateFile(Templates.Render(fileSystem, "PageModularTS", model), moduleClass + "Page.ts");
                     CreateFile(Templates.Render(fileSystem, "DialogModular", model), moduleClass + "Dialog.ts");
                     CreateFile(Templates.Render(fileSystem, "GridModular", model), moduleClass + "Grid.ts");
                     CreateModularTypingFile(Templates.Render(fileSystem, "FormTypingModular", model), typingClass + "Form.ts");
@@ -94,6 +94,8 @@
                 }
                 else
                 {
+                    CreateFile(Templates.Render(fileSystem, "IndexView", model), moduleClass + "Index.cshtml");
+                    CreateFile(Templates.Render(fileSystem, "Page", model), moduleClass + "Page.cs");
                     CreateFile(Templates.Render(fileSystem, "Dialog", model), moduleClass + "Dialog.ts");
                     CreateFile(Templates.Render(fileSystem, "Grid", model), moduleClass + "Grid.ts");
                     CreateFile(Templates.Render(fileSystem, "FormTyping", model), typingClass + "Form.ts");
