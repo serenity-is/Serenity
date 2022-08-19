@@ -81,7 +81,21 @@
         {
             get => string.Join(", ", RowBaseClassAndInterfaceList);
         }
+       
+        public record EditorVariable(string Editor, int Index);
 
+        private List<EditorVariable> editorVariables;
+
+        public List<EditorVariable> EditorVariables
+        {
+            get
+            {
+                if (editorVariables.IsEmptyOrNull())
+                    editorVariables = Fields.Select((x) => x.TSEditorType).Distinct().Select((x, i) => new EditorVariable(x, i)).ToList();
+                return editorVariables;
+            }
+        }
+        
         public List<string> RowBaseClassAndInterfaceList
         {
             get

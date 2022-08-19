@@ -1,0 +1,17 @@
+﻿{{IMPORTFROMCORE "Decorators" "EntityGrid"}}
+{{IMPORTFROMTYPES ClassName + "Columns" ClassName + "Row" ClassName + "Service" }}
+{{IMPORT "./" + ClassName + "Dialog" ClassName + "Dialog"}}
+
+@Decorators.registerClass()
+export class {{ClassName}}Grid extends EntityGrid<{{RowClassName}}, any> {
+    protected getColumnsKey() { return {{ClassName}}Columns.columnsKey; }
+    protected getDialogType() { return {{ClassName}}Dialog; }{{if Identity}}
+    protected getIdProperty() { return {{RowClassName}}.idProperty; }{{end}}
+    protected getInsertPermission() { return {{RowClassName}}.insertPermission; }
+    protected getLocalTextPrefix() { return {{RowClassName}}.localTextPrefix; }
+    protected getService() { return {{ClassName}}Service.baseUrl; }
+
+    constructor(container: JQuery) {
+        super(container);
+    }
+}

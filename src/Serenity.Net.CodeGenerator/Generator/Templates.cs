@@ -123,11 +123,19 @@ namespace Serenity.CodeGenerator
                     cw.CurrentNamespace = requestedNamespace;
                     return requestedNamespace;
                 }));
-
+                
                 context.PushGlobal(scriptObject);
 
+                var modularTSImporter = new ModularTSImporter((model as EntityModel)?.Module);
+
+                context.PushGlobal(ModularTSImporter.GetScriptObject(modularTSImporter));
+
                 cw.Append(template.Render(context).Trim());
+
+                cw.Insert(0, modularTSImporter.GetImports());
+
                 return cw.ToString();
+
             }
             catch (InvalidOperationException ex)
             {

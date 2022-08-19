@@ -1,0 +1,23 @@
+﻿{{IMPORTFROMCORE "Decorators" "EntityDialog"}}
+{{IMPORTFROMTYPES RowClassName ClassName + "Form" ClassName + "Service"}}
+
+@Decorators.registerClass(){{if CustomSettings.MaximizableDialog}}
+@Decorators.maximizable(){{end}}
+export class {{ClassName}}Dialog extends EntityDialog<{{RowClassName}}, any> {
+    protected getFormKey() { return {{ClassName}}Form.formKey; }{{if Identity}}
+    protected getIdProperty() { return {{RowClassName}}.idProperty; }{{end}}
+    protected getLocalTextPrefix() { return {{RowClassName}}.localTextPrefix; }{{if NameField}}
+    protected getNameProperty() { return {{RowClassName}}.nameProperty; }{{end}}
+    protected getService() { return {{ClassName}}Service.baseUrl; }
+    protected getDeletePermission() { return {{RowClassName}}.deletePermission; }
+    protected getInsertPermission() { return {{RowClassName}}.insertPermission; }
+    protected getUpdatePermission() { return {{RowClassName}}.updatePermission; }
+
+    protected form = new {{ClassName}}Form(this.idPrefix);
+{{if CustomSettings.MaximizableDialog}}
+
+    onDialogOpen() {
+        super.onDialogOpen();
+        this.element.closest(".ui-dialog").find(".ui-icon-maximize-window").click();
+    }{{end}}
+}

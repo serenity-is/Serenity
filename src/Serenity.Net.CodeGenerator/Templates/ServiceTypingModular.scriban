@@ -1,0 +1,34 @@
+﻿{{IMPORTFROMCORE "SaveRequest" "SaveResponse" "DeleteRequest" "DeleteResponse" "RetrieveRequest" "RetrieveResponse" "ListResponse" "ListRequest"}}
+{{IMPORT "./" + RowClassName RowClassName}}
+{{IMPORTFROMQ "ServiceOptions" "serviceRequest"}}
+
+
+export namespace {{ClassName}}Service {
+    export const baseUrl = '{{ModuleSlash}}{{ClassName}}';
+
+    export declare function Create(request: SaveRequest<{{RowClassName}}>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): JQueryXHR;
+    export declare function Update(request: SaveRequest<{{RowClassName}}>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): JQueryXHR;
+    export declare function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): JQueryXHR;
+    export declare function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<{{RowClassName}}>) => void, opt?: ServiceOptions<any>): JQueryXHR;
+    export declare function List(request: ListRequest, onSuccess?: (response: ListResponse<{{RowClassName}}>) => void, opt?: ServiceOptions<any>): JQueryXHR;
+
+    export declare const enum Methods {
+        Create = "Administration/User/Create",
+        Update = "Administration/User/Update",
+        Delete = "Administration/User/Delete",
+        Retrieve = "Administration/User/Retrieve",
+        List = "Administration/User/List"
+    }
+
+    [
+        'Create', 
+        'Update', 
+        'Delete', 
+        'Retrieve', 
+        'List'
+    ].forEach(x => {
+        (<any>{{ClassName}}Service)[x] = function (r, s, o) { 
+            return serviceRequest(baseUrl + '/' + x, r, s, o); 
+        };
+    });
+}

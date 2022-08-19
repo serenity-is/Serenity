@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Serenity.Reflection;
 #endif
 
+using Serenity.CodeGenerator;
 using System.Linq;
 
 namespace Serenity.CodeGeneration
@@ -912,14 +913,6 @@ namespace Serenity.CodeGeneration
 
         private readonly List<ModuleImport> moduleImports = new();
         private readonly HashSet<string> moduleImportAliases = new();
-
-        protected class ModuleImport
-        {
-            public string Name { get; set; }
-            public string Alias { get; set; }
-            public string From { get; set; }
-            public bool External { get; set; }
-        }
 
         protected void ClearImports()
         {

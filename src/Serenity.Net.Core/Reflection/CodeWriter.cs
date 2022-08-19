@@ -419,6 +419,17 @@
         }
 
         /// <summary>
+        /// Inserts string to internal string builder
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public StringBuilder Insert(int index, string text)
+        {
+            return sb.Insert(index, text);
+        }
+
+        /// <summary>
         /// Tries to add namespace
         /// </summary>
         /// <param name="nameSpace"></param>
