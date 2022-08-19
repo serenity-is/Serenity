@@ -1,8 +1,8 @@
-﻿{{IMPORTFROMCORE "PrefixedContext"}}
-{{IMPORTFROMQ "initFormType"}}
-{{for x in EditorVariables}}
-{{IMPORTFROMCORE x.Editor}}
-{{end}}
+﻿{{- IMPORTFROMCORE "PrefixedContext"}}
+{{- IMPORTFROMQ "initFormType"}}
+{{- for x in EditorVariables}}
+{{- IMPORTFROMCORE x.Editor}}
+{{- end}}
 
 export interface {{ClassName}}Form {%{{}%}{{for x in Fields}}{{if x.Ident != Identity}}
     {{x.Ident}}: {{x.TSEditorType}};{{end}}{{end}}
@@ -19,8 +19,8 @@ export class {{ClassName}}Form extends PrefixedContext {
 			{{for x in EditorVariables}}
 var w{{x.Index}} = {{x.Editor}};{{end}}
 
-			initFormType({{ClassName}}Form, [{{for x in Fields}}
-			'{{x.Ident}}', w{{GETEDITORVARIABLEINDEX x.TSEditorType EditorVariables}},{{end}}
+			initFormType({{ClassName}}Form, [{{for x in Fields}}{{if x.Ident != Identity}}
+			'{{x.Ident}}', w{{GETEDITORVARIABLEINDEX x.TSEditorType EditorVariables}},{{end}}{{end}}
 			]);
 		}
     }
