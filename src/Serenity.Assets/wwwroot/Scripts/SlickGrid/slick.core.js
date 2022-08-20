@@ -33,12 +33,11 @@ Slick._ = (() => {
     Range: () => Range,
     addClass: () => addClass,
     applyFormatterResultToCellNode: () => applyFormatterResultToCellNode,
-    attrEncode: () => attrEncode,
     columnDefaults: () => columnDefaults,
     convertCompatFormatter: () => convertCompatFormatter,
     defaultColumnFormat: () => defaultColumnFormat,
     disableSelection: () => disableSelection,
-    htmlEncode: () => htmlEncode,
+    escape: () => escape,
     keyCode: () => keyCode,
     patchEvent: () => patchEvent,
     preClickClassName: () => preClickClassName,
@@ -239,10 +238,24 @@ Slick._ = (() => {
     } else
       el.classList.add(cls);
   }
-  function attrEncode(s) {
+  var esc = {
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&apos;",
+    "&": "&amp;"
+  };
+  function escFunc(a) {
+    return esc[a];
+  }
+  function escape(s) {
+    if (!arguments.length)
+      s = this.value;
     if (s == null)
       return "";
-    return (s + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    if (typeof s !== "string")
+      s = "" + s;
+    return s.replace(/[<>"'&]/g, escFunc);
   }
   function disableSelection(target) {
     if (target) {
@@ -267,20 +280,19 @@ Slick._ = (() => {
     if (attr) {
       for (k in attr) {
         v = attr[k];
-        if (v != null && v !== false)
-          el.setAttribute(k, v === true ? "" : v);
+        if (v != null && v !== false) {
+          if (k === "ref" && typeof v === "function") {
+            v(el);
+            continue;
+          }
+          var key = k === "cssClass" ? "class" : k;
+          el.setAttribute(key, v === true ? "" : v);
+        }
       }
     }
-    if (children) {
-      for (c of children)
-        el.appendChild(c);
-    }
+    if (children && children.length)
+      el.append(...children);
     return el;
-  }
-  function htmlEncode(s) {
-    if (s == null)
-      return "";
-    return (s + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
   function spacerDiv(width) {
     return H("div", { style: "display:block;height:1px;position:absolute;top:0;left:0;", width });
@@ -288,7 +300,7 @@ Slick._ = (() => {
 
   // node_modules/@serenity-is/sleekgrid/src/core/formatting.ts
   function defaultColumnFormat(ctx) {
-    return htmlEncode(ctx.value);
+    return escape(ctx.value);
   }
   function convertCompatFormatter(compatFormatter) {
     if (compatFormatter == null)

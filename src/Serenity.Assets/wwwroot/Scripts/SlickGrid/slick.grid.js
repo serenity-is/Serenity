@@ -27,7 +27,7 @@ Slick._ = (() => {
   });
 
   // global-externals:_
-  var { addClass, attrEncode, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, defaultColumnFormat, disableSelection, Event, EventData, GlobalEditorLock, H, htmlEncode, keyCode, NonDataRow, preClickClassName, removeClass, spacerDiv, Range } = Slick;
+  var { addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, escape, defaultColumnFormat, disableSelection, Event, EventData, GlobalEditorLock, H, keyCode, NonDataRow, preClickClassName, removeClass, spacerDiv, Range, RowCell } = Slick;
 
   // node_modules/@serenity-is/sleekgrid/src/grid/gridoptions.ts
   var gridDefaults = {
@@ -2223,6 +2223,7 @@ Slick._ = (() => {
         cell,
         column,
         grid: this,
+        escape,
         item,
         row
       };
@@ -2312,6 +2313,7 @@ Slick._ = (() => {
       const ctx = {
         cell,
         column,
+        escape,
         grid: this,
         item,
         row
@@ -2320,25 +2322,25 @@ Slick._ = (() => {
         ctx.value = this.getDataItemValueForColumn(item, column);
         html = this.getFormatter(row, column)(ctx);
       }
-      klass = attrEncode(klass);
+      klass = escape(klass);
       if (((_a = ctx.addClass) == null ? void 0 : _a.length) || ((_b = ctx.addAttrs) == null ? void 0 : _b.length) || ((_c = ctx.tooltip) == null ? void 0 : _c.length)) {
         if ((_d = ctx.addClass) == null ? void 0 : _d.length)
-          klass += " " + attrEncode(ctx.addClass);
+          klass += " " + escape(ctx.addClass);
         sb.push('<div class="' + klass + '"');
         if ((_e = ctx.addClass) == null ? void 0 : _e.length)
-          sb.push(' data-fmtcls="' + attrEncode(ctx.addClass) + '"');
+          sb.push(' data-fmtcls="' + escape(ctx.addClass) + '"');
         var attrs = ctx.addAttrs;
         if (attrs != null) {
           var ks = [];
           for (var k in attrs) {
-            sb.push(k + '="' + attrEncode(attrs[k]) + '"');
+            sb.push(k + '="' + escape(attrs[k]) + '"');
             ks.push(k);
           }
-          sb.push(' data-fmtatt="' + attrEncode(ks.join(",")) + '"');
+          sb.push(' data-fmtatt="' + escape(ks.join(",")) + '"');
         }
         var toolTip = ctx.tooltip;
         if (toolTip != null && toolTip.length)
-          sb.push('tooltip="' + attrEncode(toolTip) + '"');
+          sb.push('tooltip="' + escape(toolTip) + '"');
         if (html != null)
           sb.push(">" + html + "</div>");
         else
@@ -3050,13 +3052,13 @@ Slick._ = (() => {
               return;
             }
           }
-          if (e.which == keyCode.HOME) {
+          if (e.key === "Home") {
             if (e.ctrlKey) {
               this.navigateTop();
               handled = true;
             } else
               handled = this.navigateRowStart();
-          } else if (e.which == keyCode.END) {
+          } else if (e.key === "End") {
             if (e.ctrlKey) {
               this.navigateBottom();
               handled = true;
@@ -3072,29 +3074,29 @@ Slick._ = (() => {
               return;
             }
           }
-          if (e.which == keyCode.ESCAPE) {
+          if (e.key === "Esc" || e.key === "Escape") {
             if (!this.getEditorLock().isActive()) {
               return;
             }
             this.cancelEditAndSetFocus();
-          } else if (e.which == keyCode.PAGEDOWN) {
+          } else if (e.key === "PageDown") {
             this.navigatePageDown();
             handled = true;
-          } else if (e.which == keyCode.PAGEUP) {
+          } else if (e.key === "PageUp") {
             this.navigatePageUp();
             handled = true;
-          } else if (e.which == keyCode.LEFT) {
+          } else if (e.key === "Left" || e.key === "ArrowLeft") {
             handled = this.navigateLeft();
-          } else if (e.which == keyCode.RIGHT) {
+          } else if (e.key === "Right" || e.key === "ArrowRight") {
             handled = this.navigateRight();
-          } else if (e.which == keyCode.UP) {
+          } else if (e.key === "Up" || e.key === "ArrowUp") {
             handled = this.navigateUp();
-          } else if (e.which == keyCode.DOWN) {
+          } else if (e.key === "Down" || e.key === "ArrowDown") {
             handled = this.navigateDown();
-          } else if (e.which == keyCode.TAB) {
+          } else if (e.key === "Tab") {
             if (this._options.enableTabKeyNavigation)
               handled = this.navigateNext();
-          } else if (e.which == keyCode.ENTER) {
+          } else if (e.key === "Enter") {
             if (this._options.editable) {
               if (this._currentEditor) {
                 if (this._activeRow === this.getDataLength()) {
@@ -3110,7 +3112,7 @@ Slick._ = (() => {
             }
             handled = true;
           }
-        } else if (e.which == keyCode.TAB && e.shiftKey && !e.ctrlKey && !e.altKey) {
+        } else if (e.key === "Tab" && e.shiftKey && !e.ctrlKey && !e.altKey) {
           handled = this.navigatePrev();
         }
       }
@@ -3322,6 +3324,7 @@ Slick._ = (() => {
       this.render();
     }
     setActiveCellInternal(newCell, opt_editMode, preClickModeOn, suppressActiveCellChangedEvent, e) {
+      var _a, _b;
       if (this._activeCellNode != null) {
         this.makeActiveCellNormal();
         this._activeCellNode.classList.remove("active");
@@ -3334,7 +3337,7 @@ Slick._ = (() => {
       this._activeCellNode = newCell;
       if (this._activeCellNode != null) {
         var bcl = this._activeCellNode.getBoundingClientRect();
-        var rowOffset = Math.floor(this._activeCellNode.closest(".grid-canvas").getBoundingClientRect().top + document.body.scrollTop);
+        var rowOffset = Math.floor((_b = (_a = this._activeCellNode.closest(".grid-canvas")) == null ? void 0 : _a.getBoundingClientRect().top) != null ? _b : 0 + document.body.scrollTop);
         var isBottom = this._activeCellNode.closest(".grid-canvas-bottom") != null;
         if (this.hasFrozenRows() && isBottom) {
           rowOffset -= this._options.frozenBottom ? Math.round(parseFloat(getComputedStyle(this._layout.getCanvasNodeFor(0, 0)).height)) : this._layout.getFrozenRows() * this._options.rowHeight;
@@ -3451,6 +3454,7 @@ Slick._ = (() => {
         columnMetaData: columnMetadata,
         item: item || {},
         event: e,
+        editorCellNavOnLRKeys: this._options.editorCellNavOnLRKeys,
         commitChanges: this.commitEditAndSetFocus.bind(this),
         cancelChanges: this.cancelEditAndSetFocus.bind(this)
       });
