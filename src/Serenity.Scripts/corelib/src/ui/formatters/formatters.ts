@@ -54,7 +54,7 @@ export class BooleanFormatter implements Formatter {
 @Decorators.registerFormatter('Serenity.CheckboxFormatter')
 export class CheckboxFormatter implements Formatter {
     format(ctx: FormatterContext) {
-        return '<span class="check-box no-float readonly ' + (!!ctx.value ? ' checked' : '') + '"></span>';
+        return '<span class="check-box no-float readonly slick-edit-preclick ' + (!!ctx.value ? ' checked' : '') + '"></span>';
     }
 }
 
