@@ -27,7 +27,7 @@ Slick._ = (() => {
   });
 
   // global-externals:_
-  var { addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, escape, defaultColumnFormat, disableSelection, Event, EventData, GlobalEditorLock, H, keyCode, NonDataRow, preClickClassName, removeClass, spacerDiv, Range, RowCell } = Slick;
+  var { addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, ensureUniqueColumnIds, escape, defaultColumnFormat, disableSelection, Event, EventData, GlobalEditorLock, initializeColumns, H, keyCode, NonDataRow, preClickClassName, Range, removeClass, RowCell, spacerDiv, titleize } = Slick;
 
   // node_modules/@serenity-is/sleekgrid/src/grid/gridoptions.ts
   var gridDefaults = {
@@ -1936,23 +1936,13 @@ Slick._ = (() => {
       }
     }
     setInitialCols(initCols) {
-      var defs = this._colDefaults;
+      initializeColumns(initCols, this._colDefaults);
       var initColById = {};
       var viewCols = [];
       var viewColById = {};
-      var i, m, k;
+      var i, m;
       for (i = 0; i < initCols.length; i++) {
         m = initCols[i];
-        for (k in defs) {
-          if (m[k] === void 0)
-            m[k] = this._colDefaults[k];
-        }
-        if (m.minWidth && m.width < m.minWidth) {
-          m.width = m.minWidth;
-        }
-        if (m.maxWidth && m.width > m.maxWidth) {
-          m.width = m.maxWidth;
-        }
         initColById[m.id] = i;
         if (m.visible !== false)
           viewCols.push(m);

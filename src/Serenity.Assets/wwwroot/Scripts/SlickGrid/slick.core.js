@@ -38,11 +38,13 @@ Slick._ = (() => {
     defaultColumnFormat: () => defaultColumnFormat,
     disableSelection: () => disableSelection,
     escape: () => escape,
+    initializeColumns: () => initializeColumns,
     keyCode: () => keyCode,
     patchEvent: () => patchEvent,
     preClickClassName: () => preClickClassName,
     removeClass: () => removeClass,
-    spacerDiv: () => spacerDiv
+    spacerDiv: () => spacerDiv,
+    titleize: () => titleize
   });
 
   // node_modules/@serenity-is/sleekgrid/src/core/base.ts
@@ -56,7 +58,6 @@ Slick._ = (() => {
 
   // node_modules/@serenity-is/sleekgrid/src/core/column.ts
   var columnDefaults = {
-    name: "",
     nameIsHtml: false,
     resizable: true,
     sortable: false,
@@ -66,6 +67,42 @@ Slick._ = (() => {
     focusable: true,
     selectable: true
   };
+  function initializeColumns(columns, defaults) {
+    var _a, _b;
+    var usedIds = {};
+    for (var i = 0; i < columns.length; i++) {
+      var m = columns[i];
+      if (defaults != null) {
+        for (var k in defaults) {
+          if (m[k] === void 0)
+            m[k] = defaults[k];
+        }
+      }
+      if (m.minWidth && m.width < m.minWidth)
+        m.width = m.minWidth;
+      if (m.maxWidth && m.width > m.maxWidth)
+        m.width = m.maxWidth;
+      if (m.id == null || usedIds[m.id]) {
+        const prefix = m.id != null && m.id.length ? m.id : m.field != null ? m.field : "col";
+        var x = 0;
+        while (usedIds[m.id = prefix + (x == 0 ? "" : "_" + x.toString())])
+          x++;
+      }
+      usedIds[m.id] = true;
+      if (m.name === void 0) {
+        m.name = titleize((_b = (_a = m.field) != null ? _a : m.id) != null ? _b : "");
+        delete m.nameIsHtml;
+      }
+    }
+  }
+  function underscore(str) {
+    return (str != null ? str : "").replace(/([A-Z]+)([A-Z][a-z])/, "$1_$2").replace(/([a-z\d])([A-Z])/, "$1_$2").replace(/[-\s]/, "_").toLowerCase();
+  }
+  function titleize(str) {
+    if (!str)
+      return str;
+    return underscore(str).replace(/\s/, "_").split("_").filter((x) => x.length).map((x) => x.charAt(0).toUpperCase() + x.substring(1).toLowerCase()).join(" ");
+  }
 
   // node_modules/@serenity-is/sleekgrid/src/core/event.ts
   var EventData = class {

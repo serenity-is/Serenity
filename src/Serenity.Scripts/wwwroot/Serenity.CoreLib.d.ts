@@ -1509,7 +1509,7 @@ declare namespace Slick {
     	defaultSortAsc?: boolean;
     	editor?: EditorClass;
     	editorFixedDecimalPlaces?: number;
-    	field: string;
+    	field?: string;
     	frozen?: boolean;
     	focusable?: boolean;
     	footerCssClass?: string;
@@ -1554,6 +1554,8 @@ declare namespace Slick {
     	/** @deprecated */
     	formatter?: CompatFormatter<TItem>;
     }
+    function initializeColumns(columns: Column[], defaults: Partial<Column<any>>): void;
+    function titleize(str: string): string;
     class Range {
     	fromRow: number;
     	fromCell: number;
