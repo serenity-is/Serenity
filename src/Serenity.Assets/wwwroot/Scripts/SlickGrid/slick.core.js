@@ -40,6 +40,7 @@ Slick._ = (() => {
     escape: () => escape,
     initializeColumns: () => initializeColumns,
     keyCode: () => keyCode,
+    parsePx: () => parsePx,
     patchEvent: () => patchEvent,
     preClickClassName: () => preClickClassName,
     removeClass: () => removeClass,
@@ -333,6 +334,12 @@ Slick._ = (() => {
   }
   function spacerDiv(width) {
     return H("div", { style: "display:block;height:1px;position:absolute;top:0;left:0;", width });
+  }
+  function parsePx(str) {
+    var value = parseFloat(str);
+    if (isNaN(value))
+      return 0;
+    return value;
   }
 
   // node_modules/@serenity-is/sleekgrid/src/core/formatting.ts

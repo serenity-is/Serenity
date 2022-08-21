@@ -1588,6 +1588,7 @@ declare namespace Slick {
     	[key: string]: string | number | boolean | ((el?: HTMLElementTagNameMap[K]) => void);
     }, ...children: (string | Node)[]): HTMLElementTagNameMap[K];
     function spacerDiv(width: string): HTMLDivElement;
+    function parsePx(str: string): number;
     interface IPlugin {
     	init(grid: Grid): void;
     	pluginName?: string;

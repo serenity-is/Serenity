@@ -27,7 +27,7 @@ Slick._ = (() => {
   });
 
   // global-externals:_
-  var { addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, ensureUniqueColumnIds, escape, defaultColumnFormat, disableSelection, Event, EventData, GlobalEditorLock, initializeColumns, H, keyCode, NonDataRow, preClickClassName, Range, removeClass, RowCell, spacerDiv, titleize } = Slick;
+  var { addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, ensureUniqueColumnIds, escape, defaultColumnFormat, disableSelection, Event, EventData, GlobalEditorLock, initializeColumns, H, keyCode, NonDataRow, parsePx, preClickClassName, Range, removeClass, RowCell, spacerDiv, titleize } = Slick;
 
   // node_modules/@serenity-is/sleekgrid/src/grid/gridoptions.ts
   var gridDefaults = {
@@ -257,7 +257,7 @@ Slick._ = (() => {
       var _paneTopH = vs.height + vs.topPanelHeight + vs.headerRowHeight + vs.footerRowHeight;
       const options = host.getOptions();
       if (options.autoHeight) {
-        host.getContainerNode().style.height = _paneTopH + vs.groupingPanelHeight + parseFloat(getComputedStyle(headerCols.parentElement).height) + "px";
+        host.getContainerNode().style.height = _paneTopH + vs.groupingPanelHeight + parsePx(getComputedStyle(headerCols.parentElement).height) + "px";
         viewport.style.height = "";
       } else
         viewport.style.height = vs.height + "px";
@@ -820,7 +820,7 @@ Slick._ = (() => {
     var p = ["border-top-width", "border-bottom-width", "padding-top", "padding-bottom"];
     var delta = 0;
     for (var val of p)
-      delta += delta += parseFloat(style.getPropertyValue(val)) || 0;
+      delta += delta += parsePx(style.getPropertyValue(val)) || 0;
     return delta;
   }
   function getInnerWidth(el) {
@@ -830,7 +830,7 @@ Slick._ = (() => {
       return width;
     var p = ["border-top-width", "border-bottom-width", "padding-top", "padding-bottom"];
     for (var val of p)
-      width -= parseFloat(style.getPropertyValue(val)) || 0;
+      width -= parsePx(style.getPropertyValue(val)) || 0;
     return Math.max(width, 0);
   }
 
@@ -1729,7 +1729,7 @@ Slick._ = (() => {
       this._headerColumnWidthDiff = 0;
       var cs = getComputedStyle(el);
       if (cs.boxSizing != "border-box")
-        h.forEach((val) => this._headerColumnWidthDiff += parseFloat(cs.getPropertyValue(val)) || 0);
+        h.forEach((val) => this._headerColumnWidthDiff += parsePx(cs.getPropertyValue(val)) || 0);
       el.remove();
       var r = this._layout.getCanvasNodeFor(0, 0).appendChild(H(
         "div",
@@ -1740,8 +1740,8 @@ Slick._ = (() => {
       this._cellWidthDiff = this._cellHeightDiff = 0;
       cs = getComputedStyle(el);
       if (cs.boxSizing != "border-box") {
-        h.forEach((val) => this._cellWidthDiff += parseFloat(cs.getPropertyValue(val)) || 0);
-        v.forEach((val) => this._cellHeightDiff += parseFloat(cs.getPropertyValue(val)) || 0);
+        h.forEach((val) => this._cellWidthDiff += parsePx(cs.getPropertyValue(val)) || 0);
+        v.forEach((val) => this._cellHeightDiff += parsePx(cs.getPropertyValue(val)) || 0);
       }
       r.remove();
       this._absoluteColMinWidth = Math.max(this._headerColumnWidthDiff, this._cellWidthDiff);
@@ -2477,14 +2477,14 @@ Slick._ = (() => {
       vs.topPanelHeight = this._options.showTopPanel ? this._options.topPanelHeight + getVBoxDelta(layout.getTopPanelFor(0).parentElement) : 0;
       vs.headerRowHeight = this._options.showHeaderRow ? this._options.headerRowHeight + getVBoxDelta(layout.getHeaderRowColsFor(0).parentElement) : 0;
       vs.footerRowHeight = this._options.showFooterRow ? this._options.footerRowHeight + getVBoxDelta(layout.getFooterRowColsFor(0).parentElement) : 0;
-      vs.headerHeight = this._options.showColumnHeader ? parseFloat(getComputedStyle(layout.getHeaderColsFor(0).parentElement).height) + getVBoxDelta(layout.getHeaderColsFor(0).parentElement) : 0;
+      vs.headerHeight = this._options.showColumnHeader ? parsePx(getComputedStyle(layout.getHeaderColsFor(0).parentElement).height) + getVBoxDelta(layout.getHeaderColsFor(0).parentElement) : 0;
       if (this._options.autoHeight) {
         vs.height = this._options.rowHeight * this.getDataLengthIncludingAddNew();
         if (this._layout.calcCanvasWidth() > vs.width)
           vs.height += this._scrollDims.height;
       } else {
         var style = getComputedStyle(this._container);
-        vs.height = parseFloat(style.height) - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) - vs.headerHeight - vs.topPanelHeight - vs.headerRowHeight - vs.footerRowHeight - vs.groupingPanelHeight;
+        vs.height = parsePx(style.height) - parsePx(style.paddingTop) - parsePx(style.paddingBottom) - vs.headerHeight - vs.topPanelHeight - vs.headerRowHeight - vs.footerRowHeight - vs.groupingPanelHeight;
       }
       vs.numVisibleRows = Math.ceil(vs.height / this._options.rowHeight);
     }
@@ -2498,7 +2498,7 @@ Slick._ = (() => {
       }
       var dataLengthIncludingAddNew = this.getDataLengthIncludingAddNew();
       var scrollCanvas = this._layout.getScrollCanvasY();
-      var oldH = Math.round(parseFloat(getComputedStyle(scrollCanvas).height));
+      var oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
       var numberOfRows;
       const frozenRows = this._layout.getFrozenRows();
       if (frozenRows) {
@@ -2506,7 +2506,7 @@ Slick._ = (() => {
       } else {
         numberOfRows = dataLengthIncludingAddNew + (this._options.leaveSpaceForNewRows ? this._viewportInfo.numVisibleRows - 1 : 0);
       }
-      var tempViewportH = Math.round(parseFloat(getComputedStyle(this._layout.getScrollContainerY()).height));
+      var tempViewportH = Math.round(parsePx(getComputedStyle(this._layout.getScrollContainerY()).height));
       const vpi = this._viewportInfo;
       var oldViewportHasVScroll = vpi.hasVScroll;
       vpi.hasVScroll = !this._options.autoHeight && numberOfRows * this._options.rowHeight > tempViewportH;
@@ -3301,7 +3301,7 @@ Slick._ = (() => {
       this.internalScrollColumnIntoView(this._colLeft[cell], this._colRight[cell]);
     }
     internalScrollColumnIntoView(left, right) {
-      var scrollRight = this._scrollLeft + parseFloat(getComputedStyle(this._layout.getScrollContainerX()).width) - (this._viewportInfo.hasVScroll ? this._scrollDims.width : 0);
+      var scrollRight = this._scrollLeft + parsePx(getComputedStyle(this._layout.getScrollContainerX()).width) - (this._viewportInfo.hasVScroll ? this._scrollDims.width : 0);
       var target;
       if (left < this._scrollLeft)
         target = left;
@@ -3330,7 +3330,7 @@ Slick._ = (() => {
         var rowOffset = Math.floor((_b = (_a = this._activeCellNode.closest(".grid-canvas")) == null ? void 0 : _a.getBoundingClientRect().top) != null ? _b : 0 + document.body.scrollTop);
         var isBottom = this._activeCellNode.closest(".grid-canvas-bottom") != null;
         if (this.hasFrozenRows() && isBottom) {
-          rowOffset -= this._options.frozenBottom ? Math.round(parseFloat(getComputedStyle(this._layout.getCanvasNodeFor(0, 0)).height)) : this._layout.getFrozenRows() * this._options.rowHeight;
+          rowOffset -= this._options.frozenBottom ? Math.round(parsePx(getComputedStyle(this._layout.getCanvasNodeFor(0, 0)).height)) : this._layout.getFrozenRows() * this._options.rowHeight;
         }
         var cell = this.getCellFromPoint(bcl[this._options.rtl ? "right" : "left"] + document.body.scrollLeft, Math.ceil(bcl.top + document.body.scrollTop) - rowOffset);
         this._activeRow = cell.row;
@@ -3498,7 +3498,7 @@ Slick._ = (() => {
     }
     scrollRowIntoView(row, doPaging) {
       if (!this._layout.isFrozenRow(row)) {
-        var viewportScrollH = Math.round(parseFloat(getComputedStyle(this._layout.getScrollContainerY()).height));
+        var viewportScrollH = Math.round(parsePx(getComputedStyle(this._layout.getScrollContainerY()).height));
         var rowNumber = this.hasFrozenRows() && !this._options.frozenBottom ? row - this._layout.getFrozenRows() + 1 : row;
         var rowAtTop = rowNumber * this._options.rowHeight;
         var rowAtBottom = (rowNumber + 1) * this._options.rowHeight - viewportScrollH + (this._viewportInfo.hasHScroll ? this._scrollDims.height : 0);
