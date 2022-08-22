@@ -11,6 +11,7 @@
         private readonly string modulePath;
         private readonly string moduleClass;
         private readonly string typingClass;
+        private readonly bool modularTS;
 
         public EntityCodeGenerator(IGeneratorFileSystem fileSystem, ICodeFileHelper codeFileHelper, EntityModel model, GeneratorConfig config, string csproj)
         {
@@ -26,12 +27,16 @@
             if (!fileSystem.DirectoryExists(serverTypings))
                 serverTypings = fileSystem.Combine(rootDir, PathHelper.ToPath("Imports/ServerTypings/"));
 
-            if (config?.ServerTypings?.ModuleTypings == true)
+            TSConfigHelper.LocateTSConfigFiles(fileSystem, rootDir, out var modulesPath, out var _);
+
+            modularTS = modulesPath != null && config?.ServerTypings?.ModuleTypings != false;
+
+            if (modularTS)
                 serverTypings = fileSystem.Combine(rootDir, PathHelper.ToPath("Modules/ServerTypes/" + model.Module + "/"));
 
             typingClass = fileSystem.Combine(serverTypings, model.ModuleDot + model.ClassName);
 
-            if (config?.ServerTypings?.ModuleTypings == true)
+            if (modularTS)
                 typingClass = fileSystem.Combine(serverTypings, model.ClassName);
 
             modulePath = fileSystem.Combine(rootDir, "Modules"); 
@@ -43,12 +48,10 @@
 
         public void Run()
         {
-            bool isModularTS = config?.ServerTypings?.ModuleTypings == true;
-
             if (config.GenerateRow)
             {
                 CreateFile(Templates.Render(fileSystem, "Row", model), moduleClass + "Row.cs");
-                if (isModularTS)
+                if (modularTS)
                 {
                     CreateModularTypingFile(Templates.Render(fileSystem, "RowTypingModular", model), typingClass + "Row.ts");
                 }
@@ -68,7 +71,7 @@
                 CreateFile(Templates.Render(fileSystem, "SaveHandler", model), handlerClass + "SaveHandler.cs");
 
                 CreateFile(Templates.Render(fileSystem, "Endpoint", model), moduleClass + "Endpoint.cs");
-                if (isModularTS)
+                if (modularTS)
                 {
                     CreateModularTypingFile(Templates.Render(fileSystem, "ServiceTypingModular", model), typingClass + "Service.ts");
                 }
@@ -83,7 +86,7 @@
             {
                 CreateFile(Templates.Render(fileSystem, "Columns", model), moduleClass + "Columns.cs");
                 CreateFile(Templates.Render(fileSystem, "Form", model), moduleClass + "Form.cs");
-                if (isModularTS)
+                if (modularTS)
                 {
                     CreateFile(Templates.Render(fileSystem, "PageModular", model), moduleClass + "Page.cs");
                     CreateFile(Templates.Render(fileSystem, "PageModularTS", model), moduleClass + "Page.ts");
