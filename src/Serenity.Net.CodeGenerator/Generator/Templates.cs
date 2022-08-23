@@ -1,6 +1,5 @@
 ﻿using Scriban;
 using Scriban.Runtime;
-using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator
 {
@@ -41,12 +40,8 @@ namespace Serenity.CodeGenerator
             return t;
         }
 
-        delegate string TypeDelegate(string key);
-        delegate string NamespaceDelegate(string key);
-        delegate string TypeListDelegate(List<string> key);
-        delegate string TypeModelListDelegate(List<AttributeTypeRef> key);
-        delegate void UsingDelegate(string key);
-        
+
+
         public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model)
         {
             var template = GetTemplate(fileSystem, templateKey);
@@ -74,60 +69,12 @@ namespace Serenity.CodeGenerator
                       ns == "System.ComponentModel" ||
                       ns == "System.Collections.Generic",
                     IsCSharp = true
-                    
+
                 };
-
-                var scriptObject = new ScriptObject();
-                scriptObject.Import("TYPEREF", new TypeDelegate((fullName) =>
-                {
-                    return cw.ShortTypeName(cw, fullName);
-                }));
-
-                scriptObject.Import("TYPEREFLIST", new TypeListDelegate((fullNames) =>
-                {
-                    if (fullNames == null)
-                        return "";
-
-                    HashSet<string> result = new();
-
-                    foreach (var fullName in fullNames)
-                    {
-                        result.Add(cw.ShortTypeName(cw, fullName));
-                    }
-
-                    return string.Join(", ", result);
-                }));
-
-                scriptObject.Import("ATTRREF", new TypeModelListDelegate((models) =>
-                {
-                    if (models == null)
-                        return "";
-
-                    HashSet<string> result = new();
-
-                    foreach (var model in models)
-                    {
-                        result.Add(cw.ShortTypeName(cw, model.TypeName) + (string.IsNullOrEmpty(model.Arguments) ? "" : "(" + model.Arguments + ")"));
-                    }
-
-                    return string.Join(", ", result);
-                }));
-
-                scriptObject.Import("USING", new UsingDelegate((requestedNamespace) =>
-                {
-                    cw.Using(requestedNamespace, true);
-                }));
-
-                scriptObject.Import("NAMESPACE", new NamespaceDelegate((requestedNamespace) =>
-                {
-                    cw.CurrentNamespace = requestedNamespace;
-                    return requestedNamespace;
-                }));
-                
-                context.PushGlobal(scriptObject);
 
                 var modularTSImporter = new ModularTSImporter((model as EntityModel)?.Module);
 
+                context.PushGlobal(CSharpDynamicUsings.GetScriptObject(cw));
                 context.PushGlobal(ModularTSImporter.GetScriptObject(modularTSImporter));
 
                 cw.Append(template.Render(context).Trim());

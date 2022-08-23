@@ -1,4 +1,2 @@
-﻿{{- IMPORTFROMQ "initFullHeightGridPage"}}
-{{- IMPORT "./" + ClassName + "Grid" ClassName + "Grid"}}
-
-initFullHeightGridPage(new {{ClassName}}Grid($('#GridDiv')).element);
+﻿
+{{QIMPORT "initFullHeightGridPage"}}(new {{IMPORTFROM "./" + ClassName + "Grid" ClassName + "Grid"}}($('#GridDiv')).element);

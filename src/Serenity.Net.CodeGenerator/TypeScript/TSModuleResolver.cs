@@ -25,7 +25,7 @@
 
             tsBasePath = PathHelper.ToPath(tsBasePath);
 
-            paths = tsConfig?.Paths ?? new Dictionary<string, string[]>();
+            paths = tsConfig?.CompilerOptions?.Paths ?? new Dictionary<string, string[]>();
         }
 
         private class PackageJson

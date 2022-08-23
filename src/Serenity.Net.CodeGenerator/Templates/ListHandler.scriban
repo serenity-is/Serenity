@@ -3,7 +3,7 @@
 {{USING "MyResponse = Serenity.Services.ListResponse<" + RootNamespace + DotModule + "." + RowClassName + ">"}}
 {{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
 
-namespace {{NAMESPACE RootNamespaceDotModule}}
+{{NAMESPACE RootNamespaceDotModule}}
 {
     public interface I{{ClassName}}ListHandler : IListHandler<MyRow, MyRequest, MyResponse> {}
 

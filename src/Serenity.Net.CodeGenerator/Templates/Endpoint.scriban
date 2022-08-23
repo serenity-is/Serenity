@@ -8,7 +8,7 @@
 {{USING "System.Globalization" }}
 {{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
 
-namespace {{NAMESPACE RootNamespaceDotModuleDot + "Endpoints"}}
+{{NAMESPACE RootNamespaceDotModuleDot + "Endpoints"}}
 {
     [Route("Services/{{ModuleSlash}}{{ClassName}}/[action]")]
     [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]

@@ -1,5 +1,4 @@
-﻿{{IMPORTFROMQ "fieldsProxy"}}
-
+﻿
 export interface {{RowClassName}} {%{{}%}{{for f in Fields}}
     {{f.Ident}}?: {{f.TSType}};{{end}}{{for j in Joins}}{{for k in j.Fields}}
     {{k.Ident}}?: {{k.TSType}};{{end}}{{end}}
@@ -15,5 +14,5 @@ export abstract class {{RowClassName}} {%{{}%}{{if Identity}}
     static readonly readPermission = '{{Permission}}';
     static readonly updatePermission = '{{Permission}}';
 
-    static readonly Fields = fieldsProxy<{{RowClassName}}>();
+    static readonly Fields = {{QIMPORT "fieldsProxy"}}<{{RowClassName}}>();
 }

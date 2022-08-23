@@ -1,6 +1,6 @@
 ﻿{{USING "Serenity.ComponentModel"}}
 
-namespace {{NAMESPACE RootNamespaceDotModuleDot + "Columns"}}
+{{NAMESPACE RootNamespaceDotModuleDot + "Columns"}}
 {
     [ColumnsScript("{{ModuleDot}}{{ClassName}}")]
     [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]

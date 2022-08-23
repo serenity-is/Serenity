@@ -1,7 +1,7 @@
 ﻿{{USING "Serenity.Web"}}
 {{USING "Serenity.ComponentModel"}}
 
-namespace {{NAMESPACE RootNamespaceDotModuleDot + "Forms"}}
+{{NAMESPACE RootNamespaceDotModuleDot + "Forms"}}
 {
     [FormScript("{{ModuleDot}}{{ClassName}}")]
     [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]

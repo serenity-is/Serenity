@@ -12,6 +12,7 @@
         private readonly string moduleClass;
         private readonly string typingClass;
         private readonly bool modularTS;
+        private readonly string modulesPath;
 
         public EntityCodeGenerator(IGeneratorFileSystem fileSystem, ICodeFileHelper codeFileHelper, EntityModel model, GeneratorConfig config, string csproj)
         {
@@ -27,7 +28,7 @@
             if (!fileSystem.DirectoryExists(serverTypings))
                 serverTypings = fileSystem.Combine(rootDir, PathHelper.ToPath("Imports/ServerTypings/"));
 
-            TSConfigHelper.LocateTSConfigFiles(fileSystem, rootDir, out var modulesPath, out var _);
+            TSConfigHelper.LocateTSConfigFiles(fileSystem, rootDir, out modulesPath, out var _);
 
             modularTS = modulesPath != null && config?.ServerTypings?.ModuleTypings != false;
 
@@ -165,6 +166,7 @@
         private void CreateModularTypingFile(string code, string file)
         {
             CreateFile(code, file);
+
             var path = fileSystem.Combine(rootDir, PathHelper.ToPath("Modules/ServerTypes/" + model.Module + ".ts"));
 
             var text = "export * from \"./" + model.Module + "/" + fileSystem.GetFileNameWithoutExtension(file) + "\"\n";

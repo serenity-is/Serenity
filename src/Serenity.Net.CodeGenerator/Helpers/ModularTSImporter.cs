@@ -7,7 +7,7 @@ namespace Serenity.CodeGenerator
     {
         private readonly List<ModuleImport> moduleImports = new();
         private readonly HashSet<string> moduleImportAliases = new();
-        private string currentModule;
+        private readonly string currentModule;
 
         public ModularTSImporter(string currentModule)
         {
@@ -57,7 +57,7 @@ namespace Serenity.CodeGenerator
                 return existing.Alias;
 
             var i = 0; string alias;
-            while (moduleImportAliases.Contains(alias = i == 0 ? name : (name + "_" + i)))
+            while (moduleImportAliases.Contains(alias = i == 0 ? name : name + "_" + i))
                 i++;
 
             moduleImportAliases.Add(alias);
@@ -77,13 +77,13 @@ namespace Serenity.CodeGenerator
             if (moduleImports.IsEmptyOrNull())
                 return "";
 
-             return string.Join(Environment.NewLine, moduleImports.GroupBy(x => x.From).Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
+            return string.Join(Environment.NewLine, moduleImports.GroupBy(x => x.From).Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
         }
 
-        delegate void ImportDelegate(string module, object[] imports);
-        delegate void ImportFromDelegate(object[] imports);
+        delegate string ImportDelegate(string module, string import);
+        delegate string ImportFromDelegate(string import);
         delegate string EditorVariableIndexDelegate(string editor, List<EditorVariable> editors);
-        
+
         /// <summary>
         /// Returns ScriptObject to be used in scriban templates
         /// </summary>
@@ -92,46 +92,31 @@ namespace Serenity.CodeGenerator
         {
             var scriptObject = new ScriptObject();
 
-            scriptObject.Import("IMPORT", new ImportDelegate((module, imports) =>
+            scriptObject.Import("IMPORTFROM", new ImportDelegate((module, import) =>
             {
                 if (module.StartsWith('@'))
                 {
-                    foreach (var import in imports)
-                    {
-                        modularTSImporter.AddExternalImport(module, (string)import);
-                    }
+                    return modularTSImporter.AddExternalImport(module, import);
                 }
                 else
                 {
-                    foreach (var import in imports)
-                    {
-                        modularTSImporter.AddModuleImport(module, (string)import);
-                    }
+                    return modularTSImporter.AddModuleImport(module, import);
                 }
             }));
 
-            scriptObject.Import("IMPORTFROMCORE", new ImportFromDelegate((imports) =>
+            scriptObject.Import("SERENITYIMPORT", new ImportFromDelegate((import) =>
             {
-                foreach (var import in imports)
-                {
-                    modularTSImporter.ImportFromCorelib((string)import);
-                }
-            }));
-            
-            scriptObject.Import("IMPORTFROMQ", new ImportFromDelegate((imports) =>
-            {
-                foreach (var import in imports)
-                {
-                    modularTSImporter.ImportFromQ((string)import);
-                }
+                return modularTSImporter.ImportFromCorelib(import);
             }));
 
-            scriptObject.Import("IMPORTFROMTYPES", new ImportFromDelegate((imports) =>
+            scriptObject.Import("QIMPORT", new ImportFromDelegate((import) =>
             {
-                foreach (var import in imports)
-                {
-                    modularTSImporter.ImportFromTypes((string)import);
-                }
+                return modularTSImporter.ImportFromQ(import);
+            }));
+
+            scriptObject.Import("SERVERTYPEIMPORT", new ImportFromDelegate((import) =>
+            {
+                return modularTSImporter.ImportFromTypes(import);
             }));
 
             scriptObject.Import("GETEDITORVARIABLEINDEX", new EditorVariableIndexDelegate((editor, editors) =>

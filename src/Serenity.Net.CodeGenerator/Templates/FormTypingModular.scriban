@@ -1,14 +1,8 @@
-﻿{{- IMPORTFROMCORE "PrefixedContext"}}
-{{- IMPORTFROMQ "initFormType"}}
-{{- for x in EditorVariables}}
-{{- IMPORTFROMCORE x.Editor}}
-{{- end}}
-
-export interface {{ClassName}}Form {%{{}%}{{for x in Fields}}{{if x.Ident != Identity}}
+﻿export interface {{ClassName}}Form {%{{}%}{{for x in Fields}}{{if x.Ident != Identity}}
     {{x.Ident}}: {{x.TSEditorType}};{{end}}{{end}}
 }
 
-export class {{ClassName}}Form extends PrefixedContext {
+export class {{ClassName}}Form extends {{SERENITYIMPORT "PrefixedContext"}} {
     static formKey = '{{ModuleDot}}{{ClassName}}';
 	private static init: boolean;
 	
@@ -17,9 +11,9 @@ export class {{ClassName}}Form extends PrefixedContext {
 		if (!{{ClassName}}Form.init)  {
 		    {{ClassName}}Form.init = true;
 			{{for x in EditorVariables}}
-var w{{x.Index}} = {{x.Editor}};{{end}}
+var w{{x.Index}} = {{SERENITYIMPORT x.Editor}};{{end}}
 
-			initFormType({{ClassName}}Form, [{{for x in Fields}}{{if x.Ident != Identity}}
+			{{QIMPORT "initFormType"}}({{ClassName}}Form, [{{for x in Fields}}{{if x.Ident != Identity}}
 			'{{x.Ident}}', w{{GETEDITORVARIABLEINDEX x.TSEditorType EditorVariables}},{{end}}{{end}}
 			]);
 		}
