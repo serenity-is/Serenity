@@ -45,6 +45,7 @@
     <TypeScriptCompile Remove="corelib\out\**;node_modules\**;test\**;wwwroot\Serenity.CoreLib.d.ts" />
     <None Include="wwwroot\Serenity.CoreLib.d.ts" />
     <ToCompileCoreLib Include="corelib\**\*.ts;corelib\tsconfig.json;SlickGrid\*.ts;rollup.config.js"></ToCompileCoreLib>
+    <NpmPackageFile Include="corelib\package.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.6.2">
