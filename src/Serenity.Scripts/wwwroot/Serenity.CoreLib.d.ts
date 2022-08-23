@@ -1423,7 +1423,7 @@ declare namespace Slick {
     	cancelChanges?: () => void;
     }
     interface EditorFactory {
-    	getEditor(column: Column): EditorClass;
+    	getEditor(column: Column, row?: number): EditorClass;
     }
     interface EditCommand {
     	row: number;
@@ -3266,10 +3266,15 @@ declare namespace Serenity {
     }
 
     class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
-        protected _entity: TItem;
-        protected _entityId: any;
+        protected entity: TItem;
+        protected entityId: any;
         protected propertyItemsData: PropertyItemsData;
         constructor(opt?: TOptions);
+        internalInit(): void;
+        protected initSync(): void;
+        protected initAsync(): Promise<void>;
+        protected afterInit(): void;
+        protected useAsync(): boolean;
         destroy(): void;
         protected getDialogOptions(): JQueryUI.DialogOptions;
         protected getDialogButtons(): DialogButton[];

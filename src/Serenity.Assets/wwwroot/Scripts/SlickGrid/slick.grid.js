@@ -2231,7 +2231,7 @@ Slick._ = (() => {
       if (colsMetadata && colsMetadata[cell] && colsMetadata[cell].editor !== void 0) {
         return colsMetadata[cell].editor;
       }
-      return column.editor || this._options.editorFactory && this._options.editorFactory.getEditor(column);
+      return column.editor || this._options.editorFactory && this._options.editorFactory.getEditor(column, row);
     }
     getDataItemValueForColumn(item, columnDef) {
       if (this._options.dataItemColumnValueExtractor)
