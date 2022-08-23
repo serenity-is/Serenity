@@ -1,5 +1,5 @@
 ﻿import { Decorators, FormKeyAttribute } from "../../decorators";
-import { DialogButton, endsWith, getAttributes, getForm, getInstanceType, getTypeFullName, PropertyItem, text } from "../../q";
+import { DialogButton, endsWith, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, PropertyItem, PropertyItemsData, text } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { TemplatedDialog } from "./templateddialog";
 
@@ -7,6 +7,7 @@ import { TemplatedDialog } from "./templateddialog";
 export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
     protected _entity: TItem;
     protected _entityId: any;
+    protected propertyItemsData: PropertyItemsData;
 
     constructor(opt?: TOptions) {
         super(opt);
@@ -107,9 +108,26 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
         };
     }
 
-    protected getPropertyItems(): PropertyItem[] {
+    protected getPropertyItems() {
+        return this.propertyItemsData?.items || [];
+    }
+
+    protected getPropertyItemsData(): PropertyItemsData {
         var formKey = this.getFormKey();
-        return getForm(formKey);
+        if (!isEmptyOrNull(formKey)) {
+            return getFormData(formKey);
+        }
+
+        return { items: [], additionalItems: [] };
+    }
+
+    protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
+        var formKey = this.getFormKey();
+        if (!isEmptyOrNull(formKey)) {
+            return await getFormDataAsync(formKey);
+        }
+
+        return { items: [], additionalItems: [] };
     }
 
     protected getSaveEntity(): TItem {

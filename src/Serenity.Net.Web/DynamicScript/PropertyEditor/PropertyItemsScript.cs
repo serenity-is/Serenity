@@ -3,13 +3,8 @@ using Serenity.PropertyGrid;
 
 namespace Serenity.Web
 {
-    public abstract class PropertyItemsScript : INamedDynamicScript
+    public abstract class PropertyItemsScript : INamedDynamicScript, IGetScriptData
     {
-        public class Data
-        {
-            public PropertyItem[] Items { get; set; }
-        }
-
         private readonly string scriptName;
         private readonly Type type;
         private readonly IServiceProvider serviceProvider;
@@ -45,22 +40,53 @@ namespace Serenity.Web
 
         public string ScriptName => scriptName;
 
+        public void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
+        {
+        }
+
         public string GetScript()
         {
-            var items = propertyProvider.GetPropertyItemsFor(type).ToList();
+            var data = GetScriptData();
+            return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, {1});", 
+                scriptName.ToSingleQuoted(), data.ToJson());
+        }
+
+        public object GetScriptData()
+        {
+            var data = new PropertyItemsData
+            {
+                Items = propertyProvider.GetPropertyItemsFor(type).ToList(),
+                AdditionalItems = new()
+            };
+
             if (typeof(ICustomizePropertyItems).IsAssignableFrom(type))
             {
                 var instance = ActivatorUtilities.CreateInstance(
                     serviceProvider, type) as ICustomizePropertyItems;
-                instance.Customize(items);
+                instance.Customize(data.Items);
             }
 
-            return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, {1});", 
-                scriptName.ToSingleQuoted(), items.ToJson());
-        }
+            var basedOnRowAttr = type.GetCustomAttribute<BasedOnRowAttribute>();
+            if (basedOnRowAttr != null &&
+                basedOnRowAttr.RowType != null)
+            {
+                var existing = new HashSet<string>(data.Items.Select(x => x.Name));
+                var additional = new HashSet<string>();
+                foreach (var item in data.Items)
+                {
+                    if (!string.IsNullOrEmpty(item.FilteringIdField) &&
+                        !existing.Contains(item.FilteringIdField))
+                        additional.Add(item.FilteringIdField);
+                }
 
-        public void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
-        {
+                if (additional.Count > 0)
+                {
+                    data.AdditionalItems = propertyProvider.GetPropertyItemsFor(basedOnRowAttr.RowType,
+                        property => additional.Contains(property.Name)).ToList();
+                }
+            }
+
+            return data;
         }
 
         public event EventHandler ScriptChanged

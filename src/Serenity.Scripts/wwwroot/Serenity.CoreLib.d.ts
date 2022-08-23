@@ -900,6 +900,10 @@ declare namespace Q {
         quickFilterSeparator?: boolean;
         quickFilterCssClass?: string;
     }
+    interface PropertyItemsData$1 {
+        items: PropertyItem[];
+        additionalItems: PropertyItem[];
+    }
     enum SummaryType {
         Disabled = -1,
         None = 0,
@@ -942,10 +946,19 @@ declare namespace Q {
     function getLookupAsync<TItem>(key: string): Promise<Q.Lookup<TItem>>;
     function reloadLookup(key: string): void;
     function reloadLookupAsync(key: string): Promise<any>;
+    interface PropertyItemsData {
+        items: PropertyItem[];
+        additionalItems: PropertyItem[];
+        type: "form" | "columns";
+    }
     function getColumns(key: string): PropertyItem[];
+    function getColumnsData(key: string): PropertyItemsData;
     function getColumnsAsync(key: string): Promise<PropertyItem[]>;
+    function getColumnsDataAsync(key: string): Promise<PropertyItemsData>;
     function getForm(key: string): PropertyItem[];
+    function getFormData(key: string): PropertyItemsData;
     function getFormAsync(key: string): Promise<PropertyItem[]>;
+    function getFormDataAsync(key: string): Promise<PropertyItemsData>;
     function getTemplate(key: string): string;
     function getTemplateAsync(key: string): Promise<string>;
     function canLoadScriptData(name: string): boolean;
@@ -2639,6 +2652,10 @@ declare namespace Serenity {
         quickFilterSeparator?: boolean;
         quickFilterCssClass?: string;
     }
+    interface PropertyItemsData {
+        items: PropertyItem[];
+        additionalItems: PropertyItem[];
+    }
     enum SummaryType {
         Disabled = -1,
         None = 0,
@@ -3251,6 +3268,7 @@ declare namespace Serenity {
     class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
         protected _entity: TItem;
         protected _entityId: any;
+        protected propertyItemsData: PropertyItemsData;
         constructor(opt?: TOptions);
         destroy(): void;
         protected getDialogOptions(): JQueryUI.DialogOptions;
@@ -3262,6 +3280,8 @@ declare namespace Serenity {
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected getPropertyItems(): PropertyItem[];
+        protected getPropertyItemsData(): PropertyItemsData;
+        protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
         protected getSaveEntity(): TItem;
         protected loadInitialEntity(): void;
         protected get_entity(): TItem;
@@ -4533,7 +4553,7 @@ declare namespace Serenity {
         protected quickFiltersBar: QuickFilterBar;
         protected slickContainer: JQuery;
         protected allColumns: Slick.Column[];
-        protected propertyItems: PropertyItem[];
+        protected propertyItemsData: PropertyItemsData;
         protected initialSettings: PersistedGridSettings;
         protected restoringSettings: number;
         private idProperty;
@@ -4627,7 +4647,8 @@ declare namespace Serenity {
         protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Format<TItem>;
         protected getColumnsKey(): string;
         protected getPropertyItems(): PropertyItem[];
-        protected getPropertyItemsAsync(): Promise<PropertyItem[]>;
+        protected getPropertyItemsData(): PropertyItemsData;
+        protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
         protected getColumns(): Slick.Column[];
         protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Slick.Column[];
         protected getSlickOptions(): Slick.GridOptions;
@@ -4875,6 +4896,7 @@ declare namespace Serenity {
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
         protected entity: TItem;
         protected entityId: any;
+        protected propertyItemsData: PropertyItemsData;
         protected propertyGrid: PropertyGrid;
         protected toolbar: Toolbar;
         protected saveAndCloseButton: JQuery;
@@ -4889,6 +4911,11 @@ declare namespace Serenity {
         protected localizationLastValue: any;
         static defaultLanguageList: () => string[][];
         constructor(opt?: TOptions);
+        internalInit(): void;
+        protected initSync(): void;
+        protected initAsync(): Promise<void>;
+        protected afterInit(): void;
+        protected useAsync(): boolean;
         destroy(): void;
         protected get_entity(): TItem;
         protected set_entity(entity: any): void;
@@ -4954,6 +4981,8 @@ declare namespace Serenity {
         protected getPendingLocalizations(): any;
         protected initPropertyGrid(): void;
         protected getPropertyItems(): PropertyItem[];
+        protected getPropertyItemsData(): PropertyItemsData;
+        protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected validateBeforeSave(): boolean;
         protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse>;

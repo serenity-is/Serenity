@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Serenity.PropertyGrid
 {
@@ -29,13 +30,14 @@ namespace Serenity.PropertyGrid
         }
 
         /// <summary>
-        /// Gets the property items for specified type.
+        /// <inheritdoc/>
         /// </summary>
         /// <param name="type">The type.</param>
+        /// <param name="predicate"><inheritdoc/></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">type is null</exception>
         /// <exception cref="InvalidProgramException">CheckNames is true and there is name mismatch</exception>
-        public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type)
+        public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type, Func<PropertyInfo, bool> predicate)
         {
             if (type == null)
                 throw new ArgumentNullException("type");
@@ -57,7 +59,8 @@ namespace Serenity.PropertyGrid
             foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .OrderBy(x => x.MetadataToken))
             {
-                if (property.GetCustomAttribute<IgnoreAttribute>(false) != null)
+                if (property.GetCustomAttribute<IgnoreAttribute>(false) != null ||
+                    (predicate != null && predicate(property) == false))
                     continue;
 
                 var source = new PropertyInfoSource(property, basedOnRow);

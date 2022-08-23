@@ -1,6 +1,6 @@
 ﻿import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
-import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getColumnsAsync, getInstanceType, getTypeFullName, getTypeName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
+import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getInstanceType, getTypeFullName, getTypeName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, PropertyItemsData, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -107,7 +107,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     protected quickFiltersBar: QuickFilterBar;
     protected slickContainer: JQuery;
     protected allColumns: Column[];
-    protected propertyItems: PropertyItem[];
+    protected propertyItemsData: PropertyItemsData;
     protected initialSettings: PersistedGridSettings;
     protected restoringSettings: number = 0;
     private idProperty: string;
@@ -192,13 +192,13 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected initSync() {
-        this.propertyItems = this.getPropertyItems();
+        this.propertyItemsData = this.getPropertyItemsData();
         this.internalInit();
         this.afterInit();
     }
 
     protected async initAsync() {
-        this.propertyItems = await this.getPropertyItemsAsync();
+        this.propertyItemsData = await this.getPropertyItemsDataAsync();
         this.internalInit();
         this.afterInit();
     }
@@ -920,26 +920,30 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return null;
     }
 
-    protected getPropertyItems(): PropertyItem[] {
-        var columnsKey = this.getColumnsKey();
-        if (!isEmptyOrNull(columnsKey)) {
-            return getColumns(columnsKey);
-        }
-
-        return [];
+    protected getPropertyItems() {
+        return this.propertyItemsData?.items || [];
     }
 
-    protected async getPropertyItemsAsync(): Promise<PropertyItem[]> {
+    protected getPropertyItemsData(): PropertyItemsData {
         var columnsKey = this.getColumnsKey();
         if (!isEmptyOrNull(columnsKey)) {
-            return await getColumnsAsync(columnsKey);
+            return getColumnsData(columnsKey);
         }
 
-        return [];
+        return { items: [], additionalItems: [] };
+    }
+
+    protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
+        var columnsKey = this.getColumnsKey();
+        if (!isEmptyOrNull(columnsKey)) {
+            return await getColumnsDataAsync(columnsKey);
+        }
+
+        return { items: [], additionalItems: [] };
     }
 
     protected getColumns(): Column[] {
-        return this.propertyItemsToSlickColumns(this.propertyItems ?? []);
+        return this.propertyItemsToSlickColumns(this.getPropertyItems());
     }
 
     protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[] {
