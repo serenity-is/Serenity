@@ -136,8 +136,20 @@
                     return true;
 
                 var ns = type.Namespace;
-                type = GetScriptType(baseTypeName);
-                if (type == null && ns != null)
+                var baseType = GetScriptType(baseTypeName);
+
+                if (baseType == null &&
+                    !string.IsNullOrEmpty(type.Module) &&
+                    baseTypeName?.IndexOf(':') < 0)
+                {
+                    var moduleBaseTypeName = type.Module + ":" + baseTypeName;
+                    if (typeNames.Contains(moduleBaseTypeName, StringComparer.Ordinal))
+                        return true;
+
+                    baseType = GetScriptType(moduleBaseTypeName);
+                }
+
+                if (baseType == null && ns != null)
                 {
                     var nsParts = ns.Split('.');
                     for (var i = nsParts.Length; i > 0; i--)
@@ -145,11 +157,13 @@
                         var prefixed = string.Join(".", nsParts.Take(i)) + '.' + baseTypeName;
                         if (typeNames.Contains(prefixed, StringComparer.Ordinal))
                             return true;
-                        type = GetScriptType(prefixed);
-                        if (type != null)
+                        baseType = GetScriptType(prefixed);
+                        if (baseType != null)
                             break;
                     }
                 }
+
+                type = baseType;
             };
 
             return false;
