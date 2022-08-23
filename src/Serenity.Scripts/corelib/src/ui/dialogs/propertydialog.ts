@@ -5,15 +5,41 @@ import { TemplatedDialog } from "./templateddialog";
 
 @Decorators.registerClass('Serenity.PropertyDialog')
 export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
-    protected _entity: TItem;
-    protected _entityId: any;
+    protected entity: TItem;
+    protected entityId: any;
     protected propertyItemsData: PropertyItemsData;
 
     constructor(opt?: TOptions) {
         super(opt);
 
+        if (this.useAsync())
+            this.initAsync();
+        else 
+            this.initSync();        
+    }
+
+    internalInit() {
         this.initPropertyGrid();
         this.loadInitialEntity();
+    }
+
+    protected initSync() {
+        this.propertyItemsData = this.getPropertyItemsData();
+        this.internalInit();
+        this.afterInit();
+    }
+
+    protected async initAsync() {
+        this.propertyItemsData = await this.getPropertyItemsDataAsync();
+        this.internalInit();
+        this.afterInit();
+    }
+
+    protected afterInit() {
+    }    
+
+    protected useAsync() {
+        return false;
     }
 
     destroy() {
@@ -143,19 +169,19 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
     }
 
     protected get_entity() {
-        return this._entity;
+        return this.entity;
     }
 
     protected set_entity(value: TItem) {
-        this._entity = (value ?? new Object()) as any;
+        this.entity = (value ?? new Object()) as any;
     }
 
     protected get_entityId() {
-        return this._entityId;
+        return this.entityId;
     }
 
     protected set_entityId(value: any): void {
-        this._entityId = value;
+        this.entityId = value;
     }
 
     protected validateBeforeSave(): boolean {
