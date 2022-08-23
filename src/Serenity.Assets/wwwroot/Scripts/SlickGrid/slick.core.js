@@ -32,14 +32,20 @@ Slick._ = (() => {
     NonDataRow: () => NonDataRow,
     Range: () => Range,
     addClass: () => addClass,
-    attrEncode: () => attrEncode,
+    applyFormatterResultToCellNode: () => applyFormatterResultToCellNode,
+    columnDefaults: () => columnDefaults,
+    convertCompatFormatter: () => convertCompatFormatter,
+    defaultColumnFormat: () => defaultColumnFormat,
     disableSelection: () => disableSelection,
-    htmlEncode: () => htmlEncode,
+    escape: () => escape,
+    initializeColumns: () => initializeColumns,
     keyCode: () => keyCode,
+    parsePx: () => parsePx,
     patchEvent: () => patchEvent,
     preClickClassName: () => preClickClassName,
     removeClass: () => removeClass,
-    spacerDiv: () => spacerDiv
+    spacerDiv: () => spacerDiv,
+    titleize: () => titleize
   });
 
   // node_modules/@serenity-is/sleekgrid/src/core/base.ts
@@ -50,6 +56,54 @@ Slick._ = (() => {
   };
   var preClickClassName = "slick-edit-preclick";
   typeof window !== "undefined" && window.Slick && (window.Slick.Map = Map);
+
+  // node_modules/@serenity-is/sleekgrid/src/core/column.ts
+  var columnDefaults = {
+    nameIsHtml: false,
+    resizable: true,
+    sortable: false,
+    minWidth: 30,
+    rerenderOnResize: false,
+    defaultSortAsc: true,
+    focusable: true,
+    selectable: true
+  };
+  function initializeColumns(columns, defaults) {
+    var _a, _b;
+    var usedIds = {};
+    for (var i = 0; i < columns.length; i++) {
+      var m = columns[i];
+      if (defaults != null) {
+        for (var k in defaults) {
+          if (m[k] === void 0)
+            m[k] = defaults[k];
+        }
+      }
+      if (m.minWidth && m.width < m.minWidth)
+        m.width = m.minWidth;
+      if (m.maxWidth && m.width > m.maxWidth)
+        m.width = m.maxWidth;
+      if (m.id == null || usedIds[m.id]) {
+        const prefix = m.id != null && m.id.length ? m.id : m.field != null ? m.field : "col";
+        var x = 0;
+        while (usedIds[m.id = prefix + (x == 0 ? "" : "_" + x.toString())])
+          x++;
+      }
+      usedIds[m.id] = true;
+      if (m.name === void 0) {
+        m.name = titleize((_b = (_a = m.field) != null ? _a : m.id) != null ? _b : "");
+        delete m.nameIsHtml;
+      }
+    }
+  }
+  function underscore(str) {
+    return (str != null ? str : "").replace(/([A-Z]+)([A-Z][a-z])/, "$1_$2").replace(/([a-z\d])([A-Z])/, "$1_$2").replace(/[-\s]/, "_").toLowerCase();
+  }
+  function titleize(str) {
+    if (!str)
+      return str;
+    return underscore(str).replace(/\s/, "_").split("_").filter((x) => x.length).map((x) => x.charAt(0).toUpperCase() + x.substring(1).toLowerCase()).join(" ");
+  }
 
   // node_modules/@serenity-is/sleekgrid/src/core/event.ts
   var EventData = class {
@@ -176,7 +230,7 @@ Slick._ = (() => {
     return e;
   }
 
-  // node_modules/@serenity-is/sleekgrid/src/core/editlock.ts
+  // node_modules/@serenity-is/sleekgrid/src/core/editing.ts
   var EditorLock = class {
     isActive(editController) {
       return editController ? this.activeEditController === editController : this.activeEditController != null;
@@ -210,6 +264,138 @@ Slick._ = (() => {
     }
   };
   var GlobalEditorLock = new EditorLock();
+
+  // node_modules/@serenity-is/sleekgrid/src/core/util.ts
+  function addClass(el, cls) {
+    if (cls == null || !cls.length)
+      return;
+    if (cls.indexOf(" ") >= 0) {
+      var arr = cls.split(" ").map((x) => x.trim()).filter((x) => x.length);
+      for (var a of arr)
+        el.classList.add(a);
+    } else
+      el.classList.add(cls);
+  }
+  var esc = {
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&apos;",
+    "&": "&amp;"
+  };
+  function escFunc(a) {
+    return esc[a];
+  }
+  function escape(s) {
+    if (!arguments.length)
+      s = this.value;
+    if (s == null)
+      return "";
+    if (typeof s !== "string")
+      s = "" + s;
+    return s.replace(/[<>"'&]/g, escFunc);
+  }
+  function disableSelection(target) {
+    if (target) {
+      target.setAttribute("unselectable", "on");
+      target.style.userSelect = "none";
+      target.addEventListener("selectstart", () => false);
+    }
+  }
+  function removeClass(el, cls) {
+    if (cls == null || !cls.length)
+      return;
+    if (cls.indexOf(" ") >= 0) {
+      var arr = cls.split(" ").map((x) => x.trim()).filter((x) => x.length);
+      for (var a of arr)
+        el.classList.remove(a);
+    } else
+      el.classList.remove(cls);
+  }
+  function H(tag, attr, ...children) {
+    var el = document.createElement(tag);
+    var k, v, c;
+    if (attr) {
+      for (k in attr) {
+        v = attr[k];
+        if (v != null && v !== false) {
+          if (k === "ref" && typeof v === "function") {
+            v(el);
+            continue;
+          }
+          var key = k === "cssClass" ? "class" : k;
+          el.setAttribute(key, v === true ? "" : v);
+        }
+      }
+    }
+    if (children && children.length)
+      el.append(...children);
+    return el;
+  }
+  function spacerDiv(width) {
+    return H("div", { style: "display:block;height:1px;position:absolute;top:0;left:0;", width });
+  }
+  function parsePx(str) {
+    var value = parseFloat(str);
+    if (isNaN(value))
+      return 0;
+    return value;
+  }
+
+  // node_modules/@serenity-is/sleekgrid/src/core/formatting.ts
+  function defaultColumnFormat(ctx) {
+    return escape(ctx.value);
+  }
+  function convertCompatFormatter(compatFormatter) {
+    if (compatFormatter == null)
+      return null;
+    return function(ctx) {
+      var fmtResult = compatFormatter(ctx.row, ctx.cell, ctx.value, ctx.column, ctx.item, ctx.grid);
+      if (fmtResult != null && typeof fmtResult !== "string" && Object.prototype.toString.call(fmtResult) === "[object Object]") {
+        ctx.addClass = fmtResult.addClasses;
+        ctx.tooltip = fmtResult.toolTip;
+        return fmtResult.text;
+      }
+      return fmtResult;
+    };
+  }
+  function applyFormatterResultToCellNode(ctx, html, node) {
+    var _a, _b, _c, _d;
+    var oldFmtAtt = (_a = node.dataset) == null ? void 0 : _a.fmtatt;
+    if ((oldFmtAtt == null ? void 0 : oldFmtAtt.length) > 0) {
+      for (var k of oldFmtAtt.split(","))
+        node.removeAttribute(k);
+      delete node.dataset.fmtatt;
+    }
+    var oldFmtCls = (_b = node.dataset) == null ? void 0 : _b.fmtcls;
+    if ((oldFmtCls == null ? void 0 : oldFmtCls.length) && ctx.addClass != oldFmtCls) {
+      removeClass(node, oldFmtCls);
+      if (!((_c = ctx.addClass) == null ? void 0 : _c.length))
+        delete node.dataset.fmtcls;
+    }
+    var oldTooltip = node.getAttribute("tooltip");
+    if (oldTooltip != null && ctx.tooltip != oldTooltip)
+      node.removeAttribute("tooltip");
+    if (ctx.tooltip !== void 0 && oldTooltip != ctx.tooltip)
+      node.setAttribute("tooltip", ctx.tooltip);
+    if (html == void 0)
+      node.innerHTML = "";
+    else
+      node.innerHTML = "" + html;
+    if (ctx.addAttrs != null) {
+      var keys = Object.keys(ctx.addAttrs);
+      if (keys.length) {
+        for (var k of keys) {
+          node.setAttribute(k, ctx.addAttrs[k]);
+        }
+        node.dataset.fmtatt = keys.join(",");
+      }
+    }
+    if ((_d = ctx.addClass) == null ? void 0 : _d.length) {
+      addClass(node, ctx.addClass);
+      node.dataset.fmtcls = ctx.addClass;
+    }
+  }
 
   // node_modules/@serenity-is/sleekgrid/src/core/group.ts
   var Group = class extends NonDataRow {
@@ -262,64 +448,6 @@ Slick._ = (() => {
       }
     }
   };
-
-  // node_modules/@serenity-is/sleekgrid/src/core/util.ts
-  function addClass(el, cls) {
-    if (cls == null || !cls.length)
-      return;
-    if (cls.indexOf(" ") >= 0) {
-      var arr = cls.split(" ").map((x) => x.trim()).filter((x) => x.length);
-      for (var a of arr)
-        el.classList.add(a);
-    } else
-      el.classList.add(cls);
-  }
-  function attrEncode(s) {
-    if (s == null)
-      return "";
-    return (s + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  }
-  function disableSelection(target) {
-    if (target) {
-      target.setAttribute("unselectable", "on");
-      target.style.userSelect = "none";
-      target.addEventListener("selectstart", () => false);
-    }
-  }
-  function removeClass(el, cls) {
-    if (cls == null || !cls.length)
-      return;
-    if (cls.indexOf(" ") >= 0) {
-      var arr = cls.split(" ").map((x) => x.trim()).filter((x) => x.length);
-      for (var a of arr)
-        el.classList.remove(a);
-    } else
-      el.classList.remove(cls);
-  }
-  function H(tag, attr, ...children) {
-    var el = document.createElement(tag);
-    var k, v, c;
-    if (attr) {
-      for (k in attr) {
-        v = attr[k];
-        if (v != null && v !== false)
-          el.setAttribute(k, v === true ? "" : v);
-      }
-    }
-    if (children) {
-      for (c of children)
-        el.appendChild(c);
-    }
-    return el;
-  }
-  function htmlEncode(s) {
-    if (s == null)
-      return "";
-    return (s + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
-  function spacerDiv(width) {
-    return H("div", { style: "display:block;height:1px;position:absolute;top:0;left:0;", width });
-  }
   return __toCommonJS(core_exports);
 })();
-["Plugins", "Formatters", "Editors"].forEach(ns => Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns] || {})); Object.assign(Slick, Slick._); delete Slick._;
+["Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._;

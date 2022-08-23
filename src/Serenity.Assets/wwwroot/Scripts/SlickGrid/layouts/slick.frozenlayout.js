@@ -25,7 +25,7 @@ Slick._ = (() => {
   });
 
   // global-externals:_
-  var { disableSelection, H, spacerDiv } = Slick;
+  var { disableSelection, H, parsePx, spacerDiv } = Slick;
 
   // node_modules/@serenity-is/sleekgrid/src/layouts/frozenlayout.ts
   var FrozenLayout = function() {
@@ -430,9 +430,9 @@ Slick._ = (() => {
       _paneTopH += vs.topPanelHeight + vs.headerRowHeight + vs.footerRowHeight;
       viewportTopH = _paneTopH - vs.topPanelHeight - vs.headerRowHeight - vs.footerRowHeight;
       if (options.autoHeight) {
-        host.getContainerNode().style.height = _paneTopH + vs.groupingPanelHeight + parseFloat(getComputedStyle(headerColsL.parentElement).height) + "px";
+        host.getContainerNode().style.height = _paneTopH + vs.groupingPanelHeight + parsePx(getComputedStyle(headerColsL.parentElement).height) + "px";
       }
-      paneTopL.style.top = vs.groupingPanelHeight + (parseFloat(getComputedStyle(paneHeaderL).height) || vs.headerHeight) + "px";
+      paneTopL.style.top = vs.groupingPanelHeight + (parsePx(getComputedStyle(paneHeaderL).height) || vs.headerHeight) + "px";
       paneTopL.style.height = _paneTopH + "px";
       var paneBottomTop = paneTopL.offsetTop + _paneTopH;
       if (options.autoHeight) {
@@ -579,7 +579,7 @@ Slick._ = (() => {
         var rowOffset = 0;
         var isBottom = cellNode.closest(".grid-canvas-bottom") != null;
         if (isBottom) {
-          rowOffset = frozenBottom ? Math.round(parseFloat(getComputedStyle(canvasTopL).height)) : frozenRows * host.getOptions().rowHeight;
+          rowOffset = frozenBottom ? Math.round(parsePx(getComputedStyle(canvasTopL).height)) : frozenRows * host.getOptions().rowHeight;
         }
         return host.getCellFromPoint(clientX - bcr[host.getOptions().rtl ? "right" : "left"] - document.body.scrollLeft, clientY - bcr.top + document.body.scrollTop + rowOffset + document.body.scrollTop).row;
       }
@@ -644,4 +644,4 @@ Slick._ = (() => {
   };
   return __toCommonJS(frozenlayout_exports);
 })();
-["Plugins", "Formatters", "Editors"].forEach(ns => Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns] || {})); Object.assign(Slick, Slick._); delete Slick._;
+["Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._;

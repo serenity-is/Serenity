@@ -1,7 +1,7 @@
 ﻿import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
 import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getColumnsAsync, getInstanceType, getTypeFullName, getTypeName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
-import { Format, FormatterContext, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
+import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor } from "../editors/selecteditor";
@@ -20,7 +20,7 @@ import { IDataGrid } from "./idatagrid";
 import { QuickFilter } from "./quickfilter";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
-import { Column, ColumnSort, Event, Grid, GridOptions, IPlugin, ItemMetadata } from "@serenity-is/sleekgrid";
+import { Column, ColumnSort, Event, FormatterContext, Grid, GridOptions, IPlugin, ItemMetadata } from "@serenity-is/sleekgrid";
 
 declare global {
     namespace Slick {

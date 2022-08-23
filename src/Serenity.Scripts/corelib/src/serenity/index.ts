@@ -4,6 +4,7 @@ export * from "../globals/validate";
 
 export * from "../q/servicetypes";
 export * from "../q/criteria";
+export * from "../q/propertyitem";
 
 export * from "../interfaces";
 export * from "../types";

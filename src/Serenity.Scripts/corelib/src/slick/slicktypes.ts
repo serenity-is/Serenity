@@ -1,26 +1,13 @@
-﻿import type { Column, Event, Grid, Group, IPlugin, ItemMetadata, Range, SelectionModel } from "@serenity-is/sleekgrid"
+﻿import type { FormatterContext, Event, Grid, Group, Range, SelectionModel } from "@serenity-is/sleekgrid"
 import { PropertyItem } from "../q";
 
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
 
 declare module "@serenity-is/sleekgrid" {
-    interface Column<TItem = any> {
+    export interface Column<TItem = any> {
         referencedFields?: string[];
-        format?: Format<TItem>;
         sourceItem?: PropertyItem;
     }
-}
-
-export interface FormatterContext<TItem = any> {
-    addAttrs?: { [key: string]: string; };
-    addClass?: string;
-    cell?: number;
-    column?: Column<TItem>;
-    grid?: Grid<TItem>;
-    item?: TItem;
-    row?: number;
-    toolTip?: string;
-    value?: any;
 }
 
 export interface Formatter {

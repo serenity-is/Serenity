@@ -1,5 +1,5 @@
 /// <reference types="jquery" />
-import { GroupTotals, Column, Grid, Group, SelectionModel, Range, Event } from '@serenity-is/sleekgrid';
+import { GroupTotals, Column, FormatterContext, Group, SelectionModel, Grid, Range, Event } from '@serenity-is/sleekgrid';
 
 declare namespace Aggregators {
     function Avg(field: string): void;
@@ -117,22 +117,8 @@ declare type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
 declare module "@serenity-is/sleekgrid" {
     interface Column<TItem = any> {
         referencedFields?: string[];
-        format?: Format<TItem>;
         sourceItem?: PropertyItem;
     }
-}
-interface FormatterContext<TItem = any> {
-    addAttrs?: {
-        [key: string]: string;
-    };
-    addClass?: string;
-    cell?: number;
-    column?: Column<TItem>;
-    grid?: Grid<TItem>;
-    item?: TItem;
-    row?: number;
-    toolTip?: string;
-    value?: any;
 }
 interface Formatter {
     format(ctx: FormatterContext): string;
@@ -278,4 +264,4 @@ declare class RemoteView<TEntity> {
     constructor(options: RemoteViewOptions);
 }
 
-export { AggregateFormatting, Aggregators, CancellableViewCallback, Format, Formatter, FormatterContext, GroupInfo, PagerOptions, PagingInfo, PagingOptions, RemoteView, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewOptions, RemoteViewProcessCallback, RowSelectionModel, SummaryOptions };
+export { AggregateFormatting, Aggregators, CancellableViewCallback, Format, Formatter, GroupInfo, PagerOptions, PagingInfo, PagingOptions, RemoteView, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewOptions, RemoteViewProcessCallback, RowSelectionModel, SummaryOptions };

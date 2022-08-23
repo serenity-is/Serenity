@@ -1108,250 +1108,118 @@ declare namespace Q {
 }
 
 declare namespace Slick {
+
     /***
      * A base class that all special / non-data rows (like Group and GroupTotals) derive from.
      */
     class NonDataRow {
-        __nonDataRow: boolean;
+    	__nonDataRow: boolean;
     }
     const preClickClassName = "slick-edit-preclick";
-
-    type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
-    interface IEventData {
-        readonly type?: string;
-        currentTarget?: EventTarget | null;
-        target?: EventTarget | null;
-        originalEvent?: any;
-        defaultPrevented?: boolean;
-        preventDefault?(): void;
-        stopPropagation?(): void;
-        stopImmediatePropagation?(): void;
-        isDefaultPrevented?(): boolean;
-        isImmediatePropagationStopped?(): boolean;
-        isPropagationStopped?(): boolean;
+    interface FormatterContext<TItem = any> {
+    	addAttrs?: {
+    		[key: string]: string;
+    	};
+    	addClass?: string;
+    	cell?: number;
+    	column?: Column<TItem>;
+    	/** returns html escaped ctx.value if called without arguments. prefer this over ctx.value to avoid html injection attacks! */
+    	readonly escape: ((value?: any) => string);
+    	grid?: any;
+    	item?: TItem;
+    	row?: number;
+    	tooltip?: string;
+    	/** when returning a formatter result, prefer ctx.escape() to avoid html injection attacks! */
+    	value?: any;
     }
-    /***
-     * An event object for passing data to event handlers and letting them control propagation.
-     * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
-     * @class EventData
-     * @constructor
-     */
-    class EventData implements IEventData {
-        private _isPropagationStopped;
-        private _isImmediatePropagationStopped;
-        /***
-         * Stops event from propagating up the DOM tree.
-         * @method stopPropagation
-         */
-        stopPropagation(): void;
-        /***
-         * Returns whether stopPropagation was called on this event object.
-         * @method isPropagationStopped
-         * @return {Boolean}
-         */
-        isPropagationStopped(): boolean;
-        /***
-         * Prevents the rest of the handlers from being executed.
-         * @method stopImmediatePropagation
-         */
-        stopImmediatePropagation(): void;
-        /***
-         * Returns whether stopImmediatePropagation was called on this event object.\
-         * @method isImmediatePropagationStopped
-         * @return {Boolean}
-         */
-        isImmediatePropagationStopped(): boolean;
+    type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+    interface CompatFormatterResult {
+    	addClasses?: string;
+    	text?: string;
+    	toolTip?: string;
     }
-    /***
-     * A simple publisher-subscriber implementation.
-     * @class Event
-     * @constructor
-     */
-    class Event<TArgs = any, TEventData extends IEventData = IEventData> {
-        private _handlers;
-        /***
-         * Adds an event handler to be called when the event is fired.
-         * <p> Slick.Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
-         * object the event was fired with.<p>
-         * @method subscribe
-         * @param fn {Function} Event handler.
-         */
-        subscribe(fn: Handler<TArgs, TEventData>): void;
-        /***
-         * Removes an event handler added with <code>subscribe(fn)</code>.
-         * @method unsubscribe
-         * @param fn {Function} Event handler to be removed.
-         */
-        unsubscribe(fn: Handler<TArgs, TEventData>): void;
-        /***
-         * Fires an event notifying all subscribers.
-         * @method notify
-         * @param args {Object} Additional data object to be passed to all handlers.
-         * @param e {EventData}
-         *      Optional.
-         *      An <code>EventData</code> object to be passed to all handlers.
-         *      For DOM events, an existing W3C/jQuery event object can be passed in.
-         * @param scope {Object}
-         *      Optional.
-         *      The scope ("this") within which the handler will be executed.
-         *      If not specified, the scope will be set to the <code> Slick.Event</code> instance.
-         */
-        notify(args?: any, e?: TEventData, scope?: object): any;
-        clear(): void;
+    type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
+    interface FormatterFactory<TItem = any> {
+    	getFormat?(column: Column<TItem>): ColumnFormat<TItem>;
+    	getFormatter?(column: Column<TItem>): CompatFormatter<TItem>;
     }
-    class EventHandler<TArgs = any, TEventData extends IEventData = IEventData> {
-        private _handlers;
-        subscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
-        unsubscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
-        unsubscribeAll(): EventHandler<TArgs, TEventData>;
-    }
-    const keyCode: {
-        BACKSPACE: number;
-        DELETE: number;
-        DOWN: number;
-        END: number;
-        ENTER: number;
-        ESCAPE: number;
-        HOME: number;
-        INSERT: number;
-        LEFT: number;
-        PAGEDOWN: number;
-        PAGEUP: number;
-        RIGHT: number;
-        TAB: number;
-        UP: number;
+    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
+    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
+    type CellStylesHash = {
+    	[row: number]: {
+    		[cell: number]: string;
+    	};
     };
-    function patchEvent(e: IEventData): IEventData;
-
-    interface EditController {
-        commitCurrentEdit(): boolean;
-        cancelCurrentEdit(): boolean;
-    }
-    /***
-     * A locking helper to track the active edit controller and ensure that only a single controller
-     * can be active at a time.  This prevents a whole class of state and validation synchronization
-     * issues.  An edit controller (such as SleekGrid) can query if an active edit is in progress
-     * and attempt a commit or cancel before proceeding.
-     * @class EditorLock
-     * @constructor
-     */
-    class EditorLock {
-        private activeEditController;
-        /***
-         * Returns true if a specified edit controller is active (has the edit lock).
-         * If the parameter is not specified, returns true if any edit controller is active.
-         * @method isActive
-         * @param editController {EditController}
-         * @return {Boolean}
-         */
-        isActive(editController?: EditController): boolean;
-        /***
-         * Sets the specified edit controller as the active edit controller (acquire edit lock).
-         * If another edit controller is already active, and exception will be thrown.
-         * @method activate
-         * @param editController {EditController} edit controller acquiring the lock
-         */
-        activate(editController: EditController): void;
-        /***
-         * Unsets the specified edit controller as the active edit controller (release edit lock).
-         * If the specified edit controller is not the active one, an exception will be thrown.
-         * @method deactivate
-         * @param editController {EditController} edit controller releasing the lock
-         */
-        deactivate(editController: EditController): void;
-        /***
-         * Attempts to commit the current edit by calling "commitCurrentEdit" method on the active edit
-         * controller and returns whether the commit attempt was successful (commit may fail due to validation
-         * errors, etc.).  Edit controller's "commitCurrentEdit" must return true if the commit has succeeded
-         * and false otherwise.  If no edit controller is active, returns true.
-         * @method commitCurrentEdit
-         * @return {Boolean}
-         */
-        commitCurrentEdit(): boolean;
-        /***
-         * Attempts to cancel the current edit by calling "cancelCurrentEdit" method on the active edit
-         * controller and returns whether the edit was successfully cancelled.  If no edit controller is
-         * active, returns true.
-         * @method cancelCurrentEdit
-         * @return {Boolean}
-         */
-        cancelCurrentEdit(): boolean;
-    }
-    /***
-     * A global singleton editor lock.
-     * @class GlobalEditorLock
-     * @static
-     * @constructor
-     */
-    const GlobalEditorLock: EditorLock;
-
+    function defaultColumnFormat(ctx: FormatterContext): any;
+    function convertCompatFormatter(compatFormatter: CompatFormatter): ColumnFormat;
+    function applyFormatterResultToCellNode(ctx: FormatterContext, html: string, node: HTMLElement): void;
     /***
      * Information about a group of rows.
      */
     class Group<TEntity = any> extends NonDataRow {
-        readonly __group = true;
-        /**
-         * Grouping level, starting with 0.
-         * @property level
-         * @type {Number}
-         */
-        level: number;
-        /***
-         * Number of rows in the group.
-         * @property count
-         * @type {Number}
-         */
-        count: number;
-        /***
-         * Grouping value.
-         * @property value
-         * @type {Object}
-         */
-        value: any;
-        /***
-         * Formatted display value of the group.
-         * @property title
-         * @type {String}
-         */
-        title: string;
-        /***
-         * Whether a group is collapsed.
-         * @property collapsed
-         * @type {Boolean}
-         */
-        collapsed: boolean;
-        /***
-         * GroupTotals, if any.
-         * @property totals
-         * @type {GroupTotals}
-         */
-        totals: GroupTotals<TEntity>;
-        /**
-         * Rows that are part of the group.
-         * @property rows
-         * @type {Array}
-         */
-        rows: TEntity[];
-        /**
-         * Sub-groups that are part of the group.
-         * @property groups
-         * @type {Array}
-         */
-        groups: Group<TEntity>[];
-        /**
-         * A unique key used to identify the group.  This key can be used in calls to DataView
-         * collapseGroup() or expandGroup().
-         * @property groupingKey
-         * @type {Object}
-         */
-        groupingKey: string;
-        /***
-         * Compares two Group instances.
-         * @method equals
-         * @return {Boolean}
-         * @param group {Group} Group instance to compare to.
-         */
-        equals(group: Group): boolean;
+    	readonly __group = true;
+    	/**
+    	 * Grouping level, starting with 0.
+    	 * @property level
+    	 * @type {Number}
+    	 */
+    	level: number;
+    	/***
+    	 * Number of rows in the group.
+    	 * @property count
+    	 * @type {Number}
+    	 */
+    	count: number;
+    	/***
+    	 * Grouping value.
+    	 * @property value
+    	 * @type {Object}
+    	 */
+    	value: any;
+    	/***
+    	 * Formatted display value of the group.
+    	 * @property title
+    	 * @type {String}
+    	 */
+    	title: string;
+    	/***
+    	 * Whether a group is collapsed.
+    	 * @property collapsed
+    	 * @type {Boolean}
+    	 */
+    	collapsed: boolean;
+    	/***
+    	 * GroupTotals, if any.
+    	 * @property totals
+    	 * @type {GroupTotals}
+    	 */
+    	totals: GroupTotals<TEntity>;
+    	/**
+    	 * Rows that are part of the group.
+    	 * @property rows
+    	 * @type {Array}
+    	 */
+    	rows: TEntity[];
+    	/**
+    	 * Sub-groups that are part of the group.
+    	 * @property groups
+    	 * @type {Array}
+    	 */
+    	groups: Group<TEntity>[];
+    	/**
+    	 * A unique key used to identify the group.  This key can be used in calls to DataView
+    	 * collapseGroup() or expandGroup().
+    	 * @property groupingKey
+    	 * @type {Object}
+    	 */
+    	groupingKey: string;
+    	/***
+    	 * Compares two Group instances.
+    	 * @method equals
+    	 * @return {Boolean}
+    	 * @param group {Group} Group instance to compare to.
+    	 */
+    	equals(group: Group): boolean;
     }
     /***
      * Information about group totals.
@@ -1363,787 +1231,1050 @@ declare namespace Slick {
      * @constructor
      */
     class GroupTotals<TEntity = any> extends NonDataRow {
-        readonly __groupTotals = true;
-        /***
-         * Parent Group.
-         * @param group
-         * @type {Group}
-         */
-        group: Group<TEntity>;
-        /***
-         * Whether the totals have been fully initialized / calculated.
-         * Will be set to false for lazy-calculated group totals.
-         * @param initialized
-         * @type {Boolean}
-         */
-        initialized: boolean;
-        /**
-         * Contains sum
-         */
-        sum?: number;
-        /**
-         * Contains avg
-         */
-        avg?: number;
-        /**
-         * Contains min
-         */
-        min?: any;
-        /**
-         * Contains max
-         */
-        max?: any;
+    	readonly __groupTotals = true;
+    	/***
+    	 * Parent Group.
+    	 * @param group
+    	 * @type {Group}
+    	 */
+    	group: Group<TEntity>;
+    	/***
+    	 * Whether the totals have been fully initialized / calculated.
+    	 * Will be set to false for lazy-calculated group totals.
+    	 * @param initialized
+    	 * @type {Boolean}
+    	 */
+    	initialized: boolean;
+    	/**
+    	 * Contains sum
+    	 */
+    	sum?: number;
+    	/**
+    	 * Contains avg
+    	 */
+    	avg?: number;
+    	/**
+    	 * Contains min
+    	 */
+    	min?: any;
+    	/**
+    	 * Contains max
+    	 */
+    	max?: any;
     }
-
-    class Range {
-        fromRow: number;
-        fromCell: number;
-        toRow: number;
-        toCell: number;
-        constructor(fromRow: number, fromCell: number, toRow?: number, toCell?: number);
-        /***
-         * Returns whether a range represents a single row.
-         */
-        isSingleRow(): boolean;
-        /***
-         * Returns whether a range represents a single cell.
-         */
-        isSingleCell(): boolean;
-        /***
-         * Returns whether a range contains a given cell.
-         */
-        contains(row: number, cell: number): boolean;
-        /***
-         * Returns a readable representation of a range.
-         */
-        toString(): string;
+    type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
+    interface IEventData {
+    	readonly type?: string;
+    	currentTarget?: EventTarget | null;
+    	target?: EventTarget | null;
+    	originalEvent?: any;
+    	defaultPrevented?: boolean;
+    	preventDefault?(): void;
+    	stopPropagation?(): void;
+    	stopImmediatePropagation?(): void;
+    	isDefaultPrevented?(): boolean;
+    	isImmediatePropagationStopped?(): boolean;
+    	isPropagationStopped?(): boolean;
     }
-
-    function addClass(el: Element, cls: string): void;
-    function attrEncode(s: any): string;
-    function disableSelection(target: HTMLElement): void;
-    function removeClass(el: Element, cls: string): void;
-    function H<K extends keyof HTMLElementTagNameMap>(tag: K, attr?: {
-        [key: string]: (string | boolean);
-    }, ...children: Node[]): HTMLElementTagNameMap[K];
-    function htmlEncode(s: any): string;
-    function spacerDiv(width: string): HTMLDivElement;
-
-    interface IPlugin {
-        init(grid: Grid): void;
-        pluginName?: string;
-        destroy?: () => void;
+    /***
+     * An event object for passing data to event handlers and letting them control propagation.
+     * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
+     * @class EventData
+     * @constructor
+     */
+    class EventData implements IEventData {
+    	private _isPropagationStopped;
+    	private _isImmediatePropagationStopped;
+    	/***
+    	 * Stops event from propagating up the DOM tree.
+    	 * @method stopPropagation
+    	 */
+    	stopPropagation(): void;
+    	/***
+    	 * Returns whether stopPropagation was called on this event object.
+    	 * @method isPropagationStopped
+    	 * @return {Boolean}
+    	 */
+    	isPropagationStopped(): boolean;
+    	/***
+    	 * Prevents the rest of the handlers from being executed.
+    	 * @method stopImmediatePropagation
+    	 */
+    	stopImmediatePropagation(): void;
+    	/***
+    	 * Returns whether stopImmediatePropagation was called on this event object.\
+    	 * @method isImmediatePropagationStopped
+    	 * @return {Boolean}
+    	 */
+    	isImmediatePropagationStopped(): boolean;
     }
+    /***
+     * A simple publisher-subscriber implementation.
+     * @class Event
+     * @constructor
+     */
+    class Event<TArgs = any, TEventData extends IEventData = IEventData> {
+    	private _handlers;
+    	/***
+    	 * Adds an event handler to be called when the event is fired.
+    	 * <p> Slick.Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
+    	 * object the event was fired with.<p>
+    	 * @method subscribe
+    	 * @param fn {Function} Event handler.
+    	 */
+    	subscribe(fn: Handler<TArgs, TEventData>): void;
+    	/***
+    	 * Removes an event handler added with <code>subscribe(fn)</code>.
+    	 * @method unsubscribe
+    	 * @param fn {Function} Event handler to be removed.
+    	 */
+    	unsubscribe(fn: Handler<TArgs, TEventData>): void;
+    	/***
+    	 * Fires an event notifying all subscribers.
+    	 * @method notify
+    	 * @param args {Object} Additional data object to be passed to all handlers.
+    	 * @param e {EventData}
+    	 *      Optional.
+    	 *      An <code>EventData</code> object to be passed to all handlers.
+    	 *      For DOM events, an existing W3C/jQuery event object can be passed in.
+    	 * @param scope {Object}
+    	 *      Optional.
+    	 *      The scope ("this") within which the handler will be executed.
+    	 *      If not specified, the scope will be set to the <code> Slick.Event</code> instance.
+    	 */
+    	notify(args?: any, e?: TEventData, scope?: object): any;
+    	clear(): void;
+    }
+    class EventHandler<TArgs = any, TEventData extends IEventData = IEventData> {
+    	private _handlers;
+    	subscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
+    	unsubscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
+    	unsubscribeAll(): EventHandler<TArgs, TEventData>;
+    }
+    /** @deprecated */
+    const keyCode: {
+    	BACKSPACE: number;
+    	DELETE: number;
+    	DOWN: number;
+    	END: number;
+    	ENTER: number;
+    	ESCAPE: number;
+    	HOME: number;
+    	INSERT: number;
+    	LEFT: number;
+    	PAGEDOWN: number;
+    	PAGEUP: number;
+    	RIGHT: number;
+    	TAB: number;
+    	UP: number;
+    };
+    function patchEvent(e: IEventData): IEventData;
     interface Position {
-        bottom?: number;
-        height?: number;
-        left?: number;
-        right?: number;
-        top?: number;
-        visible?: boolean;
-        width?: number;
-    }
-    interface ViewportInfo {
-        height: number;
-        width: number;
-        hasVScroll: boolean;
-        hasHScroll: boolean;
-        headerHeight: number;
-        groupingPanelHeight: number;
-        virtualHeight: number;
-        realScrollHeight: number;
-        topPanelHeight: number;
-        headerRowHeight: number;
-        footerRowHeight: number;
-        numVisibleRows: number;
-    }
-    interface RowCell {
-        row: number;
-        cell: number;
-    }
-    interface SelectionModel extends IPlugin {
-        setSelectedRanges(ranges: Range[]): void;
-        onSelectedRangesChanged: Slick.Event<Range[]>;
-        refreshSelections?(): void;
-    }
-    interface ViewRange {
-        top?: number;
-        bottom?: number;
-        leftPx?: number;
-        rightPx?: number;
-    }
-
-    interface EditorOptions {
-        grid: Grid;
-        gridPosition?: Position;
-        position?: Position;
-        column?: Column;
-        columnMetaData?: ColumnMetadata<any>;
-        container?: HTMLElement;
-        item?: any;
-        event: IEventData;
-        commitChanges?: () => void;
-        cancelChanges?: () => void;
-    }
-    interface Editor {
-        new (options: EditorOptions): Editor;
-        destroy(): void;
-        applyValue(item: any, value: any): void;
-        focus(): void;
-        isValueChanged(): boolean;
-        keyCaptureList?: number[];
-        loadValue(value: any): void;
-        serializeValue(): any;
-        position?(pos: Position): void;
-        preClick?(): void;
-        hide?(): void;
-        show?(): void;
-        suppressClearOnEdit?: boolean;
-        validate?(): ValidationResult;
-    }
-    interface EditorFactory {
-        getEditor(column: Column): Editor;
-    }
-    interface EditCommand {
-        row: number;
-        cell: number;
-        editor: Editor;
-        serializedValue: any;
-        prevSerializedValue: any;
-        execute: () => void;
-        undo: () => void;
+    	bottom?: number;
+    	height?: number;
+    	left?: number;
+    	right?: number;
+    	top?: number;
+    	visible?: boolean;
+    	width?: number;
     }
     interface ValidationResult {
-        valid: boolean;
-        msg?: string;
+    	valid: boolean;
+    	msg?: string;
     }
-
-    interface FormatterFactory<TItem = any> {
-        getFormatter(column: Column<TItem>): ColumnFormatter<TItem>;
+    interface RowCell {
+    	row: number;
+    	cell: number;
     }
-    interface FormatterResult {
-        addClass?: string;
-        addAttrs?: {
-            [key: string]: string;
-        };
-        html?: string;
-        text?: string;
-        toolTip?: string;
+    interface EditorHost {
+    	getActiveCell(): RowCell;
+    	navigateNext(): boolean;
+    	navigatePrev(): boolean;
+    	onCompositeEditorChange: Slick.Event<any>;
     }
-    type ColumnFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: Grid<TItem>) => string | FormatterResult;
-    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
-    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
-    type CellStylesHash = {
-        [row: number]: {
-            [cell: number]: string;
-        };
-    };
-    function defaultFormatter(_r: number, _c: number, value: any): string;
-    function applyFormatterResultToCellNode(fmtResult: FormatterResult | string, cellNode: HTMLElement): void;
-
-    interface ArgsGrid {
-        grid?: Grid;
+    interface CompositeEditorOptions {
+    	formValues: any;
     }
-    interface ArgsColumn extends ArgsGrid {
-        column: Column;
+    interface EditorOptions {
+    	grid: EditorHost;
+    	gridPosition?: Position;
+    	position?: Position;
+    	editorCellNavOnLRKeys?: boolean;
+    	column?: Column;
+    	columnMetaData?: ColumnMetadata<any>;
+    	compositeEditorOptions?: CompositeEditorOptions;
+    	container?: HTMLElement;
+    	item?: any;
+    	event?: IEventData;
+    	commitChanges?: () => void;
+    	cancelChanges?: () => void;
     }
-    interface ArgsColumnNode extends ArgsColumn {
-        node: HTMLElement;
+    interface EditorFactory {
+    	getEditor(column: Column): EditorClass;
     }
-    type ArgsSortCol = {
-        sortCol: Column;
-        sortAsc: boolean;
-    };
-    interface ArgsSort extends ArgsGrid {
-        multiColumnSort: boolean;
-        sortAsc?: boolean;
-        sortCol?: Column;
-        sortCols?: ArgsSortCol[];
+    interface EditCommand {
+    	row: number;
+    	cell: number;
+    	editor: Editor;
+    	serializedValue: any;
+    	prevSerializedValue: any;
+    	execute: () => void;
+    	undo: () => void;
     }
-    interface ArgsSelectedRowsChange extends ArgsGrid {
-        rows: number[];
-        changedSelectedRows?: number[];
-        changedUnselectedRows?: number[];
-        previousSelectedRows?: number[];
-        caller: any;
+    interface EditorClass {
+    	new (options: EditorOptions): Editor;
+    	suppressClearOnEdit?: boolean;
     }
-    interface ArgsScroll extends ArgsGrid {
-        scrollLeft: number;
-        scrollTop: number;
+    interface Editor {
+    	destroy(): void;
+    	applyValue(item: any, value: any): void;
+    	focus(): void;
+    	isValueChanged(): boolean;
+    	keyCaptureList?: number[];
+    	loadValue(value: any): void;
+    	serializeValue(): any;
+    	position?(pos: Position): void;
+    	preClick?(): void;
+    	hide?(): void;
+    	show?(): void;
+    	validate?(): ValidationResult;
     }
-    interface ArgsCssStyle extends ArgsGrid {
-        key: string;
-        hash: CellStylesHash;
+    interface EditController {
+    	commitCurrentEdit(): boolean;
+    	cancelCurrentEdit(): boolean;
     }
-    interface ArgsCell extends ArgsGrid {
-        row: number;
-        cell: number;
+    /***
+     * A locking helper to track the active edit controller and ensure that only a single controller
+     * can be active at a time.  This prevents a whole class of state and validation synchronization
+     * issues.  An edit controller (such as SleekGrid) can query if an active edit is in progress
+     * and attempt a commit or cancel before proceeding.
+     * @class EditorLock
+     * @constructor
+     */
+    class EditorLock {
+    	private activeEditController;
+    	/***
+    	 * Returns true if a specified edit controller is active (has the edit lock).
+    	 * If the parameter is not specified, returns true if any edit controller is active.
+    	 * @method isActive
+    	 * @param editController {EditController}
+    	 * @return {Boolean}
+    	 */
+    	isActive(editController?: EditController): boolean;
+    	/***
+    	 * Sets the specified edit controller as the active edit controller (acquire edit lock).
+    	 * If another edit controller is already active, and exception will be thrown.
+    	 * @method activate
+    	 * @param editController {EditController} edit controller acquiring the lock
+    	 */
+    	activate(editController: EditController): void;
+    	/***
+    	 * Unsets the specified edit controller as the active edit controller (release edit lock).
+    	 * If the specified edit controller is not the active one, an exception will be thrown.
+    	 * @method deactivate
+    	 * @param editController {EditController} edit controller releasing the lock
+    	 */
+    	deactivate(editController: EditController): void;
+    	/***
+    	 * Attempts to commit the current edit by calling "commitCurrentEdit" method on the active edit
+    	 * controller and returns whether the commit attempt was successful (commit may fail due to validation
+    	 * errors, etc.).  Edit controller's "commitCurrentEdit" must return true if the commit has succeeded
+    	 * and false otherwise.  If no edit controller is active, returns true.
+    	 * @method commitCurrentEdit
+    	 * @return {Boolean}
+    	 */
+    	commitCurrentEdit(): boolean;
+    	/***
+    	 * Attempts to cancel the current edit by calling "cancelCurrentEdit" method on the active edit
+    	 * controller and returns whether the edit was successfully cancelled.  If no edit controller is
+    	 * active, returns true.
+    	 * @method cancelCurrentEdit
+    	 * @return {Boolean}
+    	 */
+    	cancelCurrentEdit(): boolean;
     }
-    interface ArgsCellChange extends ArgsCell {
-        item: any;
-    }
-    interface ArgsCellEdit extends ArgsCellChange {
-        column: Column;
-    }
-    interface ArgsAddNewRow extends ArgsColumn {
-        item: any;
-    }
-    interface ArgsEditorDestroy extends ArgsGrid {
-        editor: Editor;
-    }
-    interface ArgsValidationError extends ArgsCell {
-        editor: Editor;
-        column: Column;
-        cellNode: HTMLElement;
-        validationResults: ValidationResult;
-    }
-
-    interface LayoutHost {
-        bindAncestorScroll(el: HTMLElement): void;
-        cleanUpAndRenderCells(range: ViewRange): void;
-        getAvailableWidth(): number;
-        getCellFromPoint(x: number, y: number): RowCell;
-        getColumnCssRules(idx: number): {
-            right: any;
-            left: any;
-        };
-        getColumns(): Column[];
-        getContainerNode(): HTMLElement;
-        getDataLength(): number;
-        getOptions(): GridOptions;
-        getRowFromNode(rowNode: HTMLElement): number;
-        getScrollDims(): {
-            width: number;
-            height: number;
-        };
-        getScrollLeft(): number;
-        getScrollTop(): number;
-        getViewportInfo(): ViewportInfo;
-        renderRows(range: ViewRange): void;
-    }
-    interface LayoutEngine {
-        appendCachedRow(row: number, rowNodeL: HTMLElement, rowNodeR: HTMLElement): void;
-        afterHeaderColumnDrag(): void;
-        afterSetOptions(args: GridOptions): void;
-        applyColumnWidths(): void;
-        beforeCleanupAndRenderCells(rendered: ViewRange): void;
-        afterRenderRows(rendered: ViewRange): void;
-        bindAncestorScrollEvents(): void;
-        calcCanvasWidth(): number;
-        updateHeadersWidth(): void;
-        isFrozenRow(row: number): boolean;
-        destroy(): void;
-        getCanvasNodeFor(cell: number, row: number): HTMLElement;
-        getCanvasNodes(): HTMLElement[];
-        getCanvasWidth(): number;
-        getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number;
-        getFooterRowCols(): HTMLElement[];
-        getFooterRowColsFor(cell: number): HTMLElement;
-        getFooterRowColumn(cell: number): HTMLElement;
-        getFrozenCols(): number;
-        getFrozenRowOffset(row: number): number;
-        getFrozenRows(): number;
-        getHeaderCols(): HTMLElement[];
-        getHeaderColsFor(cell: number): HTMLElement;
-        getHeaderColumn(cell: number): HTMLElement;
-        getHeaderRowCols(): HTMLElement[];
-        getHeaderRowColsFor(cell: number): HTMLElement;
-        getHeaderRowColumn(cell: number): HTMLElement;
-        getScrollCanvasY(): HTMLElement;
-        getScrollContainerX(): HTMLElement;
-        getScrollContainerY(): HTMLElement;
-        getTopPanelFor(arg0: number): HTMLElement;
-        getTopPanelNodes(): HTMLElement[];
-        getViewportNodeFor(cell: number, row: number): HTMLElement;
-        getViewportNodes(): HTMLElement[];
-        handleScrollH(): void;
-        handleScrollV(): void;
-        init(host: LayoutHost): void;
-        layoutName: string;
-        realScrollHeightChange(): void;
-        /** this might be called before init, chicken egg situation */
-        reorderViewColumns(viewCols: Column[], options?: GridOptions): Column[];
-        resizeCanvas(): void;
-        setPaneVisibility(): void;
-        setScroller(): void;
-        setOverflow(): void;
-        updateCanvasWidth(): boolean;
-    }
-
-    interface GridOptions<TItem = any> {
-        addNewRowCssClass?: string;
-        alwaysAllowHorizontalScroll?: boolean;
-        alwaysShowVerticalScroll?: boolean;
-        asyncEditorLoadDelay?: number;
-        asyncEditorLoading?: boolean;
-        asyncPostCleanupDelay?: number;
-        asyncPostRenderDelay?: number;
-        autoEdit?: boolean;
-        autoHeight?: boolean;
-        cellFlashingCssClass?: string;
-        cellHighlightCssClass?: string;
-        columns?: Column<TItem>[];
-        createPreHeaderPanel?: boolean;
-        dataItemColumnValueExtractor?: (item: TItem, column: Column<TItem>) => void;
-        defaultColumnWidth?: number;
-        defaultFormatter?: ColumnFormatter<TItem>;
-        editable?: boolean;
-        editCommandHandler?: (item: TItem, column: Column<TItem>, command: EditCommand) => void;
-        editorFactory?: EditorFactory;
-        editorLock?: EditorLock;
-        enableAddRow?: boolean;
-        enableAsyncPostRender?: boolean;
-        enableAsyncPostRenderCleanup?: boolean;
-        enableCellNavigation?: boolean;
-        enableCellRangeSelection?: boolean;
-        enableColumnReorder?: boolean;
-        enableRowReordering?: boolean;
-        enableTabKeyNavigation?: boolean;
-        enableTextSelectionOnCells?: boolean;
-        explicitInitialization?: boolean;
-        footerRowHeight?: number;
-        forceFitColumns?: boolean;
-        forceSyncScrolling?: boolean;
-        forceSyncScrollInterval?: number;
-        formatterFactory?: FormatterFactory;
-        frozenBottom?: boolean;
-        frozenColumns?: number;
-        frozenRows?: number;
-        fullWidthRows?: boolean;
-        groupingPanel?: boolean;
-        groupingPanelHeight?: number;
-        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
-        headerRowHeight?: number;
-        jQuery?: JQueryStatic;
-        leaveSpaceForNewRows?: boolean;
-        layoutEngine?: LayoutEngine;
-        minBuffer?: number;
-        multiColumnSort?: boolean;
-        multiSelect?: boolean;
-        preHeaderPanelHeight?: number;
-        renderAllCells?: boolean;
-        rowHeight?: number;
-        rtl?: boolean;
-        selectedCellCssClass?: string;
-        showCellSelection?: boolean;
-        showColumnHeader?: boolean;
-        showFooterRow?: boolean;
-        showGroupingPanel?: boolean;
-        showHeaderRow?: boolean;
-        showPreHeaderPanel?: boolean;
-        showTopPanel?: boolean;
-        slickCompat?: boolean;
-        suppressActiveCellChangeOnEdit?: boolean;
-        syncColumnCellResize?: boolean;
-        topPanelHeight?: number;
-        useLegacyUI?: boolean;
-        viewportClass?: string;
-    }
-    const gridDefaults: GridOptions;
-
-    class Grid<TItem = any> {
-        private _absoluteColMinWidth;
-        private _activeCanvasNode;
-        private _activeCell;
-        private _activeCellNode;
-        private _activePosX;
-        private _activeRow;
-        private _activeViewportNode;
-        private _cellCssClasses;
-        private _cellHeightDiff;
-        private _cellWidthDiff;
-        private _cellNavigator;
-        private _colById;
-        private _colDefaults;
-        private _colLeft;
-        private _colRight;
-        private _cols;
-        private _columnCssRulesL;
-        private _columnCssRulesR;
-        private _currentEditor;
-        private _data;
-        private _editController;
-        private _headerColumnWidthDiff;
-        private _hEditorLoader;
-        private _hPostRender;
-        private _hPostRenderCleanup;
-        private _hRender;
-        private _ignoreScrollUntil;
-        private _initColById;
-        private _initCols;
-        private _initialized;
-        private _jQuery;
-        private _jumpinessCoefficient;
-        private _lastRenderTime;
-        private _layout;
-        private _numberOfPages;
-        private _options;
-        private _page;
-        private _pageHeight;
-        private _pageOffset;
-        private _pagingActive;
-        private _pagingIsLastPage;
-        private _plugins;
-        private _postProcessCleanupQueue;
-        private _postProcessedRows;
-        private _postProcessFromRow;
-        private _postProcessGroupId;
-        private _postProcessToRow;
-        private _rowsCache;
-        private _scrollDims;
-        private _scrollLeft;
-        private _scrollLeftPrev;
-        private _scrollLeftRendered;
-        private _scrollTop;
-        private _scrollTopPrev;
-        private _scrollTopRendered;
-        private _selectedRows;
-        private _selectionModel;
-        private _serializedEditorValue;
-        private _sortColumns;
-        private _styleNode;
-        private _stylesheet;
-        private _tabbingDirection;
-        private _uid;
-        private _viewportInfo;
-        private _vScrollDir;
-        private _boundAncestorScroll;
-        private _container;
-        private _focusSink1;
-        private _focusSink2;
-        private _groupingPanel;
-        readonly onActiveCellChanged: Slick.Event<ArgsCell, IEventData>;
-        readonly onActiveCellPositionChanged: Slick.Event<ArgsGrid, IEventData>;
-        readonly onAddNewRow: Slick.Event<ArgsAddNewRow, IEventData>;
-        readonly onBeforeCellEditorDestroy: Slick.Event<ArgsEditorDestroy, IEventData>;
-        readonly onBeforeDestroy: Slick.Event<ArgsGrid, IEventData>;
-        readonly onBeforeEditCell: Slick.Event<ArgsCellEdit, IEventData>;
-        readonly onBeforeFooterRowCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
-        readonly onBeforeHeaderCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
-        readonly onBeforeHeaderRowCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
-        readonly onCellChange: Slick.Event<ArgsCellChange, IEventData>;
-        readonly onCellCssStylesChanged: Slick.Event<ArgsCssStyle, IEventData>;
-        readonly onClick: Slick.Event<ArgsCell, JQueryMouseEventObject>;
-        readonly onColumnsReordered: Slick.Event<ArgsGrid, IEventData>;
-        readonly onColumnsResized: Slick.Event<ArgsGrid, IEventData>;
-        readonly onCompositeEditorChange: Slick.Event<ArgsGrid, IEventData>;
-        readonly onContextMenu: Slick.Event<ArgsGrid, JQueryEventObject>;
-        readonly onDblClick: Slick.Event<ArgsCell, JQueryMouseEventObject>;
-        readonly onDrag: Slick.Event<ArgsGrid, JQueryEventObject>;
-        readonly onDragEnd: Slick.Event<ArgsGrid, JQueryEventObject>;
-        readonly onDragInit: Slick.Event<ArgsGrid, JQueryEventObject>;
-        readonly onDragStart: Slick.Event<ArgsGrid, JQueryEventObject>;
-        readonly onFooterRowCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
-        readonly onHeaderCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
-        readonly onHeaderClick: Slick.Event<ArgsColumn, IEventData>;
-        readonly onHeaderContextMenu: Slick.Event<ArgsColumn, IEventData>;
-        readonly onHeaderMouseEnter: Slick.Event<ArgsColumn, MouseEvent>;
-        readonly onHeaderMouseLeave: Slick.Event<ArgsColumn, MouseEvent>;
-        readonly onHeaderRowCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
-        readonly onKeyDown: Slick.Event<ArgsCell, JQueryKeyEventObject>;
-        readonly onMouseEnter: Slick.Event<ArgsGrid, MouseEvent>;
-        readonly onMouseLeave: Slick.Event<ArgsGrid, MouseEvent>;
-        readonly onScroll: Slick.Event<ArgsScroll, IEventData>;
-        readonly onSelectedRowsChanged: Slick.Event<ArgsSelectedRowsChange, IEventData>;
-        readonly onSort: Slick.Event<ArgsSort, IEventData>;
-        readonly onValidationError: Slick.Event<ArgsValidationError, IEventData>;
-        readonly onViewportChanged: Slick.Event<ArgsGrid, IEventData>;
-        constructor(container: JQuery | HTMLElement, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
-        private bindAncestorScroll;
-        init(): void;
-        private hasFrozenColumns;
-        private hasFrozenRows;
-        registerPlugin(plugin: IPlugin): void;
-        unregisterPlugin(plugin: IPlugin): void;
-        getPluginByName(name: string): IPlugin;
-        setSelectionModel(model: SelectionModel): void;
-        getScrollBarDimensions(): {
-            width: number;
-            height: number;
-        };
-        getDisplayedScrollbarDimensions(): {
-            width: number;
-            height: number;
-        };
-        getAbsoluteColumnMinWidth(): number;
-        getSelectionModel(): SelectionModel;
-        private colIdOrIdxToCell;
-        getCanvasNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
-        getCanvases(): JQuery | HTMLElement[];
-        getActiveCanvasNode(e?: IEventData): HTMLElement;
-        setActiveCanvasNode(e?: IEventData): void;
-        getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
-        private getViewports;
-        getActiveViewportNode(e?: IEventData): HTMLElement;
-        setActiveViewportNode(e?: IEventData): void;
-        private getAvailableWidth;
-        private updateCanvasWidth;
-        private unbindAncestorScrollEvents;
-        updateColumnHeader(columnId: string, title?: string, toolTip?: string): void;
-        getHeader(): HTMLElement;
-        getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
-        getGroupingPanel(): HTMLElement;
-        getPreHeaderPanel(): HTMLElement;
-        getHeaderRow(): HTMLElement;
-        getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
-        getFooterRow(): HTMLElement;
-        getFooterRowColumn(columnIdOrIdx: string | number): HTMLElement;
-        private createColumnFooters;
-        private formatGroupTotal;
-        private createColumnHeaders;
-        private setupColumnSort;
-        private setupColumnReorder;
-        private setupColumnResize;
-        private setOverflow;
-        private measureCellPaddingAndBorder;
-        private createCssRules;
-        private getColumnCssRules;
-        private removeCssRules;
-        destroy(): void;
-        private trigger;
-        getEditorLock(): EditorLock;
-        getEditController(): EditController;
-        getColumnIndex(id: string): number;
-        getInitialColumnIndex(id: string): number;
-        autosizeColumns(): void;
-        private applyColumnHeaderWidths;
-        setSortColumn(columnId: string, ascending: boolean): void;
-        setSortColumns(cols: ColumnSort[]): void;
-        getSortColumns(): ColumnSort[];
-        private handleSelectedRangesChanged;
-        getColumns(): Column<TItem>[];
-        getInitialColumns(): Column<TItem>[];
-        private updateViewColLeftRight;
-        private setInitialCols;
-        setColumns(columns: Column<TItem>[]): void;
-        getOptions(): GridOptions<TItem>;
-        setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void;
-        private validateAndEnforceOptions;
-        private viewOnRowCountChanged;
-        private viewOnRowsChanged;
-        private viewOnDataChanged;
-        private bindToData;
-        private unbindFromData;
-        setData(newData: any, scrollToTop?: boolean): void;
-        getData(): any;
-        getDataLength(): number;
-        private getDataLengthIncludingAddNew;
-        getDataItem(i: number): TItem;
-        getTopPanel(): HTMLElement;
-        setTopPanelVisibility(visible: boolean): void;
-        setColumnHeaderVisibility(visible: boolean, animate?: boolean): void;
-        setFooterRowVisibility(visible: boolean): void;
-        setGroupingPanelVisibility(visible: boolean): void;
-        setPreHeaderPanelVisibility(visible: boolean): void;
-        setHeaderRowVisibility(visible: boolean): void;
-        getContainerNode(): HTMLElement;
-        getUID(): string;
-        private getRowTop;
-        private getRowFromPosition;
-        private scrollTo;
-        getFormatter(row: number, column: Column<TItem>): ColumnFormatter<TItem>;
-        private getEditor;
-        private getDataItemValueForColumn;
-        private appendRowHtml;
-        private appendCellHtml;
-        private cleanupRows;
-        invalidate(): void;
-        invalidateAllRows(): void;
-        private queuePostProcessedRowForCleanup;
-        private queuePostProcessedCellForCleanup;
-        private removeRowFromCache;
-        invalidateRows(rows: number[]): void;
-        invalidateRow(row: number): void;
-        updateCell(row: number, cell: number): void;
-        updateRow(row: number): void;
-        private calcViewportSize;
-        resizeCanvas: () => void;
-        updatePagingStatusFromView(pagingInfo: {
-            pageSize: number;
-            pageNum: number;
-            totalPages: number;
-        }): void;
-        private updateRowCount;
-        /**
-         * @param viewportTop optional viewport top
-         * @param viewportLeft optional viewport left
-         * @returns viewport range
-         */
-        getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
-        getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
-        getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
-        private ensureCellNodesInRowsCache;
-        private cleanUpCells;
-        private cleanUpAndRenderCells;
-        private renderRows;
-        private startPostProcessing;
-        private startPostProcessingCleanup;
-        private invalidatePostProcessingResults;
-        private updateRowPositions;
-        private updateGrandTotals;
-        private render;
-        private handleHeaderRowScroll;
-        private handleFooterRowScroll;
-        private handleMouseWheel;
-        private handleScroll;
-        private asyncPostProcessRows;
-        private asyncPostProcessCleanupRows;
-        private updateCellCssStylesOnRenderedRows;
-        addCellCssStyles(key: string, hash: CellStylesHash): void;
-        removeCellCssStyles(key: string): void;
-        setCellCssStyles(key: string, hash: CellStylesHash): void;
-        getCellCssStyles(key: string): CellStylesHash;
-        flashCell(row: number, cell: number, speed?: number): void;
-        private handleDragInit;
-        private handleDragStart;
-        private handleDrag;
-        private handleDragEnd;
-        private handleKeyDown;
-        private handleClick;
-        private handleContextMenu;
-        private handleDblClick;
-        private handleHeaderMouseEnter;
-        private handleHeaderMouseLeave;
-        private handleHeaderContextMenu;
-        private handleHeaderClick;
-        private handleMouseEnter;
-        private handleMouseLeave;
-        private cellExists;
-        getCellFromPoint(x: number, y: number): {
-            row: number;
-            cell: number;
-        };
-        getCellFromNode(cellNode: Element): number;
-        getColumnFromNode(cellNode: Element): Column<TItem>;
-        getRowFromNode(rowNode: Element): number;
-        getCellFromEvent(e: any): {
-            row: number;
-            cell: number;
-        };
-        getCellNodeBox(row: number, cell: number): {
-            top: number;
-            right: number;
-            bottom: number;
-            left: number;
-        };
-        resetActiveCell(): void;
-        focus(): void;
-        private setFocus;
-        scrollCellIntoView(row: number, cell: number, doPaging?: boolean): void;
-        scrollColumnIntoView(cell: number): void;
-        internalScrollColumnIntoView(left: number, right: number): void;
-        private setActiveCellInternal;
-        clearTextSelection(): void;
-        private isCellPotentiallyEditable;
-        private makeActiveCellNormal;
-        editActiveCell(editor?: Editor): void;
-        private makeActiveCellEditable;
-        private commitEditAndSetFocus;
-        private cancelEditAndSetFocus;
-        private getActiveCellPosition;
-        getGridPosition(): Position;
-        private handleActiveCellPositionChange;
-        getCellEditor(): Editor;
-        getActiveCell(): RowCell;
-        getActiveCellNode(): HTMLElement;
-        scrollActiveCellIntoView(): void;
-        scrollRowIntoView(row: number, doPaging?: boolean): void;
-        scrollRowToTop(row: number): void;
-        private scrollPage;
-        navigatePageDown(): void;
-        navigatePageUp(): void;
-        navigateTop(): void;
-        navigateBottom(): void;
-        navigateToRow(row: number): boolean;
-        getColspan(row: number, cell: number): number;
-        navigateRight(): boolean;
-        navigateLeft(): boolean;
-        navigateDown(): boolean;
-        navigateUp(): boolean;
-        navigateNext(): boolean;
-        navigatePrev(): boolean;
-        navigateRowStart(): boolean;
-        navigateRowEnd(): boolean;
-        /**
-         * @param {string} dir Navigation direction.
-         * @return {boolean} Whether navigation resulted in a change of active cell.
-         */
-        navigate(dir: string): boolean;
-        getCellNode(row: number, cell: number): HTMLElement;
-        setActiveCell(row: number, cell: number): void;
-        setActiveRow(row: number, cell: number, suppressScrollIntoView?: boolean): void;
-        private canCellBeActive;
-        canCellBeSelected(row: number, cell: number): any;
-        gotoCell(row: number, cell: number, forceEdit?: boolean): void;
-        commitCurrentEdit(): boolean;
-        private cancelCurrentEdit;
-        private rowsToRanges;
-        getSelectedRows(): number[];
-        setSelectedRows(rows: number[]): void;
-    }
-
+    /***
+     * A global singleton editor lock.
+     * @class GlobalEditorLock
+     * @static
+     * @constructor
+     */
+    const GlobalEditorLock: EditorLock;
     interface Column<TItem = any> {
-        asyncPostRender?: AsyncPostRender<TItem>;
-        asyncPostRenderCleanup?: AsyncPostCleanup<TItem>;
-        behavior?: any;
-        cannotTriggerInsert?: boolean;
-        cssClass?: string;
-        defaultSortAsc?: boolean;
-        editor?: Editor;
-        field: string;
-        frozen?: boolean;
-        focusable?: boolean;
-        footerCssClass?: string;
-        formatter?: ColumnFormatter<TItem>;
-        groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: Grid<TItem>) => string;
-        headerCssClass?: string;
-        id?: string;
-        maxWidth?: any;
-        minWidth?: number;
-        name?: string;
-        nameIsHtml?: boolean;
-        previousWidth?: number;
-        referencedFields?: string[];
-        rerenderOnResize?: boolean;
-        resizable?: boolean;
-        selectable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        toolTip?: string;
-        validator?: (value: any) => ValidationResult;
-        visible?: boolean;
-        width?: number;
+    	asyncPostRender?: AsyncPostRender<TItem>;
+    	asyncPostRenderCleanup?: AsyncPostCleanup<TItem>;
+    	behavior?: any;
+    	cannotTriggerInsert?: boolean;
+    	cssClass?: string;
+    	defaultSortAsc?: boolean;
+    	editor?: EditorClass;
+    	editorFixedDecimalPlaces?: number;
+    	field?: string;
+    	frozen?: boolean;
+    	focusable?: boolean;
+    	footerCssClass?: string;
+    	format?: ColumnFormat<TItem>;
+    	/** @deprecated */
+    	formatter?: CompatFormatter<TItem>;
+    	groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: unknown) => string;
+    	headerCssClass?: string;
+    	id?: string;
+    	maxWidth?: any;
+    	minWidth?: number;
+    	name?: string;
+    	nameIsHtml?: boolean;
+    	previousWidth?: number;
+    	referencedFields?: string[];
+    	rerenderOnResize?: boolean;
+    	resizable?: boolean;
+    	selectable?: boolean;
+    	sortable?: boolean;
+    	sortOrder?: number;
+    	toolTip?: string;
+    	validator?: (value: any, editorArgs?: any) => ValidationResult;
+    	visible?: boolean;
+    	width?: number;
     }
     const columnDefaults: Partial<Column>;
     interface ColumnMetadata<TItem = any> {
-        colspan: number | '*';
-        formatter?: ColumnFormatter<TItem>;
+    	colspan: number | "*";
+    	format?: ColumnFormat<TItem>;
+    	/** @deprecated */
+    	formatter?: CompatFormatter<TItem>;
     }
     interface ColumnSort {
-        columnId: string;
-        sortAsc?: boolean;
+    	columnId: string;
+    	sortAsc?: boolean;
     }
     interface ItemMetadata<TItem = any> {
-        columns?: {
-            [key: string]: ColumnMetadata<TItem>;
-        };
-        formatter?: ColumnFormatter<TItem>;
+    	columns?: {
+    		[key: string]: ColumnMetadata<TItem>;
+    	};
+    	format?: ColumnFormat<TItem>;
+    	/** @deprecated */
+    	formatter?: CompatFormatter<TItem>;
     }
-
+    function initializeColumns(columns: Column[], defaults: Partial<Column<any>>): void;
+    function titleize(str: string): string;
+    class Range {
+    	fromRow: number;
+    	fromCell: number;
+    	toRow: number;
+    	toCell: number;
+    	constructor(fromRow: number, fromCell: number, toRow?: number, toCell?: number);
+    	/***
+    	 * Returns whether a range represents a single row.
+    	 */
+    	isSingleRow(): boolean;
+    	/***
+    	 * Returns whether a range represents a single cell.
+    	 */
+    	isSingleCell(): boolean;
+    	/***
+    	 * Returns whether a range contains a given cell.
+    	 */
+    	contains(row: number, cell: number): boolean;
+    	/***
+    	 * Returns a readable representation of a range.
+    	 */
+    	toString(): string;
+    }
+    function addClass(el: Element, cls: string): void;
+    function escape(s: any): any;
+    function disableSelection(target: HTMLElement): void;
+    function removeClass(el: Element, cls: string): void;
+    function H<K extends keyof HTMLElementTagNameMap>(tag: K, attr?: {
+    	ref?: (el?: HTMLElementTagNameMap[K]) => void;
+    	[key: string]: string | number | boolean | ((el?: HTMLElementTagNameMap[K]) => void);
+    }, ...children: (string | Node)[]): HTMLElementTagNameMap[K];
+    function spacerDiv(width: string): HTMLDivElement;
+    function parsePx(str: string): number;
+    interface IPlugin {
+    	init(grid: Grid): void;
+    	pluginName?: string;
+    	destroy?: () => void;
+    }
+    interface ViewportInfo {
+    	height: number;
+    	width: number;
+    	hasVScroll: boolean;
+    	hasHScroll: boolean;
+    	headerHeight: number;
+    	groupingPanelHeight: number;
+    	virtualHeight: number;
+    	realScrollHeight: number;
+    	topPanelHeight: number;
+    	headerRowHeight: number;
+    	footerRowHeight: number;
+    	numVisibleRows: number;
+    }
+    interface SelectionModel extends IPlugin {
+    	setSelectedRanges(ranges: Range[]): void;
+    	onSelectedRangesChanged: Slick.Event<Range[]>;
+    	refreshSelections?(): void;
+    }
+    interface ViewRange {
+    	top?: number;
+    	bottom?: number;
+    	leftPx?: number;
+    	rightPx?: number;
+    }
+    interface LayoutHost {
+    	bindAncestorScroll(el: HTMLElement): void;
+    	cleanUpAndRenderCells(range: ViewRange): void;
+    	getAvailableWidth(): number;
+    	getCellFromPoint(x: number, y: number): RowCell;
+    	getColumnCssRules(idx: number): {
+    		right: any;
+    		left: any;
+    	};
+    	getColumns(): Column[];
+    	getContainerNode(): HTMLElement;
+    	getDataLength(): number;
+    	getOptions(): GridOptions;
+    	getRowFromNode(rowNode: HTMLElement): number;
+    	getScrollDims(): {
+    		width: number;
+    		height: number;
+    	};
+    	getScrollLeft(): number;
+    	getScrollTop(): number;
+    	getViewportInfo(): ViewportInfo;
+    	renderRows(range: ViewRange): void;
+    }
+    interface LayoutEngine {
+    	appendCachedRow(row: number, rowNodeL: HTMLElement, rowNodeR: HTMLElement): void;
+    	afterHeaderColumnDrag(): void;
+    	afterSetOptions(args: GridOptions): void;
+    	applyColumnWidths(): void;
+    	beforeCleanupAndRenderCells(rendered: ViewRange): void;
+    	afterRenderRows(rendered: ViewRange): void;
+    	bindAncestorScrollEvents(): void;
+    	calcCanvasWidth(): number;
+    	updateHeadersWidth(): void;
+    	isFrozenRow(row: number): boolean;
+    	destroy(): void;
+    	getCanvasNodeFor(cell: number, row: number): HTMLElement;
+    	getCanvasNodes(): HTMLElement[];
+    	getCanvasWidth(): number;
+    	getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number;
+    	getFooterRowCols(): HTMLElement[];
+    	getFooterRowColsFor(cell: number): HTMLElement;
+    	getFooterRowColumn(cell: number): HTMLElement;
+    	getFrozenCols(): number;
+    	getFrozenRowOffset(row: number): number;
+    	getFrozenRows(): number;
+    	getHeaderCols(): HTMLElement[];
+    	getHeaderColsFor(cell: number): HTMLElement;
+    	getHeaderColumn(cell: number): HTMLElement;
+    	getHeaderRowCols(): HTMLElement[];
+    	getHeaderRowColsFor(cell: number): HTMLElement;
+    	getHeaderRowColumn(cell: number): HTMLElement;
+    	getScrollCanvasY(): HTMLElement;
+    	getScrollContainerX(): HTMLElement;
+    	getScrollContainerY(): HTMLElement;
+    	getTopPanelFor(arg0: number): HTMLElement;
+    	getTopPanelNodes(): HTMLElement[];
+    	getViewportNodeFor(cell: number, row: number): HTMLElement;
+    	getViewportNodes(): HTMLElement[];
+    	handleScrollH(): void;
+    	handleScrollV(): void;
+    	init(host: LayoutHost): void;
+    	layoutName: string;
+    	realScrollHeightChange(): void;
+    	/** this might be called before init, chicken egg situation */
+    	reorderViewColumns(viewCols: Column[], options?: GridOptions): Column[];
+    	resizeCanvas(): void;
+    	setPaneVisibility(): void;
+    	setScroller(): void;
+    	setOverflow(): void;
+    	updateCanvasWidth(): boolean;
+    }
+    interface GridOptions<TItem = any> {
+    	addNewRowCssClass?: string;
+    	alwaysAllowHorizontalScroll?: boolean;
+    	alwaysShowVerticalScroll?: boolean;
+    	asyncEditorLoadDelay?: number;
+    	asyncEditorLoading?: boolean;
+    	asyncPostCleanupDelay?: number;
+    	asyncPostRenderDelay?: number;
+    	autoEdit?: boolean;
+    	autoHeight?: boolean;
+    	cellFlashingCssClass?: string;
+    	cellHighlightCssClass?: string;
+    	columns?: Column<TItem>[];
+    	createPreHeaderPanel?: boolean;
+    	dataItemColumnValueExtractor?: (item: TItem, column: Column<TItem>) => void;
+    	defaultColumnWidth?: number;
+    	defaultFormat?: ColumnFormat<TItem>;
+    	defaultFormatter?: CompatFormatter<TItem>;
+    	editable?: boolean;
+    	editCommandHandler?: (item: TItem, column: Column<TItem>, command: EditCommand) => void;
+    	editorCellNavOnLRKeys?: boolean;
+    	editorFactory?: EditorFactory;
+    	editorLock?: EditorLock;
+    	enableAddRow?: boolean;
+    	enableAsyncPostRender?: boolean;
+    	enableAsyncPostRenderCleanup?: boolean;
+    	enableCellNavigation?: boolean;
+    	enableCellRangeSelection?: boolean;
+    	enableColumnReorder?: boolean;
+    	enableRowReordering?: boolean;
+    	enableTabKeyNavigation?: boolean;
+    	enableTextSelectionOnCells?: boolean;
+    	explicitInitialization?: boolean;
+    	footerRowHeight?: number;
+    	forceFitColumns?: boolean;
+    	forceSyncScrolling?: boolean;
+    	forceSyncScrollInterval?: number;
+    	formatterFactory?: FormatterFactory;
+    	frozenBottom?: boolean;
+    	frozenColumns?: number;
+    	frozenRows?: number;
+    	fullWidthRows?: boolean;
+    	groupingPanel?: boolean;
+    	groupingPanelHeight?: number;
+    	groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: any) => string;
+    	headerRowHeight?: number;
+    	jQuery?: JQueryStatic;
+    	leaveSpaceForNewRows?: boolean;
+    	layoutEngine?: LayoutEngine;
+    	minBuffer?: number;
+    	multiColumnSort?: boolean;
+    	multiSelect?: boolean;
+    	preHeaderPanelHeight?: number;
+    	renderAllCells?: boolean;
+    	rowHeight?: number;
+    	rtl?: boolean;
+    	selectedCellCssClass?: string;
+    	showCellSelection?: boolean;
+    	showColumnHeader?: boolean;
+    	showFooterRow?: boolean;
+    	showGroupingPanel?: boolean;
+    	showHeaderRow?: boolean;
+    	showPreHeaderPanel?: boolean;
+    	showTopPanel?: boolean;
+    	slickCompat?: boolean;
+    	suppressActiveCellChangeOnEdit?: boolean;
+    	syncColumnCellResize?: boolean;
+    	topPanelHeight?: number;
+    	useLegacyUI?: boolean;
+    	viewportClass?: string;
+    }
+    const gridDefaults: GridOptions;
+    class Grid<TItem = any> implements EditorHost {
+    	private _absoluteColMinWidth;
+    	private _activeCanvasNode;
+    	private _activeCell;
+    	private _activeCellNode;
+    	private _activePosX;
+    	private _activeRow;
+    	private _activeViewportNode;
+    	private _cellCssClasses;
+    	private _cellHeightDiff;
+    	private _cellWidthDiff;
+    	private _cellNavigator;
+    	private _colById;
+    	private _colDefaults;
+    	private _colLeft;
+    	private _colRight;
+    	private _cols;
+    	private _columnCssRulesL;
+    	private _columnCssRulesR;
+    	private _currentEditor;
+    	private _data;
+    	private _editController;
+    	private _headerColumnWidthDiff;
+    	private _hEditorLoader;
+    	private _hPostRender;
+    	private _hPostRenderCleanup;
+    	private _hRender;
+    	private _ignoreScrollUntil;
+    	private _initColById;
+    	private _initCols;
+    	private _initialized;
+    	private _jQuery;
+    	private _jumpinessCoefficient;
+    	private _lastRenderTime;
+    	private _layout;
+    	private _numberOfPages;
+    	private _options;
+    	private _page;
+    	private _pageHeight;
+    	private _pageOffset;
+    	private _pagingActive;
+    	private _pagingIsLastPage;
+    	private _plugins;
+    	private _postProcessCleanupQueue;
+    	private _postProcessedRows;
+    	private _postProcessFromRow;
+    	private _postProcessGroupId;
+    	private _postProcessToRow;
+    	private _rowsCache;
+    	private _scrollDims;
+    	private _scrollLeft;
+    	private _scrollLeftPrev;
+    	private _scrollLeftRendered;
+    	private _scrollTop;
+    	private _scrollTopPrev;
+    	private _scrollTopRendered;
+    	private _selectedRows;
+    	private _selectionModel;
+    	private _serializedEditorValue;
+    	private _sortColumns;
+    	private _styleNode;
+    	private _stylesheet;
+    	private _tabbingDirection;
+    	private _uid;
+    	private _viewportInfo;
+    	private _vScrollDir;
+    	private _boundAncestorScroll;
+    	private _container;
+    	private _focusSink1;
+    	private _focusSink2;
+    	private _groupingPanel;
+    	readonly onActiveCellChanged: Slick.Event<ArgsCell, IEventData>;
+    	readonly onActiveCellPositionChanged: Slick.Event<ArgsGrid, IEventData>;
+    	readonly onAddNewRow: Slick.Event<ArgsAddNewRow, IEventData>;
+    	readonly onBeforeCellEditorDestroy: Slick.Event<ArgsEditorDestroy, IEventData>;
+    	readonly onBeforeDestroy: Slick.Event<ArgsGrid, IEventData>;
+    	readonly onBeforeEditCell: Slick.Event<ArgsCellEdit, IEventData>;
+    	readonly onBeforeFooterRowCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
+    	readonly onBeforeHeaderCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
+    	readonly onBeforeHeaderRowCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
+    	readonly onCellChange: Slick.Event<ArgsCellChange, IEventData>;
+    	readonly onCellCssStylesChanged: Slick.Event<ArgsCssStyle, IEventData>;
+    	readonly onClick: Slick.Event<ArgsCell, MouseEvent>;
+    	readonly onColumnsReordered: Slick.Event<ArgsGrid, IEventData>;
+    	readonly onColumnsResized: Slick.Event<ArgsGrid, IEventData>;
+    	readonly onCompositeEditorChange: Slick.Event<ArgsGrid, IEventData>;
+    	readonly onContextMenu: Slick.Event<ArgsGrid, UIEvent>;
+    	readonly onDblClick: Slick.Event<ArgsCell, MouseEvent>;
+    	readonly onDrag: Slick.Event<ArgsGrid, UIEvent>;
+    	readonly onDragEnd: Slick.Event<ArgsGrid, UIEvent>;
+    	readonly onDragInit: Slick.Event<ArgsGrid, UIEvent>;
+    	readonly onDragStart: Slick.Event<ArgsGrid, UIEvent>;
+    	readonly onFooterRowCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
+    	readonly onHeaderCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
+    	readonly onHeaderClick: Slick.Event<ArgsColumn, IEventData>;
+    	readonly onHeaderContextMenu: Slick.Event<ArgsColumn, IEventData>;
+    	readonly onHeaderMouseEnter: Slick.Event<ArgsColumn, MouseEvent>;
+    	readonly onHeaderMouseLeave: Slick.Event<ArgsColumn, MouseEvent>;
+    	readonly onHeaderRowCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
+    	readonly onKeyDown: Slick.Event<ArgsCell, KeyboardEvent>;
+    	readonly onMouseEnter: Slick.Event<ArgsGrid, MouseEvent>;
+    	readonly onMouseLeave: Slick.Event<ArgsGrid, MouseEvent>;
+    	readonly onScroll: Slick.Event<ArgsScroll, IEventData>;
+    	readonly onSelectedRowsChanged: Slick.Event<ArgsSelectedRowsChange, IEventData>;
+    	readonly onSort: Slick.Event<ArgsSort, IEventData>;
+    	readonly onValidationError: Slick.Event<ArgsValidationError, IEventData>;
+    	readonly onViewportChanged: Slick.Event<ArgsGrid, IEventData>;
+    	constructor(container: JQuery | HTMLElement, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
+    	private bindAncestorScroll;
+    	init(): void;
+    	private hasFrozenColumns;
+    	private hasFrozenRows;
+    	registerPlugin(plugin: IPlugin): void;
+    	unregisterPlugin(plugin: IPlugin): void;
+    	getPluginByName(name: string): IPlugin;
+    	setSelectionModel(model: SelectionModel): void;
+    	getScrollBarDimensions(): {
+    		width: number;
+    		height: number;
+    	};
+    	getDisplayedScrollbarDimensions(): {
+    		width: number;
+    		height: number;
+    	};
+    	getAbsoluteColumnMinWidth(): number;
+    	getSelectionModel(): SelectionModel;
+    	private colIdOrIdxToCell;
+    	getCanvasNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+    	getCanvases(): JQuery | HTMLElement[];
+    	getActiveCanvasNode(e?: IEventData): HTMLElement;
+    	setActiveCanvasNode(e?: IEventData): void;
+    	getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+    	private getViewports;
+    	getActiveViewportNode(e?: IEventData): HTMLElement;
+    	setActiveViewportNode(e?: IEventData): void;
+    	private getAvailableWidth;
+    	private updateCanvasWidth;
+    	private unbindAncestorScrollEvents;
+    	updateColumnHeader(columnId: string, title?: string, toolTip?: string): void;
+    	getHeader(): HTMLElement;
+    	getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
+    	getGroupingPanel(): HTMLElement;
+    	getPreHeaderPanel(): HTMLElement;
+    	getHeaderRow(): HTMLElement;
+    	getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
+    	getFooterRow(): HTMLElement;
+    	getFooterRowColumn(columnIdOrIdx: string | number): HTMLElement;
+    	private createColumnFooters;
+    	private createColumnHeaders;
+    	private setupColumnSort;
+    	private setupColumnReorder;
+    	private setupColumnResize;
+    	private setOverflow;
+    	private measureCellPaddingAndBorder;
+    	private createCssRules;
+    	private getColumnCssRules;
+    	private removeCssRules;
+    	destroy(): void;
+    	private trigger;
+    	getEditorLock(): EditorLock;
+    	getEditController(): EditController;
+    	getColumnIndex(id: string): number;
+    	getInitialColumnIndex(id: string): number;
+    	autosizeColumns(): void;
+    	private applyColumnHeaderWidths;
+    	setSortColumn(columnId: string, ascending: boolean): void;
+    	setSortColumns(cols: ColumnSort[]): void;
+    	getSortColumns(): ColumnSort[];
+    	private handleSelectedRangesChanged;
+    	getColumns(): Column<TItem>[];
+    	getInitialColumns(): Column<TItem>[];
+    	private updateViewColLeftRight;
+    	private setInitialCols;
+    	setColumns(columns: Column<TItem>[]): void;
+    	getOptions(): GridOptions<TItem>;
+    	setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void;
+    	private validateAndEnforceOptions;
+    	private viewOnRowCountChanged;
+    	private viewOnRowsChanged;
+    	private viewOnDataChanged;
+    	private bindToData;
+    	private unbindFromData;
+    	setData(newData: any, scrollToTop?: boolean): void;
+    	getData(): any;
+    	getDataLength(): number;
+    	private getDataLengthIncludingAddNew;
+    	getDataItem(i: number): TItem;
+    	getTopPanel(): HTMLElement;
+    	setTopPanelVisibility(visible: boolean): void;
+    	setColumnHeaderVisibility(visible: boolean, animate?: boolean): void;
+    	setFooterRowVisibility(visible: boolean): void;
+    	setGroupingPanelVisibility(visible: boolean): void;
+    	setPreHeaderPanelVisibility(visible: boolean): void;
+    	setHeaderRowVisibility(visible: boolean): void;
+    	getContainerNode(): HTMLElement;
+    	getUID(): string;
+    	private getRowTop;
+    	private getRowFromPosition;
+    	private scrollTo;
+    	getFormatter(row: number, column: Column<TItem>): ColumnFormat<TItem>;
+    	getFormatterContext(row: number, cell: number): FormatterContext;
+    	private getEditor;
+    	getDataItemValueForColumn(item: TItem, columnDef: Column<TItem>): any;
+    	private appendRowHtml;
+    	private appendCellHtml;
+    	private cleanupRows;
+    	invalidate(): void;
+    	invalidateAllRows(): void;
+    	private queuePostProcessedRowForCleanup;
+    	private queuePostProcessedCellForCleanup;
+    	private removeRowFromCache;
+    	invalidateRows(rows: number[]): void;
+    	invalidateRow(row: number): void;
+    	updateCell(row: number, cell: number): void;
+    	private updateCellWithFormatter;
+    	updateRow(row: number): void;
+    	private calcViewportSize;
+    	resizeCanvas: () => void;
+    	updatePagingStatusFromView(pagingInfo: {
+    		pageSize: number;
+    		pageNum: number;
+    		totalPages: number;
+    	}): void;
+    	private updateRowCount;
+    	/**
+    	 * @param viewportTop optional viewport top
+    	 * @param viewportLeft optional viewport left
+    	 * @returns viewport range
+    	 */
+    	getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
+    	getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
+    	getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
+    	private ensureCellNodesInRowsCache;
+    	private cleanUpCells;
+    	private cleanUpAndRenderCells;
+    	private renderRows;
+    	private startPostProcessing;
+    	private startPostProcessingCleanup;
+    	private invalidatePostProcessingResults;
+    	private updateRowPositions;
+    	private updateGrandTotals;
+    	private render;
+    	private handleHeaderRowScroll;
+    	private handleFooterRowScroll;
+    	private handleMouseWheel;
+    	private handleScroll;
+    	private asyncPostProcessRows;
+    	private asyncPostProcessCleanupRows;
+    	private updateCellCssStylesOnRenderedRows;
+    	addCellCssStyles(key: string, hash: CellStylesHash): void;
+    	removeCellCssStyles(key: string): void;
+    	setCellCssStyles(key: string, hash: CellStylesHash): void;
+    	getCellCssStyles(key: string): CellStylesHash;
+    	flashCell(row: number, cell: number, speed?: number): void;
+    	private handleDragInit;
+    	private handleDragStart;
+    	private handleDrag;
+    	private handleDragEnd;
+    	private handleKeyDown;
+    	private handleClick;
+    	private handleContextMenu;
+    	private handleDblClick;
+    	private handleHeaderMouseEnter;
+    	private handleHeaderMouseLeave;
+    	private handleHeaderContextMenu;
+    	private handleHeaderClick;
+    	private handleMouseEnter;
+    	private handleMouseLeave;
+    	private cellExists;
+    	getCellFromPoint(x: number, y: number): {
+    		row: number;
+    		cell: number;
+    	};
+    	getCellFromNode(cellNode: Element): number;
+    	getColumnFromNode(cellNode: Element): Column<TItem>;
+    	getRowFromNode(rowNode: Element): number;
+    	getCellFromEvent(e: any): {
+    		row: number;
+    		cell: number;
+    	};
+    	getCellNodeBox(row: number, cell: number): {
+    		top: number;
+    		right: number;
+    		bottom: number;
+    		left: number;
+    	};
+    	resetActiveCell(): void;
+    	focus(): void;
+    	private setFocus;
+    	scrollCellIntoView(row: number, cell: number, doPaging?: boolean): void;
+    	scrollColumnIntoView(cell: number): void;
+    	private internalScrollColumnIntoView;
+    	private setActiveCellInternal;
+    	clearTextSelection(): void;
+    	private isCellPotentiallyEditable;
+    	private makeActiveCellNormal;
+    	editActiveCell(editor?: EditorClass): void;
+    	private makeActiveCellEditable;
+    	private commitEditAndSetFocus;
+    	private cancelEditAndSetFocus;
+    	private getActiveCellPosition;
+    	getGridPosition(): Position;
+    	private handleActiveCellPositionChange;
+    	getCellEditor(): Editor;
+    	getActiveCell(): RowCell;
+    	getActiveCellNode(): HTMLElement;
+    	scrollActiveCellIntoView(): void;
+    	scrollRowIntoView(row: number, doPaging?: boolean): void;
+    	scrollRowToTop(row: number): void;
+    	private scrollPage;
+    	navigatePageDown(): void;
+    	navigatePageUp(): void;
+    	navigateTop(): void;
+    	navigateBottom(): void;
+    	navigateToRow(row: number): boolean;
+    	getColspan(row: number, cell: number): number;
+    	navigateRight(): boolean;
+    	navigateLeft(): boolean;
+    	navigateDown(): boolean;
+    	navigateUp(): boolean;
+    	navigateNext(): boolean;
+    	navigatePrev(): boolean;
+    	navigateRowStart(): boolean;
+    	navigateRowEnd(): boolean;
+    	/**
+    	 * @param {string} dir Navigation direction.
+    	 * @return {boolean} Whether navigation resulted in a change of active cell.
+    	 */
+    	navigate(dir: string): boolean;
+    	getCellNode(row: number, cell: number): HTMLElement;
+    	setActiveCell(row: number, cell: number): void;
+    	setActiveRow(row: number, cell: number, suppressScrollIntoView?: boolean): void;
+    	private canCellBeActive;
+    	canCellBeSelected(row: number, cell: number): any;
+    	gotoCell(row: number, cell: number, forceEdit?: boolean): void;
+    	commitCurrentEdit(): boolean;
+    	private cancelCurrentEdit;
+    	private rowsToRanges;
+    	getSelectedRows(): number[];
+    	setSelectedRows(rows: number[]): void;
+    }
+    interface ArgsGrid {
+    	grid?: Grid;
+    }
+    interface ArgsColumn extends ArgsGrid {
+    	column: Column;
+    }
+    interface ArgsColumnNode extends ArgsColumn {
+    	node: HTMLElement;
+    }
+    type ArgsSortCol = {
+    	sortCol: Column;
+    	sortAsc: boolean;
+    };
+    interface ArgsSort extends ArgsGrid {
+    	multiColumnSort: boolean;
+    	sortAsc?: boolean;
+    	sortCol?: Column;
+    	sortCols?: ArgsSortCol[];
+    }
+    interface ArgsSelectedRowsChange extends ArgsGrid {
+    	rows: number[];
+    	changedSelectedRows?: number[];
+    	changedUnselectedRows?: number[];
+    	previousSelectedRows?: number[];
+    	caller: any;
+    }
+    interface ArgsScroll extends ArgsGrid {
+    	scrollLeft: number;
+    	scrollTop: number;
+    }
+    interface ArgsCssStyle extends ArgsGrid {
+    	key: string;
+    	hash: CellStylesHash;
+    }
+    interface ArgsCell extends ArgsGrid {
+    	row: number;
+    	cell: number;
+    }
+    interface ArgsCellChange extends ArgsCell {
+    	item: any;
+    }
+    interface ArgsCellEdit extends ArgsCellChange {
+    	column: Column;
+    }
+    interface ArgsAddNewRow extends ArgsColumn {
+    	item: any;
+    }
+    interface ArgsEditorDestroy extends ArgsGrid {
+    	editor: Editor;
+    }
+    interface ArgsValidationError extends ArgsCell {
+    	editor: Editor;
+    	column: Column;
+    	cellNode: HTMLElement;
+    	validationResults: ValidationResult;
+    }
     const BasicLayout: {
-        new (): LayoutEngine;
+    	new (): LayoutEngine;
     };
-
     const FrozenLayout: {
-        new (): LayoutEngine;
+    	new (): LayoutEngine;
     };
+    function PercentCompleteFormatter(ctx: FormatterContext): string;
+    function PercentCompleteBarFormatter(ctx: FormatterContext): string;
+    function YesNoFormatter(ctx: FormatterContext): "Yes" | "No";
+    function CheckboxFormatter(ctx: FormatterContext): string;
+    function CheckmarkFormatter(ctx: FormatterContext): "" | "<i class=\"slick-checkmark\"></i>";
+    namespace Formatters {
+    	function PercentComplete(_row: number, _cell: number, value: any): string;
+    	function PercentCompleteBar(_row: number, _cell: number, value: any): string;
+    	function YesNo(_row: number, _cell: number, value: any): "Yes" | "No";
+    	function Checkbox(_row: number, _cell: number, value: any): string;
+    	function Checkmark(_row: number, _cell: number, value: any): "" | "<i class=\"slick-checkmark\"></i>";
+    }
+    abstract class BaseEditor {
+    	protected _input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    	protected _defaultValue: any;
+    	protected _args: EditorOptions;
+    	constructor(args: EditorOptions);
+    	abstract init(): void;
+    	destroy(): void;
+    	focus(): void;
+    	getValue(): string;
+    	setValue(val: string): void;
+    	loadValue(item: any): void;
+    	serializeValue(): any;
+    	applyValue(item: any, state: any): void;
+    	isValueChanged(): boolean;
+    	validate(): ValidationResult;
+    }
+    class TextEditor extends BaseEditor {
+    	_input: HTMLInputElement;
+    	init(): void;
+    }
+    class IntegerEditor extends TextEditor {
+    	serializeValue(): number;
+    	validate(): ValidationResult;
+    }
+    class FloatEditor extends TextEditor {
+    	static AllowEmptyValue: boolean;
+    	static DefaultDecimalPlaces: number;
+    	getDecimalPlaces(): number;
+    	loadValue(item: any): void;
+    	serializeValue(): any;
+    	validate(): ValidationResult;
+    }
+    class DateEditor extends TextEditor {
+    	private _calendarOpen;
+    	init(): void;
+    	destroy(): void;
+    	show(): void;
+    	hide(): void;
+    	position(position: Position): void;
+    }
+    class YesNoSelectEditor extends BaseEditor {
+    	_input: HTMLSelectElement;
+    	init(): void;
+    	loadValue(item: any): void;
+    	serializeValue(): boolean;
+    	isValueChanged(): boolean;
+    	validate(): {
+    		valid: boolean;
+    		msg: string;
+    	};
+    }
+    class CheckboxEditor extends BaseEditor {
+    	_input: HTMLInputElement;
+    	init(): void;
+    	loadValue(item: any): void;
+    	preClick(): void;
+    	serializeValue(): boolean;
+    	applyValue(item: any, state: any): void;
+    	isValueChanged(): boolean;
+    	validate(): {
+    		valid: boolean;
+    		msg: string;
+    	};
+    }
+    class PercentCompleteEditor extends IntegerEditor {
+    	protected _picker: HTMLDivElement;
+    	init(): void;
+    	destroy(): void;
+    }
+    class LongTextEditor extends BaseEditor {
+    	_input: HTMLTextAreaElement;
+    	protected _container: HTMLElement;
+    	protected _wrapper: HTMLDivElement;
+    	init(): void;
+    	handleKeyDown(e: KeyboardEvent): void;
+    	save(): void;
+    	cancel(): void;
+    	hide(): void;
+    	show(): void;
+    	position(position: Position): void;
+    	destroy(): void;
+    }
+    namespace Editors {
+    	const Text: typeof TextEditor;
+    	const Integer: typeof IntegerEditor;
+    	const Float: typeof FloatEditor;
+    	const Date: typeof DateEditor;
+    	const YesNoSelect: typeof YesNoSelectEditor;
+    	const Checkbox: typeof CheckboxEditor;
+    	const PercentComplete: typeof PercentCompleteEditor;
+    	const LongText: typeof LongTextEditor;
+    }
 }
 
 
 declare namespace Slick {
     interface Column<TItem = any> {
         referencedFields?: string[];
-        format?: Format<TItem>;
         sourceItem?: Q.PropertyItem;
     }
 }
@@ -2164,19 +2295,6 @@ declare namespace Slick {
 
     type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
 
-    interface FormatterContext<TItem = any> {
-        addAttrs?: {
-            [key: string]: string;
-        };
-        addClass?: string;
-        cell?: number;
-        column?: Column<TItem>;
-        grid?: Grid<TItem>;
-        item?: TItem;
-        row?: number;
-        toolTip?: string;
-        value?: any;
-    }
     interface Formatter {
         format(ctx: FormatterContext): string;
     }
@@ -2326,7 +2444,6 @@ declare namespace Slick {
 declare namespace Slick {
     interface Column<TItem = any> {
         referencedFields?: string[];
-        format?: Format<TItem>;
         sourceItem?: Q.PropertyItem;
     }
 }
@@ -2465,6 +2582,72 @@ declare namespace Serenity {
         }
     }
 
+    interface PropertyItem {
+        name?: string;
+        title?: string;
+        hint?: string;
+        placeholder?: string;
+        editorType?: string;
+        editorParams?: any;
+        category?: string;
+        collapsible?: boolean;
+        collapsed?: boolean;
+        tab?: string;
+        cssClass?: string;
+        headerCssClass?: string;
+        formCssClass?: string;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        insertPermission?: string;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        updatePermission?: string;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        readPermission?: string;
+        oneWay?: boolean;
+        defaultValue?: any;
+        localizable?: boolean;
+        visible?: boolean;
+        allowHide?: boolean;
+        formatterType?: string;
+        formatterParams?: any;
+        displayFormat?: string;
+        alignment?: string;
+        width?: number;
+        widthSet?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        labelWidth?: string;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        groupOrder?: number;
+        summaryType?: SummaryType;
+        editLink?: boolean;
+        editLinkItemType?: string;
+        editLinkIdField?: string;
+        editLinkCssClass?: string;
+        filteringType?: string;
+        filteringParams?: any;
+        filteringIdField?: string;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
+        quickFilterCssClass?: string;
+    }
+    enum SummaryType {
+        Disabled = -1,
+        None = 0,
+        Sum = 1,
+        Avg = 2,
+        Min = 3,
+        Max = 4
+    }
+
     class IBooleanValue {
     }
     interface IBooleanValue {
@@ -2570,72 +2753,6 @@ declare namespace Serenity {
 
     function executeOnceWhenVisible(element: JQuery, callback: Function): void;
     function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
-
-    interface PropertyItem {
-        name?: string;
-        title?: string;
-        hint?: string;
-        placeholder?: string;
-        editorType?: string;
-        editorParams?: any;
-        category?: string;
-        collapsible?: boolean;
-        collapsed?: boolean;
-        tab?: string;
-        cssClass?: string;
-        headerCssClass?: string;
-        formCssClass?: string;
-        maxLength?: number;
-        required?: boolean;
-        insertable?: boolean;
-        insertPermission?: string;
-        hideOnInsert?: boolean;
-        updatable?: boolean;
-        updatePermission?: string;
-        hideOnUpdate?: boolean;
-        readOnly?: boolean;
-        readPermission?: string;
-        oneWay?: boolean;
-        defaultValue?: any;
-        localizable?: boolean;
-        visible?: boolean;
-        allowHide?: boolean;
-        formatterType?: string;
-        formatterParams?: any;
-        displayFormat?: string;
-        alignment?: string;
-        width?: number;
-        widthSet?: boolean;
-        minWidth?: number;
-        maxWidth?: number;
-        labelWidth?: string;
-        resizable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        groupOrder?: number;
-        summaryType?: SummaryType;
-        editLink?: boolean;
-        editLinkItemType?: string;
-        editLinkIdField?: string;
-        editLinkCssClass?: string;
-        filteringType?: string;
-        filteringParams?: any;
-        filteringIdField?: string;
-        notFilterable?: boolean;
-        filterOnly?: boolean;
-        quickFilter?: boolean;
-        quickFilterParams?: any;
-        quickFilterSeparator?: boolean;
-        quickFilterCssClass?: string;
-    }
-    enum SummaryType {
-        Disabled = -1,
-        None = 0,
-        Sum = 1,
-        Avg = 2,
-        Min = 3,
-        Max = 4
-    }
 
     interface HandleRouteEventArgs {
         handled: boolean;
@@ -4088,23 +4205,10 @@ declare namespace Serenity {
         protected getTemplate(): string;
     }
 
-    type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+    type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
 
-    interface FormatterContext<TItem = any> {
-        addAttrs?: {
-            [key: string]: string;
-        };
-        addClass?: string;
-        cell?: number;
-        column?: Slick.Column<TItem>;
-        grid?: Slick.Grid<TItem>;
-        item?: TItem;
-        row?: number;
-        toolTip?: string;
-        value?: any;
-    }
     interface Formatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
     }
     interface GroupInfo<TItem> {
         getter?: any;
@@ -4309,7 +4413,7 @@ declare namespace Serenity {
     }
     namespace SlickFormatting {
         function getEnumText(enumKey: string, name: string): string;
-        function treeToggle<TItem>(getView: () => RemoteView<TItem>, getId: (x: TItem) => any, formatter: Format<TItem>): Format<TItem>;
+        function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any, formatter: Format): Format;
         function date(format?: string): Format;
         function dateTime(format?: string): Format;
         function checkBox(): Format;
@@ -4321,7 +4425,6 @@ declare namespace Serenity {
     }
     namespace SlickHelper {
         function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any;
-        function convertToFormatter<TItem = any>(format: Format<TItem>): Slick.ColumnFormatter<TItem>;
     }
     namespace SlickTreeHelper {
         function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
@@ -4338,47 +4441,47 @@ declare namespace Serenity {
     class IInitializeColumn {
     }
     class BooleanFormatter implements Formatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         falseText: string;
         trueText: string;
     }
     class CheckboxFormatter implements Formatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
     }
     class DateFormatter implements Formatter {
         constructor();
         static format(value: any, format?: string): any;
         displayFormat: string;
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
     }
     class DateTimeFormatter extends DateFormatter {
         constructor();
     }
     class EnumFormatter implements Formatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         enumKey: string;
         static format(enumType: any, value: any): string;
         static getText(enumKey: string, name: string): string;
         static getName(enumType: any, value: any): string;
     }
     class FileDownloadFormatter implements Formatter, IInitializeColumn {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         static dbFileUrl(filename: string): string;
         initializeColumn(column: Slick.Column): void;
         displayFormat: string;
         originalNameProperty: string;
     }
     class MinuteFormatter implements Formatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         static format(value: number): string;
     }
     class NumberFormatter {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         static format(value: any, format?: string): string;
         displayFormat: string;
     }
     class UrlFormatter implements Formatter, IInitializeColumn {
-        format(ctx: FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string;
         initializeColumn(column: Slick.Column): void;
         displayProperty: string;
         displayFormat: string;
@@ -4521,7 +4624,7 @@ declare namespace Serenity {
         getTitle(): string;
         setTitle(value: string): void;
         protected getItemType(): string;
-        protected itemLink(itemType?: string, idField?: string, text?: (ctx: FormatterContext) => string, cssClass?: (ctx: FormatterContext) => string, encode?: boolean): Format<TItem>;
+        protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Format<TItem>;
         protected getColumnsKey(): string;
         protected getPropertyItems(): PropertyItem[];
         protected getPropertyItemsAsync(): Promise<PropertyItem[]>;
@@ -4664,7 +4767,7 @@ declare namespace Serenity {
         protected getDelimited(): boolean;
         protected anyDescendantsSelected(item: TItem): boolean;
         protected getColumns(): Slick.Column[];
-        protected getItemText(ctx: FormatterContext): string;
+        protected getItemText(ctx: Slick.FormatterContext): string;
         protected getSlickOptions(): Slick.GridOptions;
         protected sortItems(): void;
         protected moveSelectedUp(): boolean;
