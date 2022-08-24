@@ -75,9 +75,12 @@ export class B1 {
             var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: new TSConfig
             {
                 BaseUrl = ".",
-                Paths = new()
+                CompilerOptions = new()
                 {
-                    ["my/*"] = new[] { "./zzz/*" }
+                    Paths = new()
+                    {
+                        ["my/*"] = new[] { "./zzz/*" }
+                    }
                 }
             });
             tl.AddInputFile(fileA);
@@ -108,9 +111,12 @@ export class B1 {
             var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: new TSConfig
             {
                 BaseUrl = ".",
-                Paths = new()
+                CompilerOptions = new()
                 {
-                    ["my/*"] = new[] { "./nnn", "./zzz/*" }
+                    Paths = new()
+                    {
+                        ["my/*"] = new[] { "./nnn", "./zzz/*" }
+                    }
                 }
             });
             tl.AddInputFile(fileA);

@@ -4,16 +4,15 @@
 
 {{NAMESPACE RootNamespaceDotModuleDot + "Pages"}} 
 {
-{{- if !AspNetCore}}
-    [RoutePrefix("{{ModuleSlash}}{{ClassName}}"), Route("{action=index}")]
-{{- end}}
+{{if !AspNetCore}}    [RoutePrefix("{{ModuleSlash}}{{ClassName}}"), Route("{action=index}")]{{end}}
     [PageAuthorize(typeof({{RowClassName}}))]
     public class {{ClassName}}Controller : Controller
-    {%{{}%}{{- if AspNetCore}}
+    {%{{}%}{{if AspNetCore}}
         [Route("{{ModuleSlash}}{{ClassName}}")]{{end}}
         public ActionResult Index()
         {
-            return View("~/Modules/{{ModuleSlash}}{{ClassName}}/{{ClassName}}Index.cshtml");
+            return this.GridPage("@/{{Module}}/{{ClassName}}/{{ClassName}}Page",
+			    {{RowClassName}}.Fields.PageTitle());
         }
     }
 }

@@ -1,0 +1,30 @@
+﻿
+export namespace {{ClassName}}Service {
+    export const baseUrl = '{{ModuleSlash}}{{ClassName}}';
+
+    export declare function Create(request: {{SERENITYIMPORT "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{SERENITYIMPORT "SaveResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
+    export declare function Update(request: {{SERENITYIMPORT "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{SERENITYIMPORT "SaveResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
+    export declare function Delete(request: {{SERENITYIMPORT "DeleteRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "DeleteResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
+    export declare function Retrieve(request: {{SERENITYIMPORT "RetrieveRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "RetrieveResponse"}}<{{RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
+    export declare function List(request: {{SERENITYIMPORT "ListRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
+
+    export declare const enum Methods {
+        Create = "Administration/User/Create",
+        Update = "Administration/User/Update",
+        Delete = "Administration/User/Delete",
+        Retrieve = "Administration/User/Retrieve",
+        List = "Administration/User/List"
+    }
+
+    [
+        'Create', 
+        'Update', 
+        'Delete', 
+        'Retrieve', 
+        'List'
+    ].forEach(x => {
+        (<any>{{ClassName}}Service)[x] = function (r, s, o) { 
+            return {{QIMPORT "serviceRequest"}}(baseUrl + '/' + x, r, s, o); 
+        };
+    });
+}

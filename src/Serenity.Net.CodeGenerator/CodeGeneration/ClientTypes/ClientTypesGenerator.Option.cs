@@ -26,7 +26,7 @@
                 return "object";
 
             if (typeName.StartsWith("System.", StringComparison.Ordinal))
-                return SystemTypes.ToCSKeyword(typeName[7..]);
+                return CodeWriter.ToCSKeyword(typeName[7..]);
 
             return typeName;
         }
