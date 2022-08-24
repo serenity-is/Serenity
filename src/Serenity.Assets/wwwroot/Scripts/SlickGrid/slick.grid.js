@@ -1544,7 +1544,9 @@ Slick._ = (() => {
       }));
     }
     setupColumnReorder() {
-      if (this._jQuery)
+      var _a;
+      const jQuerySortable = this._jQuery && ((_a = this._jQuery.fn) == null ? void 0 : _a.sortable);
+      if (jQuerySortable)
         this._jQuery(this._layout.getHeaderCols()).filter(":ui-sortable").sortable("destroy");
       var columnScrollTimer = null;
       var scrollColumnsRight = () => {
@@ -1555,7 +1557,7 @@ Slick._ = (() => {
       };
       var canDragScroll;
       var hasGrouping = this._options.groupingPanel;
-      this._jQuery([this._layout.getHeaderCols()]).sortable({
+      jQuerySortable && this._jQuery([this._layout.getHeaderCols()]).sortable({
         containment: hasGrouping ? void 0 : "parent",
         distance: 3,
         axis: hasGrouping ? void 0 : "x",
@@ -1643,7 +1645,7 @@ Slick._ = (() => {
       if (firstResizable === void 0) {
         return;
       }
-      const noJQueryDrag = !this._jQuery || !this._jQuery.fn || !(!this._jQuery.fn).drag;
+      const noJQueryDrag = !this._jQuery || !this._jQuery.fn || !this._jQuery.fn.drag;
       columnElements.forEach((el, colIdx) => {
         if (colIdx < firstResizable || this._options.forceFitColumns && colIdx >= lastResizable) {
           return;
@@ -1820,7 +1822,7 @@ Slick._ = (() => {
       while (i--) {
         this.unregisterPlugin(this._plugins[i]);
       }
-      if (this._options.enableColumnReorder && this._jQuery) {
+      if (this._options.enableColumnReorder && this._jQuery && this._jQuery.fn.sortable) {
         this._jQuery(this._layout.getHeaderCols()).filter(":ui-sortable").sortable("destroy");
       }
       this.unbindAncestorScrollEvents();

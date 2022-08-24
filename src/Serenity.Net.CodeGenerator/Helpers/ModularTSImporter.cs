@@ -1,6 +1,5 @@
 ﻿using Scriban.Runtime;
 using Serenity.CodeGeneration;
-using static Serenity.CodeGenerator.EntityModel;
 
 namespace Serenity.CodeGenerator
 {
@@ -83,7 +82,7 @@ namespace Serenity.CodeGenerator
 
         delegate string ImportDelegate(string module, string import);
         delegate string ImportFromDelegate(string import);
-        delegate string EditorVariableIndexDelegate(string editor, List<EditorVariable> editors);
+        delegate string EditorVariableIndexDelegate(string editor, List<EntityModel.EditorVariable> editors);
 
         /// <summary>
         /// Returns ScriptObject to be used in scriban templates

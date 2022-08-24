@@ -1160,7 +1160,7 @@ declare namespace Slick {
     type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
     type CellStylesHash = {
     	[row: number]: {
-    		[cell: number]: string;
+    		[columnId: string]: string;
     	};
     };
     function defaultColumnFormat(ctx: FormatterContext): any;
@@ -1598,7 +1598,7 @@ declare namespace Slick {
     function removeClass(el: Element, cls: string): void;
     function H<K extends keyof HTMLElementTagNameMap>(tag: K, attr?: {
     	ref?: (el?: HTMLElementTagNameMap[K]) => void;
-    	[key: string]: string | number | boolean | ((el?: HTMLElementTagNameMap[K]) => void);
+    	[key: string]: string | number | boolean | ((el?: HTMLElementTagNameMap[K]) => void) | null | undefined;
     }, ...children: (string | Node)[]): HTMLElementTagNameMap[K];
     function spacerDiv(width: string): HTMLDivElement;
     function parsePx(str: string): number;
