@@ -18,8 +18,9 @@ export class MyDialog extends EntityDialog {
 }
 ");
             string corelibPackage = root + "node_modules/@serenity-is/corelib/package.json";
+            string corelibIndexTS = root + "node_modules/@serenity-is/corelib/src/index.ts";
             string serenityIndexTS = root + "node_modules/@serenity-is/corelib/src/serenity/index.ts";
-            string editorTypesTS = root + "node_modules/@serenity-is/corelib/src/serenity/ui/editors/editortypes.ts";
+            string editorTypesTS = root + "node_modules/@serenity-is/corelib/src/ui/editors/editortypes.ts";
             fileSystem.CreateDirectory(fileSystem.GetDirectoryName(serenityIndexTS));
             fileSystem.CreateDirectory(fileSystem.GetDirectoryName(editorTypesTS));
 
@@ -32,6 +33,9 @@ export class MyDialog extends EntityDialog {
         }
     }
 }");
+            fileSystem.WriteAllText(corelibIndexTS, @"
+export * from ""./serenity"";
+");
 
             fileSystem.WriteAllText(serenityIndexTS, @"
 export * from ""../ui/editors/editortypes"";
@@ -53,6 +57,10 @@ export class PasswordEditor extends StringEditor {
 
             var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: new TSConfig
             {
+                CompilerOptions = new TSConfig.CompilerConfig
+                {
+                    Module = "ES2015"
+                }
             });
             tl.AddInputFile(myDialog);
 
