@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator
+﻿namespace Serenity.CodeGeneration
 {
     public class ModuleImport
     {

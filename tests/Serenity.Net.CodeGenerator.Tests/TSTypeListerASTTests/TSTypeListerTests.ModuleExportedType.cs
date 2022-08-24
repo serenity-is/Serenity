@@ -58,7 +58,7 @@ export class PasswordEditor extends StringEditor {
 
             var types = tl.ExtractTypes();
 
-            var stringEditor = Assert.Single(types, x => x.FullName == "@serenity-is/corelib/StringEditor");
+            var stringEditor = Assert.Single(types, x => x.FullName == "@serenity-is/corelib:StringEditor");
             Assert.Collection(stringEditor.Attributes,
                 attr =>
                 {

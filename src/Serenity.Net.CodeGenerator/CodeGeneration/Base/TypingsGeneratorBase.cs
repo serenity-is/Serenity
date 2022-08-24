@@ -222,7 +222,7 @@ namespace Serenity.CodeGeneration
                     }
                 }
 
-                return ((string)null, type);
+                return (null, type);
             }).Where(x => x.Item1 != null)
             .ToLookup(x => x.Item1, x => x.type);
 
