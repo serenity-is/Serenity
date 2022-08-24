@@ -1,6 +1,6 @@
 ﻿import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
-import { any, Authorization, confirm, DeleteRequest, DeleteResponse, endsWith, Exception, extend, format, getAttributes, getForm, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, PropertyItem, replaceAll, RetrieveRequest, RetrieveResponse, safeCast, SaveRequest, SaveResponse, serviceCall, ServiceOptions, startsWith, text, tryGetText, UndeleteRequest, UndeleteResponse, validatorAbortHandler } from "../../q";
+import { any, Authorization, confirm, DeleteRequest, DeleteResponse, endsWith, Exception, extend, format, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, RetrieveRequest, RetrieveResponse, safeCast, SaveRequest, SaveResponse, serviceCall, ServiceOptions, startsWith, text, tryGetText, UndeleteRequest, UndeleteResponse, validatorAbortHandler } from "../../q";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { TabsExtensions } from "../helpers/tabsextensions";
@@ -15,6 +15,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
     protected entity: TItem;
     protected entityId: any;
+    protected propertyItemsData: PropertyItemsData;
     protected propertyGrid: PropertyGrid;
 
     protected toolbar: Toolbar;
@@ -35,9 +36,35 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
     constructor(opt?: TOptions) {
         super(opt);
 
+        if (this.useAsync())
+            this.initAsync();
+        else 
+            this.initSync();        
+    }
+
+    internalInit() {
         this.initPropertyGrid();
         this.initLocalizationGrid();
     }
+
+    protected initSync() {
+        this.propertyItemsData = this.getPropertyItemsData();
+        this.internalInit();
+        this.afterInit();
+    }
+
+    protected async initAsync() {
+        this.propertyItemsData = await this.getPropertyItemsDataAsync();
+        this.internalInit();
+        this.afterInit();
+    }
+
+    protected afterInit() {
+    }    
+
+    protected useAsync() {
+        return false;
+    }    
 
     destroy(): void {
 
@@ -698,9 +725,26 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
     }
 
     protected getPropertyItems() {
-        var formKey = this.getFormKey();
-        return getForm(formKey);
+        return this.propertyItemsData?.items || [];
     }
+
+    protected getPropertyItemsData(): PropertyItemsData {
+        var formKey = this.getFormKey();
+        if (!isEmptyOrNull(formKey)) {
+            return getFormData(formKey);
+        }
+
+        return { items: [], additionalItems: [] };
+    }
+
+    protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
+        var formKey = this.getFormKey();
+        if (!isEmptyOrNull(formKey)) {
+            return await getFormDataAsync(formKey);
+        }
+
+        return { items: [], additionalItems: [] };
+    }    
 
     protected getPropertyGridOptions(): PropertyGridOptions {
         return {

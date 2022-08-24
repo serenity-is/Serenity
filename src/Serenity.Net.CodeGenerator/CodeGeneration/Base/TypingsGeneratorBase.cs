@@ -196,17 +196,29 @@ namespace Serenity.CodeGeneration
             {
                 if (type.IsAbstract != false &&
                     type.IsInterface != false &&
-                    type.Attributes != null)
+                    !string.IsNullOrEmpty(type.Module))
                 {
-                    foreach (var attr in type.Attributes)
+                    if (type.SourceFile?.EndsWith(".d.ts") == true &&
+                        //(type.GenericParameters?.Count ?? 0) == 0 &&
+                        (HasBaseType(type, ClientTypesGenerator.EditorBaseClasses) ||
+                         (HasBaseType(type, "@serenity-is/corelib:Widget", "Widget") &&
+                          type.Name.EndsWith("Editor", StringComparison.Ordinal))))
                     {
-                        if (attr.Type is not null &&
-                            (attr.Type == "registerEditor" ||
-                             attr.Type.EndsWith(".registerEditor", StringComparison.Ordinal)) &&
-                            attr.Arguments?.Count > 0 &&
-                            attr.Arguments[0]?.Value is string s &&
-                            !string.IsNullOrEmpty(s))
-                            return (s, type);
+                        return (type.Name, type);
+                    }
+                    
+                    if (type.Attributes != null)
+                    {
+                        foreach (var attr in type.Attributes)
+                        {
+                            if (attr.Type is not null &&
+                                (attr.Type == "registerEditor" ||
+                                 attr.Type.EndsWith(".registerEditor", StringComparison.Ordinal)) &&
+                                attr.Arguments?.Count > 0 &&
+                                attr.Arguments[0]?.Value is string s &&
+                                !string.IsNullOrEmpty(s))
+                                return (s, type);
+                        }
                     }
                 }
 

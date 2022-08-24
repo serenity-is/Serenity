@@ -6,7 +6,7 @@ namespace Serenity.Web
     {
         private readonly Dictionary<string, object> lookupParams;
 
-        public record LookupScriptData(IEnumerable Items, Dictionary<string, object> Params);
+        public record Data(IEnumerable Items, Dictionary<string, object> Params);
 
         protected LookupScript()
         {
@@ -17,7 +17,7 @@ namespace Serenity.Web
 
         public object GetScriptData()
         {
-            return new LookupScriptData(GetItems(), LookupParams);
+            return new Data(GetItems(), LookupParams);
         }
 
         public override string GetScript()

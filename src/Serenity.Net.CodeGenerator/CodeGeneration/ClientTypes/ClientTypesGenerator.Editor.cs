@@ -53,7 +53,7 @@
             "Decorators.element"
         };
 
-        static readonly string[] EditorBaseClasses = new[]
+        public static readonly string[] EditorBaseClasses = new[]
         {
             "Serenity.Extensions.GridEditorBase",
             "GridEditorBase",

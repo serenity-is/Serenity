@@ -56,6 +56,10 @@
     quickFilterCssClass?: string;
 }
 
+export interface PropertyItemsData {
+    items: PropertyItem[];
+    additionalItems: PropertyItem[];
+}
    
 export enum SummaryType {
     Disabled = -1,
