@@ -142,6 +142,7 @@ export class GridRowSelectionMixin {
     static createSelectColumn(getMixin: () => GridRowSelectionMixin): Column {
         return {
             name: '<span class="select-all-items check-box no-float "></span>',
+            nameIsHtml: true,
             toolTip: ' ',
             field: '__select__',
             width: 27,
