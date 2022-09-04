@@ -1,3 +1,8 @@
+## 6.1.1 (2022-09-04)
+
+Bugfixes:
+  - must set nameIsHtml in GridRowSelectionMixin.createSelectColumn
+
 ## 6.1.0 (2022-09-04)
 
 Features:
@@ -12,6 +17,7 @@ Features:
   - Q.ScriptData methods won't raise a client side error if a script that does not seem to be registered (registeredscripts) is tried to be loaded, it will try, then fail if server does not return it
   - preparation for es6 modular typescript code generation / transform / source generators (StartSharp)
   - new .NET Source Generators for clienttypes, servertypings and mvc commands in addition to a row fields source generator via RowTemplate class (StartSharp, Serenity.Pro.Coder nuget package)
+  - [Breaking Change] global Promise interface augmentation is removed, please update your target to ES6 in tsconfig.json if you use Promise.resolve etc. anywhere
 
 ## 6.0.8 (2022-07-12)
 
