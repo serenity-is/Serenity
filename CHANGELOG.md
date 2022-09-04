@@ -1,3 +1,18 @@
+## 6.1.0 (2022-09-04)
+
+Features:
+  - rewrote slickgrid (sleekgrid) in typescript (https://github.com/serenity-is/sleekgrid)
+  - formatters can add classes, attributes and tooltip to the target cell directly via ctx properties
+  - allow setting end of line character to lf/crlf manually in sergen.json via "EndOfLine" setting.
+  - published @serenity-is/corelib as an npm package (modular version with embedded source)
+  - useAsync option for datagrid, entitygrid, propertydialog and entitydialog
+  - ability to retrieve data as json from dynamic scripts e.g. lookups etc via /DynamicData instead of /DynJS.axd
+  - code generator will generate code with only usings that are actually used implemented via helper methods in Scriban templates
+  - [Breaking Change] Columns and Form dynamic scripts returns an object (PropertyItemsData) instead of array. It should not be a breaking change if you receive those scripts via Q.getColumns, Q.getForm etc. methods (legacy), but make sure you update both Serenity.Scripts and Serenity.Web to 6.1.0 at least.
+  - Q.ScriptData methods won't raise a client side error if a script that does not seem to be registered (registeredscripts) is tried to be loaded, it will try, then fail if server does not return it
+  - preparation for es6 modular typescript code generation / transform / source generators (StartSharp)
+  - new .NET Source Generators for clienttypes, servertypings and mvc commands in addition to a row fields source generator via RowTemplate class (StartSharp, Serenity.Pro.Coder nuget package)
+
 ## 6.0.8 (2022-07-12)
 
 Features:

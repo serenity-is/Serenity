@@ -475,7 +475,7 @@ namespace Serenity.CodeGenerator
         {
             /// <summary>
             /// Initial type of project. Available options are
-            /// "Free" e.g. Sere, "Premium" e.g. StartSharp
+            /// "Free" e.g. Serene, "Premium" e.g. StartSharp
             /// </summary>
             public string InitialType { get; set; }
             /// <summary>
