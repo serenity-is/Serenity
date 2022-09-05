@@ -2,7 +2,7 @@
   "profiles": {
     "Serenity.CodeGenerator": {
       "commandName": "Project",
-      "commandLineArgs": "g",
+      "commandLineArgs": "t",
       "workingDirectory": "C:\\Sandbox\\StartSharp\\StartSharp\\StartSharp.Web"
     }
   }

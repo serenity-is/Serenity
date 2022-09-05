@@ -147,6 +147,19 @@ namespace Serenity.CodeGenerator
                 PathHelper.ToPath((config.ServerTypings?.OutDir.TrimToNull() ?? 
                     (modules ? "Modules/ServerTypes" : "Imports/ServerTypings"))));
 
+            if (modules)
+            {
+                var modulesDir = fileSystem.Combine(projectDir, "Modules");
+                var rootNsDir = fileSystem.Combine(projectDir, config.RootNamespace);
+                if (fileSystem.DirectoryExists(rootNsDir) &&
+                    !fileSystem.DirectoryExists(modulesDir))
+                {
+                    modulesDir = rootNsDir;
+                    if (generator.ModuleTypings)
+                        outDir = config.RootNamespace + "/ServerTypes";
+                }
+            }
+
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("Transforming " + (modules ? "ServerTypes" : "ServerTypings") + " at: ");
             Console.ResetColor();
@@ -161,22 +174,12 @@ namespace Serenity.CodeGenerator
 
             var generatedSources = generator.Run();
 
-            void writeFiles(string outDir, Func<GeneratedSource, bool> predicate)
-            {
-                MultipleOutputHelper.WriteFiles(fileSystem, outDir,
-                    generatedSources.Where(x => predicate(x))
-                        .Select(x => (x.Filename, x.Text)),
-                    deleteExtraPattern: new[] { "*.ts" },
-                    endOfLine: config.EndOfLine);
-            }
-
-            if (generator.ModuleTypings)
-                writeFiles(fileSystem.Combine(projectDir, "Modules", "ServerTypes"),
-                    x => x.Module);
-
-            if (generator.NamespaceTypings)
-                writeFiles(fileSystem.Combine(projectDir, "Imports", "ServerTypings"),
-                    x => !x.Module);
+            MultipleOutputHelper.WriteFiles(fileSystem, 
+                fileSystem.Combine(projectDir, PathHelper.ToPath(outDir)),
+                generatedSources.Where(x => x.Module == modules)
+                    .Select(x => (x.Filename, x.Text)),
+                deleteExtraPattern: new[] { "*.ts" },
+                endOfLine: config.EndOfLine);
         }
     }
 }
