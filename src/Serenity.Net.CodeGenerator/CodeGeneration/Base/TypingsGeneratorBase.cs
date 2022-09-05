@@ -937,27 +937,38 @@ namespace Serenity.CodeGeneration
             {
                 if (module)
                 {
-                    sb.Insert(0, string.Join(Environment.NewLine,
-                        moduleImports.ToLookup(x => (x.From, x.External))
-                            .Select(z =>
+                    var dotTsIndex = filename.IndexOf(".ts", StringComparison.Ordinal);
+                    var currentFrom = filename;
+
+                    if (dotTsIndex >= 0)
+                        currentFrom = filename[..dotTsIndex];
+
+                    var moduleImportsLookup = moduleImports
+                        .Where(x => x.From != currentFrom)
+                        .ToLookup(x => (x.From, x.External));
+
+                    if (moduleImportsLookup.Any())
+                    {
+                        sb.Insert(0, string.Join(Environment.NewLine, moduleImportsLookup.Select(z =>
+                        {
+                            var from = z.Key.From;
+                            if (!z.Key.External &&
+                                !from.StartsWith("/", StringComparison.Ordinal) &&
+                                !from.StartsWith(".", StringComparison.Ordinal))
                             {
-                                var from = z.Key.From;
-                                if (!z.Key.External && 
-                                    !from.StartsWith("/", StringComparison.Ordinal) &&
-                                    !from.StartsWith(".", StringComparison.Ordinal))
-                                {
-                                    if (System.IO.Path.GetDirectoryName(filename) ==
-                                        System.IO.Path.GetDirectoryName(from))
-                                        from = "./" + System.IO.Path.GetFileName(from);
-                                    else
-                                        from = "../" + from;
-                                }
+                                if (System.IO.Path.GetDirectoryName(filename) ==
+                                    System.IO.Path.GetDirectoryName(from))
+                                    from = "./" + System.IO.Path.GetFileName(from);
+                                else
+                                    from = "../" + from;
+                            }
 
-                                var importList = string.Join(", ", z.Select(p =>
-                                    p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
+                            var importList = string.Join(", ", z.Select(p =>
+                                p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
 
-                                return $"import {{ {importList} }} from \"{from}\";";
-                            })) + Environment.NewLine + Environment.NewLine);
+                            return $"import {{ {importList} }} from \"{from}\";";
+                        })) + Environment.NewLine + Environment.NewLine);
+                    }
                 }
 
                 moduleImports.Clear();
