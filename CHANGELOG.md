@@ -1,3 +1,9 @@
+## 6.1.2 (2022-09-05)
+
+Bugfixes:
+  - fix output dir for razor sdk projects modular servertypes
+  - fix for modular import from self file
+
 ## 6.1.1 (2022-09-04)
 
 Bugfixes:
