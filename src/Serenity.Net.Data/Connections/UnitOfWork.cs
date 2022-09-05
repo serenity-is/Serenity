@@ -25,6 +25,20 @@
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="UnitOfWork"/> class
+        /// with the specified System.Data.IsolationLevel value.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="il">One of the <see cref="T:System.Data.IsolationLevel"></see> values.</param>
+        /// <exception cref="ArgumentNullException">connection</exception>
+        public UnitOfWork(IDbConnection connection, IsolationLevel il)
+        {
+            _connection = connection ?? throw new ArgumentNullException("connection");
+            connection.EnsureOpen();
+            _transaction = connection.BeginTransaction(il);
+        }
+
+        /// <summary>
         /// Gets the connection.
         /// </summary>
         /// <value>
