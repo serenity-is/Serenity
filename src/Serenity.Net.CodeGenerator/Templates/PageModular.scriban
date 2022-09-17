@@ -12,7 +12,7 @@
         public ActionResult Index()
         {
             return this.GridPage("@/{{Module}}/{{ClassName}}/{{ClassName}}Page",
-			    {{RowClassName}}.Fields.PageTitle());
+                {{RowClassName}}.Fields.PageTitle());
         }
     }
 }

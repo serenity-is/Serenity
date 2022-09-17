@@ -1,5 +1,4 @@
 ﻿
-{{QIMPORT "initFullHeightGridPage"}}
 $(function() {
-    (new {{IMPORTFROM "./" + ClassName + "Grid" ClassName + "Grid"}}($('#GridDiv')).element);
+    {{QIMPORT "initFullHeightGridPage"}}(new {{IMPORTFROM "./" + ClassName + "Grid" ClassName + "Grid"}}($('#GridDiv')).element);
 });
