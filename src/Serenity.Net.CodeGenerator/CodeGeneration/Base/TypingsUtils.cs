@@ -504,6 +504,9 @@ namespace Serenity.Reflection
 
         public static IEnumerable<TypeReference> EnumerateBaseClasses(TypeReference typeRef)
         {
+            if (typeRef is null)
+                return Array.Empty<TypeReference>();
+
 #if !ISSOURCEGENERATOR
             var key = GetCacheKey(typeRef);
             if (BaseClassCache.TryGetValue(key, out var cached))
@@ -519,11 +522,11 @@ namespace Serenity.Reflection
                 typeDef = typeRef.Resolve();
 #endif
 
-            var baseType = typeDef.BaseType;
+            var baseType = typeDef?.BaseType;
             if (baseType != null)
             {
-                list.Add(typeDef.BaseType);
-                list.AddRange(EnumerateBaseClasses(typeDef.BaseType));
+                list.Add(baseType);
+                list.AddRange(EnumerateBaseClasses(baseType));
             }
 
 #if !ISSOURCEGENERATOR
