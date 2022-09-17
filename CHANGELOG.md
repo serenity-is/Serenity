@@ -1,3 +1,9 @@
+## 6.1.3 (2022-09-05)
+
+Bugfixes:
+  - wrap grid creation in jquery ready for modular page in sergen
+  - fix possible null ref exception when Cecil returns null for typeDef.Resolve()
+
 ## 6.1.2 (2022-09-05)
 
 Bugfixes:
