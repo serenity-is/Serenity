@@ -102,6 +102,7 @@ Slick._ = (() => {
       const uisd = options.useLegacyUI ? " ui-state-default" : "";
       headerCols = H("div", { class: "slick-header-columns", style: (options.rtl ? "right" : "left") + ":-1000px" });
       var headerColsS = H("div", { class: "slick-header" + uisd, style: !options.showColumnHeader && "display: none" }, headerCols);
+      updateHeadersWidth();
       headerRowCols = H("div", { class: "slick-headerrow-columns" });
       headerRowSpacer = spacerDiv(spacerW);
       var headerRow = H("div", { class: "slick-headerrow" + uisd, style: !options.showHeaderRow && "display: none" }, headerRowCols, headerRowSpacer);
@@ -239,14 +240,12 @@ Slick._ = (() => {
       canvasWidth = calcCanvasWidth();
       var scrollWidth = host.getScrollDims().width;
       const vpi = host.getViewportInfo();
-      if (canvasWidth != oldCanvasWidth) {
-        var canvasWidthPx = canvasWidth + "px";
-        canvas.style.width = canvasWidthPx;
-        headerRowCols.style.width = canvasWidthPx;
-        footerRowCols.style.width = canvasWidthPx;
-        updateHeadersWidth();
-        vpi.hasHScroll = canvasWidth > host.getViewportInfo().width - scrollWidth;
-      }
+      var canvasWidthPx = canvasWidth + "px";
+      canvas.style.width = canvasWidthPx;
+      headerRowCols.style.width = canvasWidthPx;
+      footerRowCols.style.width = canvasWidthPx;
+      updateHeadersWidth();
+      vpi.hasHScroll = canvasWidth > host.getViewportInfo().width - scrollWidth;
       var spacerWidthPx = canvasWidth + (vpi.hasVScroll ? scrollWidth : 0) + "px";
       headerRowSpacer.style.width = spacerWidthPx;
       footerRowSpacer.style.width = spacerWidthPx;
@@ -1154,7 +1153,10 @@ Slick._ = (() => {
       this.createCssRules();
       this.resizeCanvas();
       this._layout.bindAncestorScrollEvents();
-      this._container.addEventListener("resize", this.resizeCanvas);
+      if (this._jQuery)
+        $(this._container).on("resize", this.resizeCanvas);
+      else
+        this._container.addEventListener("resize", this.resizeCanvas);
       viewports.forEach((vp) => {
         var scrollTicking = false;
         vp.addEventListener("scroll", (e) => {
