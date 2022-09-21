@@ -649,7 +649,7 @@ namespace Serenity.CodeGeneration
 
         protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, bool module)
         {
-            var fullName = ShortenFullName(type.NamespaceOf(), type.Name, codeNamespace, module, null);
+            var fullName = ShortenFullName(GetNamespace(type), type.Name, codeNamespace, module, null);
 
             if (type.IsGenericInstance())
             {
