@@ -1,3 +1,16 @@
+## 6.1.6 (2022-09-21)
+
+Bugfixes:
+  - resolve issue with msbuild locator causing sergen restore to fail
+
+## 6.1.5 (2022-09-21)
+
+Bugfixes:
+  - fix sergen servertypings not removing suffixes like .Entities
+
+## 6.1.4 (2022-09-20)
+  - fix slickgrid headers trimmed in smaller screen when in a sub dialog
+
 ## 6.1.3 (2022-09-05)
 
 Bugfixes:
