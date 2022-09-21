@@ -31,8 +31,8 @@
     <PackageReference Include="MySqlConnector" Version="2.1.8" />
     <PackageReference Include="Npgsql" Version="6.0.3" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
-    <PackageReference Include="Microsoft.Build" Version="17.1.0" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.1.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build" Version="17.3.1" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.3.1" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
     <PackageReference Include="Spectre.Console" Version="0.43.0" />
   </ItemGroup>
