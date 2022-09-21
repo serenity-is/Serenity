@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>6.1.4</Version>
+    <Version>6.1.5</Version>
     <StaticWebAssetBasePath>/Serenity.Assets</StaticWebAssetBasePath>
     <EnableGlobalUsings>false</EnableGlobalUsings>
   </PropertyGroup>
