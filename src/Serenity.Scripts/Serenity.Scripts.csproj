@@ -13,14 +13,11 @@
 
   <ItemGroup>
     <None Remove="*\tsconfig.json;style\*.css;texts\**\*.json;" />
-    <Content Update="*.json">
+    <Content Update="*.json;**\tsconfig.json;**\package.json;**\package-lock.json">
       <CopyToOutputDirectory>false</CopyToOutputDirectory>
       <Pack>false</Pack>
     </Content>
     <Content Remove="texts\**\*.json" />
-    <Content Update="*\tsconfig.json">
-      <Pack>false</Pack>
-    </Content>
     <None Include="style\*.css">
       <Pack>true</Pack>
       <PackagePath>content\Content\serenity\</PackagePath>
