@@ -11,7 +11,6 @@
       "jquery",
       "jquery.validation",
       "jqueryui",
-      "bootstrap",
       "toastr",
       "react",
       "jest",
