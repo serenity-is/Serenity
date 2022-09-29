@@ -1,4 +1,6 @@
-﻿export interface PropertyItem {
+﻿import { registerEnum } from "./system";
+
+export interface PropertyItem {
     name?: string;
     title?: string;
     hint?: string;
@@ -69,3 +71,5 @@ export enum SummaryType {
     Min = 3,
     Max = 4
 }
+
+registerEnum(SummaryType, 'Serenity.SummaryType');

@@ -1,6 +1,6 @@
 ﻿import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
-import { any, Authorization, confirm, DeleteRequest, DeleteResponse, endsWith, Exception, extend, format, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, RetrieveRequest, RetrieveResponse, safeCast, SaveRequest, SaveResponse, serviceCall, ServiceOptions, startsWith, text, tryGetText, UndeleteRequest, UndeleteResponse, validatorAbortHandler } from "../../q";
+import { any, Authorization, confirm, DeleteRequest, DeleteResponse, endsWith, Exception, extend, format, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, RetrieveRequest, RetrieveResponse, safeCast, SaveRequest, SaveResponse, ScriptData, serviceCall, ServiceOptions, startsWith, text, tryGetText, UndeleteRequest, UndeleteResponse, validatorAbortHandler } from "../../q";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { TabsExtensions } from "../helpers/tabsextensions";
@@ -730,6 +730,16 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
     protected getPropertyItemsData(): PropertyItemsData {
         var formKey = this.getFormKey();
+
+        if (this.getFormKey === EntityDialog.prototype.getFormKey &&
+            this.getPropertyItems !== EntityDialog.prototype.getPropertyItems &&
+            !ScriptData.canLoad('Form.' + formKey)) {
+            return {
+                items: this.getPropertyItems(),
+                additionalItems: []
+            }
+        }
+
         if (!isEmptyOrNull(formKey)) {
             return getFormData(formKey);
         }

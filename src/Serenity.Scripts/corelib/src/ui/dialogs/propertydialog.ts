@@ -1,5 +1,5 @@
 ﻿import { Decorators, FormKeyAttribute } from "../../decorators";
-import { DialogButton, endsWith, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, PropertyItem, PropertyItemsData, text } from "../../q";
+import { DialogButton, endsWith, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, PropertyItem, PropertyItemsData, ScriptData, text } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { TemplatedDialog } from "./templateddialog";
 
@@ -140,6 +140,16 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
 
     protected getPropertyItemsData(): PropertyItemsData {
         var formKey = this.getFormKey();
+
+        if (this.getFormKey === PropertyDialog.prototype.getFormKey &&
+            this.getPropertyItems !== PropertyDialog.prototype.getPropertyItems &&
+            !ScriptData.canLoad('Form.' + formKey)) {
+            return {
+                items: this.getPropertyItems(),
+                additionalItems: []
+            }
+        }
+
         if (!isEmptyOrNull(formKey)) {
             return getFormData(formKey);
         }

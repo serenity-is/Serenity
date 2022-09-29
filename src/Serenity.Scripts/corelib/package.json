@@ -1,6 +1,6 @@
 {
   "name": "@serenity-is/corelib",
-  "version": "6.1.7",
+  "version": "6.1.8",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity CoreLib including Q, Serenity and Slick namespaces",
@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@happy-dom/jest-environment": "^6.0.4",
-    "@rollup/plugin-typescript": "8.3.4",
+    "@rollup/plugin-typescript": "8.5.0",
     "@types/jest": "27.0.2",
     "@types/node": "14.14.14",
     "esbuild": "0.15.2",
@@ -21,7 +21,7 @@
     "jest": "27.3.1",
     "jest-esbuild": "^0.2.9",
     "jquery": "3.6.0",
-    "rollup": "2.77.0",
+    "rollup": "2.79.1",
     "rollup-plugin-dts": "4.2.2",
     "terser": "^5.14.2",
     "tslib": "2.4.0",

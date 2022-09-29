@@ -9,7 +9,7 @@ import { basename, resolve } from "path";
 var globals = {
     'jquery': '$',
     'flatpickr': 'flatpickr',
-    'tslib': 'tslib',
+    'tslib': 'this.window || this',
     '@serenity-is/sleekgrid': 'this.Slick = this.Slick || {}'
 }
 
@@ -160,15 +160,11 @@ var extendGlobals = function () {
 
                 if (code && fileName.indexOf('.js') >= 0) {
                     var src = code;
-                    src = fs.readFileSync('./node_modules/tslib/tslib.js',
-                        'utf8').replace(/^\uFEFF/, '') + '\n' + src;
                     src = src.replace(/^(\s*)exports\.([A-Za-z_]+)\s*=\s*(.+?);/gm, function (match, grp1, grp2, grp3) {
                         if (grp2.charAt(0) == '_' && grp2.charAt(1) == '_')
                             return grp1 + "exports." + grp2 + " = exports." + grp2 + " || " + grp3 + ";";
                         return grp1 + "exports." + grp2 + " = exports." + grp2 + " || {}; extend(exports." + grp2 + ", " + grp3 + ");";
                     });
-                    src = src.replace(/,\s*tslib/g, '');
-                    src = src.replace(/tslib\.__/g, '__');
                     b[fileName].code = src;
                 }
                 else if (code && /(Globals\/.*|Globals|Globals\..*)\.d\.ts$/i.test(fileName) && code.indexOf('declare global') < 0) {
@@ -184,8 +180,8 @@ async function minifyScript(fileName) {
         mangle: true,
         sourceMap: {
             content: fs.existsSync(fileName + '.map') ? fs.readFileSync(fileName + '.map', 'utf8') : undefined,
-            filename: fileName.replace(/\.js$/, '.min.js'),
-            url: fileName.replace(/\.js$/, '.min.js.map'),
+            filename: fileName.replace(/\.js$/, '.min.js').replace(/\.\/out\//g, ''),
+            url: fileName.replace(/\.js$/, '.min.js.map').replace(/\.\/out\//g, '')
         },
         format: {
             beautify: false,
@@ -226,6 +222,8 @@ export default [
                 name: "window",
                 extend: true,
                 freeze: false,
+                banner: fs.readFileSync('./node_modules/tslib/tslib.js',
+                    'utf8').replace(/^\uFEFF/, '') + '\n',
                 globals
             }
         ],
