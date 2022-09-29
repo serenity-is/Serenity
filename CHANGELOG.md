@@ -1,4 +1,15 @@
-## 6.1.6 (2022-09-21)
+## 6.1.8 (2022-09-29)
+
+Bugfixes:
+  - fix source mapping for corelib.js
+  - [Breaking Change] please override getPropertyItemsData instead of getPropertyItems (bug since 6.1.0) when there is not a form key / columns key
+
+## 6.1.7 (2022-09-29)
+
+Bugfixes:
+  - don't include package.json / tsconfig.json files inside Serenity.Scripts nuget package as content files 
+
+## 6.1.6 (2022-09-29)
 
 Bugfixes:
   - resolve issue with msbuild locator causing sergen restore to fail
