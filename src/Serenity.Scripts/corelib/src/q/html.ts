@@ -92,24 +92,6 @@ export function htmlEncode(s: any): string {
     return text;
 }
 
-export function jsRender(markup: string, data?: any) {
-    if (!markup || markup.indexOf('{{') < 0) {
-        return markup;
-    }
-
-    if (!($ as any).templates || !($ as any).views) {
-        throw new Exception('Please make sure that jsrender.js is included in the page!');
-    }
-
-    data = data || {};
-    var template = ($ as any).templates(markup);
-    ($ as any).views.converters({
-        text: text
-    }, template);
-
-    return template.render(data);
-}
-
 export function log(m: any) {
     if (typeof console !== "undefined" && console.log)
         console.log(m);
