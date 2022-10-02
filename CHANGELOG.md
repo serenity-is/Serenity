@@ -1,3 +1,11 @@
+## 6.1.9 (2022-10-02)
+
+Features:
+  - enabled source generator (Serenity.Pro.Coder) in StartSharp template
+  - [Breaking Change] Q.Config.responsiveDialogs is now assumed to be true by default (this should not affect anyone unless using a very old version like 2.x etc)
+  - move idPrefix up to widget, introduce renderContents method which can be overridden to manually to initialize widget content via another method instead of an html template
+  - remove unused jsRender method
+
 ## 6.1.8 (2022-09-29)
 
 Bugfixes:
