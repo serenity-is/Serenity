@@ -765,7 +765,6 @@ declare namespace Q {
      * @param s String to be HTML encoded
      */
     function htmlEncode(s: any): string;
-    function jsRender(markup: string, data?: any): any;
     function log(m: any): void;
     function newBodyDiv(): JQuery;
     function outerHtml(element: JQuery): string;

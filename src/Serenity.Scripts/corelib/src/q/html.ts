@@ -1,5 +1,4 @@
-﻿import { Exception } from "./system";
-import { text } from "./localtext";
+﻿import { text } from "./localtext";
 import { isEmptyOrNull } from "./strings";
 
 export function addOption(select: JQuery, key: string, text: string) {
