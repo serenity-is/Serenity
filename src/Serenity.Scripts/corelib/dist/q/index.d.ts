@@ -108,8 +108,7 @@ declare var Config: {
      */
     emailAllowOnlyAscii: boolean;
     /**
-     * Set this to true, to enable responsive dialogs by default, without having to add Decorators.responsive()"
-     * on dialog classes manually. It's false by default for backward compatibility.
+     * @Obsolete defaulted to false before for backward compatibility, now its true by default
      */
     responsiveDialogs: boolean;
     /**

@@ -510,8 +510,7 @@ declare namespace Q {
          */
         emailAllowOnlyAscii: boolean;
         /**
-         * Set this to true, to enable responsive dialogs by default, without having to add Decorators.responsive()"
-         * on dialog classes manually. It's false by default for backward compatibility.
+         * @Obsolete defaulted to false before for backward compatibility, now its true by default
          */
         responsiveDialogs: boolean;
         /**
@@ -3010,6 +3009,7 @@ declare namespace Serenity {
         protected options: TOptions;
         protected widgetName: string;
         protected uniqueName: string;
+        protected idPrefix: string;
         constructor(element: JQuery, options?: TOptions);
         destroy(): void;
         protected addCssClass(): void;
@@ -3023,6 +3023,7 @@ declare namespace Serenity {
         static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
         initialize(): void;
         init(action?: (widget: any) => void): this;
+        protected renderContents(): void;
         private static __isWidgetType;
     }
     interface Widget<TOptions> {
@@ -3073,9 +3074,7 @@ declare namespace Serenity {
     }
 
     class TemplatedWidget<TOptions> extends Widget<TOptions> {
-        protected idPrefix: string;
         private static templateNames;
-        constructor(container: JQuery, options?: TOptions);
         protected byId(id: string): JQuery;
         private byID;
         private static noGeneric;
@@ -3083,6 +3082,7 @@ declare namespace Serenity {
         protected getTemplateName(): string;
         protected getFallbackTemplate(): string;
         protected getTemplate(): string;
+        protected renderContents(): void;
     }
 
     class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {

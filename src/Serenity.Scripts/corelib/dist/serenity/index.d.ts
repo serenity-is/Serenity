@@ -672,6 +672,7 @@ declare class Widget<TOptions> {
     protected options: TOptions;
     protected widgetName: string;
     protected uniqueName: string;
+    protected idPrefix: string;
     constructor(element: JQuery, options?: TOptions);
     destroy(): void;
     protected addCssClass(): void;
@@ -685,6 +686,7 @@ declare class Widget<TOptions> {
     static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
     initialize(): void;
     init(action?: (widget: any) => void): this;
+    protected renderContents(): void;
     private static __isWidgetType;
 }
 declare interface Widget<TOptions> {
@@ -751,9 +753,7 @@ declare class Toolbar extends Widget<ToolbarOptions> {
 }
 
 declare class TemplatedWidget<TOptions> extends Widget<TOptions> {
-    protected idPrefix: string;
     private static templateNames;
-    constructor(container: JQuery, options?: TOptions);
     protected byId(id: string): JQuery;
     private byID;
     private static noGeneric;
@@ -761,6 +761,7 @@ declare class TemplatedWidget<TOptions> extends Widget<TOptions> {
     protected getTemplateName(): string;
     protected getFallbackTemplate(): string;
     protected getTemplate(): string;
+    protected renderContents(): void;
 }
 
 declare class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
