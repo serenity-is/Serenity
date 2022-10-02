@@ -1,6 +1,6 @@
 {
   "name": "@serenity-is/corelib",
-  "version": "6.1.8",
+  "version": "6.1.9",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity CoreLib including Q, Serenity and Slick namespaces",
