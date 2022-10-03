@@ -6,6 +6,7 @@
         public DateTime Time { get; }
         public byte[] Content { get; }
         public bool CanCompress { get; }
+        public byte[] BrotliContent { get; }
         public byte[] CompressedContent { get; }
     }
 }

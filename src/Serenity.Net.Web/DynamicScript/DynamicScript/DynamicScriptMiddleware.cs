@@ -94,11 +94,19 @@ namespace Serenity.Web.Middleware
             cacheControl.MustRevalidate = false;
             responseHeaders.CacheControl = cacheControl;
 
-            var supportsGzip = scriptContent.CanCompress && 
+            var supportsBrotli = scriptContent.CanCompress &&
+                context.Request.Headers["Accept-Encoding"].Any(x => x.Contains("br", StringComparison.Ordinal));
+
+            var supportsGzip = !supportsBrotli && scriptContent.CanCompress && 
                 context.Request.Headers["Accept-Encoding"].Any(x => x.Contains("gzip", StringComparison.Ordinal));
 
             byte[] contentBytes;
-            if (supportsGzip)
+            if (supportsBrotli)
+            {
+                context.Response.Headers["Content-Encoding"] = "br";
+                contentBytes = scriptContent.BrotliContent;
+            }
+            else if (supportsGzip)
             {
                 context.Response.Headers["Content-Encoding"] = "gzip";
                 contentBytes = scriptContent.CompressedContent;
