@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
+using Newtonsoft.Json.Linq;
 using Serenity.Localization;
+using System.IO;
+using static System.Net.WebRequestMethods;
 
 namespace Serenity.Extensions.DependencyInjection
 {
@@ -143,8 +147,15 @@ namespace Serenity.Extensions.DependencyInjection
             return collection;
         }
 
-        public static void AddAllTexts(this IServiceProvider provider,
-            params string[] jsonTextPaths)
+        /// <summary>
+        /// Adds nested texts, enum texts, permission texts, row texts and json local text assets
+        /// </summary>
+        /// <param name="provider">The service provider that will be used to locate text registry and other types</param>
+        /// <param name="webFileProvider">If passed, json texts from static web assets will be added from Serenity.Scripts,
+        /// and any assembly with a JsonLocalTextAssetsAttribute attribute</param>
+        /// <returns>Local text registry</returns>
+        /// <exception cref="ArgumentNullException">Provider is null</exception>
+        public static ILocalTextRegistry AddBaseTexts(this IServiceProvider provider, IFileProvider webFileProvider)
         {
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));
@@ -157,8 +168,85 @@ namespace Serenity.Extensions.DependencyInjection
             textRegistry.AddNestedPermissions(typeSource);
             var rowInstances = rowTypeRegistry.AllRowTypes.Select(x => (IRow)Activator.CreateInstance(x));
             textRegistry.AddRowTexts(rowInstances);
+
+            if (webFileProvider is not null)
+            {
+                textRegistry.AddJsonTexts(webFileProvider, "Serenity.Scripts/texts");
+                foreach (var attr in typeSource.GetAssemblyAttributes<JsonLocalTextAssetsAttribute>())
+                    if (!string.IsNullOrEmpty(attr.Path))
+                        textRegistry.AddJsonTexts(webFileProvider, attr.Path);
+            }
+
+            return textRegistry;
+        }
+
+        [Obsolete("Use AddBaseTexts().AddJsonTexts().AddJsonTexts()...")]
+        /// <summary>
+        /// Adds type texts and JSON texts from passed folders
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="jsonTextPaths"></param>
+        public static void AddAllTexts(this IServiceProvider provider, params string[] jsonTextPaths)
+        {
+            var textRegistry = AddBaseTexts(provider, webFileProvider: null);
             foreach (var path in jsonTextPaths)
                 textRegistry.AddJsonTexts(path);
+        }
+
+        /// <summary>
+        /// Adds json texts from file provider and subpath
+        /// </summary>
+        /// <param name="registry">The text registry</param>
+        /// <param name="provider">File provider</param>
+        /// <param name="subpath">Sub path</param>
+        /// <param name="recursive">True to recursively scan (default true)</param>
+        /// <returns>The text registry</returns>
+        /// <exception cref="ArgumentNullException">registry, provider or subpath is null</exception>
+        public static ILocalTextRegistry AddJsonTexts(this ILocalTextRegistry registry, IFileProvider provider, string subpath, bool recursive = true)
+        {
+            if (registry is null)
+                throw new ArgumentNullException(nameof(registry));
+
+            if (provider is null)
+                throw new ArgumentNullException(nameof(provider));
+            
+            if (subpath is null)
+                throw new ArgumentNullException(nameof(subpath));
+
+            var contents = provider.GetDirectoryContents(subpath);
+            if (contents is null || !contents.Exists)
+                return registry;
+
+            foreach (var entry in contents.OrderBy(x => x.Name, StringComparer.InvariantCultureIgnoreCase))
+            {
+                if (entry.IsDirectory)
+                {
+                    if (recursive)
+                        AddJsonTexts(registry, provider, Path.Combine(subpath, entry.Name), recursive);
+                    continue;
+                }
+
+                if (!entry.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                using var stream = entry.CreateReadStream();
+                using var sr = new StreamReader(stream);
+                string json = sr.ReadToEnd().TrimToNull();
+                if (json is null)
+                    continue;
+                var texts = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json);
+                var langID = Path.GetFileNameWithoutExtension(entry.Name);
+                var idx = langID.LastIndexOf(".");
+                if (idx >= 0)
+                    langID = langID[(idx + 1)..];
+
+                if (langID.ToLowerInvariant() == "invariant")
+                    langID = "";
+
+                JsonLocalTextRegistration.AddFromNestedDictionary(texts, "", langID, registry);
+            }
+
+            return registry;
         }
     }
 }

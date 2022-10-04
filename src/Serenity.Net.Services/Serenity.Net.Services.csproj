@@ -7,5 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="6.0.0" />
   </ItemGroup>
 </Project>

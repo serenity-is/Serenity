@@ -12,20 +12,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="*\tsconfig.json;style\*.css;texts\**\*.json;" />
+    <None Remove="*\tsconfig.json;style\*.css;" />
     <Content Update="*.json;**\tsconfig.json;**\package.json;**\package-lock.json">
       <CopyToOutputDirectory>false</CopyToOutputDirectory>
       <Pack>false</Pack>
     </Content>
-    <Content Remove="texts\**\*.json" />
     <None Include="style\*.css">
       <Pack>true</Pack>
       <PackagePath>content\Content\serenity\</PackagePath>
     </None>
-    <Content Include="texts\**\*.json">
-      <Pack>true</Pack>
-      <PackagePath>content\Scripts\serenity\texts\</PackagePath>
-    </Content>
     <Content Include="corelib\out\Serenity.CoreLib.js;corelib\out\Serenity.CoreLib.js.map;corelib\out\Serenity.CoreLib.min.js">
       <Pack>true</Pack>
       <PackagePath>content\Scripts\serenity\</PackagePath>
