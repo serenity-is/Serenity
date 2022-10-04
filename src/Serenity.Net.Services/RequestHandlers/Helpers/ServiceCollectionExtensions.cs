@@ -4,7 +4,6 @@ using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Linq;
 using Serenity.Localization;
 using System.IO;
-using static System.Net.WebRequestMethods;
 
 namespace Serenity.Extensions.DependencyInjection
 {
