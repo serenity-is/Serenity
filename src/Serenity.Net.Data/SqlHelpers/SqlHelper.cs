@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.IO;
 using Dictionary = System.Collections.Generic.Dictionary<string, object>;
@@ -69,10 +70,10 @@ namespace Serenity.Data
         /// <summary>
         /// Logs the command.
         /// </summary>
-        /// <param name="type">The type.</param>
+        /// <param name="method">The type.</param>
         /// <param name="command">The command.</param>
         /// <param name="logger">Logger</param>
-        public static void LogCommand(string type, IDbCommand command, ILogger logger)
+        public static void LogCommand(string method, IDbCommand command, ILogger logger)
         {
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
@@ -81,34 +82,33 @@ namespace Serenity.Data
             {
                 if (command is SqlCommand sqlCmd)
                 {
-                    logger.LogDebug("{0}{1}{2}", Environment.NewLine, SqlCommandDumper.GetCommandText(sqlCmd));
+                    logger.LogDebug("{method}:\n{sql}", method, SqlCommandDumper.GetCommandText(sqlCmd));
                     return;
                 }
 
-                StringBuilder sb = new StringBuilder((command.CommandText ?? "").Length + 1000);
-                sb.Append(type);
-                sb.Append("\r\n");
-                sb.Append(command.CommandText);
-                if (command.Parameters != null && command.Parameters.Count > 0)
+                if (command.Parameters?.Count <= 0)
                 {
-                    sb.Append(" --- PARAMS --- ");
-                    foreach (DbParameter p in command.Parameters)
-                    {
-                        sb.Append(p.ParameterName);
-                        sb.Append("=");
-                        if (p.Value == null || p.Value == DBNull.Value)
-                            sb.Append("<NULL>");
-                        else
-                            sb.Append(p.Value.ToString());
-                        sb.Append(" ");
-                    }
+                    logger.LogDebug("{method}:\n{sql}", method, command.CommandText);
+                    return;
                 }
 
-                logger.LogDebug(sb.ToString());
+                StringBuilder sb = new("");
+                foreach (DbParameter p in command.Parameters)
+                {
+                    sb.Append(p.ParameterName);
+                    sb.Append("=");
+                    if (p.Value == null || p.Value == DBNull.Value)
+                        sb.Append("<NULL>");
+                    else
+                        sb.Append(p.Value.ToString());
+                    sb.Append("; ");
+                }
+
+                logger.LogDebug("{method}:\n{sql}:\n--PARAMS--\n{params}", method, command.CommandText, sb.ToString());
             }
             catch (Exception ex)
             {
-                logger.LogDebug("Error logging command: " + ex.ToString());
+                logger.LogDebug("Error logging command: ", ex);
             }
         }
 
@@ -265,6 +265,8 @@ namespace Serenity.Data
                 command.Connection.EnsureOpen();
                 try
                 {
+                    logger ??= command.Connection.GetLogger();
+
                     if (logger?.IsEnabled(LogLevel.Debug) == true)
                         LogCommand("ExecuteNonQuery", command, logger);
 
@@ -479,6 +481,8 @@ namespace Serenity.Data
                 IDbCommand command = NewCommand(connection, commandText, param);
                 try
                 {
+                    logger ??= connection.GetLogger();
+
                     if (logger?.IsEnabled(LogLevel.Debug) == true)
                         LogCommand("ExecuteReader", command, logger);
 
@@ -550,6 +554,8 @@ namespace Serenity.Data
             {
                 try
                 {
+                    logger ??= connection.GetLogger();
+
                     if (logger?.IsEnabled(LogLevel.Debug) == true)
                         LogCommand("ExecuteScalar", command, logger);
 

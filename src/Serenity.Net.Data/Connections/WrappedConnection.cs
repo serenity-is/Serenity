@@ -1,26 +1,31 @@
-﻿namespace Serenity.Data
+﻿using Microsoft.Extensions.Logging;
+
+namespace Serenity.Data
 {
     /// <summary>
     /// Wraps a connection to add current transaction and dialect support.
     /// </summary>
     /// <seealso cref="IDbConnection" />
     public class WrappedConnection : IDbConnection, IHasActualConnection, IHasCommandTimeout, 
-        IHasCurrentTransaction, IHasDialect, IHasOpenedOnce
+        IHasCurrentTransaction, IHasDialect, IHasLogger, IHasOpenedOnce
     {
         private readonly IDbConnection actualConnection;
         private bool openedOnce;
         private WrappedTransaction currentTransaction;
         private ISqlDialect dialect;
+        private readonly ILogger logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WrappedConnection"/> class.
         /// </summary>
         /// <param name="actualConnection">The actual connection.</param>
         /// <param name="dialect">The dialect.</param>
-        public WrappedConnection(IDbConnection actualConnection, ISqlDialect dialect)
+        /// <param name="logger">Optional logger for this connection (generally to be used by static SqlHelper methods)</param>
+        public WrappedConnection(IDbConnection actualConnection, ISqlDialect dialect, ILogger logger = null)
         {
             this.actualConnection = actualConnection;
             this.dialect = dialect;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -200,6 +205,11 @@
         /// Gets the current state of the connection.
         /// </summary>
         public ConnectionState State => actualConnection.State;
+
+        /// <summary>
+        /// Gets the logger instance for this connection if any
+        /// </summary>
+        public ILogger Logger => logger;
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

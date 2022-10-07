@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using Microsoft.Extensions.Logging;
+using System.Data.Common;
 
 namespace Serenity.Data
 {
@@ -9,16 +10,19 @@ namespace Serenity.Data
     {
         private readonly IConnectionStrings connectionStrings;
         private readonly IConnectionProfiler profiler;
+        private readonly ILoggerFactory loggerFactory;
 
         /// <summary>
         /// Creates a new instance
         /// </summary>
         /// <param name="connectionStrings">Named connection strings</param>
         /// <param name="profiler">Profiler if any</param>
-        public DefaultSqlConnections(IConnectionStrings connectionStrings, IConnectionProfiler profiler = null)
+        /// <param name="loggerFactory">Optional logger factory (to be used by static SqlHelper methods)</param>
+        public DefaultSqlConnections(IConnectionStrings connectionStrings, IConnectionProfiler profiler = null, ILoggerFactory loggerFactory = null)
         {
             this.connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
             this.profiler = profiler;
+            this.loggerFactory = loggerFactory;
         }
 
         /// <summary>
@@ -57,9 +61,9 @@ namespace Serenity.Data
             }
 
             if (profiler != null)
-                return new WrappedConnection(profiler.Profile(connection), dialect);
+                return new WrappedConnection(profiler.Profile(connection), dialect, loggerFactory.CreateLogger<ISqlConnections>());
 
-            return new WrappedConnection(connection, dialect);
+            return new WrappedConnection(connection, dialect, loggerFactory.CreateLogger<ISqlConnections>());
         }
 
         /// <summary>
