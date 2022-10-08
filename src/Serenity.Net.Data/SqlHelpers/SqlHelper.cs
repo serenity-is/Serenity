@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.IO;
 using Dictionary = System.Collections.Generic.Dictionary<string, object>;
@@ -82,13 +81,13 @@ namespace Serenity.Data
             {
                 if (command is SqlCommand sqlCmd)
                 {
-                    logger.LogDebug("{method}:\n{sql}", method, SqlCommandDumper.GetCommandText(sqlCmd));
+                    logger.LogDebug("SQL - {method}[{uid}] - START\n{sql}", method, command.GetHashCode(), SqlCommandDumper.GetCommandText(sqlCmd));
                     return;
                 }
 
                 if (command.Parameters?.Count <= 0)
                 {
-                    logger.LogDebug("{method}:\n{sql}", method, command.CommandText);
+                    logger.LogDebug("SQL - {method}[{uid}] - START\n{sql}", method, command.GetHashCode(), command.CommandText);
                     return;
                 }
 
@@ -104,7 +103,7 @@ namespace Serenity.Data
                     sb.Append("; ");
                 }
 
-                logger.LogDebug("{method}:\n{sql}:\n--PARAMS--\n{params}", method, command.CommandText, sb.ToString());
+                logger.LogDebug("SQL - {method}[{uid}] - START\n{sql}\n--PARAMS--\n{params}", method, command.GetHashCode(), command.CommandText, sb.ToString());
             }
             catch (Exception ex)
             {
@@ -263,6 +262,7 @@ namespace Serenity.Data
             {
                 int result;
                 command.Connection.EnsureOpen();
+                var stopwatch = ValueStopwatch.StartNew();
                 try
                 {
                     logger ??= command.Connection.GetLogger();
@@ -281,7 +281,8 @@ namespace Serenity.Data
                 }
 
                 if (logger?.IsEnabled(LogLevel.Debug) == true)
-                    logger.LogDebug("END - ExecuteNonQuery");
+                    logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
+                        "ExecuteNonQuery", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
 
                 return result;
             }
@@ -479,6 +480,7 @@ namespace Serenity.Data
             try
             {
                 IDbCommand command = NewCommand(connection, commandText, param);
+                var stopwatch = ValueStopwatch.StartNew();
                 try
                 {
                     logger ??= connection.GetLogger();
@@ -489,7 +491,8 @@ namespace Serenity.Data
                     var result = command.ExecuteReader();
 
                     if (logger?.IsEnabled(LogLevel.Debug) == true)
-                        logger.LogDebug("END - ExecuteReader");
+                        logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
+                            "ExecuteReader", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
 
                     return result;
                 }
@@ -552,6 +555,7 @@ namespace Serenity.Data
             using IDbCommand command = NewCommand(connection, commandText, param);
             try
             {
+                var stopwatch = ValueStopwatch.StartNew();
                 try
                 {
                     logger ??= connection.GetLogger();
@@ -562,7 +566,8 @@ namespace Serenity.Data
                     var result = command.ExecuteScalar();
 
                     if (logger?.IsEnabled(LogLevel.Debug) == true)
-                        logger.LogDebug("END - ExecuteScalar");
+                        logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms", 
+                            "ExecuteScalar", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
 
                     return result;
                 }
