@@ -21,6 +21,7 @@ var rxClassTypeIntfEnum = /^(class|type|interface|enum)\s?/;
 var rxDeclareGlobal = /^(declare\s+global.*\s*\{\r?\n)((^\s+.*\r?\n)*)?\}/gm;
 var rxRemoveExports = /^export\s*\{[^\}]*\}\s*\;\s*\r?\n/gm;
 var rxRemoveImports = /^\s*import\s*\{([\sA-Za-z0-9_,\$]*)\}\s*from\s*['"](.*)['"]\s*\;\s*\r?\n/gm;
+var rxReExports = /^\s*export\s*\{([\sA-Za-z0-9_,\$]*)\}\s*from\s*['"](.*)['"]\s*\;\s*\r?\n/gm;
 var rxReferenceTypes = /^\/\/\/\s*\<reference\s*types\=\".*\r?\n/gm
 var rxModuleAugmentation = /^(declare\s+module\s*['"]([A-Za-z\/@\-]+)['"]\s*\{\r?\n)((^\s+.*\r?\n)*)?\}/gm;
 
@@ -40,6 +41,32 @@ const convertModularToGlobal = (src, ns, isTS) => {
 
     src = src.replace(/\r/g, '');
     src = src.replace(rxRemoveExports, '');
+
+    src = src.replace(rxReExports, function (match, exportList, fromModule) {
+        var g = fromModule == "@serenity-is/sleekgrid" || fromModule.endsWith('./slick') ? 'Slick' : 
+            (fromModule == './q' || fromModule.endsWith("../q") || fromModule.indexOf('/q/') >= 0) ? "Q" : null;
+
+        if (!g) {
+            return match;
+        }
+
+        var list = [];
+
+        for (var part of exportList.split(',')) {
+            var x = part.trim();
+            if (ns != g && x) {
+                var y = x.split(' as ');
+
+                var equalsToType = g + '.' + (y[1] || y[0]).trim();
+                var typeAlias = y[0].trim();
+
+                list.push('export import ' + typeAlias + ' = ' + equalsToType + ';')
+            }
+        }
+
+        return list.join('\n') + '\n';
+    });
+
 
     var imports = {};
 
@@ -72,6 +99,11 @@ const convertModularToGlobal = (src, ns, isTS) => {
 
     if (ns == 'Slick')
         src = replaceTypeRef(src, 'Event', 'Slick.Event');
+
+    if (ns == 'Serenity') {
+        src = src.replace(' = typeof executeOnceWhenVisible', ' = typeof Q.executeOnceWhenVisible');
+        src = src.replace(' = typeof executeEverytimeWhenVisible', ' = typeof Q.executeEverytimeWhenVisible');
+    }
 
     var moduleAugmentations = [];
     src = src.replace(rxModuleAugmentation, function (match, p1, p2, p3, p4, offset, str) {
@@ -257,7 +289,7 @@ export default [
             dts(), 
             toGlobal('Slick')
         ],
-        external: ['../q', ...external]
+        external: ['../q', '../../q', ...external]
     },
     {
         input: "./out/slick/index.d.ts",
@@ -268,7 +300,7 @@ export default [
         plugins: [
             dts()
         ],
-        external: [...external]
+        external: ['../q', '../../q', ...external]
     },
     {
         input: "./out/serenity/index.d.ts",
@@ -279,7 +311,7 @@ export default [
         plugins: [
             dts()
         ],
-        external: ['../q', '../slick', ...external]
+        external: ['../q', '../../q', '../slick', ...external]
     },
     {
         input: "./out/serenity/index.d.ts",
@@ -315,6 +347,6 @@ export default [
                 }
             }
         ],
-        external: ['../q', '../slick', ...external]
+        external: ['../q', '../../q', '../slick', ...external]
     }
 ];

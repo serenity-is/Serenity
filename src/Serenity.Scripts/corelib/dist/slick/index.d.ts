@@ -1,5 +1,6 @@
 /// <reference types="jquery" />
 import { GroupTotals, Column, FormatterContext, Group, SelectionModel, Grid, Range, Event } from '@serenity-is/sleekgrid';
+import { PropertyItem, ListResponse } from '../q';
 
 declare namespace Aggregators {
     function Avg(field: string): void;
@@ -12,105 +13,6 @@ declare namespace AggregateFormatting {
     function formatMarkup<TItem = any>(totals: GroupTotals, column: Column<TItem>, aggType: string): string;
     function formatValue(column: Column, value: number): string;
     function groupTotalsFormatter<TItem = any>(totals: GroupTotals, column: Column<TItem>): string;
-}
-
-interface ServiceError {
-    Code?: string;
-    Arguments?: string;
-    Message?: string;
-    Details?: string;
-    ErrorId?: string;
-}
-interface ServiceResponse {
-    Error?: ServiceError;
-}
-interface ListResponse<TEntity> extends ServiceResponse {
-    Entities?: TEntity[];
-    Values?: any[];
-    TotalCount?: number;
-    Skip?: number;
-    Take?: number;
-}
-
-declare global {
-    namespace Q {
-        interface Lookup<TItem> {
-            items: TItem[];
-            itemById: {
-                [key: string]: TItem;
-            };
-            idField: string;
-            parentIdField: string;
-            textField: string;
-            textFormatter: (item: TItem) => string;
-        }
-    }
-}
-
-interface PropertyItem {
-    name?: string;
-    title?: string;
-    hint?: string;
-    placeholder?: string;
-    editorType?: string;
-    editorParams?: any;
-    category?: string;
-    collapsible?: boolean;
-    collapsed?: boolean;
-    tab?: string;
-    cssClass?: string;
-    headerCssClass?: string;
-    formCssClass?: string;
-    maxLength?: number;
-    required?: boolean;
-    insertable?: boolean;
-    insertPermission?: string;
-    hideOnInsert?: boolean;
-    updatable?: boolean;
-    updatePermission?: string;
-    hideOnUpdate?: boolean;
-    readOnly?: boolean;
-    readPermission?: string;
-    oneWay?: boolean;
-    defaultValue?: any;
-    localizable?: boolean;
-    visible?: boolean;
-    allowHide?: boolean;
-    formatterType?: string;
-    formatterParams?: any;
-    displayFormat?: string;
-    alignment?: string;
-    width?: number;
-    widthSet?: boolean;
-    minWidth?: number;
-    maxWidth?: number;
-    labelWidth?: string;
-    resizable?: boolean;
-    sortable?: boolean;
-    sortOrder?: number;
-    groupOrder?: number;
-    summaryType?: SummaryType;
-    editLink?: boolean;
-    editLinkItemType?: string;
-    editLinkIdField?: string;
-    editLinkCssClass?: string;
-    filteringType?: string;
-    filteringParams?: any;
-    filteringIdField?: string;
-    notFilterable?: boolean;
-    filterOnly?: boolean;
-    quickFilter?: boolean;
-    quickFilterParams?: any;
-    quickFilterSeparator?: boolean;
-    quickFilterCssClass?: string;
-}
-declare enum SummaryType {
-    Disabled = -1,
-    None = 0,
-    Sum = 1,
-    Avg = 2,
-    Min = 3,
-    Max = 4
 }
 
 declare type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;

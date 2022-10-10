@@ -2460,109 +2460,31 @@ declare namespace Slick {
 }
 
 declare namespace Serenity {
+    export import ColumnSelection = Q.ColumnSelection;
+    export import DeleteRequest = Q.DeleteRequest;
+    export import DeleteResponse = Q.DeleteResponse;
+    export import ISlickFormatter = Q.ISlickFormatter;
+    export import ListRequest = Q.ListRequest;
+    export import ListResponse = Q.ListResponse;
+    export import PropertyItem = Q.PropertyItem;
+    export import PropertyItemsData = Q.PropertyItemsData;
+    export import RetrieveColumnSelection = Q.RetrieveColumnSelection;
+    export import RetrieveLocalizationRequest = Q.RetrieveLocalizationRequest;
+    export import RetrieveLocalizationResponse = Q.RetrieveLocalizationResponse;
+    export import RetrieveRequest = Q.RetrieveRequest;
+    export import RetrieveResponse = Q.RetrieveResponse;
+    export import SaveRequest = Q.SaveRequest;
+    export import SaveRequestWithAttachment = Q.SaveRequestWithAttachment;
+    export import SaveResponse = Q.SaveResponse;
+    export import SaveWithLocalizationRequest = Q.SaveWithLocalizationRequest;
+    export import ServiceError = Q.ServiceError;
+    export import ServiceOptions = Q.ServiceOptions;
+    export import ServiceRequest = Q.ServiceRequest;
+    export import ServiceResponse = Q.ServiceResponse;
+    export import SummaryType = Q.SummaryType;
+    export import UndeleteRequest = Q.UndeleteRequest;
+    export import UndeleteResponse = Q.UndeleteResponse;
 
-
-    interface ServiceError {
-        Code?: string;
-        Arguments?: string;
-        Message?: string;
-        Details?: string;
-        ErrorId?: string;
-    }
-    interface ServiceResponse {
-        Error?: ServiceError;
-    }
-    interface ServiceRequest {
-    }
-    interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
-        request?: any;
-        service?: string;
-        blockUI?: boolean;
-        onError?(response: TResponse): void;
-        onSuccess?(response: TResponse): void;
-        onCleanup?(): void;
-    }
-    interface SaveRequest<TEntity> extends ServiceRequest {
-        EntityId?: any;
-        Entity?: TEntity;
-        Localizations?: any;
-    }
-    interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
-        Attachments?: any[];
-    }
-    interface SaveResponse extends ServiceResponse {
-        EntityId?: any;
-    }
-    interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
-        Localizations?: {
-            [key: string]: TEntity;
-        };
-    }
-    interface DeleteRequest extends ServiceRequest {
-        EntityId?: any;
-    }
-    interface DeleteResponse extends ServiceResponse {
-    }
-    interface UndeleteRequest extends ServiceRequest {
-        EntityId?: any;
-    }
-    interface UndeleteResponse extends ServiceResponse {
-    }
-    enum ColumnSelection {
-        List = 0,
-        KeyOnly = 1,
-        Details = 2,
-        None = 3,
-        IdOnly = 4,
-        Lookup = 5
-    }
-    enum RetrieveColumnSelection {
-        details = 0,
-        keyOnly = 1,
-        list = 2,
-        none = 3,
-        idOnly = 4,
-        lookup = 5
-    }
-    interface ListRequest extends ServiceRequest {
-        Skip?: number;
-        Take?: number;
-        Sort?: string[];
-        ContainsText?: string;
-        ContainsField?: string;
-        Criteria?: any[];
-        EqualityFilter?: any;
-        IncludeDeleted?: boolean;
-        ExcludeTotalCount?: boolean;
-        ColumnSelection?: ColumnSelection;
-        IncludeColumns?: string[];
-        ExcludeColumns?: string[];
-        ExportColumns?: string[];
-        DistinctFields?: string[];
-    }
-    interface ListResponse<TEntity> extends ServiceResponse {
-        Entities?: TEntity[];
-        Values?: any[];
-        TotalCount?: number;
-        Skip?: number;
-        Take?: number;
-    }
-    interface RetrieveRequest extends ServiceRequest {
-        EntityId?: any;
-        ColumnSelection?: RetrieveColumnSelection;
-        IncludeColumns?: string[];
-        ExcludeColumns?: string[];
-    }
-    interface RetrieveResponse<TEntity> extends ServiceResponse {
-        Entity?: TEntity;
-    }
-    interface RetrieveLocalizationRequest extends RetrieveRequest {
-    }
-    interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
-        Entities?: {
-            [key: string]: TEntity;
-        };
-    }
 
     function Criteria(field: string): any[];
     namespace Criteria {
@@ -2591,76 +2513,6 @@ declare namespace Serenity {
             like = "like",
             notLike = "not like"
         }
-    }
-
-    interface PropertyItem {
-        name?: string;
-        title?: string;
-        hint?: string;
-        placeholder?: string;
-        editorType?: string;
-        editorParams?: any;
-        category?: string;
-        collapsible?: boolean;
-        collapsed?: boolean;
-        tab?: string;
-        cssClass?: string;
-        headerCssClass?: string;
-        formCssClass?: string;
-        maxLength?: number;
-        required?: boolean;
-        insertable?: boolean;
-        insertPermission?: string;
-        hideOnInsert?: boolean;
-        updatable?: boolean;
-        updatePermission?: string;
-        hideOnUpdate?: boolean;
-        readOnly?: boolean;
-        readPermission?: string;
-        oneWay?: boolean;
-        defaultValue?: any;
-        localizable?: boolean;
-        visible?: boolean;
-        allowHide?: boolean;
-        formatterType?: string;
-        formatterParams?: any;
-        displayFormat?: string;
-        alignment?: string;
-        width?: number;
-        widthSet?: boolean;
-        minWidth?: number;
-        maxWidth?: number;
-        labelWidth?: string;
-        resizable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        groupOrder?: number;
-        summaryType?: SummaryType;
-        editLink?: boolean;
-        editLinkItemType?: string;
-        editLinkIdField?: string;
-        editLinkCssClass?: string;
-        filteringType?: string;
-        filteringParams?: any;
-        filteringIdField?: string;
-        notFilterable?: boolean;
-        filterOnly?: boolean;
-        quickFilter?: boolean;
-        quickFilterParams?: any;
-        quickFilterSeparator?: boolean;
-        quickFilterCssClass?: string;
-    }
-    interface PropertyItemsData {
-        items: PropertyItem[];
-        additionalItems: PropertyItem[];
-    }
-    enum SummaryType {
-        Disabled = -1,
-        None = 0,
-        Sum = 1,
-        Avg = 2,
-        Min = 3,
-        Max = 4
     }
 
     class IBooleanValue {
@@ -2754,35 +2606,6 @@ declare namespace Serenity {
     namespace EnumTypeRegistry {
         function tryGet(key: string): Function;
         function get(key: string): Function;
-    }
-
-    interface DialogButton {
-        text?: string;
-        hint?: string;
-        icon?: string;
-        click?: (e: JQueryEventObject) => void;
-        cssClass?: string;
-        htmlEncode?: boolean;
-        result?: string;
-    }
-
-    function executeOnceWhenVisible(element: JQuery, callback: Function): void;
-    function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
-
-    interface HandleRouteEventArgs {
-        handled: boolean;
-        route: string;
-        parts: string[];
-        index: number;
-    }
-
-    class ISlickFormatter {
-    }
-    class Exception extends Error {
-        constructor(message: string);
-    }
-    class ArgumentNullException extends Exception {
-        constructor(paramName: string, message?: string);
     }
 
     class EnumKeyAttribute {
@@ -3112,7 +2935,7 @@ declare namespace Serenity {
         protected arrange(): void;
         protected onDialogClose(): void;
         protected addCssClass(): void;
-        protected getDialogButtons(): DialogButton[];
+        protected getDialogButtons(): Q.DialogButton[];
         protected getDialogOptions(): JQueryUI.DialogOptions;
         protected getDialogTitle(): string;
         dialogClose(): void;
@@ -3198,12 +3021,12 @@ declare namespace Serenity {
         private getCategoryOrder;
         private createCategoryLinks;
         get_editors(): Widget<any>[];
-        get_items(): PropertyItem[];
+        get_items(): Q.PropertyItem[];
         get_idPrefix(): string;
         get_mode(): PropertyGridMode;
         set_mode(value: PropertyGridMode): void;
-        static loadEditorValue(editor: Widget<any>, item: PropertyItem, source: any): void;
-        static saveEditorValue(editor: Widget<any>, item: PropertyItem, target: any): void;
+        static loadEditorValue(editor: Widget<any>, item: Q.PropertyItem, source: any): void;
+        static saveEditorValue(editor: Widget<any>, item: Q.PropertyItem, target: any): void;
         private static setReadOnly;
         private static setReadonly;
         private static setRequired;
@@ -3214,7 +3037,7 @@ declare namespace Serenity {
         set value(val: any);
         private canModifyItem;
         updateInterface(): void;
-        enumerateItems(callback: (p1: PropertyItem, p2: Widget<any>) => void): void;
+        enumerateItems(callback: (p1: Q.PropertyItem, p2: Widget<any>) => void): void;
     }
     const enum PropertyGridMode {
         insert = 1,
@@ -3222,7 +3045,7 @@ declare namespace Serenity {
     }
     interface PropertyGridOptions {
         idPrefix?: string;
-        items?: PropertyItem[];
+        items?: Q.PropertyItem[];
         useCategories?: boolean;
         categoryOrder?: string;
         defaultCategory?: string;
@@ -3239,7 +3062,7 @@ declare namespace Serenity {
         protected loadInitialEntity(): void;
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyItems(): PropertyItem[];
+        protected getPropertyItems(): Q.PropertyItem[];
         protected getSaveEntity(): TItem;
         protected get_entity(): TItem;
         protected get_entityId(): any;
@@ -3267,7 +3090,7 @@ declare namespace Serenity {
     class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
         protected entity: TItem;
         protected entityId: any;
-        protected propertyItemsData: PropertyItemsData;
+        protected propertyItemsData: Q.PropertyItemsData;
         constructor(opt?: TOptions);
         internalInit(): void;
         protected initSync(): void;
@@ -3276,15 +3099,15 @@ declare namespace Serenity {
         protected useAsync(): boolean;
         destroy(): void;
         protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getDialogButtons(): DialogButton[];
+        protected getDialogButtons(): Q.DialogButton[];
         protected okClick(): void;
         protected okClickValidated(): void;
         protected cancelClick(): void;
         protected initPropertyGrid(): void;
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyItems(): PropertyItem[];
-        protected getPropertyItemsData(): PropertyItemsData;
+        protected getPropertyItems(): Q.PropertyItem[];
+        protected getPropertyItemsData(): Q.PropertyItemsData;
         protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
         protected getSaveEntity(): TItem;
         protected loadInitialEntity(): void;
@@ -3301,9 +3124,9 @@ declare namespace Serenity {
     namespace EditorUtils {
         function getDisplayText(editor: Widget<any>): string;
         function getValue(editor: Widget<any>): any;
-        function saveValue(editor: Widget<any>, item: PropertyItem, target: any): void;
+        function saveValue(editor: Widget<any>, item: Q.PropertyItem, target: any): void;
         function setValue(editor: Widget<any>, value: any): void;
-        function loadValue(editor: Widget<any>, item: PropertyItem, source: any): void;
+        function loadValue(editor: Widget<any>, item: Q.PropertyItem, source: any): void;
         function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
         function setReadOnly(widget: Widget<any>, isReadOnly: boolean): void;
         function setRequired(widget: Widget<any>, isRequired: boolean): void;
@@ -3589,8 +3412,8 @@ declare namespace Serenity {
             id: string;
             text: string;
         };
-        setEditValue(source: any, property: PropertyItem): void;
-        getEditValue(property: PropertyItem, target: any): void;
+        setEditValue(source: any, property: Q.PropertyItem): void;
+        getEditValue(property: Q.PropertyItem, target: any): void;
         protected get_select2Container(): JQuery;
         protected get_items(): Select2Item[];
         protected get_itemByKey(): {
@@ -3716,7 +3539,7 @@ declare namespace Serenity {
         pageSize?: number;
         minimumResultsForSearch?: any;
         sort: string[];
-        columnSelection?: ColumnSelection;
+        columnSelection?: Q.ColumnSelection;
         includeColumns?: string[];
         excludeColumns?: string[];
         includeDeleted?: boolean;
@@ -3735,8 +3558,8 @@ declare namespace Serenity {
         protected getFilterCriteria(): any[];
         protected getIdListCriteria(idList: any[]): any[];
         protected getCriteria(query: Select2SearchQuery): any[];
-        protected getListRequest(query: Select2SearchQuery): ListRequest;
-        protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): ServiceOptions<ListResponse<TItem>>;
+        protected getListRequest(query: Select2SearchQuery): Q.ListRequest;
+        protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Q.ServiceOptions<ListResponse<TItem>>;
         protected hasAsyncSource(): boolean;
         protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
     }
@@ -3862,8 +3685,8 @@ declare namespace Serenity {
         get value(): UploadedFile;
         set_value(value: UploadedFile): void;
         set value(v: UploadedFile);
-        getEditValue(property: PropertyItem, target: any): void;
-        setEditValue(source: any, property: PropertyItem): void;
+        getEditValue(property: Q.PropertyItem, target: any): void;
+        setEditValue(source: any, property: Q.PropertyItem): void;
         protected entity: UploadedFile;
         protected toolbar: Toolbar;
         protected progress: JQuery;
@@ -3894,8 +3717,8 @@ declare namespace Serenity {
         get value(): UploadedFile[];
         set_value(value: UploadedFile[]): void;
         set value(v: UploadedFile[]);
-        getEditValue(property: PropertyItem, target: any): void;
-        setEditValue(source: any, property: PropertyItem): void;
+        getEditValue(property: Q.PropertyItem, target: any): void;
+        setEditValue(source: any, property: Q.PropertyItem): void;
         jsonEncodeValue: boolean;
     }
     class MultipleImageUploadEditor extends MultipleFileUploadEditor {
@@ -3905,7 +3728,7 @@ declare namespace Serenity {
     interface QuickFilterArgs<TWidget> {
         field?: string;
         widget?: TWidget;
-        request?: ListRequest;
+        request?: Q.ListRequest;
         equalityFilter?: any;
         value?: any;
         active?: boolean;
@@ -3944,9 +3767,9 @@ declare namespace Serenity {
         onChange: (e: JQueryEventObject) => void;
         private submitHandlers;
         destroy(): void;
-        onSubmit(request: ListRequest): void;
-        protected add_submitHandlers(action: (request: ListRequest) => void): void;
-        protected remove_submitHandlers(action: (request: ListRequest) => void): void;
+        onSubmit(request: Q.ListRequest): void;
+        protected add_submitHandlers(action: (request: Q.ListRequest) => void): void;
+        protected remove_submitHandlers(action: (request: Q.ListRequest) => void): void;
         protected clear_submitHandlers(): void;
         find<TWidget>(type: {
             new (...args: any[]): TWidget;
@@ -4020,7 +3843,7 @@ declare namespace Serenity {
     }
 
     class FilterStore {
-        constructor(fields: PropertyItem[]);
+        constructor(fields: Q.PropertyItem[]);
         static getCriteriaFor(items: FilterLine[]): any[];
         static getDisplayTextFor(items: FilterLine[]): string;
         private changed;
@@ -4028,9 +3851,9 @@ declare namespace Serenity {
         private fields;
         private fieldByName;
         private items;
-        get_fields(): PropertyItem[];
+        get_fields(): Q.PropertyItem[];
         get_fieldByName(): {
-            [key: string]: PropertyItem;
+            [key: string]: Q.PropertyItem;
         };
         get_items(): FilterLine[];
         raiseChanged(): void;
@@ -4046,8 +3869,8 @@ declare namespace Serenity {
         getOperators(): FilterOperator[];
         loadState(state: any): void;
         saveState(): any;
-        get_field(): PropertyItem;
-        set_field(value: PropertyItem): void;
+        get_field(): Q.PropertyItem;
+        set_field(value: Q.PropertyItem): void;
         get_container(): JQuery;
         set_container(value: JQuery): void;
         get_operator(): FilterOperator;
@@ -4066,8 +3889,8 @@ declare namespace Serenity {
     }
     abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         private field;
-        get_field(): PropertyItem;
-        set_field(value: PropertyItem): void;
+        get_field(): Q.PropertyItem;
+        set_field(value: Q.PropertyItem): void;
         private container;
         get_container(): JQuery;
         set_container(value: JQuery): void;
@@ -4080,13 +3903,13 @@ declare namespace Serenity {
         protected isNullable(): boolean;
         createEditor(): void;
         protected operatorFormat(op: FilterOperator): string;
-        protected getTitle(field: PropertyItem): string;
+        protected getTitle(field: Q.PropertyItem): string;
         protected displayText(op: FilterOperator, values?: any[]): string;
         protected getCriteriaField(): string;
         getCriteria(): CriteriaWithText;
         loadState(state: any): void;
         saveState(): any;
-        protected argumentNull(): ArgumentNullException;
+        protected argumentNull(): Q.ArgumentNullException;
         validateEditorValue(value: string): string;
         getEditorValue(): string;
         getEditorText(): any;
@@ -4201,7 +4024,7 @@ declare namespace Serenity {
         protected rowFieldChange(row: JQuery): void;
         protected removeFiltering(row: JQuery): void;
         protected populateOperatorList(row: JQuery): void;
-        protected getFieldFor(row: JQuery): PropertyItem;
+        protected getFieldFor(row: JQuery): Q.PropertyItem;
         protected getFilteringFor(row: JQuery): IFiltering;
         protected onRowOperatorChange(e: JQueryEventObject): void;
         protected rowOperatorChange(row: JQuery): void;
@@ -4429,11 +4252,11 @@ declare namespace Serenity {
         function addQuickSearchInput(toolDiv: JQuery, view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void;
         function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
         function makeOrderable(grid: Slick.Grid, handleMove: (p1: any, p2: number) => void): void;
-        function makeOrderableWithUpdateRequest(grid: IDataGrid, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
+        function makeOrderableWithUpdateRequest(grid: IDataGrid, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => Q.SaveRequest<any>): void;
     }
     namespace PropertyItemSlickConverter {
-        function toSlickColumns(items: PropertyItem[]): Slick.Column[];
-        function toSlickColumn(item: PropertyItem): Slick.Column;
+        function toSlickColumns(items: Q.PropertyItem[]): Slick.Column[];
+        function toSlickColumn(item: Q.PropertyItem): Slick.Column;
     }
     namespace SlickFormatting {
         function getEnumText(enumKey: string, name: string): string;
@@ -4557,7 +4380,7 @@ declare namespace Serenity {
         protected quickFiltersBar: QuickFilterBar;
         protected slickContainer: JQuery;
         protected allColumns: Slick.Column[];
-        protected propertyItemsData: PropertyItemsData;
+        protected propertyItemsData: Q.PropertyItemsData;
         protected initialSettings: PersistedGridSettings;
         protected restoringSettings: number;
         private idProperty;
@@ -4591,7 +4414,7 @@ declare namespace Serenity {
         protected ensureQuickFilterBar(): QuickFilterBar;
         protected createQuickFilters(filters?: QuickFilter<Widget<any>, any>[]): void;
         protected getQuickFilters(): QuickFilter<Widget<any>, any>[];
-        static propertyItemToQuickFilter(item: PropertyItem): any;
+        static propertyItemToQuickFilter(item: Q.PropertyItem): any;
         protected findQuickFilter<TWidget>(type: {
             new (...args: any[]): TWidget;
         }, field: string): TWidget;
@@ -4624,7 +4447,7 @@ declare namespace Serenity {
         protected onClick(e: JQueryEventObject, row: number, cell: number): void;
         protected viewDataChanged(e: any, rows: TItem[]): void;
         protected bindToViewEvents(): void;
-        protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
+        protected onViewProcessData(response: Q.ListResponse<TItem>): Q.ListResponse<TItem>;
         protected onViewFilter(item: TItem): boolean;
         protected getIncludeColumns(include: {
             [key: string]: boolean;
@@ -4650,11 +4473,11 @@ declare namespace Serenity {
         protected getItemType(): string;
         protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Format<TItem>;
         protected getColumnsKey(): string;
-        protected getPropertyItems(): PropertyItem[];
-        protected getPropertyItemsData(): PropertyItemsData;
+        protected getPropertyItems(): Q.PropertyItem[];
+        protected getPropertyItemsData(): Q.PropertyItemsData;
         protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
         protected getColumns(): Slick.Column[];
-        protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Slick.Column[];
+        protected propertyItemsToSlickColumns(propertyItems: Q.PropertyItem[]): Slick.Column[];
         protected getSlickOptions(): Slick.GridOptions;
         protected populateLock(): void;
         protected populateUnlock(): void;
@@ -4772,8 +4595,8 @@ declare namespace Serenity {
         protected getIdProperty(): string;
         protected getTreeItems(): TItem[];
         protected updateItems(): void;
-        getEditValue(property: PropertyItem, target: any): void;
-        setEditValue(source: any, property: PropertyItem): void;
+        getEditValue(property: Q.PropertyItem, target: any): void;
+        setEditValue(source: any, property: Q.PropertyItem): void;
         protected getButtons(): ToolButton[];
         protected itemSelectedChanged(item: TItem): void;
         protected getSelectAllText(): string;
@@ -4781,7 +4604,7 @@ declare namespace Serenity {
         protected createSlickGrid(): Slick.Grid;
         protected onViewFilter(item: TItem): boolean;
         protected getInitialCollapse(): boolean;
-        protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
+        protected onViewProcessData(response: Q.ListResponse<TItem>): Q.ListResponse<TItem>;
         protected onClick(e: JQueryEventObject, row: number, cell: number): void;
         protected updateSelectAll(): void;
         protected updateFlags(): void;
@@ -4858,7 +4681,7 @@ declare namespace Serenity {
 
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         constructor(container: JQuery, options?: TOptions);
-        protected handleRoute(args: HandleRouteEventArgs): void;
+        protected handleRoute(args: Q.HandleRouteEventArgs): void;
         protected usePager(): boolean;
         protected createToolbarExtensions(): void;
         protected getInitialTitle(): string;
@@ -4900,7 +4723,7 @@ declare namespace Serenity {
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
         protected entity: TItem;
         protected entityId: any;
-        protected propertyItemsData: PropertyItemsData;
+        protected propertyItemsData: Q.PropertyItemsData;
         protected propertyGrid: PropertyGrid;
         protected toolbar: Toolbar;
         protected saveAndCloseButton: JQuery;
@@ -4933,10 +4756,10 @@ declare namespace Serenity {
         protected isDeleted(): boolean;
         protected isNew(): boolean;
         protected isNewOrDeleted(): boolean;
-        protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse>;
-        protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
-        protected doDelete(callback: (response: DeleteResponse) => void): void;
-        protected onDeleteSuccess(response: DeleteResponse): void;
+        protected getDeleteOptions(callback: (response: Q.DeleteResponse) => void): Q.ServiceOptions<DeleteResponse>;
+        protected deleteHandler(options: Q.ServiceOptions<DeleteResponse>, callback: (response: Q.DeleteResponse) => void): void;
+        protected doDelete(callback: (response: Q.DeleteResponse) => void): void;
+        protected onDeleteSuccess(response: Q.DeleteResponse): void;
         protected attrs<TAttr>(attrType: {
             new (...args: any[]): TAttr;
         }): TAttr[];
@@ -4958,7 +4781,7 @@ declare namespace Serenity {
         protected getIsDeletedProperty(): string;
         protected service: string;
         protected getService(): string;
-        load(entityOrId: any, done: () => void, fail: (ex: Exception) => void): void;
+        load(entityOrId: any, done: () => void, fail: (ex: Q.Exception) => void): void;
         loadNewAndOpenDialog(asPanel?: boolean): void;
         loadEntityAndOpenDialog(entity: TItem, asPanel?: boolean): void;
         protected loadResponse(data: any): void;
@@ -4966,12 +4789,12 @@ declare namespace Serenity {
         protected beforeLoadEntity(entity: TItem): void;
         protected afterLoadEntity(): void;
         loadByIdAndOpenDialog(entityId: any, asPanel?: boolean): void;
-        protected onLoadingData(data: RetrieveResponse<TItem>): void;
-        protected getLoadByIdOptions(id: any, callback: (response: RetrieveResponse<TItem>) => void): ServiceOptions<RetrieveResponse<TItem>>;
-        protected getLoadByIdRequest(id: any): RetrieveRequest;
+        protected onLoadingData(data: Q.RetrieveResponse<TItem>): void;
+        protected getLoadByIdOptions(id: any, callback: (response: Q.RetrieveResponse<TItem>) => void): Q.ServiceOptions<RetrieveResponse<TItem>>;
+        protected getLoadByIdRequest(id: any): Q.RetrieveRequest;
         protected reloadById(): void;
-        loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
-        protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
+        loadById(id: any, callback?: (response: Q.RetrieveResponse<TItem>) => void, fail?: () => void): void;
+        protected loadByIdHandler(options: Q.ServiceOptions<RetrieveResponse<TItem>>, callback: (response: Q.RetrieveResponse<TItem>) => void, fail: () => void): void;
         protected initLocalizationGrid(): void;
         protected initLocalizationGridCommon(pgOptions: PropertyGridOptions): void;
         protected isLocalizationMode(): boolean;
@@ -4984,26 +4807,26 @@ declare namespace Serenity {
         protected getLocalizationGridValue(): any;
         protected getPendingLocalizations(): any;
         protected initPropertyGrid(): void;
-        protected getPropertyItems(): PropertyItem[];
-        protected getPropertyItemsData(): PropertyItemsData;
+        protected getPropertyItems(): Q.PropertyItem[];
+        protected getPropertyItemsData(): Q.PropertyItemsData;
         protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected validateBeforeSave(): boolean;
-        protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse>;
+        protected getSaveOptions(callback: (response: Q.SaveResponse) => void): Q.ServiceOptions<SaveResponse>;
         protected getSaveEntity(): TItem;
-        protected getSaveRequest(): SaveRequest<TItem>;
-        protected onSaveSuccess(response: SaveResponse): void;
-        protected save_submitHandler(callback: (response: SaveResponse) => void): void;
-        protected save(callback?: (response: SaveResponse) => void): void | boolean;
-        protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
+        protected getSaveRequest(): Q.SaveRequest<TItem>;
+        protected onSaveSuccess(response: Q.SaveResponse): void;
+        protected save_submitHandler(callback: (response: Q.SaveResponse) => void): void;
+        protected save(callback?: (response: Q.SaveResponse) => void): void | boolean;
+        protected saveHandler(options: Q.ServiceOptions<SaveResponse>, callback: (response: Q.SaveResponse) => void): void;
         protected initToolbar(): void;
-        protected showSaveSuccessMessage(response: SaveResponse): void;
+        protected showSaveSuccessMessage(response: Q.SaveResponse): void;
         protected getToolbarButtons(): ToolButton[];
         protected getCloningEntity(): TItem;
         protected updateInterface(): void;
-        protected getUndeleteOptions(callback?: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse>;
-        protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void;
-        protected undelete(callback?: (response: UndeleteResponse) => void): void;
+        protected getUndeleteOptions(callback?: (response: Q.UndeleteResponse) => void): Q.ServiceOptions<UndeleteResponse>;
+        protected undeleteHandler(options: Q.ServiceOptions<UndeleteResponse>, callback: (response: Q.UndeleteResponse) => void): void;
+        protected undelete(callback?: (response: Q.UndeleteResponse) => void): void;
         private _readonly;
         get readOnly(): boolean;
         set readOnly(value: boolean);
@@ -5029,7 +4852,7 @@ declare namespace Serenity {
         class ReportDialog extends TemplatedDialog<ReportDialogOptions> {
             constructor(opt: ReportDialogOptions);
             protected propertyGrid: PropertyGrid;
-            protected propertyItems: PropertyItem[];
+            protected propertyItems: Q.PropertyItem[];
             protected reportKey: string;
             protected createPropertyGrid(): void;
             loadReport(reportKey: string): void;
@@ -5057,7 +4880,7 @@ declare namespace Serenity {
         }
         interface ReportRetrieveResponse extends ServiceResponse {
             ReportKey?: string;
-            Properties?: PropertyItem[];
+            Properties?: Q.PropertyItem[];
             Title?: string;
             InitialSettings?: any;
             IsDataOnlyReport?: boolean;
@@ -5123,10 +4946,10 @@ declare namespace Serenity {
         constructor(hidden: JQuery, opt: TOptions);
         protected emptyItemText(): string;
         protected getService(): string;
-        protected query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void;
-        protected executeQuery(options: ServiceOptions<ListResponse<any>>): void;
+        protected query(request: Q.ListRequest, callback: (p1: Q.ListResponse<any>) => void): void;
+        protected executeQuery(options: Q.ServiceOptions<ListResponse<any>>): void;
         protected queryByKey(key: string, callback: (p1: any) => void): void;
-        protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void;
+        protected executeQueryByKey(options: Q.ServiceOptions<RetrieveResponse<any>>): void;
         protected getItemKey(item: any): string;
         protected getItemText(item: any): string;
         protected getTypeDelay(): number;
@@ -5238,18 +5061,6 @@ interface JQueryStatic {
 declare namespace JQueryValidation {
     interface ValidationOptions {
         normalizer?: (v: string) => string;
-    }
-}
-declare namespace Q {
-    interface Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-        textFormatter: (item: TItem) => string;
     }
 }
 interface JQuery {
