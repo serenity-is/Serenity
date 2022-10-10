@@ -1,7 +1,7 @@
 ﻿<Project>
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>6.1.9</Version>
+    <Version>6.2.0</Version>
     <LangVersion>10.0</LangVersion>
     <Company>Serenity</Company>
     <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>

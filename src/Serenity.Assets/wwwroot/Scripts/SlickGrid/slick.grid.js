@@ -1962,7 +1962,7 @@ Slick._ = (() => {
       this._colById = viewColById;
     }
     setColumns(columns) {
-      var _a;
+      var _a, _b;
       this.setInitialCols(columns);
       this.updateViewColLeftRight();
       if (this._initialized) {
@@ -1978,7 +1978,7 @@ Slick._ = (() => {
         this.updateCanvasWidth();
         this._layout.applyColumnWidths();
         this.handleScroll();
-        (_a = this.getSelectionModel()) == null ? void 0 : _a.refreshSelections();
+        (_b = (_a = this.getSelectionModel()) == null ? void 0 : _a.refreshSelections) == null ? void 0 : _b.call(_a);
       }
     }
     getOptions() {

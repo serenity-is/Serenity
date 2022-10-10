@@ -1,3 +1,26 @@
+## 6.2.0 (2022-10-10)
+
+Features:
+  - implement logging support for SqlHelper via WrappedConnection and DefaultSqlConnections
+  - improve logging for SqlHelper, include ms and command hash code
+  - added brotli support to dynamic scripts and script bundles
+  - converted serenity json texts to static web assets. AddAllTexts() is obsolete, use services.AddBaseTexts(env.WebRootFileProvider).AddJsonTexts(env.WebRootFileProvider, "Scripts/site/texts").AddJsonTexts(env.ContentRootFileProvider, "App_Data/texts")
+  - convert module texts to static web assets in common and pro packages
+  - converted all StartSharp modules to modular TypeScript [StartSharp]
+  - renamed ScriptInitialization.ts to ScriptInit.ts
+  - removed namespace typings [StartSharp]
+  - removed StartSharp.Web.js [StartSharp]
+  - enable logging for sql only in development, added a appsettings.Development.json [StartSharp]
+  - pass keepNames option as true to esbuild so widgets can keep their css class names like s-RolePermissionDialog etc
+  - no need for PreserveCompliationContext as it is set by Razor sdk
+  - moved SourceMapSecurityMiddlewareExtensions to usual namespace (Serenity.Extensions.DependencyInjection)
+  
+Bugfixes:
+  - fix interfaces and enums are declared multiple times in Q / Slick / Serenity namespaces in Serenity.CoreLib.d.ts
+  - update sleekgrid to fix script error with selection models
+  - fix clean plugin for tsbuild
+  
+
 ## 6.1.9 (2022-10-02)
 
 Features:
