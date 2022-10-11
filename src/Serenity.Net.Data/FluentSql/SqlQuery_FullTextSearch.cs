@@ -3,21 +3,29 @@
     public partial class SqlQuery
     {
         /// <summary>
-        ///   MSSQL'de full text araması için gerekli join'i oluşturur.</summary>
+        ///   Creates the required join for full text search in MSSQL.
+        /// </summary>
         /// <param name="searchTable">
-        ///   Arama yapılacak alanları içeren tablo adı (zorunlu).</param>
+        ///   Table name containing the fields to be searched (required).
+        /// </param>
         /// <param name="searchFields">
-        ///   Arama yapılacak alanlar (zorunlu).</param>
+        ///   Fields to be searched (required).
+        /// </param>
         /// <param name="searchQuery">
-        ///   Aranan kelime, ya da kelime grubu (zorunlu). Kelimeler virgülle ayrılmalı.</param>
+        ///   Searched word or phrase (required). Words must be separated by comma.
+        /// </param>
         /// <param name="searchTableAlias">
-        ///   Arama yapılacak tabloya, sorgunun FROM kısmında atanmış olan alias (zorunlu, ör. T0).</param>
+        ///   Alias assigned to the table to be searched in the FROM part of the query (required, e.g. T0).
+        /// </param>
         /// <param name="searchTableKey">
-        ///   Arama yapılacak tablonun anahtar (ID) sahası (zorunlu).</param>
+        ///   Key (ID) field of the table to be searched (required).
+        /// </param>
         /// <param name="containsAlias">
-        ///   Bağlama yapılan contains table'a atanacak alias (zorunlu, ör. CT).</param>
+        ///   Alias to be assigned to the joined contains table (required, e.g. CT).
+        /// </param>
         /// <returns>
-        ///   SqlSelect nesnesinin kendisi.</returns>
+        ///   The SqlSelect object itself.
+        /// </returns>
         public SqlQuery FullTextSearchJoin(
             string searchTable, string searchFields, string searchQuery,
             string searchTableAlias, string searchTableKey, string containsAlias)

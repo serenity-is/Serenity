@@ -8,7 +8,7 @@
             sb.Append(' ');
             sb.Append(SqlSyntax.AutoBracketValid(join.Table));
 
-            // joinAlias belirtilmişse ekle
+            // append if joinAlias is defined
             if (!string.IsNullOrEmpty(join.Name))
             {
                 sb.Append(' ');
