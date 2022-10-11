@@ -61,9 +61,9 @@ namespace Serenity.Data
             }
 
             if (profiler != null)
-                return new WrappedConnection(profiler.Profile(connection), dialect, loggerFactory.CreateLogger<ISqlConnections>());
+                return new WrappedConnection(profiler.Profile(connection), dialect, loggerFactory?.CreateLogger<ISqlConnections>());
 
-            return new WrappedConnection(connection, dialect, loggerFactory.CreateLogger<ISqlConnections>());
+            return new WrappedConnection(connection, dialect, loggerFactory?.CreateLogger<ISqlConnections>());
         }
 
         /// <summary>
