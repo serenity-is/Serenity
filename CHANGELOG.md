@@ -1,7 +1,7 @@
 ## 6.2.1 (2022-10-11)
 
 Bugfixes:
-  - handle case where logger factory is null in DefaultSqlConnections causing generate command to fail
+  - handle case where logger factory is null in DefaultSqlConnections causing sergen generate command to fail
 
 ## 6.2.0 (2022-10-10)
 

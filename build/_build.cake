@@ -215,6 +215,7 @@ Task("Pack")
     myPack("Serenity.Net.Web", null, null);
     myPack("Serenity.Scripts", null, null);
     myPack("Serenity.Net.CodeGenerator", "sergen", null);
+    myPack("Serenity.Assets", null, null);
     
     fixNugetCache();
 });
@@ -226,19 +227,4 @@ Task("Push")
         myPush();
     });
  
-Task("Assets-Pack")
-    .IsDependentOn("Clean")
-    .Does(() =>
-    {
-        myPack("Serenity.Assets", null, null);
-        fixNugetCache();
-    });
-
-Task("Assets-Push")
-    .IsDependentOn("Assets-Pack")
-    .Does(() =>
-    {
-        myPush();
-    });
-
 RunTarget(target);
