@@ -12,7 +12,6 @@
       "jquery.validation",
       "jqueryui",
       "toastr",
-      "react",
       "jest",
       "node"
     ],
