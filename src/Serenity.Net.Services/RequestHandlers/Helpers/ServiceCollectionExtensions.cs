@@ -193,14 +193,14 @@ namespace Serenity.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds json texts from file provider and subpath
+        /// Adds json texts from file provider and sub path
         /// </summary>
         /// <param name="registry">The text registry</param>
         /// <param name="provider">File provider</param>
         /// <param name="subpath">Sub path</param>
         /// <param name="recursive">True to recursively scan (default true)</param>
         /// <returns>The text registry</returns>
-        /// <exception cref="ArgumentNullException">registry, provider or subpath is null</exception>
+        /// <exception cref="ArgumentNullException">registry, provider or sub path is null</exception>
         public static ILocalTextRegistry AddJsonTexts(this ILocalTextRegistry registry, IFileProvider provider, string subpath, bool recursive = true)
         {
             if (registry is null)

@@ -162,7 +162,7 @@
         /// <summary>
         /// Adds a right join to the query.
         /// </summary>
-        /// <param name="alias">The alias with tablename/alias name.</param>
+        /// <param name="alias">The alias with table name/alias name.</param>
         /// <param name="onCriteria">The ON criteria.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">

@@ -171,7 +171,7 @@
         /// Gets the SCOPE IDENTITY expression.
         /// </summary>
         /// <value>
-        /// The SCOPE INDENTITY expression.
+        /// The SCOPE IDENTITY expression.
         /// </value>
         public virtual string ScopeIdentityExpression => "LAST_INSERT_ID()";
 

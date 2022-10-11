@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Mapping
 {
     /// <summary>
-    /// Determines textual field for this field. This is placed on FK's and specifies which field
+    /// Determines textual field for this field. This is placed on foreign keys and specifies which field
     /// in joined table (view fields in this row that originates from foreign table) should be used
     /// for display / filtering.
     /// </summary>

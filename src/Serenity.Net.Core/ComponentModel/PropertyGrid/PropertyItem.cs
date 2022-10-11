@@ -73,7 +73,7 @@ namespace Serenity.ComponentModel
 
         /// <summary>
         /// Gets or sets the category of the property in form.
-        /// Only meaningfull for forms.
+        /// Only meaningful for forms.
         /// </summary>
         /// <value>
         /// The category.
