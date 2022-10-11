@@ -30,10 +30,10 @@
         public bool IsView { get; set; }
 
         /// <summary>
-        /// Gets the tablename containg schema name dot table.
+        /// Gets the table name containing schema name dot table.
         /// </summary>
         /// <value>
-        /// The tablename.
+        /// The table name.
         /// </value>
         public string Tablename => Schema.IsEmptyOrNull() ? Table : Schema + "." + Table;
     }

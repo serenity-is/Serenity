@@ -55,7 +55,7 @@
         }
 
         /// <summary>
-        /// This property is meaningfull when InplaceAdd is true. By default, dialog type name
+        /// This property is meaningful when InplaceAdd is true. By default, dialog type name
         /// is determined by LookupKey, e.g. if lookup key is "Northwind.CustomerCity", 
         /// a dialog class named "Northwind.CustomerCityDialog" is used. If dialog type is different
         /// than lookup key, set this to classname, e.g. "MyModule.MyDialog"

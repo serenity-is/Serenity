@@ -13,10 +13,10 @@
         /// </value>
         IEnumerable<Type> AllRowTypes { get; }
         /// <summary>
-        /// Bies the connection key.
+        /// Returns row types by the connection key.
         /// </summary>
         /// <param name="connectionKey">The connection key.</param>
-        /// <returns></returns>
+        /// <returns>Row types by the connection key</returns>
         IEnumerable<Type> ByConnectionKey(string connectionKey);
     }
 }

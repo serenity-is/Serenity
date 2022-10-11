@@ -20,7 +20,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the text corresponding to falsey value.
+        /// Gets or sets the text corresponding to falsy value.
         /// </summary>
         /// <value>
         /// The false text.

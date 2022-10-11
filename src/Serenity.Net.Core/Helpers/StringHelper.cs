@@ -127,7 +127,7 @@ namespace Serenity
         /// <param name="str">
         ///   String.</param>
         /// <param name="maxLength">
-        ///   Maksimum length for the resulting string. If given as 0, or <paramref name="str"/> is shorter
+        ///   Maximum length for the resulting string. If given as 0, or <paramref name="str"/> is shorter
         ///   than this value, string returns as is. Otherwise <paramref name="str"/> 
         ///   it is trimmed to be under this limit in length including "the three dots".</param>
         /// <returns>

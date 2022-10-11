@@ -83,7 +83,7 @@
         /// <summary>
         ///   Formats a DELETE query.</summary>
         /// <param name="tableName">
-        ///   Tablename.</param>
+        ///   Table name.</param>
         /// <param name="where">
         ///   Where part of the query.</param>
         /// <returns>

@@ -42,7 +42,6 @@ namespace Serenity
             GenerationRandomizer.NextBytes(buffer);
             var value = BitConverter.ToUInt64(buffer, 0);
 
-            // random değer 0 olmasın
             if (value == 0)
                 return ulong.MaxValue;
 
