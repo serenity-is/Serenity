@@ -5,7 +5,8 @@
     "noEmit": true,
     "emitDeclarationOnly": false,
     "sourceMap": true,
-    "module": "CommonJS",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "skipLibCheck": true,
     "types": [
       "jquery",
@@ -18,7 +19,7 @@
     "outDir": "../../dist/test",
     "baseUrl": ".",
     "paths": {
-      "@/*": [ "../src/*" ]
+      "@/*": [ "../src/*" ]   
     },
     "noImplicitAny": false,
     "suppressImplicitAnyIndexErrors": true,
