@@ -6,11 +6,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="Serenity.Net.Web.targets" Pack="true" PackagePath="build" Visible="false" />
     <PackageReference Include="NUglify" Version="1.19.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
   </ItemGroup>
