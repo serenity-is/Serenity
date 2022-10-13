@@ -1,3 +1,8 @@
+## 6.2.3 (2022-10-13)
+
+Features:
+  - move restoretypings target to Serenity.Net.Web.targets, this allows restoring typings\lib\index.d.ts files without having to run dotnet sergen restore
+
 ## 6.2.2 (2022-10-13)
 
 Bugfixes:
