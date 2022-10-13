@@ -1,3 +1,7 @@
+## 6.2.4 (2022-10-13)
+
+  - ignore DataGrid.defaultRowHeight and DataGrid.defaultHeaderHeight in getSlickOptions() as they cause sleekgrid to fail rendering in Serene etc. where they are not set.
+
 ## 6.2.3 (2022-10-13)
 
 Features:
