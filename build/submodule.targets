@@ -1,10 +1,2 @@
 <Project>
-  <Target Name="SubmoduleCreateInputsOutputs" BeforeTargets="BeforeBuild">
-    <CreateItem Include="$(SolutionDir)Serenity\src\Serenity.Scripts\texts\*.json">
-      <Output TaskParameter="Include" ItemName="SubmoduleSerenityTexts" />
-    </CreateItem>
-  </Target>
-  <Target Name="SubmoduleCopySerenityFiles" AfterTargets="AfterBuild">
-    <Copy SourceFiles="@(SubmoduleSerenityTexts)" DestinationFolder="$(ProjectDir)wwwroot\Scripts\serenity\texts" SkipUnchangedFiles="true" />
-  </Target>
 </Project>
