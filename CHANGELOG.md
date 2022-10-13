@@ -1,3 +1,9 @@
+## 6.2.2 (2022-10-13)
+
+Bugfixes:
+  - fix referenced packages node_modules index.d.ts restoring for modular coding in Serenity.Pro.Coder.targets [StartSharp]
+  - recreate package-lock.json on template build [StartSharp] so node_modules populated correctly. delete your package-lock.json and node_modules than run npm i if you have such an issue.
+
 ## 6.2.1 (2022-10-11)
 
 Bugfixes:
