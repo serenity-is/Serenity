@@ -790,7 +790,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
             if (columns.length > 0) {
                 columns.sort(function (x1, y) {
-                    return x1.sortOrder < y.sortOrder ? -1 : (x1.sortOrder > y.sortOrder ? 1 : 0);
+                    return Math.abs(x1.sortOrder) < Math.abs(y.sortOrder) ? -1 : (Math.abs(x1.sortOrder) > Math.abs(y.sortOrder) ? 1 : 0);
                 });
 
                 var list = [];
