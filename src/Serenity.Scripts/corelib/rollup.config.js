@@ -336,7 +336,7 @@ export default [
                    
                     fs.writeFileSync('./out/Serenity.CoreLib.d.ts', src);
                     await minifyScript('./out/Serenity.CoreLib.js');
-                    fs.mkdirSync('./dist/q');
+                    !fs.existsSync('./dist/q') && fs.mkdirSync('./dist/q');
                     fs.copyFileSync('./out/q/index.bundle.d.ts', './dist/q/index.d.ts');
                     fs.writeFileSync('./dist/index.d.ts', 'export * from "./serenity/index";');
 

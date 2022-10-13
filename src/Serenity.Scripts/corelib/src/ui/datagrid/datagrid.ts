@@ -992,8 +992,10 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         opt.multiSelect = false;
         opt.multiColumnSort = true;
         opt.enableCellNavigation = false;
-        opt.headerRowHeight = DataGrid.defaultHeaderHeight;
-        opt.rowHeight = DataGrid.defaultRowHeight;
+        if (DataGrid.defaultHeaderHeight)
+            opt.headerRowHeight = DataGrid.defaultHeaderHeight;
+        if (DataGrid.defaultRowHeight)
+            opt.rowHeight = DataGrid.defaultRowHeight;
         return opt;
     }
 
