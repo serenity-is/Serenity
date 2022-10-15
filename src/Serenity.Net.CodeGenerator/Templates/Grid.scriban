@@ -1,7 +1,7 @@
 ﻿
 namespace {{RootNamespace}}{{DotModule}} {
 
-    @Serenity.Decorators.registerClass()
+    @Serenity.Decorators.registerClass('{{RootNamespace}}{{DotModule}}.{{ClassName}}Grid')
     export class {{ClassName}}Grid extends Serenity.EntityGrid<{{RowClassName}}, any> {
         protected getColumnsKey() { return {{ClassName}}Columns.columnsKey; }
         protected getDialogType() { return {{ClassName}}Dialog; }{{if Identity}}

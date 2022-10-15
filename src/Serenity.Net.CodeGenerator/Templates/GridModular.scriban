@@ -1,5 +1,5 @@
 ﻿
-@{{SERENITYIMPORT "Decorators"}}.registerClass()
+@{{SERENITYIMPORT "Decorators"}}.registerClass('{{RootNamespace}}{{DotModule}}.{{ClassName}}Grid')
 export class {{ClassName}}Grid extends {{SERENITYIMPORT "EntityGrid"}}<{{RowClassName}}, any> {
     protected getColumnsKey() { return {{SERVERTYPEIMPORT ClassName + "Columns"}}.columnsKey; }
     protected getDialogType() { return {{IMPORTFROM "./" + ClassName + "Dialog" ClassName + "Dialog"}}; }{{if Identity}}

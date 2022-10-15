@@ -1,6 +1,5 @@
 ﻿
-@{{SERENITYIMPORT "Decorators"}}.registerClass(){{if CustomSettings.MaximizableDialog}}
-@{{SERENITYIMPORT "Decorators"}}.maximizable(){{end}}
+@{{SERENITYIMPORT "Decorators"}}.registerClass('{{RootNamespace}}{{DotModule}}.{{ClassName}}Dialog')
 export class {{ClassName}}Dialog extends {{SERENITYIMPORT "EntityDialog"}}<{{RowClassName}}, any> {
     protected getFormKey() { return {{SERVERTYPEIMPORT ClassName + "Form"}}.formKey; }{{if Identity}}
     protected getIdProperty() { return {{SERVERTYPEIMPORT RowClassName}}.idProperty; }{{end}}
@@ -12,10 +11,4 @@ export class {{ClassName}}Dialog extends {{SERENITYIMPORT "EntityDialog"}}<{{Row
     protected getUpdatePermission() { return {{SERVERTYPEIMPORT RowClassName}}.updatePermission; }
 
     protected form = new {{ClassName}}Form(this.idPrefix);
-{{if CustomSettings.MaximizableDialog}}
-
-    onDialogOpen() {
-        super.onDialogOpen();
-        this.element.closest(".ui-dialog").find(".ui-icon-maximize-window").click();
-    }{{end}}
 }
