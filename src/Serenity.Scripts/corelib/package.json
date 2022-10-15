@@ -1,6 +1,6 @@
 {
   "name": "@serenity-is/corelib",
-  "version": "6.2.0",
+  "version": "6.2.5",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity CoreLib including Q, Serenity and Slick namespaces",
@@ -16,7 +16,7 @@
     "@rollup/plugin-typescript": "8.5.0",
     "@types/jest": "27.0.2",
     "@types/node": "14.14.14",
-    "esbuild": "0.15.2",
+    "esbuild": "0.15.11",
     "flatpickr": "4.6.13",
     "jest": "27.3.1",
     "jest-esbuild": "^0.2.9",
