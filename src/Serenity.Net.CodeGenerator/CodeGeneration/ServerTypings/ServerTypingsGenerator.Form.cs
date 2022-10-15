@@ -170,49 +170,49 @@ namespace Serenity.CodeGeneration
                         }
                     }
 
-                    var editorType = GetEditorTypeKeyFrom(item.PropertyType(), basedOnField?.PropertyType(), editorTypeAttr);
+                    var editorTypeKey = GetEditorTypeKeyFrom(item.PropertyType(), basedOnField?.PropertyType(), editorTypeAttr);
 
-                    ExternalType scriptType = null;
+                    ExternalType editorScriptType = null;
 
                     if (module)
                     {
-                        scriptType = 
-                            editorTypeByKey[editorType].FirstOrDefault(x =>
+                        editorScriptType = 
+                            editorTypeByKey[editorTypeKey].FirstOrDefault(x =>
                                 !string.IsNullOrEmpty(x.Module)) ??
-                            editorTypeByKey[editorType + "Editor"].FirstOrDefault(x =>
+                            editorTypeByKey[editorTypeKey + "Editor"].FirstOrDefault(x =>
                                 !string.IsNullOrEmpty(x.Module)) ??
-                            editorTypeByKey["Serenity." + editorType].FirstOrDefault(x =>
+                            editorTypeByKey["Serenity." + editorTypeKey].FirstOrDefault(x =>
                                 !string.IsNullOrEmpty(x.Module)) ??
-                            editorTypeByKey["Serenity." + editorType + "Editor"].FirstOrDefault(x =>
+                            editorTypeByKey["Serenity." + editorTypeKey + "Editor"].FirstOrDefault(x =>
                                 !string.IsNullOrEmpty(x.Module));
                     }
 
-                    if (scriptType is null)
+                    if (editorScriptType is null)
                     {
                         foreach (var rootNamespace in RootNamespaces)
                         {
-                            string wn = rootNamespace + "." + editorType;
-                            if ((scriptType = (GetScriptType(wn) ?? GetScriptType(wn + "Editor"))) != null)
+                            string wn = rootNamespace + "." + editorTypeKey;
+                            if ((editorScriptType = (GetScriptType(wn) ?? GetScriptType(wn + "Editor"))) != null)
                                 break;
                         }
                     }
 
-                    if (scriptType == null &&
-                        (scriptType = (GetScriptType(editorType) ?? GetScriptType(editorType + "Editor"))) == null)
+                    if (editorScriptType == null &&
+                        (editorScriptType = (GetScriptType(editorTypeKey) ?? GetScriptType(editorTypeKey + "Editor"))) == null)
                         continue;
 
-                    var fullName = ReferenceScriptType(scriptType, codeNamespace, module);
-                    var shortName = fullName;
+                    var editorFullName = ReferenceScriptType(editorScriptType, codeNamespace, module);
+                    var editorShortName = editorFullName;
                     
-                    if (!module && fullName.StartsWith("Serenity.", StringComparison.Ordinal))
-                        shortName = "s." + fullName["Serenity.".Length..];
+                    if (!module && editorFullName.StartsWith("Serenity.", StringComparison.Ordinal))
+                        editorShortName = "s." + editorFullName["Serenity.".Length..];
 
                     propertyNames.Add(item.Name);
-                    propertyTypes.Add(shortName);
+                    propertyTypes.Add(editorShortName);
 
                     cw.Indented(item.Name);
                     sb.Append(": ");
-                    sb.Append(fullName);
+                    sb.Append(editorFullName);
                     sb.AppendLine(";");
                 }
             });
