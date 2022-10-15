@@ -1,3 +1,11 @@
+## 6.2.5 (2022-10-15)
+
+Features:
+  - publish tsbuild as npm package (@serenity-is/tsbuild)
+  
+Bugfixes:
+  - don't sort desc column first, if multiple SortOrder attributes are defined (#6559)
+
 ## 6.2.4 (2022-10-13)
 
   - ignore DataGrid.defaultRowHeight and DataGrid.defaultHeaderHeight in getSlickOptions() as they cause sleekgrid to fail rendering in Serene etc. where they are not set.
