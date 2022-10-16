@@ -55,6 +55,15 @@ namespace Serenity.CodeGeneration
             if (string.IsNullOrEmpty(toPath))
                 throw new ArgumentNullException("toPath");
 
+            fromPath = fromPath.Replace("/", "\\", StringComparison.Ordinal);
+            toPath = toPath.Replace("/", "\\", StringComparison.Ordinal);
+
+            if (!fromPath.Contains(':', StringComparison.Ordinal))
+                fromPath = "z:\\" + fromPath;
+
+            if (!toPath.Contains(':', StringComparison.Ordinal))
+                toPath = "z:\\" + toPath;
+
             Uri fromUri = new(AppendDirectorySeparatorChar(fromPath));
             Uri toUri = new(AppendDirectorySeparatorChar(toPath));
 
