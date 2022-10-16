@@ -34,7 +34,7 @@
                         continue;
 
                     sb.AppendLine();
-                    GeneratePermissionKeysFor(nested, declare: false, module);
+                    GeneratePermissionKeysFor(nested, declare: true, module);
                 }
             });
         }
