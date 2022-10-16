@@ -1,12 +1,8 @@
 ﻿#if ISSOURCEGENERATOR
+using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Threading;
-using Microsoft.CodeAnalysis;
-using Serenity.Reflection;
 #endif
-
-using Serenity.CodeGenerator;
-using System.Linq;
 
 namespace Serenity.CodeGeneration
 {
@@ -18,7 +14,8 @@ namespace Serenity.CodeGeneration
         protected HashSet<string> localTextKeys = new();
         protected List<GeneratedTypeInfo> generatedTypes = new();
         protected List<AnnotationTypeInfo> annotationTypes = new();
-        protected ILookup<string, ExternalType> editorTypeByKey;
+        protected ILookup<string, ExternalType> modularEditorTypeByKey;
+        protected ILookup<string, ExternalType> modularDialogTypeByKey;
 
 #if ISSOURCEGENERATOR
         private readonly CancellationToken cancellationToken;
@@ -192,19 +189,18 @@ namespace Serenity.CodeGeneration
         protected override void GenerateAll()
         {
             var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            editorTypeByKey = tsTypes.Values.Select(type =>
+            modularEditorTypeByKey = tsTypes.Values.Select(type =>
             {
                 if (type.IsAbstract != false &&
                     type.IsInterface != false &&
                     !string.IsNullOrEmpty(type.Module))
                 {
                     if (type.SourceFile?.EndsWith(".d.ts") == true &&
-                        //(type.GenericParameters?.Count ?? 0) == 0 &&
                         (HasBaseType(type, ClientTypesGenerator.EditorBaseClasses) ||
                          (HasBaseType(type, "@serenity-is/corelib:Widget", "Widget") &&
                           type.Name.EndsWith("Editor", StringComparison.Ordinal))))
                     {
-                        return (type.Name, type);
+                        return (key: type.Name, type);
                     }
                     
                     if (type.Attributes != null)
@@ -215,16 +211,41 @@ namespace Serenity.CodeGeneration
                                 (attr.Type == "registerEditor" ||
                                  attr.Type.EndsWith(".registerEditor", StringComparison.Ordinal)) &&
                                 attr.Arguments?.Count > 0 &&
-                                attr.Arguments[0]?.Value is string s &&
-                                !string.IsNullOrEmpty(s))
-                                return (s, type);
+                                attr.Arguments[0]?.Value is string key &&
+                                !string.IsNullOrEmpty(key))
+                                return (key, type);
                         }
                     }
                 }
 
                 return (null, type);
-            }).Where(x => x.Item1 != null)
-            .ToLookup(x => x.Item1, x => x.type);
+            }).Where(x => x.key != null)
+                .ToLookup(x => x.key, x => x.type);
+
+            modularDialogTypeByKey = tsTypes.Values.Select(type =>
+            {
+                if (type.IsAbstract != false &&
+                    type.IsInterface != false &&
+                    !string.IsNullOrEmpty(type.Module))
+                {
+                    if (type.Attributes != null)
+                    {
+                        foreach (var attr in type.Attributes)
+                        {
+                            if (attr.Type is not null &&
+                                (attr.Type == "registerClass" ||
+                                 attr.Type.EndsWith(".registerClass", StringComparison.Ordinal)) &&
+                                attr.Arguments?.Count > 0 &&
+                                attr.Arguments[0]?.Value is string key &&
+                                !string.IsNullOrEmpty(key))
+                                return (key, type);
+                        }
+                    }
+                }
+
+                return (null, type);
+            }).Where(x => x.key != null)
+                .ToLookup(x => x.key, x => x.type);
 
 #if ISSOURCEGENERATOR
             var types = Compilation.GetSymbolsWithName(s => true, SymbolFilter.Type).OfType<ITypeSymbol>();
@@ -952,15 +973,25 @@ namespace Serenity.CodeGeneration
                         sb.Insert(0, string.Join(Environment.NewLine, moduleImportsLookup.Select(z =>
                         {
                             var from = z.Key.From;
-                            if (!z.Key.External &&
-                                !from.StartsWith("/", StringComparison.Ordinal) &&
-                                !from.StartsWith(".", StringComparison.Ordinal))
+                            if (!z.Key.External)
                             {
-                                if (System.IO.Path.GetDirectoryName(filename) ==
-                                    System.IO.Path.GetDirectoryName(from))
-                                    from = "./" + System.IO.Path.GetFileName(from);
-                                else
-                                    from = "../" + from;
+                                if (!from.StartsWith("/", StringComparison.Ordinal) &&
+                                    !from.StartsWith(".", StringComparison.Ordinal))
+                                {
+                                    if (System.IO.Path.GetDirectoryName(filename) ==
+                                        System.IO.Path.GetDirectoryName(from))
+                                        from = "./" + System.IO.Path.GetFileName(from);
+                                    else
+                                        from = "../" + from;
+                                }
+                                else if (from.StartsWith("/Modules/", StringComparison.Ordinal))
+                                {
+                                    from = "@" + from[8..];
+                                }
+                                else if (from.StartsWith("/", StringComparison.Ordinal))
+                                {
+                                    from = "@/.." + from;
+                                }
                             }
 
                             var importList = string.Join(", ", z.Select(p =>

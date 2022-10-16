@@ -1,6 +1,9 @@
 ﻿#if !ISSOURCEGENERATOR
 using Mono.Cecil.Cil;
 #endif
+using System.Linq;
+using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 
 namespace Serenity.CodeGeneration
 {
@@ -91,6 +94,53 @@ namespace Serenity.CodeGeneration
             return editorType;
         }
 
+        public static int IndexOf<T>(IEnumerable<T> source, Func<T, bool> predicate)
+        {
+            int index = 0;
+            foreach (T item in source)
+            {
+                if (predicate(item))
+                    return index;
+                index++;
+            }
+            return -1;
+        }
+
+        private IEnumerable<string> GetDialogTypeKeyRefs(CustomAttribute editorTypeAttr)
+        {
+            if (editorTypeAttr != null)
+            {
+                var dialogType = editorTypeAttr.NamedArguments().FirstOrDefault(x => string.Equals(x.Name(), "DialogType")).ArgumentValue() as string;
+                if (!string.IsNullOrEmpty(dialogType))
+                    yield return dialogType;
+                else
+                {
+                    var inplaceAdd = editorTypeAttr.NamedArguments().FirstOrDefault(x => string.Equals(x.Name(), "InplaceAdd")).ArgumentValue() as bool?;
+                    if (inplaceAdd == true)
+                    {
+#if ISSOURCEGENERATOR
+                        var lookupType = editorTypeAttr.ConstructorArguments().Select(x => x.Value()).OfType<ITypeSymbol>().FirstOrDefault();
+#else
+                        var lookupType = editorTypeAttr.ConstructorArguments().Select(x => x.Value()).OfType<TypeReference>().FirstOrDefault()?.Resolve();
+#endif
+
+                        if (lookupType != null)
+                        {
+                            var lookupKey = AutoLookupKeyFor(lookupType);
+                            if (!string.IsNullOrEmpty(lookupKey))
+                                yield return lookupKey;
+                        }
+                        else
+                        {
+                            var lookupKey = editorTypeAttr.ConstructorArguments().Select(x => x.Value()).OfType<string>().FirstOrDefault();
+                            if (!string.IsNullOrEmpty(lookupKey))
+                                yield return lookupKey;
+                        }
+                    }
+                }
+            }
+        }
+
         private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute,
             string identifier, bool module)
         {
@@ -101,6 +151,8 @@ namespace Serenity.CodeGeneration
 
             var propertyNames = new List<string>();
             var propertyTypes = new List<string>();
+            var referencedTypeKeys = new HashSet<string>();
+            var referencedTypeAliases = new List<string>();
 
             TypeDefinition basedOnRow = null;
             var basedOnRowAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
@@ -176,15 +228,39 @@ namespace Serenity.CodeGeneration
 
                     if (module)
                     {
-                        editorScriptType = 
-                            editorTypeByKey[editorTypeKey].FirstOrDefault(x =>
-                                !string.IsNullOrEmpty(x.Module)) ??
-                            editorTypeByKey[editorTypeKey + "Editor"].FirstOrDefault(x =>
-                                !string.IsNullOrEmpty(x.Module)) ??
-                            editorTypeByKey["Serenity." + editorTypeKey].FirstOrDefault(x =>
-                                !string.IsNullOrEmpty(x.Module)) ??
-                            editorTypeByKey["Serenity." + editorTypeKey + "Editor"].FirstOrDefault(x =>
-                                !string.IsNullOrEmpty(x.Module));
+                        ExternalType findType(ILookup<string, ExternalType> lookup, string key, string suffix)
+                        {
+                            var type = lookup[key].FirstOrDefault() ??
+                                lookup[key + suffix].FirstOrDefault() ??
+                                lookup["Serenity." + editorTypeKey].FirstOrDefault() ??
+                                lookup["Serenity." + editorTypeKey + suffix].FirstOrDefault();
+
+                            if (type is not null)
+                                return type;
+
+                            foreach (var rootNamespace in RootNamespaces)
+                            {
+                                string wn = rootNamespace + "." + key;
+                                type = lookup[wn].FirstOrDefault() ??
+                                    lookup[wn + suffix].FirstOrDefault();
+                                if (type != null)
+                                    return type;
+                            }
+
+                            return null;
+                        }
+
+                        editorScriptType = findType(modularEditorTypeByKey, editorTypeKey, "Editor");
+
+                        foreach (var typeKey in GetDialogTypeKeyRefs(editorTypeAttr))
+                        {
+                            if (!referencedTypeKeys.Add(typeKey))
+                                continue;
+
+                            var dialogType = findType(modularDialogTypeByKey, typeKey, "Dialog");
+                            if (dialogType != null)
+                                referencedTypeAliases.Add(ReferenceScriptType(dialogType, codeNamespace, module));
+                        }
                     }
 
                     if (editorScriptType is null)
@@ -310,6 +386,12 @@ namespace Serenity.CodeGeneration
                     });
                 }
             });
+
+            if (module && referencedTypeAliases.Any())
+            {
+                sb.AppendLine("");
+                sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases) + "]; // inplace add dialog types");
+            }
 
             RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);
         }
