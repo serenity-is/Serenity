@@ -73,6 +73,16 @@ export const esbuildOptions = (opt) => {
 }
 
 export const build = async (opt) => {
+    if (opt.watch) {
+        setInterval(() => {
+            try {
+                process.kill(process.ppid, 0);
+            }
+            catch (e) {
+            }
+        }, 5000);
+    }
+    
     await esbuild.build(esbuildOptions(opt));
 };
 
