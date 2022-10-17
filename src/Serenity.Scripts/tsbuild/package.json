@@ -1,6 +1,6 @@
 {
   "name": "@serenity-is/tsbuild",
-  "version": "6.2.6",
+  "version": "6.2.7",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity ESBuild functions",
