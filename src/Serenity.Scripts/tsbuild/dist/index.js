@@ -73,6 +73,8 @@ export const esbuildOptions = (opt) => {
 }
 
 export const build = async (opt) => {
+    var opt = esbuildOptions(opt);
+
     if (opt.watch) {
         // this somehow resolves the issue that when debugging is stopped
         // in Visual Studio, the node process stays alive
