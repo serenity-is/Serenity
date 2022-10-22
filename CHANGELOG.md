@@ -1,3 +1,11 @@
+## 6.2.9 (2022-10-22)
+
+Features:
+  - add tests for es module editor option generation
+  - don't generate row type if it has ScriptSkip attribute, even if it is referenced by something else. 
+  - don't generate row / other type members if it has scriptskip or ignore attribute
+  - use export for nested permission key namespaces
+
 ## 6.2.8 (2022-10-22)
 
 Bugfixes:
