@@ -1,3 +1,8 @@
+## 6.2.8 (2022-10-22)
+
+Bugfixes:
+  - fix options for editors defined in es modules not generated in client types
+
 ## 6.2.7 (2022-10-22)
 
 Features:
