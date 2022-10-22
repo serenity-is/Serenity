@@ -1,4 +1,6 @@
-﻿namespace Serenity.CodeGeneration
+﻿using Serenity.CodeGenerator;
+
+namespace Serenity.CodeGeneration
 {
     public abstract class ImportGeneratorBase : CodeGeneratorBase
     {
@@ -120,6 +122,37 @@
                 sb.Append(ns);
                 sb.AppendLine(";");
             }
+        }
+
+        protected ExternalType GetScriptTypeFrom(ExternalType fromType, string typeName)
+        {
+            var ns = fromType.Namespace;
+            var scriptType = GetScriptType(typeName);
+            if (scriptType != null)
+                return scriptType;
+
+            if (!string.IsNullOrEmpty(fromType.Module) &&
+                typeName?.IndexOf(':') < 0)
+            {
+                var moduleTypeName = fromType.Module + ":" + typeName;
+                scriptType = GetScriptType(moduleTypeName);
+                if (scriptType != null)
+                    return scriptType;
+            }
+
+            if (ns != null)
+            {
+                var nsParts = ns.Split('.');
+                for (var i = nsParts.Length; i > 0; i--)
+                {
+                    var prefixed = string.Join(".", nsParts.Take(i)) + '.' + typeName;
+                    scriptType = GetScriptType(prefixed);
+                    if (scriptType != null)
+                        return scriptType;
+                }
+            }
+
+            return null;
         }
 
         protected bool HasBaseType(ExternalType type, params string[] typeNames)

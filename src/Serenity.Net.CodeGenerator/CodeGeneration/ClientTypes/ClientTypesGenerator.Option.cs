@@ -124,6 +124,9 @@
                         x.Type == "System.ComponentModel.DisplayNameAttribute" ||
                         x.Type == "Serenity.OptionAttribute" ||
                         x.Type == "Serenity.Decorators.option" ||
+                        x.Type == "Decorators.option" ||
+                        x.Type == "option" ||
+                        x.Type == "@serenity-is/corelib:Decorators.option" ||
                         x.Type == "Serenity.Decorators.displayName")))
                     continue;
 
@@ -145,7 +148,7 @@
                     (constructor.Arguments[0].Type == "jQueryApi.jQueryObject" ||
                      constructor.Arguments[0].Type == "JQuery"))
                 {
-                    var optionsType = GetScriptType(constructor.Arguments[isWidget ? 1 : 0].Type);
+                    var optionsType = GetScriptTypeFrom(type, constructor.Arguments[isWidget ? 1 : 0].Type);
                     if (optionsType != null)
                         AddOptionMembers(result, optionsType, isOptions: true);
                 }
