@@ -8,10 +8,7 @@
         private readonly StringBuilder sb;
         private readonly string tab;
         private string indent;
-        /// <summary>
-        /// Is CodeWriter running for C#
-        /// </summary>
-        public bool IsCSharp { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeWriter"/> class.
         /// </summary>
@@ -20,7 +17,7 @@
         public CodeWriter(StringBuilder sb, string tab)
             : this(sb, 1)
         {
-            this.tab = tab;
+            this.tab = tab ?? throw new ArgumentNullException(nameof(tab));
         }
 
         /// <summary>
@@ -39,9 +36,9 @@
         /// <param name="tabSize">Number of spaces.</param>
         public CodeWriter(StringBuilder sb, int tabSize)
         {
+            this.sb = sb ?? throw new ArgumentNullException(nameof(sb));
             tab = new string(' ', tabSize);
             indent = "";
-            this.sb = sb;
         }
 
         /// <summary>
@@ -67,125 +64,13 @@
         /// <param name="insideBlock">The inside block.</param>
         public void Block(Action insideBlock)
         {
+            if (insideBlock is null)
+                throw new ArgumentNullException(nameof(insideBlock));
+
             IncreaseIndent();
             insideBlock();
             DecreaseIndent();
         }
-
-        /// <summary>
-        /// Converts primitive class to C# keyword if given class is not a primitive class returns null.
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <returns></returns>
-
-        public static string ToCSKeyword(string dataType)
-        {
-            return dataType switch
-            {
-                "String" => "string",
-                "Boolean" => "bool",
-                "Byte" => "byte",
-                "Char" => "char",
-                "Decimal" => "decimal",
-                "Double" => "double",
-                "Int16" => "short",
-                "Int32" => "int",
-                "Int64" => "long",
-                "Object" => "object",
-                "SByte" => "sbyte",
-                "Single" => "float",
-                "UInt16" => "ushort",
-                "UInt32" => "uint",
-                "UInt64" => "ulong",
-                _ => null
-            };
-        }
-
-        /// <summary>
-        /// Determines is Type is a C# primitive keyword
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <returns></returns>
-
-        public static bool IsCSKeyword(string dataType)
-        {
-            return dataType switch
-            {
-                "string" => true,
-                "bool" => true,
-                "byte" => true,
-                "char" => true,
-                "decimal" => true,
-                "double" => true,
-                "short" => true,
-                "int" => true,
-                "long" => true,
-                "object" => true,
-                "sbyte" => true,
-                "float" => true,
-                "ushort" => true,
-                "uint" => true,
-                "ulong" => true,
-                _ => false
-            };
-        }
-
-        /// <summary>
-        /// Converts datatype with a namespace to datatype without namespace if its namespace is in the allowed usings else returns fullname.
-        /// <para>
-        /// Please see <see cref="IsCSharp"/> if you are using this for C#
-        /// </para>
-        /// </summary>
-        /// <param name="cw"></param>
-        /// <param name="fullName"></param>
-        /// <returns></returns>
-        public string ShortTypeName(CodeWriter cw, string fullName)
-        {
-            fullName = fullName.Trim();
-
-            if (string.IsNullOrEmpty(fullName))
-                return string.Empty;
-
-            var nullableText = "";
-            if (fullName.EndsWith("?"))
-            {
-                fullName = fullName[..^1];
-                nullableText = "?";
-            }
-
-            if (IsCSharp)
-            {
-                if (IsCSKeyword(fullName))
-                    return fullName + nullableText;
-
-                if (fullName.IndexOf('.', StringComparison.OrdinalIgnoreCase) < 0)
-                {
-                    if (fullName == "Stream")
-                        fullName = "System.IO.Stream";
-                    else
-                    {
-                        var type = Type.GetType("System." + fullName);
-
-                        if (type != null)
-                        {
-                            fullName = type.FullName;
-                        }
-                        else
-                            return fullName + nullableText;
-                    }
-                }
-
-                if (fullName.EndsWith(">"))
-                {
-                    var idx = fullName.IndexOf('<', StringComparison.OrdinalIgnoreCase);
-                    if (idx >= 0)
-                        return cw.ShortTypeName(fullName[..idx]) + '<' + ShortTypeName(cw, fullName[(idx + 1)..^1]) + '>' + nullableText;
-                }
-            }
-
-            return cw.ShortTypeName(fullName) + nullableText;
-        }
-
 
         /// <summary>
         /// Adds a brace, increases indent, runs the inside block, decreases indent back, closes the brace.
@@ -273,24 +158,6 @@
         }
 
         /// <summary>
-        /// Whether to put opening brace on the same line.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if brace on same line; otherwise, <c>false</c>.
-        /// </value>
-        public bool BraceOnSameLine { get; set; }
-
-        /// <summary>
-        /// Gets tab string
-        /// </summary>
-        public string Tab => tab;
-
-        /// <summary>
-        /// Gets internal string builder
-        /// </summary>
-        public StringBuilder Builder => sb;
-
-        /// <summary>
         /// Executes action by opening namespace if it is not null or empty
         /// </summary>
         /// <param name="ns">Namespace</param>
@@ -316,6 +183,25 @@
         }
 
         /// <summary>
+        /// Gets sets function that determines if a namespace is allowed to be added to the local usings
+        /// </summary>
+        public Func<string, bool> AllowUsing { get; set; } = (ns) => true;
+
+
+        /// <summary>
+        /// Whether to put opening brace on the same line.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if brace on same line; otherwise, <c>false</c>.
+        /// </value>
+        public bool BraceOnSameLine { get; set; }
+
+        /// <summary>
+        /// Gets internal string builder
+        /// </summary>
+        public StringBuilder Builder => sb;
+
+        /// <summary>
         /// Gets / sets current namespace
         /// </summary>
         public string CurrentNamespace { get; set; }
@@ -331,14 +217,19 @@
         public HashSet<string> GlobalUsings { get; set; }
 
         /// <summary>
+        /// Gets / sets if the code writer is used for generating C# code.
+        /// </summary>
+        public bool IsCSharp { get; set; }
+
+        /// <summary>
         /// Gets / sets local usings hash set
         /// </summary>
         public HashSet<string> LocalUsings { get; private set; }
 
         /// <summary>
-        /// Gets sets function that determines if a namespace is allowed to be added to the local usings
+        /// Gets tab string
         /// </summary>
-        public Func<string, bool> AllowUsing { get; set; } = (ns) => true;
+        public string Tab => tab;
 
         /// <summary>
         /// Returns true if the namespace is in list of usings.
@@ -362,7 +253,6 @@
         /// </summary>
         /// <param name="ns"></param>
         /// <param name="force"></param>
-        /// <returns></returns>
         public bool Using(string ns, bool force)
         {
             if (IsUsing(ns))
@@ -383,7 +273,6 @@
         /// If AllowUsing callback is null or returns true, this may add it to the list of local usings.
         /// </summary>
         /// <param name="ns"></param>
-        /// <returns></returns>
         public bool Using(string ns)
         {
             return Using(ns, false);
@@ -423,7 +312,6 @@
         /// </summary>
         /// <param name="text"></param>
         /// <param name="index"></param>
-        /// <returns></returns>
         public StringBuilder Insert(int index, string text)
         {
             return sb.Insert(index, text);
@@ -470,6 +358,115 @@
         public StringBuilder Append(char c)
         {
             return sb.Append(c);
+        }
+
+        /// <summary>
+        /// Determines is Type is a C# primitive keyword
+        /// </summary>
+        /// <param name="dataType"></param>
+        public static bool IsCSKeyword(string dataType)
+        {
+            return dataType switch
+            {
+                "string" => true,
+                "bool" => true,
+                "byte" => true,
+                "char" => true,
+                "decimal" => true,
+                "double" => true,
+                "short" => true,
+                "int" => true,
+                "long" => true,
+                "object" => true,
+                "sbyte" => true,
+                "float" => true,
+                "ushort" => true,
+                "uint" => true,
+                "ulong" => true,
+                _ => false
+            };
+        }
+
+        /// <summary>
+        /// Converts primitive class to C# keyword if given class is not a primitive class returns null.
+        /// </summary>
+        /// <param name="dataType"></param>
+        public static string ToCSKeyword(string dataType)
+        {
+            return dataType switch
+            {
+                "String" => "string",
+                "Boolean" => "bool",
+                "Byte" => "byte",
+                "Char" => "char",
+                "Decimal" => "decimal",
+                "Double" => "double",
+                "Int16" => "short",
+                "Int32" => "int",
+                "Int64" => "long",
+                "Object" => "object",
+                "SByte" => "sbyte",
+                "Single" => "float",
+                "UInt16" => "ushort",
+                "UInt32" => "uint",
+                "UInt64" => "ulong",
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Converts datatype with a namespace to datatype without namespace if its namespace is in the allowed usings else returns fullname.
+        /// <para>
+        /// Please see <see cref="IsCSharp"/> if you are using this for C#
+        /// </para>
+        /// </summary>
+        /// <param name="cw"></param>
+        /// <param name="fullName"></param>
+        public string ShortTypeName(CodeWriter cw, string fullName)
+        {
+            fullName = fullName.Trim();
+
+            if (string.IsNullOrEmpty(fullName))
+                return string.Empty;
+
+            var nullableText = "";
+            if (fullName.EndsWith("?"))
+            {
+                fullName = fullName[..^1];
+                nullableText = "?";
+            }
+
+            if (IsCSharp)
+            {
+                if (IsCSKeyword(fullName))
+                    return fullName + nullableText;
+
+                if (fullName.IndexOf('.', StringComparison.OrdinalIgnoreCase) < 0)
+                {
+                    if (fullName == "Stream")
+                        fullName = "System.IO.Stream";
+                    else
+                    {
+                        var type = Type.GetType("System." + fullName);
+
+                        if (type != null)
+                        {
+                            fullName = type.FullName;
+                        }
+                        else
+                            return fullName + nullableText;
+                    }
+                }
+
+                if (fullName.EndsWith(">"))
+                {
+                    var idx = fullName.IndexOf('<', StringComparison.OrdinalIgnoreCase);
+                    if (idx >= 0)
+                        return cw.ShortTypeName(fullName[..idx]) + '<' + ShortTypeName(cw, fullName[(idx + 1)..^1]) + '>' + nullableText;
+                }
+            }
+
+            return cw.ShortTypeName(fullName) + nullableText;
         }
 
         /// <summary>
