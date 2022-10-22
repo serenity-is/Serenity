@@ -6,10 +6,21 @@ namespace Serenity.Tests.CodeGenerator
     {
         private static ServerTypingsGenerator CreateGenerator()
         {
-            var generator = new ServerTypingsGenerator(new PhysicalGeneratorFileSystem(),
+            var generator = new ServerTypingsGenerator(new MockGeneratorFileSystem(),
                 typeof(ServerTypingsGeneratorTests).Assembly.Location);
             generator.RootNamespaces.Add("ServerTypingsTest");
             return generator;
         }
+
+        private static ServerTypingsGenerator CreateGeneratorModules()
+        {
+            var generator = new ServerTypingsGenerator(new MockGeneratorFileSystem(),
+                typeof(ServerTypingsGeneratorTests).Assembly.Location);
+            generator.RootNamespaces.Add("ServerTypingsTest");
+            generator.ModuleTypings = true;
+            generator.NamespaceTypings = false;
+            return generator;
+        }
+
     }
 }
