@@ -1,3 +1,12 @@
+## 6.2.7 (2022-10-22)
+
+Features:
+  - try to import formatter types used by columns to Columns.ts so that modular formatters can be registered from the grids that they are used from
+  - add option to disable particular transform in source generator with sergen.json MVC/SourceGenerator and ClientTypes/SourceGenerator settings by using false.
+  - go back to non-incremental source generator for clienttypes as it breaks syntax highlighting when referencing .ts files as AdditionalTexts, and there is no single output .Web.js for modules [StartSharp]
+  - disable source generator when SourceGeneratorTransform is false in project file [StartSharp]
+  - read MVC/StripViewPaths from sergen.json in ViewPathsSourceGenerator if available [StartSharp]
+
 ## 6.2.6 (2022-10-17)
 
 Features:
