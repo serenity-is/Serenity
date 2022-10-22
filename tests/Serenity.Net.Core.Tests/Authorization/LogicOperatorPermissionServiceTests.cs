@@ -155,7 +155,7 @@ public class LogicOperatorPermissionServiceTests
     [InlineData("(!(!Module:0 | (Module:1 | !0) & !Module:1 | (!(Module:Permission:0 & Module:SubModule:0) & Module:SubModule:0)))", false)]
     public void Evaluates_Expression_As_Expected(string permission, bool expected)
     {
-        var lops = new LogicOperatorPermissionService(new MockPermissions(p => p != null && p.Contains("1", System.StringComparison.CurrentCulture)));
+        var lops = new LogicOperatorPermissionService(new MockPermissions(p => p != null && p.Contains("1", StringComparison.Ordinal)));
         var actual = lops.HasPermission(permission);
         if (expected)
             Assert.True(actual);
