@@ -1,7 +1,6 @@
-﻿namespace Serenity.Tests
+﻿namespace Serenity.Tests;
+
+public class MockTextLocalizer : ITextLocalizer
 {
-    public class MockTextLocalizer : ITextLocalizer
-    {
-        public string TryGet(string key) => key;
-    }
+    public string TryGet(string key) => key;
 }

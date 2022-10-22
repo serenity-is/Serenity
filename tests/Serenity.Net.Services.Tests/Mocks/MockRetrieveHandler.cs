@@ -1,34 +1,33 @@
-﻿namespace Serenity.Tests
+﻿namespace Serenity.Tests;
+
+public class MockRetrieveHandler<TRow> : IRetrieveRequestHandler
+    where TRow: IRow, new()
 {
-    public class MockRetrieveHandler<TRow> : IRetrieveRequestHandler
-        where TRow: IRow, new()
+    public TRow Row { get; set; } = new TRow();
+
+    public RetrieveRequest Request { get; set; } = new RetrieveRequest();
+
+    public RetrieveResponse<TRow> Response { get; set; } = new RetrieveResponse<TRow>()
     {
-        public TRow Row { get; set; } = new TRow();
+        Entity = new TRow()
+    };
 
-        public RetrieveRequest Request { get; set; } = new RetrieveRequest();
+    public IDictionary<string, object> StateBag { get; set; } = new Dictionary<string, object>();
 
-        public RetrieveResponse<TRow> Response { get; set; } = new RetrieveResponse<TRow>()
-        {
-            Entity = new TRow()
-        };
+    public IDbConnection Connection { get; set; }
 
-        public IDictionary<string, object> StateBag { get; set; } = new Dictionary<string, object>();
+    public IRequestContext Context { get; set; }
 
-        public IDbConnection Connection { get; set; }
+    IRetrieveResponse IRetrieveRequestHandler.Response => Response;
+    IRow IRetrieveRequestHandler.Row => Row;
 
-        public IRequestContext Context { get; set; }
+    public virtual bool AllowSelectField(Field field)
+    {
+        return true;
+    }
 
-        IRetrieveResponse IRetrieveRequestHandler.Response => Response;
-        IRow IRetrieveRequestHandler.Row => Row;
-
-        public virtual bool AllowSelectField(Field field)
-        {
-            return true;
-        }
-
-        public virtual bool ShouldSelectField(Field field)
-        {
-            return true;
-        }
+    public virtual bool ShouldSelectField(Field field)
+    {
+        return true;
     }
 }

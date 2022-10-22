@@ -1,12 +1,11 @@
 ﻿using System.Collections;
 
-namespace Serenity.Tests
+namespace Serenity.Tests;
+
+public class NullBehaviorProvider : IBehaviorProvider
 {
-    public class NullBehaviorProvider : IBehaviorProvider
+    public IEnumerable Resolve(Type handlerType, Type rowType, Type behaviorType)
     {
-        public IEnumerable Resolve(Type handlerType, Type rowType, Type behaviorType)
-        {
-            return Array.Empty<Type>();
-        }
+        return Array.Empty<Type>();
     }
 }

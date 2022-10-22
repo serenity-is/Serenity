@@ -1,31 +1,30 @@
 ﻿using System.Collections;
 
-namespace Serenity.Tests
+namespace Serenity.Tests;
+
+public class MockDirectoryContents : IDirectoryContents
 {
-    public class MockDirectoryContents : IDirectoryContents
+    public MockDirectoryContents(IFileSystem fileSystem, string path)
     {
-        public MockDirectoryContents(IFileSystem fileSystem, string path)
-        {
-            FileSystem = fileSystem;
-            Path = path;
-        }
+        FileSystem = fileSystem;
+        Path = path;
+    }
 
-        public bool Exists => FileSystem.Directory.Exists(Path);
+    public bool Exists => FileSystem.Directory.Exists(Path);
 
-        public IFileSystem FileSystem { get; }
-        public string Path { get; }
+    public IFileSystem FileSystem { get; }
+    public string Path { get; }
 
-        public IEnumerator<Microsoft.Extensions.FileProviders.IFileInfo> GetEnumerator()
-        {
-            return FileSystem.Directory.GetDirectories(Path)
-                .Select(x => new MockFileInfo(FileSystem, x, true))
-                .Concat(FileSystem.Directory.GetFiles(Path)
-                    .Select(x => new MockFileInfo(FileSystem, x, false))).GetEnumerator();
-        }
+    public IEnumerator<Microsoft.Extensions.FileProviders.IFileInfo> GetEnumerator()
+    {
+        return FileSystem.Directory.GetDirectories(Path)
+            .Select(x => new MockFileInfo(FileSystem, x, true))
+            .Concat(FileSystem.Directory.GetFiles(Path)
+                .Select(x => new MockFileInfo(FileSystem, x, false))).GetEnumerator();
+    }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }
