@@ -69,7 +69,6 @@ namespace Serenity.CodeGenerator
                       ns == "System.ComponentModel" ||
                       ns == "System.Collections.Generic",
                     IsCSharp = true
-
                 };
 
                 var modularTSImporter = new ModularTSImporter((model as EntityModel)?.Module);

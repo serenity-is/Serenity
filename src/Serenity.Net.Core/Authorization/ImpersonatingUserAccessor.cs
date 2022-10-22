@@ -9,7 +9,7 @@ namespace Serenity.Web
     {
         private readonly IUserAccessor userContext;
         private readonly IHttpContextItemsAccessor requestContext;
-        private readonly ThreadLocal<Stack<ClaimsPrincipal>> impersonationStack = new ThreadLocal<Stack<ClaimsPrincipal>>();
+        private readonly ThreadLocal<Stack<ClaimsPrincipal>> impersonationStack = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImpersonatingUserAccessor"/> class
