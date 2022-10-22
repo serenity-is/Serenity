@@ -41,7 +41,8 @@ namespace Serenity.CodeGenerator
 
         /// <summary>Used for Newtonsoft.JSON</summary>
         public bool ShouldSerializeClientTypes() => ClientTypes != null &&
-            !string.IsNullOrEmpty(ClientTypes.OutDir);
+            (!string.IsNullOrEmpty(ClientTypes.OutDir) ||
+             ClientTypes.SourceGenerator == false);
 
         /// <summary>
         /// MVC (e.g. view locations) related configuration
@@ -53,7 +54,8 @@ namespace Serenity.CodeGenerator
             (!string.IsNullOrEmpty(MVC.OutDir) ||
              MVC.UseRootNamespace != null ||
              MVC.SearchViewPaths?.Any() == true ||
-             MVC.StripViewPaths?.Any() == true);
+             MVC.StripViewPaths?.Any() == true ||
+             MVC.SourceGenerator == false);
 
         /// <summary>
         /// Sergen restore command related configuration
@@ -409,7 +411,7 @@ namespace Serenity.CodeGenerator
             public bool ShouldSerializeNamespaceTypings() => NamespaceTypings != null;
 
             /// <summary>
-            /// Disable source generator (Serenity.Pro.Coder) for ServerTypings
+            /// Set false to disable the server typings source generator in Serenity.Pro.Coder
             /// </summary>
             public bool? SourceGenerator { get; set; }
             /// <summary>Used for Newtonsoft.JSON</summary>
@@ -425,6 +427,12 @@ namespace Serenity.CodeGenerator
             /// Output directory for generated client types .cs files
             /// </summary>
             public string OutDir { get; set; }
+            /// <summary>
+            /// Set false to disable the client types source generator in Serenity.Pro.Coder
+            /// </summary>
+            public bool? SourceGenerator { get; set; }
+            /// <summary>Used for Newtonsoft.JSON</summary>
+            public bool ShouldSerializeSourceGenerator() => SourceGenerator != null;
         }
 
         /// <summary>
@@ -451,6 +459,12 @@ namespace Serenity.CodeGenerator
             /// E.g. a subclass for Modules and Views won't be generated.
             /// </summary>
             public string[] StripViewPaths { get; set; }
+            /// <summary>
+            /// Set false to disable the view paths source generator in Serenity.Pro.Coder
+            /// </summary>
+            public bool? SourceGenerator { get; set; }
+            /// <summary>Used for Newtonsoft.JSON</summary>
+            public bool ShouldSerializeSourceGenerator() => SourceGenerator != null;
         }
 
         /// <summary>

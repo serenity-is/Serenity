@@ -141,6 +141,75 @@ namespace Serenity.CodeGeneration
             }
         }
 
+        private ExternalType FindTypeInLookup(ILookup<string, ExternalType> lookup, string key, string suffix)
+        {
+            var type = lookup[key].FirstOrDefault() ??
+                lookup[key + suffix].FirstOrDefault() ??
+                lookup["Serenity." + key].FirstOrDefault() ??
+                lookup["Serenity." + key + suffix].FirstOrDefault();
+
+            if (type is not null)
+                return type;
+
+            foreach (var rootNamespace in RootNamespaces)
+            {
+                string wn = rootNamespace + "." + key;
+                type = lookup[wn].FirstOrDefault() ??
+                    lookup[wn + suffix].FirstOrDefault();
+                if (type != null)
+                    return type;
+            }
+
+            return null;
+        }
+
+        private TypeDefinition GetBasedOnRowAndAnnotations(TypeDefinition type, 
+            out ILookup<string, PropertyDefinition> basedOnByName,
+            out List<AnnotationTypeInfo> rowAnnotations)
+        {
+            TypeDefinition basedOnRow = null;
+            var basedOnRowAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
+            if (basedOnRowAttr != null &&
+                basedOnRowAttr.ConstructorArguments().Count > 0 &&
+                basedOnRowAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.Type")
+                basedOnRow = (basedOnRowAttr.ConstructorArguments[0].Value as TypeReference).Resolve();
+
+            rowAnnotations = basedOnRow != null ? GetAnnotationTypesFor(basedOnRow) : null;
+
+            basedOnByName = null;
+            if (basedOnRowAttr != null)
+            {
+                basedOnByName = basedOnRow.PropertiesOf().Where(x => TypingsUtils.IsPublicInstanceProperty(x))
+                    .ToLookup(x => x.Name);
+            }
+
+            return basedOnRow;
+        }
+
+        private CustomAttribute GetAttribute(PropertyDefinition item, PropertyDefinition basedOnField,
+                    IEnumerable<AnnotationTypeInfo> rowAnnotations, string ns, string name)
+        {
+            var attr = TypingsUtils.FindAttr(item.GetAttributes(), ns, name);
+
+            if (attr == null && rowAnnotations != null)
+            {
+                foreach (var annotationType in rowAnnotations)
+                {
+                    if (!annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation))
+                        continue;
+
+                    attr = TypingsUtils.FindAttr(annotation.GetAttributes(), ns, name);
+                    if (attr != null)
+                        return attr;
+                }
+            }
+
+            if (attr == null && basedOnField != null)
+                attr = TypingsUtils.FindAttr(basedOnField.GetAttributes(), ns, name);
+
+            return attr;
+        }
+
         private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute,
             string identifier, bool module)
         {
@@ -153,22 +222,7 @@ namespace Serenity.CodeGeneration
             var propertyTypes = new List<string>();
             var referencedTypeKeys = new HashSet<string>();
             var referencedTypeAliases = new List<string>();
-
-            TypeDefinition basedOnRow = null;
-            var basedOnRowAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
-            if (basedOnRowAttr != null &&
-                basedOnRowAttr.ConstructorArguments().Count > 0 &&
-                basedOnRowAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.Type")
-                basedOnRow = (basedOnRowAttr.ConstructorArguments[0].Value as TypeReference).Resolve();
-
-            var rowAnnotations = basedOnRow != null ? GetAnnotationTypesFor(basedOnRow) : null;
-
-            ILookup<string, PropertyDefinition> basedOnByName = null;
-            if (basedOnRowAttr != null)
-            {
-                basedOnByName = basedOnRow.PropertiesOf().Where(x => TypingsUtils.IsPublicInstanceProperty(x))
-                    .ToLookup(x => x.Name);
-            }
+            var basedOnRow = GetBasedOnRowAndAnnotations(type, out var basedOnByName, out var rowAnnotations);
 
             cw.InBrace(delegate
             {
@@ -181,83 +235,24 @@ namespace Serenity.CodeGeneration
                     if (basedOnByName != null)
                         basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
-                    if (TypingsUtils.FindAttr(item.GetAttributes(), "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                    if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreAttribute") != null)
                         continue;
 
-                    if (basedOnField != null)
-                    {
-                        if (TypingsUtils.FindAttr(basedOnField.GetAttributes(), "Serenity.ComponentModel", "IgnoreAttribute") != null)
-                            continue;
-
-                        bool ignored = false;
-                        foreach (var annotationType in rowAnnotations)
-                        {
-                            if (annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation) &&
-                                TypingsUtils.FindAttr(annotation.GetAttributes(), "Serenity.ComponentModel", "IgnoreAttribute") != null)
-                            {
-                                ignored = true;
-                                break;
-                            }
-                        }
-
-                        if (ignored)
-                            continue;
-                    }
-
-                    var editorTypeAttr = TypingsUtils.FindAttr(item.GetAttributes(), "Serenity.ComponentModel", "EditorTypeAttribute");
-                    if (editorTypeAttr == null && basedOnField != null)
-                        editorTypeAttr = TypingsUtils.FindAttr(basedOnField.GetAttributes(), "Serenity.ComponentModel", "EditorTypeAttribute");
-
-                    if (editorTypeAttr == null && basedOnRow != null)
-                    {
-                        foreach (var annotationType in rowAnnotations)
-                        {
-                            if (!annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation))
-                                continue;
-
-                            editorTypeAttr = TypingsUtils.FindAttr(annotation.GetAttributes(),
-                                "Serenity.ComponentModel", "EditorTypeAttribute");
-                            if (editorTypeAttr != null)
-                                break;
-                        }
-                    }
-
+                    var editorTypeAttr = GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "EditorTypeAttribute");
                     var editorTypeKey = GetEditorTypeKeyFrom(item.PropertyType(), basedOnField?.PropertyType(), editorTypeAttr);
 
                     ExternalType editorScriptType = null;
 
                     if (module)
                     {
-                        ExternalType findType(ILookup<string, ExternalType> lookup, string key, string suffix)
-                        {
-                            var type = lookup[key].FirstOrDefault() ??
-                                lookup[key + suffix].FirstOrDefault() ??
-                                lookup["Serenity." + editorTypeKey].FirstOrDefault() ??
-                                lookup["Serenity." + editorTypeKey + suffix].FirstOrDefault();
-
-                            if (type is not null)
-                                return type;
-
-                            foreach (var rootNamespace in RootNamespaces)
-                            {
-                                string wn = rootNamespace + "." + key;
-                                type = lookup[wn].FirstOrDefault() ??
-                                    lookup[wn + suffix].FirstOrDefault();
-                                if (type != null)
-                                    return type;
-                            }
-
-                            return null;
-                        }
-
-                        editorScriptType = findType(modularEditorTypeByKey, editorTypeKey, "Editor");
+                        editorScriptType = FindTypeInLookup(modularEditorTypeByKey, editorTypeKey, "Editor");
 
                         foreach (var typeKey in GetDialogTypeKeyRefs(editorTypeAttr))
                         {
                             if (!referencedTypeKeys.Add(typeKey))
                                 continue;
 
-                            var dialogType = findType(modularDialogTypeByKey, typeKey, "Dialog");
+                            var dialogType = FindTypeInLookup(modularDialogTypeByKey, typeKey, "Dialog");
                             if (dialogType != null)
                                 referencedTypeAliases.Add(ReferenceScriptType(dialogType, codeNamespace, module));
                         }
@@ -389,7 +384,7 @@ namespace Serenity.CodeGeneration
 
             if (module && referencedTypeAliases.Any())
             {
-                sb.AppendLine("");
+                sb.AppendLine();
                 sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases) + "]; // inplace add dialog types");
             }
 

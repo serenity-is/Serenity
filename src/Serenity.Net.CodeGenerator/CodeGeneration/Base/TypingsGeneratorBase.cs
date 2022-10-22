@@ -15,6 +15,7 @@ namespace Serenity.CodeGeneration
         protected List<GeneratedTypeInfo> generatedTypes = new();
         protected List<AnnotationTypeInfo> annotationTypes = new();
         protected ILookup<string, ExternalType> modularEditorTypeByKey;
+        protected ILookup<string, ExternalType> modularFormatterTypeByKey;
         protected ILookup<string, ExternalType> modularDialogTypeByKey;
 
 #if ISSOURCEGENERATOR
@@ -210,6 +211,39 @@ namespace Serenity.CodeGeneration
                             if (attr.Type is not null &&
                                 (attr.Type == "registerEditor" ||
                                  attr.Type.EndsWith(".registerEditor", StringComparison.Ordinal)) &&
+                                attr.Arguments?.Count > 0 &&
+                                attr.Arguments[0]?.Value is string key &&
+                                !string.IsNullOrEmpty(key))
+                                return (key, type);
+                        }
+                    }
+                }
+
+                return (null, type);
+            }).Where(x => x.key != null)
+                .ToLookup(x => x.key, x => x.type);
+
+            modularFormatterTypeByKey = tsTypes.Values.Select(type =>
+            {
+                if (type.IsAbstract != false &&
+                    type.IsInterface != false &&
+                    !string.IsNullOrEmpty(type.Module))
+                {
+                    if (type.SourceFile?.EndsWith(".d.ts") == true &&
+                        type.Interfaces != null &&
+                        type.Interfaces.Any(x => x == "ISlickFormatter" || 
+                            x.EndsWith(".ISlickFormatter", StringComparison.Ordinal)))
+                    {
+                        return (key: type.Name, type);
+                    }
+
+                    if (type.Attributes != null)
+                    {
+                        foreach (var attr in type.Attributes)
+                        {
+                            if (attr.Type is not null &&
+                                (attr.Type == "registerFormatter" ||
+                                 attr.Type.EndsWith(".registerFormatter", StringComparison.Ordinal)) &&
                                 attr.Arguments?.Count > 0 &&
                                 attr.Arguments[0]?.Value is string key &&
                                 !string.IsNullOrEmpty(key))

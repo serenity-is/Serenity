@@ -36,7 +36,8 @@
 
             return type.Interfaces != null && type.Interfaces.Any(x =>
                 x == "Serenity.ISlickFormatter" ||
-                x == "Slick.Formatter");
+                x == "Slick.Formatter" ||
+                x.EndsWith("ISlickFormatter", StringComparison.Ordinal));
         }
     }
 }
