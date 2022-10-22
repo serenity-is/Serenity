@@ -235,7 +235,8 @@ namespace Serenity.CodeGeneration
                     if (basedOnByName != null)
                         basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
-                    if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                    if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreAttribute") != null ||
+                        GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
                         continue;
 
                     var editorTypeAttr = GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "EditorTypeAttribute");

@@ -40,7 +40,8 @@ namespace Serenity.CodeGeneration
                         if (basedOnByName != null)
                             basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
-                        if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                        if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreAttribute") != null ||
+                            GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
                             continue;
 
                         var formatterTypeAttr = GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "FormatterTypeAttribute");

@@ -86,7 +86,12 @@ namespace Serenity.CodeGeneration
                     {
                         var property = propertyByName[fieldName].FirstOrDefault();
                         if (property != null)
-                            yield return property;
+                        {
+                            var attrs = property.GetAttributes();
+                            if (TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "ScriptSkipAttribute") is null &&
+                                TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "IgnoreAttribute") is null)
+                                yield return property;
+                        }
                     }
                 }
             }
