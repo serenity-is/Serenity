@@ -15,7 +15,7 @@ public partial class FileUploadBehaviorTests
         var temporaryFile = "temporary/test.jpg";
 
         Assert.Throws<ArgumentNullException>("storage", () => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: null,
             temporaryFile: ref temporaryFile,
             logger: null));
@@ -58,7 +58,7 @@ public partial class FileUploadBehaviorTests
         var mockStorage = MockUploadStorage.Create();
 
         Assert.Throws<ArgumentOutOfRangeException>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null));
@@ -93,7 +93,7 @@ public partial class FileUploadBehaviorTests
                 mockFileSystem.AddFile(testFileName, string.Empty);
 
                 Assert.Throws<ArgumentOutOfRangeException>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-                    localizer: localizer,
+                    localizer: NullTextLocalizer.Instance,
                     storage: mockStorage,
                     temporaryFile: ref fileName,
                     logger: null));
@@ -115,7 +115,7 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, string.Empty);
 
         var ex = Assert.Throws<ValidationError>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null));
@@ -137,7 +137,7 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(1, 1)));
 
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -154,7 +154,7 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, "\0");
 
         var ex = Assert.Throws<ValidationError>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null));
@@ -176,7 +176,7 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, "\0");
 
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -197,7 +197,7 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, "\0");
 
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -225,7 +225,7 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(width, height)));
 
         var ex = Assert.Throws<ValidationError>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null));
@@ -250,7 +250,7 @@ public partial class FileUploadBehaviorTests
         using var originalImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
 
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -282,7 +282,7 @@ public partial class FileUploadBehaviorTests
         using var originalImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
 
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -314,7 +314,7 @@ public partial class FileUploadBehaviorTests
         using var originalImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
 
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -349,7 +349,7 @@ public partial class FileUploadBehaviorTests
         using var originalImage = Image.Load<Rgb24>(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
     
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -393,7 +393,7 @@ public partial class FileUploadBehaviorTests
         using var originalImage = (Image<Rgb24>)Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
     
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -448,7 +448,7 @@ public partial class FileUploadBehaviorTests
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
         Assert.Throws<ArgumentOutOfRangeException>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null));
@@ -476,7 +476,7 @@ public partial class FileUploadBehaviorTests
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -503,7 +503,7 @@ public partial class FileUploadBehaviorTests
         
     
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -534,7 +534,7 @@ public partial class FileUploadBehaviorTests
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);
@@ -581,7 +581,7 @@ public partial class FileUploadBehaviorTests
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
         FileUploadBehavior.CheckUploadedImageAndCreateThumbs(attr: attr,
-            localizer: localizer,
+            localizer: NullTextLocalizer.Instance,
             storage: mockStorage,
             temporaryFile: ref fileName,
             logger: null);

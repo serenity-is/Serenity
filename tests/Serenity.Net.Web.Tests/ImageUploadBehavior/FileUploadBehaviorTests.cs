@@ -9,12 +9,10 @@ namespace Serenity.Tests.Web;
 
 public partial class FileUploadBehaviorTests
 {
-    private readonly MockTextLocalizer localizer = new();
-
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenRowIsNull()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer);
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance);
         var result = sut.ActivateFor(null);
 
         Assert.False(result);
@@ -23,7 +21,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenTargetDoesntHave_ImageUploadEditorAttribute()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestRow.Fields.Id
         };
@@ -35,7 +33,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenTargetImageUploadEditorAttribute_DisableDefaultBehaviour_IsTrue()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestRow.Fields.ImageUploadEditorDisableDefaultBehavior
         };
@@ -47,7 +45,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenTargetType_IsNotStringField()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.IntegerFieldImageUploadEditor
         };
@@ -59,7 +57,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenRow_DoesNotInherits_IIdRow()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestRow.Fields.StringFieldImageUploadEditor
         };
@@ -71,7 +69,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_Throws_WhenTargetImageUploadEditorAttribute_OriginalName_IsNotStringField()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.ImageUploadEditorOriginalNameIntegerField
         };
@@ -82,7 +80,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_Throws_WhenTargetImageUploadEditorAttribute_OriginalName_IsNull()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.ImageUploadEditorOriginalNameNoField
         };
@@ -93,7 +91,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsTrue_WhenTargetImageUploadEditorAttribute_OriginalName_IsStringField()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.ImageUploadEditorOriginalName
         };
@@ -105,7 +103,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnPrepareQuery_ShouldAdd_NonTableReplaceFields_ToSelectSqlQuery()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.ImageUploadEditorReplaceField
         };
@@ -130,7 +128,7 @@ public partial class FileUploadBehaviorTests
     [Theory]
     public void OnPrepareQuery_ShouldNotAdd_NonTableReplaceFields_ToSqlQuery_IfFieldIsAlreadySelected(int selectIndex)
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.ImageUploadEditorReplaceField
         };
@@ -167,7 +165,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ParseReplaceFields_ThrowsArgumentException_WhenPipeOperators_AreNextToEachOther()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.ImageUploadEditorInvalidReplaceField
         };
@@ -179,7 +177,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ParseReplaceFields_ThrowsArgumentException_WhenReplaceField_DoesntExist()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), localizer)
+        var sut = new FileUploadBehavior(MockUploadStorage.Create(), NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.ImageUploadEditorReplaceFieldNoField
         };
@@ -194,7 +192,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -238,7 +236,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -281,7 +279,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -326,7 +324,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -364,7 +362,7 @@ public partial class FileUploadBehaviorTests
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -397,7 +395,7 @@ public partial class FileUploadBehaviorTests
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.ImageUploadEditorOriginalName
         };
@@ -435,7 +433,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -472,7 +470,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.ImageUploadEditorOriginalName
         };
@@ -514,7 +512,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.ImageUploadEditorCopyToHistory
         };
@@ -559,7 +557,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -606,7 +604,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -641,7 +639,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -676,7 +674,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIsDeletedRow.Fields.StringFieldImageUploadEditor
         };
@@ -711,7 +709,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIDeleteLogRow.Fields.StringFieldImageUploadEditor
         };
@@ -748,7 +746,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -797,7 +795,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -860,7 +858,7 @@ public partial class FileUploadBehaviorTests
     {
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -904,7 +902,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
@@ -1110,7 +1108,7 @@ public partial class FileUploadBehaviorTests
         var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var sut = new FileUploadBehavior(mockUploadStorage, localizer)
+        var sut = new FileUploadBehavior(mockUploadStorage, NullTextLocalizer.Instance)
         {
             Target = TestIIdRow.Fields.StringFieldImageUploadEditor
         };
