@@ -233,7 +233,7 @@ namespace Serenity.Extensions.DependencyInjection
                 string json = sr.ReadToEnd().TrimToNull();
                 if (json is null)
                     continue;
-                var texts = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json);
+                var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
                 var langID = Path.GetFileNameWithoutExtension(entry.Name);
                 var idx = langID.LastIndexOf(".");
                 if (idx >= 0)

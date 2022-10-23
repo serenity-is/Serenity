@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using System.IO;
 
 namespace Serenity.Localization
 {
@@ -15,7 +14,7 @@ namespace Serenity.Localization
         /// <param name="prefix">Prefix to prepend before local text keys</param>
         /// <param name="languageID">Language ID</param>
         /// <param name="registry">Registry</param>
-        public static void AddFromNestedDictionary(IDictionary<string, JToken> nested, string prefix, string languageID, ILocalTextRegistry registry = null)
+        public static void AddFromNestedDictionary(IDictionary<string, object> nested, string prefix, string languageID, ILocalTextRegistry registry)
         {
             if (nested == null)
                 throw new ArgumentNullException(nameof(nested));
@@ -36,7 +35,7 @@ namespace Serenity.Localization
         /// <param name="nested">Object parsed from local text JSON string</param>
         /// <param name="prefix">Prefix to prepend before local text keys</param>
         /// <param name="target">Target dictionary that will contain keys and translations</param>
-        public static void ProcessNestedDictionary(IDictionary<string, JToken> nested, string prefix, Dictionary<string, string> target)
+        public static void ProcessNestedDictionary<TValue>(IDictionary<string, TValue> nested, string prefix, Dictionary<string, string> target)
         {
             if (nested == null)
                 throw new ArgumentNullException("nested");
@@ -45,12 +44,12 @@ namespace Serenity.Localization
             {
                 var actual = prefix + k.Key;
                 var o = k.Value;
-                if (o is IDictionary<string, JToken> dictionary)
+                if (o is IDictionary<string, object> dictionary)
                     ProcessNestedDictionary(dictionary, actual + ".", target);
-                else if (o != null && (!(o is JValue value) || value.Value != null))
-                {
+                else if (o is JObject obj)
+                    ProcessNestedDictionary(obj, actual + ".", target);
+                else if (o != null)
                     target[actual] = o.ToString();
-                }
             }
         }
 
@@ -58,23 +57,29 @@ namespace Serenity.Localization
         /// Adds translations from JSON files at specified path. File names in this directory should be in format 
         /// {anyprefix}.{languageID}.json where {languageID} is a language code like 'en', 'en-GB' etc.
         /// </summary>
-        /// <param name="path">Path containing JSON files</param>
         /// <param name="registry">Registry</param>
-        public static void AddJsonTexts(this ILocalTextRegistry registry, string path)
+        /// <param name="path">Path containing JSON files</param>
+        /// <param name="fileSystem">File system</param>
+        public static void AddJsonTexts(this ILocalTextRegistry registry, string path, IFileSystem fileSystem = null)
         {
+            if (registry is null)
+                throw new ArgumentNullException(nameof(registry));
+
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
-            if (!Directory.Exists(path))
+            fileSystem ??= new PhysicalFileSystem();
+
+            if (!fileSystem.DirectoryExists(path))
                 return;
 
-            var files = Directory.GetFiles(path, "*.json", SearchOption.AllDirectories);
+            var files = fileSystem.GetFiles(path, "*.json", recursive: true);
             Array.Sort(files);
 
             foreach (var file in files)
             {
-                var texts = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(File.ReadAllText(file).TrimToNull() ?? "{}");
-                var langID = Path.GetFileNameWithoutExtension(Path.GetFileName(file));
+                var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(fileSystem.ReadAllText(file).TrimToNull() ?? "{}");
+                var langID = fileSystem.GetFileNameWithoutExtension(fileSystem.GetFileName(file));
 
                 var idx = langID.LastIndexOf(".");
                 if (idx >= 0)
