@@ -111,17 +111,6 @@ namespace Serenity.CodeGeneration
                 File.ReadAllText(path);
         }
 
-        public void RemoveReadOnly(string path)
-        {
-            var attr = File.GetAttributes(path);
-
-            if (attr.HasFlag(FileAttributes.ReadOnly))
-            {
-                attr -= FileAttributes.ReadOnly;
-                File.SetAttributes(path, attr);
-            }
-        }
-
         public void WriteAllBytes(string path, byte[] bytes)
         {
             File.WriteAllBytes(path, bytes);

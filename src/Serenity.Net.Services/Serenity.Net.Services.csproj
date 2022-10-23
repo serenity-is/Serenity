@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Services</AssemblyName>
     <Title>Serenity Platform - Services Library</Title>
-    <Description>Contains classes for CRUD service / repository implementations...</Description>            
+    <Description>Contains classes for CRUD service / repository implementations...</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />

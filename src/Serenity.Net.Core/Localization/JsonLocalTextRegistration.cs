@@ -63,7 +63,7 @@ namespace Serenity.Localization
         public static void AddJsonTexts(this ILocalTextRegistry registry, string path)
         {
             if (path == null)
-                throw new ArgumentNullException("path");
+                throw new ArgumentNullException(nameof(path));
 
             if (!Directory.Exists(path))
                 return;
