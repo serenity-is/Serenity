@@ -10,7 +10,7 @@ public class EntityConnectionExtensions_TryById_Tests
         using var connection = new MockDbConnection()
             .OnExecuteReader(command =>
             {
-                return new MockDataReader();
+                return new MockDbDataReader();
             });
 
         Assert.Null(connection.TryById<IdNameRow>(777));
@@ -22,7 +22,7 @@ public class EntityConnectionExtensions_TryById_Tests
         using var connection = new MockDbConnection()
             .OnExecuteReader(command =>
             {
-                return new MockDataReader(new
+                return new MockDbDataReader(new
                 {
                     ID = 777,
                     Name = "Test"
@@ -48,7 +48,7 @@ T0.Name AS [Name]
 FROM IdName T0 
 WHERE (T0.ID = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
 
-                return new MockDataReader();
+                return new MockDbDataReader();
             });
                 
         connection.TryById<IdNameRow>(777);
@@ -67,7 +67,7 @@ T0.CountryId AS [CountryId]
 FROM Cities T0 
 WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
 
-                return new MockDataReader(new
+                return new MockDbDataReader(new
                 {
                     CityId = 777,
                     CityName = "Test",
@@ -95,7 +95,7 @@ FROM Cities T0
 LEFT JOIN Countries jCountry ON (jCountry.CountryId = T0.CountryId)
 WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
 
-                return new MockDataReader(new
+                return new MockDbDataReader(new
                 {
                     CountryName = "TestCountry"
                 });
@@ -116,7 +116,7 @@ WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
         using var connection = new MockDbConnection()
             .OnExecuteReader(command =>
             {
-                return new MockDataReader(new
+                return new MockDbDataReader(new
                 {
                     CityId = 777,
                     CityName = "Test City",
@@ -139,7 +139,7 @@ WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
         using var connection = new MockDbConnection()
             .OnExecuteReader(command =>
             {
-                return new MockDataReader(new
+                return new MockDbDataReader(new
                 {
                     CityId = 777,
                     CityName = "Test City",

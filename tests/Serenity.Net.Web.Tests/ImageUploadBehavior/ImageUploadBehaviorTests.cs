@@ -763,7 +763,7 @@ public partial class ImageUploadBehaviorTests
         sut.ActivateFor(row);
 
         var dbConnection = new MockDbConnection();
-        dbConnection.OnExecuteReader(command => new MockDataReader(command.CommandText, null));
+        dbConnection.OnExecuteReader(command => new MockDbDataReader(command.CommandText, null));
         
         var uow = new MockUnitOfWork(dbConnection);
         var requestHandler = new MockSaveHandler<TestIIdRow>
@@ -1122,7 +1122,7 @@ public partial class ImageUploadBehaviorTests
         var dbConnection = new MockDbConnection();
         dbConnection.OnExecuteReader(command =>
         {
-            var selectFields = MockDataReader.ParseSelectFieldAliases(command.CommandText).ToList();
+            var selectFields = MockDbDataReader.ParseSelectFieldAliases(command.CommandText).ToList();
             var retRow = new TestIIdRow();
 
             foreach (var field in selectFields)
@@ -1135,7 +1135,7 @@ public partial class ImageUploadBehaviorTests
                 retRow[field] = value;
             }
 
-            return new MockDataReader(command.CommandText, retRow);
+            return new MockDbDataReader(command.CommandText, retRow);
         });
         
         var uow = new MockUnitOfWork(dbConnection);

@@ -535,7 +535,7 @@ public partial class MultipleImageUploadBehaviorTests
         sut.ActivateFor(row);
 
         var dbConnection = new MockDbConnection();
-        dbConnection.OnExecuteReader(command => new MockDataReader(command.CommandText, null));
+        dbConnection.OnExecuteReader(command => new MockDbDataReader(command.CommandText, null));
 
         var uow = new MockUnitOfWork(dbConnection);
         var requestHandler = new MockSaveHandler<MultipleTestIIdRow>
