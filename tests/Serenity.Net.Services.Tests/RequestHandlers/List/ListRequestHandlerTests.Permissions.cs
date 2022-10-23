@@ -98,7 +98,7 @@ public partial class ListRequestHandlerTests
                     Assert.DoesNotContain("T0." + field.Name, command.CommandText);
             }
 
-            return new MockDataReader();
+            return new MockDbDataReader();
         });
 
         return db;

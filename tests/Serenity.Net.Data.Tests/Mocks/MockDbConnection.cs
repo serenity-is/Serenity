@@ -16,12 +16,12 @@ public class MockDbConnection : IDbConnection
 
     public virtual IDbTransaction BeginTransaction()
     {
-        throw new NotImplementedException();
+            return new MockDbTransaction(this);
     }
 
     public virtual IDbTransaction BeginTransaction(IsolationLevel il)
     {
-        throw new NotImplementedException();
+            return new MockDbTransaction(this);
     }
 
     public virtual void ChangeDatabase(string databaseName)
@@ -36,9 +36,17 @@ public class MockDbConnection : IDbConnection
 
     public virtual IDbCommand CreateCommand()
     {
-        var command = new MockDbCommand();
+            var command = new MockDbCommand(this);
+
+            if (onExecuteReader != null)
+                command.OnExecuteReader(() => onExecuteReader(command));
+
+            if (onExecuteNonQuery != null)
+                command.OnExecuteNonQuery((command) => onExecuteNonQuery(command));
+
         if (onCreateCommand != null)
             return onCreateCommand(command);
+
         return command;
     }
 
@@ -49,17 +57,25 @@ public class MockDbConnection : IDbConnection
             action(command);
             return command;
         };
+
         return this;
     }
 
     protected Func<MockDbCommand, IDbCommand> onCreateCommand;
+        protected Func<IDbCommand, DbDataReader> onExecuteReader;
+        protected Func<MockDbCommand, int> onExecuteNonQuery;
 
     public MockDbConnection OnExecuteReader(Func<IDbCommand, DbDataReader> func)
     {
-        if (onCreateCommand != null)
-            throw new InvalidOperationException("Can't use OnCreateCommand with OnExecuteReader!");
+            onExecuteReader = func;
+            return this;
+        }
 
-        return OnCreateCommand(command => command.OnExecuteReader(() => func(command)));
+
+        public MockDbConnection OnExecuteNonQuery(Func<MockDbCommand, int> func)
+        {
+            onExecuteNonQuery = func;
+            return this;
     }
 
 #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize

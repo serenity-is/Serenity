@@ -9,8 +9,6 @@ global using System;
 global using System.Collections.Generic;
 global using System.ComponentModel;
 global using System.Data;
-global using System.IO.Abstractions;
-global using System.IO.Abstractions.TestingHelpers;
 global using System.Linq;
 global using System.Reflection;
 global using System.Security.Claims;

@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\..\src\Serenity.Net.Services\Serenity.Net.Services.csproj" />
-    <ProjectReference Include="..\Serenity.Net.Core.Tests\Serenity.Net.Core.Tests.csproj" />
-    <ProjectReference Include="..\Serenity.Net.Data.Tests\Serenity.Net.Data.Tests.csproj" />
+    <ProjectReference Include="..\Serenity.Net.Entity.Tests\Serenity.Net.Entity.Tests.csproj" />
   </ItemGroup>
 </Project>

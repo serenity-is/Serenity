@@ -1,19 +1,18 @@
 ﻿using Serenity.IO;
-using System.IO;
 
 namespace Serenity.Web
 {
     public class TempUploadStorage : DiskUploadStorage
     {
-        public TempUploadStorage(DiskUploadStorageOptions options)
-            : base(options)
+        public TempUploadStorage(DiskUploadStorageOptions options, IDiskUploadFileSystem fileSystem = null)
+            : base(options, fileSystem)
         {
-            if (!Directory.Exists(RootPath))
+            if (!this.fileSystem.DirectoryExists(RootPath))
             {
                 try
                 {
-                    Directory.CreateDirectory(RootPath);
-                    File.WriteAllText(Path.Combine(RootPath, ".temporary"), "");
+                    this.fileSystem.CreateDirectory(RootPath);
+                    this.fileSystem.WriteAllText(fileSystem.Combine(RootPath, ".temporary"), "");
                 }
                 catch
                 {
@@ -26,7 +25,7 @@ namespace Serenity.Web
 
         public override void PurgeTemporaryFiles()
         {
-            TemporaryFileHelper.PurgeDirectoryDefault(RootPath);
+            fileSystem.PurgeDirectory(RootPath);
         }
     }
 }

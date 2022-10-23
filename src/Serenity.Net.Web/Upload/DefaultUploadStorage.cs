@@ -8,7 +8,8 @@ namespace Serenity.Web
     {
         private readonly CombinedUploadStorage combined;
 
-        public DefaultUploadStorage(IOptions<UploadSettings> options, IWebHostEnvironment hostEnvironment = null)
+        public DefaultUploadStorage(IOptions<UploadSettings> options, IWebHostEnvironment hostEnvironment = null,
+            IDiskUploadFileSystem fileSystem = null)
         {
             var opt = (options ?? throw new ArgumentNullException(nameof(options))).Value;
             if (string.IsNullOrEmpty(opt.Path))
@@ -26,17 +27,19 @@ namespace Serenity.Web
             path = Path.Combine(hostEnvironment?.ContentRootPath ?? AppDomain.CurrentDomain.BaseDirectory,
                 PathHelper.ToPath(path));
 
+            fileSystem ??= new PhysicalDiskUploadFileSystem();
+
             combined = new CombinedUploadStorage(
                 new DiskUploadStorage(new DiskUploadStorageOptions
                 {
                     RootPath = path,
                     RootUrl = opt.Url
-                }),
+                }, fileSystem),
                 new TempUploadStorage(new DiskUploadStorageOptions
                 {
                     RootPath = Path.Combine(path, "temporary"),
                     RootUrl = UriHelper.Combine(opt.Url, "temporary/")
-                }),
+                }, fileSystem),
                 "temporary/");
         }
 

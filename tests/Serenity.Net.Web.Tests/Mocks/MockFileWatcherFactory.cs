@@ -4,9 +4,9 @@ public class MockFileWatcherFactory : IFileWatcherFactory
 {
     private readonly List<IFileWatcher> watchers;
 
-    public IFileSystem FileSystem { get; }
+    public System.IO.Abstractions.IFileSystem FileSystem { get; }
 
-    public MockFileWatcherFactory(IFileSystem fileSystem)
+    public MockFileWatcherFactory(System.IO.Abstractions.IFileSystem fileSystem)
     {
         FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 

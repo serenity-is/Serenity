@@ -11,6 +11,9 @@
         /// </summary>
         public new const string Key = "MultipleImageUpload";
 
+        /// <inheritdoc />
+        public override bool IsMultiple => true;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleFileUploadEditorAttribute"/> class.
         /// </summary>

@@ -1,53 +1,15 @@
-﻿using System.IO;
-
-namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration
 {
-    public class PhysicalGeneratorFileSystem : IGeneratorFileSystem
+    public class PhysicalGeneratorFileSystem : PhysicalFileSystem, IGeneratorFileSystem
     {
-        public void Copy(string source, string target, bool overwrite)
+        public DateTime GetLastWriteTime(string path)
         {
-            File.Copy(source, target, overwrite);
-        }
-
-        public void CreateDirectory(string path)
-        {
-            Directory.CreateDirectory(path);
-        }
-
-        public void DeleteFile(string path)
-        {
-            File.Delete(path);
-        }
-
-        public bool DirectoryExists(string path)
-        {
-            return Directory.Exists(path);
-        }
-
-        public bool FileExists(string path)
-        {
-            return File.Exists(path);
-        }
-
-        public string[] GetDirectories(string path)
-        {
-            return Directory.GetDirectories(path);
-        }
-
-        public string[] GetFiles(string path, string searchPattern, bool recursive = false)
-        {
-            return Directory.GetFiles(path, searchPattern, recursive ? SearchOption.AllDirectories
-                : SearchOption.TopDirectoryOnly);
-        }
-
-        public string GetFullPath(string path)
-        {
-            return Path.GetFullPath(path);
+            return System.IO.File.GetLastWriteTime(path);
         }
 
 #if ISSOURCEGENERATOR
         // https://stackoverflow.com/questions/275689/how-to-get-relative-path-from-absolute-path/32113484#32113484
-        public string GetRelativePath(string fromPath, string toPath)
+        public override string GetRelativePath(string fromPath, string toPath)
         {
             if (string.IsNullOrEmpty(fromPath))
                 throw new ArgumentNullException("fromPath");
@@ -74,57 +36,19 @@ namespace Serenity.CodeGeneration
             string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
 
             if (string.Equals(toUri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase))
-                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                relativePath = relativePath.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
 
             return relativePath;
         }
 
         private static string AppendDirectorySeparatorChar(string path)
         {
-            if (!Path.HasExtension(path) &&
-                !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                return path + Path.DirectorySeparatorChar;
+            if (!System.IO.Path.HasExtension(path) &&
+                !path.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
+                return path + System.IO.Path.DirectorySeparatorChar;
 
             return path;
         }
-#else
-        public string GetRelativePath(string relativeTo, string path)
-        {
-            return Path.GetRelativePath(relativeTo, path);
-        }
 #endif
-
-        public DateTime GetLastWriteTime(string path)
-        {
-            return File.GetLastWriteTime(path);
-        }
-
-        public byte[] ReadAllBytes(string path)
-        {
-            return File.ReadAllBytes(path);
-        }
-
-        public string ReadAllText(string path, Encoding encoding = null)
-        {
-            return encoding != null ?
-                File.ReadAllText(path, encoding) :
-                File.ReadAllText(path);
-        }
-
-        public void WriteAllBytes(string path, byte[] bytes)
-        {
-            File.WriteAllBytes(path, bytes);
-        }
-
-        public void WriteAllText(string path, string content, Encoding encoding = null)
-        {
-            if (encoding != null)
-            {
-                File.WriteAllText(path, content, encoding);
-                return;
-            }
-
-            File.WriteAllText(path, content);
-        }
     }
 }

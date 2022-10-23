@@ -1,15 +1,17 @@
 ﻿using Serenity.IO;
-using System.IO;
 
 namespace Serenity.Web
 {
     public class DiskUploadStorage : IUploadStorage
     {
+        protected readonly IDiskUploadFileSystem fileSystem;
+
         public string RootPath { get; private set; }
         public string RootUrl { get; private set; }
-
-        public DiskUploadStorage(DiskUploadStorageOptions options)
+        
+        public DiskUploadStorage(DiskUploadStorageOptions options, IDiskUploadFileSystem fileSystem = null)
         {
+            this.fileSystem = fileSystem ?? new PhysicalDiskUploadFileSystem();
             var opt = options ?? throw new ArgumentNullException(nameof(options));
 
             if (string.IsNullOrWhiteSpace(opt.RootPath))
@@ -21,8 +23,8 @@ namespace Serenity.Web
             RootUrl = opt.RootUrl;
             RootPath = opt.RootPath;
 
-            if (!Path.IsPathRooted(RootPath))
-                RootPath = Path.Combine(AppContext.BaseDirectory, PathHelper.ToPath(RootPath));
+            if (!this.fileSystem.IsPathRooted(RootPath))
+                RootPath = this.fileSystem.Combine(AppContext.BaseDirectory, PathHelper.ToPath(RootPath));
         }
 
         protected string FilePath(string path)
@@ -43,12 +45,12 @@ namespace Serenity.Web
 
         private bool IsInternalFile(string path)
         {
-            return path != null && Path.GetExtension(path)?.ToLowerInvariant()?.Trim() == ".meta";
+            return path != null && fileSystem.GetExtension(path)?.ToLowerInvariant()?.Trim() == ".meta";
         }
 
         public bool FileExists(string path)
         {
-            return File.Exists(FilePath(path)) && !IsInternalFile(path);
+            return fileSystem.FileExists(FilePath(path)) && !IsInternalFile(path);
         }
 
         public virtual IDictionary<string, string> GetFileMetadata(string path)
@@ -61,9 +63,9 @@ namespace Serenity.Web
 
             var filePath = FilePath(path);
             var metaFile = filePath + ".meta";
-            if (File.Exists(metaFile))
+            if (fileSystem.FileExists(metaFile))
             {
-                var json = File.ReadAllText(metaFile);
+                var json = fileSystem.ReadAllText(metaFile);
                 if (!string.IsNullOrEmpty(json) &&
                     json[0] == '{' &&
                     json[^1] == '}')
@@ -91,13 +93,13 @@ namespace Serenity.Web
 
             if (overwriteAll && metadata.Count == 0)
             {
-                if (File.Exists(metaFile))
-                    TemporaryFileHelper.TryDeleteOrMark(metaFile);
+                if (fileSystem.FileExists(metaFile))
+                    fileSystem.TryDeleteOrMark(metaFile);
             }
             else if (metadata.Count == 0)
                 return;
             
-            if (!overwriteAll && File.Exists(metaFile))
+            if (!overwriteAll && fileSystem.FileExists(metaFile))
             {
                 var existing = GetFileMetadata(path);
                 foreach (var x in metadata)
@@ -105,7 +107,7 @@ namespace Serenity.Web
                 metadata = existing;
             }
 
-            File.WriteAllText(metaFile, JSON.StringifyIndented(metadata));
+            fileSystem.WriteAllText(metaFile, JSON.StringifyIndented(metadata));
         }
 
         public string CopyFrom(IUploadStorage store, string sourcePath, string targetPath, bool? autoRename)
@@ -128,15 +130,15 @@ namespace Serenity.Web
             newFiles.Add(targetPath);
             try
             {
-                var sourceBasePath = Path.ChangeExtension(sourcePath, null);
-                var sourceBaseName = Path.GetFileNameWithoutExtension(sourceBasePath);
-                var targetBasePath = Path.ChangeExtension(targetPath, null);
+                var sourceBasePath = fileSystem.ChangeExtension(sourcePath, null);
+                var sourceBaseName = fileSystem.GetFileNameWithoutExtension(sourceBasePath);
+                var targetBasePath = fileSystem.ChangeExtension(targetPath, null);
 
-                var sourceDir = Path.GetDirectoryName(sourcePath);
+                var sourceDir = fileSystem.GetDirectoryName(sourcePath);
                 foreach (var f in store.GetFiles(sourceDir,
                      sourceBaseName + "_t*.jpg"))
                 {
-                    string thumbSuffix = Path.GetFileName(f)[sourceBaseName.Length..];
+                    string thumbSuffix = fileSystem.GetFileName(f)[sourceBaseName.Length..];
                     using var src = store.OpenFile(f);
                     newFiles.Add(WriteFile(targetBasePath + thumbSuffix, src, autoRename: null));
                 }
@@ -146,7 +148,7 @@ namespace Serenity.Web
             catch
             {
                 foreach (var newFile in newFiles)
-                    TemporaryFileHelper.TryDeleteOrMark(FilePath(newFile));
+                    fileSystem.TryDeleteOrMark(FilePath(newFile));
                 throw;
             }
         }
@@ -160,7 +162,7 @@ namespace Serenity.Web
                 throw new ArgumentOutOfRangeException(nameof(path));
 
             string date = DateTime.UtcNow.ToString("yyyyMMdd", Invariants.DateTimeFormat);
-            string dbHistoryFile = "history/" + date + "/" + Guid.NewGuid().ToString("N") + Path.GetExtension(path);
+            string dbHistoryFile = "history/" + date + "/" + Guid.NewGuid().ToString("N") + fileSystem.GetExtension(path);
             CopyFrom(this, path, dbHistoryFile, autoRename: false);
             return dbHistoryFile;
         }
@@ -175,21 +177,21 @@ namespace Serenity.Web
 
             var fileName = PathHelper.SecureCombine(RootPath, PathHelper.ToPath(path));
 
-            var folder = Path.GetDirectoryName(fileName);
-            TemporaryFileHelper.TryDeleteMarkedFiles(folder);
+            var folder = fileSystem.GetDirectoryName(fileName);
+            fileSystem.TryDeleteMarkedFiles(folder);
 
-            TemporaryFileHelper.Delete(fileName, DeleteType.TryDeleteOrMark);
+            fileSystem.Delete(fileName, DeleteType.TryDeleteOrMark);
 
-            string sourcePath = Path.GetDirectoryName(fileName);
-            string sourceBase = Path.GetFileNameWithoutExtension(fileName);
+            string sourcePath = fileSystem.GetDirectoryName(fileName);
+            string sourceBase = fileSystem.GetFileNameWithoutExtension(fileName);
 
-            foreach (var f in Directory.GetFiles(sourcePath,
-                sourceBase + "_t*.jpg"))
+            foreach (var f in fileSystem.GetFiles(sourcePath,
+                sourceBase + "_t*.jpg", recursive: true))
             {
-                TemporaryFileHelper.Delete(f, DeleteType.TryDeleteOrMark);
+                fileSystem.Delete(f, DeleteType.TryDeleteOrMark);
             }
 
-            TemporaryFileHelper.Delete(fileName + ".meta", DeleteType.TryDeleteOrMark);
+            fileSystem.Delete(fileName + ".meta", DeleteType.TryDeleteOrMark);
         }
 
         public long GetFileSize(string path)
@@ -200,27 +202,27 @@ namespace Serenity.Web
             if (IsInternalFile(path))
                 throw new ArgumentOutOfRangeException(nameof(path));
 
-            return new FileInfo(FilePath(path)).Length;
+            return fileSystem.GetFileSize(FilePath(path));
         }
 
         public string[] GetFiles(string path, string searchPattern)
         {
-            return Directory.GetFiles(FilePath(path), searchPattern)
+            return fileSystem.GetFiles(FilePath(path), searchPattern, recursive: true)
                 .Where(x => !IsInternalFile(x))
-                .Select(x => Path.GetRelativePath(RootPath, x))
+                .Select(x => fileSystem.GetRelativePath(RootPath, x))
                 .ToArray();
         }
 
-        public Stream OpenFile(string path)
+        public System.IO.Stream OpenFile(string path)
         {
-            return File.OpenRead(FilePath(path));
+            return fileSystem.OpenRead(FilePath(path));
         }
 
         public virtual void PurgeTemporaryFiles()
         {
         }
 
-        public string WriteFile(string path, Stream source, bool? autoRename)
+        public string WriteFile(string path, System.IO.Stream source, bool? autoRename)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
@@ -228,23 +230,26 @@ namespace Serenity.Web
             if (IsInternalFile(path))
                 throw new ArgumentOutOfRangeException(nameof(path));
 
-            var targetFile = FilePath(path);
+            var targetFullPath = FilePath(path);
 
-            if (File.Exists(targetFile))
+            if (fileSystem.FileExists(targetFullPath))
             {
                 if (autoRename == false)
-                    throw new IOException($"Target file {path} exists in storage {GetType().FullName}");
+                    throw new System.IO.IOException($"Target file {path} exists in storage {GetType().FullName}");
 
                 if (autoRename == true)
+                {
                     path = UploadPathHelper.FindAvailableName(path, FileExists);
+                    targetFullPath = FilePath(path);
+                }
             }
 
-            var targetDir = Path.GetDirectoryName(targetFile);
-            if (!Directory.Exists(targetDir))
-                Directory.CreateDirectory(targetDir);
+            var targetDir = fileSystem.GetDirectoryName(targetFullPath);
+            if (!fileSystem.DirectoryExists(targetDir))
+                fileSystem.CreateDirectory(targetDir);
 
-            using var target = File.Create(targetFile);
-            source.CopyTo(target);
+            using var targetStream = fileSystem.CreateFile(targetFullPath, overwrite: autoRename == null);
+            source.CopyTo(targetStream);
 
             return path;
         }
