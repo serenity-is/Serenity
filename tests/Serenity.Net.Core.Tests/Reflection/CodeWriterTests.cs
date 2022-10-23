@@ -1,5 +1,4 @@
-﻿using NuGet.Frameworks;
-using Serenity.Reflection;
+﻿using Serenity.Reflection;
 
 namespace Serenity.Tests.Reflection;
 
