@@ -2,7 +2,8 @@
 export * from "../globals/jquerystatic";
 export * from "../globals/validate";
 
-export * from "../q/servicetypes";
+export type { ServiceError, ServiceResponse, ServiceRequest, ServiceOptions, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, DeleteRequest, DeleteResponse, UndeleteRequest, UndeleteResponse, ListRequest, ListResponse, RetrieveRequest, RetrieveResponse, RetrieveLocalizationRequest, RetrieveLocalizationResponse, PropertyItem, PropertyItemsData } from "../q";
+export { ColumnSelection, RetrieveColumnSelection, SummaryType } from "../q";
 export * from "../q/criteria";
 
 export * from "../interfaces";

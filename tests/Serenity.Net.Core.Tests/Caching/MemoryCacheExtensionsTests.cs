@@ -1,7 +1,6 @@
 ﻿
-namespace Serenity.Tests.Caching
+namespace Serenity.Tests.Caching;
+
+public class MemoryCacheExtensionsTests
 {
-    public class MemoryCacheExtensionsTests
-    {
-    }
 }

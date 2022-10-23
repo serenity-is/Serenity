@@ -1,7 +1,7 @@
 ﻿import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
-import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getColumnsAsync, getInstanceType, getTypeFullName, getTypeName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
-import { Format, FormatterContext, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
+import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getInstanceType, getTypeFullName, getTypeName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, PropertyItemsData, ScriptData, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
+import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor } from "../editors/selecteditor";
@@ -20,7 +20,7 @@ import { IDataGrid } from "./idatagrid";
 import { QuickFilter } from "./quickfilter";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
-import { Column, ColumnSort, Event, Grid, GridOptions, IPlugin, ItemMetadata } from "@serenity-is/sleekgrid";
+import { Column, ColumnSort, Event, FormatterContext, Grid, GridOptions, IPlugin, ItemMetadata } from "@serenity-is/sleekgrid";
 
 declare global {
     namespace Slick {
@@ -107,7 +107,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     protected quickFiltersBar: QuickFilterBar;
     protected slickContainer: JQuery;
     protected allColumns: Column[];
-    protected propertyItems: PropertyItem[];
+    protected propertyItemsData: PropertyItemsData;
     protected initialSettings: PersistedGridSettings;
     protected restoringSettings: number = 0;
     private idProperty: string;
@@ -192,13 +192,13 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected initSync() {
-        this.propertyItems = this.getPropertyItems();
+        this.propertyItemsData = this.getPropertyItemsData();
         this.internalInit();
         this.afterInit();
     }
 
     protected async initAsync() {
-        this.propertyItems = await this.getPropertyItemsAsync();
+        this.propertyItemsData = await this.getPropertyItemsDataAsync();
         this.internalInit();
         this.afterInit();
     }
@@ -790,7 +790,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
             if (columns.length > 0) {
                 columns.sort(function (x1, y) {
-                    return x1.sortOrder < y.sortOrder ? -1 : (x1.sortOrder > y.sortOrder ? 1 : 0);
+                    return Math.abs(x1.sortOrder) < Math.abs(y.sortOrder) ? -1 : (Math.abs(x1.sortOrder) > Math.abs(y.sortOrder) ? 1 : 0);
                 });
 
                 var list = [];
@@ -920,26 +920,41 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return null;
     }
 
-    protected getPropertyItems(): PropertyItem[] {
-        var columnsKey = this.getColumnsKey();
-        if (!isEmptyOrNull(columnsKey)) {
-            return getColumns(columnsKey);
-        }
-
-        return [];
+    protected getPropertyItems() {
+        return this.propertyItemsData?.items || [];
     }
 
-    protected async getPropertyItemsAsync(): Promise<PropertyItem[]> {
+    protected getPropertyItemsData(): PropertyItemsData {
         var columnsKey = this.getColumnsKey();
-        if (!isEmptyOrNull(columnsKey)) {
-            return await getColumnsAsync(columnsKey);
+
+        if (this.getColumnsKey === DataGrid.prototype.getColumnsKey &&
+            this.getPropertyItems !== DataGrid.prototype.getPropertyItems &&
+            !ScriptData.canLoad('Columns.' + columnsKey)) {
+            return {
+                items: this.getPropertyItems(),
+                additionalItems: []
+            }
         }
 
-        return [];
+
+        if (!isEmptyOrNull(columnsKey)) {
+            return getColumnsData(columnsKey);
+        }
+
+        return { items: [], additionalItems: [] };
+    }
+
+    protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
+        var columnsKey = this.getColumnsKey();
+        if (!isEmptyOrNull(columnsKey)) {
+            return await getColumnsDataAsync(columnsKey);
+        }
+
+        return { items: [], additionalItems: [] };
     }
 
     protected getColumns(): Column[] {
-        return this.propertyItemsToSlickColumns(this.propertyItems ?? []);
+        return this.propertyItemsToSlickColumns(this.getPropertyItems());
     }
 
     protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[] {
@@ -977,8 +992,10 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         opt.multiSelect = false;
         opt.multiColumnSort = true;
         opt.enableCellNavigation = false;
-        opt.headerRowHeight = DataGrid.defaultHeaderHeight;
-        opt.rowHeight = DataGrid.defaultRowHeight;
+        if (DataGrid.defaultHeaderHeight)
+            opt.headerRowHeight = DataGrid.defaultHeaderHeight;
+        if (DataGrid.defaultRowHeight)
+            opt.rowHeight = DataGrid.defaultRowHeight;
         return opt;
     }
 

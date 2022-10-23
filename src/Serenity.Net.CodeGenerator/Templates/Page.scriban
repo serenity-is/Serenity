@@ -1,14 +1,15 @@
-﻿using Serenity;
-using Serenity.Web;{{if AspNetCore}}
-using Microsoft.AspNetCore.Mvc;{{else}}
-using System.Web.Mvc;{{end}}
+﻿{{USING "Serenity.Web"}}{{if AspNetCore}}
+{{USING "Microsoft.AspNetCore.Mvc"}}{{else}}
+{{USING "System.Web.Mvc"}}{{end}}
 
-namespace {{RootNamespace}}{{DotModule}}.Pages
+{{NAMESPACE RootNamespaceDotModuleDot + "Pages"}} 
 {
-{{if !AspNetCore}}    [RoutePrefix("{{ModuleSlash}}{{ClassName}}"), Route("{action=index}")]{{end}}
+{{- if !AspNetCore}}
+    [RoutePrefix("{{ModuleSlash}}{{ClassName}}"), Route("{action=index}")]
+{{- end}}
     [PageAuthorize(typeof({{RowClassName}}))]
     public class {{ClassName}}Controller : Controller
-    {%{{}%}{{if AspNetCore}}
+    {%{{}%}{{- if AspNetCore}}
         [Route("{{ModuleSlash}}{{ClassName}}")]{{end}}
         public ActionResult Index()
         {

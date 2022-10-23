@@ -5,33 +5,7 @@ import { Widget } from "./widget";
 @Decorators.registerClass("Serenity.TemplatedWidget")
 export class TemplatedWidget<TOptions> extends Widget<TOptions> {
 
-    protected idPrefix: string;
     private static templateNames: { [key: string]: string } = {};
-
-    constructor(container: JQuery, options?: TOptions) {
-        super(container, options);
-
-        this.idPrefix = this.uniqueName + '_';
-
-        var widgetMarkup = this.getTemplate().replace(new RegExp('~_', 'g'), this.idPrefix);
-
-        // for compatibility with older templates based on JsRender
-        var end = 0;
-        while (true) {
-            var idx = widgetMarkup.indexOf('{{text:"', end);
-            if (idx < 0)
-                break;
-            var end = widgetMarkup.indexOf('"}}', idx);
-            if (end < 0)
-                break;
-            var key = widgetMarkup.substr(idx + 8, end - idx - 8);
-            var txt = text(key);
-            widgetMarkup = widgetMarkup.substr(0, idx) + txt + widgetMarkup.substr(end + 3);
-            end = idx + txt.length;
-        }
-
-        this.element.html(widgetMarkup);
-    }
 
     protected byId(id: string): JQuery {
         return $('#' + this.idPrefix + id);
@@ -131,5 +105,26 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
         }
 
         return template;
+    }
+
+    protected renderContents(): void {
+        var widgetMarkup = this.getTemplate().replace(new RegExp('~_', 'g'), this.idPrefix);
+
+        // for compatibility with older templates based on JsRender
+        var end = 0;
+        while (true) {
+            var idx = widgetMarkup.indexOf('{{text:"', end);
+            if (idx < 0)
+                break;
+            var end = widgetMarkup.indexOf('"}}', idx);
+            if (end < 0)
+                break;
+            var key = widgetMarkup.substr(idx + 8, end - idx - 8);
+            var txt = text(key);
+            widgetMarkup = widgetMarkup.substr(0, idx) + txt + widgetMarkup.substr(end + 3);
+            end = idx + txt.length;
+        }
+
+        this.element.html(widgetMarkup);
     }
 }

@@ -1,4 +1,4 @@
-﻿import { Column, GroupTotals, NonDataRow } from "@serenity-is/sleekgrid";
+﻿import { escape, Column, GroupTotals, NonDataRow, convertCompatFormatter } from "@serenity-is/sleekgrid";
 import { formatNumber, htmlEncode, tryGetText } from "../q";
 
 export {}
@@ -156,31 +156,25 @@ export namespace AggregateFormatting {
     }
 
     export function formatValue(column: Column, value: number): string {
-        if (column.formatter != null) {
+
+        var formatter = column.format ?? (column.formatter ? convertCompatFormatter(column.formatter) : null);
+
+        if (formatter != null) {
             var item = new NonDataRow();
             item[column.field] = value;
             try {
-                var fmtResult = column.formatter(-1, -1, value, column, item);
-                if (fmtResult == null)
-                    return '';
-                if (typeof fmtResult === "string")
-                    return fmtResult;
-                if (typeof fmtResult.html !== "undefined")
-                    return fmtResult.html;
-                if (typeof fmtResult.text !== "undefined")
-                    return htmlEncode(fmtResult.text);
-                return "" + fmtResult;
+                return formatter({ column, escape, item, value });
             }
             catch (e) {
             }
         }
 
         if (typeof value === "number") {
-            var format = column.sourceItem?.displayFormat ?? "#,##0.##";
-            return htmlEncode(formatNumber(value, format));
+            var displayFormat = column.sourceItem?.displayFormat ?? "#,##0.##";
+            return htmlEncode(formatNumber(value, displayFormat));
         }
         else
-            return htmlEncode("" + value);
+            return htmlEncode(value);
     }
 
     export function groupTotalsFormatter<TItem = any>(totals: GroupTotals, column: Column<TItem>): string {

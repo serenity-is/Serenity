@@ -1,14 +1,13 @@
-﻿namespace Serenity.Tests
-{
-    public class NullPermissions : IPermissionService
-    {
-        public NullPermissions()
-        {
-        }
+﻿namespace Serenity.Tests;
 
-        public bool HasPermission(string permission)
-        {
-            return false;
-        }
+public class NullPermissions : IPermissionService
+{
+    public NullPermissions()
+    {
+    }
+
+    public bool HasPermission(string permission)
+    {
+        return false;
     }
 }

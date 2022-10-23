@@ -55,6 +55,15 @@ namespace Serenity.CodeGeneration
             if (string.IsNullOrEmpty(toPath))
                 throw new ArgumentNullException("toPath");
 
+            fromPath = fromPath.Replace("/", "\\", StringComparison.Ordinal);
+            toPath = toPath.Replace("/", "\\", StringComparison.Ordinal);
+
+            if (!fromPath.Contains(':', StringComparison.Ordinal))
+                fromPath = "z:\\" + fromPath;
+
+            if (!toPath.Contains(':', StringComparison.Ordinal))
+                toPath = "z:\\" + toPath;
+
             Uri fromUri = new(AppendDirectorySeparatorChar(fromPath));
             Uri toUri = new(AppendDirectorySeparatorChar(toPath));
 
@@ -100,17 +109,6 @@ namespace Serenity.CodeGeneration
             return encoding != null ?
                 File.ReadAllText(path, encoding) :
                 File.ReadAllText(path);
-        }
-
-        public void RemoveReadOnly(string path)
-        {
-            var attr = File.GetAttributes(path);
-
-            if (attr.HasFlag(FileAttributes.ReadOnly))
-            {
-                attr -= FileAttributes.ReadOnly;
-                File.SetAttributes(path, attr);
-            }
         }
 
         public void WriteAllBytes(string path, byte[] bytes)

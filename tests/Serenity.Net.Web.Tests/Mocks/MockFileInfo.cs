@@ -1,35 +1,34 @@
-﻿namespace Serenity.Tests
+﻿namespace Serenity.Tests;
+
+public class MockFileInfo : Microsoft.Extensions.FileProviders.IFileInfo
 {
-    public class MockFileInfo : Microsoft.Extensions.FileProviders.IFileInfo
+    public MockFileInfo(IFileSystem fileSystem, string path, bool isDirectory)
     {
-        public MockFileInfo(IFileSystem fileSystem, string path, bool isDirectory)
-        {
-            FileSystem = fileSystem;
-            Path = path;
-            IsDirectory = isDirectory;
-        }
+        FileSystem = fileSystem;
+        Path = path;
+        IsDirectory = isDirectory;
+    }
 
-        public IFileSystem FileSystem { get; }
-        public string Path { get; }
+    public IFileSystem FileSystem { get; }
+    public string Path { get; }
 
-        public bool Exists => IsDirectory ? FileSystem.Directory.Exists(Path) : FileSystem.File.Exists(Path);
+    public bool Exists => IsDirectory ? FileSystem.Directory.Exists(Path) : FileSystem.File.Exists(Path);
 
-        public bool IsDirectory { get; set; }
+    public bool IsDirectory { get; set; }
 
-        public DateTimeOffset LastModified => IsDirectory ?
-            FileSystem.Directory.GetLastWriteTime(Path) :
-            FileSystem.File.GetLastWriteTime(Path);
+    public DateTimeOffset LastModified => IsDirectory ?
+        FileSystem.Directory.GetLastWriteTime(Path) :
+        FileSystem.File.GetLastWriteTime(Path);
 
-        public long Length => IsDirectory ? 0 :
-            FileSystem.FileInfo.FromFileName(Path).Length;
+    public long Length => IsDirectory ? 0 :
+        FileSystem.FileInfo.FromFileName(Path).Length;
 
-        public string Name => FileSystem.Path.GetFileName(Path);
+    public string Name => FileSystem.Path.GetFileName(Path);
 
-        public string PhysicalPath => null;
+    public string PhysicalPath => null;
 
-        public System.IO.Stream CreateReadStream()
-        {
-            return FileSystem.File.OpenRead(Path);
-        }
+    public System.IO.Stream CreateReadStream()
+    {
+        return FileSystem.File.OpenRead(Path);
     }
 }

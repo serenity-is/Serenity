@@ -52,6 +52,21 @@
             get { return string.IsNullOrEmpty(Schema) ? "" : Schema + "."; }
         }
 
+        public string RootNamespaceDot
+        {
+            get { return string.IsNullOrEmpty(RootNamespace) ? "" : RootNamespace + "."; }
+        }
+
+        public string RootNamespaceDotModule
+        {
+            get { return RootNamespaceDot + (string.IsNullOrEmpty(Module) ? "" : Module); }
+        }
+
+        public string RootNamespaceDotModuleDot
+        {
+            get { return (string.IsNullOrEmpty(RootNamespaceDotModule) ? "" : RootNamespaceDotModule + "."); }
+        }
+
         public string NavigationCategory
         {
             get { return Module; }
@@ -64,13 +79,33 @@
 
         public string RowBaseClassAndInterfaces
         {
+            get => string.Join(", ", RowBaseClassAndInterfaceList);
+        }
+       
+        public record EditorVariable(string Editor, int Index);
+
+        private List<EditorVariable> editorVariables;
+
+        public List<EditorVariable> EditorVariables
+        {
             get
             {
-                var result = RowBaseClass ?? "Row";
+                if (editorVariables.IsEmptyOrNull())
+                    editorVariables = Fields.Select((x) => x.TSEditorType).Distinct().Select((x, i) => new EditorVariable(x, i)).ToList();
+                return editorVariables;
+            }
+        }
+        
+        public List<string> RowBaseClassAndInterfaceList
+        {
+            get
+            {
+                var result = new List<string> { RowBaseClass ?? "Serenity.Data.Row" };
+
                 if (!string.IsNullOrEmpty(Identity))
-                    result += ", IIdRow";
+                    result.Add("Serenity.Data.IIdRow");
                 if (!string.IsNullOrEmpty(NameField))
-                    result += ", INameRow";
+                    result.Add("Serenity.Data.INameRow");
 
                 return result;
             }

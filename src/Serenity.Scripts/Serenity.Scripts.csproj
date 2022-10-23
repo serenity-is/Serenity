@@ -12,28 +12,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="*\tsconfig.json;style\*.css;texts\**\*.json;" />
-    <Content Update="*.json">
+    <None Remove="*\tsconfig.json;style\*.css;" />
+    <Content Update="*.json;**\tsconfig.json;**\package.json;**\package-lock.json">
       <CopyToOutputDirectory>false</CopyToOutputDirectory>
-      <Pack>false</Pack>
-    </Content>
-    <Content Remove="texts\**\*.json" />
-    <Content Update="*\tsconfig.json">
       <Pack>false</Pack>
     </Content>
     <None Include="style\*.css">
       <Pack>true</Pack>
       <PackagePath>content\Content\serenity\</PackagePath>
     </None>
-    <Content Include="texts\**\*.json">
-      <Pack>true</Pack>
-      <PackagePath>content\Scripts\serenity\texts\</PackagePath>
-    </Content>
-    <Content Include="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.js.map;dist\Serenity.CoreLib.min.js">
+    <Content Include="corelib\out\Serenity.CoreLib.js;corelib\out\Serenity.CoreLib.js.map;corelib\out\Serenity.CoreLib.min.js">
       <Pack>true</Pack>
       <PackagePath>content\Scripts\serenity\</PackagePath>
     </Content>
-    <Content Include="dist\Serenity.CoreLib.d.ts">
+    <Content Include="corelib\out\Serenity.CoreLib.d.ts">
       <Pack>true</Pack>
       <PackagePath>content\Scripts\serenity\;content\Scripts\typings\serenity\;typings\serenity.corelib\index.d.ts</PackagePath>
     </Content>
@@ -42,9 +34,10 @@
     <None Remove="node_modules\**" />
     <Compile Remove="node_modules\**" />
     <EmbeddedResource Remove="node_modules\**" />
-    <TypeScriptCompile Remove="dist\**;node_modules\**;test\**;wwwroot\Serenity.CoreLib.d.ts" />
+    <TypeScriptCompile Remove="corelib\out\**;node_modules\**;test\**;wwwroot\Serenity.CoreLib.d.ts" />
     <None Include="wwwroot\Serenity.CoreLib.d.ts" />
-    <ToCompileCoreLib Include="corelib\**\*.ts;corelib\tsconfig.json;SlickGrid\*.ts;rollup.config.js"></ToCompileCoreLib>
+    <ToCompileCoreLib Include="corelib\src\**\*.ts;corelib\src\tsconfig.json;corelib\build\build.js;corelib\node_modules\@serenity-is\*\*.d.ts;corelib\rollup.config.js;corelib\package.json"></ToCompileCoreLib>
+    <NpmPackageFile Include="corelib\package.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.6.2">
@@ -52,7 +45,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  <Target Name="CompileCoreLib" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" DependsOnTargets="NpmInstall" Outputs="dist\Serenity.CoreLib.js;dist\Serenity.CoreLib.d.ts;wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts;..\Serenity.Assets\Scripts\SlickGrid\slick.grid.js;..\Serenity.Assets\Scripts\SlickGrid\slick.core.js">
+  <Target Name="CompileCoreLib" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" DependsOnTargets="NpmInstall" 
+          Outputs="wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.min.js.map;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.grid.js;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.core.js">
     <Exec Command="npm run build" WorkingDirectory=".\corelib" />
   </Target>
 </Project>

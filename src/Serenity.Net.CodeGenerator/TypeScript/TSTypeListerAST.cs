@@ -170,7 +170,11 @@ namespace Serenity.CodeGenerator
                                 if (element.Name is Identifier nameIdentifier &&
                                     nameIdentifier.Text == noGeneric)
                                 {
-                                    return id.Text + ":" + nameIdentifier.Text + functionSuffix;
+                                    var module = id.Text;
+                                    if (module.StartsWith(".", StringComparison.OrdinalIgnoreCase))
+                                        module = ResolveModule(id.Text, sourceFile.FileName, false).moduleName ?? module;
+
+                                    return module + ":" + nameIdentifier.Text + functionSuffix;
                                 }
                             }
                         }

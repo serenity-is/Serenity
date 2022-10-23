@@ -1,5 +1,4 @@
-﻿import { Exception } from "./system";
-import { text } from "./localtext";
+﻿import { text } from "./localtext";
 import { isEmptyOrNull } from "./strings";
 
 export function addOption(select: JQuery, key: string, text: string) {
@@ -90,24 +89,6 @@ export function htmlEncode(s: any): string {
         return text.replace(new RegExp('[><&]', 'g'), htmlEncoder);
     }
     return text;
-}
-
-export function jsRender(markup: string, data?: any) {
-    if (!markup || markup.indexOf('{{') < 0) {
-        return markup;
-    }
-
-    if (!($ as any).templates || !($ as any).views) {
-        throw new Exception('Please make sure that jsrender.js is included in the page!');
-    }
-
-    data = data || {};
-    var template = ($ as any).templates(markup);
-    ($ as any).views.converters({
-        text: text
-    }, template);
-
-    return template.render(data);
 }
 
 export function log(m: any) {

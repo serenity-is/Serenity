@@ -30,7 +30,7 @@ namespace Serenity.Services
             var r = JsonConvert.SerializeObject(request, Formatting.None, JsonSettings.Strict);
             wr.ContentType = "application/json";
             var rb = System.Text.Encoding.UTF8.GetBytes(r);
-            //wr.ContentLength = rb.Length; bunu yapma hata alınca çakılıyor! redirect lerle ilgili bug malesef!
+
             wr.CookieContainer = cookies;
             wr.ContinueTimeout = 10 * 60 * 1000;
             using (var requestStream = Task.Run(() => wr.GetRequestStreamAsync()).Result)
@@ -40,7 +40,7 @@ namespace Serenity.Services
             using var rs = response.GetResponseStream();
             using var sr = new StreamReader(rs);
             var rt = sr.ReadToEnd();
-            var resp = JsonConvert.DeserializeObject<TResponse>(rt, JsonSettings.Tolerant); // fazladan eklenmiş alan varsa önemseme
+            var resp = JsonConvert.DeserializeObject<TResponse>(rt, JsonSettings.Tolerant);
 
             if (resp is ServiceResponse serviceResponse &&
                 serviceResponse.Error != null)

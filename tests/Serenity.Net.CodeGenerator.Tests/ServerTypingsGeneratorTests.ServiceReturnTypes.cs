@@ -46,7 +46,9 @@ namespace Serenity.Tests.CodeGenerator
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
             {
-                Assert.Contains("function " + method.Name + "(request: Serenity.ListRequest, onSuccess?: (response: { [key: string]: any }) => void, opt?: Q.ServiceOptions<any>)", code);
+                Assert.True(
+                    code.Contains("function " + method.Name + "(request: ListRequest, onSuccess?: (response: { [key: string]: any }) => void, opt?: Q.ServiceOptions<any>)") ||
+                    code.Contains("function " + method.Name + "(request: Serenity.ListRequest, onSuccess?: (response: { [key: string]: any }) => void, opt?: Q.ServiceOptions<any>)"));
             }
         }
 
@@ -61,7 +63,9 @@ namespace Serenity.Tests.CodeGenerator
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
             {
-                Assert.Contains("function " + method.Name + "(request: Serenity.ListRequest, onSuccess?: (response: any[]) => void, opt?: Q.ServiceOptions<any>)", code);
+                Assert.True(
+                    code.Contains("function " + method.Name + "(request: ListRequest, onSuccess?: (response: any[]) => void, opt?: Q.ServiceOptions<any>)") ||
+                    code.Contains("function " + method.Name + "(request: Serenity.ListRequest, onSuccess?: (response: any[]) => void, opt?: Q.ServiceOptions<any>)"));
             }
         }
     }

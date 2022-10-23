@@ -4,12 +4,12 @@
     {
         protected void GeneratePermissionKeys(TypeDefinition type, bool module)
         {
-            GeneratePermissionKeysFor(type, declare: true, module: module);
+            GeneratePermissionKeysFor(type);
         }
 
-        protected void GeneratePermissionKeysFor(TypeDefinition type, bool declare, bool module)
+        protected void GeneratePermissionKeysFor(TypeDefinition type)
         {
-            cw.Indented(declare ? "export namespace ": "namespace ");
+            cw.Indented("export namespace ");
             sb.Append(type.Name);
             cw.InBrace(delegate
             {
@@ -34,7 +34,7 @@
                         continue;
 
                     sb.AppendLine();
-                    GeneratePermissionKeysFor(nested, declare: false, module);
+                    GeneratePermissionKeysFor(nested);
                 }
             });
         }

@@ -1,4 +1,6 @@
-﻿export interface PropertyItem {
+﻿import { registerEnum } from "./system";
+
+export interface PropertyItem {
     name?: string;
     title?: string;
     hint?: string;
@@ -56,6 +58,10 @@
     quickFilterCssClass?: string;
 }
 
+export interface PropertyItemsData {
+    items: PropertyItem[];
+    additionalItems: PropertyItem[];
+}
    
 export enum SummaryType {
     Disabled = -1,
@@ -65,3 +71,5 @@ export enum SummaryType {
     Min = 3,
     Max = 4
 }
+
+registerEnum(SummaryType, 'Serenity.SummaryType');

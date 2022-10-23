@@ -63,7 +63,7 @@
         /// <param name="connection">
         ///   Connection (required).</param>
         /// <param name="tableName">
-        ///   Tablename (required).</param>
+        ///   Table name (required).</param>
         /// <param name="keyField">
         ///   ID field meta that will be used to locate the record (required).</param>
         /// <param name="orderField">
@@ -303,7 +303,7 @@
                         // if we found more than 100 records whose display orders changed same amount, to 
                         // limit IN(...) part to overgrow, break searching and run the query. Collect the
                         // rest in another query. If query is too complex, might result in performance
-                        // degration in SQL server
+                        // degradation in SQL server
                         if (finish - start >= 100)
                             break;
 

@@ -51,7 +51,7 @@
                 sb.Append("\n\n");
             }
 
-            // sub queries should be enclosed in paranthesis
+            // sub queries should be enclosed in parenthesis
             if (query.Parent != null && !query.OmitParens)
                 sb.Append("(");
 
@@ -427,7 +427,7 @@
                 }
             }
 
-            // sub queries should be enclosed in paranthesis
+            // sub queries should be enclosed in parenthesis
             if (query.Parent != null && !query.OmitParens)
                 sb.Append(")");
 

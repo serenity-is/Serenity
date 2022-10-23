@@ -341,7 +341,7 @@ export function iframeDialog(options: IFrameDialogOptions) {
                     height: '100%'
                 })[0])).contentDocument;
                 doc.open();
-                doc.write(settings.html);
+                doc.write(options.html);
                 doc.close();
             }
         }, '<div style="overflow: hidden"><iframe></iframe></div>', 's-IFrameModal');

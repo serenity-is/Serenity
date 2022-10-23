@@ -458,11 +458,12 @@
         }
 
         /// <summary>
-        /// Foreigns the join.
+        /// Creates a left join from the foreign join index.
         /// </summary>
         /// <param name="foreignIndex">Index of the foreign.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">ForeignTable</exception>
+        [Obsolete("This method was used by the old ORM")]
         public LeftJoin ForeignJoin(int? foreignIndex = null)
         {
             if (ForeignTable.IsNullOrEmpty())
@@ -576,13 +577,13 @@
         /// <returns></returns>
         public abstract int IndexCompare(IRow row1, IRow row2);
         /// <summary>
-        /// Ases the object.
+        /// Gets the value of this row as an object.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <returns></returns>
         public abstract object AsObject(IRow row);
         /// <summary>
-        /// Ases the object.
+        /// Gets the value of this field in specified row as object.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <param name="value">The value.</param>
@@ -595,7 +596,7 @@
         protected abstract bool GetIsNull(IRow row);
 
         /// <summary>
-        /// Ases the SQL value.
+        /// Gets the value of this row as an SQL value.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <returns></returns>

@@ -15,14 +15,11 @@ namespace Serenity.Localization
     /// </remarks>
     public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
     {
-        private readonly ConcurrentDictionary<ItemKey, string> approvedTexts =
-            new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
+        private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = new(ItemKeyComparer.Default);
 
-        private readonly ConcurrentDictionary<ItemKey, string> pendingTexts =
-            new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
+        private readonly ConcurrentDictionary<ItemKey, string> pendingTexts = new(ItemKeyComparer.Default);
 
-        private readonly ConcurrentDictionary<string, string> languageFallbacks =
-            new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, string> languageFallbacks = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Adds a local text entry to the registry

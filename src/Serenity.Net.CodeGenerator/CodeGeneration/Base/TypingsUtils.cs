@@ -89,6 +89,16 @@ namespace Serenity.Reflection
             return attributeData.ConstructorArguments;
         }
 
+        public static MethodDefinition Constructor(this CustomAttribute attributeData)
+        {
+            return attributeData.AttributeConstructor;
+        }
+
+        public static IList<KeyValuePair<string, TypedConstant>> NamedArguments(this CustomAttribute attributeData)
+        {
+            return attributeData.NamedArguments;
+        }
+
         public static bool IsPublic(this MethodDefinition fieldSymbol)
         {
             return fieldSymbol.DeclaredAccessibility == Accessibility.Public;
@@ -149,10 +159,21 @@ namespace Serenity.Reflection
             return keyValuePair.Key;
         }
 
+        public static string Name(this IParameterSymbol parameterSymbol)
+        {
+            return parameterSymbol.Name;
+        }
+
         public static object ArgumentValue(this KeyValuePair<string, TypedConstant> keyValuePair)
         {
             return keyValuePair.Value.Kind == TypedConstantKind.Array ?
                 keyValuePair.Value.Values : keyValuePair.Value.Value;
+        }
+
+        public static object Value(this TypedConstant constant)
+        {
+            return constant.Kind == TypedConstantKind.Array ?
+                constant.Values : constant.Value;
         }
 
         public static bool HasCustomAttributes(this IFieldSymbol field)
@@ -334,12 +355,22 @@ namespace Serenity.Reflection
 
         public static string Name(this Mono.Cecil.CustomAttributeNamedArgument n)
         {
-            return n.Name();
+            return n.Name;
+        }
+
+        public static string Name(this Mono.Cecil.ParameterDefinition n)
+        {
+            return n.Name;
         }
 
         public static object ArgumentValue(this Mono.Cecil.CustomAttributeNamedArgument n)
         {
             return n.Argument.Value;
+        }
+
+        public static object Value(this Mono.Cecil.CustomAttributeArgument n)
+        {
+            return n.Value;
         }
 
         public static TypeReference PropertyType(this Mono.Cecil.PropertyDefinition n)
@@ -355,6 +386,16 @@ namespace Serenity.Reflection
         public static IList<Mono.Cecil.CustomAttributeArgument> ConstructorArguments(this CustomAttribute attributeData)
         {
             return attributeData.ConstructorArguments;
+        }
+
+        public static Mono.Cecil.MethodReference Constructor(this CustomAttribute attributeData)
+        {
+            return attributeData.Constructor;
+        }
+
+        public static IList<Mono.Cecil.CustomAttributeNamedArgument> NamedArguments(this CustomAttribute attributeData)
+        {
+            return attributeData.Properties;
         }
 
         public static bool IsPublic(this MethodDefinition method)
@@ -504,6 +545,9 @@ namespace Serenity.Reflection
 
         public static IEnumerable<TypeReference> EnumerateBaseClasses(TypeReference typeRef)
         {
+            if (typeRef is null)
+                return Array.Empty<TypeReference>();
+
 #if !ISSOURCEGENERATOR
             var key = GetCacheKey(typeRef);
             if (BaseClassCache.TryGetValue(key, out var cached))
@@ -519,11 +563,11 @@ namespace Serenity.Reflection
                 typeDef = typeRef.Resolve();
 #endif
 
-            var baseType = typeDef.BaseType;
+            var baseType = typeDef?.BaseType;
             if (baseType != null)
             {
-                list.Add(typeDef.BaseType);
-                list.AddRange(EnumerateBaseClasses(typeDef.BaseType));
+                list.Add(baseType);
+                list.AddRange(EnumerateBaseClasses(baseType));
             }
 
 #if !ISSOURCEGENERATOR

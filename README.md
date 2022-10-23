@@ -45,7 +45,7 @@ http://serenity.is/demo/
 
 ## Contribute / Spread the Word
 
-You may contribute to the project by opening a pull request, adding documentation, sample source code, asking a question or suggesting an improvement etc. Just open an issue here with relevant links.
+You may contribute to the project by opening a pull request, adding documentation, sample source code, asking a question or suggesting an improvement etc. Just open a discussion here with relevant links.
 
 Please help spread the word by posting in blogs, forums, social media, starring project in GitHub, or reviewing the Serene extension in [VSGallery](https://marketplace.visualstudio.com/items?itemName=VolkanCeylan.SereneSerenityApplicationTemplate&ssr=false#review-details).
 

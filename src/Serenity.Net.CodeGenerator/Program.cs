@@ -103,11 +103,11 @@ namespace Serenity.CodeGenerator
                                 namespacesPath is null)
                                 namespacesPath = fileSystem.Combine(projectDir, "tsconfig.json");
 
-                            //if (namespacesPath is not null)
-                            //{
-                                //var nsLister = new TSTypeLister(fileSystem, namespacesPath);
-                                //tsTypesNamespaces = nsLister.List();
-                            //}
+                            if (namespacesPath is not null)
+                            {
+                                var nsLister = new TSTypeLister(fileSystem, namespacesPath);
+                                tsTypesNamespaces = nsLister.List();
+                            }
 
                             if (modulesPath is not null)
                             {

@@ -4,45 +4,45 @@ using System.Threading.Tasks;
 using TSQL.Statements;
 using TSQL.Tokens;
 
-namespace Serenity.Tests
+namespace Serenity.Tests;
+
+public class MockDataReader : DbDataReader
 {
-    public class MockDataReader : DbDataReader
+    protected bool closed;
+    protected int index = -1;
+    protected string[] props;
+    protected object[][] values;
+
+    public MockDataReader()
     {
-        protected bool closed;
-        protected int index = -1;
-        protected string[] props;
-        protected object[][] values;
+        values = Array.Empty<object[]>();
+        props = Array.Empty<string>();
+    }
 
-        public MockDataReader()
-        {
-            values = Array.Empty<object[]>();
-            props = Array.Empty<string>();
-        }
+    public MockDataReader(IEnumerable<IDictionary<string, object>> items,
+        params string[] props)
+    {
+        if (items == null)
+            throw new ArgumentNullException(nameof(items));
 
-        public MockDataReader(IEnumerable<IDictionary<string, object>> items,
-            params string[] props)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            this.props = props;
-            values = items.Select(item => props.Select(p =>
+        this.props = props;
+        values = items.Select(item => props.Select(p =>
                 item.TryGetValue(p, out var o) ? o : null).ToArray()).ToArray();
-        }
+    }
 
         public MockDataReader(params object[] anonymousItems) : this(null, anonymousItems)
         {
         }
         
         public MockDataReader(string commandText, params object[] anonymousItems)
-        {
-            if (anonymousItems == null || !anonymousItems.Any())
-                throw new ArgumentNullException(nameof(anonymousItems));
+    {
+        if (anonymousItems == null || !anonymousItems.Any())
+            throw new ArgumentNullException(nameof(anonymousItems));
 
-            var sample = anonymousItems.First();
-            if (anonymousItems.Any(x => x == null || x.GetType() != sample.GetType()))
-                throw new ArgumentOutOfRangeException(nameof(anonymousItems),
-                    "All items passed to mock data reader constructor must be of same type!");
+        var sample = anonymousItems.First();
+        if (anonymousItems.Any(x => x == null || x.GetType() != sample.GetType()))
+            throw new ArgumentOutOfRangeException(nameof(anonymousItems),
+                "All items passed to mock data reader constructor must be of same type!");
 
             if (!string.IsNullOrEmpty(commandText))
                 props = ParseSelectFieldAliases(commandText)?.ToArray();
@@ -73,158 +73,158 @@ namespace Serenity.Tests
                 props = ParseSelectFieldAliases(commandText)?.ToArray();
 
             values = rows.Select(row => props.Select(prop => row[prop]).ToArray()).ToArray();
-        }
+    }
 
-        public override object this[int i] => values[index][i] ?? DBNull.Value;
+    public override object this[int i] => values[index][i] ?? DBNull.Value;
 
-        public override object this[string name] => values[index][Array.IndexOf(props, name)] ?? DBNull.Value;
+    public override object this[string name] => values[index][Array.IndexOf(props, name)] ?? DBNull.Value;
 
-        public override int Depth => 0;
-        public override bool IsClosed => closed;
-        public override int RecordsAffected => values.Length;
-        public override int FieldCount => props.Length;
+    public override int Depth => 0;
+    public override bool IsClosed => closed;
+    public override int RecordsAffected => values.Length;
+    public override int FieldCount => props.Length;
 
-        public override bool HasRows => throw new NotImplementedException();
+    public override bool HasRows => throw new NotImplementedException();
 
-        public override void Close()
-        {
-            closed = true;
-        }
+    public override void Close()
+    {
+        closed = true;
+    }
 
-        public override ValueTask DisposeAsync()
-        {
+    public override ValueTask DisposeAsync()
+    {
             GC.SuppressFinalize(this);
-            return ValueTask.CompletedTask;
-        }
+        return ValueTask.CompletedTask;
+    }
 
-        public override bool GetBoolean(int i)
-        {
-            return (bool)this[i];
-        }
+    public override bool GetBoolean(int i)
+    {
+        return (bool)this[i];
+    }
 
-        public override byte GetByte(int i)
-        {
-            return (byte)this[i];
-        }
+    public override byte GetByte(int i)
+    {
+        return (byte)this[i];
+    }
 
-        public override long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
-        {
-            throw new NotImplementedException();
-        }
+    public override long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
+    {
+        throw new NotImplementedException();
+    }
 
-        public override char GetChar(int i)
-        {
-            return (char)this[i];
-        }
+    public override char GetChar(int i)
+    {
+        return (char)this[i];
+    }
 
-        public override long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
-        {
-            return (long)this[i];
-        }
+    public override long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
+    {
+        return (long)this[i];
+    }
 
-        public override string GetDataTypeName(int i)
-        {
-            return "string";
-        }
+    public override string GetDataTypeName(int i)
+    {
+        return "string";
+    }
 
-        public override DateTime GetDateTime(int i)
-        {
-            return (DateTime)this[i];
-        }
+    public override DateTime GetDateTime(int i)
+    {
+        return (DateTime)this[i];
+    }
 
-        public override decimal GetDecimal(int i)
-        {
-            return (decimal)this[i];
-        }
+    public override decimal GetDecimal(int i)
+    {
+        return (decimal)this[i];
+    }
 
-        public override double GetDouble(int i)
-        {
-            return (double)this[i];
-        }
+    public override double GetDouble(int i)
+    {
+        return (double)this[i];
+    }
 
-        public override Type GetFieldType(int i)
-        {
+    public override Type GetFieldType(int i)
+    {
             return values?.FirstOrDefault()?[i]?.GetType() ?? typeof(object);
-        }
+    }
 
-        public override float GetFloat(int i)
-        {
-            return (float)this[i];
-        }
+    public override float GetFloat(int i)
+    {
+        return (float)this[i];
+    }
 
-        public override Guid GetGuid(int i)
-        {
-            return (Guid)this[i];
-        }
+    public override Guid GetGuid(int i)
+    {
+        return (Guid)this[i];
+    }
 
-        public override short GetInt16(int i)
-        {
-            return (short)this[i];
-        }
+    public override short GetInt16(int i)
+    {
+        return (short)this[i];
+    }
 
-        public override int GetInt32(int i)
-        {
-            return (int)this[i];
-        }
+    public override int GetInt32(int i)
+    {
+        return (int)this[i];
+    }
 
-        public override long GetInt64(int i)
-        {
-            return (long)this[i];
-        }
+    public override long GetInt64(int i)
+    {
+        return (long)this[i];
+    }
 
-        public override string GetName(int i)
-        {
-            return props[i];
-        }
+    public override string GetName(int i)
+    {
+        return props[i];
+    }
 
-        public override int GetOrdinal(string name)
-        {
-            return Array.IndexOf(props, name);
-        }
+    public override int GetOrdinal(string name)
+    {
+        return Array.IndexOf(props, name);
+    }
 
-        public override DataTable GetSchemaTable()
-        {
-            throw new NotImplementedException();
-        }
+    public override DataTable GetSchemaTable()
+    {
+        throw new NotImplementedException();
+    }
 
-        public override string GetString(int i)
-        {
-            return (string)this[i];
-        }
+    public override string GetString(int i)
+    {
+        return (string)this[i];
+    }
 
-        public override object GetValue(int i)
-        {
-            return this[i];
-        }
+    public override object GetValue(int i)
+    {
+        return this[i];
+    }
 
-        public override int GetValues(object[] values)
-        {
-            throw new NotImplementedException();
-        }
+    public override int GetValues(object[] values)
+    {
+        throw new NotImplementedException();
+    }
 
-        public override bool IsDBNull(int i)
-        {
-            return this[i] == null || this[i] is DBNull;
-        }
+    public override bool IsDBNull(int i)
+    {
+        return this[i] == null || this[i] is DBNull;
+    }
 
-        public override bool NextResult()
-        {
+    public override bool NextResult()
+    {
+        return false;
+    }
+
+    public override bool Read()
+    {
+        if (index >= values.Length - 1)
             return false;
-        }
 
-        public override bool Read()
-        {
-            if (index >= values.Length - 1)
-                return false;
+        index++;
+        return true;
+    }
 
-            index++;
-            return true;
-        }
-
-        public override IEnumerator GetEnumerator()
-        {
-            return values.GetEnumerator();
-        }
+    public override IEnumerator GetEnumerator()
+    {
+        return values.GetEnumerator();
+    }
 
         public static IEnumerable<string> ParseSelectFieldAliases(string commandText)
         {
@@ -310,5 +310,4 @@ namespace Serenity.Tests
             return result;
         }
 
-    }
 }

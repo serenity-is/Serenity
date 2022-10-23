@@ -1,0 +1,18 @@
+﻿{{USING "Serenity.Web"}}{{if AspNetCore}}
+{{USING "Microsoft.AspNetCore.Mvc"}}{{else}}
+{{USING "System.Web.Mvc"}}{{end}}
+
+{{NAMESPACE RootNamespaceDotModuleDot + "Pages"}} 
+{
+{{if !AspNetCore}}    [RoutePrefix("{{ModuleSlash}}{{ClassName}}"), Route("{action=index}")]{{end}}
+    [PageAuthorize(typeof({{RowClassName}}))]
+    public class {{ClassName}}Controller : Controller
+    {%{{}%}{{if AspNetCore}}
+        [Route("{{ModuleSlash}}{{ClassName}}")]{{end}}
+        public ActionResult Index()
+        {
+            return this.GridPage("@/{{Module}}/{{ClassName}}/{{ClassName}}Page",
+                {{RowClassName}}.Fields.PageTitle());
+        }
+    }
+}

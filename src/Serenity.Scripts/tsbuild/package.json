@@ -1,0 +1,36 @@
+{
+  "name": "@serenity-is/tsbuild",
+  "version": "6.2.8",
+  "author": "Serenity (https://serenity.is)",
+  "bugs": "https://github.com/serenity-is/serenity/issues",
+  "description": "Serenity ESBuild functions",
+  "dependencies": {
+    "esbuild": "0.15.11"
+  },
+  "optionalDependencies": {
+    "fsevents": "2.3.2"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "module": "dist/index.js",
+  "main": "dist/index.js",
+  "import": "dist/index.js",
+  "files": [
+    "dist/**/*.d.ts",
+    "dist/**/*.js"
+  ],
+  "homepage": "https://github.com/serenity-is/serenity/#readme",
+  "keywords": [
+    "serenity",
+    "business",
+    "application",
+    "framework",
+    "esbuild"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/serenity-is/serenity/src/Serenity.Scripts/tsbuild",
+  "type": "module"
+}

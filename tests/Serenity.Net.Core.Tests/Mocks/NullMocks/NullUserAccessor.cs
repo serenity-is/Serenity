@@ -1,7 +1,6 @@
-﻿namespace Serenity.Tests
+﻿namespace Serenity.Tests;
+
+public class NullUserAccessor : IUserAccessor
 {
-    public class NullUserAccessor : IUserAccessor
-    {
-        public ClaimsPrincipal User => null;
-    }
+    public ClaimsPrincipal User => null;
 }

@@ -1,7 +1,7 @@
-﻿import { Column, ColumnFormatter, Grid, IPlugin } from "@serenity-is/sleekgrid";
+﻿import { Column, FormatterContext, Grid, IPlugin } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { attrEncode, Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, text, tryGetText } from "../../q";
-import { Format, Formatter, FormatterContext, RemoteView } from "../../slick";
+import { Format, Formatter, RemoteView } from "../../slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
 import { DateFormatter, EnumFormatter, FormatterTypeRegistry, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
@@ -142,6 +142,7 @@ export class GridRowSelectionMixin {
     static createSelectColumn(getMixin: () => GridRowSelectionMixin): Column {
         return {
             name: '<span class="select-all-items check-box no-float "></span>',
+            nameIsHtml: true,
             toolTip: ' ',
             field: '__select__',
             width: 27,
@@ -588,9 +589,9 @@ export namespace SlickFormatting {
         return EnumFormatter.getText(enumKey, name);
     }
 
-    export function treeToggle<TItem>(getView: () => RemoteView<TItem>, getId: (x: TItem) => any,
-        formatter: Format<TItem>): Format<TItem> {
-        return function (ctx: FormatterContext<TItem>) {
+    export function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any,
+        formatter: Format): Format {
+        return function (ctx: FormatterContext) {
             var text = formatter(ctx);
             var view = getView();
             var indent = (ctx.item as any)._indent ?? 0;
@@ -694,39 +695,9 @@ export namespace SlickHelper {
                 var key = (col.name != null ? col.name.substr(1) : col.id);
                 col.name = text(localTextPrefix + key);
             }
-
-            if (col.formatter == null && col.format != null) {
-                col.formatter = convertToFormatter(col.format);
-            }
-            else if (col.formatter == null) {
-                col.formatter = function (row, cell, value, column, item) {
-                    return htmlEncode(value);
-                };
-            }
         }
 
         return columns;
-    }
-
-    export function convertToFormatter<TItem = any>(format: Format<TItem>): ColumnFormatter<TItem> {
-        if (format == null) {
-            return null;
-        }
-        else {
-            return function (row: number, cell: number, value: any, column: Column, item: TItem, grid: Grid) {
-                var ctx: FormatterContext<TItem> = { row, cell, value, column, item, grid };
-                var result = format(ctx);
-                if (ctx.addClass != null || ctx.addAttrs != null || ctx.toolTip != null) {
-                    return {
-                        addAttrs: ctx.addAttrs,
-                        addClass: ctx.addClass,
-                        text: result,
-                        toolTip: ctx.toolTip
-                    }
-                }
-                return result;
-            }
-        }
     }
 }
 

@@ -1,4 +1,6 @@
-﻿namespace Serenity.CodeGeneration
+﻿using Serenity.CodeGenerator;
+
+namespace Serenity.CodeGeneration
 {
     public abstract class ImportGeneratorBase : CodeGeneratorBase
     {
@@ -122,6 +124,37 @@
             }
         }
 
+        protected ExternalType GetScriptTypeFrom(ExternalType fromType, string typeName)
+        {
+            var ns = fromType.Namespace;
+            var scriptType = GetScriptType(typeName);
+            if (scriptType != null)
+                return scriptType;
+
+            if (!string.IsNullOrEmpty(fromType.Module) &&
+                typeName?.IndexOf(':') < 0)
+            {
+                var moduleTypeName = fromType.Module + ":" + typeName;
+                scriptType = GetScriptType(moduleTypeName);
+                if (scriptType != null)
+                    return scriptType;
+            }
+
+            if (ns != null)
+            {
+                var nsParts = ns.Split('.');
+                for (var i = nsParts.Length; i > 0; i--)
+                {
+                    var prefixed = string.Join(".", nsParts.Take(i)) + '.' + typeName;
+                    scriptType = GetScriptType(prefixed);
+                    if (scriptType != null)
+                        return scriptType;
+                }
+            }
+
+            return null;
+        }
+
         protected bool HasBaseType(ExternalType type, params string[] typeNames)
         {
             int loop = 0;
@@ -136,8 +169,20 @@
                     return true;
 
                 var ns = type.Namespace;
-                type = GetScriptType(baseTypeName);
-                if (type == null && ns != null)
+                var baseType = GetScriptType(baseTypeName);
+
+                if (baseType == null &&
+                    !string.IsNullOrEmpty(type.Module) &&
+                    baseTypeName?.IndexOf(':') < 0)
+                {
+                    var moduleBaseTypeName = type.Module + ":" + baseTypeName;
+                    if (typeNames.Contains(moduleBaseTypeName, StringComparer.Ordinal))
+                        return true;
+
+                    baseType = GetScriptType(moduleBaseTypeName);
+                }
+
+                if (baseType == null && ns != null)
                 {
                     var nsParts = ns.Split('.');
                     for (var i = nsParts.Length; i > 0; i--)
@@ -145,11 +190,13 @@
                         var prefixed = string.Join(".", nsParts.Take(i)) + '.' + baseTypeName;
                         if (typeNames.Contains(prefixed, StringComparer.Ordinal))
                             return true;
-                        type = GetScriptType(prefixed);
-                        if (type != null)
+                        baseType = GetScriptType(prefixed);
+                        if (baseType != null)
                             break;
                     }
                 }
+
+                type = baseType;
             };
 
             return false;

@@ -21,9 +21,10 @@
             string languageID = LocalText.InvariantLanguageID)
         {
             if (typeSource == null)
-                throw new ArgumentNullException("assemblies");
+                throw new ArgumentNullException(nameof(typeSource));
 
-            var provider = registry ?? throw new ArgumentNullException(nameof(registry));
+            if (registry is null)
+                throw new ArgumentNullException(nameof(registry));
 
             foreach (var type in typeSource.GetTypes())
             {
@@ -39,11 +40,10 @@
 
                         var descAttr = member[0].GetCustomAttribute<DescriptionAttribute>();
                         if (descAttr != null)
-                            provider.Add(languageID, "Enums." + enumKey + "." + name, descAttr.Description);
+                            registry.Add(languageID, "Enums." + enumKey + "." + name, descAttr.Description);
                     }
                 }
             }
         }
-
     }
 }

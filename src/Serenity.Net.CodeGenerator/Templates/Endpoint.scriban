@@ -1,15 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Serenity;
-using Serenity.Data;
-using Serenity.Reporting;
-using Serenity.Services;
-using Serenity.Web;
-using System;
-using System.Data;
-using System.Globalization;
-using MyRow = {{RootNamespace}}{{DotModule}}.{{RowClassName}};
+﻿{{USING "Microsoft.AspNetCore.Mvc" }}
+{{USING "Serenity.Data" }}
+{{USING "Serenity.Reporting" }}
+{{USING "Serenity.Services" }}
+{{USING "Serenity.Web" }}
+{{USING "System" }}
+{{USING "System.Data" }}
+{{USING "System.Globalization" }}
+{{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
 
-namespace {{RootNamespace}}{{DotModule}}.Endpoints
+{{NAMESPACE RootNamespaceDotModuleDot + "Endpoints"}}
 {
     [Route("Services/{{ModuleSlash}}{{ClassName}}/[action]")]
     [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]

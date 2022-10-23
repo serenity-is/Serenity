@@ -135,8 +135,18 @@
                 return;
             }
 
-            EnqueueType(memberType.Resolve());
-            MakeFriendlyReference(memberType, codeNamespace, module);
+            var resolvedType = memberType.Resolve();
+
+            if (resolvedType != null && TypingsUtils.GetAttr(resolvedType, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+            {
+                sb.Append("any");
+                return;
+            }
+            else
+            {
+                EnqueueType(memberType.Resolve());
+                MakeFriendlyReference(memberType, codeNamespace, module);
+            }
         }
 
         protected string ReferenceScriptType(ExternalType type, string codeNamespace, bool module)

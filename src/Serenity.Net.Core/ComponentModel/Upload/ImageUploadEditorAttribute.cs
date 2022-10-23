@@ -153,7 +153,7 @@ namespace Serenity.ComponentModel
         public string ThumbBackColor { get; set; }
 
         /// <summary>
-        /// Only useful for MultipleImageUploadeEditor. Specifies
+        /// Only useful for MultipleImageUploadEditor. Specifies
         /// whether to JSON encode value. If your field is a string
         /// field set it to true.
         /// </summary>

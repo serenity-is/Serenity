@@ -25,7 +25,7 @@
 
             tsBasePath = PathHelper.ToPath(tsBasePath);
 
-            paths = tsConfig?.Paths ?? new Dictionary<string, string[]>();
+            paths = tsConfig?.CompilerOptions?.Paths ?? new Dictionary<string, string[]>();
         }
 
         private class PackageJson
@@ -209,7 +209,10 @@
 
             if (moduleName is null)
             {
-                moduleName = '/' + PathHelper.ToUrl(fileSystem.GetRelativePath(tsBasePath, resolvedPath));
+                var fromPath = tsBasePath;
+                if (!fromPath.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+                    fromPath += System.IO.Path.DirectorySeparatorChar;
+                moduleName = '/' + PathHelper.ToUrl(fileSystem.GetRelativePath(fromPath, resolvedPath));
 
                 foreach (var ext in extensions.Reverse())
                 {

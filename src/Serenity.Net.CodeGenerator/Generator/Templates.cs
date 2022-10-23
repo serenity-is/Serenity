@@ -40,6 +40,8 @@ namespace Serenity.CodeGenerator
             return t;
         }
 
+
+
         public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model)
         {
             var template = GetTemplate(fileSystem, templateKey);
@@ -54,7 +56,32 @@ namespace Serenity.CodeGenerator
                 context.CurrentGlobal.Import(model,
                     ScriptMemberImportFlags.Field | ScriptMemberImportFlags.Property,
                     null, x => x.Name);
-                return template.Render(context);
+
+                var cw = new CodeWriter
+                {
+                    AllowUsing = ns => ns == "Serenity" ||
+                      ns.StartsWith("Serenity.", StringComparison.Ordinal) ||
+                      ns == "Microsoft.AspNetCore.Mvc" ||
+                      ns == "System.Globalization" ||
+                      ns == "System.Data" ||
+                      ns == "System" ||
+                      ns == "System.IO" ||
+                      ns == "System.ComponentModel" ||
+                      ns == "System.Collections.Generic",
+                    IsCSharp = true
+                };
+
+                var modularTSImporter = new ModularTSImporter((model as EntityModel)?.Module);
+
+                context.PushGlobal(CSharpDynamicUsings.GetScriptObject(cw));
+                context.PushGlobal(ModularTSImporter.GetScriptObject(modularTSImporter));
+
+                cw.Append(template.Render(context).Trim());
+
+                cw.Insert(0, modularTSImporter.GetImports());
+
+                return cw.ToString();
+
             }
             catch (InvalidOperationException ex)
             {

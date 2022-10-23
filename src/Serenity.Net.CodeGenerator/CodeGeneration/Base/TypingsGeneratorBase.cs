@@ -1,11 +1,8 @@
 ﻿#if ISSOURCEGENERATOR
+using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Threading;
-using Microsoft.CodeAnalysis;
-using Serenity.Reflection;
 #endif
-
-using System.Linq;
 
 namespace Serenity.CodeGeneration
 {
@@ -17,7 +14,9 @@ namespace Serenity.CodeGeneration
         protected HashSet<string> localTextKeys = new();
         protected List<GeneratedTypeInfo> generatedTypes = new();
         protected List<AnnotationTypeInfo> annotationTypes = new();
-        protected ILookup<string, ExternalType> editorTypeByKey;
+        protected ILookup<string, ExternalType> modularEditorTypeByKey;
+        protected ILookup<string, ExternalType> modularFormatterTypeByKey;
+        protected ILookup<string, ExternalType> modularDialogTypeByKey;
 
 #if ISSOURCEGENERATOR
         private readonly CancellationToken cancellationToken;
@@ -191,27 +190,96 @@ namespace Serenity.CodeGeneration
         protected override void GenerateAll()
         {
             var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            editorTypeByKey = tsTypes.Values.Select(type =>
+            modularEditorTypeByKey = tsTypes.Values.Select(type =>
             {
                 if (type.IsAbstract != false &&
                     type.IsInterface != false &&
-                    type.Attributes != null)
+                    !string.IsNullOrEmpty(type.Module))
                 {
-                    foreach (var attr in type.Attributes)
+                    if (type.SourceFile?.EndsWith(".d.ts") == true &&
+                        (HasBaseType(type, ClientTypesGenerator.EditorBaseClasses) ||
+                         (HasBaseType(type, "@serenity-is/corelib:Widget", "Widget") &&
+                          type.Name.EndsWith("Editor", StringComparison.Ordinal))))
                     {
-                        if (attr.Type is not null &&
-                            (attr.Type == "registerEditor" ||
-                             attr.Type.EndsWith(".registerEditor", StringComparison.Ordinal)) &&
-                            attr.Arguments?.Count > 0 &&
-                            attr.Arguments[0]?.Value is string s &&
-                            !string.IsNullOrEmpty(s))
-                            return (s, type);
+                        return (key: type.Name, type);
+                    }
+                    
+                    if (type.Attributes != null)
+                    {
+                        foreach (var attr in type.Attributes)
+                        {
+                            if (attr.Type is not null &&
+                                (attr.Type == "registerEditor" ||
+                                 attr.Type.EndsWith(".registerEditor", StringComparison.Ordinal)) &&
+                                attr.Arguments?.Count > 0 &&
+                                attr.Arguments[0]?.Value is string key &&
+                                !string.IsNullOrEmpty(key))
+                                return (key, type);
+                        }
                     }
                 }
 
-                return ((string)null, type);
-            }).Where(x => x.Item1 != null)
-            .ToLookup(x => x.Item1, x => x.type);
+                return (null, type);
+            }).Where(x => x.key != null)
+                .ToLookup(x => x.key, x => x.type);
+
+            modularFormatterTypeByKey = tsTypes.Values.Select(type =>
+            {
+                if (type.IsAbstract != false &&
+                    type.IsInterface != false &&
+                    !string.IsNullOrEmpty(type.Module))
+                {
+                    if (type.SourceFile?.EndsWith(".d.ts") == true &&
+                        type.Interfaces != null &&
+                        type.Interfaces.Any(x => x == "ISlickFormatter" || 
+                            x.EndsWith(".ISlickFormatter", StringComparison.Ordinal)))
+                    {
+                        return (key: type.Name, type);
+                    }
+
+                    if (type.Attributes != null)
+                    {
+                        foreach (var attr in type.Attributes)
+                        {
+                            if (attr.Type is not null &&
+                                (attr.Type == "registerFormatter" ||
+                                 attr.Type.EndsWith(".registerFormatter", StringComparison.Ordinal)) &&
+                                attr.Arguments?.Count > 0 &&
+                                attr.Arguments[0]?.Value is string key &&
+                                !string.IsNullOrEmpty(key))
+                                return (key, type);
+                        }
+                    }
+                }
+
+                return (null, type);
+            }).Where(x => x.key != null)
+                .ToLookup(x => x.key, x => x.type);
+
+            modularDialogTypeByKey = tsTypes.Values.Select(type =>
+            {
+                if (type.IsAbstract != false &&
+                    type.IsInterface != false &&
+                    !string.IsNullOrEmpty(type.Module))
+                {
+                    if (type.Attributes != null)
+                    {
+                        foreach (var attr in type.Attributes)
+                        {
+                            if (attr.Type is not null &&
+                                (attr.Type == "registerClass" ||
+                                 attr.Type.EndsWith(".registerClass", StringComparison.Ordinal)) &&
+                                attr.Arguments?.Count > 0 &&
+                                attr.Arguments[0]?.Value is string key &&
+                                !string.IsNullOrEmpty(key))
+                                return (key, type);
+                        }
+                    }
+                }
+
+                return (null, type);
+            }).Where(x => x.key != null)
+                .ToLookup(x => x.key, x => x.type);
 
 #if ISSOURCEGENERATOR
             var types = Compilation.GetSymbolsWithName(s => true, SymbolFilter.Type).OfType<ITypeSymbol>();
@@ -636,7 +704,7 @@ namespace Serenity.CodeGeneration
 
         protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, bool module)
         {
-            var fullName = ShortenFullName(type.NamespaceOf(), type.Name, codeNamespace, module, null);
+            var fullName = ShortenFullName(GetNamespace(type), type.Name, codeNamespace, module, null);
 
             if (type.IsGenericInstance())
             {
@@ -913,14 +981,6 @@ namespace Serenity.CodeGeneration
         private readonly List<ModuleImport> moduleImports = new();
         private readonly HashSet<string> moduleImportAliases = new();
 
-        protected class ModuleImport
-        {
-            public string Name { get; set; }
-            public string Alias { get; set; }
-            public string From { get; set; }
-            public bool External { get; set; }
-        }
-
         protected void ClearImports()
         {
             moduleImports.Clear();
@@ -932,13 +992,24 @@ namespace Serenity.CodeGeneration
             {
                 if (module)
                 {
-                    sb.Insert(0, string.Join(Environment.NewLine,
-                        moduleImports.ToLookup(x => (x.From, x.External))
-                            .Select(z =>
+                    var dotTsIndex = filename.IndexOf(".ts", StringComparison.Ordinal);
+                    var currentFrom = filename;
+
+                    if (dotTsIndex >= 0)
+                        currentFrom = filename[..dotTsIndex];
+
+                    var moduleImportsLookup = moduleImports
+                        .Where(x => x.From != currentFrom)
+                        .ToLookup(x => (x.From, x.External));
+
+                    if (moduleImportsLookup.Any())
+                    {
+                        sb.Insert(0, string.Join(Environment.NewLine, moduleImportsLookup.Select(z =>
+                        {
+                            var from = z.Key.From;
+                            if (!z.Key.External)
                             {
-                                var from = z.Key.From;
-                                if (!z.Key.External && 
-                                    !from.StartsWith("/", StringComparison.Ordinal) &&
+                                if (!from.StartsWith("/", StringComparison.Ordinal) &&
                                     !from.StartsWith(".", StringComparison.Ordinal))
                                 {
                                     if (System.IO.Path.GetDirectoryName(filename) ==
@@ -947,12 +1018,22 @@ namespace Serenity.CodeGeneration
                                     else
                                         from = "../" + from;
                                 }
+                                else if (from.StartsWith("/Modules/", StringComparison.Ordinal))
+                                {
+                                    from = "@" + from[8..];
+                                }
+                                else if (from.StartsWith("/", StringComparison.Ordinal))
+                                {
+                                    from = "@/.." + from;
+                                }
+                            }
 
-                                var importList = string.Join(", ", z.Select(p =>
-                                    p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
+                            var importList = string.Join(", ", z.Select(p =>
+                                p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
 
-                                return $"import {{ {importList} }} from \"{from}\";";
-                            })) + Environment.NewLine + Environment.NewLine);
+                            return $"import {{ {importList} }} from \"{from}\";";
+                        })) + Environment.NewLine + Environment.NewLine);
+                    }
                 }
 
                 moduleImports.Clear();

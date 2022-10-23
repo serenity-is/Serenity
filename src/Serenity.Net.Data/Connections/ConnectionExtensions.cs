@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data
+﻿using Microsoft.Extensions.Logging;
+
+namespace Serenity.Data
 {
     /// <summary>
     /// Contains DB connection related extensions
@@ -95,6 +97,17 @@
                 return SqlSettings.DefaultDialect;
 
             return hasDialect.Dialect ?? SqlSettings.DefaultDialect;
+        }
+
+        /// <summary>
+        /// Gets the logger for a connection if it implements IHasLogger
+        /// interface, or null if not.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns>The logger for connection (used by static SqlHelper methods)</returns>
+        public static ILogger GetLogger(this IDbConnection connection)
+        {
+            return (connection as IHasLogger)?.Logger;
         }
     }
 }

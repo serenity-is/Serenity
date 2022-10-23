@@ -61,6 +61,7 @@ export class Widget<TOptions> {
     protected options: TOptions;
     protected widgetName: string;
     protected uniqueName: string;
+    protected idPrefix: string;
 
     constructor(element: JQuery, options?: TOptions) {
 
@@ -82,6 +83,9 @@ export class Widget<TOptions> {
         }).data(this.widgetName, this);
 
         this.addCssClass();
+
+        this.idPrefix = this.uniqueName + '_';
+        this.renderContents();
     }
 
     public destroy(): void {
@@ -174,6 +178,9 @@ export class Widget<TOptions> {
     public init(action?: (widget: any) => void): this {
         action && action(this);
         return this;
+    }
+
+    protected renderContents(): void {
     }
 
     private static __isWidgetType = true;

@@ -11,6 +11,8 @@
         private readonly string modulePath;
         private readonly string moduleClass;
         private readonly string typingClass;
+        private readonly bool modularTS;
+        private readonly string modulesPath;
 
         public EntityCodeGenerator(IGeneratorFileSystem fileSystem, ICodeFileHelper codeFileHelper, EntityModel model, GeneratorConfig config, string csproj)
         {
@@ -26,7 +28,17 @@
             if (!fileSystem.DirectoryExists(serverTypings))
                 serverTypings = fileSystem.Combine(rootDir, PathHelper.ToPath("Imports/ServerTypings/"));
 
+            TSConfigHelper.LocateTSConfigFiles(fileSystem, rootDir, out modulesPath, out var _);
+
+            modularTS = modulesPath != null && config?.ServerTypings?.ModuleTypings != false;
+
+            if (modularTS)
+                serverTypings = fileSystem.Combine(rootDir, PathHelper.ToPath("Modules/ServerTypes/" + model.Module + "/"));
+
             typingClass = fileSystem.Combine(serverTypings, model.ModuleDot + model.ClassName);
+
+            if (modularTS)
+                typingClass = fileSystem.Combine(serverTypings, model.ClassName);
 
             modulePath = fileSystem.Combine(rootDir, "Modules"); 
             if (!string.IsNullOrEmpty(model.Module))
@@ -40,7 +52,14 @@
             if (config.GenerateRow)
             {
                 CreateFile(Templates.Render(fileSystem, "Row", model), moduleClass + "Row.cs");
-                CreateFile(Templates.Render(fileSystem, "RowTyping", model), typingClass + "Row.ts");
+                if (modularTS)
+                {
+                    CreateModularTypingFile(Templates.Render(fileSystem, "RowTypingModular", model), typingClass + "Row.ts");
+                }
+                else
+                {
+                    CreateFile(Templates.Render(fileSystem, "RowTyping", model), typingClass + "Row.ts");
+                }
             }
 
             if (config.GenerateService)
@@ -53,19 +72,39 @@
                 CreateFile(Templates.Render(fileSystem, "SaveHandler", model), handlerClass + "SaveHandler.cs");
 
                 CreateFile(Templates.Render(fileSystem, "Endpoint", model), moduleClass + "Endpoint.cs");
-                CreateFile(Templates.Render(fileSystem, "ServiceTyping", model), typingClass + "Service.ts");
+                if (modularTS)
+                {
+                    CreateModularTypingFile(Templates.Render(fileSystem, "ServiceTypingModular", model), typingClass + "Service.ts");
+                }
+                else
+                {
+                    CreateFile(Templates.Render(fileSystem, "ServiceTyping", model), typingClass + "Service.ts");
+                }
+                
             }
 
             if (config.GenerateUI)
             {
-                CreateFile(Templates.Render(fileSystem, "Page", model), moduleClass + "Page.cs");
-                CreateFile(Templates.Render(fileSystem, "IndexView", model), moduleClass + "Index.cshtml");
                 CreateFile(Templates.Render(fileSystem, "Columns", model), moduleClass + "Columns.cs");
                 CreateFile(Templates.Render(fileSystem, "Form", model), moduleClass + "Form.cs");
-                CreateFile(Templates.Render(fileSystem, "Dialog", model), moduleClass + "Dialog.ts");
-                CreateFile(Templates.Render(fileSystem, "Grid", model), moduleClass + "Grid.ts");
-                CreateFile(Templates.Render(fileSystem, "FormTyping", model), typingClass + "Form.ts");
-                CreateFile(Templates.Render(fileSystem, "ColumnsTyping", model), typingClass + "Columns.ts");
+                if (modularTS)
+                {
+                    CreateFile(Templates.Render(fileSystem, "PageModular", model), moduleClass + "Page.cs");
+                    CreateFile(Templates.Render(fileSystem, "PageModularTS", model), moduleClass + "Page.ts");
+                    CreateFile(Templates.Render(fileSystem, "DialogModular", model), moduleClass + "Dialog.ts");
+                    CreateFile(Templates.Render(fileSystem, "GridModular", model), moduleClass + "Grid.ts");
+                    CreateModularTypingFile(Templates.Render(fileSystem, "FormTypingModular", model), typingClass + "Form.ts");
+                    CreateModularTypingFile(Templates.Render(fileSystem, "ColumnsTypingModular", model), typingClass + "Columns.ts");
+                }
+                else
+                {
+                    CreateFile(Templates.Render(fileSystem, "IndexView", model), moduleClass + "Index.cshtml");
+                    CreateFile(Templates.Render(fileSystem, "Page", model), moduleClass + "Page.cs");
+                    CreateFile(Templates.Render(fileSystem, "Dialog", model), moduleClass + "Dialog.ts");
+                    CreateFile(Templates.Render(fileSystem, "Grid", model), moduleClass + "Grid.ts");
+                    CreateFile(Templates.Render(fileSystem, "FormTyping", model), typingClass + "Form.ts");
+                    CreateFile(Templates.Render(fileSystem, "ColumnsTyping", model), typingClass + "Columns.ts");
+                }
 
                 GenerateNavigationLink();
                 GenerateStyle();
@@ -122,6 +161,29 @@
             var backup = CreateDirectoryOrBackupFile(file);
             codeFileHelper.CheckoutAndWrite(file, code);
             codeFileHelper.MergeChanges(backup, file);
+        }
+
+        private void CreateModularTypingFile(string code, string file)
+        {
+            CreateFile(code, file);
+
+            var path = fileSystem.Combine(rootDir, PathHelper.ToPath("Modules/ServerTypes/" + model.Module + ".ts"));
+
+            var text = "export * from \"./" + model.Module + "/" + fileSystem.GetFileNameWithoutExtension(file) + "\"\n";
+
+            if (fileSystem.FileExists(path))
+            {
+                var current = fileSystem.ReadAllText(path);
+                
+                if(!current.Contains(text))
+                {
+                    fileSystem.WriteAllText(path, current + text);
+                }
+            }
+            else
+            {
+                fileSystem.WriteAllText(path, text);
+            }
         }
 
         private void GenerateStyle()

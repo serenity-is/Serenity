@@ -80,7 +80,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the interval minutes, default is 5 mins.
+        /// Gets or sets the interval minutes, default is 5 minutes.
         /// </summary>
         /// <value>
         /// The interval minutes.

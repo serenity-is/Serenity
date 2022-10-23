@@ -1,22 +1,19 @@
-﻿using Serenity;
-using Serenity.ComponentModel;
-using Serenity.Data;
-using Serenity.Data.Mapping;
-using System;
-using System.ComponentModel;
-using System.IO;
+﻿{{USING "Serenity.ComponentModel" }}
+{{USING "Serenity.Data" }}
+{{USING "Serenity.Data.Mapping" }}
+{{USING "System.ComponentModel" }}
 
-namespace {{RootNamespace}}{{DotModule}}
+{{NAMESPACE RootNamespaceDotModule}}
 {
     [ConnectionKey("{{ConnectionKey}}"){{if Module}}, Module("{{Module}}"){{end}}, TableName("{{SchemaAndTable}}")]
     [DisplayName("{{Title}}"), InstanceName("{{Title}}")]
     [ReadPermission("{{Permission}}")]
     [ModifyPermission("{{Permission}}")]
-    public sealed class {{RowClassName}} : {{RowBaseClassAndInterfaces}}
+    public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
     {
 {{-for x in Fields}}
-        [{{x.Attributes}}]
-        public {{x.PropertyType}} {{x.Ident}}
+        [{{ATTRREF x.AttributeList}}]
+        public {{TYPEREF x.PropertyType}} {{x.Ident}}
         {
             get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this];
             set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this] = value;
@@ -24,8 +21,8 @@ namespace {{RootNamespace}}{{DotModule}}
 {{end}}
 {{-for j in Joins}}
 {{-for k in j.Fields}}
-        [{{k.Attributes}}]
-        public {{k.PropertyType}} {{k.Ident}}
+        [{{ATTRREF k.AttributeList}}]
+        public {{TYPEREF k.PropertyType}} {{k.Ident}}
         {
             get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this];
             set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this] = value;
@@ -57,7 +54,7 @@ namespace {{RootNamespace}}{{DotModule}}
         }
 {{end}}
 
-        public class RowFields : {{FieldsBaseClass}}
+        public class RowFields : {{TYPEREF FieldsBaseClass}}
         {
 {{-for x in Fields}}
             public {{x.FieldType}}Field {{x.Ident}};

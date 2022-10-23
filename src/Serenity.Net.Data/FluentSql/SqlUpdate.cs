@@ -27,7 +27,7 @@ namespace Serenity.Data
         /// <summary>
         ///   Creates a new SqlUpdate query.</summary>
         /// <param name="tableName">
-        ///   Tablename (required).</param>
+        ///   Table name (required).</param>
         public SqlUpdate(string tableName)
         {
             Initialize(tableName);
@@ -271,7 +271,7 @@ namespace Serenity.Data
         /// <summary>
         ///   Formats an SQL UPDATE statement.</summary>
         /// <param name="tableName">
-        ///   Tablename (required).</param>
+        ///   Table name (required).</param>
         /// <param name="nameValuePairs">
         ///   Field name and values. Should have structure of <c>[field1, value1, field2, value2, ...., fieldN, valueN]</c>.
         ///   This array is required and must have even number of elements.</param>

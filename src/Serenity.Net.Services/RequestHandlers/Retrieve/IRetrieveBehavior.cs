@@ -23,7 +23,7 @@
         /// <param name="handler">Calling retrieve request handler</param>
         void OnBeforeExecuteQuery(IRetrieveRequestHandler handler);
 
-        /// <summary>Called after qery is sent to database</summary>
+        /// <summary>Called after query is sent to database</summary>
         /// <param name="handler">Calling retrieve request handler</param>
         void OnAfterExecuteQuery(IRetrieveRequestHandler handler);
 

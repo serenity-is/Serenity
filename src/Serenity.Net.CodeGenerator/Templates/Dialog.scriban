@@ -1,8 +1,7 @@
 ﻿
 namespace {{RootNamespace}}{{DotModule}} {
 
-    @Serenity.Decorators.registerClass(){{if CustomSettings.MaximizableDialog}}
-    @Serenity.Decorators.maximizable(){{end}}
+    @Serenity.Decorators.registerClass('{{RootNamespace}}{{DotModule}}.{{ClassName}}Dialog')
     export class {{ClassName}}Dialog extends Serenity.EntityDialog<{{RowClassName}}, any> {
         protected getFormKey() { return {{ClassName}}Form.formKey; }{{if Identity}}
         protected getIdProperty() { return {{RowClassName}}.idProperty; }{{end}}
@@ -14,11 +13,5 @@ namespace {{RootNamespace}}{{DotModule}} {
         protected getUpdatePermission() { return {{RowClassName}}.updatePermission; }
 
         protected form = new {{ClassName}}Form(this.idPrefix);
-{{if CustomSettings.MaximizableDialog}}
-
-        onDialogOpen() {
-            super.onDialogOpen();
-            this.element.closest(".ui-dialog").find(".ui-icon-maximize-window").click();
-        }{{end}}
     }
 }

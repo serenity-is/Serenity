@@ -14,8 +14,7 @@
         public static readonly DateTimeFormatInfo DateTimeFormat;
 
         /// <summary>
-        ///   Statik DataHelper contructor'ı. Varsayılan bağlantı string'i ve bağlantı kültürü parametlerini
-        ///   initialize eder.
+        ///   Constructor of the static DataHelper. Initializes default connection string and connection culture.
         /// </summary>
         static Invariants()
         {

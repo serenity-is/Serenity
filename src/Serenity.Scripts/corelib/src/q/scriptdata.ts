@@ -228,19 +228,41 @@ export async function reloadLookupAsync(key: string): Promise<any> {
     return await ScriptData.reloadAsync('Lookup.' + key);
 }
 
+interface PropertyItemsData {
+    items: PropertyItem[];
+    additionalItems: PropertyItem[];
+    type: "form" | "columns";
+}
+
 export function getColumns(key: string): PropertyItem[] {
+    return getColumnsData(key).items;
+}
+
+export function getColumnsData(key: string): PropertyItemsData {
     return ScriptData.ensure('Columns.' + key);
 }
 
 export async function getColumnsAsync(key: string): Promise<PropertyItem[]> {
-    return await ScriptData.ensureAsync('Columns.' + key);
+    return (await getColumnsDataAsync(key)).items;
+}
+
+export async function getColumnsDataAsync(key: string): Promise<PropertyItemsData> {
+    return ScriptData.ensureAsync('Columns.' + key);
 }
 
 export function getForm(key: string): PropertyItem[] {
+    return getFormData(key).items;
+}
+
+export function getFormData(key: string): PropertyItemsData {
     return ScriptData.ensure('Form.' + key);
 }
 
 export async function getFormAsync(key: string): Promise<PropertyItem[]> {
+    return (await getFormDataAsync(key)).items;
+}
+
+export async function getFormDataAsync(key: string): Promise<PropertyItemsData> {
     return await ScriptData.ensureAsync('Form.' + key);
 }
 
