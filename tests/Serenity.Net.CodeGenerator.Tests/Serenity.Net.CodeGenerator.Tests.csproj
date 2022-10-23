@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-	  <ProjectReference Include="..\..\src\Serenity.Net.CodeGenerator\Serenity.Net.CodeGenerator.csproj" />
-	  <ProjectReference Include="..\..\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
+    <ProjectReference Include="..\..\src\Serenity.Net.CodeGenerator\Serenity.Net.CodeGenerator.csproj" />
+    <ProjectReference Include="..\..\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
     <ProjectReference Include="..\Serenity.Net.Core.Tests\Serenity.Net.Core.Tests.csproj" />
   </ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="CSharpMinifier" Version="1.2.1" />
-	</ItemGroup>
-</Project>
+  <ItemGroup>
+    <PackageReference Include="CSharpMinifier" Version="1.2.1" />
+  </ItemGroup>
+</Project> 
