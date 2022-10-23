@@ -2,9 +2,9 @@
 
 namespace Serenity.Tests.Web;
 
-public partial class ImageUploadBehaviorTests
+public partial class MultipleFileUploadBehaviorTests
 {
-    public class TestRow : Row<TestRow.RowFields>
+    public class MultipleTestRow : Row<MultipleTestRow.RowFields>
     {
         [Identity]
         public int? Id
@@ -13,20 +13,20 @@ public partial class ImageUploadBehaviorTests
             set => fields.Id[this] = value;
         }
 
-        [ImageUploadEditor]
+        [MultipleImageUploadEditor]
         public string StringFieldImageUploadEditor
         {
             get => fields.StringFieldImageUploadEditor[this];
             set => fields.StringFieldImageUploadEditor[this] = value;
         }
 
-        [ImageUploadEditor(DisableDefaultBehavior = true)]
+        [MultipleImageUploadEditor(DisableDefaultBehavior = true)]
         public string ImageUploadEditorDisableDefaultBehavior
         {
             get => fields.ImageUploadEditorDisableDefaultBehavior[this];
             set => fields.ImageUploadEditorDisableDefaultBehavior[this] = value;
         }
-        
+
         public class RowFields : RowFieldsBase
         {
             public Int32Field Id;
@@ -35,8 +35,17 @@ public partial class ImageUploadBehaviorTests
         }
     }
 
-    [TableName("dbo.[Test]")]
-    public class TestIIdRow : Row<TestIIdRow.RowFields>, IIdRow
+    class MultipleCustomEditorImageUploadEditorAttribute : ImageUploadEditorAttribute
+    {
+        public override bool IsMultiple => true;
+
+        public MultipleCustomEditorImageUploadEditorAttribute(string editorType)
+            : base(editorType)
+        {
+        }
+    }
+
+    public class MultipleTestIIdRow : Row<MultipleTestIIdRow.RowFields>, IIdRow
     {
         [Identity]
         public int? Id
@@ -52,18 +61,25 @@ public partial class ImageUploadBehaviorTests
             set => fields.Name[this] = value;
         }
 
-        [ImageUploadEditor]
+        [MultipleImageUploadEditor]
         public string StringFieldImageUploadEditor
         {
             get => fields.StringFieldImageUploadEditor[this];
             set => fields.StringFieldImageUploadEditor[this] = value;
         }
 
-        [ImageUploadEditor]
+        [MultipleImageUploadEditor]
         public int? IntegerFieldImageUploadEditor
         {
             get => fields.IntegerFieldImageUploadEditor[this];
             set => fields.IntegerFieldImageUploadEditor[this] = value;
+        }
+
+        [MultipleCustomEditorImageUploadEditor("MultipleImageUpload")]
+        public string ImageUploadEditorCorrectEditorType
+        {
+            get => fields.ImageUploadEditorCorrectEditorType[this];
+            set => fields.ImageUploadEditorCorrectEditorType[this] = value;
         }
 
         [Expression("(SELECT 'TEST')")]
@@ -72,57 +88,36 @@ public partial class ImageUploadBehaviorTests
             get => fields.StringFieldExpression[this];
             set => fields.StringFieldExpression[this] = value;
         }
-        
-        [Expression("(SELECT 123)")]
-        public int? IntegerFieldExpression
-        {
-            get => fields.IntegerFieldExpression[this];
-            set => fields.IntegerFieldExpression[this] = value;
-        }
 
-        [ImageUploadEditor(FilenameFormat = "Test/|StringFieldExpression|")]
+        [MultipleImageUploadEditor(FilenameFormat = "Test/|StringFieldExpression|")]
         public string ImageUploadEditorReplaceField
         {
             get => fields.ImageUploadEditorReplaceField[this];
             set => fields.ImageUploadEditorReplaceField[this] = value;
         }
 
-        [ImageUploadEditor(FilenameFormat = "Test/||")]
+        [MultipleImageUploadEditor(FilenameFormat = "Test/||")]
         public string ImageUploadEditorInvalidReplaceField
         {
             get => fields.ImageUploadEditorInvalidReplaceField[this];
             set => fields.ImageUploadEditorInvalidReplaceField[this] = value;
         }
-        
-        [ImageUploadEditor(FilenameFormat = "Test/|ThisFieldDoesntExist|")]
+
+        [MultipleImageUploadEditor(FilenameFormat = "Test/|ThisFieldDoesntExist|")]
         public string ImageUploadEditorReplaceFieldNoField
         {
             get => fields.ImageUploadEditorReplaceFieldNoField[this];
             set => fields.ImageUploadEditorReplaceFieldNoField[this] = value;
         }
 
-        [ImageUploadEditor(OriginalNameProperty = nameof(RowFields.Name))]
+        [MultipleImageUploadEditor(OriginalNameProperty = nameof(RowFields.Name))]
         public string ImageUploadEditorOriginalName
         {
             get => fields.ImageUploadEditorOriginalName[this];
             set => fields.ImageUploadEditorOriginalName[this] = value;
         }
 
-        [ImageUploadEditor(OriginalNameProperty = nameof(RowFields.Id))]
-        public string ImageUploadEditorOriginalNameIntegerField
-        {
-            get => fields.ImageUploadEditorOriginalNameIntegerField[this];
-            set => fields.ImageUploadEditorOriginalNameIntegerField[this] = value;
-        }
-
-        [ImageUploadEditor(OriginalNameProperty = "ThisFieldDoesntExist")]
-        public string ImageUploadEditorOriginalNameNoField
-        {
-            get => fields.ImageUploadEditorOriginalNameNoField[this];
-            set => fields.ImageUploadEditorOriginalNameNoField[this] = value;
-        }
-
-        [ImageUploadEditor(CopyToHistory = true)]
+        [MultipleImageUploadEditor(CopyToHistory = true)]
         public string ImageUploadEditorCopyToHistory
         {
             get => fields.ImageUploadEditorCopyToHistory[this];
@@ -135,19 +130,17 @@ public partial class ImageUploadBehaviorTests
             public StringField Name;
             public StringField StringFieldImageUploadEditor;
             public Int32Field IntegerFieldImageUploadEditor;
+            public StringField ImageUploadEditorCorrectEditorType;
             public StringField StringFieldExpression;
-            public Int32Field IntegerFieldExpression;
             public StringField ImageUploadEditorReplaceField;
             public StringField ImageUploadEditorInvalidReplaceField;
             public StringField ImageUploadEditorReplaceFieldNoField;
             public StringField ImageUploadEditorOriginalName;
-            public StringField ImageUploadEditorOriginalNameIntegerField;
-            public StringField ImageUploadEditorOriginalNameNoField;
             public StringField ImageUploadEditorCopyToHistory;
         }
     }
 
-    public class TestIIsActiveDeletedRowRow : Row<TestIIsActiveDeletedRowRow.RowFields>, IIdRow, IIsActiveDeletedRow
+    public class MultipleTestIIsActiveDeletedRowRow : Row<MultipleTestIIsActiveDeletedRowRow.RowFields>, IIdRow, IIsActiveDeletedRow
     {
         [Identity]
         public int? Id
@@ -156,7 +149,7 @@ public partial class ImageUploadBehaviorTests
             set => fields.Id[this] = value;
         }
 
-        [ImageUploadEditor]
+        [MultipleImageUploadEditor]
         public string StringFieldImageUploadEditor
         {
             get => fields.StringFieldImageUploadEditor[this];
@@ -179,7 +172,7 @@ public partial class ImageUploadBehaviorTests
         }
     }
 
-    public class TestIIsDeletedRow : Row<TestIIsDeletedRow.RowFields>, IIdRow, IIsDeletedRow
+    public class MultipleTestIIsDeletedRow : Row<MultipleTestIIsDeletedRow.RowFields>, IIdRow, IIsDeletedRow
     {
         [Identity]
         public int? Id
@@ -188,7 +181,7 @@ public partial class ImageUploadBehaviorTests
             set => fields.Id[this] = value;
         }
 
-        [ImageUploadEditor]
+        [MultipleImageUploadEditor]
         public string StringFieldImageUploadEditor
         {
             get => fields.StringFieldImageUploadEditor[this];
@@ -211,7 +204,7 @@ public partial class ImageUploadBehaviorTests
         }
     }
 
-    public class TestIDeleteLogRow : Row<TestIDeleteLogRow.RowFields>, IIdRow, IDeleteLogRow
+    public class MultipleTestIDeleteLogRow : Row<MultipleTestIDeleteLogRow.RowFields>, IIdRow, IDeleteLogRow
     {
         [Identity]
         public int? Id
@@ -220,7 +213,7 @@ public partial class ImageUploadBehaviorTests
             set => fields.Id[this] = value;
         }
 
-        [ImageUploadEditor]
+        [MultipleImageUploadEditor]
         public string StringFieldImageUploadEditor
         {
             get => fields.StringFieldImageUploadEditor[this];

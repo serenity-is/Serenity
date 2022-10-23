@@ -1,15 +1,15 @@
-﻿using System.IO;
-using Serenity.ComponentModel;
+﻿using Serenity.ComponentModel;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
+using MockFileData = System.IO.Abstractions.TestingHelpers.MockFileData;
 
 namespace Serenity.Tests.Web;
 
-public partial class ImageUploadBehaviorTests
+public partial class FileUploadBehaviorTests
 {
-    private MockTextLocalizer localizer { get; } = new();
+    private readonly MockTextLocalizer localizer = new();
 
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenRowIsNull()
@@ -222,7 +222,7 @@ public partial class ImageUploadBehaviorTests
         };
 
         Assert.NotEmpty(mockFileSystem.AllFiles);
-        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.Path.GetFileName),
+        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName),
             x1 => Assert.Equal("old.jpg", x1),
             x2 => Assert.Equal("new.jpg", x2));
 
@@ -265,13 +265,13 @@ public partial class ImageUploadBehaviorTests
         };
 
         Assert.NotEmpty(mockFileSystem.AllFiles);
-        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.Path.GetFileName),
+        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName),
             x1 => Assert.Equal("new.jpg", x1));
 
         sut.OnBeforeSave(requestHandler);
         uow.Commit();
 
-        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.Path.GetFileName),
+        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName),
             x1 => Assert.Equal("new.jpg", x1));
     }
 
@@ -308,7 +308,7 @@ public partial class ImageUploadBehaviorTests
         };
 
         Assert.NotEmpty(mockFileSystem.AllFiles);
-        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.Path.GetFileName),
+        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName),
             x1 => Assert.Equal("old.jpg", x1));
 
         sut.OnBeforeSave(requestHandler);
@@ -583,13 +583,13 @@ public partial class ImageUploadBehaviorTests
             UnitOfWork = uow
         };
 
-        var fileName = Path.GetFileName(Assert.Single(mockFileSystem.AllFiles));
+        var fileName = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles));
 
         sut.OnBeforeSave(requestHandler);
         uow.Commit();
 
-        var newFile = Path.GetFileName(Assert.Single(mockFileSystem.AllFiles));
-        var rowFileName = Path.GetFileName(row.StringFieldImageUploadEditor);
+        var newFile = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles));
+        var rowFileName = mockFileSystem.GetFileName(row.StringFieldImageUploadEditor);
 
         if (!isUpdate)
         {
@@ -779,8 +779,8 @@ public partial class ImageUploadBehaviorTests
         sut.OnAfterSave(requestHandler);
         uow.Commit();
 
-        var newFile = Path.GetFileName(Assert.Single(mockFileSystem.AllFiles));
-        var rowFileName = Path.GetFileName(row.StringFieldImageUploadEditor);
+        var newFile = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles));
+        var rowFileName = mockFileSystem.GetFileName(row.StringFieldImageUploadEditor);
 
         if (!isUpdate)
         {
@@ -835,7 +835,7 @@ public partial class ImageUploadBehaviorTests
         sut.OnAfterSave(requestHandler);
         uow.Commit();
 
-        var newFile = Path.GetFileName(Assert.Single(mockFileSystem.AllFiles));
+        var newFile = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles));
         
         Assert.NotNull(dbCommand);
         var updateStatement = (TSQL.Statements.TSQLUpdateStatement)Assert.Single(TSQL.TSQLStatementReader.ParseStatements(dbCommand.CommandText));
@@ -847,7 +847,7 @@ public partial class ImageUploadBehaviorTests
         Assert.Equal(nameof(TestIIdRow.StringFieldImageUploadEditor), updateStatement.Set.Tokens[1].Text);
         Assert.Equal("=", updateStatement.Set.Tokens[2].Text);
         Assert.Equal("@p1", updateStatement.Set.Tokens[3].Text);
-        Assert.Equal(newFile, Path.GetFileName(((IDbDataParameter)dbCommand.Parameters[0]!).Value as string));
+        Assert.Equal(newFile, mockFileSystem.GetFileName(((IDbDataParameter)dbCommand.Parameters[0]!).Value as string));
         
         Assert.Equal("Id", updateStatement.Where.Tokens[2].Text);
         Assert.Equal("=", updateStatement.Where.Tokens[3].Text);
@@ -1162,7 +1162,7 @@ public partial class ImageUploadBehaviorTests
     private static byte[] CreateImage(int width, int height, IImageFormat format = null, Configuration configuration = null, Rgba32? color = null)
     {
         using var image = new Image<Rgba32>(configuration ?? Configuration.Default, width, height, color ?? new Rgba32(255, 255, 255));
-        using var stream = new MemoryStream();
+        using var stream = new System.IO.MemoryStream();
 
         image.Save(stream, format ?? PngFormat.Instance);
 

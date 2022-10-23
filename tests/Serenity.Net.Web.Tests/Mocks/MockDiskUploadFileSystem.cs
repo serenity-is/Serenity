@@ -1,34 +1,12 @@
-﻿using System.IO;
-using Serenity.IO;
-
-namespace Serenity.Tests;
+﻿namespace Serenity.Tests;
 
 public class MockDiskUploadFileSystem : MockFileSystem, IDiskUploadFileSystem
 {
-    public MockDiskUploadFileSystem(IDictionary<string, MockFileData> files, string currentDirectory = "")
-        : base(files, currentDirectory)
+    public MockDiskUploadFileSystem(string currentDirectory = "")
+        : base(currentDirectory)
     {
     }
     
-    public bool DirectoryExists(string path)
-    {
-        return Directory.Exists(path);
-    }
-
-    public void CopyFile(System.IO.Stream sourceStream, string destPath, bool overwrite)
-    {
-        if (FileExists(destPath) && !overwrite)
-            return;
-
-        using var stream = File.Open(destPath, System.IO.FileMode.Create);
-        sourceStream.CopyTo(stream);
-    }
-
-    public void CreateDirectory(string path)
-    {
-        Directory.CreateDirectory(path);
-    }
-
     public void TryDeleteMarkedFiles(string folderPath)
     {
         if (!Directory.Exists(folderPath))
@@ -39,7 +17,7 @@ public class MockDiskUploadFileSystem : MockFileSystem, IDiskUploadFileSystem
             try
             {
                 string readLine;
-                using (var sr = new StreamReader(File.OpenRead(name)))
+                using (var sr = new System.IO.StreamReader(OpenRead(name)))
                     readLine = sr.ReadToEnd();
                 var actualFile = name[..^7];
                 if (File.Exists(actualFile))
@@ -60,25 +38,20 @@ public class MockDiskUploadFileSystem : MockFileSystem, IDiskUploadFileSystem
         }
     }
 
-    private void Delete(string path)
-    {
-        File.Delete(path);
-    }
-
     private void TryDelete(string path)
     {
         if (File.Exists(path))
-            Delete(path);
+            DeleteFile(path);
     }
 
-    public void Delete(string path, DeleteType deleteType)
+    public void Delete(string path, Serenity.IO.DeleteType deleteType)
     {
-        if (deleteType == DeleteType.Delete)
-            Delete(path);
-        else if (deleteType == DeleteType.TryDelete)
+        if (deleteType == Serenity.IO.DeleteType.Delete)
+            DeleteFile(path);
+        else if (deleteType == Serenity.IO.DeleteType.TryDelete)
             TryDelete(path);
         else
-            TryDeleteOrMark(path);   
+            TryDeleteOrMark(path);
     }
 
     public void TryDeleteOrMark(string path)
@@ -99,28 +72,8 @@ public class MockDiskUploadFileSystem : MockFileSystem, IDiskUploadFileSystem
         }
     }
 
-    public string ReadAllText(string path)
+    public void PurgeDirectory(string directoryToClean, TimeSpan? autoExpireTime = null, int? maxFilesInDirectory = null, string checkFileName = null)
     {
-        return File.ReadAllText(path);
-    }
-
-    public void WriteAllText(string path, string content)
-    {
-        File.WriteAllText(path, content);
-    }
-
-    public string[] DirectoryGetFiles(string path, string searchPattern, System.IO.SearchOption searchOption)
-    {
-        return Directory.GetFiles(path, searchPattern, searchOption);
-    }
-
-    public long GetFileSize(string path)
-    {
-        return FileInfo.FromFileName(path).Length;
-    }
-
-    public System.IO.Stream FileOpenRead(string path)
-    {
-        return File.OpenRead(path);
+        // not implemented
     }
 }

@@ -2,13 +2,13 @@
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
-using System.IO;
+using MockFileData = System.IO.Abstractions.TestingHelpers.MockFileData;
 
 namespace Serenity.Tests.Web;
 
-public partial class MultipleImageUploadBehaviorTests
+public partial class MultipleFileUploadBehaviorTests
 {
-    private MockTextLocalizer localizer { get; } = new();
+    private readonly MockTextLocalizer localizer = new();
 
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenRowIsNull()
@@ -551,8 +551,8 @@ public partial class MultipleImageUploadBehaviorTests
         sut.OnAfterSave(requestHandler);
         uow.Commit();
 
-        var newFile = mockFileSystem.AllFiles.Select(x => Path.GetFileName(x)).ToList();
-        var rowFileName = JSON.Parse<UploadedFile[]>(row.StringFieldImageUploadEditor).Select(x => Path.GetFileName(x.Filename));
+        var newFile = mockFileSystem.AllFiles.Select(x => mockFileSystem.Path.GetFileName(x)).ToList();
+        var rowFileName = JSON.Parse<UploadedFile[]>(row.StringFieldImageUploadEditor).Select(x => mockFileSystem.Path.GetFileName(x.Filename));
 
         if (!isUpdate)
         {
@@ -707,7 +707,7 @@ public partial class MultipleImageUploadBehaviorTests
     private static byte[] CreateImage(int width, int height, IImageFormat format = null, Configuration configuration = null, Rgba32? color = null)
     {
         using var image = new Image<Rgba32>(configuration ?? Configuration.Default, width, height, color ?? new Rgba32(255, 255, 255));
-        using var stream = new MemoryStream();
+        using var stream = new System.IO.MemoryStream();
 
         image.Save(stream, format ?? PngFormat.Instance);
 

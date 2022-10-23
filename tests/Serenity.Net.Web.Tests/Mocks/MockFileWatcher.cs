@@ -4,9 +4,9 @@ public class MockFileWatcher : IFileWatcher
 {
     private Action<string> changed;
 
-    public IFileSystem FileSystem { get; }
+    public System.IO.Abstractions.IFileSystem FileSystem { get; }
 
-    public MockFileWatcher(IFileSystem fileSystem, string path, string filter)
+    public MockFileWatcher(System.IO.Abstractions.IFileSystem fileSystem, string path, string filter)
     {
         if (filter == null)
             throw new ArgumentNullException(nameof(filter));

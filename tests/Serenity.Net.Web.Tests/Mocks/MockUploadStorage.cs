@@ -5,8 +5,8 @@ public class MockUploadStorage : DiskUploadStorage
     public MockDiskUploadFileSystem MockFileSystem { get; }
     
     public MockUploadStorage(DiskUploadStorageOptions options,
-        MockDiskUploadFileSystem fileSystem = null) :
-        base(options, fileSystem)
+        MockDiskUploadFileSystem fileSystem) :
+        base(options, fileSystem ?? throw new ArgumentNullException(nameof(fileSystem)))
     {
         MockFileSystem = fileSystem;
     }
@@ -17,6 +17,6 @@ public class MockUploadStorage : DiskUploadStorage
         {
             RootPath = "C:/",
             RootUrl = "/upload/"
-        }, new MockDiskUploadFileSystem(null, "C:/"));
+        }, new MockDiskUploadFileSystem(currentDirectory: "C:/"));
     }
 }

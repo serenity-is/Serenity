@@ -1,12 +1,12 @@
-﻿using System.IO;
-using Serenity.ComponentModel;
+﻿using Serenity.ComponentModel;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
+using MockFileData = System.IO.Abstractions.TestingHelpers.MockFileData;
 
 namespace Serenity.Tests.Web;
 
-public partial class ImageUploadBehaviorTests
+public partial class FileUploadBehaviorTests
 {
     [Fact]
     public void Throws_WhenStorageIsNull()
@@ -67,7 +67,7 @@ public partial class ImageUploadBehaviorTests
     [Fact]
     public void Throws_WhenFileNameContainsInvalidChars()
     {
-        var invalidChars = Path.GetInvalidFileNameChars()
+        var invalidChars = System.IO.Path.GetInvalidFileNameChars()
             .Where(x => x != '/' && x != '\\').ToArray();
 
         var attr = new ImageUploadEditorAttribute();
@@ -508,9 +508,9 @@ public partial class ImageUploadBehaviorTests
             temporaryFile: ref fileName,
             logger: null);
 
-        var originalFileNameWithoutExt = Path.GetFileNameWithoutExtension(originalFile);
+        var originalFileNameWithoutExt = mockFileSystem.GetFileNameWithoutExtension(originalFile);
 
-        Assert.Collection(mockFileSystem.AllFiles.Except(new[] {originalFile}).Select(Path.GetFileName).OrderBy(fn => fn),
+        Assert.Collection(mockFileSystem.AllFiles.Except(new[] {originalFile}).Select(mockFileSystem.GetFileName).OrderBy(fn => fn),
             x => Assert.Equal($"{originalFileNameWithoutExt}_t100x100.jpg", x),
             x => Assert.Equal($"{originalFileNameWithoutExt}_t200x200.jpg", x));
     }

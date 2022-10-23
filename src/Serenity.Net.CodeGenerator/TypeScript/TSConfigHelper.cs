@@ -1,5 +1,4 @@
-﻿using Serenity.IO;
-using System.Threading;
+﻿using System.Threading;
 #if ISSOURCEGENERATOR
 using Newtonsoft.Json;
 #else
@@ -99,8 +98,8 @@ namespace Serenity.CodeGenerator
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var includeGlob = new GlobFilter(includePatterns);
-            var excludeGlob = new GlobFilter(excludePatterns);
+            var includeGlob = new IO.GlobFilter(includePatterns);
+            var excludeGlob = new IO.GlobFilter(excludePatterns);
 
             var allTsFiles = fileSystem.GetFiles(rootDir, "*.ts", recursive: true)
                 .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||

@@ -2,16 +2,16 @@
 
 public class MockHostEnvironment : IWebHostEnvironment
 {
-    public IFileSystem FileSystem { get; }
+    public System.IO.Abstractions.IFileSystem FileSystem { get; }
     public string WebRootPath { get; set; }
     public IFileProvider WebRootFileProvider { get; set; }
     public string ApplicationName { get; set; }
     public IFileProvider ContentRootFileProvider { get; set; }
     public string ContentRootPath { get; set; }
     public string EnvironmentName { get; set; }
-    public IPath Path => FileSystem.Path;
-    public IFile File => FileSystem.File;
-    public IDirectory Directory => FileSystem.Directory;
+    public System.IO.Abstractions.IPath Path => FileSystem.Path;
+    public System.IO.Abstractions.IFile File => FileSystem.File;
+    public System.IO.Abstractions.IDirectory Directory => FileSystem.Directory;
 
     public void AddWebFile(string path, string text)
     {
@@ -20,7 +20,7 @@ public class MockHostEnvironment : IWebHostEnvironment
         File.WriteAllText(file, text);
     }
 
-    public MockHostEnvironment(string root = @"C:\Testing\Test\", IFileSystem fileSystem = null)
+    public MockHostEnvironment(string root = @"C:\Testing\Test\", System.IO.Abstractions.IFileSystem fileSystem = null)
     {
         EnvironmentName = "Development";
         ApplicationName = "Test";

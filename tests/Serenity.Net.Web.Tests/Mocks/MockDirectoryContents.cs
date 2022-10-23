@@ -4,7 +4,7 @@ namespace Serenity.Tests;
 
 public class MockDirectoryContents : IDirectoryContents
 {
-    public MockDirectoryContents(IFileSystem fileSystem, string path)
+    public MockDirectoryContents(System.IO.Abstractions.IFileSystem fileSystem, string path)
     {
         FileSystem = fileSystem;
         Path = path;
@@ -12,7 +12,7 @@ public class MockDirectoryContents : IDirectoryContents
 
     public bool Exists => FileSystem.Directory.Exists(Path);
 
-    public IFileSystem FileSystem { get; }
+    public System.IO.Abstractions.IFileSystem FileSystem { get; }
     public string Path { get; }
 
     public IEnumerator<Microsoft.Extensions.FileProviders.IFileInfo> GetEnumerator()

@@ -2,14 +2,14 @@
 
 public class MockFileInfo : Microsoft.Extensions.FileProviders.IFileInfo
 {
-    public MockFileInfo(IFileSystem fileSystem, string path, bool isDirectory)
+    public MockFileInfo(System.IO.Abstractions.IFileSystem fileSystem, string path, bool isDirectory)
     {
         FileSystem = fileSystem;
         Path = path;
         IsDirectory = isDirectory;
     }
 
-    public IFileSystem FileSystem { get; }
+    public System.IO.Abstractions.IFileSystem FileSystem { get; }
     public string Path { get; }
 
     public bool Exists => IsDirectory ? FileSystem.Directory.Exists(Path) : FileSystem.File.Exists(Path);
