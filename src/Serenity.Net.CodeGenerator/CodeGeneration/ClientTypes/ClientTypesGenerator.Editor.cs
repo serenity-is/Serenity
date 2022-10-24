@@ -8,10 +8,10 @@
             sb.Append(name);
 
             bool isLookupEditor = HasBaseType(type, "Serenity.LookupEditorBase`1") ||
-                HasBaseType(type, "Serenity.LookupEditorBase");
+                HasBaseType(type, "Serenity.LookupEditorBase", "@serenity-is/corelib:LookupEditorBase", "LookupEditorBase");
 
             bool isServiceLookupEditor = HasBaseType(type, "Serenity.ServiceLookupEditorBase`1") ||
-                HasBaseType(type, "Serenity.ServiceLookupEditorBase");
+                HasBaseType(type, "Serenity.ServiceLookupEditorBase", "@serenity-is/corelib:ServiceLookupEditorBase", "ServiceLookupEditorBase");
 
             sb.Append(" : ");
             sb.AppendLine(isLookupEditor ? "LookupEditorBaseAttribute" : 
