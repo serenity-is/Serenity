@@ -2574,7 +2574,7 @@ declare namespace Serenity {
     class IValidateRequired {
     }
 
-    const enum CaptureOperationType {
+    enum CaptureOperationType {
         Before = 0,
         Delete = 1,
         Insert = 2,
@@ -3039,7 +3039,7 @@ declare namespace Serenity {
         updateInterface(): void;
         enumerateItems(callback: (p1: Q.PropertyItem, p2: Widget<any>) => void): void;
     }
-    const enum PropertyGridMode {
+    enum PropertyGridMode {
         insert = 1,
         update = 2
     }

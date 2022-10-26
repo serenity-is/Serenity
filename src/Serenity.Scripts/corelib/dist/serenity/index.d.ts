@@ -200,7 +200,7 @@ interface IValidateRequired {
 declare class IValidateRequired {
 }
 
-declare const enum CaptureOperationType {
+declare enum CaptureOperationType {
     Before = 0,
     Delete = 1,
     Insert = 2,
@@ -681,7 +681,7 @@ declare class PropertyGrid extends Widget<PropertyGridOptions> {
     updateInterface(): void;
     enumerateItems(callback: (p1: PropertyItem, p2: Widget<any>) => void): void;
 }
-declare const enum PropertyGridMode {
+declare enum PropertyGridMode {
     insert = 1,
     update = 2
 }

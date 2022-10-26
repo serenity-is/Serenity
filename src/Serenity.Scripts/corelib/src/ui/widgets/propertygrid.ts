@@ -626,7 +626,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
     }
 }
 
-export const enum PropertyGridMode {
+export enum PropertyGridMode {
     insert = 1,
     update = 2
 }

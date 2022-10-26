@@ -1,6 +1,6 @@
 ﻿export {}
 
-export const enum CaptureOperationType {
+export enum CaptureOperationType {
     Before = 0,
     Delete = 1,
     Insert = 2,
