@@ -295,7 +295,7 @@ namespace Serenity.CodeGeneration
 
             if (module)
             {
-                var prefixedContext = ImportFromSerenity("PrefixedContext");
+                var prefixedContext = ImportFromCorelib("PrefixedContext");
                 sb.Append($" extends {prefixedContext}");
             }
             else

@@ -582,7 +582,7 @@ namespace Serenity.CodeGeneration
                     if (idx >= 0)
                         importName = importName[..idx];
 
-                    name = ImportFromSerenity(importName) +
+                    name = ImportFromCorelib(importName) +
                         (idx >= 0 ? name[idx..] : "");
                     ns = "";
                 }
@@ -1051,16 +1051,6 @@ namespace Serenity.CodeGeneration
         protected string ImportFromCorelib(string name)
         {
             return AddExternalImport("@serenity-is/corelib", name);
-        }
-
-        protected string ImportFromSerenity(string name)
-        {
-            return AddExternalImport("@serenity-is/corelib", name);
-        }
-
-        protected string ImportFromSlick(string name)
-        {
-            return AddExternalImport("@serenity-is/corelib/slick", name);
         }
 
         protected string AddExternalImport(string from, string name)

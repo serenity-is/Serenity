@@ -29,16 +29,6 @@ namespace Serenity.CodeGenerator
             return AddExternalImport("@serenity-is/corelib", name);
         }
 
-        protected string ImportFromSerenity(string name)
-        {
-            return AddExternalImport("@serenity-is/corelib", name);
-        }
-
-        protected string ImportFromSlick(string name)
-        {
-            return AddExternalImport("@serenity-is/corelib/slick", name);
-        }
-
         protected string AddExternalImport(string from, string name)
         {
             return AddModuleImport(from, name, external: true);

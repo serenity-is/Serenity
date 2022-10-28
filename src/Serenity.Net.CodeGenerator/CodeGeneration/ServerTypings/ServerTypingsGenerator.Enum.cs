@@ -43,7 +43,7 @@
 
             if (module)
             {
-                var decorators = ImportFromSerenity("Decorators");
+                var decorators = ImportFromCorelib("Decorators");
                 cw.Indented($"{decorators}.registerEnumType(");
             }
             else
