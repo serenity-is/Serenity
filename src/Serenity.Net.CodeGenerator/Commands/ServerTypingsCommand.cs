@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Serenity.CodeGeneration;
+using System.IO;
 
 namespace Serenity.CodeGenerator
 {
@@ -147,17 +148,17 @@ namespace Serenity.CodeGenerator
                 PathHelper.ToPath((config.ServerTypings?.OutDir.TrimToNull() ?? 
                     (modules ? "Modules/ServerTypes" : "Imports/ServerTypings"))));
 
+            generator.ModuleTypings = modules && config?.ServerTypings?.ModuleTypings != false;
+            generator.NamespaceTypings = !modules && config?.ServerTypings?.NamespaceTypings != false;
+
             if (modules)
             {
                 var modulesDir = fileSystem.Combine(projectDir, "Modules");
                 var rootNsDir = fileSystem.Combine(projectDir, config.RootNamespace);
                 if (fileSystem.DirectoryExists(rootNsDir) &&
-                    !fileSystem.DirectoryExists(modulesDir))
-                {
-                    modulesDir = rootNsDir;
-                    if (generator.ModuleTypings)
-                        outDir = config.RootNamespace + "/ServerTypes";
-                }
+                    (!fileSystem.DirectoryExists(modulesDir) ||
+                     !fileSystem.GetFiles(modulesDir, "*.*").Any()))
+                    outDir = Path.Combine(rootNsDir, "ServerTypes");
             }
 
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -166,8 +167,6 @@ namespace Serenity.CodeGenerator
             Console.WriteLine(outDir);
 
             generator.RootNamespaces.Add(config.RootNamespace);
-            generator.ModuleTypings = modules && config?.ServerTypings?.ModuleTypings != false;
-            generator.NamespaceTypings = !modules && config?.ServerTypings?.NamespaceTypings != false;
 
             foreach (var type in tsTypes)
                 generator.AddTSType(type);
