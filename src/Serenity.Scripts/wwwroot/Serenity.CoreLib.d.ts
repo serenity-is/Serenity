@@ -2014,7 +2014,7 @@ declare namespace Slick {
     	private invalidatePostProcessingResults;
     	private updateRowPositions;
     	private updateGrandTotals;
-    	private render;
+    	render: () => void;
     	private handleHeaderRowScroll;
     	private handleFooterRowScroll;
     	private handleMouseWheel;
@@ -2324,13 +2324,6 @@ declare namespace Slick {
         rowsPerPageOptions?: number[];
         onChangePage?: (newPage: number) => void;
         onRowsPerPageChange?: (n: number) => void;
-    }
-    class RowSelectionModel implements SelectionModel {
-        init(grid: Grid): void;
-        destroy?: () => void;
-        setSelectedRanges(ranges: Range[]): void;
-        onSelectedRangesChanged: Slick.Event<Range[]>;
-        refreshSelections?(): void;
     }
     interface SummaryOptions {
         aggregators: any[];
@@ -5106,5 +5099,12 @@ declare namespace Slick {
         init(): void;
         onBeforeMoveRows: Slick.Event;
         onMoveRows: Slick.Event;
+    }
+    class RowSelectionModel implements SelectionModel {
+        init(grid: Slick.Grid): void;
+        destroy?: () => void;
+        setSelectedRanges(ranges: Slick.Range[]): void;
+        onSelectedRangesChanged: Slick.Event<Range[]>;
+        refreshSelections?(): void;
     }
 }

@@ -20,7 +20,8 @@ import { IDataGrid } from "./idatagrid";
 import { QuickFilter } from "./quickfilter";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
-import { Column, ColumnSort, Event, FormatterContext, Grid, GridOptions, IPlugin, ItemMetadata } from "@serenity-is/sleekgrid";
+import { Column, ColumnSort, Event, FormatterContext, Grid, GridOptions, IPlugin, ItemMetadata, Range, SelectionModel } from "@serenity-is/sleekgrid";
+export type { Formatter } from "../../slick";
 
 declare global {
     namespace Slick {
@@ -60,6 +61,14 @@ declare global {
             onBeforeMoveRows: Event;
             onMoveRows: Event;
         }
+
+        class RowSelectionModel implements SelectionModel {
+            init(grid: Grid): void;
+            destroy?: () => void;
+            setSelectedRanges(ranges: Range[]): void;
+            onSelectedRangesChanged: Event<Range[]>;
+            refreshSelections?(): void;
+        }        
     }
 }
 

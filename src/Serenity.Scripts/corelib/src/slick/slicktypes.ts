@@ -31,15 +31,6 @@ export interface PagerOptions {
     onChangePage?: (newPage: number) => void;
     onRowsPerPageChange?: (n: number) => void;
 }
-    
-
-export declare class RowSelectionModel implements SelectionModel {
-    init(grid: Grid): void;
-    destroy?: () => void;
-    setSelectedRanges(ranges: Range[]): void;
-    onSelectedRangesChanged: Event<Range[]>;
-    refreshSelections?(): void;
-}
 
 export interface SummaryOptions {
     aggregators: any[];

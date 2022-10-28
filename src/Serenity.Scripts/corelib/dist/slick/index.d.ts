@@ -1,5 +1,5 @@
 /// <reference types="jquery" />
-import { GroupTotals, Column, FormatterContext, Group, SelectionModel, Grid, Range, Event } from '@serenity-is/sleekgrid';
+import { GroupTotals, Column, FormatterContext, Group, Event } from '@serenity-is/sleekgrid';
 import { PropertyItem, ListResponse } from '../q';
 
 declare namespace Aggregators {
@@ -40,13 +40,6 @@ interface PagerOptions {
     rowsPerPageOptions?: number[];
     onChangePage?: (newPage: number) => void;
     onRowsPerPageChange?: (n: number) => void;
-}
-declare class RowSelectionModel implements SelectionModel {
-    init(grid: Grid): void;
-    destroy?: () => void;
-    setSelectedRanges(ranges: Range[]): void;
-    onSelectedRangesChanged: Event<Range[]>;
-    refreshSelections?(): void;
 }
 interface SummaryOptions {
     aggregators: any[];
@@ -166,4 +159,4 @@ declare class RemoteView<TEntity> {
     constructor(options: RemoteViewOptions);
 }
 
-export { AggregateFormatting, Aggregators, CancellableViewCallback, Format, Formatter, GroupInfo, PagerOptions, PagingInfo, PagingOptions, RemoteView, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewOptions, RemoteViewProcessCallback, RowSelectionModel, SummaryOptions };
+export { AggregateFormatting, Aggregators, CancellableViewCallback, Format, Formatter, GroupInfo, PagerOptions, PagingInfo, PagingOptions, RemoteView, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewOptions, RemoteViewProcessCallback, SummaryOptions };
