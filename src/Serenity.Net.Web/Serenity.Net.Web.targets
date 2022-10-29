@@ -9,37 +9,45 @@
           BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
           DependsOnTargets="$(ResolveStaticWebAssetsInputsDependsOn);IncludeTransitiveProjectReferences"
           Condition="'$(RestoreTypings)' != 'false' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">
+    <PropertyGroup>
+      <RestoreTypings Condition="'$(RestoreTypings)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json') And (!Exists('$(MSBuildProjectDirectory)\tsbuild.js') Or Exists('$(MsBuildProjectDirectory)\Namespaces\tsconfig.json'))">true</RestoreTypings>
+      <RestoreNodeTypes Condition="'$(RestoreNodeTypes)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json') And Exists('$(MSBuildProjectDirectory)\tsbuild.js')">true</RestoreNodeTypes>
+    </PropertyGroup>
     <ItemGroup>
       <!--project reference typing, serenity.scripts -->
       <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\Serenity.CoreLib.d.ts"
-                        Condition="'$(RestoreTypings)' != 'false' And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\Serenity.CoreLib.d.ts')">
+                        Condition="'$(RestoreTypings)' == 'true' And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\Serenity.CoreLib.d.ts')">
         <TargetFile>typings\serenity.corelib\index.d.ts</TargetFile>
       </_TypingToRestore>
       <!-- project reference typings all others -->
       <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\index.d.ts"
-                        Condition="'$(RestoreTypings)' != 'false' And '%(ProjectReference.Filename)' != '' And '%(ProjectReference.Filename)' != '$(ProjectName)' And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\index.d.ts')">
+                        Condition="'$(RestoreTypings)' == 'true' And '%(ProjectReference.Filename)' != '' And '%(ProjectReference.Filename)' != '$(ProjectName)' And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\index.d.ts')">
         <TargetFile>typings\%(ProjectReference.Filename)\index.d.ts</TargetFile>
       </_TypingToRestore>
       <!-- nuget package typings from wwwroot -->
       <_TypingToRestore Include="%(StaticWebAsset.RootDir)%(Directory)%(Filename).d.ts"
-                        Condition="'$(RestoreTypings)' != 'false' And '%(StaticWebAsset.SourceType)' == 'Project' And '%(Extension)' == '.js' And Exists('%(RootDir)%(Directory)%(Filename).d.ts') And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('wwwroot/'))">
+                        Condition="'$(RestoreTypings)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Project' And '%(Extension)' == '.js' And Exists('%(RootDir)%(Directory)%(Filename).d.ts') And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('wwwroot/'))">
         <TargetFile Condition="'%(StaticWebAsset.SourceId)' != 'Serenity.Scripts'">typings\%(StaticWebAsset.SourceId)\index.d.ts</TargetFile>
         <TargetFile Condition="'%(StaticWebAsset.SourceId)' == 'Serenity.Scripts'">typings\serenity.corelib\index.d.ts</TargetFile>
       </_TypingToRestore>
       <!-- nuget package typings from typings\**\index.d.ts files -->
       <_TypingToRestore Include="%(StaticWebAsset.RootDir)%(Directory)..\typings\**\index.d.ts"
-                        Condition="'$(RestoreTypings)' != 'false' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/'))">
+                        Condition="'$(RestoreTypings)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/'))">
         <TargetFile Condition="'%(StaticWebAsset.SourceId)' != 'Serenity.Scripts'">typings\%(StaticWebAsset.SourceId)\index.d.ts</TargetFile>
         <TargetFile Condition="'%(StaticWebAsset.SourceId)' == 'Serenity.Scripts'">typings\serenity.corelib\index.d.ts</TargetFile>
       </_TypingToRestore>
       <!-- node modules mock types from project reference dist\index.d.ts files -->
       <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.d.ts"
-                        Condition="'$(RestoreNodeTypes)' != 'false' And '%(ProjectReference.Filename)' != '' And '%(ProjectReference.Filename)' != '$(ProjectName)' And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.d.ts')">
+                        Condition="'$(RestoreNodeTypes)' == 'true' And '%(ProjectReference.Filename)' != '' And '%(ProjectReference.Filename)' != '$(ProjectName)' 
+                        And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.d.ts')
+                        And !Exists('node_modules\@(ProjectReference->'%(Filename)'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant())\package.json')">
         <TargetFile>node_modules\@(ProjectReference->'%(Filename)'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant())\dist\index.d.ts</TargetFile>
       </_TypingToRestore>
       <!-- node modules mock types from package reference dist\index.d.ts files -->
       <_TypingToRestore Include="%(StaticWebAsset.RootDir)%(Directory)..\dist\index.d.ts"
-                        Condition="'$(RestoreNodeTypes)' != 'false' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/')) And Exists('%(StaticWebAsset.RootDir)%(StaticWebAsset.Directory)..\dist\index.d.ts')">
+                        Condition="'$(RestoreNodeTypes)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/')) 
+                        And Exists('%(StaticWebAsset.RootDir)%(StaticWebAsset.Directory)..\dist\index.d.ts')
+                        And !Exists('node_modules\$([System.String]::Copy('%(StaticWebAsset.SourceId)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())\package.json')">
         <TargetFile>node_modules\$([System.String]::Copy('%(StaticWebAsset.SourceId)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())\dist\index.d.ts</TargetFile>
       </_TypingToRestore>
     </ItemGroup>
