@@ -40,14 +40,14 @@
       <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.d.ts"
                         Condition="'$(RestoreNodeTypes)' == 'true' And '%(ProjectReference.Filename)' != '' And '%(ProjectReference.Filename)' != '$(ProjectName)' 
                         And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.d.ts')
-                        And !Exists('node_modules\@(ProjectReference->'%(Filename)'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant())\package.json')">
+                        And !Exists(@(ProjectReference->'node_modules\%(Filename)\package.json'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant()))">
         <TargetFile>node_modules\@(ProjectReference->'%(Filename)'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant())\dist\index.d.ts</TargetFile>
       </_TypingToRestore>
       <!-- node modules mock types from package reference dist\index.d.ts files -->
       <_TypingToRestore Include="%(StaticWebAsset.RootDir)%(Directory)..\dist\index.d.ts"
                         Condition="'$(RestoreNodeTypes)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/')) 
                         And Exists('%(StaticWebAsset.RootDir)%(StaticWebAsset.Directory)..\dist\index.d.ts')
-                        And !Exists('node_modules\$([System.String]::Copy('%(StaticWebAsset.SourceId)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())\package.json')">
+                        And !Exists($([System.String]::Copy('node_modules\%(StaticWebAsset.SourceId)\package.json').Replace('Serenity.', '@serenity-is\').ToLowerInvariant()))">
         <TargetFile>node_modules\$([System.String]::Copy('%(StaticWebAsset.SourceId)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())\dist\index.d.ts</TargetFile>
       </_TypingToRestore>
     </ItemGroup>
