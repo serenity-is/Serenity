@@ -154,11 +154,19 @@ namespace Serenity.CodeGenerator
             if (modules)
             {
                 var modulesDir = fileSystem.Combine(projectDir, "Modules");
-                var rootNsDir = fileSystem.Combine(projectDir, config.RootNamespace);
-                if (fileSystem.DirectoryExists(rootNsDir) &&
-                    (!fileSystem.DirectoryExists(modulesDir) ||
-                     !fileSystem.GetFiles(modulesDir, "*.*").Any()))
-                    outDir = Path.Combine(rootNsDir, "ServerTypes");
+                if (!fileSystem.DirectoryExists(modulesDir) ||
+                    !fileSystem.GetFiles(modulesDir, "*.*").Any())
+                {
+                    var rootNsDir = fileSystem.Combine(projectDir, Path.GetFileName(csproj));
+                    if (fileSystem.DirectoryExists(rootNsDir))
+                        outDir = Path.Combine(rootNsDir, "ServerTypes");
+                    else
+                    {
+                        rootNsDir = fileSystem.Combine(projectDir, config.RootNamespace);
+                        if (fileSystem.DirectoryExists(rootNsDir))
+                            outDir = Path.Combine(rootNsDir, "ServerTypes");
+                    }
+                }
             }
 
             Console.ForegroundColor = ConsoleColor.Cyan;
