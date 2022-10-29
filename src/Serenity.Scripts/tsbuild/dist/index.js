@@ -26,7 +26,9 @@ export const importAsGlobalsMapping = {
 }
 
 export const esbuildOptions = (opt) => {
-    
+
+    opt = Object.assign({}, opt);
+
     var entryPointsRegEx = /(Page|ScriptInit)\.ts$/;
     if (opt.entryPointsRegEx !== undefined) {
         entryPointsRegEx = opt.entryPointsRegEx;
@@ -42,12 +44,28 @@ export const esbuildOptions = (opt) => {
     var entryPoints = opt.entryPoints;
     if (entryPoints === undefined) {
         entryPoints = [];
-        entryPointRoots.forEach(root => 
+        entryPointRoots.forEach(root =>
             scanDir(root)
                 .filter(p => p.match(entryPointsRegEx))
                 .forEach(p => entryPoints.push(root + '/' + p)));
     }
-    
+
+    var splitting = opt.splitting;
+    if (splitting === undefined)
+        splitting = !process.argv.slice(2).some(x => x == "--nosplit");
+
+    var plugins = opt.plugins;
+    if (plugins === undefined) {
+        plugins = [];
+        if ((opt.clean === undefined && splitting) || opt.clean)
+            plugins.push(cleanPlugin());
+        if (opt.importAsGlobals === undefined || opt.importAsGlobals)
+            plugins.push(importAsGlobalsPlugin(opt.importAsGlobals ?? importAsGlobalsMapping));
+    }
+
+    delete opt.clean;
+    delete opt.importAsGlobals;
+
     return Object.assign({
         absWorkingDir: resolve('./'),
         bundle: true,
@@ -61,14 +79,11 @@ export const esbuildOptions = (opt) => {
         minify: true,
         outbase: "./",
         outdir: 'wwwroot/esm',
+        plugins,
         sourcemap: true,
-        splitting: !process.argv.slice(2).some(x => x == "--nosplit"),
+        splitting: splitting,
         target: 'es6',
         watch: process.argv.slice(2).some(x => x == "--watch"),
-        plugins: [
-            cleanPlugin(),
-            importAsGlobalsPlugin(opt.importAsGlobalsMapping ?? importAsGlobalsMapping)
-        ]
     }, opt);
 }
 
@@ -82,7 +97,7 @@ export const build = async (opt) => {
             process.stdout.write("");
         }, 5000);
     }
-    
+
     await esbuild.build(esbuildOptions(opt));
 };
 
@@ -105,7 +120,7 @@ export function importAsGlobalsPlugin(mapping) {
         name: "global-imports",
         setup(build) {
             build.onResolve({ filter }, (args) => {
-                if (!mapping[args.path]) 
+                if (!mapping[args.path])
                     throw new Error("Unknown global: " + args.path);
                 return { path: args.path, namespace: "external-global" };
             });
@@ -131,8 +146,12 @@ export function cleanPlugin() {
 
                     const outputFiles = new Set(Object.keys(outputs));
                     scanDir(build.initialOptions.outdir).forEach(file => {
-                        if (!outputFiles.has(join(build.initialOptions.outdir, file).replace(/\\/g, '/')))
+                        if (!file.endsWith('.js') && !file.endsWith('.js.map'))
+                            return;
+                        if (!outputFiles.has(join(build.initialOptions.outdir, file).replace(/\\/g, '/'))) {
+                            console.log('esbuild clean: deleting extra file ' + file);
                             rmSync(join(build.initialOptions.outdir, file));
+                        }
                     });
                 } catch (e) {
                     console.error(`esbuild clean: ${e}`);
