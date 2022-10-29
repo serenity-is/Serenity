@@ -75,7 +75,8 @@ namespace Serenity.CodeGenerator
                     }
                 }
                 else if (node.Kind == SyntaxKind.ClassDeclaration ||
-                    node.Kind == SyntaxKind.InterfaceDeclaration)
+                    node.Kind == SyntaxKind.InterfaceDeclaration ||
+                    node.Kind == SyntaxKind.EnumDeclaration)
                     yield return node;
             }
         }
@@ -187,7 +188,9 @@ namespace Serenity.CodeGenerator
                             if ((child.Kind == SyntaxKind.ClassDeclaration &&
                                  (child as ClassDeclaration).Name.GetText() == noGeneric) ||
                                 (child.Kind == SyntaxKind.InterfaceDeclaration &&
-                                 (child as InterfaceDeclaration).Name.GetText() == noGeneric))
+                                 (child as InterfaceDeclaration).Name.GetText() == noGeneric) ||
+                                (child.Kind == SyntaxKind.EnumDeclaration && 
+                                 (child as EnumDeclaration).Name.GetText() == noGeneric))
                                 return PrependNamespace(noGeneric.ToString(), child) + functionSuffix;
                         }
                     }
@@ -505,6 +508,18 @@ namespace Serenity.CodeGenerator
             return result;
         }
 
+        ExternalType EnumToExternalType(EnumDeclaration enumDec)
+        {
+            var result = new ExternalType
+            {
+                Namespace = GetNamespace(enumDec),
+                Name = enumDec.Name.GetText(),
+                IsDeclaration = IsUnderAmbientNamespace(enumDec) ? true : null
+            };
+
+            return result;
+        }
+
         ExternalType ClassToExternalType(ClassDeclaration klass)
         {
             var result = new ExternalType 
@@ -741,6 +756,16 @@ namespace Serenity.CodeGenerator
                         }
                         break;
 
+                    case SyntaxKind.EnumDeclaration:
+                        var enumDec = node as EnumDeclaration;
+                        if (sourceFile.IsDeclarationFile || HasExportModifier(node))
+                        {
+                            var exportedType = EnumToExternalType(enumDec);
+                            result.Add(exportedType);
+                        }
+                        break;
+
+
                     case SyntaxKind.InterfaceDeclaration:
                         var intf = node as InterfaceDeclaration;
 
@@ -782,6 +807,14 @@ namespace Serenity.CodeGenerator
                         {
                             var klass = node as ClassDeclaration;
                             target.Add(PrependNamespace(klass.Name.GetText(), klass));
+                        }
+                        break;
+
+                    case SyntaxKind.EnumDeclaration:
+                        if (sourceFile.IsDeclarationFile || HasExportModifier(node))
+                        {
+                            var enumDec = node as EnumDeclaration;
+                            target.Add(PrependNamespace(enumDec.Name.GetText(), enumDec));
                         }
                         break;
 

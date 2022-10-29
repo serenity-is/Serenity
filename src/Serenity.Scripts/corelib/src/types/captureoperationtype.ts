@@ -1,4 +1,6 @@
-﻿export {}
+﻿import { registerEnum } from "../q";
+
+export {}
 
 export enum CaptureOperationType {
     Before = 0,
@@ -6,3 +8,5 @@ export enum CaptureOperationType {
     Insert = 2,
     Update = 3
 }
+
+registerEnum(CaptureOperationType, 'Serenity.CaptureOperationType');

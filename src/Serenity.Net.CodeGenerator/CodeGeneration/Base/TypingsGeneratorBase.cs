@@ -588,8 +588,22 @@ namespace Serenity.CodeGeneration
                 }
                 else if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
                 {
-                    var filename = GetFileNameFor(ns, name, module);
-                    name = AddModuleImport(filename, name, external: false);
+                    if (ns == "Serenity")
+                    {
+                        var scriptType = GetScriptType("@serenity-is/corelib:" + name);
+                        if (scriptType != null)
+                            name = ImportFromCorelib(scriptType.Name);
+                        else
+                        {
+                            var filename = GetFileNameFor(ns, name, module);
+                            name = AddModuleImport(filename, name, external: false);
+                        }
+                    }
+                    else
+                    {
+                        var filename = GetFileNameFor(ns, name, module);
+                        name = AddModuleImport(filename, name, external: false);
+                    }
                     ns = "";
                 }
             }
