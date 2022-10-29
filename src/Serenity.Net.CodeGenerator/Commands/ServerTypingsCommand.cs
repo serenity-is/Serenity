@@ -159,12 +159,18 @@ namespace Serenity.CodeGenerator
                 {
                     var rootNsDir = fileSystem.Combine(projectDir, Path.GetFileName(csproj));
                     if (fileSystem.DirectoryExists(rootNsDir))
+                    {
                         outDir = Path.Combine(rootNsDir, "ServerTypes");
+                        generator.ModulesPathFolder = Path.GetFileName(csproj);
+                    }
                     else
                     {
                         rootNsDir = fileSystem.Combine(projectDir, config.RootNamespace);
                         if (fileSystem.DirectoryExists(rootNsDir))
+                        {
                             outDir = Path.Combine(rootNsDir, "ServerTypes");
+                            generator.ModulesPathFolder = config.RootNamespace;
+                        }
                     }
                 }
             }

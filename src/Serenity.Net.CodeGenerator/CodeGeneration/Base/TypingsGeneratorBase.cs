@@ -18,6 +18,10 @@ namespace Serenity.CodeGeneration
         protected ILookup<string, ExternalType> modularFormatterTypeByKey;
         protected ILookup<string, ExternalType> modularDialogTypeByKey;
 
+        public string ModulesPathAlias { get; set; } = "@/";
+        public string ModulesPathFolder { get; set; } = "Modules";
+        public string RootPathAlias { get; set; } = "@/../";
+
 #if ISSOURCEGENERATOR
         private readonly CancellationToken cancellationToken;
 
@@ -1032,13 +1036,16 @@ namespace Serenity.CodeGeneration
                                     else
                                         from = "../" + from;
                                 }
-                                else if (from.StartsWith("/Modules/", StringComparison.Ordinal))
+                                else if (!string.IsNullOrEmpty(ModulesPathFolder) && 
+                                    ModulesPathAlias != null &&
+                                    from.StartsWith("/" + ModulesPathFolder + "/", StringComparison.Ordinal))
                                 {
-                                    from = "@" + from[8..];
+                                    from = ModulesPathAlias + from[(ModulesPathFolder.Length + 2)..];
                                 }
-                                else if (from.StartsWith("/", StringComparison.Ordinal))
+                                else if (!string.IsNullOrEmpty(RootPathAlias) &&
+                                    from.StartsWith("/", StringComparison.Ordinal))
                                 {
-                                    from = "@/.." + from;
+                                    from = RootPathAlias + from[1..];
                                 }
                             }
 
