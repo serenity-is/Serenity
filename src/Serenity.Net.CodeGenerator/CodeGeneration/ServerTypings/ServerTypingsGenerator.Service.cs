@@ -61,7 +61,7 @@
                 }
 
                 sb.AppendLine();
-                cw.Indented("export declare const enum ");
+                cw.Indented($"export declare{(module ? "" : " const")} enum ");
                 sb.Append("Methods");
 
                 cw.InBrace(delegate
