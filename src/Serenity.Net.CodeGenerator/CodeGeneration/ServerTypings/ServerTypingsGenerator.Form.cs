@@ -247,6 +247,8 @@ namespace Serenity.CodeGeneration
                     if (module)
                     {
                         editorScriptType = FindTypeInLookup(modularEditorTypeByKey, editorTypeKey, "Editor");
+                        if (editorScriptType is null && editorTypeKey.IndexOf(".", StringComparison.Ordinal) >= 0)
+                            editorScriptType = TryFindModuleType(editorTypeKey, containingAssembly: null);
 
                         foreach (var typeKey in GetDialogTypeKeyRefs(editorTypeAttr))
                         {

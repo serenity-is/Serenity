@@ -585,6 +585,43 @@ namespace Serenity.CodeGeneration
             return filename;
         }
 
+        protected ExternalType TryFindModuleType(string fullName, string containingAssembly)
+        {
+            var nonGeneric = fullName;
+            var genericIdx = nonGeneric.IndexOf('`', StringComparison.Ordinal);
+            if (genericIdx >= 0)
+                nonGeneric = nonGeneric[..genericIdx];
+
+            string ns = "";
+            var dotIdx = nonGeneric.LastIndexOf(".", StringComparison.Ordinal);
+            if (dotIdx >= 0)
+            {
+                ns = nonGeneric[0..dotIdx];
+                nonGeneric = nonGeneric[(dotIdx + 1)..];
+            }
+
+            ExternalType scriptType;
+
+            bool tryModule(string module)
+            {
+                scriptType = GetScriptType(module + ":" + nonGeneric);
+                return scriptType != null;
+            }
+
+            if ((!string.IsNullOrEmpty(containingAssembly) && tryModule(containingAssembly.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
+                (!string.IsNullOrEmpty(ns) && tryModule(ns.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
+                ((ns == "Serenity" || ns?.StartsWith("Serenity.") == true) &&
+                    (tryModule("@serenity-is/corelib") ||
+                     tryModule("@serenity-is/corelib/q") ||
+                     tryModule("@serenity-is/extensions") ||
+                     tryModule("@serenity-is/pro.extensions"))))
+            {
+                return scriptType;
+            }
+
+            return null;
+        }
+
         public virtual string ShortenFullName(string ns, string name, string codeNamespace, bool module, 
             string containingAssembly)
         {
@@ -594,38 +631,21 @@ namespace Serenity.CodeGeneration
                     containingAssembly.EndsWith(".dll"))
                     containingAssembly = containingAssembly[0..^4];
 
-                var importName = name;
-                var genericIdx = importName.IndexOf('`', StringComparison.Ordinal);
+                var nonGeneric = name;
+                var genericIdx = nonGeneric.IndexOf('`', StringComparison.Ordinal);
                 if (genericIdx >= 0)
-                    importName = importName[..genericIdx];
+                    nonGeneric = nonGeneric[..genericIdx];
 
                 if (string.IsNullOrEmpty(containingAssembly) ||
                     !assemblyNames.Contains(containingAssembly))
                 {
-                    string moduleName;
-                    ExternalType scriptType;
-
-                    bool tryModule(string module)
-                    {
-                        moduleName = module;
-                        scriptType = GetScriptType(moduleName + ":" + importName);
-                        return scriptType != null;
-                    }
-
-                    if ((!string.IsNullOrEmpty(containingAssembly) && tryModule(containingAssembly.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
-                        (!string.IsNullOrEmpty(ns) && tryModule(ns.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
-                        ((ns == "Serenity" || ns?.StartsWith("Serenity.") == true) &&
-                            (tryModule("@serenity-is/corelib") ||
-                             tryModule("@serenity-is/corelib/q") ||
-                             tryModule("@serenity-is/extensions") ||
-                             tryModule("@serenity-is/pro.extensions"))))
-                    {
-                        return AddExternalImport(moduleName, importName);
-                    }
+                    ExternalType moduleType = TryFindModuleType(ns?.Length > 0 ? (ns + "." + name) : name, containingAssembly);
+                    if (moduleType != null)
+                        return AddExternalImport(moduleType.Module, nonGeneric);
                 }
 
-                var filename = GetFileNameFor(ns, importName, module);
-                return AddModuleImport(filename, importName, external: false);
+                var filename = GetFileNameFor(ns, nonGeneric, module);
+                return AddModuleImport(filename, nonGeneric, external: false);
             }
 
             if (ns == "Serenity.Services" ||
