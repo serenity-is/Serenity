@@ -432,6 +432,15 @@ function jQueryDatepickerInitialization(): boolean {
         changeMonth: true,
         changeYear: true
     });
+
+    if ($.ui && $.ui.version <= '1.12.1') {
+        $.datepicker.setDefaults({
+            buttonImage: null,
+            buttonImageOnly: false,
+            buttonText: '<i class="fa fa-calendar"></i>'
+        });
+    }
+
     return true;
 };
 
