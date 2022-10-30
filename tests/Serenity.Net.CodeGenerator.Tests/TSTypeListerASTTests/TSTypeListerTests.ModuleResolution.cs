@@ -74,9 +74,9 @@ export class B1 {
 
             var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: new TSConfig
             {
-                BaseUrl = ".",
                 CompilerOptions = new()
                 {
+                    BaseUrl = ".",
                     Paths = new()
                     {
                         ["my/*"] = new[] { "./zzz/*" }
@@ -110,9 +110,9 @@ export class B1 {
 
             var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: new TSConfig
             {
-                BaseUrl = ".",
                 CompilerOptions = new()
                 {
+                    BaseUrl = ".",
                     Paths = new()
                     {
                         ["my/*"] = new[] { "./nnn", "./zzz/*" }

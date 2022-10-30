@@ -116,7 +116,43 @@ namespace Serenity.CodeGenerator
 
         public static TSConfig Read(IGeneratorFileSystem fileSystem, string path)
         {
-            return TryParseJsonFile<TSConfig>(fileSystem, path);
+            var config = TryParseJsonFile<TSConfig>(fileSystem, path);
+            var extends = config?.Extends;
+            var loop = 0;
+            string basePath = path;
+            while (!string.IsNullOrEmpty(extends) && loop++ < 10)
+            {
+                basePath = fileSystem.Combine(fileSystem.GetDirectoryName(basePath), extends);
+                var baseConfig = TryParseJsonFile<TSConfig>(fileSystem, basePath);
+                if (baseConfig is null)
+                    break;
+                config.Exclude ??= baseConfig.Exclude;
+                config.Files ??= baseConfig.Files;
+                config.Include ??= baseConfig.Include;
+                config.RootDir ??= baseConfig.RootDir;
+                
+                if (baseConfig.CompilerOptions != null)
+                {
+                    config.CompilerOptions ??= new();
+                    config.CompilerOptions.BaseUrl ??= baseConfig.CompilerOptions.BaseUrl;
+                    config.CompilerOptions.Module ??= baseConfig.CompilerOptions.Module;
+                    config.CompilerOptions.Paths ??= baseConfig.CompilerOptions.Paths;
+                    config.CompilerOptions.Types ??= baseConfig.CompilerOptions.Types;
+
+                    if (config.CompilerOptions.TypeRoots is null &&
+                        baseConfig.CompilerOptions.TypeRoots is not null)
+                    {
+                        // typeroots are relative to the base config files
+                        var relativePath = fileSystem.GetRelativePath(fileSystem.GetDirectoryName(path), fileSystem.GetDirectoryName(basePath));
+                        relativePath = PathHelper.ToUrl(relativePath);
+                        config.CompilerOptions.TypeRoots = baseConfig.CompilerOptions.TypeRoots.Select(x => relativePath + "/" + x).ToArray();
+                    }
+                }
+
+                extends = baseConfig.Extends;
+            }
+
+            return config;
         }
 
         public static T TryParseJsonFile<T>(IGeneratorFileSystem fileSystem, string path) where T: class

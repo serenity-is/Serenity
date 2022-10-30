@@ -19,9 +19,9 @@
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
-            tsBasePath = tsConfig is null || tsConfig.BaseUrl is null ||
-                tsConfig.BaseUrl == "." || tsConfig.BaseUrl == "./" ? tsConfigDir :
-                fileSystem.Combine(tsConfigDir, PathHelper.ToPath(tsConfig.BaseUrl));
+            tsBasePath = tsConfig is null || tsConfig.CompilerOptions?.BaseUrl is null ||
+                tsConfig.CompilerOptions?.BaseUrl == "." || tsConfig.CompilerOptions?.BaseUrl == "./" ? tsConfigDir :
+                fileSystem.Combine(tsConfigDir, PathHelper.ToPath(tsConfig.CompilerOptions?.BaseUrl));
 
             tsBasePath = PathHelper.ToPath(tsBasePath);
 
@@ -34,6 +34,37 @@
             public Dictionary<string, Dictionary<string, string[]>> TypesVersions { get; set; }
             public string Types { get; set; }
             public string Typings { get; set; }
+        }
+
+        static string RemoveTrailing(string path)
+        {
+            while (path != null && path.Length > 1 &&
+                path.EndsWith("\\", StringComparison.Ordinal) ||
+                path.EndsWith("/", StringComparison.Ordinal))
+                    path = path[..^1];
+            return path;
+        }
+
+        string TryGetNodePackageName(string path)
+        {
+            path = RemoveTrailing(PathHelper.ToUrl(path));
+            var lastNodeIdx = path.LastIndexOf("/node_modules/", StringComparison.Ordinal);
+            if (lastNodeIdx <= 0)
+                return null;
+
+            var remaining = RemoveTrailing(path[(lastNodeIdx + "/node_modules/".Length) ..]);
+            while (remaining.StartsWith("/", StringComparison.Ordinal))
+                remaining = remaining[1..];
+            if (remaining.Length > 0)
+            {
+                var parts = remaining.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                if (remaining.StartsWith("@"))
+                    return string.Join("/", parts.Take(2));
+
+                return parts.FirstOrDefault();
+            }
+
+            return null;
         }
 
         public string Resolve(string fileNameOrModule, string referencedFrom,
@@ -58,7 +89,7 @@
                 string relative = removeMultiSlash.Replace(PathHelper.ToUrl(fileNameOrModule), "/");
 
                 var searchBase = fileNameOrModule.StartsWith("/", StringComparison.Ordinal) ?
-                    tsBasePath : fileSystem.GetDirectoryName(referencedFrom);
+                    tsBasePath : fileSystem.GetDirectoryName(RemoveTrailing(referencedFrom));
 
                 if (fileNameOrModule.StartsWith("./", StringComparison.Ordinal))
                     relative = relative[2..];
@@ -100,30 +131,44 @@
                             fileSystem.FileExists(fileSystem.Combine(path, types)))
                         {
                             resolvedPath = fileSystem.Combine(path, types);
-                            moduleName = packageJson.Name ?? fileSystem.GetFileName(path);
+                            moduleName = packageJson.Name ?? TryGetNodePackageName(path) ?? fileSystem.GetFileName(path);
                         }
                         return;
                     }
 
-                    var parentDir = fileSystem.GetDirectoryName(path);
+                    var parentDir = fileSystem.GetDirectoryName(RemoveTrailing(path));
 
                     packageJson = TSConfigHelper.TryParseJsonFile<PackageJson>(fileSystem,
                         fileSystem.Combine(parentDir, "package.json"));
 
-                    if (packageJson is not null &&
-                        packageJson.TypesVersions is not null &&
-                        packageJson.TypesVersions.TryGetValue("*", out var tv) &&
-                        tv.TryGetValue(fileSystem.GetFileName(path), out var typesArr) &&
-                        typesArr is not null)
+                    if (packageJson is not null)
                     {
-                        resolvedPath = typesArr
-                            .Where(x => !string.IsNullOrEmpty(x))
-                            .Select(x => fileSystem.Combine(parentDir, x))
-                            .FirstOrDefault(x => fileSystem.FileExists(x));
+                        if (packageJson.TypesVersions is not null &&
+                            packageJson.TypesVersions.TryGetValue("*", out var tv) &&
+                            tv.TryGetValue(fileSystem.GetFileName(path), out var typesArr) &&
+                            typesArr is not null)
+                        {
+                            resolvedPath = typesArr
+                                .Where(x => !string.IsNullOrEmpty(x))
+                                .Select(x => fileSystem.Combine(parentDir, x))
+                                .FirstOrDefault(x => fileSystem.FileExists(x));
 
-                        if (resolvedPath is not null)
-                            moduleName = (packageJson.Name ?? fileSystem.GetFileName(parentDir)) + 
-                                "/" + fileSystem.GetFileName(path);
+                            if (resolvedPath is not null)
+                            {
+                                moduleName = (packageJson.Name ?? fileSystem.GetFileName(parentDir)) +
+                                    "/" + fileSystem.GetFileName(path);
+                                return;
+                            }
+                        }
+
+                        var types = packageJson.Types ?? packageJson.Typings;
+                        if (!string.IsNullOrEmpty(types) &&
+                            fileSystem.FileExists(fileSystem.Combine(parentDir, types)))
+                        {
+                            resolvedPath = fileSystem.Combine(parentDir, types);
+                            moduleName = packageJson.Name ?? TryGetNodePackageName(parentDir) ?? fileSystem.GetFileName(parentDir);
+                            return;
+                        }
                     }
                 }
 
@@ -190,14 +235,14 @@
                 if (resolvedPath is null &&
                     !string.IsNullOrEmpty(referencedFrom))
                 {
-                    var parentDir = fileSystem.GetDirectoryName(referencedFrom);
+                    var parentDir = fileSystem.GetDirectoryName(RemoveTrailing(referencedFrom));
                     while (resolvedPath is null &&
                         !string.IsNullOrEmpty(parentDir))
                     {
                         var nodeModules = fileSystem.Combine(parentDir, "node_modules");
                         if (fileSystem.DirectoryExists(nodeModules))
                             tryPackageJson(fileSystem.Combine(nodeModules, fileNameOrModule), ref moduleName);
-                        parentDir = fileSystem.GetDirectoryName(parentDir);
+                        parentDir = fileSystem.GetDirectoryName(RemoveTrailing(parentDir));
                     }
                 }
             }
@@ -207,6 +252,7 @@
 
             resolvedPath = PathHelper.ToPath(fileSystem.GetFullPath(resolvedPath));
 
+            moduleName ??= TryGetNodePackageName(resolvedPath);
             if (moduleName is null)
             {
                 var fromPath = tsBasePath;
