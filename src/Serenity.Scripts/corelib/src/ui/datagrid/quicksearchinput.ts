@@ -1,4 +1,5 @@
-﻿import { isEmptyOrNull, isValue, text, trim } from "../../q";
+﻿import { Decorators } from "../../decorators";
+import { isEmptyOrNull, isValue, text, trim } from "../../q";
 import { PopupMenuButton } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
 
@@ -15,6 +16,7 @@ export interface QuickSearchInputOptions {
     fields?: QuickSearchField[];
 }
 
+@Decorators.registerClass('Serenity.QuickSearchInput')
 export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
     private lastValue: string;
     private field: QuickSearchField;
