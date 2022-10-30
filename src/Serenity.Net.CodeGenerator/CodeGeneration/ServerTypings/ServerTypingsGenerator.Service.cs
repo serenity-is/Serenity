@@ -48,7 +48,7 @@
                             sb.Append(serviceRequest);
                         }
                         else
-                            sb.Append(ShortenFullName("Serenity", "ServiceRequest", codeNamespace, module, "serenity.corelib/index.d.ts"));
+                            sb.Append(ShortenFullName("Serenity", "ServiceRequest", codeNamespace, module, "Serenity.Net.Core"));
                     }
                     else
                         HandleMemberType(requestType, codeNamespace, module);

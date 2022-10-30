@@ -22,6 +22,8 @@ namespace Serenity.CodeGeneration
         public string ModulesPathFolder { get; set; } = "Modules";
         public string RootPathAlias { get; set; } = "@/../";
 
+        private readonly HashSet<string> assemblyNames = new(StringComparer.Ordinal);
+
 #if ISSOURCEGENERATOR
         private readonly CancellationToken cancellationToken;
 
@@ -105,6 +107,13 @@ namespace Serenity.CodeGeneration
         {
             if (assemblies == null || assemblies.Length == 0)
                 throw new ArgumentNullException(nameof(assemblies));
+
+            foreach (var assembly in assemblies)
+            {
+                var assemblyName = assembly.Name?.Name;
+                if (!string.IsNullOrEmpty(assemblyName))
+                    assemblyNames.Add(assemblyName);
+            }
 
             Assemblies = assemblies;
         }
@@ -286,6 +295,9 @@ namespace Serenity.CodeGeneration
                 .ToLookup(x => x.key, x => x.type);
 
 #if ISSOURCEGENERATOR
+            if (!string.IsNullOrEmpty(Compilation.AssemblyName))
+                assemblyNames.Add(Compilation.AssemblyName);
+
             var types = Compilation.GetSymbolsWithName(s => true, SymbolFilter.Type).OfType<ITypeSymbol>();
 
             var collector = new ExportedTypesCollector(cancellationToken);
@@ -574,45 +586,49 @@ namespace Serenity.CodeGeneration
         }
 
         public virtual string ShortenFullName(string ns, string name, string codeNamespace, bool module, 
-            string sourceFile)
+            string containingAssembly)
         {
             if (module)
             {
-                if (ns == "Serenity.Services" ||
-                    ns == "Serenity.ComponentModel")
-                {
-                    var importName = name;
-                    var idx = importName.IndexOf('`', StringComparison.Ordinal);
-                    if (idx >= 0)
-                        importName = importName[..idx];
+                if (containingAssembly != null &&
+                    containingAssembly.EndsWith(".dll"))
+                    containingAssembly = containingAssembly[0..^4];
 
-                    name = ImportFromCorelib(importName) +
-                        (idx >= 0 ? name[idx..] : "");
-                    ns = "";
-                }
-                else if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
+                var importName = name;
+                var genericIdx = importName.IndexOf('`', StringComparison.Ordinal);
+                if (genericIdx >= 0)
+                    importName = importName[..genericIdx];
+
+                if (string.IsNullOrEmpty(containingAssembly) ||
+                    !assemblyNames.Contains(containingAssembly))
                 {
-                    if (ns == "Serenity")
+                    string moduleName;
+                    ExternalType scriptType;
+
+                    bool tryModule(string module)
                     {
-                        var scriptType = GetScriptType("@serenity-is/corelib:" + name);
-                        if (scriptType != null)
-                            name = ImportFromCorelib(scriptType.Name);
-                        else
-                        {
-                            var filename = GetFileNameFor(ns, name, module);
-                            name = AddModuleImport(filename, name, external: false);
-                        }
+                        moduleName = module;
+                        scriptType = GetScriptType(moduleName + ":" + importName);
+                        return scriptType != null;
                     }
-                    else
+
+                    if ((!string.IsNullOrEmpty(containingAssembly) && tryModule(containingAssembly.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
+                        (!string.IsNullOrEmpty(ns) && tryModule(ns.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
+                        ((ns == "Serenity" || ns?.StartsWith("Serenity.") == true) &&
+                            (tryModule("@serenity-is/corelib") ||
+                             tryModule("@serenity-is/corelib/q") ||
+                             tryModule("@serenity-is/extensions") ||
+                             tryModule("@serenity-is/pro.extensions"))))
                     {
-                        var filename = GetFileNameFor(ns, name, module);
-                        name = AddModuleImport(filename, name, external: false);
+                        return AddExternalImport(moduleName, importName);
                     }
-                    ns = "";
                 }
+
+                var filename = GetFileNameFor(ns, importName, module);
+                return AddModuleImport(filename, importName, external: false);
             }
-            else if (
-                ns == "Serenity.Services" ||
+
+            if (ns == "Serenity.Services" ||
                 ns == "Serenity.ComponentModel")
             {
                 if (IsUsingNamespace("Serenity"))
@@ -722,7 +738,12 @@ namespace Serenity.CodeGeneration
 
         protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, bool module)
         {
-            var fullName = ShortenFullName(GetNamespace(type), type.Name, codeNamespace, module, null);
+            var fullName = ShortenFullName(GetNamespace(type), type.Name, codeNamespace, module,
+#if ISSOURCEGENERATOR
+                type.ContainingAssembly?.Name);
+#else
+                type.Scope?.Name);
+#endif
 
             if (type.IsGenericInstance())
             {
