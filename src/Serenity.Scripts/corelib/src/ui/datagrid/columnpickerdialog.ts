@@ -6,7 +6,7 @@ import { TemplatedDialog } from "../dialogs/templateddialog";
 import { ToolButton } from "../widgets/toolbar";
 import { IDataGrid } from "./idatagrid";
 
-@Decorators.registerClass()
+@Decorators.registerClass('Serenity.ColumnPickerDialog')
 @Decorators.resizable()
 @Decorators.responsive()
 export class ColumnPickerDialog extends TemplatedDialog<any> {
@@ -169,7 +169,7 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
 <li data-key="${col.id}" class="${allowHide ? "" : "cant-hide"}">
 <span class="drag-handle">☰</span>
 ${ htmlEncode(this.getTitle(col)) }
-${ allowHide ? `<i class="js-hide" title="${ text("Controls.ColumnPickerDialog.HideHint") }">✖</i>` : '' }
+${ allowHide ? `<i class="js-hide fa fa-eye-slash" title="${ text("Controls.ColumnPickerDialog.HideHint") }"></i>` : '' }
 <i class="js-show fa fa-eye" title="${ text("Controls.ColumnPickerDialog.ShowHint") }"></i>
 </li>`);
     }
@@ -277,7 +277,7 @@ ${ allowHide ? `<i class="js-hide" title="${ text("Controls.ColumnPickerDialog.H
 <ul id="~_VisibleCols"></ul>
 </div>
 <div class="column-list hidden-list bg-info">
-<h5><i class="fa fa-list"></i> ${ text("Controls.ColumnPickerDialog.HiddenColumns") }</h5>
+<h5><i class="fa fa-eye-slash"></i> ${ text("Controls.ColumnPickerDialog.HiddenColumns") }</h5>
 <ul id="~_HiddenCols"></ul>
 </div>
 </div>`;
