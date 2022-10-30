@@ -101,8 +101,8 @@ const convertModularToGlobal = (src, ns, isTS) => {
         src = replaceTypeRef(src, 'Event', 'Slick.Event');
 
     if (ns == 'Serenity') {
-        src = src.replace(' = typeof executeOnceWhenVisible', ' = typeof Q.executeOnceWhenVisible');
-        src = src.replace(' = typeof executeEverytimeWhenVisible', ' = typeof Q.executeEverytimeWhenVisible');
+        src = src.replace(': typeof executeOnceWhenVisible', ': typeof Q.executeOnceWhenVisible');
+        src = src.replace(': typeof executeEverytimeWhenVisible', ': typeof Q.executeEverytimeWhenVisible');
     }
 
     var moduleAugmentations = [];

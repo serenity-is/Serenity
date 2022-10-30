@@ -2773,8 +2773,8 @@ declare namespace Serenity {
     }
 
     namespace LazyLoadHelper {
-        const executeOnceWhenShown: typeof executeOnceWhenVisible;
-        const executeEverytimeWhenShown: typeof executeEverytimeWhenVisible;
+        const executeOnceWhenShown: typeof Q.executeOnceWhenVisible;
+        const executeEverytimeWhenShown: typeof Q.executeEverytimeWhenVisible;
     }
 
     class PrefixedContext {
