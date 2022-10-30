@@ -5,7 +5,7 @@ import { TemplatedWidget } from "../widgets/templatedwidget";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { DialogExtensions } from "./dialogextensions";
 
-@Decorators.registerClass([IDialog])
+@Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
 export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
 
     protected tabs: JQuery;

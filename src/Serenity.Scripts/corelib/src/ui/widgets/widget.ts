@@ -54,7 +54,7 @@ export interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> 
     init?: (w: TWidget) => void;
 }
 
-@Decorators.registerClass()
+@Decorators.registerClass('Serenity.Widget')
 export class Widget<TOptions> {
     private static nextWidgetNumber = 0;
     public element: JQuery;

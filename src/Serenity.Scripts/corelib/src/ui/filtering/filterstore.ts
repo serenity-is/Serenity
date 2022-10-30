@@ -2,7 +2,7 @@
 import { ArgumentNullException, Criteria, Culture, delegateCombine, delegateRemove, PropertyItem, text, tryGetText } from "../../q";
 import { FilterLine } from "./filterline";
 
-@Decorators.registerClass('FilterStore')
+@Decorators.registerClass('Serenity.FilterStore')
 export class FilterStore {
 
     constructor(fields: PropertyItem[]) {
