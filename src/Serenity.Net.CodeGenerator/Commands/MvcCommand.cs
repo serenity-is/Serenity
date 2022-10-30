@@ -26,7 +26,8 @@ namespace Serenity.CodeGenerator
             string[] stripViewPaths = config.MVC.StripViewPaths ?? new string[] {
                 "Modules/",
                 "Views/",
-                fileSystem.GetFileNameWithoutExtension(csproj) + "/"
+                fileSystem.GetFileNameWithoutExtension(csproj) + "/",
+                "Areas/" + fileSystem.GetFileNameWithoutExtension(csproj) + "/"
             };
 
             var rootDir = projectDir + System.IO.Path.DirectorySeparatorChar;
@@ -34,7 +35,8 @@ namespace Serenity.CodeGenerator
                 new string[] { 
                     "Modules/", 
                     "Views/",
-                    fileSystem.GetFileNameWithoutExtension(csproj) + "/"
+                    fileSystem.GetFileNameWithoutExtension(csproj) + "/",
+                    "Areas/" + fileSystem.GetFileNameWithoutExtension(csproj) + "/"
                 })
                 .Select(x => fileSystem.Combine(rootDir, PathHelper.ToPath(x)));
 
