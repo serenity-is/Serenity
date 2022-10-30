@@ -91,11 +91,8 @@ export class Toolbar extends Widget<ToolbarOptions> {
         this.element.addClass('s-Toolbar clearfix')
             .html('<div class="tool-buttons"><div class="buttons-outer">' +
                 '<div class="buttons-inner"></div></div></div>');
-        var container = $('div.buttons-inner', this.element);
-        var buttons = this.options.buttons;
-        for (var i = 0; i < buttons.length; i++) {
-            this.createButton(container, buttons[i]);
-        }
+
+        this.createButtons();
     }
 
     destroy() {
@@ -115,12 +112,23 @@ export class Toolbar extends Widget<ToolbarOptions> {
 
     protected mouseTrap: any;
 
+    protected createButtons() {
+        var container: JQuery = $('div.buttons-inner', this.element).last();
+        var buttons = this.options.buttons;
+        var currentCount = 0;
+        for (var i = 0; i < buttons.length; i++) {
+            var button = buttons[i];
+            if (button.separator && currentCount > 0) {
+                container = $('<div class="buttons-inner"></div>').appendTo(container.parent());
+                currentCount = 0;
+            }
+            this.createButton(container, button);
+            currentCount++;
+        }
+    }
+
     protected createButton(container: JQuery, b: ToolButton) {
         var cssClass = b.cssClass ?? '';
-
-        if (b.separator === true || b.separator === 'left' || b.separator === 'both') {
-            $('<div class="separator"></div>').appendTo(container);
-        }
 
         var btn = $('<div class="tool-button"><div class="button-outer">' +
             '<span class="button-inner"></span></div></div>')

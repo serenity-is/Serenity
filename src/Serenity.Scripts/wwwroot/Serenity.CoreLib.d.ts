@@ -2883,6 +2883,7 @@ declare namespace Serenity {
         constructor(div: JQuery, options: ToolbarOptions);
         destroy(): void;
         protected mouseTrap: any;
+        protected createButtons(): void;
         protected createButton(container: JQuery, b: ToolButton): void;
         findButton(className: string): JQuery;
         updateInterface(): void;
