@@ -888,6 +888,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         list.push({
             title: text('Controls.EntityDialog.SaveButton'),
             cssClass: 'save-and-close-button',
+            icon: 'fa-check-circle text-purple',
             hotkey: 'alt+s',
             onClick: () => {
                 this.save(response => {
@@ -902,6 +903,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             title: '',
             hint: text('Controls.EntityDialog.ApplyChangesButton'),
             cssClass: 'apply-changes-button',
+            icon: 'fa-clipboard-check text-purple',
             hotkey: 'alt+a',
             onClick: () => {
                 this.save(response1 => {
@@ -927,6 +929,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         list.push({
             title: text('Controls.EntityDialog.DeleteButton'),
             cssClass: 'delete-button',
+            icon: 'fa-trash-o text-red',
             hotkey: 'alt+x',
             onClick: () => {
                 confirm(text('Controls.EntityDialog.DeleteConfirmation'), () => {
@@ -978,6 +981,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         list.push({
             title: text('Controls.EntityDialog.CloneButton'),
             cssClass: 'clone-button',
+            icon: 'fa-clone',
             onClick: () => {
 
                 if (!this.isEditMode()) {

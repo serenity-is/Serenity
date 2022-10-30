@@ -159,6 +159,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         buttons.push({
             title: this.getAddButtonCaption(),
             cssClass: 'add-button',
+            icon: 'fa-plus-circle text-green',
             hotkey: 'alt+n',
             onClick: () => {
                 this.addButtonClick();
@@ -176,6 +177,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         return {
             title: (noText ? null : text('Controls.EntityGrid.RefreshButton')),
             hint: (noText ? text('Controls.EntityGrid.RefreshButton') : null),
+            icon: 'fa-refresh text-blue',
             cssClass: 'refresh-button',
             onClick: () => {
                 this.refresh();
