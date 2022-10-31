@@ -2,15 +2,21 @@
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
-        private void GenerateEnum(TypeDefinition enumType, bool module)
+        private string GetEnumKeyFor(TypeDefinition enumType)
         {
-            var codeNamespace = GetNamespace(enumType);
             string enumKey = enumType.FullNameOf();
             var enumKeyAttr = TypingsUtils.FindAttr(enumType.GetAttributes(), "Serenity.ComponentModel", "EnumKeyAttribute");
             if (enumKeyAttr != null &&
                 enumKeyAttr.ConstructorArguments().Count >= 1 &&
                 enumKeyAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.String")
                 enumKey = enumKeyAttr.ConstructorArguments[0].Value as string;
+            return enumKey;
+        }
+
+        private void GenerateEnum(TypeDefinition enumType, bool module)
+        {
+            var codeNamespace = GetNamespace(enumType);
+            var enumKey = GetEnumKeyFor(enumType);
 
             cw.Indented("export enum ");
             var identifier = MakeFriendlyName(enumType, codeNamespace, module);

@@ -141,7 +141,43 @@ namespace Serenity.CodeGeneration
             }
         }
 
-        private ExternalType FindTypeInLookup(ILookup<string, ExternalType> lookup, string key, string suffix)
+
+        private IEnumerable<string> GetEnumTypeKeyRefs(CustomAttribute editorTypeAttr)
+        {
+            if (editorTypeAttr != null)
+            {
+                var dialogType = editorTypeAttr.NamedArguments().FirstOrDefault(x => string.Equals(x.Name(), "DialogType")).ArgumentValue() as string;
+                if (!string.IsNullOrEmpty(dialogType))
+                    yield return dialogType;
+                else
+                {
+                    var inplaceAdd = editorTypeAttr.NamedArguments().FirstOrDefault(x => string.Equals(x.Name(), "InplaceAdd")).ArgumentValue() as bool?;
+                    if (inplaceAdd == true)
+                    {
+#if ISSOURCEGENERATOR
+                        var lookupType = editorTypeAttr.ConstructorArguments().Select(x => x.Value()).OfType<ITypeSymbol>().FirstOrDefault();
+#else
+                        var lookupType = editorTypeAttr.ConstructorArguments().Select(x => x.Value()).OfType<TypeReference>().FirstOrDefault()?.Resolve();
+#endif
+
+                        if (lookupType != null)
+                        {
+                            var lookupKey = AutoLookupKeyFor(lookupType);
+                            if (!string.IsNullOrEmpty(lookupKey))
+                                yield return lookupKey;
+                        }
+                        else
+                        {
+                            var lookupKey = editorTypeAttr.ConstructorArguments().Select(x => x.Value()).OfType<string>().FirstOrDefault();
+                            if (!string.IsNullOrEmpty(lookupKey))
+                                yield return lookupKey;
+                        }
+                    }
+                }
+            }
+        }
+
+        private ExternalType FindTypeInLookup(ILookup<string, ExternalType> lookup, string key, string suffix, string containingAssembly = null)
         {
             var type = lookup[key].FirstOrDefault() ??
                 lookup[key + suffix].FirstOrDefault() ??
@@ -160,7 +196,10 @@ namespace Serenity.CodeGeneration
                     return type;
             }
 
-            return null;
+            if (type is null && key.IndexOfAny(new char[] { '.', ':' }) >= 0)
+                type = TryFindModuleType(key, containingAssembly);
+
+            return type;
         }
 
         private TypeDefinition GetBasedOnRowAndAnnotations(TypeDefinition type, 
@@ -210,6 +249,40 @@ namespace Serenity.CodeGeneration
             return attr;
         }
 
+        private void TryReferenceEnumType(TypeReference itemType, TypeReference basedOnFieldType, string codeNamespace,
+            HashSet<(string group, string key)> referencedTypeKeys,
+            List<(string group, string alias)> referencedTypeAliases)
+        {
+            TypeDefinition enumType = null;
+            if (itemType != null)
+                enumType = TypingsUtils.GetEnumTypeFrom(itemType);
+            if (enumType is null && basedOnFieldType != null)
+                enumType = TypingsUtils.GetEnumTypeFrom(basedOnFieldType);
+
+            if (enumType is null)
+                return;
+
+            var enumKey = GetEnumKeyFor(enumType) ?? enumType.FullNameOf();
+            if (!referencedTypeKeys.Add(("Enum", enumKey)))
+                return;
+
+            string containingAssembly = GetAssemblyNameFor(enumType);
+            if (string.IsNullOrEmpty(containingAssembly) ||
+                !assemblyNames.Contains(containingAssembly))
+            {
+                ExternalType enumScriptType = TryFindModuleType(enumType.FullNameOf(), containingAssembly) ??
+                    TryFindModuleType(enumKey, containingAssembly);
+
+                if (enumScriptType != null)
+                    referencedTypeAliases.Add(("Enum", ReferenceScriptType(enumScriptType, codeNamespace, module: true)));
+            }
+            else
+            {
+                var moduleName = GetFileNameFor(GetNamespace(enumType), enumType.Name, module: true);
+                referencedTypeAliases.Add(("Enum", AddModuleImport(moduleName, enumType.Name, external: false)));
+            }
+        }
+
         private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute,
             string identifier, bool module)
         {
@@ -220,8 +293,8 @@ namespace Serenity.CodeGeneration
 
             var propertyNames = new List<string>();
             var propertyTypes = new List<string>();
-            var referencedTypeKeys = new HashSet<string>();
-            var referencedTypeAliases = new List<string>();
+            var referencedTypeKeys = new HashSet<(string group, string key)>();
+            var referencedTypeAliases = new List<(string group, string alias)>();
             var basedOnRow = GetBasedOnRowAndAnnotations(type, out var basedOnByName, out var rowAnnotations);
 
             cw.InBrace(delegate
@@ -246,19 +319,19 @@ namespace Serenity.CodeGeneration
 
                     if (module)
                     {
-                        editorScriptType = FindTypeInLookup(modularEditorTypeByKey, editorTypeKey, "Editor");
-                        if (editorScriptType is null && editorTypeKey.IndexOf(".", StringComparison.Ordinal) >= 0)
-                            editorScriptType = TryFindModuleType(editorTypeKey, containingAssembly: null);
+                        editorScriptType = FindTypeInLookup(modularEditorTypeByKey, editorTypeKey, "Editor", containingAssembly: null);
 
                         foreach (var typeKey in GetDialogTypeKeyRefs(editorTypeAttr))
                         {
-                            if (!referencedTypeKeys.Add(typeKey))
+                            if (!referencedTypeKeys.Add(("Dialog", typeKey)))
                                 continue;
 
-                            var dialogType = FindTypeInLookup(modularDialogTypeByKey, typeKey, "Dialog");
+                            var dialogType = FindTypeInLookup(modularDialogTypeByKey, typeKey, "Dialog", containingAssembly: null);
                             if (dialogType != null)
-                                referencedTypeAliases.Add(ReferenceScriptType(dialogType, codeNamespace, module));
+                                referencedTypeAliases.Add(("Dialog", ReferenceScriptType(dialogType, codeNamespace, module)));
                         }
+
+                        TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), codeNamespace, referencedTypeKeys, referencedTypeAliases);
                     }
 
                     if (editorScriptType is null)
@@ -388,7 +461,7 @@ namespace Serenity.CodeGeneration
             if (module && referencedTypeAliases.Any())
             {
                 sb.AppendLine();
-                sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases) + "]; // inplace add dialog types");
+                sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases.Select(x => x.alias)) + "]; // referenced types");
             }
 
             RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);

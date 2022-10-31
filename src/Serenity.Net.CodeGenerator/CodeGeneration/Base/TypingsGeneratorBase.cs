@@ -22,7 +22,7 @@ namespace Serenity.CodeGeneration
         public string ModulesPathFolder { get; set; } = "Modules";
         public string RootPathAlias { get; set; } = "@/../";
 
-        private readonly HashSet<string> assemblyNames = new(StringComparer.Ordinal);
+        protected readonly HashSet<string> assemblyNames = new(StringComparer.Ordinal);
 
 #if ISSOURCEGENERATOR
         private readonly CancellationToken cancellationToken;
@@ -154,6 +154,19 @@ namespace Serenity.CodeGeneration
 
                 EnqueueMemberType(property.PropertyType());
             }
+        }
+
+        protected string GetAssemblyNameFor(TypeReference type)
+        {
+            var assemblyName = 
+#if ISSOURCEGENERATOR
+            type.ContainingAssembly?.Name;
+#else
+            type.Scope?.Name;
+            if (assemblyName != null && assemblyName.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                assemblyName = assemblyName[0..^4];
+#endif
+            return assemblyName;
         }
 
         protected virtual string GetNamespace(TypeReference type)
@@ -592,6 +605,14 @@ namespace Serenity.CodeGeneration
             if (genericIdx >= 0)
                 nonGeneric = nonGeneric[..genericIdx];
 
+            ExternalType scriptType;
+            if (nonGeneric.IndexOf(":", StringComparison.Ordinal) >= 0)
+            {
+                scriptType = GetScriptType(nonGeneric);
+                if (scriptType != null)
+                    return scriptType;
+            }
+
             string ns = "";
             var dotIdx = nonGeneric.LastIndexOf(".", StringComparison.Ordinal);
             if (dotIdx >= 0)
@@ -599,8 +620,6 @@ namespace Serenity.CodeGeneration
                 ns = nonGeneric[0..dotIdx];
                 nonGeneric = nonGeneric[(dotIdx + 1)..];
             }
-
-            ExternalType scriptType;
 
             bool tryModule(string module)
             {
@@ -627,10 +646,6 @@ namespace Serenity.CodeGeneration
         {
             if (module)
             {
-                if (containingAssembly != null &&
-                    containingAssembly.EndsWith(".dll"))
-                    containingAssembly = containingAssembly[0..^4];
-
                 var nonGeneric = name;
                 var genericIdx = nonGeneric.IndexOf('`', StringComparison.Ordinal);
                 if (genericIdx >= 0)
@@ -758,12 +773,7 @@ namespace Serenity.CodeGeneration
 
         protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, bool module)
         {
-            var fullName = ShortenFullName(GetNamespace(type), type.Name, codeNamespace, module,
-#if ISSOURCEGENERATOR
-                type.ContainingAssembly?.Name);
-#else
-                type.Scope?.Name);
-#endif
+            var fullName = ShortenFullName(GetNamespace(type), type.Name, codeNamespace, module, GetAssemblyNameFor(type));
 
             if (type.IsGenericInstance())
             {

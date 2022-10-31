@@ -11,8 +11,9 @@ namespace Serenity.CodeGeneration
             var codeNamespace = GetNamespace(type);
 
             var identifier = type.Name;
-            var referencedTypeKeys = new HashSet<string>();
-            var referencedTypeAliases = new List<string>();
+            var referencedTypeKeys = new HashSet<(string group, string key)>();
+            var referencedTypeAliases = new List<(string group, string alias)>();
+
             var basedOnRow = GetBasedOnRowAndAnnotations(type, out var basedOnByName, out var rowAnnotations);
 
             cw.Indented("export class ");
@@ -50,12 +51,14 @@ namespace Serenity.CodeGeneration
                         if (formatterTypeKey is null)
                             continue;
 
-                        if (!referencedTypeKeys.Add(formatterTypeKey))
+                        if (!referencedTypeKeys.Add(("Formatter", formatterTypeKey)))
                             continue;
 
-                        var formatterScriptType = FindTypeInLookup(modularFormatterTypeByKey, formatterTypeKey, "Formatter");
+                        var formatterScriptType = FindTypeInLookup(modularFormatterTypeByKey, formatterTypeKey, "Formatter", containingAssembly: null);
                         if (formatterScriptType != null)
-                            referencedTypeAliases.Add(ReferenceScriptType(formatterScriptType, codeNamespace, module));
+                            referencedTypeAliases.Add(("Formatter", ReferenceScriptType(formatterScriptType, codeNamespace, module)));
+
+                        TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), codeNamespace, referencedTypeKeys, referencedTypeAliases);
                     }
                 }
             });
@@ -63,7 +66,7 @@ namespace Serenity.CodeGeneration
             if (module && referencedTypeAliases.Any())
             {
                 sb.AppendLine();
-                sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases) + "]; // formatter types");
+                sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases.Select(x => x.alias)) + "]; // referenced types");
             }
 
             RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);
