@@ -302,29 +302,33 @@ export default [
             toGlobal('Serenity'),
             {
                 name: 'writeFinal',
-                generateBundle: async function () {
-                    // inject tslib
-                    dtsOutputs.splice(0, 0, fs.readFileSync('./node_modules/tslib/tslib.d.ts',
-                        'utf8').replace(/^\uFEFF/, '').replace(/^[ \t]*export declare/gm, 'declare'));
-                    // inject sleekgrid typings after q
-                    dtsOutputs.splice(2, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/sleekgrid/dist/index.d.ts").toString(), 'Slick'));
+                writeBundle: {
+                    sequential: true,
+                    order: 'post',
+                    async handler({ dir }) {
+                        // inject tslib
+                        dtsOutputs.splice(0, 0, fs.readFileSync('./node_modules/tslib/tslib.d.ts',
+                            'utf8').replace(/^\uFEFF/, '').replace(/^[ \t]*export declare/gm, 'declare'));
+                        // inject sleekgrid typings after q
+                        dtsOutputs.splice(2, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/sleekgrid/dist/index.d.ts").toString(), 'Slick'));
 
-                    var src = dtsOutputs.join('\n').replace(/\r/g, '');
-                    src = mergeRefTypes(src);
-                   
-                    fs.writeFileSync('./out/Serenity.CoreLib.d.ts', src);
-                    await minifyScript('./out/Serenity.CoreLib.js');
-                    !fs.existsSync('./dist/q') && fs.mkdirSync('./dist/q');
-                    fs.copyFileSync('./out/q/index.bundle.d.ts', './dist/q/index.d.ts');
-                    !fs.existsSync('./dist/slick') && fs.mkdirSync('./dist/slick');
-                    fs.copyFileSync('./out/slick/index.bundle.d.ts', './dist/slick/index.d.ts');
-                    fs.copyFileSync('./out/index.bundle.d.ts', './dist/index.d.ts');
+                        var src = dtsOutputs.join('\n').replace(/\r/g, '');
+                        src = mergeRefTypes(src);
+                    
+                        fs.writeFileSync('./out/Serenity.CoreLib.d.ts', src);
+                        await minifyScript('./out/Serenity.CoreLib.js');
+                        !fs.existsSync('./dist/q') && fs.mkdirSync('./dist/q');
+                        fs.copyFileSync('./out/q/index.bundle.d.ts', './dist/q/index.d.ts');
+                        !fs.existsSync('./dist/slick') && fs.mkdirSync('./dist/slick');
+                        fs.copyFileSync('./out/slick/index.bundle.d.ts', './dist/slick/index.d.ts');
+                        fs.copyFileSync('./out/index.bundle.d.ts', './dist/index.d.ts');
 
-                    fs.copyFileSync('./out/Serenity.CoreLib.min.js', '../wwwroot/Serenity.CoreLib.min.js');
-                    fs.copyFileSync('./out/Serenity.CoreLib.min.js.map', '../wwwroot/Serenity.CoreLib.min.js.map');
-                    fs.copyFileSync('./out/Serenity.CoreLib.d.ts', '../wwwroot/Serenity.CoreLib.d.ts');
-                    fs.copyFileSync('./out/Serenity.CoreLib.js', '../wwwroot/Serenity.CoreLib.js');
-                    fs.copyFileSync('./out/Serenity.CoreLib.js.map', '../wwwroot/Serenity.CoreLib.js.map');
+                        fs.copyFileSync('./out/Serenity.CoreLib.min.js', '../wwwroot/Serenity.CoreLib.min.js');
+                        fs.copyFileSync('./out/Serenity.CoreLib.min.js.map', '../wwwroot/Serenity.CoreLib.min.js.map');
+                        fs.copyFileSync('./out/Serenity.CoreLib.d.ts', '../wwwroot/Serenity.CoreLib.d.ts');
+                        fs.copyFileSync('./out/Serenity.CoreLib.js', '../wwwroot/Serenity.CoreLib.js');
+                        fs.copyFileSync('./out/Serenity.CoreLib.js.map', '../wwwroot/Serenity.CoreLib.js.map');
+                    }
                 }
             }
         ],
