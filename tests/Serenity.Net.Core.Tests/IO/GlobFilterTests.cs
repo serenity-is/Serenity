@@ -6,28 +6,29 @@ public class GlobFilterTests
 {
     static readonly string[] filters = new string[]
     {
-            ".git/",
-            "/web.config",
-            "/Web.Debug.config",
-            "/wkhtmltopdf-license.txt",
-            "/Welcome.htm",
-            "/Readme.CodeGenerator.txt",
-            "/package.json",
-            "/*.conf",
-            "/bin/*.xml",
-            "/Imports/",
-            "TestResults/",
-            "*.cs",
-            "App_Data/**/*.log",
-            "/App_Code/**/*.xyz",
-            "node_modules/",
-            ".csslintrc",
-            "_references.js",
-            "*.csproj.user",
-            "*.dsk",
-            "*.suo",
-            "*-vsdoc.js",
-            "/*-dat.js"
+        ".git/",
+        "/web.config",
+        "/Web.Debug.config",
+        "/wkhtmltopdf-license.txt",
+        "/Welcome.htm",
+        "/Readme.CodeGenerator.txt",
+        "/package.json",
+        "/*.conf",
+        "/bin/*.xml",
+        "/Imports/",
+        "TestResults/",
+        "*.cs",
+        "App_Data/**/*.log",
+        "/App_Code/**/*.xyz",
+        "node_modules/",
+        ".csslintrc",
+        "_references.js",
+        "*.csproj.user",
+        "*.dsk",
+        "*.suo",
+        "*-vsdoc.js",
+        "/*-dat.js",
+        "Modules/**/*",
     };
 
     [Theory]
@@ -100,6 +101,7 @@ public class GlobFilterTests
     [InlineData(@"App_Data\abc\def\xyz.log", true)]
     [InlineData(@"App_Dat\xyz.log", false)]
     [InlineData(@"App_Data.log", false)]
+    [InlineData(@"xyz\App_Data\abc\def.log", true)]
     [InlineData(@"xyz\App_Data.log", false)]
     [InlineData(@"xyz\test.log", false)]
     [InlineData(@"test.xyz", false)]
@@ -124,6 +126,11 @@ public class GlobFilterTests
     [InlineData(@"-dat.js", true)]
     [InlineData(@"-dat.test.js", false)]
     [InlineData(@"-dat.xyz", false)]
+    [InlineData(@"Modules\test.ts", true)]
+    [InlineData(@"Modules\x\test.tsx", true)]
+    [InlineData(@"sub_modules\Modules\x\test.tsx", true)]
+    [InlineData(@"sub_modules\Modules\test.tsx", true)]
+    [InlineData(@"sub_modules\Module\x\test.tsx", false)]
     public void Glob_Filter_Works_Properly(string path, bool result)
     {
         var filter = new GlobFilter(filters);

@@ -397,7 +397,7 @@
         /// </summary>
         /// <param name="glob">The glob.</param>
         /// <returns></returns>
-        public static string NormalizeGlob(string glob)
+        private static string NormalizeGlob(string glob)
         {
             if (string.IsNullOrEmpty(glob))
                 return glob;
@@ -405,7 +405,7 @@
             if (glob.StartsWith("/") ||
                 glob.StartsWith("\\"))
                 glob = glob[1..];
-            else if (glob.IndexOf("**") < 0)
+            else if (!glob.StartsWith("**", StringComparison.Ordinal))
                 glob = "**/" + glob;
 
             if (glob.EndsWith("/") ||
