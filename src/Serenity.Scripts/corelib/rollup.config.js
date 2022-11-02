@@ -292,35 +292,13 @@ export default [
         external: ['../q', '../../q', ...external]
     },
     {
-        input: "./out/slick/index.d.ts",
+        input: "./out/index.d.ts",
         output: [{ 
-            file: "./dist/slick/index.d.ts",
+            file: "./out/index.bundle.d.ts",
             format: "es"
         }],
         plugins: [
-            dts()
-        ],
-        external: ['../q', '../../q', ...external]
-    },
-    {
-        input: "./out/serenity/index.d.ts",
-        output: [{ 
-            file: "./dist/serenity/index.d.ts",
-            format: "es"
-        }],
-        plugins: [
-            dts()
-        ],
-        external: ['../q', '../../q', '../slick', ...external]
-    },
-    {
-        input: "./out/serenity/index.d.ts",
-        output: [{ 
-            file: "./out/serenity/index.bundle.d.ts", 
-            format: "es"
-        }],
-        plugins: [
-            dts(), 
+            dts(),
             toGlobal('Serenity'),
             {
                 name: 'writeFinal',
@@ -338,7 +316,9 @@ export default [
                     await minifyScript('./out/Serenity.CoreLib.js');
                     !fs.existsSync('./dist/q') && fs.mkdirSync('./dist/q');
                     fs.copyFileSync('./out/q/index.bundle.d.ts', './dist/q/index.d.ts');
-                    fs.writeFileSync('./dist/index.d.ts', 'export * from "./serenity/index";');
+                    !fs.existsSync('./dist/slick') && fs.mkdirSync('./dist/slick');
+                    fs.copyFileSync('./out/slick/index.bundle.d.ts', './dist/slick/index.d.ts');
+                    fs.copyFileSync('./out/index.bundle.d.ts', './dist/index.d.ts');
 
                     fs.copyFileSync('./out/Serenity.CoreLib.min.js', '../wwwroot/Serenity.CoreLib.min.js');
                     fs.copyFileSync('./out/Serenity.CoreLib.min.js.map', '../wwwroot/Serenity.CoreLib.min.js.map');
@@ -348,6 +328,6 @@ export default [
                 }
             }
         ],
-        external: ['../q', '../../q', '../slick', ...external]
+        external: ['./q', '../q', '../../q', '../slick', ...external]
     }
 ];
