@@ -76,6 +76,7 @@ namespace Serenity.CodeGenerator
                 .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
                 .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
                     (x.StartsWith("/", StringComparison.Ordinal) ? x[1..] : x))
+                .Select(x => (!x.StartsWith("**/", StringComparison.Ordinal) && !x.StartsWith("/")) ? ("/" + x) : x)
                 .Select(x => PathHelper.ToPath(x));
 
             cancellationToken.ThrowIfCancellationRequested();
