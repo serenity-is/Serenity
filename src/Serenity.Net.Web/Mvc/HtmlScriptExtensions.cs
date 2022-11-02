@@ -79,6 +79,20 @@ namespace Serenity.Web
             return new HtmlString(sb.ToString());
         }
 
+        public static HtmlString ResolveWithHash(this IHtmlHelper helper, string contentUrl)
+        {
+            if (helper == null)
+                throw new ArgumentNullException(nameof(helper));
+
+            if (string.IsNullOrEmpty(contentUrl))
+                throw new ArgumentNullException(nameof(contentUrl));
+
+            var context = helper.ViewContext.HttpContext;
+
+            return new HtmlString(WebUtility.HtmlEncode(context.RequestServices.GetRequiredService<IContentHashCache>()
+                .ResolveWithHash(context.Request.PathBase, contentUrl)));
+        }
+
         public static HtmlString Script(this IHtmlHelper helper, string includeJS)
         {
             if (helper == null)
