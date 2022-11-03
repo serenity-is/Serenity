@@ -141,42 +141,6 @@ namespace Serenity.CodeGeneration
             }
         }
 
-
-        private IEnumerable<string> GetEnumTypeKeyRefs(CustomAttribute editorTypeAttr)
-        {
-            if (editorTypeAttr != null)
-            {
-                var dialogType = editorTypeAttr.NamedArguments().FirstOrDefault(x => string.Equals(x.Name(), "DialogType")).ArgumentValue() as string;
-                if (!string.IsNullOrEmpty(dialogType))
-                    yield return dialogType;
-                else
-                {
-                    var inplaceAdd = editorTypeAttr.NamedArguments().FirstOrDefault(x => string.Equals(x.Name(), "InplaceAdd")).ArgumentValue() as bool?;
-                    if (inplaceAdd == true)
-                    {
-#if ISSOURCEGENERATOR
-                        var lookupType = editorTypeAttr.ConstructorArguments().Select(x => x.Value()).OfType<ITypeSymbol>().FirstOrDefault();
-#else
-                        var lookupType = editorTypeAttr.ConstructorArguments().Select(x => x.Value()).OfType<TypeReference>().FirstOrDefault()?.Resolve();
-#endif
-
-                        if (lookupType != null)
-                        {
-                            var lookupKey = AutoLookupKeyFor(lookupType);
-                            if (!string.IsNullOrEmpty(lookupKey))
-                                yield return lookupKey;
-                        }
-                        else
-                        {
-                            var lookupKey = editorTypeAttr.ConstructorArguments().Select(x => x.Value()).OfType<string>().FirstOrDefault();
-                            if (!string.IsNullOrEmpty(lookupKey))
-                                yield return lookupKey;
-                        }
-                    }
-                }
-            }
-        }
-
         private ExternalType FindTypeInLookup(ILookup<string, ExternalType> lookup, string key, string suffix, string containingAssembly = null)
         {
             var type = lookup[key].FirstOrDefault() ??
@@ -346,7 +310,11 @@ namespace Serenity.CodeGeneration
 
                     if (editorScriptType == null &&
                         (editorScriptType = (GetScriptType(editorTypeKey) ?? GetScriptType(editorTypeKey + "Editor"))) == null)
-                        continue;
+                    {
+                        editorScriptType = module ? GetScriptType("@serenity-is/corelib:Widget") : GetScriptType("Serenity.Widget");
+                        if (editorScriptType is null)
+                            continue;
+                    }
 
                     var editorFullName = ReferenceScriptType(editorScriptType, codeNamespace, module);
                     var editorShortName = editorFullName;
