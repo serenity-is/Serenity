@@ -61,8 +61,10 @@
                 }
 
                 sb.AppendLine();
-                cw.Indented($"export declare{(module ? "" : " const")} enum ");
+                cw.Indented($"export {(module ? "const" : "declare const enum")} ");
                 sb.Append("Methods");
+                if (module)
+                    sb.Append(" =");
 
                 cw.InBrace(delegate
                 {
@@ -73,7 +75,7 @@
                             sb.AppendLine(",");
 
                         cw.Indented(methodName);
-                        sb.Append(" = \"");
+                        sb.Append(module ? ": \"" : " = \"");
                         sb.Append(serviceUrl);
                         sb.Append('/');
                         sb.Append(methodName);
@@ -83,7 +85,10 @@
                     }
 
                     sb.AppendLine();
-                });
+                }, endLine: !module);
+
+                if (module)
+                    sb.AppendLine(" as const;");
 
                 sb.AppendLine();
 
