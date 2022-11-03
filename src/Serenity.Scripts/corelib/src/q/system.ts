@@ -26,17 +26,44 @@ export function deepClone<T = any>(a: T, a2?: any, a3?: any): T {
         return extend(extend(deepClone(a || {}), deepClone(a2 || {})), deepClone(a3 || {}));
     }
 
-    if (!a)
-        return a;
-    
-    let v: any;
-    let b: T = Array.isArray(a) ? [] : {} as any;
-    for (const k in a) {
-        v = a[k];
-        b[k] = (typeof v === "object") ? deepClone(v) : v;
+    // https://github.com/angus-c/just/blob/master/packages/collection-clone/index.js
+    var result = a;
+    var type = {}.toString.call(a).slice(8, -1);
+    if (type == 'Set') {
+        return new Set([...(a as any)].map(value => deepClone(value))) as any;
     }
-    
-    return b;
+    if (type == 'Map') {
+        return new Map([...(a as any)].map(kv => [deepClone(kv[0]), deepClone(kv[1])])) as any;
+    }
+    if (type == 'Date') {
+        return new Date((a as any).getTime()) as any;
+    }
+    if (type == 'RegExp') {
+        return RegExp((a as any).source, getRegExpFlags(a as any)) as any;
+    }
+    if (type == 'Array' || type == 'Object') {
+        result = (Array.isArray(a) ? [] : {}) as any;
+        for (var key in a) {
+            // include prototype properties
+            result[key] = deepClone(a[key]);
+        }
+    }
+    // primitives and non-supported objects (e.g. functions) land here
+    return result;
+}
+
+function getRegExpFlags(regExp: RegExp) {
+    if (typeof (regExp.source as any).flags == 'string') {
+        return (regExp.source as any).flags;
+    } else {
+        var flags = [];
+        regExp.global && flags.push('g');
+        regExp.ignoreCase && flags.push('i');
+        regExp.multiline && flags.push('m');
+        regExp.sticky && flags.push('y');
+        regExp.unicode && flags.push('u');
+        return flags.join('');
+    }
 }
 
 // @ts-ignore check for global
