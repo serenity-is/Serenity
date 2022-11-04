@@ -1,4 +1,4 @@
-﻿import type { FormatterContext, Event, Grid, Group, Range, SelectionModel } from "@serenity-is/sleekgrid"
+﻿import type { FormatterContext, Group } from "@serenity-is/sleekgrid";
 import { PropertyItem } from "../q";
 
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;

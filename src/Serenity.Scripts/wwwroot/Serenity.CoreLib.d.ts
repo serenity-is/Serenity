@@ -2445,13 +2445,6 @@ declare namespace Slick {
 }
 
 
-declare namespace Slick {
-    interface Column<TItem = any> {
-        referencedFields?: string[];
-        sourceItem?: Q.PropertyItem;
-    }
-}
-
 declare namespace Serenity {
     export import ColumnSelection = Q.ColumnSelection;
     export import DeleteRequest = Q.DeleteRequest;
@@ -2477,6 +2470,7 @@ declare namespace Serenity {
     export import SummaryType = Q.SummaryType;
     export import UndeleteRequest = Q.UndeleteRequest;
     export import UndeleteResponse = Q.UndeleteResponse;
+    export import Formatter = Slick.Formatter;
 
 
     function Criteria(field: string): any[];
@@ -4046,147 +4040,8 @@ declare namespace Serenity {
         protected getTemplate(): string;
     }
 
-    type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
-
-    interface Formatter {
-        format(ctx: Slick.FormatterContext): string;
-    }
-    interface GroupInfo<TItem> {
-        getter?: any;
-        formatter?: (p1: Slick.Group<TItem>) => string;
-        comparer?: (a: Slick.Group<TItem>, b: Slick.Group<TItem>) => number;
-        aggregators?: any[];
-        aggregateCollapsed?: boolean;
-        lazyTotalsCalculation?: boolean;
-    }
-    interface PagerOptions {
-        view?: any;
-        showRowsPerPage?: boolean;
-        rowsPerPage?: number;
-        rowsPerPageOptions?: number[];
-        onChangePage?: (newPage: number) => void;
-        onRowsPerPageChange?: (n: number) => void;
-    }
-    interface SummaryOptions {
-        aggregators: any[];
-    }
-    interface PagingOptions {
-        rowsPerPage?: number;
-        page?: number;
-    }
-
-    interface RemoteViewOptions {
-        autoLoad?: boolean;
-        idField?: string;
-        contentType?: string;
-        dataType?: string;
-        filter?: any;
-        params?: any;
-        onSubmit?: CancellableViewCallback<any>;
-        url?: string;
-        localSort?: boolean;
-        sortBy?: any;
-        rowsPerPage?: number;
-        seekToPage?: number;
-        onProcessData?: RemoteViewProcessCallback<any>;
-        method?: string;
-        inlineFilters?: boolean;
-        groupItemMetadataProvider?: Slick.Data.GroupItemMetadataProvider;
-        onAjaxCall?: RemoteViewAjaxCallback<any>;
-        getItemMetadata?: (p1?: any, p2?: number) => any;
-        errorMsg?: string;
-    }
-    interface PagingInfo {
-        rowsPerPage: number;
-        page: number;
-        totalCount: number;
-        loading: boolean;
-        error: string;
-        dataView: RemoteView<any>;
-    }
-    type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
-    type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
-    type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
-    type RemoteViewProcessCallback<TEntity> = (data: Q.ListResponse<TEntity>, view: RemoteView<TEntity>) => Q.ListResponse<TEntity>;
-    interface RemoteView<TEntity> {
-        onSubmit: CancellableViewCallback<TEntity>;
-        onDataChanged: Slick.Event;
-        onDataLoading: Slick.Event;
-        onDataLoaded: Slick.Event;
-        onPagingInfoChanged: Slick.Event;
-        onRowCountChanged: Slick.Event;
-        onRowsChanged: Slick.Event;
-        onRowsOrCountChanged: Slick.Event;
-        getPagingInfo(): PagingInfo;
-        onGroupExpanded: Slick.Event;
-        onGroupCollapsed: Slick.Event;
-        onAjaxCall: RemoteViewAjaxCallback<TEntity>;
-        onProcessData: RemoteViewProcessCallback<TEntity>;
-        addData(data: Q.ListResponse<TEntity>): void;
-        beginUpdate(): void;
-        endUpdate(): void;
-        deleteItem(id: any): void;
-        getItems(): TEntity[];
-        setFilter(filter: RemoteViewFilter<TEntity>): void;
-        getFilter(): RemoteViewFilter<TEntity>;
-        getFilteredItems(): any;
-        fastSort: any;
-        setItems(items: any[], newIdProperty?: boolean | string): void;
-        getIdPropertyName(): string;
-        getItemById(id: any): TEntity;
-        getGrandTotals(): any;
-        getGrouping(): GroupInfo<TEntity>[];
-        getGroups(): any[];
-        getRowById(id: any): number;
-        getRowByItem(item: any): number;
-        getRows(): any[];
-        mapItemsToRows(itemArray: any[]): any[];
-        mapRowsToIds(rowArray: number[]): any[];
-        mapIdsToRows(idAray: any[]): number[];
-        setFilterArgs(args: any): void;
-        setRefreshHints(hints: any[]): void;
-        insertItem(insertBefore: number, item: any): void;
-        sortedAddItem(item: any): void;
-        sortedUpdateItem(id: any, item: any): void;
-        syncGridSelection(grid: any, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): void;
-        syncGridCellCssStyles(grid: any, key: string): void;
-        getItemMetadata(i: number): any;
-        updateItem(id: any, item: TEntity): void;
-        addItem(item: TEntity): void;
-        getIdxById(id: any): any;
-        getItemByIdx(index: number): any;
-        setGrouping(groupInfo: GroupInfo<TEntity>[]): void;
-        collapseAllGroups(level: number): void;
-        expandAllGroups(level: number): void;
-        expandGroup(keys: any[]): void;
-        collapseGroup(keys: any[]): void;
-        setSummaryOptions(options: SummaryOptions): void;
-        setPagingOptions(options: PagingOptions): void;
-        refresh(): void;
-        populate(): void;
-        populateLock(): void;
-        populateUnlock(): void;
-        getItem(row: number): any;
-        getLength(): number;
-        rowsPerPage: number;
-        errormsg: string;
-        params: any;
-        getLocalSort(): boolean;
-        setLocalSort(value: boolean): void;
-        sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
-        reSort(): void;
-        sortBy: string[];
-        url: string;
-        method: string;
-        idField: string;
-        seekToPage?: number;
-    }
-    class RemoteView<TEntity> {
-        constructor(options: RemoteViewOptions);
-    }
-
     class SlickPager extends Widget<PagerOptions> {
-        constructor(div: JQuery, o: PagerOptions);
+        constructor(div: JQuery, o: Slick.PagerOptions);
         _changePage(ctype: string): boolean;
         _updatePager(): void;
     }
@@ -4194,7 +4049,7 @@ declare namespace Serenity {
     interface IDataGrid {
         getElement(): JQuery;
         getGrid(): Slick.Grid;
-        getView(): RemoteView<any>;
+        getView(): Slick.RemoteView<any>;
         getFilterStore(): FilterStore;
     }
 
@@ -4242,8 +4097,8 @@ declare namespace Serenity {
     }
     namespace GridUtils {
         function addToggleButton(toolDiv: JQuery, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
-        function addIncludeDeletedToggle(toolDiv: JQuery, view: RemoteView<any>, hint?: string, initial?: boolean): void;
-        function addQuickSearchInput(toolDiv: JQuery, view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void;
+        function addIncludeDeletedToggle(toolDiv: JQuery, view: Slick.RemoteView<any>, hint?: string, initial?: boolean): void;
+        function addQuickSearchInput(toolDiv: JQuery, view: Slick.RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void;
         function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
         function makeOrderable(grid: Slick.Grid, handleMove: (p1: any, p2: number) => void): void;
         function makeOrderableWithUpdateRequest(grid: IDataGrid, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => Q.SaveRequest<any>): void;
@@ -4254,26 +4109,26 @@ declare namespace Serenity {
     }
     namespace SlickFormatting {
         function getEnumText(enumKey: string, name: string): string;
-        function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any, formatter: Format): Format;
-        function date(format?: string): Format;
-        function dateTime(format?: string): Format;
-        function checkBox(): Format;
-        function number(format: string): Format;
+        function treeToggle(getView: () => Slick.RemoteView<any>, getId: (x: any) => any, formatter: Slick.Format): Slick.Format;
+        function date(format?: string): Slick.Format;
+        function dateTime(format?: string): Slick.Format;
+        function checkBox(): Slick.Format;
+        function number(format: string): Slick.Format;
         function getItemType(link: JQuery): string;
         function getItemId(link: JQuery): string;
         function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
-        function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: Format<TItem>, encode?: boolean): Format<TItem>;
+        function itemLink<TItem = any>(itemType: string, idField: string, getText: Slick.Format<TItem>, cssClass?: Slick.Format<TItem>, encode?: boolean): Slick.Format<TItem>;
     }
     namespace SlickHelper {
         function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any;
     }
     namespace SlickTreeHelper {
         function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
-        function filterById<TItem>(item: TItem, view: RemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
+        function filterById<TItem>(item: TItem, view: Slick.RemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
         function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
         function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
         function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
-        function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: RemoteView<TItem>, getId: (x: TItem) => any): void;
+        function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void;
     }
 
     interface IInitializeColumn {
@@ -4383,7 +4238,7 @@ declare namespace Serenity {
         private isDisabled;
         private slickGridOnSort;
         private slickGridOnClick;
-        view: RemoteView<TItem>;
+        view: Slick.RemoteView<TItem>;
         slickGrid: Slick.Grid;
         openDialogsAsPanel: boolean;
         static defaultRowHeight: number;
@@ -4452,20 +4307,20 @@ declare namespace Serenity {
         protected onViewSubmit(): boolean;
         protected markupReady(): void;
         protected createSlickContainer(): JQuery;
-        protected createView(): RemoteView<TItem>;
+        protected createView(): Slick.RemoteView<TItem>;
         protected getDefaultSortBy(): any[];
         protected usePager(): boolean;
         protected enableFiltering(): boolean;
         protected populateWhenVisible(): boolean;
         protected createFilterBar(): void;
-        protected getPagerOptions(): PagerOptions;
+        protected getPagerOptions(): Slick.PagerOptions;
         protected createPager(): void;
-        protected getViewOptions(): RemoteViewOptions;
+        protected getViewOptions(): Slick.RemoteViewOptions;
         protected createToolbar(buttons: ToolButton[]): void;
         getTitle(): string;
         setTitle(value: string): void;
         protected getItemType(): string;
-        protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Format<TItem>;
+        protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Slick.Format<TItem>;
         protected getColumnsKey(): string;
         protected getPropertyItems(): Q.PropertyItem[];
         protected getPropertyItemsData(): Q.PropertyItemsData;
@@ -4515,7 +4370,7 @@ declare namespace Serenity {
         protected getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
         getElement(): JQuery;
         getGrid(): Slick.Grid;
-        getView(): RemoteView<TItem>;
+        getView(): Slick.RemoteView<TItem>;
         getFilterStore(): FilterStore;
     }
 
@@ -4694,7 +4549,7 @@ declare namespace Serenity {
         protected editItemOfType(itemType: string, entityOrId: any): void;
         private service;
         protected getService(): string;
-        protected getViewOptions(): RemoteViewOptions;
+        protected getViewOptions(): Slick.RemoteViewOptions;
         protected getItemType(): string;
         protected routeDialog(itemType: string, dialog: Widget<any>): void;
         protected getInsertPermission(): string;

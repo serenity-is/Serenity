@@ -21,7 +21,6 @@ import { QuickFilter } from "./quickfilter";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 import { Column, ColumnSort, Event, FormatterContext, Grid, GridOptions, IPlugin, ItemMetadata, Range, SelectionModel } from "@serenity-is/sleekgrid";
-export type { Formatter } from "../../slick";
 
 declare global {
     namespace Slick {

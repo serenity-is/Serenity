@@ -3,7 +3,9 @@
 /// <reference types="jqueryui" />
 import { PropertyItem, executeOnceWhenVisible, executeEverytimeWhenVisible, DialogButton, PropertyItemsData, ColumnSelection, ListRequest, ServiceOptions, ListResponse, ArgumentNullException, SaveRequest, HandleRouteEventArgs, DeleteResponse, Exception, RetrieveResponse, RetrieveRequest, SaveResponse, UndeleteResponse, ServiceRequest, ServiceResponse } from './q';
 export { ColumnSelection, DeleteRequest, DeleteResponse, ISlickFormatter, ListRequest, ListResponse, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, UndeleteRequest, UndeleteResponse } from './q';
-import { FormatterContext, Group, Event, Grid, Column, ItemMetadata, IPlugin, SelectionModel, Range, GridOptions } from '@serenity-is/sleekgrid';
+import { PagerOptions, RemoteView, Format, Formatter, RemoteViewOptions } from './slick';
+export { Formatter } from './slick';
+import { Grid, Column, FormatterContext, ItemMetadata, IPlugin, Event, SelectionModel, Range, GridOptions } from '@serenity-is/sleekgrid';
 
 declare global {
     namespace Select2 {
@@ -1695,150 +1697,6 @@ declare class FilterDisplayBar extends FilterWidgetBase<any> {
     protected getTemplate(): string;
 }
 
-declare type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
-declare module "@serenity-is/sleekgrid" {
-    interface Column<TItem = any> {
-        referencedFields?: string[];
-        sourceItem?: PropertyItem;
-    }
-}
-interface Formatter {
-    format(ctx: FormatterContext): string;
-}
-interface GroupInfo<TItem> {
-    getter?: any;
-    formatter?: (p1: Group<TItem>) => string;
-    comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
-    aggregators?: any[];
-    aggregateCollapsed?: boolean;
-    lazyTotalsCalculation?: boolean;
-}
-interface PagerOptions {
-    view?: any;
-    showRowsPerPage?: boolean;
-    rowsPerPage?: number;
-    rowsPerPageOptions?: number[];
-    onChangePage?: (newPage: number) => void;
-    onRowsPerPageChange?: (n: number) => void;
-}
-interface SummaryOptions {
-    aggregators: any[];
-}
-interface PagingOptions {
-    rowsPerPage?: number;
-    page?: number;
-}
-
-interface RemoteViewOptions {
-    autoLoad?: boolean;
-    idField?: string;
-    contentType?: string;
-    dataType?: string;
-    filter?: any;
-    params?: any;
-    onSubmit?: CancellableViewCallback<any>;
-    url?: string;
-    localSort?: boolean;
-    sortBy?: any;
-    rowsPerPage?: number;
-    seekToPage?: number;
-    onProcessData?: RemoteViewProcessCallback<any>;
-    method?: string;
-    inlineFilters?: boolean;
-    groupItemMetadataProvider?: Slick.Data.GroupItemMetadataProvider;
-    onAjaxCall?: RemoteViewAjaxCallback<any>;
-    getItemMetadata?: (p1?: any, p2?: number) => any;
-    errorMsg?: string;
-}
-interface PagingInfo {
-    rowsPerPage: number;
-    page: number;
-    totalCount: number;
-    loading: boolean;
-    error: string;
-    dataView: RemoteView<any>;
-}
-declare type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
-declare type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
-declare type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
-declare type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
-interface RemoteView<TEntity> {
-    onSubmit: CancellableViewCallback<TEntity>;
-    onDataChanged: Event;
-    onDataLoading: Event;
-    onDataLoaded: Event;
-    onPagingInfoChanged: Event;
-    onRowCountChanged: Event;
-    onRowsChanged: Event;
-    onRowsOrCountChanged: Event;
-    getPagingInfo(): PagingInfo;
-    onGroupExpanded: Event;
-    onGroupCollapsed: Event;
-    onAjaxCall: RemoteViewAjaxCallback<TEntity>;
-    onProcessData: RemoteViewProcessCallback<TEntity>;
-    addData(data: ListResponse<TEntity>): void;
-    beginUpdate(): void;
-    endUpdate(): void;
-    deleteItem(id: any): void;
-    getItems(): TEntity[];
-    setFilter(filter: RemoteViewFilter<TEntity>): void;
-    getFilter(): RemoteViewFilter<TEntity>;
-    getFilteredItems(): any;
-    fastSort: any;
-    setItems(items: any[], newIdProperty?: boolean | string): void;
-    getIdPropertyName(): string;
-    getItemById(id: any): TEntity;
-    getGrandTotals(): any;
-    getGrouping(): GroupInfo<TEntity>[];
-    getGroups(): any[];
-    getRowById(id: any): number;
-    getRowByItem(item: any): number;
-    getRows(): any[];
-    mapItemsToRows(itemArray: any[]): any[];
-    mapRowsToIds(rowArray: number[]): any[];
-    mapIdsToRows(idAray: any[]): number[];
-    setFilterArgs(args: any): void;
-    setRefreshHints(hints: any[]): void;
-    insertItem(insertBefore: number, item: any): void;
-    sortedAddItem(item: any): void;
-    sortedUpdateItem(id: any, item: any): void;
-    syncGridSelection(grid: any, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): void;
-    syncGridCellCssStyles(grid: any, key: string): void;
-    getItemMetadata(i: number): any;
-    updateItem(id: any, item: TEntity): void;
-    addItem(item: TEntity): void;
-    getIdxById(id: any): any;
-    getItemByIdx(index: number): any;
-    setGrouping(groupInfo: GroupInfo<TEntity>[]): void;
-    collapseAllGroups(level: number): void;
-    expandAllGroups(level: number): void;
-    expandGroup(keys: any[]): void;
-    collapseGroup(keys: any[]): void;
-    setSummaryOptions(options: SummaryOptions): void;
-    setPagingOptions(options: PagingOptions): void;
-    refresh(): void;
-    populate(): void;
-    populateLock(): void;
-    populateUnlock(): void;
-    getItem(row: number): any;
-    getLength(): number;
-    rowsPerPage: number;
-    errormsg: string;
-    params: any;
-    getLocalSort(): boolean;
-    setLocalSort(value: boolean): void;
-    sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
-    reSort(): void;
-    sortBy: string[];
-    url: string;
-    method: string;
-    idField: string;
-    seekToPage?: number;
-}
-declare class RemoteView<TEntity> {
-    constructor(options: RemoteViewOptions);
-}
-
 declare class SlickPager extends Widget<PagerOptions> {
     constructor(div: JQuery, o: PagerOptions);
     _changePage(ctype: string): boolean;
@@ -2654,4 +2512,4 @@ declare class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implem
 
 declare type Constructor<T> = new (...args: any[]) => T;
 
-export { AnyWidgetClass, AsyncLookupEditor, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, CKEditorConfig, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, CheckLookupEditorOptions, CheckTreeEditor, CheckTreeItem, CheckboxFormatter, ColumnPickerDialog, ColumnsKeyAttribute, Constructor, CreateWidgetParams, Criteria, CriteriaWithText, CssClassAttribute, DataChangeInfo, DataGrid, DateEditor, DateFiltering, DateFormatter, DateTimeEditor, DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, DateYearEditorOptions, DecimalEditor, DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, DialogExtensions, DialogTypeAttribute, DialogTypeRegistry, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, EditorTypeAttribute, EditorTypeAttributeBase, EditorTypeRegistry, EditorUtils, ElementAttribute, EmailAddressEditor, EmailEditor, EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, EnumEditor, EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, FileDownloadFormatter, FileUploadConstraints, FileUploadEditor, FileUploadEditorOptions, FilterDialog, FilterDisplayBar, FilterLine, FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, Flexify, FlexifyAttribute, FlexifyOptions, FormKeyAttribute, Formatter, FormatterTypeRegistry, GeneratedCodeAttribute, GoogleMap, GoogleMapOptions, GridPersistanceFlags, GridRadioSelectionMixin, GridRadioSelectionMixinOptions, GridRowSelectionMixin, GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, HiddenAttribute, HintAttribute, HtmlContentEditor, HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IAsyncInit, IBooleanValue, IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, ISetEditValue, IStringValue, IValidateRequired, IdPropertyAttribute, ImageUploadEditor, ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, IntegerEditorOptions, IntegerFiltering, IsActivePropertyAttribute, ItemNameAttribute, LazyLoadHelper, LocalTextPrefixAttribute, LookupEditor, LookupEditorBase, LookupEditorOptions, LookupFiltering, MaskedEditor, MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MinuteFormatter, ModalOptions, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, PanelAttribute, PasswordEditor, PersistedGridColumn, PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, PopupMenuButtonOptions, PopupToolButton, PopupToolButtonOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, PropertyGridOptions, PropertyItemSlickConverter, PropertyPanel, QuickFilter, QuickFilterArgs, QuickFilterBar, QuickFilterBarOptions, QuickSearchField, QuickSearchInput, QuickSearchInputOptions, RadioButtonEditor, RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, Reporting, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, ScriptContext, Select2AjaxEditor, Select2CommonOptions, Select2Editor, Select2EditorOptions, Select2FilterOptions, Select2InplaceAddOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult, SelectEditor, SelectEditorOptions, ServiceAttribute, ServiceLookupEditor, ServiceLookupEditorBase, ServiceLookupEditorOptions, ServiceLookupFiltering, SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, SubDialogHelper, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, TextAreaEditorOptions, TimeEditor, TimeEditorOptions, ToolButton, Toolbar, ToolbarOptions, TreeGridMixin, TreeGridMixinOptions, URLEditor, UpdatableAttribute, UploadHelper, UploadInputOptions, UploadResponse, UploadedFile, UrlFormatter, VX, ValidationHelper, WX, Widget, WidgetClass, WidgetComponentProps, WidgetDialogClass, datePickerIconSvg, reactPatch };
+export { AnyWidgetClass, AsyncLookupEditor, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, CKEditorConfig, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, CheckLookupEditorOptions, CheckTreeEditor, CheckTreeItem, CheckboxFormatter, ColumnPickerDialog, ColumnsKeyAttribute, Constructor, CreateWidgetParams, Criteria, CriteriaWithText, CssClassAttribute, DataChangeInfo, DataGrid, DateEditor, DateFiltering, DateFormatter, DateTimeEditor, DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, DateYearEditorOptions, DecimalEditor, DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, DialogExtensions, DialogTypeAttribute, DialogTypeRegistry, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, EditorTypeAttribute, EditorTypeAttributeBase, EditorTypeRegistry, EditorUtils, ElementAttribute, EmailAddressEditor, EmailEditor, EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, EnumEditor, EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, FileDownloadFormatter, FileUploadConstraints, FileUploadEditor, FileUploadEditorOptions, FilterDialog, FilterDisplayBar, FilterLine, FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, Flexify, FlexifyAttribute, FlexifyOptions, FormKeyAttribute, FormatterTypeRegistry, GeneratedCodeAttribute, GoogleMap, GoogleMapOptions, GridPersistanceFlags, GridRadioSelectionMixin, GridRadioSelectionMixinOptions, GridRowSelectionMixin, GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, HiddenAttribute, HintAttribute, HtmlContentEditor, HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IAsyncInit, IBooleanValue, IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, ISetEditValue, IStringValue, IValidateRequired, IdPropertyAttribute, ImageUploadEditor, ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, IntegerEditorOptions, IntegerFiltering, IsActivePropertyAttribute, ItemNameAttribute, LazyLoadHelper, LocalTextPrefixAttribute, LookupEditor, LookupEditorBase, LookupEditorOptions, LookupFiltering, MaskedEditor, MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MinuteFormatter, ModalOptions, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, PanelAttribute, PasswordEditor, PersistedGridColumn, PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, PopupMenuButtonOptions, PopupToolButton, PopupToolButtonOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, PropertyGridOptions, PropertyItemSlickConverter, PropertyPanel, QuickFilter, QuickFilterArgs, QuickFilterBar, QuickFilterBarOptions, QuickSearchField, QuickSearchInput, QuickSearchInputOptions, RadioButtonEditor, RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, Reporting, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, ScriptContext, Select2AjaxEditor, Select2CommonOptions, Select2Editor, Select2EditorOptions, Select2FilterOptions, Select2InplaceAddOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult, SelectEditor, SelectEditorOptions, ServiceAttribute, ServiceLookupEditor, ServiceLookupEditorBase, ServiceLookupEditorOptions, ServiceLookupFiltering, SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, SubDialogHelper, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, TextAreaEditorOptions, TimeEditor, TimeEditorOptions, ToolButton, Toolbar, ToolbarOptions, TreeGridMixin, TreeGridMixinOptions, URLEditor, UpdatableAttribute, UploadHelper, UploadInputOptions, UploadResponse, UploadedFile, UrlFormatter, VX, ValidationHelper, WX, Widget, WidgetClass, WidgetComponentProps, WidgetDialogClass, datePickerIconSvg, reactPatch };

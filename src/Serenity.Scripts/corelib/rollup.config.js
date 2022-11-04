@@ -332,6 +332,6 @@ export default [
                 }
             }
         ],
-        external: ['./q', '../q', '../../q', '../slick', ...external]
+        external: ['./q', '../q', '../../q', './slick', '../../slick', '../slick', ...external]
     }
 ];
