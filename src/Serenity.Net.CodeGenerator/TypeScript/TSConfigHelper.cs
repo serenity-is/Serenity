@@ -205,7 +205,7 @@ namespace Serenity.CodeGenerator
                 if (config is null)
                     continue;
 
-                if (config.CompilerOptions?.Module is not (null or "none"))
+                if (config.CompilerOptions?.Module?.ToLowerInvariant() is not (null or "none"))
                     modulesPath ??= configPath;
                 else
                     namespacesPath ??= configPath;
