@@ -1,3 +1,44 @@
+## 6.3.0 (2022-11-06)
+
+Features:
+  - added simplified IFileSystem base interface which removes dependency to System.IO.Abstractions, but it can still be used in tests
+  - upload behavior refinements, remove hard coded dependency to editor attributes and use interfaces instead
+  - allow upload attributes other than ImageUploadEditor / MultipleImageUploadEditor to be also handled by upload behaviors by implementing some interfaces
+  - renamed MultipleImageUploadEditor to MultipleFileUploadEditor, ImageUploadBehavior to FileUploadBehavior
+  - testable disk upload storage via IDiskUploadFileSystem abstraction. it can also be used to create a custom disk upload storage.
+  - ported several tests including local texts, globalfilter written in .NET framework for Serenity.Core
+  - use LookupEditorBaseAttribute / ServiceLookupEditorBaseAttribute for editors defined in modules as well
+  - replace const enums with normal enums to comply with isolatedModules option
+  - export Formatter interface from @serenity-is/corelib in additional to @serenity-is/corelib/slick
+  - enable tsbuild clear plugin by default only when splitting is true. it is still possible to enable it by specifying clean: true
+  - delete only .js / .js.map files when clean plugin is enabled for tsbuild
+  - don't use const enum for es modules service method exports, but use const object instead
+  - better handling for enum types in es modules 
+  - better handling for Razor SDK projects that use ProjectName dir instead of Modules folder
+  - improve imports for external module types in code / source generators
+  - moved ui overrides to serenity corelib from pro.extensions
+  - create new buttons-inner divs when a toolbar has separator, instead of creating a separator div
+  - specify full names for more classes including QuickSearchInput, TemplatedDialog etc.
+  - Areas/ProjectName is also scanned by MVC generator for views / strip view parts
+  - set buttontext as icon font only for < jquery ui 1.12.1 as 1.13x does not allow html in button text
+  - reuse editor type finding for external libs as long as their namespace match with project name. this improves type discovery for modules, as typescript does not preserve decorators in .d.ts files. make sure your namespaces match the project name, e.g. an editor with key 'MyLib.MySome.MyEditor' should be exported from a 'MyLib.MySome' project (mylib.mysome npm package) with 'MyEditor' classname.
+  - extends support for tsconfig.json in source / code generator
+  - better determination of module name in TSModuleResolver for node_modules packages
+  - also restore dist/index.js for project references to node_modules in addition to dist/index.ts
+  - auto fake import enums in form.ts / columns.ts if possible, to avoid errors when such types are in a different module
+  - add ResolveWithHash to HtmlScriptExtensions so it can be used to avoid caching issues while importing module page scripts under esm/..
+  - instead of removing a property from the form.ts when the editor type can't be discovered, assume it as a widget so it can be understood something is wrong and "as any" etc can be used to reference the form field in such cases
+
+Bugfixes:
+  - output directory for Razor SDK projects should use ProjectName dir instead of Modules
+  - fix RowSelectionModel plugin export
+  - fix executeOnceWhenVisible alias in corelib typings
+  - fix GlobFilter regex based matching for `Modules/**/*` style patterns
+  - fix TSFileLister does not work exactly like tsconfig for patterns, as TypeScript considers all patterns to start at root unlike gitignore patterns
+  - fix deepClone does not work properly with Date and several other types of objects (used https://github.com/angus-c/just)
+  - also check for "None" in addition to "none" or other cases for module / namespace detection
+
+
 ## 6.2.9 (2022-10-22)
 
 Features:
