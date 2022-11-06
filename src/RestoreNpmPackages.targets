@@ -5,7 +5,7 @@
         <StampFile>$([System.IO.Path]::Combine('%(RootDir)%(Directory)', 'node_modules', '.install-stamp'))</StampFile>
         <WorkingDir>%(RootDir)%(Directory)</WorkingDir>
         <NodeModulesDir>%(RootDir)%(Directory)\node_modules\</NodeModulesDir>
-        <InstallCommand>npm ci</InstallCommand>
+        <InstallCommand>npm install</InstallCommand>
       </NpmPackageFile>
     </ItemGroup>
   </Target>
