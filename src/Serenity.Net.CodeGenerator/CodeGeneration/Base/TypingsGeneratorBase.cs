@@ -225,7 +225,7 @@ namespace Serenity.CodeGeneration
                     if (type.SourceFile?.EndsWith(".d.ts") == true &&
                         (HasBaseType(type, ClientTypesGenerator.EditorBaseClasses) ||
                          (HasBaseType(type, "@serenity-is/corelib:Widget", "Widget") &&
-                          type.Name.EndsWith("Editor", StringComparison.Ordinal))))
+                          type.Name?.EndsWith("Editor", StringComparison.Ordinal) == true)))
                     {
                         return (key: type.Name, type);
                     }
@@ -258,7 +258,7 @@ namespace Serenity.CodeGeneration
                     if (type.SourceFile?.EndsWith(".d.ts") == true &&
                         type.Interfaces != null &&
                         type.Interfaces.Any(x => x == "ISlickFormatter" || 
-                            x.EndsWith(".ISlickFormatter", StringComparison.Ordinal)))
+                            x?.EndsWith(".ISlickFormatter", StringComparison.Ordinal) == true))
                     {
                         return (key: type.Name, type);
                     }
