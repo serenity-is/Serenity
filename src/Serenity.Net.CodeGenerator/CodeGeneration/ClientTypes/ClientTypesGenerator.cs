@@ -120,9 +120,9 @@
                     string.Equals(x.Type, "registerClass", StringComparison.Ordinal) ||
                     string.Equals(x.Type, "registerEditor", StringComparison.Ordinal) ||
                     string.Equals(x.Type, "registerFormatter", StringComparison.Ordinal) ||
-                    x.Type.EndsWith(".registerClass", StringComparison.Ordinal) ||
-                    x.Type.EndsWith(".registerEditor", StringComparison.Ordinal) ||
-                    x.Type.EndsWith(".registerFormatter", StringComparison.Ordinal))
+                    x.Type?.EndsWith(".registerClass", StringComparison.Ordinal) == true ||
+                    x.Type?.EndsWith(".registerEditor", StringComparison.Ordinal) == true ||
+                    x.Type?.EndsWith(".registerFormatter", StringComparison.Ordinal) == true)
                 )?.Arguments[0].Value as string;
 
             if (string.IsNullOrEmpty(ns))
