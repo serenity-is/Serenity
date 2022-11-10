@@ -1,6 +1,14 @@
+## 6.3.1 (2022-11-08)
+
+Bugfixes:
+  - possible null reference exception in sergen when combination types used as interfaces
+
 ## 6.3.0 (2022-11-06)
 
 Features:
+  - ported all common features projects to ES modules, including Serenity.Extensions, Serenity.Demo.BasicSamples, Serenity.Demo.Northwind
+  - ported all pro features projects to ES modules, including Serenity.Pro.Extensions, Serenity.Demo.AdvancedSamples, Serenity.Pro.Meeting etc. [StartSharp]
+  - moved CSHTML views for feature packages to `/Areas/ProjectName` and code files to `/Modules` instead of `/ProjectName/`
   - added simplified IFileSystem base interface which removes dependency to System.IO.Abstractions, but it can still be used in tests
   - upload behavior refinements, remove hard coded dependency to editor attributes and use interfaces instead
   - allow upload attributes other than ImageUploadEditor / MultipleImageUploadEditor to be also handled by upload behaviors by implementing some interfaces
@@ -28,6 +36,7 @@ Features:
   - auto fake import enums in form.ts / columns.ts if possible, to avoid errors when such types are in a different module
   - add ResolveWithHash to HtmlScriptExtensions so it can be used to avoid caching issues while importing module page scripts under esm/..
   - instead of removing a property from the form.ts when the editor type can't be discovered, assume it as a widget so it can be understood something is wrong and "as any" etc can be used to reference the form field in such cases
+  - adapt email client css for BS5 theme [StartSharp]
 
 Bugfixes:
   - output directory for Razor SDK projects should use ProjectName dir instead of Modules
@@ -37,7 +46,7 @@ Bugfixes:
   - fix TSFileLister does not work exactly like tsconfig for patterns, as TypeScript considers all patterns to start at root unlike gitignore patterns
   - fix deepClone does not work properly with Date and several other types of objects (used https://github.com/angus-c/just)
   - also check for "None" in addition to "none" or other cases for module / namespace detection
-
+  - fix email client script error [StartSharp]
 
 ## 6.2.9 (2022-10-22)
 
