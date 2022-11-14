@@ -453,7 +453,7 @@ interface WidgetComponentProps<W extends Widget<any>> {
     value?: any;
     defaultValue?: any;
 }
-declare class Widget<TOptions> {
+declare class Widget<TOptions = any> {
     private static nextWidgetNumber;
     element: JQuery;
     protected options: TOptions;

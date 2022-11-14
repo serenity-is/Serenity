@@ -2813,7 +2813,7 @@ declare namespace Serenity {
         value?: any;
         defaultValue?: any;
     }
-    class Widget<TOptions> {
+    class Widget<TOptions = any> {
         private static nextWidgetNumber;
         element: JQuery;
         protected options: TOptions;

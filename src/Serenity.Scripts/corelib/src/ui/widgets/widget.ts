@@ -55,7 +55,7 @@ export interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> 
 }
 
 @Decorators.registerClass('Serenity.Widget')
-export class Widget<TOptions> {
+export class Widget<TOptions = any> {
     private static nextWidgetNumber = 0;
     public element: JQuery;
     protected options: TOptions;
