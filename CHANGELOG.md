@@ -1,3 +1,8 @@
+## 6.3.3 (2022-11-14)
+
+Features:
+  - change TOptions generic argument for Widget to default to any
+
 ## 6.3.2 (2022-11-14)
 
 Bugfixes:
