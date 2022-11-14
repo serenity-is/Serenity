@@ -2014,6 +2014,7 @@ declare namespace Slick {
     	private invalidatePostProcessingResults;
     	private updateRowPositions;
     	private updateGrandTotals;
+    	groupTotalsFormatter(p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: any): string;
     	render: () => void;
     	private handleHeaderRowScroll;
     	private handleFooterRowScroll;

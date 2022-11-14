@@ -2819,6 +2819,9 @@ Slick._ = (() => {
         }
       }
     }
+    groupTotalsFormatter(p1, p2, grid) {
+      return this._options.groupTotalsFormatter ? this._options.groupTotalsFormatter(p1, p2, grid != null ? grid : this) : "";
+    }
     handleMouseWheel(e, delta, deltaX, deltaY) {
       deltaX = (typeof deltaX == "undefined" ? e.originalEvent.deltaX : deltaX) || 0;
       deltaY = (typeof deltaY == "undefined" ? e.originalEvent.deltaY : deltaY) || 0;
