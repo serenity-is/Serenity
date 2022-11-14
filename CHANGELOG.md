@@ -1,3 +1,8 @@
+## 6.3.2 (2022-11-14)
+
+Bugfixes:
+  - fix group totals is not displayed
+
 ## 6.3.1 (2022-11-08)
 
 Bugfixes:
