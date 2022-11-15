@@ -1,3 +1,8 @@
+## 6.3.5 (2022-11-15)
+
+Bugfixes:
+  - better detection for formatters type in clienttypes transformation
+
 ## 6.3.4 (2022-11-15)
 
 Features:
