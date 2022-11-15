@@ -158,7 +158,7 @@ namespace Serenity.CodeGenerator
                             if (import.ModuleSpecifier is not StringLiteral id)
                                 continue;
 
-                            if (import.ImportClause.Name is Identifier name &&
+                            if (import.ImportClause?.Name is Identifier name &&
                                 name.Text == noGeneric)
                                 return id.Text + ":" + name.Text + functionSuffix;
 
