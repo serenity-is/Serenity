@@ -1,3 +1,8 @@
+## 6.3.6 (2022-11-15)
+
+Bugfixes:
+  - null for ImportClause in TSTypeLister
+
 ## 6.3.5 (2022-11-15)
 
 Bugfixes:
