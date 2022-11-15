@@ -26,7 +26,15 @@
             });
         }
 
-        private static bool IsFormatterType(ExternalType type)
+        static readonly string[] FormatterAttributeNames = new[]
+        {
+            "Serenity.Decorators.registerFormatter",
+            "@serenity-is/corelib:Decorators.registerFormatter",
+            "Decorators.registerFormatter",
+            "registerFormatter"
+        };
+
+        private bool IsFormatterType(ExternalType type)
         {
             if (type.IsAbstract == true)
                 return false;
@@ -34,10 +42,16 @@
             if (type.GenericParameters?.Count > 0)
                 return false;
 
+            if (GetAttribute(type, inherited: true, attributeNames: FormatterAttributeNames) != null)
+                return true;
+
             return type.Interfaces != null && type.Interfaces.Any(x =>
                 x == "Serenity.ISlickFormatter" ||
                 x == "Slick.Formatter" ||
+                x == "@serenity-is/corelib:Formatter" ||
+                x == "@serenity-is/corelib/slick:Formatter" ||
                 x?.EndsWith("ISlickFormatter", StringComparison.Ordinal) == true);
         }
+
     }
 }
