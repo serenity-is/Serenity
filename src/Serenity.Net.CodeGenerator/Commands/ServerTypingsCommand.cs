@@ -149,6 +149,7 @@ namespace Serenity.CodeGenerator
                     (modules ? "Modules/ServerTypes" : "Imports/ServerTypings"))));
 
             generator.ModuleTypings = modules && config?.ServerTypings?.ModuleTypings != false;
+            generator.ModuleReExports = generator.ModuleTypings && config?.ServerTypings?.ModuleReExports != false;
             generator.NamespaceTypings = !modules && config?.ServerTypings?.NamespaceTypings != false;
 
             if (modules)

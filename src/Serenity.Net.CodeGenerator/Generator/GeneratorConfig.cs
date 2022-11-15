@@ -395,6 +395,13 @@ namespace Serenity.CodeGenerator
             public bool LocalTexts { get; set; }
 
             /// <summary>
+            /// Generate module re-exports. Defaults to true.
+            /// </summary>
+            public bool? ModuleReExports { get; set; }
+            /// <summary>Used for Newtonsoft.JSON</summary>
+            public bool ShouldSerializeModuleReExports() => ModuleReExports != null;
+
+            /// <summary>
             /// Generate module typings. Defaults to true if you
             /// have "module" defined in tsconfig.json
             /// </summary>

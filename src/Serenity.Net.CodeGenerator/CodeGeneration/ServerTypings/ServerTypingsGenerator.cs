@@ -3,6 +3,7 @@
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         public bool LocalTexts { get; set; }
+        public bool ModuleReExports { get; set; } = true;
         public bool ModuleTypings { get; set; } = false;
         public bool NamespaceTypings { get; set; } = true;
 
@@ -36,8 +37,8 @@
             if (LocalTexts && ModuleTypings)
                 GenerateTexts(module: true);
 
-            if (ModuleTypings)
-                GenerateModuleIndexes();
+            if (ModuleTypings && ModuleReExports)
+                GenerateModuleReExports();
         }
 
         protected override void GenerateCodeFor(TypeDefinition type)

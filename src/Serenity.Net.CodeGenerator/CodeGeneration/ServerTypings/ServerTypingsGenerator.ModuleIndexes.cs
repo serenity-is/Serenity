@@ -2,7 +2,7 @@
 {
     public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
-        protected void GenerateModuleIndexes()
+        protected void GenerateModuleReExports()
         {
             var rootNamespace = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
 
