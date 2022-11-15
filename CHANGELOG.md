@@ -1,3 +1,8 @@
+## 6.3.4 (2022-11-15)
+
+Features:
+  - add option to disable module re-exports (or indexes) for servertypings transform in sergen.json under ServerTypings/ModuleReExports
+
 ## 6.3.3 (2022-11-14)
 
 Features:
