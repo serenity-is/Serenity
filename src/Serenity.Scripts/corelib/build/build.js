@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import { compatCore, compatGrid, compatLayoutsFrozen } from "@serenity-is/sleekgrid/build/defines";
 import { join, resolve } from "path";
 import { createRequire } from 'node:module';
+import { readFileSync, writeFileSync } from "fs";
 
 const root = resolve(join(fileURLToPath(new URL('.', import.meta.url)), '../'));
 
@@ -30,14 +31,13 @@ let localImport = function (filter, pkg) {
 }
 
 var coreLibBase = {
-    absWorkingDir: resolve(join(root, 'src')),
+    absWorkingDir: resolve(root),
     bundle: true,
     color: true,
     chunkNames: 'chunks/[name]-[hash]',
     format: 'esm',
     logLevel: 'info',
-    outbase: ".",
-    outdir: '../dist',
+    outdir: 'dist',
     sourcemap: true,
     splitting: false,
     target: 'es6'
@@ -46,18 +46,24 @@ var coreLibBase = {
 await esbuild.build({
     ...coreLibBase,
     entryPoints: [
-        'q/index.ts',
-        'slick/index.ts'
+        'src/q/index.ts',
+        'src/slick/index.ts',
+        'src/index.ts'
     ],
-    external: ['../q', '../slick'],
+    outbase: 'src',
+    external: ['../q', '../slick', './q', './slick'],
     minify: true
 });
 
-await esbuild.build({
-    ...coreLibBase,
-    entryPoints: [
-        'index.ts'
-    ],
-    external: ['./q', './slick'],
-    minify: true
-});
+var corelibIndex = readFileSync("./dist/index.js", "utf8");
+corelibIndex = corelibIndex.replace(/(["'])\.\.\/q/g, '$1.\\/q').replace(/(["'])\.\.\/slick/g, '$1.\\/slick');
+writeFileSync("./dist/index.js", corelibIndex, "utf8");
+
+//await esbuild.build({
+//    ...coreLibBase,
+//    entryPoints: [
+//        'index.ts'
+//    ],
+//    external: ['./q', './slick', '../q', '../slick'],
+//    minify: true
+//});
