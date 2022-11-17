@@ -12,7 +12,6 @@ export interface GridRowSelectionMixinOptions {
     selectable?: (item: any) => boolean;
 }
 
-
 @Decorators.registerClass('Serenity.GridRowSelectionMixin')
 export class GridRowSelectionMixin {
 
@@ -50,12 +49,10 @@ export class GridRowSelectionMixin {
         });
 
         grid.getGrid().onHeaderClick.subscribe((e1, u) => {
-            if (e1.isDefaultPrevented()) {
+            if (e1.isDefaultPrevented())
                 return;
-            }
             if ($(e1.target).hasClass('select-all-items')) {
                 e1.preventDefault();
-                var view = grid.getView();
                 if (Object.keys(this.include).length > 0) {
                     clearKeys(this.include);
                 }
@@ -68,6 +65,7 @@ export class GridRowSelectionMixin {
                 }
                 this.updateSelectAll();
                 grid.getView().setItems(grid.getView().getItems(), true);
+                setTimeout(this.updateSelectAll.bind(this), 0);
             }
         });
 
