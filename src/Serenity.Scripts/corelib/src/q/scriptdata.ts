@@ -19,8 +19,12 @@ function getHash(key: string, reload?: boolean): string {
         ScriptData.setRegisteredScripts(regs);
     }
 
-    if (stateStore.__hash == null && reload)
-        stateStore.__hash = {};
+    if (stateStore.__hash == null) {
+        if (reload)
+            stateStore.__hash = {};
+        else
+            return null;
+    }
 
     if (reload)
         return (stateStore.__hash[key] = new Date().getTime().toString());
@@ -49,7 +53,7 @@ function setLoadedData(name: string, value: any): void {
 export namespace ScriptData {
     
     export function bindToChange(name: string, regClass: string, onChange: () => void) {
-        ($(document.body) as any).bind('scriptdatachange.' + regClass, function (e: any, s: string) {
+        typeof $ !== "undefined" && typeof document !== "undefined" && ($(document.body) as any).bind('scriptdatachange.' + regClass, function (e: any, s: string) {
             if (s == name) {
                 onChange();
             }
@@ -57,11 +61,11 @@ export namespace ScriptData {
     }
 
     export function triggerChange(name: string) {
-        $(document.body).triggerHandler('scriptdatachange', [name]);
+        typeof $ !== "undefined" && typeof document !== "undefined" && $(document.body).triggerHandler('scriptdatachange', [name]);
     }
 
     export function unbindFromChange(regClass: string) {
-        $(document.body).unbind('scriptdatachange.' + regClass);
+        typeof $ !== "undefined" && typeof document !== "undefined" && $(document.body).unbind('scriptdatachange.' + regClass);
     }
 
     function loadOptions(name: string, async: boolean): JQueryAjaxSettings {
