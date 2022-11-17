@@ -542,7 +542,8 @@ declare namespace Q {
      *
      * @source underscore.js
      */
-    function debounce(func: Function, wait?: number, immediate?: boolean): () => any;
+    function debounce(func: Function, wait?: number, immediate?: boolean): any;
+    function mockDebounce(f: typeof debounce): void;
 
     interface DialogButton {
         text?: string;

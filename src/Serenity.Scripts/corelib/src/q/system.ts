@@ -96,7 +96,12 @@ export interface TypeMember {
     setter?: string;
 }
 
-let types: { [key: string]: Type } = {};
+function getTypeStore() {
+    const stateStore = getStateStore();
+    if (stateStore.__types == null)
+        stateStore.__types = {};
+    return stateStore.__types;
+}
 
 export function getNested(from: any, name: string) {
     var a = name.split('.');
@@ -110,6 +115,7 @@ export function getNested(from: any, name: string) {
 
 export function getType(name: string, target?: any): Type  {
     var type: any;
+    const types = getTypeStore();
     if (target == null) {
         type = types[name];
         if (type != null || globalObj == null || name === "Object")
@@ -290,6 +296,7 @@ export function addTypeMember(type: any, member: TypeMember): TypeMember {
 }
 
 export function getTypes(from?: any): any[] {
+    const types = getTypeStore();
     var result = [];
     if (!from) {
         for (var t in types) {
@@ -533,6 +540,7 @@ function interfaceIsAssignableFrom(from: any) {
 }
 
 function registerType(type: any, name: string, intf: any[]) {
+    const types = getTypeStore();
     if (name && name.length) {
         setTypeName(type, name);
         types[name] = type;
@@ -585,6 +593,8 @@ export function initializeTypes(root: any, pre: string, limit: number) {
 
     if (!root)
         return;
+
+    const types = getTypeStore();
 
     for (var k of Object.keys(root)) {
         if (k.charAt(0) < 'A' || k.charAt(0) > 'Z')
