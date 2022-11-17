@@ -1,5 +1,5 @@
 ﻿import { Decorators, EnumKeyAttribute } from "../../decorators";
-import { Enum, getAttributes, tryGetText } from "../../q";
+import { Enum, getAttributes, tryGetText } from "@serenity-is/corelib/q";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { Select2CommonOptions, Select2Editor } from "./select2editor";
 

@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { canLoadScriptData, Config, format, getBaseType, getInstanceType, getTemplate, getTypeFullName, getTypeName, replaceAll, startsWith, text } from "../../q";
+import { canLoadScriptData, Config, format, getBaseType, getInstanceType, getTemplate, getTypeFullName, getTypeName, replaceAll, startsWith, text } from "@serenity-is/corelib/q";
 import { Widget } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedWidget")

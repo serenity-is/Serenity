@@ -4,7 +4,7 @@ import { blockUI, blockUndo } from "./blockui";
 import { alert, iframeDialog } from "./dialogs";
 import { notifyError } from "./notify";
 import { format } from "./formatting";
-import { PropertyItem } from "./propertyitem";
+import { PropertyItem, PropertyItemsData } from "./propertyitem";
 import { getStateStore } from "./system";
 
 function getHash(key: string, reload?: boolean): string {
@@ -230,12 +230,6 @@ export function reloadLookup(key: string) {
 
 export async function reloadLookupAsync(key: string): Promise<any> {
     return await ScriptData.reloadAsync('Lookup.' + key);
-}
-
-interface PropertyItemsData {
-    items: PropertyItem[];
-    additionalItems: PropertyItem[];
-    type: "form" | "columns";
 }
 
 export function getColumns(key: string): PropertyItem[] {

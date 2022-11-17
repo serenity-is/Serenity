@@ -899,7 +899,7 @@ declare namespace Q {
         quickFilterSeparator?: boolean;
         quickFilterCssClass?: string;
     }
-    interface PropertyItemsData$1 {
+    interface PropertyItemsData {
         items: PropertyItem[];
         additionalItems: PropertyItem[];
     }
@@ -945,11 +945,6 @@ declare namespace Q {
     function getLookupAsync<TItem>(key: string): Promise<Q.Lookup<TItem>>;
     function reloadLookup(key: string): void;
     function reloadLookupAsync(key: string): Promise<any>;
-    interface PropertyItemsData {
-        items: PropertyItem[];
-        additionalItems: PropertyItem[];
-        type: "form" | "columns";
-    }
     function getColumns(key: string): PropertyItem[];
     function getColumnsData(key: string): PropertyItemsData;
     function getColumnsAsync(key: string): Promise<PropertyItem[]>;
@@ -2449,6 +2444,7 @@ declare namespace Slick {
 
 declare namespace Serenity {
     export import ColumnSelection = Q.ColumnSelection;
+    export import Criteria = Q.Criteria;
     export import DeleteRequest = Q.DeleteRequest;
     export import DeleteResponse = Q.DeleteResponse;
     export import ISlickFormatter = Q.ISlickFormatter;
@@ -2474,35 +2470,6 @@ declare namespace Serenity {
     export import UndeleteResponse = Q.UndeleteResponse;
     export import Formatter = Slick.Formatter;
 
-
-    function Criteria(field: string): any[];
-    namespace Criteria {
-        function isEmpty(c: any[]): boolean;
-        function join(c1: any[], op: string, c2: any[]): any[];
-        function paren(c: any[]): any[];
-        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
-        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
-        enum Operator {
-            paren = "()",
-            not = "not",
-            isNull = "is null",
-            isNotNull = "is not null",
-            exists = "exists",
-            and = "and",
-            or = "or",
-            xor = "xor",
-            eq = "=",
-            ne = "!=",
-            gt = ">",
-            ge = ">=",
-            lt = "<",
-            le = "<=",
-            in = "in",
-            notIn = "not in",
-            like = "like",
-            notLike = "not like"
-        }
-    }
 
     class IBooleanValue {
     }

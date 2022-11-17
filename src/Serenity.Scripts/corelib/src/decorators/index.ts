@@ -2,7 +2,7 @@ import {
     addAttribute, addTypeMember, isEnum, MemberType, ISlickFormatter,
     registerClass as regClass, registerInterface as regIntf, registerEnum as regEnum,
     startsWith
-} from "../q";
+} from "@serenity-is/corelib/q";
 
 function Attr(name: string) {
     return function (target: Function) {

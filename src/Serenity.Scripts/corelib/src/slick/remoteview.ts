@@ -1,4 +1,4 @@
-﻿import { deepClone, extend, ListRequest, ListResponse, notifyError, ServiceResponse, text, tryGetText } from "../q";
+﻿import { deepClone, extend, ListRequest, ListResponse, notifyError, ServiceResponse, text, tryGetText } from "@serenity-is/corelib/q";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 import { Event, EventData, Grid, gridDefaults, Group, GroupTotals } from "@serenity-is/sleekgrid";
 import { AggregateFormatting } from "./aggregators";

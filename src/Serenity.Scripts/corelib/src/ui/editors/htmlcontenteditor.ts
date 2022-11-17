@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { endsWith, isEmptyOrNull, isTrimmedEmpty, resolveUrl, text, trimToNull } from "../../q";
+import { endsWith, isEmptyOrNull, isTrimmedEmpty, resolveUrl, text, trimToNull } from "@serenity-is/corelib/q";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { Widget } from "../widgets/widget";
 

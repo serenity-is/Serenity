@@ -1,6 +1,6 @@
 ﻿import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, getInstanceType, isEmptyOrNull, layoutFillHeight, newBodyDiv, parseInteger, positionToastContainer, validateOptions } from "../../q";
+import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, getInstanceType, isEmptyOrNull, layoutFillHeight, newBodyDiv, parseInteger, positionToastContainer, validateOptions } from "@serenity-is/corelib/q";
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { DialogExtensions } from "./dialogextensions";

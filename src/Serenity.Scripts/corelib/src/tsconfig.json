@@ -21,6 +21,11 @@
       "jqueryui",
       "toastr"
     ],
+    "baseUrl": ".",
+    "paths": {
+      "@serenity-is/corelib/q": ["./q"],
+      "@serenity-is/corelib/slick": ["./slick"]
+    },
     "outDir": "../out",
     "suppressImplicitAnyIndexErrors": true,
     "target": "ES5",

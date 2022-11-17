@@ -1,4 +1,4 @@
-﻿import { Config, Exception, notifyError, endsWith, getType, isAssignableFrom } from "../q";
+﻿import { Config, Exception, notifyError, endsWith, getType, isAssignableFrom } from "@serenity-is/corelib/q";
 import { IDialog } from "../interfaces";
 
 export namespace DialogTypeRegistry {

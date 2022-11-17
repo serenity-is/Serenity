@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { cast, isEmptyOrNull, PropertyItem, text, tryGetText } from "../../q";
+import { cast, isEmptyOrNull, PropertyItem, text, tryGetText } from "@serenity-is/corelib/q";
 import { Select2Editor } from "../editors/select2editor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { FilteringTypeRegistry, IFiltering } from "./filtering";

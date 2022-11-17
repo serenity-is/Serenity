@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
-import { endsWith, extend, isEmptyOrNull, isInstanceOfType, isTrimmedEmpty, PropertyItem, replaceAll, startsWith, text, trimToNull } from "../../q";
+import { endsWith, extend, isEmptyOrNull, isInstanceOfType, isTrimmedEmpty, PropertyItem, replaceAll, startsWith, text, trimToNull } from "@serenity-is/corelib/q";
 import { FileUploadConstraints, UploadedFile, UploadHelper, UploadInputOptions } from "../helpers/uploadhelper";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";

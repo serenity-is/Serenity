@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
-import { any, Authorization, isArray, isEmptyOrNull, isTrimmedEmpty, PropertyItem, startsWith, text, trimToEmpty, trimToNull } from "../../q";
+import { any, Authorization, isArray, isEmptyOrNull, isTrimmedEmpty, PropertyItem, startsWith, text, trimToEmpty, trimToNull } from "@serenity-is/corelib/q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";

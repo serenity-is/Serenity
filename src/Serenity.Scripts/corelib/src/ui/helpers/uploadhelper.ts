@@ -1,4 +1,4 @@
-import { blockUI, blockUndo, endsWith, format, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, round, startsWith, text } from "../../q";
+import { blockUI, blockUndo, endsWith, format, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, round, startsWith, text } from "@serenity-is/corelib/q";
 
 export namespace UploadHelper {
 

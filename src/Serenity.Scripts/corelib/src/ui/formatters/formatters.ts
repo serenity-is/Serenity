@@ -1,8 +1,8 @@
 ﻿import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { ArgumentNullException, attrEncode, Config, Culture, endsWith, Enum, Exception, format, formatDate, formatNumber, getAttributes, getTypeFullName, getTypes, htmlEncode, 
-    isAssignableFrom, isEmptyOrNull, ISlickFormatter, parseDecimal, parseISODateTime, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "../../q";
-import { Formatter } from "../../slick";
+    isAssignableFrom, isEmptyOrNull, ISlickFormatter, parseDecimal, parseISODateTime, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "@serenity-is/corelib/q";
+import { Formatter } from "@serenity-is/corelib/slick";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
 export interface IInitializeColumn {

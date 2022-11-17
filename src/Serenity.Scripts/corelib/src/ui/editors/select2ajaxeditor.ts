@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { isEmptyOrNull, isValue, ListRequest, ListResponse, RetrieveResponse, safeCast, serviceCall, ServiceOptions, text, trimToNull } from "../../q";
+import { isEmptyOrNull, isValue, ListRequest, ListResponse, RetrieveResponse, safeCast, serviceCall, ServiceOptions, text, trimToNull } from "@serenity-is/corelib/q";
 import { ValidationHelper } from "../helpers/validationhelper";
 import { Widget } from "../widgets/widget";
 import { WX } from "../widgets/wx";

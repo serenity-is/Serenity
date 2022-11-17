@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IDoubleValue, IReadOnly } from "../../interfaces";
-import { addOption, toId } from "../../q";
+import { addOption, toId } from "@serenity-is/corelib/q";
 import { Widget } from "../widgets/widget";
 import { EditorUtils } from "./editorutils";
 

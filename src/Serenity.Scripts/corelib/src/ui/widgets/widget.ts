@@ -1,7 +1,7 @@
 ﻿import { jQueryPatch } from "../../patch/jquerypatch";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, format, getAttributes, getInstanceType, getTypeFullName, getTypeName, isAssignableFrom, notifyError, replaceAll, startsWith } from "../../q";
+import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, format, getAttributes, getInstanceType, getTypeFullName, getTypeName, isAssignableFrom, notifyError, replaceAll, startsWith } from "@serenity-is/corelib/q";
 
 export interface WidgetClass<TOptions = object> {
     new(element: JQuery, options?: TOptions): Widget<TOptions>;

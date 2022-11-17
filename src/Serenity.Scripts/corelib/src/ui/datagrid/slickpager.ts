@@ -1,5 +1,5 @@
-﻿import { extend, text } from "../../q";
-import { PagerOptions } from "../../slick";
+﻿import { extend, text } from "@serenity-is/corelib/q";
+import { PagerOptions } from "@serenity-is/corelib/slick";
 import { Widget } from "../widgets/widget";
 
 export class SlickPager extends Widget<PagerOptions> {

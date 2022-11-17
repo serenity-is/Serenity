@@ -1,5 +1,5 @@
 ﻿import { EditorAttribute } from "../decorators";
-import { ArgumentNullException, Config, endsWith, Exception, format, getAttributes, getType, getTypeFullName, getTypes, isEmptyOrNull, startsWith } from "../q";
+import { ArgumentNullException, Config, endsWith, Exception, format, getAttributes, getType, getTypeFullName, getTypes, isEmptyOrNull, startsWith } from "@serenity-is/corelib/q";
 
 // @ts-ignore
 let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));

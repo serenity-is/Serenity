@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { trimToNull } from "../../q";
+import { trimToNull } from "@serenity-is/corelib/q";
 import { StringEditor } from "./stringeditor";
 
 @Decorators.registerEditor('Serenity.URLEditor', [IStringValue])

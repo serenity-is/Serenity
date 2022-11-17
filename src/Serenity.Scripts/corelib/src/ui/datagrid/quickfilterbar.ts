@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { ArgumentNullException, Criteria, delegateCombine, delegateRemove, formatDate, isArray, isEmptyOrNull, isTrimmedEmpty, ListRequest, notifyWarning, parseDate, text, toId, tryGetText } from "../../q";
+import { ArgumentNullException, Criteria, delegateCombine, delegateRemove, formatDate, isArray, isEmptyOrNull, isTrimmedEmpty, ListRequest, notifyWarning, parseDate, text, toId, tryGetText } from "@serenity-is/corelib/q";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";

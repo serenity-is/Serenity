@@ -1,4 +1,4 @@
-﻿import { Exception, validatorAbortHandler } from "../../q";
+﻿import { Exception, validatorAbortHandler } from "@serenity-is/corelib/q";
 import { Widget } from "../widgets/widget";
 
 export namespace ValidationHelper {

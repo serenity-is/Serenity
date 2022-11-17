@@ -1,4 +1,4 @@
-﻿import { registerEnum } from "../q";
+﻿import { registerEnum } from "@serenity-is/corelib/q";
 
 export {}
 

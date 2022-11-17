@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { htmlEncode, isEmptyOrNull, startsWith } from "../../q";
+import { htmlEncode, isEmptyOrNull, startsWith } from "@serenity-is/corelib/q";
 import { Widget } from "./widget";
 
 export interface ToolButton {

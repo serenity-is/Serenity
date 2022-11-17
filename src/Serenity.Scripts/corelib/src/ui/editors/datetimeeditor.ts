@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { addOption, addValidationRule, Culture, format, formatDate, formatISODateTimeUTC, Invariant, isEmptyOrNull, parseDate, parseISODateTime, round, text, today, trunc, tryGetText } from "../../q";
+import { addOption, addValidationRule, Culture, format, formatDate, formatISODateTimeUTC, Invariant, isEmptyOrNull, parseDate, parseISODateTime, round, text, today, trunc, tryGetText } from "@serenity-is/corelib/q";
 import { Widget } from "../widgets/widget";
 import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";

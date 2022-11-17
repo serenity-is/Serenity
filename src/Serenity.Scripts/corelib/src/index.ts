@@ -2,9 +2,8 @@
 export * from "./globals/jquerystatic";
 export * from "./globals/validate";
 
-export type { ServiceError, ServiceResponse, ServiceRequest, ServiceOptions, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, DeleteRequest, DeleteResponse, UndeleteRequest, UndeleteResponse, ListRequest, ListResponse, RetrieveRequest, RetrieveResponse, RetrieveLocalizationRequest, RetrieveLocalizationResponse, PropertyItem, PropertyItemsData } from "./q";
-export { ColumnSelection, RetrieveColumnSelection, SummaryType } from "./q";
-export * from "./q/criteria";
+export type { ServiceError, ServiceResponse, ServiceRequest, ServiceOptions, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, DeleteRequest, DeleteResponse, UndeleteRequest, UndeleteResponse, ListRequest, ListResponse, RetrieveRequest, RetrieveResponse, RetrieveLocalizationRequest, RetrieveLocalizationResponse, PropertyItem, PropertyItemsData } from "@serenity-is/corelib/q";
+export { ColumnSelection, RetrieveColumnSelection, SummaryType, Criteria } from "@serenity-is/corelib/q";
 
 export * from "./interfaces";
 export * from "./types";

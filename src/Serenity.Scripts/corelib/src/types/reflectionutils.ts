@@ -1,4 +1,4 @@
-﻿import { isEmptyOrNull } from "../q";
+﻿import { isEmptyOrNull } from "@serenity-is/corelib/q";
 
 export namespace ReflectionUtils {
 

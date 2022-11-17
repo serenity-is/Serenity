@@ -1,4 +1,4 @@
-﻿import { validateOptions } from "../../q";
+﻿import { validateOptions } from "@serenity-is/corelib/q";
 import { TemplatedWidget } from "./templatedwidget";
 import { Toolbar, ToolButton } from "./toolbar";
 

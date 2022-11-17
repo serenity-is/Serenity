@@ -29,6 +29,11 @@ const replaceTypeRef = function(src, name, rep) {
     return src.replace(new RegExp('(>|:|,)\\s*' + name.replace('$', '\\$') + '([^A-Za-z0-9_\\$])', 'g'), (m, p1, p2) => p1 + ' ' + rep + p2);
 }
 
+function moduleToGlobalName(fromModule) {
+    return (fromModule == "@serenity-is/sleekgrid" || fromModule.endsWith('./slick') || fromModule == "@serenity-is/corelib/slick") ? 'Slick' : 
+        (fromModule == "@serenity-is/corelib/q" || fromModule == './q' || fromModule.endsWith("../q") || fromModule.indexOf('/q/') >= 0) ? "Q" : null;
+}
+
 const convertModularToGlobal = (src, ns, isTS) => {
     src = src.replace(/: Event;/g, ': Slick.Event;');
     src = src.replace(/: Event</g, ': Slick.Event<');
@@ -43,9 +48,7 @@ const convertModularToGlobal = (src, ns, isTS) => {
     src = src.replace(rxRemoveExports, '');
 
     src = src.replace(rxReExports, function (match, exportList, fromModule) {
-        var g = fromModule == "@serenity-is/sleekgrid" || fromModule.endsWith('./slick') ? 'Slick' : 
-            (fromModule == './q' || fromModule.endsWith("../q") || fromModule.indexOf('/q/') >= 0) ? "Q" : null;
-
+        var g = moduleToGlobalName(fromModule)
         if (!g) {
             return match;
         }
@@ -71,8 +74,7 @@ const convertModularToGlobal = (src, ns, isTS) => {
     var imports = {};
 
     src = src.replace(rxRemoveImports, function (match, p1, p2) {
-        var g = p2 == "@serenity-is/sleekgrid" || p2.endsWith('./slick') ? 'Slick' : 
-            (p2 == './q' || p2.endsWith("../q") || p2.indexOf('/q/') >= 0) ? "Q" : null;
+        var g = moduleToGlobalName(p2);
 
         if (!g) {
             return match;
@@ -289,7 +291,7 @@ export default [
             dts(), 
             toGlobal('Slick')
         ],
-        external: ['../q', '../../q', ...external]
+        external: ['../q', '../../q', '@serenity-is/corelib/q', ...external]
     },
     {
         input: "./out/index.d.ts",
@@ -332,6 +334,6 @@ export default [
                 }
             }
         ],
-        external: ['./q', '../q', '../../q', './slick', '../../slick', '../slick', ...external]
+        external: ['./q', '../q', '../../q', './slick', '../../slick', '../slick', '@serenity-is/corelib/q', '@serenity-is/corelib/slick', ...external]
     }
 ];

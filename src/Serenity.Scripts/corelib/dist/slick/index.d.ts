@@ -1,6 +1,6 @@
 /// <reference types="jquery" />
 import { GroupTotals, Column, FormatterContext, Group, Event } from '@serenity-is/sleekgrid';
-import { PropertyItem, ListResponse } from '../q';
+import { PropertyItem, ListResponse } from '@serenity-is/corelib/q';
 
 declare namespace Aggregators {
     function Avg(field: string): void;

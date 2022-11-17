@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { isEmptyOrNull, trimToNull, tryGetText } from "../../q";
+import { isEmptyOrNull, trimToNull, tryGetText } from "@serenity-is/corelib/q";
 import { Widget } from "../widgets/widget";
 
 export interface EmailEditorOptions {

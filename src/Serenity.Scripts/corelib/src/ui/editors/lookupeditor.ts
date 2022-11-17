@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { endsWith, getInstanceType, getLookup, getLookupAsync, getTypeFullName, reloadLookup, ScriptData } from "../../q";
+import { endsWith, getInstanceType, getLookup, getLookupAsync, getTypeFullName, reloadLookup, ScriptData } from "@serenity-is/corelib/q";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface LookupEditorOptions extends Select2EditorOptions {

@@ -1,7 +1,7 @@
 ﻿import { Decorators, DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog } from "../../interfaces";
-import { Authorization, endsWith, format, getInstanceType, getTypeFullName, HandleRouteEventArgs, isEmptyOrNull, LT, replaceAll, resolveUrl, Router, safeCast, text, tryGetText } from "../../q";
-import { RemoteViewOptions } from "../../slick";
+import { Authorization, endsWith, format, getInstanceType, getTypeFullName, HandleRouteEventArgs, isEmptyOrNull, LT, replaceAll, resolveUrl, Router, safeCast, text, tryGetText } from "@serenity-is/corelib/q";
+import { RemoteViewOptions } from "@serenity-is/corelib/slick";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";

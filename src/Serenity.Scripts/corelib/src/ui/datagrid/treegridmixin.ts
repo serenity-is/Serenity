@@ -1,5 +1,5 @@
 ﻿import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { htmlEncode, ListResponse, toGrouping, tryFirst } from "../../q";
+import { htmlEncode, ListResponse, toGrouping, tryFirst } from "@serenity-is/corelib/q";
 import { SlickFormatting, SlickHelper, SlickTreeHelper } from "../helpers/slickhelpers";
 import { DataGrid } from "./datagrid";
 

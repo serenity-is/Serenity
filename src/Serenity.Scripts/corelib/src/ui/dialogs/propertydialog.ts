@@ -1,5 +1,5 @@
 ﻿import { Decorators, FormKeyAttribute } from "../../decorators";
-import { DialogButton, endsWith, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, PropertyItem, PropertyItemsData, ScriptData, text } from "../../q";
+import { DialogButton, endsWith, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, PropertyItem, PropertyItemsData, ScriptData, text } from "@serenity-is/corelib/q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { TemplatedDialog } from "./templateddialog";
 

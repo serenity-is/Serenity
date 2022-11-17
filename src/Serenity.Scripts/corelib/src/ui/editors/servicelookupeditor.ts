@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { ColumnSelection, Criteria, isEmptyOrNull, ListRequest, ListResponse, resolveUrl, serviceCall, ServiceOptions, startsWith } from "../../q";
+import { ColumnSelection, Criteria, isEmptyOrNull, ListRequest, ListResponse, resolveUrl, serviceCall, ServiceOptions, startsWith } from "@serenity-is/corelib/q";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface ServiceLookupEditorOptions extends Select2EditorOptions {

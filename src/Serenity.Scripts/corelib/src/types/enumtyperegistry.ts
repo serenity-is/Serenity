@@ -1,5 +1,5 @@
 ﻿import { EnumKeyAttribute } from "../decorators";
-import { Config, Exception, format, getAttributes, getTypeFullName, getTypes, isEnum, notifyError, startsWith } from "../q";
+import { Config, Exception, format, getAttributes, getTypeFullName, getTypes, isEnum, notifyError, startsWith } from "@serenity-is/corelib/q";
 
 export namespace EnumTypeRegistry {
 
