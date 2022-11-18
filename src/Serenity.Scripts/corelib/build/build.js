@@ -54,16 +54,3 @@ await esbuild.build({
     external: ['@serenity-is/corelib/q', '@serenity-is/corelib/slick' ],
     minify: true
 });
-
-var corelibIndex = readFileSync("./dist/index.js", "utf8");
-corelibIndex = corelibIndex.replace(/(["'])\.\.\/q/g, '$1.\\/q').replace(/(["'])\.\.\/slick/g, '$1.\\/slick');
-writeFileSync("./dist/index.js", corelibIndex, "utf8");
-
-//await esbuild.build({
-//    ...coreLibBase,
-//    entryPoints: [
-//        'index.ts'
-//    ],
-//    external: ['./q', './slick', '../q', '../slick'],
-//    minify: true
-//});
