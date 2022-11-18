@@ -19,7 +19,9 @@
     "outDir": "../../dist/test",
     "baseUrl": ".",
     "paths": {
-      "@/*": [ "../src/*" ]   
+      "@/*": [ "../src/*" ],
+      "@serenity-is/corelib/q": ["../src/q"],
+      "@serenity-is/corelib/slick": ["../src/slick"]
     },
     "noImplicitAny": false,
     "suppressImplicitAnyIndexErrors": true,
