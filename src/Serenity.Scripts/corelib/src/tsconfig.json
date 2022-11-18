@@ -21,7 +21,6 @@
       "jqueryui",
       "toastr"
     ],
-    "baseUrl": ".",
     "paths": {
       "@serenity-is/corelib/q": ["./q"],
       "@serenity-is/corelib/slick": ["./slick"]

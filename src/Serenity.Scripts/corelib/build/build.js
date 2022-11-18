@@ -19,17 +19,6 @@ for (var esmOpt of [
     esbuild.build(esmOpt).catch(() => process.exit());
 }
 
-let localImport = function (filter, pkg) {
-    return {
-        name: 'import-local',
-        setup(build) {
-            build.onResolve({ filter: filter }, args => {
-                return { path: pkg, external: true }
-            })
-        }
-    }
-}
-
 var coreLibBase = {
     absWorkingDir: resolve(root),
     bundle: true,
@@ -51,6 +40,6 @@ await esbuild.build({
         'src/index.ts'
     ],
     outbase: 'src',
-    external: ['@serenity-is/corelib/q', '@serenity-is/corelib/slick' ],
+    external: ['@serenity-is/corelib/q', '@serenity-is/corelib/slick', '@serenity-is/sleekgrid' ],
     minify: true
 });
