@@ -51,7 +51,7 @@ await esbuild.build({
         'src/index.ts'
     ],
     outbase: 'src',
-    external: ['../q', '../slick', './q', './slick'],
+    external: ['@serenity-is/corelib/q', '@serenity-is/corelib/slick' ],
     minify: true
 });
 
