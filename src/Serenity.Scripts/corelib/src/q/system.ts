@@ -536,7 +536,13 @@ function merge(arr1: any[], arr2: any[]) {
 }
 
 function interfaceIsAssignableFrom(from: any) {
-    return from != null && (from as TypeExt).__interfaces != null && (from as TypeExt).__interfaces.indexOf(this) >= 0;
+    return from != null && 
+        (from as TypeExt).__interfaces != null && 
+        (from as TypeExt).__interfaces.some(x => 
+            x === this ||
+            (this.__typeName?.length && 
+                x.__interface &&
+                x.__typeName === this.__typeName));
 }
 
 function registerType(type: any, name: string, intf: any[]) {

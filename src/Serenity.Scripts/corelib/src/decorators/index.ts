@@ -1,5 +1,5 @@
 import {
-    addAttribute, addTypeMember, isEnum, MemberType, ISlickFormatter,
+    addAttribute, addTypeMember, MemberType, ISlickFormatter,
     registerClass as regClass, registerInterface as regIntf, registerEnum as regEnum,
     startsWith
 } from "@serenity-is/corelib/q";

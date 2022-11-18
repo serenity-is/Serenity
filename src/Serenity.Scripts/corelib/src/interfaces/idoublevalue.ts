@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../decorators";
 
-@Decorators.registerInterface()
+@Decorators.registerInterface("Serenity.IDoubleValue")
 export class IDoubleValue {
 }
 
