@@ -8,12 +8,8 @@ namespace Serenity.Services
     public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
     {
         public Field Target { get; set; }
-        
-        private IUploadEditor uploadEditor;
-        private IUploadImageOptions uploadImageOptions;
-        private IUploadFileConstraints uploadFileConstraints;
-        private IUploadFileSizeConstraints uploadFileSizeConstraints;
 
+        private IUploadEditor editorAttr;
         private string fileNameFormat;
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
         private readonly ITextLocalizer localizer;
@@ -36,19 +32,8 @@ namespace Serenity.Services
             if (Target is null)
                 return false;
 
-            foreach (var attribute in Target.CustomAttributes)
-            {
-                if (attribute is IUploadEditor editorOptions)
-                    uploadEditor = editorOptions;
-                if (attribute is IUploadImageOptions imageOptions)
-                    uploadImageOptions = imageOptions;
-                if (attribute is IUploadFileConstraints fileConstraints)
-                    uploadFileConstraints = fileConstraints;
-                if (attribute is IUploadFileSizeConstraints fileSizeConstraints)
-                    uploadFileSizeConstraints = fileSizeConstraints;
-            }
-
-            if (uploadEditor is null or {IsMultiple: true} || uploadFileConstraints is null || uploadImageOptions is {DisableDefaultBehavior: true})
+            editorAttr = Target.CustomAttributes.OfType<IUploadEditor>().FirstOrDefault();
+            if (editorAttr is null || editorAttr.DisableDefaultBehavior || editorAttr.IsMultiple)
                 return false;
 
             if (Target is not StringField)
@@ -61,21 +46,21 @@ namespace Serenity.Services
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but Row type doesn't implement IIdRow!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
 
-            if (!uploadImageOptions.OriginalNameProperty.IsEmptyOrNull())
+            var originalNameProperty = (editorAttr as IUploadFileOptions)?.OriginalNameProperty;
+            if (!string.IsNullOrEmpty(originalNameProperty))
             {
-                var nameField = row.FindFieldByPropertyName(uploadImageOptions.OriginalNameProperty) ??
-                    row.FindField(uploadImageOptions.OriginalNameProperty);
+                var nameField = row.FindFieldByPropertyName(originalNameProperty) ??
+                    row.FindField(originalNameProperty);
 
                 originalNameField = (StringField)nameField ?? throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but " +
                     "a field with OriginalNameProperty '{2}' is not found!",
                     Target.PropertyName ?? Target.Name, 
                     row.GetType().FullName,
-                    uploadImageOptions.OriginalNameProperty));
+                    originalNameProperty));
             }
 
-            var format = uploadImageOptions.FilenameFormat;
-
+            var format = (editorAttr as IUploadFileOptions)?.FilenameFormat;
             if (format == null)
             {
                 format = row.GetType().Name;
@@ -226,7 +211,8 @@ namespace Serenity.Services
                 return;
             }
 
-            DeleteOldFile(storage, filesToDelete, oldFilename, uploadImageOptions.CopyToHistory);
+            DeleteOldFile(storage, filesToDelete, oldFilename, 
+                copyToHistory: (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
 
             if (newFilename == null)
             {
@@ -282,14 +268,15 @@ namespace Serenity.Services
             var filesToDelete = new FilesToDelete(storage);
             handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
 
-            DeleteOldFile(storage, filesToDelete, oldFilename, uploadImageOptions.CopyToHistory);
+            DeleteOldFile(storage, filesToDelete, oldFilename, 
+                copyToHistory: (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
         }
 
         private CopyTemporaryFileResult CopyTemporaryFile(ISaveRequestHandler handler, IFilesToDelete filesToDelete)
         {
             var fileName = (StringField)Target;
             var newFilename = fileName[handler.Row] = fileName[handler.Row].TrimToNull();
-            CheckUploadedImageAndCreateThumbs(uploadFileConstraints, uploadImageOptions, uploadFileSizeConstraints, localizer, storage, ref newFilename, logger);
+            CheckUploadedImageAndCreateThumbs(editorAttr, localizer, storage, ref newFilename, logger);
 
             var idField = ((IIdRow)handler.Row).IdField;
             var originalName = storage.GetOriginalName(newFilename);
@@ -332,88 +319,105 @@ namespace Serenity.Services
             filename[handler.Row] = copyResult.Path;
         }
 
-        public static void CheckUploadedImageAndCreateThumbs(ImageUploadEditorAttribute attr,
-            ITextLocalizer localizer,
-            IUploadStorage storage, ref string temporaryFile, IExceptionLogger logger = null)
-        {
-            CheckUploadedImageAndCreateThumbs(attr,
-                attr,
-                attr,
-                localizer,
-                storage,
-                ref temporaryFile,
-                logger);
-        }
-
-        public static void CheckUploadedImageAndCreateThumbs(IUploadFileConstraints uploadFileConstraints,
-            IUploadImageOptions uploadImageOptions,
-            IUploadFileSizeConstraints uploadFileSizeConstraints,
-            ITextLocalizer localizer,
-            IUploadStorage storage, ref string temporaryFile, IExceptionLogger logger = null)
+        public static void CheckUploadedImageAndCreateThumbs(
+            IUploadEditor editorAttr, ITextLocalizer localizer,
+            IUploadStorage storage, ref string temporaryFile, 
+            IExceptionLogger logger = null)
         {
             if (storage == null)
                 throw new ArgumentNullException(nameof(storage));
 
-            ImageCheckResult[] supportedFormats = null;
-
-            if (!uploadFileConstraints.AllowNonImage)
-                supportedFormats = new[] {
-                    ImageCheckResult.JPEGImage,
-                    ImageCheckResult.GIFImage,
-                    ImageCheckResult.PNGImage
-                };
-
             UploadPathHelper.CheckFileNameSecurity(temporaryFile);
 
-            var checker = new ImageChecker
+            var fileConstraints = editorAttr as IUploadFileConstraints;
+            using var fs = storage.OpenFile(temporaryFile);
+
+            storage.PurgeTemporaryFiles();
+
+            var minSize = fileConstraints?.MinSize ?? 0;
+            if (minSize != 0 && fs.Length < minSize)
+                throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
+                    Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
+                    UploadFormatting.FileSizeDisplay(minSize)));
+
+            var maxSize = fileConstraints?.MaxSize ?? 0;
+            if (maxSize != 0 && fs.Length > maxSize)
+                throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
+                    Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
+                    UploadFormatting.FileSizeDisplay(maxSize)));
+
+            var extension = Path.GetExtension(temporaryFile)?.ToLowerInvariant();
+            var allowedExtensions = fileConstraints?.AllowedExtensions.ToLowerInvariant();
+            if (!string.IsNullOrEmpty(allowedExtensions))
             {
-                MinWidth = uploadImageOptions.MinWidth,
-                MaxWidth = uploadImageOptions.MaxWidth,
-                MinHeight = uploadImageOptions.MinHeight,
-                MaxHeight = uploadImageOptions.MaxHeight,
-                MaxDataSize = uploadFileSizeConstraints.MaxSize
-            };
+                if (!allowedExtensions.Split(',', ';', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim())
+                    .Any(x => x == extension))
+                {
+                    throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
+                        Texts.Controls.ImageUpload.ExtensionNotAllowed.ToString(localizer),
+                        Path.GetExtension(temporaryFile), fileConstraints.AllowedExtensions));
+                }
+            }
+
+            var imageExtensions = fileConstraints?.ImageExtensions ?? ImageUploadEditorAttribute.DefaultImageExtensions;
+            if (string.IsNullOrEmpty(imageExtensions) ||
+                !imageExtensions.Split(',', ';', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim())
+                    .Any(x => x == extension))
+            {
+                if (fileConstraints?.AllowNonImage == true)
+                    return;
+
+                if (string.IsNullOrEmpty(imageExtensions))
+                    throw new ValidationError(
+                        Texts.Controls.ImageUpload.NotAnImageFile.ToString(localizer));
+
+                throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
+                    Texts.Controls.ImageUpload.NotAnImageWithExtensions.ToString(localizer),
+                    Path.GetExtension(temporaryFile), fileConstraints.ImageExtensions));
+            }
+
+            var imageConstraints = editorAttr as IUploadImageContrains;
 
             Image image = null;
             try
             {
-                using var fs = storage.OpenFile(temporaryFile);
-                if (uploadFileSizeConstraints.MinSize != 0 && fs.Length < uploadFileSizeConstraints.MinSize)
-                    throw new ValidationError(string.Format(CultureInfo.CurrentCulture, 
-                        Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
-                        UploadFormatting.FileSizeDisplay(uploadFileSizeConstraints.MinSize)));
-
-                if (uploadFileSizeConstraints.MaxSize != 0 && fs.Length > uploadFileSizeConstraints.MaxSize)
-                    throw new ValidationError(string.Format(CultureInfo.CurrentCulture, 
-                        Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
-                        UploadFormatting.FileSizeDisplay(uploadFileSizeConstraints.MaxSize)));
-
-                ImageCheckResult result;
-                if (string.Compare(Path.GetExtension(temporaryFile), ".swf", StringComparison.OrdinalIgnoreCase) == 0)
+                var checker = new ImageChecker
                 {
-                    throw new ValidationError("SWF files are not allowed!");
-                }
-                else
-                {
-                    result = checker.CheckStream(fs, true, out image, logger);
-                }
+                    MinWidth = imageConstraints?.MinWidth ?? 0,
+                    MaxWidth = imageConstraints?.MaxWidth ?? 0,
+                    MinHeight = imageConstraints?.MinHeight ?? 0,
+                    MaxHeight = imageConstraints?.MaxHeight ?? 0,
+                    MaxDataSize = fileConstraints?.MaxSize ?? 0
+                };
 
-                if (result == ImageCheckResult.InvalidImage && uploadFileConstraints.AllowNonImage)
-                    return;
+                ImageCheckResult result = checker.CheckStream(fs, true, out image, 
+                    out var mimeType, out var fileExtensions, logger);
 
-                if (result > ImageCheckResult.UnsupportedFormat ||
-                    (supportedFormats != null && Array.IndexOf(supportedFormats, result) < 0))
+                if (result != ImageCheckResult.Valid)
                 {
+                    if (fileConstraints?.IgnoreInvalidImage == true &&
+                        (result == ImageCheckResult.InvalidImage ||
+                         result == ImageCheckResult.ImageIsEmpty))
+                        return;
+
                     var error = checker.FormatErrorMessage(result, localizer);
                     throw new ValidationError(error);
                 }
 
-                if (result >= ImageCheckResult.FlashMovie)
-                    return;
+                if (fileConstraints?.IgnoreExtensionMismatch != true &&
+                    !fileExtensions.Any(x => string.Equals(x, extension,
+                        StringComparison.OrdinalIgnoreCase)))
+                {
+                    throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
+                        Texts.Controls.ImageUpload.ImageExtensionMismatch.ToString(localizer),
+                        Path.GetExtension(temporaryFile), mimeType));
+                }
+
+                var uploadImageOptions = editorAttr as IUploadImageOptions;
 
                 var baseFile = Path.ChangeExtension(temporaryFile, null);
-
-                storage.PurgeTemporaryFiles();
 
                 if ((uploadImageOptions.ScaleWidth > 0 || uploadImageOptions.ScaleHeight > 0) &&
                     ((uploadImageOptions.ScaleWidth > 0 && (uploadImageOptions.ScaleSmaller || checker.Width > uploadImageOptions.ScaleWidth)) ||

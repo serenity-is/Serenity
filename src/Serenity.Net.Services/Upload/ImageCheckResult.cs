@@ -5,26 +5,9 @@
     public enum ImageCheckResult
     {
         /// <summary>
-        ///   Checked image is a GIF</summary>
-        [Description("GIF Image")]
-        GIFImage,
-        /// <summary>
-        ///   Checked image is a JPEG</summary>
-        [Description("JPEG Image")]
-        JPEGImage,
-        /// <summary>
-        ///   Checked image is a PNG</summary>
-        [Description("PNG Image")]
-        PNGImage,
-        /// <summary>
-        ///   Checked file is a FLASH .SWF, ImageChecker itself won't return such a result,
-        ///   used by TemporaryImage</summary>
-        [Description("Flash Movie")]
-        FlashMovie,
-        /// <summary>
-        ///   Unsupported format</summary>
-        [Description("Uploaded image format is not supported!")]
-        UnsupportedFormat,
+        ///   Checked image is OK</summary>
+        [Description("Valid image")]
+        Valid,
         /// <summary>
         ///   Error occurred during reading</summary>
         [Description("Error occurred during reading file stream!")]

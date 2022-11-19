@@ -12,4 +12,10 @@ public interface IUploadEditor
     /// Sets if the editor is going to be used for multiple file upload.
     /// </summary>
     public bool IsMultiple { get; }
+
+    /// <summary>
+    /// If you don't want FileUploadBehavior / MultipleFileUploadBehavior to process this upload, 
+    /// and want to handle it manually, set to true (not recommended)
+    /// </summary>
+    public bool DisableDefaultBehavior { get; }
 }

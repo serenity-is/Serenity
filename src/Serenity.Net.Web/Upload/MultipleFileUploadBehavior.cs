@@ -5,12 +5,8 @@ namespace Serenity.Services
     public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
     {
         public Field Target { get; set; }
-        
-        private IUploadEditor uploadEditor;
-        private IUploadImageOptions uploadImageOptions;
-        private IUploadFileConstraints uploadFileConstraints;
-        private IUploadFileSizeConstraints uploadFileSizeConstraints;
 
+        private IUploadEditor editorAttr;
         private string fileNameFormat;
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
         private Dictionary<string, Field> replaceFields;
@@ -32,19 +28,8 @@ namespace Serenity.Services
             if (Target is null)
                 return false;
 
-            foreach (var attribute in Target.CustomAttributes)
-            {
-                if (attribute is IUploadEditor editorOptions)
-                    uploadEditor = editorOptions;
-                if (attribute is IUploadImageOptions imageOptions)
-                    uploadImageOptions = imageOptions;
-                if (attribute is IUploadFileConstraints fileConstraints)
-                    uploadFileConstraints = fileConstraints;
-                if (attribute is IUploadFileSizeConstraints fileSizeConstraints)
-                    uploadFileSizeConstraints = fileSizeConstraints;
-            }
-            
-            if (uploadEditor is null or {IsMultiple: false} || uploadFileConstraints is null || uploadImageOptions is {DisableDefaultBehavior: true})
+            editorAttr = Target.CustomAttributes.OfType<IUploadEditor>().FirstOrDefault();
+            if (editorAttr is null || editorAttr.DisableDefaultBehavior || !editorAttr.IsMultiple)
                 return false;
 
             if (Target is not StringField)
@@ -57,7 +42,7 @@ namespace Serenity.Services
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but Row type doesn't implement IIdRow!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
 
-            var format = uploadImageOptions.FilenameFormat;
+            var format = (editorAttr as IUploadFileOptions)?.FilenameFormat;
 
             if (format == null)
             {
@@ -135,7 +120,8 @@ namespace Serenity.Services
                 if (newFileList.Any(x => string.Compare(x.Filename.Trim(), filename, StringComparison.OrdinalIgnoreCase) == 0))
                     continue;
 
-                FileUploadBehavior.DeleteOldFile(storage, filesToDelete, filename, uploadImageOptions.CopyToHistory);
+                FileUploadBehavior.DeleteOldFile(storage, filesToDelete, filename, 
+                    copyToHistory: (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
             }
 
             if (newFileList.IsEmptyOrNull())
@@ -161,7 +147,8 @@ namespace Serenity.Services
             handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
 
             foreach (var file in oldFileList)
-                FileUploadBehavior.DeleteOldFile(storage, filesToDelete, file.Filename, uploadImageOptions.CopyToHistory);
+                FileUploadBehavior.DeleteOldFile(storage, filesToDelete, file.Filename, 
+                    (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
         }
 
         private string CopyTemporaryFiles(ISaveRequestHandler handler,
@@ -176,7 +163,7 @@ namespace Serenity.Services
                 if (!filename.StartsWith("temporary/", StringComparison.OrdinalIgnoreCase))
                     throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
-                FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadFileConstraints, uploadImageOptions, uploadFileSizeConstraints, localizer, storage, ref filename, logger);
+                FileUploadBehavior.CheckUploadedImageAndCreateThumbs(editorAttr, localizer, storage, ref filename, logger);
 
                 var idField = ((IIdRow)handler.Row).IdField;
 

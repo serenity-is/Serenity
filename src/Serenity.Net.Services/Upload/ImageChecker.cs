@@ -21,8 +21,12 @@ namespace Serenity.Web
         ///   Image validation result. One of <see cref="ImageCheckResult"/> values. If the result is one of
         ///   GIFImage, JPEGImage, PNGImage, the checking is successful. Rest of results are invalid.</returns>
         public ImageCheckResult CheckStream(Stream inputStream, bool returnImage, out Image image, 
+            out string mimeType, out IEnumerable<string> fileExtensions,
             IExceptionLogger exLogger = null)
         {
+            fileExtensions = Array.Empty<string>();
+            mimeType = null;
+
             // store the start time of validation
             DateTime startTime = DateTime.Now;
 
@@ -62,6 +66,8 @@ namespace Serenity.Web
             {
                 // load image validating it
                 image = Image.Load(inputStream, out format);
+                mimeType = format.DefaultMimeType;
+                fileExtensions = format.FileExtensions;
             }
             catch (Exception ex)
             {
@@ -75,25 +81,13 @@ namespace Serenity.Web
 
             try
             {
-                ImageCheckResult checkResult;
-
-                // check image format, if not JPEG, PNG or GIF return UnsupportedFormat error
-                if (format is SixLabors.ImageSharp.Formats.Jpeg.JpegFormat)
-                    checkResult = ImageCheckResult.JPEGImage;
-                else if (format is SixLabors.ImageSharp.Formats.Gif.GifFormat)
-                    checkResult = ImageCheckResult.GIFImage;
-                else if (format is SixLabors.ImageSharp.Formats.Png.PngFormat)
-                    checkResult = ImageCheckResult.PNGImage;
-                else
-                    return ImageCheckResult.UnsupportedFormat;
-
                 // read image size
                 Width = image.Width;
                 Height = image.Height;
 
                 var constraintResult = CheckSizeConstraints(Width, Height);
 
-                if (constraintResult != ImageCheckResult.JPEGImage)
+                if (constraintResult != ImageCheckResult.Valid)
                     return constraintResult;
 
                 TimeSpan span = DateTime.Now.Subtract(startTime);
@@ -101,7 +95,7 @@ namespace Serenity.Web
                 
                 isImageOK = true;
 
-                return checkResult;
+                return ImageCheckResult.Valid;
             }
             finally
             {
@@ -156,22 +150,7 @@ namespace Serenity.Web
             if (MaxHeight != 0 && height > MaxHeight)
                 return ImageCheckResult.HeightTooHigh;
 
-            return ImageCheckResult.JPEGImage;
-        }
-
-        /// <summary>
-        ///   Use this overload to check an image from a stream.</summary>
-        /// <param name="inputStream">
-        ///   Stream with image data</param>
-        /// <returns>
-        ///   Image checking result</returns>
-        /// <seealso cref="CheckStream(Stream, bool, out Image)"/>
-        public ImageCheckResult CheckStream(Stream inputStream, IExceptionLogger exLogger = null)
-        {
-            var result = CheckStream(inputStream, false, out Image image, exLogger);
-            if (image != null)
-                image.Dispose();
-            return result;
+            return ImageCheckResult.Valid;
         }
 
         /// <summary>
@@ -215,13 +194,6 @@ namespace Serenity.Web
             var format = localizer.Get("Enums.ImageCheckResult." + Enum.GetName(typeof(ImageCheckResult), result));
             switch (result)
             {
-                case ImageCheckResult.GIFImage:
-                case ImageCheckResult.PNGImage:
-                case ImageCheckResult.JPEGImage:
-                case ImageCheckResult.FlashMovie:
-                case ImageCheckResult.InvalidImage:
-                case ImageCheckResult.ImageIsEmpty:
-                    return format;
                 case ImageCheckResult.DataSizeTooHigh:
                     return string.Format(format, MaxDataSize, DataSize);
                 case ImageCheckResult.SizeMismatch:
@@ -233,11 +205,11 @@ namespace Serenity.Web
                     return string.Format(format, MinWidth, Width);
                 case ImageCheckResult.HeightMismatch:
                 case ImageCheckResult.HeightTooHigh:
-                    return string.Format(format, MaxHeight, MaxHeight);
+                    return string.Format(format, MaxHeight, Height);
                 case ImageCheckResult.HeightTooLow:
-                    return string.Format(format, MinHeight, MaxHeight);
+                    return string.Format(format, MinHeight, Height);
                 default:
-                    throw new ArgumentOutOfRangeException("ImageCheckResult");
+                    return format;
             }
         }
     }
