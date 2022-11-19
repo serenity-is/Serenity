@@ -129,16 +129,18 @@ namespace Serenity.Web
         private bool ProcessImageStream(Stream fileContent, ITextLocalizer localizer)
         {
             var imageChecker = new ImageChecker();
-            CheckResult = imageChecker.CheckStream(fileContent, true, out Image image, Logger);
+            CheckResult = imageChecker.CheckStream(fileContent, true, out Image image, out string mimeType,
+                out _, Logger);
             try
             {
                 FileSize = imageChecker.DataSize;
                 ImageWidth = imageChecker.Width;
                 ImageHeight = imageChecker.Height;
 
-                if (CheckResult != ImageCheckResult.JPEGImage &&
-                    CheckResult != ImageCheckResult.GIFImage &&
-                    CheckResult != ImageCheckResult.PNGImage)
+                if (CheckResult != ImageCheckResult.Valid ||
+                    (mimeType != "image/jpeg" &&
+                     mimeType != "image/gif" &&
+                     mimeType != "image/png"))
                 {
                     ErrorMessage = imageChecker.FormatErrorMessage(CheckResult, localizer);
                     return false;
@@ -146,9 +148,6 @@ namespace Serenity.Web
                 else
                 {
                     IsImage = true;
-
-                    var extension = CheckResult == ImageCheckResult.PNGImage ? ".png" :
-                        (CheckResult == ImageCheckResult.GIFImage ? ".gif" : ".jpg");
 
                     storage.PurgeTemporaryFiles();
 

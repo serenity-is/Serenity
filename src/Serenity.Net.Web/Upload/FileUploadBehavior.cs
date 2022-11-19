@@ -320,7 +320,7 @@ namespace Serenity.Services
         }
 
         public static void CheckUploadedImageAndCreateThumbs(
-            IUploadEditor editorAttr, ITextLocalizer localizer,
+            IUploadEditor attr, ITextLocalizer localizer,
             IUploadStorage storage, ref string temporaryFile, 
             IExceptionLogger logger = null)
         {
@@ -329,7 +329,7 @@ namespace Serenity.Services
 
             UploadPathHelper.CheckFileNameSecurity(temporaryFile);
 
-            var fileConstraints = editorAttr as IUploadFileConstraints;
+            var fileConstraints = attr as IUploadFileConstraints;
             using var fs = storage.OpenFile(temporaryFile);
 
             storage.PurgeTemporaryFiles();
@@ -347,7 +347,7 @@ namespace Serenity.Services
                     UploadFormatting.FileSizeDisplay(maxSize)));
 
             var extension = Path.GetExtension(temporaryFile)?.ToLowerInvariant();
-            var allowedExtensions = fileConstraints?.AllowedExtensions.ToLowerInvariant();
+            var allowedExtensions = fileConstraints?.AllowedExtensions?.ToLowerInvariant();
             if (!string.IsNullOrEmpty(allowedExtensions))
             {
                 if (!allowedExtensions.Split(',', ';', StringSplitOptions.RemoveEmptyEntries)
@@ -362,9 +362,9 @@ namespace Serenity.Services
 
             var imageExtensions = fileConstraints?.ImageExtensions ?? ImageUploadEditorAttribute.DefaultImageExtensions;
             if (string.IsNullOrEmpty(imageExtensions) ||
-                !imageExtensions.Split(',', ';', StringSplitOptions.RemoveEmptyEntries)
+                !imageExtensions.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Trim())
-                    .Any(x => x == extension))
+                    .Any(x => string.Equals(x, extension, StringComparison.OrdinalIgnoreCase)))
             {
                 if (fileConstraints?.AllowNonImage == true)
                     return;
@@ -378,7 +378,7 @@ namespace Serenity.Services
                     Path.GetExtension(temporaryFile), fileConstraints.ImageExtensions));
             }
 
-            var imageConstraints = editorAttr as IUploadImageContrains;
+            var imageConstraints = attr as IUploadImageContrains;
 
             Image image = null;
             try
@@ -398,8 +398,11 @@ namespace Serenity.Services
                 if (result != ImageCheckResult.Valid)
                 {
                     if (fileConstraints?.IgnoreInvalidImage == true &&
-                        (result == ImageCheckResult.InvalidImage ||
-                         result == ImageCheckResult.ImageIsEmpty))
+                        result == ImageCheckResult.InvalidImage)
+                        return;
+
+                    if (fileConstraints?.IgnoreEmptyImage == true &&
+                        result == ImageCheckResult.ImageIsEmpty)
                         return;
 
                     var error = checker.FormatErrorMessage(result, localizer);
@@ -415,7 +418,7 @@ namespace Serenity.Services
                         Path.GetExtension(temporaryFile), mimeType));
                 }
 
-                var uploadImageOptions = editorAttr as IUploadImageOptions;
+                var uploadImageOptions = attr as IUploadImageOptions;
 
                 var baseFile = Path.ChangeExtension(temporaryFile, null);
 

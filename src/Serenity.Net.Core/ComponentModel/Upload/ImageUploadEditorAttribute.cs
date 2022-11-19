@@ -157,13 +157,13 @@ namespace Serenity.ComponentModel
 
         /// <inheritdoc/>
         public const string DefaultImageExtensions =
-            ".bmp;.gif;.jpg;.jpeg;.png;.tiff;.gif;.webp";
+            ".gif;.jpg;.jpeg;.png;";
 
         /// <inheritdoc/>
         public string ImageExtensions { get; set; } = DefaultImageExtensions;
 
         /// <inheritdoc/>
-        public bool IgnoreExtensionMismatch { get; set; }
+        public bool IgnoreExtensionMismatch { get; set; } = true;
 
         /// <inheritdoc/>
         public bool IgnoreEmptyImage { get; set; }

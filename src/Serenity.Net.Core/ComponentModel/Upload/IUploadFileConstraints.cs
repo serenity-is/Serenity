@@ -32,16 +32,23 @@ public interface IUploadFileConstraints
     public string ImageExtensions { get; }
 
     /// <summary>
-    /// The upload behavior raises an error when it detects the extension
-    /// does not match the actual format of the uploaded file. 
+    /// If set to false, the upload behavior raises an error when it 
+    /// detects the extension does not match the actual format of 
+    /// the uploaded file. 
     /// For example, if the uploaded file is "test.jpg" but it has a "png"
     /// image inside it raises an error.
-    /// Set this to true to skip that check.
+    /// Default is true, so such mismatches are ignored
     /// </summary>
     public bool IgnoreExtensionMismatch { get; }
 
     /// <summary>
-    /// If the file contains an invalid image or an empty image, 
+    /// If the file contains an empty image, 
+    /// ignore it instead of raising an error.
+    /// </summary>
+    public bool IgnoreEmptyImage { get; }
+
+    /// <summary>
+    /// If the file contains an invalid image, 
     /// ignore it instead of raising an error.
     /// </summary>
     public bool IgnoreInvalidImage { get; }

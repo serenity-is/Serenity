@@ -148,7 +148,7 @@ public partial class FileUploadBehaviorTests
     {
         var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
         var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "temporary/test.txt";
+        var fileName = "temporary/test.png";
 
         var attr = new ImageUploadEditorAttribute();
         mockFileSystem.AddFile(fileName, "\0");
