@@ -15,7 +15,7 @@ declare namespace AggregateFormatting {
     function groupTotalsFormatter<TItem = any>(totals: GroupTotals, column: Column<TItem>): string;
 }
 
-declare type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
 declare module "@serenity-is/sleekgrid" {
     interface Column<TItem = any> {
         referencedFields?: string[];
@@ -78,10 +78,10 @@ interface PagingInfo {
     error: string;
     dataView: RemoteView<any>;
 }
-declare type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
-declare type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
-declare type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
-declare type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
+type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
+type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
+type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
+type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
 interface RemoteView<TEntity> {
     onSubmit: CancellableViewCallback<TEntity>;
     onDataChanged: Event;

@@ -2,7 +2,7 @@
 /// <reference types="jqueryui" />
 /// <reference types="toastr" />
 /// <reference types="jquery.validation" />
-declare type Grouping<TItem> = {
+type Grouping<TItem> = {
     [key: string]: TItem[];
 };
 /**
@@ -40,13 +40,13 @@ declare function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean)
  * and values that are arrays containing elements for a particular key.
  */
 declare function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Grouping<TItem>;
-declare type Group<TItem> = {
+type Group<TItem> = {
     order: number;
     key: string;
     items: TItem[];
     start: number;
 };
-declare type Groups<TItem> = {
+type Groups<TItem> = {
     byKey: {
         [key: string]: Group<TItem>;
     };
@@ -602,7 +602,7 @@ declare function trimToNull(s: string): string;
 declare function replaceAll(s: string, f: string, r: string): string;
 declare function zeroPad(n: number, digits: number): string;
 
-declare type Dictionary<TItem> = {
+type Dictionary<TItem> = {
     [key: string]: TItem;
 };
 declare function coalesce(a: any, b: any): any;
@@ -610,7 +610,7 @@ declare function isValue(a: any): boolean;
 declare let today: () => Date;
 declare function extend<T = any>(a: T, b: T): T;
 declare function deepClone<T = any>(a: T, a2?: any, a3?: any): T;
-declare type Type = Function | Object;
+type Type = Function | Object;
 interface TypeMember {
     name: string;
     type: MemberType;

@@ -2917,8 +2917,9 @@ Slick._ = (() => {
       }
     }
     asyncPostProcessCleanupRows() {
+      var _a;
       var cols = this._cols;
-      while (this._postProcessCleanupQueue.length > 0) {
+      while (((_a = this._postProcessCleanupQueue) == null ? void 0 : _a.length) > 0) {
         var groupId = this._postProcessCleanupQueue[0].groupId;
         while (this._postProcessCleanupQueue.length > 0 && this._postProcessCleanupQueue[0].groupId == groupId) {
           var entry = this._postProcessCleanupQueue.shift();
