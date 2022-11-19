@@ -93,7 +93,7 @@ namespace Serenity.CodeGenerator
                     var binDebugIdx = assemblyFile1.IndexOf("/bin/Debug/", StringComparison.OrdinalIgnoreCase);
                     string assemblyFile2 = assemblyFile1;
                     if (binDebugIdx >= 0)
-                        assemblyFile2 = string.Concat(assemblyFile1.AsSpan(0, binDebugIdx), "/bin/Release/", assemblyFile1[(binDebugIdx + "/bin/Release".Length)..]);
+                        assemblyFile2 = string.Concat(assemblyFile1[0..binDebugIdx], "/bin/Release/", assemblyFile1[(binDebugIdx + "/bin/Release".Length)..]);
 
                     assemblyFiles[i] = assemblyFile1;
 
