@@ -329,151 +329,30 @@ namespace Serenity.Services
 
             UploadPathHelper.CheckFileNameSecurity(temporaryFile);
 
-            var fileConstraints = attr as IUploadFileConstraints;
             using var fs = storage.OpenFile(temporaryFile);
 
             storage.PurgeTemporaryFiles();
 
-            var minSize = fileConstraints?.MinSize ?? 0;
-            if (minSize != 0 && fs.Length < minSize)
-                throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                    Texts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
-                    UploadFormatting.FileSizeDisplay(minSize)));
+            var fileExtension = Path.GetExtension(temporaryFile);
+            UploadValidator.CheckFileConstraints(attr as IUploadFileConstraints, fs.Length,
+                fileExtension, localizer, out bool isImageExtension);
 
-            var maxSize = fileConstraints?.MaxSize ?? 0;
-            if (maxSize != 0 && fs.Length > maxSize)
-                throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                    Texts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
-                    UploadFormatting.FileSizeDisplay(maxSize)));
+            if (!isImageExtension)
+                return;
 
-            var extension = Path.GetExtension(temporaryFile)?.ToLowerInvariant();
-            var allowedExtensions = fileConstraints?.AllowedExtensions?.ToLowerInvariant();
-            if (!string.IsNullOrEmpty(allowedExtensions))
-            {
-                if (!allowedExtensions.Split(',', ';', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x => x.Trim())
-                    .Any(x => x == extension))
-                {
-                    throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                        Texts.Controls.ImageUpload.ExtensionNotAllowed.ToString(localizer),
-                        Path.GetExtension(temporaryFile), fileConstraints.AllowedExtensions));
-                }
-            }
+            UploadValidator.CheckImageConstraints(attr as IUploadImageContrains,
+                fs, fileExtension, localizer, logger, out Image image);
 
-            var imageExtensions = fileConstraints?.ImageExtensions ?? ImageUploadEditorAttribute.DefaultImageExtensions;
-            if (string.IsNullOrEmpty(imageExtensions) ||
-                !imageExtensions.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x => x.Trim())
-                    .Any(x => string.Equals(x, extension, StringComparison.OrdinalIgnoreCase)))
-            {
-                if (fileConstraints?.AllowNonImage == true)
-                    return;
-
-                if (string.IsNullOrEmpty(imageExtensions))
-                    throw new ValidationError(
-                        Texts.Controls.ImageUpload.NotAnImageFile.ToString(localizer));
-
-                throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                    Texts.Controls.ImageUpload.NotAnImageWithExtensions.ToString(localizer),
-                    Path.GetExtension(temporaryFile), fileConstraints.ImageExtensions));
-            }
-
-            var imageConstraints = attr as IUploadImageContrains;
-
-            Image image = null;
             try
             {
-                var checker = new ImageChecker
-                {
-                    MinWidth = imageConstraints?.MinWidth ?? 0,
-                    MaxWidth = imageConstraints?.MaxWidth ?? 0,
-                    MinHeight = imageConstraints?.MinHeight ?? 0,
-                    MaxHeight = imageConstraints?.MaxHeight ?? 0,
-                    MaxDataSize = fileConstraints?.MaxSize ?? 0
-                };
-
-                ImageCheckResult result = checker.CheckStream(fs, true, out image, 
-                    out var mimeType, out var fileExtensions, logger);
-
-                if (result != ImageCheckResult.Valid)
-                {
-                    if (fileConstraints?.IgnoreInvalidImage == true &&
-                        result == ImageCheckResult.InvalidImage)
-                        return;
-
-                    if (fileConstraints?.IgnoreEmptyImage == true &&
-                        result == ImageCheckResult.ImageIsEmpty)
-                        return;
-
-                    var error = checker.FormatErrorMessage(result, localizer);
-                    throw new ValidationError(error);
-                }
-
-                if (fileConstraints?.IgnoreExtensionMismatch != true &&
-                    !fileExtensions.Any(x => string.Equals(x, extension,
-                        StringComparison.OrdinalIgnoreCase)))
-                {
-                    throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                        Texts.Controls.ImageUpload.ImageExtensionMismatch.ToString(localizer),
-                        Path.GetExtension(temporaryFile), mimeType));
-                }
-
-                var uploadImageOptions = attr as IUploadImageOptions;
-
-                var baseFile = Path.ChangeExtension(temporaryFile, null);
-
-                if ((uploadImageOptions.ScaleWidth > 0 || uploadImageOptions.ScaleHeight > 0) &&
-                    ((uploadImageOptions.ScaleWidth > 0 && (uploadImageOptions.ScaleSmaller || checker.Width > uploadImageOptions.ScaleWidth)) ||
-                        (uploadImageOptions.ScaleHeight > 0 && (uploadImageOptions.ScaleSmaller || checker.Height > uploadImageOptions.ScaleHeight))))
-                {
-                    var originalName = storage.GetOriginalName(temporaryFile);
-                    var scaleBackColor = !string.IsNullOrEmpty(uploadImageOptions.ScaleBackColor) ?
-                        Color.Parse(uploadImageOptions.ScaleBackColor) : (Color?)null;
-                    
-                    using var scaledImage = ThumbnailGenerator.Generate(
-                        image, uploadImageOptions.ScaleWidth, uploadImageOptions.ScaleHeight, uploadImageOptions.ScaleMode, backgroundColor: scaleBackColor);
-                    temporaryFile = baseFile + ".jpg";
-                    fs.Close();
-                    using var ms = new MemoryStream();
-                    scaledImage.Save(ms, new JpegEncoder { Quality = uploadImageOptions.ScaleQuality == 0 ? null : uploadImageOptions.ScaleQuality });
-                    ms.Seek(0, SeekOrigin.Begin);
-                    temporaryFile = storage.WriteFile(temporaryFile, ms, autoRename: null); // overwrite
-                    if (!string.IsNullOrEmpty(originalName))
-                        storage.SetOriginalName(temporaryFile, Path.ChangeExtension(originalName, ".jpg"));
-                }
-
-                var thumbSizes = uploadImageOptions.ThumbSizes.TrimToNull();
-                if (thumbSizes == null)
-                    return;
-                
-                var thumbBackColor = !string.IsNullOrEmpty(uploadImageOptions.ThumbBackColor) ?
-                    Color.Parse(uploadImageOptions.ThumbBackColor) : (Color?)null;
-
-                foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split(new[] { ',' }))
-                {
-                    var dims = sizeStr.ToUpperInvariant().Split(new[] { 'X' });
-                    if (dims.Length != 2 ||
-                        !int.TryParse(dims[0], out int w) ||
-                        !int.TryParse(dims[1], out int h) ||
-                        w < 0 ||
-                        h < 0 ||
-                        (w == 0 && h == 0))
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-                        throw new ArgumentOutOfRangeException(nameof(uploadImageOptions.ThumbSizes));
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
-
-                    using var thumbImage = ThumbnailGenerator.Generate(image, w, h, uploadImageOptions.ThumbMode, backgroundColor: thumbBackColor);
-                    var thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
-                    using var ms = new MemoryStream();
-                    thumbImage.Save(ms, new JpegEncoder { Quality = uploadImageOptions.ThumbQuality == 0 ? null : uploadImageOptions.ThumbQuality });
-                    ms.Seek(0, SeekOrigin.Begin);
-                    storage.WriteFile(thumbFile, ms, autoRename: null);
-                }
+                fs.Close();
+                if (image != null)
+                    UploadProcessor.ScaleImageAndCreateThumbs(attr as IUploadImageOptions,
+                        storage, image, ref temporaryFile);
             }
             finally
             {
-                if (image != null)
-                    image.Dispose();
+                image?.Dispose();
             }
         }
     }

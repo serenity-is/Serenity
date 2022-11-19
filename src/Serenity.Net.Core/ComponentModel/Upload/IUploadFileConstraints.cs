@@ -20,6 +20,12 @@ public interface IUploadFileConstraints
     public string AllowedExtensions { get; }
 
     /// <summary>
+    /// Contains extensions that are considered dangerous / disallowed.
+    /// Default is ".asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;.dll;.jar;.jsp;.htaccess;.htpasswd;.lnk;.php;.ps1;.vbe;.vbs"
+    /// </summary>
+    public string ExtensionBlacklist { get; }
+
+    /// <summary>
     /// Semicolon separated list of image extensions. The default list is 
     /// ".gif;.jpg;.jpeg;.png;"
     /// If specified, only these set of file extensions are considered
@@ -30,28 +36,6 @@ public interface IUploadFileConstraints
     /// allowed and only if they contain a valid image.
     /// </summary>
     public string ImageExtensions { get; }
-
-    /// <summary>
-    /// If set to false, the upload behavior raises an error when it 
-    /// detects the extension does not match the actual format of 
-    /// the uploaded file. 
-    /// For example, if the uploaded file is "test.jpg" but it has a "png"
-    /// image inside it raises an error.
-    /// Default is true, so such mismatches are ignored
-    /// </summary>
-    public bool IgnoreExtensionMismatch { get; }
-
-    /// <summary>
-    /// If the file contains an empty image, 
-    /// ignore it instead of raising an error.
-    /// </summary>
-    public bool IgnoreEmptyImage { get; }
-
-    /// <summary>
-    /// If the file contains an invalid image, 
-    /// ignore it instead of raising an error.
-    /// </summary>
-    public bool IgnoreInvalidImage { get; }
 
     /// <summary>
     /// Maximum size in bytes of the uploaded file.
