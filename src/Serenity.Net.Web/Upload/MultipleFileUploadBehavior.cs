@@ -10,17 +10,16 @@ namespace Serenity.Services
         private string fileNameFormat;
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
         private Dictionary<string, Field> replaceFields;
+        private readonly IUploadValidator uploadValidator;
+        private readonly IImageProcessor imageProcessor;
         private readonly IUploadStorage storage;
-        private readonly ITextLocalizer localizer;
-        private readonly IExceptionLogger logger;
 
-        public MultipleFileUploadBehavior(IUploadStorage storage,
-            ITextLocalizer localizer,
-            IExceptionLogger logger = null)
+        public MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
+            IUploadStorage storage)
         {
-            this.storage = storage;
-            this.localizer = localizer;
-            this.logger = logger;
+            this.uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
+            this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
+            this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
         }
 
         public bool ActivateFor(IRow row)
@@ -163,7 +162,8 @@ namespace Serenity.Services
                 if (!filename.StartsWith("temporary/", StringComparison.OrdinalIgnoreCase))
                     throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
-                FileUploadBehavior.CheckUploadedImageAndCreateThumbs(editorAttr, localizer, storage, ref filename, logger);
+                FileUploadBehavior.CheckUploadedImageAndCreateThumbs(editorAttr, uploadValidator, imageProcessor,
+                    storage, ref filename);
 
                 var idField = ((IIdRow)handler.Row).IdField;
 

@@ -13,6 +13,9 @@ namespace Serenity.Web
 
             collection.AddOptions();
             collection.TryAddSingleton<IUploadStorage, DefaultUploadStorage>();
+            collection.TryAddSingleton<IUploadValidator, DefaultUploadValidator>();
+            collection.TryAddSingleton<IImageProcessor, DefaultImageProcessor>();
+            collection.TryAddSingleton<IUploadProcessor, DefaultUploadProcessor>();
         }
 
         public static void AddUploadStorage(this IServiceCollection collection,

@@ -1,6 +1,4 @@
-﻿using Serenity.Web;
-
-namespace Serenity.ComponentModel;
+﻿namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Options for the uploaded image and thumbnails
@@ -30,7 +28,7 @@ public interface IUploadImageOptions
     /// <summary>
     /// What kind of image scaling should be used to generate image.
     /// </summary>
-    public ImageScaleMode ScaleMode { get; }
+    public Web.ImageScaleMode ScaleMode { get; }
     
     /// <summary>
     /// Background color to use when padding image
@@ -56,7 +54,7 @@ public interface IUploadImageOptions
     /// <summary>
     /// What kind of image scaling should be used to generate thumbnails.
     /// </summary>
-    public ImageScaleMode ThumbMode { get; }
+    public Web.ImageScaleMode ThumbMode { get; }
 
     /// <summary>
     /// Quality of thumbnails.

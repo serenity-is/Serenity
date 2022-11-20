@@ -4,10 +4,21 @@ export namespace UploadHelper {
 
     export function addUploadInput(options: UploadInputOptions): JQuery {
         options.container.addClass('fileinput-button');
+
+        var uploadUrl = options.uploadUrl || '~/File/TemporaryUpload';
+        if (options.uploadIntent) {
+            if (uploadUrl.indexOf('?') < 0)
+                uploadUrl += "?"
+            else
+                uploadUrl += "&";
+            uploadUrl += "uploadIntent=";
+            uploadUrl += encodeURIComponent(options.uploadIntent);
+        }
+
         var uploadInput = $('<input/>').attr('type', 'file')
             .attr('name', options.inputName + '[]')
-            .attr('data-url', resolveUrl('~/File/TemporaryUpload'))
-            .attr('multiple', 'multiple').appendTo(options.container);
+            .attr('data-url', resolveUrl(uploadUrl))
+            .appendTo(options.container);
 
         if (options.allowMultiple) {
             uploadInput.attr('multiple', 'multiple');
@@ -235,6 +246,8 @@ export interface UploadInputOptions {
     progress?: JQuery;
     inputName?: string;
     allowMultiple?: boolean;
+    uploadIntent?: string;
+    uploadUrl?: string;
     fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
 }
 

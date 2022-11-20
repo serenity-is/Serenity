@@ -1260,6 +1260,8 @@ interface UploadInputOptions {
     progress?: JQuery;
     inputName?: string;
     allowMultiple?: boolean;
+    uploadIntent?: string;
+    uploadUrl?: string;
     fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
 }
 interface UploadResponse {
@@ -1282,6 +1284,8 @@ interface FileUploadConstraints {
 
 interface FileUploadEditorOptions extends FileUploadConstraints {
     displayFileName?: boolean;
+    uploadIntent?: string;
+    uploadUrl?: string;
     urlPrefix?: string;
 }
 interface ImageUploadEditorOptions extends FileUploadEditorOptions {
@@ -1321,6 +1325,7 @@ declare class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions> i
     protected progress: JQuery;
     protected hiddenInput: JQuery;
     constructor(div: JQuery, opt: ImageUploadEditorOptions);
+    protected getUploadInputOptions(): UploadInputOptions;
     protected addFileButtonText(): string;
     protected getToolButtons(): ToolButton[];
     protected populate(): void;

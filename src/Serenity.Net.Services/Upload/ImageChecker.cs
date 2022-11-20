@@ -1,6 +1,4 @@
-﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using System.IO;
+﻿using System.IO;
 
 namespace Serenity.Web
 {
@@ -20,12 +18,14 @@ namespace Serenity.Web
         /// <returns>
         ///   Image validation result. One of <see cref="ImageCheckResult"/> values. If the result is one of
         ///   GIFImage, JPEGImage, PNGImage, the checking is successful. Rest of results are invalid.</returns>
-        public ImageCheckResult CheckStream(Stream inputStream, bool returnImage, out Image image, 
-            out string mimeType, out IEnumerable<string> fileExtensions,
-            IExceptionLogger exLogger = null)
+        public ImageCheckResult CheckStream(Stream inputStream, IImageProcessor imageProcessor, bool returnImage, 
+            out object image, out ImageFormatInfo formatInfo, IExceptionLogger exLogger = null)
         {
-            fileExtensions = Array.Empty<string>();
-            mimeType = null;
+            if (inputStream is null)
+                throw new ArgumentNullException(nameof(inputStream));
+
+            if (imageProcessor is null)
+                throw new ArgumentNullException(nameof(imageProcessor));
 
             // store the start time of validation
             DateTime startTime = DateTime.Now;
@@ -36,7 +36,8 @@ namespace Serenity.Web
             Height = 0;
             Milliseconds = -1;
             image = null;
-            
+            formatInfo = null;
+
             try
             {
                 // set stream position to start
@@ -59,15 +60,14 @@ namespace Serenity.Web
             if (MaxDataSize != 0 && DataSize > MaxDataSize)
                 return ImageCheckResult.DataSizeTooHigh;
 
-            IImageFormat format;
-
             // try to upload image
             try
             {
                 // load image validating it
-                image = Image.Load(inputStream, out format);
-                mimeType = format.DefaultMimeType;
-                fileExtensions = format.FileExtensions;
+                image = imageProcessor.Load(inputStream, out formatInfo);
+                var (width, height) = imageProcessor.GetImageSize(image);
+                Width = width;
+                Height = height;
             }
             catch (Exception ex)
             {
@@ -81,10 +81,6 @@ namespace Serenity.Web
 
             try
             {
-                // read image size
-                Width = image.Width;
-                Height = image.Height;
-
                 var constraintResult = CheckSizeConstraints(Width, Height);
 
                 if (constraintResult != ImageCheckResult.Valid)
@@ -101,7 +97,7 @@ namespace Serenity.Web
             {
                 if (!(isImageOK && returnImage))
                 {
-                    image.Dispose();
+                    (image as IDisposable)?.Dispose();
                     image = null;
                 }
             }

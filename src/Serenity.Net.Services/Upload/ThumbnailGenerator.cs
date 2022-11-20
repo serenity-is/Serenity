@@ -1,6 +1,5 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 
 namespace Serenity.Web
 {
@@ -32,60 +31,11 @@ namespace Serenity.Web
         ///   Specifies fill color for PreserveRatioWithFill mode.</param>
         /// <returns>
         ///   Generated thumbnail image. Should be disposed by caller.</returns>
+        [Obsolete("Please inject IImageProcessor from services and use that instead")]
         public static Image Generate(Image image, int thumbWidth, int thumbHeight,
             ImageScaleMode mode, Color? backgroundColor = null, bool inplace = false)
         {
-            if (image == null)
-                throw new ArgumentNullException("image");
-
-            int imageWidth = image.Width;
-            int imageHeight = image.Height;
-
-            // if image or thumb width and height is zero, return an empty image
-            if (imageWidth <= 0 || imageHeight <= 0 || (thumbWidth <= 0 && thumbHeight <= 0))
-                return GenerateEmptyBitmap(imageWidth, imageHeight, backgroundColor ?? Color.Black);
-
-            // if thumb width is zero, thumb height is not zero
-            // so calculate width by aspect ratio, do similar
-            // if thumb height is zero. for both states, aspect
-            // ratio of source and thumb will be same
-            if (thumbWidth == 0)
-            {
-                thumbWidth = Convert.ToInt32(imageWidth * thumbHeight / ((double)imageHeight));
-                mode = ImageScaleMode.StretchToFit;
-            }
-            else if (thumbHeight == 0)
-            {
-                thumbHeight = Convert.ToInt32(imageHeight * thumbWidth / ((double)imageWidth));
-                mode = ImageScaleMode.StretchToFit;
-            }
-
-            var resizeMode = mode switch
-            {
-                ImageScaleMode.PreserveRatioNoFill => ResizeMode.Max,
-                ImageScaleMode.PreserveRatioWithFill => ResizeMode.Pad,
-                ImageScaleMode.CropSourceImage => ResizeMode.Crop,
-                _ => ResizeMode.Stretch,
-            };
-
-            void operation(IImageProcessingContext x)
-            {
-                x.Resize(new ResizeOptions
-                {
-                    Mode = resizeMode,
-                    Size = new Size(thumbWidth, thumbHeight),
-                    PremultiplyAlpha = false,
-                    PadColor = backgroundColor ?? Color.Black
-                });
-            }
-
-            if (inplace)
-            {
-                image.Mutate(operation);
-                return image;
-            }
-
-            return image.Clone(operation);
+            return (Image)new DefaultImageProcessor().Scale(image, thumbWidth, thumbHeight, mode, backgroundColor?.ToHex(), inplace);
         }
 
         public static Image GenerateEmptyBitmap(int width, int height, Color color)

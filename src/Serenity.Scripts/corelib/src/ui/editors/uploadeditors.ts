@@ -6,7 +6,9 @@ import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
 
 export interface FileUploadEditorOptions extends FileUploadConstraints {
-    displayFileName?: boolean; 
+    displayFileName?: boolean;
+    uploadIntent?: string;
+    uploadUrl?: string;
     urlPrefix?: string;
 }
 
@@ -58,6 +60,8 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
             zone: this.element,
             inputName: this.uniqueName,
             progress: this.progress,
+            uploadIntent: this.options.uploadIntent,
+            uploadUrl: this.options.uploadUrl,
             fileDone: (response, name, data) => {
                 if (!UploadHelper.checkImageConstraints(response, this.options)) {
                     return;
@@ -296,29 +300,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
             .addClass('upload-progress')
             .prependTo(this.toolbar.element);
 
-        var addFileButton = this.toolbar.findButton('add-file-button');
-
-        this.uploadInput = UploadHelper.addUploadInput({
-            container: addFileButton,
-            zone: this.element,
-            inputName: this.uniqueName,
-            progress: this.progress,
-            fileDone: (response, name, data) => {
-                if (!UploadHelper.checkImageConstraints(response, this.options)) {
-                    return;
-                }
-                var newEntity = { OriginalName: name, Filename: response.TemporaryFile };
-                self.entities.push(newEntity);
-                self.populate();
-
-                var validator = this.hiddenInput.closest('form').data('validator');
-                if (validator != null) {
-                    validator.element(this.hiddenInput);
-                }
-
-                self.updateInterface();
-            }
-        });
+        UploadHelper.addUploadInput(this.getUploadInputOptions());
 
         this.fileSymbols = $('<ul/>').appendTo(this.element);
         if (!this.element.attr('id')) {
@@ -329,7 +311,34 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
             '_Validator" data-vx-highlight="' + this.element.attr('id') + '"/>').appendTo(this.element);
 
         this.updateInterface();
+    }
 
+    protected getUploadInputOptions(): UploadInputOptions {
+        var addFileButton = this.toolbar.findButton('add-file-button');
+
+        return {
+            container: addFileButton,
+            zone: this.element,
+            inputName: this.uniqueName,
+            progress: this.progress,
+            uploadIntent: this.options.uploadIntent,
+            uploadUrl: this.options.uploadUrl,
+            fileDone: (response, name) => {
+                if (!UploadHelper.checkImageConstraints(response, this.options)) {
+                    return;
+                }
+                var newEntity = { OriginalName: name, Filename: response.TemporaryFile };
+                this.entities.push(newEntity);
+                this.populate();
+
+                var validator = this.hiddenInput.closest('form').data('validator');
+                if (validator != null) {
+                    validator.element(this.hiddenInput);
+                }
+
+                this.updateInterface();
+            }
+        }
     }
 
     protected addFileButtonText(): string {

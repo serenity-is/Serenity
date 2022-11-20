@@ -9,7 +9,7 @@ namespace Serenity.ComponentModel
     /// your files will stay in temporary directory.
     /// </summary>
     /// <seealso cref="CustomEditorAttribute" />
-    public partial class ImageUploadEditorAttribute : CustomEditorAttribute, 
+    public partial class ImageUploadEditorAttribute : CustomEditorAttribute,
         IUploadEditor, IUploadFileConstraints, IUploadFileOptions, IUploadImageContrains, IUploadImageOptions
     {
         /// <summary>
@@ -33,7 +33,7 @@ namespace Serenity.ComponentModel
             : this(Key)
         {
         }
-        
+
         /// <inheritdoc />
         public virtual bool IsMultiple => false;
 
@@ -179,5 +179,12 @@ namespace Serenity.ComponentModel
 
         /// <inheritdoc/>
         public bool IgnoreInvalidImage { get; set; }
+
+        /// <inheritdoc/>
+        public string UploadIntent
+        {
+            get { return GetOption<string>("uploadIntent"); }
+            set { SetOption("uploadIntent", value); }
+        }
     }
 }

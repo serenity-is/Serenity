@@ -1,6 +1,4 @@
 ﻿using Serenity.Web;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
 using System.IO;
 
 namespace Serenity.Services
@@ -12,19 +10,18 @@ namespace Serenity.Services
         private IUploadEditor editorAttr;
         private string fileNameFormat;
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
-        private readonly ITextLocalizer localizer;
-        private readonly IExceptionLogger logger;
+        private readonly IUploadValidator uploadValidator;
+        private readonly IImageProcessor imageProcessor;
         private readonly IUploadStorage storage;
         private StringField originalNameField;
         private Dictionary<string, Field> replaceFields;
 
-        public FileUploadBehavior(IUploadStorage storage,
-            ITextLocalizer localizer, 
-            IExceptionLogger logger = null)
+        public FileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
+            IUploadStorage storage)
         {
-            this.storage = storage;
-            this.localizer = localizer;
-            this.logger = logger;
+            this.uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
+            this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
+            this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
         }
 
         public bool ActivateFor(IRow row)
@@ -276,7 +273,8 @@ namespace Serenity.Services
         {
             var fileName = (StringField)Target;
             var newFilename = fileName[handler.Row] = fileName[handler.Row].TrimToNull();
-            CheckUploadedImageAndCreateThumbs(editorAttr, localizer, storage, ref newFilename, logger);
+            CheckUploadedImageAndCreateThumbs(editorAttr, uploadValidator, imageProcessor, 
+                storage, ref newFilename);
 
             var idField = ((IIdRow)handler.Row).IdField;
             var originalName = storage.GetOriginalName(newFilename);
@@ -320,9 +318,8 @@ namespace Serenity.Services
         }
 
         public static void CheckUploadedImageAndCreateThumbs(
-            IUploadEditor attr, ITextLocalizer localizer,
-            IUploadStorage storage, ref string temporaryFile, 
-            IExceptionLogger logger = null)
+            IUploadEditor attr, IUploadValidator validator, IImageProcessor imageProcessor,
+            IUploadStorage storage, ref string temporaryFile)
         {
             if (storage == null)
                 throw new ArgumentNullException(nameof(storage));
@@ -333,26 +330,29 @@ namespace Serenity.Services
 
             storage.PurgeTemporaryFiles();
 
-            var fileExtension = Path.GetExtension(temporaryFile);
-            UploadValidator.CheckFileConstraints(attr as IUploadFileConstraints, fs.Length,
-                fileExtension, localizer, out bool isImageExtension);
+            validator.ValidateFile(attr as IUploadFileConstraints ?? new FileUploadEditorAttribute(), 
+                fs, temporaryFile, out bool isImageExtension);
 
             if (!isImageExtension)
                 return;
 
-            UploadValidator.CheckImageConstraints(attr as IUploadImageContrains,
-                fs, fileExtension, localizer, logger, out Image image);
+            validator.ValidateImage(attr as IUploadImageContrains ?? new FileUploadEditorAttribute(),
+                fs, temporaryFile, out object image);
 
-            try
+            if (image != null)
             {
-                fs.Close();
-                if (image != null)
-                    UploadProcessor.ScaleImageAndCreateThumbs(attr as IUploadImageOptions,
-                        storage, image, ref temporaryFile);
-            }
-            finally
-            {
-                image?.Dispose();
+                try
+                {
+
+                    fs.Close();
+                    temporaryFile = UploadStorageExtensions.ScaleImageAndCreateAllThumbs(image, imageProcessor,
+                        attr as IUploadImageOptions ?? new FileUploadEditorAttribute(), 
+                        storage, temporaryFile);
+                }
+                finally
+                {
+                    (image as IDisposable)?.Dispose();
+                }
             }
         }
     }
