@@ -330,13 +330,13 @@ namespace Serenity.Services
 
             storage.PurgeTemporaryFiles();
 
-            validator.ValidateFile(attr as IUploadFileConstraints ?? new FileUploadEditorAttribute(), 
+            validator.ValidateFile(attr as IUploadFileConstraints ?? new UploadOptions(), 
                 fs, temporaryFile, out bool isImageExtension);
 
             if (!isImageExtension)
                 return;
 
-            validator.ValidateImage(attr as IUploadImageContrains ?? new FileUploadEditorAttribute(),
+            validator.ValidateImage(attr as IUploadImageContrains ?? new UploadOptions(),
                 fs, temporaryFile, out object image);
 
             if (image != null)
@@ -346,7 +346,7 @@ namespace Serenity.Services
 
                     fs.Close();
                     temporaryFile = UploadStorageExtensions.ScaleImageAndCreateAllThumbs(image, imageProcessor,
-                        attr as IUploadImageOptions ?? new FileUploadEditorAttribute(), 
+                        attr as IUploadImageOptions ?? new UploadOptions(), 
                         storage, temporaryFile);
                 }
                 finally

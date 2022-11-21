@@ -3,7 +3,7 @@
 /// <summary>
 /// Contstraints for the uploaded image.
 /// </summary>
-public interface IUploadImageContrains
+public interface IUploadImageContrains : IUploadOptions
 {
     /// <summary>
     /// If set to false, the upload behavior raises an error when it 

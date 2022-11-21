@@ -35,7 +35,7 @@ public partial class MultipleFileUploadBehaviorTests
         }
     }
 
-    class MultipleCustomEditorImageUploadEditorAttribute : ImageUploadEditorAttribute
+    class MultipleCustomEditorImageUploadEditorAttribute : BaseUploadEditorAttribute
     {
         public override bool IsMultiple => true;
 

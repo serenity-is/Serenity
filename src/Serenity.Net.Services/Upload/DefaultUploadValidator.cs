@@ -30,7 +30,7 @@ namespace Serenity.Web
             isImageExtension = false;
             var fileExtension = Path.GetExtension(filename);
 
-            if ((constraints.ExtensionBlacklist ?? ImageUploadEditorAttribute.DefaultExtensionBlacklist)
+            if ((constraints.ExtensionBlacklist ?? UploadOptions.DefaultExtensionBlacklist)
                 .Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
                 .Any(x => string.Equals(x.Trim(), fileExtension, StringComparison.OrdinalIgnoreCase)))
                 throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
@@ -61,7 +61,7 @@ namespace Serenity.Web
                 }
             }
 
-            var imageExtensions = constraints.ImageExtensions ?? ImageUploadEditorAttribute.DefaultImageExtensions;
+            var imageExtensions = constraints.ImageExtensions ?? UploadOptions.DefaultImageExtensions;
             if (string.IsNullOrEmpty(imageExtensions) ||
                 !imageExtensions.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Trim())

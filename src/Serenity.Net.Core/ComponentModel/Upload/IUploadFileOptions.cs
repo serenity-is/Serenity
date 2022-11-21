@@ -3,7 +3,7 @@
 /// <summary>
 /// Upload options related to the file name and encoding
 /// </summary>
-public interface IUploadFileOptions
+public interface IUploadFileOptions : IUploadOptions
 {
     /// <summary>
     /// Should a copy of file placed in a special history folder on upload. 

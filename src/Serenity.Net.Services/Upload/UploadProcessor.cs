@@ -22,12 +22,12 @@ namespace Serenity.Web
         public int ThumbQuality { get; set; }
 
         public bool ProcessStream(Stream fileContent, string extension, 
-            ITextLocalizer localizer, IUploadEditor attr = null)
+            ITextLocalizer localizer, IUploadOptions options = null)
         {
             if (fileContent is null)
                 throw new ArgumentNullException(nameof(fileContent));
 
-            attr ??= new ImageUploadEditorAttribute
+            options ??= new UploadOptions
             {
                 ThumbBackColor = ThumbBackColor,
                 ThumbHeight = ThumbHeight,
@@ -40,7 +40,7 @@ namespace Serenity.Web
             var uploadProcessor = new DefaultUploadProcessor(new DefaultImageProcessor(),
                 storage, new DefaultUploadValidator(imageProcessor, localizer, logger), localizer, logger);
 
-            var result = uploadProcessor.Process(fileContent, "___tempfile__" + extension, attr);
+            var result = uploadProcessor.Process(fileContent, "___tempfile__" + extension, options);
             ErrorMessage = result.ErrorMessage;
             FileSize = result.FileSize;
             ImageHeight = result.ImageWidth;

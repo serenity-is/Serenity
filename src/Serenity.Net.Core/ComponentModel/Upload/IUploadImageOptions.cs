@@ -3,7 +3,7 @@
 /// <summary>
 /// Options for the uploaded image and thumbnails
 /// </summary>
-public interface IUploadImageOptions
+public interface IUploadImageOptions : IUploadOptions
 {
     /// <summary>
     /// Quality of scaled image (not thumb).

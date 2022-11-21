@@ -21,7 +21,7 @@ namespace Serenity.Web
             this.logger = logger;
         }
 
-        public ProcessedUploadInfo Process(Stream stream, string filename, IUploadEditor attr)
+        public ProcessedUploadInfo Process(Stream stream, string filename, IUploadOptions options)
         {
             if (stream is null)
                 throw new ArgumentNullException(nameof(stream));
@@ -29,8 +29,8 @@ namespace Serenity.Web
             if (filename is null)
                 throw new ArgumentNullException(nameof(filename));
 
-            if (attr is null)
-                throw new ArgumentNullException(nameof(attr));
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
 
             var result = new ProcessedUploadInfo
             {
@@ -41,12 +41,12 @@ namespace Serenity.Web
             {
                 try
                 {
-                    uploadValidator.ValidateFile(attr as IUploadFileConstraints ?? new ImageUploadEditorAttribute(),
+                    uploadValidator.ValidateFile(options as IUploadFileConstraints ?? new UploadOptions(),
                         stream, filename, out bool isImageExtension);
 
                     object image = null;
                     if (isImageExtension)
-                        uploadValidator.ValidateImage(attr as IUploadImageContrains ?? new ImageUploadEditorAttribute(),
+                        uploadValidator.ValidateImage(options as IUploadImageContrains ?? new UploadOptions(),
                             stream, filename, out image);
                     try
                     {
@@ -64,7 +64,7 @@ namespace Serenity.Web
                             result.ImageHeight = height;
                             stream.Close();
                             result.TemporaryFile = UploadStorageExtensions.ScaleImageAndCreateAllThumbs(image, imageProcessor,
-                                attr as IUploadImageOptions ?? new ImageUploadEditorAttribute(),
+                                options as IUploadImageOptions ?? new UploadOptions(),
                                 uploadStorage, result.TemporaryFile);
                         }
                         result.Success = true;

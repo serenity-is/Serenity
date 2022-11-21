@@ -5,15 +5,12 @@
     /// non-image file types by default.
     /// </summary>
     /// <seealso cref="ImageUploadEditorAttribute" />
-    public class MultipleImageUploadEditorAttribute : ImageUploadEditorAttribute
+    public class MultipleImageUploadEditorAttribute : BaseUploadEditorAttribute
     {
         /// <summary>
         /// Editor type key
         /// </summary>
-        public new const string Key = "MultipleImageUpload";
-        
-        /// <inheritdoc />
-        public override bool IsMultiple => true;
+        public const string Key = "MultipleImageUpload";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleImageUploadEditorAttribute"/> class.
@@ -23,5 +20,8 @@
         {
             JsonEncodeValue = true;
         }
+
+        /// <inheritdoc />
+        public override bool IsMultiple => true;
     }
 }

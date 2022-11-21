@@ -3,7 +3,7 @@
 /// <summary>
 /// Constraints of the uploaded file size.
 /// </summary>
-public interface IUploadFileConstraints
+public interface IUploadFileConstraints : IUploadOptions
 {
     /// <summary>
     /// Should non-image uploads be allowed.
