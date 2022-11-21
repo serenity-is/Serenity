@@ -79,6 +79,9 @@
         /// <param name="endLine">If should end the line</param>
         public void InBrace(Action insideBlock, bool endLine = true)
         {
+            if (insideBlock is null)
+                throw new ArgumentNullException(nameof(insideBlock));
+
             StartBrace();
             insideBlock();
             EndBrace(endLine);
@@ -167,7 +170,7 @@
             if (!string.IsNullOrEmpty(ns))
             {
                 var oldNamespace = CurrentNamespace;
-                sb.Append("namespace ");
+                Indented("namespace ");
                 sb.AppendLine(ns);
                 CurrentNamespace = ns;
                 InBrace(action);
@@ -249,7 +252,8 @@
 
         /// <summary>
         /// Returns true if the namespace is in list of usings.
-        /// If AllowUsing callback is null or returns true, this may add it to the list of local usings.
+        /// If AllowUsing callback is null or returns true, or force is true,
+        /// this may add it to the list of local usings.
         /// </summary>
         /// <param name="ns"></param>
         /// <param name="force"></param>
@@ -270,7 +274,8 @@
 
         /// <summary>
         /// Returns true if the namespace is in list of usings.
-        /// If AllowUsing callback is null or returns true, this may add it to the list of local usings.
+        /// If AllowUsing callback is null or returns true, 
+        /// this may add it to the list of local usings.
         /// </summary>
         /// <param name="ns"></param>
         public bool Using(string ns)
@@ -477,6 +482,7 @@
         public override string ToString()
         {
             var nsb = new StringBuilder();
+
             if (!string.IsNullOrEmpty(FileComment))
             {
                 nsb.AppendLine(FileComment);

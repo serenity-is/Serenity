@@ -14,8 +14,7 @@
     {
         private static readonly char[] chars = new char[] { '|', '&', '!', '(', ')' };
         private readonly IPermissionService permissionService;
-        private readonly ConcurrentDictionary<string, string[]> cache =
-            new ConcurrentDictionary<string, string[]>();
+        private readonly ConcurrentDictionary<string, string[]> cache = new();
 
         /// <summary>
         /// Creates a new LogicOperatorPermissionService wrapping passed IPermissionService
