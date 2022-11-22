@@ -18,7 +18,7 @@ Slick._ = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // node_modules/@serenity-is/sleekgrid/src/grid/index.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/grid/index.ts
   var grid_exports = {};
   __export(grid_exports, {
     BasicLayout: () => BasicLayout,
@@ -29,7 +29,7 @@ Slick._ = (() => {
   // global-externals:_
   var { addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, ensureUniqueColumnIds, escape, defaultColumnFormat, disableSelection, Event, EventData, GlobalEditorLock, initializeColumns, H, keyCode, NonDataRow, parsePx, preClickClassName, Range, removeClass, RowCell, spacerDiv, titleize } = Slick;
 
-  // node_modules/@serenity-is/sleekgrid/src/grid/gridoptions.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/grid/gridoptions.ts
   var gridDefaults = {
     addNewRowCssClass: "new-row",
     alwaysAllowHorizontalScroll: false,
@@ -82,7 +82,7 @@ Slick._ = (() => {
     topPanelHeight: 30
   };
 
-  // node_modules/@serenity-is/sleekgrid/src/grid/basiclayout.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/grid/basiclayout.ts
   var BasicLayout = function() {
     var host;
     var canvasWidth;
@@ -314,7 +314,7 @@ Slick._ = (() => {
     return intf;
   };
 
-  // node_modules/@serenity-is/sleekgrid/src/grid/cellnavigator.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/grid/cellnavigator.ts
   var CellNavigator = class {
     constructor(h) {
       this.host = h;
@@ -537,7 +537,7 @@ Slick._ = (() => {
     }
   };
 
-  // node_modules/@serenity-is/sleekgrid/src/grid/internal.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/grid/internal.ts
   var maxSupportedCssHeight;
   var scrollbarDimensions;
   function absBox(elem) {
@@ -833,7 +833,7 @@ Slick._ = (() => {
     return Math.max(width, 0);
   }
 
-  // node_modules/@serenity-is/sleekgrid/src/grid/grid.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/grid/grid.ts
   var Grid = class {
     constructor(container, data, columns, options) {
       this._activeCellNode = null;
