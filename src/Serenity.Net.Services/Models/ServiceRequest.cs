@@ -1,5 +1,9 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// The base request object model for all service requests.
+    /// Your custom request objects should all derive from this type.
+    /// </summary>
     public class ServiceRequest
     {
         /// <summary>

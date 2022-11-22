@@ -1,39 +1,28 @@
 ﻿namespace Serenity.Services
 {
-    public enum RetrieveColumnSelection
-    {
-        /// <summary>
-        /// Details, e.g. all the fields
-        /// </summary>
-        Details = 0,
-        /// <summary>
-        /// Key Only, e.g. the primary key(s) and ID of the table
-        /// </summary>
-        KeyOnly = 1,
-        /// <summary>
-        /// List, e.g. only the table columns
-        /// </summary>
-        List = 2,
-        /// <summary>
-        /// None, don't select any property by default
-        /// </summary>
-        None = 3,
-        /// <summary>
-        /// Only select Id property by default
-        /// </summary>
-        IdOnly = 4,
-        /// <summary>
-        /// Lookup, e.g. ID, Name and fields with LookupInclude attribute
-        /// </summary>
-        Lookup = 5
-    }
-
+    /// <summary>
+    /// The request model for a Retrieve service
+    /// </summary>
     public class RetrieveRequest : ServiceRequest, IIncludeExcludeColumns
     {
+        /// <summary>
+        /// The entity ID to retrieve
+        /// </summary>
         public object EntityId { get; set; }
+
+        /// <summary>
+        /// The group of columns to select. This is 
+        /// RetrieveColumnSelection.Details by default, e.g.
+        /// all the table / view columns, but not unmapped or
+        /// complex object style (list etc.) columns.
+        /// </summary>
         public RetrieveColumnSelection ColumnSelection { get; set; }
+
+        /// <inheritdoc/>
         [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> IncludeColumns { get; set; }
+
+        /// <inheritdoc/>
         [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> ExcludeColumns { get; set; }
     }

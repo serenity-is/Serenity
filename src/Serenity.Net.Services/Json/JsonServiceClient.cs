@@ -4,24 +4,53 @@ using System.Threading.Tasks;
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// A JSON service client implementation
+    /// </summary>
     public class JsonServiceClient
     {
-        protected CookieContainer cookies = new CookieContainer();
+        /// <summary>
+        /// Cookie container
+        /// </summary>
+        protected CookieContainer cookies = new();
 
+        /// <summary>
+        /// Creates an instance of JsonServiceClient for the passed baseUrl
+        /// </summary>
+        /// <param name="baseUrl">The base url</param>
         public JsonServiceClient(string baseUrl)
         {
             BaseUrl = baseUrl;
             cookies = new CookieContainer();
         }
 
+        /// <summary>
+        /// Base url for the client
+        /// </summary>
         protected string BaseUrl { get; set; }
 
+        /// <summary>
+        /// Post to JSON service
+        /// </summary>
+        /// <typeparam name="TResponse">The type of response expected</typeparam>
+        /// <param name="relativeUrl">Relative url</param>
+        /// <param name="request">Request object</param>
+        /// <returns></returns>
         public virtual TResponse Post<TResponse>(string relativeUrl, object request)
             where TResponse : new()
         {
             return InternalPost<TResponse>(relativeUrl, request);
         }
 
+        /// <summary>
+        /// Posts to a JSON service, internal version
+        /// </summary>
+        /// <typeparam name="TResponse">Response type</typeparam>
+        /// <param name="relativeUrl">Relative url</param>
+        /// <param name="request">The request object</param>
+        /// <returns>The response</returns>
+        /// <exception cref="ValidationError">Throws a validation error exception
+        /// if the returned response contains a service error.</exception>
         protected TResponse InternalPost<TResponse>(string relativeUrl, object request)
             where TResponse : new()
         {

@@ -1,7 +1,14 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// The base service response object model for all service response
+    /// types. Your custom response objects should derive from this class.
+    /// </summary>
     public class ServiceResponse
     {
+        /// <summary>
+        /// The error returned if any.
+        /// </summary>
         public ServiceError Error { get; set; }
 
         /// <summary>

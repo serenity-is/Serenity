@@ -2,16 +2,20 @@
 
 namespace Serenity.Services
 {
-    public interface IRetrieveResponse
-    {
-        object Entity { get; }
-        IDictionary Localizations { get; set; }
-    }
-
+    /// <summary>
+    /// The service response model for a Retrieve service
+    /// </summary>
+    /// <typeparam name="T">Type of the entity</typeparam>
     public class RetrieveResponse<T> : ServiceResponse, IRetrieveResponse
     {
+        /// <summary>
+        /// The returned entity
+        /// </summary>
         public T Entity { get; set; }
 
+        /// <summary>
+        /// Dictionary containing localizations if requested.
+        /// </summary>
         public Dictionary<string, T> Localizations { get; set; }
 
         object IRetrieveResponse.Entity => Entity;

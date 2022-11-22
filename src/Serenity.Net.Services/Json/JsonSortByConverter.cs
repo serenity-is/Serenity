@@ -2,8 +2,6 @@
 {
     /// <summary>
     ///   Serialize/deserialize a SortBy object as string</summary>
-    /// <typeparam name="T">
-    ///   Type</typeparam>
     public class JsonSortByConverter : JsonConverter
     {
         /// <summary>

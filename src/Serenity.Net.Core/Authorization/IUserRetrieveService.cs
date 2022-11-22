@@ -2,7 +2,7 @@
 namespace Serenity.Abstractions
 {
     /// <summary>
-    /// User definition retrieve service abstraction
+    /// Abstraction to retrieve a user definition by its id or username
     /// </summary>
     public interface IUserRetrieveService
     {
