@@ -8,13 +8,13 @@ export namespace {{ClassName}}Service {
     export declare function Retrieve(request: {{SERENITYIMPORT "RetrieveRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "RetrieveResponse"}}<{{RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
     export declare function List(request: {{SERENITYIMPORT "ListRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
 
-    export declare const enum Methods {
-        Create = "Administration/User/Create",
-        Update = "Administration/User/Update",
-        Delete = "Administration/User/Delete",
-        Retrieve = "Administration/User/Retrieve",
-        List = "Administration/User/List"
-    }
+    export const Methods {
+        Create: "{{ModuleSlash}}{{ClassName}}/Create",
+        Update: "{{ModuleSlash}}{{ClassName}}/Update",
+        Delete: "{{ModuleSlash}}{{ClassName}}/Delete",
+        Retrieve: "{{ModuleSlash}}{{ClassName}}/Retrieve",
+        List: "{{ModuleSlash}}{{ClassName}}/List"
+    } as const;
 
     [
         'Create', 
