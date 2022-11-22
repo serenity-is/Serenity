@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Abstractions
 {
     /// <summary>
-    /// Abstraction to access current user
+    /// Abstraction to access the current user
     /// </summary>
     public interface IUserAccessor
     {
