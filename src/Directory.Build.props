@@ -11,8 +11,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/serenity-is/Serenity</PackageProjectUrl>
     <PackageTags>Serenity</PackageTags>
-    <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
-    <Terser>$(MSBuildProjectDirectory)\node_modules\.bin\terser</Terser>
+    <ESBuild>pnpm exec esbuild</ESBuild>
+    <Terser>pnpm exec terser</Terser>
     <DefaultItemExcludes>$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;libman.json</DefaultItemExcludes>
   </PropertyGroup>
   <PropertyGroup>
