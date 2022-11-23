@@ -1,5 +1,8 @@
 ﻿namespace Serenity.Reporting
 {
+    /// <summary>
+    /// Default report registry implementation
+    /// </summary>
     public class ReportRegistry : IReportRegistry
     {
         private Dictionary<string, Report> reportByKey;
@@ -8,6 +11,13 @@
         private readonly IPermissionService permissions;
         private readonly ITextLocalizer localizer;
 
+        /// <summary>
+        /// Creates an instance of the class.
+        /// </summary>
+        /// <param name="typeSource">The type source to search report types in</param>
+        /// <param name="permissions">Permission service</param>
+        /// <param name="localizer">Text localizer</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ReportRegistry(ITypeSource typeSource, IPermissionService permissions, ITextLocalizer localizer)
         {
             types = (typeSource ?? throw new ArgumentNullException(nameof(types)))
@@ -16,6 +26,11 @@
             this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
 
+        /// <summary>
+        /// Gets report key for the report type by looking at its ReportAttribute,
+        /// returning type full name if it does not have a report key or the attribute.
+        /// </summary>
+        /// <param name="type">The report type</param>
         public static string GetReportKey(Type type)
         {
             var attr = type.GetCustomAttribute<ReportAttribute>(false);
@@ -34,6 +49,11 @@
             return string.Empty;
         }
 
+        /// <summary>
+        /// Gets category title for a category key
+        /// </summary>
+        /// <param name="key">The category key.</param>
+        /// <param name="localizer">Text localizer</param>
         public static string GetReportCategoryTitle(string key, ITextLocalizer localizer)
         {
             var title = localizer?.TryGet("Report.Category." + key.Replace("/", "."));
@@ -83,6 +103,7 @@
             reportByKey = reportByKeyNew;
         }
 
+        /// <inheritdoc/>
         public bool HasAvailableReportsInCategory(string categoryKey)
         {
             EnsureTypes();
@@ -97,6 +118,7 @@
             return false;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<Report> GetAvailableReportsInCategory(string categoryKey)
         {
             EnsureTypes();
@@ -138,12 +160,34 @@
             return null;
         }
 
+        /// <summary>
+        /// Metadata for a registered report
+        /// </summary>
         public class Report
         {
+            /// <summary>
+            /// Type of the report
+            /// </summary>
             public Type Type { get; private set; }
+
+            /// <summary>
+            /// Report key
+            /// </summary>
             public string Key { get; private set; }
+
+            /// <summary>
+            /// Report permission
+            /// </summary>
             public string Permission { get; private set; }
+
+            /// <summary>
+            /// Report title
+            /// </summary>
             public string Title { get; private set; }
+
+            /// <summary>
+            /// The category
+            /// </summary>
             public Category Category { get; private set; }
 
             public Report(Type type, ITextLocalizer localizer)
@@ -165,11 +209,26 @@
             }
         }
 
+        /// <summary>
+        /// Model for a report category
+        /// </summary>
         public class Category
         {
+            /// <summary>
+            /// Key for the category
+            /// </summary>
             public string Key { get; private set; }
+
+            /// <summary>
+            /// Category title
+            /// </summary>
             public string Title { get; private set; }
 
+            /// <summary>
+            /// Creates an instance of the class
+            /// </summary>
+            /// <param name="key">Category key</param>
+            /// <param name="title">Category title</param>
             public Category(string key, string title)
             {
                 Key = key;

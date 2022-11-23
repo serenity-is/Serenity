@@ -2,6 +2,9 @@
 
 namespace Serenity.Reporting
 {
+    /// <summary>
+    /// Contains methods to extract ReportColumns from other types.
+    /// </summary>
     public static class ReportColumnConverter
     {
         private static ReportColumn FromMember(MemberInfo member, Type dataType,
@@ -28,11 +31,11 @@ namespace Serenity.Reporting
             else
             {
                 var dtf = baseField as DateTimeField;
-                if (dtf is object && !dtf.DateOnly)
+                if (dtf is not null && !dtf.DateOnly)
                 {
                     result.Format = "dd/MM/yyyy HH:mm";
                 }
-                else if (dtf is object ||
+                else if (dtf is not null ||
                     dataType == typeof(DateTime) ||
                     dataType == typeof(DateTime?))
                 {
@@ -40,10 +43,9 @@ namespace Serenity.Reporting
                 }
             }
 
-            if (baseField is object)
+            if (baseField is not null)
             {
-                if (result.Title == null)
-                    result.Title = baseField.GetTitle(localizer);
+                result.Title ??= baseField.GetTitle(localizer);
 
                 if (result.Width == null && baseField is StringField && baseField.Size != 0)
                     result.Width = baseField.Size;
@@ -54,16 +56,34 @@ namespace Serenity.Reporting
             return result;
         }
 
+        /// <summary>
+        /// Extracts a report column from a <see cref="FieldInfo"/>
+        /// </summary>
+        /// <param name="field">The field object</param>
+        /// <param name="localizer">Text localizer</param>
+        /// <param name="baseField">Base field object</param>
         public static ReportColumn FromFieldInfo(FieldInfo field, ITextLocalizer localizer, Field baseField = null)
         {
             return FromMember(field, field.FieldType, baseField, localizer);
         }
 
+        /// <summary>
+        /// Extracts a report column from a <see cref="PropertyInfo"/>
+        /// </summary>
+        /// <param name="property">The property object</param>
+        /// <param name="localizer">Text localizer</param>
+        /// <param name="baseField">Base field object</param>
         public static ReportColumn FromPropertyInfo(PropertyInfo property, ITextLocalizer localizer, Field baseField = null)
         {
             return FromMember(property, property.PropertyType, baseField, localizer);
         }
 
+        /// <summary>
+        /// Extracts list of report columns from a type, which is usually a Columns type.
+        /// </summary>
+        /// <param name="objectType">The columns type</param>
+        /// <param name="serviceProvider">Service provider</param>
+        /// <param name="localizer">Text localizer</param>
         public static List<ReportColumn> ObjectTypeToList(Type objectType, 
             IServiceProvider serviceProvider, ITextLocalizer localizer)
         {
@@ -116,6 +136,12 @@ namespace Serenity.Reporting
             return list;
         }
 
+        /// <summary>
+        /// Extracts a report column from a <see cref="Field"/> object.
+        /// </summary>
+        /// <param name="field">The field object</param>
+        /// <param name="localizer">Text localizer</param>
+        /// <returns></returns>
         public static ReportColumn FromField(Field field, ITextLocalizer localizer)
         {
             var column = new ReportColumn
@@ -131,6 +157,11 @@ namespace Serenity.Reporting
             return column;
         }
 
+        /// <summary>
+        /// Extracts report columns from an entity type (<see cref="IRow"/>)
+        /// </summary>
+        /// <param name="instance">The row instance</param>
+        /// <param name="localizer">Text localizer</param>
         public static List<ReportColumn> EntityTypeToList(IRow instance, ITextLocalizer localizer)
         {
             var list = new List<ReportColumn>();

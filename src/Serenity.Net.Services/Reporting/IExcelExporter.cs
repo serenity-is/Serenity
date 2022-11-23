@@ -8,7 +8,7 @@ namespace Serenity.Reporting
         /// Exports the specified data to Excel format
         /// </summary>
         /// <param name="data">The data.</param>
-        /// <param name="columns">The columns to export.
+        /// <param name="columns">The columns to export.</param>
         byte[] Export(IEnumerable data, IEnumerable<ReportColumn> columns);
 
         /// <summary>

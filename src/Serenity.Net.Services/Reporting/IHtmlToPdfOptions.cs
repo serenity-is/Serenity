@@ -1,5 +1,8 @@
 ﻿namespace Serenity.Reporting
 {
+    /// <summary>
+    /// Set of options for HTML to PDF converter (WKHTMLToPdf)
+    /// </summary>
     public interface IHtmlToPdfOptions
     {
         /// <summary>
