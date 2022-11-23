@@ -47,7 +47,6 @@
         /// <summary>
         /// Gets the list of delete behaviors
         /// </summary>
-        /// <returns></returns>
         protected virtual IEnumerable<IDeleteBehavior> GetBehaviors()
         {
             return Context.Behaviors.Resolve<TRow, IDeleteBehavior>(GetType());
@@ -270,6 +269,20 @@
         }
 
         /// <summary>
+        /// Checks if the entity is already deleted
+        /// </summary>
+        protected virtual bool IsDeleted()
+        {
+            var isActiveDeletedRow = Row as IIsActiveDeletedRow;
+            var isDeletedRow = Row as IIsDeletedRow;
+            var deleteLogRow = Row as IDeleteLogRow;
+
+            return ((isDeletedRow != null && isDeletedRow.IsDeletedField[Row] == true) ||
+                (isActiveDeletedRow != null && isActiveDeletedRow.IsActiveField[Row] < 0) ||
+                (deleteLogRow != null && !deleteLogRow.DeleteUserIdField.IsNull(Row)));
+        }
+
+        /// <summary>
         /// Processes the delete request. This is the entry point for the handler.
         /// </summary>
         /// <param name="unitOfWork">Unit of work</param>
@@ -291,13 +304,7 @@
             ValidatePermissions();
             ValidateRequest();
 
-            var isActiveDeletedRow = Row as IIsActiveDeletedRow;
-            var isDeletedRow = Row as IIsDeletedRow;
-            var deleteLogRow = Row as IDeleteLogRow;
-
-            if ((isDeletedRow != null && isDeletedRow.IsDeletedField[Row] == true) ||
-                (isActiveDeletedRow != null && isActiveDeletedRow.IsActiveField[Row] < 0) ||
-                (deleteLogRow != null && !deleteLogRow.DeleteUserIdField.IsNull(Row)))
+            if (IsDeleted())
                 Response.WasAlreadyDeleted = true;
             else
             {
