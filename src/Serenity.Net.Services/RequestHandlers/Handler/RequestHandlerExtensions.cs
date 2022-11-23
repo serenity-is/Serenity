@@ -17,6 +17,11 @@
             return (DeleteRequest)Activator.CreateInstance(handler.GetRequestType());
         }
 
+        public static UndeleteRequest CreateRequest(this IUndeleteRequestHandler handler)
+        {
+            return (UndeleteRequest)Activator.CreateInstance(handler.GetRequestType());
+        }
+
         public static SaveRequest<TRow> CreateRequest<TRow>(this ISaveRequestHandler handler)
         {
             return (SaveRequest<TRow>)Activator.CreateInstance(handler.GetRequestType());

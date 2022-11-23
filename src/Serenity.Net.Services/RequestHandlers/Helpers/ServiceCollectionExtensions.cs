@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
-using Newtonsoft.Json.Linq;
 using Serenity.Localization;
 using System.IO;
 
@@ -33,6 +32,8 @@ namespace Serenity.Extensions.DependencyInjection
             collection.TryAddTransient(typeof(IUpdateHandler<>), typeof(UpdateHandlerProxy<>));
             collection.TryAddTransient(typeof(IDeleteHandler<,,>), typeof(DeleteHandlerProxy<,,>));
             collection.TryAddTransient(typeof(IDeleteHandler<>), typeof(DeleteHandlerProxy<>));
+            collection.TryAddTransient(typeof(IUndeleteHandler<,,>), typeof(UndeleteHandlerProxy<,,>));
+            collection.TryAddTransient(typeof(IUndeleteHandler<>), typeof(UndeleteHandlerProxy<>));
             collection.TryAddTransient(typeof(IListHandler<,,>), typeof(ListHandlerProxy<,,>));
             collection.TryAddTransient(typeof(IListHandler<,>), typeof(ListHandlerProxy<,>));
             collection.TryAddTransient(typeof(IListHandler<>), typeof(ListHandlerProxy<>));
@@ -74,7 +75,9 @@ namespace Serenity.Extensions.DependencyInjection
                         intf == typeof(IRetrieveRequestProcessor) ||
                         intf == typeof(IRetrieveRequestHandler) ||
                         intf == typeof(IDeleteRequestProcessor) ||
-                        intf == typeof(IDeleteRequestHandler))
+                        intf == typeof(IDeleteRequestHandler) ||
+                        intf == typeof(IUndeleteRequestProcessor) ||
+                        intf == typeof(IUndeleteRequestHandler))
                         continue;
 
                     if (intf.IsGenericType)

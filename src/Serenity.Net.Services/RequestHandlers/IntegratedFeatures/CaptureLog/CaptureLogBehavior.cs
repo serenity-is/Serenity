@@ -1,18 +1,23 @@
 ﻿namespace Serenity.Services
 {
-    public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior
+    /// <summary>
+    /// Capture log behavior
+    /// </summary>
+    public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IUndeleteBehavior
     {
         private CaptureLogAttribute captureLogAttr;
 
+        /// <inheritdoc/>
         public bool ActivateFor(IRow row)
         {
-            if (!(row is IIdRow))
+            if (row is not IIdRow)
                 return false;
 
             captureLogAttr = row.GetType().GetCustomAttribute<CaptureLogAttribute>();
             return captureLogAttr != null;
         }
 
+        /// <inheritdoc/>
         public override void OnAudit(IDeleteRequestHandler handler)
         {
             if (handler.Row == null)
@@ -35,6 +40,35 @@
             Log(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetIdentifier());
         }
 
+        /// <inheritdoc/>
+        public void OnAudit(IUndeleteRequestHandler handler)
+        {
+            if (handler.Row == null)
+                return;
+
+            IRow newRow = handler.Row.Clone();
+
+            // log it as if it is an update operation
+            if (handler.Row is IIsActiveDeletedRow)
+            {
+                ((IIsActiveDeletedRow)newRow).IsActiveField[newRow] = 1;
+            }
+            else if (handler.Row is IIsDeletedRow)
+            {
+                ((IIsDeletedRow)newRow).IsDeletedField[newRow] = true;
+            }
+            else if (handler.Row is IDeleteLogRow)
+            {
+                ((IDeleteLogRow)newRow).DeleteUserIdField.AsObject(newRow, null);
+                ((IDeleteLogRow)newRow).DeleteDateField.AsObject(newRow, null);
+            }
+            else
+                return;
+
+            Log(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetIdentifier());
+        }
+
+        /// <inheritdoc/>
         public override void OnAudit(ISaveRequestHandler handler)
         {
             if (handler.Row == null)
@@ -46,7 +80,6 @@
 
                 return;
             }
-
 
             bool anyChanged = false;
             foreach (var field in handler.Row.GetTableFields())
@@ -74,6 +107,15 @@
                 Log(handler.UnitOfWork, handler.Old, handler.Row, handler.Context.User?.GetIdentifier());
         }
 
+        /// <summary>
+        /// Logs a capture log operation
+        /// </summary>
+        /// <param name="uow">Unit of work</param>
+        /// <param name="old">Old entity</param>
+        /// <param name="row">New entity</param>
+        /// <param name="userId">User ID</param>
+        /// <exception cref="ArgumentNullException">old and row is null</exception>
+        /// <exception cref="InvalidOperationException">Capture log row type does not implement ICaptureLogRow interface</exception>
         public void Log(IUnitOfWork uow, IRow old, IRow row, object userId)
         {
             if (old == null && row == null)
@@ -177,6 +219,31 @@
                 copyCapturedFields(row, logRow);
                 uow.Connection.Insert(logRow);
             }
+        }
+
+        /// <inheritdoc/>
+        public void OnPrepareQuery(IUndeleteRequestHandler handler, SqlQuery query)
+        {
+        }
+
+        /// <inheritdoc/>
+        public void OnValidateRequest(IUndeleteRequestHandler handler)
+        {
+        }
+
+        /// <inheritdoc/>
+        public void OnBeforeUndelete(IUndeleteRequestHandler handler)
+        {
+        }
+
+        /// <inheritdoc/>
+        public void OnAfterUndelete(IUndeleteRequestHandler handler)
+        {
+        }
+
+        /// <inheritdoc/>
+        public void OnReturn(IUndeleteRequestHandler handler)
+        {
         }
     }
 }
