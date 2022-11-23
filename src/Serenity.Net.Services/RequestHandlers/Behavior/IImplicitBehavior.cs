@@ -7,6 +7,10 @@
     /// </summary>
     public interface IImplicitBehavior
     {
+        /// <summary>
+        /// Returns true if this behavior should be used for the target row type.
+        /// </summary>
+        /// <param name="row">The target row type.</param>
         bool ActivateFor(IRow row);
     }
 }

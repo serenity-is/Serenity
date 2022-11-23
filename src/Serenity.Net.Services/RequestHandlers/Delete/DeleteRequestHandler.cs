@@ -1,16 +1,42 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// Generic base class for delete request handlers
+    /// </summary>
+    /// <typeparam name="TRow">Entity type</typeparam>
+    /// <typeparam name="TDeleteRequest">Delete request type</typeparam>
+    /// <typeparam name="TDeleteResponse">Delete response type</typeparam>
     public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDeleteRequestProcessor,
         IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>
         where TRow : class, IRow, IIdRow, new()
         where TDeleteRequest : DeleteRequest
         where TDeleteResponse : DeleteResponse, new()
     {
+        /// <summary>
+        /// The entity
+        /// </summary>
         protected TRow Row;
+
+        /// <summary>
+        /// Response object
+        /// </summary>
         protected TDeleteResponse Response;
+
+        /// <summary>
+        /// Request object
+        /// </summary>
         protected TDeleteRequest Request;
+
+        /// <summary>
+        /// Lazy list of behaviors that is activated for this request
+        /// </summary>
         protected Lazy<IDeleteBehavior[]> behaviors;
 
+        /// <summary>
+        /// Creates an instance of the class
+        /// </summary>
+        /// <param name="context">Request context</param>
+        /// <exception cref="ArgumentNullException">Context is null</exception>
         public DeleteRequestHandler(IRequestContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
@@ -18,24 +44,41 @@
             behaviors = new Lazy<IDeleteBehavior[]>(() => GetBehaviors().ToArray());
         }
 
+        /// <summary>
+        /// Gets the list of delete behaviors
+        /// </summary>
+        /// <returns></returns>
         protected virtual IEnumerable<IDeleteBehavior> GetBehaviors()
         {
             return Context.Behaviors.Resolve<TRow, IDeleteBehavior>(GetType());
         }
 
+        /// <summary>
+        /// Gets current connection from the unit of work
+        /// </summary>
         public IDbConnection Connection => UnitOfWork.Connection;
 
+        /// <summary>
+        /// Method that is executed before the actual SQL delete operation.
+        /// </summary>
         protected virtual void OnBeforeDelete()
         {
             foreach (var behavior in behaviors.Value)
                 behavior.OnBeforeDelete(this);
         }
 
+        /// <summary>
+        /// Gets the display order filter for current group, if the entity 
+        /// implements <see cref="IDisplayOrderRow"/> interface
+        /// </summary>
         protected virtual BaseCriteria GetDisplayOrderFilter()
         {
             return DisplayOrderFilterHelper.GetDisplayOrderFilterFor(Row);
         }
 
+        /// <summary>
+        /// Method that is executed after the actual SQL delete operation
+        /// </summary>
         protected virtual void OnAfterDelete()
         {
             if (Row as IDisplayOrderRow != null)
@@ -48,12 +91,19 @@
                 behavior.OnAfterDelete(this);
         }
 
+        /// <summary>
+        /// Validates the parameters of the delete request.
+        /// </summary>
         protected virtual void ValidateRequest()
         {
             foreach (var behavior in behaviors.Value)
                 behavior.OnValidateRequest(this);
         }
 
+        /// <summary>
+        /// Prepares the query used to select the existing record
+        /// </summary>
+        /// <param name="query">The query</param>
         protected virtual void PrepareQuery(SqlQuery query)
         {
             query.SelectTableFields();
@@ -62,6 +112,9 @@
                 behavior.OnPrepareQuery(this, query);
         }
 
+        /// <summary>
+        /// Loads the entity that is going to be deleted
+        /// </summary>
         protected virtual void LoadEntity()
         {
             var idField = Row.IdField;
@@ -78,6 +131,10 @@
                 throw DataValidation.EntityNotFoundError(Row, Request.EntityId, Localizer);
         }
 
+        /// <summary>
+        /// Invokes the passed delete action method
+        /// </summary>
+        /// <param name="action">Delete action method</param>
         protected virtual void InvokeDeleteAction(Action action)
         {
             try
@@ -93,6 +150,9 @@
             }
         }
 
+        /// <summary>
+        /// Executes the actual SQL delete operation
+        /// </summary>
         protected virtual void ExecuteDelete()
         {
             var isActiveDeletedRow = Row as IIsActiveDeletedRow;
@@ -168,23 +228,37 @@
             InvalidateCacheOnCommit();
         }
 
+        /// <summary>
+        /// Attaches a cache invalidation call to to OnCommit 
+        /// callback of the current unit of work. This would clear
+        /// cached items related to this row type.
+        /// </summary>
         protected virtual void InvalidateCacheOnCommit()
         {
             Cache.InvalidateOnCommit(UnitOfWork, Row);
         }
 
+        /// <summary>
+        /// Performs auditing
+        /// </summary>
         protected virtual void DoAudit()
         {
             foreach (var behavior in behaviors.Value)
                 behavior.OnAudit(this);
         }
 
+        /// <summary>
+        /// The method that is called just before the response is returned.
+        /// </summary>
         protected virtual void OnReturn()
         {
             foreach (var behavior in behaviors.Value)
                 behavior.OnReturn(this);
         }
 
+        /// <summary>
+        /// Validates the user permissions for delete operation
+        /// </summary>
         protected virtual void ValidatePermissions()
         {
             var attr = typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??
@@ -195,6 +269,12 @@
                 Permissions.ValidatePermission(attr.Permission ?? "?", Localizer);
         }
 
+        /// <summary>
+        /// Processes the delete request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="unitOfWork">Unit of work</param>
+        /// <param name="request">Request</param>
+        /// <exception cref="ArgumentNullException">unitofWork is null</exception>
         public TDeleteResponse Process(IUnitOfWork unitOfWork, TDeleteRequest request)
         {
             StateBag.Clear();
@@ -240,21 +320,50 @@
             return Process(uow, (TDeleteRequest)request);
         }
 
+        /// <inheritdoc/>
         public TDeleteResponse Delete(IUnitOfWork uow, TDeleteRequest request)
         {
             return Process(uow, request);
         }
 
+        /// <summary>
+        /// Gets the two level cache from the request context
+        /// </summary>
         public ITwoLevelCache Cache => Context.Cache;
+
+        /// <summary>
+        /// Gets the request context
+        /// </summary>
         public IRequestContext Context { get; private set; }
+
+        /// <summary>
+        /// Gets localizer from the request context
+        /// </summary>
         public ITextLocalizer Localizer => Context.Localizer;
+
+        /// <summary>
+        /// Gets permission service from the request context
+        /// </summary>
         public IPermissionService Permissions => Context.Permissions;
+
+        /// <summary>
+        /// Gets current user from the request context
+        /// </summary>
         public ClaimsPrincipal User => Context.User;
 
+        /// <summary>
+        /// Gets current unit of work
+        /// </summary>
         public IUnitOfWork UnitOfWork { get; protected set; }
+
         IRow IDeleteRequestHandler.Row => Row;
         DeleteRequest IDeleteRequestHandler.Request => Request;
         DeleteResponse IDeleteRequestHandler.Response => Response;
+
+        /// <summary>
+        /// A state bag for behaviors to preserve state among their methods.
+        /// It will be cleared before each request, e.g. Process call.
+        /// </summary>
         public IDictionary<string, object> StateBag { get; private set; }
     }
 }

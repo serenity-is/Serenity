@@ -2,11 +2,20 @@
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// Default implementation for <see cref="IBehaviorProvider"/>
+    /// </summary>
     public class DefaultBehaviorProvider : IBehaviorProvider
     {
         private readonly IImplicitBehaviorRegistry implicitBehaviors;
         private readonly IBehaviorFactory behaviorFactory;
 
+        /// <summary>
+        /// Creates an instance of the class.
+        /// </summary>
+        /// <param name="implicitBehaviors">Registry for implict behaviors.</param>
+        /// <param name="behaviorFactory">Behavior factory</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors,
             IBehaviorFactory behaviorFactory)
         {
@@ -17,6 +26,7 @@ namespace Serenity.Services
                 throw new ArgumentNullException(nameof(behaviorFactory));
         }
 
+        /// <inheritdoc/>
         public IEnumerable Resolve(Type handlerType, Type rowType, Type behaviorType)
         {
             var list = new List<object>();
@@ -32,10 +42,10 @@ namespace Serenity.Services
                 if (behavior == null)
                     continue;
 
-                if (!(behavior is IImplicitBehavior implicitBehavior))
+                if (behavior is not IImplicitBehavior implicitBehavior)
                     continue;
 
-                if (!(behavior is IFieldBehavior fieldBehavior))
+                if (behavior is not IFieldBehavior fieldBehavior)
                 {
                     if (implicitBehavior.ActivateFor(row))
                         list.Add(behavior);
