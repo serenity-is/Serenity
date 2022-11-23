@@ -17,7 +17,7 @@
                 return;
             }
 
-            if (source.BasedOnField is object &&
+            if (source.BasedOnField is not null &&
                 source.BasedOnField.Flags.HasFlag(FieldFlags.NotMapped))
                 item.Sortable = false;
         }

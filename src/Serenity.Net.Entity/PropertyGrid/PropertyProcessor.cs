@@ -7,57 +7,31 @@
     /// <seealso cref="IPropertyProcessor" />
     public abstract class PropertyProcessor : IPropertyProcessor
     {
-        /// <summary>
-        /// Processes the specified source.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="item">The item.</param>
+        /// <inheritdoc/>
         public virtual void Process(IPropertySource source, PropertyItem item)
         {
         }
 
-        /// <summary>
-        /// Initializes this instance.
-        /// </summary>
+        /// <inheritdoc/>
         public virtual void Initialize()
         {
         }
 
-        /// <summary>
-        /// Posts the process.
-        /// </summary>
+        /// <inheritdoc/>
         public virtual void PostProcess()
         {
         }
 
-        /// <summary>
-        /// Gets the priority.
-        /// </summary>
-        /// <value>
-        /// The priority.
-        /// </value>
+        /// <inheritdoc/>
         public virtual int Priority => 50;
 
-        /// <summary>
-        /// Gets or sets the type.
-        /// </summary>
-        /// <value>
-        /// The type.
-        /// </value>
+        /// <inheritdoc/>
         public Type Type { get; set; }
-        /// <summary>
-        /// Gets or sets the based on row.
-        /// </summary>
-        /// <value>
-        /// The based on row.
-        /// </value>
+
+        /// <inheritdoc/>
         public IRow BasedOnRow { get; set; }
-        /// <summary>
-        /// Gets or sets the items.
-        /// </summary>
-        /// <value>
-        /// The items.
-        /// </value>
+
+        /// <inheritdoc/>
         public List<PropertyItem> Items { get; set; }
     }
 }

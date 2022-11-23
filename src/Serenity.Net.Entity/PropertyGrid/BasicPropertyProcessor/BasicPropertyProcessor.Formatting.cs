@@ -18,7 +18,7 @@
                 }
                 else if (valueType == typeof(DateTime) || valueType == typeof(DateTime?))
                 {
-                    if (basedOnField is object &&
+                    if (basedOnField is not null &&
                         basedOnField is DateTimeField dtf &&
                         !dtf.DateOnly)
                         item.FormatterType = "DateTime";

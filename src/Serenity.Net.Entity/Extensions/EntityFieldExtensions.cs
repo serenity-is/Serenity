@@ -67,7 +67,7 @@
         /// <param name="row">The row.</param>
         public static void AutoTrim(this Field field, IRow row)
         {
-            if (field as StringField is object &&
+            if (field as StringField is not null &&
                 (field.Flags & FieldFlags.Trim) == FieldFlags.Trim)
             {
                 string value = (field as StringField)[row];

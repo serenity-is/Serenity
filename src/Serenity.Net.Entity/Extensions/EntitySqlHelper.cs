@@ -272,7 +272,7 @@ namespace Serenity.Data
                 if (info.IntoRowIndex < 0 || info.IntoRowIndex >= into.Count)
                     continue;
 
-                if (!(into[info.IntoRowIndex] is IRow row))
+                if (into[info.IntoRowIndex] is not IRow row)
                     continue;
 
                 if (info.IntoField is Field field &&
@@ -294,7 +294,7 @@ namespace Serenity.Data
                 var name = reader.GetName(index);
                 field = row.Fields.FindField(name) ?? row.Fields.FindFieldByPropertyName(name);
 
-                if (field is object)
+                if (field is not null)
                 {
                     try
                     {

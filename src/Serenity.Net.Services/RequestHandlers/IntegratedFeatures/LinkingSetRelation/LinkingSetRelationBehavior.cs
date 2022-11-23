@@ -2,9 +2,13 @@
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// Behavior class that handles <see cref="LinkingSetRelationAttribute"/>
+    /// </summary>
     public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior,
         IImplicitBehavior, IRetrieveBehavior, IListBehavior, IFieldBehavior
     {
+        /// <inheritdoc/>
         public Field Target { get; set; }
 
         private readonly IDefaultHandlerFactory handlerFactory;
@@ -20,11 +24,17 @@ namespace Serenity.Services
         private Func<IRow> rowFactory;
         private Func<IList> listFactory;
 
+        /// <summary>
+        /// Creates an instance of the class
+        /// </summary>
+        /// <param name="handlerFactory">Default handler factory</param>
+        /// <exception cref="ArgumentNullException">handlerFactory is null</exception>
         public LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory)
         {
             this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
         }
 
+        /// <inheritdoc/>
         public bool ActivateFor(IRow row)
         {
             if (Target is null)
@@ -34,7 +44,7 @@ namespace Serenity.Services
             if (attr == null)
                 return false;
 
-            if (!(row is IIdRow))
+            if (row is not IIdRow)
             {
                 throw new ArgumentException(string.Format("Field '{0}' in row type '{1}' has a [LinkingSetRelation] attribute " +
                     "but it doesn't implement IIdRow!",
@@ -122,15 +132,24 @@ namespace Serenity.Services
             return true;
         }
 
-        public void OnAfterExecuteQuery(IRetrieveRequestHandler handler) { }
+        /// <inheritdoc/>
+        public void OnAfterExecuteQuery(IRetrieveRequestHandler handler) { }        
+        /// <inheritdoc/>
         public void OnBeforeExecuteQuery(IRetrieveRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnPrepareQuery(IRetrieveRequestHandler handler, SqlQuery query) { }
+        /// <inheritdoc/>
         public void OnValidateRequest(IRetrieveRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnValidateRequest(IListRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnApplyFilters(IListRequestHandler handler, SqlQuery query) { }
+        /// <inheritdoc/>
         public void OnBeforeExecuteQuery(IListRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnAfterExecuteQuery(IListRequestHandler handler) { }
 
+        /// <inheritdoc/>
         public void OnPrepareQuery(IListRequestHandler handler, SqlQuery query)
         {
             if (Target is null ||
@@ -146,7 +165,7 @@ namespace Serenity.Services
 
                 var values = new List<object>();
 
-                if (!(value is string) && value is IEnumerable enumerable)
+                if (value is not string && value is IEnumerable enumerable)
                 {
                     foreach (var val in enumerable)
                         values.Add(itemKeyField.ConvertValue(val, CultureInfo.InvariantCulture));
@@ -175,6 +194,7 @@ namespace Serenity.Services
             }
         }
 
+        /// <inheritdoc/>
         public void OnReturn(IRetrieveRequestHandler handler)
         {
             if (Target is null ||
@@ -202,6 +222,7 @@ namespace Serenity.Services
             Target.AsObject(handler.Row, list);
         }
 
+        /// <inheritdoc/>
         public void OnReturn(IListRequestHandler handler)
         {
             if (Target is null ||
@@ -256,8 +277,7 @@ namespace Serenity.Services
             var detail = rowFactory();
             thisKeyField.AsObject(detail, masterId);
             itemKeyField.AsObject(detail, itemKeyField.ConvertValue(itemKey, CultureInfo.InvariantCulture));
-            if (filterField is object)
-                filterField.AsObject(detail, filterValue);
+            filterField?.AsObject(detail, filterValue);
 
             var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(rowType);
             var saveRequest = saveHandler.CreateRequest();
@@ -346,9 +366,10 @@ namespace Serenity.Services
             }
         }
 
+        /// <inheritdoc/>
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
-            if (!(Target.AsObject(handler.Row) is IList newList))
+            if (Target.AsObject(handler.Row) is not IList newList)
                 return;
 
             var idField = handler.Row.IdField;
@@ -386,6 +407,7 @@ namespace Serenity.Services
                 newList.Cast<object>().ToList());
         }
 
+        /// <inheritdoc/>
         public override void OnBeforeDelete(IDeleteRequestHandler handler)
         {
             if (Target is null ||

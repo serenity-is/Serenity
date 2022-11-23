@@ -1,5 +1,8 @@
 ﻿namespace Serenity.PropertyGrid
 {
+    /// <summary>
+    /// Property processor for handling localizable properties
+    /// </summary>
     public partial class LocalizablePropertyProcessor : PropertyProcessor
     {
         private LocalizationRowAttribute localAttr;
@@ -8,6 +11,7 @@
         private Field mappedIdField;
         private int rowPrefixLength;
 
+        /// <inheritdoc/>
         public override void Initialize()
         {
             localAttr = null;
@@ -24,6 +28,7 @@
                     localAttr.LocalizationRow.FullName));
         }
 
+        /// <inheritdoc/>
         public override void Process(IPropertySource source, PropertyItem item)
         {
             var attr = source.GetAttribute<LocalizableAttribute>();
@@ -35,13 +40,14 @@
                 return;
             }
 
-            if (source.BasedOnField is object &&
+            if (source.BasedOnField is not null &&
                 IsLocalized(source.BasedOnField))
             {
                 item.Localizable = true;
             }
         }
 
+        /// <inheritdoc/>
         public override int Priority => 15;
 
         private bool IsEnabled()
@@ -65,10 +71,14 @@
             return true;
         }
 
+        /// <summary>
+        /// Returns if the field is localizable
+        /// </summary>
+        /// <param name="field">Field object</param>
         public bool IsLocalized(Field field)
         {
-            return IsEnabled() && Services.LocalizationBehavior.GetLocalizationMatch(field,
-                localRowInstance, localRowPrefixLength, rowPrefixLength) is object;
+            return IsEnabled() && LocalizationBehavior.GetLocalizationMatch(field,
+                localRowInstance, localRowPrefixLength, rowPrefixLength) is not null;
         }
     }
 }

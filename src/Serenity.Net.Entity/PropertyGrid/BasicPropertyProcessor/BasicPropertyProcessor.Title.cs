@@ -15,9 +15,9 @@
             {
                 var basedOnField = source.BasedOnField;
 
-                if (basedOnField is object)
+                if (basedOnField is not null)
                 {
-                    item.Title = basedOnField.Caption is object ?
+                    item.Title = basedOnField.Caption is not null ?
                         basedOnField.Caption.Key : basedOnField.AutoTextKey;
                 }
                 else

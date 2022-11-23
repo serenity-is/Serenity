@@ -1,20 +1,30 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// Interface that handles <see cref="UniqueConstraintAttribute"/> on fields
+    /// </summary>
     public class UniqueFieldSaveBehavior : BaseSaveBehavior, IImplicitBehavior, IFieldBehavior
     {
+        /// <inheritdoc/>
         public Field Target { get; set; }
-        public ITextLocalizer Localizer { get; }
+
+        private readonly ITextLocalizer localizer;
 
         private UniqueAttribute attr;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="localizer">Text localizer</param>
         public UniqueFieldSaveBehavior(ITextLocalizer localizer)
         {
-            Localizer = localizer;
+            this.localizer = localizer;
         }
 
+        /// <inheritdoc/>
         public bool ActivateFor(IRow row)
         {
-            if (ReferenceEquals(null, Target))
+            if (Target is null)
                 return false;
 
             if (!Target.Flags.HasFlag(FieldFlags.Unique))
@@ -28,10 +38,11 @@
             return true;
         }
 
+        /// <inheritdoc/>
         public override void OnBeforeSave(ISaveRequestHandler handler)
         {
-            ValidateUniqueConstraint(handler, new Field[] { Target }, Localizer,
-                attr == null ? (string)null : attr.ErrorMessage,
+            ValidateUniqueConstraint(handler, new Field[] { Target }, localizer,
+                attr?.ErrorMessage,
                 attr != null && attr.IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
         }
 
@@ -49,10 +60,10 @@
                 else
                     criteria &= field == new ValueCriteria(field.AsSqlValue(handler.Row));
 
-            var idField = (Field)((IIdRow)handler.Row).IdField;
+            var idField = ((IIdRow)handler.Row).IdField;
 
             if (handler.IsUpdate)
-                criteria &= (Field)idField != new ValueCriteria(idField.AsSqlValue(handler.Old));
+                criteria &= idField != new ValueCriteria(idField.AsSqlValue(handler.Old));
 
             var row = handler.Row.CreateNew();
             if (new SqlQuery()
@@ -63,11 +74,11 @@
                     .Exists(handler.UnitOfWork.Connection))
             { 
                 throw new ValidationError("UniqueViolation",
-                    String.Join(", ", fields.Select(x => x.PropertyName ?? x.Name)),
+                    string.Join(", ", fields.Select(x => x.PropertyName ?? x.Name)),
                     string.Format(!string.IsNullOrEmpty(errorMessage) ?
                         (localizer.TryGet(errorMessage) ?? errorMessage) :
                             localizer.Get("Validation.UniqueConstraint"),
-                        String.Join(", ", fields.Select(x => x.GetTitle(localizer)))));
+                        string.Join(", ", fields.Select(x => x.GetTitle(localizer)))));
             }
         }
     }

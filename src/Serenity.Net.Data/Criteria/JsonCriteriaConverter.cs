@@ -39,7 +39,7 @@ namespace Serenity.Data
             if (criteria is ValueCriteria valueCriteria)
             {
                 var value = valueCriteria.Value;
-                if (value != null && value is IEnumerable && !(value is string))
+                if (value != null && value is IEnumerable && value is not string)
                 {
                     // make sure that first value in array won't be recognized as a operator
                     // while deserializing (e.g. if values are [">", "a", "b"], serialize them
@@ -141,7 +141,7 @@ namespace Serenity.Data
                         if (item == null)
                             throw new ArgumentNullException("item");
 
-                        if (!(item is JValue))
+                        if (item is not JValue)
                             throw new JsonSerializationException(string.Format("Can't deserialize {0} as Criteria value", item.ToString()));
 
                         list.Add(((JValue)item).Value);
@@ -150,7 +150,7 @@ namespace Serenity.Data
                     return new ValueCriteria(list.ToArray());
                 }
 
-                if (!(array[0] is JValue jValue) || !(jValue.Value is string))
+                if (array[0] is not JValue jValue || jValue.Value is not string)
                     throw new JsonSerializationException(string.Format("Couldn't deserialize string criteria: {0}", array.ToString()));
 
                 var value = (string)((JValue)array[0]).Value;
@@ -165,7 +165,7 @@ namespace Serenity.Data
 
             if (array.Count == 2)
             {
-                if (!(array[0] is JValue jValue) || !(jValue.Value is string))
+                if (array[0] is not JValue jValue || jValue.Value is not string)
                     throw new JsonSerializationException(string.Format("Couldn't deserialize unary criteria: {0}", array.ToString()));
 
                 var opStr = (string)((JValue)array[0]).Value;
@@ -181,7 +181,7 @@ namespace Serenity.Data
 
             if (array.Count == 3)
             {
-                if (!(array[1] is JValue jValue) || !(jValue.Value is string))
+                if (array[1] is not JValue jValue || jValue.Value is not string)
                     throw new JsonSerializationException(string.Format("Couldn't deserialize unary criteria: {0}", array.ToString()));
 
                 var opStr = (string)((JValue)array[1]).Value;

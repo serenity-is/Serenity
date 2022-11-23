@@ -197,6 +197,12 @@
             /// </summary>
             public Category Category { get; private set; }
 
+            /// <summary>
+            /// Creates a new instance of the class
+            /// </summary>
+            /// <param name="type">Report type</param>
+            /// <param name="localizer">Text localizer</param>
+            /// <exception cref="ArgumentNullException">Type is null</exception>
             public Report(Type type, ITextLocalizer localizer)
             {
                 Type = type ?? throw new ArgumentNullException("type");

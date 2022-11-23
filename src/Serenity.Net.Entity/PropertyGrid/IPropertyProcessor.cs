@@ -10,16 +10,19 @@
         /// Initializes this instance.
         /// </summary>
         void Initialize();
+
         /// <summary>
         /// Sets properties of a PropertyItem by analysing a property source
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="item">The item.</param>
         void Process(IPropertySource source, PropertyItem item);
+
         /// <summary>
-        /// Posts the process.
+        /// Called after process in a secondary pass.
         /// </summary>
         void PostProcess();
+
         /// <summary>
         /// Gets or sets the items.
         /// </summary>
@@ -27,13 +30,15 @@
         /// The items.
         /// </value>
         List<PropertyItem> Items { get; set; }
+
         /// <summary>
-        /// Gets or sets the type.
+        /// Gets or sets the type property processor is working on.
         /// </summary>
         /// <value>
         /// The type.
         /// </value>
         Type Type { get; set; }
+
         /// <summary>
         /// Gets or sets the based on row.
         /// </summary>
@@ -41,8 +46,10 @@
         /// The based on row.
         /// </value>
         IRow BasedOnRow { get; set; }
+
         /// <summary>
-        /// Gets the priority.
+        /// Gets the priority. The processors are called based
+        /// on this priority.
         /// </summary>
         /// <value>
         /// The priority.

@@ -92,7 +92,7 @@
             else if (IsCreate)
             {
                 var idField = Row.IdField;
-                if (idField is object &&
+                if (idField is not null &&
                     idField.Flags.HasFlag(FieldFlags.AutoIncrement))
                 {
                     InvokeSaveAction(() =>
@@ -109,7 +109,7 @@
                         Connection.Insert(Row);
                     });
 
-                    if (idField is object)
+                    if (idField is not null)
                         Response.EntityId = idField.AsObject(Row);
                 }
 
@@ -152,7 +152,7 @@
 
         protected virtual void HandleDisplayOrder(bool afterSave)
         {
-            if (!(Row is IDisplayOrderRow displayOrderRow))
+            if (Row is not IDisplayOrderRow displayOrderRow)
                 return;
 
             if (IsCreate && !afterSave)

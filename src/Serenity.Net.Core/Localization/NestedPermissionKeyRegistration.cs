@@ -45,7 +45,7 @@
                 if (member.FieldType != typeof(string))
                     continue;
 
-                if (!(member.GetValue(null) is string key) ||
+                if (member.GetValue(null) is not string key ||
                     string.IsNullOrEmpty(key) ||
                     key.IndexOfAny(splitChar) >= 0) // skip permissions with logical operators
                     continue;
@@ -65,8 +65,7 @@
 
                 thisKeys.Add(key);
 
-                if (permissions != null)
-                    permissions.Add(key);
+                permissions?.Add(key);
 
                 if (registry != null)
                 {

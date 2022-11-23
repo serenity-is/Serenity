@@ -436,7 +436,7 @@
             /// <exception cref="InvalidOperationException">Internal else value is not null</exception>
             public CaseBuilder Else(object elseValue)
             {
-                if (this.elseValue is object)
+                if (this.elseValue is not null)
                     throw new InvalidOperationException();
 
                 this.elseValue = elseValue ?? DBNull.Value;
@@ -487,7 +487,7 @@
                     }
                 }
 
-                if (elseValue is object)
+                if (elseValue is not null)
                 {
                     sb.Append(" ELSE ");
 

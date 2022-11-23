@@ -218,7 +218,7 @@ namespace Serenity.Services
 
                 filename[handler.Row] = null;
 
-                if (!(originalNameField is null))
+                if (originalNameField is not null)
                     originalNameField[handler.Row] = null;
 
                 return;

@@ -20,7 +20,7 @@
             var old = handler.Old;
             var isUpdate = old == null;
 
-            if (!(row is IParentIdRow parentIdRow))
+            if (row is not IParentIdRow parentIdRow)
                 return;
 
             var parentId = parentIdRow.ParentIdField.AsObject(row);
@@ -41,8 +41,8 @@
             if (foreignRowType == null)
                 return;
 
-            if (!(Activator.CreateInstance(foreignRowType) is IIdRow foreignRow) ||
-                !(foreignRow is IIsActiveRow iar))
+            if (Activator.CreateInstance(foreignRowType) is not IIdRow foreignRow ||
+                foreignRow is not IIsActiveRow iar)
                 return;
 
             ServiceHelper.CheckParentNotDeleted(handler.UnitOfWork.Connection, 

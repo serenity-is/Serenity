@@ -35,7 +35,7 @@ namespace Serenity.Services
                 return sortOrders.Select(x => new SortBy(x.Item1.PropertyName ?? x.Item1.Name, x.Item2)).ToArray();
 
             var nameField = Row.NameField;
-            if (nameField is object)
+            if (nameField is not null)
                 return new SortBy[] { new SortBy(nameField.Name, false) };
 
             return null;
@@ -180,7 +180,7 @@ namespace Serenity.Services
                 if (!fields.Any())
                 {
                     var nameField = Row.NameField;
-                    if (nameField is object)
+                    if (nameField is not null)
                         return new Field[] { nameField };
                 }
 
@@ -367,7 +367,7 @@ namespace Serenity.Services
                     $"Can't apply equality filter on field {field.PropertyName ?? field.Name}");
             }
 
-            if (!(value is string) && value is IEnumerable enumerable)
+            if (value is not string && value is IEnumerable enumerable)
             {
                 var values = new List<object>();
                 foreach (var val in enumerable)
@@ -392,7 +392,7 @@ namespace Serenity.Services
             if (value is string str && str.Length == 0)
                 return true;
 
-            if (!(value is string) && value is IEnumerable &&
+            if (value is not string && value is IEnumerable &&
                 !(value as IEnumerable).GetEnumerator().MoveNext())
                 return true;
 
@@ -473,7 +473,7 @@ namespace Serenity.Services
             var field = Row.FindField(sortBy.Field) ??
                 Row.FindFieldByPropertyName(sortBy.Field);
 
-            if (field is object)
+            if (field is not null)
             {
                 if (field.Flags.HasFlag(FieldFlags.NotMapped))
                     return;

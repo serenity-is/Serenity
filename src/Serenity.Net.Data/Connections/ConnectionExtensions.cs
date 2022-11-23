@@ -93,7 +93,7 @@ namespace Serenity.Data
         /// <returns>The sql dialect.</returns>
         public static ISqlDialect GetDialect(this IDbConnection connection)
         {
-            if (!(connection is IHasDialect hasDialect))
+            if (connection is not IHasDialect hasDialect)
                 return SqlSettings.DefaultDialect;
 
             return hasDialect.Dialect ?? SqlSettings.DefaultDialect;

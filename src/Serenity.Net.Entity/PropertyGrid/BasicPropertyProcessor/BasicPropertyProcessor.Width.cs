@@ -10,7 +10,7 @@
             var basedOnField = source.BasedOnField;
 
             item.Width = widthAttr == null || widthAttr.Value == 0 ?
-                (basedOnField is object ? AutoWidth(basedOnField) : 80) : widthAttr.Value;
+                (basedOnField is not null ? AutoWidth(basedOnField) : 80) : widthAttr.Value;
 
             if (widthAttr != null && widthAttr.Value != 0)
                 item.WidthSet = true;

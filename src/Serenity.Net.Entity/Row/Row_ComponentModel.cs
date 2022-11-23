@@ -205,8 +205,7 @@
         /// <param name="propertyName">Name of the property.</param>
         public void RemoveValidationError(string propertyName)
         {
-            if (validationErrors != null)
-                validationErrors.Remove(propertyName ?? string.Empty);
+            validationErrors?.Remove(propertyName ?? string.Empty);
         }
 
         /// <summary>

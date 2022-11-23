@@ -19,7 +19,7 @@
                 !join.OnCriteria.IsEmpty)
             {
                 sb.Append(" ON ");
-                if (!(join.OnCriteria is BinaryCriteria))
+                if (join.OnCriteria is not BinaryCriteria)
                     sb.Append('(');
 
                 if (modifySelf)
@@ -27,7 +27,7 @@
                 else
                     sb.Append(join.OnCriteria.ToStringIgnoreParams());
 
-                if (!(join.OnCriteria is BinaryCriteria))
+                if (join.OnCriteria is not BinaryCriteria)
                     sb.Append(')');
             }
         }

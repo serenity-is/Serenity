@@ -201,7 +201,16 @@
             throw new ArgumentOutOfRangeException("displayOrderIDType");
         }
 
-
+        /// <summary>
+        /// Updates display order values in a table
+        /// </summary>
+        /// <param name="connection">Connection</param>
+        /// <param name="orderRecords">List of records with new orders</param>
+        /// <param name="tableName">Tablename</param>
+        /// <param name="keyField">Key field</param>
+        /// <param name="orderField">Order field</param>
+        /// <param name="hasUniqueConstraint">True if order field has a unique constraint</param>
+        /// <exception cref="ArgumentNullException">connection, tableName, keyField or orderField is null</exception>
         public static bool UpdateOrders(IDbConnection connection, List<OrderRecord> orderRecords,
             string tableName, Field keyField, Field orderField, bool hasUniqueConstraint = false)
         {

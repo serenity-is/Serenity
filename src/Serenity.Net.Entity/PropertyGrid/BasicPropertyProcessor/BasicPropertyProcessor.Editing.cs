@@ -41,7 +41,7 @@
 
                             if (!isRow)
                             {
-                                if (source.BasedOnField is object)
+                                if (source.BasedOnField is not null)
                                     prefix = source.BasedOnField.Fields.LocalTextPrefix;
                             }
                             else
@@ -52,7 +52,7 @@
                         if (prefix != null)
                         {
                             var propertyName = distinct.PropertyName.IsEmptyOrNull() ?
-                                    (source.BasedOnField is object ?
+                                    (source.BasedOnField is not null ?
                                         (source.BasedOnField.PropertyName ?? source.BasedOnField.Name) :
                                     item.Name) : distinct.PropertyName;
 
@@ -71,7 +71,7 @@
             if (dtka != null && dtka.Value != DateTimeKind.Unspecified)
                 item.EditorParams["useUtc"] = true;
 
-            if (source.BasedOnField is object)
+            if (source.BasedOnField is not null)
             {
                 if (dtka == null &&
                     source.BasedOnField is DateTimeField dtf &&
@@ -148,7 +148,7 @@
 
         private static void SetServiceLookupParams(EditorTypeAttribute editorTypeAttr, Dictionary<string, object> editorParams)
         {
-            if (!(editorTypeAttr is ServiceLookupEditorBaseAttribute sle) || sle.ItemType == null)
+            if (editorTypeAttr is not ServiceLookupEditorBaseAttribute sle || sle.ItemType == null)
                 return;
 
             if (!editorParams.ContainsKey("service"))
@@ -175,7 +175,7 @@
                     if (!editorParams.ContainsKey("textField"))
                     {
                         var nameField = rowInstance.NameField;
-                        if (nameField is object)
+                        if (nameField is not null)
                             editorParams["textField"] = nameField.PropertyName ??
                                 nameField.Name;
                     }

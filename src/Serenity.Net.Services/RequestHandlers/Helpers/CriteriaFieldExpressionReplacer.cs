@@ -84,7 +84,7 @@ namespace Serenity.Data
 
             criteria = result as Criteria;
 
-            if (criteria is object)
+            if (criteria is not null)
             {
                 var field = FindField(criteria.Expression);
                 if (field is null)
@@ -115,7 +115,7 @@ namespace Serenity.Data
                 criteria.Operator > CriteriaOperator.NotIn)
                 return false;
 
-            if (!(criteria.LeftOperand is Criteria left))
+            if (criteria.LeftOperand is not Criteria left)
                 return false;
 
             field = FindField(left.Expression);
@@ -125,7 +125,7 @@ namespace Serenity.Data
             if (field is StringField)
                 return false;
 
-            if (!(criteria.RightOperand is ValueCriteria right))
+            if (criteria.RightOperand is not ValueCriteria right)
                 return false;
 
             value = right.Value;

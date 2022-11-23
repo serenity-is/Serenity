@@ -52,8 +52,7 @@
             naturalOrder = 0;
             this.caption = caption;
             customAttributes = Array.Empty<object>();
-            if (fields != null)
-                fields.Add(this);
+            fields?.Add(this);
         }
 
         /// <summary>
@@ -628,7 +627,7 @@
         {
             get
             {
-                if (criteria is object)
+                if (criteria is not null)
                     return criteria;
 
                 criteria = new Criteria(this);

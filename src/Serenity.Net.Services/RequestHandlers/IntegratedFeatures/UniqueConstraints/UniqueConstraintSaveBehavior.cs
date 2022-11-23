@@ -1,16 +1,24 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// Behavior that handles <see cref="UniqueConstraintAttribute"/>
+    /// </summary>
     public class UniqueConstraintSaveBehavior : BaseSaveBehavior, IImplicitBehavior
     {
         private UniqueConstraintAttribute[] attrList;
         private IEnumerable<Field>[] attrFields;
-        public ITextLocalizer Localizer { get; }
+        private readonly ITextLocalizer localizer;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="localizer">Text localizer</param>
         public UniqueConstraintSaveBehavior(ITextLocalizer localizer)
         {
-            Localizer = localizer;
+            this.localizer = localizer;
         }
 
+        /// <inheritdoc/>
         public bool ActivateFor(IRow row)
         {
             var attr = row.GetType().GetCustomAttributes<UniqueConstraintAttribute>()
@@ -19,10 +27,11 @@
             if (!attr.Any())
                 return false;
 
-            this.attrList = attr.ToArray();
+            attrList = attr.ToArray();
             return true;
         }
 
+        /// <inheritdoc/>
         public override void OnBeforeSave(ISaveRequestHandler handler)
         {
             if (attrList == null)
@@ -51,7 +60,7 @@
                 var attr = attrList[i];
                 var fields = attrFields[i];
 
-                UniqueFieldSaveBehavior.ValidateUniqueConstraint(handler, fields, Localizer, attr.ErrorMessage,
+                UniqueFieldSaveBehavior.ValidateUniqueConstraint(handler, fields, localizer, attr.ErrorMessage,
                     attrList[i].IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
             }
         }

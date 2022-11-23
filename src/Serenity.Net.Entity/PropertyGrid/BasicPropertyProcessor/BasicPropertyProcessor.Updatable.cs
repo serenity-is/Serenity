@@ -16,7 +16,7 @@
                 }
             }
 
-            if (source.BasedOnField is object)
+            if (source.BasedOnField is not null)
             {
                 if ((source.BasedOnField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
                     item.Updatable = false;

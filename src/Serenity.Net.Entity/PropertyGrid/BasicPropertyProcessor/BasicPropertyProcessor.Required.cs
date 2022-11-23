@@ -10,7 +10,7 @@
                 if (attr.IsRequired)
                     item.Required = true;
             }
-            else if (source.BasedOnField is object &&
+            else if (source.BasedOnField is not null &&
                 (source.BasedOnField.Flags & FieldFlags.NotNull) == FieldFlags.NotNull)
             {
                 item.Required = true;

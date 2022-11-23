@@ -1,5 +1,8 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// Behavior that handles <see cref="UpdatableExtensionAttribute"/>
+    /// </summary>
     public class UpdatableExtensionBehavior : BaseSaveDeleteBehavior, IImplicitBehavior
     {
         private class RelationInfo
@@ -17,6 +20,11 @@
 
         private readonly IDefaultHandlerFactory handlerFactory;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="handlerFactory">Default handler factory</param>
+        /// <exception cref="ArgumentNullException">handlerFactory is null</exception>
         public UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory)
         {
             this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
@@ -24,6 +32,7 @@
 
         private List<RelationInfo> infoList;
 
+        /// <inheritdoc/>
         public bool ActivateFor(IRow row)
         {
             var attrs = row.GetType().GetCustomAttributes<UpdatableExtensionAttribute>();
@@ -58,7 +67,7 @@
                 var thisKey = attr.ThisKey;
                 if (string.IsNullOrEmpty(thisKey))
                 {
-                    if (!(row is IIdRow))
+                    if (row is not IIdRow)
                     {
                         throw new ArgumentException(string.Format(
                             "Row type '{0}' has an ExtensionRelation attribute " +
@@ -211,6 +220,7 @@
             return true;
         }
 
+        /// <inheritdoc/>
         public override void OnBeforeSave(ISaveRequestHandler handler)
         {
             foreach (var info in infoList)
@@ -231,7 +241,7 @@
             var criteria = new Criteria(info.OtherKeyField.PropertyName ?? info.OtherKeyField.Name) ==
                 new ValueCriteria(thisKey);
 
-            if (info.FilterField is object)
+            if (info.FilterField is not null)
             {
                 var flt = new Criteria(info.FilterField.PropertyName ?? info.FilterField.Name);
                 if (info.FilterValue == null)
@@ -259,9 +269,9 @@
 
         private bool CheckPresenceValue(RelationInfo info, IRow row)
         {
-            if (info.PresenceField is object)
+            if (info.PresenceField is not null)
             {
-                if (!(info.PresenceField is BooleanField) &&
+                if (info.PresenceField is not BooleanField &&
                     info.PresenceValue is bool b)
                 {
                     if (info.PresenceField.IsNull(row) == b)
@@ -280,6 +290,7 @@
             return true;
         }
 
+        /// <inheritdoc/>
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
             foreach (var info in infoList)
@@ -305,8 +316,7 @@
                     ((IIdRow)extension).IdField.AsObject(extension, oldID);
 
                 info.OtherKeyField.AsObject(extension, thisKey);
-                if (info.FilterField is object)
-                    info.FilterField.AsObject(extension, info.FilterValue);
+                info.FilterField?.AsObject(extension, info.FilterValue);
 
                 var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(info.Attr.RowType);
                 var request = saveHandler.CreateRequest();
@@ -321,6 +331,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public override void OnBeforeDelete(IDeleteRequestHandler handler)
         {
             foreach (var info in infoList)

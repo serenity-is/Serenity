@@ -114,7 +114,7 @@
                             field = row.Fields.FindFieldByPropertyName(fieldName);
 
                         bool deserializeAsExtension = field is null &&
-                            !(ShouldDeserializeExtension is null) && ShouldDeserializeExtension(row, fieldName);
+                            ShouldDeserializeExtension is not null && ShouldDeserializeExtension(row, fieldName);
 
                         if (field is null && 
                             !deserializeAsExtension &&

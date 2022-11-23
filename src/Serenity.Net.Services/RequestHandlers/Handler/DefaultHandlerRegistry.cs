@@ -25,6 +25,7 @@
                 .Where(type => !type.IsInterface && !type.IsAbstract);
         }
 
+        /// <inheritdoc/>
         public IEnumerable<Type> GetTypes(Type handlerType)
         {
             return GetTypes().Where(type => handlerType.IsAssignableFrom(type));

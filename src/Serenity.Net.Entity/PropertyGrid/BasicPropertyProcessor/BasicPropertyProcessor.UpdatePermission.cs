@@ -16,7 +16,7 @@
                 }
             }
 
-            if (source.BasedOnField is object)
+            if (source.BasedOnField is not null)
             {
                 if (source.BasedOnField.UpdatePermission != null &&
                     source.BasedOnField.UpdatePermission != "*")

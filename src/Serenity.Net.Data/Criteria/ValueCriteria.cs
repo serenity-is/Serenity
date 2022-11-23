@@ -34,7 +34,7 @@ namespace Serenity.Data
         /// <param name="query">The target query to add params to.</param>
         public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
-            if (value is IEnumerable enumerable && !(value is string))
+            if (value is IEnumerable enumerable && value is not string)
             {
                 var c = 0;
                 foreach (var k in enumerable)

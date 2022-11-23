@@ -586,7 +586,7 @@ namespace Serenity.Data
                         var idFieldAttribute = field.GetAttribute<IdPropertyAttribute>();
                         if (idFieldAttribute != null)
                         {
-                            if (idField is object)
+                            if (idField is not null)
                                 throw new InvalidProgramException($"{rowType.FullName} have multiple [IdProperty] attributes!");
 
                             idField = field;
@@ -595,7 +595,7 @@ namespace Serenity.Data
                         var nameFieldAttribute = field.GetAttribute<NamePropertyAttribute>();
                         if (nameFieldAttribute != null)
                         {
-                            if (nameField is object)
+                            if (nameField is not null)
                                 throw new InvalidProgramException($"{rowType.FullName} have multiple [NameProperty] attributes!");
 
                             nameField = field;
@@ -978,8 +978,7 @@ namespace Serenity.Data
                 throw new ArgumentOutOfRangeException("item",
                     string.Format("field list already contains a field with name '{0}'", item.Name));
 
-            if (item.Fields != null)
-                item.Fields.Remove(item);
+            item.Fields?.Remove(item);
 
             base.InsertItem(index, item);
 

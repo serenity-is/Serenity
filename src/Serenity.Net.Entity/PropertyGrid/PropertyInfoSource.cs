@@ -25,7 +25,7 @@
                 {
                     // only use field found by field name if it has no property
                     var byFieldName = basedOnRow.Fields.FindField(property.Name);
-                    if (byFieldName is object &&
+                    if (byFieldName is not null &&
                         string.IsNullOrEmpty(byFieldName.PropertyName))
                         BasedOnField = byFieldName;
                 }
@@ -37,7 +37,7 @@
             if (ValueType.IsEnum)
                 EnumType = ValueType;
             else if (
-                BasedOnField is object
+                BasedOnField is not null
                 && BasedOnField is IEnumTypeField)
             {
                 EnumType = (BasedOnField as IEnumTypeField).EnumType;
@@ -69,7 +69,7 @@
             var attrList = new List<TAttribute>();
             attrList.AddRange(Property.GetCustomAttributes<TAttribute>());
 
-            if (BasedOnField is object)
+            if (BasedOnField is not null)
             {
                 foreach (var a in BasedOnField.CustomAttributes)
                     if (typeof(TAttribute).IsAssignableFrom(a.GetType()))

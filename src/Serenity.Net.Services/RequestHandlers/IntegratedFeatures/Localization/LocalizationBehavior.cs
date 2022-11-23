@@ -2,6 +2,9 @@
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// Behavior for handling localizable rows / properties
+    /// </summary>
     public class LocalizationBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IRetrieveBehavior
     {
         private readonly IDefaultHandlerFactory handlerFactory;
@@ -18,11 +21,17 @@ namespace Serenity.Services
         private BaseCriteria foreignKeyCriteria;
         private Func<IDictionary> dictionaryFactory;
 
+        /// <summary>
+        /// Creates an instance of the class
+        /// </summary>
+        /// <param name="handlerFactory">Default handler factory</param>
+        /// <exception cref="ArgumentNullException">handlerFactory is null</exception>
         public LocalizationBehavior(IDefaultHandlerFactory handlerFactory)
         {
             this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
         }
 
+        /// <inheritdoc/>
         public bool ActivateFor(IRow row)
         {
             attr = row.GetType().GetCustomAttribute<LocalizationRowAttribute>();
@@ -46,7 +55,7 @@ namespace Serenity.Services
                         row.GetType().FullName, localRowType.FullName));
             }
 
-            if (!(row is IIdRow))
+            if (row is not IIdRow)
             {
                 throw new ArgumentException(string.Format(
                     "Row type '{0}' has a LocalizationRowAttribute, " +
@@ -85,11 +94,6 @@ namespace Serenity.Services
 
             foreignKeyCriteria = new Criteria(foreignKeyField.PropertyName ?? foreignKeyField.Name);
             return true;
-        }
-
-        private bool IsLocalized(Field field)
-        {
-            return GetLocalizationMatch(field) is object;
         }
 
         private Field GetLocalizationMatch(Field field)
@@ -154,11 +158,16 @@ namespace Serenity.Services
             return null;
         }
 
+        /// <inheritdoc/>
         public void OnAfterExecuteQuery(IRetrieveRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnBeforeExecuteQuery(IRetrieveRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnPrepareQuery(IRetrieveRequestHandler handler, SqlQuery query) { }
+        /// <inheritdoc/>
         public void OnValidateRequest(IRetrieveRequestHandler handler) { }
 
+        /// <inheritdoc/>
         public void OnReturn(IRetrieveRequestHandler handler)
         {
             if (handler.Request == null ||
@@ -199,7 +208,7 @@ namespace Serenity.Services
                 for (var i = 0; i < fields.Count; i++)
                 {
                     var match = matches[i];
-                    if (match is object)
+                    if (match is not null)
                     {
                         var field = fields[i];
                         var value = match.AsObject(localRow);
@@ -235,14 +244,7 @@ namespace Serenity.Services
             deleteHandler.Process(uow, deleteRequest);
         }
 
-        private string AsString(object obj)
-        {
-            if (obj == null)
-                return null;
-
-            return obj.ToString();
-        }
-
+        /// <inheritdoc/>
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
             var localizations = handler.Request.Localizations;
@@ -282,7 +284,7 @@ namespace Serenity.Services
                     match.AsObject(localRow, value);
 
                     if (value != null &&
-                        (!(value is string) || !(value as string).IsTrimmedEmpty()))
+                        (value is not string || !(value as string).IsTrimmedEmpty()))
                     {
                         anyNonEmpty = true;
                     }
@@ -295,6 +297,7 @@ namespace Serenity.Services
             }
         }
 
+        /// <inheritdoc/>
         public override void OnBeforeDelete(IDeleteRequestHandler handler)
         {
             if (ServiceQueryHelper.UseSoftDelete(handler.Row))

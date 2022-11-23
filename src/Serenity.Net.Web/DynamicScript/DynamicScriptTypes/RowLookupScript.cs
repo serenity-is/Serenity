@@ -11,9 +11,9 @@ namespace Serenity.Web
         {
             var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
 
-            if (row.NameField is object)
+            if (row.NameField is not null)
                 query.OrderBy(row.NameField);
-            else if (row.IdField is object)
+            else if (row.IdField is not null)
                 query.OrderBy(row.IdField);
         }
 
@@ -21,10 +21,10 @@ namespace Serenity.Web
         {
             var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
 
-            if (row.IdField is object)
+            if (row.IdField is not null)
                 query.Select(row.IdField);
 
-            if (row.NameField is object)
+            if (row.NameField is not null)
                 query.Select(row.NameField);
 
             var list = new List<object>();
@@ -43,7 +43,7 @@ namespace Serenity.Web
 
             var row = new TRow();
 
-            if (row.IdField is object)
+            if (row.IdField is not null)
             {
                 IdField = row.IdField.PropertyName ?? row.IdField.Name;
             }

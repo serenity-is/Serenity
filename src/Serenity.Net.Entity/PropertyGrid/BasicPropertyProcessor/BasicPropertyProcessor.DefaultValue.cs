@@ -14,7 +14,7 @@
                 }
             }
 
-            if (source.BasedOnField is object && source.BasedOnField.DefaultValue != null)
+            if (source.BasedOnField is not null && source.BasedOnField.DefaultValue != null)
                 item.DefaultValue = source.BasedOnField.DefaultValue;
         }
     }

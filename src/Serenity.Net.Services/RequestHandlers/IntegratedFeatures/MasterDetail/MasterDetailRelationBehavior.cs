@@ -2,9 +2,13 @@
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// Behavior class that handles <see cref="MasterDetailRelationAttribute"/>
+    /// </summary>
     public class MasterDetailRelationBehavior : BaseSaveDeleteBehavior,
         IImplicitBehavior, IRetrieveBehavior, IListBehavior, IFieldBehavior
     {
+        /// <inheritdoc/>
         public Field Target { get; set; }
 
         private readonly IDefaultHandlerFactory handlerFactory;
@@ -21,11 +25,17 @@ namespace Serenity.Services
         private BaseCriteria queryCriteria;
         private HashSet<string> includeColumns;
 
+        /// <summary>
+        /// Creates an instance of the class
+        /// </summary>
+        /// <param name="handlerFactory">Default handler factory</param>
+        /// <exception cref="ArgumentNullException">handlerFactory is null</exception>
         public MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         {
             this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
         }
-
+        
+        /// <inheritdoc/>
         public bool ActivateFor(IRow row)
         {
             if (Target is null)
@@ -135,16 +145,26 @@ namespace Serenity.Services
             return true;
         }
 
+        /// <inheritdoc/>
         public void OnAfterExecuteQuery(IRetrieveRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnBeforeExecuteQuery(IRetrieveRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnPrepareQuery(IRetrieveRequestHandler handler, SqlQuery query) { }
+        /// <inheritdoc/>
         public void OnValidateRequest(IRetrieveRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnPrepareQuery(IListRequestHandler handler, SqlQuery query) { }
+        /// <inheritdoc/>
         public void OnValidateRequest(IListRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnApplyFilters(IListRequestHandler handler, SqlQuery query) { }
+        /// <inheritdoc/>
         public void OnBeforeExecuteQuery(IListRequestHandler handler) { }
+        /// <inheritdoc/>
         public void OnAfterExecuteQuery(IListRequestHandler handler) { }
 
+        /// <inheritdoc/>
         public void OnReturn(IRetrieveRequestHandler handler)
         {
             if (Target is null ||
@@ -167,6 +187,7 @@ namespace Serenity.Services
             Target.AsObject(handler.Row, list);
         }
 
+        /// <inheritdoc/>
         public void OnReturn(IListRequestHandler handler)
         {
             if (Target is null ||
@@ -215,8 +236,7 @@ namespace Serenity.Services
             detail = detail.Clone();
 
             foreignKeyField.AsObject(detail, masterId);
-            if (filterField is object)
-                filterField.AsObject(detail, filterValue);
+            filterField?.AsObject(detail, filterValue);
 
             detail.IdField.AsObject(detail, detailId);
 
@@ -244,8 +264,8 @@ namespace Serenity.Services
 
         private void DetailListSave(IUnitOfWork uow, object masterId, IList oldList, IList newList)
         {
-            if (!((oldList.Count > 0 ? oldList[0] :
-                (newList.Count > 0) ? newList[0] : null) is IRow row))
+            if ((oldList.Count > 0 ? oldList[0] :
+                (newList.Count > 0) ? newList[0] : null) is not IRow row)
                 return;
 
             if (oldList.Count == 0)
@@ -325,9 +345,10 @@ namespace Serenity.Services
             }
         }
 
+        /// <inheritdoc/>
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
-            if (!(Target.AsObject(handler.Row) is IList newList))
+            if (Target.AsObject(handler.Row) is not IList newList)
                 return;
 
             var masterId = masterKeyField.AsObject(handler.Row);
@@ -377,6 +398,7 @@ namespace Serenity.Services
             DetailListSave(handler.UnitOfWork, masterId, oldList, newList);
         }
 
+        /// <inheritdoc/>
         public override void OnBeforeDelete(IDeleteRequestHandler handler)
         {
             if (Target is null ||
