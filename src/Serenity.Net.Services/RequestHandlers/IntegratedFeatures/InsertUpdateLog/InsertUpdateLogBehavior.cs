@@ -1,12 +1,19 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// Behavior class that handles assignment of relevant fields 
+    /// for rows with <see cref="IInsertLogRow"/> 
+    /// and <see cref="IUpdateLogRow"/> interfaces
+    /// </summary>
     public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
     {
+        /// <inheritdoc/>
         public bool ActivateFor(IRow row)
         {
             return row is IUpdateLogRow || row is IInsertLogRow;
         }
 
+        /// <inheritdoc/>
         public override void OnSetInternalFields(ISaveRequestHandler handler)
         {
             var row = handler.Row;

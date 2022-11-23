@@ -1,7 +1,19 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// Contains static helper methods for service handler queries.
+    /// </summary>
     public static class ServiceQueryHelper
     {
+        /// <summary>
+        /// Applies the sort order to the query
+        /// </summary>
+        /// <param name="query">Query</param>
+        /// <param name="sort">Sort field, ignored if null, empty or
+        /// not a usable field (e.g. a field that is selected in the query
+        /// or available in the row)</param>
+        /// <param name="descending">Descending flag</param>
+        /// <exception cref="ArgumentNullException">query is null</exception>
         public static SqlQuery ApplySort(this SqlQuery query, string sort, bool descending)
         {
             if (query == null)
@@ -21,11 +33,10 @@
                     if (row != null)
                     {
                         var field = ((IRow)ext.FirstIntoRow).FindFieldByPropertyName(sort);
-                        if (field is object)
+                        if (field is not null)
                         {
                             expr = ((IGetExpressionByName)query).GetExpression(field.Name);
-                            if (expr == null)
-                                expr = field.Expression;
+                            expr ??= field.Expression;
                         }
                     }
                 }
@@ -37,6 +48,11 @@
             return query;
         }
 
+        /// <summary>
+        /// Applies sort order to the query
+        /// </summary>
+        /// <param name="query">Query</param>
+        /// <param name="sortBy">Sort order</param>
         public static SqlQuery ApplySort(this SqlQuery query, SortBy sortBy)
         {
             if (sortBy != null)
@@ -45,6 +61,12 @@
             return query;
         }
 
+        /// <summary>
+        /// Applies sort orders to the query
+        /// </summary>
+        /// <param name="query">Query</param>
+        /// <param name="sortByList">Sort orders</param>
+        /// <param name="defaultSortBy">The default sort order</param>
         public static SqlQuery ApplySort(this SqlQuery query, IList<SortBy> sortByList, params SortBy[] defaultSortBy)
         {
             if (sortByList == null || sortByList.Count == 0)
@@ -63,6 +85,14 @@
             return query;
         }
 
+        /// <summary>
+        /// Applies skip, take and exclude total count parameters to the query
+        /// </summary>
+        /// <param name="query">Query</param>
+        /// <param name="skip">Skip parameter</param>
+        /// <param name="take">Take parameter</param>
+        /// <param name="excludeTotalCount">ExcludeTotalCount flag</param>
+        /// <returns></returns>
         public static SqlQuery ApplySkipTakeAndCount(this SqlQuery query, int skip, int take,
             bool excludeTotalCount)
         {
@@ -73,6 +103,12 @@
             return query;
         }
 
+        /// <summary>
+        /// Applies contains text criteria to the query
+        /// </summary>
+        /// <param name="query">Query</param>
+        /// <param name="containsText">Contains text</param>
+        /// <param name="filter">Filter callback</param>
         public static SqlQuery ApplyContainsText(this SqlQuery query, string containsText,
             Action<string, long?> filter)
         {
@@ -90,6 +126,11 @@
             return query;
         }
 
+        /// <summary>
+        /// Creates a contains text criteria
+        /// </summary>
+        /// <param name="containsText">Contains text</param>
+        /// <param name="textFields">The list of fields to search contains text in</param>
         public static BaseCriteria GetContainsTextFilter(string containsText, Criteria[] textFields)
         {
             containsText = containsText.TrimToNull();
@@ -105,6 +146,11 @@
             return null;
         }
 
+        /// <summary>
+        /// Gets not deleted criteria for a row type, e.g. for 
+        /// rows that support soft delete.
+        /// </summary>
+        /// <param name="row">Row instance</param>
         public static BaseCriteria GetNotDeletedCriteria(IRow row)
         {
             if (row is IIsActiveDeletedRow isActiveDeletedRow)
@@ -131,6 +177,10 @@
             return null;
         }
 
+        /// <summary>
+        /// Returns if row uses soft delete
+        /// </summary>
+        /// <param name="row">Row instance</param>
         public static bool UseSoftDelete(IRow row)
         {
             return row is IIsActiveDeletedRow ||

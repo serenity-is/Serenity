@@ -1,5 +1,8 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// Contains helper methods for two level cache invalidation
+    /// </summary>
     public static class TwoLevelCacheInvalidationExtensions
     {
         private class GenerationUpdater
@@ -19,8 +22,19 @@
             }
         }
 
+        /// <summary>
+        /// Invalidates cached items related to a group key when the 
+        /// unit of work commits
+        /// </summary>
+        /// <param name="cache">Cache</param>
+        /// <param name="uow">Unit of work</param>
+        /// <param name="groupKey">Group key</param>
+        /// <exception cref="ArgumentNullException">cache is null</exception>
         public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, string groupKey)
         {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+
             if (groupKey.IsNullOrEmpty())
                 throw new ArgumentNullException(nameof(groupKey));
 
@@ -58,6 +72,15 @@
             }
         }
 
+        /// <summary>
+        /// Invalidates cached items related to fields class group key and
+        /// any related fields types specified using TwoLevelCached attributes
+        /// on the row type.
+        /// </summary>
+        /// <param name="cache">Cache</param>
+        /// <param name="uow">Unit of work</param>
+        /// <param name="fields">Fields type</param>
+        /// <exception cref="ArgumentNullException">Cache is null</exception>
         public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, RowFieldsBase fields)
         {
             if (fields is null)
@@ -70,6 +93,15 @@
                 ProcessTwoLevelCachedAttribute(cache, uow, fieldsType.DeclaringType);
         }
 
+        /// <summary>
+        /// Invalidates cached items on commit for specified row type
+        /// and any related field types specified using TwoLevelCached attributes
+        /// on the row type.
+        /// </summary>
+        /// <param name="cache">Cache</param>
+        /// <param name="uow">Unit of work</param>
+        /// <param name="row">Row type</param>
+        /// <exception cref="ArgumentNullException">Cache is null</exception>
         public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, IRow row)
         {
             if (row is null)

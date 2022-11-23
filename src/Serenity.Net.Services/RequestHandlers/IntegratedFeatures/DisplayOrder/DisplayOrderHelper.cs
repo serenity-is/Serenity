@@ -80,6 +80,8 @@
         ///   orders are 1, 2 and 3. If this parameter is set to true (descending), their display orders will
         ///   become 3, 2, 1. This parameter controls if records that are added recently and has no display
         ///   order value assigned (or 0) be shown at start or at the end.</param>
+        /// <param name="hasUniqueConstraint">True if the entity has a unique constraint on display order
+        /// column.</param>
         /// <returns>
         ///   If any of the display order values is changed true.</returns>
         public static bool ReorderValues(IDbConnection connection, string tableName, Field keyField, Field orderField,

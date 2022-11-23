@@ -1,7 +1,14 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// Display order related helper methods
+    /// </summary>
     public class DisplayOrderFilterHelper
     {
+        /// <summary>
+        /// Gets display order criteria for a row instance
+        /// </summary>
+        /// <param name="row">Row class</param>
         public static BaseCriteria GetDisplayOrderFilterFor(IRow row)
         {
             var flt = Criteria.Empty;
