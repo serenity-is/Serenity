@@ -6,8 +6,16 @@ using System.IO;
 
 namespace Serenity.Extensions.DependencyInjection
 {
+    /// <summary>
+    /// Contains dependency injection extensions for <see cref="IServiceCollection"/>
+    /// </summary>
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Registers default implementations of <see cref="IBehaviorFactory"/>, 
+        /// <see cref="IImplicitBehaviorRegistry"/> and <see cref="IBehaviorProvider"/>
+        /// </summary>
+        /// <param name="collection">Service collection</param>
         public static IServiceCollection AddServiceBehaviors(this IServiceCollection collection)
         {
             collection.TryAddSingleton<IBehaviorFactory, DefaultBehaviorFactory>();
@@ -16,6 +24,11 @@ namespace Serenity.Extensions.DependencyInjection
             return collection;
         }
 
+        /// <summary>
+        /// Registers default implementations of <see cref="IHandlerActivator"/>, 
+        /// <see cref="IDefaultHandlerFactory"/> and <see cref="IDefaultHandlerRegistry"/>
+        /// </summary>
+        /// <param name="collection">Service collection</param>
         public static IServiceCollection AddServiceHandlerFactory(this IServiceCollection collection)
         {
             collection.TryAddSingleton<IHandlerActivator, DefaultHandlerActivator>();
@@ -24,6 +37,11 @@ namespace Serenity.Extensions.DependencyInjection
             return collection;
         }
 
+        /// <summary>
+        /// Registers proxy activators for the DI container to resolve generic request handler instances
+        /// like <see cref="ICreateHandler{TRow}" />, <see cref="IListHandler{TRow}" /> etc.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
         public static IServiceCollection AddProxyRequestHandlers(this IServiceCollection collection)
         {
             collection.TryAddTransient(typeof(ICreateHandler<,,>), typeof(CreateHandlerProxy<,,>));
@@ -42,6 +60,23 @@ namespace Serenity.Extensions.DependencyInjection
             return collection;
         }
 
+        /// <summary>
+        /// Registers all the custom request handlers implementing IRequestHandler
+        /// interface, from the type source in the service collection if available,
+        /// or using the provided typeSource, optionally filtering handler types
+        /// via a provided predicate.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <param name="typeSource">Type source. Should be provided if it is not already
+        /// registered in the service collection. Pass an empty type source
+        /// if you want to disable auto registrations.</param>
+        /// <param name="predicate">Predicate to filter handler types to register.
+        /// The first argument is registration type (the interface or the handler type itself),
+        /// and the second argument is the implementation type (e.g. the handler type). 
+        /// If you don't want concrete types like MySaveHandler etc. to be registered for
+        /// themselves (recommended), the predicate should be "(intf, impl) => intf != impl"</param>
+        /// <exception cref="ArgumentNullException">collection is null or typeSource can't be found in the collection</exception>
+        /// <exception cref="InvalidProgramException">Multiple candidates found for a service interface.</exception>
         public static IServiceCollection AddCustomRequestHandlers(this IServiceCollection collection, 
             ITypeSource typeSource = null, Func<Type, Type, bool> predicate = null)
         {
@@ -130,6 +165,19 @@ namespace Serenity.Extensions.DependencyInjection
             return collection;
         }
 
+        /// <summary>
+        /// Registers all the services required for request handlers
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <param name="customHandlerTypeSource">Custom handler type source
+        /// to pass to the AddCustomHandlers call. Pass an empty type source
+        /// if you want to disable auto registrations</param>
+        /// <param name="customHandlerPredicate">Predicate to filter handler types to register.
+        /// The first argument is registration type (the interface or the handler type itself),
+        /// and the second argument is the implementation type (e.g. the handler type). 
+        /// If you don't want concrete types like MySaveHandler etc. to be registered for
+        /// themselves (recommended), the predicate should be "(intf, impl) => intf != impl"</param>
+        /// <exception cref="InvalidProgramException">Multiple candidates found for a service interface.</exception>
         public static IServiceCollection AddServiceHandlers(this IServiceCollection collection, 
             ITypeSource customHandlerTypeSource = null, Func<Type, Type, bool> customHandlerPredicate = null)
         {
@@ -182,12 +230,12 @@ namespace Serenity.Extensions.DependencyInjection
             return textRegistry;
         }
 
-        [Obsolete("Use AddBaseTexts().AddJsonTexts().AddJsonTexts()...")]
         /// <summary>
         /// Adds type texts and JSON texts from passed folders
         /// </summary>
         /// <param name="provider"></param>
         /// <param name="jsonTextPaths"></param>
+        [Obsolete("Use AddBaseTexts().AddJsonTexts().AddJsonTexts()...")]
         public static void AddAllTexts(this IServiceProvider provider, params string[] jsonTextPaths)
         {
             var textRegistry = AddBaseTexts(provider, webFileProvider: null);

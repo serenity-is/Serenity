@@ -1,11 +1,20 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// Default implementation for the <see cref="IDefaultHandlerFactory"/>
+    /// </summary>
     public class DefaultHandlerFactory : IDefaultHandlerFactory
     {
         private readonly IDefaultHandlerRegistry registry;
         private readonly IHandlerActivator activator;
         private readonly ConcurrentDictionary<(Type rowType, Type handlerInterface), Type> cache;
 
+        /// <summary>
+        /// Creates an instance of the class.
+        /// </summary>
+        /// <param name="registry">Default handler registry</param>
+        /// <param name="activator">Handler activator</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerActivator activator)
         {
             cache = new ConcurrentDictionary<(Type rowType, Type handlerInterface), Type>();
@@ -41,6 +50,7 @@
                 $"for row type {args.rowType.FullName}. Please add [DefaultHandler] to one of them.");
         }
 
+        /// <inheritdoc/>
         public object CreateHandler(Type rowType, Type handlerInterface)
         {
             if (rowType == null)

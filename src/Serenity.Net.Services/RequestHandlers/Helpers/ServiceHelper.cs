@@ -1,7 +1,17 @@
 ﻿namespace Serenity.Services
 {
+    /// <summary>
+    /// Contains some helper methods for service handlers
+    /// </summary>
     public static class ServiceHelper
     {
+        /// <summary>
+        /// Checks that parent record is not soft deleted
+        /// </summary>
+        /// <param name="connection">Connection</param>
+        /// <param name="tableName">Table name</param>
+        /// <param name="filter">Filter callback</param>
+        /// <param name="localizer">Text localizer</param>
         public static void CheckParentNotDeleted(IDbConnection connection, string tableName,
             Action<SqlQuery> filter, ITextLocalizer localizer)
         {
@@ -11,6 +21,12 @@
                 throw DataValidation.ParentRecordDeleted(tableName, localizer);
         }
 
+        /// <summary>
+        /// Sets the Skip, Take and Total parameters in the response
+        /// </summary>
+        /// <typeparam name="T">Type of the response entities</typeparam>
+        /// <param name="response">Response object</param>
+        /// <param name="query">Query to get params from</param>
         public static void SetSkipTakeTotal<T>(this ListResponse<T> response, SqlQuery query)
         {
             response.Skip = query.Skip();
@@ -19,6 +35,16 @@
                 response.TotalCount = response.Entities.Count + response.Skip;
         }
 
+        /// <summary>
+        /// Checks if an exception seems to be an unique index exception
+        /// </summary>
+        /// <param name="connection">Connection</param>
+        /// <param name="exception">Exception</param>
+        /// <param name="indexName">Optional index name to check</param>
+        /// <param name="oldRow">Old row</param>
+        /// <param name="newRow">New row</param>
+        /// <param name="indexFields">List of index fields</param>
+        /// <exception cref="ArgumentNullException">connection or exception is null</exception>
         public static bool IsUniqueIndexException(IDbConnection connection,
             Exception exception, string indexName,
             IRow oldRow, IRow newRow, params Field[] indexFields)

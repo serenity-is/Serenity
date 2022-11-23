@@ -142,6 +142,13 @@
             return list;
         }
 
+        /// <summary>
+        /// Returns report with the report key, 
+        /// optionally validating its permissions.
+        /// </summary>
+        /// <param name="reportKey">Report key</param>
+        /// <param name="validatePermission">Validate permission. Default true.</param>
+        /// <exception cref="ArgumentNullException">reportKey is n ull</exception>
         public Report GetReport(string reportKey, bool validatePermission = true)
         {
             EnsureTypes();

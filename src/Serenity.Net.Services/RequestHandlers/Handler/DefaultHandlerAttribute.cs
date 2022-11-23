@@ -7,11 +7,19 @@
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class DefaultHandlerAttribute : Attribute
     {
+        /// <summary>
+        /// Creates an instance of the attribute
+        /// </summary>
+        /// <param name="isDefault">True to specify this as default.
+        /// Default is true.</param>
         public DefaultHandlerAttribute(bool isDefault = true)
         {
             Value = isDefault;
         }
 
+        /// <summary>
+        /// Gets if the handler marked as default.
+        /// </summary>
         public bool Value { get; }
     }
 }

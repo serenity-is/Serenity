@@ -2,25 +2,51 @@
 
 namespace Serenity.Data
 {
+    /// <summary>
+    /// Converts field names in a criteria to their 
+    /// corresponding SQL field expressions.
+    /// </summary>
     public class CriteriaFieldExpressionReplacer : SafeCriteriaValidator
     {
         private readonly IPermissionService permissions;
         private readonly bool lookupAccessMode;
 
+        /// <summary>
+        /// Creates an instance of the class
+        /// </summary>
+        /// <param name="row">The row instance</param>
+        /// <param name="permissions">Permission service</param>
+        /// <param name="lookupAccessMode">Use lookup access mode.
+        /// In the lookup access mode only the lookup fields can be
+        /// used in the filter. Default is false.</param>
+        /// <exception cref="ArgumentNullException">row or permissions is null</exception>
         public CriteriaFieldExpressionReplacer(IRow row, IPermissionService permissions, bool lookupAccessMode = false)
         {
-            Row = row;
+            Row = row ?? throw new ArgumentNullException(nameof(row));
             this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
             this.lookupAccessMode = lookupAccessMode;
         }
 
+        /// <summary>
+        /// The row instance
+        /// </summary>
         protected IRow Row { get; private set; }
 
+        /// <summary>
+        /// Visits the criteria for conversion and returns
+        /// a processed criteria containing replaced field
+        /// expressions.
+        /// </summary>
+        /// <param name="criteria">The criteria</param>
         public BaseCriteria Process(BaseCriteria criteria)
         {
             return Visit(criteria);
         }
 
+        /// <summary>
+        /// Virtual method to check if a Field can be filtered.
+        /// </summary>
+        /// <param name="field">Field instance</param>
         protected virtual bool CanFilterField(Field field)
         {
             if (field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
@@ -42,11 +68,16 @@ namespace Serenity.Data
             return true;
         }
 
+        /// <summary>
+        /// Finds a field by its property name or field name
+        /// </summary>
+        /// <param name="expression">The property name or field name</param>
         protected virtual Field FindField(string expression)
         {
             return Row.FindFieldByPropertyName(expression) ?? Row.FindField(expression);
         }
 
+        /// <inheritdoc/>
         protected override BaseCriteria VisitCriteria(Criteria criteria)
         {
             var result = base.VisitCriteria(criteria);
@@ -101,6 +132,7 @@ namespace Serenity.Data
             return value != null;
         }
 
+        /// <inheritdoc/>
         protected override BaseCriteria VisitBinary(BinaryCriteria criteria)
         {
             if (ShouldConvertValues(criteria, out Field field, out object value))

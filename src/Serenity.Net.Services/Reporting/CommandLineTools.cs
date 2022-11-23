@@ -1,5 +1,8 @@
 ﻿namespace Serenity.IO
 {
+    /// <summary>
+    /// Contains functions related to command line
+    /// </summary>
     public class CommandLineTools
     {
         private static readonly Regex invalidChar = new Regex("[\x00\x0a\x0d]", RegexOptions.Compiled); //  these can not be escaped

@@ -2,6 +2,9 @@
 
 namespace Serenity.Reporting
 {
+    /// <summary>
+    /// Interface for Excel exporters
+    /// </summary>
     public interface IExcelExporter
     {
         /// <summary>

@@ -13,6 +13,7 @@
     {
         /// <summary>Called when query to load old entity is built</summary>
         /// <param name="handler">Calling save request handler</param>
+        /// <param name="query">The query</param>
         void OnPrepareQuery(IDeleteRequestHandler handler, SqlQuery query);
 
         /// <summary>Called when delete request is validated</summary>
