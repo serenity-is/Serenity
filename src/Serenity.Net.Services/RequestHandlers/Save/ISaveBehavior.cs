@@ -13,6 +13,7 @@
     {
         /// <summary>Called when query to load old entity is built</summary>
         /// <param name="handler">Calling save request handler</param>
+        /// <param name="query">Query</param>
         void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query);
 
         /// <summary>Called when save request is validated</summary>

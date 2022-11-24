@@ -13,21 +13,6 @@
         where TUndeleteResponse : UndeleteResponse, new()
     {
         /// <summary>
-        /// The entity
-        /// </summary>
-        protected TRow Row;
-
-        /// <summary>
-        /// Response object
-        /// </summary>
-        protected TUndeleteResponse Response;
-
-        /// <summary>
-        /// Request object
-        /// </summary>
-        protected TUndeleteRequest Request;
-
-        /// <summary>
         /// Lazy list of behaviors that is activated for this request
         /// </summary>
         protected Lazy<IUndeleteBehavior[]> behaviors;
@@ -334,14 +319,29 @@
         /// </summary>
         public IUnitOfWork UnitOfWork { get; protected set; }
 
-        IRow IUndeleteRequestHandler.Row => Row;
-        UndeleteRequest IUndeleteRequestHandler.Request => Request;
-        UndeleteResponse IUndeleteRequestHandler.Response => Response;
+        /// <summary>
+        /// The entity
+        /// </summary>
+        public TRow Row { get; protected set; }
+
+        /// <summary>
+        /// Request object
+        /// </summary>
+        public TUndeleteRequest Request { get; protected set; }
+
+        /// <summary>
+        /// Response object
+        /// </summary>
+        public TUndeleteResponse Response { get; protected set; }
 
         /// <summary>
         /// A state bag for behaviors to preserve state among their methods.
         /// It will be cleared before each request, e.g. Process call.
         /// </summary>
         public IDictionary<string, object> StateBag { get; private set; }
+
+        IRow IUndeleteRequestHandler.Row => Row;
+        UndeleteRequest IUndeleteRequestHandler.Request => Request;
+        UndeleteResponse IUndeleteRequestHandler.Response => Response;
     }
 }

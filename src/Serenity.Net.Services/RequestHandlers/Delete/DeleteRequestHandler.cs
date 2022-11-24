@@ -13,21 +13,6 @@
         where TDeleteResponse : DeleteResponse, new()
     {
         /// <summary>
-        /// The entity
-        /// </summary>
-        protected TRow Row;
-
-        /// <summary>
-        /// Response object
-        /// </summary>
-        protected TDeleteResponse Response;
-
-        /// <summary>
-        /// Request object
-        /// </summary>
-        protected TDeleteRequest Request;
-
-        /// <summary>
         /// Lazy list of behaviors that is activated for this request
         /// </summary>
         protected Lazy<IDeleteBehavior[]> behaviors;
@@ -362,6 +347,21 @@
         /// Gets current unit of work
         /// </summary>
         public IUnitOfWork UnitOfWork { get; protected set; }
+
+        /// <summary>
+        /// The entity
+        /// </summary>
+        public TRow Row { get; protected set; }
+
+        /// <summary>
+        /// Request object
+        /// </summary>
+        public TDeleteRequest Request { get; protected set; }
+
+        /// <summary>
+        /// Response object
+        /// </summary>
+        public TDeleteResponse Response { get; protected set; }
 
         /// <summary>
         /// A state bag for behaviors to preserve state among their methods.

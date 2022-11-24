@@ -15,21 +15,6 @@ namespace Serenity.Services
         where TListResponse : ListResponse<TRow>, new()
     {
         /// <summary>
-        /// The entity used for querying / metadata lookup
-        /// </summary>
-        protected TRow Row;
-
-        /// <summary>
-        /// Response object
-        /// </summary>
-        protected TListRequest Request;
-
-        /// <summary>
-        /// Request object
-        /// </summary>
-        protected TListResponse Response;
-
-        /// <summary>
         /// Set of ignored equality filter entries
         /// </summary>
         protected HashSet<string> ignoredEqualityFilters;
@@ -209,7 +194,7 @@ namespace Serenity.Services
         /// and if <see cref="AllowSelectField(Field)"/> and <see cref="ShouldSelectField(Field)"/>
         /// returns true.
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="query">Query</param>
         protected virtual void SelectFields(SqlQuery query)
         {
             foreach (var field in Row.GetFields())
@@ -877,6 +862,21 @@ namespace Serenity.Services
         /// Gets the select query
         /// </summary>
         public SqlQuery Query { get; private set; }
+
+        /// <summary>
+        /// The entity used for querying / metadata lookup
+        /// </summary>
+        public TRow Row { get; protected set; }
+
+        /// <summary>
+        /// Response object
+        /// </summary>
+        public TListRequest Request { get; protected set; }
+
+        /// <summary>
+        /// Response object
+        /// </summary>
+        public TListResponse Response { get; protected set; }
 
         /// <summary>
         /// A state bag for behaviors to preserve state among their methods.

@@ -17,7 +17,6 @@
         /// </summary>
         /// <param name="connection">Connection</param>
         /// <param name="request">List request</param>
-        /// <returns></returns>
         TListResponse List(IDbConnection connection, TListRequest request);
     }
 }

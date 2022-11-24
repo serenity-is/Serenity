@@ -13,21 +13,6 @@
         where TRetrieveResponse : RetrieveResponse<TRow>, new()
     {
         /// <summary>
-        /// The entity
-        /// </summary>
-        protected TRow Row;
-
-        /// <summary>
-        /// Request object
-        /// </summary>
-        protected TRetrieveRequest Request;
-
-        /// <summary>
-        /// Response object
-        /// </summary>
-        protected TRetrieveResponse Response;
-
-        /// <summary>
         /// Lazy list of behaviors that is activated for this request
         /// </summary>
         protected Lazy<IRetrieveBehavior[]> behaviors;
@@ -349,6 +334,21 @@
         /// Gets the select query
         /// </summary>
         public SqlQuery Query { get; private set; }
+
+        /// <summary>
+        /// The entity used for querying / metadata lookup
+        /// </summary>
+        public TRow Row { get; protected set; }
+
+        /// <summary>
+        /// Response object
+        /// </summary>
+        public TRetrieveRequest Request { get; protected set; }
+
+        /// <summary>
+        /// Response object
+        /// </summary>
+        public TRetrieveResponse Response { get; protected set; }
 
         /// <summary>
         /// A state bag for behaviors to preserve state among their methods.
