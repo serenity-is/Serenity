@@ -3,6 +3,9 @@ using Serenity.PropertyGrid;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Abstract base class for <see cref="ColumnsScript"/> and <see cref="FormScript"/>
+    /// </summary>
     public abstract class PropertyItemsScript : INamedDynamicScript, IGetScriptData
     {
         private readonly string scriptName;
@@ -11,6 +14,13 @@ namespace Serenity.Web
         private readonly IPropertyItemProvider propertyProvider;
         private EventHandler scriptChanged;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="scriptName">Script name</param>
+        /// <param name="type">Columns or form type</param>
+        /// <param name="propertyProvider">Property item provider</param>
+        /// <param name="serviceProvider">Service provider</param>
         protected PropertyItemsScript(string scriptName, Type type, 
             IPropertyItemProvider propertyProvider, IServiceProvider serviceProvider)
         {
@@ -22,6 +32,12 @@ namespace Serenity.Web
             this.scriptName = scriptName;
         }
 
+        /// <summary>
+        /// Checks the name if its empty or null
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         protected static string CheckName(string name)
         {
             if (name.IsEmptyOrNull())
@@ -30,20 +46,27 @@ namespace Serenity.Web
             return name;
         }
 
+        /// <inheritdoc/>
         public TimeSpan Expiration { get; set; }
+
+        /// <inheritdoc/>
         public string GroupKey { get; set; }
 
+        /// <inheritdoc/>
         public void Changed()
         {
             scriptChanged?.Invoke(this, new EventArgs());
         }
 
+        /// <inheritdoc/>
         public string ScriptName => scriptName;
 
+        /// <inheritdoc/>
         public void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
         {
         }
 
+        /// <inheritdoc/>
         public string GetScript()
         {
             var data = GetScriptData();
@@ -51,6 +74,7 @@ namespace Serenity.Web
                 scriptName.ToSingleQuoted(), data.ToJson());
         }
 
+        /// <inheritdoc/>
         public object GetScriptData()
         {
             var data = new PropertyItemsData
@@ -89,6 +113,7 @@ namespace Serenity.Web
             return data;
         }
 
+        /// <inheritdoc/>
         public event EventHandler ScriptChanged
         {
             add { scriptChanged += value; }

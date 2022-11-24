@@ -8,16 +8,33 @@ using Serenity.Web.Middleware;
 
 namespace Serenity.Extensions.DependencyInjection
 {
+    /// <summary>
+    /// Contains DI extension methods related to dynamic script services
+    /// </summary>
     public static class DynamicScriptServiceCollectionExtensions
     {
+        /// <summary>
+        /// Registers he default <see cref="IDynamicScriptManager"/> implementation.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <returns></returns>
         public static IServiceCollection AddDynamicScriptManager(this IServiceCollection collection)
         {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
             collection.AddCaching();
             collection.AddTextRegistry();
             collection.TryAddSingleton<IDynamicScriptManager, DynamicScriptManager>();
             return collection;
         }
 
+        /// <summary>
+        /// Registers the default <see cref="IDynamicScriptManager" /> implementation
+        /// in addition to the <see cref="IPropertyItemProvider"/> implementation.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <returns></returns>
         public static IServiceCollection AddDynamicScripts(this IServiceCollection collection)
         {
             AddDynamicScriptManager(collection);
@@ -25,20 +42,41 @@ namespace Serenity.Extensions.DependencyInjection
             return collection;
         }
 
+        /// <summary>
+        /// Registers the default <see cref="IFileWatcherFactory"/> implementation.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <returns></returns>
         public static IServiceCollection AddFileWatcherFactory(this IServiceCollection collection)
         {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
             collection.TryAddSingleton<IFileWatcherFactory, DefaultFileWatcherFactory>();
             return collection;
         }
 
+        /// <summary>
+        /// Registers the default <see cref="IContentHashCache"/> implementation.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
         public static IServiceCollection AddContentHashCache(this IServiceCollection collection)
         {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
             AddFileWatcherFactory(collection);
             collection.AddOptions();
             collection.TryAddSingleton<IContentHashCache, ContentHashCache>();
             return collection;
         }
 
+        /// <summary>
+        /// Registers the default service types related to CSS bundling, including
+        /// <see cref="ICssBundleManager"/>.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <exception cref="ArgumentNullException">Collection is null</exception>
         public static void AddCssBundling(this IServiceCollection collection)
         {
             if (collection == null)
@@ -49,6 +87,13 @@ namespace Serenity.Extensions.DependencyInjection
             collection.TryAddSingleton<ICssBundleManager, CssBundleManager>();
         }
 
+        /// <summary>
+        /// Registers the default service types related to CSS bundling, including
+        /// <see cref="ICssBundleManager"/>.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <param name="setupAction">Action to edit options</param>
+        /// <exception cref="ArgumentNullException">Collection is null</exception>
         public static void AddCssBundling(this IServiceCollection collection,
             Action<CssBundlingOptions> setupAction)
         {
@@ -62,6 +107,12 @@ namespace Serenity.Extensions.DependencyInjection
             collection.Configure(setupAction);
         }
 
+        /// <summary>
+        /// Registers the default service types related to Script bundling, including
+        /// <see cref="IScriptBundleManager"/>.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <exception cref="ArgumentNullException">Collection is null</exception>
         public static void AddScriptBundling(this IServiceCollection collection)
         {
             if (collection == null)
@@ -72,6 +123,13 @@ namespace Serenity.Extensions.DependencyInjection
             collection.TryAddSingleton<IScriptBundleManager, ScriptBundleManager>();
         }
 
+        /// <summary>
+        /// Registers the default service types related to Script bundling, including
+        /// <see cref="IScriptBundleManager"/>.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <param name="setupAction">Action to edit options</param>
+        /// <exception cref="ArgumentNullException">Collection is null</exception>
         public static void AddScriptBundling(this IServiceCollection collection, 
             Action<ScriptBundlingOptions> setupAction)
         {
@@ -85,11 +143,21 @@ namespace Serenity.Extensions.DependencyInjection
             collection.Configure(setupAction);
         }
 
+        /// <summary>
+        /// Adds <see cref="DynamicScriptMiddleware"/> to the application pipeline
+        /// </summary>
+        /// <param name="builder">Application builder</param>
         public static IApplicationBuilder UseDynamicScriptMiddleware(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<DynamicScriptMiddleware>();
         }
 
+        /// <summary>
+        /// Adds dynamic script related services to the application including
+        /// dynamic script types, css watching, script watching, template scripts, and
+        /// dynamic script middleware
+        /// </summary>
+        /// <param name="builder">Application builder</param>
         public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder)
         {
             if (builder == null)
@@ -103,6 +171,12 @@ namespace Serenity.Extensions.DependencyInjection
             return UseDynamicScriptMiddleware(builder);
         }
 
+        /// <summary>
+        /// Executes registration of dynamic script types including data scripts,
+        /// lookup scripts, distinct values, columns and forms.
+        /// </summary>
+        /// <param name="serviceProvider">Service provider</param>
+        /// <returns></returns>
         public static IServiceProvider UseDynamicScriptTypes(this IServiceProvider serviceProvider)
         {
             var scriptManager = serviceProvider.GetRequiredService<IDynamicScriptManager>();
@@ -127,6 +201,10 @@ namespace Serenity.Extensions.DependencyInjection
             return serviceProvider;
         }
 
+        /// <summary>
+        /// Actives CSS file watching
+        /// </summary>
+        /// <param name="serviceProvider">Service provider</param>
         public static IServiceProvider UseCssWatching(this IServiceProvider serviceProvider)
         {
             var hostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
@@ -135,6 +213,13 @@ namespace Serenity.Extensions.DependencyInjection
             return serviceProvider;
         }
 
+        /// <summary>
+        /// Activates CSS file watching
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <param name="cssPaths">CSS paths</param>
+        /// <exception cref="ArgumentNullException">serviceProvider is null</exception>
+        /// <exception cref="InvalidOperationException">CSS bundle manager is not registered</exception>
         public static IServiceProvider UseCssWatching(this IServiceProvider serviceProvider,
             params string[] cssPaths)
         {
@@ -171,6 +256,10 @@ namespace Serenity.Extensions.DependencyInjection
             return serviceProvider;
         }
 
+        /// <summary>
+        /// Activates script file watching
+        /// </summary>
+        /// <param name="serviceProvider">Service provider</param>
         public static IServiceProvider UseScriptWatching(this IServiceProvider serviceProvider)
         {
             var hostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
@@ -179,6 +268,13 @@ namespace Serenity.Extensions.DependencyInjection
             return serviceProvider;
         }
 
+        /// <summary>
+        /// Activates script file watching
+        /// </summary>
+        /// <param name="serviceProvider">Service provider</param>
+        /// <param name="scriptPaths">List of script paths to watch</param>
+        /// <exception cref="ArgumentNullException">serviceProvider or scriptPaths is null</exception>
+        /// <exception cref="InvalidOperationException">Script bundle manager is not registered</exception>
         public static IServiceProvider UseScriptWatching(this IServiceProvider serviceProvider,
             params string[] scriptPaths)
         {
@@ -215,6 +311,10 @@ namespace Serenity.Extensions.DependencyInjection
             return serviceProvider;
         }
 
+        /// <summary>
+        /// Registers template scripts
+        /// </summary>
+        /// <param name="serviceProvider">Service provider</param>
         public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider)
         {
             var hostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
@@ -227,6 +327,12 @@ namespace Serenity.Extensions.DependencyInjection
             return serviceProvider;
         }
 
+        /// <summary>
+        /// Registers template scripts
+        /// </summary>
+        /// <param name="serviceProvider">Service provider</param>
+        /// <param name="templateRoots">Root paths for templates</param>
+        /// <exception cref="ArgumentNullException">Service provider or template roots is null</exception>
         public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider, 
             params string[] templateRoots)
         {

@@ -2,23 +2,33 @@
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// A dynamic script type for registered scripts
+    /// </summary>
     public class RegisteredScripts : DynamicScript, INamedDynamicScript, IGetScriptData
     {
         private readonly IDynamicScriptManager scriptManager;
 
+        /// <inheritdoc/>
         public string ScriptName => "RegisteredScripts";
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="scriptManager"></param>
         public RegisteredScripts(IDynamicScriptManager scriptManager)
         {
             Expiration = TimeSpan.FromDays(-1);
-            this.scriptManager = scriptManager;
+            this.scriptManager = scriptManager ?? throw new ArgumentNullException(nameof(scriptManager));
         }
 
+        /// <inheritdoc/>
         public object GetScriptData()
         {
             return scriptManager.GetRegisteredScripts();
         }
 
+        /// <inheritdoc/>
         public override string GetScript()
         {
             return "Q.ScriptData.setRegisteredScripts(" +

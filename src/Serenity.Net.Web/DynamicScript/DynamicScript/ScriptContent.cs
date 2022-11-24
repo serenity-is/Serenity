@@ -5,6 +5,9 @@ using System.Security.Cryptography;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Default implementation for <see cref="IScriptContent"/>
+    /// </summary>
     public class ScriptContent : IScriptContent
     {
         private readonly bool canCompress;
@@ -13,6 +16,13 @@ namespace Serenity.Web
         private byte[] gzipContent;
         private byte[] brotliContent;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="content">Content</param>
+        /// <param name="time">Time</param>
+        /// <param name="canCompress">Allow compression</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ScriptContent(byte[] content, DateTime time, bool canCompress)
         {
             this.content = content ?? throw new ArgumentNullException(nameof(content));
@@ -43,9 +53,13 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public byte[] Content => content;
+
+        /// <inheritdoc/>
         public bool CanCompress => canCompress;
-        
+
+        /// <inheritdoc/>
         public byte[] CompressedContent
         {
             get
@@ -69,6 +83,7 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public byte[] BrotliContent
         {
             get

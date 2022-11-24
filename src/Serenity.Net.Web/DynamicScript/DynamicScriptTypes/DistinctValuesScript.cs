@@ -2,12 +2,22 @@
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// A dynamic script type for distinct values of a field
+    /// </summary>
+    /// <typeparam name="TRow"></typeparam>
     public class DistinctValuesScript<TRow> : LookupScript
        where TRow : class, IRow, new()
     {
         private readonly ISqlConnections connections;
         private readonly string propertyName;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="connections">Sql connections</param>
+        /// <param name="propertyName">Property name</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DistinctValuesScript(ISqlConnections connections, string propertyName)
         {
             this.connections = connections ?? throw new ArgumentNullException(nameof(connections));
@@ -43,12 +53,20 @@ namespace Serenity.Web
             return field;
         }
 
+        /// <summary>
+        /// Applies the sort order to the query
+        /// </summary>
+        /// <param name="query">Query</param>
         protected virtual void ApplyOrder(SqlQuery query)
         {
             var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
             query.OrderBy(GetFieldFrom(row));
         }
 
+        /// <summary>
+        /// Prepares the sql query
+        /// </summary>
+        /// <param name="query">Sql query</param>
         protected virtual void PrepareQuery(SqlQuery query)
         {
             var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
@@ -62,6 +80,7 @@ namespace Serenity.Web
                 query.Where(field != "");
         }
 
+        /// <inheritdoc/>
         public override string GetScript()
         {
             return "Q.ScriptData.set(" + ("Lookup." + LookupKey).ToSingleQuoted() +
@@ -69,6 +88,7 @@ namespace Serenity.Web
                 ".map(function(x) { return { v: x }; })));";
         }
 
+        /// <inheritdoc/>
         protected override IEnumerable GetItems()
         {
             var loader = new TRow();

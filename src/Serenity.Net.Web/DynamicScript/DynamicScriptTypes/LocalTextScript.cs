@@ -3,6 +3,9 @@ using System.IO;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Local text dynamic script
+    /// </summary>
     public class LocalTextScript : DynamicScript, INamedDynamicScript
     {
         private readonly string scriptName;
@@ -11,6 +14,15 @@ namespace Serenity.Web
         private readonly bool isPending;
         private readonly ILocalTextRegistry registry;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="registry">Text registry</param>
+        /// <param name="package">Package key</param>
+        /// <param name="includes">Includes regex</param>
+        /// <param name="languageId">LanguageID</param>
+        /// <param name="isPending">True to include pending texts</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public LocalTextScript(ILocalTextRegistry registry, string package, string includes, string languageId, bool isPending)
         {
             this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
@@ -20,13 +32,30 @@ namespace Serenity.Web
             scriptName = GetScriptName(package ?? throw new ArgumentNullException(nameof(package)), languageId, isPending);
         }
 
+        /// <inheritdoc/>
         public string ScriptName => scriptName;
 
+        /// <summary>
+        /// Gets script registration name for a local text package
+        /// </summary>
+        /// <param name="package">Package key</param>
+        /// <param name="languageId">Language ID</param>
+        /// <param name="isPending">Is pending flag</param>
+        /// <returns></returns>
         public static string GetScriptName(string package, string languageId, bool isPending)
         {
             return string.Format(CultureInfo.InvariantCulture, "LocalText.{0}.{1}.{2}", package, languageId, isPending ? "Pending" : "Public");
         }
 
+        /// <summary>
+        /// Gets local text package script content
+        /// </summary>
+        /// <param name="registry">Text registry</param>
+        /// <param name="packages">Packages setting</param>
+        /// <param name="package">Package key</param>
+        /// <param name="languageId">Language ID</param>
+        /// <param name="isPending">True to include pending texts</param>
+        /// <exception cref="ArgumentNullException">Package key or packages setting is null</exception>
         public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
             LocalTextPackages packages, string package, string languageId, bool isPending)
         {
@@ -42,6 +71,14 @@ namespace Serenity.Web
             return GetLocalTextPackageScript(registry, includes, languageId, isPending);
         }
 
+        /// <summary>
+        /// Gets a local text package script content
+        /// </summary>
+        /// <param name="registry">Text registry</param>
+        /// <param name="includes">Includes regex</param>
+        /// <param name="languageId">Language ID</param>
+        /// <param name="isPending">True to include pending text</param>
+        /// <exception cref="ArgumentNullException">Registry is null</exception>
         public static string GetLocalTextPackageScript(ILocalTextRegistry registry, string includes, string languageId, bool isPending)
         {
             if (registry == null)
@@ -144,6 +181,7 @@ namespace Serenity.Web
             return jwBuilder.ToString();
         }
 
+        /// <inheritdoc/>
         public override string GetScript()
         {
             return GetLocalTextPackageScript(registry, includes, languageId, isPending);

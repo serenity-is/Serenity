@@ -2,6 +2,10 @@
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Registrar for HTML templates (obsolete, please avoid such templates and specify
+    /// templates directly in the Widget's getTemplate() method
+    /// </summary>
     public class TemplateScriptRegistrar
     {
         private static readonly string[] TemplateSuffixes = new[] { ".Template.html", ".ts.html" };
@@ -50,6 +54,13 @@ namespace Serenity.Web
             manager.Changed("TemplateBundle");
         }
 
+        /// <summary>
+        /// Initializes the watcher
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="paths"></param>
+        /// <param name="watchForChanges"></param>
+        /// <returns></returns>
         public IEnumerable<FileWatcher> Initialize(IDynamicScriptManager manager, string[] paths, bool watchForChanges = true)
         {
             var watchers = new List<FileWatcher>();

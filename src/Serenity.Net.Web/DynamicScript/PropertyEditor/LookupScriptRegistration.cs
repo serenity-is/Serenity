@@ -2,8 +2,22 @@
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Contains helper methods for lookup script registration
+    /// </summary>
     public class LookupScriptRegistration
     {
+        /// <summary>
+        /// Creates and registers dynamic <see cref="LookupScript"/> objects for
+        /// classes with <see cref="LookupScriptAttribute"/>
+        /// </summary>
+        /// <param name="scriptManager">Dynamic script manager</param>
+        /// <param name="typeSource">Type source</param>
+        /// <param name="serviceProvider">Service provider</param>
+        /// <exception cref="ArgumentNullException">Script manager, type source or
+        /// service provider is null</exception>
+        /// <exception cref="InvalidOperationException">A custom type has LookupScriptAttribute
+        /// but it does not derive from the <see cref="LookupScript"/> class.</exception>
         public static void RegisterLookupScripts(IDynamicScriptManager scriptManager, 
             ITypeSource typeSource, IServiceProvider serviceProvider)
         {

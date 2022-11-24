@@ -2,11 +2,19 @@
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Generic lookup script type for rows
+    /// </summary>
+    /// <typeparam name="TRow">Row type</typeparam>
     public class RowLookupScript<TRow> : LookupScript
         where TRow: class, IRow, new()
     {
         private readonly ISqlConnections connections;
 
+        /// <summary>
+        /// Applies the sort order to the query
+        /// </summary>
+        /// <param name="query">Query</param>
         protected virtual void ApplyOrder(SqlQuery query)
         {
             var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
@@ -17,6 +25,10 @@ namespace Serenity.Web
                 query.OrderBy(row.IdField);
         }
 
+        /// <summary>
+        /// Prepares the sql query to select fields
+        /// </summary>
+        /// <param name="query">Sql query</param>
         protected virtual void PrepareQuery(SqlQuery query)
         {
             var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
@@ -36,6 +48,11 @@ namespace Serenity.Web
             }
         }
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="connections">Sql connections</param>
+        /// <exception cref="ArgumentNullException">Connections is null</exception>
         public RowLookupScript(ISqlConnections connections)
             : base()
         {
@@ -65,6 +82,7 @@ namespace Serenity.Web
             GroupKey = row.GetFields().GenerationKey;
         }
 
+        /// <inheritdoc/>
         protected override IEnumerable GetItems()
         {
             var list = new List<TRow>();

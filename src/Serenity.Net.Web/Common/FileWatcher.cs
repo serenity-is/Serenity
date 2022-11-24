@@ -2,17 +2,23 @@
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Default file watcher implementation for physical file system
+    /// </summary>
     public class FileWatcher : IFileWatcher, IDisposable
     {
         private Action<string> changed;
         private bool disposed;
         private readonly FileSystemWatcher watcher;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="path">Watch path</param>
+        /// <param name="filter">Watch filter</param>
+        /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
         public FileWatcher(string path, string filter)
         {
-            if (filter == null)
-                throw new ArgumentNullException(nameof(filter));
-
             Path = path ?? throw new ArgumentNullException(nameof(path));
             Filter = filter ?? throw new ArgumentNullException(nameof(filter));
 
@@ -33,12 +39,14 @@ namespace Serenity.Web
             changed?.Invoke(name);
         }
 
+        /// <inheritdoc/>
         public event Action<string> Changed
         {
             add { changed += value; }
             remove { changed -= value; }
         }
 
+        /// <inheritdoc/>
         protected void Dispose(bool disposing)
         {
             if (!disposed)
@@ -50,18 +58,23 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         void IDisposable.Dispose()
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc/>
         public void RaiseChanged(string name)
         {
             changed?.Invoke(name);
         }
 
+        /// <inheritdoc/>
         public string Path { get; }
+        
+        /// <inheritdoc/>
         public string Filter { get; }
     }
 }

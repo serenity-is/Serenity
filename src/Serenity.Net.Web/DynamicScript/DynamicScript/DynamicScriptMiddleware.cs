@@ -6,17 +6,28 @@ using System.Threading.Tasks;
 
 namespace Serenity.Web.Middleware
 {
+    /// <summary>
+    /// Dynamic script middleware that handles "/DynJS.axd/" and "/DynamicData/" paths.
+    /// </summary>
     public class DynamicScriptMiddleware
     {
         private readonly RequestDelegate next;
         const string dynJSPath = "/DynJS.axd/";
         const string dynamicDataPath = "/DynamicData/";
 
+        /// <summary>
+        /// Creates a new instance of the middleware
+        /// </summary>
+        /// <param name="next">Next request delegate</param>
         public DynamicScriptMiddleware(RequestDelegate next)
         {
             this.next = next;
         }
 
+        /// <summary>
+        /// Invokes the middleware in the context
+        /// </summary>
+        /// <param name="context">HTTP context</param>
         public Task Invoke(HttpContext context)
         {
             bool dynJS = context.Request.Path.Value.StartsWith(dynJSPath, StringComparison.OrdinalIgnoreCase);
@@ -46,6 +57,13 @@ namespace Serenity.Web.Middleware
             return ReturnScript(context, scriptKey, contentType, json: dynamicData);
         }
 
+        /// <summary>
+        /// Returns a dynamic script by its key
+        /// </summary>
+        /// <param name="context">HTTP context</param>
+        /// <param name="scriptKey">Script key</param>
+        /// <param name="contentType">Content type</param>
+        /// <param name="json">True to return JSON</param>
         public async static Task ReturnScript(HttpContext context, string scriptKey, string contentType, bool json)
         {
             IScriptContent scriptContent;
@@ -118,6 +136,13 @@ namespace Serenity.Web.Middleware
                 scriptContent.Time);
         }
 
+        /// <summary>
+        /// Writes a file content to the response with modified since control
+        /// </summary>
+        /// <param name="context">HTTP context</param>
+        /// <param name="bytes">Content bytes</param>
+        /// <param name="lastWriteTime">Last write time</param>
+        /// <exception cref="ArgumentNullException">Context is null</exception>
         public async static Task WriteWithIfModifiedSinceControl(HttpContext context, byte[] bytes, DateTime lastWriteTime)
         {
             if (context == null)

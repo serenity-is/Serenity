@@ -1,5 +1,8 @@
 ﻿namespace Serenity.Web
 {
+    /// <summary>
+    /// Default implementation for <see cref="IDynamicScriptManager"/>
+    /// </summary>
     public partial class DynamicScriptManager : IDynamicScriptManager
     {
         private readonly ConcurrentDictionary<string, IDynamicScript> registeredScripts;
@@ -12,6 +15,13 @@
 
         private static readonly UTF8Encoding utf8Encoding = new(true);
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="cache">Two level cache</param>
+        /// <param name="permissions">Permission service</param>
+        /// <param name="localizer">Text localizer</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DynamicScriptManager(ITwoLevelCache cache, IPermissionService permissions, ITextLocalizer localizer)
         {
             this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
@@ -22,11 +32,13 @@
             Register(new RegisteredScripts(this));
         }
 
+        /// <inheritdoc/>
         public bool IsRegistered(string name)
         {
             return registeredScripts.ContainsKey(name);
         }
 
+        /// <inheritdoc/>
         public void Changed(string name)
         {
             if (name == null)
@@ -36,16 +48,19 @@
             scriptChanged?.Invoke(name);
         }
 
+        /// <inheritdoc/>
         public void IfNotRegistered(string name, Func<IDynamicScript> callback)
         {
             registeredScripts.GetOrAdd(name, (name) => callback());
         }
 
+        /// <inheritdoc/>
         public void Register(INamedDynamicScript script)
         {
             Register(script.ScriptName, script);
         }
 
+        /// <inheritdoc/>
         public void Register(string name, IDynamicScript script)
         {
             if (name == null)
@@ -53,6 +68,7 @@
             registeredScripts[name] = script ?? throw new ArgumentNullException(nameof(script));
         }
 
+        /// <inheritdoc/>
         public Dictionary<string, string> GetRegisteredScripts()
         {
             var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -67,11 +83,18 @@
             return result;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<string> GetRegisteredScriptNames()
         {
             return registeredScripts.Keys;
         }
 
+        /// <summary>
+        /// Peeks the script hash for a script without actually executing it
+        /// </summary>
+        /// <param name="name">Registration name</param>
+        /// <param name="script">Dynamic script</param>
+        /// <exception cref="ArgumentNullException">name is null</exception>
         public string PeekScriptHash(string name, IDynamicScript script)
         {
             if (name == null)
@@ -168,18 +191,21 @@
             return scriptContent;
         }
 
+        /// <inheritdoc/>
         public void Reset()
         {
             foreach (var name in registeredScripts.Keys)
                 scriptLastChange[name] = DateTime.UtcNow;
         }
 
+        /// <inheritdoc/>
         public void CheckScriptRights(string name)
         {
             if (registeredScripts.TryGetValue(name, out var script))
                 script.CheckRights(permissions, localizer);
         }
 
+        /// <inheritdoc/>
         public string GetScriptText(string name, bool json)
         {
             if (!registeredScripts.TryGetValue(name, out var script))
@@ -189,6 +215,7 @@
             return utf8Encoding.GetString(content);
         }
 
+        /// <inheritdoc/>
         public string GetScriptInclude(string name, string extension = ".js")
         {
             if (!registeredScripts.TryGetValue(name, out var script))
@@ -199,6 +226,7 @@
             return name + extension + "?v=" + hash;
         }
 
+        /// <inheritdoc/>
         public IScriptContent ReadScriptContent(string name, bool json)
         {
             if (!registeredScripts.TryGetValue(name, out var script))
@@ -209,6 +237,7 @@
             return EnsureScriptContent(name, script, json);
         }
 
+        /// <inheritdoc/>
         public event Action<string> ScriptChanged
         {
             add
