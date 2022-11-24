@@ -5,13 +5,21 @@ using System.IO;
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// An action filter for methods that accept JSON content via their
+    /// "request" arguments.
+    /// </summary>
     public class JsonRequestAttribute : ActionFilterAttribute
     {
+        /// <summary>
+        /// Creates a new instance of the attribute
+        /// </summary>
         public JsonRequestAttribute()
         {
             ParamName = "request";
         }
 
+        /// <inheritdoc/>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             if (filterContext == null)
@@ -111,10 +119,16 @@ namespace Serenity.Services
             return null;
         }
 
+        /// <summary>
+        /// The parameter name for "request" argument. 
+        /// </summary>
         public string ParamName { get; set; }
 
         private bool? allowGet;
 
+        /// <summary>
+        /// True to allow this filter for GET request
+        /// </summary>
         public bool AllowGet
         {
             get => allowGet ?? DefaultAllowGet;
@@ -123,6 +137,9 @@ namespace Serenity.Services
 
         private bool? allowQuery;
 
+        /// <summary>
+        /// True to allow getting JSON body from query string
+        /// </summary>
         public bool AllowQuery
         {
             get => allowQuery ?? DefaultAllowQuery;
@@ -131,17 +148,34 @@ namespace Serenity.Services
 
         private bool? allowForm;
 
+        /// <summary>
+        /// True to allow getting JSON body from the posted form 
+        /// </summary>
         public bool AllowForm
         {
             get => allowForm ?? DefaultAllowForm;
             set => allowForm = value;
         }
 
+        /// <summary>
+        /// The default for AllowGet which is True
+        /// </summary>
         public static bool DefaultAllowGet { get; set; } = true;
+
+        /// <summary>
+        /// The default for AllowQuery which is true
+        /// </summary>
         public static bool DefaultAllowQuery { get; set; } = true;
+
+        /// <summary>
+        /// The default for AllowForm which is true
+        /// </summary>
         public static bool DefaultAllowForm { get; set; } = true;
     }
 
+    /// <summary>
+    /// Obsolete version of <see cref="JsonRequest"/> attribute.
+    /// </summary>
     [Obsolete("Prefer [JsonRequest] attribute")]
     public class JsonFilter : JsonRequestAttribute
     {

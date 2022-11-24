@@ -3,9 +3,20 @@ using Serenity.Web;
 
 namespace Serenity.Navigation
 {
+    /// <summary>
+    /// Navigation item attribute
+    /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public abstract class NavigationItemAttribute : Attribute
     {
+        /// <summary>
+        /// Creates a new instance of the attribute
+        /// </summary>
+        /// <param name="order">Order</param>
+        /// <param name="path">Path</param>
+        /// <param name="url">Url</param>
+        /// <param name="permission">Permission</param>
+        /// <param name="icon">Icon class</param>
         protected NavigationItemAttribute(int order, string path, string url, object permission, string icon)
         {
             path ??= "";
@@ -32,11 +43,28 @@ namespace Serenity.Navigation
             Url = url;
         }
 
+        /// <summary>
+        /// Creates a new instance of the attribute
+        /// </summary>
+        /// <param name="order">Order</param>
+        /// <param name="path">Path</param>
+        /// <param name="controller">Controller to get URL and the permission from</param>
+        /// <param name="icon">Icon class</param>
+        /// <param name="action">The action name</param>
         protected NavigationItemAttribute(int order, string path, Type controller, string icon, string action)
             : this(order, path, GetUrlFromController(controller, action), GetPermissionFromController(controller, action), icon)
         {
         }
 
+        /// <summary>
+        /// Tries to extract URL from a controller action
+        /// </summary>
+        /// <param name="controller">Controller</param>
+        /// <param name="action">Action name</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Controll or action is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Action name is invalid</exception>
+        /// <exception cref="InvalidOperationException">Route attribute is not found</exception>
         public static string GetUrlFromController(Type controller, string action)
         {
             if (controller == null)
@@ -112,6 +140,13 @@ namespace Serenity.Navigation
             return url;
         }
 
+        /// <summary>
+        /// Tries to extract permission from a controller action
+        /// </summary>
+        /// <param name="controller">Controller</param>
+        /// <param name="action">Action</param>
+        /// <exception cref="ArgumentNullException">Controller or action is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Action name is invalid</exception>
         public static string GetPermissionFromController(Type controller, string action)
         {
             if (controller == null)

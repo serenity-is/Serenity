@@ -5,8 +5,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// Contains some extensions for service endpoints
+    /// </summary>
     public static class EndpointExtensions
     {
+        /// <summary>
+        /// Converts the exception object to a service response
+        /// </summary>
+        /// <typeparam name="TResponse">Response object</typeparam>
+        /// <param name="exception">Exception</param>
+        /// <param name="httpContext">HTTP context</param>
         public static TResponse ConvertToResponse<TResponse>(this Exception exception, HttpContext httpContext)
             where TResponse : ServiceResponse, new()
         {
@@ -17,6 +26,14 @@ namespace Serenity.Services
                     .EnvironmentName, "development", StringComparison.OrdinalIgnoreCase));
         }
 
+        /// <summary>
+        /// Convert the exception to a service response
+        /// </summary>
+        /// <typeparam name="TResponse"></typeparam>
+        /// <param name="exception">Exception</param>
+        /// <param name="logger">Exception logger</param>
+        /// <param name="localizer">Text localizer</param>
+        /// <param name="showDetails">True to show details</param>
         public static TResponse ConvertToResponse<TResponse>(this Exception exception, IExceptionLogger logger, 
             ITextLocalizer localizer, bool showDetails)
             where TResponse: ServiceResponse, new()
@@ -58,6 +75,13 @@ namespace Serenity.Services
             return response;
         }
 
+        /// <summary>
+        /// Executes an action method and converts any exception to a service response
+        /// </summary>
+        /// <typeparam name="TResponse">Response type</typeparam>
+        /// <param name="controller">Controller</param>
+        /// <param name="handler">Handler callback</param>
+        /// <returns></returns>
         public static Result<TResponse> ExecuteMethod<TResponse>(this Controller controller, Func<TResponse> handler)
             where TResponse: ServiceResponse, new()
         {
@@ -76,6 +100,14 @@ namespace Serenity.Services
             return new Result<TResponse>(response);
         }
 
+        /// <summary>
+        /// Executes a callback by passing a connection object and converts
+        /// any exception raised inside to a service response.
+        /// </summary>
+        /// <typeparam name="TResponse">Response type</typeparam>
+        /// <param name="controller">Controller</param>
+        /// <param name="connectionKey">Connection key</param>
+        /// <param name="handler">Handler callback</param>
         public static Result<TResponse> UseConnection<TResponse>(this Controller controller, string connectionKey, Func<IDbConnection, TResponse> handler)
             where TResponse : ServiceResponse, new()
         {
@@ -97,6 +129,14 @@ namespace Serenity.Services
         }
 
 
+        /// <summary>
+        /// Executes a callback by passing a unit of work object and converts
+        /// any exception raised inside to a service response.
+        /// </summary>
+        /// <typeparam name="TResponse">Response type</typeparam>
+        /// <param name="controller">Controller</param>
+        /// <param name="connectionKey">Connection key</param>
+        /// <param name="handler">Handler callback</param>
         public static Result<TResponse> InTransaction<TResponse>(this Controller controller, string connectionKey, Func<IUnitOfWork, TResponse> handler)
             where TResponse : ServiceResponse, new()
         {

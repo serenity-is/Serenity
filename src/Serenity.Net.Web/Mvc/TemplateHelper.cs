@@ -12,6 +12,9 @@ using System.IO;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Helper methods for CSHTML templating
+    /// </summary>
     public static class TemplateHelper
     {
         private static ActionContext GetActionContext(IServiceProvider serviceProvider)
@@ -23,6 +26,13 @@ namespace Serenity.Web
             return new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
         }
 
+        /// <summary>
+        /// Renders a CSHTML view to string
+        /// </summary>
+        /// <param name="serviceProvider">Service provider</param>
+        /// <param name="viewName">View name</param>
+        /// <param name="model">Model object</param>
+        /// <exception cref="InvalidOperationException"></exception>
         public static string RenderViewToString(IServiceProvider serviceProvider, string viewName, object model)
         {
             var actionContext = GetActionContext(serviceProvider);

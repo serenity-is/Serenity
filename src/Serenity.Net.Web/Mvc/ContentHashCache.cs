@@ -7,6 +7,9 @@ using System.Security.Cryptography;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ContentHashCache : IContentHashCache
     {
         private readonly ConcurrentDictionary<string, string> hashByContentPath;

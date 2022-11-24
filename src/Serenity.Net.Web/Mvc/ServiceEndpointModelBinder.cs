@@ -4,8 +4,12 @@ using System.Threading.Tasks;
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// Provides model binding for service endpoints
+    /// </summary>
     public class ServiceEndpointModelBinderProvider : IModelBinderProvider
     {
+        /// <inheritdoc/>
         public IModelBinder GetBinder(ModelBinderProviderContext context)
         {
             if (context == null)
@@ -22,10 +26,17 @@ namespace Serenity.Services
         }
     }
 
+    /// <summary>
+    /// Null model binder for interface arguments
+    /// </summary>
     public class ServiceEndpointNullModelBinder : IModelBinder
     {
+        /// <summary>
+        /// Default instance
+        /// </summary>
         public static readonly ServiceEndpointNullModelBinder Instance = new();
 
+        /// <inheritdoc/>
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
             bindingContext.Result = ModelBindingResult.Success(null);
@@ -33,8 +44,12 @@ namespace Serenity.Services
         }
     }
 
+    /// <summary>
+    /// Action model convention for service endpoints
+    /// </summary>
     public class ServiceEndpointActionModelConvention : IActionModelConvention
     {
+        /// <inheritdoc/>
         public void Apply(ActionModel action)
         {
             if (!action.Controller.ControllerType.IsSubclassOf(typeof(ServiceEndpoint)))

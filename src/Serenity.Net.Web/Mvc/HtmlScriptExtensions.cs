@@ -7,8 +7,19 @@ using System.Net;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Contains Serenity related helper methods that can be used in Razor CSHTML files
+    /// </summary>
     public static class HtmlScriptExtensions
     {
+        /// <summary>
+        /// Renders a CSS stylesheet link element. If bundling is enabled, it may contain
+        /// the bundle URL instead of the CSS URL. If the bundle containing the CSS file
+        /// is already rendered in this context, it will return an empty string.
+        /// </summary>
+        /// <param name="helper">HTML helper</param>
+        /// <param name="cssUrl">CSS Url</param>
+        /// <exception cref="ArgumentNullException">HTML helper or cssUrl is null</exception>
         public static HtmlString Stylesheet(this IHtmlHelper helper, string cssUrl)
         {
             if (helper == null)
@@ -32,6 +43,13 @@ namespace Serenity.Web
                 return HtmlString.Empty;
         }
 
+        /// <summary>
+        /// Renders individual link elements for all CSS files in a bundle if bundling is disabled,
+        /// and renders a single link element containing the bundle URL if it is enabled.
+        /// </summary>
+        /// <param name="helper">HTML helper</param>
+        /// <param name="bundleKey">Bundle key</param>
+        /// <exception cref="ArgumentNullException">Helper or bundleKey is null</exception>
         public static HtmlString StyleBundle(this IHtmlHelper helper, string bundleKey)
         {
             if (helper == null)
@@ -79,6 +97,12 @@ namespace Serenity.Web
             return new HtmlString(sb.ToString());
         }
 
+        /// <summary>
+        /// Resolves a content URL by adding its hash with "?v=" prefix.
+        /// </summary>
+        /// <param name="helper">HTML helper</param>
+        /// <param name="contentUrl">Content URL</param>
+        /// <exception cref="ArgumentNullException">Helper or contentUrl is null</exception>
         public static HtmlString ResolveWithHash(this IHtmlHelper helper, string contentUrl)
         {
             if (helper == null)
@@ -93,6 +117,14 @@ namespace Serenity.Web
                 .ResolveWithHash(context.Request.PathBase, contentUrl)));
         }
 
+        /// <summary>
+        /// Renders a script include element. If bundling is enabled, it may contain
+        /// the bundle URL instead of the script URL. If the bundle containing the script file
+        /// is already rendered in this context, it will return an empty string.
+        /// </summary>
+        /// <param name="helper">HTML helper</param>
+        /// <param name="includeJS">Script url</param>
+        /// <exception cref="ArgumentNullException">HTML helper or includeJS is null</exception>
         public static HtmlString Script(this IHtmlHelper helper, string includeJS)
         {
             if (helper == null)
@@ -115,6 +147,13 @@ namespace Serenity.Web
                 return new HtmlString("");
         }
 
+        /// <summary>
+        /// Renders individual script elements for all JS files in a bundle if bundling is disabled,
+        /// and renders a single script element containing the bundle URL if it is enabled.
+        /// </summary>
+        /// <param name="helper">HTML helper</param>
+        /// <param name="bundleKey">Bundle key</param>
+        /// <exception cref="ArgumentNullException">Helper or bundleKey is null</exception>
         public static HtmlString ScriptBundle(this IHtmlHelper helper, string bundleKey)
         {
             if (helper == null)
@@ -186,6 +225,12 @@ namespace Serenity.Web
             return false;
         }
 
+        /// <summary>
+        /// Gets the text content of a local text script
+        /// </summary>
+        /// <param name="page">HTML helper</param>
+        /// <param name="package">Package key</param>
+        /// <param name="isPending">True to include pending texts</param>
         public static string GetLocalTextContent(this IHtmlHelper page, string package, bool isPending = false)
         {
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
@@ -202,6 +247,12 @@ namespace Serenity.Web
             return scriptManager.GetScriptText(scriptName);
         }
 
+        /// <summary>
+        /// Gets the script URL for a local text script
+        /// </summary>
+        /// <param name="page">HTML helper</param>
+        /// <param name="package">Package key</param>
+        /// <param name="isPending">True to include pending texts</param>
         public static string GetLocalTextInclude(this IHtmlHelper page, string package, bool isPending = false)
         {
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
@@ -218,6 +269,12 @@ namespace Serenity.Web
             return scriptManager.GetScriptInclude(scriptName);
         }
 
+        /// <summary>
+        /// Gets a script element for including a local text script
+        /// </summary>
+        /// <param name="page">HTML helper</param>
+        /// <param name="package">Package key</param>
+        /// <param name="isPending">True to include pending texts</param>
         public static HtmlString LocalTextScript(this IHtmlHelper page, string package, bool isPending = false)
         {
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";

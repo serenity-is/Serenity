@@ -2,8 +2,19 @@
 
 namespace Serenity.Navigation
 {
+    /// <summary>
+    /// Contains helper methods for navigation models and items
+    /// </summary>
     public class NavigationHelper
     {
+        /// <summary>
+        /// Gets navigation items
+        /// </summary>
+        /// <param name="permissions">Permission service</param>
+        /// <param name="typeSource">Type source</param>
+        /// <param name="serviceProvider">Service provider</param>
+        /// <param name="resolveUrl">Resolve URL callback</param>
+        /// <param name="filter">Filter function</param>
         public static List<NavigationItem> GetNavigationItems(IPermissionService permissions, 
             ITypeSource typeSource, IServiceProvider serviceProvider, 
             Func<string, string> resolveUrl = null, 
@@ -13,6 +24,14 @@ namespace Serenity.Navigation
             return ConvertToNavigationItems(permissions, menuItems, resolveUrl);
         }
 
+        /// <summary>
+        /// Converts a list of <see cref="NavigationItemAttribute"/> objects to a list of
+        /// <see cref="NavigationItem"/> classes.
+        /// </summary>
+        /// <param name="permissions">Permission service</param>
+        /// <param name="attrByCategory">A lookup to find attributes by their category</param>
+        /// <param name="resolveUrl">Resolve url callback</param>
+        /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
         public static List<NavigationItem> ConvertToNavigationItems(IPermissionService permissions, 
             ILookup<string, NavigationItemAttribute> attrByCategory, Func<string, string> resolveUrl)
         {
@@ -91,6 +110,11 @@ namespace Serenity.Navigation
                 .ThenBy(x => x.Order);
         }
 
+        /// <summary>
+        /// Creates a lookup of navigation item attributes by their category
+        /// </summary>
+        /// <param name="list">List with navigation item attributes</param>
+        /// <exception cref="ArgumentNullException">List is null</exception>
         public static ILookup<string, NavigationItemAttribute> ByCategory(
             IEnumerable<NavigationItemAttribute> list)
         {

@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// Subclass of controller for service endpoints
+    /// </summary>
     [HandleServiceException]
     public abstract class ServiceEndpoint : Controller
     {
@@ -11,6 +14,7 @@ namespace Serenity.Services
         private UnitOfWork unitOfWork;
         private IRequestContext context;
 
+        /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
             if (unitOfWork != null)
@@ -28,6 +32,7 @@ namespace Serenity.Services
             base.Dispose(disposing);
         }
 
+        /// <inheritdoc/>
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var uowParam = context.ActionDescriptor.Parameters.FirstOrDefault(x => x.ParameterType == typeof(IUnitOfWork));
@@ -64,6 +69,7 @@ namespace Serenity.Services
             base.OnActionExecuting(context);
         }
 
+        /// <inheritdoc/>
         public override void OnActionExecuted(ActionExecutedContext context)
         {
             if (unitOfWork != null)
@@ -95,6 +101,9 @@ namespace Serenity.Services
             base.OnActionExecuted(context);
         }
 
+        /// <summary>
+        /// Gets the request context
+        /// </summary>
         protected IRequestContext Context
         {
             get
@@ -110,8 +119,19 @@ namespace Serenity.Services
             }
         }
 
+        /// <summary>
+        /// Gets the cache from the request context
+        /// </summary>
         protected ITwoLevelCache Cache => Context?.Cache;
+
+        /// <summary>
+        /// Gets the localizer from the request context
+        /// </summary>
         protected ITextLocalizer Localizer => Context?.Localizer;
+
+        /// <summary>
+        /// Gets the permission service from the request context
+        /// </summary>
         protected IPermissionService Permissions => Context?.Permissions;
     }
 }

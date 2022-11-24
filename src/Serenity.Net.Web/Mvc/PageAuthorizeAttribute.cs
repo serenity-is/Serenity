@@ -48,6 +48,14 @@ namespace Serenity.Web
             }
         }
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="sourceType">Source type</param>
+        /// <param name="attributeTypes">Attribute types</param>
+        /// <exception cref="ArgumentNullException">Source type or attribute types is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">One of the attribute types
+        /// is not a subclass of PermissionAttributeBase.</exception>
         protected PageAuthorizeAttribute(Type sourceType, params Type[] attributeTypes)
             : this()
         {

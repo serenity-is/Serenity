@@ -4,6 +4,9 @@ using Microsoft.Extensions.Options;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Default implementation for <see cref="IScriptBundleManager"/>
+    /// </summary>
     public class ScriptBundleManager : IScriptBundleManager
     {
         private static readonly object sync = new();
@@ -24,6 +27,15 @@ namespace Serenity.Web
         [ThreadStatic]
         private static HashSet<string> recursionCheck;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="options">Options</param>
+        /// <param name="scriptManager">Dynamic script manager</param>
+        /// <param name="hostEnvironment">Web host environment</param>
+        /// <param name="contextAccessor">HTTP context accessor</param>
+        /// <param name="logger">Exception logger</param>
+        /// <exception cref="ArgumentNullException">One of arguments is null</exception>
         public ScriptBundleManager(IOptions<ScriptBundlingOptions> options, IDynamicScriptManager scriptManager, IWebHostEnvironment hostEnvironment,
             IHttpContextAccessor contextAccessor = null, IExceptionLogger logger = null)
         {
@@ -52,6 +64,7 @@ namespace Serenity.Web
             };
         }
 
+        /// <inheritdoc/>
         public void Reset()
         {
             lock (sync)
@@ -262,6 +275,7 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public bool IsEnabled
         {
             get
@@ -271,6 +285,7 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public void ScriptsChanged()
         {
             BundleUtils.ClearVersionCache();
@@ -287,6 +302,7 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<string> GetBundleIncludes(string bundleKey)
         {
             lock (sync)
@@ -299,6 +315,7 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public string GetScriptBundle(string scriptUrl)
         {
             Dictionary<string, string> bySrcUrl;

@@ -2,8 +2,12 @@
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// An exception filter attribute to handle service exceptions and return them to ServiceResponse objects
+    /// </summary>
     public class HandleServiceExceptionAttribute : ExceptionFilterAttribute
     {
+        /// <inheritdoc/>
         public override void OnException(ExceptionContext context)
         {
             context.ExceptionHandled = true;
