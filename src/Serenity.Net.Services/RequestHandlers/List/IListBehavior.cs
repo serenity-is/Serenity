@@ -17,10 +17,12 @@
 
         /// <summary>Called when query to is built</summary>
         /// <param name="handler">Calling list request handler</param>
+        /// <param name="query">Query</param>
         void OnPrepareQuery(IListRequestHandler handler, SqlQuery query);
 
         /// <summary>Called when filters are applied to query</summary>
         /// <param name="handler">Calling list request handler</param>
+        /// <param name="query">Query</param>
         void OnApplyFilters(IListRequestHandler handler, SqlQuery query);
 
         /// <summary>Called just before query is sent to database</summary>

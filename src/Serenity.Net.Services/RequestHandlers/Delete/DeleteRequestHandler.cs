@@ -287,12 +287,12 @@
         /// </summary>
         /// <param name="unitOfWork">Unit of work</param>
         /// <param name="request">Request</param>
-        /// <exception cref="ArgumentNullException">unitofWork is null</exception>
+        /// <exception cref="ArgumentNullException">unitofWork or request is null</exception>
         public TDeleteResponse Process(IUnitOfWork unitOfWork, TDeleteRequest request)
         {
             StateBag.Clear();
-            UnitOfWork = unitOfWork ?? throw new ArgumentNullException("unitOfWork");
-            Request = request;
+            UnitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            Request = request ?? throw new ArgumentNullException(nameof(request));
             Response = new TDeleteResponse();
 
             if (request.EntityId == null)
@@ -363,14 +363,14 @@
         /// </summary>
         public IUnitOfWork UnitOfWork { get; protected set; }
 
-        IRow IDeleteRequestHandler.Row => Row;
-        DeleteRequest IDeleteRequestHandler.Request => Request;
-        DeleteResponse IDeleteRequestHandler.Response => Response;
-
         /// <summary>
         /// A state bag for behaviors to preserve state among their methods.
         /// It will be cleared before each request, e.g. Process call.
         /// </summary>
         public IDictionary<string, object> StateBag { get; private set; }
+
+        IRow IDeleteRequestHandler.Row => Row;
+        DeleteRequest IDeleteRequestHandler.Request => Request;
+        DeleteResponse IDeleteRequestHandler.Response => Response;
     }
 }

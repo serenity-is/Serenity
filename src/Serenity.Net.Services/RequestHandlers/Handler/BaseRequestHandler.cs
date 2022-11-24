@@ -7,7 +7,7 @@
     public abstract class BaseRequestHandler : IRequestHandler
     {
         /// <summary>
-        /// Creates an instance of the calss.
+        /// Creates an instance of the class.
         /// </summary>
         /// <param name="context">Request context</param>
         /// <exception cref="ArgumentNullException">Context is null</exception>
